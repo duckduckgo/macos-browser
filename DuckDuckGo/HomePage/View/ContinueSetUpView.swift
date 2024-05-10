@@ -109,7 +109,7 @@ extension HomePage.Views {
                     HStack {
                         Spacer()
                         VStack {
-                            RemoveIemButton(icon: NSImage(named: "Close")!) {
+                            RemoveIemButton(icon: .close) {
                                 model.removeItem(for: featureType)
                             }
                             .visibility(isHovering ? .visible : .gone)
@@ -139,7 +139,9 @@ extension HomePage.Views {
             var body: some View {
                 ZStack(alignment: .center) {
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.0))
+                        .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                        .background(Color.homepageCardBackground)
+                        .cornerRadius(12)
                     ZStack {
                         VStack(spacing: 18) {
                             icon
@@ -156,7 +158,7 @@ extension HomePage.Views {
                                     .multilineTextAlignment(.center)
                                     .lineLimit(3)
                                     .font(.system(size: 11))
-                                    .foregroundColor(Color("GreyTextColor"))
+                                    .foregroundColor(Color(.greyText))
                                     .fixedSize(horizontal: false, vertical: true)
                             }
                             Spacer()
@@ -180,8 +182,8 @@ extension HomePage.Views {
             let title: String
             let action: () -> Void
             let foregroundColor: Color = .clear
-            let foregroundColorOnHover: Color = Color("HomeFavoritesHoverColor")
-            let foregroundColorOnHoverOnCard: Color = Color("HomeFavoritesBackgroundColor")
+            let foregroundColorOnHover: Color = .homeFavoritesHover
+            let foregroundColorOnHoverOnCard: Color = .homeFavoritesBackground
             private let titleWidth: Double
 
             @State var isHovering = false
@@ -212,7 +214,7 @@ extension HomePage.Views {
                         .cornerRadius(5.0)
                     Text(title)
                         .font(.system(size: 11))
-                        .foregroundColor(Color("LinkBlueColor"))
+                        .foregroundColor(Color(.linkBlue))
                 }
                 .onTapGesture {
                     action()
@@ -231,8 +233,8 @@ extension HomePage.Views {
         struct RemoveIemButton: View {
             let icon: NSImage
             let action: () -> Void
-            let foreGroundColor: Color = Color("HomeFavoritesBackgroundColor")
-            let foregroundColorOnHover: Color = Color("HomeFavoritesHoverColor")
+            let foreGroundColor: Color = .homeFavoritesBackground
+            let foregroundColorOnHover: Color = .homeFavoritesHover
 
             @State var isHovering = false
 
@@ -260,17 +262,17 @@ extension HomePage.Views {
 
             var body: some View {
                 HStack(spacing: 0) {
-                    Image("NextStepsLeft")
+                    Image(.nextStepsLeft)
                         .frame(width: 12, height: 5)
                         .padding(.top, 6)
                     ZStack {
                         Rectangle()
-                            .fill(Color("LinkBlueColor"))
+                            .fill(Color(.linkBlue))
                             .frame(width: textWidth, height: 20)
                         Text(text)
-                            .foregroundColor(Color("HomeNextStepsTextColor"))
+                            .foregroundColor(Color(.homeNextStepsText))
                     }
-                    Image("NextStepsRight")
+                    Image(.nextStepsRight)
                         .frame(width: 10, height: 19)
                 }
             }

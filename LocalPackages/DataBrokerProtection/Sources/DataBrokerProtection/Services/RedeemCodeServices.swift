@@ -34,15 +34,14 @@ public protocol DataBrokerProtectionRedeemUseCase {
 
     /// Returns the auth header needed for the authenticated endpoints.
     ///
-    /// In case there is no auth header present, tries to fetch a new access token with the saved invite code.
-    ///
-    /// - Returns: `String` a string that contains the bearer access token
-    func getAuthHeader() async throws -> String
+    /// - Returns: `String` a string that contains the bearer access token or nil
+    func getAuthHeader() -> String?
 }
 
 public protocol AuthenticationRepository {
     func getInviteCode() -> String?
     func getAccessToken() -> String?
+    func getWaitlistTimestamp() -> Int?
 
     func save(accessToken: String)
     func save(inviteCode: String)
@@ -77,19 +76,11 @@ public final class RedeemUseCase: DataBrokerProtectionRedeemUseCase {
         authenticationRepository.save(accessToken: accessToken)
     }
 
-    public func getAuthHeader() async throws -> String {
-        var accessToken = authenticationRepository.getAccessToken() ?? ""
-
-        if accessToken.isEmpty {
-            guard let inviteCode = authenticationRepository.getInviteCode() else {
-                throw AuthenticationError.noInviteCode
-            }
-
-            accessToken = try await authenticationService.redeem(inviteCode: inviteCode)
-            authenticationRepository.save(accessToken: accessToken)
+    public func getAuthHeader() -> String? {
+        guard let token = authenticationRepository.getAccessToken() else {
+            return nil
         }
-
-        return "bearer \(accessToken)"
+        return "bearer \(token)"
     }
 }
 
@@ -97,6 +88,7 @@ public final class KeychainAuthenticationData: AuthenticationRepository {
     enum DBPWaitlistKeys: String {
         case accessTokenKey = "dbp:accessTokenKey"
         case inviteCodeKey = "dbp:inviteCodeKey"
+        case waitlistTimestamp = "databrokerprotection.timestamp"
     }
 
     /// Hack to stop the bleeding on https://app.asana.com/0/1203581873609357/1206097441142301/f
@@ -125,6 +117,11 @@ public final class KeychainAuthenticationData: AuthenticationRepository {
 
     public func save(inviteCode: String) {
         add(string: inviteCode, forField: .inviteCodeKey)
+    }
+
+    public func getWaitlistTimestamp() -> Int? {
+        guard let timestampString = getString(forField: .waitlistTimestamp) else { return nil }
+        return Int(timestampString)
     }
 
     public func reset() {
@@ -199,6 +196,7 @@ public final class KeychainAuthenticationData: AuthenticationRepository {
 public enum AuthenticationError: Error, Equatable {
     case noInviteCode
     case cantGenerateURL
+    case noAuthToken
     case issueRedeemingInviteCode(error: String)
 }
 
@@ -213,25 +211,20 @@ struct RedeemResponse: Codable {
 }
 
 public struct AuthenticationService: DataBrokerProtectionAuthenticationService {
-    private struct Constants {
-#if DEBUG
-        static let redeemURL = "https://dbp-staging.duckduckgo.com/dbp/redeem?"
-#else
-        static let redeemURL = "https://dbp.duckduckgo.com/dbp/redeem?"
-#endif
-    }
-
     private let urlSession: URLSession
+    private let settings: DataBrokerProtectionSettings
 
-    public init(urlSession: URLSession = URLSession.shared) {
+    public init(urlSession: URLSession = URLSession.shared, settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings()) {
         self.urlSession = urlSession
+        self.settings = settings
     }
 
     public func redeem(inviteCode: String) async throws -> String {
-        guard let url = URL(string: Constants.redeemURL + "code=\(inviteCode)") else {
+        let redeemURL = settings.selectedEnvironment.endpointURL.appendingPathComponent("dbp/redeem")
+
+        guard let url = URL(string: "\(redeemURL.absoluteString)?code=\(inviteCode)") else {
             throw AuthenticationError.cantGenerateURL
         }
-
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         let (data, _) = try await urlSession.data(for: request)

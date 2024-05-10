@@ -17,6 +17,7 @@
 //
 
 import Foundation
+@testable import DuckDuckGo_Privacy_Browser
 
 extension FileManager {
 
@@ -34,8 +35,16 @@ extension FileManager {
         return testsTempDir
     }
 
-    func cleanupTemporaryDirectory() {
-        try? self.removeItem(at: self.temporaryDirectory)
+    func cleanupTemporaryDirectory(excluding: Set<String> = []) {
+        if excluding.isEmpty {
+            try? self.removeItem(at: self.temporaryDirectory)
+        } else {
+            let temporaryDirectory = self.temporaryDirectory
+            for file in (try? self.contentsOfDirectory(atPath: self.temporaryDirectory.path)) ?? [] where !excluding.contains(file) {
+                try? self.removeItem(at: temporaryDirectory.appendingPathComponent(file))
+            }
+        }
+
         _=self.temporaryDirectory
     }
 

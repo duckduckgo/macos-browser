@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Common
+import Foundation
 import UniformTypeIdentifiers
 
 final class DownloadViewModel {
@@ -26,21 +27,17 @@ final class DownloadViewModel {
     let url: URL
     let websiteURL: URL?
 
-    @Published private(set) var localURL: URL? {
-        didSet {
-            self.filename = localURL?.lastPathComponent ?? ""
-        }
-    }
+    @Published private(set) var localURL: URL?
     @Published private(set) var filename: String = ""
-    @Published private(set) var fileType: UTType?
+    private var cancellable: AnyCancellable?
 
-    enum State {
-        case downloading(Progress)
+    enum State: Equatable {
+        case downloading(Progress, shouldAnimateOnAppear: Bool)
         case complete(URL?)
         case failed(FileDownloadError)
 
         var progress: Progress? {
-            guard case .downloading(let progress) = self else { return nil }
+            guard case .downloading(let progress, _) = self else { return nil }
             return progress
         }
 
@@ -49,10 +46,15 @@ final class DownloadViewModel {
             return error
         }
 
-        init(item: DownloadListItem) {
+        var shouldAnimateOnAppear: Bool? {
+            guard case .downloading(_, shouldAnimateOnAppear: let animate) = self else { return nil }
+            return animate
+        }
+
+        init(item: DownloadListItem, shouldAnimateOnAppear: Bool) {
             if let progress = item.progress {
-                self = .downloading(progress)
-            } else if item.error == nil, let destinationURL = item.destinationURL {
+                self = .downloading(progress, shouldAnimateOnAppear: shouldAnimateOnAppear)
+            } else if item.error == nil, let destinationURL = item.destinationURL, item.tempURL == nil {
                 self = .complete(destinationURL)
             } else {
                 self = .failed(item.error ?? .failedToCompleteDownloadTask(underlyingError: URLError(.cancelled),
@@ -65,18 +67,29 @@ final class DownloadViewModel {
 
     init(item: DownloadListItem) {
         self.id = item.identifier
-        self.url = item.url
+        self.url = item.downloadURL
         self.websiteURL = item.websiteURL
-        self.state = .init(item: item)
+        self.state = .init(item: item, shouldAnimateOnAppear: true)
 
         self.update(with: item)
     }
 
     func update(with item: DownloadListItem) {
-        self.localURL = item.destinationURL
-        self.filename = item.destinationURL?.lastPathComponent ?? ""
-        self.fileType = item.fileType
-        self.state = .init(item: item)
+        self.localURL = item.tempURL == nil ? item.destinationURL : nil // only return destination file URL for completed downloads
+        self.filename = item.fileName
+        let oldState = self.state
+        let newState = State(item: item, shouldAnimateOnAppear: state.shouldAnimateOnAppear ?? true)
+        if oldState != newState {
+            os_log(.debug, log: .downloads, "DownloadViewModel: \(item.identifier): \(oldState) ➡️ \(newState)")
+            self.state = newState
+        }
+    }
+
+    /// resets shouldAnimateOnAppear flag
+    func didAppear() {
+        if case .downloading(let progress, shouldAnimateOnAppear: true) = state {
+            state = .downloading(progress, shouldAnimateOnAppear: false)
+        }
     }
 
 }
@@ -91,6 +104,23 @@ extension DownloadViewModel {
     var isActive: Bool {
         if case .downloading = state { return true }
         return false
+    }
+
+}
+
+extension DownloadViewModel.State: CustomDebugStringConvertible {
+
+    var debugDescription: String {
+        switch self {
+        case .downloading(let progress, shouldAnimateOnAppear: true):
+            ".downloading(\(progress.isIndeterminate ? -1 : progress.fractionCompleted), animateOnAppear: true)"
+        case .downloading(let progress, shouldAnimateOnAppear: false):
+            ".downloading(\(progress.isIndeterminate ? -1 : progress.fractionCompleted))"
+        case .complete:
+            ".complete"
+        case .failed:
+            ".failed"
+        }
     }
 
 }

@@ -25,81 +25,133 @@ import SwiftUIExtensions
 extension Preferences {
 
     struct GeneralView: View {
-        @ObservedObject var defaultBrowserModel: DefaultBrowserPreferences
         @ObservedObject var startupModel: StartupPreferences
+        @ObservedObject var downloadsModel: DownloadsPreferences
+        @ObservedObject var searchModel: SearchPreferences
+        @ObservedObject var tabsModel: TabsPreferences
+        @ObservedObject var dataClearingModel: DataClearingPreferences
         @State private var showingCustomHomePageSheet = false
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
+            PreferencePane(UserText.general) {
 
-                // TITLE
-                TextMenuTitle(UserText.general)
+                // SECTION 1: On Startup
+                PreferencePaneSection(UserText.onStartup) {
 
-                // SECTION 1: Default Browser
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.defaultBrowser)
-
-                    HStack {
-                        if defaultBrowserModel.isDefault {
-                            Image("SolidCheckmark")
-                            Text(UserText.isDefaultBrowser)
-                        } else {
-                            Image("Warning").foregroundColor(Color("LinkBlueColor"))
-                            Text(UserText.isNotDefaultBrowser)
-                            Button(UserText.makeDefaultBrowser) {
-                                defaultBrowserModel.becomeDefault()
+                    PreferencePaneSubSection {
+                        Picker(selection: $startupModel.restorePreviousSession, content: {
+                            Text(UserText.showHomePage).tag(false)
+                                .padding(.bottom, 4).accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker.openANewWindow")
+                            Text(UserText.reopenAllWindowsFromLastSession).tag(true)
+                                .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker.reopenAllWindowsFromLastSession")
+                        }, label: {})
+                        .pickerStyle(.radioGroup)
+                        .disabled(dataClearingModel.isAutoClearEnabled)
+                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker")
+                        if dataClearingModel.isAutoClearEnabled {
+                            VStack(alignment: .leading, spacing: 1) {
+                                TextMenuItemCaption(UserText.disableAutoClearToEnableSessionRestore)
+                                TextButton(UserText.showDataClearingSettings) {
+                                    startupModel.show(url: .settingsPane(.dataClearing))
+                                }
                             }
+                            .padding(.leading, 19)
                         }
                     }
                 }
 
-                // SECTION 2: On Startup
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.onStartup)
-                    Picker(selection: $startupModel.restorePreviousSession, content: {
-                        Text(UserText.showHomePage).tag(false)
-                        Text(UserText.reopenAllWindowsFromLastSession).tag(true)
-                    }, label: {})
-                    .pickerStyle(.radioGroup)
-                    .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                // SECTION 2: Tabs
+                PreferencePaneSection(UserText.tabs) {
+                    PreferencePaneSubSection {
+                        ToggleMenuItem(UserText.preferNewTabsToWindows, isOn: $tabsModel.preferNewTabsToWindows)
+                        ToggleMenuItem(UserText.switchToNewTabWhenOpened, isOn: $tabsModel.switchToNewTabWhenOpened)
+                    }
+
+                    PreferencePaneSubSection {
+                        HStack {
+                            Picker(UserText.newTabPositionTitle, selection: $tabsModel.newTabPosition) {
+                                ForEach(NewTabPosition.allCases, id: \.self) { position in
+                                    Text(UserText.newTabPositionMode(for: position)).tag(position)
+                                }
+                            }
+                            .fixedSize()
+                        }
+                    }
                 }
 
                 // SECTION 3: Home Page
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.homePage)
-                    TextMenuItemCaption(UserText.homePageDescription)
-                    Picker(selection: $startupModel.launchToCustomHomePage, label: EmptyView()) {
-                        Text(UserText.newTab).tag(false)
-                        VStack(alignment: .leading) {
-                            HStack(spacing: 15) {
-                                Text(UserText.specificPage)
-                                Button(UserText.setPage) {
-                                    showingCustomHomePageSheet.toggle()
-                                }.disabled(!startupModel.launchToCustomHomePage)
-                            }
-                            TextMenuItemCaption(startupModel.friendlyURL)
-                                .padding(.top, 0)
-                                .visibility(!startupModel.launchToCustomHomePage ? .gone : .visible)
+                PreferencePaneSection(UserText.homePage) {
 
-                        }.tag(true)
+                    PreferencePaneSubSection {
+
+                        TextMenuItemCaption(UserText.homePageDescription)
+
+                        Picker(selection: $startupModel.launchToCustomHomePage, label: EmptyView()) {
+                            Text(UserText.newTab).tag(false)
+                            VStack(alignment: .leading, spacing: 0) {
+                                HStack(spacing: 15) {
+                                    Text(UserText.specificPage)
+                                    Button(UserText.setPage) {
+                                        showingCustomHomePageSheet.toggle()
+                                    }.disabled(!startupModel.launchToCustomHomePage)
+                                }
+                                TextMenuItemCaption(startupModel.friendlyURL)
+                                    .padding(.top, 0)
+                                    .visibility(!startupModel.launchToCustomHomePage ? .gone : .visible)
+
+                            }.tag(true)
+                        }
+                        .pickerStyle(.radioGroup)
+                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
                     }
-                    .pickerStyle(.radioGroup)
-                    .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
-                    .padding(.bottom, 0)
-                    HStack {
-                        Picker(UserText.mainMenuHomeButton, selection: $startupModel.homeButtonPosition) {
-                            ForEach(HomeButtonPosition.allCases, id: \.self) { position in
-                                Text(UserText.homeButtonMode(for: position)).tag(position)
+
+                    PreferencePaneSubSection {
+                        HStack {
+                            Picker(UserText.mainMenuHomeButton, selection: $startupModel.homeButtonPosition) {
+                                ForEach(HomeButtonPosition.allCases, id: \.self) { position in
+                                    Text(UserText.homeButtonMode(for: position)).tag(position)
+                                }
                             }
-                        }.scaledToFit()
-                        .onChange(of: startupModel.homeButtonPosition) { _ in
-                            startupModel.updateHomeButton()
+                            .fixedSize()
+                            .onChange(of: startupModel.homeButtonPosition) { _ in
+                                startupModel.updateHomeButton()
+                            }
                         }
                     }
+
                 }.sheet(isPresented: $showingCustomHomePageSheet) {
                     CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }
 
+                // SECTION 4: Search Settings
+                PreferencePaneSection(UserText.privateSearch) {
+                    ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions).accessibilityIdentifier("PreferencesGeneralView.showAutocompleteSuggestions")
+                }
+
+                // SECTION 5: Downloads
+                PreferencePaneSection(UserText.downloads) {
+                    PreferencePaneSubSection {
+                        ToggleMenuItem(UserText.downloadsOpenPopupOnCompletion,
+                                       isOn: $downloadsModel.shouldOpenPopupOnCompletion)
+                    }.padding(.bottom, 5)
+
+                    // MARK: Location
+                    PreferencePaneSubSection {
+                        Text(UserText.downloadsLocation).bold()
+
+                        HStack {
+                            NSPathControlView(url: downloadsModel.selectedDownloadLocation)
+                            Button(UserText.downloadsChangeDirectory) {
+                                downloadsModel.presentDownloadDirectoryPanel()
+                            }
+                        }
+                        .disabled(downloadsModel.alwaysRequestDownloadLocation)
+
+                        ToggleMenuItem(UserText.downloadsAlwaysAsk,
+                                       isOn: $downloadsModel.alwaysRequestDownloadLocation)
+                    }
+                }
             }
         }
     }

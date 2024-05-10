@@ -16,13 +16,13 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Combine
 import NetworkProtection
+import PixelKit
 
 final class VPNLocationViewModel: ObservableObject {
+    private static var cachedLocations: [VPNCountryItemModel]?
     private let locationListRepository: NetworkProtectionLocationListRepository
     private let settings: VPNSettings
     private var selectedLocation: VPNSettings.SelectedLocation
@@ -53,26 +53,36 @@ final class VPNLocationViewModel: ObservableObject {
         self.settings = settings
         selectedLocation = settings.selectedLocation
         self.isNearestSelected = selectedLocation == .nearest
-        state = .loading
+        if let cachedLocations = Self.cachedLocations {
+            state = .loaded(countryItems: cachedLocations)
+        } else {
+            state = .loading
+        }
         Task {
             await reloadList()
         }
     }
 
     func onViewAppeared() async {
-        Pixel.fire(.networkProtectionGeoswitchingOpened)
+        PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingOpened)
+        await reloadList()
+    }
+
+    func onViewDisappered() async {
+        selectedLocation = settings.selectedLocation
         await reloadList()
     }
 
     func onNearestItemSelection() async {
-        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetNearest, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingSetNearest, frequency: .dailyAndCount)
         selectedLocation = .nearest
         await reloadList()
     }
 
     func onCountryItemSelection(id: String, cityId: String? = nil) async {
-        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetCustom, frequency: .dailyAndCount, includeAppVersionParameter: true)
-        let location = NetworkProtectionSelectedLocation(country: id, city: cityId)
+        PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingSetCustom, frequency: .dailyAndCount)
+        let city = cityId == VPNCityItemModel.nearest.id ? nil : cityId
+        let location = NetworkProtectionSelectedLocation(country: id, city: city)
         selectedLocation = .location(location)
         await reloadList()
     }
@@ -85,7 +95,7 @@ final class VPNLocationViewModel: ObservableObject {
     private func reloadList() async {
         guard let locations = try? await locationListRepository.fetchLocationList().sortedByName() else { return }
         if locations.isEmpty {
-            DailyPixel.fire(pixel: .networkProtectionGeoswitchingNoLocations, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingNoLocations, frequency: .dailyAndCount)
         }
         let isNearestSelected = selectedLocation == .nearest
         self.isNearestSelected = isNearestSelected
@@ -123,6 +133,7 @@ final class VPNLocationViewModel: ObservableObject {
                 )
             )
         }
+        Self.cachedLocations = countryItems
         state = .loaded(countryItems: countryItems)
     }
 }
@@ -174,17 +185,6 @@ extension VPNCityItemModel {
     }
 }
 
-extension NetworkProtectionLocationListCompositeRepository {
-    convenience init() {
-        let settings = VPNSettings(defaults: .netP)
-        self.init(
-            environment: settings.selectedEnvironment,
-            tokenStore: NetworkProtectionKeychainTokenStore(),
-            errorEvents: .networkProtectionAppDebugEvents
-        )
-    }
-}
-
 extension VPNLocationViewModel {
     convenience init() {
         let locationListRepository = NetworkProtectionLocationListCompositeRepository()
@@ -208,5 +208,3 @@ private extension String {
         Locale.current.localizedString(forRegionCode: self) ?? ""
     }
 }
-
-#endif

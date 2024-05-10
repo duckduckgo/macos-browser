@@ -1,11 +1,37 @@
 //
-//  File.swift
-//  
+//  FileManager+shorterPath.swift
 //
-//  Created by ddg on 11/19/23.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 //
 
 import Foundation
+
+public protocol UDSURLShortening {
+    func shorten(_ url: URL, symlinkName: String) throws -> URL
+}
+
+/// Default shortener using the default `FileManager` singleton.
+///
+public struct UDSURLShortener: UDSURLShortening {
+
+    public init() {}
+
+    public func shorten(_ url: URL, symlinkName: String) throws -> URL {
+        try FileManager.default.shortenSocketURL(socketFileURL: url, symlinkName: symlinkName)
+    }
+}
 
 extension FileManager {
 
@@ -24,12 +50,12 @@ extension FileManager {
         let shortenedFileURL = temporaryDirectory.appendingPathComponent(symlinkName)
 
         guard fileURL.path.count > shortenedFileURL.path.count else {
-            // Can't shorten
+            // The file URL is already shorter that what we can produce
             return fileURL
         }
 
-        // Just make extra sure there's nothing there
-        try? removeItem(at: shortenedFileURL)
+        // Just make extra sure there's no pre-existing file at the shortened file path
+        //try? removeItem(at: shortenedFileURL)
         try createSymbolicLink(at: shortenedFileURL, withDestinationURL: fileURL)
 
         return shortenedFileURL
@@ -48,19 +74,18 @@ extension FileManager {
         let directoryURL = socketFileURL.deletingLastPathComponent()
         let shortenedDirectoryURL = try shortenURL(for: directoryURL, symlinkName: symlinkName)
         let shortSocketURL = shortenedDirectoryURL.appendingPathComponent(socketFileURL.lastPathComponent)
-
+/*
         do {
             try removeItem(at: shortSocketURL)
         } catch let error as CocoaError {
             switch error.code {
             case .fileNoSuchFile:
-                // Ignored because this means "No such file"... so it's ok if we can't delete a
-                // file that does not exist.
+                // Ignored because it's ok if we can't delete a file that we accept may not exist.
                 break
             default:
                 throw error
             }
-        }
+        }*/
 
         return shortSocketURL
     }

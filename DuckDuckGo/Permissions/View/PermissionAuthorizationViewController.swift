@@ -63,6 +63,8 @@ final class PermissionAuthorizationViewController: NSViewController {
     @IBOutlet var denyButton: NSButton!
     @IBOutlet var buttonsBottomConstraint: NSLayoutConstraint!
     @IBOutlet var learnMoreBottomConstraint: NSLayoutConstraint!
+    @IBOutlet weak var linkButton: LinkButton!
+    @IBOutlet weak var allowButton: NSButton!
 
     weak var query: PermissionAuthorizationQuery? {
         didSet {
@@ -81,6 +83,7 @@ final class PermissionAuthorizationViewController: NSViewController {
         } else {
             denyButton.title = UserText.permissionPopoverDenyButton
         }
+        denyButton.setAccessibilityIdentifier("PermissionAuthorizationViewController.denyButton")
     }
 
     private func updateText() {
@@ -106,12 +109,15 @@ final class PermissionAuthorizationViewController: NSViewController {
                                                   query.domain,
                                                   query.permissions.localizedDescription)
         }
-        alwaysAllowCheckbox.stringValue = UserText.permissionAlwaysAllowOnDomainCheckbox
+        alwaysAllowCheckbox.title = UserText.permissionAlwaysAllowOnDomainCheckbox
         domainNameLabel.stringValue = query.domain.isEmpty ? "" : "“" + query.domain + "”"
         alwaysAllowStackView.isHidden = !query.shouldShowAlwaysAllowCheckbox
         learnMoreStackView.isHidden = !query.permissions.contains(.geolocation)
         learnMoreBottomConstraint.isActive = !learnMoreStackView.isHidden
         buttonsBottomConstraint.isActive = !learnMoreBottomConstraint.isActive
+        linkButton.title = UserText.permissionPopupLearnMoreLink
+        allowButton.title = UserText.permissionPopupAllowButton
+        allowButton.setAccessibilityIdentifier("PermissionAuthorizationViewController.allowButton")
     }
 
     @IBAction func alwaysAllowLabelClick(_ sender: Any) {

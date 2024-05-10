@@ -15,19 +15,20 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-#if DBP && SUBSCRIPTION
+#if DBP
 
 import Foundation
 import Subscription
 import DataBrokerProtection
+import PixelKit
 
 final class DataBrokerProtectionSubscriptionEventHandler {
 
-    private let accountManager: Subscription.AccountManaging
+    private let accountManager: AccountManaging
     private let authRepository: AuthenticationRepository
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
-    init(accountManager: Subscription.AccountManaging = AccountManager(),
+    init(accountManager: AccountManaging = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)),
          authRepository: AuthenticationRepository = KeychainAuthenticationData(),
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
         self.accountManager = accountManager
@@ -42,7 +43,7 @@ final class DataBrokerProtectionSubscriptionEventHandler {
 
     @objc private func handleAccountDidSignIn() {
         guard let token = accountManager.accessToken else {
-            Pixel.fire(.dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn)
+            PixelKit.fire(GeneralPixel.dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn)
             assertionFailure("[DBP Subscription] AccountManager signed in but token could not be retrieved")
             return
         }

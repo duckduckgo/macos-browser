@@ -16,12 +16,10 @@
 //  limitations under the License.
 //
 
-#if (NETWORK_PROTECTION || NETP_SYSTEM_EXTENSION)
-
 import AppKit
 import Foundation
 import Common
-import NetworkProtection
+import NetworkProtectionUI
 
 extension AppLaunchCommand {
     var rawValue: String {
@@ -30,9 +28,13 @@ extension AppLaunchCommand {
         case .stopVPN: return "stopVPN"
         case .justOpen: return "justOpen"
         case .shareFeedback: return "shareFeedback"
+        case .showFAQ: return "showFAQ"
         case .showStatus: return "showStatus"
         case .showSettings: return "showSettings"
+        case .showVPNLocations: return "showVPNLocations"
         case .enableOnDemand: return "enableOnDemand"
+        case .moveAppToApplications: return "moveAppToApplications"
+        case .showPrivacyPro: return "showPrivacyPro"
         }
     }
 }
@@ -84,10 +86,18 @@ extension AppLaunchCommand {
             return "networkprotection://just-open"
         case .shareFeedback:
             return "networkprotection://share-feedback"
+        case .showFAQ:
+            return "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/vpn/"
         case .showStatus:
             return "networkprotection://show-status"
         case .showSettings:
             return "networkprotection://show-settings"
+        case .showVPNLocations:
+            return "networkprotection://show-settings/locations"
+        case .moveAppToApplications:
+            return "networkprotection://move-app-to-applications"
+        case .showPrivacyPro:
+            return "networkprotection://show-privacy-pro"
         default:
             return nil
         }
@@ -144,5 +154,3 @@ extension URL {
     }
 
 }
-
-#endif

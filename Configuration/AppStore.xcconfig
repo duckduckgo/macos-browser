@@ -23,10 +23,10 @@ MAIN_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX).d
 MAIN_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX).debug
 MAIN_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX).review
 
-GCC_PREPROCESSOR_DEFINITIONS[arch=*][sdk=*] = APPSTORE=1
-GCC_PREPROCESSOR_DEFINITIONS[config=CI][arch=*][sdk=*] = APPSTORE=1 DEBUG=1 CI=1 $(inherited)
-GCC_PREPROCESSOR_DEFINITIONS[config=Debug][arch=*][sdk=*] = APPSTORE=1 DEBUG=1 $(inherited)
-GCC_PREPROCESSOR_DEFINITIONS[config=Review][arch=*][sdk=*] = APPSTORE=1 REVIEW=1 $(inherited)
+GCC_PREPROCESSOR_DEFINITIONS[arch=*][sdk=*] = APPSTORE=1 SWIFT_OBJC_INTERFACE_HEADER_NAME=$(SWIFT_OBJC_INTERFACE_HEADER_NAME)
+GCC_PREPROCESSOR_DEFINITIONS[config=CI][arch=*][sdk=*] = APPSTORE=1 DEBUG=1 CI=1 SWIFT_OBJC_INTERFACE_HEADER_NAME=$(SWIFT_OBJC_INTERFACE_HEADER_NAME) $(inherited)
+GCC_PREPROCESSOR_DEFINITIONS[config=Debug][arch=*][sdk=*] = APPSTORE=1 DEBUG=1 SWIFT_OBJC_INTERFACE_HEADER_NAME=$(SWIFT_OBJC_INTERFACE_HEADER_NAME) $(inherited)
+GCC_PREPROCESSOR_DEFINITIONS[config=Review][arch=*][sdk=*] = APPSTORE=1 REVIEW=1 SWIFT_OBJC_INTERFACE_HEADER_NAME=$(SWIFT_OBJC_INTERFACE_HEADER_NAME) $(inherited)
 
 MACOSX_DEPLOYMENT_TARGET = 12.3
 
@@ -41,9 +41,57 @@ NETP_APP_GROUP[config=Review][sdk=macos*] = $(NETP_BASE_APP_GROUP).review
 NETP_APP_GROUP[config=Debug][sdk=macos*] = $(NETP_BASE_APP_GROUP).debug
 NETP_APP_GROUP[config=Release][sdk=macos*] = $(NETP_BASE_APP_GROUP)
 
-AGENT_BUNDLE_ID[sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent
-AGENT_BUNDLE_ID[config=Debug][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.debug
-AGENT_BUNDLE_ID[config=CI][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.debug
-AGENT_BUNDLE_ID[config=Review][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.review
+SUBSCRIPTION_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).$(MAIN_BUNDLE_IDENTIFIER_PREFIX).subscription
+SUBSCRIPTION_APP_GROUP[config=CI][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP).debug
+SUBSCRIPTION_APP_GROUP[config=Review][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP).review
+SUBSCRIPTION_APP_GROUP[config=Debug][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP).debug
+SUBSCRIPTION_APP_GROUP[config=Release][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP)
+
+AGENT_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.mobile.ios.vpn.agent
+AGENT_BUNDLE_ID[sdk=*] = $(AGENT_BUNDLE_ID_BASE)
+AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
+AGENT_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
+AGENT_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).review
 
 AGENT_PRODUCT_NAME = DuckDuckGo VPN App Store
+AGENT_RELEASE_PRODUCT_NAME = DuckDuckGo VPN
+
+// Extensions
+
+PROXY_EXTENSION_BUNDLE_ID[sdk=*] = $(AGENT_BUNDLE_ID).proxy
+PROXY_EXTENSION_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID).proxy
+PROXY_EXTENSION_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID).proxy
+PROXY_EXTENSION_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID).proxy
+PROXY_EXTENSION_BUNDLE_ID[config=Release][sdk=*] = $(AGENT_BUNDLE_ID).proxy
+
+TUNNEL_EXTENSION_BUNDLE_ID[sdk=*] = $(AGENT_BUNDLE_ID).network-protection-extension
+TUNNEL_EXTENSION_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID).network-protection-extension
+TUNNEL_EXTENSION_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID).network-protection-extension
+TUNNEL_EXTENSION_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID).network-protection-extension
+TUNNEL_EXTENSION_BUNDLE_ID[config=Release][sdk=*] = $(AGENT_BUNDLE_ID).network-protection-extension
+
+// Distributed Notifications Prefix
+
+DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE = $(AGENT_BUNDLE_ID_BASE).network-extension
+
+DISTRIBUTED_NOTIFICATIONS_PREFIX[config=CI][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).ci
+DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Review][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).review
+DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Debug][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).debug
+DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Release][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE)
+
+// DBP
+
+DBP_BACKGROUND_AGENT_PRODUCT_NAME = DuckDuckGo Personal Information Removal App Store
+DBP_BACKGROUND_AGENT_RELEASE_PRODUCT_NAME = DuckDuckGo Personal Information Removal
+
+DBP_BACKGROUND_AGENT_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.mobile.ios.DBP.backgroundAgent
+DBP_BACKGROUND_AGENT_BUNDLE_ID[sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID_BASE)
+DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID_BASE).debug
+DBP_BACKGROUND_AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID_BASE).debug
+DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID_BASE).review
+
+DBP_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.appstore.dbp
+DBP_APP_GROUP[config=CI][sdk=*] = $(DBP_BASE_APP_GROUP).debug
+DBP_APP_GROUP[config=Review][sdk=*] = $(DBP_BASE_APP_GROUP).review
+DBP_APP_GROUP[config=Debug][sdk=*] = $(DBP_BASE_APP_GROUP).debug
+DBP_APP_GROUP[config=Release][sdk=*] = $(DBP_BASE_APP_GROUP)

@@ -1,8 +1,9 @@
 {
-  "name": "vericora.com",
-  "version": "0.1.1",
+  "name": "Vericora",
+  "url": "vericora.com",
+  "version": "0.1.5",
   "parent": "verecor.com",
-  "addedDatetime": 1677733200000,
+  "addedDatetime": 1677736800000,
   "steps": [
     {
       "stepType": "scan",
@@ -10,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "9488e141-d109-4cbf-bc65-1b9036728ff4",
+          "id": "8e8c6092-f40e-4383-82f6-1498005d342f",
           "url": "https://vericora.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -24,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "baaecb74-8d63-496c-a3e0-a8acbdee2c99",
+          "id": "e7d234aa-9241-460b-b614-f3dc0cc7840e",
           "selector": ".search-item",
           "profile": {
             "name": {
@@ -47,7 +48,9 @@
               "beforeText": ","
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://vericora.com/view/${id}"
             }
           }
         }

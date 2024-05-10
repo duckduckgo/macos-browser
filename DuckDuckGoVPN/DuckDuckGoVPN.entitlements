@@ -5,6 +5,7 @@
 	<key>com.apple.developer.networking.networkextension</key>
 	<array>
 		<string>packet-tunnel-provider-systemextension</string>
+		<string>app-proxy-provider-systemextension</string>
 	</array>
 	<key>com.apple.developer.system-extension.install</key>
 	<true/>
@@ -12,10 +13,13 @@
 	<array>
 		<string>$(NETP_APP_GROUP)</string>
 		<string>$(IPC_APP_GROUP)</string>
+		<string>$(SUBSCRIPTION_APP_GROUP)</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
+		<string>$(AppIdentifierPrefix)$(NETP_APP_GROUP)</string>
 		<string>$(NETP_APP_GROUP)</string>
+		<string>$(SUBSCRIPTION_APP_GROUP)</string>
 	</array>
 </dict>
 </plist>

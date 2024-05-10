@@ -1,6 +1,7 @@
 {
-  "name": "newenglandfacts.com",
-  "version": "0.1.1",
+  "name": "New England Facts",
+  "url": "newenglandfacts.com",
+  "version": "0.1.5",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -10,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "8bd7953c-ee22-49be-8937-a1798046a0c1",
+          "id": "ecac2e82-71fd-4a3d-ba7e-bfe46b0a3db8",
           "url": "https://newenglandfacts.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -24,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "4012d312-2f7f-4cc1-bf7a-b7655f550c1a",
+          "id": "633a36d1-a68c-4435-93eb-de82d940e7f7",
           "selector": ".b-pfl-list",
           "profile": {
             "name": {
@@ -48,7 +49,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://newenglandfacts.com/people/${id}"
             }
           }
         }

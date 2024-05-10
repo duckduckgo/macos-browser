@@ -21,20 +21,36 @@ import Foundation
 import NetworkProtection
 import ServiceManagement
 import AppKit
+import Subscription
 
-/// Class that implements the necessary logic to ensure Network Protection is enabled, or prevent the app from running otherwise.
+/// Class that implements the necessary logic to ensure the VPN is enabled, or prevent the app from running otherwise.
 ///
 final class NetworkProtectionBouncer {
 
-    /// Simply verifies that the Network Protection feature is enabled and if not, takes care of killing the
+    /// Simply verifies that the VPN feature is enabled and if not, takes care of killing the
     /// current app.
     ///
-    func requireAuthTokenOrKillApp() {
-        let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default, errorEvents: nil)
+    func requireAuthTokenOrKillApp(controller: TunnelController) async {
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
+        guard !accountManager.isUserAuthenticated else {
+            return
+        }
+
+        let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default,
+                                                                errorEvents: nil,
+                                                                isSubscriptionEnabled: false,
+                                                                accessTokenProvider: { nil })
         guard keychainStore.isFeatureActivated else {
-            os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized.")
-            exit(EXIT_FAILURE)
+            os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized. Missing token.")
+
+            await controller.stop()
+
+            // EXIT_SUCCESS ensures the login item won't relaunch
+            // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()
+            // See where it mentions:
+            //      "If the helper crashes or exits with a non-zero status, the system relaunches it"
+            exit(EXIT_SUCCESS)
         }
     }
 }

@@ -24,13 +24,30 @@ public protocol ManagementViewModel: ObservableObject {
     var isConnectingDevicesAvailable: Bool { get }
     var isAccountCreationAvailable: Bool { get }
     var isAccountRecoveryAvailable: Bool { get }
+    var isAppVersionNotSupported: Bool { get }
 
     var isSyncEnabled: Bool { get }
     var isCreatingAccount: Bool { get }
     var shouldShowErrorMessage: Bool { get set }
     var syncErrorMessage: SyncErrorMessage? { get }
+    var isSyncPaused: Bool { get }
     var isSyncBookmarksPaused: Bool { get }
     var isSyncCredentialsPaused: Bool { get }
+    var syncPausedTitle: String? { get }
+    var syncPausedMessage: String? { get }
+    var syncPausedButtonTitle: String? { get }
+    var syncPausedButtonAction: (() -> Void)? { get }
+    var syncBookmarksPausedTitle: String? { get }
+    var syncBookmarksPausedMessage: String? { get }
+    var syncBookmarksPausedButtonTitle: String? { get }
+    var syncBookmarksPausedButtonAction: (() -> Void)? { get }
+    var syncCredentialsPausedTitle: String? { get }
+    var syncCredentialsPausedMessage: String? { get }
+    var syncCredentialsPausedButtonTitle: String? { get }
+    var syncCredentialsPausedButtonAction: (() -> Void)? { get }
+
+    var invalidBookmarksTitles: [String] { get }
+    var invalidCredentialsTitles: [String] { get }
 
     var recoveryCode: String? { get }
     var codeToDisplay: String? { get }
@@ -48,9 +65,9 @@ public protocol ManagementViewModel: ObservableObject {
     func manageBookmarks()
     func manageLogins()
 
-    func syncWithAnotherDevicePressed()
-    func syncWithServerPressed()
-    func recoverDataPressed()
+    func syncWithAnotherDevicePressed() async
+    func syncWithServerPressed() async
+    func recoverDataPressed() async
     func turnOffSyncPressed()
 }
 
@@ -64,9 +81,15 @@ public enum SyncErrorType {
     case unableToRemoveDevice
     case invalidCode
     case unableCreateRecoveryPDF
+    case unableToAuthenticateOnDevice
 
     var title: String {
-        return UserText.syncErrorAlertTitle
+        switch self {
+        case .unableToAuthenticateOnDevice:
+            return UserText.syncDeviceAuthenticationErrorAlertTitle
+        default:
+            return UserText.syncErrorAlertTitle
+        }
     }
 
     var description: String {
@@ -89,6 +112,26 @@ public enum SyncErrorType {
             return UserText.invalidCodeDescription
         case .unableCreateRecoveryPDF:
             return UserText.unableCreateRecoveryPdfDescription
+        case .unableToAuthenticateOnDevice:
+            return UserText.unableToAuthenticateDevice
+        }
+    }
+
+    var buttonTitle: String {
+        switch self {
+        case .unableToAuthenticateOnDevice:
+            return UserText.syncDeviceAuthenticationErrorAlertButton
+        default:
+            return UserText.ok
+        }
+    }
+
+    func onButtonPressed(delegate: ManagementDialogModelDelegate?) {
+        switch self {
+        case .unableToAuthenticateOnDevice:
+            delegate?.openSystemPasswordSettings()
+        default:
+            break
         }
     }
 }

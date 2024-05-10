@@ -26,21 +26,22 @@ extension NSMenuItem {
         return item
     }
 
-    convenience init(title string: String, action selector: Selector? = nil, target: AnyObject? = nil, keyEquivalent: [KeyEquivalentElement] = [], representedObject: Any? = nil, items: [NSMenuItem]? = nil) {
+    convenience init(title string: String, action selector: Selector? = nil, target: AnyObject? = nil, keyEquivalent: [KeyEquivalentElement] = [], representedObject: Any? = nil, state: NSControl.StateValue = .off, items: [NSMenuItem]? = nil) {
         self.init(title: string, action: selector, keyEquivalent: keyEquivalent.charCode)
         if !keyEquivalent.modifierMask.isEmpty {
             self.keyEquivalentModifierMask = keyEquivalent.modifierMask
         }
         self.target = target
         self.representedObject = representedObject
+        self.state = state
 
         if let items {
             self.submenu = NSMenu(title: title, items: items)
         }
     }
 
-    convenience init(title string: String, action selector: Selector? = nil, target: AnyObject? = nil, keyEquivalent: [KeyEquivalentElement] = [], representedObject: Any? = nil, @MenuBuilder items: () -> [NSMenuItem]) {
-        self.init(title: string, action: selector, target: target, keyEquivalent: keyEquivalent, representedObject: representedObject, items: items())
+    convenience init(title string: String, action selector: Selector? = nil, target: AnyObject? = nil, keyEquivalent: [KeyEquivalentElement] = [], representedObject: Any? = nil, state: NSControl.StateValue = .off, @MenuBuilder items: () -> [NSMenuItem]) {
+        self.init(title: string, action: selector, target: target, keyEquivalent: keyEquivalent, representedObject: representedObject, state: state, items: items())
     }
 
     convenience init(action selector: Selector?) {
@@ -100,6 +101,17 @@ extension NSMenuItem {
     @discardableResult
     func submenu(_ submenu: NSMenu) -> NSMenuItem {
         self.submenu = submenu
+        return self
+    }
+
+    @discardableResult
+    func withAccessibilityIdentifier(_ accessibilityIdentifier: String) -> NSMenuItem {
+        self.setAccessibilityIdentifier(accessibilityIdentifier)
+        return self
+    }
+
+    func withAccessibilityValue(_ accessibilityValue: String) -> NSMenuItem {
+        self.setAccessibilityValue(accessibilityValue)
         return self
     }
 

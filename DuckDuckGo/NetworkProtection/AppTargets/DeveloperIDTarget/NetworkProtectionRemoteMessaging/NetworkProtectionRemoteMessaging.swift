@@ -18,8 +18,7 @@
 
 import Foundation
 import Networking
-
-#if NETWORK_PROTECTION
+import PixelKit
 
 protocol NetworkProtectionRemoteMessaging {
 
@@ -92,7 +91,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
                     try self.messageStorage.store(messages: messages)
                     self.updateLastRefreshDate() // Update last refresh date on success, otherwise let the app try again next time
                 } catch {
-                    Pixel.fire(.debug(event: .networkProtectionRemoteMessageStorageFailed, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.networkProtectionRemoteMessageStorageFailed, error: error))
                 }
             case .failure(let error):
                 // Ignore 403 errors, those happen when a file can't be found on S3
@@ -101,19 +100,19 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
                     return
                 }
 
-                Pixel.fire(.debug(event: .networkProtectionRemoteMessageFetchingFailed, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.networkProtectionRemoteMessageFetchingFailed, error: error))
             }
         }
 
     }
 
-    /// Uses the "days since Network Protection activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
+    /// Uses the "days since VPN activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
     func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage] {
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
         let possibleMessages: [NetworkProtectionRemoteMessage] = messageStorage.storedMessages()
 
-        // Only show messages that haven't been dismissed, and check whether they have a requirement on how long the user
-        // has used Network Protection for.
+        // Only show messages that haven't been dismissed, and check whether they have a
+        // requirement on how long the user has used the VPN for.
         let filteredMessages = possibleMessages.filter { message in
 
             // Don't show messages that have already been dismissed. If you need to show the same message to a user again,
@@ -133,7 +132,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             }
 
             // Next, check if the message requires access to NetP but it's not visible:
-            if message.requiresNetworkProtectionAccess, !networkProtectionVisibility.isNetworkProtectionVisible() {
+            if message.requiresNetworkProtectionAccess, !networkProtectionVisibility.isVPNVisible() {
                 return false
             }
 
@@ -178,5 +177,3 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
 }
-
-#endif

@@ -23,29 +23,23 @@ import XCTest
 class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     func testWhenBookmarkStoreHasNoFolders_ThenOnlyDefaultNodesAreReturned() {
-        let dataSource = BookmarkSidebarTreeController()
+        let dataSource = BookmarkSidebarTreeController(bookmarkManager: LocalBookmarkManager())
         let treeController = BookmarkTreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
         let representedObjects = defaultNodes.representedObjects()
 
-        // The sidebar defines three hardcoded nodes:
+        // The sidebar defines one hardcoded nodes:
         //
-        // 1. Favorites node
-        // 2. Spacer node
-        // 3. Bookmarks node
+        // 1. Bookmarks node
 
-        XCTAssertEqual(defaultNodes.count, 3)
+        XCTAssertEqual(defaultNodes.count, 1)
 
-        XCTAssertFalse(defaultNodes[0].canHaveChildNodes)
-        XCTAssertFalse(defaultNodes[1].canHaveChildNodes)
-        XCTAssertTrue(defaultNodes[2].canHaveChildNodes)
+        XCTAssertTrue(defaultNodes[0].canHaveChildNodes)
 
-        XCTAssert(representedObjects[0] === PseudoFolder.favorites)
-        XCTAssert(representedObjects[1] === SpacerNode.blank)
-        XCTAssert(representedObjects[2] === PseudoFolder.bookmarks)
+        XCTAssert(representedObjects.first === PseudoFolder.bookmarks)
     }
 
-    func testWhenBookmarkStoreHasNoTopLevelFolders_ThenTheDefaultBookmarksNodeHasNoChildren() {
+    func testWhenBookmarkStoreHasNoTopLevelFolders_ThenTheDefaultBookmarksNodeHasNoChildren() throws {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
@@ -56,11 +50,13 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
         let treeController = BookmarkTreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
-        XCTAssertEqual(defaultNodes.count, 3)
+        XCTAssertEqual(defaultNodes.count, 1)
 
         // The sidebar tree controller only shows folders, so if there are only bookmarks then the bookmarks default folder will be empty.
-        let bookmarksNode = defaultNodes[2]
-        XCTAssert(bookmarksNode.childNodes.isEmpty)
+        let bookmarksNode = defaultNodes[0]
+        let pseudoFolder = try XCTUnwrap(bookmarksNode.representedObject as? PseudoFolder)
+        XCTAssertTrue(bookmarksNode.childNodes.isEmpty)
+        XCTAssertEqual(pseudoFolder.name, "Bookmarks")
     }
 
     func testWhenBookmarkStoreHasTopLevelFolders_ThenTheDefaultBookmarksNodeHasThemAsChildren() {
@@ -75,9 +71,9 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
         let treeController = BookmarkTreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
-        XCTAssertEqual(defaultNodes.count, 3)
+        XCTAssertEqual(defaultNodes.count, 1)
 
-        let bookmarksNode = defaultNodes[2]
+        let bookmarksNode = defaultNodes[0]
         XCTAssertEqual(bookmarksNode.childNodes.count, 1)
 
         let childNode = bookmarksNode.childNodes[0]
@@ -98,9 +94,9 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
         let treeController = BookmarkTreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
-        XCTAssertEqual(defaultNodes.count, 3)
+        XCTAssertEqual(defaultNodes.count, 1)
 
-        let bookmarksNode = defaultNodes[2]
+        let bookmarksNode = defaultNodes[0]
         XCTAssertTrue(bookmarksNode.canHaveChildNodes)
         XCTAssertEqual(bookmarksNode.childNodes.count, 1)
 

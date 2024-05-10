@@ -1,0 +1,64 @@
+{
+  "name": "FastPeopleSearch",
+  "url": "fastpeoplesearch.com",
+  "version": "0.1.5",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1675317600000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "040e0a0a-095a-490e-8c55-ee7b66732030",
+          "url": "https://www.fastpeoplesearch.com/name/${firstName}-${lastName}_${city}-${state}"
+        },
+        {
+          "actionType": "extract",
+          "id": "f7a316c3-f4c0-46b5-be2d-b8df71852a26",
+          "selector": ".card",
+          "profile": {
+            "name": {
+              "selector": ".larger"
+            },
+            "alternativeNamesList": {
+              "selector": ".//h3[contains(strong, 'AKA')]/following-sibling::span | .//span[contains(text(), 'Goes By')]/strong",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".//div[@class='card-block']",
+              "afterText": "Age:",
+              "beforeText": "Full Name:"
+            },
+            "addressFullList": {
+              "selector": ".//h3[contains(strong, 'Past Addresses')]/following-sibling::div/div/a",
+              "findElements": true
+            },
+            "addressCityState": {
+              "selector": ".grey"
+            },
+            "relativesList": {
+              "selector": ".//h3[contains(strong, 'Relatives')]/following-sibling::a[@class='nowrap']",
+              "findElements": true,
+              "separator": "•"
+            },
+            "profileUrl": {
+              "selector": ".link-to-details"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

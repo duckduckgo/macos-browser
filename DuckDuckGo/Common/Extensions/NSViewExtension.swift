@@ -79,11 +79,18 @@ extension NSView {
         return self
     }
 
+    var isShown: Bool {
+        get { !isHidden }
+        set { isHidden = !newValue }
+    }
+
     func makeMeFirstResponder() {
         guard let window = window else {
             os_log("%s: Window not available", type: .error, className)
             return
         }
+        // prevent all text selection on repeated Address Bar activation
+        guard window.firstResponder !== (self as? NSControl)?.currentEditor() ?? self else { return }
 
         window.makeFirstResponder(self)
     }

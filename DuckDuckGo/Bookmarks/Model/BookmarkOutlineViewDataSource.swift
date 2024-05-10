@@ -30,10 +30,12 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     @Published var selectedFolders: [BookmarkFolder] = []
 
     let treeController: BookmarkTreeController
-    var expandedNodesIDs = Set<String>()
+    private(set) var expandedNodesIDs = Set<String>()
 
     private let contentMode: ContentMode
     private let bookmarkManager: BookmarkManager
+    private let showMenuButtonOnHover: Bool
+    private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
     private let presentFaviconsFetcherOnboarding: (() -> Void)?
 
     private var favoritesPseudoFolder = PseudoFolder.favorites
@@ -41,13 +43,17 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     init(
         contentMode: ContentMode,
-        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+        bookmarkManager: BookmarkManager,
         treeController: BookmarkTreeController,
+        showMenuButtonOnHover: Bool = true,
+        onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)? = nil,
         presentFaviconsFetcherOnboarding: (() -> Void)? = nil
     ) {
         self.contentMode = contentMode
         self.bookmarkManager = bookmarkManager
         self.treeController = treeController
+        self.showMenuButtonOnHover = showMenuButtonOnHover
+        self.onMenuRequestedAction = onMenuRequestedAction
         self.presentFaviconsFetcherOnboarding = presentFaviconsFetcherOnboarding
 
         super.init()
@@ -117,11 +123,14 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
-        guard let node = item as? BookmarkNode,
-              let cell = outlineView.makeView(withIdentifier: BookmarkOutlineViewCell.identifier, owner: self) as? BookmarkOutlineViewCell else {
-            assertionFailure("\(#file): Failed to create BookmarkOutlineViewCell or cast item to Node")
+        guard let node = item as? BookmarkNode else {
+            assertionFailure("\(#file): Failed to cast item to Node")
             return nil
         }
+        let cell = outlineView.makeView(withIdentifier: .init(BookmarkOutlineCellView.className()), owner: self) as? BookmarkOutlineCellView
+            ?? BookmarkOutlineCellView(identifier: .init(BookmarkOutlineCellView.className()))
+        cell.shouldShowMenuButton = showMenuButtonOnHover
+        cell.delegate = self
 
         if let bookmark = node.representedObject as? Bookmark {
             cell.update(from: bookmark)
@@ -232,7 +241,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         // Folders cannot be dragged onto any of their descendants:
 
         let containsDescendantOfDestination = draggedFolders.contains { draggedFolder in
-            let folder = BookmarkFolder(id: draggedFolder.id, title: draggedFolder.name)
+            let folder = BookmarkFolder(id: draggedFolder.id, title: draggedFolder.name, parentFolderUUID: draggedFolder.parentFolderUUID, children: draggedFolder.children)
 
             guard let draggedNode = treeController.node(representing: folder) else {
                 return false
@@ -327,4 +336,12 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return contentMode == .foldersOnly
     }
 
+}
+
+// MARK: - BookmarkOutlineCellViewDelegate
+
+extension BookmarkOutlineViewDataSource: BookmarkOutlineCellViewDelegate {
+    func outlineCellViewRequestedMenu(_ cell: BookmarkOutlineCellView) {
+        onMenuRequestedAction?(cell)
+    }
 }

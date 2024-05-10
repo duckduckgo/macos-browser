@@ -19,6 +19,8 @@
 import Cocoa
 import BrowserServicesKit
 import Common
+import History
+import PixelKit
 
 @MainActor
 final class FirePopoverViewModel {
@@ -187,7 +189,7 @@ final class FirePopoverViewModel {
     // MARK: - Burning
 
     func burn() {
-        Pixel.fire(.fireButtonFirstBurn, limitTo: .dailyFirst)
+        PixelKit.fire(GeneralPixel.fireButtonFirstBurn, frequency: .legacyDaily)
 
         switch (clearingOption, areAllSelected) {
         case (.currentTab, _):
@@ -196,7 +198,7 @@ final class FirePopoverViewModel {
                 assertionFailure("No tab selected")
                 return
             }
-            Pixel.fire(.fireButton(option: .tab))
+            PixelKit.fire(GeneralPixel.fireButton(option: .tab))
             let burningEntity = Fire.BurningEntity.tab(tabViewModel: tabViewModel,
                                                        selectedDomains: selectedDomains,
                                                        parentTabCollectionViewModel: tabCollectionViewModel)
@@ -206,17 +208,17 @@ final class FirePopoverViewModel {
                 assertionFailure("FirePopoverViewModel: TabCollectionViewModel is not present")
                 return
             }
-            Pixel.fire(.fireButton(option: .window))
+            PixelKit.fire(GeneralPixel.fireButton(option: .window))
             let burningEntity = Fire.BurningEntity.window(tabCollectionViewModel: tabCollectionViewModel,
                                                           selectedDomains: selectedDomains)
             fireViewModel.fire.burnEntity(entity: burningEntity)
 
         case (.allData, true):
-            Pixel.fire(.fireButton(option: .allSites))
+            PixelKit.fire(GeneralPixel.fireButton(option: .allSites))
             fireViewModel.fire.burnAll()
 
         case (.allData, false):
-            Pixel.fire(.fireButton(option: .allSites))
+            PixelKit.fire(GeneralPixel.fireButton(option: .allSites))
             fireViewModel.fire.burnEntity(entity: .allWindows(mainWindowControllers: WindowControllersManager.shared.mainWindowControllers,
                                                               selectedDomains: selectedDomains))
         }
@@ -224,7 +226,7 @@ final class FirePopoverViewModel {
 
 }
 
-extension History {
+extension BrowsingHistory {
 
     func visitedDomains(tld: TLD) -> Set<String> {
         return reduce(Set<String>(), { result, historyEntry in

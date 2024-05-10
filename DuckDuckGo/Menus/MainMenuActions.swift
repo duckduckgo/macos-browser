@@ -21,6 +21,9 @@ import Cocoa
 import Common
 import WebKit
 import Configuration
+import History
+import PixelKit
+import Subscription
 
 // Actions are sent to objects of responder chain
 
@@ -107,7 +110,7 @@ extension AppDelegate {
     // MARK: - Window
 
     @objc func reopenAllWindowsFromLastSession(_ sender: Any?) {
-        stateRestorationManager.restoreLastSessionState(interactive: true)
+        _=stateRestorationManager.restoreLastSessionState(interactive: true)
     }
 
     // MARK: - Help
@@ -116,6 +119,30 @@ extension AppDelegate {
 
     @objc func openFeedback(_ sender: Any?) {
         FeedbackPresenter.presentFeedbackForm()
+    }
+
+    @objc func openReportBrokenSite(_ sender: Any?) {
+        let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
+        let privacyDashboardViewController = storyboard.instantiateController(identifier: "PrivacyDashboardViewController") { coder in
+            PrivacyDashboardViewController(coder: coder, privacyInfo: nil, dashboardMode: .report)
+        }
+
+        privacyDashboardViewController.sizeDelegate = self
+
+        let window = NSWindow(contentViewController: privacyDashboardViewController)
+        window.styleMask.remove(.resizable)
+        window.setFrame(NSRect(x: 0, y: 0, width: PrivacyDashboardViewController.Constants.initialContentWidth,
+                               height: PrivacyDashboardViewController.Constants.reportBrokenSiteInitialContentHeight),
+                        display: true)
+        privacyDashboardWindow = window
+
+        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              let tabModel = parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel else {
+            assertionFailure("AppDelegate: Failed to present PrivacyDashboard")
+            return
+        }
+        privacyDashboardViewController.updateTabViewModel(tabModel)
+        parentWindowController.window?.beginSheet(window) { _ in }
     }
 
     #endif
@@ -188,7 +215,7 @@ extension AppDelegate {
             savePanel.beginSheetModal(for: window) { response in
                 guard response == .OK, let selectedURL = savePanel.url else { return }
 
-                let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+                let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
                 let exporter = CSVLoginExporter(secureVault: vault!)
                 do {
                     try exporter.exportVaultLogins(to: selectedURL)
@@ -241,7 +268,16 @@ extension MainViewController {
 
     /// Finds currently active Tab even if it‘s playing a Full Screen video
     private func getActiveTabAndIndex() -> (tab: Tab, index: TabIndex)? {
-        guard let tab = WindowControllersManager.shared.lastKeyMainWindowController?.activeTab else {
+        var tab: Tab? {
+            // popup windows don‘t get to lastKeyMainWindowController so try getting their WindowController directly fron a key window
+            if let window = self.view.window,
+               let mainWindowController = window.nextResponder as? MainWindowController,
+               let tab = mainWindowController.activeTab {
+                return tab
+            }
+            return WindowControllersManager.shared.lastKeyMainWindowController?.activeTab
+        }
+        guard let tab else {
             assertionFailure("Could not get currently active Tab")
             return nil
         }
@@ -282,7 +318,13 @@ extension MainViewController {
             os_log("MainViewController: Cannot reference address bar text field", type: .error)
             return
         }
-        addressBarTextField.makeMeFirstResponder()
+
+        // If the address bar is already the first responder it means that the user is editing the URL and wants to select the whole url.
+        if addressBarTextField.isFirstResponder {
+            addressBarTextField.selectText(nil)
+        } else {
+            addressBarTextField.makeMeFirstResponder()
+        }
     }
 
     @objc func closeTab(_ sender: Any?) {
@@ -350,7 +392,7 @@ extension MainViewController {
             }
             navigationBarViewController.view.window?.makeKeyAndOrderFront(nil)
         }
-        navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: false)
+        navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: sender is NSMenuItem /* keep button visible for some time on Cmd+J */)
     }
 
     @objc func toggleBookmarksBarFromMenu(_ sender: Any) {
@@ -380,9 +422,7 @@ extension MainViewController {
     }
 
     @objc func toggleNetworkProtectionShortcut(_ sender: Any) {
-#if NETWORK_PROTECTION
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
-#endif
     }
 
     // MARK: - History
@@ -442,13 +482,16 @@ extension MainViewController {
         }
 
         let dateString = sender.dateString
+        let isToday = sender.isToday
         let visits = sender.getVisits()
         let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString)
         alert.beginSheetModal(for: window, completionHandler: { response in
             guard case .alertFirstButtonReturn = response else {
                 return
             }
-            FireCoordinator.fireViewModel.fire.burnVisits(of: visits, except: FireproofDomains.shared)
+            FireCoordinator.fireViewModel.fire.burnVisits(of: visits,
+                                                          except: FireproofDomains.shared,
+                                                          isToday: isToday)
         })
     }
 
@@ -465,6 +508,11 @@ extension MainViewController {
             .addressBarViewController?
             .addressBarButtonsViewController?
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
+    }
+
+    @objc func bookmarkAllOpenTabs(_ sender: Any) {
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
     }
 
     @objc func favoriteThisPage(_ sender: Any) {
@@ -561,6 +609,12 @@ extension MainViewController {
         WindowsManager.openNewWindow(with: tab)
     }
 
+    @objc func duplicateTab(_ sender: Any?) {
+        guard let (_, index) = getActiveTabAndIndex() else { return }
+
+        tabCollectionViewModel.duplicateTab(at: index)
+    }
+
     @objc func pinOrUnpinTab(_ sender: Any?) {
         guard let (_, selectedTabIndex) = getActiveTabAndIndex() else { return }
 
@@ -597,16 +651,26 @@ extension MainViewController {
     // MARK: - Printing
 
     @objc func printWebView(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.print()
+        let pdfHUD = (sender as? NSMenuItem)?.pdfHudRepresentedObject // if printing a PDF (may be from a frame context menu)
+        getActiveTabAndIndex()?.tab.print(pdfHUD: pdfHUD)
     }
 
     // MARK: - Saving
 
     @objc func saveAs(_ sender: Any) {
-        getActiveTabAndIndex()?.tab.saveWebContentAs()
+        let pdfHUD = (sender as? NSMenuItem)?.pdfHudRepresentedObject // if saving a PDF (may be from a frame context menu)
+        getActiveTabAndIndex()?.tab.saveWebContent(pdfHUD: pdfHUD, location: .prompt)
     }
 
     // MARK: - Debug
+
+    @objc func addDebugTabs(_ sender: AnyObject) {
+        let numberOfTabs = sender.representedObject as? Int ?? 1
+        (1...numberOfTabs).forEach { _ in
+            let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .ui))
+            tabCollectionViewModel.append(tab: tab)
+        }
+    }
 
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
         UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
@@ -622,7 +686,7 @@ extension MainViewController {
     }
 
     @objc func resetSecureVaultData(_ sender: Any?) {
-        let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
 
         let accounts = (try? vault?.accounts()) ?? []
         for accountID in accounts.compactMap(\.id) {
@@ -671,38 +735,65 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowImport.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay0.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay7.rawValue)
-        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
     }
 
     @objc func internalUserState(_ sender: Any?) {
         guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
         let state = internalUserDecider.isInternalUser
         internalUserDecider.debugSetInternalUserState(!state)
+
+        if !DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+            // We only clear PPro state when it's not available, as otherwise
+            // there should be no state to clear.  Clearing PPro state can
+            // trigger notifications which we want to avoid unless
+            // necessary.
+            clearPrivacyProState()
+        }
+    }
+
+    /// Clears the PrivacyPro state to make testing easier.
+    ///
+    private func clearPrivacyProState() {
+        AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).signOut()
+        resetThankYouModalChecks(nil)
+        UserDefaults.netP.networkProtectionEntitlementsExpired = false
+
+        // Clear pixel data
+        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProFeatureEnabled)
+        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProBetaUserThankYouDBP)
+        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProBetaUserThankYouVPN)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
-        UserDefaults.standard.removePersistentDomain(forName: DailyPixel.Constant.dailyPixelStorageIdentifier)
+        PixelKit.shared?.clearFrequencyHistoryForAllPixels()
+    }
+
+    @objc func inPermanentSurveyShareOn(_ sender: Any?) {
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
+    }
+
+    @objc func inPermanentSurveyShareOff(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
     }
 
     @objc func changeInstallDateToToday(_ sender: Any?) {
         UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @objc func changeInstallDateToLessThan21DaysAgo(_ sender: Any?) {
-        let lessThanTwentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -20, to: Date())
-        UserDefaults.standard.set(lessThanTwentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @objc func changeInstallDateToLessThan5DayAgo(_ sender: Any?) {
+        let lessThanFiveDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: Date())
+        UserDefaults.standard.set(lessThanFiveDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @objc func changeInstallDateToMoreThan21DaysAgoButLessThan27(_ sender: Any?) {
-        let twentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -21, to: Date())
-        UserDefaults.standard.set(twentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @objc func changeInstallDateToMoreThan5DayAgoButLessThan9(_ sender: Any?) {
+        let between5And9DaysAgo = Calendar.current.date(byAdding: .day, value: -5, to: Date())
+        UserDefaults.standard.set(between5And9DaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @objc func changeInstallDateToMoreThan27DaysAgo(_ sender: Any?) {
-        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -28, to: Date())
-        UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @objc func changeInstallDateToMoreThan9DaysAgo(_ sender: Any?) {
+        let nineDaysAgo = Calendar.current.date(byAdding: .day, value: -9, to: Date())
+        UserDefaults.standard.set(nineDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
     @objc func showSaveCredentialsPopover(_ sender: Any?) {
@@ -726,6 +817,28 @@ extension MainViewController {
                       webViewSize: .zero)
 
         WindowsManager.openPopUpWindow(with: tab, origin: nil, contentSize: nil)
+    }
+
+    @objc func resetThankYouModalChecks(_ sender: Any?) {
+        let presenter = WaitlistThankYouPromptPresenter()
+        presenter.resetPromptCheck()
+        UserDefaults.netP.removeObject(forKey: UserDefaults.vpnLegacyUserAccessDisabledOnceKey)
+    }
+
+    @objc func showVPNThankYouModal(_ sender: Any?) {
+        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .vpn)
+        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
+        if let thankYouWindow = thankYouWindowController.window {
+            WindowsManager.windows.first?.beginSheet(thankYouWindow)
+        }
+    }
+
+    @objc func showPIRThankYouModal(_ sender: Any?) {
+        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .dbp)
+        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
+        if let thankYouWindow = thankYouWindowController.window {
+            WindowsManager.windows.first?.beginSheet(thankYouWindow)
+        }
     }
 
     @objc func resetEmailProtectionInContextPrompt(_ sender: Any?) {
@@ -808,6 +921,9 @@ extension MainViewController: NSMenuItemValidation {
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        guard fireViewController.fireViewModel.fire.burningData == nil else {
+            return true
+        }
         switch menuItem.action {
         // Back/Forward
         case #selector(MainViewController.back(_:)):
@@ -825,8 +941,8 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(findInPage),
              #selector(findInPageNext),
              #selector(findInPagePrevious):
-            return activeTabViewModel?.canReload == true // must have content loaded
-                && view.window?.isKeyWindow == true // disable in full screen
+            return activeTabViewModel?.canFindInPage == true // must have content loaded
+                && view.window?.isKeyWindow == true // disable in video full screen
 
         case #selector(findInPageDone):
             return getActiveTabAndIndex()?.tab.findInPage?.isActive == true
@@ -837,12 +953,15 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.zoomOut(_:)):
             return getActiveTabAndIndex()?.tab.webView.canZoomOut == true
         case #selector(MainViewController.actualSize(_:)):
-            return getActiveTabAndIndex()?.tab.webView.canZoomToActualSize == true
+            return getActiveTabAndIndex()?.tab.webView.canZoomToActualSize == true ||
+            getActiveTabAndIndex()?.tab.webView.canResetMagnification == true
 
         // Bookmarks
         case #selector(MainViewController.bookmarkThisPage(_:)),
              #selector(MainViewController.favoriteThisPage(_:)):
             return activeTabViewModel?.canBeBookmarked == true
+        case #selector(MainViewController.bookmarkAllOpenTabs(_:)):
+            return tabCollectionViewModel.canBookmarkAllOpenTabs()
         case #selector(MainViewController.openBookmark(_:)),
              #selector(MainViewController.showManageBookmarks(_:)):
             return true
@@ -932,13 +1051,16 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(AppDelegate.openExportLogins(_:)):
             return areTherePasswords
 
+        case #selector(AppDelegate.openReportBrokenSite(_:)):
+            return WindowControllersManager.shared.selectedTab?.canReload ?? false
+
         default:
             return true
         }
     }
 
     private var areTherePasswords: Bool {
-        let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
         guard let vault else {
             return false
         }
@@ -979,6 +1101,26 @@ extension MainViewController: FindInPageDelegate {
 
     @objc func findInPageDone(_ sender: Any) {
         activeTabViewModel?.closeFindInPage()
+    }
+
+}
+
+extension AppDelegate: PrivacyDashboardViewControllerSizeDelegate {
+
+    func privacyDashboardViewControllerDidChange(size: NSSize) {
+        privacyDashboardWindow?.setFrame(NSRect(origin: .zero, size: size), display: true, animate: true)
+    }
+}
+
+extension NSMenuItem {
+
+    var pdfHudRepresentedObject: WKPDFHUDViewWrapper? {
+        guard let representedObject = representedObject else { return nil }
+
+        return representedObject as? WKPDFHUDViewWrapper ?? {
+            assertionFailure("Unexpected SaveAs/Print menu item represented object: \(representedObject)")
+            return nil
+        }()
     }
 
 }

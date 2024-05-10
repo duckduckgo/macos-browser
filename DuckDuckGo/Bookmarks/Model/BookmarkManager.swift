@@ -28,14 +28,18 @@ protocol BookmarkManager: AnyObject {
     func allHosts() -> Set<String>
     func getBookmark(for url: URL) -> Bookmark?
     func getBookmark(forUrl url: String) -> Bookmark?
+    func getBookmarkFolder(withId id: String) -> BookmarkFolder?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
+    func makeBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType)
     func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void)
     func remove(bookmark: Bookmark)
     func remove(folder: BookmarkFolder)
     func remove(objectsWithUUIDs uuids: [String])
     func update(bookmark: Bookmark)
+    func update(bookmark: Bookmark, withURL url: URL, title: String, isFavorite: Bool)
     func update(folder: BookmarkFolder)
+    func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType)
     @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
     func add(bookmark: Bookmark, to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func add(objectsWithUUIDs uuids: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
@@ -44,12 +48,13 @@ protocol BookmarkManager: AnyObject {
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
-
     func handleFavoritesAfterDisablingSync()
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
+
+    func requestSync()
 
 }
 
@@ -134,6 +139,10 @@ final class LocalBookmarkManager: BookmarkManager {
         return list?[url]
     }
 
+    func getBookmarkFolder(withId id: String) -> BookmarkFolder? {
+        bookmarkStore.bookmarkFolder(withId: id)
+    }
+
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
         makeBookmark(for: url, title: title, isFavorite: isFavorite, index: nil, parent: nil)
     }
@@ -161,6 +170,12 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         return bookmark
+    }
+
+    func makeBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType) {
+        bookmarkStore.saveBookmarks(for: websitesInfo, inNewFolderNamed: folderName, withinParentFolder: parent)
+        loadBookmarks()
+        requestSync()
     }
 
     func remove(bookmark: Bookmark) {
@@ -209,8 +224,31 @@ final class LocalBookmarkManager: BookmarkManager {
 
     }
 
+    func update(bookmark: Bookmark, withURL url: URL, title: String, isFavorite: Bool) {
+        guard list != nil else { return }
+        guard getBookmark(forUrl: bookmark.url) != nil else {
+            os_log("LocalBookmarkManager: Failed to update bookmark url - not in the list.", type: .error)
+            return
+        }
+
+        guard let newBookmark = list?.update(bookmark: bookmark, newURL: url.absoluteString, newTitle: title, newIsFavorite: isFavorite) else {
+            os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
+            return
+        }
+
+        bookmarkStore.update(bookmark: newBookmark)
+        loadBookmarks()
+        requestSync()
+    }
+
     func update(folder: BookmarkFolder) {
         bookmarkStore.update(folder: folder)
+        loadBookmarks()
+        requestSync()
+    }
+
+    func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType) {
+        bookmarkStore.update(folder: folder, andMoveToParent: parent)
         loadBookmarks()
         requestSync()
     }

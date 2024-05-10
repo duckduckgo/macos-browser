@@ -23,6 +23,7 @@ extension UserDefaults {
     /// The app group's shared UserDefaults
     static let netP = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .netP))!
     static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
+    static let subs = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .subs))!
 }
 
 @propertyWrapper
@@ -54,10 +55,13 @@ public struct UserDefaultsWrapper<T> {
         case grammarCheckEnabledOnce = "grammar.check.enabled.once"
 
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
+        case autoClearEnabled = "preferences.auto-clear-enabled"
+        case warnBeforeClearingEnabled = "preferences.warn-before-clearing-enabled"
         case gpcEnabled = "preferences.gpc-enabled"
         case selectedDownloadLocationKey = "preferences.download-location"
         case lastUsedCustomDownloadLocation = "preferences.custom-last-used-download-location"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
+        case openDownloadsPopupOnCompletionKey = "preferences.downloads.open.on.completion"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
         case duckPlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
@@ -69,12 +73,16 @@ public struct UserDefaultsWrapper<T> {
         case askToSaveAddresses = "preferences.ask-to-save.addresses"
         case askToSavePaymentMethods = "preferences.ask-to-save.payment-methods"
         case autolockLocksFormFilling = "preferences.lock-autofill-form-fill"
+        case autofillDebugScriptEnabled = "preferences.enable-autofill-debug-script"
+        case autofillSurveyEnabled = "preferences.enable-autofill-survey"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
         case lastCrashReportCheckDate = "last.crash.report.check.date"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
+        case appTerminationHandledCorrectly = "app.termination.handled.correctly"
+        case restoreTabsOnStartup = "restore.tabs.on.startup"
 
         case restorePreviousSession = "preferences.startup.restore-previous-session"
         case launchToCustomHomePage = "preferences.startup.launch-to-custom-home-page"
@@ -82,6 +90,9 @@ public struct UserDefaultsWrapper<T> {
         case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
         case showFullURL = "preferences.appearance.show-full-url"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
+        case preferNewTabsToWindows = "preferences.tabs.prefer-new-tabs-to-windows"
+        case switchToNewTabWhenOpened = "preferences.tabs.switch-to-new-tab-when-opened"
+        case newTabPosition = "preferences.tabs.new-tab-position"
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
 
@@ -108,9 +119,8 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowImport = "home.page.show.import"
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
-        case homePageShowSurveyDay0 = "home.page.show.survey.0"
-        case homePageUserInteractedWithSurveyDay0 = "home.page.user.interacted.with.survey.0"
-        case homePageShowSurveyDay7 = "home.page.show.survey.7"
+        case homePageUserInSurveyShare = "home.page.user.in.survey.share"
+        case homePageShowPermanentSurvey = "home.page.show.import.permanent.survey"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"
@@ -144,13 +154,13 @@ public struct UserDefaultsWrapper<T> {
         case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
         case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
 
-        // Network Protection
+        // VPN
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
         case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
-        // Network Protection: Shared Defaults
+        // VPN: Shared Defaults
         // ---
         // Please note that shared defaults MUST have a name that matches exactly their value,
         // or else KVO will just not work as of 2023-08-07
@@ -172,13 +182,26 @@ public struct UserDefaultsWrapper<T> {
         case favoritesDisplayMode = "sync.favorites-display-mode"
         case syncBookmarksPaused = "sync.bookmarks-paused"
         case syncCredentialsPaused = "sync.credentials-paused"
+        case syncIsPaused = "sync.paused"
         case syncBookmarksPausedErrorDisplayed = "sync.bookmarks-paused-error-displayed"
         case syncCredentialsPausedErrorDisplayed = "sync.credentials-paused-error-displayed"
+        case syncInvalidLoginPausedErrorDisplayed = "sync.invalid-login-paused-error-displayed"
         case syncIsFaviconsFetcherEnabled = "sync.is-favicons-fetcher-enabled"
         case syncIsEligibleForFaviconsFetcherOnboarding = "sync.is-eligible-for-favicons-fetcher-onboarding"
         case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
         case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
         case syncDidShowSyncPausedByFeatureFlagAlert = "sync.did-show-sync-paused-by-feature-flag-alert"
+        case syncLastErrorNotificationTime = "sync.last-error-notification-time"
+        case syncLastSuccesfullTime = "sync.last-time-success"
+        case syncLastNonActionableErrorCount = "sync.non-actionable-error-count"
+        case syncCurrentAllPausedError = "sync.current-all-paused-error"
+        case syncCurrentBookmarksPausedError = "sync.current-bookmarks-paused-error"
+        case syncCurrentCredentialsPausedError = "sync.current-credentials-paused-error"
+
+        // Subscription
+
+        case subscriptionInternalTesting = "subscription.internal-testing-enabled"
+        case subscriptionEnvironment = "subscription.environment"
     }
 
     enum RemovedKeys: String, CaseIterable {
@@ -245,7 +268,7 @@ public struct UserDefaultsWrapper<T> {
 
             return value
         }
-        set {
+        nonmutating set {
             setValue(newValue)
         }
     }

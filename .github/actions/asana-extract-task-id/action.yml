@@ -1,0 +1,23 @@
+name: Extract Asana Task ID
+description: Extracts Asana task ID from a task URL
+inputs:
+  task-url:
+    description: "Asana task URL"
+    required: true
+    type: string
+outputs:
+  task-id:
+    description: "Task ID"
+    value: ${{ steps.extract-task-id.outputs.task-id }}
+runs:
+  using: "composite"
+  steps:
+    - id: extract-task-id
+      run: |
+        task_url_regex='^https://app.asana.com/[0-9]/[0-9]*/([0-9]*)/f$'
+        if [[ "${{ inputs.task-url }}" =~ ${task_url_regex} ]]; then
+          echo "task-id=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+        else
+          echo "::error::Asana Task URL has incorrect format (attempted to match ${task_url_regex})."
+        fi
+      shell: bash

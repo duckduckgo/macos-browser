@@ -29,19 +29,19 @@ extension HomePage.Views {
 
                 VStack {
                     Divider()
-                        .foregroundColor(Color("HomePageMoreOrLessTextColor"))
+                        .foregroundColor((.homePageMoreOrLessText))
                 }.frame(maxWidth: .infinity)
 
                 HStack {
                     Text(isExpanded ? UserText.moreOrLessCollapse : UserText.moreOrLessExpand)
-                    Image("HomeArrowUp")
+                    Image(.homeArrowUp)
                         .rotationEffect(.degrees(isExpanded ? 0 : 180))
                 }
-                .foregroundColor(Color("HomePageMoreOrLessTextColor"))
+                .foregroundColor((.homePageMoreOrLessText))
 
                 VStack {
                     Divider()
-                        .foregroundColor(Color("HomePageMoreOrLessTextColor"))
+                        .foregroundColor((.homePageMoreOrLessText))
                 }.frame(maxWidth: .infinity)
             }
             .frame(height: 32)

@@ -20,25 +20,7 @@ import Cocoa
 
 extension NSColor {
 
-    static var homePageBackgroundColor: NSColor {
-        NSColor(named: "HomePageBackgroundColor")!
-    }
-
-    static var homePageSearchBarBackgroundColor: NSColor {
-         return NSColor(named: "HomePageSearchBarBackgroundColor")!
-     }
-
-    static var addressBarFocusedBackgroundColor: NSColor {
-        NSColor(named: "AddressBarFocusedBackgroundColor")!
-    }
-
-    static var addressBarBackgroundColor: NSColor {
-        NSColor(named: "AddressBarBackgroundColor")!
-    }
-
-    static var burnerAccentColor: NSColor {
-        NSColor(named: "BurnerAccentColor")!
-    }
+    // MARK: Aliases
 
     static var burnerWindowMouseOverColor: NSColor {
         .alternateSelectedControlTextColor.withAlphaComponent(0.1)
@@ -48,127 +30,32 @@ extension NSColor {
         .alternateSelectedControlTextColor.withAlphaComponent(0.2)
     }
 
-    static var addressBarBorderColor: NSColor {
-        NSColor(named: "AddressBarBorderColor")!
-    }
-
-    static var addressBarShadowColor: NSColor {
-        NSColor(named: "AddressBarShadowColor")!
-    }
-
-    static var addressBarSolidSeparatorColor: NSColor {
-        NSColor(named: "AddressBarSolidSeparatorColor")!
-    }
-
-    static var suggestionsShadowColor: NSColor {
-        NSColor(named: "SuggestionsShadowColor")!
-    }
-
     static let detailAccentColor = NSColor(catalogName: "System", colorName: "detailAccentColor") ?? .controlAccentColor
 
-    static var addressBarSuffixColor: NSColor {
+    static var addressBarSuffix: NSColor {
         .detailAccentColor
     }
 
-    static var findInPageFocusedBackgroundColor: NSColor {
-        NSColor(named: "FindInPageFocusedBackgroundColor")!
-    }
-
-    static var suggestionTextColor: NSColor {
-        NSColor(named: "SuggestionTextColor")!
-    }
-
-    static var suggestionIconColor: NSColor {
-        NSColor(named: "SuggestionIconColor")!
-    }
-
-    static var selectedSuggestionTintColor: NSColor {
-        NSColor(named: "SelectedSuggestionTintColor")!
-    }
-
-    static var interfaceBackgroundColor: NSColor {
-        NSColor(named: "InterfaceBackgroundColor")!
-    }
-
-    static var tabMouseOverColor: NSColor {
-        NSColor(named: "TabMouseOverColor")!
-    }
-
-    static var buttonMouseOverColor: NSColor {
-        NSColor(named: "ButtonMouseOverColor")!
-    }
-
-    static var progressBarGradientDarkColor: NSColor {
+    static var progressBarGradientDark: NSColor {
         .controlAccentColor
     }
 
-    static var progressBarGradientLightColor: NSColor {
+    static var progressBarGradientLight: NSColor {
         .detailAccentColor
     }
 
-    static var backgroundSecondaryColor: NSColor {
-        NSColor(named: "BackgroundSecondaryColor")!
+    static var textEditorBackground: NSColor {
+        .blackWhite5
     }
 
-    static var tableCellEditingColor: NSColor {
-        NSColor(named: "TableCellEditingColor")!
+    static var textEditorBorder: NSColor {
+        .blackWhite10
     }
 
-    static var rowHoverColor: NSColor {
-        NSColor(named: "RowHoverColor")!
-    }
-
-    static var rowDragDropColor: NSColor {
-        NSColor(named: "RowDragDropColor")!
-    }
-
-    static var privacyEnabledColor: NSColor {
-        NSColor(named: "PrivacyEnabledColor")!
-    }
-
-    static var editingPanelColor: NSColor {
-        NSColor(named: "EditingPanelColor")!
-    }
-
-    static var dialogPanelBackgroundColor: NSColor {
-        NSColor(named: "DialogPanelBackground")!
-    }
-
-    static var buttonMouseDownColor: NSColor {
-        NSColor(named: "ButtonMouseDownColor")!
-    }
-
-    static let buttonColor: NSColor = NSColor(named: "ButtonColor")!
-
-    static var logoBackgroundColor: NSColor {
-        NSColor(named: "LogoBackgroundColor")!
-    }
-
-    static var textEditorBackgroundColor: NSColor {
-        NSColor(named: "BlackWhite5")!
-    }
-
-    static var textEditorBorderColor: NSColor {
-        NSColor(named: "BlackWhite10")!
-    }
+    // MARK: - Helpers
 
     var ciColor: CIColor {
         CIColor(color: self)!
     }
 
-    static var redButtonTintColor: NSColor {
-        NSColor(named: "RedButtonTintColor")!
-    }
-
-    static var fireButtonRedBackgroundColor: NSColor {
-        NSColor(named: "FireButtonRedBackgroundColor")!
-    }
-
-    static var fireButtonRedHoverColor: NSColor {
-        NSColor(named: "FireButtonRedHoverColor")!
-    }
-
-    static var fireButtonRedPressedColor: NSColor {
-        NSColor(named: "FireButtonRedPressedColor")!
-    }
 }

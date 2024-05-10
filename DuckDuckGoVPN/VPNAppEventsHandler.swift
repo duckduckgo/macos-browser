@@ -30,20 +30,20 @@ final class VPNAppEventsHandler {
 
     func appDidFinishLaunching() {
         let currentVersion = AppVersion.shared.versionAndBuildNumber
-        let versionStore = NetworkProtectionLastVersionRunStore()
+        let versionStore = NetworkProtectionLastVersionRunStore(userDefaults: .netP)
         defer {
-            versionStore.lastVersionRun = currentVersion
+            versionStore.lastAgentVersionRun = currentVersion
         }
 
         let restartTunnel = {
-            os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", versionStore.lastVersionRun ?? "null", currentVersion)
+            os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", versionStore.lastAgentVersionRun ?? "null", currentVersion)
             self.restartTunnel()
         }
 
 #if DEBUG || REVIEW // Since DEBUG and REVIEW builds may not change version No. we want them to always reset.
         restartTunnel()
 #else
-        if versionStore.lastVersionRun != currentVersion {
+        if versionStore.lastAgentVersionRun != currentVersion {
             restartTunnel()
         }
 #endif
@@ -55,8 +55,7 @@ final class VPNAppEventsHandler {
         Task {
             // Restart NetP SysEx on app update
             if await tunnelController.isConnected {
-                await tunnelController.stop()
-                await tunnelController.start()
+                await tunnelController.restart()
             }
         }
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22689"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -10,18 +10,20 @@
         <scene sceneID="uf3-HR-DIS">
             <objects>
                 <viewController id="o2v-eH-jTI" customClass="NavigationBarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="hYV-nu-QIp" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="hYV-nu-QIp" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="939" height="68"/>
-                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="EQw-GG-GMA" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="939" height="68"/>
                             </customView>
-                            <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEh-kf-smR">
+                            <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eEh-kf-smR">
                                 <rect key="frame" x="12" y="30" width="124" height="28"/>
                                 <subviews>
                                     <box hidden="YES" horizontalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="X5m-gH-M1N">
-                                        <rect key="frame" x="-2" y="-68" width="5" height="96"/>
+                                        <rect key="frame" x="-2" y="8" width="5" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="20" id="1Cr-jJ-dOQ"/>
+                                        </constraints>
                                     </box>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="kky-0N-Cfd" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
@@ -250,7 +252,7 @@
                                             <action selector="bookmarksButtonAction:" target="o2v-eH-jTI" id="feR-3s-kbn"/>
                                         </connections>
                                     </button>
-                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iKf-yR-au9" userLabel="Network Protection Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iKf-yR-au9" userLabel="VPN Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="sRc-lQ-ndi">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -321,6 +323,7 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="EQw-GG-GMA" secondAttribute="bottom" id="4ye-CO-dDp"/>
+                            <constraint firstAttribute="height" constant="68" id="KjG-nj-hqf"/>
                             <constraint firstItem="eEh-kf-smR" firstAttribute="leading" secondItem="hYV-nu-QIp" secondAttribute="leading" constant="12" id="MQ7-vv-adb"/>
                             <constraint firstItem="aWu-Jm-Oaz" firstAttribute="top" secondItem="eEh-kf-smR" secondAttribute="top" id="S2g-Lx-lQw"/>
                             <constraint firstAttribute="trailing" secondItem="aWu-Jm-Oaz" secondAttribute="trailing" constant="12" id="UeG-qO-bD2"/>
@@ -338,13 +341,14 @@
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                <color key="value" name="InterfaceBackgroundColor"/>
+                                <color key="value" name="NavigationBarBackgroundColor"/>
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
                         <outlet property="addressBarBottomConstraint" destination="Xaz-X5-bmg" id="Xsd-Ca-9o5"/>
                         <outlet property="addressBarContainer" destination="Wba-nA-FYj" id="VEq-Sp-Ns1"/>
+                        <outlet property="addressBarHeightConstraint" destination="KjG-nj-hqf" id="pT7-bY-Rf2"/>
                         <outlet property="addressBarLeftToNavButtonsConstraint" destination="rfA-3F-QAf" id="IJE-cK-DQ6"/>
                         <outlet property="addressBarProportionalWidthConstraint" destination="rqL-Vd-lnY" id="zxF-f6-8wE"/>
                         <outlet property="addressBarStack" destination="gIy-el-24l" id="vlT-AD-nDv"/>
@@ -470,7 +474,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
-                            <textField focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="le0-Hn-ZAC">
+                            <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="le0-Hn-ZAC">
                                 <rect key="frame" x="359" y="8" width="8" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" refusesFirstResponder="YES" alignment="center" usesSingleLineMode="YES" id="rpt-TE-48N">
                                     <font key="font" metaFont="system"/>
@@ -720,6 +724,7 @@
                                                     <userDefinedRuntimeAttribute type="image" keyPath="disabledImage" value="Geolocation-Icon"/>
                                                     <userDefinedRuntimeAttribute type="image" keyPath="mutedImage" value="Geolocation-Icon"/>
                                                 </userDefinedRuntimeAttributes>
+                                                <accessibility identifier="NavigationBarViewController.geolocationPermissionButton"/>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uao-nC-0co" userLabel="Microphone Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="32" y="0.0" width="32" height="32"/>
@@ -743,6 +748,7 @@
                                                     <userDefinedRuntimeAttribute type="image" keyPath="disabledImage" value="Microphone-Icon"/>
                                                     <userDefinedRuntimeAttribute type="image" keyPath="mutedImage" value="Microphone-Icon"/>
                                                 </userDefinedRuntimeAttributes>
+                                                <accessibility identifier="NavigationBarViewController.microphonePermissionButton"/>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C2L-f9-L3r" userLabel="Camera Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="64" y="0.0" width="32" height="32"/>
@@ -766,6 +772,7 @@
                                                     <userDefinedRuntimeAttribute type="image" keyPath="disabledImage" value="Camera-Tab-Blocked"/>
                                                     <userDefinedRuntimeAttribute type="image" keyPath="mutedImage" value="Camera-Icon"/>
                                                 </userDefinedRuntimeAttributes>
+                                                <accessibility identifier="NavigationBarViewController.cameraPermissionButton"/>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qqY-h9-UQ7" userLabel="Popups Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="96" y="0.0" width="32" height="32"/>
@@ -785,6 +792,7 @@
                                                         <color key="value" name="ButtonMouseDownColor"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
+                                                <accessibility identifier="NavigationBarViewController.popupsPermissionButton"/>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gGA-Yv-pnz" userLabel="External Scheme Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="128" y="0.0" width="32" height="32"/>
@@ -922,8 +930,8 @@
         <namedColor name="InactiveSearchBarBackground">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.05000000074505806" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
-        <namedColor name="InterfaceBackgroundColor">
-            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="NavigationBarBackgroundColor">
+            <color red="0.98039215686274506" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

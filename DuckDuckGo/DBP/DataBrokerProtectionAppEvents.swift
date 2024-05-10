@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import LoginItems
 import Common
@@ -33,22 +35,38 @@ struct DataBrokerProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
         let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
 
-        guard featureVisibility.isFeatureVisible() else {
+        guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
+
+        /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
+        /// since the waitlist flag might have been turned off
+        if !featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() {
             featureVisibility.disableAndDeleteForWaitlistUsers()
             return
         }
 
         Task {
             try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
+
+            // If we don't have profileQueries it means there's no user profile saved in our DB
+            // In this case, let's disable the agent and delete any left-over data because there's nothing for it to do
+            if let profileQueriesCount = try? DataBrokerProtectionManager.shared.dataManager.profileQueriesCount(),
+               profileQueriesCount > 0 {
+                restartBackgroundAgent(loginItemsManager: loginItemsManager)
+            } else {
+                featureVisibility.disableAndDeleteForWaitlistUsers()
+            }
         }
 
-        restartBackgroundAgent(loginItemsManager: loginItemsManager)
     }
 
     func applicationDidBecomeActive() {
         let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
 
-        guard featureVisibility.isFeatureVisible() else {
+        guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
+
+        /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
+        /// since the waitlist flag might have been turned off
+        if !featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() {
             featureVisibility.disableAndDeleteForWaitlistUsers()
             return
         }
@@ -63,9 +81,9 @@ struct DataBrokerProtectionAppEvents {
         if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
             switch source {
             case .cardUI:
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistCardUITapped, frequency: .dailyAndCount)
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistCardUITapped, frequency: .dailyAndCount)
             case .localPush:
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
             }
 
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
@@ -78,15 +96,17 @@ struct DataBrokerProtectionAppEvents {
 
     private func sendActiveDataBrokerProtectionWaitlistUserPixel() {
         if DefaultDataBrokerProtectionFeatureVisibility().waitlistIsOngoing {
-            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistUserActive, frequency: .dailyOnly)
+            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistUserActive, frequency: .daily)
         }
     }
 
     private func restartBackgroundAgent(loginItemsManager: LoginItemsManager) {
-        pixelHandler.fire(.resetLoginItem)
+        DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerResetLoginItemDaily, frequency: .daily)
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
         loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
 
         // restartLoginItems doesn't work when we change the agent name
     }
 }
+
+#endif

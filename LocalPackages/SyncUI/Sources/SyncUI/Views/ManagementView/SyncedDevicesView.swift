@@ -41,10 +41,10 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
             .onDisappear {
                 isVisible = false
             }
-            Button {
-                model.syncWithAnotherDevicePressed()
-            } label: {
-                Text(UserText.beginSyncButton)
+            Button(UserText.beginSyncButton) {
+                Task {
+                    await model.syncWithAnotherDevicePressed()
+                }
             }
             .disabled(!model.isConnectingDevicesAvailable)
             .padding(.horizontal, 10)
@@ -77,7 +77,7 @@ struct IconOnBackground: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color("BlackWhite100").opacity(0.06))
+                .fill(Color(.blackWhite100).opacity(0.06))
                 .frame(width: 24, height: 24)
 
             Image(nsImage: image)
@@ -105,7 +105,7 @@ struct SyncedDevicesList: View {
             ForEach(devices) { device in
                 if !device.isCurrent {
                     Rectangle()
-                        .fill(Color("BlackWhite10"))
+                        .fill(Color(.blackWhite10))
                         .frame(height: 1)
                         .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
                 }
@@ -145,7 +145,7 @@ struct SyncedDevicesList: View {
                 }
             }
             Rectangle()
-                .fill(Color("BlackWhite10"))
+                .fill(Color(.blackWhite10))
                 .frame(height: 1)
                 .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
         }

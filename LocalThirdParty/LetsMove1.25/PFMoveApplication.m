@@ -23,16 +23,11 @@
 @end
 
 // Strings
-// These are macros to be able to use custom i18n tools
-#define _I10NS(nsstr) NSLocalizedStringFromTableInBundle(nsstr, @"MoveApplication", [LetsMove bundle], nil)
-#define kStrMoveApplicationCouldNotMove _I10NS(@"Could not move to Applications folder")
-#define kStrMoveApplicationQuestionTitle  _I10NS(@"You're almost there")
-#define kStrMoveApplicationQuestionTitleHome _I10NS(@"You're almost there")
-#define kStrMoveApplicationQuestionMessage _I10NS(@"The DuckDuckGo app needs to be in the Applications folder for some features to work properly.")
-#define kStrMoveApplicationButtonMove _I10NS(@"Move to Applications Folder")
-#define kStrMoveApplicationButtonDoNotMove _I10NS(@"Do Not Move")
-#define kStrMoveApplicationQuestionInfoWillRequirePasswd _I10NS(@"")
-#define kStrMoveApplicationQuestionInfoInDownloadsFolder _I10NS(@"")
+#define kStrMoveApplicationCouldNotMove NSLocalizedStringWithDefaultValue(@"letsmove.could.not.move", nil, [LetsMove bundle], @"Could not move to Applications folder", @"Error message when moving the app to the /Applications folder failed")
+#define kStrMoveApplicationQuestionTitle NSLocalizedStringWithDefaultValue(@"letsmove.alert.title", nil, [LetsMove bundle], @"You‘re almost there", @"Title of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there")
+#define kStrMoveApplicationQuestionMessage NSLocalizedStringWithDefaultValue(@"letsmove.alert.message", nil, [LetsMove bundle], @"The DuckDuckGo app needs to be in the Applications folder for some features to work properly.", @"Message of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there")
+#define kStrMoveApplicationButtonMove NSLocalizedStringWithDefaultValue(@"letsmove.move.button", nil, [LetsMove bundle], @"Move to Applications Folder", @"Move the /Applications folder button title")
+#define kStrMoveApplicationButtonDoNotMove NSLocalizedStringWithDefaultValue(@"letsmove.dont.move.button", nil, [LetsMove bundle], @"Do Not Move", @"Do Not Move to the /Applications folder button title")
 
 // Needs to be defined for compiling under 10.5 SDK
 #ifndef NSAppKitVersionNumber10_5
@@ -49,9 +44,8 @@ static NSString *AlertSuppressKey = @"moveToApplicationsFolderAlertSuppress";
 static BOOL MoveInProgress = NO;
 
 // Helper functions
-static NSString *PreferredInstallLocation(BOOL *isUserDirectory);
+static NSString *PreferredInstallLocation(void);
 static BOOL IsInApplicationsFolder(NSString *path);
-static BOOL IsInDownloadsFolder(NSString *path);
 static BOOL IsApplicationAtPathRunning(NSString *path);
 static BOOL IsApplicationAtPathNested(NSString *path);
 static NSString *ContainingDiskImageDevice(NSString *path);
@@ -63,19 +57,19 @@ static NSString *ShellQuotedString(NSString *string);
 static void Relaunch(NSString *destinationPath);
 
 // Main worker function
-void PFMoveToApplicationsFolderIfNecessary(void) {
+void PFMoveToApplicationsFolderIfNecessary(BOOL allowAlertSilencing) {
 
 	// Make sure to do our work on the main thread.
 	// Apparently Electron apps need this for things to work properly.
 	if (![NSThread isMainThread]) {
 		dispatch_async(dispatch_get_main_queue(), ^{
-			PFMoveToApplicationsFolderIfNecessary();
+			PFMoveToApplicationsFolderIfNecessary(allowAlertSilencing);
 		});
 		return;
 	}
 	
 	// Skip if user suppressed the alert before
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:AlertSuppressKey]) return;
+	if (allowAlertSilencing && [[NSUserDefaults standardUserDefaults] boolForKey:AlertSuppressKey]) return;
 
 	// Path of the bundle
 	NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
@@ -97,8 +91,7 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 	NSString *diskImageDevice = ContainingDiskImageDevice(bundlePath);
 
 	// Since we are good to go, get the preferred installation directory.
-	BOOL installToUserApplications = NO;
-	NSString *applicationsDirectory = PreferredInstallLocation(&installToUserApplications);
+	NSString *applicationsDirectory = PreferredInstallLocation();
 	NSString *bundleName = [bundlePath lastPathComponent];
 	NSString *destinationPath = [applicationsDirectory stringByAppendingPathComponent:bundleName];
 
@@ -113,19 +106,9 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 	{
 		NSString *informativeText = nil;
 
-		[alert setMessageText:(installToUserApplications ? kStrMoveApplicationQuestionTitleHome : kStrMoveApplicationQuestionTitle)];
+		[alert setMessageText:kStrMoveApplicationQuestionTitle];
 
 		informativeText = kStrMoveApplicationQuestionMessage;
-
-		if (needAuthorization) {
-			informativeText = [informativeText stringByAppendingString:@" "];
-			informativeText = [informativeText stringByAppendingString:kStrMoveApplicationQuestionInfoWillRequirePasswd];
-		}
-		else if (IsInDownloadsFolder(bundlePath)) {
-			// Don't mention this stuff if we need authentication. The informative text is long enough as it is in that case.
-			informativeText = [informativeText stringByAppendingString:@" "];
-			informativeText = [informativeText stringByAppendingString:kStrMoveApplicationQuestionInfoInDownloadsFolder];
-		}
 
 		[alert setInformativeText:informativeText];
 
@@ -137,7 +120,7 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 		[cancelButton setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; // Escape key
 
 		// Setup suppression button
-		[alert setShowsSuppressionButton:YES];
+		[alert setShowsSuppressionButton:allowAlertSilencing];
 
 		if (PFUseSmallAlertSuppressCheckbox) {
 			NSCell *cell = [[alert suppressionButton] cell];
@@ -239,58 +222,16 @@ BOOL PFMoveIsInProgress(void) {
 #pragma mark -
 #pragma mark Helper Functions
 
-static NSString *PreferredInstallLocation(BOOL *isUserDirectory) {
-	// Return the preferred install location.
-	// Assume that if the user has a ~/Applications folder, they'd prefer their
-	// applications to go there.
-
-	NSFileManager *fm = [NSFileManager defaultManager];
-
-	NSArray *userApplicationsDirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSUserDomainMask, YES);
-
-	if ([userApplicationsDirs count] > 0) {
-		NSString *userApplicationsDir = [userApplicationsDirs objectAtIndex:0];
-		BOOL isDirectory;
-
-		if ([fm fileExistsAtPath:userApplicationsDir isDirectory:&isDirectory] && isDirectory) {
-			// User Applications directory exists. Get the directory contents.
-			NSArray *contents = [fm contentsOfDirectoryAtPath:userApplicationsDir error:NULL];
-
-			// Check if there is at least one ".app" inside the directory.
-			for (NSString *contentsPath in contents) {
-				if ([[contentsPath pathExtension] isEqualToString:@"app"]) {
-					if (isUserDirectory) *isUserDirectory = YES;
-					return [userApplicationsDir stringByResolvingSymlinksInPath];
-				}
-			}
-		}
-	}
-
-	// No user Applications directory in use. Return the machine local Applications directory
-	if (isUserDirectory) *isUserDirectory = NO;
-
-	return [[NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES) lastObject] stringByResolvingSymlinksInPath];
+static NSString *PreferredInstallLocation(void) {
+    return [[NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES) lastObject] stringByResolvingSymlinksInPath];
 }
 
 static BOOL IsInApplicationsFolder(NSString *path) {
 	// Check all the normal Application directories
-	NSArray *applicationDirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSAllDomainsMask, YES);
+	NSArray *applicationDirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES);
 	for (NSString *appDir in applicationDirs) {
 		if ([path hasPrefix:appDir]) return YES;
 	}
-
-	// Also, handle the case that the user has some other Application directory (perhaps on a separate data partition).
-	if ([[path pathComponents] containsObject:@"Applications"]) return YES;
-
-	return NO;
-}
-
-static BOOL IsInDownloadsFolder(NSString *path) {
-	NSArray *downloadDirs = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory, NSAllDomainsMask, YES);
-	for (NSString *downloadsDirPath in downloadDirs) {
-		if ([path hasPrefix:downloadsDirPath]) return YES;
-	}
-
 	return NO;
 }
 
@@ -390,21 +331,10 @@ static NSString *ContainingDiskImageDevice(NSString *path) {
 
 static BOOL Trash(NSString *path) {
 	BOOL result = NO;
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_8
 	if (floor(NSAppKitVersionNumber) >= NSAppKitVersionNumber10_8) {
 		result = [[NSFileManager defaultManager] trashItemAtURL:[NSURL fileURLWithPath:path] resultingItemURL:NULL error:NULL];
 	}
-#endif
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_11
-	if (!result) {
-		result = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation
-															  source:[path stringByDeletingLastPathComponent]
-														 destination:@""
-															   files:[NSArray arrayWithObject:[path lastPathComponent]]
-																 tag:NULL];
-	}
-#endif
-	
+
 	// As a last resort try trashing with AppleScript.
 	// This allows us to trash the app in macOS Sierra even when the app is running inside
 	// an app translocation image.

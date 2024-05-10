@@ -21,6 +21,7 @@ import Combine
 import ContentBlocking
 import Foundation
 import PrivacyDashboard
+import History
 
 /**
  Tab Extensions should conform to TabExtension protocol
@@ -69,6 +70,8 @@ protocol TabExtensionDependencies {
     var downloadManager: FileDownloadManagerProtocol { get }
     var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
     var duckPlayer: DuckPlayer { get }
+    var certificateTrustEvaluator: CertificateTrustEvaluating { get }
+    var tunnelController: NetworkProtectionIPCTunnelController? { get }
 }
 
 // swiftlint:disable:next large_tuple
@@ -77,6 +80,7 @@ typealias TabExtensionsBuilderArguments = (
     isTabPinned: () -> Bool,
     isTabBurner: Bool,
     contentPublisher: AnyPublisher<Tab.TabContent, Never>,
+    setContent: (Tab.TabContent) -> Void,
     titlePublisher: AnyPublisher<String?, Never>,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
     inheritedAttribution: AdClickAttributionLogic.State?,
@@ -120,9 +124,17 @@ extension TabExtensionsBuilder {
 
         add {
             PrivacyDashboardTabExtension(contentBlocking: dependencies.privacyFeatures.contentBlocking,
+                                         certificateTrustEvaluator: dependencies.certificateTrustEvaluator,
                                          autoconsentUserScriptPublisher: userScripts.map(\.?.autoconsentUserScript),
                                          didUpgradeToHttpsPublisher: httpsUpgrade.didUpgradeToHttpsPublisher,
-                                         trackersPublisher: contentBlocking.trackersPublisher)
+                                         trackersPublisher: contentBlocking.trackersPublisher,
+                                         webViewPublisher: args.webViewFuture)
+        }
+
+        add {
+            BrokenSiteInfoTabExtension(contentPublisher: args.contentPublisher,
+                                       webViewPublisher: args.webViewFuture,
+                                       contentScopeUserScriptPublisher: userScripts.compactMap(\.?.contentScopeUserScriptIsolated))
         }
 
         add {
@@ -156,13 +168,18 @@ extension TabExtensionsBuilder {
                                   isBurner: args.isTabBurner)
         }
         add {
-            SearchNonexistentDomainNavigationResponder(tld: dependencies.privacyFeatures.contentBlocking.tld, contentPublisher: args.contentPublisher)
+            TabSnapshotExtension(webViewPublisher: args.webViewFuture,
+                                 contentPublisher: args.contentPublisher,
+                                 isBurner: args.isTabBurner)
+        }
+        add {
+            SearchNonexistentDomainNavigationResponder(tld: dependencies.privacyFeatures.contentBlocking.tld, contentPublisher: args.contentPublisher, setContent: args.setContent)
         }
         add {
             HistoryTabExtension(isBurner: args.isTabBurner,
                                 historyCoordinating: dependencies.historyCoordinating,
                                 trackersPublisher: contentBlocking.trackersPublisher,
-                                urlPublisher: args.contentPublisher.map { content in content.isUrl ? content.url : nil },
+                                urlPublisher: args.contentPublisher.map { content in content.isUrl ? content.urlForWebView : nil },
                                 titlePublisher: args.titlePublisher)
         }
         add {
@@ -177,6 +194,17 @@ extension TabExtensionsBuilder {
                                    isBurner: args.isTabBurner,
                                    scriptsPublisher: userScripts.compactMap { $0 },
                                    webViewPublisher: args.webViewFuture)
+        }
+
+        add {
+            SSLErrorPageTabExtension(webViewPublisher: args.webViewFuture,
+                                  scriptsPublisher: userScripts.compactMap { $0 })
+        }
+
+        if let tunnelController = dependencies.tunnelController {
+            add {
+                NetworkProtectionControllerTabExtension(tunnelController: tunnelController)
+            }
         }
     }
 

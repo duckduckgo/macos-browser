@@ -22,11 +22,13 @@ import Common
 import DDGSync
 import Persistence
 import SyncDataProviders
+import PixelKit
 
 final class SyncDataProviders: DataProvidersSource {
     public let bookmarksAdapter: SyncBookmarksAdapter
     public let credentialsAdapter: SyncCredentialsAdapter
     public let settingsAdapter: SyncSettingsAdapter
+    public let syncErrorHandler: SyncErrorHandler
 
     @MainActor
     func makeDataProviders() -> [DataProviding] {
@@ -41,11 +43,16 @@ final class SyncDataProviders: DataProvidersSource {
             metadataStore: syncMetadata,
             metricsEventsHandler: metricsEventsHandler
         )
-        credentialsAdapter.setUpProviderIfNeeded(
-            secureVaultFactory: secureVaultFactory,
-            metadataStore: syncMetadata,
-            metricsEventsHandler: metricsEventsHandler
-        )
+
+        // Credentials syncing is disabled in UI Tests until we figure out Secure Vault errors in CI
+        if NSApp.runType != .uiTests {
+            credentialsAdapter.setUpProviderIfNeeded(
+                secureVaultFactory: secureVaultFactory,
+                metadataStore: syncMetadata,
+                metricsEventsHandler: metricsEventsHandler
+            )
+        }
+
         settingsAdapter.setUpProviderIfNeeded(
             metadataDatabase: syncMetadataDatabase.db,
             metadataStore: syncMetadata,
@@ -88,11 +95,12 @@ final class SyncDataProviders: DataProvidersSource {
         }
     }
 
-    init(bookmarksDatabase: CoreDataDatabase, secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
+    init(bookmarksDatabase: CoreDataDatabase, secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory, syncErrorHandler: SyncErrorHandler) {
         self.bookmarksDatabase = bookmarksDatabase
         self.secureVaultFactory = secureVaultFactory
-        bookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase)
-        credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory)
+        self.syncErrorHandler = syncErrorHandler
+        bookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, syncErrorHandler: syncErrorHandler)
+        credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory, syncErrorHandler: syncErrorHandler)
         settingsAdapter = SyncSettingsAdapter()
     }
 
@@ -104,9 +112,9 @@ final class SyncDataProviders: DataProvidersSource {
         syncMetadataDatabase.db.loadStore { context, error in
             guard context != nil else {
                 if let error = error {
-                    Pixel.fire(.debug(event: .syncMetadataCouldNotLoadDatabase, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncMetadataCouldNotLoadDatabase, error: error))
                 } else {
-                    Pixel.fire(.debug(event: .syncMetadataCouldNotLoadDatabase))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncMetadataCouldNotLoadDatabase))
                 }
 
                 Thread.sleep(forTimeInterval: 1)

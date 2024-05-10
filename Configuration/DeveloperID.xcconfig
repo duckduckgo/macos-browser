@@ -55,6 +55,12 @@ IPC_APP_GROUP[config=Review][sdk=macos*] = $(BASE_IPC_APP_GROUP).review
 IPC_APP_GROUP[config=Debug][sdk=macos*] = $(BASE_IPC_APP_GROUP).debug
 IPC_APP_GROUP[config=Release][sdk=macos*] = $(BASE_IPC_APP_GROUP)
 
+SUBSCRIPTION_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).$(MAIN_BUNDLE_IDENTIFIER_PREFIX).subscription
+SUBSCRIPTION_APP_GROUP[config=CI][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP).debug
+SUBSCRIPTION_APP_GROUP[config=Review][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP).review
+SUBSCRIPTION_APP_GROUP[config=Debug][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP).debug
+SUBSCRIPTION_APP_GROUP[config=Release][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP)
+
 SYSEX_MACH_SERVICE_NAME[sdk=*] = $(NETP_APP_GROUP).ipc
 SYSEX_MACH_SERVICE_NAME[config=CI][sdk=*] = $(NETP_APP_GROUP).ipc
 SYSEX_MACH_SERVICE_NAME[config=Review][sdk=*] = $(NETP_APP_GROUP).ipc
@@ -69,21 +75,38 @@ NOTIFICATIONS_AGENT_PRODUCT_NAME = DuckDuckGo Notifications
 
 AGENT_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.macos.vpn
 
-DBP_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.dbp
-DBP_APP_GROUP[config=CI][sdk=*] = $(DBP_BASE_APP_GROUP).debug
-DBP_APP_GROUP[config=Review][sdk=*] = $(DBP_BASE_APP_GROUP).review
-DBP_APP_GROUP[config=Debug][sdk=*] = $(DBP_BASE_APP_GROUP).debug
-DBP_APP_GROUP[config=Release][sdk=*] = $(DBP_BASE_APP_GROUP)
-
 AGENT_BUNDLE_ID[sdk=*] = $(AGENT_BUNDLE_ID_BASE)
 AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
 AGENT_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
 AGENT_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).review
 AGENT_PRODUCT_NAME = DuckDuckGo VPN
 
-DBP_BACKGROUND_AGENT_BUNDLE_ID[sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent
-DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID).debug
-DBP_BACKGROUND_AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID).debug
-DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID).review
+// Extensions
+
+PROXY_EXTENSION_BUNDLE_ID[sdk=*] = $(SYSEX_BUNDLE_ID)
+PROXY_EXTENSION_BUNDLE_ID[config=Debug][sdk=*] = $(SYSEX_BUNDLE_ID)
+PROXY_EXTENSION_BUNDLE_ID[config=CI][sdk=*] = $(SYSEX_BUNDLE_ID)
+PROXY_EXTENSION_BUNDLE_ID[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID)
+PROXY_EXTENSION_BUNDLE_ID[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID)
+
+TUNNEL_EXTENSION_BUNDLE_ID[sdk=*] = $(SYSEX_BUNDLE_ID)
+TUNNEL_EXTENSION_BUNDLE_ID[config=Debug][sdk=*] = $(SYSEX_BUNDLE_ID)
+TUNNEL_EXTENSION_BUNDLE_ID[config=CI][sdk=*] = $(SYSEX_BUNDLE_ID)
+TUNNEL_EXTENSION_BUNDLE_ID[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID)
+TUNNEL_EXTENSION_BUNDLE_ID[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID)
+
+// DBP
 
 DBP_BACKGROUND_AGENT_PRODUCT_NAME = DuckDuckGo Personal Information Removal
+
+DBP_BACKGROUND_AGENT_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent
+DBP_BACKGROUND_AGENT_BUNDLE_ID[sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID_BASE)
+DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID_BASE).debug
+DBP_BACKGROUND_AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID_BASE).debug
+DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID_BASE).review
+
+DBP_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.dbp
+DBP_APP_GROUP[config=CI][sdk=*] = $(DBP_BASE_APP_GROUP).debug
+DBP_APP_GROUP[config=Review][sdk=*] = $(DBP_BASE_APP_GROUP).review
+DBP_APP_GROUP[config=Debug][sdk=*] = $(DBP_BASE_APP_GROUP).debug
+DBP_APP_GROUP[config=Release][sdk=*] = $(DBP_BASE_APP_GROUP)

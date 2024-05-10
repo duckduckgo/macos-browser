@@ -37,7 +37,7 @@ protocol ScriptSourceProviding {
 // refactor: ScriptSourceProvider to be passed to init methods as `some ScriptSourceProviding`, DefaultScriptSourceProvider to be killed
 // swiftlint:disable:next identifier_name
 func DefaultScriptSourceProvider() -> ScriptSourceProviding {
-    ScriptSourceProvider(configStorage: ConfigurationStore.shared, privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager, privacySettings: PrivacySecurityPreferences.shared, contentBlockingManager: ContentBlocking.shared.contentBlockingManager, trackerDataManager: ContentBlocking.shared.trackerDataManager, tld: ContentBlocking.shared.tld)
+    ScriptSourceProvider(configStorage: ConfigurationStore.shared, privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager, webTrackingProtectionPreferences: WebTrackingProtectionPreferences.shared, contentBlockingManager: ContentBlocking.shared.contentBlockingManager, trackerDataManager: ContentBlocking.shared.trackerDataManager, tld: ContentBlocking.shared.tld)
 }
 
 struct ScriptSourceProvider: ScriptSourceProviding {
@@ -52,19 +52,19 @@ struct ScriptSourceProvider: ScriptSourceProviding {
     let privacyConfigurationManager: PrivacyConfigurationManaging
     let contentBlockingManager: ContentBlockerRulesManagerProtocol
     let trackerDataManager: TrackerDataManager
-    let privacySettings: PrivacySecurityPreferences
+    let webTrakcingProtectionPreferences: WebTrackingProtectionPreferences
     let tld: TLD
 
     init(configStorage: ConfigurationStoring,
          privacyConfigurationManager: PrivacyConfigurationManaging,
-         privacySettings: PrivacySecurityPreferences,
+         webTrackingProtectionPreferences: WebTrackingProtectionPreferences,
          contentBlockingManager: ContentBlockerRulesManagerProtocol,
          trackerDataManager: TrackerDataManager,
          tld: TLD) {
 
         self.configStorage = configStorage
         self.privacyConfigurationManager = privacyConfigurationManager
-        self.privacySettings = privacySettings
+        self.webTrakcingProtectionPreferences = webTrackingProtectionPreferences
         self.contentBlockingManager = contentBlockingManager
         self.trackerDataManager = trackerDataManager
         self.tld = tld
@@ -83,9 +83,10 @@ struct ScriptSourceProvider: ScriptSourceProviding {
     public func buildAutofillSource() -> AutofillUserScriptSourceProvider {
         let privacyConfig = self.privacyConfigurationManager.privacyConfig
         return DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
-                                                     properties: ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
+                                                     properties: ContentScopeProperties(gpcEnabled: webTrakcingProtectionPreferences.isGPCEnabled,
                                                                                         sessionKey: self.sessionKey ?? "",
-                                                                                        featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig)))
+                                                                                        featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig)),
+                                                     isDebug: AutofillPreferences().debugScriptEnabled)
                 .withJSLoading()
                 .build()
     }

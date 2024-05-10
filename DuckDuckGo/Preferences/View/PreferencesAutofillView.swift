@@ -19,6 +19,7 @@
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
+import PixelKit
 
 fileprivate extension Preferences.Const {
     static let autoLockWarningOffset: CGFloat = {
@@ -62,13 +63,47 @@ extension Preferences {
         }
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-
-                // TITLE
-                TextMenuTitle(UserText.autofill)
+            PreferencePane(UserText.autofill) {
 
                 // Autofill Content  Button
                 PreferencePaneSection {
+
+                    // New section
+                    if model.autofillSurveyEnabled {
+                        HStack(alignment: .top, spacing: 20) {
+                            Image(.passwordsDDG128)
+                                .frame(width: 64, height: 48)
+
+                            VStack(alignment: .leading) {
+                                Text(verbatim: "Help us improve!")
+                                    .bold()
+                                Text(verbatim: "We want to make using passwords in DuckDuckGo better.")
+                                    .foregroundColor(.greyText)
+                                    .padding(.top, 1)
+
+                                HStack {
+                                    Button(action: {
+                                        model.disableAutofillSurvey()
+                                    }, label: {
+                                        Text(verbatim: "No Thanks")
+                                    })
+                                    Button(action: {
+                                        model.launchSurvey()
+                                    }, label: {
+                                        Text(verbatim: "Take Survey")
+                                    })
+                                    .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                                }
+                                .padding(.top, 12)
+                            }
+
+                            Spacer()
+                        }
+                        .padding()
+                        .roundedBorder()
+                        .padding(.bottom, 24)
+                    }
+
                     Button(UserText.autofillViewContentButton) {
                         model.showAutofillPopover()
                     }
@@ -85,25 +120,32 @@ extension Preferences {
 
 #if !APPSTORE
                 // SECTION 1: Password Manager
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.autofillPasswordManager)
+                PreferencePaneSection(UserText.autofillPasswordManager) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Picker(selection: passwordManagerBinding, content: {
+                        passwordManagerPicker(passwordManagerBinding) {
                             Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)
+                        }
+                    }
+
+                    if model.passwordManager != .bitwarden {
+                        VStack {
+                            Button(UserText.importPasswords) {
+                                model.openImportBrowserDataWindow()
+                            }
+                            Button(UserText.exportLogins) {
+                                model.openExportLogins()
+                            }
+                        }
+                        .padding(.leading, 15)
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        passwordManagerPicker(passwordManagerBinding) {
                             Text(UserText.autofillPasswordManagerBitwarden).tag(PasswordManager.bitwarden)
-                        }, label: {})
-                        .pickerStyle(.radioGroup)
-                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        }
                         if model.passwordManager == .bitwarden && !model.isBitwardenSetupFlowPresented {
                             bitwardenStatusView(for: bitwardenManager.status)
                         }
-                    }
-                    Spacer()
-                    Button(UserText.importPasswords) {
-                        model.openImportBrowserDataWindow()
-                    }
-                    Button(UserText.exportLogins) {
-                        model.openExportLogins()
                     }
                 }
 #endif
@@ -129,7 +171,7 @@ extension Preferences {
                         Button(UserText.autofillExcludedSitesReset) {
                             showingResetNeverPromptSitesSheet.toggle()
                             if showingResetNeverPromptSitesSheet {
-                                Pixel.fire(.autofillLoginsSettingsResetExcludedDisplayed)
+                                PixelKit.fire(GeneralPixel.autofillLoginsSettingsResetExcludedDisplayed)
                             }
                         }
                     }.sheet(isPresented: $showingResetNeverPromptSitesSheet) {
@@ -145,6 +187,8 @@ extension Preferences {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 Text(UserText.autofillLockWhenIdle)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .multilineTextAlignment(.leading)
                                 NSPopUpButtonView(selection: autoLockThresholdBinding) {
                                     let button = NSPopUpButton()
                                     button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -171,6 +215,15 @@ extension Preferences {
             }
         }
 
+        @ViewBuilder
+        private func passwordManagerPicker(_ binding: Binding<PasswordManager>, @ViewBuilder content: @escaping () -> some View) -> some View {
+            Picker(selection: binding, content: {
+                content()
+            }, label: {})
+            .pickerStyle(.radioGroup)
+            .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+        }
+
         // swiftlint:disable cyclomatic_complexity
         // swiftlint:disable function_body_length
         @ViewBuilder private func bitwardenStatusView(for status: BWStatus) -> some View {
@@ -182,14 +235,18 @@ extension Preferences {
                 .offset(x: Preferences.Const.autoLockWarningOffset)
             case .notInstalled:
                 BitwardenStatusView(iconType: .warning,
-                                    title: UserText.bitwardenNotInstalled,
-                                    buttonValue: nil)
+                                    title: UserText.bitwardenNotInstalled)
                 .offset(x: Preferences.Const.autoLockWarningOffset)
             case .oldVersion:
                 BitwardenStatusView(iconType: .warning,
-                                    title: UserText.bitwardenOldVersion,
-                                    buttonValue: nil)
+                                    title: UserText.bitwardenOldVersion)
                 .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .incompatible:
+                BitwardenStatusView(iconType: .warning,
+                                    title: UserText.bitwardenIncompatible,
+                                    content: AnyView(BitwardenDowngradeInfoView()))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+                    .offset(x: Preferences.Const.autoLockWarningOffset)
             case .notRunning:
                 BitwardenStatusView(iconType: .warning,
                                     title: UserText.bitwardenPreferencesRun,
@@ -258,6 +315,13 @@ extension Preferences {
 
 private struct BitwardenStatusView: View {
 
+    internal init(iconType: BitwardenStatusView.IconType, title: String, buttonValue: BitwardenStatusView.ButtonValue? = nil, content: AnyView? = nil) {
+        self.iconType = iconType
+        self.title = title
+        self.buttonValue = buttonValue
+        self.content = content
+    }
+
     struct ButtonValue {
         let title: String
         let action: () -> Void
@@ -280,6 +344,7 @@ private struct BitwardenStatusView: View {
     let iconType: IconType
     let title: String
     let buttonValue: ButtonValue?
+    let content: AnyView?
 
     var body: some View {
 
@@ -287,10 +352,15 @@ private struct BitwardenStatusView: View {
             HStack(alignment: .top) {
                 Image(iconType.imageName)
                     .padding(.top, 2)
-                Text(title)
-                    .lineLimit(nil)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding([.top, .bottom], 2)
+                VStack(alignment: .leading) {
+                    Text(title)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding([.top, .bottom], 2)
+                    if let content {
+                        content.padding([.top, .bottom], 2)
+                    }
+                }
             }
             .padding([.leading, .trailing], 6)
             .padding([.top, .bottom], 2)
@@ -308,6 +378,25 @@ private struct BitwardenStatusView: View {
 
     }
 
+}
+
+struct BitwardenDowngradeInfoView: View, PreferencesTabOpening {
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            VStack(alignment: .leading) {
+                HStack {
+                    Text("1.")
+                    Button(UserText.bitwardenIncompatibleStep1, action: {
+                        openNewTab(with: URL(string: "https://github.com/bitwarden/clients/releases/download/desktop-v2024.2.1/Bitwarden-2024.2.1-universal.dmg")!)
+                    }).foregroundColor(.accentColor)
+                }
+                Text(UserText.bitwardenIncompatibleStep2)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
 }
 
 struct ResetNeverPromptSitesSheet: View {
@@ -333,7 +422,7 @@ struct ResetNeverPromptSitesSheet: View {
                 Spacer()
                 Button(UserText.cancel) {
                     isSheetPresented.toggle()
-                    Pixel.fire(.autofillLoginsSettingsResetExcludedDismissed)
+                    PixelKit.fire(GeneralPixel.autofillLoginsSettingsResetExcludedDismissed)
                 }
                 Button(action: {
                     saveChanges()
@@ -350,7 +439,7 @@ struct ResetNeverPromptSitesSheet: View {
     private func saveChanges() {
         autofillPreferencesModel.resetNeverPromptWebsites()
         isSheetPresented.toggle()
-        Pixel.fire(.autofillLoginsSettingsResetExcludedConfirmed)
+        PixelKit.fire(GeneralPixel.autofillLoginsSettingsResetExcludedConfirmed)
     }
 
 }

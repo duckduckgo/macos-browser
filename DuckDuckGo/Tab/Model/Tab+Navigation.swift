@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Navigation
+import Combine
 import Common
 import Foundation
+import Navigation
 import WebKit
 
 extension Tab: NavigationResponder {
@@ -41,6 +42,11 @@ extension Tab: NavigationResponder {
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
             .weak(nullable: self.navigationHotkeyHandler),
+            .weak(nullable: self.brokenSiteInfo),
+
+            // redirect to SERP for non-valid domains entered by user
+            // should be before `self` to avoid Tab presenting an error screen
+            .weak(nullable: self.searchForNonexistentDomains),
 
             .weak(self),
 
@@ -65,8 +71,7 @@ extension Tab: NavigationResponder {
             // add extra headers to SERP requests
             .struct(SerpHeadersNavigationResponder()),
 
-            // redirect to SERP for non-valid domains entered by user
-            .weak(nullable: self.searchForNonexistentDomains),
+            .struct(RedirectNavigationResponder()),
 
             // ensure Content Blocking Rules are applied before navigation
             .weak(nullable: self.contentBlockingAndSurrogates),
@@ -78,8 +83,16 @@ extension Tab: NavigationResponder {
             // Find In Page
             .weak(nullable: self.findInPage),
 
+            // Tab Snapshots
+            .weak(nullable: self.tabSnapshots),
+
+            // Error Page
+            .weak(nullable: self.errorPage),
+
             // should be the last, for Unit Tests navigation events tracking
-            .struct(nullable: testsClosureNavigationResponder)
+            .struct(nullable: testsClosureNavigationResponder),
+
+            .weak(nullable: self.networkProtection)
         )
 
         newWindowPolicyDecisionMakers = [NewWindowPolicyDecisionMaker?](arrayLiteral:

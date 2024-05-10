@@ -217,6 +217,7 @@ Gw
                         </connections>
                     </view>
                     <connections>
+                        <outlet property="allowButton" destination="STv-Br-1F5" id="EvA-HP-3cE"/>
                         <outlet property="alwaysAllowCheckbox" destination="4Qg-BR-C50" id="mOB-Cq-IBs"/>
                         <outlet property="alwaysAllowStackView" destination="5JO-km-2KL" id="gfB-hu-D8L"/>
                         <outlet property="buttonsBottomConstraint" destination="JHg-ZD-huo" id="rMx-K0-yVz"/>
@@ -225,6 +226,7 @@ Gw
                         <outlet property="domainNameLabel" destination="Qnx-0b-4zc" id="NxM-TF-b10"/>
                         <outlet property="learnMoreBottomConstraint" destination="jON-5j-XdC" id="5go-VL-qbA"/>
                         <outlet property="learnMoreStackView" destination="ar6-d0-ukR" id="9iC-DA-5VW"/>
+                        <outlet property="linkButton" destination="A53-A7-zYD" id="785-hB-7VJ"/>
                     </connections>
                 </viewController>
                 <customObject id="Pct-h6-WSE" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -256,7 +258,7 @@ Gw
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="descriptionLabel" destination="yEs-pq-qFy" id="gdZ-Ku-LPa"/>
+                        <outlet property="descriptionLabel" destination="yEs-pq-qFy" id="d3X-uA-PzU"/>
                     </connections>
                 </viewController>
                 <customObject id="mY3-IC-3w4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

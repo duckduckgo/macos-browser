@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Common
+import Foundation
 import UniformTypeIdentifiers
 
 extension String {
@@ -32,6 +33,46 @@ extension String {
         self.replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "\"", with: "\\\"")
             .replacingOccurrences(of: "'", with: "\\'")
+            .replacingOccurrences(of: "\n", with: "\\n")
+    }
+
+    private static let unicodeHtmlCharactersMapping: [Character: String] = [
+        "&": "&amp;",
+        "\"": "&quot;",
+        "'": "&apos;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "/": "&#x2F;",
+        "!": "&excl;",
+        "$": "&#36;",
+        "%": "&percnt;",
+        "=": "&#61;",
+        "#": "&#35;",
+        "@": "&#64;",
+        "[": "&#91;",
+        "\\": "&#92;",
+        "]": "&#93;",
+        "^": "&#94;",
+        "`": "&#97;",
+        "{": "&#123;",
+        "}": "&#125;",
+    ]
+    func escapedUnicodeHtmlString() -> String {
+        var result = ""
+
+        for character in self {
+            if let mapped = Self.unicodeHtmlCharactersMapping[character] {
+                result.append(mapped)
+            } else {
+                result.append(character)
+            }
+        }
+
+        return result
+    }
+
+    func replacingInvalidFileNameCharacters(with replacement: String = "_") -> String {
+        replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:\\\\]", with: replacement, options: .regularExpression)
     }
 
     init(_ staticString: StaticString) {
@@ -70,6 +111,15 @@ extension String {
 
     var pathExtension: String {
         (self as NSString).pathExtension
+    }
+
+    func appendingPathComponent(_ component: String) -> String {
+        (self as NSString).appendingPathComponent(component)
+    }
+
+    func appendingPathExtension(_ pathExtension: String?) -> String {
+        guard let pathExtension, !pathExtension.isEmpty else { return self }
+        return self + "." + pathExtension
     }
 
     // MARK: - Mutating

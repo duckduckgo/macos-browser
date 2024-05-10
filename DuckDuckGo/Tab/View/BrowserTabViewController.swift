@@ -16,19 +16,23 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
-import WebKit
 import Combine
 import Common
 import SwiftUI
-import BrowserServicesKit
+import WebKit
+import Subscription
+import PixelKit
 
+// swiftlint:disable file_length
+// swiftlint:disable:next type_body_length
 final class BrowserTabViewController: NSViewController {
-    @IBOutlet var errorView: NSView!
-    @IBOutlet var homePageView: NSView!
-    @IBOutlet var errorMessageLabel: NSTextField!
-    @IBOutlet var hoverLabel: NSTextField!
-    @IBOutlet var hoverLabelContainer: NSView!
+
+    private lazy var browserTabView = BrowserTabView(frame: .zero, backgroundColor: .browserTabBackground)
+    private lazy var hoverLabel = NSTextField(string: URL.duckDuckGo.absoluteString)
+    private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
+
     private weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
@@ -36,12 +40,10 @@ final class BrowserTabViewController: NSViewController {
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    private let bookmarkManager: BookmarkManager
 
-    private var tabContentCancellable: AnyCancellable?
-    private var userDialogsCancellable: AnyCancellable?
+    private var tabViewModelCancellables = Set<AnyCancellable>()
     private var activeUserDialogCancellable: Cancellable?
-    private var errorViewStateCancellable: AnyCancellable?
-    private var hoverLinkCancellable: AnyCancellable?
     private var pinnedTabsDelegatesCancellable: AnyCancellable?
     private var keyWindowSelectedTabCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
@@ -51,34 +53,58 @@ final class BrowserTabViewController: NSViewController {
 
     private var hoverLabelWorkItem: DispatchWorkItem?
 
-    private var transientTabContentViewController: NSViewController?
-
-    static func create(tabCollectionViewModel: TabCollectionViewModel) -> BrowserTabViewController {
-        NSStoryboard(name: "BrowserTab", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
-        }!
-    }
+    private(set) var transientTabContentViewController: NSViewController?
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init(tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.bookmarkManager = bookmarkManager
 
-        super.init(coder: coder)
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    override func loadView() {
+        view = browserTabView
+
+        hoverLabelContainer.cornerRadius = 4
+        view.addSubview(hoverLabelContainer)
+
+        hoverLabel.focusRingType = .none
+        hoverLabel.translatesAutoresizingMaskIntoConstraints = false
+        hoverLabel.font = .systemFont(ofSize: 13)
+        hoverLabel.drawsBackground = false
+        hoverLabel.isEditable = false
+        hoverLabel.isBordered = false
+        hoverLabel.lineBreakMode = .byClipping
+        hoverLabel.textColor = .labelColor
+        hoverLabelContainer.addSubview(hoverLabel)
+
+        setupLayout()
+    }
+
+    private func setupLayout() {
+        hoverLabelContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -2).isActive = true
+        view.bottomAnchor.constraint(equalTo: hoverLabelContainer.bottomAnchor, constant: -4).isActive = true
+
+        hoverLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        hoverLabel.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        hoverLabel.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+        hoverLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        hoverLabelContainer.bottomAnchor.constraint(equalTo: hoverLabel.bottomAnchor, constant: 10).isActive = true
+        hoverLabel.leadingAnchor.constraint(equalTo: hoverLabelContainer.leadingAnchor, constant: 12).isActive = true
+        hoverLabelContainer.trailingAnchor.constraint(equalTo: hoverLabel.trailingAnchor, constant: 8).isActive = true
+        hoverLabel.topAnchor.constraint(equalTo: hoverLabelContainer.topAnchor, constant: 6).isActive = true
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: LocalBookmarkManager.shared)
-        self.addAndLayoutChild(homePageViewController, into: homePageView)
-
         hoverLabelContainer.alphaValue = 0
         subscribeToTabs()
         subscribeToSelectedTabViewModel()
-        subscribeToErrorViewState()
 
         view.registerForDraggedTypes([.URL, .fileURL])
     }
@@ -129,12 +155,14 @@ final class BrowserTabViewController: NSViewController {
 
 #endif
 
-#if SUBSCRIPTION
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onCloseSubscriptionPage),
                                                name: .subscriptionPageCloseAndOpenPreferences,
                                                object: nil)
-#endif
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onSubscriptionAccountDidSignOut),
+                                               name: .accountDidSignOut,
+                                               object: nil)
     }
 
     @objc
@@ -156,7 +184,7 @@ final class BrowserTabViewController: NSViewController {
         guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController,
               let previouslySelectedTab else { return }
 
-        if let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab,
+        if let activeTab = tabViewModel?.tab,
            let url = activeTab.url,
            EmailUrls().isDuckDuckGoEmailProtection(url: url) {
 
@@ -171,12 +199,14 @@ final class BrowserTabViewController: NSViewController {
 #if DBP
     @objc
     private func onDBPFeatureDisabled(_ notification: Notification) {
-        tabCollectionViewModel.removeAll(with: .dataBrokerProtection)
+        Task { @MainActor in
+            tabCollectionViewModel.removeAll(with: .dataBrokerProtection)
+        }
     }
 
     @objc
     private func onCloseDataBrokerProtection(_ notification: Notification) {
-        guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab,
+        guard let activeTab = tabViewModel?.tab,
               view.window?.isKeyWindow == true else { return }
 
         self.closeTab(activeTab)
@@ -194,10 +224,9 @@ final class BrowserTabViewController: NSViewController {
 
 #endif
 
-#if SUBSCRIPTION
     @objc
     private func onCloseSubscriptionPage(_ notification: Notification) {
-        guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
+        guard let activeTab = tabViewModel?.tab else { return }
         self.closeTab(activeTab)
 
         if let previouslySelectedTab = self.previouslySelectedTab {
@@ -207,19 +236,37 @@ final class BrowserTabViewController: NSViewController {
 
         openNewTab(with: .settings(pane: .subscription))
     }
-#endif
+
+    @objc
+    private func onSubscriptionAccountDidSignOut(_ notification: Notification) {
+        Task { @MainActor in
+            tabCollectionViewModel.removeAll { tabContent in
+                if case .subscription = tabContent {
+                    return true
+                } else if case .identityTheftRestoration = tabContent {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        }
+    }
 
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel
             .sink { [weak self] selectedTabViewModel in
 
                 guard let self = self else { return }
+                generateNativePreviewIfNeeded()
                 self.tabViewModel = selectedTabViewModel
                 self.showTabContent(of: selectedTabViewModel)
-                self.subscribeToErrorViewState()
+
+                self.tabViewModelCancellables.removeAll(keepingCapacity: true)
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
+
+                self.adjustFirstResponder(force: true)
             }
             .store(in: &cancellables)
     }
@@ -293,10 +340,8 @@ final class BrowserTabViewController: NSViewController {
     private func addWebViewToViewHierarchy(_ webView: WebView, tab: Tab) {
         let container = WebViewContainerView(tab: tab, webView: webView, frame: view.bounds)
         self.webViewContainer = container
-        view.addSubview(container)
-
         // Make sure link preview (tooltip shown in the bottom-left) is on top
-        view.addSubview(hoverLabelContainer)
+        view.addSubview(container, positioned: .below, relativeTo: hoverLabelContainer)
     }
 
     private func changeWebView(tabViewModel: TabViewModel?) {
@@ -324,19 +369,15 @@ final class BrowserTabViewController: NSViewController {
         let webViewContainer = webViewContainer
 
         displayWebView(of: tabViewModel)
-        tabViewModel.updateAddressBarStrings()
+
         if let oldWebView = oldWebView, let webViewContainer = webViewContainer, oldWebView !== webView {
             removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
         }
-
-        if setFirstResponderAfterAdding {
-            setFirstResponderAfterAdding = false
-            makeWebViewFirstResponder()
-        }
+        adjustFirstResponderAfterAddingContentViewIfNeeded()
     }
 
     private func subscribeToTabContent(of tabViewModel: TabViewModel?) {
-        tabContentCancellable = tabViewModel?.tab.$content
+        tabViewModel?.tab.$content
             .dropFirst()
             .removeDuplicates(by: { old, new in
                 // no need to call showTabContent if webView stays in place and only its URL changes
@@ -346,16 +387,23 @@ final class BrowserTabViewController: NSViewController {
                 return old == new
             })
             .map { [weak tabViewModel] tabContent -> AnyPublisher<Void, Never> in
+                // For non-URL tabs, just emit an event displaying the tab content
                 guard let tabViewModel, tabContent.isUrl else {
                     return Just(()).eraseToAnyPublisher()
                 }
 
-                return Publishers.Merge4(
-                    tabViewModel.tab.webViewDidReceiveRedirectPublisher,
-                    tabViewModel.tab.webViewDidCommitNavigationPublisher,
-                    tabViewModel.tab.webViewDidFailNavigationPublisher,
-                    tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
+                // For URL tabs, we only want to show tab content (webView) when
+                // it has content to display (first navigation had been committed)
+                // or starts navigation.
+                return Publishers.Merge(
+                    tabViewModel.tab.$hasCommittedContent
+                        .filter { $0 == true }
+                        .asVoid(),
+                    tabViewModel.tab.navigationStatePublisher.compactMap { $0 }
+                        .filter{ $0 >= .started }
+                        .asVoid()
                 )
+                // take the first such event and move forward.
                 .prefix(1)
                 .eraseToAnyPublisher()
             }
@@ -365,67 +413,122 @@ final class BrowserTabViewController: NSViewController {
                 guard let tabViewModel else { return }
                 self?.showTabContent(of: tabViewModel)
             }
+            .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToUserDialogs(of tabViewModel: TabViewModel?) {
-        userDialogsCancellable = nil
         guard let tabViewModel else { return }
 
-        userDialogsCancellable = Publishers.CombineLatest(
+        Publishers.CombineLatest(
             tabViewModel.tab.$userInteractionDialog,
             tabViewModel.tab.downloads?.savePanelDialogPublisher ?? Just(nil).eraseToAnyPublisher()
         )
         .map { $1 ?? $0 }
+        .removeDuplicates()
         .sink { [weak self] dialog in
             self?.show(dialog)
         }
-    }
-
-    private func subscribeToErrorViewState() {
-        errorViewStateCancellable = tabViewModel?.$errorViewState.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.displayErrorView(
-                self?.tabViewModel?.errorViewState.isVisible ?? false,
-                message: self?.tabViewModel?.errorViewState.message ?? UserText.unknownErrorMessage
-            )
-        }
+        .store(in: &tabViewModelCancellables)
     }
 
     func subscribeToHoveredLink(of tabViewModel: TabViewModel?) {
-        hoverLinkCancellable = tabViewModel?.tab.hoveredLinkPublisher.sink { [weak self] in
+        tabViewModel?.tab.hoveredLinkPublisher.sink { [weak self] in
             self?.scheduleHoverLabelUpdatesForUrl($0)
+        }.store(in: &tabViewModelCancellables)
+#if DEBUG
+        if case .xcPreviews = NSApp.runType {
+            self.scheduleHoverLabelUpdatesForUrl(.duckDuckGo)
+        }
+#endif
+    }
+
+    private func shouldMakeContentViewFirstResponder(for tabContent: Tab.TabContent) -> Bool {
+        // always steal focus when first responder is not a text field
+        guard view.window?.firstResponder is NSText else {
+            return true
+        }
+
+        switch tabContent {
+        case .newtab:
+            return false
+        case .url(_, _, source: .webViewUpdated):
+            // prevent Address Bar deactivation when the WebView is restoring state or updates url on redirect
+            return false
+
+        case .url(_, _, source: .pendingStateRestoration),
+             .url(_, _, source: .loadedByStateRestoration),
+             .url(_, _, source: .userEntered),
+             .url(_, _, source: .historyEntry),
+             .url(_, _, source: .bookmark),
+             .url(_, _, source: .ui),
+             .url(_, _, source: .link),
+             .url(_, _, source: .appOpenUrl),
+             .url(_, _, source: .reload):
+            return true
+
+        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .onboarding, .identityTheftRestoration:
+            return true
+
+        case .none:
+            return false
         }
     }
 
-    func makeWebViewFirstResponder() {
-        if let webView = self.webView {
-            webView.makeMeFirstResponder()
-        } else {
-            setFirstResponderAfterAdding = true
-            view.window?.makeFirstResponder(nil)
+    func adjustFirstResponder(force: Bool = false, tabContent: Tab.TabContent? = nil) {
+        viewToMakeFirstResponderAfterAdding = nil
+        guard let window = view.window, window.isVisible,
+              let tabContent = tabContent ?? tabViewModel?.tab.content,
+              force || shouldMakeContentViewFirstResponder(for: tabContent) else { return }
+
+        let getView: (() -> NSView?)?
+        switch tabContent {
+        case .newtab:
+            // don‘t steal focus from the address bar at .newtab page
+            return
+        case .onboarding:
+            getView = { [weak self] in self?.transientTabContentViewController?.view }
+        case .url, .subscription, .identityTheftRestoration:
+            getView = { [weak self] in self?.webView }
+        case .settings:
+            getView = { [weak self] in self?.preferencesViewController?.view }
+        case .bookmarks:
+            getView = { [weak self] in self?.bookmarksViewController?.view }
+        case .dataBrokerProtection:
+            getView = { [weak self] in self?.dataBrokerProtectionHomeViewController?.view }
+        case .none:
+            getView = nil
         }
+
+        var contentView = getView?()
+        if let getView, contentView == nil || contentView?.window !== window {
+            // if contentView in wrong window or not created yet - activate after adding
+            viewToMakeFirstResponderAfterAdding = getView
+            contentView = nil
+        }
+
+        guard window.firstResponder !== contentView ?? window else { return }
+        window.makeFirstResponder(contentView)
     }
 
-    private var setFirstResponderAfterAdding = false
+    private var viewToMakeFirstResponderAfterAdding: (() -> NSView?)?
+    private func adjustFirstResponderAfterAddingContentViewIfNeeded() {
+        guard let window = view.window,
+              let contentView = viewToMakeFirstResponderAfterAdding?() else { return }
 
-    private func setFirstResponderIfNeeded() {
-        guard let webView else {
-            setFirstResponderAfterAdding = true
+        guard contentView.window === window else {
+            os_log("BrowserTabViewController: Content view window is \(contentView.window?.description ?? "<nil>") but expected: \(window)", type: .error)
             return
         }
-        guard webView.url != nil else {
+        viewToMakeFirstResponderAfterAdding = nil
+
+        // if the Address Bar was activated after the initial adjustFirstResponder call -
+        // don‘t steal focus from the Address Bar
+        guard window.firstResponder === window else {
+            self.viewToMakeFirstResponderAfterAdding = nil
             return
         }
 
-        DispatchQueue.main.async { [weak self] in
-            self?.makeWebViewFirstResponder()
-        }
-    }
-
-    private func displayErrorView(_ shown: Bool, message: String) {
-        errorMessageLabel.stringValue = message
-        errorView.isHidden = !shown
-        webView?.isHidden = shown
-        homePageView.isHidden = shown
+        window.makeFirstResponder(contentView)
     }
 
     func openNewTab(with content: Tab.TabContent) {
@@ -444,22 +547,17 @@ final class BrowserTabViewController: NSViewController {
                       shouldLoadInBackground: true,
                       burnerMode: tabCollectionViewModel.burnerMode,
                       webViewSize: view.frame.size)
-        tabCollectionViewModel.append(tab: tab, selected: true)
+
+        tabCollectionViewModel.insertOrAppend(tab: tab, selected: true)
     }
 
     // MARK: - Browser Tabs
 
-    private func show(displayableTabAtIndex index: Int) {
-        // The tab switcher only displays displayable tab types.
-        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(Tab.TabContent.displayableTabTypes[index])
-        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
-    }
-
     private func removeAllTabContent(includingWebView: Bool = true) {
-        self.homePageView.removeFromSuperview()
         transientTabContentViewController?.removeCompletely()
         preferencesViewController?.removeCompletely()
         bookmarksViewController?.removeCompletely()
+        homePageViewController?.removeCompletely()
 #if DBP
         dataBrokerProtectionHomeViewController?.removeCompletely()
 #endif
@@ -485,6 +583,9 @@ final class BrowserTabViewController: NSViewController {
             return
         }
         scheduleHoverLabelUpdatesForUrl(nil)
+        defer {
+            adjustFirstResponderAfterAddingContentViewIfNeeded()
+        }
 
         switch tabViewModel?.tab.content {
         case .bookmarks:
@@ -492,21 +593,24 @@ final class BrowserTabViewController: NSViewController {
             addAndLayoutChild(bookmarksViewControllerCreatingIfNeeded())
 
         case let .settings(pane):
-            removeAllTabContent()
             let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
+            if preferencesViewController.parent !== self {
+                removeAllTabContent()
+            }
             if let pane = pane, preferencesViewController.model.selectedPane != pane {
                 preferencesViewController.model.selectPane(pane)
             }
-            addAndLayoutChild(preferencesViewController)
-
+            if preferencesViewController.parent !== self {
+                addAndLayoutChild(preferencesViewController)
+            }
         case .onboarding:
             removeAllTabContent()
-            if !OnboardingViewModel().onboardingFinished {
+            if !OnboardingViewModel.isOnboardingFinished {
                 requestDisableUI()
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
-        case .url:
+        case .url, .subscription, .identityTheftRestoration:
             if shouldReplaceWebView(for: tabViewModel) {
                 removeAllTabContent(includingWebView: true)
                 changeWebView(tabViewModel: tabViewModel)
@@ -514,7 +618,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .newtab:
             removeAllTabContent()
-            view.addAndLayout(homePageView)
+            addAndLayoutChild(homePageViewControllerCreatingIfNeeded())
 
 #if DBP
         case .dataBrokerProtection:
@@ -536,10 +640,48 @@ final class BrowserTabViewController: NSViewController {
         let isPinnedTab = tabCollectionViewModel.pinnedTabsCollection?.tabs.contains(tabViewModel.tab) == true
         let isKeyWindow = view.window?.isKeyWindow == true
 
-        let tabIsNotOnScreen = tabViewModel.tab.webView.tabContentView.superview == nil
-        let isDifferentTabDisplayed = webView != tabViewModel.tab.webView
+        let tabIsNotOnScreen = webView?.tabContentView.superview == nil
+        let isDifferentTabDisplayed = webView !== tabViewModel.tab.webView
 
-        return isDifferentTabDisplayed || tabIsNotOnScreen || (isPinnedTab && isKeyWindow)
+        return isDifferentTabDisplayed
+        || tabIsNotOnScreen
+        || (isPinnedTab && isKeyWindow && webView?.tabContentView.window !== view.window)
+    }
+
+    func generateNativePreviewIfNeeded() {
+        guard let tabViewModel = tabViewModel, !tabViewModel.tab.content.isUrl, !tabViewModel.isShowingErrorPage else {
+            return
+        }
+
+        var containsHostingView: Bool
+        switch tabViewModel.tab.content {
+        case .onboarding:
+            return
+        case .newtab, .settings:
+            containsHostingView = true
+        default:
+            containsHostingView = false
+        }
+
+        guard let viewForRendering = browserTabView.findContentSubview(containsHostingView: containsHostingView) else {
+            assertionFailure("No view for rendering of the snapshot")
+            return
+        }
+
+        Task {
+            await tabViewModel.tab.tabSnapshots?.renderSnapshot(from: viewForRendering)
+        }
+    }
+
+    // MARK: - New Tab page
+
+    var homePageViewController: HomePageViewController?
+    private func homePageViewControllerCreatingIfNeeded() -> HomePageViewController {
+        return homePageViewController ?? {
+            let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
+            self.homePageViewController = homePageViewController
+            return homePageViewController
+        }()
     }
 
 #if DBP
@@ -575,7 +717,7 @@ final class BrowserTabViewController: NSViewController {
     var bookmarksViewController: BookmarkManagementSplitViewController?
     private func bookmarksViewControllerCreatingIfNeeded() -> BookmarkManagementSplitViewController {
         return bookmarksViewController ?? {
-            let bookmarksViewController = BookmarkManagementSplitViewController.create()
+            let bookmarksViewController = BookmarkManagementSplitViewController()
             bookmarksViewController.delegate = self
             self.bookmarksViewController = bookmarksViewController
             return bookmarksViewController
@@ -635,7 +777,7 @@ extension BrowserTabViewController: NSDraggingDestination {
             return true
         }
 
-        selectedTab.setContent(.url(url, source: .appOpenUrl))
+        selectedTab.setContent(.contentFromURL(url, source: .appOpenUrl))
         return true
     }
 
@@ -672,16 +814,14 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tabPageDOMLoaded(_ tab: Tab) {
-        if tabViewModel?.tab == tab {
+        if tabViewModel?.tab === tab {
             tabViewModel?.isLoading = false
         }
     }
 
     func tabDidStartNavigation(_ tab: Tab) {
-        setFirstResponderIfNeeded()
-        guard let tabViewModel = tabViewModel else { return }
+        guard let tabViewModel, tabViewModel.tab === tab else { return }
 
-        tab.permissions.tabDidStartNavigation()
         if !tabViewModel.isLoading,
            tabViewModel.tab.webView.isLoading {
             tabViewModel.isLoading = true
@@ -695,7 +835,7 @@ extension BrowserTabViewController: TabDelegate {
         case .window(active: let active, let isBurner):
             assert(isBurner == childTab.burnerMode.isBurner)
             WindowsManager.openNewWindow(with: childTab, showWindow: active)
-        case .tab(selected: let selected, _):
+        case .tab(selected: let selected, _, _):
             self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
         }
     }
@@ -777,6 +917,15 @@ extension BrowserTabViewController: TabDelegate {
     // MARK: - Dialogs
 
     fileprivate func show(_ dialog: Tab.UserDialog?) {
+        guard activeUserDialogCancellable == nil || dialog == nil else {
+            // first hide a displayed dialog before showing another one
+            activeUserDialogCancellable = nil
+            DispatchQueue.main.async { [weak self] in
+                self?.show(dialog)
+            }
+            return
+        }
+
         switch dialog?.dialog {
         case .basicAuthenticationChallenge(let query):
             activeUserDialogCancellable = showBasicAuthenticationChallenge(with: query)
@@ -799,14 +948,14 @@ extension BrowserTabViewController: TabDelegate {
 
         let alert = AuthenticationAlert(host: request.parameters.host,
                                         isEncrypted: request.parameters.receivesCredentialSecurely)
-        alert.beginSheetModal(for: window) { [request] response in
+        alert.beginSheetModal(for: window) { [weak request] response in
             // don‘t submit the query when tab is switched
             if case .abort = response { return }
             guard case .OK = response else {
-                request.submit(nil)
+                request?.submit(nil)
                 return
             }
-            request.submit(.credential(URLCredential(user: alert.usernameTextField.stringValue,
+            request?.submit(.credential(URLCredential(user: alert.usernameTextField.stringValue,
                                                      password: alert.passwordTextField.stringValue,
                                                      persistence: .forSession)))
         }
@@ -819,18 +968,37 @@ extension BrowserTabViewController: TabDelegate {
         dispatchPrecondition(condition: .onQueue(.main))
         guard let window = view.window else { return nil }
 
+        let preferences = DownloadsPreferences.shared
+        let directoryURL = preferences.lastUsedCustomDownloadLocation ?? preferences.effectiveDownloadLocation
         let savePanel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: request.parameters.fileTypes,
                                                                  suggestedFilename: request.parameters.suggestedFilename,
-                                                                 directoryURL: DownloadsPreferences().effectiveDownloadLocation)
+                                                                 directoryURL: directoryURL)
 
-        savePanel.beginSheetModal(for: window) { [request] response in
-            if case .abort = response {
+        savePanel.beginSheetModal(for: window) { [weak request, weak self] response in
+            switch response {
+            case .abort:
                 // panel not closed by user but by a tab switching
                 return
-            } else if case .OK = response, let url = savePanel.url {
-                request.submit( (url, savePanel.selectedFileType) )
-            } else {
-                request.submit(nil)
+            case .OK:
+                guard let self,
+                      let window = view.window,
+                      let url = savePanel.url else { fallthrough }
+
+                do {
+                    // validate selected URL is writable
+                    try FileManager.default.checkWritability(url)
+                } catch {
+                    // hide the save panel
+                    self.activeUserDialogCancellable = nil
+                    NSAlert(error: error).beginSheetModal(for: window) { [weak self] _ in
+                        guard let self, let request else { return }
+                        self.activeUserDialogCancellable = showSavePanel(with: request)
+                    }
+                    return
+                }
+                request?.submit( (url, savePanel.selectedFileType) )
+            default:
+                request?.submit(nil)
             }
         }
 
@@ -844,14 +1012,16 @@ extension BrowserTabViewController: TabDelegate {
         let openPanel = NSOpenPanel()
         openPanel.allowsMultipleSelection = request.parameters.allowsMultipleSelection
 
-        openPanel.beginSheetModal(for: window) { [request] response in
-            // don‘t submit the query when tab is switched
-            if case .abort = response { return }
-            guard case .OK = response else {
-                request.submit(nil)
+        openPanel.beginSheetModal(for: window) { [weak request] response in
+            switch response {
+            case .abort:
+                // don‘t submit the query when tab is switched
                 return
+            case .OK:
+                request?.submit(openPanel.urls)
+            default:
+                request?.submit(nil)
             }
-            request.submit(openPanel.urls)
         }
 
         // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
@@ -877,6 +1047,7 @@ extension BrowserTabViewController: TabDelegate {
         let context = PrintContext(request: request)
         let contextInfo = Unmanaged<PrintContext>.passRetained(context).toOpaque()
 
+        printOperation.printPanel.options.formUnion([.showsPaperSize, .showsOrientation, .showsScaling])
         printOperation.runModal(for: window, delegate: self, didRun: didRunSelector, contextInfo: contextInfo)
 
         // get the Print Panel that (hopefully) was added to the window.sheets
@@ -929,12 +1100,13 @@ extension BrowserTabViewController: TabDownloadsDelegate {
 
 extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
-    func selectedTab(at index: Int) {
-        show(displayableTabAtIndex: index)
+    func selectedTabContent(_ content: Tab.TabContent) {
+        tabViewModel?.tab.setContent(content)
+        showTabContent(of: tabViewModel)
     }
 
     func selectedPreferencePane(_ identifier: PreferencePaneIdentifier) {
-        guard let selectedTab = tabCollectionViewModel.selectedTabViewModel?.tab else {
+        guard let selectedTab = tabViewModel?.tab else {
             return
         }
 
@@ -952,12 +1124,13 @@ extension BrowserTabViewController: OnboardingDelegate {
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
-        let defaultBrowserPreferences = DefaultBrowserPreferences()
+        let defaultBrowserPreferences = DefaultBrowserPreferences.shared
         if defaultBrowserPreferences.isDefault {
             completion()
             return
         }
 
+        PixelKit.fire(GeneralPixel.defaultRequestedFromOnboarding)
         defaultBrowserPreferences.becomeDefault { _ in
             _ = defaultBrowserPreferences
             withAnimation {
@@ -1049,15 +1222,27 @@ extension BrowserTabViewController {
 
     private func hideWebViewSnapshotIfNeeded() {
         if webViewSnapshot != nil {
-            DispatchQueue.main.async {
-                let isWebViewFirstResponder = self.view.window?.firstResponder === self.view.window
-                // check this because if address bar was the first responder, we don't want to mess with it
-                if isWebViewFirstResponder {
-                    self.setFirstResponderAfterAdding = true
+            DispatchQueue.main.async { [weak self, tabViewModel] in
+                guard let self,
+                      self.tabViewModel === tabViewModel else { return }
+
+                // only make web view first responder after replacing the 
+                // snapshot if the address bar is not the first responder
+                if view.window?.firstResponder === view.window {
+                    viewToMakeFirstResponderAfterAdding = { [weak self] in
+                        self?.webView
+                    }
                 }
-                self.showTabContent(of: self.tabCollectionViewModel.selectedTabViewModel)
-                self.webViewSnapshot?.removeFromSuperview()
+                showTabContent(of: tabViewModel)
+                webViewSnapshot?.removeFromSuperview()
             }
         }
     }
 }
+
+@available(macOS 14.0, *)
+#Preview {
+    BrowserTabViewController(tabCollectionViewModel: TabCollectionViewModel(tabCollection: TabCollection(tabs: [.init(content: .url(.duckDuckGo, source: .ui))])))
+}
+
+// swiftlint:enable file_length

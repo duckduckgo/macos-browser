@@ -26,38 +26,57 @@ import TestUtils
 @testable import DDGSync
 @testable import DuckDuckGo_Privacy_Browser
 
+private final class MockUserAuthenticator: UserAuthenticating {
+    func authenticateUser(reason: DuckDuckGo_Privacy_Browser.DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult {
+        .success
+    }
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
+        result(.success)
+    }
+}
+
 final class SyncPreferencesTests: XCTestCase {
 
     let scheduler = CapturingScheduler()
     let managementDialogModel = ManagementDialogModel()
     var ddgSyncing: MockDDGSyncing!
     var syncBookmarksAdapter: SyncBookmarksAdapter!
-    var appearancePersistor = MockPersistor()
+    var syncCredentialsAdapter: SyncCredentialsAdapter!
+    var appearancePersistor = MockAppearancePreferencesPersistor()
     var appearancePreferences: AppearancePreferences!
     var syncPreferences: SyncPreferences!
+    var pausedStateManager: MockSyncPausedStateManaging!
     var testRecoveryCode = "some code"
+    var cancellables: Set<AnyCancellable>!
 
     var bookmarksDatabase: CoreDataDatabase!
     var location: URL!
 
     override func setUp() {
+        cancellables = []
         setUpDatabase()
         appearancePreferences = AppearancePreferences(persistor: appearancePersistor)
         ddgSyncing = MockDDGSyncing(authState: .inactive, scheduler: scheduler, isSyncInProgress: false)
+        pausedStateManager = MockSyncPausedStateManaging()
 
-        syncBookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, appearancePreferences: appearancePreferences)
+        syncBookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, appearancePreferences: appearancePreferences, syncErrorHandler: SyncErrorHandler())
+        syncCredentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: AutofillSecureVaultFactory, syncErrorHandler: SyncErrorHandler())
 
         syncPreferences = SyncPreferences(
             syncService: ddgSyncing,
             syncBookmarksAdapter: syncBookmarksAdapter,
+            syncCredentialsAdapter: syncCredentialsAdapter,
             appearancePreferences: appearancePreferences,
-            managementDialogModel: managementDialogModel
+            managementDialogModel: managementDialogModel,
+            userAuthenticator: MockUserAuthenticator(),
+            syncPausedStateManager: pausedStateManager
         )
     }
 
     override func tearDown() {
         ddgSyncing = nil
         syncPreferences = nil
+        pausedStateManager = nil
         tearDownDatabase()
     }
 
@@ -98,14 +117,14 @@ final class SyncPreferencesTests: XCTestCase {
         XCTAssertEqual(syncPreferences.recoveryCode, account.recoveryCode)
     }
 
-    @MainActor func testOnPresentRecoverSyncAccountDialogThenRecoverAccountDialogShown() {
-        syncPreferences.recoverDataPressed()
+    @MainActor func testOnPresentRecoverSyncAccountDialogThenRecoverAccountDialogShown() async {
+        await syncPreferences.recoverDataPressed()
 
         XCTAssertEqual(managementDialogModel.currentDialog, .recoverSyncedData)
     }
 
-    @MainActor func testOnSyncWithServerPressedThenSyncWithServerDialogShown() {
-        syncPreferences.syncWithServerPressed()
+    @MainActor func testOnSyncWithServerPressedThenSyncWithServerDialogShown() async {
+        await syncPreferences.syncWithServerPressed()
 
         XCTAssertEqual(managementDialogModel.currentDialog, .syncWithServer)
     }
@@ -134,86 +153,117 @@ final class SyncPreferencesTests: XCTestCase {
         XCTAssertTrue(ddgSyncing.disconnectCalled)
     }
 
-}
+    // MARK: - SYNC ERRORS
+    @MainActor
+    func test_WhenSyncPausedIsTrue_andChangePublished_isSyncPausedIsUpdated() async {
+        let expectation2 = XCTestExpectation(description: "isSyncPaused received the update")
+        let expectation1 = XCTestExpectation(description: "isSyncPaused published")
+        syncPreferences.$isSyncPaused
+            .dropFirst()
+            .sink { isPaused in
+                XCTAssertTrue(isPaused)
+                expectation2.fulfill()
+            }
+            .store(in: &cancellables)
 
-class MockDDGSyncing: DDGSyncing {
+        Task {
+            pausedStateManager.isSyncPaused = true
+            pausedStateManager.isSyncPausedChangedPublisher.send()
+            expectation1.fulfill()
+        }
 
-    let registeredDevices = [RegisteredDevice(id: "1", name: "Device 1", type: "desktop"), RegisteredDevice(id: "2", name: "Device 2", type: "mobile"), RegisteredDevice(id: "3", name: "Device 1", type: "desktop")]
-    var disconnectCalled = false
-
-    var dataProvidersSource: DataProvidersSource?
-
-    @Published var featureFlags: SyncFeatureFlags = .all
-
-    var featureFlagsPublisher: AnyPublisher<SyncFeatureFlags, Never> {
-        $featureFlags.eraseToAnyPublisher()
+        await self.fulfillment(of: [expectation1, expectation2], timeout: 5.0)
     }
 
-    @Published var authState: SyncAuthState = .inactive
+    @MainActor
+    func test_WhenSyncBookmarksPausedIsTrue_andChangePublished_isSyncBookmarksPausedIsUpdated() async {
+        let expectation2 = XCTestExpectation(description: "isSyncBookmarksPaused received the update")
+        let expectation1 = XCTestExpectation(description: "isSyncBookmarksPaused published")
+        syncPreferences.$isSyncBookmarksPaused
+            .dropFirst()
+            .sink { isPaused in
+                XCTAssertTrue(isPaused)
+                expectation2.fulfill()
+            }
+            .store(in: &cancellables)
 
-    var authStatePublisher: AnyPublisher<SyncAuthState, Never> {
-        $authState.eraseToAnyPublisher()
+        Task {
+            pausedStateManager.isSyncBookmarksPaused = true
+            pausedStateManager.isSyncPausedChangedPublisher.send()
+            expectation1.fulfill()
+        }
+
+        await self.fulfillment(of: [expectation1, expectation2], timeout: 5.0)
     }
 
-    var account: SyncAccount?
+    @MainActor
+    func test_WhenSyncCredentialsPausedIsTrue_andChangePublished_isSyncCredentialsPausedIsUpdated() async {
+        let expectation2 = XCTestExpectation(description: "isSyncCredentialsPaused received the update")
+        let expectation1 = XCTestExpectation(description: "isSyncCredentialsPaused published")
+        syncPreferences.$isSyncCredentialsPaused
+            .dropFirst()
+            .sink { isPaused in
+                XCTAssertTrue(isPaused)
+                expectation2.fulfill()
+            }
+            .store(in: &cancellables)
 
-    var scheduler: Scheduling
+        Task {
+            pausedStateManager.isSyncCredentialsPaused = true
+            pausedStateManager.isSyncPausedChangedPublisher.send()
+            expectation1.fulfill()
+        }
 
-    var syncDailyStats = SyncDailyStats(store: MockKeyValueStore())
-
-    @Published var isSyncInProgress: Bool
-
-    var isSyncInProgressPublisher: AnyPublisher<Bool, Never> {
-        $isSyncInProgress.eraseToAnyPublisher()
+        await self.fulfillment(of: [expectation1, expectation2], timeout: 5.0)
     }
 
-    init(dataProvidersSource: DataProvidersSource? = nil, authState: SyncAuthState, account: SyncAccount? = nil, scheduler: Scheduling = CapturingScheduler(), isSyncInProgress: Bool) {
-        self.dataProvidersSource = dataProvidersSource
-        self.authState = authState
-        self.account = account
-        self.scheduler = scheduler
-        self.isSyncInProgress = isSyncInProgress
+    @MainActor
+    func test_WhenSyncIsTurnedOff_ErrorHandlerSyncDidTurnOffCalled() async {
+        let expectation = XCTestExpectation(description: "Sync Turned off")
+
+        Task {
+            syncPreferences.turnOffSync()
+            expectation.fulfill()
+        }
+
+        await fulfillment(of: [expectation], timeout: 5.0)
+        XCTAssertTrue(pausedStateManager.syncDidTurnOffCalled)
     }
 
-    func initializeIfNeeded() {
+    @MainActor
+    func test_WhenAccountRemoved_ErrorHandlerSyncDidTurnOffCalled() async {
+        let expectation = XCTestExpectation(description: "Sync Turned off")
+
+        Task {
+            syncPreferences.deleteAccount()
+            expectation.fulfill()
+        }
+
+        await fulfillment(of: [expectation], timeout: 5.0)
+        XCTAssertTrue(pausedStateManager.syncDidTurnOffCalled)
     }
 
-    func createAccount(deviceName: String, deviceType: String) async throws {
+    func test_ErrorHandlerReturnsExpectedSyncBookmarksPausedMetadata() {
+        XCTAssertEqual(syncPreferences.syncBookmarksPausedTitle, MockSyncPausedStateManaging.syncBookmarksPausedData.title)
+        XCTAssertEqual(syncPreferences.syncBookmarksPausedMessage, MockSyncPausedStateManaging.syncBookmarksPausedData.description)
+        XCTAssertEqual(syncPreferences.syncBookmarksPausedButtonTitle, MockSyncPausedStateManaging.syncBookmarksPausedData.buttonTitle)
+        XCTAssertNotNil(syncPreferences.syncBookmarksPausedButtonAction)
     }
 
-    func login(_ recoveryKey: SyncCode.RecoveryKey, deviceName: String, deviceType: String) async throws -> [RegisteredDevice] {
-        return []
+    func test_ErrorHandlerReturnsExpectedSyncCredentialsPausedMetadata() {
+        XCTAssertEqual(syncPreferences.syncCredentialsPausedTitle, MockSyncPausedStateManaging.syncCredentialsPausedData.title)
+        XCTAssertEqual(syncPreferences.syncCredentialsPausedMessage, MockSyncPausedStateManaging.syncCredentialsPausedData.description)
+        XCTAssertEqual(syncPreferences.syncCredentialsPausedButtonTitle, MockSyncPausedStateManaging.syncCredentialsPausedData.buttonTitle)
+        XCTAssertNotNil(syncPreferences.syncCredentialsPausedButtonAction)
     }
 
-    func remoteConnect() throws -> RemoteConnecting {
-        return MockRemoteConnecting()
+    func test_ErrorHandlerReturnsExpectedSyncIsPausedMetadata() {
+        XCTAssertEqual(syncPreferences.syncPausedTitle, MockSyncPausedStateManaging.syncIsPausedData.title)
+        XCTAssertEqual(syncPreferences.syncPausedMessage, MockSyncPausedStateManaging.syncIsPausedData.description)
+        XCTAssertEqual(syncPreferences.syncPausedButtonTitle, MockSyncPausedStateManaging.syncIsPausedData.buttonTitle)
+        XCTAssertNil(syncPreferences.syncPausedButtonAction)
     }
 
-    func transmitRecoveryKey(_ connectCode: SyncCode.ConnectCode) async throws {
-    }
-
-    func disconnect() async throws {
-        disconnectCalled = true
-    }
-
-    func disconnect(deviceId: String) async throws {
-    }
-
-    func fetchDevices() async throws -> [RegisteredDevice] {
-        return registeredDevices
-    }
-
-    func updateDeviceName(_ name: String) async throws -> [RegisteredDevice] {
-        return []
-    }
-
-    func deleteAccount() async throws {
-    }
-
-    var serverEnvironment: ServerEnvironment = .production
-
-    func updateServerEnvironment(_ serverEnvironment: ServerEnvironment) {
-    }
 }
 
 class CapturingScheduler: Scheduling {
@@ -245,30 +295,4 @@ struct MockRemoteConnecting: RemoteConnecting {
 
     func stopPolling() {
     }
-}
-
-struct MockPersistor: AppearancePreferencesPersistor {
-
-    var homeButtonPosition: HomeButtonPosition = .hidden
-
-    var showFullURL: Bool = false
-
-    var showAutocompleteSuggestions: Bool = false
-
-    var currentThemeName: String = ""
-
-    var defaultPageZoom: CGFloat = 1.0
-
-    var favoritesDisplayMode: String?
-
-    var isFavoriteVisible: Bool = true
-
-    var isContinueSetUpVisible: Bool = true
-
-    var isRecentActivityVisible: Bool = true
-
-    var showBookmarksBar: Bool = false
-
-    var bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn
-
 }

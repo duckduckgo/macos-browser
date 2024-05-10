@@ -31,21 +31,29 @@ final class ScanOperation: DataBrokerOperation {
     let query: BrokerProfileQueryData
     let emailService: EmailServiceProtocol
     let captchaService: CaptchaServiceProtocol
+    let cookieHandler: CookieHandler
+    let stageCalculator: StageDurationCalculator
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<[ExtractedProfile], Error>?
     var extractedProfile: ExtractedProfile?
-    var stageCalculator: DataBrokerProtectionStageDurationCalculator?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
     var retriesCountOnError: Int = 0
+    let clickAwaitTime: TimeInterval
+    let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    var postLoadingSiteStartTime: Date?
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
+         cookieHandler: CookieHandler = BrokerCookieHandler(),
          operationAwaitTime: TimeInterval = 3,
+         clickAwaitTime: TimeInterval = 0,
+         stageDurationCalculator: StageDurationCalculator,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -54,16 +62,18 @@ final class ScanOperation: DataBrokerOperation {
         self.emailService = emailService
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
+        self.stageCalculator = stageDurationCalculator
         self.shouldRunNextStep = shouldRunNextStep
+        self.clickAwaitTime = clickAwaitTime
+        self.cookieHandler = cookieHandler
+        self.pixelHandler = pixelHandler
     }
 
-    func run(inputValue: Void,
+    func run(inputValue: InputValue,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
-             stageCalculator: DataBrokerProtectionStageDurationCalculator, // We do not need it for scans - for now.
              showWebView: Bool) async throws -> [ExtractedProfile] {
         try await withCheckedThrowingContinuation { continuation in
-            self.stageCalculator = stageCalculator
             self.continuation = continuation
             Task {
                 await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker, showWebView: showWebView)
@@ -87,7 +97,7 @@ final class ScanOperation: DataBrokerOperation {
         }
     }
 
-    func extractedProfiles(profiles: [ExtractedProfile]) async {
+    func extractedProfiles(profiles: [ExtractedProfile], meta: [String: Any]?) async {
         complete(profiles)
         await executeNextStep()
     }

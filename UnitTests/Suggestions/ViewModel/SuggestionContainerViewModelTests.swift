@@ -18,7 +18,7 @@
 
 import XCTest
 import Combine
-import BrowserServicesKit
+import Suggestions
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SuggestionContainerViewModelTests: XCTestCase {
@@ -154,7 +154,7 @@ extension SuggestionResult {
         ]
         return SuggestionResult(topHits: topHits,
                                 duckduckgoSuggestions: [],
-                                historyAndBookmarks: [])
+                                localSuggestions: [])
     }
 
 }

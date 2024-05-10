@@ -20,11 +20,10 @@ import AppKit
 import BrowserServicesKit
 import Common
 import Foundation
+import PixelKit
 
-#if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionUI
-#endif
 
 extension HomePage.Models {
 
@@ -40,45 +39,18 @@ extension HomePage.Models {
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
         let privacyConfigurationManager: PrivacyConfigurationManaging
+        let homePageRemoteMessaging: HomePageRemoteMessaging
+        let permanentSurveyManager: SurveyManager
 
-#if NETWORK_PROTECTION && DBP
-        let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
-        let networkProtectionUserDefaults: UserDefaults
-
-        let dataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging
-        let dataBrokerProtectionUserDefaults: UserDefaults
-#endif
-
-        var isDay0SurveyEnabled: Bool {
-            let newTabContinueSetUpSettings = privacyConfigurationManager.privacyConfig.settings(for: .newTabContinueSetUp)
-            if let day0SurveyString =  newTabContinueSetUpSettings["surveyCardDay0"] as? String {
-                if day0SurveyString == "enabled" {
-                    return true
-                }
-            }
-            return false
-        }
-        var isDay7SurveyEnabled: Bool {
-            let newTabContinueSetUpSettings = privacyConfigurationManager.privacyConfig.settings(for: .newTabContinueSetUp)
-            if let day7SurveyString =  newTabContinueSetUpSettings["surveyCardDay7"] as? String {
-                if day7SurveyString == "enabled" {
-                    return true
-                }
-            }
-            return false
-        }
         var duckPlayerURL: String {
             let duckPlayerSettings = privacyConfigurationManager.privacyConfig.settings(for: .duckPlayer)
             return duckPlayerSettings["tryDuckPlayerLink"] as? String ?? "https://www.youtube.com/watch?v=yKWIA-Pys4c"
         }
-        var day0SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/230701?list=1"
-        var day7SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/230702?list=1"
 
         private let defaultBrowserProvider: DefaultBrowserProvider
         private let dataImportProvider: DataImportStatusProviding
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
-        private let privacyPreferences: PrivacySecurityPreferences
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
 
         @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
@@ -100,23 +72,14 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
         private var shouldShowEmailProtectionSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowSurveyDay0, defaultValue: true)
-        private var shouldShowSurveyDay0: Bool
-
-        @UserDefaultsWrapper(key: .homePageUserInteractedWithSurveyDay0, defaultValue: false)
-        private var userInteractedWithSurveyDay0: Bool
+        @UserDefaultsWrapper(key: .homePageShowPermanentSurvey, defaultValue: true)
+        private var shouldShowPermanentSurvey: Bool
 
         @UserDefaultsWrapper(key: .shouldShowDBPWaitlistInvitedCardUI, defaultValue: false)
         private var shouldShowDBPWaitlistInvitedCardUI: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowSurveyDay7, defaultValue: true)
-        private var shouldShowSurveyDay7: Bool
-
         @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
         private var isFirstSession: Bool
-
-        @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Calendar.current.date(byAdding: .month, value: -1, to: Date())!)
-        private var firstLaunchDate: Date
 
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > itemsRowCountWhenCollapsed
@@ -125,8 +88,6 @@ extension HomePage.Models {
         var hasContent: Bool {
             return !featuresMatrix.isEmpty
         }
-
-        lazy var statisticsStore: StatisticsStore = LocalStatisticsStore()
 
         lazy var listOfFeatures = isFirstSession ? firstRunFeatures : randomisedFeatures
 
@@ -138,61 +99,34 @@ extension HomePage.Models {
 
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
-#if NETWORK_PROTECTION && DBP
         init(defaultBrowserProvider: DefaultBrowserProvider,
              dataImportProvider: DataImportStatusProviding,
              tabCollectionViewModel: TabCollectionViewModel,
              emailManager: EmailManager = EmailManager(),
-             privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
-             networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging,
-             dataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging,
-             networkProtectionUserDefaults: UserDefaults,
-             dataBrokerProtectionUserDefaults: UserDefaults,
-             privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
+             homePageRemoteMessaging: HomePageRemoteMessaging,
+             privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
+             permanentSurveyManager: SurveyManager = PermanentSurveyManager()) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
             self.emailManager = emailManager
-            self.privacyPreferences = privacyPreferences
             self.duckPlayerPreferences = duckPlayerPreferences
-            self.networkProtectionRemoteMessaging = networkProtectionRemoteMessaging
-            self.dataBrokerProtectionRemoteMessaging = dataBrokerProtectionRemoteMessaging
-            self.networkProtectionUserDefaults = networkProtectionUserDefaults
-            self.dataBrokerProtectionUserDefaults = dataBrokerProtectionUserDefaults
+            self.homePageRemoteMessaging = homePageRemoteMessaging
             self.privacyConfigurationManager = privacyConfigurationManager
+            self.permanentSurveyManager = permanentSurveyManager
 
             refreshFeaturesMatrix()
 
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
         }
-#else
-        init(defaultBrowserProvider: DefaultBrowserProvider,
-             dataImportProvider: DataImportStatusProviding,
-             tabCollectionViewModel: TabCollectionViewModel,
-             emailManager: EmailManager = EmailManager(),
-             privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
-             duckPlayerPreferences: DuckPlayerPreferencesPersistor,
-             privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
-            self.defaultBrowserProvider = defaultBrowserProvider
-            self.dataImportProvider = dataImportProvider
-            self.tabCollectionViewModel = tabCollectionViewModel
-            self.emailManager = emailManager
-            self.privacyPreferences = privacyPreferences
-            self.duckPlayerPreferences = duckPlayerPreferences
-            self.privacyConfigurationManager = privacyConfigurationManager
-            refreshFeaturesMatrix()
-            NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
-            NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
-        }
-#endif
 
-        // swiftlint:disable:next cyclomatic_complexity
         @MainActor func performAction(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
                 do {
+                    PixelKit.fire(GeneralPixel.defaultRequestedFromHomepageSetupView)
                     try defaultBrowserProvider.presentDefaultBrowserPrompt()
                 } catch {
                     defaultBrowserProvider.openSystemPreferences()
@@ -207,10 +141,8 @@ extension HomePage.Models {
             case .emailProtection:
                 let tab = Tab(content: .url(EmailUrls().emailProtectionLink, source: .ui), shouldLoadInBackground: true)
                 tabCollectionViewModel.append(tab: tab)
-            case .surveyDay0:
-                visitSurvey(day: .day0)
-            case .surveyDay7:
-                visitSurvey(day: .day7)
+            case .permanentSurvey:
+                visitSurvey()
             case .networkProtectionRemoteMessage(let message):
                 handle(remoteMessage: message)
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -232,19 +164,15 @@ extension HomePage.Models {
                 shouldShowDuckPlayerSetting = false
             case .emailProtection:
                 shouldShowEmailProtectionSetting = false
-            case .surveyDay0:
-                shouldShowSurveyDay0 = false
-            case .surveyDay7:
-                shouldShowSurveyDay7 = false
+            case .permanentSurvey:
+                shouldShowPermanentSurvey = false
             case .networkProtectionRemoteMessage(let message):
-#if NETWORK_PROTECTION
-                networkProtectionRemoteMessaging.dismiss(message: message)
-                Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
-#endif
+                homePageRemoteMessaging.networkProtectionRemoteMessaging.dismiss(message: message)
+                PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDismissed(messageID: message.id))
             case .dataBrokerProtectionRemoteMessage(let message):
 #if DBP
-                dataBrokerProtectionRemoteMessaging.dismiss(message: message)
-                Pixel.fire(.dataBrokerProtectionRemoteMessageDismissed(messageID: message.id))
+                homePageRemoteMessaging.dataBrokerProtectionRemoteMessaging.dismiss(message: message)
+                PixelKit.fire(GeneralPixel.dataBrokerProtectionRemoteMessageDismissed(messageID: message.id))
 #endif
             case .dataBrokerProtectionWaitlistInvited:
                 shouldShowDBPWaitlistInvitedCardUI = false
@@ -252,7 +180,6 @@ extension HomePage.Models {
             refreshFeaturesMatrix()
         }
 
-        // swiftlint:disable:next cyclomatic_complexity function_body_length
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
 #if DBP
@@ -260,61 +187,48 @@ extension HomePage.Models {
                 features.append(.dataBrokerProtectionWaitlistInvited)
             }
 
-            for message in dataBrokerProtectionRemoteMessaging.presentableRemoteMessages() {
+            for message in homePageRemoteMessaging.dataBrokerProtectionRemoteMessaging.presentableRemoteMessages() {
                 features.append(.dataBrokerProtectionRemoteMessage(message))
-                DailyPixel.fire(
-                    pixel: .dataBrokerProtectionRemoteMessageDisplayed(messageID: message.id),
-                    frequency: .dailyOnly,
-                    includeAppVersionParameter: true
-                )
+                PixelKit.fire(GeneralPixel.dataBrokerProtectionRemoteMessageDisplayed(messageID: message.id), frequency: .daily)
             }
 #endif
 
-#if NETWORK_PROTECTION
-            for message in networkProtectionRemoteMessaging.presentableRemoteMessages() {
-                features.append(.networkProtectionRemoteMessage(message))
-                DailyPixel.fire(
-                    pixel: .networkProtectionRemoteMessageDisplayed(messageID: message.id),
-                    frequency: .dailyOnly,
-                    includeAppVersionParameter: true
-                )
+            for message in homePageRemoteMessaging.networkProtectionRemoteMessaging.presentableRemoteMessages() {
+                PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDisplayed(messageID: message.id), frequency: .daily)
             }
-#endif
 
-            for feature in listOfFeatures {
-                switch feature {
-                case .defaultBrowser:
-                    if shouldMakeDefaultCardBeVisible {
-                        features.append(feature)
-                    }
-                case .importBookmarksAndPasswords:
-                    if shouldImportCardBeVisible {
-                        features.append(feature)
-                    }
-                case .duckplayer:
-                    if shouldDuckPlayerCardBeVisible {
-                        features.append(feature)
-                    }
-                case .emailProtection:
-                    if shouldEmailProtectionCardBeVisible {
-                        features.append(feature)
-                    }
-                case .surveyDay0:
-                    if shouldSurveyDay0BeVisible {
-                        features.append(feature)
-                    }
-                case .surveyDay7:
-                    if shouldSurveyDay7BeVisible {
-                        features.append(feature)
-                    }
-                case .networkProtectionRemoteMessage, .dataBrokerProtectionRemoteMessage, .dataBrokerProtectionWaitlistInvited:
-                    break // Do nothing, these messages get appended first
-                }
-            }
+            appendFeatureCards(&features)
+
             featuresMatrix = features.chunked(into: itemsPerRow)
         }
 
+        private func appendFeatureCards(_ features: inout [FeatureType]) {
+            for feature in listOfFeatures where shouldAppendFeature(feature: feature) {
+                features.append(feature)
+            }
+        }
+
+        private func shouldAppendFeature(feature: FeatureType) -> Bool {
+            switch feature {
+            case .defaultBrowser:
+                return shouldMakeDefaultCardBeVisible
+            case .importBookmarksAndPasswords:
+                return shouldImportCardBeVisible
+            case .duckplayer:
+                return shouldDuckPlayerCardBeVisible
+            case .emailProtection:
+                return shouldEmailProtectionCardBeVisible
+            case .permanentSurvey:
+                return shouldPermanentSurveyBeVisible
+            case .networkProtectionRemoteMessage,
+                 .dataBrokerProtectionRemoteMessage,
+                 .dataBrokerProtectionWaitlistInvited:
+                return false // These are handled separately
+            }
+        }
+
         // Helper Functions
+        @MainActor(unsafe)
         @objc private func newTabOpenNotification(_ notification: Notification) {
             if !isFirstSession {
                 listOfFeatures = randomisedFeatures
@@ -322,7 +236,7 @@ extension HomePage.Models {
 #if DEBUG
             isFirstSession = false
 #endif
-            if OnboardingViewModel().onboardingFinished {
+            if OnboardingViewModel.isOnboardingFinished {
                 isFirstSession = false
             }
         }
@@ -356,19 +270,16 @@ extension HomePage.Models {
         }
 
         private var shouldMakeDefaultCardBeVisible: Bool {
-            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowMakeDefaultSetting &&
             !defaultBrowserProvider.isDefault
         }
 
         private var shouldImportCardBeVisible: Bool {
-            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowImportSetting &&
             !dataImportProvider.didImport
         }
 
         private var shouldDuckPlayerCardBeVisible: Bool {
-            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowDuckPlayerSetting &&
             duckPlayerPreferences.duckPlayerModeBool == nil &&
             !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
@@ -383,64 +294,27 @@ extension HomePage.Models {
         }
 
         private var shouldEmailProtectionCardBeVisible: Bool {
-            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowEmailProtectionSetting &&
             !emailManager.isSignedIn
         }
 
-        private var shouldSurveyDay0BeVisible: Bool {
-            let oneDayAgo = Calendar.current.date(byAdding: .weekday, value: -1, to: Date())!
-            return !PixelExperiment.isNoCardsExperimentOn &&
-            isDay0SurveyEnabled &&
-            shouldShowSurveyDay0 &&
-            !userInteractedWithSurveyDay0 &&
-            firstLaunchDate > oneDayAgo
+        private var shouldPermanentSurveyBeVisible: Bool {
+            return shouldShowPermanentSurvey &&
+            permanentSurveyManager.isSurveyAvailable
         }
 
-        private var shouldSurveyDay7BeVisible: Bool {
-            let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
-            return !PixelExperiment.isNoCardsExperimentOn &&
-            isDay7SurveyEnabled &&
-            shouldShowSurveyDay0 &&
-            shouldShowSurveyDay7 &&
-            !userInteractedWithSurveyDay0 &&
-            firstLaunchDate <= oneWeekAgo
-        }
+        @MainActor private func visitSurvey() {
+            guard let url = permanentSurveyManager.url else { return }
 
-        private enum SurveyDay {
-            case day0
-            case day7
-        }
-
-        @MainActor private func visitSurvey(day: SurveyDay) {
-            var surveyURLString: String
-            switch day {
-            case .day0:
-                surveyURLString = day0SurveyURL
-            case .day7:
-                surveyURLString = day7SurveyURL
-            }
-            if let atb = statisticsStore.atb {
-                surveyURLString += "&atb=\(atb)"
-            }
-
-            if let url = URL(string: surveyURLString) {
-                let tab = Tab(content: .url(url, source: .ui), shouldLoadInBackground: true)
-                tabCollectionViewModel.append(tab: tab)
-                switch day {
-                case .day0:
-                    userInteractedWithSurveyDay0 = true
-                case .day7:
-                    shouldShowSurveyDay7 = false
-                }
-            }
+            let tab = Tab(content: .url(url, source: .ui), shouldLoadInBackground: true)
+            tabCollectionViewModel.append(tab: tab)
+            shouldShowPermanentSurvey = false
         }
 
         @MainActor private func handle(remoteMessage: NetworkProtectionRemoteMessage) {
-#if NETWORK_PROTECTION
             guard let actionType = remoteMessage.action.actionType else {
-                Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
-                networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
+                homePageRemoteMessaging.networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
                 refreshFeaturesMatrix()
                 return
             }
@@ -452,21 +326,20 @@ extension HomePage.Models {
                 if let surveyURL = remoteMessage.presentableSurveyURL() {
                     let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
                     tabCollectionViewModel.append(tab: tab)
-                    Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
+                    PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
 
                     // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
-                    networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                    homePageRemoteMessaging.networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
                     refreshFeaturesMatrix()
                 }
             }
-#endif
         }
 
         @MainActor private func handle(remoteMessage: DataBrokerProtectionRemoteMessage) {
 #if DBP
             guard let actionType = remoteMessage.action.actionType else {
-                Pixel.fire(.dataBrokerProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
-                dataBrokerProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                PixelKit.fire(GeneralPixel.dataBrokerProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
+                homePageRemoteMessaging.dataBrokerProtectionRemoteMessaging.dismiss(message: remoteMessage)
                 refreshFeaturesMatrix()
                 return
             }
@@ -478,10 +351,10 @@ extension HomePage.Models {
                 if let surveyURL = remoteMessage.presentableSurveyURL() {
                     let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
                     tabCollectionViewModel.append(tab: tab)
-                    Pixel.fire(.dataBrokerProtectionRemoteMessageOpened(messageID: remoteMessage.id))
+                    PixelKit.fire(GeneralPixel.dataBrokerProtectionRemoteMessageOpened(messageID: remoteMessage.id))
 
                     // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
-                    dataBrokerProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                    homePageRemoteMessaging.dataBrokerProtectionRemoteMessaging.dismiss(message: remoteMessage)
                     refreshFeaturesMatrix()
                 }
             }
@@ -496,15 +369,14 @@ extension HomePage.Models {
         // We ignore the `networkProtectionRemoteMessage` case here to avoid it getting accidentally included - it has special handling and will get
         // included elsewhere.
         static var allCases: [HomePage.Models.FeatureType] {
-            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .surveyDay0, .surveyDay7]
+            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .permanentSurvey]
         }
 
         case duckplayer
         case emailProtection
         case defaultBrowser
         case importBookmarksAndPasswords
-        case surveyDay0
-        case surveyDay7
+        case permanentSurvey
         case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
         case dataBrokerProtectionRemoteMessage(DataBrokerProtectionRemoteMessage)
         case dataBrokerProtectionWaitlistInvited
@@ -519,10 +391,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerCardTitle
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionCardTitle
-            case .surveyDay0:
-                return UserText.newTabSetUpSurveyDay0CardTitle
-            case .surveyDay7:
-                return UserText.newTabSetUpSurveyDay7CardTitle
+            case .permanentSurvey:
+                return PermanentSurveyManager.title
             case .networkProtectionRemoteMessage(let message):
                 return message.cardTitle
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -542,10 +412,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerSummary
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionSummary
-            case .surveyDay0:
-                return UserText.newTabSetUpSurveyDay0Summary
-            case .surveyDay7:
-                return UserText.newTabSetUpSurveyDay7Summary
+            case .permanentSurvey:
+                return PermanentSurveyManager.body
             case .networkProtectionRemoteMessage(let message):
                 return message.cardDescription
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -565,10 +433,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerAction
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionAction
-            case .surveyDay0:
-                return UserText.newTabSetUpSurveyDay0Action
-            case .surveyDay7:
-                return UserText.newTabSetUpSurveyDay7Action
+            case .permanentSurvey:
+                return PermanentSurveyManager.actionTitle
             case .networkProtectionRemoteMessage(let message):
                 return message.action.actionTitle
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -583,23 +449,21 @@ extension HomePage.Models {
 
             switch self {
             case .defaultBrowser:
-                return NSImage(named: "Default-App-128")!.resized(to: iconSize)!
+                return .defaultApp128.resized(to: iconSize)!
             case .importBookmarksAndPasswords:
-                return NSImage(named: "Import-128")!.resized(to: iconSize)!
+                return .import128.resized(to: iconSize)!
             case .duckplayer:
-                return NSImage(named: "Clean-Tube-128")!.resized(to: iconSize)!
+                return .cleanTube128.resized(to: iconSize)!
             case .emailProtection:
-                return NSImage(named: "inbox-128")!.resized(to: iconSize)!
-            case .surveyDay0:
-                return NSImage(named: "Survey-128")!.resized(to: iconSize)!
-            case .surveyDay7:
-                return NSImage(named: "Survey-128")!.resized(to: iconSize)!
+                return .inbox128.resized(to: iconSize)!
+            case .permanentSurvey:
+                return .survey128.resized(to: iconSize)!
             case .networkProtectionRemoteMessage:
-                return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
+                return .vpnEnded.resized(to: iconSize)!
             case .dataBrokerProtectionRemoteMessage:
-                return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!
+                return .dbpInformationRemover.resized(to: iconSize)!
             case .dataBrokerProtectionWaitlistInvited:
-                return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!
+                return .dbpInformationRemover.resized(to: iconSize)!
             }
         }
     }
@@ -615,5 +479,45 @@ extension HomePage.Models {
         static func height(for rowCount: Int) -> CGFloat {
             (itemHeight + verticalSpacing) * CGFloat(rowCount) - verticalSpacing
         }
+    }
+}
+
+// MARK: - Remote Messaging
+
+struct HomePageRemoteMessaging {
+
+    static func defaultMessaging() -> HomePageRemoteMessaging {
+#if DBP
+        return HomePageRemoteMessaging(
+            networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
+            networkProtectionUserDefaults: .netP,
+            dataBrokerProtectionRemoteMessaging: DefaultDataBrokerProtectionRemoteMessaging(),
+            dataBrokerProtectionUserDefaults: .dbp
+        )
+#else
+        return HomePageRemoteMessaging(
+            networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
+            networkProtectionUserDefaults: .netP
+        )
+#endif
+    }
+
+    let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
+    let networkProtectionUserDefaults: UserDefaults
+
+#if DBP
+    let dataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging
+    let dataBrokerProtectionUserDefaults: UserDefaults
+#endif
+
+}
+
+extension AppVersion {
+    public var majorAndMinorOSVersion: String {
+        let components = osVersion.split(separator: ".")
+        guard components.count >= 2 else {
+            return majorVersionNumber
+        }
+        return "\(components[0]).\(components[1])"
     }
 }

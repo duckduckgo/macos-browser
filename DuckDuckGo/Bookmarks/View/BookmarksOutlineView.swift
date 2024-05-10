@@ -50,13 +50,12 @@ final class BookmarksOutlineView: NSOutlineView {
         }
     }
 
-    override func awakeFromNib() {
-        guard let scrollView = enclosingScrollView else { fatalError() }
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        guard let scrollView = enclosingScrollView else { return }
 
-        let trackingArea = NSTrackingArea(rect: scrollView.frame,
-                                          options: [.mouseMoved, .activeInKeyWindow, .inVisibleRect],
-                                          owner: self,
-                                          userInfo: nil)
+        let trackingArea = NSTrackingArea(rect: .zero, options: [.mouseMoved, .activeInKeyWindow, .inVisibleRect], owner: self, userInfo: nil)
+
         scrollView.addTrackingArea(trackingArea)
     }
 
@@ -69,4 +68,5 @@ final class BookmarksOutlineView: NSOutlineView {
         rowView.highlight = !(item?.representedObject is SpacerNode)
         lastRow = rowView
     }
+
 }

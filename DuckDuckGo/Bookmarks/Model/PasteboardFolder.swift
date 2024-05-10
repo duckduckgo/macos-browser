@@ -26,12 +26,15 @@ struct PasteboardFolder: Hashable {
         static let name = "name"
     }
 
-    let id: String
-    let name: String
+    var id: String { folder.id }
+    var name: String { folder.title }
+    var parentFolderUUID: String? { folder.parentFolderUUID }
+    var children: [BaseBookmarkEntity] { folder.children }
 
-    init(id: String, name: String) {
-        self.id = id
-        self.name = name
+    private let folder: BookmarkFolder
+
+    init(folder: BookmarkFolder) {
+        self.folder = folder
     }
 
     // MARK: - Pasteboard Restoration
@@ -41,7 +44,7 @@ struct PasteboardFolder: Hashable {
             return nil
         }
 
-        self.init(id: id, name: name)
+        self.init(folder: .init(id: id, title: name))
     }
 
     init?(pasteboardItem: NSPasteboardItem) {
@@ -78,19 +81,17 @@ struct PasteboardFolder: Hashable {
     static let folderUTIInternalType = NSPasteboard.PasteboardType(rawValue: folderUTIInternal)
 
     var pasteboardFolder: PasteboardFolder {
-        return PasteboardFolder(id: folderID, name: folderName)
+        return PasteboardFolder(folder: folder)
     }
 
     var internalDictionary: PasteboardAttributes {
         return pasteboardFolder.internalDictionaryRepresentation
     }
 
-    private let folderID: String
-    private let folderName: String
+    private let folder: BookmarkFolder
 
     init(folder: BookmarkFolder) {
-        self.folderID = folder.id
-        self.folderName = folder.title
+        self.folder = folder
     }
 
     // MARK: - NSPasteboardWriting
@@ -102,7 +103,7 @@ struct PasteboardFolder: Hashable {
     func pasteboardPropertyList(forType type: NSPasteboard.PasteboardType) -> Any? {
         switch type {
         case .string:
-            return folderName
+            return folder.title
         case FolderPasteboardWriter.folderUTIInternalType:
             return internalDictionary
         default:

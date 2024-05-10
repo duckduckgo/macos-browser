@@ -16,28 +16,31 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
+import AppKit
 import Common
 import LoginItems
 import NetworkProtection
 import NetworkExtension
 import NetworkProtectionIPC
 import NetworkProtectionUI
+import Subscription
 
 struct VPNMetadata: Encodable {
 
     struct AppInfo: Encodable {
         let appVersion: String
-        let lastVersionRun: String
+        let lastAgentVersionRun: String
+        let lastExtensionVersionRun: String
         let isInternalUser: Bool
+        let isInApplicationsDirectory: Bool
     }
 
     struct DeviceInfo: Encodable {
         let osVersion: String
         let buildFlavor: String
         let lowPowerModeEnabled: Bool
+        let cpuArchitecture: String
     }
 
     struct NetworkInfo: Encodable {
@@ -47,7 +50,8 @@ struct VPNMetadata: Encodable {
     struct VPNState: Encodable {
         let onboardingState: String
         let connectionState: String
-        let lastErrorMessage: String
+        let lastStartErrorDescription: String
+        let lastTunnelErrorDescription: String
         let connectedServer: String
         let connectedServerIP: String
     }
@@ -65,10 +69,14 @@ struct VPNMetadata: Encodable {
 
     struct LoginItemState: Encodable {
         let vpnMenuState: String
-
-#if NETP_SYSTEM_EXTENSION
+        let vpnMenuIsRunning: Bool
         let notificationsAgentState: String
-#endif
+        let notificationsAgentIsRunning: Bool
+    }
+
+    struct PrivacyProInfo: Encodable {
+        let hasPrivacyProAccount: Bool
+        let hasVPNEntitlement: Bool
     }
 
     let appInfo: AppInfo
@@ -77,6 +85,7 @@ struct VPNMetadata: Encodable {
     let vpnState: VPNState
     let vpnSettingsState: VPNSettingsState
     let loginItemState: LoginItemState
+    let privacyProInfo: PrivacyProInfo
 
     func toPrettyPrintedJSON() -> String? {
         let encoder = JSONEncoder()
@@ -110,18 +119,23 @@ protocol VPNMetadataCollector {
 final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
     private let statusReporter: NetworkProtectionStatusReporter
+    private let ipcClient: TunnelControllerIPCClient
+    private let defaults: UserDefaults
 
-    init() {
-        let machServiceName = Bundle.main.vpnMenuAgentBundleId
-        let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
+    init(defaults: UserDefaults = .netP) {
+        let ipcClient = TunnelControllerIPCClient()
         ipcClient.register()
+
+        self.ipcClient = ipcClient
+        self.defaults = defaults
 
         self.statusReporter = DefaultNetworkProtectionStatusReporter(
             statusObserver: ipcClient.connectionStatusObserver,
             serverInfoObserver: ipcClient.serverInfoObserver,
             connectionErrorObserver: ipcClient.connectionErrorObserver,
             connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
+            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications(),
+            dataVolumeObserver: ipcClient.dataVolumeObserver
         )
 
         // Force refresh just in case. A refresh is requested when the IPC client is created, but distributed notifications don't guarantee delivery
@@ -137,6 +151,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         let vpnState = await collectVPNState()
         let vpnSettingsState = collectVPNSettingsState()
         let loginItemState = collectLoginItemState()
+        let privacyProInfo = await collectPrivacyProInfo()
 
         return VPNMetadata(
             appInfo: appInfoMetadata,
@@ -144,18 +159,26 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             networkInfo: networkInfoMetadata,
             vpnState: vpnState,
             vpnSettingsState: vpnSettingsState,
-            loginItemState: loginItemState
+            loginItemState: loginItemState,
+            privacyProInfo: privacyProInfo
         )
     }
 
     // MARK: - Metadata Collection
 
     private func collectAppInfoMetadata() -> VPNMetadata.AppInfo {
-        let appVersion = AppVersion.shared.versionNumber
-        let versionStore = NetworkProtectionLastVersionRunStore()
+        let appVersion = AppVersion.shared.versionAndBuildNumber
+        let versionStore = NetworkProtectionLastVersionRunStore(userDefaults: defaults)
         let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
+        let isInApplicationsDirectory = Bundle.main.isInApplicationsDirectory
 
-        return .init(appVersion: appVersion, lastVersionRun: versionStore.lastVersionRun ?? "Unknown", isInternalUser: isInternalUser)
+        return .init(
+            appVersion: appVersion,
+            lastAgentVersionRun: versionStore.lastAgentVersionRun ?? "none",
+            lastExtensionVersionRun: versionStore.lastExtensionVersionRun ?? "none",
+            isInternalUser: isInternalUser,
+            isInApplicationsDirectory: isInApplicationsDirectory
+        )
     }
 
     private func collectDeviceInfoMetadata() -> VPNMetadata.DeviceInfo {
@@ -169,21 +192,37 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             lowPowerModeEnabled = false
         }
 
-        return .init(osVersion: osVersion, buildFlavor: buildFlavor, lowPowerModeEnabled: lowPowerModeEnabled)
+        let architecture = getMachineArchitecture()
+
+        return .init(osVersion: osVersion, buildFlavor: buildFlavor, lowPowerModeEnabled: lowPowerModeEnabled, cpuArchitecture: architecture)
+    }
+
+    private func getMachineArchitecture() -> String {
+        #if arch(arm)
+            return "arm"
+        #elseif arch(arm64)
+            return "arm64"
+        #elseif arch(i386)
+            return "i386"
+        #elseif arch(x86_64)
+            return "x86_64"
+        #else
+            return "unknown"
+        #endif
     }
 
     func collectNetworkInformation() async -> VPNMetadata.NetworkInfo {
         let monitor = NWPathMonitor()
         monitor.start(queue: DispatchQueue(label: "VPNMetadataCollector.NWPathMonitor.paths"))
 
-        var path: Network.NWPath?
         let startTime = CFAbsoluteTimeGetCurrent()
 
         while true {
             if !monitor.currentPath.availableInterfaces.isEmpty {
-                path = monitor.currentPath
+                let path = monitor.currentPath
                 monitor.cancel()
-                return .init(currentPath: path.debugDescription)
+
+                return .init(currentPath: path.anonymousDescription)
             }
 
             // Wait up to 3 seconds to fetch the path.
@@ -198,7 +237,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     func collectVPNState() async -> VPNMetadata.VPNState {
         let onboardingState: String
 
-        switch UserDefaults.netP.networkProtectionOnboardingStatus {
+        switch defaults.networkProtectionOnboardingStatus {
         case .completed:
             onboardingState = "complete"
         case .isOnboarding(let step):
@@ -210,30 +249,45 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             }
         }
 
+        let errorHistory = VPNOperationErrorHistory(ipcClient: ipcClient, defaults: defaults)
+
         let connectionState = String(describing: statusReporter.statusObserver.recentValue)
-        let lastErrorMessage = statusReporter.connectionErrorObserver.recentValue ?? "none"
-        let connectedServer = statusReporter.serverInfoObserver.recentValue.serverLocation ?? "none"
+        let lastTunnelErrorDescription = await errorHistory.lastTunnelErrorDescription
+        let connectedServer = statusReporter.serverInfoObserver.recentValue.serverLocation?.serverLocation ?? "none"
         let connectedServerIP = statusReporter.serverInfoObserver.recentValue.serverAddress ?? "none"
         return .init(onboardingState: onboardingState,
                      connectionState: connectionState,
-                     lastErrorMessage: lastErrorMessage,
+                     lastStartErrorDescription: errorHistory.lastStartErrorDescription,
+                     lastTunnelErrorDescription: lastTunnelErrorDescription,
                      connectedServer: connectedServer,
                      connectedServerIP: connectedServerIP)
     }
 
     func collectLoginItemState() -> VPNMetadata.LoginItemState {
         let vpnMenuState = String(describing: LoginItem.vpnMenu.status)
+        let vpnMenuIsRunning = !NSRunningApplication.runningApplications(withBundleIdentifier: LoginItem.vpnMenu.agentBundleID).isEmpty
 
 #if NETP_SYSTEM_EXTENSION
         let notificationsAgentState = String(describing: LoginItem.notificationsAgent.status)
-        return .init(vpnMenuState: vpnMenuState, notificationsAgentState: notificationsAgentState)
+        let notificationsAgentIsRunning = !NSRunningApplication.runningApplications(withBundleIdentifier: LoginItem.notificationsAgent.agentBundleID).isEmpty
+
+        return .init(
+            vpnMenuState: vpnMenuState,
+            vpnMenuIsRunning: vpnMenuIsRunning,
+            notificationsAgentState: notificationsAgentState,
+            notificationsAgentIsRunning: notificationsAgentIsRunning)
 #else
-        return .init(vpnMenuState: vpnMenuState)
+        return .init(
+            vpnMenuState: vpnMenuState,
+            vpnMenuIsRunning: vpnMenuIsRunning,
+            notificationsAgentState: "not-required",
+            notificationsAgentIsRunning: false
+        )
 #endif
     }
 
     func collectVPNSettingsState() -> VPNMetadata.VPNSettingsState {
-        let settings = VPNSettings(defaults: .netP)
+        let settings = VPNSettings(defaults: defaults)
 
         return .init(
             connectOnLoginEnabled: settings.connectOnLogin,
@@ -247,6 +301,15 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         )
     }
 
-}
+    func collectPrivacyProInfo() async -> VPNMetadata.PrivacyProInfo {
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
-#endif
+        let hasVPNEntitlement = (try? await accountManager.hasEntitlement(for: .networkProtection).get()) ?? false
+
+        return .init(
+            hasPrivacyProAccount: accountManager.isUserAuthenticated,
+            hasVPNEntitlement: hasVPNEntitlement
+        )
+    }
+
+}

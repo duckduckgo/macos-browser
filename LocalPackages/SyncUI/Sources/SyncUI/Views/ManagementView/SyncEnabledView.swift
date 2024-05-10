@@ -26,44 +26,50 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         // Errors
         VStack(alignment: .leading, spacing: 16) {
             syncUnavailableView()
+            if model.isSyncPaused {
+                syncPaused()
+            }
             if model.isSyncBookmarksPaused {
                 syncPaused(for: .bookmarks)
             }
             if model.isSyncCredentialsPaused {
                 syncPaused(for: .credentials)
             }
+            if !model.invalidBookmarksTitles.isEmpty {
+                syncHasInvalidItems(for: .bookmarks)
+            }
+            if !model.invalidCredentialsTitles.isEmpty {
+                syncHasInvalidItems(for: .credentials)
+            }
         }
 
         // Sync Enabled
-        PreferencePaneSection(verticalPadding: 8) {
+        PreferencePaneSection {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
         }
 
         // Synced Devices
-        PreferencePaneSection(verticalPadding: 8) {
-            TextMenuItemHeader(UserText.syncedDevices)
-
+        PreferencePaneSection(UserText.syncedDevices) {
             SyncedDevicesView<ViewModel>()
                 .environmentObject(model)
         }
 
         // Options
-        PreferencePaneSection(verticalPadding: 8) {
-            TextMenuItemHeader(UserText.optionsSectionTitle)
+        PreferencePaneSection(UserText.optionsSectionTitle) {
+            PreferencePaneSubSection {
+                ToggleMenuItem(UserText.fetchFaviconsOptionTitle, isOn: $model.isFaviconsFetchingEnabled)
+                TextMenuItemCaption(UserText.fetchFaviconsOptionCaption)
+            }
 
-            ToggleMenuItem(UserText.fetchFaviconsOptionTitle, isOn: $model.isFaviconsFetchingEnabled)
-            TextMenuItemCaption(UserText.fetchFaviconsOptionCaption)
-                .padding(.bottom, 8)
-
-            ToggleMenuItem(UserText.shareFavoritesOptionTitle, isOn: $model.isUnifiedFavoritesEnabled)
-            TextMenuItemCaption(UserText.shareFavoritesOptionCaption)
+            PreferencePaneSubSection {
+                ToggleMenuItem(UserText.shareFavoritesOptionTitle, isOn: $model.isUnifiedFavoritesEnabled)
+                TextMenuItemCaption(UserText.shareFavoritesOptionCaption)
+            }
         }
 
         // Recovery
-        PreferencePaneSection(verticalPadding: 8) {
-            TextMenuItemHeader(UserText.recovery)
-
+        PreferencePaneSection(UserText.recovery) {
             HStack(alignment: .top, spacing: 12) {
                 Text(UserText.recoveryInstructions)
                     .fixMultilineScrollableText()
@@ -75,7 +81,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         // Turn Off and Delete Data
-        PreferencePaneSection(verticalPadding: 8) {
+        PreferencePaneSection {
             Button(UserText.turnOffAndDeleteServerData) {
                 model.presentDeleteAccount()
             }
@@ -83,13 +89,82 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     }
 
     @ViewBuilder
+    func syncPaused() -> some View {
+        if let title = model.syncPausedTitle,
+           let message = model.syncPausedMessage,
+           let buttonTitle = model.syncPausedButtonTitle  {
+            if let action = model.syncPausedButtonAction {
+                SyncWarningMessage(title: title, message: message, buttonTitle: buttonTitle) {
+                    action()
+                }
+            } else {
+                SyncWarningMessage(title: title, message: message, buttonTitle: buttonTitle)
+            }
+        }
+
+    }
+
+    @ViewBuilder
     func syncPaused(for itemType: LimitedItemType) -> some View {
+        var title: String? {
+            switch itemType {
+            case .bookmarks:
+                return model.syncBookmarksPausedTitle
+            case .credentials:
+                return model.syncCredentialsPausedTitle
+            }
+        }
+        var message: String? {
+            switch itemType {
+            case .bookmarks:
+                return model.syncBookmarksPausedMessage
+            case .credentials:
+                return model.syncCredentialsPausedMessage
+            }
+        }
+        var buttonTitle: String? {
+            switch itemType {
+            case .bookmarks:
+                return model.syncBookmarksPausedButtonTitle
+            case .credentials:
+                return model.syncCredentialsPausedButtonTitle
+            }
+        }
+
+        if let title,
+           let message,
+           let buttonTitle {
+            if let action = model.syncPausedButtonAction {
+                SyncWarningMessage(title: title, message: message, buttonTitle: buttonTitle) {
+                    action()
+                }
+            } else {
+                SyncWarningMessage(title: title, message: message, buttonTitle: buttonTitle)
+            }
+        }
+    }
+
+    @ViewBuilder
+    func syncHasInvalidItems(for itemType: LimitedItemType) -> some View {
+        var title: String {
+            switch itemType {
+            case .bookmarks:
+                return UserText.invalidBookmarksPresentTitle
+            case .credentials:
+                return UserText.invalidCredentialsPresentTitle
+            }
+        }
         var description: String {
             switch itemType {
             case .bookmarks:
-                return UserText.bookmarksLimitExceededDescription
+                assert(!model.invalidBookmarksTitles.isEmpty)
+                let firstInvalidBookmarkTitle = model.invalidBookmarksTitles.first ?? ""
+                return UserText.invalidBookmarksPresentDescription(firstInvalidBookmarkTitle, numberOfInvalidItems: model.invalidBookmarksTitles.count)
+
             case .credentials:
-                return UserText.credentialsLimitExceededDescription
+                assert(!model.invalidCredentialsTitles.isEmpty)
+                let firstInvalidCredentialTitle = model.invalidCredentialsTitles.first ?? ""
+                return UserText.invalidCredentialsPresentDescription(firstInvalidCredentialTitle, numberOfInvalidItems: model.invalidCredentialsTitles.count)
             }
         }
         var actionTitle: String {
@@ -100,7 +175,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 return UserText.credentialsLimitExceededAction
             }
         }
-        SyncWarningMessage(title: UserText.syncLimitExceededTitle, message: description, buttonTitle: actionTitle) {
+        SyncWarningMessage(title: title, message: description, buttonTitle: actionTitle) {
             switch itemType {
             case .bookmarks:
                 model.manageBookmarks()
@@ -115,7 +190,11 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         if model.isDataSyncingAvailable {
             EmptyView()
         } else {
-            SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessage)
+            if model.isAppVersionNotSupported {
+                SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessageUpgradeRequired)
+            } else {
+                SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessage)
+            }
         }
     }
 

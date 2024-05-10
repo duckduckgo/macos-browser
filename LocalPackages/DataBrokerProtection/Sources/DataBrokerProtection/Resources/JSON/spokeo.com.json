@@ -1,7 +1,34 @@
 {
-  "name": "spokeo.com",
-  "version": "0.1.2",
-  "addedDatetime": 1692590400000,
+  "name": "Spokeo",
+  "url": "spokeo.com",
+  "version": "0.1.6",
+  "addedDatetime": 1692572400000,
+  "mirrorSites": [
+    {
+      "name": "CallerSmart",
+      "url": "callersmart.com",
+      "addedAt": 1705599286529,
+      "removedAt": null
+    },
+    {
+      "name": "Selfie Network",
+      "url": "selfie.network",
+      "addedAt": 1705599286529,
+      "removedAt": null
+    },
+    {
+      "name": "Selfie Systems",
+      "url": "selfie.systems",
+      "addedAt": 1705599286529,
+      "removedAt": null
+    },
+    {
+      "name": "PeopleWin",
+      "url": "peoplewin.com",
+      "addedAt": 1705599286529,
+      "removedAt": null
+    }
+  ],
   "steps": [
     {
       "stepType": "scan",
@@ -9,12 +36,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "169c9600-433e-4de9-b357-8c659b113556",
+          "id": "1dd21871-1eee-4b1a-8338-fefeab90687f",
           "url": "https://www.spokeo.com/${firstName}-${lastName}/${state|stateFull}/${city}"
         },
         {
           "actionType": "extract",
-          "id": "4bb496d5-63d4-4d36-bab5-e923387f8c75",
+          "id": "bd52ece4-55ba-4839-8360-a201c99d6ae6",
           "selector": ".single-column-list-item",
           "profile": {
             "name": {
@@ -34,7 +61,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": ".title"
+              "selector": ".title",
+              "identifierType": "path",
+              "identifier": "https://www.spokeo.com/${firstName}-${lastName}/${state|stateFull}/${city|hyphenated}/${id}"
             }
           }
         }
@@ -46,12 +75,23 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "cc521fcb-a8ea-4820-8bc1-0ccce9dbd8fd",
+          "id": "35347a66-bcc1-410d-b89b-dfe995603505",
           "url": "https://www.spokeo.com/optout"
         },
         {
+          "actionType": "expectation",
+          "id": "9e58d407-0291-499f-8003-4a78c17773f1",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#g-recaptcha",
+              "parent": ".optout_container"
+            }
+          ]
+        },
+        {
           "actionType": "fillForm",
-          "id": "147ebdbd-e96a-4c39-b1d6-7f7e77e6369d",
+          "id": "9690a6f5-d16f-4068-b4e8-4eac82165071",
           "selector": ".optout_container",
           "elements": [
             {
@@ -66,17 +106,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "2e4b92a1-12ab-482d-b83e-e9de82c2b992",
+          "id": "442e6845-03f7-41d9-8a83-33b0133b882d",
           "selector": "#g-recaptcha"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "4a0bbc9a-a717-4b1d-b3a6-af8131621f52",
+          "id": "c4abef86-72c3-43dd-99b6-c5f030b8b398",
           "selector": "#g-recaptcha"
         },
         {
           "actionType": "click",
-          "id": "79cb3967-20d9-46c5-b4ec-f2da86b481fb",
+          "id": "016e68ea-f862-4378-9d8f-ed4dfd329297",
           "elements": [
             {
               "type": "button",
@@ -86,7 +126,7 @@
         },
         {
           "actionType": "expectation",
-          "id": "990e3970-6d50-4bbc-9c34-c26929646083",
+          "id": "cfd69cf0-1995-4df9-a957-3a230c0a21f5",
           "expectations": [
             {
               "type": "text",
@@ -97,12 +137,12 @@
         },
         {
           "actionType": "emailConfirmation",
-          "id": "8993da43-4b9b-4d5b-b59a-efcc609d2583",
+          "id": "576295bc-1534-4326-8683-5234bfc69499",
           "pollingTime": 30
         },
         {
           "actionType": "expectation",
-          "id": "69810d0a-8de0-4613-ad63-f549ea72ef29",
+          "id": "7a5f4deb-6c15-4a6f-831c-49617721b465",
           "expectations": [
             {
               "type": "text",

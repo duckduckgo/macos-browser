@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Common
 
 struct MapperToUI {
 
@@ -26,22 +27,24 @@ struct MapperToUI {
             name: extractedProfile.fullName ?? "No name",
             addresses: extractedProfile.addresses?.map(mapToUI) ?? [],
             alternativeNames: extractedProfile.alternativeNames ?? [String](),
-            relatives: extractedProfile.relatives ?? [String]()
+            relatives: extractedProfile.relatives ?? [String](),
+            date: extractedProfile.removedDate?.timeIntervalSince1970
         )
     }
 
-    func mapToUI(_ dataBrokerName: String, extractedProfile: ExtractedProfile) -> DBPUIDataBrokerProfileMatch {
+    func mapToUI(_ dataBrokerName: String, databrokerURL: String, extractedProfile: ExtractedProfile) -> DBPUIDataBrokerProfileMatch {
         DBPUIDataBrokerProfileMatch(
-            dataBroker: DBPUIDataBroker(name: dataBrokerName),
+            dataBroker: DBPUIDataBroker(name: dataBrokerName, url: databrokerURL),
             name: extractedProfile.fullName ?? "No name",
             addresses: extractedProfile.addresses?.map(mapToUI) ?? [],
             alternativeNames: extractedProfile.alternativeNames ?? [String](),
-            relatives: extractedProfile.relatives ?? [String]()
+            relatives: extractedProfile.relatives ?? [String](),
+            date: extractedProfile.removedDate?.timeIntervalSince1970
         )
     }
 
     func mapToUI(_ dataBroker: DataBroker) -> DBPUIDataBroker {
-        DBPUIDataBroker(name: dataBroker.name)
+        DBPUIDataBroker(name: dataBroker.name, url: dataBroker.url)
     }
 
     func mapToUI(_ address: AddressCityState) -> DBPUIUserProfileAddress {
@@ -53,10 +56,15 @@ struct MapperToUI {
         // not by the total real cans that the app is doing.
         let profileQueriesGroupedByBroker = Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.name })
 
-        let totalScans = profileQueriesGroupedByBroker.reduce(0) { accumulator, element in
+        // We don't want to consider deprecated queries when reporting manual scans to the UI
+        let filteredProfileQueriesGroupedByBroker = profileQueriesGroupedByBroker.mapValues { queries in
+            queries.filter { !$0.profileQuery.deprecated }
+        }
+
+        let totalScans = filteredProfileQueriesGroupedByBroker.reduce(0) { accumulator, element in
             return accumulator + element.value.totalScans
         }
-        let currentScans = profileQueriesGroupedByBroker.reduce(0) { accumulator, element in
+        let currentScans = filteredProfileQueriesGroupedByBroker.reduce(0) { accumulator, element in
             return accumulator + element.value.currentScans
         }
 
@@ -75,7 +83,7 @@ struct MapperToUI {
                 if !$0.dataBroker.mirrorSites.isEmpty {
                     let mirrorSitesMatches = $0.dataBroker.mirrorSites.compactMap { mirrorSite in
                         if mirrorSite.shouldWeIncludeMirrorSite() {
-                            return mapToUI(mirrorSite.name, extractedProfile: extractedProfile)
+                            return mapToUI(mirrorSite.name, databrokerURL: mirrorSite.url, extractedProfile: extractedProfile)
                         }
 
                         return nil
@@ -110,10 +118,10 @@ struct MapperToUI {
 
                 if let closestMatchesFoundEvent = scanOperation.closestMatchesFoundEvent() {
                     for mirrorSite in dataBroker.mirrorSites where mirrorSite.shouldWeIncludeMirrorSite(for: closestMatchesFoundEvent.date) {
-                        let mirrorSiteMatch = mapToUI(mirrorSite.name, extractedProfile: extractedProfile)
+                        let mirrorSiteMatch = mapToUI(mirrorSite.name, databrokerURL: mirrorSite.url, extractedProfile: extractedProfile)
 
                         if let extractedProfileRemovedDate = extractedProfile.removedDate,
-                            mirrorSite.shouldWeIncludeMirrorSite(for: extractedProfileRemovedDate) {
+                           mirrorSite.shouldWeIncludeMirrorSite(for: extractedProfileRemovedDate) {
                             removedProfiles.append(mirrorSiteMatch)
                         } else {
                             inProgressOptOuts.append(mirrorSiteMatch)
@@ -124,10 +132,19 @@ struct MapperToUI {
         }
 
         let completedOptOutsDictionary = Dictionary(grouping: removedProfiles, by: { $0.dataBroker })
-        let completedOptOuts = completedOptOutsDictionary.map { (key: DBPUIDataBroker, value: [DBPUIDataBrokerProfileMatch]) in
-            DBPUIOptOutMatch(dataBroker: key, matches: value.count)
-        }
-        let lastScans = getLastScanInformation(brokerProfileQueryData: brokerProfileQueryData)
+        let completedOptOuts: [DBPUIOptOutMatch] = completedOptOutsDictionary.compactMap { (key: DBPUIDataBroker, value: [DBPUIDataBrokerProfileMatch]) in
+            value.compactMap { match in
+                guard let removedDate = match.date else { return nil }
+                return DBPUIOptOutMatch(dataBroker: key,
+                                        matches: value.count,
+                                        name: match.name,
+                                        alternativeNames: match.alternativeNames,
+                                        addresses: match.addresses,
+                                        date: removedDate)
+            }
+        }.flatMap { $0 }
+
+        let lastScans = getLastScansInformation(brokerProfileQueryData: brokerProfileQueryData)
         let nextScans = getNextScansInformation(brokerProfileQueryData: brokerProfileQueryData)
 
         return DBPUIScanAndOptOutMaintenanceState(
@@ -138,49 +155,131 @@ struct MapperToUI {
         )
     }
 
-    private func getLastScanInformation(brokerProfileQueryData: [BrokerProfileQueryData],
-                                        currentDate: Date = Date(),
-                                        format: String = "dd/MM/yyyy") -> DBUIScanDate {
-        let scansGroupedByLastRunDate = Dictionary(grouping: brokerProfileQueryData, by: { $0.scanOperationData.lastRunDate?.toFormat(format) })
-        let closestScansBeforeToday = scansGroupedByLastRunDate
-            .filter { $0.key != nil && $0.key!.toDate(using: format) < currentDate }
-            .sorted { $0.key! < $1.key! }
-            .flatMap { [$0.key?.toDate(using: format): $0.value] }
-            .last
+    private func getLastScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
+                                         currentDate: Date = Date(),
+                                         format: String = "dd/MM/yyyy") -> DBPUIScanDate {
+        let eightDaysBeforeToday = currentDate.addingTimeInterval(-8 * 24 * 60 * 60)
+        let scansInTheLastEightDays = brokerProfileQueryData
+            .filter { $0.scanOperationData.lastRunDate != nil && $0.scanOperationData.lastRunDate! <= currentDate && $0.scanOperationData.lastRunDate! > eightDaysBeforeToday }
+            .sorted { $0.scanOperationData.lastRunDate! < $1.scanOperationData.lastRunDate! }
+            .reduce(into: [BrokerProfileQueryData]()) { result, element in
+                if !result.contains(where: { $0.dataBroker.url == element.dataBroker.url }) {
+                    result.append(element)
+                }
+            }
+            .flatMap {
+                var brokers = [DBPUIDataBroker]()
+                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: $0.scanOperationData.lastRunDate!.timeIntervalSince1970))
 
-        return scanDate(element: closestScansBeforeToday)
+                for mirrorSite in $0.dataBroker.mirrorSites where mirrorSite.addedAt < $0.scanOperationData.lastRunDate! {
+                    brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanOperationData.lastRunDate!.timeIntervalSince1970))
+                }
+
+                return brokers
+            }
+
+        if scansInTheLastEightDays.isEmpty {
+            return DBPUIScanDate(date: currentDate.timeIntervalSince1970, dataBrokers: [DBPUIDataBroker]())
+        } else {
+            return DBPUIScanDate(date: scansInTheLastEightDays.first!.date!, dataBrokers: scansInTheLastEightDays)
+        }
     }
 
     private func getNextScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
                                          currentDate: Date = Date(),
-                                         format: String = "dd/MM/yyyy") -> DBUIScanDate {
-        let scansGroupedByPreferredRunDate = Dictionary(grouping: brokerProfileQueryData, by: { $0.scanOperationData.preferredRunDate?.toFormat(format) })
-        let closestScansAfterToday = scansGroupedByPreferredRunDate
-            .filter { $0.key != nil && $0.key!.toDate(using: format) > currentDate }
-            .sorted { $0.key! < $1.key! }
-            .flatMap { [$0.key?.toDate(using: format): $0.value] }
-            .first
+                                         format: String = "dd/MM/yyyy") -> DBPUIScanDate {
+        let eightDaysAfterToday = currentDate.addingTimeInterval(8 * 24 * 60 * 60)
+        let scansHappeningInTheNextEightDays = brokerProfileQueryData
+            .filter { $0.scanOperationData.preferredRunDate != nil && $0.scanOperationData.preferredRunDate! > currentDate && $0.scanOperationData.preferredRunDate! < eightDaysAfterToday }
+            .sorted { $0.scanOperationData.preferredRunDate! < $1.scanOperationData.preferredRunDate! }
+            .reduce(into: [BrokerProfileQueryData]()) { result, element in
+                if !result.contains(where: { $0.dataBroker.url == element.dataBroker.url }) {
+                    result.append(element)
+                }
+            }
+            .flatMap {
+                var brokers = [DBPUIDataBroker]()
+                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: $0.scanOperationData.preferredRunDate!.timeIntervalSince1970))
 
-        return scanDate(element: closestScansAfterToday)
+                for mirrorSite in $0.dataBroker.mirrorSites {
+                    if let removedDate = mirrorSite.removedAt {
+                        if removedDate > $0.scanOperationData.preferredRunDate! {
+                            brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanOperationData.preferredRunDate!.timeIntervalSince1970))
+                        }
+                    } else {
+                        brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanOperationData.preferredRunDate!.timeIntervalSince1970))
+                    }
+                }
+
+                return brokers
+            }
+
+        if scansHappeningInTheNextEightDays.isEmpty {
+            return DBPUIScanDate(date: currentDate.timeIntervalSince1970, dataBrokers: [DBPUIDataBroker]())
+        } else {
+            return DBPUIScanDate(date: scansHappeningInTheNextEightDays.first!.date!, dataBrokers: scansHappeningInTheNextEightDays)
+        }
     }
 
-    private func scanDate(element: Dictionary<Date?, [BrokerProfileQueryData]>.Element?) -> DBUIScanDate {
-        if let element = element, let date = element.key {
-            return DBUIScanDate(
-                date: date.timeIntervalSince1970,
-                dataBrokers: element.value.flatMap {
-                    var brokers = [DBPUIDataBroker(name: $0.dataBroker.name)]
+    func mapToUIDebugMetadata(metadata: DBPBackgroundAgentMetadata?, brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIDebugMetadata {
+        let currentAppVersion = Bundle.main.fullVersionNumber ?? "ERROR: Error fetching app version"
 
-                    for mirrorSite in $0.dataBroker.mirrorSites where mirrorSite.shouldWeIncludeMirrorSite(for: date) {
-                        brokers.append(DBPUIDataBroker(name: mirrorSite.name))
-                    }
-
-                    return brokers
-                }
-            )
-        } else {
-            return DBUIScanDate(date: 0, dataBrokers: [DBPUIDataBroker]())
+        guard let metadata = metadata else {
+            return DBPUIDebugMetadata(lastRunAppVersion: currentAppVersion, isAgentRunning: false)
         }
+
+        let lastOperation = brokerProfileQueryData.lastOperation
+        let lastStartedOperation = brokerProfileQueryData.lastStartedOperation
+        let lastError = brokerProfileQueryData.lastOperationThatErrored
+
+        let lastOperationBrokerURL = brokerProfileQueryData.filter { $0.dataBroker.id == lastOperation?.brokerId }.first?.dataBroker.url
+        let lastStartedOperationBrokerURL = brokerProfileQueryData.filter { $0.dataBroker.id == lastStartedOperation?.brokerId }.first?.dataBroker.url
+
+        let metadataUI = DBPUIDebugMetadata(lastRunAppVersion: currentAppVersion,
+                                            lastRunAgentVersion: metadata.backgroundAgentVersion,
+                                            isAgentRunning: true,
+                                            lastSchedulerOperationType: lastOperation?.toString,
+                                            lastSchedulerOperationTimestamp: lastOperation?.lastRunDate?.timeIntervalSince1970.withoutDecimals,
+                                            lastSchedulerOperationBrokerUrl: lastOperationBrokerURL,
+                                            lastSchedulerErrorMessage: lastError?.error,
+                                            lastSchedulerErrorTimestamp: lastError?.date.timeIntervalSince1970.withoutDecimals,
+                                            lastSchedulerSessionStartTimestamp: metadata.lastSchedulerSessionStartTimestamp,
+                                            agentSchedulerState: metadata.agentSchedulerState,
+                                            lastStartedSchedulerOperationType: lastStartedOperation?.toString,
+                                            lastStartedSchedulerOperationTimestamp: lastStartedOperation?.historyEvents.closestHistoryEvent?.date.timeIntervalSince1970.withoutDecimals,
+                                            lastStartedSchedulerOperationBrokerUrl: lastStartedOperationBrokerURL)
+
+#if DEBUG
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            let jsonData = try encoder.encode(metadataUI)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                os_log("Metadata: %{public}s", log: OSLog.default, type: .info, jsonString)
+            }
+        } catch {
+            os_log("Error encoding struct to JSON: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
+        }
+#endif
+
+        return metadataUI
+    }
+}
+
+extension Bundle {
+    var fullVersionNumber: String? {
+        guard let appVersion = self.releaseVersionNumber,
+              let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String else {
+            return nil
+        }
+
+        return appVersion + " (build: \(buildNumber))"
+    }
+}
+
+extension TimeInterval {
+    var withoutDecimals: Double {
+        Double(Int(self))
     }
 }
 
@@ -209,6 +308,10 @@ extension String {
 
 fileprivate extension BrokerProfileQueryData {
 
+    var closestHistoryEvent: HistoryEvent? {
+        events.sorted(by: { $0.date > $1.date }).first
+    }
+
     var sitesScanned: [String] {
         if scanOperationData.lastRunDate != nil {
             let scanEvents = scanOperationData.scanStartedEvents()
@@ -235,26 +338,93 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
 
     var totalScans: Int {
         guard let broker = self.first?.dataBroker else { return 0 }
+        return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+    }
 
-        let areAllQueriesDeprecated = allSatisfy { $0.profileQuery.deprecated }
+    var currentScans: Int {
+        guard let broker = self.first?.dataBroker else { return 0 }
 
-        if areAllQueriesDeprecated {
+        let didAllQueriesFinished = allSatisfy { $0.scanOperationData.lastRunDate != nil }
+
+        if !didAllQueriesFinished {
             return 0
         } else {
             return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
         }
     }
 
-    var currentScans: Int {
-        guard let broker = self.first?.dataBroker else { return 0 }
+    var lastOperation: BrokerOperationData? {
+        let allOperations = flatMap { $0.operationsData }
+        let lastOperation = allOperations.sorted(by: {
+            if let date1 = $0.lastRunDate, let date2 = $1.lastRunDate {
+                return date1 > date2
+            } else if $0.lastRunDate != nil {
+                return true
+            } else {
+                return false
+            }
+        }).first
 
-        let areAllQueriesDeprecated = allSatisfy { $0.profileQuery.deprecated }
-        let didAllQueriesFinished = allSatisfy { $0.scanOperationData.lastRunDate != nil }
+        return lastOperation
+    }
 
-        if areAllQueriesDeprecated || !didAllQueriesFinished {
-            return 0
+    var lastOperationThatErrored: HistoryEvent? {
+        let lastError = flatMap { $0.operationsData }
+            .flatMap { $0.historyEvents }
+            .filter { $0.isError }
+            .sorted(by: { $0.date > $1.date })
+            .first
+
+        return lastError
+    }
+
+    var lastStartedOperation: BrokerOperationData? {
+        let allOperations = flatMap { $0.operationsData }
+
+        return allOperations.sorted(by: {
+            if let date1 = $0.historyEvents.closestHistoryEvent?.date, let date2 = $1.historyEvents.closestHistoryEvent?.date {
+                return date1 > date2
+            } else if $0.historyEvents.closestHistoryEvent?.date != nil {
+                return true
+            } else {
+                return false
+            }
+        }).first
+    }
+}
+
+fileprivate extension BrokerOperationData {
+    var toString: String {
+        if (self as? OptOutOperationData) != nil {
+            return "optOut"
         } else {
-            return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+            return "scan"
+        }
+    }
+}
+
+fileprivate extension Array where Element == HistoryEvent {
+    var closestHistoryEvent: HistoryEvent? {
+        self.sorted(by: { $0.date > $1.date }).first
+    }
+}
+
+extension HistoryEvent {
+
+    var isError: Bool {
+        switch type {
+        case .error:
+            return true
+        default:
+            return false
+        }
+    }
+
+    var error: String? {
+        switch type {
+        case .error(let error):
+            return error.name
+        default: return nil
         }
     }
 }

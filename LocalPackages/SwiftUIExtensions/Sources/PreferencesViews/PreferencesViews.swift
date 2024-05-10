@@ -34,14 +34,17 @@ public struct TextMenuTitle: View {
 
 public struct TextMenuItemHeader: View {
     public let text: String
+    public let bottomPadding: CGFloat
 
-    public init(_ text: String) {
+    public init(_ text: String, bottomPadding: CGFloat = 4) {
         self.text = text
+        self.bottomPadding = bottomPadding
     }
 
     public var body: some View {
         Text(text)
             .font(Const.Fonts.preferencePaneSectionHeader)
+            .padding(.bottom, bottomPadding)
     }
 }
 
@@ -56,7 +59,7 @@ public struct TextMenuItemCaption: View {
         Text(text)
             .frame(maxWidth: .infinity, alignment: .leading)
             .fixMultilineScrollableText()
-            .foregroundColor(Color("GreyTextColor"))
+            .foregroundColor(Color(.greyText))
     }
 }
 
@@ -115,20 +118,65 @@ public struct SpacedCheckbox<Content>: View where Content: View {
     }
 }
 
-public struct PreferencePaneSection<Content>: View where Content: View {
+public struct PreferencePane<Content>: View where Content: View {
 
+    public let title: String?
     public let spacing: CGFloat
-    public let verticalPadding: CGFloat
     @ViewBuilder public let content: () -> Content
 
-    public init(spacing: CGFloat = 12, verticalPadding: CGFloat = 20, @ViewBuilder content: @escaping () -> Content) {
+    public init(_ title: String? = nil, spacing: CGFloat = 23, @ViewBuilder content: @escaping () -> Content) {
+        self.title = title
         self.spacing = spacing
-        self.verticalPadding = verticalPadding
         self.content = content
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: spacing, content: content)
-            .padding(.vertical, verticalPadding)
+        VStack(alignment: .leading, spacing: spacing) {
+            if let title {
+                TextMenuTitle(title)
+            }
+            content()
+        }
+    }
+}
+
+public struct PreferencePaneSection<Content>: View where Content: View {
+
+    public let header: String?
+    public let spacing: CGFloat
+    @ViewBuilder public let content: () -> Content
+
+    public init(_ header: String? = nil, spacing: CGFloat = 8, @ViewBuilder content: @escaping () -> Content) {
+        self.header = header
+        self.spacing = spacing
+        self.content = content
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: spacing) {
+            if let header {
+                TextMenuItemHeader(header)
+            }
+            content()
+        }
+        .padding(.bottom, 16)
+    }
+}
+
+public struct PreferencePaneSubSection<Content>: View where Content: View {
+
+    public let spacing: CGFloat
+    @ViewBuilder public let content: () -> Content
+
+    public init(spacing: CGFloat = 8, @ViewBuilder content: @escaping () -> Content) {
+        self.spacing = spacing
+        self.content = content
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: spacing) {
+            content()
+        }
+        .padding(.bottom, 4)
     }
 }

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -39,7 +38,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="550" height="432"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8pY-q4-yXW">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8pY-q4-yXW">
                                 <rect key="frame" x="18" y="360" width="514" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="510" id="axz-QQ-mY7"/>
@@ -51,7 +50,7 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qpb-iS-ipd">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qpb-iS-ipd">
                                 <rect key="frame" x="18" y="319" width="514" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Problem Details" id="iOH-0S-sSX">
                                     <font key="font" metaFont="system"/>
@@ -62,15 +61,15 @@
                             <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BCE-ZT-Gcn">
                                 <rect key="frame" x="20" y="50" width="510" height="261"/>
                                 <clipView key="contentView" drawsBackground="NO" id="7d5-pg-ric">
-                                    <rect key="frame" x="0.0" y="0.0" width="510" height="261"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="495" height="261"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" fieldEditor="YES" usesRuler="YES" smartInsertDelete="YES" id="kX4-zd-AAp">
-                                            <rect key="frame" x="0.0" y="0.0" width="510" height="261"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="495" height="261"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="minSize" width="510" height="261"/>
+                                            <size key="minSize" width="495" height="261"/>
                                             <size key="maxSize" width="562" height="10000000"/>
                                             <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                         </textView>
@@ -84,7 +83,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="w5p-4h-eAs">
-                                    <rect key="frame" x="494" y="0.0" width="16" height="261"/>
+                                    <rect key="frame" x="495" y="0.0" width="15" height="261"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
@@ -111,7 +110,7 @@ DQ
                                     <action selector="dontSendAction:" target="XEv-He-h8z" id="vrp-q8-LkV"/>
                                 </connections>
                             </button>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kaF-DY-AaS">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kaF-DY-AaS">
                                 <rect key="frame" x="18" y="396" width="514" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo Privacy Browser quit unexpectedly." id="dqk-Wm-ePw">
                                     <font key="font" metaFont="systemSemibold" size="13"/>
@@ -140,7 +139,12 @@ DQ
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="descriptionLabel" destination="8pY-q4-yXW" id="WUz-Pg-PI4"/>
+                        <outlet property="dontSendButton" destination="CAq-Gi-cda" id="rrj-qf-MPf"/>
+                        <outlet property="sendButton" destination="9qO-yz-kTg" id="Bke-tL-SgJ"/>
+                        <outlet property="textFieldTitle" destination="qpb-iS-ipd" id="mAQ-kE-tA1"/>
                         <outlet property="textView" destination="kX4-zd-AAp" id="SYu-5w-BSd"/>
+                        <outlet property="titleLabel" destination="kaF-DY-AaS" id="7IE-3T-Ima"/>
                     </connections>
                 </viewController>
                 <customObject id="flF-ji-2et" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

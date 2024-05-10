@@ -41,7 +41,7 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     private weak var selfTestFrameInfo: WKFrameInfo?
 
     private var topUrl: URL?
-    private let preferences = PrivacySecurityPreferences.shared
+    private let preferences = CookiePopupProtectionPreferences.shared
     private let management = AutoconsentManagement.shared
 
     public var messageNames: [String] { MessageName.allCases.map(\.rawValue) }
@@ -202,14 +202,14 @@ extension AutoconsentUserScript {
             return
         }
 
-        guard [.http, .https].contains(url.navigationalScheme) else {
+        guard url.navigationalScheme?.isHypertextScheme == true else {
             // ignore special schemes
             os_log("Ignoring special URL scheme: %s", log: .autoconsent, type: .debug, messageData.url)
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
             return
         }
 
-        if preferences.autoconsentEnabled == false {
+        if preferences.isAutoconsentEnabled == false {
             // this will only happen if the user has just declined a prompt in this tab
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
             return
@@ -240,7 +240,7 @@ extension AutoconsentUserScript {
             "rules": nil, // rules are bundled with the content script atm
             "config": [
                 "enabled": true,
-                "autoAction": preferences.autoconsentEnabled == true ? "optOut" : nil,
+                "autoAction": preferences.isAutoconsentEnabled == true ? "optOut" : nil,
                 "disabledCmps": disabledCMPs,
                 "enablePrehide": true,
                 "enableCosmeticRules": true,

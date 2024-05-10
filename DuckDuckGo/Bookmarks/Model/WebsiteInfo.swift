@@ -18,15 +18,17 @@
 
 import Foundation
 
-struct WebsiteInfo {
+struct WebsiteInfo: Equatable {
     let url: URL
-    let title: String?
+    /// Returns the title of the website if available, otherwise returns the domain of the URL.
+    /// If both title and and domain are nil, it returns the absolute string representation of the URL.
+    let title: String
 
     init?(_ tab: Tab) {
         guard case let .url(url, _, _) = tab.content else {
             return nil
         }
         self.url = url
-        self.title = tab.title
+        self.title = tab.title ?? url.host ?? url.absoluteString
     }
 }

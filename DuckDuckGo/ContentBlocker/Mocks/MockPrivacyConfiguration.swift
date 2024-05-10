@@ -18,6 +18,7 @@
 
 import BrowserServicesKit
 import Combine
+import Common
 
 #if DEBUG
 
@@ -60,7 +61,8 @@ final class MockPrivacyConfiguration: PrivacyConfiguration {
     func isUserUnprotected(domain: String?) -> Bool { false }
     func isTempUnprotected(domain: String?) -> Bool { false }
     func isInExceptionList(domain: String?, forFeature featureKey: PrivacyFeature) -> Bool { false }
-    func settings(for feature: PrivacyFeature) -> PrivacyConfigurationData.PrivacyFeature.FeatureSettings { featureSettings }
+    func settings(for feature: PrivacyFeature) -> PrivacyConfigurationData.PrivacyFeature.FeatureSettings {
+        featureSettings }
     func userEnabledProtection(forDomain: String) {}
     func userDisabledProtection(forDomain: String) {}
 }
@@ -95,6 +97,8 @@ final class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManag
     var updatesPublisher: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
     var privacyConfig: PrivacyConfiguration = MockPrivacyConfiguration()
     var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider()
+    var toggleProtectionsCounter: ToggleProtectionsCounter = ToggleProtectionsCounter(eventReporting: EventMapping<ToggleProtectionsCounterEvent> { _, _, _, _ in
+    })
 }
 
 #endif

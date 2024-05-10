@@ -16,17 +16,19 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
 import BrowserServicesKit
+import Combine
 import Common
-import SecureStorage
+import Foundation
 import GRDB
+import SecureStorage
+
 @testable import DataBrokerProtection
 
 extension BrokerProfileQueryData {
     static func mock(with steps: [Step] = [Step](),
                      dataBrokerName: String = "test",
+                     url: String = "test.com",
                      lastRunDate: Date? = nil,
                      preferredRunDate: Date? = nil,
                      extractedProfile: ExtractedProfile? = nil,
@@ -36,6 +38,7 @@ extension BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
                 name: dataBrokerName,
+                url: url,
                 steps: steps,
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock,
@@ -63,6 +66,8 @@ final class InternalUserDeciderStoreMock: InternalUserStoring {
 }
 
 final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
+    var toggleProtectionsCounter: ToggleProtectionsCounter = ToggleProtectionsCounter(eventReporting: nil)
+
     var currentConfig: Data = Data()
 
     var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
@@ -174,10 +179,10 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasLoadCalledWithURL: URL?
     var wasWaitForWebViewLoadCalled = false
     var wasFinishCalled = false
-    var wasExecuteCalledForExtractedProfile = false
-    var wasExecuteCalledForProfileData = false
+    var wasExecuteCalledForUserData = false
     var wasExecuteCalledForSolveCaptcha = false
     var wasExecuteJavascriptCalled = false
+    var wasSetCookiesCalled = false
 
     func initializeWebView(showWebView: Bool) async {
         wasInitializeWebViewCalled = true
@@ -187,7 +192,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasLoadCalledWithURL = url
     }
 
-    func waitForWebViewLoad(timeoutInSeconds: Int) async throws {
+    func waitForWebViewLoad() async throws {
         wasWaitForWebViewLoadCalled = true
     }
 
@@ -197,18 +202,12 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
 
     func execute(action: DataBrokerProtection.Action, data: DataBrokerProtection.CCFRequestData) async {
         switch data {
-        case .profile:
-            wasExecuteCalledForExtractedProfile = false
-            wasExecuteCalledForSolveCaptcha = false
-            wasExecuteCalledForProfileData = true
         case .solveCaptcha:
-            wasExecuteCalledForExtractedProfile = false
             wasExecuteCalledForSolveCaptcha = true
-            wasExecuteCalledForProfileData = false
-        case.extractedProfile:
-            wasExecuteCalledForExtractedProfile = true
+            wasExecuteCalledForUserData = false
+        case .userData:
+            wasExecuteCalledForUserData = true
             wasExecuteCalledForSolveCaptcha = false
-            wasExecuteCalledForProfileData = false
         }
     }
 
@@ -216,15 +215,39 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasExecuteJavascriptCalled = true
     }
 
+    func takeSnaphost(path: String, fileName: String) async throws {
+
+    }
+
+    func saveHTML(path: String, fileName: String) async throws {
+
+    }
+
+    func setCookies(_ cookies: [HTTPCookie]) async {
+        wasSetCookiesCalled = true
+    }
+
     func reset() {
         wasInitializeWebViewCalled = false
         wasLoadCalledWithURL = nil
         wasWaitForWebViewLoadCalled = false
         wasFinishCalled = false
-        wasExecuteCalledForExtractedProfile = false
         wasExecuteCalledForSolveCaptcha = false
-        wasExecuteCalledForProfileData = false
         wasExecuteJavascriptCalled = false
+        wasExecuteCalledForUserData = false
+        wasSetCookiesCalled = false
+    }
+}
+
+final class MockCookieHandler: CookieHandler {
+    var cookiesToReturn: [HTTPCookie]?
+
+    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]? {
+        return cookiesToReturn
+    }
+
+    func clear() {
+        cookiesToReturn = nil
     }
 }
 
@@ -232,15 +255,15 @@ final class EmailServiceMock: EmailServiceProtocol {
 
     var shouldThrow: Bool = false
 
-    func getEmail(dataBrokerName: String?) async throws -> String {
+    func getEmail(dataBrokerURL: String, attemptId: UUID) async throws -> EmailData {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
 
-        return "test@duck.com"
+        return EmailData(pattern: nil, emailAddress: "test@duck.com")
     }
 
-    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingIntervalInSeconds: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
+    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingInterval: TimeInterval, attemptId: UUID, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
@@ -259,7 +282,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
     var wasSubmitCaptchaToBeResolvedCalled = false
     var shouldThrow = false
 
-    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
+    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int, pollingInterval: TimeInterval, attemptId: UUID, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
         if shouldThrow {
             throw CaptchaServiceError.errorWhenSubmittingCaptcha
         }
@@ -269,7 +292,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
         return "transactionID"
     }
 
-    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
+    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: TimeInterval, attemptId: UUID, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
         if shouldThrow {
             throw CaptchaServiceError.errorWhenFetchingCaptchaResult
         }
@@ -286,6 +309,14 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
 }
 
 final class MockRedeemUseCase: DataBrokerProtectionRedeemUseCase {
+    var shouldSendNilAuthHeader = false
+
+    func getAuthHeader() -> String? {
+        if shouldSendNilAuthHeader {
+            return nil
+        }
+        return "auth header"
+    }
 
     func shouldAskForInviteCode() -> Bool {
         false
@@ -295,8 +326,8 @@ final class MockRedeemUseCase: DataBrokerProtectionRedeemUseCase {
 
     }
 
-    func getAuthHeader() async throws -> String {
-        return "auth header"
+    func reset() {
+        shouldSendNilAuthHeader = false
     }
 }
 
@@ -321,11 +352,11 @@ final class MockAuthenticationService: DataBrokerProtectionAuthenticationService
 }
 
 final class MockAuthenticationRepository: AuthenticationRepository {
-
     var shouldSendNilInviteCode = false
     var shouldSendNilAccessToken = false
     var wasInviteCodeSaveCalled = false
     var wasAccessTokenSaveCalled = false
+    var shouldSendNilWaitlistTimeStamp = false
 
     func getInviteCode() -> String? {
         if shouldSendNilInviteCode {
@@ -351,29 +382,37 @@ final class MockAuthenticationRepository: AuthenticationRepository {
         wasAccessTokenSaveCalled = true
     }
 
+    func getWaitlistTimestamp() -> Int? {
+        if shouldSendNilWaitlistTimeStamp {
+            return nil
+        }
+        return 123
+    }
+
     func reset() {
         shouldSendNilInviteCode = false
         shouldSendNilAccessToken = false
         wasInviteCodeSaveCalled = false
         wasAccessTokenSaveCalled = false
+        shouldSendNilWaitlistTimeStamp = false
     }
 }
 
 final class BrokerUpdaterRepositoryMock: BrokerUpdaterRepository {
-    var wasSaveLastRunDateCalled = false
-    var lastRunDate: Date?
+    var wasSaveLatestAppVersionCheckCalled = false
+    var lastCheckedVersion: String?
 
-    func saveLastRunDate(date: Date) {
-        wasSaveLastRunDateCalled = true
+    func saveLatestAppVersionCheck(version: String) {
+        wasSaveLatestAppVersionCheckCalled = true
     }
 
-    func getLastRunDate() -> Date? {
-        return lastRunDate
+    func getLastCheckedVersion() -> String? {
+        return lastCheckedVersion
     }
 
     func reset() {
-        wasSaveLastRunDateCalled = false
-        lastRunDate = nil
+        wasSaveLatestAppVersionCheckCalled = false
+        lastCheckedVersion = nil
     }
 }
 
@@ -491,9 +530,9 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
 
     func fetchBroker(with name: String) throws -> DataBroker? {
         if shouldReturnOldVersionBroker {
-            return .init(id: 1, name: "Broker", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)
+            return .init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)
         } else if shouldReturnNewVersionBroker {
-            return .init(id: 1, name: "Broker", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)
+            return .init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)
         }
 
         return nil
@@ -618,11 +657,11 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
 
 public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
-    static var lastPixelFired: DataBrokerProtectionPixels?
+    static var lastPixelsFired = [DataBrokerProtectionPixels]()
 
     public init() {
         super.init { event, _, _, _ in
-            MockDataBrokerProtectionPixelsHandler.lastPixelFired = event
+            MockDataBrokerProtectionPixelsHandler.lastPixelsFired.append(event)
         }
     }
 
@@ -631,7 +670,7 @@ public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProte
     }
 
     func clear() {
-        MockDataBrokerProtectionPixelsHandler.lastPixelFired = nil
+        MockDataBrokerProtectionPixelsHandler.lastPixelsFired.removeAll()
     }
 }
 
@@ -660,6 +699,9 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastParentBrokerWhereChildSitesWhereFetched: String?
     var lastProfileQueryIdOnScanUpdatePreferredRunDate: Int64?
     var brokerProfileQueryDataToReturn = [BrokerProfileQueryData]()
+    var profile: DataBrokerProtectionProfile?
+    var attemptInformation: AttemptInformation?
+    var historyEvents = [HistoryEvent]()
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -680,15 +722,17 @@ final class MockDatabase: DataBrokerProtectionRepository {
         callsList.filter { $0 }.count > 0 // If one value is true. The database was called
     }
 
-    func save(_ profile: DataBrokerProtectionProfile) -> Bool {
+    func save(_ profile: DataBrokerProtectionProfile) throws {
         wasSaveProfileCalled = true
-
-        return true
     }
 
     func fetchProfile() -> DataBrokerProtectionProfile? {
         wasFetchProfileCalled = true
-        return nil
+        return profile
+    }
+
+    func setFetchedProfile(_ profile: DataBrokerProtectionProfile?) {
+        self.profile = profile
     }
 
     func deleteProfileData() {
@@ -757,6 +801,14 @@ final class MockDatabase: DataBrokerProtectionRepository {
         return lastHistoryEventToReturn
     }
 
+    func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) -> [HistoryEvent] {
+        return [HistoryEvent]()
+    }
+
+    func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) -> [HistoryEvent] {
+        return historyEvents
+    }
+
     func hasMatches() -> Bool {
         false
     }
@@ -766,7 +818,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     }
 
     func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {
-        return nil
+        return attemptInformation
     }
 
     func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
@@ -800,5 +852,111 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastParentBrokerWhereChildSitesWhereFetched = nil
         lastProfileQueryIdOnScanUpdatePreferredRunDate = nil
         brokerProfileQueryDataToReturn.removeAll()
+        profile = nil
+        attemptInformation = nil
+        historyEvents.removeAll()
+    }
+}
+
+final class MockAppVersion: AppVersionNumberProvider {
+
+    var versionNumber: String
+
+    init(versionNumber: String) {
+        self.versionNumber = versionNumber
+    }
+}
+
+final class MockStageDurationCalculator: StageDurationCalculator {
+    var isManualScan: Bool = false
+    var attemptId: UUID = UUID()
+    var stage: Stage?
+
+    func durationSinceLastStage() -> Double {
+        return 0.0
+    }
+
+    func durationSinceStartTime() -> Double {
+        return 0.0
+    }
+
+    func fireOptOutStart() {
+    }
+
+    func fireOptOutEmailGenerate() {
+    }
+
+    func fireOptOutCaptchaParse() {
+    }
+
+    func fireOptOutCaptchaSend() {
+    }
+
+    func fireOptOutCaptchaSolve() {
+    }
+
+    func fireOptOutSubmit() {
+    }
+
+    func fireOptOutEmailReceive() {
+    }
+
+    func fireOptOutEmailConfirm() {
+    }
+
+    func fireOptOutValidate() {
+    }
+
+    func fireOptOutSubmitSuccess(tries: Int) {
+    }
+
+    func fireOptOutFillForm() {
+    }
+
+    func fireOptOutFailure(tries: Int) {
+    }
+
+    func fireScanSuccess(matchesFound: Int) {
+    }
+
+    func fireScanFailed() {
+    }
+
+    func fireScanError(error: any Error) {
+    }
+
+    func setStage(_ stage: DataBrokerProtection.Stage) {
+        self.stage = stage
+    }
+
+    func setEmailPattern(_ emailPattern: String?) {
+    }
+
+    func setLastActionId(_ actionID: String) {
+    }
+
+    func clear() {
+        self.stage = nil
+    }
+}
+
+final class MockDataBrokerProtectionBackendServicePixels: DataBrokerProtectionBackendServicePixels {
+    var fireEmptyAccessTokenWasCalled = false
+    var fireGenerateEmailHTTPErrorWasCalled = false
+    var statusCode: Int?
+
+    func fireGenerateEmailHTTPError(statusCode: Int) {
+        fireGenerateEmailHTTPErrorWasCalled = true
+        self.statusCode = statusCode
+    }
+
+    func fireEmptyAccessToken(callSite: BackendServiceCallSite) {
+        fireEmptyAccessTokenWasCalled = true
+    }
+
+    func reset() {
+        fireEmptyAccessTokenWasCalled = false
+        fireGenerateEmailHTTPErrorWasCalled = false
+        statusCode = nil
     }
 }

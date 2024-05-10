@@ -21,6 +21,27 @@ import WebKit
 
 final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
 
+    static let emptyHtml = """
+    <html>
+      <head>
+        <style>
+          body {
+            background: rgb(255, 255, 255);
+            display: flex;
+            height: 100vh;
+          }
+          // avoid page blinking in dark mode
+          @media (prefers-color-scheme: dark) {
+            body {
+              background: rgb(51, 51, 51);
+            }
+          }
+        </style>
+      </head>
+      <body />
+    </html>
+    """
+
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
             assertionFailure("No URL for Private Player scheme handler")
@@ -29,7 +50,7 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
 
         guard requestURL.isDuckPlayer else {
             // return empty page for native UI pages navigations (like the Home page or Settings) if the request is not for the Duck Player
-            let data = "<html><body /></html>".utf8data
+            let data = Self.emptyHtml.utf8data
 
             let response = URLResponse(url: requestURL,
                                        mimeType: "text/html",

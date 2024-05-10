@@ -18,9 +18,10 @@
 
 import AppKit
 import BrowserServicesKit
-import Foundation
 import CoreData
+import Foundation
 import Persistence
+import PixelKit
 
 final class Database {
 
@@ -41,17 +42,21 @@ final class Database {
 
     static func makeDatabase() -> (CoreDataDatabase?, Error?) {
         func makeDatabase(keyStore: EncryptionKeyStoring, containerLocation: URL) -> (CoreDataDatabase?, Error?) {
-            do {
-                try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
-            } catch {
-                return (nil, error)
-            }
+
             let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
+
+            // Encryption is disabled for UI Tests to make them work in CI
+            if NSApp.runType != .uiTests {
+                _=mainModel.registerValueTransformers(withAllowedPropertyClasses: [
+                    NSImage.self,
+                    NSString.self,
+                    NSURL.self,
+                    NSNumber.self,
+                    NSError.self,
+                    NSData.self
+                ], keyStore: keyStore)
+            }
+
             let httpsUpgradeModel = HTTPSUpgrade.managedObjectModel
 
             return (CoreDataDatabase(name: Constants.databaseName,
@@ -64,15 +69,23 @@ final class Database {
         }())
 #endif
 
-        let keyStore: EncryptionKeyStoring
-        let containerLocation: URL
-#if CI
-        keyStore = (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
-        containerLocation = FileManager.default.temporaryDirectory
-#else
-        keyStore = EncryptionKeyStore(generator: EncryptionKeyGenerator())
-        containerLocation = URL.sandboxApplicationSupportURL
+        let keyStore: EncryptionKeyStoring = {
+#if DEBUG
+            guard case .normal = NSApp.runType else {
+                return (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
+            }
 #endif
+            return EncryptionKeyStore(generator: EncryptionKeyGenerator())
+        }()
+
+        let containerLocation: URL = {
+#if DEBUG
+            guard case .normal = NSApp.runType else {
+                return FileManager.default.temporaryDirectory
+            }
+#endif
+            return .sandboxApplicationSupportURL
+        }()
 
         return makeDatabase(keyStore: keyStore, containerLocation: containerLocation)
     }
@@ -88,7 +101,7 @@ final class Database {
         // Fire the pixel once a day at max
         if lastPixelSentAt < Date.daysAgo(1) {
             lastDatabaseFactoryFailurePixelDate = Date()
-            Pixel.fire(.debug(event: .dbMakeDatabaseError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.dbMakeDatabaseError(error: error)))
         }
     }
 }
@@ -110,16 +123,77 @@ extension Array where Element == CoreDataErrorsParser.ErrorInfo {
     }
 }
 
+extension ValueTransformer {
+
+    static func registerValueTransformer(for propertyClass: AnyClass, with keyStore: EncryptionKeyStoring) -> NSValueTransformerName {
+        guard let encodableType = propertyClass as? (NSObject & NSSecureCoding).Type else {
+            fatalError("Unsupported type")
+        }
+        func registerValueTransformer<T: NSObject & NSSecureCoding>(for type: T.Type) -> NSValueTransformerName {
+            (try? EncryptedValueTransformer<T>.registerTransformer(keyStore: keyStore))!
+            return EncryptedValueTransformer<T>.transformerName
+        }
+        return registerValueTransformer(for: encodableType)
+    }
+
+}
+
+extension NSManagedObjectModel {
+
+    private static let transformerUserInfoKey = "transformer"
+    func registerValueTransformers(withAllowedPropertyClasses allowedPropertyClasses: [AnyClass]? = nil,
+                                   keyStore: EncryptionKeyStoring) -> [NSValueTransformerName] {
+        var registeredTransformers = [NSValueTransformerName]()
+        let allowedPropertyClassNames = allowedPropertyClasses.map { Set($0.map(NSStringFromClass)) }
+
+        // fix "no NSValueTransformer with class name 'X'" warnings
+        // https://stackoverflow.com/a/77623593/748453
+        for entity in self.entities {
+            for property in entity.properties {
+                guard let property = property as? NSAttributeDescription, property.attributeType == .transformableAttributeType else { continue }
+
+                let transformerName: String
+                if let valueTransformerName = property.valueTransformerName, !valueTransformerName.isEmpty {
+                    transformerName = valueTransformerName
+                } else if let transformerUserInfoValue = property.userInfo?[Self.transformerUserInfoKey] as? String, !transformerUserInfoValue.isEmpty {
+                    transformerName = transformerUserInfoValue
+                    property.userInfo?.removeValue(forKey: Self.transformerUserInfoKey)
+                    property.valueTransformerName = transformerName
+                } else {
+                    assertionFailure("Transformer (User Info `transformer` key) not set for \(entity).\(property)")
+                    continue
+                }
+
+                guard ValueTransformer(forName: .init(rawValue: transformerName)) == nil else { continue }
+
+                let propertyClassName = transformerName.dropping(suffix: "Transformer")
+                assert(propertyClassName != transformerName, "Expected Transformer name like `NSStringTransformer`")
+                guard allowedPropertyClassNames?.contains(propertyClassName) != false,
+                      let propertyClass = NSClassFromString(propertyClassName) else {
+                    assertionFailure("Invalid class name `\(propertyClassName)` for \(transformerName)")
+                    continue
+                }
+
+                let transformer = ValueTransformer.registerValueTransformer(for: propertyClass, with: keyStore)
+                assert(ValueTransformer(forName: .init(transformerName)) != nil)
+                registeredTransformers.append(transformer)
+            }
+        }
+        return registeredTransformers
+    }
+
+}
+
 extension NSManagedObjectContext {
 
-    func save(onErrorFire event: Pixel.Event.Debug) throws {
+    func save(onErrorFire event: PixelKitEventV2) throws {
         do {
             try save()
         } catch {
             let nsError = error as NSError
             let processedErrors = CoreDataErrorsParser.parse(error: nsError)
 
-            Pixel.fire(.debug(event: event, error: error),
+            PixelKit.fire(DebugEvent(event, error: error),
                        withAdditionalParameters: processedErrors.errorPixelParameters)
 
             throw error

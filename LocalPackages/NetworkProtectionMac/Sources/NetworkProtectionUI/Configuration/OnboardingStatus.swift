@@ -25,12 +25,14 @@ public typealias OnboardingStatusPublisher = AnyPublisher<OnboardingStatus, Neve
 ///
 @frozen
 public enum OnboardingStatus: RawRepresentable, Equatable {
+
     /// The onboarding has been completed at least once
     ///
     case completed
 
     case isOnboarding(step: OnboardingStep)
 
+    static let notStartedRawValue = "notStarted"
     static let completedRawValue = "completed"
     static let isOnboardingRawValue = "isOnboarding."
 

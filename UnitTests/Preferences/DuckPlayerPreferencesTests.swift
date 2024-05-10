@@ -72,8 +72,8 @@ final class DuckPlayerPreferencesTests: XCTestCase {
 
     func testPersisterReturnsValuesFromDisk() {
         UserDefaultsWrapper<Any>.clearAll()
-        var persister1 = DuckPlayerPreferencesUserDefaultsPersistor()
-        var persister2 = DuckPlayerPreferencesUserDefaultsPersistor()
+        let persister1 = DuckPlayerPreferencesUserDefaultsPersistor()
+        let persister2 = DuckPlayerPreferencesUserDefaultsPersistor()
 
         persister2.duckPlayerModeBool = nil
         persister1.duckPlayerModeBool = true

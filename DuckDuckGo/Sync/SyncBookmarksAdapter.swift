@@ -22,12 +22,13 @@ import Common
 import DDGSync
 import Persistence
 import SyncDataProviders
+import PixelKit
 
 public class BookmarksFaviconsFetcherErrorHandler: EventMapping<BookmarksFaviconsFetcherError> {
 
     public init() {
         super.init { event, _, _, _ in
-            Pixel.fire(.debug(event: .bookmarksFaviconsFetcherFailed, error: event.underlyingError))
+            PixelKit.fire(DebugEvent(GeneralPixel.bookmarksFaviconsFetcherFailed, error: event.underlyingError))
         }
     }
 
@@ -40,11 +41,12 @@ final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
     let databaseCleaner: BookmarkDatabaseCleaner
+    let syncErrorHandler: SyncErrorHandling
 
     @Published
     var isFaviconsFetchingEnabled: Bool = UserDefaultsWrapper(key: .syncIsFaviconsFetcherEnabled, defaultValue: false).wrappedValue {
         didSet {
-            var udWrapper = UserDefaultsWrapper(key: .syncIsFaviconsFetcherEnabled, defaultValue: false)
+            let udWrapper = UserDefaultsWrapper(key: .syncIsFaviconsFetcherEnabled, defaultValue: false)
             udWrapper.wrappedValue = isFaviconsFetchingEnabled
             if isFaviconsFetchingEnabled {
                 faviconsFetcher?.initializeFetcherState()
@@ -60,24 +62,16 @@ final class SyncBookmarksAdapter {
     @UserDefaultsWrapper(key: .syncDidMigrateToImprovedListsHandling, defaultValue: false)
     private var didMigrateToImprovedListsHandling: Bool
 
-    @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
-    private var isSyncBookmarksPaused: Bool {
-        didSet {
-            NotificationCenter.default.post(name: SyncPreferences.Consts.syncPausedStateChanged, object: nil)
-        }
-    }
-
-    @UserDefaultsWrapper(key: .syncBookmarksPausedErrorDisplayed, defaultValue: false)
-    private var didShowBookmarksSyncPausedError: Bool
-
     init(
         database: CoreDataDatabase,
         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-        appearancePreferences: AppearancePreferences = .shared
+        appearancePreferences: AppearancePreferences = .shared,
+        syncErrorHandler: SyncErrorHandling
     ) {
         self.database = database
         self.bookmarkManager = bookmarkManager
         self.appearancePreferences = appearancePreferences
+        self.syncErrorHandler = syncErrorHandler
         databaseCleaner = BookmarkDatabaseCleaner(
             bookmarkDatabase: database,
             errorEvents: BookmarksCleanupErrorHandling(),
@@ -112,10 +106,11 @@ final class SyncBookmarksAdapter {
             database: database,
             metadataStore: metadataStore,
             metricsEvents: metricsEventsHandler,
+            log: OSLog.sync,
             syncDidUpdateData: { [weak self] in
-                LocalBookmarkManager.shared.loadBookmarks()
-                self?.isSyncBookmarksPaused = false
-                self?.didShowBookmarksSyncPausedError = false
+                self?.syncErrorHandler.syncBookmarksSucceded()
+                guard let manager = self?.bookmarkManager as? LocalBookmarkManager else { return }
+                manager.loadBookmarks()
             },
             syncDidFinish: { [weak self] faviconsFetcherInput in
                 if let faviconsFetcher, self?.isFaviconsFetchingEnabled == true {
@@ -132,7 +127,7 @@ final class SyncBookmarksAdapter {
 
         if !didMigrateToImprovedListsHandling {
             didMigrateToImprovedListsHandling = true
-            provider.lastSyncTimestamp = nil
+            provider.updateSyncTimestamps(server: nil, local: nil)
         }
 
         bindSyncErrorPublisher(provider)
@@ -146,7 +141,7 @@ final class SyncBookmarksAdapter {
         do {
             stateStore = try BookmarksFaviconsFetcherStateStore(applicationSupportURL: URL.sandboxApplicationSupportURL)
         } catch {
-            Pixel.fire(.debug(event: .bookmarksFaviconsFetcherStateStoreInitializationFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.bookmarksFaviconsFetcherStateStoreInitializationFailed, error: error))
             os_log(.error, log: OSLog.sync, "Failed to initialize BookmarksFaviconsFetcherStateStore: %{public}s", String(reflecting: error))
             return nil
         }
@@ -164,32 +159,7 @@ final class SyncBookmarksAdapter {
     private func bindSyncErrorPublisher(_ provider: BookmarksProvider) {
         syncErrorCancellable = provider.syncErrorPublisher
             .sink { [weak self] error in
-                switch error {
-                case let syncError as SyncError:
-                    Pixel.fire(.debug(event: .syncBookmarksFailed, error: syncError))
-                    switch syncError {
-                    case .unexpectedStatusCode(409):
-                        // If bookmarks count limit has been exceeded
-                        self?.isSyncBookmarksPaused = true
-                        Pixel.fire(.syncBookmarksCountLimitExceededDaily, limitTo: .dailyFirst)
-                        self?.showSyncPausedAlert()
-                    case .unexpectedStatusCode(413):
-                        // If bookmarks request size limit has been exceeded
-                        self?.isSyncBookmarksPaused = true
-                        Pixel.fire(.syncBookmarksRequestSizeLimitExceededDaily, limitTo: .dailyFirst)
-                        self?.showSyncPausedAlert()
-                    default:
-                        break
-                    }
-                default:
-                    let nsError = error as NSError
-                    if nsError.domain != NSURLErrorDomain {
-                        let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
-                        let params = processedErrors.errorPixelParameters
-                        Pixel.fire(.debug(event: .syncBookmarksFailed, error: error), withAdditionalParameters: params)
-                    }
-                }
-                os_log(.error, log: OSLog.sync, "Bookmarks Sync error: %{public}s", String(reflecting: error))
+                self?.syncErrorHandler.handleBookmarkError(error)
             }
     }
 
@@ -197,25 +167,6 @@ final class SyncBookmarksAdapter {
         bookmarkManager.handleFavoritesAfterDisablingSync()
         if appearancePreferences.favoritesDisplayMode.isDisplayUnified {
             appearancePreferences.favoritesDisplayMode = .displayNative(.desktop)
-        }
-    }
-
-    private func showSyncPausedAlert() {
-        guard !didShowBookmarksSyncPausedError else { return }
-        Task {
-            await MainActor.run {
-                let alert = NSAlert.syncBookmarksPaused()
-                let response = alert.runModal()
-                didShowBookmarksSyncPausedError = true
-
-                switch response {
-                case .alertSecondButtonReturn:
-                    alert.window.sheetParent?.endSheet(alert.window)
-                    WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
-                default:
-                    break
-                }
-            }
         }
     }
 

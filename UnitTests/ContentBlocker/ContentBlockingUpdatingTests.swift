@@ -25,7 +25,7 @@ import BrowserServicesKit
 
 final class ContentBlockingUpdatingTests: XCTestCase {
 
-    let preferences = PrivacySecurityPreferences.shared
+    let preferences = WebTrackingProtectionPreferences.shared
     let rulesManager = ContentBlockerRulesManagerMock()
     var updating: UserContentUpdating!
 
@@ -37,7 +37,7 @@ final class ContentBlockingUpdatingTests: XCTestCase {
                                                                                                                                               embeddedDataProvider: AppTrackerDataSetProvider(),
                                                                                                                                               errorReporting: nil),
                                        configStorage: MockConfigurationStore(),
-                                       privacySecurityPreferences: preferences,
+                                       webTrackingProtectionPreferences: preferences,
                                        tld: TLD())
     }
 
@@ -107,7 +107,7 @@ final class ContentBlockingUpdatingTests: XCTestCase {
         }
 
         rulesManager.updatesSubject.send(Self.testUpdate())
-        preferences.gpcEnabled = !preferences.gpcEnabled
+        preferences.isGPCEnabled = !preferences.isGPCEnabled
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 0, handler: nil)

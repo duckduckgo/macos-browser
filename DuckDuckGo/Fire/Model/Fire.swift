@@ -23,6 +23,7 @@ import DDGSync
 import PrivacyDashboard
 import WebKit
 import SecureStorage
+import History
 
 final class Fire {
 
@@ -234,6 +235,7 @@ final class Fire {
     @MainActor
     func burnVisits(of visits: [Visit],
                     except fireproofDomains: FireproofDomains,
+                    isToday: Bool,
                     completion: (() -> Void)? = nil) {
 
         // Get domains to burn
@@ -253,7 +255,16 @@ final class Fire {
         domains = domains.convertedToETLDPlus1(tld: tld)
 
         historyCoordinating.burnVisits(visits) {
-            self.burnEntity(entity: .none(selectedDomains: domains),
+            let entity: BurningEntity
+
+            // Burn all windows in case we are burning visits for today
+            if isToday {
+                entity = .allWindows(mainWindowControllers: self.windowControllerManager.mainWindowControllers, selectedDomains: domains)
+            } else {
+                entity = .none(selectedDomains: domains)
+            }
+
+            self.burnEntity(entity: entity,
                             includingHistory: false,
                             completion: completion)
         }
@@ -299,6 +310,9 @@ final class Fire {
                 $0.close()
             }
         }
+
+        // If the app is not active, don't retake focus by opening a new window
+        guard NSApp.isActive else { return }
 
         // Open a new window in case there is none
         DispatchQueue.main.async { [weak self] in
@@ -381,7 +395,7 @@ final class Fire {
     // MARK: - Favicons
 
     private func autofillDomains() -> Set<String> {
-        guard let vault = try? secureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared),
+        guard let vault = try? secureVaultFactory.makeVault(reporter: SecureVaultReporter.shared),
               let accounts = try? vault.accounts() else {
             return []
         }

@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import BrowserServicesKit
+import Suggestions
 
 struct SuggestionViewModel: Equatable {
 
@@ -94,7 +94,8 @@ struct SuggestionViewModel: Equatable {
             } else {
                 return title ?? url.toString(forUserInput: userStringValue)
             }
-        case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _):
+        case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _),
+             .internalPage(title: let title, url: _):
             return title
         case .unknown(value: let value):
             return value
@@ -113,7 +114,8 @@ struct SuggestionViewModel: Equatable {
             } else {
                 return title
             }
-        case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _):
+        case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _),
+             .internalPage(title: let title, url: _):
             return title
         }
     }
@@ -155,31 +157,34 @@ struct SuggestionViewModel: Equatable {
                                               dropScheme: true,
                                               dropTrailingSlash: true)
             }
+        case .internalPage:
+            return " – " + UserText.duckDuckGo
         }
     }
 
     // MARK: - Icon
 
-    static let webImage = NSImage(named: "Web")
-    static let searchImage = NSImage(named: "Search")
-    static let historyImage = NSImage(named: "HistorySuggestion")
-    static let bookmarkImage = NSImage(named: "BookmarkSuggestion")
-    static let favoriteImage = NSImage(named: "FavoritedBookmarkSuggestion")
-
     var icon: NSImage? {
         switch suggestion {
         case .phrase:
-            return Self.searchImage
+            return .search
         case .website:
-            return Self.webImage
+            return .web
         case .historyEntry:
-            return Self.historyImage
+            return .historySuggestion
         case .bookmark(title: _, url: _, isFavorite: false, allowedInTopHits: _):
-            return Self.bookmarkImage
+            return .bookmarkSuggestion
         case .bookmark(title: _, url: _, isFavorite: true, allowedInTopHits: _):
-            return Self.favoriteImage
+            return .favoritedBookmarkSuggestion
         case .unknown:
-            return Self.webImage
+            return .web
+        case .internalPage(title: _, url: let url) where url == .bookmarks:
+            return .bookmarksFolder
+        case .internalPage(title: _, url: let url) where url.isSettingsURL:
+            return .settingsMulticolor16
+        case .internalPage(title: _, url: let url):
+            guard url == URL(string: StartupPreferences.shared.formattedCustomHomePageURL) else { return nil }
+            return .home16
         }
     }
 

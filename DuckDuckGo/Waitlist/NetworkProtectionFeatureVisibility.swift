@@ -16,32 +16,38 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import BrowserServicesKit
 import Combine
 import Common
 import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
+import LoginItems
+import PixelKit
+import Subscription
 
 protocol NetworkProtectionFeatureVisibility {
-    func isNetworkProtectionVisible() -> Bool
-    func disableForAllUsers()
-    func disableForWaitlistUsers()
+    var isInstalled: Bool { get }
+
+    func canStartVPN() async throws -> Bool
+    func isVPNVisible() -> Bool
+    func shouldUninstallAutomatically() -> Bool
+    func disableForAllUsers() async
+    @discardableResult
+    func disableIfUserHasNoAccess() async -> Bool
+
+    var onboardStatusPublisher: AnyPublisher<OnboardingStatus, Never> { get }
 }
 
 struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
+    private static var subscriptionAuthTokenPrefix: String { "ddg:" }
     private let featureDisabler: NetworkProtectionFeatureDisabling
     private let featureOverrides: WaitlistBetaOverriding
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
-    private let networkProtectionWaitlist = NetworkProtectionWaitlist()
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let defaults: UserDefaults
-
-    var waitlistIsOngoing: Bool {
-        isWaitlistEnabled && isWaitlistBetaActive
-    }
+    let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+    let accountManager: AccountManager
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
@@ -55,17 +61,54 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         self.featureDisabler = featureDisabler
         self.featureOverrides = featureOverrides
         self.defaults = defaults
+        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
     }
 
-    /// Calculates whether Network Protection is visible.
-    /// The following criteria are used:
+    var isInstalled: Bool {
+        LoginItem.vpnMenu.status.isInstalled
+    }
+
+    /// Whether the user can start the VPN.
     ///
-    /// 1. If the user has a valid auth token, the feature is visible
-    /// 2. If no auth token is found, the feature is visible if the waitlist feature flag is enabled
+    /// For beta users this means they have an auth token.
+    /// For subscription users this means they have entitlements.
     ///
-    /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding Network Protection from the user.
-    func isNetworkProtectionVisible() -> Bool {
-        isEasterEggUser || waitlistIsOngoing
+    func canStartVPN() async throws -> Bool {
+        guard subscriptionFeatureAvailability.isFeatureAvailable else {
+            return false
+        }
+
+        switch await accountManager.hasEntitlement(for: .networkProtection) {
+        case .success(let hasEntitlement):
+            return hasEntitlement
+        case .failure(let error):
+            throw error
+        }
+    }
+
+    /// Whether the user can see the VPN entry points in the UI.
+    ///
+    /// For beta users this means they have an auth token.
+    /// For subscription users this means they are authenticated.
+    ///
+    func isVPNVisible() -> Bool {
+        guard subscriptionFeatureAvailability.isFeatureAvailable else {
+            return false
+        }
+
+        return accountManager.isUserAuthenticated
+    }
+
+    /// We've had to add this method because accessing the singleton in app delegate is crashing the integration tests.
+    ///
+    var subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability {
+        DefaultSubscriptionFeatureAvailability()
+    }
+
+    /// Returns whether the VPN should be uninstalled automatically.
+    /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
+    func shouldUninstallAutomatically() -> Bool {
+        return subscriptionFeatureAvailability.isFeatureAvailable && !accountManager.isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
     }
 
     /// Whether the user is fully onboarded
@@ -80,70 +123,19 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         defaults.networkProtectionOnboardingStatusPublisher
     }
 
-    /// Easter egg users can be identified by them being internal users and having an auth token (NetP being activated).
+    func disableForAllUsers() async {
+        await featureDisabler.disable(uninstallSystemExtension: false)
+    }
+
+    /// A method meant to be called safely from different places to disable the VPN if the user isn't meant to have access to it.
     ///
-    private var isEasterEggUser: Bool {
-        !isWaitlistUser && networkProtectionFeatureActivation.isFeatureActivated
-    }
-
-    /// Whether it's a user with feature access
-    private var isEnabledWaitlistUser: Bool {
-        isWaitlistUser && waitlistIsOngoing
-    }
-
-    /// Waitlist users are users that have the waitlist enabled and active
-    ///
-    private var isWaitlistUser: Bool {
-        networkProtectionWaitlist.waitlistStorage.isWaitlistUser
-    }
-
-    /// Waitlist users are users that have the waitlist enabled and active and are invited
-    ///
-    private var isInvitedWaitlistUser: Bool {
-        networkProtectionWaitlist.waitlistStorage.isWaitlistUser && networkProtectionWaitlist.waitlistStorage.isInvited
-    }
-
-    private var isWaitlistBetaActive: Bool {
-        switch featureOverrides.waitlistActive {
-        case .useRemoteValue:
-            guard privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlistBetaActive) else {
-                return false
-            }
-
-            return true
-        case .on:
-            return true
-        case .off:
+    @discardableResult
+    func disableIfUserHasNoAccess() async -> Bool {
+        guard shouldUninstallAutomatically() else {
             return false
         }
-    }
 
-    private var isWaitlistEnabled: Bool {
-        switch featureOverrides.waitlistEnabled {
-        case .useRemoteValue:
-            return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlist)
-        case .on:
-            return true
-        case .off:
-            return false
-        }
-    }
-
-    func disableForAllUsers() {
-        Task {
-            await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
-        }
-    }
-
-    func disableForWaitlistUsers() {
-        guard isWaitlistUser else {
-            return
-        }
-
-        Task {
-            await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
-        }
+        await disableForAllUsers()
+        return true
     }
 }
-
-#endif

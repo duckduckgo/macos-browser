@@ -17,7 +17,7 @@
 //
 
 import XCTest
-import BrowserServicesKit
+import Suggestions
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SuggestionContainerTests: XCTestCase {
@@ -44,7 +44,7 @@ final class SuggestionContainerTests: XCTestCase {
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 1)
         }
-        XCTAssertEqual(suggestionContainer.result?.all, result.topHits + result.duckduckgoSuggestions + result.historyAndBookmarks)
+        XCTAssertEqual(suggestionContainer.result?.all, result.topHits + result.duckduckgoSuggestions + result.localSuggestions)
     }
 
     func testWhenStopGettingSuggestionsIsCalled_ThenNoSuggestionsArePublished() {

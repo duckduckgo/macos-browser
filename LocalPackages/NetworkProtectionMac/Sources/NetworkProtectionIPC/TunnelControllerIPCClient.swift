@@ -26,17 +26,19 @@ public protocol IPCClientInterface: AnyObject {
     func errorChanged(_ error: String?)
     func serverInfoChanged(_ serverInfo: NetworkProtectionStatusServerInfo)
     func statusChanged(_ status: ConnectionStatus)
+    func dataVolumeUpdated(_ dataVolume: DataVolume)
 }
 
 /// This is the XPC interface with parameters that can be packed properly
 @objc
-protocol XPCClientInterface: NSObjectProtocol {
+protocol XPCClientInterface {
     func errorChanged(error: String?)
     func serverInfoChanged(payload: Data)
     func statusChanged(payload: Data)
+    func dataVolumeUpdated(payload: Data)
 }
 
-public final class TunnelControllerIPCClient: NSObject {
+public final class TunnelControllerIPCClient {
 
     // MARK: - XPC Communication
 
@@ -47,29 +49,71 @@ public final class TunnelControllerIPCClient: NSObject {
     public var serverInfoObserver = ConnectionServerInfoObserverThroughIPC()
     public var connectionErrorObserver = ConnectionErrorObserverThroughIPC()
     public var connectionStatusObserver = ConnectionStatusObserverThroughIPC()
+    public var dataVolumeObserver = DataVolumeObserverThroughIPC()
 
     /// The delegate.
     ///
-    public weak var clientDelegate: IPCClientInterface?
+    public weak var clientDelegate: IPCClientInterface? {
+        didSet {
+            xpcDelegate.clientDelegate = self.clientDelegate
+        }
+    }
+
+    private let xpcDelegate: TunnelControllerXPCClientDelegate
 
     public init(machServiceName: String) {
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
         let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
+        self.xpcDelegate = TunnelControllerXPCClientDelegate(
+            clientDelegate: self.clientDelegate,
+            serverInfoObserver: self.serverInfoObserver,
+            connectionErrorObserver: self.connectionErrorObserver,
+            connectionStatusObserver: self.connectionStatusObserver,
+            dataVolumeObserver: self.dataVolumeObserver
+        )
 
         xpc = XPCClient(
             machServiceName: machServiceName,
             clientInterface: clientInterface,
             serverInterface: serverInterface)
 
-        super.init()
+        xpc.delegate = xpcDelegate
+        xpc.onDisconnect = { [weak self] in
+            guard let self else { return }
 
-        xpc.delegate = self
+            Task { @MainActor in
+                try await Task.sleep(interval: .seconds(1))
+
+                // By calling register we make sure that XPC will connect as soon as it
+                // becomes available again, as requests are queued.  This helps ensure
+                // that the client app will always be connected to XPC.
+                self.register()
+            }
+        }
+
+        self.register()
     }
 }
 
-// MARK: - Incoming communication from the server
+private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
 
-extension TunnelControllerIPCClient: XPCClientInterface {
+    weak var clientDelegate: IPCClientInterface?
+    let serverInfoObserver: ConnectionServerInfoObserverThroughIPC
+    let connectionErrorObserver: ConnectionErrorObserverThroughIPC
+    let connectionStatusObserver: ConnectionStatusObserverThroughIPC
+    let dataVolumeObserver: DataVolumeObserverThroughIPC
+
+    init(clientDelegate: IPCClientInterface?,
+         serverInfoObserver: ConnectionServerInfoObserverThroughIPC,
+         connectionErrorObserver: ConnectionErrorObserverThroughIPC,
+         connectionStatusObserver: ConnectionStatusObserverThroughIPC,
+         dataVolumeObserver: DataVolumeObserverThroughIPC) {
+        self.clientDelegate = clientDelegate
+        self.serverInfoObserver = serverInfoObserver
+        self.connectionErrorObserver = connectionErrorObserver
+        self.connectionStatusObserver = connectionStatusObserver
+        self.dataVolumeObserver = dataVolumeObserver
+    }
 
     func errorChanged(error: String?) {
         connectionErrorObserver.publish(error)
@@ -93,6 +137,15 @@ extension TunnelControllerIPCClient: XPCClientInterface {
         connectionStatusObserver.publish(status)
         clientDelegate?.statusChanged(status)
     }
+
+    func dataVolumeUpdated(payload: Data) {
+        guard let dataVolume = try? JSONDecoder().decode(DataVolume.self, from: payload) else {
+            return
+        }
+
+        dataVolumeObserver.publish(dataVolume)
+        clientDelegate?.dataVolumeUpdated(dataVolume)
+    }
 }
 
 // MARK: - Outgoing communication to the server
@@ -107,22 +160,22 @@ extension TunnelControllerIPCClient: IPCServerInterface {
         })
     }
 
-    public func start() {
+    public func start(completion: @escaping (Error?) -> Void) {
         xpc.execute(call: { server in
-            server.start()
-        }, xpcReplyErrorHandler: { _ in
-            // Intentional no-op as there's no completion block
-            // If you add a completion block, please remember to call it here too!
-        })
+            server.start(completion: completion)
+        }, xpcReplyErrorHandler: completion)
     }
 
-    public func stop() {
+    public func stop(completion: @escaping (Error?) -> Void) {
         xpc.execute(call: { server in
-            server.stop()
-        }, xpcReplyErrorHandler: { _ in
-            // Intentional no-op as there's no completion block
-            // If you add a completion block, please remember to call it here too!
-        })
+            server.stop(completion: completion)
+        }, xpcReplyErrorHandler: completion)
+    }
+
+    public func fetchLastError(completion: @escaping (Error?) -> Void) {
+        xpc.execute(call: { server in
+            server.fetchLastError(completion: completion)
+        }, xpcReplyErrorHandler: completion)
     }
 
     public func debugCommand(_ command: DebugCommand) async throws {

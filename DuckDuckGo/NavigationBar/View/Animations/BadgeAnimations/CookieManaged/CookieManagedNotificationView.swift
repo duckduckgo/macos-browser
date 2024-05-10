@@ -41,12 +41,12 @@ struct CookieAnimationView: View {
         Group {
             ZStack(alignment: .center) {
                 Group {
-                    Image("Cookie")
+                    Image(.cookie)
                         .resizable()
                         .foregroundColor(.primary)
                         .opacity(cookieAlpha)
 
-                    Image("CookieBite")
+                      Image(.cookieBite)
                         .resizable()
                         .foregroundColor(.primary)
                         .opacity(bittenCookieAlpha)
@@ -217,7 +217,7 @@ struct CookieManagedNotificationView_Previews: PreviewProvider {
 private enum Consts {
 
     enum Colors {
-        static let badgeBackgroundColor = Color("URLNotificationBadgeBackground")
+        static let badgeBackgroundColor = Color.urlNotificationBadgeBackground
     }
 
     enum CookieAnimation {

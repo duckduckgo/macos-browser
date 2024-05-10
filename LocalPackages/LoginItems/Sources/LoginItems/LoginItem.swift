@@ -21,6 +21,10 @@ import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import Foundation
 import ServiceManagement
 
+public enum SMLoginItemSetEnabledError: Error {
+    case failed
+}
+
 /// Takes care of enabling and disabling a login item.
 ///
 public struct LoginItem: Equatable, Hashable {
@@ -46,6 +50,10 @@ public struct LoginItem: Equatable, Hashable {
 
         public var isEnabled: Bool {
             self == .enabled
+        }
+
+        public var isInstalled: Bool {
+            self == .enabled || self == .requiresApproval
         }
 
         @available(macOS 13.0, *)
@@ -85,7 +93,10 @@ public struct LoginItem: Equatable, Hashable {
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).register()
         } else {
-            SMLoginItemSetEnabled(agentBundleID as CFString, true)
+            let success = SMLoginItemSetEnabled(agentBundleID as CFString, true)
+            if !success {
+                throw SMLoginItemSetEnabledError.failed
+            }
         }
 
         launchInformation.updateLastEnabledTimestamp()
@@ -97,7 +108,10 @@ public struct LoginItem: Equatable, Hashable {
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).unregister()
         } else {
-            SMLoginItemSetEnabled(agentBundleID as CFString, false)
+            let success = SMLoginItemSetEnabled(agentBundleID as CFString, false)
+            if !success {
+                throw SMLoginItemSetEnabledError.failed
+            }
         }
     }
 
@@ -106,7 +120,7 @@ public struct LoginItem: Equatable, Hashable {
     /// This call will only enable the login item if it was enabled to begin with.
     ///
     public func restart() throws {
-        guard [.enabled, .requiresApproval].contains(status) else {
+        guard [.enabled].contains(status) else {
             os_log("🟢 restart not needed for login item %{public}@", log: log, self.debugDescription)
             return
         }

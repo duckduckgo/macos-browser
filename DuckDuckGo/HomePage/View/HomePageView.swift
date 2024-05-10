@@ -24,7 +24,7 @@ extension HomePage.Views {
 
     struct RootView: View {
 
-        let backgroundColor = Color("NewTabPageBackgroundColor")
+        let backgroundColor: Color = .newTabPageBackground
         static let targetWidth: CGFloat = 508
         let isBurner: Bool
 
@@ -38,7 +38,7 @@ extension HomePage.Views {
             if isBurner {
                 BurnerHomePageView()
             } else {
-                regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable, isNoCardExperimentOn: PixelExperiment.isNoCardsExperimentOn)
+                regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable)
                     .contextMenu(ContextMenu(menuItems: {
                         if model.isContinueSetUpAvailable {
                             Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
@@ -53,15 +53,12 @@ extension HomePage.Views {
             }
         }
 
-        func regularHomePageView(includingContinueSetUpCards: Bool, isNoCardExperimentOn: Bool) -> some View {
+        func regularHomePageView(includingContinueSetUpCards: Bool) -> some View {
             ZStack(alignment: .top) {
 
                 ScrollView {
                     VStack(spacing: 0) {
                         Group {
-                            if isNoCardExperimentOn {
-                                DefaultBrowserPrompt()
-                            }
                             if includingContinueSetUpCards {
                                 ContinueSetUpView()
                                     .padding(.top, 64)
@@ -107,9 +104,9 @@ extension HomePage.Views {
         }
 
         struct HomeContentButtonView: View {
-            let defaultColor: Color = Color("NewTabPageBackgroundColor")
-            let onHoverColor: Color = Color("ButtonMouseOverColor")
-            let onSelectedColor: Color = Color("ButtonMouseDownColor")
+            let defaultColor: Color = .newTabPageBackground
+            let onHoverColor: Color = .buttonMouseOver
+            let onSelectedColor: Color = .buttonMouseDown
             let iconSize = 16.02
             let targetSize = 28.0
 
@@ -132,7 +129,7 @@ extension HomePage.Views {
                         .fill(buttonBackgroundColor)
                         .frame(width: targetSize, height: targetSize, alignment: .bottomTrailing)
                         .cornerRadius(3)
-                    Image("OptionsMainView")
+                    Image(.optionsMainView)
                         .resizable()
                         .frame(width: iconSize, height: iconSize)
                         .scaledToFit()
@@ -163,7 +160,7 @@ extension HomePage.Views {
                 HStack {
                     Toggle(isOn: $model.isContinueSetUpVisible, label: {
                         HStack {
-                            Image("RocketNoColor")
+                            Image(.rocketGrayscale)
                                 .frame(width: iconSize, height: iconSize)
                             Text(UserText.newTabSetUpSectionTitle)
                         }
@@ -175,7 +172,7 @@ extension HomePage.Views {
             HStack {
                 Toggle(isOn: $model.isFavoriteVisible, label: {
                     HStack {
-                        Image("Favorite")
+                        Image(.favorite)
                             .frame(width: iconSize, height: iconSize)
                         Text(UserText.newTabFavoriteSectionTitle)
                     }
@@ -185,7 +182,7 @@ extension HomePage.Views {
             HStack {
                 Toggle(isOn: $model.isRecentActivityVisible, label: {
                     HStack {
-                        Image("Shield")
+                        Image(.shield)
                             .frame(width: iconSize, height: iconSize)
                         Text(UserText.newTabRecentActivitySectionTitle)
                     }

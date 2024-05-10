@@ -21,6 +21,7 @@ import Combine
 import Common
 import Lottie
 import SwiftUI
+import WebKit
 
 final class TabBarViewController: NSViewController {
 
@@ -31,7 +32,6 @@ final class TabBarViewController: NSViewController {
     }
 
     @IBOutlet weak var visualEffectBackgroundView: NSVisualEffectView!
-    @IBOutlet weak var gradientBackgroundView: GradientView!
     @IBOutlet weak var pinnedTabsContainerView: NSView!
     @IBOutlet private weak var collectionView: TabBarCollectionView!
     @IBOutlet private weak var scrollView: TabBarScrollView!
@@ -141,7 +141,7 @@ final class TabBarViewController: NSViewController {
     }
 
     @objc func addButtonAction(_ sender: NSButton) {
-        tabCollectionViewModel.appendNewTab(with: .newtab)
+        tabCollectionViewModel.insertOrAppendNewTab()
     }
 
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
@@ -159,6 +159,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupFireButton() {
+        fireButton.image = .burn
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
         fireButton.sendAction(on: .leftMouseDown)
@@ -168,9 +169,9 @@ final class TabBarViewController: NSViewController {
         if tabCollectionViewModel.isBurner {
             burnerWindowBackgroundView.isHidden = false
             fireButton.isAnimationEnabled = false
-            fireButton.backgroundColor = NSColor.fireButtonRedBackgroundColor
-            fireButton.mouseOverColor = NSColor.fireButtonRedHoverColor
-            fireButton.mouseDownColor = NSColor.fireButtonRedPressedColor
+            fireButton.backgroundColor = NSColor.fireButtonRedBackground
+            fireButton.mouseOverColor = NSColor.fireButtonRedHover
+            fireButton.mouseDownColor = NSColor.fireButtonRedPressed
             fireButton.normalTintColor = NSColor.white
             fireButton.mouseDownTintColor = NSColor.white
             fireButton.mouseOverTintColor = NSColor.white
@@ -281,7 +282,7 @@ final class TabBarViewController: NSViewController {
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 if self.view.isMouseLocationInsideBounds() == false {
-                    self.hideTabPreview()
+                    self.hideTabPreview(allowQuickRedisplay: true)
                 }
             }
         }
@@ -314,6 +315,8 @@ final class TabBarViewController: NSViewController {
             removeFireproofing(from: tab)
         case let .close(index):
             tabCollectionViewModel.remove(at: .pinned(index))
+        case let .muteOrUnmute(tab):
+            tab.muteUnmuteTab()
         }
     }
 
@@ -486,7 +489,7 @@ final class TabBarViewController: NSViewController {
             if dividedWidth < TabBarViewItem.Width.minimumSelected.rawValue {
                 dividedWidth = (tabsWidth - TabBarViewItem.Width.minimumSelected.rawValue) / (numberOfItems - 1)
             }
-            return min(TabBarViewItem.Width.maximum.rawValue, max(minimumWidth, dividedWidth))
+            return min(TabBarViewItem.Width.maximum.rawValue, max(minimumWidth, dividedWidth)).rounded()
         } else {
             return minimumWidth
         }
@@ -506,7 +509,7 @@ final class TabBarViewController: NSViewController {
                 guard let self = self else { return }
                 self.updateLayout()
                 self.enableScrollButtons()
-                self.hideTabPreview()
+                self.hideTabPreview(allowQuickRedisplay: true)
             })
         }
     }
@@ -524,7 +527,7 @@ final class TabBarViewController: NSViewController {
 
     @objc private func scrollViewBoundsDidChange(_ sender: Any) {
         enableScrollButtons()
-        hideTabPreview()
+        hideTabPreview(allowQuickRedisplay: true)
     }
 
     private func enableScrollButtons() {
@@ -558,11 +561,7 @@ final class TabBarViewController: NSViewController {
 
     // MARK: - Tab Preview
 
-    private var tabPreviewWindowController: TabPreviewWindowController = {
-        let storyboard = NSStoryboard(name: "TabPreview", bundle: nil)
-        // swiftlint:disable:next force_cast
-        return storyboard.instantiateController(withIdentifier: "TabPreviewWindowController") as! TabPreviewWindowController
-    }()
+    private lazy var tabPreviewWindowController = TabPreviewWindowController()
 
     private func showTabPreview(for tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
@@ -574,7 +573,7 @@ final class TabBarViewController: NSViewController {
         }
 
         let position = scrollView.frame.minX + tabBarViewItem.view.frame.minX - clipView.bounds.origin.x
-        showTabPreview(for: tabViewModel, from: position, after: .init(from: tabBarViewItem.widthStage))
+        showTabPreview(for: tabViewModel, from: position)
     }
 
     private func showPinnedTabPreview(at index: Int) {
@@ -584,15 +583,15 @@ final class TabBarViewController: NSViewController {
         }
 
         let position = pinnedTabsContainerView.frame.minX + PinnedTabView.Const.dimension * CGFloat(index)
-        showTabPreview(for: tabViewModel, from: position, after: .init(from: .withoutTitle))
+        showTabPreview(for: tabViewModel, from: position)
     }
 
     private func showTabPreview(
         for tabViewModel: TabViewModel,
-        from xPosition: CGFloat,
-        after interval: TabPreviewWindowController.TimerInterval
-    ) {
-        tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel)
+        from xPosition: CGFloat) {
+        let isSelected = tabCollectionViewModel.selectedTabViewModel === tabViewModel
+        tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel,
+                                                                    isSelected: isSelected)
 
         guard let window = view.window else {
             os_log("TabBarViewController: Showing tab preview window failed", type: .error)
@@ -600,14 +599,14 @@ final class TabBarViewController: NSViewController {
         }
 
         var point = view.bounds.origin
-        point.y -= TabPreviewWindowController.VerticalSpace.padding.rawValue
+        point.y -= TabPreviewWindowController.padding
         point.x += xPosition
         let pointInWindow = view.convert(point, to: nil)
-        tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: interval, topLeftPointInWindow: pointInWindow)
+        tabPreviewWindowController.show(parentWindow: window, topLeftPointInWindow: pointInWindow)
     }
 
-    func hideTabPreview() {
-        tabPreviewWindowController.hide()
+    func hideTabPreview(allowQuickRedisplay: Bool = false) {
+        tabPreviewWindowController.hide(allowQuickRedisplay: allowQuickRedisplay)
     }
 
 }
@@ -989,8 +988,17 @@ extension TabBarViewController: TabBarViewItemDelegate {
                 showTabPreview(for: tabBarViewItem)
             }
         } else {
-            tabPreviewWindowController.scheduleHiding()
+            tabPreviewWindowController.hide(allowQuickRedisplay: true, withDelay: true)
         }
+    }
+
+    func tabBarViewItemCanBeDuplicated(_ tabBarViewItem: TabBarViewItem) -> Bool {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
+            return false
+        }
+
+        return tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.content.canBeDuplicated ?? false
     }
 
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem) {
@@ -1008,7 +1016,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return false
         }
 
-        return tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.isUrl ?? false
+        return tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.content.canBePinned ?? false
     }
 
     func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem) {
@@ -1021,15 +1029,33 @@ extension TabBarViewController: TabBarViewItemDelegate {
         tabCollectionViewModel.pinTab(at: indexPath.item)
     }
 
+    func tabBarViewItemCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
+            return false
+        }
+
+        return tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.content.canBeBookmarked ?? false
+    }
+
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.content.url else {
+              let url = tabViewModel.tab.content.userEditableUrl else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
 
         bookmarkTab(with: url, title: tabViewModel.title)
+    }
+
+    func tabBarViewAllItemsCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool {
+        tabCollectionViewModel.canBookmarkAllOpenTabs()
+    }
+
+    func tabBarViewItemBookmarkAllOpenTabsAction(_ tabBarViewItem: TabBarViewItem) {
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
     }
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
@@ -1065,6 +1091,15 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         tabCollectionViewModel.removeAllTabs(except: indexPath.item)
+    }
+
+    func tabBarViewItemCloseToTheLeftAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
+            return
+        }
+
+        tabCollectionViewModel.removeTabs(before: indexPath.item)
     }
 
     func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem) {
@@ -1105,6 +1140,17 @@ extension TabBarViewController: TabBarViewItemDelegate {
         fireproof(tab)
     }
 
+    func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
+        else {
+            assertionFailure("TabBarViewController: Failed to get tab from tab bar view item")
+            return
+        }
+
+        tab.muteUnmuteTab()
+    }
+
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
@@ -1114,6 +1160,13 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         removeFireproofing(from: tab)
+    }
+
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState? {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item] else { return nil }
+
+        return tab.audioState
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {

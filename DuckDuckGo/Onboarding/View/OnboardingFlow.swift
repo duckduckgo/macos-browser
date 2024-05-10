@@ -36,7 +36,7 @@ struct OnboardingFlow: View {
 
             HStack(alignment: .top, spacing: 23) {
 
-                Image("OnboardingDax")
+                Image(.onboardingDax)
                     .resizable()
                     .frame(width: 64, height: 64)
                     .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)

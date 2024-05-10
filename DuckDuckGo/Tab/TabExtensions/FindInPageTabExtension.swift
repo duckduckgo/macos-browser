@@ -218,7 +218,7 @@ extension FindInPageTabExtension: NavigationResponder {
         close()
     }
 
-    func navigation(_ navigation: Navigation?, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType?) {
+    func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
         if case .sessionStateReplace = navigationType {
             close()
         }

@@ -21,7 +21,7 @@ import Common
 
 extension WindowsManager {
 
-    class func restoreState(from coder: NSCoder, includePinnedTabs: Bool = true, includeWindows: Bool = true) throws {
+    @discardableResult class func restoreState(from coder: NSCoder, includePinnedTabs: Bool = true, includeWindows: Bool = true) throws -> WindowManagerStateRestoration {
         guard let state = coder.decodeObject(of: WindowManagerStateRestoration.self,
                                              forKey: NSKeyedArchiveRootObjectKey) else {
             throw coder.error ?? NSError(domain: "WindowsManagerStateRestoration", code: -1, userInfo: nil)
@@ -33,6 +33,8 @@ extension WindowsManager {
         if includeWindows {
             restoreWindows(from: state)
         }
+
+        return state
     }
 
     private class func restoreWindows(from state: WindowManagerStateRestoration) {
@@ -50,7 +52,7 @@ extension WindowsManager {
     }
 
     private class func setUpWindow(from item: WindowRestorationItem) {
-        guard let window = openNewWindow(with: item.model, showWindow: true) else { return }
+        guard let window = openNewWindow(with: item.model, showWindow: !item.isMiniaturized, isMiniaturized: item.isMiniaturized) else { return }
         window.setContentSize(item.frame.size)
         window.setFrameOrigin(item.frame.origin)
     }
@@ -133,11 +135,13 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
     private enum NSSecureCodingKeys {
         static let frame = "frame"
         static let model = "model"
+        static let isMiniaturized = "isMiniaturized"
 
     }
 
     let model: TabCollectionViewModel
     let frame: NSRect
+    let isMiniaturized: Bool
 
     @MainActor
     init?(windowController: MainWindowController) {
@@ -148,6 +152,7 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
 
         self.frame = windowController.window!.frame
         self.model = windowController.mainViewController.tabCollectionViewModel
+        self.isMiniaturized = windowController.window!.isMiniaturized
     }
 
     static var supportsSecureCoding: Bool { true }
@@ -159,10 +164,12 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
         }
         self.model = model
         self.frame = coder.decodeRect(forKey: NSSecureCodingKeys.frame)
+        self.isMiniaturized = coder.decodeBool(forKey: NSSecureCodingKeys.isMiniaturized)
     }
 
     func encode(with coder: NSCoder) {
         coder.encode(frame, forKey: NSSecureCodingKeys.frame)
         coder.encode(model, forKey: NSSecureCodingKeys.model)
+        coder.encode(isMiniaturized, forKey: NSSecureCodingKeys.isMiniaturized)
     }
 }

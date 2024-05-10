@@ -34,7 +34,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func save(_ broker: BrokerDB) throws -> Int64
     func update(_ broker: BrokerDB) throws
     func fetchBroker(with id: Int64) throws -> BrokerDB?
-    func fetchBroker(with name: String) throws -> BrokerDB?
+    func fetchBroker(with url: String) throws -> BrokerDB?
     func fetchAllBrokers() throws -> [BrokerDB]
 
     func save(_ profileQuery: ProfileQueryDB) throws -> Int64
@@ -85,6 +85,8 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(), key: Data) throws {
         try super.init(file: file, key: key, writerType: .pool) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
+            migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
+
         }
     }
 
@@ -259,6 +261,16 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             $0.column(OptOutAttemptDB.Columns.startDate.name, .date).notNull()
         }
     }
+
+    static func migrateV2(database: Database) throws {
+        try database.alter(table: BrokerDB.databaseTableName) {
+            $0.add(column: BrokerDB.Columns.url.name, .text)
+        }
+        try database.execute(sql: """
+                UPDATE \(BrokerDB.databaseTableName) SET \(BrokerDB.Columns.url.name) = \(BrokerDB.Columns.name.name)
+            """)
+    }
+
     // swiftlint:enable function_body_length
 
     func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
@@ -320,7 +332,8 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     }
 
     func deleteProfileData() throws {
-        try db.write { db in
+        try db.writeWithoutTransaction { db in
+            try db.execute(sql: "PRAGMA foreign_keys = OFF;")
             try OptOutDB
                 .deleteAll(db)
             try ScanDB
@@ -331,6 +344,11 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                 .deleteAll(db)
             try PhoneDB
                 .deleteAll(db)
+            try ProfileDB
+                .deleteAll(db)
+            try BrokerDB
+                .deleteAll(db)
+            try db.execute(sql: "PRAGMA foreign_keys = ON;")
         }
     }
 
@@ -353,10 +371,10 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    func fetchBroker(with name: String) throws -> BrokerDB? {
+    func fetchBroker(with url: String) throws -> BrokerDB? {
         try db.read { db in
             return try BrokerDB
-                .filter(Column(BrokerDB.Columns.name.name) == name)
+                .filter(Column(BrokerDB.Columns.url.name) == url)
                 .fetchOne(db)
         }
     }
@@ -376,8 +394,13 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     func update(_ profileQuery: ProfileQueryDB) throws -> Int64 {
         try db.write { db in
-            try profileQuery.upsert(db)
-            return db.lastInsertedRowID
+            if let id = profileQuery.id {
+                try profileQuery.update(db)
+                return id
+            } else {
+                try profileQuery.insert(db)
+                return db.lastInsertedRowID
+            }
         }
     }
 

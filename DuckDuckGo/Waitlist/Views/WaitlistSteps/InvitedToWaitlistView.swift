@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import SwiftUI
 import SwiftUIExtensions
@@ -47,7 +45,7 @@ struct InvitedToWaitlistView: View {
 
                 Text(viewData.subtitle)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(Color("BlackWhite80"))
+                    .foregroundColor(Color(.blackWhite80))
 
                 if !viewData.entryViewViewDataList.isEmpty {
                     VStack(spacing: 16.0) {
@@ -57,14 +55,14 @@ struct InvitedToWaitlistView: View {
                     }
                     .padding(20.0)
                     .frame(maxWidth: .infinity)
-                    .background(Color("BlackWhite1"))
-                    .border(Color("BlackWhite5"))
+                    .background(Color.blackWhite1)
+                        .border(.blackWhite5)
                 }
 
                 Text(viewData.availabilityDisclaimer)
                     .multilineTextAlignment(.center)
                     .font(.system(size: 12))
-                    .foregroundColor(Color("BlackWhite60"))
+                    .foregroundColor(Color(.blackWhite60))
             }
         } buttons: {
             Button(viewData.buttonDismissLabel) {
@@ -95,13 +93,13 @@ private struct WaitlistListEntryView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(viewData.title)
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(Color("BlackWhite80"))
+                    .foregroundColor(Color(.blackWhite80))
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Text(viewData.subtitle)
                     .font(.system(size: 13))
-                    .foregroundColor(Color("BlackWhite60"))
+                    .foregroundColor(Color(.blackWhite60))
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -118,35 +116,6 @@ struct WaitlistEntryViewItemViewData: Identifiable {
     let title: String
     let subtitle: String
 }
-
-#endif
-
-#if NETWORK_PROTECTION
-
-struct NetworkProtectionInvitedToWaitlistViewData: InvitedToWaitlistViewData {
-    let headerImageName = "Gift-96"
-    let title = UserText.networkProtectionWaitlistInvitedTitle
-    let subtitle = UserText.networkProtectionWaitlistInvitedSubtitle
-    let buttonDismissLabel = UserText.networkProtectionWaitlistButtonDismiss
-    let buttonGetStartedLabel = UserText.networkProtectionWaitlistButtonGetStarted
-    let availabilityDisclaimer = UserText.networkProtectionWaitlistAvailabilityDisclaimer
-    let entryViewViewDataList: [WaitlistEntryViewItemViewData] =
-    [
-        .init(imageName: "Shield-16",
-              title: UserText.networkProtectionWaitlistInvitedSection1Title,
-              subtitle: UserText.networkProtectionWaitlistInvitedSection1Subtitle),
-
-        .init(imageName: "Rocket-16",
-                  title: UserText.networkProtectionWaitlistInvitedSection2Title,
-                  subtitle: UserText.networkProtectionWaitlistInvitedSection2Subtitle),
-
-        .init(imageName: "Card-16",
-                  title: UserText.networkProtectionWaitlistInvitedSection3Title,
-                  subtitle: UserText.networkProtectionWaitlistInvitedSection3Subtitle),
-    ]
-}
-
-#endif
 
 #if DBP
 

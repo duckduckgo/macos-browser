@@ -21,12 +21,11 @@ import BrowserServicesKit
 
 public enum FeatureFlag: String {
     case debugMenu
+    case sslCertificatesBypass
 
     /// Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
     /// https://app.asana.com/0/1199230911884351/1205979030848528/f
     case appendAtbToSerpQueries
-
-    case vpnGeoswitching
 }
 
 extension FeatureFlag: FeatureFlagSourceProviding {
@@ -36,8 +35,8 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .internalOnly
         case .appendAtbToSerpQueries:
             return .internalOnly
-        case .vpnGeoswitching:
-            return .internalOnly
+        case .sslCertificatesBypass:
+            return .remoteReleasable(.subfeature(sslCertificatesSubfeature.allowBypass))
         }
     }
 }

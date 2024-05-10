@@ -22,15 +22,30 @@ import Foundation
 final class AddBookmarkFolderPopoverViewModel: ObservableObject {
 
     private let bookmarkManager: BookmarkManager
-
     let folders: [FolderViewModel]
+    private let completionHandler: (BookmarkFolder?) -> Void
+
     @Published var parent: BookmarkFolder?
-
     @Published var folderName: String = ""
-
     @Published private(set) var isDisabled = false
 
-    private let completionHandler: (BookmarkFolder?) -> Void
+    var title: String {
+        UserText.Bookmarks.Dialog.Title.addFolder
+    }
+
+    var cancelActionTitle: String {
+        UserText.cancel
+    }
+
+    var defaultActionTitle: String {
+        UserText.Bookmarks.Dialog.Action.addFolder
+    }
+
+    let isCancelActionDisabled = false
+
+    var isDefaultActionButtonDisabled: Bool {
+        folderName.trimmingWhitespace().isEmpty || isDisabled
+    }
 
     init(bookmark: Bookmark? = nil,
          folderName: String = "",
@@ -51,19 +66,19 @@ final class AddBookmarkFolderPopoverViewModel: ObservableObject {
     }
 
     func addFolder() {
-        guard !folderName.isEmpty else {
+        guard !folderName.trimmingWhitespace().isEmpty else {
             assertionFailure("folderName is empty, button should be disabled")
             return
         }
 
         isDisabled = true
-        bookmarkManager.makeFolder(for: folderName, parent: parent) { [completionHandler] result in
+        bookmarkManager.makeFolder(for: folderName.trimmingWhitespace(), parent: parent) { [completionHandler] result in
             completionHandler(result)
         }
     }
 
     var isAddFolderButtonDisabled: Bool {
-        folderName.isEmpty
+        folderName.trimmingWhitespace().isEmpty
     }
 
 }

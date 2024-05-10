@@ -31,7 +31,7 @@ final class LoadingProgressView: NSView, CAAnimationDelegate {
     private var targetProgress: Double = 0.0
     private var targetTime: CFTimeInterval = 0.0
 
-    var isShown: Bool {
+    var isProgressShown: Bool {
         progressMask.opacity == 1.0
     }
 
@@ -75,8 +75,8 @@ final class LoadingProgressView: NSView, CAAnimationDelegate {
 
         var colors = [CGColor]()
         for _ in 0...6 {
-            colors.append(NSColor.progressBarGradientDarkColor.cgColor)
-            colors.append(NSColor.progressBarGradientLightColor.cgColor)
+            colors.append(NSColor.progressBarGradientDark.cgColor)
+            colors.append(NSColor.progressBarGradientLight.cgColor)
         }
 
         progressLayer.colors = colors
@@ -118,6 +118,7 @@ final class LoadingProgressView: NSView, CAAnimationDelegate {
                 && progressMask.animation(forKey: Constants.fadeOutAnimationKey) == nil
         else { return }
 
+        self.lastEvent = ProgressEvent(progress: Constants.max, interval: Constants.hideAnimationDuration)
         increaseProgress(to: Constants.max, animationDuration: Constants.hideAnimationDuration)
     }
 
@@ -256,7 +257,7 @@ final class LoadingProgressView: NSView, CAAnimationDelegate {
 
     // MARK: IB
     override func prepareForInterfaceBuilder() {
-        layer!.backgroundColor = NSColor.progressBarGradientDarkColor.cgColor
+        layer!.backgroundColor = NSColor.progressBarGradientDark.cgColor
     }
 
 }
@@ -302,7 +303,12 @@ extension LoadingProgressView {
 
             for (idx, step) in milestones.enumerated() {
                 if let event = lastProgressEvent {
-                    if event.progress >= step.progress {
+                    if event.progress == Constants.max {
+                        // 100%: finish fast
+                        nextStepIdx = milestones.indices.last!
+                        estimatedElapsedTime = TimeInterval.greatestFiniteMagnitude
+                        break
+                    } else if event.progress >= step.progress {
                         estimatedElapsedTime += step.interval
                     } else {
                         // take percentage of estimated time for the current step based of (actual / estimated) progress difference

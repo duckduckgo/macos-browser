@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: SwiftLint
         uses: docker://norionomura/swiftlint:0.54.0
         with:
@@ -37,11 +37,11 @@ jobs:
     steps:
     - name: Check out the code
       if: github.event_name == 'pull_request' || github.event_name == 'push'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Check out the code
       if: github.event_name != 'pull_request' && github.event_name != 'push'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: ${{ inputs.branch || github.ref_name }}
 
@@ -53,6 +53,36 @@ jobs:
         scandir: scripts
       env:
         SHELLCHECK_OPTS: -x -P scripts -P scripts/helpers
+
+  bats:
+
+    name: Test Shell Scripts
+
+    runs-on: macos-13
+
+    steps:
+    - name: Check out the code
+      if: github.event_name == 'pull_request' || github.event_name == 'push'
+      uses: actions/checkout@v4
+
+    - name: Check out the code
+      if: github.event_name != 'pull_request' && github.event_name != 'push'
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.branch || github.ref_name }}
+
+    - name: Install Bats
+      run: brew install bats-core
+
+    - name: Run Bats tests
+      run: bats --formatter junit scripts/tests/* > bats-tests.xml
+
+    - name: Publish unit tests report
+      uses: mikepenz/action-junit-report@v3
+      if: always() # always run even if the previous step fails
+      with:
+        check_name: "Test Report: Shell Scripts"
+        report_paths: 'bats-tests.xml'
 
   tests:
     name: Test
@@ -88,13 +118,13 @@ jobs:
     steps:
     - name: Check out the code
       if: github.event_name == 'pull_request' || github.event_name == 'push'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
 
     - name: Check out the code
       if: github.event_name != 'pull_request' && github.event_name != 'push'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
         ref: ${{ inputs.branch || github.ref_name }}
@@ -120,10 +150,6 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
-    - name: Install xcbeautify
-      continue-on-error: true
-      run: brew install xcbeautify
-
     - name: Build and run unit tests
       run: |
         echo "Runner ${RUNNER_NAME} (${RUNNER_TRACKING_ID})"
@@ -133,7 +159,7 @@ jobs:
           -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
           -configuration "CI" \
-          -skipPackagePluginValidation \
+          -skipPackagePluginValidation -skipMacroValidation \
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           "-skip-testing:${{ matrix.integration-tests-target }}" \
@@ -147,7 +173,7 @@ jobs:
           -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
           -configuration "CI" \
-          -skipPackagePluginValidation \
+          -skipPackagePluginValidation -skipMacroValidation \
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           "-only-testing:${{ matrix.integration-tests-target }}" \
@@ -260,16 +286,12 @@ jobs:
     # workflow_call is used by bump_internal_release and is followed by a proper release job
     if: github.actor != 'dependabot[bot]' && (github.event_name == 'push' || github.event_name == 'pull_request')
 
-    strategy:
-      matrix:
-        scheme: [ "DuckDuckGo Privacy Browser", "DuckDuckGo Privacy Pro" ]
-
     runs-on: macos-13-xlarge
     timeout-minutes: 30
 
     steps:
     - name: Check out the code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
 
@@ -311,18 +333,14 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
-    - name: Install xcbeautify
-      continue-on-error: true
-      run: brew install xcbeautify
-
     - name: Build the app
       run: |
         export OS_ACTIVITY_MODE=debug
         set -o pipefail && xcodebuild \
-          -scheme "${{ matrix.scheme }}" \
+          -scheme "DuckDuckGo Privacy Browser" \
           -derivedDataPath "DerivedData" \
           -configuration "Release" \
-          -skipPackagePluginValidation \
+          -skipPackagePluginValidation -skipMacroValidation \
           | tee release-xcodebuild.log \
           | xcbeautify
 
@@ -339,7 +357,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -355,7 +373,7 @@ jobs:
 
   create-asana-task:
     name: Create Asana Task
-    needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
+    needs: [swiftlint, bats, tests, release-build, verify-autoconsent-bundle, private-api]
 
     if: failure() && github.ref_name == 'main' && github.run_attempt == 1
 
@@ -372,7 +390,7 @@ jobs:
 
   close-asana-task:
     name: Close Asana Task
-    needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
+    needs: [swiftlint, bats, tests, release-build, verify-autoconsent-bundle, private-api]
 
     if: success() && github.ref_name == 'main' && github.run_attempt > 1
 

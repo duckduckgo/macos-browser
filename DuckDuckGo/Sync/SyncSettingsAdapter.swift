@@ -23,6 +23,7 @@ import Common
 import DDGSync
 import Persistence
 import SyncDataProviders
+import PixelKit
 
 extension SettingsProvider.Setting {
     static let favoritesDisplayMode = SettingsProvider.Setting(key: "favorites_display_mode")
@@ -53,6 +54,7 @@ final class SyncSettingsAdapter {
             metadataStore: metadataStore,
             settingsHandlers: [FavoritesDisplayModeSyncHandler(), EmailProtectionSyncHandler(emailManager: emailManager)],
             metricsEvents: metricsEventsHandler,
+            log: OSLog.sync,
             syncDidUpdateData: { [weak self] in
                 self?.syncDidCompleteSubject.send()
             }
@@ -62,18 +64,18 @@ final class SyncSettingsAdapter {
             .sink { error in
                 switch error {
                 case let syncError as SyncError:
-                    Pixel.fire(.debug(event: .syncSettingsFailed, error: syncError))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncSettingsFailed, error: syncError))
                 case let settingsMetadataError as SettingsSyncMetadataSaveError:
                     let underlyingError = settingsMetadataError.underlyingError
                     let processedErrors = CoreDataErrorsParser.parse(error: underlyingError as NSError)
                     let params = processedErrors.errorPixelParameters
-                    Pixel.fire(.debug(event: .syncSettingsMetadataUpdateFailed, error: underlyingError), withAdditionalParameters: params)
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncSettingsMetadataUpdateFailed, error: underlyingError), withAdditionalParameters: params)
                 default:
                     let nsError = error as NSError
                     if nsError.domain != NSURLErrorDomain {
                         let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
                         let params = processedErrors.errorPixelParameters
-                        Pixel.fire(.debug(event: .syncSettingsFailed, error: error), withAdditionalParameters: params)
+                        PixelKit.fire(DebugEvent(GeneralPixel.syncSettingsFailed, error: error), withAdditionalParameters: params)
                     }
                 }
                 os_log(.error, log: OSLog.sync, "Settings Sync error: %{public}s", String(reflecting: error))

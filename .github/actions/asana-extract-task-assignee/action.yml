@@ -1,0 +1,25 @@
+name: Extract Asana Task Assignee
+description: Returns the Asana task assignee, if task is assigned
+inputs:
+  access-token:
+    description: "Asana access token"
+    required: true
+    type: string
+  task-id:
+    description: "Asana task ID"
+    required: true
+    type: string
+outputs:
+  assignee-id:
+    description: "Assignee ID"
+    value: ${{ steps.extract-assignee-id.outputs.assignee-id }}
+runs:
+  using: "composite"
+  steps:
+    - id: extract-assignee-id
+      run: |
+        assignee_id=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${{ inputs.task-id }}?opt_fields=assignee" \
+          -H "Authorization: Bearer ${{ inputs.access-token }}" \
+          | jq -r '.data.assignee.gid')
+        echo "assignee-id=${assignee_id}" >> $GITHUB_OUTPUT
+      shell: bash

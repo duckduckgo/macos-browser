@@ -15,7 +15,7 @@ print_usage_and_exit() {
 
 	cat <<- EOF
 	Usage:
-	  $ $(basename "$0") <review|release|review-sandbox|release-sandbox|dbp|subscription> [-a <asana_task_url>] [-d] [-s] [-r] [-v <version>]
+	  $ $(basename "$0") <review|release|dbp> [-a <asana_task_url>] [-d] [-s] [-r] [-v <version>]
 
 	Options:
 	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
@@ -24,6 +24,8 @@ print_usage_and_exit() {
 	 -r                   Show raw output (don't use xcpretty or xcbeautify)
 	 -s                   Skip xcodebuild output in logs
 	 -v <version>         Override app version with <version> (does not update Xcode project)
+
+	This script is only meant for building notarized apps. For making App Store builds, use fastlane.
 
 	To clear keychain entries:
 	  $ $(basename "$0") clear-keychain
@@ -49,25 +51,10 @@ read_command_line_arguments() {
 			scheme="DuckDuckGo Privacy Browser"
 			configuration="Release"
 			;;
-		review-sandbox)
-			app_name="DuckDuckGo App Store Review"
-			scheme="Product Review Release App Store"
-			configuration="Review"
-			;;
-		release-sandbox)
-			app_name="DuckDuckGo"
-			scheme="DuckDuckGo Privacy Browser App Store"
-			configuration="Release"
-			;;
 		dbp)
 			app_name="DuckDuckGoDBP"
 			scheme="DuckDuckGo DBP"
 			configuration="Release"
-			;;
-		subscription)
-			app_name="DuckDuckGo Privacy Pro"
-			scheme="DuckDuckGo Privacy Pro"
-			configuration="Review"
 			;;
 		clear-keychain)
 			clear_keychain
@@ -244,7 +231,7 @@ archive_and_export() {
 		-configuration "${configuration}" \
 		-archivePath "${archive}" \
 		-derivedDataPath "${derived_data}" \
-		-skipPackagePluginValidation \
+		-skipPackagePluginValidation -skipMacroValidation \
 		MARKETING_VERSION="${app_version}" \
 		CURRENT_PROJECT_VERSION="${build_number}" \
 		RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo \
@@ -260,7 +247,7 @@ archive_and_export() {
 		-exportPath "${workdir}" \
 		-exportOptionsPlist "${export_options_plist}" \
 		-configuration "${configuration}" \
-		-skipPackagePluginValidation \
+		-skipPackagePluginValidation -skipMacroValidation \
 		2>&1 \
 		| ${log_formatter}
 }

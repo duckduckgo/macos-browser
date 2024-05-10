@@ -16,13 +16,15 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
+import BrowserServicesKit
 import Combine
 import Common
 import DDGSync
-import SwiftUI
-import BrowserServicesKit
+import Foundation
 import SecureStorage
+import SwiftUI
+import PixelKit
 
 protocol PasswordManagementDelegate: AnyObject {
 
@@ -45,6 +47,12 @@ final class PasswordManagementViewController: NSViewController {
 
     weak var delegate: PasswordManagementDelegate?
 
+    @IBOutlet weak var lockMenuItem: NSMenuItem!
+    @IBOutlet weak var importPasswordMenuItem: NSMenuItem!
+    @IBOutlet weak var settingsMenuItem: NSMenuItem!
+    @IBOutlet weak var deleteAllPasswordsMenuItem: NSMenuItem!
+    @IBOutlet weak var unlockYourAutofillLabel: FlatButton!
+    @IBOutlet weak var autofillTitleLabel: NSTextField!
     @IBOutlet weak var unlockYourAutofillInfo: NSButtonCell!
     @IBOutlet var listContainer: NSView!
     @IBOutlet var itemContainer: NSView!
@@ -62,9 +70,9 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var lockScreenIconImageView: NSImageView! {
         didSet {
             if DeviceAuthenticator.deviceSupportsBiometrics {
-                lockScreenIconImageView.image = NSImage(named: "LoginsLockTouchID")
+                lockScreenIconImageView.image = .loginsLockTouchID
             } else {
-                lockScreenIconImageView.image = NSImage(named: "LoginsLockPassword")
+                lockScreenIconImageView.image = .loginsLockPassword
             }
         }
     }
@@ -75,7 +83,7 @@ final class PasswordManagementViewController: NSViewController {
             lockScreenOpenInPreferencesTextView.delegate = self
 
             let linkAttributes: [NSAttributedString.Key: Any] = [
-                .foregroundColor: NSColor(named: "LinkBlueColor")!,
+                .foregroundColor: NSColor.linkBlue,
                 .cursor: NSCursor.pointingHand
             ]
 
@@ -94,7 +102,7 @@ final class PasswordManagementViewController: NSViewController {
                 .cursor: NSCursor.arrow,
                 .paragraphStyle: paragraphStyle,
                 .font: NSFont.systemFont(ofSize: 13, weight: .regular),
-                .foregroundColor: NSColor(named: "BlackWhite60")!
+                .foregroundColor: NSColor.blackWhite60
             ], range: NSRange(location: 0, length: string.length))
 
             lockScreenOpenInPreferencesTextView.textStorage?.setAttributedString(string)
@@ -145,7 +153,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     var secureVault: (any AutofillSecureVault)? {
-        try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
     }
 
     private let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
@@ -159,7 +167,7 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidLoad()
         createListView()
         createLoginItemView()
-
+        setupStrings()
         reloadDataAfterSyncCancellable = bindSyncDidFinish()
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
@@ -174,7 +182,6 @@ final class PasswordManagementViewController: NSViewController {
         exportLoginItem.title = UserText.exportLogins
         unlockYourAutofillInfo.setAccessibilityIdentifier("Unlock Autofill")
         addVaultItemButton.setAccessibilityIdentifier("add item")
-
         NotificationCenter.default.publisher(for: .deviceBecameLocked)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
@@ -188,6 +195,18 @@ final class PasswordManagementViewController: NSViewController {
                 self?.refreshData()
             }
             .store(in: &cancellables)
+    }
+
+    private func setupStrings() {
+        importPasswordMenuItem.title = UserText.importPasswords
+        exportLoginItem.title = UserText.exportLogins
+        deleteAllPasswordsMenuItem.title = UserText.deleteAllPasswords
+        settingsMenuItem.title = UserText.settingsSuspended
+        unlockYourAutofillLabel.title = UserText.passwordManagerUnlockAutofill
+        autofillTitleLabel.stringValue = UserText.autofill
+        emptyStateTitle.stringValue = UserText.pmEmptyStateDefaultTitle
+        emptyStateMessage.stringValue = UserText.pmEmptyStateDefaultDescription
+        emptyStateButton.title = UserText.importData
     }
 
     private func bindSyncDidFinish() -> AnyCancellable? {
@@ -250,13 +269,12 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func promptForAuthenticationIfNecessary() {
-        let authenticator = DeviceAuthenticator.shared
-#if DEBUG
-        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+        guard NSApp.runType != .uiTests else {
             toggleLockScreen(hidden: true)
             return
         }
-#endif
+
+        let authenticator = DeviceAuthenticator.shared
         toggleLockScreen(hidden: !authenticator.requiresAuthentication)
 
         authenticator.authenticateUser(reason: .unlockLogins) { authenticationResult in
@@ -296,6 +314,18 @@ final class PasswordManagementViewController: NSViewController {
         DataImportView().show()
     }
 
+    @IBAction func onDeleteAllPasswordsClicked(_ sender: Any) {
+        let builder = AutofillDeleteAllPasswordsBuilder()
+        guard let autofillDeleteAllPasswordsExecutor = builder.buildExecutor() else { return }
+        let presenter = builder.buildPresenter()
+
+        presenter.show(actionExecutor: autofillDeleteAllPasswordsExecutor) {
+            self.refreshData {
+                self.select(category: .logins)
+            }
+        }
+    }
+
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
         promptForAuthenticationIfNecessary()
     }
@@ -318,7 +348,7 @@ final class PasswordManagementViewController: NSViewController {
             self?.searchField.stringValue = text
             self?.updateFilter()
 
-            if clearWhenNoMatches && self?.listModel?.displayedItems.isEmpty == true {
+            if clearWhenNoMatches && self?.listModel?.displayedSections.isEmpty == true {
                 self?.searchField.stringValue = ""
                 self?.updateFilter()
             } else if self?.isDirty == false {
@@ -519,7 +549,7 @@ final class PasswordManagementViewController: NSViewController {
             if case SecureStorageError.duplicateRecord = error {
                 showDuplicateAlert()
             } else {
-                Pixel.fire(.debug(event: .secureVaultError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
             }
         }
     }
@@ -542,7 +572,7 @@ final class PasswordManagementViewController: NSViewController {
             postChange()
 
         } catch {
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
     }
 
@@ -586,7 +616,7 @@ final class PasswordManagementViewController: NSViewController {
             postChange()
 
         } catch {
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
     }
 
@@ -605,7 +635,7 @@ final class PasswordManagementViewController: NSViewController {
                     self.requestSync()
                     self.refreshData()
                 } catch {
-                    Pixel.fire(.debug(event: .secureVaultError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
 
             default:
@@ -628,7 +658,7 @@ final class PasswordManagementViewController: NSViewController {
                     try self.secureVault?.deleteIdentityFor(identityId: id)
                     self.refreshData()
                 } catch {
-                    Pixel.fire(.debug(event: .secureVaultError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
 
             default:
@@ -670,7 +700,7 @@ final class PasswordManagementViewController: NSViewController {
                     try self.secureVault?.deleteCreditCardFor(cardId: id)
                     self.refreshData()
                 } catch {
-                    Pixel.fire(.debug(event: .secureVaultError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
 
             default:
@@ -680,17 +710,20 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    private func refreshData() {
+    private func refreshData(completion: (() -> Void)? = nil) {
         self.itemModel?.clearSecureVaultModel()
-        self.refetchWithText(self.searchField.stringValue)
+        self.refetchWithText(self.searchField.stringValue) {
+            completion?()
+        }
         self.postChange()
     }
 
     var passwordManagerSelectionCancellable: AnyCancellable?
 
     // swiftlint:disable function_body_length
+    // swiftlint:disable:next cyclomatic_complexity
     private func createListView() {
-        let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator) { [weak self] previousValue, newValue in
+        let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator, onItemSelected: { [weak self] previousValue, newValue in
             guard let newValue = newValue,
                   let id = newValue.secureVaultID,
                   let window = self?.view.window else {
@@ -721,7 +754,7 @@ final class PasswordManagementViewController: NSViewController {
                         self?.syncModelsOnNote(note)
                     }
                 } catch {
-                    Pixel.fire(.debug(event: .secureVaultError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
             }
 
@@ -748,7 +781,18 @@ final class PasswordManagementViewController: NSViewController {
             } else {
                 loadNewItemWithID()
             }
-        }
+        }, onAddItemSelected: { [weak self] category in
+            switch category {
+            case .logins:
+                self?.createNewLogin()
+            case .identities:
+                self?.createNewIdentity()
+            case .cards:
+                self?.createNewCreditCard()
+            default:
+                break
+            }
+        })
 
         self.listModel = listModel
         self.listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
@@ -775,22 +819,11 @@ final class PasswordManagementViewController: NSViewController {
     // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
-        let menu = NSMenu()
-
-        func createMenuItem(title: String, action: Selector, imageName: String) -> NSMenuItem {
-            let item = NSMenuItem(title: title, action: action, target: self, keyEquivalent: "")
-            item.image = NSImage(named: imageName)
-
-            return item
+        return NSMenu {
+            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), target: self).withImage(.loginGlyph)
+            NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), target: self).withImage(.identityGlyph)
+            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), target: self).withImage(.creditCardGlyph)
         }
-
-        menu.items = [
-            createMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), imageName: "LoginGlyph"),
-            createMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), imageName: "IdentityGlyph"),
-            createMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), imageName: "CreditCardGlyph"),
-        ]
-
-        return menu
     }
 
     private func updateFilter() {
@@ -825,7 +858,7 @@ final class PasswordManagementViewController: NSViewController {
                     items = cards.map(SecureVaultItem.card)
                 }
             } catch {
-                Pixel.fire(.debug(event: .secureVaultError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
             }
 
             DispatchQueue.main.async {
@@ -953,10 +986,10 @@ final class PasswordManagementViewController: NSViewController {
 
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
-        case .allItems: showDefaultEmptyState()
-        case .logins: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle)
-        case .identities: showEmptyState(imageName: "IdentitiesEmpty", title: UserText.pmEmptyStateIdentitiesTitle)
-        case .cards: showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
+        case .allItems: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
+        case .logins: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
+        case .identities: showEmptyState(image: .identitiesEmpty, title: UserText.pmEmptyStateIdentitiesTitle)
+        case .cards: showEmptyState(image: .creditCardsEmpty, title: UserText.pmEmptyStateCardsTitle)
         }
     }
 
@@ -964,24 +997,15 @@ final class PasswordManagementViewController: NSViewController {
         emptyState.isHidden = true
     }
 
-    private func showDefaultEmptyState() {
+    private func showEmptyState(image: NSImage, title: String, message: String? = nil, hideMessage: Bool = true, hideButton: Bool = true) {
         emptyState.isHidden = false
-        emptyStateMessage.isHidden = false
-        emptyStateButton.isHidden = false
-
-        emptyStateImageView.image = NSImage(named: "LoginsEmpty")
-
-        emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultTitle, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultDescription, lineHeight: 1.05, kern: -0.08)
-    }
-
-    private func showEmptyState(imageName: String, title: String) {
-        emptyState.isHidden = false
-
-        emptyStateImageView.image = NSImage(named: imageName)
+        emptyStateImageView.image = image
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.isHidden = true
-        emptyStateButton.isHidden = true
+        if let message {
+            emptyStateMessage.attributedStringValue = NSAttributedString.make(message, lineHeight: 1.05, kern: -0.08)
+        }
+        emptyStateMessage.isHidden = hideMessage
+        emptyStateButton.isHidden = hideButton
     }
 
     private func requestSync() {
@@ -1035,4 +1059,23 @@ extension PasswordManagementViewController: NSTextViewDelegate {
         return NSRange(location: 0, length: 0)
     }
 
+}
+
+extension PasswordManagementViewController: NSMenuItemValidation {
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        switch menuItem.action {
+        case #selector(PasswordManagementViewController.onDeleteAllPasswordsClicked(_:)):
+            return haveDuckDuckGoPasswords
+        default:
+            guard let appDelegate = NSApplication.shared.delegate as? AppDelegate else { return false }
+            return appDelegate.validateMenuItem(menuItem)
+        }
+    }
+
+    private var haveDuckDuckGoPasswords: Bool {
+        guard let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared) else { return false }
+        let accounts = (try? vault.accounts()) ?? []
+        return !accounts.isEmpty
+    }
 }

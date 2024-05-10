@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import History
 
 final class TabCollection: NSObject {
 
@@ -75,6 +76,11 @@ final class TabCollection: NSObject {
     func removeAll(andAppend tab: Tab? = nil) {
         tabsWillClose(range: 0..<tabs.count)
         tabs = tab.map { [$0] } ?? []
+    }
+
+    func removeTabs(before index: Int) {
+        tabsWillClose(range: 0..<index)
+        tabs.removeSubrange(0..<index)
     }
 
     func removeTabs(after index: Int) {

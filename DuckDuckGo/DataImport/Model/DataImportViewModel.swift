@@ -18,8 +18,8 @@
 
 import AppKit
 import Common
-import Foundation
 import UniformTypeIdentifiers
+import PixelKit
 
 struct DataImportViewModel {
 
@@ -106,6 +106,11 @@ struct DataImportViewModel {
         init(_ dataType: DataImport.DataType, _ result: DataImportResult<DataTypeSummary>) {
             self.dataType = dataType
             self.result = result
+        }
+
+        static func == (lhs: DataTypeImportResult, rhs: DataTypeImportResult) -> Bool {
+            lhs.dataType == rhs.dataType &&
+            lhs.result.description == rhs.result.description
         }
     }
 
@@ -248,7 +253,7 @@ struct DataImportViewModel {
                     // switch to file import of the failed data type displaying successful import results
                     nextScreen = .fileImport(dataType: dataType, summary: Set(summary.filter({ $0.value.isSuccess }).keys))
                 }
-                Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: error))
+                PixelKit.fire(GeneralPixel.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: error))
             }
         }
 
@@ -286,7 +291,7 @@ struct DataImportViewModel {
             switch error {
             // chromium user denied keychain prompt error
             case let error as ChromiumLoginReader.ImportError where error.type == .userDeniedKeychainPrompt:
-                Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: error))
+                PixelKit.fire(GeneralPixel.passwordImportKeychainPromptDenied)
                 // stay on the same screen
                 return true
 
@@ -308,7 +313,10 @@ struct DataImportViewModel {
                     break
                 }
                 log("file read no permission for \(url.path)")
-                Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: importError))
+
+                if url != selectedProfile?.profileURL.appendingPathComponent(SafariDataImporter.bookmarksFileName) {
+                    PixelKit.fire(GeneralPixel.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: importError))
+                }
                 screen = .getReadPermission(url)
                 return true
 
@@ -319,16 +327,19 @@ struct DataImportViewModel {
     }
 
     /// Skip button press
-    @MainActor mutating func skipImport() {
+    @MainActor mutating func skipImportOrDismiss(using dismiss: @escaping () -> Void) {
         if let screen = screenForNextDataTypeRemainingToImport(after: screen.fileImportDataType) {
             // skip to next non-imported data type
             self.screen = screen
-        } else if selectedDataTypes.first(where: { error(for: $0) != nil }) != nil {
+        } else if selectedDataTypes.first(where: {
+            let error = error(for: $0)
+            return error != nil && error?.errorType != .noData
+        }) != nil {
             // errors occurred during import: show feedback screen
             self.screen = .feedback
         } else {
-            // display total summary
-            self.screen = .summary(selectedDataTypes)
+            // When we skip a manual import, and there are no next non-imported data types, we dismiss
+            self.dismiss(using: dismiss)
         }
     }
 
@@ -668,7 +679,7 @@ extension DataImportViewModel {
             initiateImport()
 
         case .skip:
-            skipImport()
+            skipImportOrDismiss(using: dismiss)
 
         case .cancel:
             importTask?.cancel()

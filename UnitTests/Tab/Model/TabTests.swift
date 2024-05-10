@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Navigation
 import XCTest
 
@@ -42,6 +43,7 @@ final class TabTests: XCTestCase {
 
     var webViewConfiguration: WKWebViewConfiguration!
     var schemeHandler: TestSchemeHandler!
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         contentBlockingMock = ContentBlockingMock()
@@ -57,6 +59,7 @@ final class TabTests: XCTestCase {
         webViewConfiguration = WKWebViewConfiguration()
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.http.rawValue)
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.https.rawValue)
+        cancellables = []
     }
 
     override func tearDown() {
@@ -66,6 +69,7 @@ final class TabTests: XCTestCase {
         webViewConfiguration = nil
         schemeHandler = nil
         WKWebView.customHandlerSchemes = []
+        cancellables = nil
     }
 
     // MARK: - Tab Content
@@ -110,13 +114,26 @@ final class TabTests: XCTestCase {
     }
 
     func testWhenDownloadDialogIsShowingChangingURLDoesNOTClearDialog() {
-        let tab = Tab()
+        // GIVEN
+        let tab = Tab(content: .none, extensionsBuilder: TestTabExtensionsBuilder(load: [DownloadsTabExtension.self]))
         tab.url = .duckDuckGo
-        DownloadsPreferences().alwaysRequestDownloadLocation = true
+        DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor()).alwaysRequestDownloadLocation = true
         tab.webView(WebViewMock(), saveDataToFile: Data(), suggestedFilename: "anything", mimeType: "application/pdf", originatingURL: .duckDuckGo)
-        XCTAssertNotNil(tab.userInteractionDialog)
+        var expectedDialog: Tab.UserDialog?
+        let expectation = expectation(description: "savePanelDialog published")
+        tab.downloads?.savePanelDialogPublisher.sink(receiveValue: { userDialog in
+            if let userDialog {
+                expectation.fulfill()
+                expectedDialog = userDialog
+            }
+        }).store(in: &cancellables)
+
+        waitForExpectations(timeout: 1)
+        // WHEN
         tab.url = .duckDuckGoMorePrivacyInfo
-        XCTAssertNotNil(tab.userInteractionDialog)
+
+        // THEN
+        XCTAssertNotNil(expectedDialog)
     }
 
     // MARK: - Back/Forward navigation
@@ -256,8 +273,8 @@ final class TabTests: XCTestCase {
         XCTAssertTrue(tab.canGoBack)
         XCTAssertFalse(tab.canGoForward)
         XCTAssertEqual(tab.webView.url, urls.url3)
-        XCTAssertEqual(tab.webView.backForwardList.backList.map(\.url), [urls.url])
-        XCTAssertEqual(tab.webView.backForwardList.forwardList, [])
+        XCTAssertEqual(tab.backHistoryItems.map(\.url), [urls.url])
+        XCTAssertEqual(tab.forwardHistoryItems, [])
 
         withExtendedLifetime((c1, c2)) {}
     }
@@ -331,8 +348,8 @@ final class TabTests: XCTestCase {
         XCTAssertTrue(tab.canGoBack)
         XCTAssertFalse(tab.canGoForward)
         XCTAssertEqual(tab.webView.url, urls.url3)
-        XCTAssertEqual(tab.webView.backForwardList.backList.map(\.url), [urls.url, urls.url3])
-        XCTAssertEqual(tab.webView.backForwardList.forwardList, [])
+        XCTAssertEqual(tab.backHistoryItems.map(\.url), [urls.url, urls.url3])
+        XCTAssertEqual(tab.forwardHistoryItems, [])
 
         withExtendedLifetime((c1, c2)) {}
     }
@@ -351,7 +368,7 @@ final class TabTests: XCTestCase {
 extension Tab {
     var url: URL? {
         get {
-            content.url
+            content.userEditableUrl
         }
         set {
             setContent(newValue.map { TabContent.url($0, source: .link) } ?? .newtab)

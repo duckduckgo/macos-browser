@@ -13,16 +13,15 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "101.1.4"),
     ],
     targets: [
         .target(
             name: "LoginItems",
-            dependencies: [],
+            dependencies: [
+            ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
-            ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            ]
         ),
     ]
 )

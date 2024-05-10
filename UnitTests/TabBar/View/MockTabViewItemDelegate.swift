@@ -21,14 +21,17 @@ import Foundation
 
 class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
+    var mockedCurrentTab: Tab?
+
+    var canBookmarkAllOpenTabs = false
+    var hasItemsToTheLeft = false
     var hasItemsToTheRight = false
+    var audioState: WKWebView.AudioState?
+
+    private(set) var tabBarViewItemBookmarkAllOpenTabsActionCalled = false
 
     func tabBarViewItem(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem, isMouseOver: Bool) {
 
-    }
-
-    func tabBarViewItemCanBePinned(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> Bool {
-        return true
     }
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
@@ -43,20 +46,44 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     }
 
+    func tabBarViewItemCloseToTheLeftAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
+
+    }
+
     func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
 
+    }
+
+    func tabBarViewItemCanBeDuplicated(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> Bool {
+        mockedCurrentTab?.content.canBeDuplicated ?? true
     }
 
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
 
     }
 
+    func tabBarViewItemCanBePinned(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> Bool {
+        mockedCurrentTab?.content.canBePinned ?? true
+    }
+
     func tabBarViewItemPinAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
 
     }
 
+    func tabBarViewItemCanBeBookmarked(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> Bool {
+        mockedCurrentTab?.content.canBeBookmarked ?? true
+    }
+
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
 
+    }
+
+    func tabBarViewAllItemsCanBeBookmarked(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> Bool {
+        canBookmarkAllOpenTabs
+    }
+
+    func tabBarViewItemBookmarkAllOpenTabsAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
+        tabBarViewItemBookmarkAllOpenTabsActionCalled = true
     }
 
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
@@ -75,8 +102,20 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     }
 
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState? {
+        return audioState
+    }
+
+    func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem) {
+
+    }
+
     func otherTabBarViewItemsState(for tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> DuckDuckGo_Privacy_Browser.OtherTabBarViewItemsState {
-        OtherTabBarViewItemsState(hasItemsToTheLeft: false, hasItemsToTheRight: hasItemsToTheRight)
+        OtherTabBarViewItemsState(hasItemsToTheLeft: hasItemsToTheLeft, hasItemsToTheRight: hasItemsToTheRight)
+    }
+
+    func clear() {
+        self.audioState = nil
     }
 
 }

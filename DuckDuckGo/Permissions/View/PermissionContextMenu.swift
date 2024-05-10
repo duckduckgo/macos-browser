@@ -57,6 +57,7 @@ final class PermissionContextMenu: NSMenu {
         setupOtherPermissionMenuItems(for: remainingPermission)
         setupPopupsPermissionsMenuItems()
         addPersistenceItems()
+        self.setAccessibilityIdentifier("PermissionContextMenu")
     }
 
     private func setupCameraPermissionsMenuItems(_ permissions: Permissions) -> Permissions {
@@ -279,6 +280,8 @@ private extension NSMenuItem {
         if isChecked {
             item.state = .on
         }
+        item.setAccessibilityIdentifier("PermissionContextMenu.alwaysAllow")
+        item.setAccessibilityValue(item.state == .on ? "selected" : "unselected")
         return item
     }
 
@@ -299,6 +302,8 @@ private extension NSMenuItem {
         if isChecked {
             item.state = .on
         }
+        item.setAccessibilityIdentifier("PermissionContextMenu.alwaysAsk")
+        item.setAccessibilityValue(item.state == .on ? "selected" : "unselected")
         return item
     }
 
@@ -312,6 +317,8 @@ private extension NSMenuItem {
         if isChecked {
             item.state = .on
         }
+        item.setAccessibilityIdentifier("PermissionContextMenu.alwaysDeny")
+        item.setAccessibilityValue(item.state == .on ? "selected" : "unselected")
         return item
     }
 
@@ -325,7 +332,10 @@ private extension NSMenuItem {
                            permission.localizedDescription,
                            Bundle.main.displayName ?? "DuckDuckGo")
         }
-        return NSMenuItem(title: title, action: nil, keyEquivalent: "")
+        let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+        item.setAccessibilityIdentifier("PermissionContextMenu.permissionDisabled")
+        item.setAccessibilityValue(item.state == .on ? "selected" : "unselected")
+        return item
     }
 
     static func openSystemPreferences(for permission: PermissionType, target: PermissionContextMenu) -> NSMenuItem {

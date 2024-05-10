@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import WebKit
-import Combine
 import BrowserServicesKit
+import Combine
+import Common
+import WebKit
 
 extension WKWebViewConfiguration {
 
@@ -50,6 +51,44 @@ extension WKWebViewConfiguration {
 
         self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
+
+        _=NSPopover.swizzleShowRelativeToRectOnce
      }
+
+}
+
+extension NSPopover {
+
+    fileprivate static let swizzleShowRelativeToRectOnce: () = {
+        guard let originalMethod = class_getInstanceMethod(NSPopover.self, #selector(show(relativeTo:of:preferredEdge:))),
+              let swizzledMethod = class_getInstanceMethod(NSPopover.self, #selector(swizzled_show(relativeTo:of:preferredEdge:))) else {
+            assertionFailure("Methods not available")
+            return
+        }
+
+        method_exchangeImplementations(originalMethod, swizzledMethod)
+    }()
+
+    // ignore popovers shown from a view not in view hierarchy
+    // https://app.asana.com/0/1201037661562251/1206407295280737/f
+    @objc(swizzled_showRelativeToRect:ofView:preferredEdge:)
+    private dynamic func swizzled_show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
+        if positioningView.superview == nil {
+            var observer: Cancellable?
+            observer = positioningView.observe(\.window) { positioningView, _ in
+                if positioningView.window != nil {
+                    self.swizzled_show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+                    observer?.cancel()
+                }
+            }
+            positioningView.onDeinit {
+                observer?.cancel()
+            }
+
+            os_log(.error, "trying to present \(self) from \(positioningView) not in view hierarchy")
+            return
+        }
+        self.swizzled_show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+    }
 
 }

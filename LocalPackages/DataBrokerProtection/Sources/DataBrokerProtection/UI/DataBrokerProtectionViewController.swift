@@ -18,7 +18,9 @@
 
 import Cocoa
 import SwiftUI
+import Common
 import BrowserServicesKit
+import PixelKit
 import WebKit
 import Combine
 
@@ -26,8 +28,11 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let dataManager: DataBrokerProtectionDataManaging
     private let scheduler: DataBrokerProtectionScheduler
     private var webView: WKWebView?
+    private var loader: NSProgressIndicator!
     private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
     private let webUIViewModel: DBPUIViewModel
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private let webUIPixel: DataBrokerProtectionWebUIPixels
 
     private let openURLHandler: (URL?) -> Void
     private var reloadObserver: NSObjectProtocol?
@@ -42,6 +47,8 @@ final public class DataBrokerProtectionViewController: NSViewController {
         self.dataManager = dataManager
         self.openURLHandler = openURLHandler
         self.webUISettings = webUISettings
+        self.pixelHandler = DataBrokerProtectionPixelsHandler()
+        self.webUIPixel = DataBrokerProtectionWebUIPixels(pixelHandler: pixelHandler)
         self.webUIViewModel = DBPUIViewModel(dataManager: dataManager,
                                              scheduler: scheduler,
                                              webUISettings: webUISettings,
@@ -49,8 +56,10 @@ final public class DataBrokerProtectionViewController: NSViewController {
                                              prefs: prefs,
                                              webView: webView)
 
+        // Prepare the profile cache to avoid stuttering later
+        // It's in a task to avoid stuttering now
         Task {
-            _ = dataManager.fetchProfile(ignoresCache: true)
+            try? dataManager.prepareProfileCache()
         }
 
         super.init(nibName: nil, bundle: nil)
@@ -64,8 +73,8 @@ final public class DataBrokerProtectionViewController: NSViewController {
         super.viewDidLoad()
 
         reloadObserver = NotificationCenter.default.addObserver(forName: DataBrokerProtectionNotifications.shouldReloadUI,
-                                               object: nil,
-                                               queue: .main) { [weak self] _ in
+                                                                object: nil,
+                                                                queue: .main) { [weak self] _ in
             self?.webView?.reload()
         }
     }
@@ -75,14 +84,39 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
         webView?.uiDelegate = self
+        webView?.navigationDelegate = self
         view = webView!
 
+        addLoadingIndicator()
+
         if let url = URL(string: webUISettings.selectedURL) {
+            webUIPixel.firePixel(for: webUISettings.selectedURLType, type: .loading)
             webView?.load(url)
         } else {
+            removeLoadingIndicator()
             assertionFailure("Selected URL is not valid \(webUISettings.selectedURL)")
         }
+    }
 
+    private func addLoadingIndicator() {
+        loader = NSProgressIndicator()
+        loader.wantsLayer = true
+        loader.style = .spinning
+        loader.controlSize = .regular
+        loader.sizeToFit()
+        loader.translatesAutoresizingMaskIntoConstraints = false
+        loader.controlSize = .large
+        view.addSubview(loader)
+
+        NSLayoutConstraint.activate([
+            loader.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loader.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+        ])
+    }
+
+    private func removeLoadingIndicator() {
+        loader.stopAnimation(nil)
+        loader.removeFromSuperview()
     }
 
     deinit {
@@ -96,5 +130,45 @@ extension DataBrokerProtectionViewController: WKUIDelegate {
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         openURLHandler(navigationAction.request.url)
         return nil
+    }
+}
+
+extension DataBrokerProtectionViewController: WKNavigationDelegate {
+
+    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: any Error) {
+        fireWebViewError(error)
+    }
+
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: any Error) {
+        fireWebViewError(error)
+    }
+
+    private func fireWebViewError(_ error: Error) {
+        webUIPixel.firePixel(for: error)
+        removeLoadingIndicator()
+    }
+
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+        guard let statusCode = (navigationResponse.response as? HTTPURLResponse)?.statusCode else {
+            // if there's no http status code to act on, exit and allow navigation
+            return .allow
+        }
+
+        if statusCode >= 400 {
+            webUIPixel.firePixel(for: NSError(domain: NSURLErrorDomain, code: statusCode))
+            return .cancel
+        }
+
+        return .allow
+    }
+
+    public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        loader.startAnimation(nil)
+    }
+
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        removeLoadingIndicator()
+
+        webUIPixel.firePixel(for: webUISettings.selectedURLType, type: .success)
     }
 }

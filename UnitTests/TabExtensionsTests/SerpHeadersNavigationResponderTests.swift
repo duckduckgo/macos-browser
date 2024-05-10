@@ -22,6 +22,7 @@ import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 
+@available(macOS 12.0, *)
 class SerpHeadersNavigationResponderTests: XCTestCase {
 
     let ddgUrls = [
@@ -49,6 +50,9 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
         contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
     }
 
+    var webViewConfiguration: WKWebViewConfiguration!
+    var schemeHandler: TestSchemeHandler!
+
     override func setUp() {
         contentBlockingMock = ContentBlockingMock()
         privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
@@ -56,39 +60,46 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
+
+        schemeHandler = TestSchemeHandler()
+        WKWebView.customHandlerSchemes = [.http, .https]
+        webViewConfiguration = WKWebViewConfiguration()
+        webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.http.rawValue)
+        webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.https.rawValue)
     }
 
     override func tearDown() {
         contentBlockingMock = nil
         privacyFeaturesMock = nil
+        schemeHandler = nil
+        WKWebView.customHandlerSchemes = []
     }
 
     // MARK: - Tests
 
     @MainActor
     func testOnDDGRequest_headersAdded() {
-        var onNavAction: (@MainActor (NavigationAction) -> NavigationActionPolicy?)!
-        let extensionsBuilder = TestTabExtensionsBuilder(load: []) { builder in { _, _ in
-            builder.add {
-                TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
-                    onNavAction(navigationAction)
-                })
-            }
-        }}
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
-
         for url in ddgUrls {
-            let eNavAction = expectation(description: "onNavAction for \(url.absoluteString)")
-            onNavAction = { navigationAction in
-                XCTAssertEqual(navigationAction.url, url)
+            let eRequestReceived = expectation(description: "Request received for \(url.absoluteString)")
+            let eDidFinish = expectation(description: "Navigation did finish for \(url.absoluteString)")
+            let extensionsBuilder = TestTabExtensionsBuilder(load: []) { builder in { _, _ in
+                builder.add {
+                    TestsClosureNavigationResponderTabExtension(.init(navigationDidFinish: { _ in
+                        eDidFinish.fulfill()
+                    }))
+                }
+            }}
+            let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+
+            schemeHandler.middleware = [{ request in
+                XCTAssertEqual(request.url, url)
                 for (key, value) in SerpHeadersNavigationResponder.headers {
-                    XCTAssertEqual(navigationAction.request.value(forHTTPHeaderField: key), value, "for " + url.absoluteString)
+                    XCTAssertEqual(request.value(forHTTPHeaderField: key), value, "for " + url.absoluteString)
                 }
 
-                eNavAction.fulfill()
-
-                return .cancel
-            }
+                eRequestReceived.fulfill()
+                return .ok(.html(""))
+            }]
 
             tab.setContent(.url(url, source: .link))
             waitForExpectations(timeout: 5)
@@ -98,29 +109,27 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
 
     @MainActor
     func testOnRegularRequest_headersNotAdded() {
-        var onNavAction: (@MainActor (NavigationAction) -> NavigationActionPolicy?)!
-        let extensionsBuilder = TestTabExtensionsBuilder(load: []) { builder in { _, _ in
-            builder.add {
-                TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
-                    onNavAction(navigationAction)
-                })
-            }
-        }}
-
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
-
         for url in nonDdgUrls {
-            let eNavAction = expectation(description: "onNavAction for \(url.absoluteString)")
-            onNavAction = { navigationAction in
-                XCTAssertEqual(navigationAction.url, url)
+            let eRequestReceived = expectation(description: "Request received for \(url.absoluteString)")
+            let eDidFinish = expectation(description: "Navigation did finish for \(url.absoluteString)")
+            let extensionsBuilder = TestTabExtensionsBuilder(load: []) { builder in { _, _ in
+                builder.add {
+                    TestsClosureNavigationResponderTabExtension(.init(navigationDidFinish: { _ in
+                        eDidFinish.fulfill()
+                    }))
+                }
+            }}
+            let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+
+            schemeHandler.middleware = [{ request in
+                XCTAssertEqual(request.url, url)
                 for (key, _) in SerpHeadersNavigationResponder.headers {
-                    XCTAssertNil(navigationAction.request.value(forHTTPHeaderField: key), "for " + url.absoluteString)
+                    XCTAssertNil(request.value(forHTTPHeaderField: key), "for " + url.absoluteString)
                 }
 
-                eNavAction.fulfill()
-
-                return .cancel
-            }
+                eRequestReceived.fulfill()
+                return .ok(.html(""))
+            }]
 
             tab.setContent(.url(url, source: .link))
             waitForExpectations(timeout: 5)

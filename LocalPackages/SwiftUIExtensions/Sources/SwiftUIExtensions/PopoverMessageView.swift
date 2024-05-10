@@ -16,17 +16,18 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 import SwiftUI
 
 public final class PopoverMessageViewModel: ObservableObject {
     @Published var message: String
-    @Published var image: String?
+    @Published var image: NSImage?
     @Published var buttonText: String?
     @Published var buttonAction: (() -> Void)?
 
     public init(message: String,
-                image: String? = nil,
+                image: NSImage? = nil,
                 buttonText: String? = nil,
                 buttonAction: (() -> Void)? = nil) {
         self.message = message
@@ -46,7 +47,7 @@ public struct PopoverMessageView: View {
     public var body: some View {
         HStack {
             if let image = viewModel.image {
-                Image(image)
+                Image(nsImage: image)
             }
 
             Text(viewModel.message)

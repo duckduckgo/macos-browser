@@ -66,7 +66,7 @@ class LocalStatisticsStoreTests: XCTestCase {
     // Legacy Statistics:
 
     func testWhenInitializingTheLocalStatisticsStore_ThenLegacyStatisticsAreCleared() {
-        var legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
+        let legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
         legacyStore.atb = "atb"
 
         XCTAssertNotNil(legacyStore.atb)

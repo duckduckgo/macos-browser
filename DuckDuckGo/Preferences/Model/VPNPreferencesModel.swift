@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Combine
 import Foundation
@@ -27,7 +25,6 @@ import BrowserServicesKit
 
 final class VPNPreferencesModel: ObservableObject {
 
-    let shouldShowLocationItem: Bool
     @Published var locationItem: VPNLocationPreferenceItemModel
 
     @Published var alwaysON = true
@@ -62,7 +59,7 @@ final class VPNPreferencesModel: ObservableObject {
 
     private var onboardingStatus: OnboardingStatus {
         didSet {
-            showUninstallVPN = onboardingStatus != .default
+            showUninstallVPN = DefaultNetworkProtectionVisibility().isInstalled
         }
     }
 
@@ -70,8 +67,7 @@ final class VPNPreferencesModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     init(settings: VPNSettings = .init(defaults: .netP),
-         defaults: UserDefaults = .netP,
-         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
+         defaults: UserDefaults = .netP) {
         self.settings = settings
 
         connectOnLogin = settings.connectOnLogin
@@ -81,7 +77,6 @@ final class VPNPreferencesModel: ObservableObject {
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
-        shouldShowLocationItem = featureFlagger.isFeatureOn(.vpnGeoswitching)
 
         subscribeToOnboardingStatusChanges(defaults: defaults)
         subscribeToShowInMenuBarSettingChanges()
@@ -114,7 +109,7 @@ final class VPNPreferencesModel: ObservableObject {
 
         switch response {
         case .OK:
-            await NetworkProtectionFeatureDisabler().disable(keepAuthToken: true, uninstallSystemExtension: true)
+            await NetworkProtectionFeatureDisabler().disable(uninstallSystemExtension: true)
         default:
             // intentional no-op
             break
@@ -137,5 +132,3 @@ final class VPNPreferencesModel: ObservableObject {
         return alert
     }
 }
-
-#endif

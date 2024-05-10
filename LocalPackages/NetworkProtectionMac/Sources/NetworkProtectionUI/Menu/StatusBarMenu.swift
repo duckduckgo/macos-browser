@@ -21,8 +21,9 @@ import Foundation
 import Combine
 import SwiftUI
 import NetworkProtection
+import LoginItems
 
-/// Abstraction of the the Network Protection status bar menu with a simple interface.
+/// Abstraction of the the VPN status bar menu with a simple interface.
 ///
 @objc
 public final class StatusBarMenu: NSObject {
@@ -31,7 +32,18 @@ public final class StatusBarMenu: NSObject {
     private let model: StatusBarMenuModel
 
     private let statusItem: NSStatusItem
-    private let popover: NetworkProtectionPopover
+    private var popover: NetworkProtectionPopover?
+
+    private let controller: TunnelController
+    private let statusReporter: NetworkProtectionStatusReporter
+    private let onboardingStatusPublisher: OnboardingStatusPublisher
+    private let appLauncher: AppLaunching
+    private let menuItems: () -> [MenuItem]
+    private let agentLoginItem: LoginItem?
+    private let isMenuBarStatusView: Bool
+    private let userDefaults: UserDefaults
+    private let locationFormatter: VPNLocationFormatting
+    private let uninstallHandler: () async -> Void
 
     // MARK: - NetP Icon publisher
 
@@ -52,18 +64,29 @@ public final class StatusBarMenu: NSObject {
                 statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,
                 iconProvider: IconProvider,
-                menuItems: @escaping () -> [MenuItem]) {
+                appLauncher: AppLaunching,
+                menuItems: @escaping () -> [MenuItem],
+                agentLoginItem: LoginItem?,
+                isMenuBarStatusView: Bool,
+                userDefaults: UserDefaults,
+                locationFormatter: VPNLocationFormatting,
+                uninstallHandler: @escaping () async -> Void) {
 
         self.model = model
         let statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.statusItem = statusItem
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, iconProvider: iconProvider)
 
-        popover = NetworkProtectionPopover(controller: controller,
-                                           onboardingStatusPublisher: onboardingStatusPublisher,
-                                           statusReporter: statusReporter,
-                                           menuItems: menuItems)
-        popover.behavior = .transient
+        self.controller = controller
+        self.statusReporter = statusReporter
+        self.onboardingStatusPublisher = onboardingStatusPublisher
+        self.appLauncher = appLauncher
+        self.menuItems = menuItems
+        self.agentLoginItem = agentLoginItem
+        self.isMenuBarStatusView = isMenuBarStatusView
+        self.userDefaults = userDefaults
+        self.locationFormatter = locationFormatter
+        self.uninstallHandler = uninstallHandler
 
         super.init()
 
@@ -100,22 +123,35 @@ public final class StatusBarMenu: NSObject {
     // MARK: - Popover
 
     private func togglePopover(isOptionKeyPressed: Bool) {
-        if popover.isShown {
+        if let popover, popover.isShown {
             popover.close()
+            self.popover = nil
         } else {
             guard let button = statusItem.button else {
                 return
             }
 
-            popover.setShowsDebugInformation(isOptionKeyPressed)
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
+            popover = NetworkProtectionPopover(controller: controller,
+                                               onboardingStatusPublisher: onboardingStatusPublisher,
+                                               statusReporter: statusReporter,
+                                               appLauncher: appLauncher,
+                                               menuItems: menuItems,
+                                               agentLoginItem: agentLoginItem,
+                                               isMenuBarStatusView: isMenuBarStatusView,
+                                               userDefaults: userDefaults,
+                                               locationFormatter: locationFormatter,
+                                               uninstallHandler: uninstallHandler)
+            popover?.behavior = .transient
+
+            popover?.setShowsDebugInformation(isOptionKeyPressed)
+            popover?.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         }
     }
 
     // MARK: - Context
 
     private func showContextMenu() {
-        if popover.isShown {
+        if let popover, popover.isShown {
             popover.close()
         }
 

@@ -26,7 +26,7 @@ struct TurnOffSyncView: View {
     var body: some View {
         SyncDialog {
             VStack(spacing: 20.0) {
-                Image("SyncRemoveDeviceDesktop")
+                Image(.syncRemoveDeviceDesktop)
                 SyncUIViews.TextHeader(text: UserText.turnOffSyncConfirmTitle)
                 SyncUIViews.TextDetailMultiline(text: UserText.turnOffSyncConfirmMessage)
             }

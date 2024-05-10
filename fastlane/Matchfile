@@ -4,7 +4,19 @@ git_branch "macos"
 platform "macos"
 
 type "appstore"
-app_identifier "com.duckduckgo.mobile.ios"
+app_identifier [
+    "com.duckduckgo.mobile.ios",
+    "com.duckduckgo.mobile.ios.vpn.agent",
+    "com.duckduckgo.mobile.ios.vpn.agent.network-protection-extension",
+    "com.duckduckgo.mobile.ios.review",
+    "com.duckduckgo.mobile.ios.vpn.agent.review",
+    "com.duckduckgo.mobile.ios.vpn.agent.review.network-protection-extension",
+    "com.duckduckgo.mobile.ios.vpn.agent.proxy",
+    "com.duckduckgo.mobile.ios.vpn.agent.review.proxy",
+    "com.duckduckgo.mobile.ios.DBP.backgroundAgent.review",
+    "com.duckduckgo.mobile.ios.DBP.backgroundAgent"
+
+]
 additional_cert_types ["mac_installer_distribution"]
 generate_apple_certs false
 

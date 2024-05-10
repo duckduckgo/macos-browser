@@ -20,31 +20,42 @@ import Foundation
 
 extension UserText {
 
-    static let networkProtectionTunnelName = NSLocalizedString("network.protection.tunnel.name", value: "DuckDuckGo Network Protection", comment: "The name of the NetP VPN that will be visible in the system to the user")
-    static let networkProtection = NSLocalizedString("network.protection", value: "Network Protection", comment: "Menu item for opening Network Protection")
+    // "network.protection.tunnel.name" - The name of the NetP VPN that will be visible in the system to the user
+    static let networkProtectionTunnelName = "DuckDuckGo VPN"
+    // "network.protection" - Menu item for opening the VPN
+    static let networkProtection = "VPN"
 
     // MARK: - Navigation Bar
-
-    static let networkProtectionButtonTooltip = NSLocalizedString("network.protection.status.button.tooltip", value: "Network Protection", comment: "The tooltip for NetP's nav bar button")
+    // "network.protection.status.button.tooltip" - The tooltip for NetP's nav bar button
+    static let networkProtectionButtonTooltip = "VPN"
 
     // MARK: - Invite Code
-
-    static let networkProtectionInviteDialogTitle = NSLocalizedString("network.protection.invite.dialog.title", value: "You've unlocked a beta feature!", comment: "Title for the network protection invite dialog")
-    static let networkProtectionInviteDialogMessage = NSLocalizedString("network.protection.invite.dialog.message", value: "Enter your invite code to get started.", comment: "Message for the network protection invite dialog")
-    static let networkProtectionInviteFieldPrompt = NSLocalizedString("network.protection.invite.field.prompt", value: "Code", comment: "Prompt for the network protection invite code text field")
-    static let networkProtectionInviteSuccessTitle = NSLocalizedString("network.protection.invite.success.title", value: "Success! You’re in.", comment: "Title for the network protection invite success view")
-    static let networkProtectionInviteSuccessMessage = NSLocalizedString("network.protection.invite.success.title", value: "DuckDuckGo's VPN secures all of your device's Internet traffic anytime, anywhere.", comment: "Message for the network protection invite success view")
+    // "network.protection.invite.dialog.title" - Title for the VPN invite dialog
+    static let networkProtectionInviteDialogTitle = "Enter your invite code"
+    // "network.protection.invite.dialog.message" - Message for the VPN invite dialog
+    static let networkProtectionInviteDialogMessage = "Enter your invite code to get started."
+    // "network.protection.invite.field.prompt" - Prompt for the VPN invite code text field
+    static let networkProtectionInviteFieldPrompt = "Code"
+    // "network.protection.invite.success.title" - Title for the VPN invite success view
+    static let networkProtectionInviteSuccessTitle = "Success! You’re in."
+    // "network.protection.invite.success.title" - Message for the VPN invite success view
+    static let networkProtectionInviteSuccessMessage = "DuckDuckGo's VPN secures all of your device's Internet traffic anytime, anywhere."
 
     // MARK: - Navigation Bar Status View
-
-    static let networkProtectionNavBarStatusViewShareFeedback = NSLocalizedString("network.protection.navbar.status.view.share.feedback", value: "Send Feedback…", comment: "Menu item for 'Send Feedback' in the Network Protection status view that's shown in the navigation bar")
-    static let networkProtectionNavBarStatusMenuVPNSettings = NSLocalizedString("network.protection.status.menu.vpn.settings", value: "VPN Settings…", comment: "The status menu 'VPN Settings' menu item")
+    // "network.protection.navbar.status.view.share.feedback" - Menu item for 'Share VPN Feedback' in the VPN status view that's shown in the navigation bar
+    static let networkProtectionNavBarStatusViewShareFeedback = "Share VPN Feedback…"
+    // "network.protection.status.menu.vpn.settings" - The status menu 'VPN Settings' menu item
+    static let networkProtectionNavBarStatusMenuVPNSettings = "VPN Settings…"
+    // "network.protection.status.menu.faq" - The status menu 'FAQ' menu item
+    static let networkProtectionNavBarStatusMenuFAQ = "Frequently Asked Questions…"
 
     // MARK: - System Extension Installation Messages
+    // "network.protection.configuration.system-settings.legacy" - Text for a label in the VPN popover, displayed after attempting to enable the VPN for the first time while using macOS 12 and below
+    private static let networkProtectionSystemSettingsLegacy = "Go to Security & Privacy in System Preferences to allow DuckDuckGo VPN to activate"
+    // "network.protection.configuration.system-settings.modern" - Text for a label in the VPN popover, displayed after attempting to enable the VPN for the first time while using macOS 13 and above
+    private static let networkProtectionSystemSettingsModern = "Go to Privacy & Security in System Settings to allow DuckDuckGo VPN to activate"
 
-    private static let networkProtectionSystemSettingsLegacy = NSLocalizedString("network.protection.configuration.system-settings.legacy", value: "Go to Security & Privacy in System Preferences to allow Network Protection to activate", comment: "Text for a label in the Network Protection popover, displayed after attempting to enable Network Protection for the first time while using macOS 12 and below")
-    private static let networkProtectionSystemSettingsModern = NSLocalizedString("network.protection.configuration.system-settings.modern", value: "Go to Privacy & Security in System Settings to allow Network Protection to activate", comment: "Text for a label in the Network Protection popover, displayed after attempting to enable Network Protection for the first time while using macOS 13 and above")
-
+    // Dynamically selected based on macOS version, not directly convertible to static string
     static var networkProtectionSystemSettings: String {
         if #available(macOS 13.0, *) {
             return networkProtectionSystemSettingsModern
@@ -53,172 +64,147 @@ extension UserText {
         }
     }
 
-    static let networkProtectionUnknownActivationError = NSLocalizedString("network.protection.system.extension.unknown.activation.error", value: "There as an unexpected error. Please try again.", comment: "Message shown to users when they try to enable NetP and there is an unexpected activation error.")
-    static let networkProtectionPleaseReboot = NSLocalizedString("network.protection.system.extension.please.reboot", value: "Please reboot to activate Network Protection", comment: "Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation")
-
+    // "network.protection.system.extension.unknown.activation.error" - Message shown to users when they try to enable NetP and there is an unexpected activation error.
+    static let networkProtectionUnknownActivationError = "There as an unexpected error. Please try again."
+    // "network.protection.system.extension.please.reboot" - Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation
+    static let networkProtectionPleaseReboot = "VPN update available. Restart your Mac to reconnect."
 }
 
-// MARK: - Network Protection Waitlist
-
 extension UserText {
-
-    static let networkProtectionWaitlistNotificationTitle = NSLocalizedString("network-protection.waitlist.notification.title", value: "Network Protection beta is ready!", comment: "Title for Network Protection waitlist notification")
-    static let networkProtectionWaitlistNotificationText = NSLocalizedString("network-protection.waitlist.notification.text", value: "Open your invite", comment: "Title for Network Protection waitlist notification")
-
-    static let networkProtectionWaitlistJoinTitle = NSLocalizedString("network-protection.waitlist.join.title", value: "Network Protection Beta", comment: "Title for Network Protection join waitlist screen")
-    static let networkProtectionWaitlistJoinSubtitle1 = NSLocalizedString("network-protection.waitlist.join.subtitle.1", value: "Secure your connection anytime, anywhere with Network Protection, the VPN from DuckDuckGo.", comment: "First subtitle for Network Protection join waitlist screen")
-    static let networkProtectionWaitlistJoinSubtitle2 = NSLocalizedString("network-protection.waitlist.join.subtitle.2", value: "Join the waitlist, and we’ll notify you when it’s your turn.", comment: "Second subtitle for Network Protection join waitlist screen")
-
-    static let networkProtectionWaitlistJoinedTitle = NSLocalizedString("network-protection.waitlist.joined.title", value: "You’re on the list!", comment: "Title for Network Protection joined waitlist screen")
-    static let networkProtectionWaitlistJoinedWithNotificationsSubtitle1 = NSLocalizedString("network-protection.waitlist.joined.with-notifications.subtitle.1", value: "New invites are sent every few days, on a first come, first served basis.", comment: "Subtitle 1 for Network Protection joined waitlist screen when notifications are enabled")
-    static let networkProtectionWaitlistJoinedWithNotificationsSubtitle2 = NSLocalizedString("network-protection.waitlist.joined.with-notifications.subtitle.2", value: "We’ll notify you when your invite is ready.", comment: "Subtitle 2 for Network Protection joined waitlist screen when notifications are enabled")
-    static let networkProtectionWaitlistEnableNotifications = NSLocalizedString("network-protection.waitlist.enable-notifications", value: "Want to get a notification when your Network Protection invite is ready?", comment: "Enable notifications prompt for Network Protection joined waitlist screen")
-
-    static let networkProtectionWaitlistInvitedTitle = NSLocalizedString("network-protection.waitlist.invited.title", value: "You’re invited to try\nNetwork Protection beta!", comment: "Title for Network Protection invited screen")
-    static let networkProtectionWaitlistInvitedSubtitle = NSLocalizedString("network-protection.waitlist.invited.subtitle", value: "Get an extra layer of protection online with the VPN built for speed and simplicity. Encrypt your internet connection across your entire device and hide your location and IP address from sites you visit.", comment: "Subtitle for Network Protection invited screen")
-
-    static let networkProtectionWaitlistInvitedSection1Title = NSLocalizedString("network-protection.waitlist.invited.section-1.title", value: "Full-device coverage", comment: "Title for section 1 of the Network Protection invited screen")
-    static let networkProtectionWaitlistInvitedSection1Subtitle = NSLocalizedString("network-protection.waitlist.invited.section-1.subtitle", value: "Encrypt online traffic across your browsers and apps.", comment: "Subtitle for section 1 of the Network Protection invited screen")
-
-    static let networkProtectionWaitlistInvitedSection2Title = NSLocalizedString("network-protection.waitlist.invited.section-2.title", value: "Fast, reliable, and easy to use", comment: "Title for section 2 of the Network Protection invited screen")
-    static let networkProtectionWaitlistInvitedSection2Subtitle = NSLocalizedString("network-protection.waitlist.invited.section-2.subtitle", value: "No need for a separate app. Connect in one click and see your connection status at a glance.", comment: "Subtitle for section 2 of the Network Protection invited screen")
-
-    static let networkProtectionWaitlistInvitedSection3Title = NSLocalizedString("network-protection.waitlist.invited.section-3.title", value: "Strict no-logging policy", comment: "Title for section 3 of the Network Protection invited screen")
-    static let networkProtectionWaitlistInvitedSection3Subtitle = NSLocalizedString("network-protection.waitlist.invited.section-3.subtitle", value: "We do not log or save any data that can connect you to your online activity.", comment: "Subtitle for section 3 of the Network Protection invited screen")
-
-    static let networkProtectionWaitlistEnableTitle = NSLocalizedString("network-protection.waitlist.enable.title", value: "Ready to enable Network Protection?", comment: "Title for Network Protection enable screen")
-    static let networkProtectionWaitlistEnableSubtitle = NSLocalizedString("network-protection.waitlist.enable.subtitle", value: "Look for the globe icon in the browser toolbar or in the Mac menu bar.\n\nYou'll be asked to Allow a VPN connection once when setting up Network Protection the first time.", comment: "Subtitle for Network Protection enable screen")
-
-    static let networkProtectionWaitlistAvailabilityDisclaimer = NSLocalizedString("network-protection.waitlist.availability-disclaimer", value: "Network Protection is free to use during the beta.", comment: "Availability disclaimer for Network Protection join waitlist screen")
-
-    static let networkProtectionWaitlistButtonClose = NSLocalizedString("network-protection.waitlist.button.close", value: "Close", comment: "Close button for Network Protection join waitlist screen")
-    static let networkProtectionWaitlistButtonDone = NSLocalizedString("network-protection.waitlist.button.done", value: "Done", comment: "Close button for Network Protection joined waitlist screen")
-    static let networkProtectionWaitlistButtonDismiss = NSLocalizedString("network-protection.waitlist.button.dismiss", value: "Dismiss", comment: "Dismiss button for Network Protection join waitlist screen")
-    static let networkProtectionWaitlistButtonCancel = NSLocalizedString("network-protection.waitlist.button.cancel", value: "Cancel", comment: "Cancel button for Network Protection join waitlist screen")
-    static let networkProtectionWaitlistButtonNoThanks = NSLocalizedString("network-protection.waitlist.button.no-thanks", value: "No Thanks", comment: "No Thanks button for Network Protection joined waitlist screen")
-    static let networkProtectionWaitlistButtonGetStarted = NSLocalizedString("network-protection.waitlist.button.get-started", value: "Get Started", comment: "Get Started button for Network Protection joined waitlist screen")
-    static let networkProtectionWaitlistButtonGotIt = NSLocalizedString("network-protection.waitlist.button.got-it", value: "Got It", comment: "Got It button for Network Protection joined waitlist screen")
-    static let networkProtectionWaitlistButtonEnableNotifications = NSLocalizedString("network-protection.waitlist.button.enable-notifications", value: "Enable Notifications", comment: "Enable Notifications button for Network Protection joined waitlist screen")
-    static let networkProtectionWaitlistButtonJoinWaitlist = NSLocalizedString("network-protection.waitlist.button.join-waitlist", value: "Join the Waitlist", comment: "Join Waitlist button for Network Protection join waitlist screen")
-    static let networkProtectionWaitlistButtonAgreeAndContinue = NSLocalizedString("network-protection.waitlist.button.agree-and-continue", value: "Agree and Continue", comment: "Agree and Continue button for Network Protection join waitlist screen")
-
-}
-
-// MARK: - Network Protection Terms of Service
-
-extension UserText {
-
-    static let networkProtectionPrivacyPolicyTitle = NSLocalizedString("network-protection.privacy-policy.title", value: "Privacy Policy", comment: "Privacy Policy title for Network Protection")
-
-    static let networkProtectionPrivacyPolicySection1Title = NSLocalizedString("network-protection.privacy-policy.section.1.title", value: "We don’t ask for any personal information from you in order to use this beta service.", comment: "Privacy Policy title for Network Protection")
-    static let networkProtectionPrivacyPolicySection1ListMarkdown = NSLocalizedString("network-protection.privacy-policy.section.1.list", value: "This Privacy Policy is for our limited waitlist beta VPN product.\n\nOur main [Privacy Policy](https://duckduckgo.com/privacy) also applies here.", comment: "Privacy Policy list for Network Protection")
-    static let networkProtectionPrivacyPolicySection1ListNonMarkdown = NSLocalizedString("network-protection.privacy-policy.section.1.list", value: "This Privacy Policy is for our limited waitlist beta VPN product.\n\nOur main Privacy Policy also applies here.", comment: "Privacy Policy list for Network Protection")
-
-    static let networkProtectionPrivacyPolicySection2Title = NSLocalizedString("network-protection.privacy-policy.section.2.title", value: "We don’t keep any logs of your online activity.", comment: "Privacy Policy title for Network Protection")
-    static let networkProtectionPrivacyPolicySection2List = NSLocalizedString("network-protection.privacy-policy.section.2.list", value: "That means we have no way to tie what you do online to you as an individual and we don’t have any record of things like:\n    • Website visits\n    • DNS requests\n    • Connections made\n    • IP addresses used\n    • Session lengths", comment: "Privacy Policy list for Network Protection")
-
-    static let networkProtectionPrivacyPolicySection3Title = NSLocalizedString("network-protection.privacy-policy.section.3.title", value: "We only keep anonymous performance metrics that we cannot connect to your online activity.", comment: "Privacy Policy title for Network Protection")
-    static let networkProtectionPrivacyPolicySection3List = NSLocalizedString("network-protection.privacy-policy.section.3.list", value: "Our servers store generic usage (for example, CPU load) and diagnostic data (for example, errors), but none of that data is connected to any individual’s activity.\n\nWe use this non-identifying information to monitor and ensure the performance and quality of the service, for example to make sure servers aren’t overloaded.", comment: "Privacy Policy list for Network Protection")
-
-    static let networkProtectionPrivacyPolicySection4Title = NSLocalizedString("network-protection.privacy-policy.section.4.title", value: "We use dedicated servers for all VPN traffic.", comment: "Privacy Policy title for Network Protection")
-    static let networkProtectionPrivacyPolicySection4List = NSLocalizedString("network-protection.privacy-policy.section.4.list", value: "Dedicated servers means they are not shared with anyone else.\n\nWe rent our servers from providers we carefully selected because they meet our privacy requirements.\n\nWe have strict access controls in place so that only limited DuckDuckGo team members have access to our servers.", comment: "Privacy Policy list for Network Protection")
-
-    static let networkProtectionPrivacyPolicySection5Title = NSLocalizedString("network-protection.privacy-policy.section.5.title", value: "We protect and limit use of your data when you communicate directly with DuckDuckGo.", comment: "Privacy Policy title for Network Protection")
-    static let networkProtectionPrivacyPolicySection5List = NSLocalizedString("network-protection.privacy-policy.section.5.list", value: "If you reach out to us for support by submitting a bug report or through email and agree to be contacted to troubleshoot the issue, we’ll contact you using the information you provide.\n\nIf you participate in a voluntary product survey or questionnaire and agree to provide further feedback, we may contact you using the information you provide.\n\nWe will permanently delete all personal information you provided to us (email, contact information), within 30 days after closing a support case or, in the case of follow up feedback, within 60 days after ending this beta service.", comment: "Privacy Policy list for Network Protection")
-
-    static let networkProtectionTermsOfServiceTitle = NSLocalizedString("network-protection.terms-of-service.title", value: "Terms of Service", comment: "Terms of Service title for Network Protection")
-
-    static let networkProtectionTermsOfServiceSection1Title = NSLocalizedString("network-protection.terms-of-service.section.1.title", value: "The service is for limited and personal use only.", comment: "Terms of Service title for Network Protection")
-    static let networkProtectionTermsOfServiceSection1List = NSLocalizedString("network-protection.terms-of-service.section.1.list", value: "This service is provided for your personal use only.\n\nYou are responsible for all activity in the service that occurs on or through your device.\n\nThis service may only be used through the DuckDuckGo app on the device on which you are given access. If you delete the DuckDuckGo app, you will lose access to the service.\n\nYou may not use this service through a third-party client.", comment: "Terms of Service list for Network Protection")
-
-    static let networkProtectionTermsOfServiceSection2Title = NSLocalizedString("network-protection.terms-of-service.section.2.title", value: "You agree to comply with all applicable laws, rules, and regulations.", comment: "Terms of Service title for Network Protection")
-    static let networkProtectionTermsOfServiceSection2ListMarkdown = NSLocalizedString("network-protection.terms-of-service.section.2.list", value: "You agree that you will not use the service for any unlawful, illicit, criminal, or fraudulent purpose, or in any manner that could give rise to civil or criminal liability under applicable law.\n\nYou agree to comply with our [DuckDuckGo Terms of Service](https://duckduckgo.com/terms), which are incorporated by reference.", comment: "Terms of Service list for Network Protection")
-    static let networkProtectionTermsOfServiceSection2ListNonMarkdown = NSLocalizedString("network-protection.terms-of-service.section.2.list", value: "You agree that you will not use the service for any unlawful, illicit, criminal, or fraudulent purpose, or in any manner that could give rise to civil or criminal liability under applicable law.\n\nYou agree to comply with our DuckDuckGo Terms of Service, which are incorporated by reference.", comment: "Terms of Service list for Network Protection")
-
-    static let networkProtectionTermsOfServiceSection3Title = NSLocalizedString("network-protection.terms-of-service.section.3.title", value: "You must be eligible to use this service.", comment: "Terms of Service title for Network Protection")
-    static let networkProtectionTermsOfServiceSection3List = NSLocalizedString("network-protection.terms-of-service.section.3.list", value: "Access to this beta is randomly awarded. You are responsible for ensuring eligibility.\n\nYou must be at least 18 years old and live in a location where use of a VPN is legal in order to be eligible to use this service.", comment: "Terms of Service list for Network Protection")
-
-    static let networkProtectionTermsOfServiceSection4Title = NSLocalizedString("network-protection.terms-of-service.section.4.title", value: "We provide this beta service as-is and without warranty.", comment: "Terms of Service title for Network Protection")
-    static let networkProtectionTermsOfServiceSection4List = NSLocalizedString("network-protection.terms-of-service.section.4.list", value: "This service is provided as-is and without warranties or guarantees of any kind.\n\nTo the extent possible under applicable law, DuckDuckGo will not be liable for any damage or loss arising from your use of the service. In any event, the total aggregate liability of DuckDuckGo shall not exceed $25 or the equivalent in your local currency.\n\nWe may in the future transfer responsibility for the service to a subsidiary of DuckDuckGo.  If that happens, you agree that references to “DuckDuckGo” will refer to our subsidiary, which will then become responsible for providing the service and for any liabilities relating to it.", comment: "Terms of Service list for Network Protection")
-
-    static let networkProtectionTermsOfServiceSection5Title = NSLocalizedString("network-protection.terms-of-service.section.5.title", value: "We may terminate access at any time.", comment: "Terms of Service title for Network Protection")
-    static let networkProtectionTermsOfServiceSection5List = NSLocalizedString("network-protection.terms-of-service.section.5.list", value: "We reserve the right to revoke access to the service at any time in our sole discretion.\n\nWe may also terminate access for violation of these terms, including for repeated infringement of the intellectual property rights of others.", comment: "Terms of Service list for Network Protection")
-
-    static let networkProtectionTermsOfServiceSection6Title = NSLocalizedString("network-protection.terms-of-service.section.6.title", value: "The service is free during the beta period.", comment: "Terms of Service title for Network Protection")
-    static let networkProtectionTermsOfServiceSection6List = NSLocalizedString("network-protection.terms-of-service.section.6.list", value: "Access to this service is currently free of charge, but that is limited to this beta period.\n\nYou understand and agree that this service is provided on a temporary, testing basis only.", comment: "Terms of Service list for Network Protection")
-
-    static let networkProtectionTermsOfServiceSection7Title = NSLocalizedString("network-protection.terms-of-service.section.7.title", value: "We are continually updating the service.", comment: "Terms of Service title for Network Protection")
-    static let networkProtectionTermsOfServiceSection7List = NSLocalizedString("network-protection.terms-of-service.section.7.list", value: "The service is in beta, and we are regularly changing it.\n\nService coverage, speed, server locations, and quality may vary without warning.", comment: "Terms of Service list for Network Protection")
-
-    static let networkProtectionTermsOfServiceSection8Title = NSLocalizedString("network-protection.terms-of-service.section.8.title", value: "We need your feedback.", comment: "Terms of Service title for Network Protection")
-    static let networkProtectionTermsOfServiceSection8List = NSLocalizedString("network-protection.terms-of-service.section.8.list", value: "You may be asked during the beta period to provide feedback about your experience. Doing so is optional and your feedback may be used to improve the service.\n\nIf you have enabled notifications for the DuckDuckGo app, we may use notifications to ask about your experience. You can disable notifications if you do not want to receive them.", comment: "Terms of Service list for Network Protection")
 
     // MARK: - Feedback Form
+    // "vpn.feedback-form.title" - Title for each screen of the VPN feedback form
+    static let vpnFeedbackFormTitle = "Help Improve the DuckDuckGo VPN"
+    // "vpn.feedback-form.category.select-category" - Title for the category selection state of the VPN feedback form
+    static let vpnFeedbackFormCategorySelect = "Select a category"
+    // "vpn.feedback-form.category.unable-to-install" - Title for the 'unable to install' category of the VPN feedback form
+    static let vpnFeedbackFormCategoryUnableToInstall = "Unable to install VPN"
+    // "vpn.feedback-form.category.fails-to-connect" - Title for the 'VPN fails to connect' category of the VPN feedback form
+    static let vpnFeedbackFormCategoryFailsToConnect = "VPN fails to connect"
+    // "vpn.feedback-form.category.too-slow" - Title for the 'VPN is too slow' category of the VPN feedback form
+    static let vpnFeedbackFormCategoryTooSlow = "VPN connection is too slow"
+    // "vpn.feedback-form.category.issues-with-apps" - Title for the category 'VPN causes issues with other apps or websites' category of the VPN feedback form
+    static let vpnFeedbackFormCategoryIssuesWithApps = "VPN causes issues with other apps or websites"
+    // "vpn.feedback-form.category.local-device-connectivity" - Title for the local device connectivity category of the VPN feedback form
+    static let vpnFeedbackFormCategoryLocalDeviceConnectivity = "VPN won't let me connect to local device"
+    // "vpn.feedback-form.category.browser-crash-or-freeze" - Title for the browser crash/freeze category of the VPN feedback form
+    static let vpnFeedbackFormCategoryBrowserCrashOrFreeze = "VPN causes browser to crash or freeze"
+    // "vpn.feedback-form.category.feature-request" - Title for the 'VPN feature request' category of the VPN feedback form
+    static let vpnFeedbackFormCategoryFeatureRequest = "VPN feature request"
+    // "vpn.feedback-form.category.other" - Title for the 'other VPN feedback' category of the VPN feedback form
+    static let vpnFeedbackFormCategoryOther = "Other VPN feedback"
 
-    static let vpnFeedbackFormTitle = NSLocalizedString("vpn.feedback-form.title", value: "Help Improve the DuckDuckGo VPN", comment: "Title for each screen of the VPN feedback form")
-    static let vpnFeedbackFormCategorySelect = NSLocalizedString("vpn.feedback-form.category.select-category", value: "Select a category", comment: "Title for the category selection state of the VPN feedback form")
-    static let vpnFeedbackFormCategoryUnableToInstall = NSLocalizedString("vpn.feedback-form.category.unable-to-install", value: "Unable to install VPN", comment: "Title for the 'unable to install' category of the VPN feedback form")
-    static let vpnFeedbackFormCategoryFailsToConnect = NSLocalizedString("vpn.feedback-form.category.fails-to-connect", value: "VPN fails to connect", comment: "Title for the 'VPN fails to connect' category of the VPN feedback form")
-    static let vpnFeedbackFormCategoryTooSlow = NSLocalizedString("vpn.feedback-form.category.too-slow", value: "VPN connection is too slow", comment: "Title for the 'VPN is too slow' category of the VPN feedback form")
-    static let vpnFeedbackFormCategoryIssuesWithApps = NSLocalizedString("vpn.feedback-form.category.issues-with-apps", value: "VPN causes issues with other apps or websites", comment: "Title for the category 'VPN causes issues with other apps or websites' category of the VPN feedback form")
-    static let vpnFeedbackFormCategoryLocalDeviceConnectivity = NSLocalizedString("vpn.feedback-form.category.local-device-connectivity", value: "VPN won't let me connect to local device", comment: "Title for the local device connectivity category of the VPN feedback form")
-    static let vpnFeedbackFormCategoryBrowserCrashOrFreeze = NSLocalizedString("vpn.feedback-form.category.browser-crash-or-freeze", value: "VPN causes browser to crash or freeze", comment: "Title for the browser crash/freeze category of the VPN feedback form")
-    static let vpnFeedbackFormCategoryFeatureRequest = NSLocalizedString("vpn.feedback-form.category.feature-request", value: "VPN feature request", comment: "Title for the 'VPN feature request' category of the VPN feedback form")
-    static let vpnFeedbackFormCategoryOther = NSLocalizedString("vpn.feedback-form.category.other", value: "Other VPN feedback", comment: "Title for the 'other VPN feedback' category of the VPN feedback form")
+    // "vpn.feedback-form.text-1" - Text for the body of the VPN feedback form
+    static let vpnFeedbackFormText1 = "Please describe what's happening, what you expected to happen, and the steps that led to the issue:"
+    // "vpn.feedback-form.text-2" - Text for the body of the VPN feedback form
+    static let vpnFeedbackFormText2 = "In addition to the details entered into this form, your app issue report will contain:"
+    // "vpn.feedback-form.text-3" - Bullet text for the body of the VPN feedback form
+    static let vpnFeedbackFormText3 = "• Whether specific DuckDuckGo features are enabled"
+    // "vpn.feedback-form.text-4" - Bullet text for the body of the VPN feedback form
+    static let vpnFeedbackFormText4 = "• Aggregate DuckDuckGo app diagnostics"
+    // "vpn.feedback-form.text-5" - Text for the body of the VPN feedback form
+    static let vpnFeedbackFormText5 = "By clicking \"Submit\" I agree that DuckDuckGo may use the information in this report for purposes of improving the app's features."
 
-    static let vpnFeedbackFormText1 = NSLocalizedString("vpn.feedback-form.text-1", value: "Please describe what's happening, what you expected to happen, and the steps that led to the issue:", comment: "Text for the body of the VPN feedback form")
-    static let vpnFeedbackFormText2 = NSLocalizedString("vpn.feedback-form.text-2", value: "In addition to the details entered into this form, your app issue report will contain:", comment: "Text for the body of the VPN feedback form")
-    static let vpnFeedbackFormText3 = NSLocalizedString("vpn.feedback-form.text-3", value: "• Whether specific DuckDuckGo features are enabled", comment: "Bullet text for the body of the VPN feedback form")
-    static let vpnFeedbackFormText4 = NSLocalizedString("vpn.feedback-form.text-4", value: "• Aggregate DuckDuckGo app diagnostics", comment: "Bullet text for the body of the VPN feedback form")
-    static let vpnFeedbackFormText5 = NSLocalizedString("vpn.feedback-form.text-5", value: "By clicking \"Submit\" I agree that DuckDuckGo may use the information in this report for purposes of improving the app's features.", comment: "Text for the body of the VPN feedback form")
+    // "vpn.feedback-form.sending-confirmation.title" - Title for the feedback sent view title of the VPN feedback form
+    static let vpnFeedbackFormSendingConfirmationTitle = "Thank you!"
+    // "vpn.feedback-form.sending-confirmation.description" - Title for the feedback sent view description of the VPN feedback form
+    static let vpnFeedbackFormSendingConfirmationDescription = "Your feedback will help us improve the DuckDuckGo VPN."
+    // "vpn.feedback-form.sending-confirmation.error" - Title for the feedback sending error text of the VPN feedback form
+    static let vpnFeedbackFormSendingConfirmationError = "We couldn't send your feedback right now, please try again."
 
-    static let vpnFeedbackFormSendingConfirmationTitle = NSLocalizedString("vpn.feedback-form.sending-confirmation.title", value: "Thank you!", comment: "Title for the feedback sent view title of the VPN feedback form")
-    static let vpnFeedbackFormSendingConfirmationDescription = NSLocalizedString("vpn.feedback-form.sending-confirmation.description", value: "Your feedback will help us improve the\nDuckDuckGo VPN.", comment: "Title for the feedback sent view description of the VPN feedback form")
-    static let vpnFeedbackFormSendingConfirmationError = NSLocalizedString("vpn.feedback-form.sending-confirmation.error", value: "We couldn't send your feedback right now, please try again.", comment: "Title for the feedback sending error text of the VPN feedback form")
+    // "vpn.feedback-form.button.done" - Title for the Done button of the VPN feedback form
+    static let vpnFeedbackFormButtonDone = "Done"
+    // "vpn.feedback-form.button.cancel" - Title for the Cancel button of the VPN feedback form
+    static let vpnFeedbackFormButtonCancel = "Cancel"
+    // "vpn.feedback-form.button.submit" - Title for the Submit button of the VPN feedback form
+    static let vpnFeedbackFormButtonSubmit = "Submit"
+    // "vpn.feedback-form.button.submitting" - Title for the Submitting state of the VPN feedback form
+    static let vpnFeedbackFormButtonSubmitting = "Submitting…"
 
-    static let vpnFeedbackFormButtonDone = NSLocalizedString("vpn.feedback-form.button.done", value: "Done", comment: "Title for the Done button of the VPN feedback form")
-    static let vpnFeedbackFormButtonCancel = NSLocalizedString("vpn.feedback-form.button.cancel", value: "Cancel", comment: "Title for the Cancel button of the VPN feedback form")
-    static let vpnFeedbackFormButtonSubmit = NSLocalizedString("vpn.feedback-form.button.submit", value: "Submit", comment: "Title for the Submit button of the VPN feedback form")
-    static let vpnFeedbackFormButtonSubmitting = NSLocalizedString("vpn.feedback-form.button.submitting", value: "Submitting…", comment: "Title for the Submitting state of the VPN feedback form")
+    // MARK: - Setting Titles
+    // "vpn.location.title" - Location section title in VPN settings
+    static let vpnLocationTitle = "Location"
+    // "vpn.general.title" - General section title in VPN settings
+    static let vpnGeneralTitle = "General"
+    // "vpn.notifications.settings.title" - Notifications section title in VPN settings
+    static let vpnNotificationsSettingsTitle = "Notifications"
+    // "vpn.advanced.settings.title" - VPN Advanced section title in VPN settings
+    static let vpnAdvancedSettingsTitle = "Advanced"
 
+    // MARK: - Location
+    // "vpn.location.change.button.title" - Title of the VPN location preference change button
+    static let vpnLocationChangeButtonTitle = "Change..."
+    // "vpn.location.list.title" - Title of the VPN location list screen
+    static let vpnLocationListTitle = "VPN Location"
+    // "vpn.location.recommended.section.title" - Title of the VPN location list recommended section
+    static let vpnLocationRecommendedSectionTitle = "Recommended"
+    // "vpn.location.custom.section.title" - Title of the VPN location list custom section
+    static let vpnLocationCustomSectionTitle = "Custom"
+    // "vpn.location.submit.button.title" - Title of the VPN location list submit button
+    static let vpnLocationSubmitButtonTitle = "Submit"
+    // "vpn.location.custom.section.title" - Title of the VPN location list cancel button (Note: seems like a duplicate key with a different purpose, please check)
+    static let vpnLocationCancelButtonTitle = "Cancel"
+    // "vpn.location.description.nearest" - Nearest city setting description
+    static let vpnLocationNearest = "Nearest"
+    // "vpn.location.description.nearest.available" - Nearest available location setting description
+    static let vpnLocationNearestAvailable = "Nearest Location"
+    // "vpn.location.nearest.available.title" - Subtitle underneath the nearest available vpn location preference text.
+    static let vpnLocationNearestAvailableSubtitle = "Automatically connect to the nearest server we can find."
+
+    // "network.protection.vpn.location.country.item.formatted.cities.count" - Subtitle of countries item when there are multiple cities, example :
+    static func vpnLocationCountryItemFormattedCitiesCount(_ count: Int) -> String {
+        let message = "%d cities"
+        return String(format: message, count)
+    }
+
+    // MARK: - Settings
+    // "vpn.setting.title.connect.on.login" - Connect on Login setting title
+    static let vpnConnectOnLoginSettingTitle = "Connect on login"
+    // "vpn.setting.title.connect.on.login" - Display VPN status in the menu bar.
+    static let vpnShowInMenuBarSettingTitle = "Show VPN in menu bar"
+    // "vpn.setting.description.always.on" - Always ON setting description
+    static let vpnAlwaysOnSettingDescription = "Automatically restores the VPN connection after interruption. For your security, this setting cannot be disabled."
+    // "vpn.setting.title.exclude.local.networks" - Exclude Local Networks setting title
+    static let vpnExcludeLocalNetworksSettingTitle = "Exclude local networks"
+    // "vpn.setting.description.exclude.local.networks" - Exclude Local Networks setting description
+    static let vpnExcludeLocalNetworksSettingDescription = "Bypass the VPN for local network connections, like to a printer."
+    // "vpn.setting.description.secure.dns" - Secure DNS setting description
+    static let vpnSecureDNSSettingDescription = "Our VPN uses Secure DNS to keep your online activity private, so that your Internet provider can't see what websites you visit."
+    // "vpn.button.title.uninstall.vpn" - Uninstall VPN button title
+    static let uninstallVPNButtonTitle = "Uninstall DuckDuckGo VPN..."
+
+    // MARK: - VPN Settings Alerts
+    // "vpn.uninstall.alert.title" - Alert title when the user selects to uninstall our VPN
+    static let uninstallVPNAlertTitle = "Are you sure you want to uninstall the VPN?"
+    // "vpn.uninstall.alert.informative.text" - Informative text for the alert that comes up when the user decides to uninstall our VPN
+    static let uninstallVPNInformativeText = "Uninstalling the DuckDuckGo VPN will disconnect the VPN and remove it from your device."
+
+    // MARK: - VPN Screen
+    // "network.protection.vpn.location.nearest" - Description of the location type in the VPN status view
+    static let netPVPNLocationNearest = "(Nearest)"
+
+    // "network.protection.vpn.location.subtitle.formatted.city.and.country" - Subtitle for the preferred location item that formats a city and country. E.g Chicago, United States
+    static func netPVPNSettingsLocationSubtitleFormattedCityAndCountry(city: String, country: String) -> String {
+        return "\(city), \(country)"
+    }
 }
 
-#if DBP
-// MARK: - Data Broker Protection Waitlist
+// MARK: - Thank You Modals
+
 extension UserText {
-    static let dataBrokerProtectionPrivacyPolicyTitle = NSLocalizedString("data-broker-protection.privacy-policy.title", value: "Privacy Policy", comment: "Privacy Policy title for Personal Information Removal")
+    static let dbpThankYouTitle = "Personal Information Removal early access is over"
+    static let dbpThankYouSubtitle = "Thank you for being a tester!"
+    static let dbpThankYouBody1 = "To continue using Personal Information Removal, subscribe to DuckDuckGo Privacy Pro and get 40% off with promo code THANKYOU"
 
-    static let dataBrokerProtectionWaitlistNotificationTitle = NSLocalizedString("data-broker-protection.waitlist.notification.title", value: "Personal Information Removal beta is ready!", comment: "Title for Personal Information Removal waitlist notification")
-    static let dataBrokerProtectionWaitlistNotificationText = NSLocalizedString("data-broker-protection.waitlist.notification.text", value: "Open your invite", comment: "Title for Personal Information Removal waitlist notification")
+    static let vpnThankYouTitle = "DuckDuckGo VPN early access is over"
+    static let vpnThankYouSubtitle = "Thank you for being a tester!"
+    static let vpnThankYouBody1 = "To continue using the VPN, subscribe to DuckDuckGo Privacy Pro and get 40% off with promo code THANKYOU"
 
-    static let dataBrokerProtectionWaitlistJoinTitle = NSLocalizedString("data-broker-protection.waitlist.join.title", value: "Personal Information Removal Beta", comment: "Title for Personal Information Removal join waitlist screen")
-    static let dataBrokerProtectionWaitlistJoinSubtitle1 = NSLocalizedString("data-broker-protection.waitlist.join.subtitle.1", value: "Automatically scan and remove your data from 17+ sites that sell personal information with DuckDuckGo’s Personal Information Removal.", comment: "First subtitle for Personal Information Removal join waitlist screen")
-
-    static let dataBrokerProtectionWaitlistJoinedTitle = NSLocalizedString("data-broker-protection.waitlist.joined.title", value: "You’re on the list!", comment: "Title for Personal Information Removal joined waitlist screen")
-    static let dataBrokerProtectionWaitlistJoinedWithNotificationsSubtitle1 = NSLocalizedString("data-broker-protection.waitlist.joined.with-notifications.subtitle.1", value: "New invites are sent every few days, on a first come, first served basis.", comment: "Subtitle 1 for Personal Information Removal joined waitlist screen when notifications are enabled")
-    static let dataBrokerProtectionWaitlistJoinedWithNotificationsSubtitle2 = NSLocalizedString("data-broker-protection.waitlist.joined.with-notifications.subtitle.2", value: "We’ll notify you when your invite is ready.", comment: "Subtitle 2 for Personal Information Removal joined waitlist screen when notifications are enabled")
-    static let dataBrokerProtectionWaitlistEnableNotifications = NSLocalizedString("data-broker-protection.waitlist.enable-notifications", value: "Want to get a notification when your Personal Information Removal invite is ready?", comment: "Enable notifications prompt for Personal Information Removal joined waitlist screen")
-
-    static let dataBrokerProtectionWaitlistInvitedTitle = NSLocalizedString("data-broker-protection.waitlist.invited.title", value: "You’re invited to try\nPersonal Information Removal beta!", comment: "Title for Personal Information Removal invited screen")
-    static let dataBrokerProtectionWaitlistInvitedSubtitle = NSLocalizedString("data-broker-protection.waitlist.invited.subtitle", value: "Automatically find and remove your personal information – such as your name and address – from 17+ sites that store and sell it, reducing the risk of identity theft and spam.", comment: "Subtitle for Personal Information Removal invited screen")
-
-    static let dataBrokerProtectionWaitlistEnableTitle = NSLocalizedString("data-broker-protection.waitlist.enable.title", value: "Let’s get started", comment: "Title for Personal Information Removal enable screen")
-    static let dataBrokerProtectionWaitlistEnableSubtitle = NSLocalizedString("data-broker-protection.waitlist.enable.subtitle", value: "We’ll need your name, address and the year you were born in order to find your personal information on data broker sites\n\nThis info is stored securely on your device, and is never sent to DuckDuckGo.", comment: "Subtitle for Personal Information Removal enable screen")
-
-    static let dataBrokerProtectionWaitlistAvailabilityDisclaimer = NSLocalizedString("data-broker-protection.waitlist.availability-disclaimer", value: "Personal Information Removal is free during the beta.\nJoin the waitlist and we'll notify you when ready.", comment: "Availability disclaimer for Personal Information Removal join waitlist screen")
-
-    static let dataBrokerProtectionWaitlistButtonClose = NSLocalizedString("data-broker-protection.waitlist.button.close", value: "Close", comment: "Close button for Personal Information Removal join waitlist screen")
-    static let dataBrokerProtectionWaitlistButtonDone = NSLocalizedString("data-broker-protection.waitlist.button.done", value: "Done", comment: "Close button for Personal Information Removal joined waitlist screen")
-    static let dataBrokerProtectionWaitlistButtonDismiss = NSLocalizedString("data-broker-protection.waitlist.button.dismiss", value: "Dismiss", comment: "Dismiss button for Personal Information Removal join waitlist screen")
-    static let dataBrokerProtectionWaitlistButtonCancel = NSLocalizedString("data-broker-protection.waitlist.button.cancel", value: "Cancel", comment: "Cancel button for Personal Information Removal join waitlist screen")
-    static let dataBrokerProtectionWaitlistButtonNoThanks = NSLocalizedString("data-broker-protection.waitlist.button.no-thanks", value: "No Thanks", comment: "No Thanks button for Personal Information Removal joined waitlist screen")
-    static let dataBrokerProtectionWaitlistButtonGetStarted = NSLocalizedString("data-broker-protection.waitlist.button.get-started", value: "Get Started", comment: "Get Started button for Personal Information Removal joined waitlist screen")
-    static let dataBrokerProtectionWaitlistButtonGotIt = NSLocalizedString("data-broker-protection.waitlist.button.got-it", value: "Get started", comment: "Get started button for Personal Information Removal joined waitlist screen")
-
-    static let dataBrokerProtectionWaitlistButtonEnableNotifications = NSLocalizedString("data-broker-protection.waitlist.button.enable-notifications", value: "Enable Notifications", comment: "Enable Notifications button for Personal Information Removal joined waitlist screen")
-    static let dataBrokerProtectionWaitlistButtonJoinWaitlist = NSLocalizedString("data-broker-protection.waitlist.button.join-waitlist", value: "Join the Waitlist", comment: "Join Waitlist button for Personal Information Removal join waitlist screen")
-    static let dataBrokerProtectionWaitlistButtonAgreeAndContinue = NSLocalizedString("data-broker-protection.waitlist.button.agree-and-continue", value: "Agree and Continue", comment: "Agree and Continue button for Personal Information Removal join waitlist screen")
-
-}
-
+#if APPSTORE
+    static let dbpThankYouBody2 = "Offer redeemable for a limited time only in the desktop version of the DuckDuckGo browser by U.S. testers when you download from duckduckgo.com/app"
+    static let vpnThankYouBody2 = "Offer redeemable for a limited time only in the desktop version of the DuckDuckGo browser by U.S. testers when you download from duckduckgo.com/app"
+#else
+    static let dbpThankYouBody2 = "Offer redeemable for a limited time in the desktop version of the DuckDuckGo browser by U.S. beta testers only."
+    static let vpnThankYouBody2 = "Offer redeemable for a limited time in the desktop version of the DuckDuckGo browser by U.S. beta testers only."
 #endif
+}

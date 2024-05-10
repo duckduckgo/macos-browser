@@ -1,0 +1,15 @@
+data:
+  html_text: |
+    <body>
+      <h2>[ACTION NEEDED] Failed to publish ${TAG} release – tagging failed</h2>
+      <ul>
+        <li><b>❗️ Tagging repository with ${TAG} tag failed.</b></li>
+        <li><b>⚠️ GitHub release creation was skipped.</b></li>
+        <li><b>⚠️ Deleting <code>${BRANCH}</code> was skipped.</b></li>
+      </ul>
+
+      <a data-asana-gid='${ASSIGNEE_ID}'/>, please proceed with the release <a data-asana-gid='${TASK_ID}' data-asana-dynamic='false'>according to instructions</a>.
+
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>

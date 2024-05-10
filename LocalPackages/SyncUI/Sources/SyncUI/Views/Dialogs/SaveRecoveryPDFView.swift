@@ -26,7 +26,7 @@ struct SaveRecoveryPDFView: View {
     var body: some View {
         SyncDialog {
             VStack(spacing: 20.0) {
-                Image("SyncRecoveryPDF")
+                Image(.syncRecoveryPDF)
                 SyncUIViews.TextHeader(text: UserText.saveRecoveryPDF)
                 SyncUIViews.TextDetailMultiline(text: UserText.recoveryPDFExplanation)
             }
@@ -60,7 +60,7 @@ struct SaveRecoveryPDFView: View {
             .padding(20)
 
             Text(UserText.recoveryPDFWarning)
-                .foregroundColor(Color("BlackWhite60"))
+                .foregroundColor(Color(.blackWhite60))
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
         } buttons: {

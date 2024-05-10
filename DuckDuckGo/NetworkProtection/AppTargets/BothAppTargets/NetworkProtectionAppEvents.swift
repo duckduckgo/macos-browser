@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
 import Common
 import Foundation
 import LoginItems
@@ -24,8 +23,9 @@ import NetworkProtection
 import NetworkProtectionUI
 import NetworkProtectionIPC
 import NetworkExtension
+import Subscription
 
-/// Implements the sequence of steps that Network Protection needs to execute when the App starts up.
+/// Implements the sequence of steps that the VPN needs to execute when the App starts up.
 ///
 final class NetworkProtectionAppEvents {
 
@@ -47,8 +47,15 @@ final class NetworkProtectionAppEvents {
     // MARK: - Feature Visibility
 
     private let featureVisibility: NetworkProtectionFeatureVisibility
+    private let featureDisabler: NetworkProtectionFeatureDisabling
+    private let defaults: UserDefaults
 
-    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility()) {
+    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
+         defaults: UserDefaults = .netP) {
+
+        self.defaults = defaults
+        self.featureDisabler = featureDisabler
         self.featureVisibility = featureVisibility
     }
 
@@ -57,118 +64,36 @@ final class NetworkProtectionAppEvents {
     func applicationDidFinishLaunching() {
         let loginItemsManager = LoginItemsManager()
 
-        Task {
-            await removeLegacyLoginItemAndVPNConfiguration()
-            migrateNetworkProtectionAuthTokenToSharedKeychainIfNecessary()
+        Task { @MainActor in
+            let disabled = await featureVisibility.disableIfUserHasNoAccess()
 
-            guard featureVisibility.isNetworkProtectionVisible() else {
-                featureVisibility.disableForAllUsers()
+            guard !disabled else {
                 return
             }
 
             restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
-            refreshNetworkProtectionServers()
         }
     }
 
     /// Call this method when the app becomes active to run the associated NetP logic.
     ///
     func applicationDidBecomeActive() {
-        guard featureVisibility.isNetworkProtectionVisible() else {
-            featureVisibility.disableForAllUsers()
-            return
-        }
-    }
-
-    /// If necessary, this method migrates the auth token from an unspecified data protection keychain (our previous
-    /// storage location), to the new shared keychain, which is where apps in our app group will try to access the NetP
-    /// auth token.
-    ///
-    /// This method bails out on any error condition - the user will probably have to re-enter their auth token if we can't
-    /// migrate this, and that's ok.  This migration only affects internal users so it's not worth pixeling, and it's not worth
-    /// alerting the user to an error since they'll see Network Protection disable and eventually re-enable it.
-    ///
-    private func migrateNetworkProtectionAuthTokenToSharedKeychainIfNecessary() {
-        let sharedKeychainStore = NetworkProtectionKeychainTokenStore()
-
-        guard !sharedKeychainStore.isFeatureActivated else {
-            // We only migrate if the auth token is missing from our new shared keychain.
-            return
-        }
-
-        let legacyServiceName = "\(Bundle.main.bundleIdentifier!).authToken"
-        let legacyKeychainStore = NetworkProtectionKeychainTokenStore(keychainType: .dataProtection(.unspecified),
-                                                                      serviceName: legacyServiceName,
-                                                                      errorEvents: nil)
-
-        guard let token = try? legacyKeychainStore.fetchToken() else {
-            // If fetching the token fails, we just assume we can't migrate anything and the user
-            // will need to re-enable NetP.
-            return
-        }
-
-        do {
-            try sharedKeychainStore.store(token)
-        } catch {
-            print(String(describing: error))
+        Task { @MainActor in
+            await featureVisibility.disableIfUserHasNoAccess()
         }
     }
 
     private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
-        let currentVersion = AppVersion.shared.versionAndBuildNumber
-        let versionStore = NetworkProtectionLastVersionRunStore()
-        defer {
-            versionStore.lastVersionRun = currentVersion
-        }
-
-        // should‘ve been run at least once with NetP enabled
-        guard let lastVersionRun = versionStore.lastVersionRun else {
-            os_log(.info, log: .networkProtection, "No last version found for the NetP login items, skipping update")
-            return
-        }
-
         // We want to restart the VPN menu app to make sure it's always on the latest.
         restartNetworkProtectionMenu(using: loginItemsManager)
     }
 
     private func restartNetworkProtectionMenu(using loginItemsManager: LoginItemsManager) {
-        loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
-    }
-
-    /// Fetches a new list of Network Protection servers, and updates the existing set.
-    ///
-    private func refreshNetworkProtectionServers() {
-        Task {
-            let serverCount: Int
-            do {
-                serverCount = try await NetworkProtectionDeviceManager.create().refreshServerList().count
-            } catch {
-                os_log("Failed to update Network Protection servers", log: .networkProtection, type: .error)
-                return
-            }
-
-            os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, serverCount)
-        }
-    }
-
-    // MARK: - Legacy Login Item and Extension
-
-    private func removeLegacyLoginItemAndVPNConfiguration() async {
-        LoginItem(bundleId: legacyAgentBundleID, defaults: .netP).forceStop()
-
-        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
-        let tunnel = tunnels?.first {
-            ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == legacySystemExtensionBundleID
-        }
-
-        guard let tunnel else {
+        guard loginItemsManager.isAnyEnabled(LoginItemsManager.networkProtectionLoginItems) else {
             return
         }
 
-        UserDefaults.netP.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
-
-        try? await tunnel.removeFromPreferences()
+        loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
     }
-}
 
-#endif
+}

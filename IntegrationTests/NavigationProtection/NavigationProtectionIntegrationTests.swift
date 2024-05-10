@@ -21,6 +21,7 @@ import Common
 import Navigation
 import os.log
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -41,11 +42,12 @@ class NavigationProtectionIntegrationTests: XCTestCase {
 
     }
 
-    override func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window?.close()
         window = nil
 
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests
@@ -53,7 +55,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
     @MainActor
     func testAMPLinks() async throws {
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         var onDidCancel: ((NavigationAction, [ExpectedNavigation]?) -> Void)?
         var onWillStart: ((Navigation) -> Void)?
@@ -75,7 +77,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         for i in 0..<itemsCount {
             print("processing", i)
             // open test page if needed
-            if tab.content.url != url {
+            if tab.content.urlForWebView != url {
                 _=try await tab.setUrl(url, source: .link)?.result.get()
             }
 
@@ -130,7 +132,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
     @MainActor
     func testReferrerTrimming() async throws {
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         var lastRedirectedNavigation: Navigation?
         var onDidFinish: ((Navigation) -> Void)?
@@ -163,7 +165,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         }.timeout(40, "didFinish").first().promise().value
 
         // download results
-        var persistor = DownloadsPreferencesUserDefaultsPersistor()
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
         // download task promise
         let downloadTaskPromise = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
@@ -181,7 +183,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
 
         // wait for the download to complete
         let fileUrl = try await downloadTaskPromise.value.output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError(description: "failed to download") as NSError, isRetryable: false) }.first().promise().get()
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError(description: "failed to download") as NSError) }.first().promise().get()
 
         // print(try! String(contentsOf: fileUrl))
         let results = try JSONDecoder().decode(Results.self, from: Data(contentsOf: fileUrl)).results
@@ -203,11 +205,11 @@ class NavigationProtectionIntegrationTests: XCTestCase {
 
         let url = URL(string: "https://privacy-test-pages.site/privacy-protections/gpc/")!
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
         _=try await tab.setUrl(url, source: .link)?.result.get()
 
         // enable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
 
         // expect popup to open and then close
         var oldValue: TabViewModel! = self.tabViewModel
@@ -251,13 +253,13 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         ]
         // retry several times for correct results to come
         for _ in 0..<5 {
-            var persistor = DownloadsPreferencesUserDefaultsPersistor()
+            let persistor = DownloadsPreferencesUserDefaultsPersistor()
             persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
             let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
             _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
 
             let fileUrl = try await downloadTaskFuture.value.output
-                .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
+                .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
 
             // print(try! String(contentsOf: fileUrl))
             results = try JSONDecoder().decode(Results.self, from: Data(contentsOf: fileUrl))

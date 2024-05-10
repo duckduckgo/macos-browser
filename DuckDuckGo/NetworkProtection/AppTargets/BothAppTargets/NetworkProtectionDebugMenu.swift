@@ -16,18 +16,21 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Common
 import Foundation
 import NetworkProtection
+import NetworkProtectionProxy
 import SwiftUI
 
-/// Controller for the Network Protection debug menu.
+/// Controller for the VPN debug menu.
 ///
 @MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
+
+    private let transparentProxySettings = TransparentProxySettings(defaults: .netP)
+
+    // MARK: - Menus
 
     private let environmentMenu = NSMenu()
 
@@ -39,7 +42,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private let resetToDefaults = NSMenuItem(title: "Reset Settings to defaults", action: #selector(NetworkProtectionDebugMenu.resetSettings))
 
-    private let exclusionsMenu = NSMenu()
+    private let excludedRoutesMenu = NSMenu()
+    private let excludeDDGBrowserTrafficFromVPN = NSMenuItem(title: "DDG Browser", action: #selector(toggleExcludeDDGBrowser))
+    private let excludeDBPTrafficFromVPN = NSMenuItem(title: "DBP Background Agent", action: #selector(toggleExcludeDBPBackgroundAgent))
 
     private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "Kill Switch (enforceRoutes)", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
     private let shouldIncludeAllNetworksMenuItem = NSMenuItem(title: "includeAllNetworks", action: #selector(NetworkProtectionDebugMenu.toggleIncludeAllNetworks))
@@ -47,13 +52,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private let disableRekeyingMenuItem = NSMenuItem(title: "Disable Rekeying", action: #selector(NetworkProtectionDebugMenu.toggleRekeyingDisabled))
 
     private let excludeLocalNetworksMenuItem = NSMenuItem(title: "excludeLocalNetworks", action: #selector(NetworkProtectionDebugMenu.toggleShouldExcludeLocalRoutes))
-
-    private let enterWaitlistInviteCodeItem = NSMenuItem(title: "Enter Waitlist Invite Code", action: #selector(NetworkProtectionDebugMenu.showNetworkProtectionInviteCodePrompt))
-
-    private let waitlistTokenItem = NSMenuItem(title: "Waitlist Token:")
-    private let waitlistTimestampItem = NSMenuItem(title: "Waitlist Timestamp:")
-    private let waitlistInviteCodeItem = NSMenuItem(title: "Waitlist Invite Code:")
-    private let waitlistTermsAndConditionsAcceptedItem = NSMenuItem(title: "T&C Accepted:")
 
     // swiftlint:disable:next function_body_length
     init() {
@@ -63,7 +61,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         registrationKeyValidityMenu = NSMenu { [registrationKeyValidityAutomaticItem] in
             registrationKeyValidityAutomaticItem
         }
-        super.init(title: "Network Protection")
+        super.init(title: "VPN")
 
         buildItems {
             NSMenuItem(title: "Reset") {
@@ -76,7 +74,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 resetToDefaults
                     .targetting(self)
 
-                NSMenuItem(title: "Remove System Extension and Login Items", action: #selector(NetworkProtectionDebugMenu.removeSystemExtensionAndAgents))
+                NSMenuItem(title: "Remove Network Extension and Login Items", action: #selector(NetworkProtectionDebugMenu.removeSystemExtensionAndAgents))
                     .targetting(self)
 
                 NSMenuItem(title: "Reset Remote Messages", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionRemoteMessages))
@@ -89,10 +87,12 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 .targetting(self)
             shouldEnforceRoutesMenuItem
                 .targetting(self)
-            NSMenuItem(title: "Excluded Routes").submenu(exclusionsMenu)
             NSMenuItem.separator()
 
             NSMenuItem(title: "Send Test Notification", action: #selector(NetworkProtectionDebugMenu.sendTestNotification))
+                .targetting(self)
+
+            NSMenuItem(title: "Log Feedback Metadata to Console", action: #selector(NetworkProtectionDebugMenu.logFeedbackMetadataToConsole))
                 .targetting(self)
 
             NSMenuItem(title: "Onboarding")
@@ -100,6 +100,14 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem(title: "Environment")
                 .submenu(environmentMenu)
+
+            NSMenuItem(title: "Exclusions") {
+                NSMenuItem(title: "Excluded Apps") {
+                    excludeDDGBrowserTrafficFromVPN.targetting(self)
+                    excludeDBPTrafficFromVPN.targetting(self)
+                }
+                NSMenuItem(title: "Excluded Routes").submenu(excludedRoutesMenu)
+            }
 
             NSMenuItem(title: "Preferred Server").submenu(preferredServerMenu)
 
@@ -129,28 +137,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
                     .targetting(self)
             }
 
-            NSMenuItem(title: "NetP Waitlist") {
-                NSMenuItem(title: "Reset Waitlist State", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionWaitlistState))
-                    .targetting(self)
-                NSMenuItem(title: "Reset T&C Acceptance", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionTermsAndConditionsAcceptance))
-                    .targetting(self)
-
-                enterWaitlistInviteCodeItem
-                    .targetting(self)
-
-                NSMenuItem(title: "Send Waitlist Notification", action: #selector(NetworkProtectionDebugMenu.sendNetworkProtectionWaitlistAvailableNotification))
-                    .targetting(self)
-                NSMenuItem.separator()
-
-                waitlistTokenItem
-                waitlistTimestampItem
-                waitlistInviteCodeItem
-                waitlistTermsAndConditionsAcceptedItem
-            }
-
-            NSMenuItem(title: "NetP Waitlist Feature Flag Overrides")
-                .submenu(NetworkProtectionWaitlistFeatureFlagOverridesMenu())
-
             NSMenuItem.separator()
 
             NSMenuItem(title: "Kill Switch (alternative approach)") {
@@ -166,11 +152,13 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
         preferredServerMenu.autoenablesItems = false
         populateNetworkProtectionEnvironmentListMenuItems()
-        populateNetworkProtectionServerListMenuItems()
+        Task {
+            try? await populateNetworkProtectionServerListMenuItems()
+        }
         populateNetworkProtectionRegistrationKeyValidityMenuItems()
 
-        exclusionsMenu.delegate = self
-        exclusionsMenu.autoenablesItems = false
+        excludedRoutesMenu.delegate = self
+        excludedRoutesMenu.autoenablesItems = false
         populateExclusionsMenuItems()
     }
 
@@ -210,7 +198,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         settings.resetToDefaults()
     }
 
-    /// Removes the system extension and agents for Network Protection.
+    /// Removes the system extension and agents for DuckDuckGo VPN.
     ///
     @objc func removeSystemExtensionAndAgents(_ sender: Any?) {
         Task { @MainActor in
@@ -233,6 +221,17 @@ final class NetworkProtectionDebugMenu: NSMenu {
             } catch {
                 await NSAlert(error: error).runModal()
             }
+        }
+    }
+
+    /// Prints feedback collector metadata to the console. This is to facilitate easier iteration of the metadata collector, without having to go through the feedback form flow every time.
+    ///
+    @objc func logFeedbackMetadataToConsole(_ sender: Any?) {
+        Task { @MainActor in
+            let collector = DefaultVPNMetadataCollector()
+            let metadata = await collector.collectMetadata()
+
+            print(metadata.toPrettyPrintedJSON()!)
         }
     }
 
@@ -316,9 +315,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
         ]
     }
 
-    private func populateNetworkProtectionServerListMenuItems() {
-        let networkProtectionServerStore = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
-        let servers = (try? networkProtectionServerStore.storedNetworkProtectionServerList()) ?? []
+    @MainActor
+    private func populateNetworkProtectionServerListMenuItems() async throws {
+        let servers = try await NetworkProtectionDeviceManager.create().refreshServerList()
 
         preferredServerAutomaticItem.target = self
         if servers.isEmpty {
@@ -377,7 +376,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     private func populateExclusionsMenuItems() {
-        exclusionsMenu.removeAllItems()
+        excludedRoutesMenu.removeAllItems()
 
         for item in settings.excludedRoutes {
             let menuItem: NSMenuItem
@@ -392,12 +391,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
                                       target: self,
                                       representedObject: range.stringRepresentation)
             }
-            exclusionsMenu.addItem(menuItem)
+            excludedRoutesMenu.addItem(menuItem)
         }
-
-        // Only allow testers to enter a custom code if they're on the waitlist, to simulate the correct path through the flow
-        let waitlist = NetworkProtectionWaitlist()
-        enterWaitlistInviteCodeItem.isEnabled = waitlist.waitlistStorage.isOnWaitlist || waitlist.waitlistStorage.isInvited
 
     }
 
@@ -405,10 +400,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     override func update() {
         updateEnvironmentMenu()
+        updateExclusionsMenu()
         updatePreferredServerMenu()
         updateRekeyValidityMenu()
         updateNetworkProtectionMenuItemsState()
-        updateNetworkProtectionItems()
     }
 
     private func updateEnvironmentMenu() {
@@ -475,26 +470,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         disableRekeyingMenuItem.state = settings.disableRekeying ? .on : .off
     }
 
-    private func updateNetworkProtectionItems() {
-        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier, keychainAppGroup: NetworkProtectionWaitlist.keychainAppGroup)
-        waitlistTokenItem.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
-        waitlistInviteCodeItem.title = "Waitlist Invite Code: \(waitlistStorage.getWaitlistInviteCode() ?? "N/A")"
-
-        if let timestamp = waitlistStorage.getWaitlistTimestamp() {
-            waitlistTimestampItem.title = "Waitlist Timestamp: \(String(describing: timestamp))"
-        } else {
-            waitlistTimestampItem.title = "Waitlist Timestamp: N/A"
-        }
-
-        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
-        waitlistTermsAndConditionsAcceptedItem.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
-    }
-
     // MARK: Waitlist
-
-    @objc func sendNetworkProtectionWaitlistAvailableNotification(_ sender: Any?) {
-        NetworkProtectionWaitlist().sendInviteCodeAvailableNotification(completion: nil)
-    }
 
     @objc func resetNetworkProtectionActivationDate(_ sender: Any?) {
         overrideNetworkProtectionActivationDate(to: nil)
@@ -527,53 +503,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
         }
     }
 
-    @objc func resetNetworkProtectionWaitlistState(_ sender: Any?) {
-        NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
-        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
-        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionWaitlistSignUpPromptDismissed.rawValue)
-        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-    }
-
-    @objc func resetNetworkProtectionTermsAndConditionsAcceptance(_ sender: Any?) {
-        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
-        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-    }
-
-    @objc func showNetworkProtectionInviteCodePrompt(_ sender: Any?) {
-        let code = getInviteCode()
-
-        Task {
-            do {
-                let redeemer = NetworkProtectionCodeRedemptionCoordinator()
-                try await redeemer.redeem(code)
-                NetworkProtectionWaitlist().waitlistStorage.store(inviteCode: code)
-                NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-            } catch {
-                // Do nothing here, this is just a debug menu
-            }
-        }
-    }
-
-    private func getInviteCode() -> String {
-        let alert = NSAlert()
-        alert.addButton(withTitle: "Use Invite Code")
-        alert.addButton(withTitle: "Cancel")
-        alert.messageText = "Enter Invite Code"
-        alert.informativeText = "Please grab a Network Protection invite code from Asana and enter it here."
-
-        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        alert.accessoryView = textField
-
-        let response = alert.runModal()
-
-        if response == .alertFirstButtonReturn {
-            return textField.stringValue
-        } else {
-            return ""
-        }
-    }
-
     // MARK: Environment
+
     @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
         let title = menuItem.title
         let selectedEnvironment: VPNSettings.SelectedEnvironment
@@ -588,11 +519,28 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
         Task {
             _ = try await NetworkProtectionDeviceManager.create().refreshServerList()
-            await MainActor.run {
-                populateNetworkProtectionServerListMenuItems()
-            }
+            try? await populateNetworkProtectionServerListMenuItems()
+
             settings.selectedServer = .automatic
         }
+    }
+
+    // MARK: - Exclusions
+
+    private let dbpBackgroundAppIdentifier = Bundle.main.dbpBackgroundAgentBundleId
+    private let ddgBrowserAppIdentifier = Bundle.main.bundleIdentifier!
+
+    private func updateExclusionsMenu() {
+        excludeDBPTrafficFromVPN.state = transparentProxySettings.isExcluding(dbpBackgroundAppIdentifier) ? .on : .off
+        excludeDDGBrowserTrafficFromVPN.state = transparentProxySettings.isExcluding(ddgBrowserAppIdentifier) ? .on : .off
+    }
+
+    @objc private func toggleExcludeDBPBackgroundAgent() {
+        transparentProxySettings.toggleExclusion(for: dbpBackgroundAppIdentifier)
+    }
+
+    @objc private func toggleExcludeDDGBrowser() {
+        transparentProxySettings.toggleExclusion(for: ddgBrowserAppIdentifier)
     }
 }
 
@@ -618,6 +566,4 @@ extension NetworkProtectionDebugMenu: NSMenuDelegate {
 #Preview {
     return MenuPreview(menu: NetworkProtectionDebugMenu())
 }
-#endif
-
 #endif

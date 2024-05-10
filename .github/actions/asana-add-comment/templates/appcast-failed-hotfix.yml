@@ -1,0 +1,9 @@
+data:
+  html_text: |
+    <body>
+      <h2>[ACTION NEEDED] Publishing ${TAG} hotfix release to Sparkle failed</h2>
+      <a data-asana-gid='${ASSIGNEE_ID}'/>, please proceed with generating appcast2.xml and uploading files to S3 from your local machine, <a data-asana-gid='${TASK_ID}' data-asana-dynamic='false'>according to instructions</a>.
+
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>

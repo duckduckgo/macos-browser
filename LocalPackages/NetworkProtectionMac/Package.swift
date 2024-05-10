@@ -27,12 +27,15 @@ let package = Package(
     ],
     products: [
         .library(name: "NetworkProtectionIPC", targets: ["NetworkProtectionIPC"]),
-        .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
+        .library(name: "NetworkProtectionProxy", targets: ["NetworkProtectionProxy"]),
+        .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "101.1.4"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "144.0.5"),
+        .package(url: "https://github.com/airbnb/lottie-spm", exact: "4.4.1"),
         .package(path: "../XPCHelper"),
-        .package(path: "../SwiftUIExtensions")
+        .package(path: "../SwiftUIExtensions"),
+        .package(path: "../LoginItems"),
     ],
     targets: [
         // MARK: - NetworkProtectionIPC
@@ -41,12 +44,25 @@ let package = Package(
             name: "NetworkProtectionIPC",
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
-                .product(name: "XPCHelper", package: "XPCHelper")
+                .product(name: "XPCHelper", package: "XPCHelper"),
+                .product(name: "PixelKit", package: "BrowserServicesKit"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
+            ]
+        ),
+
+        // MARK: - NetworkProtectionProxy
+
+        .target(
+            name: "NetworkProtectionProxy",
+            dependencies: [
+                .product(name: "NetworkProtection", package: "BrowserServicesKit"),
+                .product(name: "PixelKit", package: "BrowserServicesKit"),
             ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ]
         ),
 
         // MARK: - NetworkProtectionUI
@@ -55,23 +71,27 @@ let package = Package(
             name: "NetworkProtectionUI",
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
-                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
+                .product(name: "PixelKit", package: "BrowserServicesKit"),
+                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
+                .product(name: "LoginItems", package: "LoginItems"),
+                .product(name: "Lottie", package: "lottie-spm")
             ],
             resources: [
                 .copy("Resources/Assets.xcassets")
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
-            ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            ]
         ),
+
         .testTarget(
             name: "NetworkProtectionUITests",
             dependencies: [
                 "NetworkProtectionUI",
-                .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit")
-            ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
-        )
+                .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit"),
+                .product(name: "LoginItems", package: "LoginItems"),
+                .product(name: "PixelKitTestingUtilities", package: "BrowserServicesKit"),
+            ]
+        ),
     ]
 )

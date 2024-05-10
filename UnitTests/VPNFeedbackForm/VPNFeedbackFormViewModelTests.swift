@@ -19,8 +19,6 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-#if NETWORK_PROTECTION
-
 final class VPNFeedbackFormViewModelTests: XCTestCase {
 
     func testWhenCreatingViewModel_ThenInitialStateIsFeedbackPending() throws {
@@ -85,14 +83,28 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
     func collectMetadata() async -> VPNMetadata {
         self.collectedMetadata = true
 
-        let appInfo = VPNMetadata.AppInfo(appVersion: "1.2.3", lastVersionRun: "1.2.3", isInternalUser: false)
-        let deviceInfo = VPNMetadata.DeviceInfo(osVersion: "14.0.0", buildFlavor: "dmg", lowPowerModeEnabled: false)
+        let appInfo = VPNMetadata.AppInfo(
+            appVersion: "1.2.3",
+            lastAgentVersionRun: "1.2.3",
+            lastExtensionVersionRun: "1.2.3",
+            isInternalUser: false,
+            isInApplicationsDirectory: true
+        )
+
+        let deviceInfo = VPNMetadata.DeviceInfo(
+            osVersion: "14.0.0",
+            buildFlavor: "dmg",
+            lowPowerModeEnabled: false,
+            cpuArchitecture: "arm64"
+        )
+
         let networkInfo = VPNMetadata.NetworkInfo(currentPath: "path")
 
         let vpnState = VPNMetadata.VPNState(
             onboardingState: "onboarded",
             connectionState: "connected",
-            lastErrorMessage: "none",
+            lastStartErrorDescription: "none",
+            lastTunnelErrorDescription: "none",
             connectedServer: "Paoli, PA",
             connectedServerIP: "123.123.123.123"
         )
@@ -110,7 +122,14 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
 
         let loginItemState = VPNMetadata.LoginItemState(
             vpnMenuState: "enabled",
-            notificationsAgentState: "enabled"
+            vpnMenuIsRunning: true,
+            notificationsAgentState: "enabled",
+            notificationsAgentIsRunning: true
+        )
+
+        let privacyProInfo = VPNMetadata.PrivacyProInfo(
+            hasPrivacyProAccount: true,
+            hasVPNEntitlement: true
         )
 
         return VPNMetadata(
@@ -119,7 +138,8 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
             networkInfo: networkInfo,
             vpnState: vpnState,
             vpnSettingsState: vpnSettingsState,
-            loginItemState: loginItemState
+            loginItemState: loginItemState,
+            privacyProInfo: privacyProInfo
         )
     }
 
@@ -156,5 +176,3 @@ private class MockVPNFeedbackFormViewModelDelegate: VPNFeedbackFormViewModelDele
     }
 
 }
-
-#endif

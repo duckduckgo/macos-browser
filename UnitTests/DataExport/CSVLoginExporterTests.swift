@@ -25,11 +25,9 @@ class CSVLoginExporterTests: XCTestCase {
 
     func testWhenExportingLogins_ThenLoginsArePersistedToDisk() throws {
         let mockFileStore = FileStoreMock()
-        let vault = try MockSecureVaultFactory.makeVault(errorReporter: nil)
+        let vault = try MockSecureVaultFactory.makeVault(reporter: nil)
 
-        let credentials = websiteCredentials(identifiers: [1])
-        vault.storedAccounts = credentials.map(\.value.account)
-        vault.storedCredentials = credentials
+        vault.addWebsiteCredentials(identifiers: [1])
 
         let exporter = CSVLoginExporter(secureVault: vault, fileStore: mockFileStore)
 
@@ -43,20 +41,4 @@ class CSVLoginExporterTests: XCTestCase {
         let expectedRow = "\"title-1\",\"domain-1\",\"user-1\",\"password\\\"containing\\\"quotes\""
         XCTAssertEqual(data, (expectedHeader + expectedRow).data(using: .utf8)!)
     }
-
-    private func websiteCredentials(identifiers: [Int64]) -> [Int64: SecureVaultModels.WebsiteCredentials] {
-        var credentials = [Int64: SecureVaultModels.WebsiteCredentials]()
-
-        for identifier in identifiers {
-            let account = SecureVaultModels.WebsiteAccount(id: String(identifier),
-                                                           title: "title-\(identifier)",
-                                                           username: "user-\(identifier)",
-                                                           domain: "domain-\(identifier)")
-            let credential = SecureVaultModels.WebsiteCredentials(account: account, password: "password\"containing\"quotes".data(using: .utf8)!)
-            credentials[identifier] = credential
-        }
-
-        return credentials
-    }
-
 }

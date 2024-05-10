@@ -31,11 +31,23 @@ public protocol IPCServerInterface: AnyObject {
 
     /// Start the VPN tunnel.
     ///
-    func start()
+    /// - Parameters:
+    ///     - completion: the completion closure.  This will be called as soon as the IPC request has been processed, and won't
+    ///         signal successful completion of the request.
+    ///
+    func start(completion: @escaping (Error?) -> Void)
 
     /// Stop the VPN tunnel.
     ///
-    func stop()
+    /// - Parameters:
+    ///     - completion: the completion closure.  This will be called as soon as the IPC request has been processed, and won't
+    ///         signal successful completion of the request.
+    ///
+    func stop(completion: @escaping (Error?) -> Void)
+
+    /// Fetches the last error directly from the tunnel manager.
+    ///
+    func fetchLastError(completion: @escaping (Error?) -> Void)
 
     /// Debug commands
     ///
@@ -57,11 +69,15 @@ protocol XPCServerInterface {
 
     /// Start the VPN tunnel.
     ///
-    func start()
+    func start(completion: @escaping (Error?) -> Void)
 
     /// Stop the VPN tunnel.
     ///
-    func stop()
+    func stop(completion: @escaping (Error?) -> Void)
+
+    /// Fetches the last error directly from the tunnel manager.
+    ///
+    func fetchLastError(completion: @escaping (Error?) -> Void)
 
     /// Debug commands
     ///
@@ -135,6 +151,20 @@ extension TunnelControllerIPCServer: IPCClientInterface {
             client.statusChanged(payload: payload)
         }
     }
+
+    public func dataVolumeUpdated(_ dataVolume: DataVolume) {
+        let payload: Data
+
+        do {
+            payload = try JSONEncoder().encode(dataVolume)
+        } catch {
+            return
+        }
+
+        xpc.forEachClient { client in
+            client.dataVolumeUpdated(payload: payload)
+        }
+    }
 }
 
 // MARK: - Incoming communication from a client
@@ -144,12 +174,16 @@ extension TunnelControllerIPCServer: XPCServerInterface {
         serverDelegate?.register()
     }
 
-    func start() {
-        serverDelegate?.start()
+    func start(completion: @escaping (Error?) -> Void) {
+        serverDelegate?.start(completion: completion)
     }
 
-    func stop() {
-        serverDelegate?.stop()
+    func stop(completion: @escaping (Error?) -> Void) {
+        serverDelegate?.stop(completion: completion)
+    }
+
+    func fetchLastError(completion: @escaping (Error?) -> Void) {
+        serverDelegate?.fetchLastError(completion: completion)
     }
 
     func debugCommand(_ payload: Data, completion: @escaping (Error?) -> Void) {

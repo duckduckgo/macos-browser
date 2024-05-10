@@ -1,6 +1,7 @@
 {
-  "name": "smartbackgroundchecks.com",
-  "version": "0.1.1",
+  "name": "SmartBackgroundChecks",
+  "url": "smartbackgroundchecks.com",
+  "version": "0.1.5",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678082400000,
   "steps": [
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "97b307c8-e3e4-4090-a6ab-c5eeb599d248",
+          "id": "290d3add-c786-4ecf-a528-50b2a240f791",
           "url": "https://www.smartbackgroundchecks.com/people/${firstName}-${lastName}/${city}/${state}"
         },
         {
           "actionType": "extract",
-          "id": "ca20a933-b703-427e-8cbf-e2f25cd763a6",
+          "id": "2e04c4da-5f4b-4ab3-bd9e-4d4300d51f63",
           "selector": ".card-block",
           "profile": {
             "name": {
@@ -41,7 +42,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": ".//h2//a"
+              "selector": ".//h2//a",
+              "identifierType": "path",
+              "identifier": "https://www.smartbackgroundchecks.com/people/${firstName}-${lastName}/${id}"
             }
           }
         }

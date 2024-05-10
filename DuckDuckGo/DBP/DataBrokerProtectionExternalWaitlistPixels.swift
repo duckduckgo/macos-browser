@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import PixelKit
 
 struct DataBrokerProtectionExternalWaitlistPixels {
 
@@ -35,16 +36,11 @@ struct DataBrokerProtectionExternalWaitlistPixels {
         return (regionCode ?? "US") == "US"
     }
 
-    static func fire(pixel: Pixel.Event, frequency: DailyPixel.PixelFrequency) {
+    static func fire(pixel: PixelKitEventV2, frequency: PixelKit.Frequency) {
         if Self.isUserLocaleAllowed {
             let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
-            DailyPixel.fire(pixel: pixel,
-                            frequency: frequency,
-                            includeAppVersionParameter: true,
-                            withAdditionalParameters: [
-                                "isInternalUser": isInternalUser.description
-                            ]
-            )
+            let parameters = ["isInternalUser": isInternalUser.description]
+            PixelKit.fire(pixel, frequency: frequency, withAdditionalParameters: parameters)
         }
     }
 }

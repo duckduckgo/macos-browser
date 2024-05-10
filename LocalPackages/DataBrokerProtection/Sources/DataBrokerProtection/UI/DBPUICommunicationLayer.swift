@@ -23,9 +23,9 @@ import UserScript
 import Common
 
 protocol DBPUICommunicationDelegate: AnyObject {
-    func saveProfile() async -> Bool
+    func saveProfile() async throws
     func getUserProfile() -> DBPUIUserProfile?
-    func deleteProfileData()
+    func deleteProfileData() throws
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool
     func setNameAtIndexInCurrentUserProfile(_ payload: DBPUINameAtIndex) -> Bool
     func removeNameAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
@@ -36,6 +36,8 @@ protocol DBPUICommunicationDelegate: AnyObject {
     func startScanAndOptOut() -> Bool
     func getInitialScanState() async -> DBPUIInitialScanState
     func getMaintananceScanState() async -> DBPUIScanAndOptOutMaintenanceState
+    func getDataBrokers() async -> [DBPUIDataBroker]
+    func getBackgroundAgentMetadata() async -> DBPUIDebugMetadata
 }
 
 enum DBPUIReceivedMethodName: String {
@@ -53,6 +55,8 @@ enum DBPUIReceivedMethodName: String {
     case startScanAndOptOut
     case initialScanStatus
     case maintenanceScanStatus
+    case getDataBrokers
+    case getBackgroundAgentMetadata
 }
 
 enum DBPUISendableMethodName: String {
@@ -69,7 +73,7 @@ struct DBPUICommunicationLayer: Subfeature {
     weak var delegate: DBPUICommunicationDelegate?
 
     private enum Constants {
-        static let version = 1
+        static let version = 3
     }
 
     internal init(webURLSettings: DataBrokerProtectionWebUIURLSettingsRepresentable) {
@@ -101,6 +105,8 @@ struct DBPUICommunicationLayer: Subfeature {
         case .startScanAndOptOut: return startScanAndOptOut
         case .initialScanStatus: return initialScanStatus
         case .maintenanceScanStatus: return maintenanceScanStatus
+        case .getDataBrokers: return getDataBrokers
+        case .getBackgroundAgentMetadata: return getBackgroundAgentMetadata
         }
 
     }
@@ -124,9 +130,13 @@ struct DBPUICommunicationLayer: Subfeature {
     func saveProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         os_log("Web UI requested to save the profile", log: .dataBrokerProtection)
 
-        let success = await delegate?.saveProfile()
-
-        return DBPUIStandardResponse(version: Constants.version, success: success ?? false)
+        do {
+            try await delegate?.saveProfile()
+            return DBPUIStandardResponse(version: Constants.version, success: true)
+        } catch {
+            os_log("DBPUICommunicationLayer saveProfile, error: %{public}@", log: .error, error.localizedDescription)
+            return DBPUIStandardResponse(version: Constants.version, success: false)
+        }
     }
 
     func getCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -138,8 +148,13 @@ struct DBPUICommunicationLayer: Subfeature {
     }
 
     func deleteUserProfileData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        delegate?.deleteProfileData()
-        return DBPUIStandardResponse(version: Constants.version, success: true)
+        do {
+            try delegate?.deleteProfileData()
+            return DBPUIStandardResponse(version: Constants.version, success: true)
+        } catch {
+            os_log("DBPUICommunicationLayer deleteUserProfileData, error: %{public}@", log: .error, error.localizedDescription)
+            return DBPUIStandardResponse(version: Constants.version, success: false)
+        }
     }
 
     func addNameToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -262,6 +277,15 @@ struct DBPUICommunicationLayer: Subfeature {
         }
 
         return maintenanceScanStatus
+    }
+
+    func getDataBrokers(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
+        let dataBrokers = await delegate?.getDataBrokers() ?? [DBPUIDataBroker]()
+        return DBPUIDataBrokerList(dataBrokers: dataBrokers)
+    }
+
+    func getBackgroundAgentMetadata(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
+        return await delegate?.getBackgroundAgentMetadata()
     }
 
     func sendMessageToUI(method: DBPUISendableMethodName, params: DBPUISendableMessage, into webView: WKWebView) {

@@ -38,14 +38,13 @@ final class ContentBlockingRulesUpdateObserver {
         bindContentBlockingRulesRecompilation(publisher: (ContentBlocking.shared as? AppContentBlocking)!.userContentUpdating.userContentBlockingAssets)
     }
 
-    public func didStartCompilation(for domain: String, token: ContentBlockerRulesManager.CompletionToken ) {
+    public func startCompilation(for domain: String, token: ContentBlockerRulesManager.CompletionToken ) {
         pendingUpdates[token] = domain
         onPendingUpdates?()
     }
 
-    private func bindContentBlockingRulesRecompilation<Pub: Publisher>(publisher: Pub)
-    where Pub.Output == UserContentUpdating.NewContent, Pub.Failure == Never {
-
+    private func bindContentBlockingRulesRecompilation<Pub: Publisher>(publisher: Pub) where Pub.Output == UserContentUpdating.NewContent,
+                                                                                                Pub.Failure == Never {
         rulesRecompilationCancellable = publisher
             .compactMap(\.nonEmptyCompletionTokens)
             .receive(on: RunLoop.main)

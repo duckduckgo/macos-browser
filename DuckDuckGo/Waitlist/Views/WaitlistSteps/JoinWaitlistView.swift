@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION || DBP
-
 import SwiftUI
 import SwiftUIExtensions
 
@@ -48,18 +46,18 @@ struct JoinWaitlistView: View {
 
                 Text(viewData.subtitle1)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(Color("BlackWhite80"))
+                    .foregroundColor(Color(.blackWhite80))
 
                 if !viewData.subtitle2.isEmpty {
                     Text(viewData.subtitle2)
                         .multilineTextAlignment(.center)
-                        .foregroundColor(Color("BlackWhite80"))
+                        .foregroundColor(Color(.blackWhite80))
                 }
 
                 Text(viewData.availabilityDisclaimer)
                     .multilineTextAlignment(.center)
                     .font(.system(size: 12))
-                    .foregroundColor(Color("BlackWhite60"))
+                    .foregroundColor(Color(.blackWhite60))
             }
         } buttons: {
             Button(viewData.buttonCloseLabel) {
@@ -74,22 +72,6 @@ struct JoinWaitlistView: View {
         .environmentObject(model)
     }
 }
-
-#endif
-
-#if NETWORK_PROTECTION
-
-struct NetworkProtectionJoinWaitlistViewData: JoinWaitlistViewViewData {
-    let headerImageName = "JoinWaitlistHeader"
-    let title = UserText.networkProtectionWaitlistJoinTitle
-    let subtitle1 = UserText.networkProtectionWaitlistJoinSubtitle1
-    let subtitle2 = UserText.networkProtectionWaitlistJoinSubtitle2
-    let availabilityDisclaimer = UserText.networkProtectionWaitlistAvailabilityDisclaimer
-    let buttonCloseLabel = UserText.networkProtectionWaitlistButtonClose
-    let buttonJoinWaitlistLabel = UserText.networkProtectionWaitlistButtonJoinWaitlist
-}
-
-#endif
 
 #if DBP
 

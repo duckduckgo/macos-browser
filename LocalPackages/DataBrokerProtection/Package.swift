@@ -29,33 +29,30 @@ let package = Package(
             targets: ["DataBrokerProtection"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "101.1.4"),
-        .package(path: "../PixelKit"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "144.0.5"),
         .package(path: "../SwiftUIExtensions"),
-        .package(path: "../XPCHelper")
+        .package(path: "../XPCHelper"),
     ],
     targets: [
         .target(
             name: "DataBrokerProtection",
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
-                .product(name: "PixelKit", package: "PixelKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
-                .byName(name: "XPCHelper")
+                .byName(name: "XPCHelper"),
+                .product(name: "PixelKit", package: "BrowserServicesKit"),
             ],
             resources: [.process("Resources")],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
-            ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            ]
         ),
         .testTarget(
             name: "DataBrokerProtectionTests",
             dependencies: [
                 "DataBrokerProtection",
-                "BrowserServicesKit"
-            ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+                "BrowserServicesKit",
+            ]
         )
     ]
 )

@@ -1,7 +1,8 @@
 {
-  "name": "peoplefinders.com",
-  "version": "0.1.0",
-  "addedDatetime": 1677128400000,
+  "name": "PeopleFinders",
+  "url": "peoplefinders.com",
+  "version": "0.1.5",
+  "addedDatetime": 1677132000000,
   "steps": [
     {
       "stepType": "scan",
@@ -9,12 +10,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "aafba5bd-a157-4e35-b653-0797a732d94c",
+          "id": "12c69911-415b-4904-8162-d7993d44e348",
           "url": "https://www.peoplefinders.com/people/${firstName}-${lastName}/${state}/${city}?landing=all&age=${age}"
         },
         {
           "actionType": "extract",
-          "id": "b8f10f20-3363-4781-a03b-c4958b6269c7",
+          "id": "f35cbfda-053f-444c-93b7-36e9bed2612b",
           "selector": ".record",
           "profile": {
             "name": {
@@ -36,7 +37,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "param",
+              "identifier": "id"
             }
           }
         }
@@ -48,12 +51,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "f5fbd4f5-23f7-45ed-a9ce-3e9b0a5a7a0a",
+          "id": "da658a1f-254b-42c6-b78a-f93655048db8",
           "url": "https://www.peoplefinders.com/opt-out"
         },
         {
           "actionType": "click",
-          "id": "7b33cd1b-3948-4454-8434-e703cc235123",
+          "id": "c15a2587-ff08-4ec6-b7c0-0744273d57a9",
           "elements": [
             {
               "type": "button",
@@ -63,7 +66,7 @@
         },
         {
           "actionType": "fillForm",
-          "id": "32056b7a-dc80-4d5d-b9cc-dccd32cb56be",
+          "id": "5685d436-32d5-4de0-a2b8-d5bbb4fa778d",
           "selector": ".opt-out-form",
           "elements": [
             {
@@ -78,17 +81,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "5d5068aa-5c16-4fdc-8f3b-e412ad4eabed",
+          "id": "fcf4b0cf-9bb4-42e6-a2a9-68e4f2a25a2c",
           "selector": ".g-recaptcha"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "3443e060-8aee-4bd0-ab2c-ea03f8b8f93c",
+          "id": "25c7fbb0-0508-4f93-aeb8-3642ecef8c33",
           "selector": ".g-recaptcha"
         },
         {
           "actionType": "click",
-          "id": "cb9ef5b0-0155-42f1-a766-145b3c14586b",
+          "id": "4ac6a176-ddaf-437f-8d8f-2dde0fe6b0ed",
           "elements": [
             {
               "type": "button",
@@ -98,22 +101,22 @@
         },
         {
           "actionType": "emailConfirmation",
-          "id": "5cc7cfa5-e8ab-4dc1-b58b-973af3d3f364",
+          "id": "6f43425f-a49d-4eac-bec2-794c5f6bd687",
           "pollingTime": 30
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "3a44c15d-1dd0-4e92-beba-bf3d8544c6e9",
+          "id": "45f59ed0-3a36-4ab6-9c45-e906471fb3e4",
           "selector": ".g-recaptcha"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "d2566371-8b02-4414-9a24-1f9d2761eb1d",
+          "id": "85469ad1-8870-449d-961e-22ea10738ec0",
           "selector": ".g-recaptcha"
         },
         {
           "actionType": "click",
-          "id": "259d8895-ac58-46b0-a209-7f209171e13c",
+          "id": "cab0438c-1770-4dac-930d-041d44772172",
           "elements": [
             {
               "type": "button",
@@ -123,7 +126,7 @@
         },
         {
           "actionType": "expectation",
-          "id": "ed02f55b-67b3-4efc-a3cc-ce6b6c7ceeed",
+          "id": "bc09540c-8aeb-4d9f-b515-0ebb6f4583a5",
           "expectations": [
             {
               "type": "url",

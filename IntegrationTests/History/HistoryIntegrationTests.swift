@@ -18,8 +18,10 @@
 
 import Combine
 import Common
+import History
 import Navigation
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -35,8 +37,21 @@ class HistoryIntegrationTests: XCTestCase {
         mainViewController.browserTabViewController.tabViewModel!
     }
 
+    var contentBlockingMock: ContentBlockingMock!
+    var privacyFeaturesMock: AnyPrivacyFeatures!
+    var privacyConfiguration: MockPrivacyConfiguration {
+        contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
+    }
+
     @MainActor
     override func setUp() async throws {
+        contentBlockingMock = ContentBlockingMock()
+        privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
+        // disable waiting for CBR compilation on navigation
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
+            return false
+        }
+
         await withCheckedContinuation { continuation in
             HistoryCoordinator.shared.burnAll {
                 continuation.resume(returning: ())
@@ -44,17 +59,18 @@ class HistoryIntegrationTests: XCTestCase {
         }
     }
 
-    override func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window?.close()
         window = nil
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests
 
     @MainActor
     func testWhenPageTitleIsUpdated_historyEntryTitleUpdated() async throws {
-        let tab = Tab(content: .newtab)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let html = """
@@ -98,7 +114,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenSameDocumentNavigation_historyEntryTitleUpdated() async throws {
-        let tab = Tab(content: .newtab)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let html = """
@@ -142,7 +158,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigatingToSamePage_visitIsAdded() async throws {
-        let tab = Tab(content: .newtab)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let urls = [
@@ -162,7 +178,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigatingBack_visitIsNotAdded() async throws {
-        let tab = Tab(content: .newtab)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let urls = [
@@ -183,7 +199,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenScriptTrackerLoaded_trackerAddedToHistory() async throws {
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
@@ -211,7 +227,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenSurrogateTrackerLoaded_trackerAddedToHistory() async throws {
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!

@@ -1,0 +1,64 @@
+name: Add a Message to Asana Release Automation Task
+description: Adds a comment about release progress to the Asana release task's "Automation" subtask
+inputs:
+  access-token:
+    description: "Asana access token"
+    required: true
+    type: string
+  task-url:
+    description: "Asana release task URL"
+    required: false
+    type: string
+  comment:
+    description: "Comment to add to the Asana task"
+    required: false
+    type: string
+  template-name:
+    description: |
+      Name of a template file (without extension) for the comment, relative to 'templates'
+      subdirectory of the 'asana-add-comment' action.
+      The file is processed by envsubst before being sent to Asana.
+    required: false
+    type: string
+runs:
+  using: "composite"
+  steps:
+    - id: get-automation-subtask
+      uses: ./.github/actions/asana-get-release-automation-subtask-id
+      with:
+        access-token: ${{ inputs.access-token }}
+        task-url: ${{ inputs.task-url }}
+
+    - id: get-asana-user-id
+      if: github.event_name != 'schedule'
+      uses: duckduckgo/apple-toolbox/actions/asana-get-user-id-for-github-handle@main
+      with:
+        access-token: ${{ inputs.access-token }}
+        github-handle: ${{ github.actor }}
+
+    - id: add-colaborator
+      shell: bash
+      env:
+        ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
+        ASSIGNEE_ID: ${{ steps.get-asana-user-id.outputs.user-id || steps.get-automation-subtask.outputs.assignee-id }}
+        TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+      run: |
+        return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/addFollowers" \
+          -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+          -H 'content-type: application/json' \
+          --write-out '%{http_code}' \
+          --output /dev/null \
+          -d "{ \"data\": { \"followers\": [ \"${ASSIGNEE_ID}\" ] } }")
+
+        if [ $return_code -ne 200 ]; then
+          echo "::error::Failed to add a collaborator to the Asana task"
+          exit 1
+        fi
+
+    - id: add-comment
+      uses: ./.github/actions/asana-add-comment
+      with:
+        access-token: ${{ inputs.access-token }}
+        task-id: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+        comment: ${{ inputs.comment }}
+        template-name: ${{ inputs.template-name }}

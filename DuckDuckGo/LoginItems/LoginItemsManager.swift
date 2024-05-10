@@ -19,18 +19,57 @@
 import Common
 import Foundation
 import LoginItems
+import PixelKit
 
-/// Class to manage the login items for Network Protection and DBP
-/// 
-final class LoginItemsManager {
+protocol LoginItemsManaging {
+    func throwingEnableLoginItems(_ items: Set<LoginItem>, log: OSLog) throws
+}
+
+/// Class to manage the login items for the VPN and DBP
+///
+final class LoginItemsManager: LoginItemsManaging {
+    private enum Action: String {
+        case enable
+        case disable
+        case restart
+    }
+
     // MARK: - Main Interactions
 
     func enableLoginItems(_ items: Set<LoginItem>, log: OSLog) {
-        updateLoginItems(items, whatAreWeDoing: "enable", using: LoginItem.enable)
+        for item in items {
+            do {
+                try item.enable()
+                os_log("🟢 Enabled successfully %{public}@", log: log, String(describing: item))
+            } catch let error as NSError {
+                handleError(for: item, action: .enable, error: error)
+            }
+        }
+    }
+
+    /// Throwing version of enableLoginItems
+    ///
+    func throwingEnableLoginItems(_ items: Set<LoginItem>, log: OSLog) throws {
+        for item in items {
+            do {
+                try item.enable()
+                os_log("🟢 Enabled successfully %{public}@", log: log, String(describing: item))
+            } catch let error as NSError {
+                handleError(for: item, action: .enable, error: error)
+                throw error
+            }
+        }
     }
 
     func restartLoginItems(_ items: Set<LoginItem>, log: OSLog) {
-        updateLoginItems(items, whatAreWeDoing: "restart", using: LoginItem.restart)
+        for item in items {
+            do {
+                try item.restart()
+                os_log("🟢 Restarted successfully %{public}@", log: log, String(describing: item))
+            } catch let error as NSError {
+                handleError(for: item, action: .restart, error: error)
+            }
+        }
     }
 
     func disableLoginItems(_ items: Set<LoginItem>) {
@@ -39,31 +78,26 @@ final class LoginItemsManager {
         }
     }
 
+    func isAnyEnabled(_ items: Set<LoginItem>) -> Bool {
+        return items.contains(where: { item in
+            item.status == .enabled
+        })
+    }
+
+    private func handleError(for item: LoginItem, action: Action, error: NSError) {
+        let event = GeneralPixel.loginItemUpdateError(loginItemBundleID: item.agentBundleID,
+                                                      action: "enable",
+                                                      buildType: AppVersion.shared.buildType,
+                                                      osVersion: AppVersion.shared.osVersion)
+        PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
+        os_log("🔴 Could not enable %{public}@: %{public}@", item.debugDescription, error.debugDescription)
+    }
+
     // MARK: - Debug Interactions
 
     func resetLoginItems(_ items: Set<LoginItem>) async throws {
         for item in items {
             try? item.disable()
-        }
-    }
-
-    // MARK: - Misc Utility
-
-    private func updateLoginItems(_ items: Set<LoginItem>, whatAreWeDoing: String, using action: (LoginItem) -> () throws -> Void) {
-        for item in items {
-            do {
-                try action(item)()
-            } catch let error as NSError {
-                let event = Pixel.Event.Debug.loginItemUpdateError(
-                    loginItemBundleID: item.agentBundleID,
-                    action: whatAreWeDoing,
-                    buildType: AppVersion.shared.buildType,
-                    osVersion: AppVersion.shared.osVersion
-                )
-
-                DailyPixel.fire(pixel: .debug(event: event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
-                logOrAssertionFailure("🔴 Could not \(whatAreWeDoing) \(item): \(error.debugDescription)")
-            }
         }
     }
 

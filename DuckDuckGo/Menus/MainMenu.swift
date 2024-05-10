@@ -24,14 +24,9 @@ import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import SwiftUI
 import WebKit
 import Configuration
-
-#if NETWORK_PROTECTION
 import NetworkProtection
-#endif
-
-#if SUBSCRIPTION
+import Subscription
 import SubscriptionUI
-#endif
 
 // swiftlint:disable:next type_body_length
 @MainActor final class MainMenu: NSMenu {
@@ -40,11 +35,11 @@ import SubscriptionUI
         static let maxTitleLength = 55
     }
 
-    // MARK: - DuckDuckGo
+    // MARK: DuckDuckGo
     let servicesMenu = NSMenu(title: UserText.mainMenuAppServices)
-    let preferencesMenuItem = NSMenuItem(title: UserText.mainMenuAppPreferences, action: #selector(AppDelegate.openPreferences), keyEquivalent: ",")
+    let preferencesMenuItem = NSMenuItem(title: UserText.mainMenuAppPreferences, action: #selector(AppDelegate.openPreferences), keyEquivalent: ",").withAccessibilityIdentifier("MainMenu.preferencesMenuItem")
 
-    // MARK: - File
+    // MARK: File
     let newWindowMenuItem = NSMenuItem(title: UserText.newWindowMenuItem, action: #selector(AppDelegate.newWindow), keyEquivalent: "n")
     let newTabMenuItem = NSMenuItem(title: UserText.mainMenuFileNewTab, action: #selector(AppDelegate.newTab), keyEquivalent: "t")
     let openLocationMenuItem = NSMenuItem(title: UserText.mainMenuFileOpenLocation, action: #selector(AppDelegate.openLocation), keyEquivalent: "l")
@@ -55,7 +50,7 @@ import SubscriptionUI
 
     let sharingMenu = SharingMenu(title: UserText.shareMenuItem)
 
-    // MARK: - View
+    // MARK: View
     let stopMenuItem = NSMenuItem(title: UserText.mainMenuViewStop, action: #selector(MainViewController.stopLoadingPage), keyEquivalent: ".")
     let reloadMenuItem = NSMenuItem(title: UserText.mainMenuViewReloadPage, action: #selector(MainViewController.reloadPage), keyEquivalent: "r")
 
@@ -64,14 +59,14 @@ import SubscriptionUI
     let zoomInMenuItem = NSMenuItem(title: UserText.mainMenuViewZoomIn, action: #selector(MainViewController.zoomIn), keyEquivalent: "+")
     let zoomOutMenuItem = NSMenuItem(title: UserText.mainMenuViewZoomOut, action: #selector(MainViewController.zoomOut), keyEquivalent: "-")
 
-    // MARK: - History
+    // MARK: History
     let historyMenu = HistoryMenu()
 
     var backMenuItem: NSMenuItem { historyMenu.backMenuItem }
     var forwardMenuItem: NSMenuItem { historyMenu.forwardMenuItem }
 
-    // MARK: - Bookmarks
-    let manageBookmarksMenuItem = NSMenuItem(title: UserText.mainMenuHistoryManageBookmarks, action: #selector(MainViewController.showManageBookmarks))
+    // MARK: Bookmarks
+    let manageBookmarksMenuItem = NSMenuItem(title: UserText.mainMenuHistoryManageBookmarks, action: #selector(MainViewController.showManageBookmarks)).withAccessibilityIdentifier("MainMenu.manageBookmarksMenuItem")
     var bookmarksMenuToggleBookmarksBarMenuItem = NSMenuItem(title: "BookmarksBarMenuPlaceholder", action: #selector(MainViewController.toggleBookmarksBarFromMenu), keyEquivalent: "B")
     let importBookmarksMenuItem = NSMenuItem(title: UserText.importBookmarks, action: #selector(AppDelegate.openImportBrowserDataWindow))
     let bookmarksMenu = NSMenu(title: UserText.bookmarks)
@@ -84,20 +79,19 @@ import SubscriptionUI
     let toggleBookmarksShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowBookmarksShortcut, action: #selector(MainViewController.toggleBookmarksShortcut), keyEquivalent: "K")
     let toggleDownloadsShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowDownloadsShortcut, action: #selector(MainViewController.toggleDownloadsShortcut), keyEquivalent: "J")
 
-#if NETWORK_PROTECTION
     let toggleNetworkProtectionShortcutMenuItem = NSMenuItem(title: UserText.showNetworkProtectionShortcut, action: #selector(MainViewController.toggleNetworkProtectionShortcut), keyEquivalent: "N")
-#endif
 
-    // MARK: - Window
+    // MARK: Window
     let windowsMenu = NSMenu(title: UserText.mainMenuWindow)
 
-    // MARK: - Debug
+    // MARK: Debug
 
     private var loggingMenu: NSMenu?
     let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: nil)
     let configurationDateAndTimeMenuItem = NSMenuItem(title: "Configuration URL", action: nil)
+    let autofillDebugScriptMenuItem = NSMenuItem(title: "Autofill Debug Script", action: #selector(MainMenu.toggleAutofillScriptDebugSettingsAction))
 
-    // MARK: - Help
+    // MARK: Help
 
     let helpMenu = NSMenu(title: UserText.mainMenuHelp) {
         NSMenuItem(title: UserText.mainMenuHelpDuckDuckGoHelp, action: #selector(NSApplication.showHelp), keyEquivalent: "?")
@@ -109,259 +103,282 @@ import SubscriptionUI
 #endif
     }
 
-    // swiftlint:disable:next function_body_length
+    // MARK: - Initialization
+
     init(featureFlagger: FeatureFlagger, bookmarkManager: BookmarkManager, faviconManager: FaviconManagement, copyHandler: CopyHandler) {
 
         super.init(title: UserText.duckDuckGo)
 
         buildItems {
-            // MARK: DuckDuckGo
-            NSMenuItem(title: UserText.duckDuckGo) {
-                NSMenuItem(title: UserText.aboutDuckDuckGo, action: #selector(AppDelegate.openAbout))
-                NSMenuItem.separator()
-
-                preferencesMenuItem
-
-                NSMenuItem.separator()
-
-                NSMenuItem(title: UserText.mainMenuAppServices)
-                    .submenu(servicesMenu)
-                NSMenuItem.separator()
-
-#if SPARKLE
-                NSMenuItem(title: UserText.mainMenuAppCheckforUpdates, action: #selector(AppDelegate.checkForUpdates))
-                NSMenuItem.separator()
-#endif
-
-                NSMenuItem(title: UserText.mainMenuAppHideDuckDuckGo, action: #selector(NSApplication.hide), keyEquivalent: "h")
-                NSMenuItem(title: UserText.mainMenuAppHideOthers, action: #selector(NSApplication.hideOtherApplications), keyEquivalent: [.option, .command, "h"])
-                NSMenuItem(title: UserText.mainMenuAppShowAll, action: #selector(NSApplication.unhideAllApplications))
-                NSMenuItem.separator()
-
-                NSMenuItem(title: UserText.mainMenuAppQuitDuckDuckGo, action: #selector(NSApplication.terminate), keyEquivalent: "q")
-            }
-
-            // MARK: File
-            NSMenuItem(title: UserText.mainMenuFile) {
-                newWindowMenuItem
-                NSMenuItem(title: UserText.newBurnerWindowMenuItem, action: #selector(AppDelegate.newBurnerWindow), keyEquivalent: "N")
-                newTabMenuItem
-                openLocationMenuItem
-                NSMenuItem.separator()
-
-                closeWindowMenuItem
-                closeAllWindowsMenuItem
-                closeTabMenuItem
-                NSMenuItem(title: UserText.mainMenuFileSaveAs, action: #selector(MainViewController.saveAs), keyEquivalent: "s")
-                NSMenuItem.separator()
-
-                importBrowserDataMenuItem
-                NSMenuItem(title: UserText.mainMenuFileExport) {
-                    NSMenuItem(title: UserText.mainMenuFileExportPasswords, action: #selector(AppDelegate.openExportLogins))
-                    NSMenuItem(title: UserText.mainMenuFileExportBookmarks, action: #selector(AppDelegate.openExportBookmarks))
-                }
-                NSMenuItem.separator()
-
-                NSMenuItem(title: UserText.shareMenuItem)
-                    .submenu(sharingMenu)
-                NSMenuItem.separator()
-
-                NSMenuItem(title: UserText.printMenuItem, action: #selector(MainViewController.printWebView), keyEquivalent: "p")
-            }
-
-            // MARK: Edit
-            NSMenuItem(title: UserText.mainMenuEdit) {
-                NSMenuItem(title: UserText.mainMenuEditUndo, action: Selector(("undo:")), keyEquivalent: "z")
-                NSMenuItem(title: UserText.mainMenuEditRedo, action: Selector(("redo:")), keyEquivalent: "Z")
-                NSMenuItem.separator()
-
-                NSMenuItem(title: UserText.mainMenuEditCut, action: #selector(NSText.cut), keyEquivalent: "x")
-                NSMenuItem(title: UserText.mainMenuEditCopy, action: #selector(CopyHandler.copy(_:)), target: copyHandler, keyEquivalent: "c")
-                NSMenuItem(title: UserText.mainMenuEditPaste, action: #selector(NSText.paste), keyEquivalent: "v")
-                NSMenuItem(title: UserText.mainMenuEditPasteAndMatchStyle, action: #selector(NSTextView.pasteAsPlainText), keyEquivalent: [.option, .command, .shift, "v"])
-                NSMenuItem(title: UserText.mainMenuEditPasteAndMatchStyle, action: #selector(NSTextView.pasteAsPlainText), keyEquivalent: [.command, .shift, "v"])
-                    .alternate()
-
-                NSMenuItem(title: UserText.mainMenuEditDelete, action: #selector(NSText.delete))
-                NSMenuItem(title: UserText.mainMenuEditSelectAll, action: #selector(NSText.selectAll), keyEquivalent: "a")
-                NSMenuItem.separator()
-
-                NSMenuItem(title: UserText.mainMenuEditFind) {
-                    NSMenuItem(title: UserText.findInPageMenuItem, action: #selector(MainViewController.findInPage), keyEquivalent: "f")
-                    NSMenuItem(title: UserText.mainMenuEditFindFindNext, action: #selector(MainViewController.findInPageNext), keyEquivalent: "g")
-                    NSMenuItem(title: UserText.mainMenuEditFindFindPrevious, action: #selector(MainViewController.findInPagePrevious), keyEquivalent: "G")
-                    NSMenuItem.separator()
-
-                    NSMenuItem(title: UserText.mainMenuEditFindHideFind, action: #selector(MainViewController.findInPageDone), keyEquivalent: "F")
-                }
-
-                NSMenuItem(title: UserText.mainMenuEditSpellingandGrammar) {
-                    NSMenuItem(title: UserText.mainMenuEditSpellingandShowSpellingandGrammar, action: #selector(NSText.showGuessPanel), keyEquivalent: ":")
-                    NSMenuItem(title: UserText.mainMenuEditSpellingandCheckDocumentNow, action: #selector(NSText.checkSpelling), keyEquivalent: ";")
-                    NSMenuItem.separator()
-
-                    NSMenuItem(title: UserText.mainMenuEditSpellingandCheckSpellingWhileTyping, action: #selector(NSTextView.toggleContinuousSpellChecking))
-                    NSMenuItem(title: UserText.mainMenuEditSpellingandCheckGrammarWithSpelling, action: #selector(NSTextView.toggleGrammarChecking))
-                    NSMenuItem(title: UserText.mainMenuEditSpellingandCorrectSpellingAutomatically, action: #selector(NSTextView.toggleAutomaticSpellingCorrection))
-                        .hidden()
-                }
-
-                NSMenuItem(title: UserText.mainMenuEditSubstitutions) {
-                    NSMenuItem(title: UserText.mainMenuEditSubstitutionsShowSubstitutions, action: #selector(NSTextView.orderFrontSubstitutionsPanel))
-                    NSMenuItem.separator()
-
-                    NSMenuItem(title: UserText.mainMenuEditSubstitutionsSmartCopyPaste, action: #selector(NSTextView.toggleSmartInsertDelete))
-                    NSMenuItem(title: UserText.mainMenuEditSubstitutionsSmartQuotes, action: #selector(NSTextView.toggleAutomaticQuoteSubstitution))
-                    NSMenuItem(title: UserText.mainMenuEditSubstitutionsSmartDashes, action: #selector(NSTextView.toggleAutomaticDashSubstitution))
-                    NSMenuItem(title: UserText.mainMenuEditSubstitutionsSmartLinks, action: #selector(NSTextView.toggleAutomaticLinkDetection))
-                    NSMenuItem(title: UserText.mainMenuEditSubstitutionsDataDetectors, action: #selector(NSTextView.toggleAutomaticDataDetection))
-                    NSMenuItem(title: UserText.mainMenuEditSubstitutionsTextReplacement, action: #selector(NSTextView.toggleAutomaticTextReplacement))
-                }
-
-                NSMenuItem(title: UserText.mainMenuEditTransformations) {
-                    NSMenuItem(title: UserText.mainMenuEditTransformationsMakeUpperCase, action: #selector(NSResponder.uppercaseWord))
-                    NSMenuItem(title: UserText.mainMenuEditTransformationsMakeLowerCase, action: #selector(NSResponder.lowercaseWord))
-                    NSMenuItem(title: UserText.mainMenuEditTransformationsCapitalize, action: #selector(NSResponder.capitalizeWord))
-                }
-
-                NSMenuItem(title: UserText.mainMenuEditSpeech) {
-                    NSMenuItem(title: UserText.mainMenuEditSpeechStartSpeaking, action: #selector(NSTextView.startSpeaking))
-                    NSMenuItem(title: UserText.mainMenuEditSpeechStopSpeaking, action: #selector(NSTextView.stopSpeaking))
-                }
-            }
-
-            // MARK: View
-            NSMenuItem(title: UserText.mainMenuView) {
-                stopMenuItem
-                reloadMenuItem
-                NSMenuItem.separator()
-
-                NSMenuItem(title: UserText.mainMenuViewHome, action: #selector(MainViewController.home), keyEquivalent: "H")
-                NSMenuItem.separator()
-
-                toggleBookmarksBarMenuItem
-
-                NSMenuItem(title: UserText.openDownloads, action: #selector(MainViewController.toggleDownloads), keyEquivalent: "j")
-                NSMenuItem.separator()
-
-                homeButtonMenuItem
-                toggleAutofillShortcutMenuItem
-                toggleBookmarksShortcutMenuItem
-                toggleDownloadsShortcutMenuItem
-
-#if NETWORK_PROTECTION
-                toggleNetworkProtectionShortcutMenuItem
-#endif
-
-                NSMenuItem.separator()
-
-                toggleFullscreenMenuItem
-                NSMenuItem.separator()
-
-                actualSizeMenuItem
-                zoomInMenuItem
-                zoomOutMenuItem
-                NSMenuItem.separator()
-
-                NSMenuItem(title: UserText.mainMenuDeveloper) {
-                    NSMenuItem(title: UserText.openDeveloperTools, action: #selector(MainViewController.toggleDeveloperTools), keyEquivalent: [.option, .command, "i"])
-                    NSMenuItem(title: UserText.mainMenuViewDeveloperJavaScriptConsole, action: #selector(MainViewController.openJavaScriptConsole), keyEquivalent: [.option, .command, "c"])
-                    NSMenuItem(title: UserText.mainMenuViewDeveloperShowPageSource, action: #selector(MainViewController.showPageSource), keyEquivalent: [.option, .command, "u"])
-                    NSMenuItem(title: UserText.mainMenuViewDeveloperShowResources, action: #selector(MainViewController.showPageResources), keyEquivalent: [.option, .command, "a"])
-                }
-            }
-
-            // MARK: History
-            NSMenuItem(title: UserText.mainMenuHistory)
-                .submenu(historyMenu)
-
-            // MARK: Bookmarks
-            NSMenuItem(title: UserText.bookmarks).submenu(bookmarksMenu.buildItems {
-                NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(MainViewController.bookmarkThisPage), keyEquivalent: "d")
-                manageBookmarksMenuItem
-                bookmarksMenuToggleBookmarksBarMenuItem
-                NSMenuItem.separator()
-
-                importBookmarksMenuItem
-                NSMenuItem(title: UserText.exportBookmarks, action: #selector(AppDelegate.openExportBookmarks))
-                NSMenuItem.separator()
-
-                NSMenuItem(title: UserText.favorites)
-                    .submenu(favoritesMenu.buildItems {
-                        NSMenuItem(title: UserText.mainMenuHistoryFavoriteThisPage, action: #selector(MainViewController.favoriteThisPage))
-                            .withImage(NSImage(named: "Favorite"))
-                        NSMenuItem.separator()
-                    })
-                    .withImage(NSImage(named: "Favorite"))
-
-                NSMenuItem.separator()
-            })
-
-            // MARK: Window
-            NSMenuItem(title: UserText.mainMenuWindow)
-                .submenu(windowsMenu.buildItems {
-                    NSMenuItem(title: UserText.mainMenuWindowMinimize, action: #selector(NSWindow.performMiniaturize), keyEquivalent: "m")
-                    NSMenuItem(title: UserText.zoom, action: #selector(NSWindow.performZoom))
-                    NSMenuItem.separator()
-
-                    NSMenuItem(title: UserText.pinTab, action: #selector(MainViewController.pinOrUnpinTab))
-                    NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(MainViewController.moveTabToNewWindow))
-                    NSMenuItem(title: UserText.mainMenuWindowMergeAllWindows, action: #selector(NSWindow.mergeAllWindows))
-                    NSMenuItem.separator()
-
-                    NSMenuItem(title: UserText.mainMenuWindowShowPreviousTab, action: #selector(MainViewController.showPreviousTab), keyEquivalent: [.control, .shift, .tab])
-                    NSMenuItem(title: "Show Previous Tab (Hidden)", action: #selector(MainViewController.showPreviousTab), keyEquivalent: [.command, .shift, "["])
-                        .hidden()
-                    NSMenuItem(title: "Show Previous Tab (Hidden)", action: #selector(MainViewController.showPreviousTab), keyEquivalent: [.option, .command, .left])
-                        .hidden()
-
-                    NSMenuItem(title: UserText.mainMenuWindowShowNextTab, action: #selector(MainViewController.showNextTab), keyEquivalent: [.control, .tab])
-                    NSMenuItem(title: "Show Next Tab (Hidden)", action: #selector(MainViewController.showNextTab), keyEquivalent: [.command, .shift, "]"])
-                        .hidden()
-                    NSMenuItem(title: "Show Next Tab (Hidden)", action: #selector(MainViewController.showNextTab), keyEquivalent: [.option, .command, .right])
-                        .hidden()
-
-                    NSMenuItem(title: "Show First Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "1")
-                        .hidden()
-                    NSMenuItem(title: "Show Second Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "2")
-                        .hidden()
-                    NSMenuItem(title: "Show Third Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "3")
-                        .hidden()
-                    NSMenuItem(title: "Show Fourth Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "4")
-                        .hidden()
-                    NSMenuItem(title: "Show Fifth Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "5")
-                        .hidden()
-                    NSMenuItem(title: "Show Sixth Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "6")
-                        .hidden()
-                    NSMenuItem(title: "Show Seventh Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "7")
-                        .hidden()
-                    NSMenuItem(title: "Show Eighth Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "8")
-                        .hidden()
-                    NSMenuItem(title: "Show Ninth Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "9")
-                        .hidden()
-                    NSMenuItem.separator()
-
-                    NSMenuItem(title: UserText.mainMenuWindowBringAllToFront, action: #selector(NSApplication.arrangeInFront))
-                })
-
-            // MARK: Debug
-#if DEBUG || REVIEW
-            NSMenuItem(title: "Debug")
-                .submenu(setupDebugMenu())
-#else
-            if featureFlagger.isFeatureOn(.debugMenu) {
-                NSMenuItem(title: "Debug")
-                    .submenu(setupDebugMenu())
-            }
-#endif
-
-            // MARK: Help
-            NSMenuItem(title: UserText.mainMenuHelp)
-                .submenu(helpMenu)
+            buildDuckDuckGoMenu()
+            buildFileMenu()
+            buildEditMenu(copyHandler: copyHandler)
+            buildViewMenu()
+            buildHistoryMenu()
+            buildBookmarksMenu()
+            buildWindowMenu()
+            buildDebugMenu(featureFlagger: featureFlagger)
+            buildHelpMenu()
         }
 
         subscribeToBookmarkList(bookmarkManager: bookmarkManager)
         subscribeToFavicons(faviconManager: faviconManager)
+    }
+
+    func buildDuckDuckGoMenu() -> NSMenuItem {
+        NSMenuItem(title: UserText.duckDuckGo) {
+            NSMenuItem(title: UserText.aboutDuckDuckGo, action: #selector(AppDelegate.openAbout))
+            NSMenuItem.separator()
+
+            preferencesMenuItem
+
+            NSMenuItem.separator()
+
+            NSMenuItem(title: UserText.mainMenuAppServices)
+                .submenu(servicesMenu)
+            NSMenuItem.separator()
+
+#if SPARKLE
+            NSMenuItem(title: UserText.mainMenuAppCheckforUpdates, action: #selector(AppDelegate.checkForUpdates))
+            NSMenuItem.separator()
+#endif
+
+            NSMenuItem(title: UserText.mainMenuAppHideDuckDuckGo, action: #selector(NSApplication.hide), keyEquivalent: "h")
+            NSMenuItem(title: UserText.mainMenuAppHideOthers, action: #selector(NSApplication.hideOtherApplications), keyEquivalent: [.option, .command, "h"])
+            NSMenuItem(title: UserText.mainMenuAppShowAll, action: #selector(NSApplication.unhideAllApplications))
+            NSMenuItem.separator()
+
+            NSMenuItem(title: UserText.mainMenuAppQuitDuckDuckGo, action: #selector(NSApplication.terminate), keyEquivalent: "q")
+        }
+    }
+
+    func buildFileMenu() -> NSMenuItem {
+        NSMenuItem(title: UserText.mainMenuFile) {
+            newWindowMenuItem
+            NSMenuItem(title: UserText.newBurnerWindowMenuItem, action: #selector(AppDelegate.newBurnerWindow), keyEquivalent: "N")
+            newTabMenuItem
+            openLocationMenuItem
+            NSMenuItem.separator()
+
+            closeWindowMenuItem
+            closeAllWindowsMenuItem
+            closeTabMenuItem
+            NSMenuItem(title: UserText.mainMenuFileSaveAs, action: #selector(MainViewController.saveAs), keyEquivalent: "s")
+            NSMenuItem.separator()
+
+            importBrowserDataMenuItem
+            NSMenuItem(title: UserText.mainMenuFileExport) {
+                NSMenuItem(title: UserText.mainMenuFileExportPasswords, action: #selector(AppDelegate.openExportLogins))
+                NSMenuItem(title: UserText.mainMenuFileExportBookmarks, action: #selector(AppDelegate.openExportBookmarks))
+            }
+            NSMenuItem.separator()
+
+            NSMenuItem(title: UserText.shareMenuItem)
+                .submenu(sharingMenu)
+            NSMenuItem.separator()
+
+            NSMenuItem(title: UserText.printMenuItem, action: #selector(MainViewController.printWebView), keyEquivalent: "p")
+        }
+    }
+
+    func buildEditMenu(copyHandler: CopyHandler) -> NSMenuItem {
+        NSMenuItem(title: UserText.mainMenuEdit) {
+            NSMenuItem(title: UserText.mainMenuEditUndo, action: Selector(("undo:")), keyEquivalent: "z")
+            NSMenuItem(title: UserText.mainMenuEditRedo, action: Selector(("redo:")), keyEquivalent: "Z")
+            NSMenuItem.separator()
+
+            NSMenuItem(title: UserText.mainMenuEditCut, action: #selector(NSText.cut), keyEquivalent: "x")
+            NSMenuItem(title: UserText.mainMenuEditCopy, action: #selector(CopyHandler.copy(_:)), target: copyHandler, keyEquivalent: "c")
+            NSMenuItem(title: UserText.mainMenuEditPaste, action: #selector(NSText.paste), keyEquivalent: "v")
+            NSMenuItem(title: UserText.mainMenuEditPasteAndMatchStyle, action: #selector(NSTextView.pasteAsPlainText), keyEquivalent: [.option, .command, .shift, "v"])
+            NSMenuItem(title: UserText.mainMenuEditPasteAndMatchStyle, action: #selector(NSTextView.pasteAsPlainText), keyEquivalent: [.command, .shift, "v"])
+                .alternate()
+
+            NSMenuItem(title: UserText.mainMenuEditDelete, action: #selector(NSText.delete))
+            NSMenuItem(title: UserText.mainMenuEditSelectAll, action: #selector(NSText.selectAll), keyEquivalent: "a")
+            NSMenuItem.separator()
+
+            NSMenuItem(title: UserText.mainMenuEditFind) {
+                NSMenuItem(title: UserText.findInPageMenuItem, action: #selector(MainViewController.findInPage), keyEquivalent: "f").withAccessibilityIdentifier("MainMenu.findInPage")
+                NSMenuItem(title: UserText.mainMenuEditFindFindNext, action: #selector(MainViewController.findInPageNext), keyEquivalent: "g").withAccessibilityIdentifier("MainMenu.findNext")
+                NSMenuItem(title: UserText.mainMenuEditFindFindPrevious, action: #selector(MainViewController.findInPagePrevious), keyEquivalent: "G").withAccessibilityIdentifier("MainMenu.findPrevious")
+                NSMenuItem.separator()
+
+                NSMenuItem(title: UserText.mainMenuEditFindHideFind, action: #selector(MainViewController.findInPageDone), keyEquivalent: "F").withAccessibilityIdentifier("MainMenu.findInPageDone")
+            }
+
+            NSMenuItem(title: UserText.mainMenuEditSpellingandGrammar) {
+                NSMenuItem(title: UserText.mainMenuEditSpellingandShowSpellingandGrammar, action: #selector(NSText.showGuessPanel), keyEquivalent: ":")
+                NSMenuItem(title: UserText.mainMenuEditSpellingandCheckDocumentNow, action: #selector(NSText.checkSpelling), keyEquivalent: ";")
+                NSMenuItem.separator()
+
+                NSMenuItem(title: UserText.mainMenuEditSpellingandCheckSpellingWhileTyping, action: #selector(NSTextView.toggleContinuousSpellChecking))
+                NSMenuItem(title: UserText.mainMenuEditSpellingandCheckGrammarWithSpelling, action: #selector(NSTextView.toggleGrammarChecking))
+                NSMenuItem(title: UserText.mainMenuEditSpellingandCorrectSpellingAutomatically, action: #selector(NSTextView.toggleAutomaticSpellingCorrection))
+                    .hidden()
+            }
+
+            NSMenuItem(title: UserText.mainMenuEditSubstitutions) {
+                NSMenuItem(title: UserText.mainMenuEditSubstitutionsShowSubstitutions, action: #selector(NSTextView.orderFrontSubstitutionsPanel))
+                NSMenuItem.separator()
+
+                NSMenuItem(title: UserText.mainMenuEditSubstitutionsSmartCopyPaste, action: #selector(NSTextView.toggleSmartInsertDelete))
+                NSMenuItem(title: UserText.mainMenuEditSubstitutionsSmartQuotes, action: #selector(NSTextView.toggleAutomaticQuoteSubstitution))
+                NSMenuItem(title: UserText.mainMenuEditSubstitutionsSmartDashes, action: #selector(NSTextView.toggleAutomaticDashSubstitution))
+                NSMenuItem(title: UserText.mainMenuEditSubstitutionsSmartLinks, action: #selector(NSTextView.toggleAutomaticLinkDetection))
+                NSMenuItem(title: UserText.mainMenuEditSubstitutionsDataDetectors, action: #selector(NSTextView.toggleAutomaticDataDetection))
+                NSMenuItem(title: UserText.mainMenuEditSubstitutionsTextReplacement, action: #selector(NSTextView.toggleAutomaticTextReplacement))
+            }
+
+            NSMenuItem(title: UserText.mainMenuEditTransformations) {
+                NSMenuItem(title: UserText.mainMenuEditTransformationsMakeUpperCase, action: #selector(NSResponder.uppercaseWord))
+                NSMenuItem(title: UserText.mainMenuEditTransformationsMakeLowerCase, action: #selector(NSResponder.lowercaseWord))
+                NSMenuItem(title: UserText.mainMenuEditTransformationsCapitalize, action: #selector(NSResponder.capitalizeWord))
+            }
+
+            NSMenuItem(title: UserText.mainMenuEditSpeech) {
+                NSMenuItem(title: UserText.mainMenuEditSpeechStartSpeaking, action: #selector(NSTextView.startSpeaking))
+                NSMenuItem(title: UserText.mainMenuEditSpeechStopSpeaking, action: #selector(NSTextView.stopSpeaking))
+            }
+        }
+    }
+
+    func buildViewMenu() -> NSMenuItem {
+        NSMenuItem(title: UserText.mainMenuView) {
+            stopMenuItem
+            reloadMenuItem
+            NSMenuItem.separator()
+
+            NSMenuItem(title: UserText.mainMenuViewHome, action: #selector(MainViewController.home), keyEquivalent: "H")
+            NSMenuItem.separator()
+
+            toggleBookmarksBarMenuItem
+
+            NSMenuItem(title: UserText.openDownloads, action: #selector(MainViewController.toggleDownloads), keyEquivalent: "j")
+            NSMenuItem.separator()
+
+            homeButtonMenuItem
+            toggleAutofillShortcutMenuItem
+            toggleBookmarksShortcutMenuItem
+            toggleDownloadsShortcutMenuItem
+
+            toggleNetworkProtectionShortcutMenuItem
+
+            NSMenuItem.separator()
+
+            toggleFullscreenMenuItem
+            NSMenuItem.separator()
+
+            actualSizeMenuItem
+            zoomInMenuItem
+            zoomOutMenuItem
+            NSMenuItem.separator()
+
+            NSMenuItem(title: UserText.mainMenuDeveloper) {
+                NSMenuItem(title: UserText.openDeveloperTools, action: #selector(MainViewController.toggleDeveloperTools), keyEquivalent: [.option, .command, "i"])
+                NSMenuItem(title: UserText.mainMenuViewDeveloperJavaScriptConsole, action: #selector(MainViewController.openJavaScriptConsole), keyEquivalent: [.option, .command, "c"])
+                NSMenuItem(title: UserText.mainMenuViewDeveloperShowPageSource, action: #selector(MainViewController.showPageSource), keyEquivalent: [.option, .command, "u"])
+                NSMenuItem(title: UserText.mainMenuViewDeveloperShowResources, action: #selector(MainViewController.showPageResources), keyEquivalent: [.option, .command, "a"])
+            }
+        }
+    }
+
+    func buildHistoryMenu() -> NSMenuItem {
+        NSMenuItem(title: UserText.mainMenuHistory)
+            .submenu(historyMenu)
+    }
+
+    func buildBookmarksMenu() -> NSMenuItem {
+        NSMenuItem(title: UserText.bookmarks).submenu(bookmarksMenu.buildItems {
+            NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(MainViewController.bookmarkThisPage), keyEquivalent: "d")
+            NSMenuItem(title: UserText.bookmarkAllTabs, action: #selector(MainViewController.bookmarkAllOpenTabs), keyEquivalent: [.command, .shift, "d"])
+            manageBookmarksMenuItem
+            bookmarksMenuToggleBookmarksBarMenuItem
+            NSMenuItem.separator()
+
+            importBookmarksMenuItem
+            NSMenuItem(title: UserText.exportBookmarks, action: #selector(AppDelegate.openExportBookmarks))
+            NSMenuItem.separator()
+
+            NSMenuItem(title: UserText.favorites)
+                .submenu(favoritesMenu.buildItems {
+                    NSMenuItem(title: UserText.mainMenuHistoryFavoriteThisPage, action: #selector(MainViewController.favoriteThisPage))
+                        .withImage(.favorite)
+                        .withAccessibilityIdentifier("MainMenu.favoriteThisPage")
+                    NSMenuItem.separator()
+                })
+                .withImage(.favorite)
+
+            NSMenuItem.separator()
+        })
+    }
+
+    func buildWindowMenu() -> NSMenuItem {
+        NSMenuItem(title: UserText.mainMenuWindow)
+            .submenu(windowsMenu.buildItems {
+                NSMenuItem(title: UserText.mainMenuWindowMinimize, action: #selector(NSWindow.performMiniaturize), keyEquivalent: "m")
+                NSMenuItem(title: UserText.zoom, action: #selector(NSWindow.performZoom))
+                NSMenuItem.separator()
+
+                NSMenuItem(title: UserText.duplicateTab, action: #selector(MainViewController.duplicateTab))
+                NSMenuItem(title: UserText.pinTab, action: #selector(MainViewController.pinOrUnpinTab))
+                NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(MainViewController.moveTabToNewWindow))
+                NSMenuItem(title: UserText.mainMenuWindowMergeAllWindows, action: #selector(NSWindow.mergeAllWindows))
+                NSMenuItem.separator()
+
+                NSMenuItem(title: UserText.mainMenuWindowShowPreviousTab, action: #selector(MainViewController.showPreviousTab), keyEquivalent: [.control, .shift, .tab])
+                NSMenuItem(title: "Show Previous Tab (Hidden)", action: #selector(MainViewController.showPreviousTab), keyEquivalent: [.command, .shift, "["])
+                    .hidden()
+                NSMenuItem(title: "Show Previous Tab (Hidden)", action: #selector(MainViewController.showPreviousTab), keyEquivalent: [.option, .command, .left])
+                    .hidden()
+
+                NSMenuItem(title: UserText.mainMenuWindowShowNextTab, action: #selector(MainViewController.showNextTab), keyEquivalent: [.control, .tab])
+                NSMenuItem(title: "Show Next Tab (Hidden)", action: #selector(MainViewController.showNextTab), keyEquivalent: [.command, .shift, "]"])
+                    .hidden()
+                NSMenuItem(title: "Show Next Tab (Hidden)", action: #selector(MainViewController.showNextTab), keyEquivalent: [.option, .command, .right])
+                    .hidden()
+
+                NSMenuItem(title: "Show First Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "1")
+                    .hidden()
+                NSMenuItem(title: "Show Second Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "2")
+                    .hidden()
+                NSMenuItem(title: "Show Third Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "3")
+                    .hidden()
+                NSMenuItem(title: "Show Fourth Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "4")
+                    .hidden()
+                NSMenuItem(title: "Show Fifth Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "5")
+                    .hidden()
+                NSMenuItem(title: "Show Sixth Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "6")
+                    .hidden()
+                NSMenuItem(title: "Show Seventh Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "7")
+                    .hidden()
+                NSMenuItem(title: "Show Eighth Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "8")
+                    .hidden()
+                NSMenuItem(title: "Show Ninth Tab (Hidden)", action: #selector(MainViewController.showTab), keyEquivalent: "9")
+                    .hidden()
+                NSMenuItem.separator()
+
+                NSMenuItem(title: UserText.mainMenuWindowBringAllToFront, action: #selector(NSApplication.arrangeInFront))
+            })
+    }
+
+    func buildDebugMenu(featureFlagger: FeatureFlagger) -> NSMenuItem? {
+#if DEBUG || REVIEW
+        NSMenuItem(title: "Debug")
+            .submenu(setupDebugMenu())
+#else
+        if featureFlagger.isFeatureOn(.debugMenu) {
+            NSMenuItem(title: "Debug")
+                .submenu(setupDebugMenu())
+        } else {
+            nil
+        }
+#endif
+    }
+
+    func buildHelpMenu() -> NSMenuItem {
+        NSMenuItem(title: UserText.mainMenuHelp)
+            .submenu(helpMenu)
     }
 
     required init(coder: NSCoder) {
@@ -374,10 +391,8 @@ import SubscriptionUI
     override func update() {
         super.update()
 
-#if NETWORK_PROTECTION
         // To be safe, hide the NetP shortcut menu item by default.
         toggleNetworkProtectionShortcutMenuItem.isHidden = true
-#endif
 
         updateHomeButtonMenuItem()
         updateBookmarksBarMenuItem()
@@ -385,6 +400,7 @@ import SubscriptionUI
         updateLoggingMenuItems()
         updateInternalUserItem()
         updateRemoteConfigurationInfo()
+        updateAutofillDebugScriptMenuItem()
     }
 
     // MARK: - Bookmarks
@@ -519,18 +535,18 @@ import SubscriptionUI
     }
 
     private func updateShortcutMenuItems() {
-        toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .autofill)
-        toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
-        toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
+        Task { @MainActor in
+            toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .autofill)
+            toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
+            toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
-#if NETWORK_PROTECTION
-        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-            toggleNetworkProtectionShortcutMenuItem.isHidden = false
-            toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
-        } else {
-            toggleNetworkProtectionShortcutMenuItem.isHidden = true
+            if DefaultNetworkProtectionVisibility().isVPNVisible() {
+                toggleNetworkProtectionShortcutMenuItem.isHidden = false
+                toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
+            } else {
+                toggleNetworkProtectionShortcutMenuItem.isHidden = true
+            }
         }
-#endif
     }
 
     // MARK: - Debug
@@ -540,27 +556,43 @@ import SubscriptionUI
     // swiftlint:disable:next function_body_length
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
+            NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
+            NSMenuItem.separator()
+            NSMenuItem(title: "Tab") {
+                NSMenuItem(title: "Append Tabs") {
+                    NSMenuItem(title: "10 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 10)
+                    NSMenuItem(title: "50 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 50)
+                    NSMenuItem(title: "100 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 100)
+                    NSMenuItem(title: "150 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 150)
+                }
+            }
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))
-                NSMenuItem(title: "Reset Autofill Data", action: #selector(MainViewController.resetSecureVaultData))
-                NSMenuItem(title: "Reset Bookmarks", action: #selector(MainViewController.resetBookmarks))
+                NSMenuItem(title: "Reset Autofill Data", action: #selector(MainViewController.resetSecureVaultData)).withAccessibilityIdentifier("MainMenu.resetSecureVaultData")
+                NSMenuItem(title: "Reset Bookmarks", action: #selector(MainViewController.resetBookmarks)).withAccessibilityIdentifier("MainMenu.resetBookmarks")
                 NSMenuItem(title: "Reset Pinned Tabs", action: #selector(MainViewController.resetPinnedTabs))
                 NSMenuItem(title: "Reset YouTube Overlay Interactions", action: #selector(MainViewController.resetDuckPlayerOverlayInteractions))
                 NSMenuItem(title: "Reset MakeDuckDuckYours user settings", action: #selector(MainViewController.resetMakeDuckDuckGoYoursUserSettings))
+                NSMenuItem(title: "Permanent Survey share on", action: #selector(MainViewController.inPermanentSurveyShareOn(_:)))
+                NSMenuItem(title: "Permanent Survey share off", action: #selector(MainViewController.inPermanentSurveyShareOff(_:)))
                 NSMenuItem(title: "Change Activation Date") {
                     NSMenuItem(title: "Today", action: #selector(MainViewController.changeInstallDateToToday), keyEquivalent: "N")
-                    NSMenuItem(title: "Less Than a 21 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan21DaysAgo))
-                    NSMenuItem(title: "More Than 21 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan21DaysAgoButLessThan27))
-                    NSMenuItem(title: "More Than 27 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan27DaysAgo))
+                    NSMenuItem(title: "Less Than a 5 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan5DayAgo(_:)))
+                    NSMenuItem(title: "More Than 5 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan5DayAgoButLessThan9(_:)))
+                    NSMenuItem(title: "More Than 9 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan9DaysAgo(_:)))
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
-                NSMenuItem(title: "Reset Daily Pixels", action: #selector(MainViewController.resetDailyPixels))
-            }
+                NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
+                NSMenuItem(title: "Reset Passwords Survey", action: #selector(enablePasswordsSurveyAction), target: self)
+            }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
                 NSMenuItem(title: "Show Credentials Saved Popover", action: #selector(MainViewController.showCredentialsSavedPopover))
                 NSMenuItem(title: "Show Pop Up Window", action: #selector(MainViewController.showPopUpWindow))
+                NSMenuItem(title: "Show VPN Thank You Modal", action: #selector(MainViewController.showVPNThankYouModal))
+                NSMenuItem(title: "Show PIR Thank You Modal", action: #selector(MainViewController.showPIRThankYouModal))
+                NSMenuItem(title: "Reset Thank You Modal Checks", action: #selector(MainViewController.resetThankYouModalChecks))
             }
             NSMenuItem(title: "Remote Configuration") {
                 customConfigurationUrlMenuItem
@@ -581,18 +613,31 @@ import SubscriptionUI
                 .submenu(DataBrokerProtectionDebugMenu())
 #endif
 
-#if NETWORK_PROTECTION
-            NSMenuItem(title: "Network Protection")
-                .submenu(NetworkProtectionDebugMenu())
-#endif
+            if case .normal = NSApp.runType {
+                NSMenuItem(title: "VPN")
+                    .submenu(NetworkProtectionDebugMenu())
+            }
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 
-#if SUBSCRIPTION
-            SubscriptionDebugMenu(currentViewController: {
-                WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            })
-#endif
+            let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
+            let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
+
+            SubscriptionDebugMenu(
+                currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
+                updateEnvironment: {
+                    guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
+                    currentEnvironmentWrapper.wrappedValue = newEnvironment
+                    SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment
+                    VPNSettings(defaults: .netP).selectedEnvironment = newEnvironment == .staging ? .staging : .production
+                },
+                isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
+                updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
+                currentViewController: {
+                    WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+            },
+                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)
+            )
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }
@@ -613,6 +658,9 @@ import SubscriptionUI
             menuItem.identifier = .init(category)
             menu.addItem(menuItem)
         }
+
+        menu.addItem(autofillDebugScriptMenuItem
+            .targetting(self))
 
         menu.addItem(.separator())
         let debugLoggingMenuItem = NSMenuItem(title: OSLog.isRunningInDebugEnvironment ? "Disable DEBUG level logging…" : "Enable DEBUG level logging…", action: #selector(debugLoggingMenuItemAction), target: self)
@@ -640,6 +688,10 @@ import SubscriptionUI
 
             item.state = enabledCategories.contains(category) ? .on : .off
         }
+    }
+
+    private func updateAutofillDebugScriptMenuItem() {
+        autofillDebugScriptMenuItem.state = AutofillPreferences().debugScriptEnabled ? .on : .off
     }
 
     private func updateRemoteConfigurationInfo() {
@@ -670,6 +722,16 @@ import SubscriptionUI
 
     @objc private func disableAllLogsMenuItemAction(_ sender: NSMenuItem) {
         OSLog.loggingCategories = []
+    }
+
+    @objc private func toggleAutofillScriptDebugSettingsAction(_ sender: NSMenuItem) {
+        AutofillPreferences().debugScriptEnabled = !AutofillPreferences().debugScriptEnabled
+        NotificationCenter.default.post(name: .autofillScriptDebugSettingsDidChange, object: nil)
+        updateAutofillDebugScriptMenuItem()
+    }
+
+    @objc private func enablePasswordsSurveyAction(_ sender: NSMenuItem) {
+        AutofillPreferences().autofillSurveyEnabled = true
     }
 
     @objc private func debugLoggingMenuItemAction(_ sender: NSMenuItem) {

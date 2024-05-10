@@ -1,0 +1,46 @@
+data:
+  name: Tag ${BRANCH} branch and create GitHub release
+  assignee: "${ASSIGNEE_ID}"
+  html_notes: |
+    <body>
+      Failed to tag the release with <code>${TAG}</code> tag.
+
+      Please follow instructions below to tag the branch, make GitHub release and merge release branch to <code>${BASE_BRANCH}</code> manually.
+
+
+      Issue the following git commands to tag the release and merge the branch:
+      <ul>
+        <li><code>git fetch origin</code></li>
+        <li><code>git checkout ${BRANCH}</code> switch to the release branch</li>
+        <li><code>git pull origin ${BRANCH}</code> pull latest changes</li>
+        <li><code>git tag ${TAG}</code> tag the release</li>
+        <li><code>git push origin ${TAG}</code> push the tag</li>
+        <li><code>git checkout ${BASE_BRANCH}</code> switch to ${BASE_BRANCH}</li>
+        <li><code>git pull origin ${BASE_BRANCH}</code> pull the latest code</li>
+        <li><code>git merge ${BRANCH}</code>
+          <ul>
+            <li>Resolve conflicts as needed</li>
+            <li>When merging a hotfix branch into an internal release branch, you will get conflicts in version and build number xcconfig files:
+              <ul>
+                <li>In the version file: accept the internal version number (higher).</li>
+                <li>In the build number file: accept the hotfix build number (higher). This step is very important in order to calculate the build number of the next internal release correctly.</li>
+              </ul></li>
+          </ul></li>
+        <li><code>git push origin ${BASE_BRANCH}</code> push merged branch</li>
+      </ul>
+
+      To create GitHub release:
+      <ul>
+        <li>Set up GH CLI if you haven't yet: <a data-asana-gid='1203791243007683'/></li>
+        <li>Run the following command:
+        <ul>
+          <li><code>gh release create ${TAG} --generate-notes --prerelease --notes-start-tag ${LAST_RELEASE_TAG}</code></li>
+        </ul></li>
+      </ul>
+
+      Complete this task when ready and proceed with testing the build. If you're bumping an internal release, you should get another task asking you to publish the release in Sparkle. 
+      Look for other tasks in <a data-asana-gid='${AUTOMATION_TASK_ID}'/> task and handle them as needed.
+
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>

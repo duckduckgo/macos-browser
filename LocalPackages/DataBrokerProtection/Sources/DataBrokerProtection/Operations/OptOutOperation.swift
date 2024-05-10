@@ -31,13 +31,17 @@ final class OptOutOperation: DataBrokerOperation {
     let query: BrokerProfileQueryData
     let emailService: EmailServiceProtocol
     let captchaService: CaptchaServiceProtocol
+    let cookieHandler: CookieHandler
+    let stageCalculator: StageDurationCalculator
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<Void, Error>?
     var extractedProfile: ExtractedProfile?
-    var stageCalculator: DataBrokerProtectionStageDurationCalculator?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
+    let clickAwaitTime: TimeInterval
+    let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    var postLoadingSiteStartTime: Date?
 
     // Captcha is a third-party resource that sometimes takes more time to load
     // if we are not able to get the captcha information. We will try to run the action again
@@ -51,7 +55,11 @@ final class OptOutOperation: DataBrokerOperation {
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
+         cookieHandler: CookieHandler = BrokerCookieHandler(),
          operationAwaitTime: TimeInterval = 3,
+         clickAwaitTime: TimeInterval = 40,
+         stageCalculator: StageDurationCalculator,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -60,17 +68,19 @@ final class OptOutOperation: DataBrokerOperation {
         self.emailService = emailService
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
+        self.stageCalculator = stageCalculator
         self.shouldRunNextStep = shouldRunNextStep
+        self.clickAwaitTime = clickAwaitTime
+        self.cookieHandler = cookieHandler
+        self.pixelHandler = pixelHandler
     }
 
     func run(inputValue: ExtractedProfile,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
-             stageCalculator: DataBrokerProtectionStageDurationCalculator,
              showWebView: Bool = false) async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.extractedProfile = inputValue.merge(with: query.profileQuery)
-            self.stageCalculator = stageCalculator
             self.continuation = continuation
 
             Task {
@@ -99,7 +109,7 @@ final class OptOutOperation: DataBrokerOperation {
         }
     }
 
-    func extractedProfiles(profiles: [ExtractedProfile]) async {
+    func extractedProfiles(profiles: [ExtractedProfile], meta: [String: Any]?) async {
         // No - op
     }
 
@@ -109,11 +119,10 @@ final class OptOutOperation: DataBrokerOperation {
         try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
 
         if let action = actionsHandler?.nextAction(), self.shouldRunNextStep() {
+            stageCalculator.setLastActionId(action.id)
             await runNextAction(action)
         } else {
             await webViewHandler?.finish() // If we executed all steps we release the web view
-            stageCalculator?.fireOptOutValidate()
-            stageCalculator?.fireOptOutSubmitSuccess()
             complete(())
         }
     }

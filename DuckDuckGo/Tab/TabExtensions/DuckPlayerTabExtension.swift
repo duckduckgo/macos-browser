@@ -21,6 +21,7 @@ import Common
 import ContentBlocking
 import Foundation
 import Navigation
+import PixelKit
 
 protocol YoutubeScriptsProvider {
     var youtubeOverlayScript: YoutubeOverlayUserScript? { get }
@@ -111,9 +112,9 @@ extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
 
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL, in webView: WKWebView) {
         if duckPlayer.mode == .enabled {
-            Pixel.fire(.duckPlayerViewFromYoutubeAutomatic)
+            PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeAutomatic)
         } else {
-            Pixel.fire(.duckPlayerViewFromYoutubeViaHoverButton)
+            PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaHoverButton)
         }
         // to be standardised across the app
         let isRequestingNewTab = NSApp.isCommandPressed
@@ -131,6 +132,17 @@ extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
 extension DuckPlayerTabExtension: NewWindowPolicyDecisionMaker {
 
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
+        // if a link was clicked inside duckplayer (like a recommendation)
+        // and has target=_blank - then we want to prevent a new tab
+        // opening, and just load it inside the current one instead
+        if navigationAction.targetFrame == nil,
+           navigationAction.safeSourceFrame?.webView?.url?.isDuckPlayer == true,
+           navigationAction.request.url?.isYoutubeVideoRecommendation == true,
+           let webView, let url = navigationAction.request.url {
+            webView.load(URLRequest(url: url))
+            return .cancel
+        }
+
         if let shouldSelectNextNewTab {
             defer {
                 self.shouldSelectNextNewTab = nil
@@ -191,7 +203,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // Always allow loading Private Player URLs (local HTML)
         if navigationAction.url.isDuckURLScheme || navigationAction.url.isDuckPlayer {
             if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
-                Pixel.fire(.duckPlayerViewFromSERP)
+                PixelKit.fire(GeneralPixel.duckPlayerViewFromSERP)
             }
             return .allow
         }
@@ -204,7 +216,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         return .next
     }
 
-    func navigation(_ navigation: Navigation?, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType?) {
+    func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
         // Navigating to a Youtube URL without page reload
         if duckPlayer.mode == .enabled,
            case .sessionStatePush = navigationType,
@@ -278,10 +290,10 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
             switch navigationAction.navigationType {
             case .custom, .redirect(.server):
-                Pixel.fire(.duckPlayerViewFromOther)
+                PixelKit.fire(GeneralPixel.duckPlayerViewFromOther)
             case .other:
                 if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
-                    Pixel.fire(.duckPlayerViewFromSERP)
+                    PixelKit.fire(GeneralPixel.duckPlayerViewFromSERP)
                 }
             default:
                 break
@@ -300,7 +312,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
             return
         }
         if navigation.url.isDuckPlayer {
-            Pixel.fire(.duckPlayerDailyUniqueView, limitTo: .dailyFirst)
+            PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView, frequency: .legacyDaily)
         }
     }
 

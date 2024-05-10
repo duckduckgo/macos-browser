@@ -24,11 +24,11 @@ struct PasswordManagementBitwardenItemView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Image("BitwardenLogin")
+            Image(.bitwardenLogin)
 
             VStack(spacing: 2) {
                 Text(UserText.passwordManagerPopoverTitle(managerName: manager.displayName))
-                HStack (spacing: 3) {
+                HStack(spacing: 3) {
                     Text(UserText.passwordManagerPopoverChangeInSettingsLabel)
                     Button {
                         WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
@@ -41,7 +41,7 @@ struct PasswordManagementBitwardenItemView: View {
             if let email = manager.username {
                 Text(UserText.passwordManagerPopoverConnectedToUser(user: email))
                     .font(.subheadline)
-                    .foregroundColor(Color("BlackWhite60"))
+                    .foregroundColor(Color(.blackWhite60))
             }
 
             Button {

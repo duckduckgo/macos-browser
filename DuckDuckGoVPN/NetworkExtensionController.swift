@@ -17,32 +17,49 @@
 //
 
 import Foundation
+import NetworkProtection
 import NetworkProtectionUI
+
+#if NETP_SYSTEM_EXTENSION
 import SystemExtensionManager
 import SystemExtensions
+#endif
 
-/// Network Protection's network extension session object.
+/// The VPN's network extension session object.
 ///
 /// Through this class the app that owns the VPN can interact with the network extension.
 ///
 final class NetworkExtensionController {
 
+#if NETP_SYSTEM_EXTENSION
     private let systemExtensionManager: SystemExtensionManager
+    private let defaults: UserDefaults
+#endif
 
-    init(extensionBundleID: String) {
+    init(extensionBundleID: String, defaults: UserDefaults = .netP) {
+#if NETP_SYSTEM_EXTENSION
         systemExtensionManager = SystemExtensionManager(extensionBundleID: extensionBundleID)
+        self.defaults = defaults
+#endif
     }
+
 }
 
 extension NetworkExtensionController {
+
     func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
-        try await systemExtensionManager.activate(
+#if NETP_SYSTEM_EXTENSION
+        let extensionVersion = try await systemExtensionManager.activate(
             waitingForUserApproval: waitingForUserApproval)
 
-        try? await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
+        NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = extensionVersion
+
+        try await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
+#endif
     }
 
     func deactivateSystemExtension() async throws {
+#if NETP_SYSTEM_EXTENSION
         do {
             try await systemExtensionManager.deactivate()
         } catch OSSystemExtensionError.extensionNotFound {
@@ -51,5 +68,7 @@ extension NetworkExtensionController {
         } catch {
             throw error
         }
+#endif
     }
+
 }

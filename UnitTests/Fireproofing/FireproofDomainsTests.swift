@@ -17,6 +17,7 @@
 //
 
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 final class FireproofDomainsTests: XCTestCase {
@@ -70,7 +71,7 @@ final class FireproofDomainsTests: XCTestCase {
     }
 
     func testWhenFireproofedDomainsInUserDefaultsThenMigrationIsPerformed() {
-        var udw = UserDefaultsWrapper<[String]?>(key: .fireproofDomains, defaultValue: nil)
+        let udw = UserDefaultsWrapper<[String]?>(key: .fireproofDomains, defaultValue: nil)
         udw.wrappedValue = ["example.com", "www.secondexample.com"]
         XCTAssertEqual(logins.fireproofDomains.sorted(), ["example.com", "secondexample.com"])
         XCTAssertNil(udw.wrappedValue)
@@ -86,7 +87,7 @@ final class FireproofDomainsTests: XCTestCase {
     }
 
     func testWhenFireproofedDomainsInStoreThenTheyAreLoaded() {
-        var udw = UserDefaultsWrapper<[String]?>(key: .fireproofDomains, defaultValue: nil)
+        let udw = UserDefaultsWrapper<[String]?>(key: .fireproofDomains, defaultValue: nil)
         udw.wrappedValue = []
         store.domains = ["example.com": .init(), "secondexample.com": .init()]
         XCTAssertEqual(logins.fireproofDomains.sorted(), ["example.com", "secondexample.com"])

@@ -21,43 +21,64 @@ import Common
 
 final class TabPreviewWindowController: NSWindowController {
 
-    enum VerticalSpace: CGFloat {
-        case padding = 2
-    }
+    static let width: CGFloat = 280
+    static let padding: CGFloat = 2
+    static let bottomPadding: CGFloat = 40
+    static let delay: CGFloat = 1
 
-    enum TimerInterval: TimeInterval {
-        case short = 0.66
-        case medium = 1
-        case long = 3
-    }
-
-    private var showingTimer: Timer?
-    private var hidingTimer: Timer?
+    private var previewTimer: Timer?
+    private var hideTimer: Timer?
+    private var lastHideTime: Date?
 
     private var isHiding = false
 
     // swiftlint:disable force_cast
     var tabPreviewViewController: TabPreviewViewController {
-        contentViewController as! TabPreviewViewController
+        return self.window!.contentViewController as! TabPreviewViewController
     }
     // swiftlint:enable force_cast
 
-    override func windowDidLoad() {
-        super.windowDidLoad()
+    init() {
+        super.init(window: Self.loadWindow())
 
-        window?.animationBehavior = .utilityWindow
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(suggestionWindowOpenNotification(_:)),
                                                name: .suggestionWindowOpen,
                                                object: nil)
     }
 
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
+
+    private static func loadWindow() -> NSWindow {
+        let tabPreviewViewController = TabPreviewViewController()
+
+        let window = NSWindow(contentRect: CGRect(x: 294, y: 313, width: 280, height: 58), styleMask: [.titled, .fullSizeContentView], backing: .buffered, defer: true)
+        window.contentViewController = tabPreviewViewController
+
+        window.allowsToolTipsWhenApplicationIsInactive = false
+        window.autorecalculatesKeyViewLoop = false
+        window.isReleasedWhenClosed = false
+        window.titleVisibility = .hidden
+        window.titlebarAppearsTransparent = true
+        window.animationBehavior = .utilityWindow
+
+        return window
+    }
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
 
-    func scheduleShowing(parentWindow: NSWindow, timerInterval: TimerInterval, topLeftPointInWindow: CGPoint) {
-        if isHiding { return }
+    func show(parentWindow: NSWindow, topLeftPointInWindow: CGPoint) {
+        func presentPreview(tabPreviewWindow: NSWindow) {
+            parentWindow.addChildWindow(tabPreviewWindow, ordered: .above)
+            self.layout(topLeftPoint: parentWindow.convertPoint(toScreen: topLeftPointInWindow))
+        }
+
+        // Invalidate hide timer if it exists
+        hideTimer?.invalidate()
 
         guard let childWindows = parentWindow.childWindows,
               let tabPreviewWindow = self.window else {
@@ -65,62 +86,77 @@ final class TabPreviewWindowController: NSWindowController {
             return
         }
 
-        hidingTimer?.invalidate()
-
         if childWindows.contains(tabPreviewWindow) {
             layout(topLeftPoint: parentWindow.convertPoint(toScreen: topLeftPointInWindow))
             return
         }
 
-        showingTimer?.invalidate()
-        showingTimer = Timer.scheduledTimer(withTimeInterval: timerInterval.rawValue, repeats: false, block: { [weak self] _ in
-            parentWindow.addChildWindow(tabPreviewWindow, ordered: .above)
-            self?.layout(topLeftPoint: parentWindow.convertPoint(toScreen: topLeftPointInWindow))
-        })
+        // Check time elapsed since last hide
+        if let lastHide = lastHideTime, Date().timeIntervalSince(lastHide) < Self.delay {
+            // Show immediately if less than 1.5 seconds have passed
+            presentPreview(tabPreviewWindow: tabPreviewWindow)
+        } else {
+            // Set up a new timer for normal delayed presentation
+            previewTimer?.invalidate()
+            previewTimer = Timer.scheduledTimer(withTimeInterval: Self.delay, repeats: false) { _ in
+                presentPreview(tabPreviewWindow: tabPreviewWindow)
+            }
+        }
+
     }
 
-    func scheduleHiding() {
-        showingTimer?.invalidate()
+    func hide(allowQuickRedisplay: Bool = false, withDelay delay: Bool = false) {
+        func removePreview(allowQuickRedisplay: Bool) {
+            guard let window = window else {
+                lastHideTime = nil
+                return
+            }
 
-        guard let window = window else {
-            os_log("TabPreviewWindowController: Window not available", type: .error)
-            return
+            guard let parentWindow = window.parent else {
+                if !allowQuickRedisplay {
+                    lastHideTime = nil
+                }
+                return
+            }
+
+            parentWindow.removeChildWindow(window)
+            (window).orderOut(nil)
+
+            // Record the hide time
+            lastHideTime = allowQuickRedisplay ? Date() : nil
         }
 
-        if !window.isVisible || hidingTimer?.isValid ?? false { return }
+        previewTimer?.invalidate()
 
-        hidingTimer = Timer.scheduledTimer(withTimeInterval: 1/4, repeats: false, block: { [weak self] _ in
-            self?.hide()
-        })
-    }
-
-    func hide() {
-        showingTimer?.invalidate()
-        hidingTimer?.invalidate()
-
-        guard let window = window, window.isVisible else {
-            return
-        }
-        guard let parentWindow = window.parent else {
-            os_log("TabPreviewWindowController: Tab preview window not available", type: .error)
-            return
-        }
-
-        isHiding = true
-        parentWindow.removeChildWindow(window)
-        (window).orderOut(nil)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1/4) { [weak self] in
-            if self?.isHiding ?? false { self?.isHiding = false }
+        if delay {
+            // Set up a new timer to hide the preview after 0.05 seconds
+            // It makes the transition from one preview to another more fluent
+            hideTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: false) { _ in
+                removePreview(allowQuickRedisplay: allowQuickRedisplay)
+            }
+        } else {
+            // Hide the preview immediately
+            removePreview(allowQuickRedisplay: allowQuickRedisplay)
         }
     }
 
     private func layout(topLeftPoint: NSPoint) {
         guard let window = window else {
-            os_log("TabBarCollectionView: Tab preview window not available", type: .error)
             return
         }
+        var topLeftPoint = topLeftPoint
 
-        window.setFrame(NSRect(x: 0, y: 0, width: 250, height: 58), display: true)
+        // Make sure preview is presented within screen
+        if let screenVisibleFrame = window.screen?.visibleFrame {
+            topLeftPoint.x = min(topLeftPoint.x, screenVisibleFrame.origin.x + screenVisibleFrame.width - window.frame.width)
+            topLeftPoint.x = max(topLeftPoint.x, screenVisibleFrame.origin.x)
+
+            let windowHeight = window.frame.size.height
+            if topLeftPoint.y <= windowHeight + screenVisibleFrame.origin.y {
+                topLeftPoint.y = topLeftPoint.y + windowHeight + Self.bottomPadding
+            }
+        }
+
         window.setFrameTopLeftPoint(topLeftPoint)
     }
 
@@ -129,19 +165,7 @@ final class TabPreviewWindowController: NSWindowController {
 extension TabPreviewWindowController {
 
     @objc func suggestionWindowOpenNotification(_ notification: Notification) {
-        hide()
-    }
-
-}
-
-extension TabPreviewWindowController.TimerInterval {
-
-    init(from tabWidthStage: TabBarViewItem.WidthStage) {
-        switch tabWidthStage {
-        case .full: self = .long
-        case .withoutCloseButton: self = .medium
-        case .withoutTitle: self = .short
-        }
+        hide(allowQuickRedisplay: false)
     }
 
 }

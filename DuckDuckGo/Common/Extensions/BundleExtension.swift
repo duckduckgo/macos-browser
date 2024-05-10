@@ -26,6 +26,8 @@ extension Bundle {
         static let buildNumber = kCFBundleVersionKey as String
         static let versionNumber = "CFBundleShortVersionString"
         static let displayName = "CFBundleDisplayName"
+        static let documentTypes = "CFBundleDocumentTypes"
+        static let typeExtensions = "CFBundleTypeExtensions"
         static let vpnMenuAgentBundleId = "AGENT_BUNDLE_ID"
         static let vpnMenuAgentProductName = "AGENT_PRODUCT_NAME"
 
@@ -97,15 +99,7 @@ extension Bundle {
 #endif
 
     func appGroup(bundle: BundleGroup) -> String {
-        var appGroupName: String
-
-        switch bundle {
-        case .dbp:
-            appGroupName = "DBP_APP_GROUP"
-        case .netP:
-            appGroupName = "NETP_APP_GROUP"
-        }
-
+        let appGroupName = bundle.appGroupKey
         guard let appGroup = object(forInfoDictionaryKey: appGroupName) as? String else {
             fatalError("Info.plist is missing \(appGroupName)")
         }
@@ -119,9 +113,42 @@ extension Bundle {
         return appGroup
     }
 
+    var isInApplicationsDirectory: Bool {
+        let directoryPaths = NSSearchPathForDirectoriesInDomains(.applicationDirectory, .localDomainMask, true)
+
+        guard let applicationsPath = directoryPaths.first else {
+            // Default to true to be safe. In theory this should always return a valid path and the else branch will never be run, but some app logic
+            // depends on this check in order to allow users to proceed, so we should avoid blocking them in case this assumption is ever wrong.
+            return true
+        }
+
+        let path = self.bundlePath
+        return path.hasPrefix(applicationsPath)
+    }
+
+    var documentTypes: [[String: Any]] {
+        infoDictionary?[Keys.documentTypes] as? [[String: Any]] ?? []
+    }
+
+    var fileTypeExtensions: Set<String> {
+        documentTypes.reduce(into: []) { $0.formUnion($1[Keys.typeExtensions] as? [String] ?? []) }
+    }
+
 }
 
 enum BundleGroup {
     case netP
     case dbp
+    case subs
+
+    var appGroupKey: String {
+        switch self {
+        case .dbp:
+            return "DBP_APP_GROUP"
+        case .netP:
+            return "NETP_APP_GROUP"
+        case .subs:
+            return "SUBSCRIPTION_APP_GROUP"
+        }
+    }
 }

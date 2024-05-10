@@ -27,62 +27,94 @@ public enum EmailError: Error, Equatable, Codable {
     case cantDecodeEmailLink
     case unknownStatusReceived(email: String)
     case cancelled
+    case httpError(statusCode: Int)
+    case unknownHTTPError
+}
+
+struct EmailData: Decodable {
+    let pattern: String?
+    let emailAddress: String
 }
 
 protocol EmailServiceProtocol {
-    func getEmail(dataBrokerName: String?) async throws -> String
+    func getEmail(dataBrokerURL: String, attemptId: UUID) async throws -> EmailData
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int,
-                             pollingIntervalInSeconds: Int,
+                             pollingInterval: TimeInterval,
+                             attemptId: UUID,
                              shouldRunNextStep: @escaping () -> Bool) async throws -> URL
 }
 
 struct EmailService: EmailServiceProtocol {
     private struct Constants {
-        static let baseUrl = "https://dbp.duckduckgo.com/dbp/em/v0"
+        static let endpointSubPath = "/dbp/em/v0"
     }
 
     public let urlSession: URLSession
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
+    private let settings: DataBrokerProtectionSettings
+    private let servicePixel: DataBrokerProtectionBackendServicePixels
 
     init(urlSession: URLSession = URLSession.shared,
-         redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase()) {
+         redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
+         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings(),
+         servicePixel: DataBrokerProtectionBackendServicePixels = DefaultDataBrokerProtectionBackendServicePixels()) {
         self.urlSession = urlSession
         self.redeemUseCase = redeemUseCase
+        self.settings = settings
+        self.servicePixel = servicePixel
     }
 
-    func getEmail(dataBrokerName: String? = nil) async throws -> String {
-        var urlString = Constants.baseUrl + "/generate"
+    func getEmail(dataBrokerURL: String, attemptId: UUID) async throws -> EmailData {
+        var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
+        urlComponents?.path = "\(Constants.endpointSubPath)/generate"
+        urlComponents?.queryItems = [
+            URLQueryItem(name: "dataBroker", value: dataBrokerURL),
+            URLQueryItem(name: "attemptId", value: attemptId.uuidString)
+        ]
 
-        if let dataBrokerValue = dataBrokerName {
-            urlString += "?dataBroker=\(dataBrokerValue)"
-        }
-
-        guard let url = URL(string: urlString) else {
+        guard let url = urlComponents?.url else {
             throw EmailError.cantGenerateURL
         }
 
         var request = URLRequest(url: url)
-        let authHeader = try await redeemUseCase.getAuthHeader()
+        guard let authHeader = redeemUseCase.getAuthHeader() else {
+            servicePixel.fireEmptyAccessToken(callSite: .getEmail)
+            throw AuthenticationError.noAuthToken
+        }
+
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
 
-        let (data, _) = try await urlSession.data(for: request)
+        let (data, response) = try await urlSession.data(for: request)
+        try validateHTTPResponse(response)
 
-        if let resJson = try? JSONSerialization.jsonObject(with: data) as? [String: AnyObject],
-           let email = resJson["emailAddress"] as? String {
-            return email
-        } else {
+        do {
+            return try JSONDecoder().decode(EmailData.self, from: data)
+        } catch {
             throw EmailError.cantFindEmail
+        }
+    }
+
+    private func validateHTTPResponse(_ response: URLResponse) throws {
+        if let httpResponse = response as? HTTPURLResponse {
+            if !(200...299).contains(httpResponse.statusCode) {
+                servicePixel.fireGenerateEmailHTTPError(statusCode: httpResponse.statusCode)
+                throw EmailError.httpError(statusCode: httpResponse.statusCode)
+            }
+        } else {
+            servicePixel.fireGenerateEmailHTTPError(statusCode: 0)
+            throw EmailError.unknownHTTPError
         }
     }
 
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int = 100,
-                             pollingIntervalInSeconds: Int = 30,
+                             pollingInterval: TimeInterval = 30,
+                             attemptId: UUID,
                              shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
-        let pollingTimeInNanoSecondsSeconds = UInt64(pollingIntervalInSeconds) * NSEC_PER_SEC
+        let pollingTimeInNanoSecondsSeconds = UInt64(pollingInterval * 1000) * NSEC_PER_MSEC
 
-        guard let emailResult = try? await extractEmailLink(email: email) else {
+        guard let emailResult = try? await extractEmailLink(email: email, attemptId: attemptId) else {
             throw EmailError.cantFindEmail
         }
 
@@ -107,20 +139,33 @@ struct EmailService: EmailServiceProtocol {
             try await Task.sleep(nanoseconds: pollingTimeInNanoSecondsSeconds)
             return try await getConfirmationLink(from: email,
                                                  numberOfRetries: numberOfRetries - 1,
-                                                 pollingIntervalInSeconds: pollingIntervalInSeconds,
+                                                 pollingInterval: pollingInterval,
+                                                 attemptId: attemptId,
                                                  shouldRunNextStep: shouldRunNextStep)
         case .unknown:
             throw EmailError.unknownStatusReceived(email: email)
         }
     }
 
-    private func extractEmailLink(email: String) async throws -> EmailResponse {
-        guard let url = URL(string: Constants.baseUrl + "/links?e=\(email)") else {
+    private func extractEmailLink(email: String, attemptId: UUID) async throws -> EmailResponse {
+        var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
+        urlComponents?.path = "\(Constants.endpointSubPath)/links"
+        urlComponents?.queryItems = [
+            URLQueryItem(name: "e", value: email),
+            URLQueryItem(name: "attemptId", value: attemptId.uuidString)
+        ]
+
+        guard let url = urlComponents?.url else {
             throw EmailError.cantGenerateURL
         }
 
         var request = URLRequest(url: url)
-        let authHeader = try await redeemUseCase.getAuthHeader()
+
+        guard let authHeader = redeemUseCase.getAuthHeader() else {
+            servicePixel.fireEmptyAccessToken(callSite: .extractEmailLink)
+            throw AuthenticationError.noAuthToken
+        }
+
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
 
         let (data, _) = try await urlSession.data(for: request)

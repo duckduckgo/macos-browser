@@ -18,10 +18,8 @@
 
 import Foundation
 import SwiftUI
-
-#if SUBSCRIPTION
 import Subscription
-#endif
+import BrowserServicesKit
 
 struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
@@ -29,67 +27,95 @@ struct PreferencesSection: Hashable, Identifiable {
 
     @MainActor
     static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
+        var privacyPanes: [PreferencePaneIdentifier] = [.defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection]
+
+        if includingVPN {
+            privacyPanes.append(.vpn)
+        }
+
         let regularPanes: [PreferencePaneIdentifier] = {
-#if SUBSCRIPTION
-            var panes: [PreferencePaneIdentifier] = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
-
-            if NSApp.delegateTyped.internalUserDecider.isInternalUser {
-                if let generalIndex = panes.firstIndex(of: .general) {
-                    panes.insert(.sync, at: generalIndex + 1)
-                }
-            }
-
-            if !AccountManager().isUserAuthenticated && !SubscriptionPurchaseEnvironment.canPurchase {
-                if let subscriptionIndex = panes.firstIndex(of: .subscription) {
-                    panes.remove(at: subscriptionIndex)
-                }
-            }
-#else
-            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
+            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .accessibility, .dataClearing]
 
             if includingSync {
                 panes.insert(.sync, at: 1)
             }
-#endif
+
             if includingDuckPlayer {
                 panes.append(.duckPlayer)
             }
 
-#if NETWORK_PROTECTION
-            if includingVPN {
-                panes.append(.vpn)
-            }
-#endif
-
             return panes
         }()
 
-        return [
+#if APPSTORE
+        // App Store guidelines don't allow references to other platforms, so the Mac App Store build omits the otherPlatforms section.
+        let otherPanes: [PreferencePaneIdentifier] = [.about]
+#else
+        let otherPanes: [PreferencePaneIdentifier] = [.about, .otherPlatforms]
+#endif
+
+        var sections: [PreferencesSection] = [
+            .init(id: .privacyProtections, panes: privacyPanes),
             .init(id: .regularPreferencePanes, panes: regularPanes),
-            .init(id: .about, panes: [.about])
+            .init(id: .about, panes: otherPanes)
         ]
+
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+
+            var shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
+
+            if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
+                shouldHidePrivacyProDueToNoProducts = false
+            }
+
+            if !shouldHidePrivacyProDueToNoProducts {
+                let subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
+                sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
+            }
+        }
+
+        return sections
     }
 }
 
 enum PreferencesSectionIdentifier: Hashable, CaseIterable {
+    case privacyProtections
+    case privacyPro
     case regularPreferencePanes
     case about
+
+    var displayName: String? {
+        switch self {
+        case .privacyProtections:
+            return UserText.privacyProtections
+        case .privacyPro:
+            return nil
+        case .regularPreferencePanes:
+            return UserText.mainSettings
+        case .about:
+            return nil
+        }
+    }
+
 }
 
-enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
+enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIterable {
+    case defaultBrowser
+    case privateSearch
+    case webTrackingProtection
+    case cookiePopupProtection
+    case emailProtection
+
     case general
     case sync
     case appearance
-    case privacy
-#if NETWORK_PROTECTION
+    case dataClearing
     case vpn
-#endif
-#if SUBSCRIPTION
     case subscription
-#endif
     case autofill
-    case downloads
+    case accessibility
     case duckPlayer = "duckplayer"
+    case otherPlatforms = "https://duckduckgo.com/app"
     case about
 
     var id: Self {
@@ -112,66 +138,83 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     @MainActor
     var displayName: String {
         switch self {
+        case .defaultBrowser:
+            return UserText.defaultBrowser
+        case .privateSearch:
+            return UserText.privateSearch
+        case .webTrackingProtection:
+            return UserText.webTrackingProtection
+        case .cookiePopupProtection:
+            return UserText.cookiePopUpProtection
+        case .emailProtection:
+            return UserText.emailProtectionPreferences
         case .general:
             return UserText.general
         case .sync:
             let isSyncBookmarksPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
             let isSyncCredentialsPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
+            let isSyncPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncIsPaused.rawValue)
             let syncService = NSApp.delegateTyped.syncService
             let isDataSyncingDisabled = syncService?.featureFlags.contains(.dataSyncing) == false && syncService?.authState == .active
-            if isSyncBookmarksPaused || isSyncCredentialsPaused || isDataSyncingDisabled {
+            if isSyncPaused || isSyncBookmarksPaused || isSyncCredentialsPaused || isDataSyncingDisabled {
                 return UserText.sync + " ⚠️"
             }
             return UserText.sync
         case .appearance:
             return UserText.appearance
-        case .privacy:
-            return UserText.privacy
-#if NETWORK_PROTECTION
+        case .dataClearing:
+            return UserText.dataClearing
         case .vpn:
             return UserText.vpn
-#endif
-#if SUBSCRIPTION
         case .subscription:
             return UserText.subscription
-#endif
         case .autofill:
             return UserText.autofill
-        case .downloads:
-            return UserText.downloads
+        case .accessibility:
+            return UserText.accessibility
         case .duckPlayer:
             return UserText.duckPlayer
         case .about:
             return UserText.about
+        case .otherPlatforms:
+            return UserText.duckduckgoOnOtherPlatforms
         }
     }
 
     var preferenceIconName: String {
         switch self {
+        case .defaultBrowser:
+            return "DefaultBrowser"
+        case .privateSearch:
+            return "PrivateSearchIcon"
+        case .webTrackingProtection:
+            return "WebTrackingProtectionIcon"
+        case .cookiePopupProtection:
+            return "CookieProtectionIcon"
+        case .emailProtection:
+            return "EmailProtectionIcon"
         case .general:
-            return "Rocket"
+            return "GeneralIcon"
         case .sync:
             return "Sync"
         case .appearance:
             return "Appearance"
-        case .privacy:
-            return "Privacy"
-#if NETWORK_PROTECTION
+        case .dataClearing:
+            return "FireSettings"
         case .vpn:
             return "VPN"
-#endif
-#if SUBSCRIPTION
         case .subscription:
-            return "Privacy"
-#endif
+            return "PrivacyPro"
         case .autofill:
             return "Autofill"
-        case .downloads:
-            return "DownloadsPreferences"
+        case .accessibility:
+            return "Accessibility"
         case .duckPlayer:
             return "DuckPlayerSettings"
         case .about:
             return "About"
+        case .otherPlatforms:
+            return "OtherPlatformsPreferences"
         }
     }
 }

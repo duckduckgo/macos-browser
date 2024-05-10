@@ -39,6 +39,53 @@ extension SyncDevice {
 }
 
 final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
+    var syncPausedTitle: String? {
+        return syncPausedStateManager.syncPausedMessageData?.title
+    }
+
+    var syncPausedMessage: String? {
+        return syncPausedStateManager.syncPausedMessageData?.description
+    }
+
+    var syncPausedButtonTitle: String? {
+        return syncPausedStateManager.syncPausedMessageData?.buttonTitle
+    }
+
+    var syncPausedButtonAction: (() -> Void)? {
+        return syncPausedStateManager.syncPausedMessageData?.action
+    }
+
+    var syncBookmarksPausedTitle: String? {
+        return syncPausedStateManager.syncBookmarksPausedMessageData?.title
+    }
+
+    var syncBookmarksPausedMessage: String? {
+        return syncPausedStateManager.syncBookmarksPausedMessageData?.description
+    }
+
+    var syncBookmarksPausedButtonTitle: String? {
+        return syncPausedStateManager.syncBookmarksPausedMessageData?.buttonTitle
+    }
+
+    var syncBookmarksPausedButtonAction: (() -> Void)? {
+        return syncPausedStateManager.syncBookmarksPausedMessageData?.action
+    }
+
+    var syncCredentialsPausedTitle: String? {
+        return syncPausedStateManager.syncCredentialsPausedMessageData?.title
+    }
+
+    var syncCredentialsPausedMessage: String? {
+        return syncPausedStateManager.syncCredentialsPausedMessageData?.description
+    }
+
+    var syncCredentialsPausedButtonTitle: String? {
+        return syncPausedStateManager.syncCredentialsPausedMessageData?.buttonTitle
+    }
+
+    var syncCredentialsPausedButtonAction: (() -> Void)? {
+        return syncPausedStateManager.syncCredentialsPausedMessageData?.action
+    }
 
     struct Consts {
         static let syncPausedStateChanged = Notification.Name("com.duckduckgo.app.SyncPausedStateChanged")
@@ -82,9 +129,12 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
-    @Published var isSyncBookmarksPaused: Bool
+    @Published var isSyncPaused: Bool = false
+    @Published var isSyncBookmarksPaused: Bool = false
+    @Published var isSyncCredentialsPaused: Bool = false
 
-    @Published var isSyncCredentialsPaused: Bool
+    @Published var invalidBookmarksTitles: [String] = []
+    @Published var invalidCredentialsTitles: [String] = []
 
     private var shouldRequestSyncOnFavoritesOptionChange: Bool = true
     private var isScreenLocked: Bool = false
@@ -100,12 +150,16 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var isConnectingDevicesAvailable: Bool = true
     @Published var isAccountCreationAvailable: Bool = true
     @Published var isAccountRecoveryAvailable: Bool = true
+    @Published var isAppVersionNotSupported: Bool = true
+
+    private let syncPausedStateManager: any SyncPausedStateManaging
 
     private func updateSyncFeatureFlags(_ syncFeatureFlags: SyncFeatureFlags) {
         isDataSyncingAvailable = syncFeatureFlags.contains(.dataSyncing)
         isConnectingDevicesAvailable = syncFeatureFlags.contains(.connectFlows)
         isAccountCreationAvailable = syncFeatureFlags.contains(.accountCreation)
         isAccountRecoveryAvailable = syncFeatureFlags.contains(.accountRecovery)
+        isAppVersionNotSupported = syncFeatureFlags.unavailableReason == .appVersionNotSupported
     }
 
     var recoveryCode: String? {
@@ -115,18 +169,22 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     init(
         syncService: DDGSyncing,
         syncBookmarksAdapter: SyncBookmarksAdapter,
+        syncCredentialsAdapter: SyncCredentialsAdapter,
         appearancePreferences: AppearancePreferences = .shared,
-        managementDialogModel: ManagementDialogModel = ManagementDialogModel()
+        managementDialogModel: ManagementDialogModel = ManagementDialogModel(),
+        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
+        syncPausedStateManager: any SyncPausedStateManaging
     ) {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
+        self.syncCredentialsAdapter = syncCredentialsAdapter
         self.appearancePreferences = appearancePreferences
         self.syncFeatureFlags = syncService.featureFlags
+        self.userAuthenticator = userAuthenticator
+        self.syncPausedStateManager = syncPausedStateManager
 
         self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
         self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
-        isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
-        isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
 
         self.managementDialogModel = managementDialogModel
         self.managementDialogModel.delegate = self
@@ -134,8 +192,25 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         updateSyncFeatureFlags(self.syncFeatureFlags)
         setUpObservables()
         setUpSyncOptionsObservables(apperancePreferences: appearancePreferences)
+        updateSyncPausedState()
     }
 
+    private func updateSyncPausedState() {
+        self.isSyncPaused = syncPausedStateManager.isSyncPaused
+        self.isSyncBookmarksPaused = syncPausedStateManager.isSyncBookmarksPaused
+        self.isSyncCredentialsPaused = syncPausedStateManager.isSyncCredentialsPaused
+    }
+
+    private func updateInvalidObjects() {
+        invalidBookmarksTitles = syncBookmarksAdapter.provider?
+            .fetchDescriptionsForObjectsThatFailedValidation()
+            .map { $0.truncated(length: 15) } ?? []
+
+        let invalidCredentialsObjects: [String] = (try? syncCredentialsAdapter.provider?.fetchDescriptionsForObjectsThatFailedValidation()) ?? []
+        invalidCredentialsTitles = invalidCredentialsObjects.map({ $0.truncated(length: 15) })
+    }
+
+    // swiftlint:disable:next function_body_length
     private func setUpObservables() {
         syncService.featureFlagsPublisher
             .dropFirst()
@@ -150,6 +225,16 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.updateState()
+            }
+            .store(in: &cancellables)
+
+        syncService.isSyncInProgressPublisher
+            .removeDuplicates()
+            .filter { !$0 }
+            .asVoid()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.updateInvalidObjects()
             }
             .store(in: &cancellables)
 
@@ -168,11 +253,10 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             }
             .store(in: &cancellables)
 
-        NotificationCenter.default.publisher(for: Self.Consts.syncPausedStateChanged)
+        syncPausedStateManager.syncPausedChangedPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
-                self?.isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
+                self?.updateSyncPausedState()
             }
             .store(in: &cancellables)
 
@@ -209,11 +293,10 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             do {
                 try await syncService.disconnect()
                 managementDialogModel.endFlow()
-                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
-                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
+                syncPausedStateManager.syncDidTurnOff()
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToTurnSyncOff, description: error.localizedDescription)
-                firePixelIfNeeded(event: .debug(event: .syncLogoutError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.syncLogoutError(error: error)))
             }
         }
     }
@@ -315,7 +398,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             return
         }
 
-        guard case .normal = NSApp.runType else {
+        guard [NSApplication.RunType.normal, .uiTests].contains(NSApp.runType) else {
             return
         }
 
@@ -347,9 +430,11 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     private let syncService: DDGSyncing
     private let syncBookmarksAdapter: SyncBookmarksAdapter
+    private let syncCredentialsAdapter: SyncCredentialsAdapter
     private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
     private var connector: RemoteConnecting?
+    private let userAuthenticator: UserAuthenticating
 }
 
 extension SyncPreferences: ManagementDialogModelDelegate {
@@ -359,11 +444,10 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             do {
                 try await syncService.deleteAccount()
                 managementDialogModel.endFlow()
-                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
-                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
+                syncPausedStateManager.syncDidTurnOff()
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToDeleteData, description: error.localizedDescription)
-                firePixelIfNeeded(event: .debug(event: .syncDeleteAccountError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.syncDeleteAccountError(error: error)))
             }
         }
     }
@@ -378,7 +462,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 mapDevices(devices)
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToUpdateDeviceName, description: error.localizedDescription)
-                firePixelIfNeeded(event: .debug(event: .syncUpdateDeviceError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.syncUpdateDeviceError(error: error)))
             }
             syncService.scheduler.resumeSyncQueue()
         }
@@ -394,7 +478,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         let device = deviceInfo()
         let devices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
         mapDevices(devices)
-        Pixel.fire(.syncLogin)
+        PixelKit.fire(GeneralPixel.syncLogin)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if isRecovery {
                 self.showDevicesSynced()
@@ -416,11 +500,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 let device = deviceInfo()
                 presentDialog(for: .prepareToSync)
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
-                Pixel.fire(.syncSignupDirect)
+                PixelKit.fire(GeneralPixel.syncSignupDirect)
                 presentDialog(for: .saveRecoveryCode(recoveryCode ?? ""))
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToSyncToServer, description: error.localizedDescription)
-                firePixelIfNeeded(event: .debug(event: .syncSignupError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.syncSignupError(error: error)))
             }
         }
     }
@@ -456,7 +540,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                             description: error.localizedDescription
                         )
                     }
-                    firePixelIfNeeded(event: .debug(event: .syncLoginError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncLoginError(error: error)))
                 }
             }
         }
@@ -479,14 +563,14 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     try await loginAndShowPresentedDialog(recoveryKey, isRecovery: fromRecoveryScreen)
                 } catch {
                     managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToMergeTwoAccounts, description: "")
-                    firePixelIfNeeded(event: .debug(event: .syncLoginExistingAccountError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: error)))
                 }
             } else if let connectKey = syncCode.connect {
                 do {
                     if syncService.account == nil {
                         let device = deviceInfo()
                         try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
-                        Pixel.fire(.syncSignupConnect)
+                        PixelKit.fire(GeneralPixel.syncSignupConnect)
                         presentDialog(for: .saveRecoveryCode(recoveryCode))
                     }
 
@@ -505,7 +589,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                         type: .unableToSyncToOtherDevice,
                         description: error.localizedDescription
                     )
-                    firePixelIfNeeded(event: .debug(event: .syncLoginError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncLoginError(error: error)))
                 }
             } else {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .invalidCode, description: "")
@@ -526,10 +610,19 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             return
         }
 
-        let data = RecoveryPDFGenerator()
-            .generate(recoveryCode)
-
         Task { @MainActor in
+            let authenticationResult = await userAuthenticator.authenticateUser(reason: .syncSettings)
+            guard authenticationResult.authenticated else {
+                if authenticationResult == .noAuthAvailable {
+                    presentDialog(for: .empty)
+                    managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToAuthenticateOnDevice, description: "")
+                }
+                return
+            }
+
+            let data = RecoveryPDFGenerator()
+                .generate(recoveryCode)
+
             let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "Sync Data Recovery - DuckDuckGo.pdf")
             let response = await panel.begin()
 
@@ -537,10 +630,12 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                   let location = panel.url else { return }
 
             do {
-                try data.writeFileWithProgress(to: location)
+                try Progress.withPublishedProgress(url: location) {
+                    try data.write(to: location)
+                }
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableCreateRecoveryPDF, description: error.localizedDescription)
-                firePixelIfNeeded(event: .debug(event: .syncCannotCreateRecoveryPDF, error: nil))
+                PixelKit.fire(DebugEvent(GeneralPixel.syncCannotCreateRecoveryPDF))
             }
         }
 
@@ -555,7 +650,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToRemoveDevice, description: error.localizedDescription)
-                firePixelIfNeeded(event: .debug(event: .syncRemoveDeviceError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.syncRemoveDeviceError(error: error)))
             }
         }
     }
@@ -566,7 +661,15 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
-    func syncWithAnotherDevicePressed() {
+    func syncWithAnotherDevicePressed() async {
+        let authenticationResult = await userAuthenticator.authenticateUser(reason: .syncSettings)
+        guard authenticationResult.authenticated else {
+            if authenticationResult == .noAuthAvailable {
+                presentDialog(for: .empty)
+                managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToAuthenticateOnDevice, description: "")
+            }
+            return
+        }
         if isSyncEnabled {
             presentDialog(for: .syncWithAnotherDevice(code: recoveryCode ?? ""))
         } else {
@@ -575,18 +678,29 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
-    func syncWithServerPressed() {
+    func syncWithServerPressed() async {
+        let authenticationResult = await userAuthenticator.authenticateUser(reason: .syncSettings)
+        guard authenticationResult.authenticated else {
+            if authenticationResult == .noAuthAvailable {
+                presentDialog(for: .empty)
+                managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToAuthenticateOnDevice, description: "")
+            }
+            return
+        }
         presentDialog(for: .syncWithServer)
     }
 
     @MainActor
-    func recoverDataPressed() {
+    func recoverDataPressed() async {
+        let authenticationResult = await userAuthenticator.authenticateUser(reason: .syncSettings)
+        guard authenticationResult.authenticated else {
+            if authenticationResult == .noAuthAvailable {
+                presentDialog(for: .empty)
+                managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToAuthenticateOnDevice, description: "")
+            }
+            return
+        }
         presentDialog(for: .recoverSyncedData)
-    }
-
-    @MainActor
-    func downloadDDGPressed() {
-
     }
 
     @MainActor
@@ -609,6 +723,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
+    func openSystemPasswordSettings() {
+        NSWorkspace.shared.open(URL.touchIDAndPassword)
+    }
+
+    @MainActor
     private func showDevicesSynced() {
         presentDialog(for: .nowSyncing)
     }
@@ -620,16 +739,4 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool) {
         recoverDevice(recoveryCode: code, fromRecoveryScreen: fromRecoveryScreen)
     }
-
-    private func firePixelIfNeeded(event: Pixel.Event) {
-        if case let .debug(_, debugError) = event {
-            if debugError == nil {
-                Pixel.fire(event)
-            }
-            if let syncError = debugError as? SyncError, !syncError.isServerError {
-                Pixel.fire(event, withAdditionalParameters: syncError.errorParameters)
-            }
-        }
-    }
-
 }

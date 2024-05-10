@@ -16,12 +16,13 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 
 final class PseudoFolder: Equatable {
 
-    static let favorites = PseudoFolder(id: UUID().uuidString, name: UserText.favorites, icon: NSImage(named: "FavoriteFilledBorder")!)
-    static let bookmarks = PseudoFolder(id: UUID().uuidString, name: UserText.bookmarks, icon: NSImage(named: "Folder")!)
+    static let favorites = PseudoFolder(id: UUID().uuidString, name: UserText.favorites, icon: .favoriteFilledBorder)
+    static let bookmarks = PseudoFolder(id: UUID().uuidString, name: UserText.bookmarks, icon: .bookmarksFolder)
 
     let id: String
     let name: String
@@ -38,7 +39,7 @@ final class PseudoFolder: Equatable {
     }
 
     static func == (lhs: PseudoFolder, rhs: PseudoFolder) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.id == rhs.id
     }
 
 }

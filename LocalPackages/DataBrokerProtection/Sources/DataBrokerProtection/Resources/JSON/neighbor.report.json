@@ -1,7 +1,8 @@
 {
-  "name": "neighbor.report",
-  "version": "0.1.4",
-  "addedDatetime": 1703559600000,
+  "name": "Neighbor Report",
+  "url": "neighbor.report",
+  "version": "0.1.6",
+  "addedDatetime": 1703570400000,
   "steps": [
     {
       "stepType": "scan",
@@ -9,12 +10,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "a554d7d2-f348-487a-97de-8d4f0d1d35c0",
+          "id": "6e589101-df53-4af7-bf6a-41376927f6ec",
           "url": "https://neighbor.report/${firstName}-${lastName}/${state|stateFull|hyphenated}/${city|hyphenated}"
         },
         {
           "actionType": "extract",
-          "id": "17f80250-1e3c-4e55-8e50-68fe98a6ce23",
+          "id": "1ec79c67-40b0-4f91-baf8-996073109092",
           "selector": ".lstd",
           "profile": {
             "name": {
@@ -38,7 +39,9 @@
               "separator": ","
             },
             "profileUrl": {
-              "selector": "(.//a[@class='persons'])[1]"
+              "selector": "(.//a[@class='persons'])[1]",
+              "identifierType": "path",
+              "identifier": "https://neighbor.report/person/${id}"
             }
           }
         }
@@ -50,12 +53,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "59cc488d-e317-4fb4-8aaa-a20cb71f7480",
+          "id": "d894a462-02c3-4f2a-966d-44aea2fbb6d4",
           "url": "https://neighbor.report/remove"
         },
         {
           "actionType": "fillForm",
-          "id": "3a4c1775-941a-4f48-873d-c780f5ea25a0",
+          "id": "7fbaf65f-c130-494b-8f61-a77cebb422f4",
           "selector": ".form-horizontal",
           "elements": [
             {
@@ -74,17 +77,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "f470e245-d5ee-4908-bd6c-16e604a1a29b",
+          "id": "23d6eb3e-2cfd-45f8-a0ca-b2168605173e",
           "selector": ".recaptcha-div"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "7f0a8fc6-32a3-4f4a-b61d-267f9666de91",
+          "id": "f0ea9801-8b8d-4e27-bd3f-bba0cdb4bf4a",
           "selector": ".recaptcha-div"
         },
         {
           "actionType": "click",
-          "id": "7fbc5a97-bc57-41bc-a556-0fdfd8a0845d",
+          "id": "2aa19f1d-1dbf-4465-8e40-857311bf7f37",
           "elements": [
             {
               "type": "button",
@@ -93,8 +96,19 @@
           ]
         },
         {
+          "actionType": "expectation",
+          "id": "2f4f23f8-4599-48a6-a52c-3ed630114a90",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Remove persons"
+            }
+          ]
+        },
+        {
           "actionType": "click",
-          "id": "d1513f65-a746-4597-9ed2-4cd5e40dead3",
+          "id": "1f411b2e-9f93-4519-ae35-7c0411b535e1",
           "elements": [
             {
               "type": "button",
@@ -108,7 +122,7 @@
         },
         {
           "actionType": "expectation",
-          "id": "8acd9c96-443d-4593-a3a7-9efc9fd5070a",
+          "id": "2bf0a2dd-7d16-4d40-9091-61c96a1e6949",
           "expectations": [
             {
               "type": "text",

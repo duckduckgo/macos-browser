@@ -42,7 +42,7 @@ struct PasswordManagementLoginItemView: View {
                 if editMode {
 
                     RoundedRectangle(cornerRadius: 8)
-                        .foregroundColor(Color(NSColor.editingPanelColor))
+                        .foregroundColor(Color(.editingPanel))
                         .shadow(radius: 6)
 
                 }
@@ -83,7 +83,9 @@ struct PasswordManagementLoginItemView: View {
                     }
 
                     Buttons()
-                        .padding()
+                        .padding(.top, editMode ? 12 : 10)
+                        .padding(.bottom, editMode ? 12 : 3)
+                        .padding(.horizontal)
 
                 }
             }
@@ -219,7 +221,7 @@ private struct UsernameLabel: View {
                     Button {
                         model.copy(model.username)
                     } label: {
-                        Image("Copy")
+                        Image(.copy)
                     }
                     .buttonStyle(PlainButtonStyle())
                     .tooltip(UserText.copyUsernameTooltip)
@@ -285,7 +287,7 @@ private struct PrivateEmailMessage: View {
         let text = String(format: UserText.pmSignInToManageEmail, UserText.pmEnableEmailProtection)
         var attributedString = AttributedString(text)
         if let range = attributedString.range(of: UserText.pmEnableEmailProtection) {
-            attributedString[range].foregroundColor = Color("LinkBlueColor")
+            attributedString[range].foregroundColor = Color(.linkBlue)
         }
         return attributedString
     }
@@ -358,25 +360,9 @@ private struct PasswordView: View {
 
                 HStack {
 
-                    if isPasswordVisible {
+                    SecureTextField(textValue: $model.password, isVisible: isPasswordVisible)
 
-                        TextField("", text: $model.password)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                    } else {
-
-                        SecureField("", text: $model.password)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                    }
-
-                    Button {
-                        isPasswordVisible = !isPasswordVisible
-                    } label: {
-                        Image("SecureEyeToggle")
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .tooltip(isPasswordVisible ? UserText.hidePasswordTooltip : UserText.showPasswordTooltip)
+                    SecureTextFieldButton(isVisible: $isPasswordVisible, toolTipHideText: UserText.hidePasswordTooltip, toolTipShowText: UserText.showPasswordTooltip)
                     .padding(.trailing, 10)
 
                 }
@@ -386,29 +372,16 @@ private struct PasswordView: View {
 
                 HStack(alignment: .center, spacing: 6) {
 
-                    if isPasswordVisible {
-                        Text(model.password)
-                    } else {
-                        Text(model.password.isEmpty ? "" : "••••••••••••")
-                    }
+                    HiddenText(isVisible: isPasswordVisible, text: model.password, hiddenTextLength: 12)
 
                     if (isHovering || isPasswordVisible) && model.password != "" {
-                        Button {
-                            isPasswordVisible = !isPasswordVisible
-                        } label: {
-                            Image("SecureEyeToggle")
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .tooltip(isPasswordVisible ? UserText.hidePasswordTooltip : UserText.showPasswordTooltip)
+                        SecureTextFieldButton(isVisible: $isPasswordVisible, toolTipHideText: UserText.hidePasswordTooltip, toolTipShowText: UserText.showPasswordTooltip)
                     }
 
                     if isHovering && model.password != "" {
-                        Button {
+                        CopyButton {
                             model.copy(model.password)
-                        } label: {
-                            Image("Copy")
                         }
-                        .buttonStyle(PlainButtonStyle())
                         .tooltip(UserText.copyPasswordTooltip)
                     }
 
@@ -491,9 +464,9 @@ private struct NotesView: View {
                     .background(
                         ZStack {
                             RoundedRectangle(cornerRadius: cornerRadius)
-                                .stroke(Color(NSColor.textEditorBorderColor), lineWidth: borderWidth)
+                                .stroke(Color(.textEditorBorder), lineWidth: borderWidth)
                             RoundedRectangle(cornerRadius: cornerRadius)
-                                .fill(Color(NSColor.textEditorBackgroundColor))
+                                .fill(Color(.textEditorBackground))
                         }
                     )
             }
@@ -507,6 +480,20 @@ private struct NotesView: View {
                         model.copy(model.notes)
                     })
                 }))
+                .modifier(TextSelectionModifier())
+        }
+    }
+
+}
+
+private struct TextSelectionModifier: ViewModifier {
+
+    func body(content: Content) -> some View {
+        if #available(macOS 12, *) {
+            content
+                .textSelection(.enabled)
+        } else {
+            content
         }
     }
 

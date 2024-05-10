@@ -30,16 +30,15 @@ import UDSHelper
 /// Clients can edit those defaults and this class will observe the changes and relay them to the runnel.
 ///
 final class TunnelControllerIPCService {
-    private let tunnelController: TunnelController
+    private let tunnelController: NetworkProtectionTunnelController
     private let networkExtensionController: NetworkExtensionController
     private let server: NetworkProtectionIPC.TunnelControllerIPCServer
     private let statusReporter: NetworkProtectionStatusReporter
     private var cancellables = Set<AnyCancellable>()
     private let defaults: UserDefaults
-
     private let udsServer: UDSServer<VPNIPCServerCommand>
 
-    init(tunnelController: TunnelController,
+    init(tunnelController: NetworkProtectionTunnelController,
          networkExtensionController: NetworkExtensionController,
          statusReporter: NetworkProtectionStatusReporter,
          fileManager: FileManager = .default,
@@ -51,13 +50,14 @@ final class TunnelControllerIPCService {
         self.statusReporter = statusReporter
         self.defaults = defaults
 
-        let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.ipcAppGroupName)!.appendingPathComponent("vpn.sock")
+        let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .netP))!.appendingPathComponent("vpn.sock")
 
         udsServer = UDSServer<VPNIPCServerCommand>(socketFileURL: socketFileURL, log: .networkProtectionIPCLog)
 
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
         subscribeToServerChanges()
+        subscribeToDataVolumeUpdates()
 
         server.serverDelegate = self
     }
@@ -72,9 +72,15 @@ final class TunnelControllerIPCService {
                 // no-op
                 switch request {
                 case .start:
-                    start()
+                    start { _ in
+                        Task {
+                            await self.tunnelController.start()
+                        }
+                    }
                 case .stop:
-                    stop()
+                    stop { _ in
+                        // no-op
+                    }
                 }
             }
         } catch {
@@ -108,6 +114,15 @@ final class TunnelControllerIPCService {
             }
             .store(in: &cancellables)
     }
+
+    private func subscribeToDataVolumeUpdates() {
+        statusReporter.dataVolumeObserver.publisher
+            .subscribe(on: DispatchQueue.main)
+            .sink { [weak self] dataVolume in
+                self?.server.dataVolumeUpdated(dataVolume)
+            }
+            .store(in: &cancellables)
+    }
 }
 
 // MARK: - Requests from the client
@@ -119,15 +134,38 @@ extension TunnelControllerIPCService: IPCServerInterface {
         server.statusChanged(statusReporter.statusObserver.recentValue)
     }
 
-    func start() {
+    func start(completion: @escaping (Error?) -> Void) {
         Task {
             await tunnelController.start()
         }
+
+        // For IPC requests, completion means the IPC request was processed, and NOT
+        // that the requested operation was executed fully.  Failure to complete the
+        // operation will be handled entirely within the tunnel controller.
+        completion(nil)
     }
 
-    func stop() {
+    func stop(completion: @escaping (Error?) -> Void) {
         Task {
             await tunnelController.stop()
+        }
+
+        // For IPC requests, completion means the IPC request was processed, and NOT
+        // that the requested operation was executed fully.  Failure to complete the
+        // operation will be handled entirely within the tunnel controller.
+        completion(nil)
+    }
+
+    func fetchLastError(completion: @escaping (Error?) -> Void) {
+        Task {
+            guard #available(macOS 13.0, *),
+                  let connection = await tunnelController.connection else {
+
+                completion(nil)
+                return
+            }
+
+            connection.fetchLastDisconnectError(completionHandler: completion)
         }
     }
 
@@ -136,7 +174,7 @@ extension TunnelControllerIPCService: IPCServerInterface {
     }
 
     func debugCommand(_ command: DebugCommand) async throws {
-        _ = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID)
+        try await tunnelController.relay(command)
 
         switch command {
         case .removeSystemExtension:
@@ -156,6 +194,9 @@ extension TunnelControllerIPCService: IPCServerInterface {
             if defaults.networkProtectionOnboardingStatus == .completed {
                 defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
             }
+        case .disableConnectOnDemandAndShutDown:
+            // Not implemented on macOS yet
+            break
         }
     }
 }

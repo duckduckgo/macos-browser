@@ -33,6 +33,10 @@ extension UserText {
     static let pmEmptyStateCardsTitle = NSLocalizedString("pm.empty.cards.title", value: "No Cards", comment: "Label for cards empty state title")
     static let pmEmptyStateNotesTitle = NSLocalizedString("pm.empty.notes.title", value: "No Notes", comment: "Label for notes empty state title")
 
+    static let pmAddItem = NSLocalizedString("pm.add.new", value: "Add New", comment: "Add New item button")
+    static let pmAddCard = NSLocalizedString("pm.add.card", value: "Add Credit Card", comment: "Add New Credit Card button")
+    static let pmAddLogin = NSLocalizedString("pm.add.login", value: "Add Password", comment: "Add New Login button")
+    static let pmAddIdentity = NSLocalizedString("pm.add.identity", value: "Add Identity", comment: "Add New Identity button")
     static let pmNewCard = NSLocalizedString("pm.new.card", value: "Credit Card", comment: "Label for new card title")
     static let pmNewLogin = NSLocalizedString("pm.new.login", value: "Password", comment: "Label for new login title")
     static let pmNewIdentity = NSLocalizedString("pm.new.identity", value: "Identity", comment: "Label for new identity title")
@@ -103,7 +107,7 @@ extension UserText {
     static func pmLockScreenDuration(duration: String) -> String {
         let localized = NSLocalizedString("pm.lock-screen.duration",
                                           value: "Your autofill info will remain unlocked until your computer is idle for %@.",
-                                          comment: "")
+                                          comment: "Message about the duration for which autofill information remains unlocked on the lock screen.")
         return String(format: localized, duration)
     }
 
@@ -121,5 +125,46 @@ extension UserText {
     static let autoLockThreshold30Minutes = NSLocalizedString("pm.lock-screen.threshold.30-minutes", value: "30 minutes", comment: "Label used when selecting the Auto-Lock threshold")
     static let autoLockThreshold1Hour = NSLocalizedString("pm.lock-screen.threshold.1-hour", value: "1 hour", comment: "Label used when selecting the Auto-Lock threshold")
     static let autoLockThreshold12Hours = NSLocalizedString("pm.lock-screen.threshold.12-hours", value: "12 hours", comment: "Label used when selecting the Auto-Lock threshold")
+
+    // MARK: Autofill Item Deletion (Autofill -> More Menu, Settings -> Autofill)
+    static let deleteAllPasswords = NSLocalizedString("autofill.items.delete-all-passwords", value: "Delete All Passwords…", comment: "Opens Delete All Passwords dialog")
+
+    // Confirmation Message Text
+    static func deleteAllPasswordsConfirmationMessageText(count: Int) -> String {
+        let localized = NSLocalizedString("autofill.items.delete-all-passwords-confirmation-message-text", value: "Are you sure you want to delete all passwords (%d)?", comment: "Message displayed on dialog asking user to confirm deletion of all passwords")
+        return String(format: localized, count)
+    }
+
+    // Confirmation Information Text
+    static func deleteAllPasswordsConfirmationInformationText(syncEnabled: Bool) -> String {
+        if syncEnabled {
+            return NSLocalizedString("autofill.items.delete-all-passwords-synced-confirmation-information-text", value: "Your passwords will be deleted from all synced devices. Make sure you still have a way to access your accounts.", comment: "Information message displayed when deleting all passwords on a synced device")
+        } else {
+            return NSLocalizedString("autofill.items.delete-all-passwords-device-confirmation-information-text", value: "Your passwords will be deleted from this device. Make sure you still have a way to access your accounts.", comment: "Information message displayed when deleting all passwords on a device")
+        }
+    }
+
+    // Completion Message Text
+    static func deleteAllPasswordsCompletionMessageText(count: Int) -> String {
+        let localized = NSLocalizedString("autofill.items.delete-all-passwords-completion-message-text", value: "All passwords deleted (%d)", comment: "Message displayed on completion of multiple password deletion")
+        return String(format: localized, count)
+    }
+
+    // Completion Information Text
+    static func deleteAllPasswordsCompletionInformationText(syncEnabled: Bool) -> String {
+        if syncEnabled {
+            return NSLocalizedString("autofill.items.delete-all-passwords-synced-completion-information-text",
+                                     value: "Your passwords have been deleted from all synced devices.",
+                                     comment: "Information message displayed on completion of multiple password deletion when devices are synced")
+        } else {
+            return ""
+        }
+    }
+
+    // Completion Close Button
+    static let deleteAllPasswordsCompletionButtonText = NSLocalizedString("autofill.items.delete-all-passwords-completion-button-texy", value: "Close", comment: "Button text on dialog confirming deletion was completed")
+
+    // System Alert Permission Text
+    static let deleteAllPasswordsPermissionText = NSLocalizedString("autofill.items.delete-all-passwords-permisson-text", value: "delete all passwords", comment: "Message displayed in system authentication dialog")
 
 }

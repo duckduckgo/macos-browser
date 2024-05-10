@@ -16,7 +16,13 @@
 //  limitations under the License.
 //
 
+/*
+ WARNING: This component doesn't work anymore, re-implementation needed
+ https://app.asana.com/0/0/1207002879349166/f
+ */
+
 import Foundation
+import PixelKit
 
 enum PixelExperiment: String, CaseIterable {
 
@@ -30,15 +36,6 @@ enum PixelExperiment: String, CaseIterable {
 
     static var isExperimentInstalled: Bool {
         return logic.isInstalled
-    }
-
-    static var isNoCardsExperimentOn: Bool {
-        // This is to avoid the cohort is assigned before the user actually sees the new tab page (after the onboarding has been completed)
-        if isExperimentInstalled && !OnboardingViewModel().onboardingFinished {
-            return true
-        }
-        // Cohort are assigned the first time it's called
-        return Self.cohort == .noCards
     }
 
     static var allocatedCohortDoesNotMatchCurrentCohorts: Bool {
@@ -60,11 +57,10 @@ enum PixelExperiment: String, CaseIterable {
 
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
     //  remember to keep it clear for privacy triage.
-    case control = "c"
-    case noCards = "d"
+    case control
 }
 
-/// These functions contain the business logic for determining if the pixel should be fired or not.
+// These functions contain the business logic for determining if the pixel should be fired or not.
 extension PixelExperiment {
 
     static func fireEnrollmentPixel() {
@@ -77,22 +73,6 @@ extension PixelExperiment {
 
     static func fireDay21To27SerpPixel() {
         logic.fireDay21To27SerpPixel()
-    }
-
-    static func fireSetAsDefaultInitialPixel() {
-        logic.fireSetAsDefaultInitialPixel()
-    }
-
-    static func fireImportDataInitialPixel() {
-        logic.fireImportDataInitialPixel()
-    }
-
-    static func fireWatchInDuckPlayerPixel() {
-        logic.fireWatchInDuckPlayerPixel()
-    }
-
-    static func fireEmailProtectionEnabledPixel() {
-        logic.fireEmailProtectionEnabledPixel()
     }
 
 }
@@ -154,55 +134,26 @@ final internal class PixelExperimentLogic {
         isInstalled = true
     }
 
-    // You'll need additional pixels for your experiment.  Pass the cohort as a paramter.
+    // You'll need additional pixels for your experiment.  Pass the cohort as a parameter.
     func fireEnrollmentPixel() {
         // You'll probably need this at least.
-        guard allocatedCohort != nil, let cohort else { return }
-        Pixel.fire(.newTabInitial(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
     }
 
+    // Often used
     func fireFirstSerpPixel() {
         guard allocatedCohort != nil, let cohort else { return }
-        Pixel.fire(.serpInitial(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
+        PixelKit.fire(GeneralPixel.serpInitial(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
     }
 
+    // Often used for retention experiments
     func fireDay21To27SerpPixel() {
         guard allocatedCohort != nil, let cohort else { return }
 
-        if now() >= Pixel.firstLaunchDate.adding(.days(21)) && now() <= Pixel.firstLaunchDate.adding(.days(27)) {
-            Pixel.fire(.serpDay21to27(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
-        }
-    }
-
-    func fireSetAsDefaultInitialPixel() {
-        if allocatedCohort != nil, let cohort {
-            Pixel.fire(.setAsDefaultInitial(cohort: cohort.rawValue), limitTo: .initial)
-        } else {
-            Pixel.fire(.setAsDefaultInitial(), limitTo: .initial)
-        }
-    }
-
-    func fireImportDataInitialPixel() {
-        if allocatedCohort != nil, let cohort {
-            Pixel.fire(.importDataInitial(cohort: cohort.rawValue), limitTo: .initial)
-        } else {
-            Pixel.fire(.importDataInitial(), limitTo: .initial)
-        }
-    }
-
-    func fireWatchInDuckPlayerPixel() {
-        if allocatedCohort != nil, let cohort {
-            Pixel.fire(.watchInDuckPlayerInitial(cohort: cohort.rawValue), limitTo: .initial)
-        } else {
-            Pixel.fire(.watchInDuckPlayerInitial(), limitTo: .initial)
-        }
-    }
-
-    func fireEmailProtectionEnabledPixel() {
-        if allocatedCohort != nil, let cohort {
-            Pixel.fire(.emailEnabledInitial(cohort: cohort.rawValue), limitTo: .initial)
-        } else {
-            Pixel.fire(.emailEnabledInitial(), limitTo: .initial)
+        DispatchQueue.main.async {
+            let now = self.now()
+            if now >= AppDelegate.firstLaunchDate.adding(.days(21)) && now <= AppDelegate.firstLaunchDate.adding(.days(27)) {
+                PixelKit.fire(GeneralPixel.serpDay21to27(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+            }
         }
     }
 

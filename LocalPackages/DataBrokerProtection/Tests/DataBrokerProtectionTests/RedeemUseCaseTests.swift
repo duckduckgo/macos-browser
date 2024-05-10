@@ -69,22 +69,22 @@ final class RedeemUseCaseTests: XCTestCase {
 
         let sut = RedeemUseCase(authenticationService: service, authenticationRepository: repository)
 
-        let accessToken = try? await sut.getAuthHeader()
+        let accessToken = sut.getAuthHeader()
 
         XCTAssertNil(accessToken)
         XCTAssertFalse(service.wasRedeemCalled)
         XCTAssertFalse(repository.wasAccessTokenSaveCalled)
     }
 
-    func testWhenGetAuthHeadersHasEmptyAccessToken_thenWeRedeemAndSave() async {
+    func testWhenGetAuthHeadersHasEmptyAccessToken_thenWeReturnNil() async {
         repository.shouldSendNilInviteCode = false
         repository.shouldSendNilAccessToken = true
         let sut = RedeemUseCase(authenticationService: service, authenticationRepository: repository)
 
-        _ = try? await sut.getAuthHeader()
+        let result = sut.getAuthHeader()
 
-        XCTAssertTrue(service.wasRedeemCalled)
-        XCTAssertTrue(repository.wasAccessTokenSaveCalled)
+        XCTAssertNil(result)
+        XCTAssertFalse(repository.wasAccessTokenSaveCalled)
     }
 
     func testWhenGetAuthHeadersHasAccessToken_thenWeReturnHeaderWithoutRedeeming() async {
@@ -92,7 +92,7 @@ final class RedeemUseCaseTests: XCTestCase {
         repository.shouldSendNilAccessToken = false
         let sut = RedeemUseCase(authenticationService: service, authenticationRepository: repository)
 
-        let accessToken = try? await sut.getAuthHeader()
+        let accessToken = sut.getAuthHeader()
 
         XCTAssertEqual(accessToken, "bearer accessToken")
         XCTAssertFalse(service.wasRedeemCalled)

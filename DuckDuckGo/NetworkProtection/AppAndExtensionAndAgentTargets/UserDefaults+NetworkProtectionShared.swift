@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETP_SYSTEM_EXTENSION
-
 import Combine
 import Foundation
 import NetworkProtectionUI
@@ -77,5 +75,3 @@ extension NetworkProtectionUI.OnboardingStatus {
 #endif
     }()
 }
-
-#endif

@@ -33,20 +33,22 @@ struct SyncWarningMessage: View {
     }
 
     var body: some View {
-        PreferencePaneSection(verticalPadding: 16) {
-            HStack(alignment: .top, spacing: 8) {
-                Text("⚠️")
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(title).bold()
-                    Text(message)
-                    if let buttonTitle, let buttonAction {
-                        Button(buttonTitle, action: buttonAction)
-                            .padding(.top, 8)
-                    }
+        HStack(alignment: .top, spacing: 16) {
+            Image(.alertColor16)
+                .frame(width: 16)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(title).bold()
+                Text(message)
+                if let buttonTitle, let buttonAction {
+                    Button(buttonTitle, action: buttonAction)
+                        .padding(.top, 8)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(width: 512, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("AlertBubbleBackground")))
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color(.alertBubbleBackground)))
+        .padding(.top, 16)
     }
 }

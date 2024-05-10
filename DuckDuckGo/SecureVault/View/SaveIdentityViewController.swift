@@ -20,6 +20,7 @@ import AppKit
 import BrowserServicesKit
 import Combine
 import Common
+import PixelKit
 
 protocol SaveIdentityDelegate: AnyObject {
 
@@ -43,6 +44,9 @@ final class SaveIdentityViewController: NSViewController {
     }
 
     @IBOutlet private var identityStackView: NSStackView!
+    @IBOutlet weak var titleLabel: NSTextField!
+    @IBOutlet weak var notNowButton: NSButton!
+    @IBOutlet weak var saveButton: NSButton!
 
     weak var delegate: SaveIdentityDelegate?
 
@@ -67,11 +71,11 @@ final class SaveIdentityViewController: NSViewController {
         identity.title = UserText.pmDefaultIdentityAutofillTitle
 
         do {
-            try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeIdentity(identity)
-            Pixel.fire(.autofillItemSaved(kind: .identity))
+            try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared).storeIdentity(identity)
+            PixelKit.fire(GeneralPixel.autofillItemSaved(kind: .identity))
         } catch {
             os_log("%s:%s: failed to store identity %s", type: .error, className, #function, error.localizedDescription)
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
     }
 
@@ -81,6 +85,11 @@ final class SaveIdentityViewController: NSViewController {
     }
 
     // MARK: - Public
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setUpStrings()
+    }
 
     func saveIdentity(_ identity: SecureVaultModels.Identity) {
         self.identity = identity
@@ -117,6 +126,12 @@ final class SaveIdentityViewController: NSViewController {
 
         identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.emailAddress))
 
+    }
+
+    private func setUpStrings() {
+        titleLabel.stringValue = UserText.passwordManagementSaveAddress
+        notNowButton.title = UserText.notNow
+        saveButton.title = UserText.save
     }
 
 }

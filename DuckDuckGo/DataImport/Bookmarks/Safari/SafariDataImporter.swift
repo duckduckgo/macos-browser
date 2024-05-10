@@ -17,7 +17,7 @@
 //
 
 import AppKit
-import Foundation
+import PixelKit
 
 final class SafariDataImporter: DataImporter {
 
@@ -26,7 +26,6 @@ final class SafariDataImporter: DataImporter {
         let openPanel = NSOpenPanel()
         // if file does not exist, grant permission to its parent folder
         openPanel.directoryURL = fileUrl.deletingLastPathComponent()
-        openPanel.directoryURL = fileUrl
         openPanel.message = UserText.bookmarkImportSafariRequestPermissionButtonTitle
         openPanel.allowsOtherFileTypes = false
         openPanel.canChooseFiles = false
@@ -60,7 +59,7 @@ final class SafariDataImporter: DataImporter {
         }
     }
 
-    static private let bookmarksFileName = "Bookmarks.plist"
+    static let bookmarksFileName = "Bookmarks.plist"
 
     private var fileUrl: URL {
         profile.profileURL.appendingPathComponent(Self.bookmarksFileName)
@@ -115,7 +114,7 @@ final class SafariDataImporter: DataImporter {
             await faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
         case .failure(let error):
-            Pixel.fire(.dataImportFailed(source: source, sourceVersion: profile.installedAppsMajorVersionDescription(), error: error))
+            PixelKit.fire(GeneralPixel.dataImportFailed(source: source, sourceVersion: profile.installedAppsMajorVersionDescription(), error: error))
         }
     }
 

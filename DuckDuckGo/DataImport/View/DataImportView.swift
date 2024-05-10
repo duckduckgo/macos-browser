@@ -128,7 +128,7 @@ struct DataImportView: ModalView {
 
                 // if no data to import
                 if model.summary(for: dataType)?.isEmpty == true
-                            || model.error(for: dataType)?.errorType == .noData {
+                    || model.error(for: dataType)?.errorType == .noData {
 
                     DataImportNoDataView(source: model.importSource, dataType: dataType)
                         .padding(.bottom, 24)
@@ -492,8 +492,7 @@ extension DataImportViewModel.ButtonType {
                   profileURL: URL(fileURLWithPath: "/test/Profile 1")),
             .init(browser: .chrome,
                   profileURL: URL(fileURLWithPath: "/test/Profile 2")),
-        ], validateProfileData: { _ in
-            { .init(logins: .available, bookmarks: .available) } // swiftlint:disable:this opening_brace
+        ], validateProfileData: { _ in { .init(logins: .available, bookmarks: .available) } // swiftlint:disable:this opening_brace
         })
     } dataImporterFactory: { source, type, _, _ in
         return MockDataImporter(source: source, dataType: type)

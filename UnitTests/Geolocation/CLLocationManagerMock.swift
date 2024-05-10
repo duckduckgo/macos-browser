@@ -103,4 +103,21 @@ final class CLLocationManagerMock: CLLocationManager {
         isUpdatingHeading = true
     }
 
+    override func requestLocation() {
+        fatalError("Unexpected call")
+    }
+
+    var whenInUseAuthorizationRequested: (() -> Void)!
+    override func requestWhenInUseAuthorization() {
+        whenInUseAuthorizationRequested!()
+    }
+
+    override func requestAlwaysAuthorization() {
+        fatalError("Unexpected call")
+    }
+
+    override func requestTemporaryFullAccuracyAuthorization(withPurposeKey purposeKey: String, completion: (((any Error)?) -> Void)? = nil) {
+        fatalError("Unexpected call")
+    }
+
 }

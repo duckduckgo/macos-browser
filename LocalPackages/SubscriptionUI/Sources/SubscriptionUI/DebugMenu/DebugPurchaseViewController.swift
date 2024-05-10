@@ -34,9 +34,9 @@ public final class DebugPurchaseViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init() {
+    public init(subscriptionAppGroup: String) {
         manager = PurchaseManager.shared
-        model = DebugPurchaseModel(manager: manager)
+        model = DebugPurchaseModel(manager: manager, subscriptionAppGroup: subscriptionAppGroup)
 
         super.init(nibName: nil, bundle: nil)
     }

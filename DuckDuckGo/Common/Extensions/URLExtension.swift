@@ -16,16 +16,23 @@
 //  limitations under the License.
 //
 
+import AppKit
+import BrowserServicesKit
 import Common
 import Foundation
-import BrowserServicesKit
 
 extension URL.NavigationalScheme {
 
     static let duck = URL.NavigationalScheme(rawValue: "duck")
+    static let javascript = URL.NavigationalScheme(rawValue: "javascript")
 
     static var validSchemes: [URL.NavigationalScheme] {
         return [.http, .https, .file]
+    }
+
+    /// HTTP or HTTPS
+    var isHypertextScheme: Bool {
+        Self.hypertextSchemes.contains(self)
     }
 
 }
@@ -78,6 +85,7 @@ extension URL {
 
     // MARK: - Factory
 
+#if !SANDBOX_TEST_TOOL
     static func makeSearchUrl(from searchQuery: String) -> URL? {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -123,6 +131,7 @@ extension URL {
 
         return url
     }
+#endif
 
     static let blankPage = URL(string: "about:blank")!
 
@@ -130,12 +139,20 @@ extension URL {
     static let welcome = URL(string: "duck://welcome")!
     static let settings = URL(string: "duck://settings")!
     static let bookmarks = URL(string: "duck://bookmarks")!
+    // base url for Error Page Alternate HTML loaded into Web View
+    static let error = URL(string: "duck://error")!
 
-    static let dataBrokerProtection = URL(string: "duck://dbp")!
+    static let dataBrokerProtection = URL(string: "duck://personal-information-removal")!
 
+#if !SANDBOX_TEST_TOOL
     static func settingsPane(_ pane: PreferencePaneIdentifier) -> URL {
         return settings.appendingPathComponent(pane.rawValue)
     }
+
+    var isSettingsURL: Bool {
+        isChild(of: .settings) && (pathComponents.isEmpty || PreferencePaneIdentifier(url: self) != nil)
+    }
+#endif
 
     enum Invalid {
         static let aboutNewtab = URL(string: "about:newtab")!
@@ -223,10 +240,10 @@ extension URL {
         toString(decodePunycode: decodePunycode, dropScheme: dropScheme, needsWWW: nil, dropTrailingSlash: dropTrailingSlash)
     }
 
-    private func toString(decodePunycode: Bool,
-                          dropScheme: Bool,
-                          needsWWW: Bool? = nil,
-                          dropTrailingSlash: Bool) -> String {
+    func toString(decodePunycode: Bool,
+                  dropScheme: Bool,
+                  needsWWW: Bool? = nil,
+                  dropTrailingSlash: Bool) -> String {
         guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
               var string = components.string
         else {
@@ -271,6 +288,15 @@ extension URL {
         return string
     }
 
+    func hostAndPort() -> String? {
+        guard let host else { return nil }
+
+        guard let port = port else { return host }
+
+        return "\(host):\(port)"
+    }
+
+#if !SANDBOX_TEST_TOOL
     func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
         let hasInputScheme = input.hasOrIsPrefix(of: self.separatedScheme ?? "")
         let hasInputWww = input.dropping(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue)
@@ -281,6 +307,7 @@ extension URL {
                              needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty && hasInputWww,
                              dropTrailingSlash: !input.hasSuffix("/"))
     }
+#endif
 
     /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
     var suggestedFilename: String? {
@@ -314,7 +341,7 @@ extension URL {
     }
 
     var isExternalSchemeLink: Bool {
-        return !["https", "http", "about", "file", "blob", "data", "ftp"].contains(scheme)
+        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript].contains(navigationalScheme)
     }
 
     // MARK: - DuckDuckGo
@@ -337,11 +364,19 @@ extension URL {
     }
 
     static var cookieConsentPopUpManagement: URL {
-        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-consent-pop-up-management")!
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-pop-up-management")!
     }
 
     static var gpcLearnMore: URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
+    }
+
+    static var privateSearchLearnMore: URL {
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/search-privacy/")!
+    }
+
+    static var searchSettings: URL {
+        return URL(string: "https://duckduckgo.com/settings/")!
     }
 
     static var ddgLearnMore: URL {
@@ -356,9 +391,14 @@ extension URL {
         return URL(string: "https://duckduckgo.com/privacy")!
     }
 
+    static var privacyPro: URL {
+        return URL(string: "https://duckduckgo.com/pro")!
+    }
+
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
     static var duckDuckGoEmailLogin = URL(string: "https://duckduckgo.com/email")!
 
+    static var duckDuckGoEmailInfo = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/email-protection/what-is-duckduckgo-email-protection/")!
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
     var isDuckDuckGo: Bool {
@@ -371,6 +411,10 @@ extension URL {
         }
 
         return false
+    }
+
+    var isEmailProtection: Bool {
+        self.isChild(of: .duckDuckGoEmailLogin) || self == .duckDuckGoEmail
     }
 
     enum DuckDuckGoParameters: String {
@@ -447,9 +491,62 @@ extension URL {
 
     }
 
+    var isFileHidden: Bool {
+        get throws {
+            try self.resourceValues(forKeys: [.isHiddenKey]).isHidden ?? false
+        }
+    }
+
+    var isDirectory: Bool {
+        var isDirectory: ObjCBool = false
+        guard isFileURL,
+              FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) else { return false }
+        return isDirectory.boolValue
+    }
+
+    mutating func setFileHidden(_ hidden: Bool) throws {
+        var resourceValues = URLResourceValues()
+        resourceValues.isHidden = true
+        try setResourceValues(resourceValues)
+    }
+
+    /// Check if location pointed by the URL is writable
+    /// - Note: if there‘s no file at the URL, it will try to create a file and then remove it
+    func isWritableLocation() -> Bool {
+        do {
+            try FileManager.default.checkWritability(self)
+            return true
+        } catch {
+            return false
+        }
+    }
+
+#if DEBUG && APPSTORE
+    /// sandbox extension URL access should be stopped after SecurityScopedFileURLController is deallocated - this function validates it and breaks if the file is still writable
+    func ensureUrlIsNotWritable(or handler: () -> Void) {
+        let fm = FileManager.default
+        // is the URL ~/Downloads?
+        if self.resolvingSymlinksInPath() == fm.urls(for: .downloadsDirectory, in: .userDomainMask).first!.resolvingSymlinksInPath() {
+            assert(isWritableLocation())
+            return
+        }
+        // is parent directory writable (e.g. ~/Downloads)?
+        if fm.isWritableFile(atPath: self.deletingLastPathComponent().path)
+            // trashed files are still accessible for some reason even after stopping access
+            || fm.isInTrash(self)
+            // other file is being saved at the same URL
+            || NSURL.activeSecurityScopedUrlUsages.contains(where: { $0.url !== self as NSURL && $0.url == self as NSURL })
+            || !isWritableLocation() { return }
+
+        handler()
+    }
+#endif
+
     // MARK: - System Settings
 
-    static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+    static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!
+
+    static var touchIDAndPassword = URL(string: "x-apple.systempreferences:com.apple.preferences.password")!
 
     // MARK: - Blob URLs
 
@@ -463,7 +560,7 @@ extension URL {
         return false
     }
 
-    func stripUnsupportedCredentials() -> String {
+    func strippingUnsupportedCredentials() -> String {
         if self.absoluteString.firstIndex(of: "@") != nil {
             let authPattern = "([^:]+):\\/\\/[^\\/]*@"
             let strippedURL = self.absoluteString.replacingOccurrences(of: authPattern, with: "$1://", options: .regularExpression)
@@ -471,5 +568,17 @@ extension URL {
             return "\(strippedURL)\(uuid)"
         }
         return self.absoluteString
+    }
+
+    public func isChild(of parentURL: URL) -> Bool {
+        if scheme == parentURL.scheme,
+           port == parentURL.port,
+           let parentURLHost = parentURL.host,
+           self.isPart(ofDomain: parentURLHost),
+           pathComponents.starts(with: parentURL.pathComponents) {
+            return true
+        } else {
+            return false
+        }
     }
 }

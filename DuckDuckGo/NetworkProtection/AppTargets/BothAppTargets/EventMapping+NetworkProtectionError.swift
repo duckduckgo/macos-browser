@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Common
 import Foundation
 import NetworkProtection
@@ -36,10 +34,10 @@ extension EventMapping where Event == NetworkProtectionError {
             domainEvent = .networkProtectionClientInvalidInviteCode
             frequency = .standard
         case .failedToRedeemInviteCode(let error):
-            domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error: error)
+            domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error)
             frequency = .standard
         case .failedToParseRedeemResponse(let error):
-            domainEvent = .networkProtectionClientFailedToParseRedeemResponse(error: error)
+            domainEvent = .networkProtectionClientFailedToParseRedeemResponse(error)
             frequency = .standard
         case .invalidAuthToken:
             domainEvent = .networkProtectionClientInvalidAuthToken
@@ -53,6 +51,9 @@ extension EventMapping where Event == NetworkProtectionError {
         case .keychainWriteError(field: let field, status: let status):
             domainEvent = .networkProtectionKeychainWriteError(field: field, status: status)
             frequency = .standard
+        case .keychainUpdateError(field: let field, status: let status):
+            domainEvent = .networkProtectionKeychainUpdateError(field: field, status: status)
+            frequency = .standard
         case .keychainDeleteError(status: let status):
             domainEvent = .networkProtectionKeychainDeleteError(status: status)
             frequency = .standard
@@ -60,28 +61,22 @@ extension EventMapping where Event == NetworkProtectionError {
             domainEvent = .networkProtectionNoAuthTokenFoundError
             frequency = .standard
         case .failedToFetchLocationList(let error):
-            domainEvent = .networkProtectionClientFailedToFetchLocations(error: error)
-            frequency = .dailyAndContinuous
+            domainEvent = .networkProtectionClientFailedToFetchLocations(error)
+            frequency = .dailyAndCount
         case .failedToParseLocationListResponse(let error):
-            domainEvent = .networkProtectionClientFailedToParseLocationsResponse(error: error)
-            frequency = .dailyAndContinuous
+            domainEvent = .networkProtectionClientFailedToParseLocationsResponse(error)
+            frequency = .dailyAndCount
         case .noServerRegistrationInfo,
                 .couldNotSelectClosestServer,
                 .couldNotGetPeerPublicKey,
                 .couldNotGetPeerHostName,
                 .couldNotGetInterfaceAddressRange,
                 .failedToEncodeRegisterKeyRequest,
-                .noServerListFound,
                 .serverListInconsistency,
                 .failedToFetchRegisteredServers,
                 .failedToFetchServerList,
                 .failedToParseServerListResponse,
                 .failedToParseRegisteredServersResponse,
-                .failedToEncodeServerList,
-                .failedToDecodeServerList,
-                .failedToWriteServerList,
-                .couldNotCreateServerListDirectory,
-                .failedToReadServerList,
                 .wireGuardCannotLocateTunnelFileDescriptor,
                 .wireGuardInvalidState,
                 .wireGuardDnsResolution,
@@ -95,11 +90,11 @@ extension EventMapping where Event == NetworkProtectionError {
             domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             frequency = .standard
             return
+        case .vpnAccessRevoked:
+            return
         }
 
         let debugEvent = DebugEvent(eventType: .custom(domainEvent))
         PixelKit.fire(debugEvent, frequency: .standard, includeAppVersionParameter: true)
     }
 }
-
-#endif

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1400"
+   LastUpgradeVersion = "1520"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -69,13 +69,14 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
+      language = "en"
       codeCoverageEnabled = "YES">
       <PreActions>
          <ExecutionAction
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "killall tests-server&#10;# integration tests resources dir&#10;pushd &quot;${METAL_LIBRARY_OUTPUT_DIR}&quot;&#10;&quot;${BUILT_PRODUCTS_DIR}/tests-server&quot; &amp;&#10;popd&#10;">
+               scriptText = "killall tests-server&#10;killall sandbox-test-tool&#10;# integration tests resources dir&#10;pushd &quot;${METAL_LIBRARY_OUTPUT_DIR}&quot;&#10;&quot;${BUILT_PRODUCTS_DIR}/tests-server&quot; &amp;&#10;popd&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
@@ -93,7 +94,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "killall tests-server&#10;">
+               scriptText = "killall tests-server&#10;killall sandbox-test-tool&#10;">
             </ActionContent>
          </ExecutionAction>
       </PostActions>
@@ -115,13 +116,22 @@
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
+                  Identifier = "PixelExperimentTests">
+               </Test>
+               <Test
                   Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
                </Test>
                <Test
                   Identifier = "PixelStoreTests/testWhenValuesAreRemovedThenTheyAreNotInCache()">
                </Test>
                <Test
+                  Identifier = "PreferencesSidebarModelTests/testWhenResetTabSelectionIfNeededCalledThenPreferencesTabIsSelected()">
+               </Test>
+               <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
+               </Test>
+               <Test
+                  Identifier = "TabSnapshotExtensionTests/testWhenSnapshotIsRestored_ThenRenderingIsSkippedAfterLoading()">
                </Test>
                <Test
                   Identifier = "WindowManagerStateRestorationTests/testWindowManagerStateRestoration()">
@@ -145,9 +155,6 @@
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenNavigationActionIsData_downloadStarts()">
-               </Test>
-               <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
@@ -158,9 +165,6 @@
                </Test>
                <Test
                   Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
-               </Test>
-               <Test
-                  Identifier = "SearchNonexistentDomainTests/testWhenNonexistentDomainSuggestionChosen_redirectedToSERP()">
                </Test>
             </SkippedTests>
          </TestableReference>
@@ -182,16 +186,6 @@
                BuildableName = "NetworkProtectionUITests"
                BlueprintName = "NetworkProtectionUITests"
                ReferencedContainer = "container:LocalPackages/NetworkProtectionMac">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PixelKitTests"
-               BuildableName = "PixelKitTests"
-               BlueprintName = "PixelKitTests"
-               ReferencedContainer = "container:LocalPackages/PixelKit">
             </BuildableReference>
          </TestableReference>
          <TestableReference

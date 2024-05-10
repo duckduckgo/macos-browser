@@ -20,6 +20,8 @@
 
 import XCTest
 import BrowserServicesKit
+import Common
+import PixelKit
 @testable import DataBrokerProtection
 
 final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
@@ -44,7 +46,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let extractedProfileId: Int64 = 1
             let currentPreferredRunDate = Date()
 
-            let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+            let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
             let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -92,14 +94,14 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let extractedProfileId: Int64 = 1
             let currentPreferredRunDate = Date()
 
-            let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+            let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
             let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
             let mockScanOperation = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
 
-            let extractedProfileSaved1 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc")
-            let extractedProfileSaved2 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "zxz")
+            let extractedProfileSaved1 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc", identifier: "abc")
+            let extractedProfileSaved2 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "zxz", identifier: "zxz")
 
             let optOutData = [OptOutOperationData.mock(with: extractedProfileSaved1),
                               OptOutOperationData.mock(with: extractedProfileSaved2)]
@@ -143,7 +145,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let extractedProfileId: Int64 = 1
             let currentPreferredRunDate = Date()
 
-            let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+            let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
             let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -641,6 +643,149 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         }
     }
 
+    func testCorrectDataBrokerTypeIsSent_whenOptOutIsDoneInChildSite() async {
+        do {
+            mockDatabase.attemptInformation = .mock
+            mockWebOperationRunner.scanResults = [.mockWithoutId]
+            _ = try await sut.runScanOperation(
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mockWithParentOptOut,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
+                shouldRunNextStep: { true }
+            )
+
+            if let lastPixelFired = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last {
+                switch lastPixelFired {
+                case .optOutSuccess(_, _, _, let type):
+                    XCTAssertEqual(type, .child)
+                default: XCTFail("We should be firing the opt-out submit pixel last")
+                }
+            } else {
+                XCTFail("We should be firing the opt-out submit pixel")
+            }
+        } catch {
+            XCTFail("Should not throw")
+        }
+    }
+
+    func testCorrectDataBrokerTypeIsSent_whenOptOutIsDoneInParentSite() async {
+        do {
+            mockDatabase.attemptInformation = .mock
+            mockWebOperationRunner.scanResults = [.mockWithoutId]
+            _ = try await sut.runScanOperation(
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mock,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
+                shouldRunNextStep: { true }
+            )
+
+            if let lastPixelFired = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last {
+                switch lastPixelFired {
+                case .optOutSuccess(_, _, _, let type):
+                    XCTAssertEqual(type, .parent)
+                default: XCTFail("We should be firing the opt-out submit pixel last")
+                }
+            } else {
+                XCTFail("We should be firing the opt-out submit pixel")
+            }
+        } catch {
+            XCTFail("Should not throw")
+        }
+    }
+
+    func testCorrectNumberOfTriesIsFired_whenOptOutSucceeds() async {
+        do {
+            mockDatabase.historyEvents = [
+                .init(brokerId: 1, profileQueryId: 1, type: .optOutStarted),
+                .init(brokerId: 1, profileQueryId: 1, type: .error(error: .cancelled)),
+                .init(brokerId: 1, profileQueryId: 1, type: .optOutStarted),
+                .init(brokerId: 1, profileQueryId: 1, type: .error(error: .cancelled)),
+                .init(brokerId: 1, profileQueryId: 1, type: .optOutStarted),
+            ]
+            _ = try await sut.runOptOutOperation(
+                for: .mockWithoutRemovedDate,
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mock,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
+                shouldRunNextStep: { true }
+            )
+            if let lastPixelFired = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last {
+                switch lastPixelFired {
+                case .optOutSubmitSuccess(_, _, _, let tries, _):
+                    XCTAssertEqual(tries, 3)
+                default: XCTFail("We should be firing the opt-out submit-success pixel last")
+                }
+            } else {
+                XCTFail("We should be firing the opt-out submit-success pixel")
+            }
+        } catch {
+            XCTFail("Should not throw")
+        }
+    }
+
+    func testCorrectNumberOfTriesIsFired_whenOptOutFails() async {
+        do {
+            mockWebOperationRunner.shouldOptOutThrow = true
+            mockDatabase.historyEvents = [
+                .init(brokerId: 1, profileQueryId: 1, type: .optOutStarted),
+                .init(brokerId: 1, profileQueryId: 1, type: .error(error: .cancelled)),
+                .init(brokerId: 1, profileQueryId: 1, type: .optOutStarted),
+                .init(brokerId: 1, profileQueryId: 1, type: .error(error: .cancelled)),
+                .init(brokerId: 1, profileQueryId: 1, type: .optOutStarted),
+            ]
+            _ = try await sut.runOptOutOperation(
+                for: .mockWithoutRemovedDate,
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mock,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
+                shouldRunNextStep: { true }
+            )
+            XCTFail("The code above should throw")
+        } catch {
+            if let lastPixelFired = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last {
+                switch lastPixelFired {
+                case .optOutFailure(_, _, _, _, let tries, _, _):
+                    XCTAssertEqual(tries, 3)
+                default: XCTFail("We should be firing the opt-out submit-success pixel last")
+                }
+            } else {
+                XCTFail("We should be firing the opt-out submit-success pixel")
+            }
+        }
+    }
+
     // MARK: - Update operation dates tests
 
     func testWhenUpdatingDatesOnOptOutAndLastEventIsError_thenWeSetPreferredRunDateWithRetryErrorDate() throws {
@@ -745,7 +890,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let extractedProfileId: Int64 = 1
         let currentPreferredRunDate = Date()
 
-        let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+        let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
         let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
         let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -770,7 +915,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let currentPreferredRunDate = Date()
         let expectedPreferredRunDate = Date().addingTimeInterval(config.confirmOptOutScan.hoursToSeconds)
 
-        let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+        let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
         let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
         let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -788,14 +933,13 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 }
 
 final class MockWebOperationRunner: WebOperationRunner {
-
     var shouldScanThrow = false
     var shouldOptOutThrow = false
     var scanResults = [ExtractedProfile]()
     var wasScanCalled = false
     var wasOptOutCalled = false
 
-    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: DataBrokerProtectionStageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
+    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: StageDurationCalculator, pixelHandler: EventMapping<DataBrokerProtectionPixels>, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
         wasScanCalled = true
 
         if shouldScanThrow {
@@ -805,7 +949,7 @@ final class MockWebOperationRunner: WebOperationRunner {
         }
     }
 
-    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, stageCalculator: DataBrokerProtectionStageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, stageCalculator: StageDurationCalculator, pixelHandler: EventMapping<DataBrokerProtectionPixels>, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
         wasOptOutCalled = true
 
         if shouldOptOutThrow {
@@ -831,6 +975,10 @@ extension ScanOperationData {
             historyEvents: [HistoryEvent]()
         )
     }
+
+    static func mockWith(historyEvents: [HistoryEvent]) -> ScanOperationData {
+        ScanOperationData(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents)
+    }
 }
 
 extension OptOutOperationData {
@@ -846,6 +994,7 @@ extension DataBroker {
         DataBroker(
             id: 1,
             name: "Test broker",
+            url: "testbroker.com",
             steps: [
                 Step(type: .scan, actions: [Action]()),
                 Step(type: .optOut, actions: [Action]())
@@ -863,6 +1012,7 @@ extension DataBroker {
         DataBroker(
             id: 1,
             name: "Test broker",
+            url: "testbroker.com",
             steps: [
                 Step(type: .scan, actions: [Action]()),
                 Step(type: .optOut, actions: [Action](), optOutType: .parentSiteOptOut)
@@ -872,16 +1022,31 @@ extension DataBroker {
                 retryError: 0,
                 confirmOptOutScan: 0,
                 maintenanceScan: 0
-            )
+            ),
+            parent: "some"
         )
     }
 
     static var mockWithoutId: DataBroker {
         DataBroker(
             name: "Test broker",
+            url: "testbroker.com",
             steps: [Step](),
             version: "1.0",
             schedulingConfig: DataBrokerScheduleConfig(
+                retryError: 0,
+                confirmOptOutScan: 0,
+                maintenanceScan: 0
+            )
+        )
+    }
+
+    static func mockWithURL(_ url: String) -> DataBroker {
+        .init(name: "Test",
+              url: url,
+              steps: [Step](),
+              version: "1.0",
+              schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 0,
                 confirmOptOutScan: 0,
                 maintenanceScan: 0
@@ -904,19 +1069,19 @@ extension ProfileQuery {
 extension ExtractedProfile {
 
     static var mockWithRemovedDate: ExtractedProfile {
-        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: Date())
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: Date(), identifier: "someURL")
     }
 
     static var mockWithoutRemovedDate: ExtractedProfile {
-        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL")
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", identifier: "someURL")
     }
 
     static var mockWithoutId: ExtractedProfile {
-        ExtractedProfile(name: "Some name", profileUrl: "someOtherURL")
+        ExtractedProfile(name: "Some name", profileUrl: "someOtherURL", identifier: "someOtherURL")
     }
 
     static func mockWithRemoveDate(_ date: Date) -> ExtractedProfile {
-        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: date)
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: date, identifier: "someURL")
     }
 }
 
@@ -954,6 +1119,17 @@ final class MockUserNotification: DataBrokerProtectionUserNotificationService {
         firstRemovedNotificationWasSent = false
         checkInNotificationWasScheduled = false
         allInfoRemovedWasSent = false
+    }
+}
+
+extension AttemptInformation {
+
+    static var mock: AttemptInformation {
+        AttemptInformation(extractedProfileId: 1,
+                           dataBroker: "broker",
+                           attemptId: UUID().uuidString,
+                           lastStageDate: Date(),
+                           startDate: Date())
     }
 }
 

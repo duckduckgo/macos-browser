@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Combine
 import Foundation
@@ -31,21 +29,16 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
     private var status: NetworkProtection.ConnectionStatus = .default
-    private let popoverManager: NetworkProtectionNavBarPopoverManager
+    private let popoverManager: NetPPopoverManager
     private let waitlistActivationDateStore: DefaultWaitlistActivationDateStore
-
-    // MARK: - IPC
-
-    public var ipcClient: TunnelControllerIPCClient {
-        popoverManager.ipcClient
-    }
 
     // MARK: - Subscriptions
 
     private var cancellables = Set<AnyCancellable>()
 
-    // MARK: - NetP Icon publisher
+    // MARK: - VPN
 
+    private let vpnVisibility: NetworkProtectionFeatureVisibility
     private let iconPublisher: NetworkProtectionIconPublisher
     private var iconPublisherCancellable: AnyCancellable?
 
@@ -76,23 +69,15 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     // MARK: - Initialization
 
-    init(popoverManager: NetworkProtectionNavBarPopoverManager,
+    init(popoverManager: NetPPopoverManager,
          pinningManager: PinningManager = LocalPinningManager.shared,
-         statusReporter: NetworkProtectionStatusReporter? = nil,
+         vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         statusReporter: NetworkProtectionStatusReporter,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
         self.popoverManager = popoverManager
-
-        let ipcClient = popoverManager.ipcClient
-
+        self.vpnVisibility = vpnVisibility
         self.networkProtectionStatusReporter = statusReporter
-            ?? DefaultNetworkProtectionStatusReporter(
-                statusObserver: ipcClient.connectionStatusObserver,
-                serverInfoObserver: ipcClient.serverInfoObserver,
-                connectionErrorObserver: ipcClient.connectionErrorObserver,
-                connectivityIssuesObserver: DisabledConnectivityIssueObserver(),
-                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
-        )
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
         self.pinningManager = pinningManager
         self.shortcutTitle = pinningManager.shortcutTitle(for: .networkProtection)
@@ -116,30 +101,20 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     }
 
     private func setupIconSubscription() {
-        iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
-            self?.buttonImage = self?.buttonImageFromWaitlistState(icon: icon)
-        }
+        iconPublisherCancellable = iconPublisher.$icon
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] icon in
+                self?.buttonImage = self?.buttonImageFromWaitlistState(icon: icon)
+            }
     }
 
     /// Temporary override used for the NetP waitlist beta, as a different asset is used for users who are invited to join the beta but haven't yet accepted.
     /// This will be removed once the waitlist beta has ended.
     private func buttonImageFromWaitlistState(icon: NetworkProtectionAsset?) -> NSImage {
         let icon = icon ?? iconPublisher.icon
-
-        let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
-        let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
-
-        if !isWaitlistUser && !hasAuthToken {
-            return NSImage(named: "NetworkProtectionAvailableButton")!
-        }
-
-        if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-            return NSImage(named: "NetworkProtectionAvailableButton")!
-        }
-
-        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-            return .image(for: icon)!
-        }
+#if DEBUG
+        guard [.normal, .integrationTests].contains(NSApp.runType) else { return NSImage() }
+#endif
 
         return .image(for: icon)!
     }
@@ -194,30 +169,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     @MainActor
     func updateVisibility() {
-        // The button is visible in the case where NetP has not been activated, but the user has been invited and they haven't accepted T&Cs.
-        let networkProtectionVisibility = DefaultNetworkProtectionVisibility()
-        if networkProtectionVisibility.isNetworkProtectionVisible() {
-            if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
-                                frequency: .dailyOnly,
-                                includeAppVersionParameter: true)
-                showButton = true
-                return
-            }
-
-            let waitlist = NetworkProtectionWaitlist()
-            let isWaitlistUser = waitlist.waitlistStorage.isWaitlistUser
-            let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
-
-            // If the user hasn't signed up to the waitlist or doesn't have an auth token through some other method, then show them the badged icon
-            // to get their attention and encourage them to sign up. Also avoid showing the button is the user has opened the waitlist UI but
-            // dismissed it.
-            if !isWaitlistUser && !hasAuthToken && !waitlist.waitlistSignUpPromptDismissed {
-                showButton = true
-                return
-            }
-        }
-
         guard !isPinned,
               !popoverManager.isShown,
               !isHavingConnectivityIssues else {
@@ -237,7 +188,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         pinningManager.togglePinning(for: .networkProtection)
     }
 
-    /// We want to pin Network Protection to the navigation bar the first time it's enabled, and only
+    /// We want to pin the VPN to the navigation bar the first time it's enabled, and only
     /// if the user hasn't toggled it manually before.
     /// 
     private func pinNetworkProtectionToNavBarIfNeverPinnedBefore() {
@@ -255,5 +206,3 @@ extension NetworkProtectionNavBarButtonModel: NSPopoverDelegate {
         updateVisibility()
     }
 }
-
-#endif

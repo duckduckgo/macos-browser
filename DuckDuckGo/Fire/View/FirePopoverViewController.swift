@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import History
 
 protocol FirePopoverViewControllerDelegate: AnyObject {
 
@@ -42,6 +43,9 @@ final class FirePopoverViewController: NSViewController {
     private var firePopoverViewModel: FirePopoverViewModel
     private let historyCoordinating: HistoryCoordinating
 
+    @IBOutlet weak var closeTabsLabel: NSTextField!
+    @IBOutlet weak var openFireWindowsTitleLabel: NSTextField!
+    @IBOutlet weak var fireWindowDescriptionLabel: NSTextField!
     @IBOutlet weak var headerWrapperView: NSView!
     @IBOutlet weak var mainButtonsToBurnerWindowContraint: NSLayoutConstraint!
     @IBOutlet weak var infoLabel: NSTextField!
@@ -101,6 +105,7 @@ final class FirePopoverViewController: NSViewController {
             return
         }
 
+        setUpStrings()
         updateClearButtonAppearance()
         setupOptionsButton()
         updateCloseDetailsButton()
@@ -114,6 +119,16 @@ final class FirePopoverViewController: NSViewController {
         super.viewWillAppear()
 
         firePopoverViewModel.refreshItems()
+    }
+
+    private func setUpStrings() {
+        openFireWindowsTitleLabel.stringValue = UserText.fireDialogFireWindowTitle
+        fireWindowDescriptionLabel.stringValue = UserText.fireDialogFireWindowDescription
+        closeTabsLabel.stringValue = UserText.fireDialogCloseTabs
+        openDetailsButton.title = UserText.details
+        closeBurnerWindowButton.title = UserText.fireDialogBurnWindowButton
+        clearButton.title = UserText.clear
+        cancelButton.title = UserText.cancel
     }
 
     @IBAction func optionsButtonAction(_ sender: NSPopUpButton) {
@@ -199,7 +214,7 @@ final class FirePopoverViewController: NSViewController {
         let range = NSRange(location: 0, length: button.title.count)
 
         attrTitle.addAttributes([
-            .foregroundColor: NSColor.redButtonTintColor,
+            .foregroundColor: NSColor.redButtonTint,
             .font: NSFont.systemFont(ofSize: NSFont.systemFontSize)],
             range: range)
 
@@ -340,7 +355,6 @@ final class FirePopoverViewController: NSViewController {
         optionsButtonWidthConstraint.constant = maxWidth + 32
         optionsButton.selectItem(at: optionsButton.numberOfItems - 1)
     }
-
 }
 
 extension FirePopoverViewController: NSCollectionViewDataSource {

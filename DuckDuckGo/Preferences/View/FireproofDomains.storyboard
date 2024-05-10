@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -31,7 +30,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="removeAllDomains:" target="Clu-Bo-JRW" id="oQr-Dn-QVf"/>
+                                    <action selector="removeAllDomains:" target="Clu-Bo-JRW" id="xPH-8I-h5n"/>
                                 </connections>
                             </button>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aPG-Pg-rGL">
@@ -71,7 +70,7 @@
                                                                     </constraints>
                                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Web" id="NnR-kL-cYY"/>
                                                                 </imageView>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="xe6-Rk-8Bn">
+                                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="xe6-Rk-8Bn">
                                                                     <rect key="frame" x="18" y="4" width="109" height="16"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Fireproof Domain" id="DUF-uC-HJj">
                                                                         <font key="font" usesAppearanceFont="YES"/>
@@ -116,7 +115,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aur-0h-QzR">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aur-0h-QzR">
                                 <rect key="frame" x="18" y="271" width="95" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Fireproof Sites" id="s7t-C5-auR">
                                     <font key="font" metaFont="systemMedium" size="13"/>
@@ -124,7 +123,7 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mWM-R4-iMO">
+                            <searchField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mWM-R4-iMO">
                                 <rect key="frame" x="300" y="268" width="155" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="155" id="dkQ-Pw-ZiZ"/>
@@ -170,6 +169,9 @@ DQ
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="doneButton" destination="goL-jl-7Gp" id="8Yb-2X-umJ"/>
+                        <outlet property="fireproofSitesLabel" destination="aur-0h-QzR" id="B5V-iN-MUj"/>
+                        <outlet property="removeAllDomainsButton" destination="KAc-ZW-ZAV" id="g8n-OJ-q2k"/>
                         <outlet property="removeDomainButton" destination="DEQ-Uh-Y7p" id="Zne-M8-g88"/>
                         <outlet property="tableView" destination="pIp-Qw-5G1" id="kNl-PR-zGb"/>
                     </connections>

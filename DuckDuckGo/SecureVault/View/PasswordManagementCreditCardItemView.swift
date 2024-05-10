@@ -39,7 +39,7 @@ struct PasswordManagementCreditCardItemView: View {
                 if model.isInEditMode {
 
                     RoundedRectangle(cornerRadius: 8)
-                        .foregroundColor(Color(NSColor.editingPanelColor))
+                        .foregroundColor(Color(.editingPanel))
                         .shadow(radius: 6)
 
                 }
@@ -47,11 +47,16 @@ struct PasswordManagementCreditCardItemView: View {
                 VStack(alignment: .leading, spacing: 0) {
 
                     HeaderView()
+                        .padding(.top, 16)
                         .padding(.bottom, model.isInEditMode ? 20 : 30)
 
                     EditableCreditCardField(textFieldValue: $model.cardNumber, title: UserText.pmCardNumber)
                     EditableCreditCardField(textFieldValue: $model.cardholderName, title: UserText.pmCardholderName)
-                    EditableCreditCardField(textFieldValue: $model.cardSecurityCode, title: UserText.pmCardVerificationValue)
+                    SecureEditableCreditCardField(textFieldValue: $model.cardSecurityCode,
+                                                  title: UserText.pmCardVerificationValue,
+                                                  hiddenTextLength: 3,
+                                                  toolTipHideText: UserText.autofillHideCardCvvTooltip,
+                                                  toolTipShowText: UserText.autofillShowCardCvvTooltip)
 
                     // Expiration:
 
@@ -94,10 +99,12 @@ struct PasswordManagementCreditCardItemView: View {
                     Spacer(minLength: 0)
 
                     Buttons()
+                        .padding(.top, model.isInEditMode ? 12 : 10)
+                        .padding(.bottom, model.isInEditMode ? 12 : 3)
 
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding()
+                .padding(.horizontal)
 
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
@@ -116,7 +123,7 @@ private struct HeaderView: View {
 
         HStack(alignment: .center, spacing: 0) {
 
-            Image("Card")
+            Image(.card)
                 .padding(.trailing, 10)
 
             if model.isNew || model.isEditing {
@@ -218,7 +225,7 @@ private struct EditableCreditCardField: View {
                             Button {
                                 model.copy(textFieldValue)
                             } label: {
-                                Image("Copy")
+                                Image(.copy)
                             }.buttonStyle(PlainButtonStyle())
                         }
 
@@ -234,5 +241,69 @@ private struct EditableCreditCardField: View {
 
         }
     }
+}
 
+private struct SecureEditableCreditCardField: View {
+
+    @EnvironmentObject var model: PasswordManagementCreditCardModel
+
+    @Binding var textFieldValue: String
+
+    @State private var isHovering = false
+    @State private var isVisible = false
+
+    let title: String
+    let hiddenTextLength: Int
+    let toolTipHideText: String
+    let toolTipShowText: String
+
+    var body: some View {
+
+        if model.isInEditMode || !textFieldValue.isEmpty {
+
+            VStack(alignment: .leading, spacing: 0) {
+
+                Text(title)
+                    .bold()
+                    .padding(.bottom, 5)
+
+                if model.isEditing || model.isNew {
+
+                    HStack {
+
+                        TextField("", text: $textFieldValue)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .padding(.bottom, interItemSpacing)
+
+                    }
+                    .padding(.bottom, interItemSpacing)
+
+                } else {
+
+                    HStack(spacing: 6) {
+
+                        HiddenText(isVisible: isVisible, text: textFieldValue, hiddenTextLength: hiddenTextLength)
+
+                        if (isHovering || isVisible) && textFieldValue != "" {
+                            SecureTextFieldButton(isVisible: $isVisible, toolTipHideText: toolTipHideText, toolTipShowText: toolTipShowText)
+                        }
+
+                        if isHovering {
+                            CopyButton {
+                                model.copy(textFieldValue)
+                            }
+                        }
+
+                        Spacer()
+                    }
+                    .padding(.bottom, interItemSpacing)
+                }
+
+            }
+            .onHover {
+                isHovering = $0
+            }
+
+        }
+    }
 }

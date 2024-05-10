@@ -156,7 +156,7 @@ extension DefaultDataBrokerProtectionUserNotificationService: UNUserNotification
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         guard let identifier = UNNotificationRequest.Identifier(rawValue: response.notification.request.identifier) else { return }
 
-        let pixelMapper: [UNNotificationRequest.Identifier: DataBrokerProtectionPixels] = [.firstScanComplete: .dataBrokerProtectionNotificationSentFirstScanComplete,
+        let pixelMapper: [UNNotificationRequest.Identifier: DataBrokerProtectionPixels] = [.firstScanComplete: .dataBrokerProtectionNotificationOpenedFirstScanComplete,
                                                                                            .firstProfileRemoved: .dataBrokerProtectionNotificationOpenedFirstRemoval,
                                                                                            .allInfoRemoved: .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
                                                                                            .twoWeeksCheckIn: .dataBrokerProtectionNotificationOpened2WeeksCheckIn]

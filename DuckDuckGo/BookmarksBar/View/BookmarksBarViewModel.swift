@@ -47,11 +47,13 @@ final class BookmarksBarViewModel: NSObject {
         case clickItem
         case openInNewTab
         case openInNewWindow
-        case addToFavorites
+        case toggleFavorites
         case edit
         case moveToEnd
         case copyURL
         case deleteEntity
+        case addFolder
+        case manageBookmarks
     }
 
     struct BookmarksBarItem {
@@ -306,8 +308,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
             return NSView()
         }
 
-        let image = NSImage(named: "Drop-Target-Indicator-16")!
-        let imageView = NSImageView(image: image)
+        let imageView = NSImageView(image: .dropTargetIndicator16)
         imageView.contentTintColor = NSColor.controlAccentColor
 
         return imageView
@@ -483,8 +484,8 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
         delegate?.bookmarksBarViewModelReceived(action: .openInNewWindow, for: item)
     }
 
-    func bookmarksBarCollectionViewItemAddToFavoritesAction(_ item: BookmarksBarCollectionViewItem) {
-        delegate?.bookmarksBarViewModelReceived(action: .addToFavorites, for: item)
+    func bookmarksBarCollectionViewItemToggleFavoritesAction(_ item: BookmarksBarCollectionViewItem) {
+        delegate?.bookmarksBarViewModelReceived(action: .toggleFavorites, for: item)
     }
 
     func bookmarksBarCollectionViewEditAction(_ item: BookmarksBarCollectionViewItem) {
@@ -501,6 +502,14 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
 
     func bookmarksBarCollectionViewItemDeleteEntityAction(_ item: BookmarksBarCollectionViewItem) {
         delegate?.bookmarksBarViewModelReceived(action: .deleteEntity, for: item)
+    }
+
+    func bookmarksBarCollectionViewItemAddEntityAction(_ item: BookmarksBarCollectionViewItem) {
+        delegate?.bookmarksBarViewModelReceived(action: .addFolder, for: item)
+    }
+
+    func bookmarksBarCollectionViewItemManageBookmarksAction(_ item: BookmarksBarCollectionViewItem) {
+        delegate?.bookmarksBarViewModelReceived(action: .manageBookmarks, for: item)
     }
 
 }

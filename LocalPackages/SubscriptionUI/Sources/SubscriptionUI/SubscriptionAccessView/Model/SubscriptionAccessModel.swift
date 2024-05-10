@@ -20,31 +20,32 @@ import Foundation
 import Subscription
 
 public protocol SubscriptionAccessModel {
-    var items: [AccessChannel] { get }
-
     var title: String { get }
     var description: String { get }
 
-    func descriptionHeader(for channel: AccessChannel) -> String?
-    func description(for channel: AccessChannel) -> String
-    func buttonTitle(for channel: AccessChannel) -> String?
-    func handleAction(for channel: AccessChannel)
+    var email: String? { get }
+    var emailLabel: String { get }
+    var emailDescription: String { get }
+    var emailButtonTitle: String { get }
+
+    func handleEmailAction()
 }
 
-extension SubscriptionAccessModel {
-    public var items: [AccessChannel] { SubscriptionPurchaseEnvironment.current == .appStore ? [.appleID, .email] : [.email] }
-
-    public func descriptionHeader(for channel: AccessChannel) -> String? { nil }
+public protocol PurchaseRestoringSubscriptionAccessModel {
+    var shouldShowRestorePurchase: Bool { get }
+    var restorePurchaseDescription: String { get }
+    var restorePurchaseButtonTitle: String { get }
+    func handleRestorePurchaseAction()
 }
 
 public final class SubscriptionAccessActionHandlers {
     var restorePurchases: () -> Void
     var openURLHandler: (URL) -> Void
-    var goToSyncPreferences: () -> Void
+    var uiActionHandler: (PreferencesSubscriptionModel.UserEvent) -> Void
 
-    public init(restorePurchases: @escaping () -> Void, openURLHandler: @escaping (URL) -> Void, goToSyncPreferences: @escaping () -> Void) {
+    public init(restorePurchases: @escaping () -> Void, openURLHandler: @escaping (URL) -> Void, uiActionHandler: @escaping (PreferencesSubscriptionModel.UserEvent) -> Void) {
         self.restorePurchases = restorePurchases
         self.openURLHandler = openURLHandler
-        self.goToSyncPreferences = goToSyncPreferences
+        self.uiActionHandler = uiActionHandler
     }
 }

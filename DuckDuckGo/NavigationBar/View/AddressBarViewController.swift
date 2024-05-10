@@ -36,6 +36,7 @@ final class AddressBarViewController: NSViewController {
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    private var tabViewModel: TabViewModel?
     private let suggestionContainerViewModel: SuggestionContainerViewModel
     private let isBurner: Bool
 
@@ -58,6 +59,7 @@ final class AddressBarViewController: NSViewController {
         didSet {
             updateView()
             self.addressBarButtonsViewController?.isTextFieldEditorFirstResponder = isFirstResponder
+            self.clickPoint = nil // reset click point if the address bar activated during click
         }
     }
 
@@ -82,7 +84,7 @@ final class AddressBarViewController: NSViewController {
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
-            isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
+            isHomePage: tabViewModel?.tab.content == .newtab,
             isBurner: isBurner,
             suggestionContainer: SuggestionContainer())
         self.isBurner = isBurner
@@ -96,17 +98,16 @@ final class AddressBarViewController: NSViewController {
         view.wantsLayer = true
         view.layer?.masksToBounds = false
 
+        addressBarTextField.placeholderString = UserText.addressBarPlaceholder
+        addressBarTextField.setAccessibilityIdentifier("AddressBarViewController.addressBarTextField")
+
         updateView()
         // only activate active text field leading constraint on its appearance to avoid constraint conflicts
         activeTextFieldMinXConstraint.isActive = false
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
-        subscribeToSelectedTabViewModel()
-        subscribeToAddressBarValue()
-        registerForMouseEnteredAndExitedEvents()
     }
 
     override func viewWillAppear() {
-
         if view.window?.isPopUpWindow == true {
             addressBarTextField.isHidden = true
             inactiveBackgroundView.isHidden = true
@@ -139,6 +140,9 @@ final class AddressBarViewController: NSViewController {
                                                    object: nil)
             addMouseMonitors()
         }
+        subscribeToSelectedTabViewModel()
+        subscribeToAddressBarValue()
+        registerForMouseEnteredAndExitedEvents()
         subscribeToButtonsWidth()
         subscribeForShadowViewUpdates()
     }
@@ -159,24 +163,18 @@ final class AddressBarViewController: NSViewController {
     func escapeKeyDown() -> Bool {
         guard isFirstResponder else { return false }
 
-        guard !mode.isEditing else {
+        if mode.isEditing {
             addressBarTextField.escapeKeyDown()
             return true
         }
 
-        // If the webview doesn't have content it doesn't handle becoming the first responder properly
-        if tabCollectionViewModel.selectedTabViewModel?.tab.webView.url != nil {
-            tabCollectionViewModel.selectedTabViewModel?.tab.webView.makeMeFirstResponder()
-        } else {
-            view.superview?.becomeFirstResponder()
-        }
+        view.window?.makeFirstResponder(nil)
 
         return true
     }
 
     @IBSegueAction func createAddressBarButtonsViewController(_ coder: NSCoder) -> AddressBarButtonsViewController? {
-        let controller = AddressBarButtonsViewController(coder: coder,
-                                                         tabCollectionViewModel: tabCollectionViewModel)
+        let controller = AddressBarButtonsViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
 
         self.addressBarButtonsViewController = controller
         controller?.delegate = self
@@ -187,10 +185,10 @@ final class AddressBarViewController: NSViewController {
 
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] tabViewModel in
                 guard let self else { return }
 
+                self.tabViewModel = tabViewModel
                 tabViewModelCancellables.removeAll()
 
                 subscribeToTabContent()
@@ -216,57 +214,67 @@ final class AddressBarViewController: NSViewController {
     }
 
     private func subscribeToTabContent() {
-        tabCollectionViewModel.selectedTabViewModel?.tab.$content
-            .receive(on: DispatchQueue.main)
+        tabViewModel?.tab.$content
             .map { $0 == .newtab }
             .assign(to: \.isHomePage, onWeaklyHeld: self)
             .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToPassiveAddressBarString() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+        guard let tabViewModel else {
             passiveTextField.stringValue = ""
             return
         }
-        selectedTabViewModel.$passiveAddressBarString
+        tabViewModel.$passiveAddressBarAttributedString
             .receive(on: DispatchQueue.main)
-            .assign(to: \.stringValue, onWeaklyHeld: passiveTextField)
+            .assign(to: \.attributedStringValue, onWeaklyHeld: passiveTextField)
             .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToProgressEvents() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+        guard let tabViewModel else {
             progressIndicator.hide(animated: false)
             return
         }
 
-        if selectedTabViewModel.isLoading {
-            progressIndicator.show(progress: selectedTabViewModel.progress, startTime: selectedTabViewModel.loadingStartTime)
+        func shouldShowLoadingIndicator(for tabViewModel: TabViewModel, isLoading: Bool, error: Error?) -> Bool {
+            if isLoading,
+               let url = tabViewModel.tab.content.urlForWebView,
+               url.navigationalScheme?.isHypertextScheme == true,
+               !url.isDuckDuckGoSearch, !url.isDuckPlayer,
+               error == nil {
+                return true
+            } else {
+                return false
+            }
+        }
+
+        if shouldShowLoadingIndicator(for: tabViewModel, isLoading: tabViewModel.isLoading, error: tabViewModel.tab.error) {
+            progressIndicator.show(progress: tabViewModel.progress, startTime: tabViewModel.loadingStartTime)
         } else {
             progressIndicator.hide(animated: false)
         }
 
-        selectedTabViewModel.$progress
+        tabViewModel.$progress
             .sink { [weak self] value in
-                guard selectedTabViewModel.isLoading,
+                guard tabViewModel.isLoading,
                       let progressIndicator = self?.progressIndicator,
-                      progressIndicator.isShown
+                      progressIndicator.isProgressShown
                 else { return }
 
                 progressIndicator.increaseProgress(to: value)
             }
             .store(in: &tabViewModelCancellables)
 
-        selectedTabViewModel.$isLoading
-            .sink { [weak self] isLoading in
+        tabViewModel.$isLoading.combineLatest(tabViewModel.tab.$error)
+            .debounce(for: 0.1, scheduler: RunLoop.main)
+            .sink { [weak self] isLoading, error in
                 guard let progressIndicator = self?.progressIndicator else { return }
 
-                if isLoading,
-                   selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch == false {
+                if shouldShowLoadingIndicator(for: tabViewModel, isLoading: isLoading, error: error) {
+                    progressIndicator.show(progress: tabViewModel.progress, startTime: tabViewModel.loadingStartTime)
 
-                    progressIndicator.show(progress: selectedTabViewModel.progress, startTime: selectedTabViewModel.loadingStartTime)
-
-                } else if progressIndicator.isShown {
+                } else if progressIndicator.isProgressShown {
                     progressIndicator.finishAndHide()
                 }
             }
@@ -296,7 +304,7 @@ final class AddressBarViewController: NSViewController {
     }
 
     var accentColor: NSColor {
-        return isBurner ? NSColor.burnerAccentColor : NSColor.controlAccentColor
+        return isBurner ? NSColor.burnerAccent : NSColor.controlAccentColor
     }
 
     private func updateView() {
@@ -315,6 +323,8 @@ final class AddressBarViewController: NSViewController {
         activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.8).cgColor
         activeOuterBorderView.layer?.backgroundColor = accentColor.withAlphaComponent(0.2).cgColor
         activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.8).cgColor
+
+        addressBarTextField.placeholderString = tabViewModel?.tab.content == .newtab ? UserText.addressBarPlaceholder : ""
     }
 
     private func updateShadowViewPresence(_ isFirstResponder: Bool) {
@@ -331,7 +341,7 @@ final class AddressBarViewController: NSViewController {
 
     private func updateShadowView(_ isSuggestionsWindowVisible: Bool) {
         shadowView.shadowSides = isSuggestionsWindowVisible ? [.left, .top, .right] : []
-        shadowView.shadowColor = isSuggestionsWindowVisible ? .suggestionsShadowColor : .clear
+        shadowView.shadowColor = isSuggestionsWindowVisible ? .suggestionsShadow : .clear
         shadowView.shadowRadius = isSuggestionsWindowVisible ? 8.0 : 0.0
 
         activeOuterBorderView.isHidden = isSuggestionsWindowVisible
@@ -354,7 +364,7 @@ final class AddressBarViewController: NSViewController {
         case .suggestion(let suggestionViewModel):
             switch suggestionViewModel.suggestion {
             case .phrase, .unknown: self.mode = .editing(isUrl: false)
-            case .website, .bookmark, .historyEntry: self.mode = .editing(isUrl: true)
+            case .website, .bookmark, .historyEntry, .internalPage: self.mode = .editing(isUrl: true)
             }
         }
     }
@@ -363,13 +373,13 @@ final class AddressBarViewController: NSViewController {
         self.updateMode()
         self.addressBarButtonsViewController?.updateButtons()
 
-        guard let window = view.window else { return }
+        guard let window = view.window, NSApp.runType != .unitTests else { return }
 
         NSAppearance.withAppAppearance {
             if window.isKeyWindow {
                 activeBackgroundView.layer?.borderWidth = 2.0
                 activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.6).cgColor
-                activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
+                activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackground.cgColor
 
                 activeOuterBorderView.isHidden = !isHomePage
             } else {
@@ -481,12 +491,16 @@ extension AddressBarViewController {
         return event
     }
 
+    private static let maxClickReleaseDistanceToResignFirstResponder: CGFloat = 4
+
     func mouseUp(with event: NSEvent) -> NSEvent? {
         // click (same position down+up) outside of the field: resign first responder
         guard event.window === self.view.window,
               self.view.window?.firstResponder === addressBarTextField.currentEditor(),
-              self.clickPoint == event.locationInWindow
-        else { return event }
+              let clickPoint,
+              clickPoint.distance(to: event.locationInWindow) <= Self.maxClickReleaseDistanceToResignFirstResponder else {
+            return event
+        }
 
         self.view.window?.makeFirstResponder(nil)
 
@@ -506,7 +520,7 @@ extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
 fileprivate extension NSView {
 
     var shouldShowArrowCursor: Bool {
-        self is NSButton || self is AnimationView
+        self is NSButton || self is LottieAnimationView
     }
 
 }

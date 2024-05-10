@@ -111,9 +111,18 @@ final class WebViewTests: XCTestCase {
         XCTAssertFalse(webView.canZoomToActualSize)
     }
 
+    func testThatFreshWebViewInstanceCannotResetMagnification() {
+        XCTAssertFalse(webView.canResetMagnification)
+    }
+
     func testWhenZoomLevelChangesThenWebViewCanBeZoomedToActualSize() {
         webView.zoomLevel = .percent150
         XCTAssertTrue(webView.canZoomToActualSize)
+    }
+
+    func testWhenMagnificationLevelChangesThenWebViewCanResetMagnification() {
+        webView.magnification = 2.0
+        XCTAssertTrue(webView.canResetMagnification)
     }
 
     func testWhenMagnificationChangesThenWebViewCanBeZoomedToActualSize() {
@@ -125,7 +134,7 @@ final class WebViewTests: XCTestCase {
         let tabVM = TabViewModel(tab: Tab())
         let randomZoomLevel = DefaultZoomValue.percent300
         // Select Default zoom
-        AppearancePreferences.shared.defaultPageZoom = randomZoomLevel
+        AccessibilityPreferences.shared.defaultPageZoom = randomZoomLevel
 
         // Zooming out
         tabVM.tab.webView.zoomOut()
@@ -138,7 +147,19 @@ final class WebViewTests: XCTestCase {
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
 
         // Set new default zoom
-        AppearancePreferences.shared.defaultPageZoom = .percent75
+        AccessibilityPreferences.shared.defaultPageZoom = .percent75
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, .percent75)
+    }
+
+    func testThatResetZoomLevelResetsMagnification() {
+        let tabVM = TabViewModel(tab: Tab())
+
+        // Set MAgnification
+        tabVM.tab.webView.magnification = 3.0
+
+        // Reset
+        tabVM.tab.webView.resetZoomLevel()
+
+        XCTAssertEqual(tabVM.tab.webView.magnification, 1)
     }
 }

@@ -16,17 +16,19 @@
 //  limitations under the License.
 //
 
-import XCTest
-@testable import DuckDuckGo_Privacy_Browser
-import Combine
 import class Persistence.CoreDataDatabase
+import Combine
+import History
+import XCTest
+
+@testable import DuckDuckGo_Privacy_Browser
 
 final class HistoryStoreTests: XCTestCase {
 
     private var cancellables = Set<AnyCancellable>()
 
     private var context: NSManagedObjectContext!
-    private var historyStore: HistoryStore!
+    private var historyStore: EncryptedHistoryStore!
     private var location: URL!
 
     override func setUp() {
@@ -40,7 +42,7 @@ final class HistoryStoreTests: XCTestCase {
             }
         }
         context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
-        historyStore = HistoryStore(context: context)
+        historyStore = EncryptedHistoryStore(context: context)
     }
 
     override func tearDownWithError() throws {
@@ -75,7 +77,7 @@ final class HistoryStoreTests: XCTestCase {
     func testWhenCleanOldIsCalled_ThenOlderEntriesThanDateAreCleaned() {
         let toBeKeptIdentifier = UUID()
         let newHistoryEntry = HistoryEntry(identifier: toBeKeptIdentifier,
-                                           url: URL(string: "wikipedia.org")!,
+                                           url: URL(string: "http://wikipedia.org")!,
                                            title: nil,
                                            numberOfVisits: 1,
                                            lastVisit: Date(),
@@ -322,7 +324,7 @@ final class HistoryStoreTests: XCTestCase {
         waitForExpectations(timeout: 2, handler: nil)
     }
 
-    private func cleanOldAndWait(cleanUntil date: Date, assertion: @escaping (History) -> Void, file: StaticString = #file, line: UInt = #line) {
+    private func cleanOldAndWait(cleanUntil date: Date, assertion: @escaping (BrowsingHistory) -> Void, file: StaticString = #file, line: UInt = #line) {
         let loadingExpectation = self.expectation(description: "Loading")
         historyStore.cleanOld(until: date)
             .receive(on: DispatchQueue.main)

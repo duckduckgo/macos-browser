@@ -19,8 +19,6 @@
 import Foundation
 import SwiftUI
 
-#if NETWORK_PROTECTION
-
 struct VPNFeedbackFormView: View {
 
     @EnvironmentObject var viewModel: VPNFeedbackFormViewModel
@@ -132,29 +130,29 @@ private struct VPNFeedbackFormIssueDescriptionForm: View {
     @ViewBuilder
     func textEditor() -> some View {
 #if APPSTORE
-            FocusableTextEditor(text: $model.notes)
+        FocusableTextEditor(text: $viewModel.feedbackFormText, characterLimit: 1000)
 #else
-            if #available(macOS 12, *) {
-                FocusableTextEditor(text: $viewModel.feedbackFormText, characterLimit: 1000)
-            } else {
-                TextEditor(text: $viewModel.feedbackFormText)
-                    .frame(height: 197.0)
-                    .font(.body)
-                    .foregroundColor(.primary)
-                    .onChange(of: viewModel.feedbackFormText) {
-                        viewModel.feedbackFormText = String($0.prefix(1000))
+        if #available(macOS 12, *) {
+            FocusableTextEditor(text: $viewModel.feedbackFormText, characterLimit: 1000)
+        } else {
+            TextEditor(text: $viewModel.feedbackFormText)
+                .frame(height: 197.0)
+                .font(.body)
+                .foregroundColor(.primary)
+                .onChange(of: viewModel.feedbackFormText) {
+                    viewModel.feedbackFormText = String($0.prefix(1000))
+                }
+                .padding(EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 0.0))
+                .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
+                .background(
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8.0)
+                            .stroke(Color(.textEditorBorder), lineWidth: 0.4)
+                        RoundedRectangle(cornerRadius: 8.0)
+                            .fill(Color(.textEditorBackground))
                     }
-                    .padding(EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 0.0))
-                    .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
-                    .background(
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 8.0)
-                                .stroke(Color(NSColor.textEditorBorderColor), lineWidth: 0.4)
-                            RoundedRectangle(cornerRadius: 8.0)
-                                .fill(Color(NSColor.textEditorBackgroundColor))
-                        }
-                    )
-            }
+                )
+        }
 #endif
     }
 
@@ -164,7 +162,7 @@ private struct VPNFeedbackFormSentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Image("VPNFeedbackSent")
+            Image(.vpnFeedbackSent)
                 .padding(.top, 20)
 
             Text(UserText.vpnFeedbackFormSendingConfirmationTitle)
@@ -214,5 +212,3 @@ private struct VPNFeedbackFormButtons: View {
     }
 
 }
-
-#endif

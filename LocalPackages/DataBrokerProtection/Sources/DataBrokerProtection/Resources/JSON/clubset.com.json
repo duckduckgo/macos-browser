@@ -1,6 +1,7 @@
 {
-  "name": "clubset.com",
-  "version": "0.1.1",
+  "name": "Clubset",
+  "url": "clubset.com",
+  "version": "0.1.5",
   "parent": "verecor.com",
   "addedDatetime": 1702965600000,
   "steps": [
@@ -10,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "917f5d40-2011-4fe5-9ef6-136d6bfaea35",
+          "id": "9b8c7984-a54a-40d1-8e2e-56cd1910ec61",
           "url": "https://clubset.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state|upcase}&city=${city|capitalize}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -24,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "06e37215-ef34-4971-bf86-e5a03dfe46e8",
+          "id": "dee8a12e-b8bd-4a37-b77d-8330d8eda4cb",
           "selector": ".card",
           "profile": {
             "name": {
@@ -50,7 +51,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://clubset.com/profile/${id}"
             }
           }
         }

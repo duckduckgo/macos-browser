@@ -18,10 +18,10 @@
 
 import Common
 import Foundation
+import AppKit
+import PixelKit
 
-#if NETWORK_PROTECTION
-import NetworkProtection
-#endif
+import NetworkProtectionUI
 
 #if DBP
 import DataBrokerProtection
@@ -62,15 +62,15 @@ final class URLEventHandler {
     @objc func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
         guard let stringValue = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue else {
             os_log("UrlEventListener: unable to determine path", type: .error)
-            Pixel.fire(.debug(event: .appOpenURLFailed,
-                              error: NSError(domain: "CouldNotGetPath", code: -1, userInfo: nil)))
+            let error = NSError(domain: "CouldNotGetPath", code: -1, userInfo: nil)
+            PixelKit.fire(DebugEvent(GeneralPixel.appOpenURLFailed, error: error))
             return
         }
 
         guard let url = URL.makeURL(from: stringValue) else {
             os_log("UrlEventListener: failed to construct URL from path %s", type: .error, stringValue)
-            Pixel.fire(.debug(event: .appOpenURLFailed,
-                              error: NSError(domain: "CouldNotConstructURL", code: -1, userInfo: nil)))
+            let error = NSError(domain: "CouldNotConstructURL", code: -1, userInfo: nil)
+            PixelKit.fire(DebugEvent(GeneralPixel.appOpenURLFailed, error: error))
             return
         }
 
@@ -103,11 +103,9 @@ final class URLEventHandler {
     }
 
     private static func openURL(_ url: URL) {
-#if NETWORK_PROTECTION
         if url.scheme?.isNetworkProtectionScheme == true {
             handleNetworkProtectionURL(url)
         }
-#endif
 
 #if DBP
         if url.scheme?.isDataBrokerProtectionScheme == true {
@@ -115,17 +113,26 @@ final class URLEventHandler {
         }
 #endif
 
-#if NETWORK_PROTECTION || DBP
+        if url.isFileURL && url.pathExtension == WebKitDownloadTask.downloadExtension {
+            guard let mainViewController = {
+                if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController {
+                    return mainWindowController.mainViewController
+                }
+                return WindowsManager.openNewWindow(with: .newtab, source: .ui, isBurner: false)?.contentViewController as? MainViewController
+            }() else { return }
+
+            if !mainViewController.navigationBarViewController.isDownloadsPopoverShown {
+                mainViewController.navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: false)
+            }
+
+            return
+        }
+
         if url.scheme?.isNetworkProtectionScheme == false && url.scheme?.isDataBrokerProtectionScheme == false {
             WaitlistModalDismisser.dismissWaitlistModalViewControllerIfNecessary(url)
             WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
         }
-#else
-        WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
-#endif
     }
-
-#if NETWORK_PROTECTION
 
     /// Handles NetP URLs
     ///
@@ -139,12 +146,23 @@ final class URLEventHandler {
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
         case AppLaunchCommand.shareFeedback.launchURL:
             WindowControllersManager.shared.showShareFeedbackModal()
+        case AppLaunchCommand.justOpen.launchURL:
+            WindowControllersManager.shared.showMainWindow()
+        case AppLaunchCommand.showVPNLocations.launchURL:
+            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
+            WindowControllersManager.shared.showLocationPickerSheet()
+        case AppLaunchCommand.showPrivacyPro.launchURL:
+            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+#if !APPSTORE && !DEBUG
+        case AppLaunchCommand.moveAppToApplications.launchURL:
+            // this should be run after NSApplication.shared is set
+            PFMoveToApplicationsFolderIfNecessary(false)
+#endif
         default:
             return
         }
     }
-
-#endif
 
 #if DBP
     /// Handles DBP URLs

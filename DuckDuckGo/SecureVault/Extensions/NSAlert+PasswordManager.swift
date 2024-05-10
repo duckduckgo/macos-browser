@@ -22,61 +22,95 @@ extension NSAlert {
 
     static func passwordManagerConfirmDeleteLogin() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Are you sure you want to delete this saved password?"
-        alert.informativeText = "This action cannot be undone."
+        alert.messageText = UserText.passwordManagerAlertRemovePasswordConfirmation
+        alert.informativeText = UserText.thisActionCannotBeUndone
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Delete")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: UserText.passwordManagerAlerDeleteButton)
+        alert.addButton(withTitle: UserText.cancel)
         return alert
     }
 
     static func passwordManagerSaveChangesToLogin() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Save the changes you made?"
+        alert.messageText = UserText.passwordManagerAlertSaveChanges
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Save")
-        alert.addButton(withTitle: "Discard")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: UserText.save)
+        alert.addButton(withTitle: UserText.discard)
+        alert.addButton(withTitle: UserText.cancel)
         return alert
     }
 
     static func passwordManagerDuplicateLogin() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Duplicate Password"
-        alert.informativeText = "You already have a password saved for this username and website."
+        alert.messageText = UserText.passwordManagerAlertDuplicatePassword
+        alert.informativeText = UserText.passwordManagerAlertDuplicatePasswordDescription
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: UserText.ok)
         return alert
     }
 
     static func passwordManagerConfirmDeleteCard() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Are you sure you want to delete this saved credit card?"
-        alert.informativeText = "This action cannot be undone."
+        alert.messageText = UserText.passwordManagerAlertRemoveCardConfirmation
+        alert.informativeText = UserText.thisActionCannotBeUndone
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Delete")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: UserText.passwordManagerAlerDeleteButton)
+        alert.addButton(withTitle: UserText.cancel)
         return alert
     }
 
     static func passwordManagerConfirmDeleteIdentity() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Are you sure you want to delete this saved autofill info?"
-        alert.informativeText = "This action cannot be undone."
+        alert.messageText = UserText.passwordManagerAlertRemoveIdentityConfirmation
+        alert.informativeText = UserText.thisActionCannotBeUndone
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Delete")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: UserText.passwordManagerAlerDeleteButton)
+        alert.addButton(withTitle: UserText.cancel)
         return alert
     }
 
     static func passwordManagerConfirmDeleteNote() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Are you sure you want to delete this note?"
-        alert.informativeText = "This action cannot be undone."
+        alert.messageText = UserText.passwordManagerAlertRemoveNoteConfirmation
+        alert.informativeText = UserText.thisActionCannotBeUndone
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Delete")
-        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: UserText.passwordManagerAlerDeleteButton)
+        alert.addButton(withTitle: UserText.cancel)
         return alert
     }
 
+    static func deleteAllPasswordsConfirmationAlert(count: Int, syncEnabled: Bool) -> NSAlert {
+        let messageText = UserText.deleteAllPasswordsConfirmationMessageText(count: count)
+        let informationText = UserText.deleteAllPasswordsConfirmationInformationText(syncEnabled: syncEnabled)
+        return autofillActionConfirmationAlert(messageText: messageText,
+                                        informationText: informationText,
+                                        confirmButtonText: UserText.passwordManagerAlerDeleteButton)
+    }
+
+    private static func autofillActionConfirmationAlert(messageText: String,
+                                                        informationText: String,
+                                                        confirmButtonText: String) -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = messageText
+        alert.informativeText = informationText
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: confirmButtonText)
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
+    static func deleteAllPasswordsCompletionAlert(count: Int, syncEnabled: Bool) -> NSAlert {
+        let messageText = UserText.deleteAllPasswordsCompletionMessageText(count: count)
+        let informationText = UserText.deleteAllPasswordsCompletionInformationText(syncEnabled: syncEnabled)
+        return autofillActionCompletionAlert(messageText: messageText,
+                                      informationText: informationText)
+    }
+
+    private static func autofillActionCompletionAlert(messageText: String, informationText: String) -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = messageText
+        alert.informativeText = informationText
+        alert.addButton(withTitle: UserText.deleteAllPasswordsCompletionButtonText)
+        return alert
+    }
 }
