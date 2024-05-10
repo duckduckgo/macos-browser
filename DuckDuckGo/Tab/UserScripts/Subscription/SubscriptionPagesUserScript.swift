@@ -92,7 +92,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     private let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
 
-    init(subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = GenericAttributionPixelHandler.subscription) {
+    init(subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler.default) {
         self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
     }
 

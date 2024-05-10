@@ -25,27 +25,37 @@ protocol SubscriptionAttributionPixelHandler {
 
 // MARK: - SubscriptionAttributionPixelHandler
 
-extension GenericAttributionPixelHandler: SubscriptionAttributionPixelHandler {
+final class PrivacyProSubscriptionAttributionPixelHandler: SubscriptionAttributionPixelHandler {
+    private let decoratedAttributionPixelHandler: AttributionPixelHandler
+    private let originStore: SubscriptionOriginStorage
+
+    init(attributionPixelHandler: AttributionPixelHandler, originStore: SubscriptionOriginStorage) {
+        decoratedAttributionPixelHandler = attributionPixelHandler
+        self.originStore = originStore
+    }
 
     func fireSuccessfulSubscriptionAttributionPixel() {
-        fireAttributionPixel(
+        decoratedAttributionPixelHandler.fireAttributionPixel(
             event: PrivacyProPixel.privacyProSuccessfulSubscriptionAttribution,
             frequency: .standard,
             parameters: nil
         )
+        originStore.origin = nil
     }
 
 }
 
-// MARK: - GenericAttributionPixelHandler + Subscription
+// MARK: -
 
-extension GenericAttributionPixelHandler {
+extension PrivacyProSubscriptionAttributionPixelHandler {
 
-    static let subscription = GenericAttributionPixelHandler(
-        originProvider: SubscriptionOriginStore(
-            userDefaults: UserDefaults.subs
+    static let `default`: PrivacyProSubscriptionAttributionPixelHandler = {
+        let originStore = SubscriptionOriginStore(userDefaults: UserDefaults.subs)
+        return PrivacyProSubscriptionAttributionPixelHandler(
+            attributionPixelHandler: GenericAttributionPixelHandler(originProvider: originStore),
+            originStore: originStore
         )
-    )
+    }()
 
 }
 
