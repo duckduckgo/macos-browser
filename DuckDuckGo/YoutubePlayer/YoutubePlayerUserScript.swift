@@ -52,7 +52,7 @@ final class YoutubePlayerUserScript: NSObject, Subfeature {
         case .getUserValues:
             return DuckPlayer.shared.handleGetUserValues
         case .setUserValues:
-            return DuckPlayer.shared.handleSetUserValues
+            return DuckPlayer.shared.handleSetUserValuesMessage(from: .duckPlayer)
         default:
             assertionFailure("YoutubePlayerUserScript: Failed to parse User Script message: \(methodName)")
             return nil
