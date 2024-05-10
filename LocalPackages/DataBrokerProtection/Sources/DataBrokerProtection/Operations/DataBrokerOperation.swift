@@ -21,7 +21,7 @@ import Common
 
 protocol DataBrokerOperationDependencies {
     var database: DataBrokerProtectionRepository { get }
-    var brokerTimeInterval: TimeInterval { get }
+    var config: DataBrokerProtectionProcessorConfiguration { get }
     var runnerProvider: JobRunnerProvider { get }
     var notificationCenter: NotificationCenter { get }
     var pixelHandler: EventMapping<DataBrokerProtectionPixels> { get }
@@ -30,7 +30,7 @@ protocol DataBrokerOperationDependencies {
 
 struct DefaultDataBrokerOperationDependencies: DataBrokerOperationDependencies {
     let database: DataBrokerProtectionRepository
-    let brokerTimeInterval: TimeInterval
+    var config: DataBrokerProtectionProcessorConfiguration
     let runnerProvider: JobRunnerProvider
     let notificationCenter: NotificationCenter
     let pixelHandler: EventMapping<DataBrokerProtectionPixels>
@@ -43,23 +43,23 @@ enum OperationType {
     case all
 }
 
+protocol DataBrokerOperationErrorDelegate: AnyObject {
+    func dataBrokerOperationDidError(_ error: Error)
+}
+
+// swiftlint:disable explicit_non_final_class
 class DataBrokerOperation: Operation {
 
-    public var error: Error?
-
     private let dataBrokerID: Int64
-    private let database: DataBrokerProtectionRepository
+    private let operationType: OperationType
+    private let priorityDate: Date? // The date to filter and sort operations priorities
+    private let showWebView: Bool
+    private(set) weak var errorDelegate: DataBrokerOperationErrorDelegate? // Internal read-only to enable mocking
+    private let operationDependencies: DataBrokerOperationDependencies
+
     private let id = UUID()
     private var _isExecuting = false
     private var _isFinished = false
-    private let brokerTimeInterval: TimeInterval? // The time in seconds to wait in-between operations
-    private let priorityDate: Date? // The date to filter and sort operations priorities
-    private let operationType: OperationType
-    private let notificationCenter: NotificationCenter
-    private let runner: WebJobRunner
-    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
-    private let showWebView: Bool
-    private let userNotificationService: DataBrokerProtectionUserNotificationService
 
     deinit {
         os_log("Deinit operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
@@ -69,18 +69,15 @@ class DataBrokerOperation: Operation {
          operationType: OperationType,
          priorityDate: Date? = nil,
          showWebView: Bool,
+         errorDelegate: DataBrokerOperationErrorDelegate,
          operationDependencies: DataBrokerOperationDependencies) {
 
         self.dataBrokerID = dataBrokerID
         self.priorityDate = priorityDate
         self.operationType = operationType
         self.showWebView = showWebView
-        self.database = operationDependencies.database
-        self.brokerTimeInterval = operationDependencies.brokerTimeInterval
-        self.runner = operationDependencies.runnerProvider.getJobRunner()
-        self.notificationCenter = operationDependencies.notificationCenter
-        self.pixelHandler = operationDependencies.pixelHandler
-        self.userNotificationService = operationDependencies.userNotificationService
+        self.errorDelegate = errorDelegate
+        self.operationDependencies = operationDependencies
         super.init()
     }
 
@@ -146,7 +143,7 @@ class DataBrokerOperation: Operation {
         let allBrokerProfileQueryData: [BrokerProfileQueryData]
 
         do {
-            allBrokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
+            allBrokerProfileQueryData = try operationDependencies.database.fetchAllBrokerProfileQueryData()
         } catch {
             os_log("DataBrokerOperationsCollection error: runOperation, error: %{public}@", log: .error, error.localizedDescription)
             return
@@ -178,30 +175,30 @@ class DataBrokerOperation: Operation {
 
                 try await DataBrokerProfileQueryOperationManager().runOperation(operationData: operationData,
                                                                                 brokerProfileQueryData: brokerProfileData,
-                                                                                database: database,
-                                                                                notificationCenter: notificationCenter,
-                                                                                runner: runner,
-                                                                                pixelHandler: pixelHandler,
+                                                                                database: operationDependencies.database,
+                                                                                notificationCenter: operationDependencies.notificationCenter,
+                                                                                runner: operationDependencies.runnerProvider.getJobRunner(),
+                                                                                pixelHandler: operationDependencies.pixelHandler,
                                                                                 showWebView: showWebView,
                                                                                 isManualScan: operationType == .scan,
-                                                                                userNotificationService: userNotificationService,
+                                                                                userNotificationService: operationDependencies.userNotificationService,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }
                     return !self.isCancelled
                 })
 
-                if let sleepInterval = brokerTimeInterval {
-                    os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
-                    try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
-                }
+                let sleepInterval = operationDependencies.config.intervalBetweenSameBrokerOperations
+                os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
+                try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
 
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-                self.error = error
+
+                errorDelegate?.dataBrokerOperationDidError(error)
 
                 if let error = error as? DataBrokerProtectionError,
                    let dataBrokerName = brokerProfileQueriesData.first?.dataBroker.name {
-                    pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
+                    operationDependencies.pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
                 }
             }
         }
@@ -222,3 +219,4 @@ class DataBrokerOperation: Operation {
         os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
     }
 }
+// swiftlint:enable explicit_non_final_class

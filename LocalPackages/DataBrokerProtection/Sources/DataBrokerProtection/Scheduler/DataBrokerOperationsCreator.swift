@@ -23,6 +23,7 @@ protocol DataBrokerOperationsCreator {
     func operations(forOperationType operationType: OperationType,
                     withPriorityDate priorityDate: Date?,
                     showWebView: Bool,
+                    errorDelegate: DataBrokerOperationErrorDelegate,
                     operationDependencies: DataBrokerOperationDependencies) throws -> [DataBrokerOperation]
 }
 
@@ -31,6 +32,7 @@ final class DefaultDataBrokerOperationsCreator: DataBrokerOperationsCreator {
     func operations(forOperationType operationType: OperationType,
                     withPriorityDate priorityDate: Date?,
                     showWebView: Bool,
+                    errorDelegate: DataBrokerOperationErrorDelegate,
                     operationDependencies: DataBrokerOperationDependencies) throws -> [DataBrokerOperation] {
 
         let brokerProfileQueryData = try operationDependencies.database.fetchAllBrokerProfileQueryData()
@@ -42,10 +44,11 @@ final class DefaultDataBrokerOperationsCreator: DataBrokerOperationsCreator {
 
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
                 let collection = DataBrokerOperation(dataBrokerID: dataBrokerID,
-                                                                operationType: operationType,
-                                                                priorityDate: priorityDate,
-                                                                showWebView: showWebView,
-                                                                operationDependencies: operationDependencies)
+                                                     operationType: operationType,
+                                                     priorityDate: priorityDate,
+                                                     showWebView: showWebView,
+                                                     errorDelegate: errorDelegate,
+                                                     operationDependencies: operationDependencies)
                 operations.append(collection)
                 visitedDataBrokerIDs.insert(dataBrokerID)
             }

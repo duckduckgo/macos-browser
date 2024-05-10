@@ -20,6 +20,7 @@ import Common
 import Foundation
 
 protocol DataBrokerProtectionOperationQueue {
+    var maxConcurrentOperationCount: Int { get set }
     func cancelAllOperations()
     func addOperation(_ op: Operation)
     func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void)
@@ -63,11 +64,13 @@ protocol DataBrokerProtectionQueueManager: DataBrokerDebugCommandExecutor {
 
 final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueManager {
 
-    private var mode = DataBrokerProtectionQueueMode.idle
-    private let operationQueue: DataBrokerProtectionOperationQueue
+    private var operationQueue: DataBrokerProtectionOperationQueue
     private let operationsCreator: DataBrokerOperationsCreator
     private let mismatchCalculator: MismatchCalculator
     private let brokerUpdater: DataBrokerProtectionBrokerUpdater?
+
+    private var mode = DataBrokerProtectionQueueMode.idle
+    private var operationErrors: [Error] = []
 
     init(operationQueue: DataBrokerProtectionOperationQueue,
          operationsCreator: DataBrokerOperationsCreator,
@@ -149,7 +152,7 @@ private extension DefaultDataBrokerProtectionQueueManager {
         switch mode {
         case .immediate(let completion), .scheduled(let completion):
             operationQueue.cancelAllOperations()
-            completion?(nil)
+            completion?(errorCollection())
         default:
             break
         }
@@ -167,12 +170,15 @@ private extension DefaultDataBrokerProtectionQueueManager {
         // Fire Pixels
         firePixels(operationDependencies: operationDependencies)
 
+        operationQueue.maxConcurrentOperationCount = operationDependencies.config.concurrentOperationsFor(type)
+
         // Use builder to build operations
         let operations: [DataBrokerOperation]
         do {
             operations = try operationsCreator.operations(forOperationType: type,
                                                           withPriorityDate: priorityDate,
                                                           showWebView: showWebView,
+                                                          errorDelegate: self,
                                                           operationDependencies: operationDependencies)
 
             for collection in operations {
@@ -185,13 +191,12 @@ private extension DefaultDataBrokerProtectionQueueManager {
         }
 
         operationQueue.addBarrierBlock { [weak self] in
-            let errorCollection = self?.errorCollection(fromOperations: operations)
+            let errorCollection = self?.errorCollection()
             completion?(errorCollection)
         }
     }
 
-    func errorCollection(fromOperations operations: [DataBrokerOperation]) -> DataBrokerProtectionSchedulerErrorCollection? {
-        let operationErrors = operations.compactMap { $0.error }
+    func errorCollection() -> DataBrokerProtectionSchedulerErrorCollection? {
         return operationErrors.count != 0 ? DataBrokerProtectionSchedulerErrorCollection(operationErrors: operationErrors) : nil
     }
 
@@ -206,5 +211,11 @@ private extension DefaultDataBrokerProtectionQueueManager {
         engagementPixels.fireEngagementPixel()
         // This will try to fire the event weekly report pixels
         eventPixels.tryToFireWeeklyPixels()
+    }
+}
+
+extension DefaultDataBrokerProtectionQueueManager: DataBrokerOperationErrorDelegate {
+    func dataBrokerOperationDidError(_ error: any Error) {
+        operationErrors.append(error)
     }
 }
