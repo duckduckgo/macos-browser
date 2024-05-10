@@ -1299,74 +1299,62 @@
         }
       }
     },
-    "alert.sync-bad-data-error-description" : {
+    "alert.sync-bookmarks-bad-data-error-description" : {
       "comment" : "Description for alert shown when sync error occurs because of bad data",
-      "extractionState" : "stale",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Einige Lesezeichen oder Passwörter sind falsch formatiert oder zu lang und wurden nicht synchronisiert."
+            "value" : "Einige Lesezeichen sind falsch formatiert oder zu lang und wurden nicht synchronisiert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Some bookmarks or passwords are formatted incorrectly or too long and were not synced."
+            "value" : "Some bookmarks are formatted incorrectly or too long and were not synced."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Algunos marcadores o contraseñas tienen un formato incorrecto o demasiado largo y no se han sincronizado."
+            "value" : "Algunos marcadores tienen un formato incorrecto o demasiado largo y no se han sincronizado."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Certains signets ou mots de passe sont mal formatés ou trop longs et n'ont pas été synchronisés."
+            "value" : "Certains signets sont mal formatés ou trop longs et n'ont pas été synchronisés.\n"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alcuni segnalibri o password sono formattati in modo errato o sono troppo lunghi e non sono stati sincronizzati."
+            "value" : "Alcuni segnalibri sono formattati in modo errato o sono troppo lunghi e non sono stati sincronizzati."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sommige bladwijzers of wachtwoorden hebben de verkeerd indeling of te lang en werden niet gesynchroniseerd."
+            "value" : "Sommige bladwijzers hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Niektóre zakładki lub hasła mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane."
+            "value" : "Niektóre zakładki mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alguns marcadores ou palavras-passe estão formatados incorretamente ou são demasiado longos e não foram sincronizados."
+            "value" : "Alguns marcadores estão formatados incorretamente ou são demasiado longos e não foram sincronizados."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Некоторые закладки или пароли не синхронизируются из-за неверного формата или превышения ограничений по длине."
-          }
-        }
-      }
-    },
-    "alert.sync-bookmarks-bad-data-error-description" : {
-      "comment" : "Description for alert shown when sync error occurs because of bad data",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Some bookmarks are formatted incorrectly or too long and were not synced."
+            "value" : "Некоторые закладки не синхронизируются из-за неверного формата или превышения ограничений по длине."
           }
         }
       }
@@ -1495,10 +1483,58 @@
       "comment" : "Description for alert shown when sync error occurs because of bad data",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Passwörter sind falsch formatiert oder zu lang und wurden nicht synchronisiert."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Some passwords are formatted incorrectly or too long and were not synced."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunas contraseñas tienen un formato incorrecto o demasiado largo y no se han sincronizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains mots de passe sont mal formatés ou trop longs et n'ont pas été synchronisés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcune password sono formattate in modo errato o sono troppo lunghe e non sono state sincronizzate."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommige wachtwoorden hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektóre hasła mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algumas palavras-passe estão formatadas incorretamente ou são demasiado longas e não foram sincronizadas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторые пароли не синхронизируются из-за неверного формата или превышения ограничений по длине."
           }
         }
       }
@@ -1749,8 +1785,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Sync hat einen Fehler festgestellt. Bitte deaktiviere die Synchronisierung und stelle die Verbindung mit deinem Wiederherstellungscode wieder her."
+            "state" : "translated",
+            "value" : "Synchronisierung wurde angehalten. Wenn du die Synchronisierung dieses Geräts fortsetzen möchtest, stelle die Verbindung mit einem anderen Gerät oder deinem Wiederherstellungscode wieder her."
           }
         },
         "en" : {
@@ -1761,44 +1797,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Se ha producido un error en la sincronización. Desactiva la sincronización y vuelve a conectarte con tu código de recuperación."
+            "state" : "translated",
+            "value" : "La sincronización se ha pausado. Si quieres seguir sincronizando este dispositivo, vuelve a conectarte con otro dispositivo o con tu código de recuperación."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "La synchronisation a rencontré une erreur. Veuillez désactiver la synchronisation et vous reconnecter à l’aide de votre code de récupération."
+            "state" : "translated",
+            "value" : "La synchronisation a été suspendue. Si vous souhaitez continuer à synchroniser cet appareil, reconnectez-vous à l’aide d’un autre appareil ou de votre code de récupération."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Sync ha riscontrato un errore. Disattiva la sincronizzazione e riconnettiti utilizzando il codice di ripristino."
+            "state" : "translated",
+            "value" : "La sincronizzazione è stata sospesa. Se vuoi continuare a sincronizzare questo dispositivo, riconnettiti utilizzando un altro dispositivo o il tuo codice di ripristino."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Er is een fout opgetreden bij het synchroniseren. Schakel de synchronisatie uit en maak opnieuw verbinding met je herstelcode."
+            "state" : "translated",
+            "value" : "Synchronisatie is onderbroken. Als je dit apparaat wilt blijven synchroniseren, maak dan opnieuw verbinding met een ander apparaat of met je herstelcode."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Podczas synchronizacji wystąpił błąd. Wyłącz synchronizację i ponownie nawiąż połączenie za pomocą kodu odzyskiwania."
+            "state" : "translated",
+            "value" : "Synchronizacja została wstrzymana. Jeśli chcesz kontynuować synchronizowanie tego urządzenia, ponownie nawiąż połączenie za pomocą innego urządzenia lub użyj kodu odzyskiwania."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Erro durante a sincronização. Desativa a sincronização e inicia sessão novamente com o teu código de recuperação."
+            "state" : "translated",
+            "value" : "A sincronização foi pausada. Se quiseres continuar a sincronizar este dispositivo, inicia sessão novamente noutro dispositivo ou com o teu código de recuperação."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Произошла ошибка синхронизации. Отключите ее и выполните повторную привязку с помощью кода восстановления."
+            "state" : "translated",
+            "value" : "Синхронизация приостановлена. Чтобы возобновить ее, выполните повторную привязку, используя другое устройство или код восстановления."
           }
         }
       }
@@ -46015,10 +46051,58 @@
       "comment" : "Description of incorrectly formatted data error when syncing.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Lesezeichen sind falsch formatiert oder zu lang und wurden nicht synchronisiert."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Some bookmarks are formatted incorrectly or too long and were not synced."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunos marcadores tienen un formato incorrecto o demasiado largo y no se han sincronizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains signets sont mal formatés ou trop longs et n'ont pas été synchronisés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcuni segnalibri sono formattati in modo errato o sono troppo lunghi e non sono stati sincronizzati."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommige bladwijzers hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektóre zakładki mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alguns marcadores estão formatados incorretamente ou são demasiado longos e não foram sincronizados."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторые закладки не синхронизируются из-за неверного формата или превышения ограничений по длине."
           }
         }
       }
@@ -46147,10 +46231,58 @@
       "comment" : "Description of too many requests error when syncing.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync & Backup ist vorübergehend nicht verfügbar."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Sync & Backup is temporarily unavailable."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización y la copia de seguridad no están disponibles temporalmente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync & Backup est temporairement indisponible."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync & Backup non è temporaneamente disponibile."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "'Synchronisatie en back-up' is tijdelijk niet beschikbaar."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funkcja Sync & Backup jest tymczasowo niedostępna."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Sync & Backup está temporariamente indisponível."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Функция «Синхронизация и резервное копирование» временно недоступна."
           }
         }
       }
@@ -46279,10 +46411,58 @@
       "comment" : "Description of incorrectly formatted data error when syncing.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Passwörter sind falsch formatiert oder zu lang und wurden nicht synchronisiert."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Some passwords are formatted incorrectly or too long and were not synced."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunas contraseñas tienen un formato incorrecto o demasiado largo y no se han sincronizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains mots de passe sont mal formatés ou trop longs et n'ont pas été synchronisés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcune password sono formattate in modo errato o sono troppo lunghe e non sono state sincronizzate."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommige wachtwoorden hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektóre hasła mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algumas palavras-passe estão formatadas incorretamente ou são demasiado longas e não foram sincronizadas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторые пароли не синхронизируются из-за неверного формата или превышения ограничений по длине."
           }
         }
       }
