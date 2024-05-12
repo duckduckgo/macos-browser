@@ -138,7 +138,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         XCTAssert(mockQueue.operations.filter { $0.isCancelled }.count >= 0)
     }
 
-    func testWhenStartScheduledScan_andCurrentModeIsImmediate_thenCurrentOperationsAreNotInterrupted_andNewCompletionIsCalledWithZeroErrors() throws {
+    func testWhenStartScheduledScan_andCurrentModeIsImmediate_thenCurrentOperationsAreNotInterrupted_andNewCompletionIsCalledWithError() throws {
         // Given
         sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
                                                       operationsCreator: mockOperationsCreator,
@@ -159,6 +159,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         mockOperations = (11...15).map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut) }
         mockOperationsWithError = (16...20).map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut, shouldError: true) }
         mockOperationsCreator.operationCollections = mockOperations + mockOperationsWithError
+        let expectedError = DataBrokerProtectionQueueError.cannotInterrupt
         var completionCalled = false
 
         // When
@@ -171,7 +172,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         XCTAssert(mockQueue.didCallCancelCount == 0)
         XCTAssert(mockQueue.operations.filter { !$0.isCancelled }.count == 10)
         XCTAssert(mockQueue.operations.filter { $0.isCancelled }.count == 0)
-        XCTAssertNil(errorCollection)
+        XCTAssertEqual((errorCollection.oneTimeError as? DataBrokerProtectionQueueError), expectedError)
         XCTAssert(completionCalled)
     }
 

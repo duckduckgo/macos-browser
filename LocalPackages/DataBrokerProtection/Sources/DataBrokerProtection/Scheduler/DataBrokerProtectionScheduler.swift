@@ -69,7 +69,7 @@ public final class DefaultDataBrokerProtectionScheduler {
     private lazy var queueManager: DataBrokerProtectionQueueManager = {
            let operationQueue = OperationQueue()
            let operationsBuilder = DefaultDataBrokerOperationsCreator()
-           let mismatchCalculator = MismatchCalculatorUseCase(database: dataManager.database,
+           let mismatchCalculator = DefaultMismatchCalculator(database: dataManager.database,
                                                               pixelHandler: pixelHandler)
 
            var brokerUpdater: DataBrokerProtectionBrokerUpdater?

@@ -45,6 +45,10 @@ enum DataBrokerProtectionQueueMode {
     }
 }
 
+enum DataBrokerProtectionQueueError: Error {
+    case cannotInterrupt
+}
+
 protocol DataBrokerProtectionQueueManager {
 
     init(operationQueue: DataBrokerProtectionOperationQueue,
@@ -122,7 +126,9 @@ private extension DefaultDataBrokerProtectionQueueManager {
                                     completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
 
         guard mode.canBeInterruptedBy(newMode: newMode) else {
-            completion?(nil)
+            let error = DataBrokerProtectionQueueError.cannotInterrupt
+            let errorCollection = DataBrokerProtectionAgentErrorCollection(oneTimeError: error)
+            completion?(errorCollection)
             return
         }
 
