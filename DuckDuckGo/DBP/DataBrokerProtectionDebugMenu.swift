@@ -105,7 +105,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Operations") {
                 NSMenuItem(title: "Hidden WebView") {
                     menuItem(withTitle: "Run queued operations",
-                             action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations(_:)),
+                             action: #selector(DataBrokerProtectionDebugMenu.startScheduledOperations(_:)),
                              representedObject: false)
 
                     menuItem(withTitle: "Run scan operations",
@@ -119,7 +119,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
                 NSMenuItem(title: "Visible WebView") {
                     menuItem(withTitle: "Run queued operations",
-                             action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations(_:)),
+                             action: #selector(DataBrokerProtectionDebugMenu.startScheduledOperations(_:)),
                              representedObject: true)
 
                     menuItem(withTitle: "Run scan operations",
@@ -204,18 +204,18 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         }
     }
 
-    @objc private func runQueuedOperations(_ sender: NSMenuItem) {
+    @objc private func startScheduledOperations(_ sender: NSMenuItem) {
         os_log("Running queued operations...", log: .dataBrokerProtection)
         let showWebView = sender.representedObject as? Bool ?? false
 
-        DataBrokerProtectionManager.shared.loginItemInterface.runQueuedOperations(showWebView: showWebView)
+        DataBrokerProtectionManager.shared.loginItemInterface.startScheduledOperations(showWebView: showWebView)
     }
 
     @objc private func runScanOperations(_ sender: NSMenuItem) {
         os_log("Running scan operations...", log: .dataBrokerProtection)
         let showWebView = sender.representedObject as? Bool ?? false
 
-        DataBrokerProtectionManager.shared.loginItemInterface.startManualScan(showWebView: showWebView)
+        DataBrokerProtectionManager.shared.loginItemInterface.startImmediateOperations(showWebView: showWebView)
     }
 
     @objc private func runOptoutOperations(_ sender: NSMenuItem) {

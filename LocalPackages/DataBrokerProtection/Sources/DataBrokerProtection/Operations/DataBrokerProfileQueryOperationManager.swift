@@ -35,7 +35,7 @@ protocol OperationsManager {
                       runner: WebJobRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       showWebView: Bool,
-                      isManualScan: Bool,
+                      isImmediateOperation: Bool,
                       userNotificationService: DataBrokerProtectionUserNotificationService,
                       shouldRunNextStep: @escaping () -> Bool) async throws
 }
@@ -58,7 +58,7 @@ extension OperationsManager {
                                runner: runner,
                                pixelHandler: pixelHandler,
                                showWebView: false,
-                               isManualScan: isManual,
+                               isImmediateOperation: isManual,
                                userNotificationService: userNotificationService,
                                shouldRunNextStep: shouldRunNextStep)
     }
@@ -73,7 +73,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                runner: WebJobRunner,
                                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                showWebView: Bool = false,
-                               isManualScan: Bool = false,
+                               isImmediateOperation: Bool = false,
                                userNotificationService: DataBrokerProtectionUserNotificationService,
                                shouldRunNextStep: @escaping () -> Bool) async throws {
 
@@ -84,7 +84,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                        notificationCenter: notificationCenter,
                                        pixelHandler: pixelHandler,
                                        showWebView: showWebView,
-                                       isManual: isManualScan,
+                                       isManual: isImmediateOperation,
                                        userNotificationService: userNotificationService,
                                        shouldRunNextStep: shouldRunNextStep)
         } else if let optOutJobData = operationData as? OptOutJobData {
@@ -126,7 +126,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
         let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name,
                                                                           handler: pixelHandler,
-                                                                          isManualScan: isManual)
+                                                                          isImmediateOperation: isManual)
 
         do {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)

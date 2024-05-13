@@ -199,7 +199,7 @@ extension DataBrokerJob {
     }
 
     private func fireSiteLoadingPixel(startTime: Date, hasError: Bool) {
-        if stageCalculator.isManualScan {
+        if stageCalculator.isImmediateOperation {
             let dataBrokerURL = self.query.dataBroker.url
             let durationInMs = (Date().timeIntervalSince(startTime) * 1000).rounded(.towardZero)
             pixelHandler.fire(.initialScanSiteLoadDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL))
@@ -207,7 +207,7 @@ extension DataBrokerJob {
     }
 
     func firePostLoadingDurationPixel(hasError: Bool) {
-        if stageCalculator.isManualScan, let postLoadingSiteStartTime = self.postLoadingSiteStartTime {
+        if stageCalculator.isImmediateOperation, let postLoadingSiteStartTime = self.postLoadingSiteStartTime {
             let dataBrokerURL = self.query.dataBroker.url
             let durationInMs = (Date().timeIntervalSince(postLoadingSiteStartTime) * 1000).rounded(.towardZero)
             pixelHandler.fire(.initialScanPostLoadingDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL))

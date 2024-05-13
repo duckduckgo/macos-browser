@@ -95,8 +95,8 @@ public final class DataBrokerProtectionAgentManager {
             return
         }
 
-        scheduler.runQueuedOperations(showWebView: false) { [weak self] _ in
-            self?.pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler)
+        scheduler.startScheduledOperations(showWebView: false) { [weak self] _ in
+            self?.pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleStartScheduledOperationsCallbackStartScheduler)
             self?.scheduler.startScheduler()
         }
     }
@@ -105,7 +105,7 @@ public final class DataBrokerProtectionAgentManager {
 extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
 
     public func profileSaved() {
-        scheduler.startManualScan(startTime: Date()) { _ in
+        scheduler.startImmediateOperations(startTime: Date()) { _ in
 
         }
     }
@@ -115,7 +115,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
     }
 
     public func appLaunched() {
-        scheduler.runQueuedOperations()
+        scheduler.startScheduledOperations()
     }
 }
 
@@ -126,14 +126,14 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentDebugComman
         }
     }
 
-    public func startManualScan(showWebView: Bool) {
-        scheduler.startManualScan(startTime: Date()) { _ in
+    public func startImmediateOperations(showWebView: Bool) {
+        scheduler.startImmediateOperations(startTime: Date()) { _ in
 
         }
     }
 
-    public func runQueuedOperations(showWebView: Bool) {
-        scheduler.runQueuedOperations(showWebView: showWebView)
+    public func startScheduledOperations(showWebView: Bool) {
+        scheduler.startScheduledOperations(showWebView: showWebView)
     }
 
     public func runAllOptOuts(showWebView: Bool) {

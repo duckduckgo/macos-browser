@@ -179,7 +179,7 @@ class DataBrokerOperation: Operation {
                                                                                 runner: operationDependencies.runnerProvider.getJobRunner(),
                                                                                 pixelHandler: operationDependencies.pixelHandler,
                                                                                 showWebView: showWebView,
-                                                                                isManualScan: operationType == .scan,
+                                                                                isImmediateOperation: operationType == .scan,
                                                                                 userNotificationService: operationDependencies.userNotificationService,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }

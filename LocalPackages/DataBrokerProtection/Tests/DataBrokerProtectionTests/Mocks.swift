@@ -868,7 +868,7 @@ final class MockAppVersion: AppVersionNumberProvider {
 }
 
 final class MockStageDurationCalculator: StageDurationCalculator {
-    var isManualScan: Bool = false
+    var isImmediateOperation: Bool = false
     var attemptId: UUID = UUID()
     var stage: Stage?
 
@@ -1160,7 +1160,7 @@ final class MockDataBrokerOperationsCreator: DataBrokerOperationsCreator {
 
     var operationCollections: [DataBrokerOperation] = []
     var shouldError = false
-    var priorityDate: Date? = nil
+    var priorityDate: Date?
     var createdType: OperationType = .scan
 
     init(operationCollections: [DataBrokerOperation] = []) {

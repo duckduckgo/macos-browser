@@ -133,9 +133,9 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         })
     }
 
-    public func startManualScan(showWebView: Bool) {
+    public func startImmediateOperations(showWebView: Bool) {
         xpc.execute(call: { server in
-            server.startManualScan(showWebView: showWebView)
+            server.startImmediateOperations(showWebView: showWebView)
         }, xpcReplyErrorHandler: { error in
             os_log("Error \(error.localizedDescription)")
             // Intentional no-op as there's no completion block
@@ -143,9 +143,9 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         })
     }
 
-    public func runQueuedOperations(showWebView: Bool) {
+    public func startScheduledOperations(showWebView: Bool) {
         xpc.execute(call: { server in
-            server.runQueuedOperations(showWebView: showWebView)
+            server.startScheduledOperations(showWebView: showWebView)
         }, xpcReplyErrorHandler: { error in
             os_log("Error \(error.localizedDescription)")
             // Intentional no-op as there's no completion block
