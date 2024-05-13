@@ -232,7 +232,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
                                                       brokerUpdater: mockUpdater,
                                                       pixelHandler: mockPixelHandler)
         var mockOperations = (1...5).map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut) }
-        var mockOperationsWithError = (6...10).map { MockDataBrokerOperation(id: $0, 
+        var mockOperationsWithError = (6...10).map { MockDataBrokerOperation(id: $0,
                                                                              operationType: .scan,
                                                                              errorDelegate: sut,
                                                                              shouldError: true) }
@@ -247,7 +247,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
 
         // Given
         mockOperations = (11...15).map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut) }
-        mockOperationsWithError = (16...20).map { MockDataBrokerOperation(id: $0, 
+        mockOperationsWithError = (16...20).map { MockDataBrokerOperation(id: $0,
                                                                           operationType: .scan,
                                                                           errorDelegate: sut,
                                                                           shouldError: true) }

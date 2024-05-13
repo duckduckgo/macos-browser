@@ -138,7 +138,6 @@ class DataBrokerOperation: Operation {
         return filteredAndSortedOperationsData
     }
 
-    // swiftlint:disable:next function_body_length
     private func runOperation() async {
         let allBrokerProfileQueryData: [BrokerProfileQueryData]
 
