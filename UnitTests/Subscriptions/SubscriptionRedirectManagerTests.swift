@@ -65,7 +65,7 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
         XCTAssertNil(storeMock.origin)
 
         // WHEN
-        let result = sut.redirectURL(for: url)
+        _ = sut.redirectURL(for: url)
 
         // THEN
         XCTAssertEqual(storeMock.origin, "test")
@@ -77,7 +77,7 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
         storeMock.origin = "test"
 
         // WHEN
-        let result = sut.redirectURL(for: url)
+        _ = sut.redirectURL(for: url)
 
         // THEN
         XCTAssertNil(storeMock.origin)
