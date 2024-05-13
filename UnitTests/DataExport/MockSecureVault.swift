@@ -58,6 +58,14 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         return storedAccounts
     }
 
+    func accountsCount() throws -> Int {
+        return storedAccounts.count
+    }
+
+    func accountsCountBucket() throws -> String {
+        return ""
+    }
+
     func accountsFor(domain: String) throws -> [SecureVaultModels.WebsiteAccount] {
         return storedAccounts.filter { $0.domain == domain }
     }
@@ -325,6 +333,10 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
 
     func accounts() throws -> [SecureVaultModels.WebsiteAccount] {
         return _accounts
+    }
+
+    func accountsCount() throws -> Int {
+        return _accounts.count
     }
 
     func neverPromptWebsites() throws -> [SecureVaultModels.NeverPromptWebsites] {

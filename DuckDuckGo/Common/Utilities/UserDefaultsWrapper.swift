@@ -74,6 +74,7 @@ public struct UserDefaultsWrapper<T> {
         case askToSavePaymentMethods = "preferences.ask-to-save.payment-methods"
         case autolockLocksFormFilling = "preferences.lock-autofill-form-fill"
         case autofillDebugScriptEnabled = "preferences.enable-autofill-debug-script"
+        case autofillSurveyEnabled = "preferences.enable-autofill-survey"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
@@ -182,13 +183,21 @@ public struct UserDefaultsWrapper<T> {
         case favoritesDisplayMode = "sync.favorites-display-mode"
         case syncBookmarksPaused = "sync.bookmarks-paused"
         case syncCredentialsPaused = "sync.credentials-paused"
+        case syncIsPaused = "sync.paused"
         case syncBookmarksPausedErrorDisplayed = "sync.bookmarks-paused-error-displayed"
         case syncCredentialsPausedErrorDisplayed = "sync.credentials-paused-error-displayed"
+        case syncInvalidLoginPausedErrorDisplayed = "sync.invalid-login-paused-error-displayed"
         case syncIsFaviconsFetcherEnabled = "sync.is-favicons-fetcher-enabled"
         case syncIsEligibleForFaviconsFetcherOnboarding = "sync.is-eligible-for-favicons-fetcher-onboarding"
         case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
         case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
         case syncDidShowSyncPausedByFeatureFlagAlert = "sync.did-show-sync-paused-by-feature-flag-alert"
+        case syncLastErrorNotificationTime = "sync.last-error-notification-time"
+        case syncLastSuccesfullTime = "sync.last-time-success"
+        case syncLastNonActionableErrorCount = "sync.non-actionable-error-count"
+        case syncCurrentAllPausedError = "sync.current-all-paused-error"
+        case syncCurrentBookmarksPausedError = "sync.current-bookmarks-paused-error"
+        case syncCurrentCredentialsPausedError = "sync.current-credentials-paused-error"
 
         // Subscription
 
