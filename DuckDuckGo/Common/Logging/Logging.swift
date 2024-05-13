@@ -44,6 +44,7 @@ extension OSLog {
         case sync = "Sync"
         case networkProtection = "VPN"
         case dbp = "dbp"
+        case extensions = "extensions"
     }
 
     enum AllCategories {
@@ -72,6 +73,7 @@ extension OSLog {
     @OSLogWrapper(.sync) static var sync
     @OSLogWrapper(.networkProtection) static var networkProtection
     @OSLogWrapper(.dbp) static var dbp
+    @OSLogWrapper(.extensions) static var extensions
 
     // Debug->Logging categories will only be enabled for one day
     @UserDefaultsWrapper(key: .loggingEnabledDate, defaultValue: .distantPast)

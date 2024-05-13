@@ -109,7 +109,7 @@ final class GeolocationProvider: NSObject, GeolocationProviderProtocol {
         self.geolocationService = geolocationService
         super.init()
 
-        geolocationProviderCallbacks = geolocationManager.setProvider(self)
+//        geolocationProviderCallbacks = geolocationManager.setProvider(self)
         appIsActiveCancellable = appIsActivePublisher.assign(to: \.isAppActive, onWeaklyHeld: self)
     }
 
@@ -217,8 +217,8 @@ private extension WKProcessPool {
 private struct WKGeolocationManager {
 
     // https://github.com/WebKit/WebKit/blob/8afe31a018b11741abdf9b4d5bb973d7c1d9ff05/Source/WebKit/UIProcess/API/C/WKGeolocationManager.h
-    typealias WKGeolocationManagerSetProviderType = @convention(c)
-        (UnsafeRawPointer?, UnsafePointer<WKGeolocationProviderBase>?) -> Void
+//    typealias WKGeolocationManagerSetProviderType = @convention(c)
+//        (UnsafeRawPointer?, UnsafePointer<WKGeolocationProviderBase>?) -> Void
     typealias WKGeolocationDidChangePositionType = @convention(c)
         (UnsafeRawPointer?, UnsafeRawPointer?) -> Void
     typealias WKGeolocationDidFailType = @convention(c)
@@ -226,8 +226,8 @@ private struct WKGeolocationManager {
     typealias WKGeolocationDidFailWithErrorType = @convention(c)
         (UnsafeRawPointer?, UnsafeRawPointer?) -> Void
 
-    static let setProvider: WKGeolocationManagerSetProviderType? =
-        dynamicSymbol(named: "WKGeolocationManagerSetProvider")
+//    static let setProvider: WKGeolocationManagerSetProviderType? =
+//        dynamicSymbol(named: "WKGeolocationManagerSetProvider")
     static let providerDidChangePosition: WKGeolocationDidChangePositionType? =
         dynamicSymbol(named: "WKGeolocationManagerProviderDidChangePosition")
     static let failedToDeterminePosition: WKGeolocationDidFailType? =
@@ -241,18 +241,18 @@ private struct WKGeolocationManager {
         self.geolocationManager = geolocationManager
     }
 
-    func setProvider(_ provider: GeolocationProvider?) -> UnsafeRawPointer {
-        let clientInfo = provider.map { Unmanaged.passUnretained($0).toOpaque() }
-        let providerCallbacks = UnsafeMutablePointer<WKGeolocationProviderV1>.allocate(capacity: 1)
-
-        providerCallbacks.initialize(to: WKGeolocationProviderV1(base: .init(version: 1, clientInfo: clientInfo),
-                                                                 startUpdating: startUpdatingCallback,
-                                                                 stopUpdating: stopUpdatingCallback,
-                                                                 setEnableHighAccuracy: setEnableHighAccuracyCallback))
-
-        WKGeolocationManager.setProvider?(geolocationManager, &providerCallbacks.pointee.base)
-        return UnsafeRawPointer(providerCallbacks)
-    }
+//    func setProvider(_ provider: GeolocationProvider?) -> UnsafeRawPointer {
+//        let clientInfo = provider.map { Unmanaged.passUnretained($0).toOpaque() }
+//        let providerCallbacks = UnsafeMutablePointer<WKGeolocationProviderV1>.allocate(capacity: 1)
+//
+//        providerCallbacks.initialize(to: WKGeolocationProviderV1(base: .init(version: 1, clientInfo: clientInfo),
+//                                                                 startUpdating: startUpdatingCallback,
+//                                                                 stopUpdating: stopUpdatingCallback,
+//                                                                 setEnableHighAccuracy: setEnableHighAccuracyCallback))
+//
+//        WKGeolocationManager.setProvider?(geolocationManager, &providerCallbacks.pointee.base)
+//        return UnsafeRawPointer(providerCallbacks)
+//    }
 
     func providerDidChangePosition(_ location: CLLocation) {
         guard let position = createWKGeolocationPosition(location) else { return }

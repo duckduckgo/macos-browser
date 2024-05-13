@@ -5,6 +5,7 @@
 #import <db.h>
 
 #import "WKWebView+Private.h"
+#import "WebExtensions.h"
 #import "NSException+Catch.h"
 #import "NSObject+performSelector.h"
 #import "WKGeolocationProvider.h"
