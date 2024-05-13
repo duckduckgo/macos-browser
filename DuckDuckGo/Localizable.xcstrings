@@ -18262,55 +18262,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Berichte, die an DuckDuckGo gesendet werden, sind 100 % anonym und enthalten nur deine Nachricht, die DuckDuckGo-App-Version und deine macOS-Version."
+            "value" : "Berichte, die an DuckDuckGo gesendet werden, sind 100% anonym und enthalten nur deine Nachricht, die DuckDuckGo-Browser-Version und deine macOS-Version."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo app version, and your macOS version."
+            "value" : "Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo browser version, and your macOS version."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los informes enviados a DuckDuckGo son 100 % anónimos y solo incluyen tu mensaje, la versión de la aplicación DuckDuckGo y tu versión de macOS."
+            "value" : "Los informes enviados a DuckDuckGo son 100% anónimos y solo incluyen tu mensaje, la versión de navegador de DuckDuckGo y tu versión de macOS."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les rapports envoyés à DuckDuckGo sont 100 % anonymes et n'incluent que votre message, la version de l'application DuckDuckGo et la version de votre macOS."
+            "value" : "Les rapports envoyés à DuckDuckGo sont 100% anonymes et n'incluent que votre message, la version du navigateur DuckDuckGo et la version de votre macOS."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I report inviati a DuckDuckGo sono anonimi al 100% e includono solo il tuo messaggio, la versione dell'app DuckDuckGo e la tua versione macOS."
+            "value" : "I report inviati a DuckDuckGo sono anonimi al 100% e includono solo il tuo messaggio, la versione del browser DuckDuckGo e la tua versione macOS."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rapporten die naar DuckDuckGo worden verzonden, zijn 100% anoniem en bevatten alleen je bericht, de versie van de DuckDuckGo-app en je versie van macOS."
+            "value" : "Rapporten die naar DuckDuckGo worden verzonden, zijn 100% anoniem en bevatten alleen je bericht, de versie van de DuckDuckGo-browser en je versie van macOS."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Raporty wysyłane do DuckDuckGo są stuprocentowo anonimowe i zawierają jedynie wiadomość, wersję aplikacji DuckDuckGo oraz wersję systemu macOS."
+            "value" : "Raporty wysyłane do DuckDuckGo są w 100% anonimowe i zawierają jedynie wiadomość, wersję przeglądarki DuckDuckGo oraz wersję systemu macOS."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Os relatórios enviados para a DuckDuckGo são 100% anónimos e incluem apenas a tua mensagem, a versão da aplicação DuckDuckGo e a versão do teu macOS."
+            "value" : "Os relatórios enviados para a DuckDuckGo são 100% anónimos e incluem apenas a tua mensagem, a versão do navegador DuckDuckGo e a versão do teu macOS."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Отчеты, отправляемые в DuckDuckGo, на 100% анонимны. В отчет входит только написанное вами сообщение и сведения о версии приложения DuckDuckGo и операционной системы (macOS)."
+            "value" : "Отчеты, отправляемые в DuckDuckGo, на 100% анонимны. В отчет входит только написанное вами сообщение и сведения о версии браузера DuckDuckGo и операционной системы (macOS)."
           }
         }
       }
@@ -48103,55 +48103,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Feedback hilft uns, die DuckDuckGo-App zu verbessern."
+            "value" : "Dein Feedback hilft uns, den DuckDuckGo-Browser zu verbessern."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your feedback will help us improve the DuckDuckGo app."
+            "value" : "Your feedback will help us improve the DuckDuckGo browser."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tus comentarios nos ayudarán a mejorar la aplicación DuckDuckGo."
+            "value" : "Tus comentarios nos ayudarán a mejorar el navegador DuckDuckGo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vos commentaires nous aideront à améliorer l'application DuckDuckGo."
+            "value" : "Vos commentaires nous aideront à améliorer le navigateur DuckDuckGo."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il tuo feedback ci aiuterà a migliorare l'app DuckDuckGo."
+            "value" : "Il tuo feedback ci aiuterà a migliorare il browser DuckDuckGo."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jouw feedback zal ons helpen de DuckDuckGo-app te verbeteren."
+            "value" : "Jouw feedback helpt ons de DuckDuckGo-browser te verbeteren."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Twoja opinia pomoże nam w ulepszaniu aplikacji DuckDuckGo."
+            "value" : "Twoja opinia pomoże nam ulepszyć przeglądarkę DuckDuckGo."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O teu feedback ajuda-nos a melhorar a aplicação DuckDuckGo."
+            "value" : "O teu feedback ajuda-nos a melhorar o navegador DuckDuckGo."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваш отзыв поможет нам улучшить приложение DuckDuckGo."
+            "value" : "Ваш ответ поможет браузеру DuckDuckGo стать еще лучше."
           }
         }
       }
