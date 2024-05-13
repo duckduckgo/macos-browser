@@ -145,6 +145,7 @@ final class AddressBarViewController: NSViewController {
         registerForMouseEnteredAndExitedEvents()
         subscribeToButtonsWidth()
         subscribeForShadowViewUpdates()
+
     }
 
     // swiftlint:disable notification_center_detachment

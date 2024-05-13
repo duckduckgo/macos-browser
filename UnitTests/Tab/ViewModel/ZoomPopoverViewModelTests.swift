@@ -32,8 +32,7 @@ final class ZoomPopoverViewModelTests: XCTestCase {
         UserDefaultsWrapper<Any>.clearAll()
         let tab = Tab(url: url)
         tabVM = TabViewModel(tab: tab)
-        accessibilityPreferences = AccessibilityPreferences.shared
-        zoomPopover = ZoomPopoverViewModel(accessibilityPreferences: accessibilityPreferences, tabViewModel: tabVM)
+        zoomPopover = ZoomPopoverViewModel(tabViewModel: tabVM)
         let window = NSWindow()
         window.contentView = tabVM.tab.webView
     }
@@ -83,15 +82,18 @@ final class ZoomPopoverViewModelTests: XCTestCase {
     }
 
     @MainActor
-    func test_WhenZoomValueIsSetInAppearancePreference_ThenPopoverZoomLevelUpdated() async {
-        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
-        zoomPopover = ZoomPopoverViewModel(accessibilityPreferences: accessibilityPreferences, tabViewModel: tabVM)
+    func test_WhenZoomValueIsSetInTab_ThenPopoverZoomLevelUpdated() async {
+        let expectation = XCTestExpectation()
+        zoomPopover = ZoomPopoverViewModel(tabViewModel: tabVM)
+        zoomPopover.reset()
 
-        accessibilityPreferences.updateZoomPerWebsite(zoomLevel: randomZoomLevel, url: hostURL)
-
-        await MainActor.run {
-            XCTAssertEqual(zoomPopover.zoomLevel, randomZoomLevel)
+        Task {
+            tabVM.tab.webView.zoomIn()
+            expectation.fulfill()
         }
+
+        await fulfillment(of: [expectation], timeout: 5.0)
+        XCTAssertEqual(zoomPopover.zoomLevel, .percent115)
     }
 
 }

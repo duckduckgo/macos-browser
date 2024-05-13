@@ -20,6 +20,7 @@ import Foundation
 import AppKit
 import Bookmarks
 import Common
+import Combine
 
 protocol AccessibilityPreferencesPersistor {
     var defaultPageZoom: CGFloat { get set }
@@ -63,18 +64,17 @@ enum DefaultZoomValue: CGFloat, CaseIterable {
 final class AccessibilityPreferences: ObservableObject {
     static let shared = AccessibilityPreferences()
 
-    public static let zoomPerWebsiteUpdated = Notification.Name("com.duckduckgo.app.ZoomPerWebsiteUpdated")
-
     @Published var defaultPageZoom: DefaultZoomValue {
         didSet {
             persistor.defaultPageZoom = defaultPageZoom.rawValue
         }
     }
 
+    let zoomPerWebsiteUpdatedSubject = PassthroughSubject<Void, Never>()
     private var zoomPerWebsite: [String: DefaultZoomValue] {
         didSet {
             persistor.zoomPerWebsite = zoomPerWebsite.mapValues { $0.rawValue }
-            NotificationCenter.default.post(name: AccessibilityPreferences.zoomPerWebsiteUpdated, object: nil)
+            zoomPerWebsiteUpdatedSubject.send()
         }
     }
 

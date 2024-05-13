@@ -75,6 +75,14 @@ final class TabViewModel {
     @Published private(set) var usedPermissions = Permissions()
     @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
 
+    let zoomLevelSubject = PassthroughSubject<DefaultZoomValue, Never>()
+    private (set) var zoomLevel: DefaultZoomValue = .percent100 {
+        didSet {
+            self.tab.webView.zoomLevel = zoomLevel
+            zoomLevelSubject.send(zoomLevel)
+        }
+    }
+
     var canPrint: Bool {
         !isShowingErrorPage && canReload && tab.webView.canPrint
     }
@@ -102,7 +110,7 @@ final class TabViewModel {
         self.tab = tab
         self.appearancePreferences = appearancePreferences
         self.accessibilityPreferences = accessibilityPreferences
-
+        zoomLevel = accessibilityPreferences.defaultPageZoom
         subscribeToUrl()
         subscribeToCanGoBackForwardAndReload()
         subscribeToTitle()
@@ -240,10 +248,10 @@ final class TabViewModel {
             guard let self = self else { return }
             self.tab.webView.defaultZoomValue = newValue
             if !isThereZoomPerWebsite {
-                self.tab.webView.zoomLevel = newValue
+                self.zoomLevel = newValue
             }
         }.store(in: &cancellables)
-        NotificationCenter.default.publisher(for: AccessibilityPreferences.zoomPerWebsiteUpdated)
+        accessibilityPreferences.zoomPerWebsiteUpdatedSubject
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.updateZoomForWebsite()
@@ -252,14 +260,16 @@ final class TabViewModel {
 
     private var isThereZoomPerWebsite: Bool {
         guard let urlString = tab.url?.absoluteString else { return false }
+        guard !tab.burnerMode.isBurner else { return false }
         return accessibilityPreferences.zoomPerWebsite(url: urlString) != nil
     }
 
     private func updateZoomForWebsite() {
         guard let urlString = tab.url?.absoluteString else { return }
+        guard !tab.burnerMode.isBurner else { return }
         let zoomToApply: DefaultZoomValue = accessibilityPreferences.zoomPerWebsite(url: urlString) ?? accessibilityPreferences.defaultPageZoom
-        if self.tab.webView.zoomLevel != zoomToApply {
-            self.tab.webView.zoomLevel = zoomToApply
+        if self.zoomLevel != zoomToApply {
+            self.zoomLevel = zoomToApply
         }
     }
 
@@ -466,7 +476,9 @@ extension TabViewModel: TabDataClearing {
 
 extension TabViewModel: WebViewZoomLevelDelegate {
     func zoomWasSet(to level: DefaultZoomValue) {
+        zoomLevel = level
         guard let urlString = tab.url?.absoluteString else { return }
+        guard !tab.burnerMode.isBurner else { return }
         if accessibilityPreferences.zoomPerWebsite(url: urlString) != level {
             accessibilityPreferences.updateZoomPerWebsite(zoomLevel: level, url: urlString)
         }

@@ -18,6 +18,7 @@
 
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
+import Combine
 
 class AccessibilityPreferencesTests: XCTestCase {
 
@@ -29,13 +30,13 @@ class AccessibilityPreferencesTests: XCTestCase {
     let domain2 = "duckduckgo.com"
     let domain3 = "test.com"
     let domain4 = "somesite.it"
-    let notificationName = AccessibilityPreferences.zoomPerWebsiteUpdated
 
     var zoom1: DefaultZoomValue!
     var zoom2: DefaultZoomValue!
     var zoom3: DefaultZoomValue!
     var zoom4: DefaultZoomValue!
     var mockPersistor: MockAccessibilityPreferencesPersistor!
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         UserDefaultsWrapper<Any>.clearAll()
@@ -82,15 +83,20 @@ class AccessibilityPreferencesTests: XCTestCase {
 
     func test_whenZoomLevelPerWebsiteChangedInPreferences_thenThePersisterAndUserDefaultsZoomPerWebsiteValuesAreUpdated() {
         // GIVEN
-        let notificationExpectation = expectation(forNotification: notificationName, object: nil, handler: nil)
+        let expectation = XCTestExpectation()
         UserDefaultsWrapper<Any>.clearAll()
         let persister = AccessibilityPreferencesUserDefaultsPersistor()
         let model = AccessibilityPreferences(persistor: persister)
+        model.zoomPerWebsiteUpdatedSubject
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                expectation.fulfill()
+            }.store(in: &cancellables)
 
         // WHEN
         model.updateZoomPerWebsite(zoomLevel: zoom1, url: website1)
         model.updateZoomPerWebsite(zoomLevel: zoom2, url: website2)
-        wait(for: [notificationExpectation], timeout: 5)
+        wait(for: [expectation], timeout: 5)
 
         // THEN
         XCTAssertEqual(model.zoomPerWebsite(url: website1), zoom1)
@@ -101,7 +107,7 @@ class AccessibilityPreferencesTests: XCTestCase {
 
     func test_whenBurningZoomLevels_thenOnlyFireproofSiteZoomLevelAreRetained() {
         // GIVEN
-        let notificationExpectation = expectation(forNotification: notificationName, object: nil, handler: nil)
+        let expectation = XCTestExpectation()
         UserDefaultsWrapper<Any>.clearAll()
         let persister = AccessibilityPreferencesUserDefaultsPersistor()
         let model = AccessibilityPreferences(persistor: persister)
@@ -110,10 +116,16 @@ class AccessibilityPreferencesTests: XCTestCase {
         model.updateZoomPerWebsite(zoomLevel: zoom3, url: website3)
         model.updateZoomPerWebsite(zoomLevel: zoom4, url: website4)
         let fireProofDomains = MockFireproofDomains(domains: [website1, website3])
+        model.zoomPerWebsiteUpdatedSubject
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                expectation.fulfill()
+            }.store(in: &cancellables)
 
         // WHEN
         model.burnZoomLevels(except: fireProofDomains)
-        wait(for: [notificationExpectation], timeout: 5)
+
+        wait(for: [expectation], timeout: 5)
 
         // THEN
         XCTAssertEqual(model.zoomPerWebsite(url: website1), zoom1)
@@ -128,7 +140,7 @@ class AccessibilityPreferencesTests: XCTestCase {
 
     func test_whenBurningZoomLevelsPerSites_thenZoomLevelOfTheSiteIsNotRetained() {
         // GIVEN
-        let notificationExpectation = expectation(forNotification: notificationName, object: nil, handler: nil)
+        let expectation = XCTestExpectation()
         UserDefaultsWrapper<Any>.clearAll()
         let persister = AccessibilityPreferencesUserDefaultsPersistor()
         let model = AccessibilityPreferences(persistor: persister)
@@ -136,10 +148,15 @@ class AccessibilityPreferencesTests: XCTestCase {
         model.updateZoomPerWebsite(zoomLevel: zoom2, url: website2)
         model.updateZoomPerWebsite(zoomLevel: zoom3, url: website3)
         model.updateZoomPerWebsite(zoomLevel: zoom4, url: website4)
+        model.zoomPerWebsiteUpdatedSubject
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                expectation.fulfill()
+            }.store(in: &cancellables)
 
         // WHEN
         model.burnZoomLevel(of: [domain1, domain4])
-        wait(for: [notificationExpectation], timeout: 5)
+        wait(for: [expectation], timeout: 5)
 
         // THEN
         XCTAssertNil(model.zoomPerWebsite(url: website1))

@@ -286,6 +286,27 @@ final class TabViewModelTests: XCTestCase {
     }
 
     @MainActor
+    func test_WhenPreferencesDefaultZoomLevelIsSet_AndThereIsAZoomLevelForWebsite_AndIsFireWindow_ThenTabsWebViewZoomLevelIsNotUpdated() {
+        // GIVEN
+        UserDefaultsWrapper<Any>.clearAll()
+        let url = URL(string: "https://app.asana.com/0/1")!
+        let hostURL = "https://app.asana.com/"
+        let filteredCases = DefaultZoomValue.allCases.filter { $0 != AccessibilityPreferences.shared.defaultPageZoom }
+        let randomZoomLevel = filteredCases.randomElement()!
+        AccessibilityPreferences.shared.updateZoomPerWebsite(zoomLevel: randomZoomLevel, url: hostURL)
+        var tab = Tab(url: url)
+        var tabVM = TabViewModel(tab: tab)
+
+        // WHEN
+        AccessibilityPreferences.shared.defaultPageZoom = .percent50
+        let burnerTab = Tab(content: .url(url, credential: nil, source: .ui), burnerMode: BurnerMode(isBurner: true))
+        tabVM = TabViewModel(tab: burnerTab)
+
+        // THEN
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, AccessibilityPreferences.shared.defaultPageZoom)
+    }
+
+    @MainActor
     func test_WhenPreferencesZoomPerWebsiteLevelIsSet_AndANewTabIsOpen_ThenItsWebViewHasTheLatestValueOfZoomLevel() {
         // GIVEN
         UserDefaultsWrapper<Any>.clearAll()
@@ -301,6 +322,24 @@ final class TabViewModelTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
+    }
+
+    @MainActor
+    func test_WhenPreferencesZoomPerWebsiteLevelIsSet_AndANewBurnerTabIsOpen_ThenItsWebViewHasTheDefaultZoomLevel() {
+        // GIVEN
+        UserDefaultsWrapper<Any>.clearAll()
+        let url = URL(string: "https://app.asana.com/0/1")!
+        let hostURL = "https://app.asana.com/"
+        let filteredCases = DefaultZoomValue.allCases.filter { $0 != AccessibilityPreferences.shared.defaultPageZoom }
+        let randomZoomLevel = filteredCases.randomElement()!
+        AccessibilityPreferences.shared.updateZoomPerWebsite(zoomLevel: randomZoomLevel, url: hostURL)
+
+        // WHEN
+        let burnerTab = Tab(content: .url(url, credential: nil, source: .ui), burnerMode: BurnerMode(isBurner: true))
+        let tabVM = TabViewModel(tab: burnerTab, appearancePreferences: AppearancePreferences())
+
+        // THEN
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, AccessibilityPreferences.shared.defaultPageZoom)
     }
 
     @MainActor
@@ -324,6 +363,26 @@ final class TabViewModelTests: XCTestCase {
     }
 
     @MainActor
+    func test_WhenPreferencesZoomPerWebsiteLevelIsSet_AndIsFireWindow_ThenTabsWebViewZoomLevelIsNot() async {
+        // GIVEN
+        UserDefaultsWrapper<Any>.clearAll()
+        let url = URL(string: "https://app.asana.com/0/1")!
+        let hostURL = "https://app.asana.com/"
+        let burnerTab = Tab(content: .url(url, credential: nil, source: .ui), burnerMode: BurnerMode(isBurner: true))
+        let tabVM = TabViewModel(tab: burnerTab)
+        let filteredCases = DefaultZoomValue.allCases.filter { $0 != AccessibilityPreferences.shared.defaultPageZoom }
+        let randomZoomLevel = filteredCases.randomElement()!
+
+        // WHEN
+        AccessibilityPreferences.shared.updateZoomPerWebsite(zoomLevel: randomZoomLevel, url: hostURL)
+
+        // THEN
+        await MainActor.run {
+            XCTAssertEqual(tabVM.tab.webView.zoomLevel, AccessibilityPreferences.shared.defaultPageZoom)
+        }
+    }
+
+    @MainActor
     func test_WhenZoomWasSetIsCalled_ThenAppearancePreferencesPerWebsiteZoomIsSet() {
         // GIVEN
         let url = URL(string: "https://app.asana.com/0/1")!
@@ -339,6 +398,26 @@ final class TabViewModelTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(AccessibilityPreferences.shared.zoomPerWebsite(url: hostURL), randomZoomLevel)
+    }
+
+    @MainActor
+    func test_WhenZoomWasSetIsCalled_AndIsFireWindow_ThenAppearancePreferencesPerWebsiteZoomIsNotSet() {
+        // GIVEN
+        let url = URL(string: "https://app.asana.com/0/1")!
+        let hostURL = "https://app.asana.com/"
+        AccessibilityPreferences.shared.updateZoomPerWebsite(zoomLevel: AccessibilityPreferences.shared.defaultPageZoom, url: hostURL)
+        UserDefaultsWrapper<Any>.clearAll()
+        let burnerTab = Tab(content: .url(url, credential: nil, source: .ui), burnerMode: BurnerMode(isBurner: true))
+        let tabVM = TabViewModel(tab: burnerTab)
+        let filteredCases = DefaultZoomValue.allCases.filter { $0 !=  AccessibilityPreferences.shared.defaultPageZoom}
+        let randomZoomLevel = filteredCases.randomElement()!
+
+        // WHEN
+        print(randomZoomLevel)
+        tabVM.zoomWasSet(to: randomZoomLevel)
+
+        // THEN
+        XCTAssertEqual(AccessibilityPreferences.shared.zoomPerWebsite(url: hostURL), nil)
     }
 
     @MainActor

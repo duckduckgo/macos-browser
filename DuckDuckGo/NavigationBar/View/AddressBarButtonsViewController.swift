@@ -100,6 +100,7 @@ final class AddressBarButtonsViewController: NSViewController {
     var trackerAnimationView3: LottieAnimationView!
     var shieldAnimationView: LottieAnimationView!
     var shieldDotAnimationView: LottieAnimationView!
+
     @IBOutlet weak var notificationAnimationView: NavigationBarBadgeAnimationView!
 
     @IBOutlet weak var permissionButtons: NSView!
@@ -142,7 +143,11 @@ final class AddressBarButtonsViewController: NSViewController {
     @Published private(set) var buttonsWidth: CGFloat = 0
 
     private var tabCollectionViewModel: TabCollectionViewModel
-    private var tabViewModel: TabViewModel?
+    private var tabViewModel: TabViewModel? {
+        didSet {
+            subscribeToTabZoomLevel()
+        }
+    }
 
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     var controllerMode: AddressBarViewController.Mode? {
@@ -203,10 +208,8 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
         subscribeToEffectiveAppearance()
-        subscribeToAccessibilityAppearancePreference()
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
-        updateZoomButtonVisibility()
         bookmarkButton.sendAction(on: .leftMouseDown)
 
         privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
@@ -306,11 +309,9 @@ final class AddressBarButtonsViewController: NSViewController {
         let isTextFieldValueText = textFieldValue?.isText ?? false
 
         var hasNonDefaultZoom = false
-        guard let url = tabViewModel?.tab.url else { return }
-        if let zoomPerWebsite = accessibilityPreferences.zoomPerWebsite(url: url.absoluteString) {
-            if zoomPerWebsite != accessibilityPreferences.defaultPageZoom {
-                hasNonDefaultZoom = true
-            }
+        guard let url = tabViewModel!.tab.url else { return }
+        if tabViewModel?.zoomLevel != accessibilityPreferences.defaultPageZoom {
+            hasNonDefaultZoom = true
         }
 
         let shouldShowZoom = hasURL
@@ -430,12 +431,17 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     @IBAction func zoomButtonAction(_ sender: Any) {
-        NotificationCenter.default.removeObserver(self, name: NSPopover.willCloseNotification, object: zoomPopover)
-        guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
-        zoomPopover = ZoomPopover(tabViewModel: tabViewModel)
-        zoomPopover!.show(positionedBelow: zoomButton)
-        NotificationCenter.default.addObserver(forName: NSPopover.didCloseNotification, object: zoomPopover, queue: .main) { _ in
-            self.updateZoomButtonVisibility()
+        if zoomPopover != nil {
+            NotificationCenter.default.removeObserver(self, name: NSPopover.willCloseNotification, object: zoomPopover)
+            zoomPopover?.close()
+            zoomPopover = nil
+        } else {
+            guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+            zoomPopover = ZoomPopover(tabViewModel: tabViewModel)
+            zoomPopover?.show(positionedBelow: zoomButton)
+            NotificationCenter.default.addObserver(forName: NSPopover.didCloseNotification, object: zoomPopover, queue: .main) { _ in
+                self.updateZoomButtonVisibility()
+            }
         }
     }
 
@@ -1004,9 +1010,8 @@ final class AddressBarButtonsViewController: NSViewController {
             }
     }
 
-    private func subscribeToAccessibilityAppearancePreference() {
-        accessibilityPreferencesCancellable = NotificationCenter.default.publisher(for: AccessibilityPreferences.zoomPerWebsiteUpdated)
-            .receive(on: DispatchQueue.main)
+    private func subscribeToTabZoomLevel() {
+        accessibilityPreferencesCancellable = tabViewModel?.zoomLevelSubject
             .sink { [weak self] _ in
                 self?.updateZoomButtonVisibility()
             }
