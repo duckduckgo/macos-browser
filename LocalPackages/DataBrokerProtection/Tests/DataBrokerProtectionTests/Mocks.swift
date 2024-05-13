@@ -1026,37 +1026,66 @@ extension DataBroker {
     }
 }
 
-final class MockDataBrokerProtectionOperationQueue: OperationQueue {
+final class MockDataBrokerProtectionOperationQueue: DataBrokerProtectionOperationQueue {
+    var maxConcurrentOperationCount = 1
+
+    var operations: [Operation] = []
+    var operationCount: Int {
+        operations.count
+    }
 
     private(set) var didCallCancelCount = 0
     private(set) var didCallAddCount = 0
     private(set) var didCallAddBarrierBlockCount = 0
 
-    override func cancelAllOperations() {
+    private var barrierBlock: (@Sendable () -> Void)?
+
+    func cancelAllOperations() {
         didCallCancelCount += 1
-        super.cancelAllOperations()
+        self.operations.forEach { $0.cancel() }
     }
 
-    override func addOperation(_ op: Operation) {
+    func addOperation(_ op: Operation) {
         didCallAddCount += 1
-        super.addOperation(op)
+        self.operations.append(op)
     }
 
-    override func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void) {
+    func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void) {
         didCallAddBarrierBlockCount += 1
-        super.addBarrierBlock(barrier)
+        self.barrierBlock = barrier
+    }
+
+    func completeAllOperations() {
+        operations.forEach { $0.start() }
+        operations.removeAll()
+        barrierBlock?()
+    }
+
+    func completeOperationsUpTo(index: Int) {
+        guard index < operationCount else { return }
+
+        (0..<index).forEach {
+            operations[$0].start()
+        }
+
+        (0..<index).forEach {
+            operations.remove(at: $0)
+        }
     }
 }
 
 final class MockDataBrokerOperation: DataBrokerOperation {
 
-    private var shouldSleep = false
+    private var shouldError = false
+    private var _isExecuting = false
+    private var _isFinished = false
+    private var _isCancelled = false
+    private var operationsManager: OperationsManager!
 
     convenience init(id: Int64,
                      operationType: OperationType,
                      errorDelegate: DataBrokerOperationErrorDelegate,
-                     shouldError: Bool = false,
-                     shouldSleep: Bool = true) {
+                     shouldError: Bool = false) {
 
         self.init(dataBrokerID: id,
                   operationType: operationType,
@@ -1064,19 +1093,46 @@ final class MockDataBrokerOperation: DataBrokerOperation {
                   errorDelegate: errorDelegate,
                   operationDependencies: DefaultDataBrokerOperationDependencies.mock)
 
-        // Immediately fire this before as operations may have not started when they are interrupted
-        if shouldError {
-            errorDelegate.dataBrokerOperationDidError(DataBrokerProtectionError.noActionFound)
-        }
-
-        self.shouldSleep = shouldSleep
+        self.shouldError = shouldError
     }
 
     override func main() {
-        if shouldSleep {
-            Thread.sleep(forTimeInterval: 1)
+        if shouldError {
+            errorDelegate?.dataBrokerOperationDidError(DataBrokerProtectionError.noActionFound, withBrokerName: nil)
         }
-        super.main()
+
+        finish()
+    }
+
+    override func cancel() {
+        self._isCancelled = true
+    }
+
+    override var isCancelled: Bool {
+        _isCancelled
+    }
+
+    override var isAsynchronous: Bool {
+        return true
+    }
+
+    override var isExecuting: Bool {
+        return _isExecuting
+    }
+
+    override var isFinished: Bool {
+        return _isFinished
+    }
+
+    private func finish() {
+        willChangeValue(forKey: #keyPath(isExecuting))
+        willChangeValue(forKey: #keyPath(isFinished))
+
+        _isExecuting = false
+        _isFinished = true
+
+        didChangeValue(forKey: #keyPath(isExecuting))
+        didChangeValue(forKey: #keyPath(isFinished))
     }
 }
 
@@ -1084,7 +1140,7 @@ final class MockDataBrokerOperationErrorDelegate: DataBrokerOperationErrorDelega
 
     var operationErrors: [Error] = []
 
-    func dataBrokerOperationDidError(_ error: any Error) {
+    func dataBrokerOperationDidError(_ error: any Error, withBrokerName brokerName: String?) {
         operationErrors.append(error)
     }
 }

@@ -44,7 +44,7 @@ enum OperationType {
 }
 
 protocol DataBrokerOperationErrorDelegate: AnyObject {
-    func dataBrokerOperationDidError(_ error: Error)
+    func dataBrokerOperationDidError(_ error: Error, withBrokerName brokerName: String?)
 }
 
 // swiftlint:disable explicit_non_final_class
@@ -194,12 +194,7 @@ class DataBrokerOperation: Operation {
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
 
-                errorDelegate?.dataBrokerOperationDidError(error)
-
-                if let error = error as? DataBrokerProtectionError,
-                   let dataBrokerName = brokerProfileQueriesData.first?.dataBroker.name {
-                    operationDependencies.pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
-                }
+                errorDelegate?.dataBrokerOperationDidError(error, withBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
             }
         }
 

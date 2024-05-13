@@ -80,7 +80,8 @@ public final class DefaultDataBrokerProtectionScheduler {
            return DefaultDataBrokerProtectionQueueManager(operationQueue: operationQueue,
                                                           operationsCreator: operationsBuilder,
                                                           mismatchCalculator: mismatchCalculator,
-                                                          brokerUpdater: brokerUpdater)
+                                                          brokerUpdater: brokerUpdater,
+                                                          pixelHandler: pixelHandler)
        }()
 
     private lazy var operationDependencies: DataBrokerOperationDependencies = {

@@ -54,7 +54,8 @@ protocol DataBrokerProtectionQueueManager {
     init(operationQueue: DataBrokerProtectionOperationQueue,
          operationsCreator: DataBrokerOperationsCreator,
          mismatchCalculator: MismatchCalculator,
-         brokerUpdater: DataBrokerProtectionBrokerUpdater?)
+         brokerUpdater: DataBrokerProtectionBrokerUpdater?,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>)
 
     func startImmediateOperationsIfPermitted(showWebView: Bool,
                                              operationDependencies: DataBrokerOperationDependencies,
@@ -72,6 +73,7 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
     private let operationsCreator: DataBrokerOperationsCreator
     private let mismatchCalculator: MismatchCalculator
     private let brokerUpdater: DataBrokerProtectionBrokerUpdater?
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     private var mode = DataBrokerProtectionQueueMode.idle
     private var operationErrors: [Error] = []
@@ -79,12 +81,14 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
     init(operationQueue: DataBrokerProtectionOperationQueue,
          operationsCreator: DataBrokerOperationsCreator,
          mismatchCalculator: MismatchCalculator,
-         brokerUpdater: DataBrokerProtectionBrokerUpdater?) {
+         brokerUpdater: DataBrokerProtectionBrokerUpdater?,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
 
         self.operationQueue = operationQueue
         self.operationsCreator = operationsCreator
         self.mismatchCalculator = mismatchCalculator
         self.brokerUpdater = brokerUpdater
+        self.pixelHandler = pixelHandler
     }
 
     func startImmediateOperationsIfPermitted(showWebView: Bool,
@@ -113,7 +117,7 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
     }
 
     func stopAllOperations() {
-        cancelOperationsAndCallCompletion(forMode: mode)
+        cancelCurrentModeAndResetIfNeeded()
     }
 }
 
@@ -132,7 +136,8 @@ private extension DefaultDataBrokerProtectionQueueManager {
             return
         }
 
-        cancelOperationsAndCallCompletion(forMode: mode)
+        cancelCurrentModeAndResetIfNeeded()
+
         mode = newMode
 
         addOperations(withType: type,
@@ -141,14 +146,20 @@ private extension DefaultDataBrokerProtectionQueueManager {
                       completion: completion)
     }
 
-    func cancelOperationsAndCallCompletion(forMode mode: DataBrokerProtectionQueueMode) {
+    func cancelCurrentModeAndResetIfNeeded() {
         switch mode {
         case .immediate(let completion), .scheduled(let completion):
             operationQueue.cancelAllOperations()
             completion?(errorCollection())
+            resetModeAndClearErrors()
         default:
             break
         }
+    }
+
+    func resetModeAndClearErrors() {
+        mode = .idle
+        operationErrors = []
     }
 
     func addOperations(withType type: OperationType,
@@ -186,6 +197,7 @@ private extension DefaultDataBrokerProtectionQueueManager {
         operationQueue.addBarrierBlock { [weak self] in
             let errorCollection = self?.errorCollection()
             completion?(errorCollection)
+            self?.resetModeAndClearErrors()
         }
     }
 
@@ -208,7 +220,11 @@ private extension DefaultDataBrokerProtectionQueueManager {
 }
 
 extension DefaultDataBrokerProtectionQueueManager: DataBrokerOperationErrorDelegate {
-    func dataBrokerOperationDidError(_ error: any Error) {
+    func dataBrokerOperationDidError(_ error: any Error, withBrokerName brokerName: String?) {
         operationErrors.append(error)
+
+        if let error = error as? DataBrokerProtectionError, let dataBrokerName = brokerName {
+            pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
+        }
     }
 }
