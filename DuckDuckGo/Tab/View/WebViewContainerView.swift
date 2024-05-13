@@ -51,7 +51,6 @@ final class WebViewContainerView: NSView {
     }
 
     private var blurViewIsHiddenCancellable: AnyCancellable?
-    private var fullScreenWindowWillCloseCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     override func didAddSubview(_ subview: NSView) {
@@ -122,43 +121,20 @@ final class WebViewContainerView: NSView {
     // (three-fingers-up swipe)
     // see https://app.asana.com/0/1177771139624306/1204370242122745/f
     private func observeFullScreenWindowWillExitFullScreen(_ fullScreenWindow: NSWindow) {
-        NotificationCenter.default.publisher(for: NSWindow.willExitFullScreenNotification, object: fullScreenWindow)
-            .sink { [weak self] _ in
-                guard let self else { return }
-                self.cancellables.removeAll()
+        if #available(macOS 12.0, *) { // works fine on Big Sur
+            NotificationCenter.default.publisher(for: NSWindow.willExitFullScreenNotification, object: fullScreenWindow)
+                .sink { [weak self] _ in
+                    guard let self else { return }
+                    self.cancellables.removeAll()
 
-                if NSWorkspace.isMissionControlActive() {
-                    // closeAllMediaPresentations causes all Full Screen windows to be closed and removed from their WebViews
-                    // (and reinstantiated the next time Full Screen is requested)
-                    // this would slightly break UX in case multiple Full Screen windows are open but it fixes the bug
-                    if #available(macOS 12.0, *) {
+                    if NSWorkspace.isMissionControlActive() {
+                        // closeAllMediaPresentations causes all Full Screen windows to be closed and removed from their WebViews
+                        // (and reinstantiated the next time Full Screen is requested)
                         webView.closeAllMediaPresentations {}
-                    } else {
-                        webView.closeAllMediaPresentations()
-                    }
-
-                }
-            }
-            .store(in: &cancellables)
-
-        // https://app.asana.com/0/72649045549333/1206959015087322/f
-        if #unavailable(macOS 14.4) {
-            fullScreenWindowWillCloseCancellable = NotificationCenter.default.publisher(for: NSWindow.willCloseNotification, object: fullScreenWindow)
-                .sink { [weak self] notification in
-                    self?.fullScreenWindowWillCloseCancellable = nil
-                    let fullScreenWindowController = (notification.object as? NSWindow)?.windowController
-                    DispatchQueue.main.async { [weak fullScreenWindowController] in
-                        guard let fullScreenWindowController else { return }
-                        // just in case.
-                        // if WKFullScreenWindowController receives `close()` the next time it‘s open it will crash because its _webView is nil
-                        // https://errors.duckduckgo.com/organizations/ddg/issues/3411/?project=6&referrer=release-issue-stream
-                        NSException.try {
-                            fullScreenWindowController.setValue(NSView(), forKeyPath: #keyPath(webView))
-                        }
                     }
                 }
+                .store(in: &cancellables)
         }
-
     }
 
     override func removeFromSuperview() {

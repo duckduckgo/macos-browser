@@ -35,27 +35,25 @@ extension NSWorkspace {
             return false
         }
 
-        let allScreenSizes = NSScreen.screens.map(\.frame.size)
-
         // Here‘s the trick: normally the Dock App only displays full-screen overlay windows drawing the Dock.
         // When the Mission Control is activated, the Dock presents multiple window tiles for each visible window
         // so here we filter out all the screen-sized windows and if the resulting list is not empty it may
         // mean that Mission Control is active.
-        let missionControlWindows = visibleWindows.filter { window in
-            windowName(window) == "Dock" && !allScreenSizes.contains(windowSize(window))
+        let dockAppWindows = visibleWindows.filter { window in
+            window.ownerName == "Dock"
+        }
+        // filter out wallpaper windows
+        var missionControlWindows = dockAppWindows.filter { window in
+            window.name?.hasPrefix("Wallpaper") != true
+        }
+        // filter out the Dock drawing windows
+        for screen in NSScreen.screens {
+            if let idx = missionControlWindows.firstIndex(where: { window in window.size == screen.frame.size }) {
+                missionControlWindows.remove(at: idx)
+            }
         }
 
-        func windowName(_ dict: [CFString: Any]) -> String? {
-            dict[kCGWindowOwnerName] as? String
-        }
-        func windowSize(_ dict: [CFString: Any]) -> NSSize {
-            guard let bounds = dict[kCGWindowBounds] as? [String: NSNumber],
-                  let width = bounds["Width"]?.intValue,
-                  let height = bounds["Height"]?.intValue else { return .zero }
-            return NSSize(width: width, height: height)
-        }
-
-        return missionControlWindows.count > allScreenSizes.count
+        return missionControlWindows.count > 0
     }
 
     @available(macOS, obsoleted: 14.0, message: "This needs to be removed as it‘s no longer necessary.")
@@ -76,6 +74,25 @@ extension NSWorkspace.OpenConfiguration {
         if let environment {
             self.environment = environment
         }
+    }
+
+}
+
+private extension [CFString: Any] {
+
+    var name: String? {
+        self[kCGWindowName] as? String
+    }
+
+    var ownerName: String? {
+        self[kCGWindowOwnerName] as? String
+    }
+
+    var size: NSSize {
+        guard let bounds = self[kCGWindowBounds] as? [String: NSNumber],
+              let width = bounds["Width"]?.intValue,
+              let height = bounds["Height"]?.intValue else { return .zero }
+        return NSSize(width: width, height: height)
     }
 
 }
