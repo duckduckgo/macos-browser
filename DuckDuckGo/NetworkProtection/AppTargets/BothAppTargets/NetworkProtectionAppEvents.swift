@@ -47,15 +47,15 @@ final class NetworkProtectionAppEvents {
     // MARK: - Feature Visibility
 
     private let featureVisibility: NetworkProtectionFeatureVisibility
-    private let featureDisabler: VPNUninstalling
+    private let uninstaller: VPNUninstalling
     private let defaults: UserDefaults
 
     init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
-         featureDisabler: VPNUninstalling = VPNUninstaller(),
+         uninstaller: VPNUninstalling = VPNUninstaller(),
          defaults: UserDefaults = .netP) {
 
         self.defaults = defaults
-        self.featureDisabler = featureDisabler
+        self.uninstaller = uninstaller
         self.featureVisibility = featureVisibility
     }
 
