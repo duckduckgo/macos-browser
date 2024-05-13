@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1714746648846,
+    "version": 1715350028654,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -298,6 +298,9 @@
                     "domain": "malmostadsteater.se"
                 },
                 {
+                    "domain": "hertz.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -312,7 +315,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "7096d80d39c6c9a98d98ff6bde5644e0"
+            "hash": "cf3197bc061274e9c23a870dea493b9a"
         },
         "autofill": {
             "exceptions": [
@@ -4903,10 +4906,10 @@
                     "url": "https://selfserve.decipherinc.com/survey/selfserve/32ab/240404?list=2",
                     "firstDay": 5,
                     "lastDay": 8,
-                    "sharePercentage": 60
+                    "sharePercentage": 100
                 }
             },
-            "hash": "8a5c9011216219c6576ec362acb51fd0"
+            "hash": "cbd62a1a63a829da0277ca045a311eb2"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -6060,6 +6063,12 @@
                                 "domains": [
                                     "<all>"
                                 ]
+                            },
+                            {
+                                "rule": "st.dynamicyield.com/st",
+                                "domains": [
+                                    "harborfreight.com"
+                                ]
                             }
                         ]
                     },
@@ -6760,7 +6769,14 @@
                             {
                                 "rule": "grow.me/main.js",
                                 "domains": [
-                                    "budgetbytes.com"
+                                    "budgetbytes.com",
+                                    "foodfornet.com"
+                                ]
+                            },
+                            {
+                                "rule": "api.grow.me",
+                                "domains": [
+                                    "foodfornet.com"
                                 ]
                             }
                         ]
@@ -7122,6 +7138,12 @@
                                 "domains": [
                                     "cosmicbook.news"
                                 ]
+                            },
+                            {
+                                "rule": "scripts.mediavine.com/tags/food-for-net.js",
+                                "domains": [
+                                    "foodfornet.com"
+                                ]
                             }
                         ]
                     },
@@ -7264,6 +7286,12 @@
                                 "rule": "altriagroupinc.tt.omtrdc.net/rest/v1/delivery",
                                 "domains": [
                                     "marlboro.com"
+                                ]
+                            },
+                            {
+                                "rule": "whirlpool.tt.omtrdc.net/rest/v1/delivery",
+                                "domains": [
+                                    "kitchenaid.com"
                                 ]
                             },
                             {
@@ -8345,7 +8373,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "8abdf819c66bc3e2391e900958ed0294"
+            "hash": "2dd3c945cc9811719be893edcd79682e"
         },
         "trackingCookies1p": {
             "settings": {
