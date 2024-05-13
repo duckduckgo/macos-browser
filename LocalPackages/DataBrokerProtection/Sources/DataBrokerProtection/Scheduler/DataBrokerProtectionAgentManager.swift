@@ -21,29 +21,16 @@ import Common
 import BrowserServicesKit
 import PixelKit
 
-public final class DataBrokerProtectionAgentManager {
+// This is to avoid exposing all the dependancies outside of the DBP package
+public class DataBrokerProtectionAgentManagerProvider {
+    // swiftlint:disable:next function_body_length
+    public static func agentManager() -> DataBrokerProtectionAgentManager {
+        let pixelHandler = DataBrokerProtectionPixelsHandler()
+        let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler()
+        let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
+        let privacyConfigurationManager = PrivacyConfigurationManagingMock() // Forgive me, for I have sinned
+        let ipcServer = DataBrokerProtectionIPCServer(machServiceName: Bundle.main.bundleIdentifier!)
 
-    public static let shared: DataBrokerProtectionAgentManager = {
-        return DataBrokerProtectionAgentManager(activityScheduler: DataBrokerProtectionBackgroundActivityScheduler())
-    }()
-
-    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
-
-    private let authenticationRepository: AuthenticationRepository = KeychainAuthenticationData()
-    private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
-    private lazy var userNotificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
-    private let activityScheduler: DataBrokerProtectionBackgroundActivityScheduler
-
-    private lazy var redeemUseCase: DataBrokerProtectionRedeemUseCase = {
-        return RedeemUseCase(authenticationService: authenticationService,
-                             authenticationRepository: authenticationRepository)
-    }()
-    private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
-    private lazy var browserWindowManager = BrowserWindowManager()
-    private var didStartActivityScheduler = false
-
-    private lazy var privacyConfigurationManager = PrivacyConfigurationManagingMock() // Forgive me, for I have sinned
-    private lazy var contentScopeProperties: ContentScopeProperties = {
         let features = ContentScopeFeatureToggles(emailProtection: false,
                                                   emailProtectionIncontextSignup: false,
                                                   credentialsAutofill: false,
@@ -53,60 +40,88 @@ public final class DataBrokerProtectionAgentManager {
                                                   passwordGeneration: false,
                                                   inlineIconCredentials: false,
                                                   thirdPartyCredentialsProvider: false)
+        let contentScopeProperties = ContentScopeProperties(gpcEnabled: false,
+                                                            sessionKey: UUID().uuidString,
+                                                            featureToggles: features)
 
-        let sessionKey = UUID().uuidString
-        return ContentScopeProperties(gpcEnabled: false,
-                                      sessionKey: sessionKey,
-                                      featureToggles: features)
-    }()
+        let fakeBroker = DataBrokerDebugFlagFakeBroker()
+        let dataManager = DataBrokerProtectionDataManager(pixelHandler: pixelHandler, fakeBrokerFlag: fakeBroker)
 
-    private lazy var ipcServer: DataBrokerProtectionIPCServer = {
-        let server = DataBrokerProtectionIPCServer(machServiceName: Bundle.main.bundleIdentifier!)
-        server.serverDelegate = self
-        return server
-    }()
+        let operationQueue = OperationQueue()
+        let operationsBuilder = DefaultDataBrokerOperationsCreator()
+        let mismatchCalculator = DefaultMismatchCalculator(database: dataManager.database,
+                                                           pixelHandler: pixelHandler)
 
-    lazy var dataManager: DataBrokerProtectionDataManager = {
-        DataBrokerProtectionDataManager(pixelHandler: pixelHandler, fakeBrokerFlag: fakeBrokerFlag)
-    }()
+        var brokerUpdater: DataBrokerProtectionBrokerUpdater?
+        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: nil) {
+            brokerUpdater = DefaultDataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
+        }
+        let queueManager =  DefaultDataBrokerProtectionQueueManager(operationQueue: operationQueue,
+                                                       operationsCreator: operationsBuilder,
+                                                       mismatchCalculator: mismatchCalculator,
+                                                       brokerUpdater: brokerUpdater,
+                                                       pixelHandler: pixelHandler)
 
-    private lazy var queueManager: DataBrokerProtectionQueueManager = {
-           let operationQueue = OperationQueue()
-           let operationsBuilder = DefaultDataBrokerOperationsCreator()
-           let mismatchCalculator = DefaultMismatchCalculator(database: dataManager.database,
-                                                              pixelHandler: pixelHandler)
-
-           var brokerUpdater: DataBrokerProtectionBrokerUpdater?
-           if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: nil) {
-               brokerUpdater = DefaultDataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
-           }
-
-           return DefaultDataBrokerProtectionQueueManager(operationQueue: operationQueue,
-                                                          operationsCreator: operationsBuilder,
-                                                          mismatchCalculator: mismatchCalculator,
-                                                          brokerUpdater: brokerUpdater,
-                                                          pixelHandler: pixelHandler)
-       }()
-
-    private lazy var operationDependencies: DataBrokerOperationDependencies = {
+        let redeemUseCase = RedeemUseCase(authenticationService: AuthenticationService(),
+                                          authenticationRepository: KeychainAuthenticationData())
         let emailService = EmailService(redeemUseCase: redeemUseCase)
         let captchaService = CaptchaService(redeemUseCase: redeemUseCase)
         let runnerProvider = DataBrokerJobRunnerProvider(privacyConfigManager: privacyConfigurationManager,
                                                          contentScopeProperties: contentScopeProperties,
                                                          emailService: emailService,
                                                          captchaService: captchaService)
+         let operationDependencies = DefaultDataBrokerOperationDependencies(
+            database: dataManager.database,
+            config: DataBrokerProtectionProcessorConfiguration(),
+            runnerProvider: runnerProvider,
+            notificationCenter: NotificationCenter.default,
+            pixelHandler: pixelHandler,
+            userNotificationService: notificationService)
 
-        return DefaultDataBrokerOperationDependencies(database: dataManager.database,
-                                                      config: DataBrokerProtectionProcessorConfiguration(),
-                                                      runnerProvider: runnerProvider,
-                                                      notificationCenter: NotificationCenter.default,
-                                                      pixelHandler: pixelHandler, userNotificationService: userNotificationService)
-    }()
+        return DataBrokerProtectionAgentManager(
+            userNotificationService: notificationService,
+            activityScheduler: activityScheduler,
+            ipcServer: ipcServer,
+            queueManager: queueManager,
+            dataManager: dataManager,
+            operationDependencies: operationDependencies,
+            pixelHandler: pixelHandler)
+    }
+}
 
-    private init(activityScheduler: DataBrokerProtectionBackgroundActivityScheduler) {
+public final class DataBrokerProtectionAgentManager {
+
+    private let userNotificationService: DataBrokerProtectionUserNotificationService
+    private var activityScheduler: DataBrokerProtectionBackgroundActivityScheduler
+    private var ipcServer: DataBrokerProtectionIPCServer
+    private let queueManager: DataBrokerProtectionQueueManager
+    private let dataManager: DataBrokerProtectionDataManager
+    private let operationDependencies: DataBrokerOperationDependencies
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+
+    // Used for debug functions only, so not injected
+    private lazy var browserWindowManager = BrowserWindowManager()
+
+    private var didStartActivityScheduler = false
+
+    init(userNotificationService: DataBrokerProtectionUserNotificationService,
+         activityScheduler: DataBrokerProtectionBackgroundActivityScheduler,
+         ipcServer: DataBrokerProtectionIPCServer,
+         queueManager: DataBrokerProtectionQueueManager,
+         dataManager: DataBrokerProtectionDataManager,
+         operationDependencies: DataBrokerOperationDependencies,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
+        self.userNotificationService = userNotificationService
         self.activityScheduler = activityScheduler
-        activityScheduler.delegate = self
-        ipcServer.activate()
+        self.ipcServer = ipcServer
+        self.queueManager = queueManager
+        self.dataManager = dataManager
+        self.operationDependencies = operationDependencies
+        self.pixelHandler = pixelHandler
+
+        self.activityScheduler.delegate = self
+        self.ipcServer.serverDelegate = self
+        self.ipcServer.activate()
     }
 
     public func agentFinishedLaunching() {
@@ -204,7 +219,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentDebugComman
     }
 
     public func startManualScan(showWebView: Bool) {
-        queueManager.startImmediateOperationsIfPermitted(showWebView: showWebView, 
+        queueManager.startImmediateOperationsIfPermitted(showWebView: showWebView,
                                                          operationDependencies: operationDependencies,
                                                          completion: nil)
     }

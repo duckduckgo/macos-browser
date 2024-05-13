@@ -85,7 +85,7 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         os_log("DuckDuckGoAgent started", log: .dbpBackgroundAgent, type: .info)
 
-        let manager = DataBrokerProtectionAgentManager.shared
+        let manager = DataBrokerProtectionAgentManagerProvider.agentManager()
         manager.agentFinishedLaunching()
 
         setupStatusBarMenu()

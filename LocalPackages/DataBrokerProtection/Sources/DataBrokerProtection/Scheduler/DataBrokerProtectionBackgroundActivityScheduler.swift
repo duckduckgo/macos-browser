@@ -20,11 +20,18 @@ import Foundation
 import Common
 import BrowserServicesKit
 
+public protocol DataBrokerProtectionBackgroundActivityScheduler {
+    func startScheduler()
+    var delegate: DataBrokerProtectionBackgroundActivitySchedulerDelegate? { get set }
+
+    var lastTriggerTimestamp: Date? { get set }
+}
+
 public protocol DataBrokerProtectionBackgroundActivitySchedulerDelegate: AnyObject {
     func dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(_ activityScheduler: DataBrokerProtectionBackgroundActivityScheduler)
 }
 
-public final class DataBrokerProtectionBackgroundActivityScheduler {
+public final class DefaultDataBrokerProtectionBackgroundActivityScheduler: DataBrokerProtectionBackgroundActivityScheduler {
 
     private enum SchedulerCycle {
         // Arbitrary numbers for now
@@ -47,8 +54,8 @@ public final class DataBrokerProtectionBackgroundActivityScheduler {
         activity.qualityOfService = QualityOfService.background
     }
 
-    public func startScheduler(showWebView: Bool = false) {
-        activity.schedule { completion in
+    public func startScheduler() {
+        activity.schedule { _ in
 
             self.lastTriggerTimestamp = Date()
             os_log("Scheduler running...", log: .dataBrokerProtection)
