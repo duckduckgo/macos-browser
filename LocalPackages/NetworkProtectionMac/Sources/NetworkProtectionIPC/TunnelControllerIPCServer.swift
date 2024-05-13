@@ -29,6 +29,8 @@ public protocol IPCServerInterface: AnyObject {
     ///
     func register()
 
+    func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void)
+
     /// Start the VPN tunnel.
     ///
     /// - Parameters:
@@ -66,6 +68,8 @@ protocol XPCServerInterface {
     /// This is the point where the server will start sending status updates to the client.
     ///
     func register()
+
+    func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void)
 
     /// Start the VPN tunnel.
     ///
@@ -178,6 +182,10 @@ extension TunnelControllerIPCServer: IPCClientInterface {
 extension TunnelControllerIPCServer: XPCServerInterface {
     func register() {
         serverDelegate?.register()
+    }
+
+    func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void) {
+        serverDelegate?.register(version: version, bundlePath: bundlePath, completion: completion)
     }
 
     func start(completion: @escaping (Error?) -> Void) {

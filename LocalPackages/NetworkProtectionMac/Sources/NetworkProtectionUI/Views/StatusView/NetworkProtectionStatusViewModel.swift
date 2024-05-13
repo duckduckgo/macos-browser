@@ -22,6 +22,7 @@ import NetworkExtension
 import NetworkProtection
 import ServiceManagement
 import SwiftUI
+import Common
 
 /// This view can be shown from any location where we want the user to be able to interact with VPN.
 /// This view shows status information about the VPN, and offers a chance to toggle it ON and OFF.
@@ -248,6 +249,7 @@ extension NetworkProtectionStatusView {
 
         private func subscribeToKnownFailures() {
             statusReporter.knownFailureObserver.publisher
+                .removeDuplicates()
                 .subscribe(on: Self.knownFailureDispatchQueue)
                 .assign(to: \.knownFailure, onWeaklyHeld: self)
                 .store(in: &cancellables)
@@ -381,6 +383,8 @@ extension NetworkProtectionStatusView {
             switch (knownFailure.domain, knownFailure.code) {
             case ("SMAppServiceErrorDomain", 1):
                 return UserText.vpnOperationNotPermittedMessage
+            case ("NetworkProtection.NetworkProtectionClientError", 14):
+                return UserText.vpnLoginItemVersionMismatchedMessage
             default:
                 return nil
             }

@@ -21,6 +21,7 @@ import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
+import Common
 
 /// Takes care of handling incoming IPC requests from clients that need to be relayed to the tunnel, and handling state
 /// changes that need to be relayed back to IPC clients.
@@ -50,6 +51,7 @@ final class TunnelControllerIPCService {
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
         subscribeToServerChanges()
+        subscribeToKnownFailureUpdates()
         subscribeToDataVolumeUpdates()
 
         server.serverDelegate = self
@@ -86,6 +88,15 @@ final class TunnelControllerIPCService {
             .store(in: &cancellables)
     }
 
+    private func subscribeToKnownFailureUpdates() {
+        statusReporter.knownFailureObserver.publisher
+            .subscribe(on: DispatchQueue.main)
+            .sink { [weak self] failure in
+                self?.server.knownFailureUpdated(failure)
+            }
+            .store(in: &cancellables)
+    }
+
     private func subscribeToDataVolumeUpdates() {
         statusReporter.dataVolumeObserver.publisher
             .subscribe(on: DispatchQueue.main)
@@ -103,6 +114,18 @@ extension TunnelControllerIPCService: IPCServerInterface {
     func register() {
         server.serverInfoChanged(statusReporter.serverInfoObserver.recentValue)
         server.statusChanged(statusReporter.statusObserver.recentValue)
+    }
+
+    func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void) {
+        server.serverInfoChanged(statusReporter.serverInfoObserver.recentValue)
+        server.statusChanged(statusReporter.statusObserver.recentValue)
+        if DefaultIPCMetadataCollector.version != version {
+            let error = NetworkProtectionClientError.loginItemVersionMismatched
+            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
+            completion(error)
+        } else {
+            completion(nil)
+        }
     }
 
     func start(completion: @escaping (Error?) -> Void) {
