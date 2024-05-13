@@ -299,7 +299,7 @@ final class AddressBarButtonsViewController: NSViewController {
         bookmarkButton.isShown = shouldShowBookmarkButton
     }
 
-    private func updateZoomButtonVisibility() {
+    private func updateZoomButtonVisibility(animation: Bool = false) {
         zoomButton.isHidden = true
         let hasURL = tabViewModel?.tab.url != nil
         let isEditingMode = controllerMode?.isEditing ?? false
@@ -317,8 +317,7 @@ final class AddressBarButtonsViewController: NSViewController {
         && !isEditingMode
         && !isTextFieldValueText
         && !isTextFieldEditorFirstResponder
-        && !isAnyTrackerAnimationPlaying
-        && !isAnyShieldAnimationPlaying
+        && !animation
         && (hasNonDefaultZoom || zoomPopover?.isShown == true)
 
         zoomButton.isHidden = !shouldShowZoom
@@ -888,8 +887,10 @@ final class AddressBarButtonsViewController: NSViewController {
             }
 
             animationView.isHidden = false
-            animationView.play { _ in
+            updateZoomButtonVisibility(animation: true)
+            animationView.play { [weak self] _ in
                 animationView.isHidden = true
+                self?.updateZoomButtonVisibility(animation: false)
             }
         default:
             return
@@ -908,12 +909,13 @@ final class AddressBarButtonsViewController: NSViewController {
             }
             trackerAnimationView?.isHidden = false
             trackerAnimationView?.reloadImages()
+            self.updateZoomButtonVisibility(animation: true)
             trackerAnimationView?.play { [weak self] _ in
                 trackerAnimationView?.isHidden = true
                 self?.updatePrivacyEntryPointIcon()
                 self?.updatePermissionButtons()
                 self?.playBadgeAnimationIfNecessary()
-                self?.updateZoomButtonVisibility()
+                self?.updateZoomButtonVisibility(animation: false)
             }
         }
 

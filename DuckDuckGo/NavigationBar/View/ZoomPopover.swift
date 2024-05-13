@@ -37,16 +37,13 @@ struct ZoomPopoverContentView: View {
                     .padding(.horizontal, 8)
             }
 
-            HStack(spacing: 0) {
+            HStack(spacing: 1) {
                 Button {
                     viewModel.zoomOut()
                 } label: {
                     Image(systemName: "minus")
                         .frame(width: 32, height: 28)
                 }
-                Rectangle()
-                    .fill(Color("BlackWhite50"))
-                    .frame(width: 1, height: 28)
                 Button {
                     viewModel.zoomIn()
                 } label: {
@@ -140,7 +137,7 @@ final class ZoomPopover: NSPopover {
         let boundingFrame = self.boundingFrame
         guard !boundingFrame.isInfinite else { return frame }
         var frame = frame
-        frame.origin.x = boundingFrame.midX - 36
+        frame.origin.x = boundingFrame.minX
         return frame
     }
 
