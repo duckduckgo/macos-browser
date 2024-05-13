@@ -91,6 +91,12 @@ public final class UDSServer<Message: Codable> {
         self.log = log
         self.receiver = UDSReceiver<Message>(log: log)
 
+        do {
+            try fileManager.removeItem(at: socketFileURL)
+        } catch {
+            print(error)
+        }
+
         os_log("UDSServer - Initialized with path: %{public}@", log: log, type: .info, socketFileURL.path)
     }
 
@@ -99,13 +105,10 @@ public final class UDSServer<Message: Codable> {
 
         do {
             let params = NWParameters()
-            let shortSocketURL = try fileManager.shortenSocketURL(socketFileURL: socketFileURL, symlinkName: "appgroup")
-
-            //os_log("UDSServer - Listening on shortened path: %{public}@", log: log, type: .info, shortSocketURL.path)
-
             params.defaultProtocolStack.transportProtocol = NWProtocolTCP.Options()
             params.requiredLocalEndpoint = NWEndpoint.unix(path: socketFileURL.path)
             params.allowLocalEndpointReuse = true
+            //params.acceptLocalOnly = true
 
             listener = try NWListener(using: params)
             self.listener = listener

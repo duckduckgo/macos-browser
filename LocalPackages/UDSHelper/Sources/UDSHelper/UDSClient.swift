@@ -65,66 +65,53 @@ public actor UDSClient<Incoming: Codable, Outgoing: Codable> {
     /// Establishes a new connection
     ///
     private func connect() async throws -> NWConnection {
-        /*let shortSocketURL: URL
-
-        do {
-            shortSocketURL = try urlShortener.shorten(socketFileURL, symlinkName: "appgroup")
-        } catch {
-            os_log("UDSClient - Error creating short path for socket: %{public}@",
-                   log: log,
-                   type: .error,
-                   String(describing: error))
-            throw error
-        }*/
-
-        //os_log("UDSClient - Connecting to shortened path: %{public}@", log: log, type: .info, shortSocketURL.path)
-
         let endpoint = NWEndpoint.unix(path: socketFileURL.path)
         let parameters = NWParameters.tcp
         let connection = NWConnection(to: endpoint, using: parameters)
-        internalConnection = connection
 
-        return try await withTaskCancellationHandler {
-            try await withCheckedThrowingContinuation { continuation in
-                connection.stateUpdateHandler = { [weak self] state in
-                    guard let self else { return }
-
-                    Task {
-                        switch state {
-                        case .cancelled:
-                            os_log("UDSClient - Connection cancelled", log: self.log, type: .info)
-
-                            await self.releaseConnection()
-                            continuation.resume(throwing: ConnectionError.cancelled)
-                        case .failed(let error):
-                            os_log("UDSClient - Connection failed with error: %{public}@", log: self.log, type: .error, String(describing: error))
-
-                            await self.releaseConnection()
-                            continuation.resume(throwing: ConnectionError.failure(error))
-                        case .ready:
-                            os_log("UDSClient - Connection ready", log: self.log, type: .info)
-
-                            await self.retainConnection(connection)
-                            continuation.resume(returning: connection)
-                        case .waiting(let error):
-                            os_log("UDSClient - Waiting to connect... %{public}@", log: self.log, type: .info, String(describing: error))
-                        default:
-                            os_log("UDSClient - Unexpected state", log: self.log, type: .info)
-
-                            break
-                        }
-                    }
-                }
-
-                connection.start(queue: queue)
+        connection.stateUpdateHandler = { state in
+            Task {
+                try await self.statusUpdateHandler(state)
             }
-        } onCancel: {
-            connection.cancel()
         }
+
+        internalConnection = connection
+        connection.start(queue: queue)
+
+        while connection.state != .ready {
+            switch connection.state {
+            case .cancelled:
+                throw ConnectionError.cancelled
+            case .failed(let error):
+                throw ConnectionError.failure(error)
+            default:
+                try await Task.sleep(nanoseconds: 200 * MSEC_PER_SEC)
+            }
+        }
+
+        return connection
     }
 
-    private func retainConnection(_ connection: NWConnection) {
-        internalConnection = connection
+    private func statusUpdateHandler(_ state: NWConnection.State) async throws {
+        switch state {
+        case .cancelled:
+            os_log("UDSClient - Connection cancelled", log: self.log, type: .info)
+
+            self.releaseConnection()
+            throw ConnectionError.cancelled
+        case .failed(let error):
+            os_log("UDSClient - Connection failed with error: %{public}@", log: self.log, type: .error, String(describing: error))
+
+            self.releaseConnection()
+            throw ConnectionError.failure(error)
+        case .ready:
+            os_log("UDSClient - Connection ready", log: self.log, type: .info)
+        case .waiting(let error):
+            os_log("UDSClient - Waiting to connect... %{public}@", log: self.log, type: .info, String(describing: error))
+        default:
+            os_log("UDSClient - Unexpected state", log: self.log, type: .info)
+            break
+        }
     }
 
     private func releaseConnection() {

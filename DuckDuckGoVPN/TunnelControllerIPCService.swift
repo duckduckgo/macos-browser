@@ -73,9 +73,7 @@ final class TunnelControllerIPCService {
                 switch request {
                 case .start:
                     start { _ in
-                        Task {
-                            await self.tunnelController.start()
-                        }
+                        // no-op
                     }
                 case .stop:
                     stop { _ in
@@ -84,7 +82,7 @@ final class TunnelControllerIPCService {
                 }
             }
         } catch {
-            fatalError()
+            fatalError(error.localizedDescription)
         }
     }
 

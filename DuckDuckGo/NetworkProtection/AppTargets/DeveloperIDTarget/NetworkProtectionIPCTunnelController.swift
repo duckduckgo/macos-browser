@@ -106,7 +106,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
         do {
             try await enableLoginItems()
 
-            try? await udsClient.send(.start)
+            try await udsClient.send(.start)
 /*
             ipcClient.start { [pixelKit] error in
                 if let error {
