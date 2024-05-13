@@ -140,6 +140,10 @@ private extension DefaultDataBrokerProtectionQueueManager {
 
         mode = newMode
 
+        updateBrokerData()
+
+        firePixels(operationDependencies: operationDependencies)
+
         addOperations(withType: type,
                       showWebView: showWebView,
                       operationDependencies: operationDependencies,
@@ -150,7 +154,7 @@ private extension DefaultDataBrokerProtectionQueueManager {
         switch mode {
         case .immediate(let completion), .scheduled(let completion):
             operationQueue.cancelAllOperations()
-            completion?(errorCollection())
+            completion?(errorCollectionForCurrentOperations())
             resetModeAndClearErrors()
         default:
             break
@@ -162,17 +166,16 @@ private extension DefaultDataBrokerProtectionQueueManager {
         operationErrors = []
     }
 
+    func updateBrokerData() {
+        // Update broker files if applicable
+        brokerUpdater?.checkForUpdatesInBrokerJSONFiles()
+    }
+
     func addOperations(withType type: OperationType,
                        priorityDate: Date? = nil,
                        showWebView: Bool,
                        operationDependencies: DataBrokerOperationDependencies,
                        completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
-
-        // Update broker files if applicable
-        brokerUpdater?.checkForUpdatesInBrokerJSONFiles()
-
-        // Fire Pixels
-        firePixels(operationDependencies: operationDependencies)
 
         operationQueue.maxConcurrentOperationCount = operationDependencies.config.concurrentOperationsFor(type)
 
@@ -195,13 +198,13 @@ private extension DefaultDataBrokerProtectionQueueManager {
         }
 
         operationQueue.addBarrierBlock { [weak self] in
-            let errorCollection = self?.errorCollection()
+            let errorCollection = self?.errorCollectionForCurrentOperations()
             completion?(errorCollection)
             self?.resetModeAndClearErrors()
         }
     }
 
-    func errorCollection() -> DataBrokerProtectionAgentErrorCollection? {
+    func errorCollectionForCurrentOperations() -> DataBrokerProtectionAgentErrorCollection? {
         return operationErrors.count != 0 ? DataBrokerProtectionAgentErrorCollection(operationErrors: operationErrors) : nil
     }
 

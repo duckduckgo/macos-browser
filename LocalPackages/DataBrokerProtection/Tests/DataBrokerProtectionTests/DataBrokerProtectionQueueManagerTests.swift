@@ -111,7 +111,43 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         XCTAssertEqual(mockQueue.maxConcurrentOperationCount, expectedConcurrentOperations)
     }
 
-    func testWhenStartSecondImmediateScan_andCurrentModeIsImmediate_thenCurrentOperationsAreInterrupted_andCurrentCompletionIsCalledWithErrors() async throws {
+    func testWhenStartImmediateScan_andCurrentModeIsScheduled_thenCurrentOperationsAreInterrupted_andCurrentCompletionIsCalledWithErrors() async throws {
+        // Given
+        sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
+                                                      operationsCreator: mockOperationsCreator,
+                                                      mismatchCalculator: mockMismatchCalculator,
+                                                      brokerUpdater: mockUpdater,
+                                                      pixelHandler: mockPixelHandler)
+        let mockOperationsWithError = (1...2).map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut, shouldError: true) }
+        var mockOperations = (3...4).map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut) }
+        mockOperationsCreator.operationCollections = mockOperationsWithError + mockOperations
+        var errorCollection: DataBrokerProtectionAgentErrorCollection!
+
+        // When
+        sut.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { errors in
+            errorCollection = errors
+        }
+
+        mockQueue.completeOperationsUpTo(index: 2)
+
+        // Then
+        XCTAssert(mockQueue.operationCount == 2)
+
+        // Given
+        mockOperations = (5...8).map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut) }
+        mockOperationsCreator.operationCollections = mockOperations
+
+        // When
+        sut.startImmediateOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in }
+
+        // Then
+        XCTAssert(errorCollection.operationErrors?.count == 2)
+        XCTAssert(mockQueue.didCallCancelCount == 1)
+        XCTAssert(mockQueue.operations.filter { !$0.isCancelled }.count == 4)
+        XCTAssert(mockQueue.operations.filter { $0.isCancelled }.count >= 2)
+    }
+
+    func testWhenStartImmediateScan_andCurrentModeIsImmediate_thenCurrentOperationsAreInterrupted_andCurrentCompletionIsCalledWithErrors() async throws {
         // Given
         sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
                                                       operationsCreator: mockOperationsCreator,
