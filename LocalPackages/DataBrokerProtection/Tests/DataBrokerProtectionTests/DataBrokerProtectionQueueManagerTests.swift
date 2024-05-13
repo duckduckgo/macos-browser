@@ -79,6 +79,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         // Then
         await fulfillment(of: [expectation], timeout: 5)
         XCTAssert(errorCollection.operationErrors?.count == 1)
+        XCTAssertNil(mockOperationsCreator.priorityDate)
         XCTAssertEqual(mockQueue.maxConcurrentOperationCount, expectedConcurrentOperations)
     }
 
@@ -108,6 +109,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         // Then
         await fulfillment(of: [expectation], timeout: 5)
         XCTAssert(errorCollection.operationErrors?.count == 1)
+        XCTAssertNotNil(mockOperationsCreator.priorityDate)
         XCTAssertEqual(mockQueue.maxConcurrentOperationCount, expectedConcurrentOperations)
     }
 
@@ -324,5 +326,25 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         // Then
         await fulfillment(of: [expectation], timeout: 3)
         XCTAssert(errorCollection.operationErrors?.count == 2)
+    }
+
+    func testWhenCallDebugOptOutCommand_thenOptOutOperationsAreCreated() throws {
+        // Given
+        sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
+                                                      operationsCreator: mockOperationsCreator,
+                                                      mismatchCalculator: mockMismatchCalculator,
+                                                      brokerUpdater: mockUpdater,
+                                                      pixelHandler: mockPixelHandler)
+        let expectedConcurrentOperations = DataBrokerProtectionProcessorConfiguration().concurrentOperationsFor(.optOut)
+        XCTAssert(mockOperationsCreator.createdType == .scan)
+
+        // When
+        sut.execute(.startOptOutOperations(showWebView: false,
+                                           operationDependencies: mockDependencies,
+                                           completion: nil))
+
+        // Then
+        XCTAssert(mockOperationsCreator.createdType == .optOut)
+        XCTAssertEqual(mockQueue.maxConcurrentOperationCount, expectedConcurrentOperations)
     }
 }

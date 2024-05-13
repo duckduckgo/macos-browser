@@ -86,4 +86,37 @@ final class DataBrokerProtectionQueueModeTests: XCTestCase {
         // Then
         XCTAssertFalse(result)
     }
+
+    func testWhenModeIsIdle_thenPriorityDateIsNil() throws {
+        // Given
+        let sut = DataBrokerProtectionQueueMode.idle
+
+        // When
+        let result = sut.priorityDate
+
+        // Then
+        XCTAssertNil(result)
+    }
+
+    func testWhenModeIsImmediate_thenPriorityDateIsNil() throws {
+        // Given
+        let sut = DataBrokerProtectionQueueMode.immediate(completion: nil)
+
+        // When
+        let result = sut.priorityDate
+
+        // Then
+        XCTAssertNil(result)
+    }
+
+    func testWhenModeIsScheduled_thenPriorityDateIsNotNil() throws {
+        // Given
+        let sut = DataBrokerProtectionQueueMode.scheduled(completion: nil)
+
+        // When
+        let result = sut.priorityDate
+
+        // Then
+        XCTAssertNotNil(result)
+    }
 }

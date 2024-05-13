@@ -265,25 +265,20 @@ public final class DefaultDataBrokerProtectionScheduler {
 
         os_log("Opting out all brokers...", log: .dataBrokerProtection)
         self.currentOperation = .optOutAll
-        // TODO: Re-implement based on WIP debug command protocol
-        /*
-         This was based on my implementation of `debugCommands`. However, based on Elle's work and the outcomes, my approach is not feasible.
-         we will need to implement the debug protocol including as part of Elle's work
-         */
-//        queueManager.execute(.startOptOutOperations(showWebView: showWebView, operationDependencies: operationDependencies) { [weak self] errors in
-//            if let errors = errors {
-//                if let oneTimeError = errors.oneTimeError {
-//                    os_log("Error during DefaultDataBrokerProtectionScheduler.optOutAllBrokers in dataBrokerProcessor.runAllOptOutOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-//                    self?.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.optOutAllBrokers"))
-//                }
-//                if let operationErrors = errors.operationErrors,
-//                          operationErrors.count != 0 {
-//                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.optOutAllBrokers in dataBrokerProcessor.runAllOptOutOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
-//                }
-//            }
-//            self?.currentOperation = .idle
-//            completion?(errors)
-//        })
+        queueManager.execute(.startOptOutOperations(showWebView: showWebView, operationDependencies: operationDependencies) { [weak self] errors in
+            if let errors = errors {
+                if let oneTimeError = errors.oneTimeError {
+                    os_log("Error during DefaultDataBrokerProtectionScheduler.optOutAllBrokers in dataBrokerProcessor.runAllOptOutOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                    self?.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.optOutAllBrokers"))
+                }
+                if let operationErrors = errors.operationErrors,
+                          operationErrors.count != 0 {
+                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.optOutAllBrokers in dataBrokerProcessor.runAllOptOutOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                }
+            }
+            self?.currentOperation = .idle
+            completion?(errors)
+        })
     }
 }
 

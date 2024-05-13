@@ -1160,6 +1160,7 @@ final class MockDataBrokerOperationsCreator: DataBrokerOperationsCreator {
 
     var operationCollections: [DataBrokerOperation] = []
     var shouldError = false
+    var priorityDate: Date? = nil
     var createdType: OperationType = .scan
 
     init(operationCollections: [DataBrokerOperation] = []) {
@@ -1172,7 +1173,8 @@ final class MockDataBrokerOperationsCreator: DataBrokerOperationsCreator {
                     errorDelegate: DataBrokerOperationErrorDelegate,
                     operationDependencies: DataBrokerOperationDependencies) throws -> [DataBrokerOperation] {
         guard !shouldError else { throw DataBrokerProtectionError.unknown("")}
-        createdType = operationType
+        self.createdType = operationType
+        self.priorityDate = priorityDate
         return operationCollections
     }
 }
