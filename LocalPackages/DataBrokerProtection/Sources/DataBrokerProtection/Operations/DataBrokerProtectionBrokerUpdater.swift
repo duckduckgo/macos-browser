@@ -99,7 +99,7 @@ final class AppVersionNumber: AppVersionNumberProvider {
 }
 
 protocol DataBrokerProtectionBrokerUpdater {
-    static func provide() -> DefaultDataBrokerProtectionBrokerUpdater?
+    static func provideForDebug() -> DefaultDataBrokerProtectionBrokerUpdater?
     func updateBrokers()
     func checkForUpdatesInBrokerJSONFiles()
 }
@@ -124,7 +124,7 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
         self.pixelHandler = pixelHandler
     }
 
-    public static func provide() -> DefaultDataBrokerProtectionBrokerUpdater? {
+    public static func provideForDebug() -> DefaultDataBrokerProtectionBrokerUpdater? {
         if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: DataBrokerProtectionSecureVaultErrorReporter.shared) {
             return DefaultDataBrokerProtectionBrokerUpdater(vault: vault)
         }

@@ -1193,7 +1193,7 @@ final class MockDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrokerUpd
     private(set) var didCallUpdateBrokers = false
     private(set) var didCallCheckForUpdates = false
 
-    static func provide() -> DefaultDataBrokerProtectionBrokerUpdater? {
+    static func provideForDebug() -> DefaultDataBrokerProtectionBrokerUpdater? {
         nil
     }
 
