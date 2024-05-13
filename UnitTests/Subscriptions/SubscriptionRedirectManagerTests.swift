@@ -17,6 +17,7 @@
 //
 
 import XCTest
+import Subscription
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SubscriptionRedirectManagerTests: XCTestCase {
@@ -27,6 +28,7 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
         try super.setUpWithError()
         storeMock = .init()
         sut = PrivacyProSubscriptionRedirectManager(featureAvailabiltyProvider: true, originStore: storeMock)
+        SubscriptionPurchaseEnvironment.canPurchase = true
     }
 
     override func tearDownWithError() throws {
