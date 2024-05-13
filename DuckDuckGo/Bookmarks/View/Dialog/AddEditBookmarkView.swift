@@ -49,7 +49,6 @@ struct AddEditBookmarkView: View {
                     .init(
                         title: UserText.Bookmarks.Dialog.Field.name,
                         content: TextField("", text: $bookmarkName)
-                            .focusedOnAppear()
                             .accessibilityIdentifier("bookmark.add.name.textfield")
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .font(.system(size: 14))

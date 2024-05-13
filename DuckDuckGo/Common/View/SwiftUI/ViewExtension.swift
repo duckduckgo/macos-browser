@@ -51,11 +51,6 @@ extension View {
             // hacky way to set the @Environment.presentationMode.
             // here we downcast a (non-writable) \.presentationMode KeyPath to a WritableKeyPath
             self.environment(presentationModeKey, Binding<PresentationMode>(onDismiss: onDismiss))
-        } else {
-#if !APPSTORE
-            // macOS 11 compatibility:
-            self.environment(\.legacyDismiss, onDismiss)
-#endif
         }
     }
 }
@@ -93,28 +88,6 @@ struct DismissAction {
 @available(macOS, obsoleted: 12.0, message: "This needs to be removed as it‘s no longer necessary.")
 struct LegacyDismissAction: EnvironmentKey {
     static var defaultValue: () -> Void { { } }
-}
-
-extension EnvironmentValues {
-    @available(macOS, obsoleted: 12.0, message: "This extension needs to be removed as it‘s no longer necessary.")
-    var dismiss: DismissAction {
-        DismissAction {
-            if \EnvironmentValues.presentationMode as? WritableKeyPath != nil {
-                presentationMode.wrappedValue.dismiss()
-            } else {
-                self[LegacyDismissAction.self]()
-            }
-        }
-    }
-    @available(macOS, obsoleted: 12.0, message: "This extension needs to be removed as it‘s no longer necessary.")
-    fileprivate var legacyDismiss: () -> Void {
-        get {
-            self[LegacyDismissAction.self]
-        }
-        set {
-            self[LegacyDismissAction.self] = newValue
-        }
-    }
 }
 #endif
 
