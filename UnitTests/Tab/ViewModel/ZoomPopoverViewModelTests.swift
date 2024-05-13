@@ -85,15 +85,15 @@ final class ZoomPopoverViewModelTests: XCTestCase {
     func test_WhenZoomValueIsSetInTab_ThenPopoverZoomLevelUpdated() async {
         let expectation = XCTestExpectation()
         zoomPopover = ZoomPopoverViewModel(tabViewModel: tabVM)
-        zoomPopover.reset()
+        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
 
         Task {
-            tabVM.tab.webView.zoomIn()
+            tabVM.zoomWasSet(to: randomZoomLevel)
             expectation.fulfill()
         }
 
         await fulfillment(of: [expectation], timeout: 5.0)
-        XCTAssertEqual(zoomPopover.zoomLevel, .percent115)
+        XCTAssertEqual(zoomPopover.zoomLevel, randomZoomLevel)
     }
 
 }
