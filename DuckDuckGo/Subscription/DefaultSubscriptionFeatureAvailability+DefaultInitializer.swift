@@ -25,6 +25,6 @@ extension DefaultSubscriptionFeatureAvailability {
 
     convenience init() {
         self.init(privacyConfigurationManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-                  subscriptionEnvironment: Application.appDelegate.subscriptionManager.currentEnvironment)
+                  subscriptionPlatform: Application.appDelegate.subscriptionManager.currentEnvironment.platform)
     }
 }
