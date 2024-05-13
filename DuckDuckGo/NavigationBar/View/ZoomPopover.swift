@@ -58,31 +58,19 @@ struct ZoomPopoverContentView: View {
 }
 
 final class ZoomPopoverViewModel: ObservableObject {
-    let accessibilityPreferences: AccessibilityPreferences
     let tabViewModel: TabViewModel
     @Published var zoomLevel: DefaultZoomValue = .percent100
     private var cancellables = Set<AnyCancellable>()
 
-    init(accessibilityPreferences: AccessibilityPreferences, tabViewModel: TabViewModel) {
-        self.accessibilityPreferences = accessibilityPreferences
+    init(tabViewModel: TabViewModel) {
         self.tabViewModel = tabViewModel
         guard let urlString = tabViewModel.tab.url?.absoluteString else { return }
-        zoomLevel = accessibilityPreferences.zoomPerWebsite(url: urlString) ?? .percent100
-        NotificationCenter.default.publisher(for: AccessibilityPreferences.zoomPerWebsiteUpdated)
+        zoomLevel = tabViewModel.zoomLevel
+        tabViewModel.zoomLevelSubject
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                if let newZoomLevel = accessibilityPreferences.zoomPerWebsite(url: urlString) {
-                    self?.zoomLevel = newZoomLevel
-                } else {
-                    self?.zoomLevel = accessibilityPreferences.defaultPageZoom
-                }
+            .sink { [weak self] newValue in
+                self?.zoomLevel = newValue
             }.store(in: &cancellables)
-        accessibilityPreferences.$defaultPageZoom.sink { [weak self] newValue in
-            guard let self = self else { return }
-            if accessibilityPreferences.zoomPerWebsite(url: urlString) == nil {
-                zoomLevel = newValue
-            }
-        }.store(in: &cancellables)
     }
 
     func zoomIn() {
@@ -159,7 +147,7 @@ final class ZoomPopover: NSPopover {
     // swiftlint:enable force_cast
 
     private func setupContentController() {
-        let controller = ZoomPopoverViewController(viewModel: ZoomPopoverViewModel(accessibilityPreferences: AccessibilityPreferences.shared, tabViewModel: tabViewModel))
+        let controller = ZoomPopoverViewController(viewModel: ZoomPopoverViewModel(tabViewModel: tabViewModel))
         contentViewController = controller
     }
 
