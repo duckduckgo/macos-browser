@@ -309,7 +309,6 @@ final class AddressBarButtonsViewController: NSViewController {
         let isTextFieldValueText = textFieldValue?.isText ?? false
 
         var hasNonDefaultZoom = false
-        guard let url = tabViewModel!.tab.url else { return }
         if tabViewModel?.zoomLevel != accessibilityPreferences.defaultPageZoom {
             hasNonDefaultZoom = true
         }
@@ -432,16 +431,12 @@ final class AddressBarButtonsViewController: NSViewController {
 
     @IBAction func zoomButtonAction(_ sender: Any) {
         if zoomPopover != nil {
-            NotificationCenter.default.removeObserver(self, name: NSPopover.willCloseNotification, object: zoomPopover)
             zoomPopover?.close()
-            zoomPopover = nil
         } else {
             guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
             zoomPopover = ZoomPopover(tabViewModel: tabViewModel)
+            zoomPopover?.delegate = self
             zoomPopover?.show(positionedBelow: zoomButton)
-            NotificationCenter.default.addObserver(forName: NSPopover.didCloseNotification, object: zoomPopover, queue: .main) { _ in
-                self.updateZoomButtonVisibility()
-            }
         }
     }
 
@@ -579,7 +574,6 @@ final class AddressBarButtonsViewController: NSViewController {
         geolocationButton.sendAction(on: .leftMouseDown)
         popupsButton.sendAction(on: .leftMouseDown)
         externalSchemeButton.sendAction(on: .leftMouseDown)
-        zoomButton.contentTintColor = .black
     }
 
     private var animationViewCache = [String: LottieAnimationView]()
@@ -1097,7 +1091,9 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
         case privacyDashboardPopover:
             privacyEntryPointButton.state = .off
             _privacyDashboardPopover = nil
-
+        case zoomPopover:
+            updateZoomButtonVisibility()
+            zoomPopover = nil
         default:
             break
         }

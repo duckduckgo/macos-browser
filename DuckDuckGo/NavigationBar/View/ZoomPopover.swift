@@ -64,7 +64,6 @@ final class ZoomPopoverViewModel: ObservableObject {
 
     init(tabViewModel: TabViewModel) {
         self.tabViewModel = tabViewModel
-        guard let urlString = tabViewModel.tab.url?.absoluteString else { return }
         zoomLevel = tabViewModel.zoomLevel
         tabViewModel.zoomLevelSubject
             .receive(on: DispatchQueue.main)
