@@ -17,7 +17,6 @@
 //
 
 import XCTest
-import SubscriptionTestUtils
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SubscriptionRedirectManagerTests: XCTestCase {
