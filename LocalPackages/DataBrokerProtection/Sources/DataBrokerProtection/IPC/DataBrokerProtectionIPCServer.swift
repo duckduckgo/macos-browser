@@ -85,7 +85,6 @@ public protocol IPCServerInterface: AnyObject, DataBrokerProtectionAgentDebugCom
     // MARK: - DataBrokerProtectionAgentAppEvents
 
     func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
-    func dataDeleted(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
     func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
 }
 
@@ -105,7 +104,6 @@ protocol XPCServerInterface {
     // MARK: - DataBrokerProtectionAgentAppEvents
 
     func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
-    func dataDeleted(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
     func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
 
     // MARK: - DataBrokerProtectionAgentDebugCommands
@@ -125,7 +123,7 @@ public final class DataBrokerProtectionIPCServer {
 
     /// The delegate.
     ///
-    public weak var serverDelegate: DataBrokerProtectionAgentInterface?
+    public weak var serverDelegate: DataBrokerProtectionAppToAgentInterface?
 
     public init(machServiceName: String) {
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
@@ -162,11 +160,6 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
     func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
         xpcMessageReceivedCompletion(nil)
         serverDelegate?.profileSaved()
-    }
-
-    func dataDeleted(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
-        xpcMessageReceivedCompletion(nil)
-        serverDelegate?.dataDeleted()
     }
 
     func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {

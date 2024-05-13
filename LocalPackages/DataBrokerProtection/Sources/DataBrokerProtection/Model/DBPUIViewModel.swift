@@ -29,7 +29,7 @@ protocol DBPUIScanOps: AnyObject {
 
 final class DBPUIViewModel {
     private let dataManager: DataBrokerProtectionDataManaging
-    private let agentInterface: DataBrokerProtectionAgentInterface
+    private let agentInterface: DataBrokerProtectionAppToAgentInterface
 
     private let privacyConfig: PrivacyConfigurationManaging?
     private let prefs: ContentScopeProperties?
@@ -39,7 +39,7 @@ final class DBPUIViewModel {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
     init(dataManager: DataBrokerProtectionDataManaging,
-         agentInterface: DataBrokerProtectionAgentInterface,
+         agentInterface: DataBrokerProtectionAppToAgentInterface,
          webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
          privacyConfig: PrivacyConfigurationManaging? = nil,
          prefs: ContentScopeProperties? = nil,

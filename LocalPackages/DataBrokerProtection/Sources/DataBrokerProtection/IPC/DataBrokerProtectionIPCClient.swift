@@ -101,16 +101,6 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         })
     }
 
-    public func dataDeleted(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
-        xpc.execute(call: { server in
-            server.dataDeleted(xpcMessageReceivedCompletion: xpcMessageReceivedCompletion)
-        }, xpcReplyErrorHandler: { error in
-            os_log("Error \(error.localizedDescription)")
-            // Intentional no-op as there's no completion block
-            // If you add a completion block, please remember to call it here too!
-        })
-    }
-
     public func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
         xpc.execute(call: { server in
             server.appLaunched(xpcMessageReceivedCompletion: xpcMessageReceivedCompletion)

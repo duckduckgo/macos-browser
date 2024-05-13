@@ -22,9 +22,8 @@ import Foundation
 import DataBrokerProtection
 import Common
 
-protocol DataBrokerProtectionLoginItemInterface: DataBrokerProtectionAgentInterface {
-    func disableLoginItem()
-    func enableLoginItem()
+protocol DataBrokerProtectionLoginItemInterface: DataBrokerProtectionAppToAgentInterface {
+    func dataDeleted()
 }
 
 /// Launches a login item and then communicates with it through IPC
@@ -43,28 +42,28 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
 
     // MARK: - Login Item Management
 
-    func disableLoginItem() {
+    private func disableLoginItem() {
         DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerDisableLoginItemDaily, frequency: .daily)
         loginItemsManager.disableLoginItems([.dbpBackgroundAgent])
     }
 
-    func enableLoginItem() {
+    private func enableLoginItem() {
         DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerEnableLoginItemDaily, frequency: .daily)
         loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
     }
 
-    // MARK: - DataBrokerProtectionAgentInterface
+    // MARK: - DataBrokerProtectionLoginItemInterface
+
+    func dataDeleted() {
+        disableLoginItem()
+    }
+
+    // MARK: - DataBrokerProtectionAppToAgentInterface
     // MARK: - DataBrokerProtectionAgentAppEvents
 
     func profileSaved() {
         enableLoginItem()
         ipcClient.profileSaved { error in
-            // TODO
-        }
-    }
-
-    func dataDeleted() {
-        ipcClient.dataDeleted { error in
             // TODO
         }
     }

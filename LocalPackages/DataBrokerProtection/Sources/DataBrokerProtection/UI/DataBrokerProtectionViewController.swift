@@ -36,7 +36,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let openURLHandler: (URL?) -> Void
     private var reloadObserver: NSObjectProtocol?
 
-    public init(agentInterface: DataBrokerProtectionAgentInterface,
+    public init(agentInterface: DataBrokerProtectionAppToAgentInterface,
                 dataManager: DataBrokerProtectionDataManaging,
                 privacyConfig: PrivacyConfigurationManaging? = nil,
                 prefs: ContentScopeProperties? = nil,

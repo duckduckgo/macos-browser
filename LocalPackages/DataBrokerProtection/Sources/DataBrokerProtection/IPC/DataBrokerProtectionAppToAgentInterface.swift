@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionAgentInterface.swift
+//  DataBrokerProtectionAppToAgentInterface.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Foundation
 
-public enum DataBrokerProtectionAgentInterfaceError: Error {
+public enum DataBrokerProtectionAppToAgentInterfaceError: Error {
     case loginItemDoesNotHaveNecessaryPermissions
     case appInWrongDirectory
     case operationsInterrupted
@@ -47,9 +47,7 @@ public class DataBrokerProtectionAgentErrorCollection: NSObject, NSSecureCoding 
 
     // MARK: - NSSecureCoding
 
-    public static var supportsSecureCoding: Bool {
-        return true
-    }
+    public static let supportsSecureCoding = true
 
     public func encode(with coder: NSCoder) {
         coder.encode(oneTimeError, forKey: NSSecureCodingKeys.oneTimeError)
@@ -64,7 +62,6 @@ public class DataBrokerProtectionAgentErrorCollection: NSObject, NSSecureCoding 
 
 public protocol DataBrokerProtectionAgentAppEvents {
     func profileSaved()
-    func dataDeleted()
     func appLaunched()
 }
 
@@ -76,6 +73,6 @@ public protocol DataBrokerProtectionAgentDebugCommands {
     func getDebugMetadata() async -> DBPBackgroundAgentMetadata?
 }
 
-public protocol DataBrokerProtectionAgentInterface: AnyObject, DataBrokerProtectionAgentAppEvents, DataBrokerProtectionAgentDebugCommands {
+public protocol DataBrokerProtectionAppToAgentInterface: AnyObject, DataBrokerProtectionAgentAppEvents, DataBrokerProtectionAgentDebugCommands {
 
 }

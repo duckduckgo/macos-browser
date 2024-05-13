@@ -63,8 +63,6 @@ protocol DataBrokerProtectionQueueManager {
     func startScheduledOperationsIfPermitted(showWebView: Bool,
                                              operationDependencies: DataBrokerOperationDependencies,
                                              completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
-
-    func stopAllOperations()
 }
 
 final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueManager {
