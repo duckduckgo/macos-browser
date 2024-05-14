@@ -108,7 +108,9 @@ public final class UDSServer<Message: Codable> {
             params.defaultProtocolStack.transportProtocol = NWProtocolTCP.Options()
             params.requiredLocalEndpoint = NWEndpoint.unix(path: socketFileURL.path)
             params.allowLocalEndpointReuse = true
-            //params.acceptLocalOnly = true
+            // IMPORTANT: I'm leaving the following line commented because I want to document
+            // that enabling it seems to break the UDS listener completely.
+            // params.acceptLocalOnly = true
 
             listener = try NWListener(using: params)
             self.listener = listener
