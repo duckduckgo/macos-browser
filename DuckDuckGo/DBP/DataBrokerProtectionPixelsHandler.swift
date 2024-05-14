@@ -39,7 +39,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerScanAllBrokersCompletedOnAgentWithError(error: let error),
                     .ipcServerScanAllBrokersCompletionCalledOnAppWithError(error: let error),
                     .ipcServerOptOutAllBrokersCompletion(error: let error),
-                    .ipcServerRunQueuedOperationsCompletion(error: let error):
+                    .ipcServerStartScheduledOperationsCompletion(error: let error):
                 PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
             case .ipcServerStartSchedulerCalledByApp,
                     .ipcServerStartSchedulerReceivedByAgent,
@@ -72,10 +72,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .backgroundAgentStarted,
                     .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
                     .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
-                    .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossibleStartScheduledOperationsCallbackStartScheduler,
                     .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
                     .ipcServerOptOutAllBrokers,
-                    .ipcServerRunQueuedOperations,
+                    .ipcServerStartScheduledOperations,
                     .ipcServerRunAllOperations,
                     .scanSuccess,
                     .scanFailed,

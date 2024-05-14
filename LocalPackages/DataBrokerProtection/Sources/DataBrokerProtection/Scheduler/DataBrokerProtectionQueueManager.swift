@@ -33,6 +33,15 @@ enum DataBrokerProtectionQueueMode {
     case immediate(completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
     case scheduled(completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
 
+    var priorityDate: Date? {
+        switch self {
+        case .idle, .immediate:
+            return nil
+        case .scheduled:
+            return Date()
+        }
+    }
+
     func canBeInterruptedBy(newMode: DataBrokerProtectionQueueMode) -> Bool {
         switch (self, newMode) {
         case (.idle, _):
@@ -49,6 +58,12 @@ enum DataBrokerProtectionQueueError: Error {
     case cannotInterrupt
 }
 
+enum DataBrokerProtectionQueueManagerDebugCommand {
+    case startOptOutOperations(showWebView: Bool,
+                               operationDependencies: DataBrokerOperationDependencies,
+                               completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+}
+
 protocol DataBrokerProtectionQueueManager {
 
     init(operationQueue: DataBrokerProtectionOperationQueue,
@@ -63,6 +78,8 @@ protocol DataBrokerProtectionQueueManager {
     func startScheduledOperationsIfPermitted(showWebView: Bool,
                                              operationDependencies: DataBrokerOperationDependencies,
                                              completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+
+    func execute(_ command: DataBrokerProtectionQueueManagerDebugCommand)
 }
 
 final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueManager {
@@ -114,8 +131,15 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
                                    completion: completion)
     }
 
-    func stopAllOperations() {
-        cancelCurrentModeAndResetIfNeeded()
+    func execute(_ command: DataBrokerProtectionQueueManagerDebugCommand) {
+        guard case .startOptOutOperations(let showWebView,
+                                          let operationDependencies,
+                                          let completion) = command else { return }
+
+        addOperations(withType: .optOut,
+                      showWebView: showWebView,
+                      operationDependencies: operationDependencies,
+                      completion: completion)
     }
 }
 
@@ -143,6 +167,7 @@ private extension DefaultDataBrokerProtectionQueueManager {
         firePixels(operationDependencies: operationDependencies)
 
         addOperations(withType: type,
+                      priorityDate: mode.priorityDate,
                       showWebView: showWebView,
                       operationDependencies: operationDependencies,
                       completion: completion)

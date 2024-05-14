@@ -67,8 +67,8 @@ public protocol DataBrokerProtectionAgentAppEvents {
 
 public protocol DataBrokerProtectionAgentDebugCommands {
     func openBrowser(domain: String)
-    func startManualScan(showWebView: Bool)
-    func runQueuedOperations(showWebView: Bool)
+    func startImmediateOperations(showWebView: Bool)
+    func startScheduledOperations(showWebView: Bool)
     func runAllOptOuts(showWebView: Bool)
     func getDebugMetadata() async -> DBPBackgroundAgentMetadata?
 }

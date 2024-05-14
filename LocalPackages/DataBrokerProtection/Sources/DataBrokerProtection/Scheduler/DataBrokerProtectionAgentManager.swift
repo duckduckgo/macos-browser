@@ -216,13 +216,13 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentDebugComman
         }
     }
 
-    public func startManualScan(showWebView: Bool) {
+    public func startImmediateOperations(showWebView: Bool) {
         queueManager.startImmediateOperationsIfPermitted(showWebView: showWebView,
                                                          operationDependencies: operationDependencies,
                                                          completion: nil)
     }
 
-    public func runQueuedOperations(showWebView: Bool) {
+    public func startScheduledOperations(showWebView: Bool) {
         // TODO
         //scheduler.runQueuedOperations(showWebView: showWebView)
     }

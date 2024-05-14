@@ -868,7 +868,7 @@ final class MockAppVersion: AppVersionNumberProvider {
 }
 
 final class MockStageDurationCalculator: StageDurationCalculator {
-    var isManualScan: Bool = false
+    var isImmediateOperation: Bool = false
     var attemptId: UUID = UUID()
     var stage: Stage?
 
@@ -1047,6 +1047,9 @@ final class MockDataBrokerProtectionOperationQueueManager: DataBrokerProtectionQ
         completion?(startScheduledOperationsIfPermittedCompletionError)
         startScheduledOperationsIfPermittedCalledCompletion?(startScheduledOperationsIfPermittedCompletionError)
     }
+
+    func execute(_ command: DataBrokerProtection.DataBrokerProtectionQueueManagerDebugCommand) {
+    }
 }
 
 final class MockUserNotificationService: DataBrokerProtectionUserNotificationService {
@@ -1141,6 +1144,7 @@ final class MockDataBrokerProtectionDataManager: DataBrokerProtectionDataManagin
 }
 
 final class MockIPCServer: DataBrokerProtectionIPCServer {
+
     var serverDelegate: DataBrokerProtection.DataBrokerProtectionAppToAgentInterface?
 
     init(machServiceName: String) {
@@ -1164,12 +1168,12 @@ final class MockIPCServer: DataBrokerProtectionIPCServer {
         serverDelegate?.openBrowser(domain: domain)
     }
 
-    func startManualScan(showWebView: Bool) {
-        serverDelegate?.startManualScan(showWebView: showWebView)
+    func startImmediateOperations(showWebView: Bool) {
+        serverDelegate?.startImmediateOperations(showWebView: showWebView)
     }
 
-    func runQueuedOperations(showWebView: Bool) {
-        serverDelegate?.runQueuedOperations(showWebView: showWebView)
+    func startScheduledOperations(showWebView: Bool) {
+        serverDelegate?.startScheduledOperations(showWebView: showWebView)
     }
 
     func runAllOptOuts(showWebView: Bool) {
@@ -1315,6 +1319,7 @@ final class MockDataBrokerOperationsCreator: DataBrokerOperationsCreator {
 
     var operationCollections: [DataBrokerOperation] = []
     var shouldError = false
+    var priorityDate: Date?
     var createdType: OperationType = .scan
 
     init(operationCollections: [DataBrokerOperation] = []) {
@@ -1327,7 +1332,8 @@ final class MockDataBrokerOperationsCreator: DataBrokerOperationsCreator {
                     errorDelegate: DataBrokerOperationErrorDelegate,
                     operationDependencies: DataBrokerOperationDependencies) throws -> [DataBrokerOperation] {
         guard !shouldError else { throw DataBrokerProtectionError.unknown("")}
-        createdType = operationType
+        self.createdType = operationType
+        self.priorityDate = priorityDate
         return operationCollections
     }
 }
