@@ -131,12 +131,10 @@ public final class DataBrokerProtectionAgentManager {
             // If there's no saved profile we don't need to start the scheduler
             // Theoretically this should never happen, if there's no data, the agent shouldn't be running
             guard (try dataManager.fetchProfile()) != nil else {
-                pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile)
                 return
             }
         } catch {
-            pixelHandler.fire(.generalError(error: error,
-                                            functionOccurredIn: "DataBrokerProtectionBackgroundManager.runOperationsAndStartSchedulerIfPossible"))
+            os_log("Error during AgentManager.agentFinishedLaunching when trying to fetchProfile, error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
             return
         }
 
@@ -168,15 +166,15 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
                 if let oneTimeError = errors.oneTimeError {
                     switch oneTimeError {
                     case DataBrokerProtectionAppToAgentInterfaceError.operationsInterrupted:
-                        os_log("Interrupted during DefaultDataBrokerProtectionScheduler.startManualScan in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        os_log("Interrupted during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
                     default:
-                        os_log("Error during DefaultDataBrokerProtectionScheduler.startManualScan in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                        self.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.startManualScan"))
+                        os_log("Error during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted, error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        self.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DataBrokerProtectionAgentManager.profileSaved"))
                     }
                 }
                 if let operationErrors = errors.operationErrors,
                           operationErrors.count != 0 {
-                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.startManualScan in dataBrokerProcessor.runAllScanOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                    os_log("Operation error(s) during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted, count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             }
 
