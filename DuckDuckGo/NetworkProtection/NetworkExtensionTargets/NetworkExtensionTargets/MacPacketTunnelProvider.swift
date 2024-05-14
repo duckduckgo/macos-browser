@@ -356,15 +356,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                                                                  key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
         let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
-
-        // The VPN environment is forced to match the subscription environment
-        switch subscriptionEnvironment.serviceEnvironment {
-        case .production:
-            settings.selectedEnvironment = .production
-        case .staging:
-            settings.selectedEnvironment = .staging
-        }
-
         let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let accountManager = AccountManager(accessTokenStorage: tokenStore,

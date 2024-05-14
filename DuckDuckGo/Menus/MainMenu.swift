@@ -628,6 +628,15 @@ import SubscriptionUI
             let updateServiceEnvironment: (SubscriptionEnvironment.ServiceEnvironment) -> Void = { env in
                 currentEnvironment.serviceEnvironment = env
                 SubscriptionManager.save(subscriptionEnvironment: currentEnvironment, userDefaults: subscriptionUserDefaults)
+
+                // The VPN environment is forced to match the Subscription environment
+                let settings = VPNSettings(defaults: .netP)
+                switch env {
+                case .production:
+                    settings.selectedEnvironment = .production
+                case .staging:
+                    settings.selectedEnvironment = .staging
+                }
             }
             let updatePurchasingPlatform: (SubscriptionEnvironment.Platform) -> Void = { platform in
                 currentEnvironment.platform = platform
