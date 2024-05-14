@@ -77,23 +77,18 @@ final class PrivacyDashboardViewController: NSViewController {
     var sizeDelegate: PrivacyDashboardViewControllerSizeDelegate?
     private weak var tabViewModel: TabViewModel?
 
-    required init?(coder: NSCoder,
-                   privacyInfo: PrivacyInfo?,
-                   dashboardMode: PrivacyDashboardMode,
-                   privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
+    init(privacyInfo: PrivacyInfo? = nil,
+         dashboardMode: PrivacyDashboardMode = .dashboard,
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
         self.privacyDashboardController = PrivacyDashboardController(privacyInfo: privacyInfo,
                                                                      dashboardMode: dashboardMode,
                                                                      privacyConfigurationManager: privacyConfigurationManager,
                                                                      eventMapping: toggleReportEvents)
-        super.init(coder: coder)
+        super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
-        self.privacyDashboardController = PrivacyDashboardController(privacyInfo: nil,
-                                                                     dashboardMode: .dashboard,
-                                                                     privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
-                                                                     eventMapping: toggleReportEvents)
-        super.init(coder: coder)
+        fatalError("\(Self.self): Bad initializer")
     }
 
     public func updateTabViewModel(_ tabViewModel: TabViewModel) {
@@ -107,9 +102,14 @@ final class PrivacyDashboardViewController: NSViewController {
         }
     }
 
+    override func loadView() {
+        view = NSView(frame: NSRect(x: 0, y: 0, width: 360, height: 489))
+        initWebView()
+    }
+
     public override func viewDidLoad() {
         super.viewDidLoad()
-        initWebView()
+
         privacyDashboardController.setup(for: webView)
         privacyDashboardController.privacyDashboardNavigationDelegate = self
         privacyDashboardController.privacyDashboardDelegate = self

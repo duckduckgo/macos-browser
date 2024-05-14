@@ -39,12 +39,14 @@ final class MockAutofillPopoverPresenter: AutofillPopoverPresenter {
 
     var popoverPresentingWindow: NSWindow?
 
-    func show(positionedBelow view: NSView, withDomain domain: String?, selectedCategory category: DuckDuckGo_Privacy_Browser.SecureVaultSorting.Category?) {
+    func show(positionedBelow view: NSView, withDomain domain: String?, selectedCategory category: DuckDuckGo_Privacy_Browser.SecureVaultSorting.Category?) -> NSPopover {
         didShowWithCategory = true
+        return NSPopover()
     }
 
-    func show(positionedBelow view: NSView, withSelectedAccount: BrowserServicesKit.SecureVaultModels.WebsiteAccount) {
+    func show(positionedBelow view: NSView, withSelectedAccount: BrowserServicesKit.SecureVaultModels.WebsiteAccount) -> NSPopover {
         didShowWithSelectedAccount = true
+        return NSPopover()
     }
 
     func dismiss() {

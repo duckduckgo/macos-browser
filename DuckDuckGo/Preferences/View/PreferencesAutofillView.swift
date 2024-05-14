@@ -67,6 +67,43 @@ extension Preferences {
 
                 // Autofill Content  Button
                 PreferencePaneSection {
+
+                    // New section
+                    if model.autofillSurveyEnabled {
+                        HStack(alignment: .top, spacing: 20) {
+                            Image(.passwordsDDG128)
+                                .frame(width: 64, height: 48)
+
+                            VStack(alignment: .leading) {
+                                Text(verbatim: "Help us improve!")
+                                    .bold()
+                                Text(verbatim: "We want to make using passwords in DuckDuckGo better.")
+                                    .foregroundColor(.greyText)
+                                    .padding(.top, 1)
+
+                                HStack {
+                                    Button(action: {
+                                        model.disableAutofillSurvey()
+                                    }, label: {
+                                        Text(verbatim: "No Thanks")
+                                    })
+                                    Button(action: {
+                                        model.launchSurvey()
+                                    }, label: {
+                                        Text(verbatim: "Take Survey")
+                                    })
+                                    .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                                }
+                                .padding(.top, 12)
+                            }
+
+                            Spacer()
+                        }
+                        .padding()
+                        .roundedBorder()
+                        .padding(.bottom, 24)
+                    }
+
                     Button(UserText.autofillViewContentButton) {
                         model.showAutofillPopover()
                     }
@@ -351,7 +388,7 @@ struct BitwardenDowngradeInfoView: View, PreferencesTabOpening {
                 HStack {
                     Text("1.")
                     Button(UserText.bitwardenIncompatibleStep1, action: {
-                        openNewTab(with: URL(string: "https://github.com/bitwarden/clients/releases/download/desktop-v2024.2.1/Bitwarden-2024.2.1-universal.dmg")!)
+                        openNewTab(with: URL(string: "https://github.com/bitwarden/clients/releases/download/desktop-v2024.4.3/Bitwarden-2024.4.3-universal.dmg")!)
                     }).foregroundColor(.accentColor)
                 }
                 Text(UserText.bitwardenIncompatibleStep2)

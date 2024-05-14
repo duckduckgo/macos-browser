@@ -79,9 +79,17 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerViewFromYoutubeAutomatic
     case duckPlayerViewFromSERP
     case duckPlayerViewFromOther
-    case duckPlayerSettingAlways
-    case duckPlayerSettingNever
+    case duckPlayerOverlayYoutubeImpressions
+    case duckPlayerOverlayYoutubeWatchHere
+    case duckPlayerSettingAlwaysDuckPlayer
+    case duckPlayerSettingAlwaysOverlaySERP
+    case duckPlayerSettingAlwaysOverlayYoutube
+    case duckPlayerSettingAlwaysSettings
+    case duckPlayerSettingNeverOverlaySERP
+    case duckPlayerSettingNeverOverlayYoutube
+    case duckPlayerSettingNeverSettings
     case duckPlayerSettingBackToDefault
+    case duckPlayerWatchOnYoutube
 
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
@@ -274,10 +282,13 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncMetadataCouldNotLoadDatabase
     case syncBookmarksProviderInitializationFailed
     case syncBookmarksFailed
+    case syncBookmarksPatchCompressionFailed
     case syncCredentialsProviderInitializationFailed
     case syncCredentialsFailed
+    case syncCredentialsPatchCompressionFailed
     case syncSettingsFailed
     case syncSettingsMetadataUpdateFailed
+    case syncSettingsPatchCompressionFailed
     case syncSignupError(error: Error)
     case syncLoginError(error: Error)
     case syncLogoutError(error: Error)
@@ -410,12 +421,28 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_duck-player_view-from_serp"
         case .duckPlayerViewFromOther:
             return "m_mac_duck-player_view-from_other"
-        case .duckPlayerSettingAlways:
-            return "m_mac_duck-player_setting_always"
-        case .duckPlayerSettingNever:
-            return "m_mac_duck-player_setting_never"
+        case .duckPlayerSettingAlwaysSettings:
+            return "m_mac_duck-player_setting_always_settings"
+        case .duckPlayerOverlayYoutubeImpressions:
+            return "m_mac_duck-player_overlay_youtube_impressions"
+        case .duckPlayerOverlayYoutubeWatchHere:
+            return "m_mac_duck-player_overlay_youtube_watch_here"
+        case .duckPlayerSettingAlwaysDuckPlayer:
+            return "m_mac_duck-player_setting_always_duck-player"
+        case .duckPlayerSettingAlwaysOverlaySERP:
+            return "m_mac_duck-player_setting_always_overlay_serp"
+        case .duckPlayerSettingAlwaysOverlayYoutube:
+            return "m_mac_duck-player_setting_always_overlay_youtube"
+        case .duckPlayerSettingNeverOverlaySERP:
+            return "m_mac_duck-player_setting_never_overlay_serp"
+        case .duckPlayerSettingNeverOverlayYoutube:
+            return "m_mac_duck-player_setting_never_overlay_youtube"
+        case .duckPlayerSettingNeverSettings:
+            return "m_mac_duck-player_setting_never_settings"
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
+        case .duckPlayerWatchOnYoutube:
+            return "m_mac_duck-player_watch_on_youtube"
 
         case .dashboardProtectionAllowlistAdd:
             return "m_mac_mp_wla"
@@ -727,10 +754,13 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
         case .syncBookmarksProviderInitializationFailed: return "sync_bookmarks_provider_initialization_failed"
         case .syncBookmarksFailed: return "sync_bookmarks_failed"
+        case .syncBookmarksPatchCompressionFailed: return "sync_bookmarks_patch_compression_failed"
         case .syncCredentialsProviderInitializationFailed: return "sync_credentials_provider_initialization_failed"
         case .syncCredentialsFailed: return "sync_credentials_failed"
+        case .syncCredentialsPatchCompressionFailed: return "sync_credentials_patch_compression_failed"
         case .syncSettingsFailed: return "sync_settings_failed"
         case .syncSettingsMetadataUpdateFailed: return "sync_settings_metadata_update_failed"
+        case .syncSettingsPatchCompressionFailed: return "sync_settings_patch_compression_failed"
         case .syncSignupError: return "sync_signup_error"
         case .syncLoginError: return "sync_login_error"
         case .syncLogoutError: return "sync_logout_error"
