@@ -53,7 +53,6 @@ final class AddressBarButtonsViewController: NSViewController {
         }()
     }
 
-
     @IBOutlet weak var privacyEntryPointButton: MouseOverAnimationButton!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
     @IBOutlet weak var imageButtonWrapper: NSView!

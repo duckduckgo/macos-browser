@@ -65,15 +65,6 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     private(set) var bookmarkPopover: AddBookmarkPopover?
     private weak var bookmarkPopoverDelegate: NSPopoverDelegate?
 
-    private func bookmarkPopoverCreatingIfNeeded() -> AddBookmarkPopover {
-        return bookmarkPopover ?? {
-            let popover = AddBookmarkPopover()
-            popover.delegate = self
-            self.bookmarkPopover = popover
-            return popover
-        }()
-    }
-
     private let networkProtectionPopoverManager: NetPPopoverManager
 
     private var popoverIsShownCancellables = Set<AnyCancellable>()
@@ -234,9 +225,11 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     func showEditBookmarkPopover(with bookmark: Bookmark, isNew: Bool, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
         guard closeTransientPopovers() else { return }
 
-        let bookmarkPopover = bookmarkPopoverCreatingIfNeeded()
+        let bookmarkPopover = AddBookmarkPopover()
+        bookmarkPopover.delegate = self
         bookmarkPopover.isNew = isNew
         bookmarkPopover.bookmark = bookmark
+        self.bookmarkPopover = bookmarkPopover
         self.bookmarkPopoverDelegate = delegate
         show(bookmarkPopover, positionedBelow: button)
     }

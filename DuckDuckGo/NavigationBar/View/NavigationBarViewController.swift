@@ -625,7 +625,7 @@ final class NavigationBarViewController: NSViewController {
                     !update.item.isBurner,
                     WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window {
 
-                    self.popovers.showDownloadsPopoverAndAutoHide(usingView: downloadsButton,
+                    self.popovers.showDownloadsPopoverAndAutoHide(from: downloadsButton,
                                                                   popoverDelegate: self,
                                                                   downloadsDelegate: self)
                 } else if update.item.isBurner {
