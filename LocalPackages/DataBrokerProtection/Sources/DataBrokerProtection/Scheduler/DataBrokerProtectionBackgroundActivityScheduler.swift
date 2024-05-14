@@ -34,8 +34,6 @@ public protocol DataBrokerProtectionBackgroundActivitySchedulerDelegate: AnyObje
 public final class DefaultDataBrokerProtectionBackgroundActivityScheduler: DataBrokerProtectionBackgroundActivityScheduler {
 
     private enum SchedulerCycle {
-        // Arbitrary numbers for now
-
         static let interval: TimeInterval = 20 * 60 // 20 minutes
         static let tolerance: TimeInterval = 10 * 60 // 10 minutes
     }
