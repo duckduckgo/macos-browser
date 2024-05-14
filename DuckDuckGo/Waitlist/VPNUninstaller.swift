@@ -153,7 +153,7 @@ final class VPNUninstaller: VPNUninstalling {
             // We can do this optimistically as it has little if any impact.
             unpinNetworkProtection()
 
-            guard false && !isDisabling else {
+            guard !isDisabling else {
                 throw UninstallError.cancelled(reason: .alreadyUninstalling)
             }
 
@@ -207,11 +207,11 @@ final class VPNUninstaller: VPNUninstalling {
             notifyVPNUninstalled()
             isDisabling = false
 
-            pixelKit?.fire(IPCUninstallAttempt.success)
+            pixelKit?.fire(IPCUninstallAttempt.success, frequency: .dailyAndCount)
         } catch UninstallError.cancelled(let reason) {
-            pixelKit?.fire(IPCUninstallAttempt.cancelled(reason))
+            pixelKit?.fire(IPCUninstallAttempt.cancelled(reason), frequency: .dailyAndCount)
         } catch {
-            pixelKit?.fire(IPCUninstallAttempt.failure(error))
+            pixelKit?.fire(IPCUninstallAttempt.failure(error), frequency: .dailyAndCount)
         }
     }
 
