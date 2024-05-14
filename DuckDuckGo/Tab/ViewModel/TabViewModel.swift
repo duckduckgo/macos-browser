@@ -79,7 +79,9 @@ final class TabViewModel {
     private (set) var zoomLevel: DefaultZoomValue = .percent100 {
         didSet {
             self.tab.webView.zoomLevel = zoomLevel
-            zoomLevelSubject.send(zoomLevel)
+            if oldValue != zoomLevel {
+                zoomLevelSubject.send(zoomLevel)
+            }
         }
     }
 
@@ -268,9 +270,7 @@ final class TabViewModel {
         guard let urlString = tab.url?.absoluteString else { return }
         guard !tab.burnerMode.isBurner else { return }
         let zoomToApply: DefaultZoomValue = accessibilityPreferences.zoomPerWebsite(url: urlString) ?? accessibilityPreferences.defaultPageZoom
-        if self.zoomLevel != zoomToApply {
-            self.zoomLevel = zoomToApply
-        }
+        self.zoomLevel = zoomToApply
     }
 
     private func subscribeToWebViewDidFinishNavigation() {
@@ -420,6 +420,7 @@ final class TabViewModel {
     func reload() {
         tab.reload()
         updateAddressBarStrings()
+        self.updateZoomForWebsite()
     }
 
     private func errorFaviconToShow(error: WKError?) -> NSImage {
