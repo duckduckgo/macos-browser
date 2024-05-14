@@ -57,8 +57,8 @@ public final class DataBrokerProtectionManager {
         self.authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager()
     }
 
-    public func shouldAskForInviteCode() -> Bool {
-        authenticationManager.shouldAskForInviteCode()
+    public func isUserAuthenticated() -> Bool {
+        authenticationManager.isUserAuthenticated
     }
 
     // MARK: - Debugging Features
