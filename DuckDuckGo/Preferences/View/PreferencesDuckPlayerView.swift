@@ -17,6 +17,7 @@
 //
 
 import PreferencesViews
+import PixelKit
 import SwiftUI
 import SwiftUIExtensions
 
@@ -30,6 +31,14 @@ extension Preferences {
                 model.duckPlayerMode
             } set: { newValue in
                 model.duckPlayerMode = newValue
+                switch model.duckPlayerMode {
+                case .enabled:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysSettings)
+                case .alwaysAsk:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
+                case .disabled:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingNeverSettings)
+                }
             }
         }
 

@@ -44,8 +44,8 @@ struct SyncWarningMessage: View {
                         .padding(.top, 8)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.leading, -12)
         .frame(maxWidth: .infinity)
         .padding()
         .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color(.alertBubbleBackground)))

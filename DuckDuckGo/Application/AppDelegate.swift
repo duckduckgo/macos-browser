@@ -424,7 +424,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #else
         let environment = defaultEnvironment
 #endif
-        let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
+        let syncErrorHandler = SyncErrorHandler()
+        let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db, syncErrorHandler: syncErrorHandler)
         let syncService = DDGSync(
             dataProvidersSource: syncDataProviders,
             errorEvents: SyncErrorHandler(),
@@ -449,7 +450,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .filter { $0 }
             .asVoid()
             .sink { [weak syncService] in
-                PixelKit.fire(GeneralPixel.syncDaily, frequency: .daily)
+                PixelKit.fire(GeneralPixel.syncDaily, frequency: .legacyDaily)
                 syncService?.syncDailyStats.sendStatsIfNeeded(handler: { params in
                     PixelKit.fire(GeneralPixel.syncSuccessRateDaily, withAdditionalParameters: params)
                 })
@@ -532,7 +533,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func emailDidSignInNotification(_ notification: Notification) {
-        PixelKit.fire(GeneralPixel.emailEnabled)
+        PixelKit.fire(NonStandardEvent(NonStandardPixel.emailEnabled))
         if AppDelegate.isNewUser {
             PixelKit.fire(GeneralPixel.emailEnabledInitial, frequency: .legacyInitial)
         }
@@ -543,7 +544,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func emailDidSignOutNotification(_ notification: Notification) {
-        PixelKit.fire(GeneralPixel.emailDisabled)
+        PixelKit.fire(NonStandardEvent(NonStandardPixel.emailDisabled))
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
             syncService?.scheduler.notifyDataChanged()
         }

@@ -87,7 +87,7 @@ final class MoreOptionsMenu: NSMenu {
         setupMenuItems()
     }
 
-    let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
+    let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "").withImage(.optionsButtonMenuZoom)
 
     private func setupMenuItems() {
 
@@ -524,7 +524,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
             let pixelParameters = self.emailManager.emailPixelParameters
             self.emailManager.updateLastUseDate()
 
-            PixelKit.fire(GeneralPixel.emailUserCreatedAlias, withAdditionalParameters: pixelParameters)
+            PixelKit.fire(NonStandardEvent(NonStandardPixel.emailUserCreatedAlias), withAdditionalParameters: pixelParameters)
 
             NSPasteboard.general.copy(address)
             NotificationCenter.default.post(name: NSNotification.Name.privateEmailCopiedToClipboard, object: nil)
