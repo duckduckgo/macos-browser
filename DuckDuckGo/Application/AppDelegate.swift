@@ -184,6 +184,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
         let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        
+        // The VPN environment is forced to match the subscription environment
+        let settings = VPNSettings(defaults: UserDefaults.netP)
+        switch subscriptionEnvironment.serviceEnvironment {
+        case .production:
+            settings.selectedEnvironment = .production
+        case .staging:
+            settings.selectedEnvironment = .staging
+        }
+
         let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
                                                                  key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))

@@ -272,7 +272,7 @@ final class NavigationBarViewController: NSViewController {
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
-                                   networkProtectionFeatureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager), 
+                                   networkProtectionFeatureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
                                    internalUserDecider: internalUserDecider,
                                    accountManager: subscriptionManager.accountManager)
         menu.actionDelegate = self

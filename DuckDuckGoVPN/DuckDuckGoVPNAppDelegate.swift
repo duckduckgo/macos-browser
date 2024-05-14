@@ -48,8 +48,16 @@ final class DuckDuckGoVPNApplication: NSApplication {
         let settings = VPNSettings(defaults: UserDefaults.netP)
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
-        //        let subscriptionEnvironment: SubscriptionEnvironment.ServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
-        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults) // TODO: the subscription environment should be matching to the VPNSettings environment, what should we do?
+        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+
+        // The VPN environment is forced to match the subscription environment
+        switch subscriptionEnvironment.serviceEnvironment {
+        case .production:
+            settings.selectedEnvironment = .production
+        case .staging:
+            settings.selectedEnvironment = .staging
+        }
+
         let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
