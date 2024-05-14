@@ -20,9 +20,9 @@ import XCTest
 import Foundation
 @testable import DataBrokerProtection
 
-final class DataBrokerProtectionProcessorConfigurationTests: XCTestCase {
+final class DataBrokerExecutionConfigTests: XCTestCase {
 
-    private let sut = DataBrokerProtectionProcessorConfiguration()
+    private let sut = DataBrokerExecutionConfig()
 
     func testWhenOperationIsManualScans_thenConcurrentOperationsBetweenBrokersIsSix() {
         let value = sut.concurrentOperationsFor(.scan)

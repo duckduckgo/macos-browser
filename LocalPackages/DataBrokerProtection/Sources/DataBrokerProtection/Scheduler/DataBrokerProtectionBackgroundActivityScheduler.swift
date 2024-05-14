@@ -24,7 +24,7 @@ public protocol DataBrokerProtectionBackgroundActivityScheduler {
     func startScheduler()
     var delegate: DataBrokerProtectionBackgroundActivitySchedulerDelegate? { get set }
 
-    var lastTriggerTimestamp: Date? { get set }
+    var lastTriggerTimestamp: Date? { get }
 }
 
 public protocol DataBrokerProtectionBackgroundActivitySchedulerDelegate: AnyObject {
@@ -33,23 +33,18 @@ public protocol DataBrokerProtectionBackgroundActivitySchedulerDelegate: AnyObje
 
 public final class DefaultDataBrokerProtectionBackgroundActivityScheduler: DataBrokerProtectionBackgroundActivityScheduler {
 
-    private enum SchedulerCycle {
-        static let interval: TimeInterval = 20 * 60 // 20 minutes
-        static let tolerance: TimeInterval = 10 * 60 // 10 minutes
-    }
-
     private let activity: NSBackgroundActivityScheduler
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
 
     public weak var delegate: DataBrokerProtectionBackgroundActivitySchedulerDelegate?
-    public var lastTriggerTimestamp: Date?
+    public private(set) var lastTriggerTimestamp: Date?
 
-    public init() {
+    public init(config: DataBrokerExecutionConfig) {
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
         activity.repeats = true
-        activity.interval = SchedulerCycle.interval
-        activity.tolerance = SchedulerCycle.tolerance
-        activity.qualityOfService = QualityOfService.background
+        activity.interval = config.activitySchedulerTriggerInterval
+        activity.tolerance = config.activitySchedulerIntervalTolerance
+        activity.qualityOfService = config.activitySchedulerQOS
     }
 
     public func startScheduler() {

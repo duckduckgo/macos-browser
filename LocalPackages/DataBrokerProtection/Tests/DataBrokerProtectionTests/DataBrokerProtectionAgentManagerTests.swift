@@ -53,7 +53,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockDataManager = MockDataBrokerProtectionDataManager(pixelHandler: mockPixelHandler, fakeBrokerFlag: fakeBroker)
 
         mockDependencies = DefaultDataBrokerOperationDependencies(database: mockDatabase,
-                                                                  config: DataBrokerProtectionProcessorConfiguration(),
+                                                                  config: DataBrokerExecutionConfig(),
                                                                   runnerProvider: MockRunnerProvider(),
                                                                   notificationCenter: .default,
                                                                   pixelHandler: mockPixelHandler,

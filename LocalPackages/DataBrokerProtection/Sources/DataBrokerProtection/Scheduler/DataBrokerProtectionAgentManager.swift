@@ -26,7 +26,10 @@ public class DataBrokerProtectionAgentManagerProvider {
     // swiftlint:disable:next function_body_length
     public static func agentManager() -> DataBrokerProtectionAgentManager {
         let pixelHandler = DataBrokerProtectionPixelsHandler()
-        let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler()
+
+        let executionConfig = DataBrokerExecutionConfig()
+        let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler(config: executionConfig)
+
         let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
         let privacyConfigurationManager = PrivacyConfigurationManagingMock() // Forgive me, for I have sinned
         let ipcServer = DefaultDataBrokerProtectionIPCServer(machServiceName: Bundle.main.bundleIdentifier!)
@@ -72,7 +75,7 @@ public class DataBrokerProtectionAgentManagerProvider {
                                                          captchaService: captchaService)
          let operationDependencies = DefaultDataBrokerOperationDependencies(
             database: dataManager.database,
-            config: DataBrokerProtectionProcessorConfiguration(),
+            config: executionConfig,
             runnerProvider: runnerProvider,
             notificationCenter: NotificationCenter.default,
             pixelHandler: pixelHandler,

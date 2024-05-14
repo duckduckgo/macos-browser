@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionProcessorConfiguration.swift
+//  DataBrokerExecutionConfig.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,13 +18,12 @@
 
 import Foundation
 
-struct DataBrokerProtectionProcessorConfiguration {
-    // Arbitrary numbers for now
+public struct DataBrokerExecutionConfig {
     let intervalBetweenSameBrokerOperations: TimeInterval = 2
+
     private let concurrentOperationsDifferentBrokers: Int = 2
     // https://app.asana.com/0/481882893211075/1206981742767469/f
     private let concurrentOperationsOnManualScans: Int = 6
-
     func concurrentOperationsFor(_ operation: OperationType) -> Int {
         switch operation {
         case .all, .optOut:
@@ -33,4 +32,8 @@ struct DataBrokerProtectionProcessorConfiguration {
             return concurrentOperationsOnManualScans
         }
     }
+
+    let activitySchedulerTriggerInterval: TimeInterval = 20 * 60 // 20 minutes
+    let activitySchedulerIntervalTolerance: TimeInterval = 10 * 60 // 10 minutes
+    let activitySchedulerQOS: QualityOfService = .background
 }

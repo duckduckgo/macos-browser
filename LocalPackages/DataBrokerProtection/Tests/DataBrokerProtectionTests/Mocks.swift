@@ -1027,6 +1027,7 @@ extension DataBroker {
 }
 
 final class MockDataBrokerProtectionOperationQueueManager: DataBrokerProtectionQueueManager {
+    var debugRunningStatusString: String { return "" }
 
     var startImmediateOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
     var startScheduledOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
@@ -1307,7 +1308,7 @@ final class MockDataBrokerOperationErrorDelegate: DataBrokerOperationErrorDelega
 extension DefaultDataBrokerOperationDependencies {
     static var mock: DefaultDataBrokerOperationDependencies {
         DefaultDataBrokerOperationDependencies(database: MockDatabase(),
-                                               config: DataBrokerProtectionProcessorConfiguration(),
+                                               config: DataBrokerExecutionConfig(),
                                                runnerProvider: MockRunnerProvider(),
                                                notificationCenter: .default,
                                                pixelHandler: MockPixelHandler(),
