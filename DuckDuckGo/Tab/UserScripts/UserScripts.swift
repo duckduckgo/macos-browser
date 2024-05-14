@@ -75,7 +75,7 @@ final class UserScripts: UserScriptsProvider {
             youtubePlayerUserScript = nil
         }
 
-        userScripts.append(autoconsentUserScript)
+//        userScripts.append(autoconsentUserScript)
 
         if let youtubeOverlayScript {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
@@ -88,31 +88,31 @@ final class UserScripts: UserScriptsProvider {
             if let youtubePlayerUserScript {
                 specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
             }
-            userScripts.append(specialPages)
+//            userScripts.append(specialPages)
         }
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
-            userScripts.append(subscriptionPagesUserScript)
+//            userScripts.append(subscriptionPagesUserScript)
 
             identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())
-            userScripts.append(identityTheftRestorationPagesUserScript)
+//            userScripts.append(identityTheftRestorationPagesUserScript)
         }
     }
 
     lazy var userScripts: [UserScript] = [
-        debugScript,
-        faviconScript,
-        contextMenuScript,
-        surrogatesScript,
-        contentBlockerRulesScript,
-        pageObserverScript,
-        printingUserScript,
-        hoverUserScript,
-        clickToLoadScript,
-        contentScopeUserScript,
-        contentScopeUserScriptIsolated,
-        autofillScript
+//        debugScript,
+//        faviconScript,
+//        contextMenuScript,
+//        surrogatesScript,
+//        contentBlockerRulesScript,
+//        pageObserverScript,
+//        printingUserScript,
+//        hoverUserScript,
+//        clickToLoadScript,
+//        contentScopeUserScript,
+//        contentScopeUserScriptIsolated,
+//        autofillScript
     ]
 
     @MainActor
@@ -125,7 +125,7 @@ final class UserScripts: UserScriptsProvider {
                 }
             }
             for await result in group {
-                wkUserScripts.append(result.wkUserScript)
+//                wkUserScripts.append(result.wkUserScript)
             }
 
             return wkUserScripts

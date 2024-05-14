@@ -119,6 +119,8 @@
 		1DB9618329F67F6200CF5568 /* FaviconNullStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */; };
 		1DC669702B6CF0D700AA0645 /* TabSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC6696F2B6CF0D700AA0645 /* TabSnapshotStore.swift */; };
 		1DC669712B6CF0D700AA0645 /* TabSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC6696F2B6CF0D700AA0645 /* TabSnapshotStore.swift */; };
+		1DCD21B52BF35CF30094C093 /* emoji-substitution in Resources */ = {isa = PBXBuildFile; fileRef = 1DCD21B42BF35CF30094C093 /* emoji-substitution */; };
+		1DCD21B62BF35CF30094C093 /* emoji-substitution in Resources */ = {isa = PBXBuildFile; fileRef = 1DCD21B42BF35CF30094C093 /* emoji-substitution */; };
 		1DCFBC8A29ADF32B00313531 /* BurnerHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */; };
 		1DCFBC8B29ADF32B00313531 /* BurnerHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */; };
 		1DDC84F72B83558F00670238 /* PreferencesPrivateSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDC84F62B83558F00670238 /* PreferencesPrivateSearchView.swift */; };
@@ -2845,6 +2847,7 @@
 		1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderMock.swift; sourceTree = "<group>"; };
 		1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconNullStore.swift; sourceTree = "<group>"; };
 		1DC6696F2B6CF0D700AA0645 /* TabSnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSnapshotStore.swift; sourceTree = "<group>"; };
+		1DCD21B42BF35CF30094C093 /* emoji-substitution */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "emoji-substitution"; sourceTree = "<group>"; };
 		1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurnerHomePageView.swift; sourceTree = "<group>"; };
 		1DDC84F62B83558F00670238 /* PreferencesPrivateSearchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesPrivateSearchView.swift; sourceTree = "<group>"; };
 		1DDC84FA2B8356CE00670238 /* PreferencesDefaultBrowserView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesDefaultBrowserView.swift; sourceTree = "<group>"; };
@@ -3434,7 +3437,6 @@
 		85AC3B4825DAC9BD00C7D2AA /* ConfigurationStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationStorageTests.swift; sourceTree = "<group>"; };
 		85AC7ADA27BD628400FFB69B /* HomePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePage.swift; sourceTree = "<group>"; };
 		85AC7ADC27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageDefaultBrowserModel.swift; sourceTree = "<group>"; };
-		85AE2FF124A33A2D002D507F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		85B7184927677C2D00B4277F /* Onboarding.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Onboarding.storyboard; sourceTree = "<group>"; };
 		85B7184B27677C6500B4277F /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		85B7184D27677CBB00B4277F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -4380,6 +4382,7 @@
 		1D1380622BF20900002C4C66 /* WebExtensions */ = {
 			isa = PBXGroup;
 			children = (
+				1DCD21B42BF35CF30094C093 /* emoji-substitution */,
 				1D13805D2BF20900002C4C66 /* WebExtensionManager.swift */,
 				1D13805E2BF20900002C4C66 /* WebExtensions.h */,
 				1D13805F2BF20900002C4C66 /* WKWebExtensionTab.swift */,
@@ -6148,7 +6151,6 @@
 			children = (
 				B6E6B9ED2BA1FB4D008AA7E1 /* AppKit.framework */,
 				B6F7128029F681EB00594A45 /* QuickLookUI.framework */,
-				85AE2FF124A33A2D002D507F /* WebKit.framework */,
 				4B4D603E2A0B290200BCD287 /* NetworkExtension.framework */,
 			);
 			name = Frameworks;
@@ -8900,6 +8902,7 @@
 				3706FCDA293F65D500E42796 /* dark-trackers-1.json in Resources */,
 				3706FCDB293F65D500E42796 /* Feedback.storyboard in Resources */,
 				B658BAB72B0F848D00D1F2C7 /* Localizable.xcstrings in Resources */,
+				1DCD21B62BF35CF30094C093 /* emoji-substitution in Resources */,
 				3706FCDF293F65D500E42796 /* shield-mouse-over.json in Resources */,
 				3706FCE1293F65D500E42796 /* PermissionAuthorization.storyboard in Resources */,
 				3706FCE2293F65D500E42796 /* dark-trackers-3.json in Resources */,
@@ -9094,6 +9097,7 @@
 				AA34397C2754D55100B241FA /* dark-trackers-1.json in Resources */,
 				AA3863C527A1E28F00749AB5 /* Feedback.storyboard in Resources */,
 				B658BAB62B0F845D00D1F2C7 /* Localizable.xcstrings in Resources */,
+				1DCD21B52BF35CF30094C093 /* emoji-substitution in Resources */,
 				AA7EB6E727E8809D00036718 /* shield-mouse-over.json in Resources */,
 				B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */,
 				AA34397D2754D55100B241FA /* dark-trackers-3.json in Resources */,
@@ -12171,6 +12175,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37717E66296B5A20002FAEDF /* Global.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../WebKit/WebKitBuild/Release";
 			};
 			name = CI;
 		};
@@ -12178,6 +12183,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../WebKit/WebKitBuild/Release";
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = CI;
@@ -12473,6 +12479,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37717E66296B5A20002FAEDF /* Global.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../WebKit/WebKitBuild/Release";
 			};
 			name = Debug;
 		};
@@ -12480,6 +12487,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37717E66296B5A20002FAEDF /* Global.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../WebKit/WebKitBuild/Release";
 			};
 			name = Release;
 		};
@@ -12487,6 +12495,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../WebKit/WebKitBuild/Release";
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = Debug;
@@ -12495,6 +12504,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../WebKit/WebKitBuild/Release";
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = Release;
@@ -12517,6 +12527,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37717E66296B5A20002FAEDF /* Global.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../WebKit/WebKitBuild/Release";
 			};
 			name = Review;
 		};
@@ -12524,6 +12535,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../WebKit/WebKitBuild/Release";
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = Review;

@@ -207,12 +207,17 @@ protocol NewWindowPolicyDecisionMaker {
         self.tabsPreferences = tabsPreferences
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
-                                                 burnerMode: burnerMode)
+        var extensionController: _WKWebExtensionController?
+        // This must be done before initializing WKWebView with the configuration
+        if #available(macOS 13.1, *) {
+            WebExtensionManager.shared.setUpWebExtensionController(for: configuration)
+        }
+        
+        configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking, burnerMode: burnerMode)
         self.webViewConfiguration = configuration
-        let userContentController = configuration.userContentController as? UserContentController
-        assert(userContentController != nil)
-        self.userContentController = userContentController
+//        let userContentController = configuration.userContentController as? UserContentController
+//        assert(userContentController != nil)
+//        self.userContentController = userContentController
 
         webView = WebView(frame: CGRect(origin: .zero, size: webViewSize), configuration: configuration)
         webView.allowsLinkPreview = false

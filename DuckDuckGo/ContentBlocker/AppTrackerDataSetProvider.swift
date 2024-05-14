@@ -39,7 +39,6 @@ final class AppTrackerDataSetProvider: EmbeddedDataProvider {
     }
 
     static func loadEmbeddedAsData() -> Data {
-        let json = try? Data(contentsOf: embeddedUrl)
-        return json!
+        return Data()
     }
 }

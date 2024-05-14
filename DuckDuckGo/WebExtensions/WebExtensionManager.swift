@@ -63,19 +63,19 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     lazy var extensions: [_WKWebExtension] = {
         // Bundled extensions
         let emoji = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "emoji-substitution", ofType: nil)!)
-        let openMyPageButton = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "open-my-page-button", ofType: nil)!)
-        let tabs = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "tabs-tabs-tabs", ofType: nil)!)
-        let urlBlocker = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "url-blocker", ofType: nil)!)
+//        let openMyPageButton = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "open-my-page-button", ofType: nil)!)
+//        let tabs = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "tabs-tabs-tabs", ofType: nil)!)
+//        let urlBlocker = WebExtensionManager.loadWebExtension(path: Bundle.main.path(forResource: "url-blocker", ofType: nil)!)
 
         // Popular extensions
-        let bitwarden = WebExtensionManager.loadWebExtension(path: "/Applications/Bitwarden.app/Contents/PlugIns/safari.appex/Contents/Resources/")
-        let lastpass = WebExtensionManager.loadWebExtension(path: "/Applications/LastPass.app/Contents/PlugIns/safariext.appex/Contents/Resources/")
-        let dashlane = WebExtensionManager.loadWebExtension(path: "/Applications/Dashlane.app/Contents/PlugIns/SafariWebExtension (macOS).appex/Contents/Resources/")
-        let nordpass = WebExtensionManager.loadWebExtension(path: "/Applications/NordPass® Password Manager & Digital Vault.app/Contents/PlugIns/NordPass® Password Manager & Digital Vault Extension.appex/Contents/Resources/")
-        let adBlock = WebExtensionManager.loadWebExtension(path: "/Applications/NordPass® Password Manager & Digital Vault.app/Contents/PlugIns/NordPass® Password Manager & Digital Vault Extension.appex/Contents/Resources/")
-        let nightEye = WebExtensionManager.loadWebExtension(path: "/Applications/Night Eye.app/Contents/PlugIns/Night Eye Extension.appex/Contents/Resources/")
+//        let bitwarden = WebExtensionManager.loadWebExtension(path: "/Applications/Bitwarden.app/Contents/PlugIns/safari.appex/Contents/Resources/")
+//        let lastpass = WebExtensionManager.loadWebExtension(path: "/Applications/LastPass.app/Contents/PlugIns/safariext.appex/Contents/Resources/")
+//        let dashlane = WebExtensionManager.loadWebExtension(path: "/Applications/Dashlane.app/Contents/PlugIns/SafariWebExtension (macOS).appex/Contents/Resources/")
+//        let nordpass = WebExtensionManager.loadWebExtension(path: "/Applications/NordPass® Password Manager & Digital Vault.app/Contents/PlugIns/NordPass® Password Manager & Digital Vault Extension.appex/Contents/Resources/")
+//        let adBlock = WebExtensionManager.loadWebExtension(path: "/Applications/NordPass® Password Manager & Digital Vault.app/Contents/PlugIns/NordPass® Password Manager & Digital Vault Extension.appex/Contents/Resources/")
+//        let nightEye = WebExtensionManager.loadWebExtension(path: "/Applications/Night Eye.app/Contents/PlugIns/Night Eye Extension.appex/Contents/Resources/")
 
-        return [emoji!]
+        return [bitwarden!]
     }()
 
     // Context manages the extension's permissions and allows it to inject content, run background logic, show popovers, and display other web-based UI to the user.

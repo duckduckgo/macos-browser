@@ -47,6 +47,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var downloadsButton: MouseOverButton!
     @IBOutlet weak var networkProtectionButton: MouseOverButton!
     @IBOutlet weak var navigationButtons: NSStackView!
+    @IBOutlet weak var rightButtons: NSStackView!
     @IBOutlet weak var addressBarContainer: NSView!
     @IBOutlet weak var daxLogo: NSImageView!
     @IBOutlet weak var addressBarStack: NSStackView!
@@ -167,6 +168,12 @@ final class NavigationBarViewController: NSViewController {
 #if DEBUG || REVIEW
         addDebugNotificationListeners()
 #endif
+
+        if #available(macOS 13.1, *) {
+            WebExtensionManager.shared.toolbarButtons().enumerated().forEach { (index, button) in
+                rightButtons.insertArrangedSubview(button, at: index)
+            }
+        }
     }
 
     override func viewWillAppear() {
