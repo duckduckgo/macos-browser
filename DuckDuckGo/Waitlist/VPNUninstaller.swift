@@ -18,11 +18,12 @@
 
 import BrowserServicesKit
 import Common
+import LoginItems
 import NetworkExtension
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
-import LoginItems
+import PixelKit
 import SystemExtensions
 
 protocol VPNUninstalling {
@@ -63,6 +64,51 @@ final class VPNUninstaller: VPNUninstalling {
         }
     }
 
+    enum IPCUninstallAttempt: PixelKitEventV2 {
+        case begin
+        case cancelled(_ reason: UninstallCancellationReason)
+        case success
+        case failure(_ error: Error)
+
+        var name: String {
+            switch self {
+            case .begin:
+                return "vpn_browser_uninstall_attempt_ipc"
+
+            case .cancelled:
+                return "vpn_browser_uninstall_cancelled_ipc"
+
+            case .success:
+                return "vpn_browser_uninstall_success_ipc"
+
+            case .failure:
+                return "vpn_browser_uninstall_failure_ipc"
+            }
+        }
+
+        var parameters: [String: String]? {
+            switch self {
+            case .begin,
+                    .success,
+                    .failure:
+                return nil
+            case .cancelled(let reason):
+                return ["reason": reason.rawValue]
+            }
+        }
+
+        var error: Error? {
+            switch self {
+            case .begin,
+                    .cancelled,
+                    .success:
+                return nil
+            case .failure(let error):
+                return error
+            }
+        }
+    }
+
     private let log: OSLog
     private let loginItemsManager: LoginItemsManaging
     private let pinningManager: LocalPinningManager
@@ -70,6 +116,7 @@ final class VPNUninstaller: VPNUninstalling {
     private let userDefaults: UserDefaults
     private let vpnMenuLoginItem: LoginItem
     private let ipcClient: TunnelControllerIPCClient
+    private let pixelKit: PixelFiring?
 
     @MainActor
     private var isDisabling = false
@@ -80,6 +127,7 @@ final class VPNUninstaller: VPNUninstalling {
          settings: VPNSettings = .init(defaults: .netP),
          ipcClient: TunnelControllerIPCClient = TunnelControllerIPCClient(),
          vpnMenuLoginItem: LoginItem = .vpnMenu,
+         pixelKit: PixelFiring? = PixelKit.shared,
          log: OSLog = .networkProtection) {
 
         self.log = log
@@ -89,6 +137,7 @@ final class VPNUninstaller: VPNUninstalling {
         self.userDefaults = userDefaults
         self.vpnMenuLoginItem = vpnMenuLoginItem
         self.ipcClient = ipcClient
+        self.pixelKit = pixelKit
     }
 
     /// This method disables the VPN and clear all of its state.
@@ -98,62 +147,72 @@ final class VPNUninstaller: VPNUninstalling {
     ///
     @MainActor
     func uninstall(removeSystemExtension: Bool) async throws {
-        // We can do this optimistically as it has little if any impact.
-        unpinNetworkProtection()
-
-        guard !isDisabling else {
-            throw UninstallError.cancelled(reason: .alreadyUninstalling)
-        }
-
-        guard vpnMenuLoginItem.status.isInstalled else {
-            throw UninstallError.cancelled(reason: .alreadyUninstalled)
-        }
-
-        isDisabling = true
-
-        defer {
-            resetUserDefaults(uninstallSystemExtension: removeSystemExtension)
-        }
+        pixelKit?.fire(IPCUninstallAttempt.begin)
 
         do {
-            try enableLoginItems()
-        } catch {
-            throw UninstallError.runAgentError(error)
-        }
+            // We can do this optimistically as it has little if any impact.
+            unpinNetworkProtection()
 
-        // Allow some time for the login items to fully launch
-        try? await Task.sleep(interval: 0.5)
-
-        if removeSystemExtension {
-            do {
-                try await self.removeSystemExtension()
-            } catch {
-                throw UninstallError.systemExtensionError(error)
+            guard false && !isDisabling else {
+                throw UninstallError.cancelled(reason: .alreadyUninstalling)
             }
-        }
 
-        var attemptNumber = 1
-        while attemptNumber <= 3 {
+            guard vpnMenuLoginItem.status.isInstalled else {
+                throw UninstallError.cancelled(reason: .alreadyUninstalled)
+            }
+
+            isDisabling = true
+
+            defer {
+                resetUserDefaults(uninstallSystemExtension: removeSystemExtension)
+            }
+
             do {
-                try await removeVPNConfiguration()
-                break // Removal succeeded, break out of the while loop and continue with the rest of uninstallation
+                try enableLoginItems()
             } catch {
-                print("Failed to remove VPN configuration, with error: \(error.localizedDescription)")
+                throw UninstallError.runAgentError(error)
+            }
 
-                if attemptNumber == 3 {
-                    throw UninstallError.vpnConfigurationError(error)
+            // Allow some time for the login items to fully launch
+            try? await Task.sleep(interval: 0.5)
+
+            if removeSystemExtension {
+                do {
+                    try await self.removeSystemExtension()
+                } catch {
+                    throw UninstallError.systemExtensionError(error)
                 }
             }
 
-            attemptNumber += 1
+            var attemptNumber = 1
+            while attemptNumber <= 3 {
+                do {
+                    try await removeVPNConfiguration()
+                    break // Removal succeeded, break out of the while loop and continue with the rest of uninstallation
+                } catch {
+                    print("Failed to remove VPN configuration, with error: \(error.localizedDescription)")
+
+                    if attemptNumber == 3 {
+                        throw UninstallError.vpnConfigurationError(error)
+                    }
+                }
+
+                attemptNumber += 1
+            }
+
+            // We want to give some time for the login item to reset state before disabling it
+            try? await Task.sleep(interval: 0.5)
+            disableLoginItems()
+
+            notifyVPNUninstalled()
+            isDisabling = false
+
+            pixelKit?.fire(IPCUninstallAttempt.success)
+        } catch UninstallError.cancelled(let reason) {
+            pixelKit?.fire(IPCUninstallAttempt.cancelled(reason))
+        } catch {
+            pixelKit?.fire(IPCUninstallAttempt.failure(error))
         }
-
-        // We want to give some time for the login item to reset state before disabling it
-        try? await Task.sleep(interval: 0.5)
-        disableLoginItems()
-
-        notifyVPNUninstalled()
-        isDisabling = false
     }
 
     private func enableLoginItems() throws {
