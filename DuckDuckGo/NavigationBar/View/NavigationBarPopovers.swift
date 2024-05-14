@@ -165,7 +165,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     }
 
     private var downloadsPopoverTimer: Timer?
-    func showDownloadsPopoverAndAutoHide(usingView button: MouseOverButton, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
+    func showDownloadsPopoverAndAutoHide(from button: MouseOverButton, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
         let timerBlock: (Timer) -> Void = { [weak self] _ in
             self?.downloadsPopoverTimer?.invalidate()
             self?.downloadsPopoverTimer = nil
