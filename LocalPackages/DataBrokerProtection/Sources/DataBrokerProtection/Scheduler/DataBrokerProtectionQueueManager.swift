@@ -80,6 +80,7 @@ protocol DataBrokerProtectionQueueManager {
                                              completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
 
     func execute(_ command: DataBrokerProtectionQueueManagerDebugCommand)
+    var debugRunningStatusString: String { get }
 }
 
 final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueManager {
@@ -92,6 +93,16 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
 
     private var mode = DataBrokerProtectionQueueMode.idle
     private var operationErrors: [Error] = []
+
+    var debugRunningStatusString: String {
+        switch mode {
+        case .idle:
+            return "idle"
+        case .immediate(let completion),
+                .scheduled(let completion):
+            return "running"
+        }
+    }
 
     init(operationQueue: DataBrokerProtectionOperationQueue,
          operationsCreator: DataBrokerOperationsCreator,
