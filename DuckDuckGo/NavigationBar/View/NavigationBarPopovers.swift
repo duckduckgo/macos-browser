@@ -45,10 +45,6 @@ extension PopoverPresenter {
     }
 }
 
-protocol PrivacyDashboardPopoverPresenter {
-
-}
-
 final class NavigationBarPopovers: NSObject, PopoverPresenter {
 
     enum Constants {

@@ -465,7 +465,7 @@ final class NavigationBarViewController: NSViewController {
             setDownloadButtonHidingTimer()
         }
 
-        popovers.toggleDownloadsPopover(usingView: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
+        popovers.toggleDownloadsPopover(from: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
     }
 
     func showPasswordManagerPopover(selectedCategory: SecureVaultSorting.Category?) {
