@@ -118,11 +118,17 @@ protocol XPCServerInterface {
     func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
 }
 
-public final class DataBrokerProtectionIPCServer {
+protocol DataBrokerProtectionIPCServer: IPCClientInterface, XPCServerInterface {
+    var serverDelegate: DataBrokerProtectionAppToAgentInterface? { get set }
+
+    init(machServiceName: String)
+
+    func activate()
+}
+
+public final class DefaultDataBrokerProtectionIPCServer: DataBrokerProtectionIPCServer {
     let xpc: XPCServer<XPCClientInterface, XPCServerInterface>
 
-    /// The delegate.
-    ///
     public weak var serverDelegate: DataBrokerProtectionAppToAgentInterface?
 
     public init(machServiceName: String) {
@@ -137,6 +143,8 @@ public final class DataBrokerProtectionIPCServer {
         xpc.delegate = self
     }
 
+    // DataBrokerProtectionIPCServer
+
     public func activate() {
         xpc.activate()
     }
@@ -144,15 +152,15 @@ public final class DataBrokerProtectionIPCServer {
 
 // MARK: - Outgoing communication to the clients
 
-extension DataBrokerProtectionIPCServer: IPCClientInterface {
+extension DefaultDataBrokerProtectionIPCServer: IPCClientInterface {
 }
 
 // MARK: - Incoming communication from a client
 
-extension DataBrokerProtectionIPCServer: XPCServerInterface {
+extension DefaultDataBrokerProtectionIPCServer: XPCServerInterface {
 
     func register() {
-        
+
     }
 
     // MARK: - DataBrokerProtectionAgentAppEvents

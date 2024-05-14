@@ -29,7 +29,7 @@ public class DataBrokerProtectionAgentManagerProvider {
         let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler()
         let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
         let privacyConfigurationManager = PrivacyConfigurationManagingMock() // Forgive me, for I have sinned
-        let ipcServer = DataBrokerProtectionIPCServer(machServiceName: Bundle.main.bundleIdentifier!)
+        let ipcServer = DefaultDataBrokerProtectionIPCServer(machServiceName: Bundle.main.bundleIdentifier!)
 
         let features = ContentScopeFeatureToggles(emailProtection: false,
                                                   emailProtectionIncontextSignup: false,
@@ -95,7 +95,7 @@ public final class DataBrokerProtectionAgentManager {
     private var activityScheduler: DataBrokerProtectionBackgroundActivityScheduler
     private var ipcServer: DataBrokerProtectionIPCServer
     private let queueManager: DataBrokerProtectionQueueManager
-    private let dataManager: DataBrokerProtectionDataManager
+    private let dataManager: DataBrokerProtectionDataManaging
     private let operationDependencies: DataBrokerOperationDependencies
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
@@ -108,7 +108,7 @@ public final class DataBrokerProtectionAgentManager {
          activityScheduler: DataBrokerProtectionBackgroundActivityScheduler,
          ipcServer: DataBrokerProtectionIPCServer,
          queueManager: DataBrokerProtectionQueueManager,
-         dataManager: DataBrokerProtectionDataManager,
+         dataManager: DataBrokerProtectionDataManaging,
          operationDependencies: DataBrokerOperationDependencies,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
         self.userNotificationService = userNotificationService
