@@ -54,6 +54,7 @@ public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtecti
     }
 
     // MARK: - Redeem code flow
+
     // We might want the ability to ask for invite code later on, keeping this here to make things easier
     // https://app.asana.com/0/1204167627774280/1207270521849479/f
 
