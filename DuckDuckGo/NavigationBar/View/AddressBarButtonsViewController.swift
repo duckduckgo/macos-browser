@@ -34,16 +34,6 @@ final class AddressBarButtonsViewController: NSViewController {
 
     weak var delegate: AddressBarButtonsViewControllerDelegate?
 
-    private var bookmarkPopover: AddBookmarkPopover?
-    private func bookmarkPopoverCreatingIfNeeded() -> AddBookmarkPopover {
-        return bookmarkPopover ?? {
-            let popover = AddBookmarkPopover()
-            popover.delegate = self
-            self.bookmarkPopover = popover
-            return popover
-        }()
-    }
-
     private var permissionAuthorizationPopover: PermissionAuthorizationPopover?
     private func permissionAuthorizationPopoverCreatingIfNeeded() -> PermissionAuthorizationPopover {
         return permissionAuthorizationPopover ?? {
@@ -63,25 +53,6 @@ final class AddressBarButtonsViewController: NSViewController {
         }()
     }
 
-    private var _privacyDashboardPopover: PrivacyDashboardPopover?
-    private var privacyDashboardPopover: PrivacyDashboardPopover {
-        get {
-            if let result = _privacyDashboardPopover {
-                return result
-            } else {
-                let popover = PrivacyDashboardPopover()
-                popover.delegate = self
-                self.privacyDashboardPopover = popover
-                self.subscribePrivacyDashboardPendingUpdates(privacyDashboardPopover: popover)
-                return popover
-            }
-        }
-        set {
-            _privacyDashboardPopover = newValue
-        }
-    }
-
-    @IBOutlet weak var privacyDashboardPositioningView: NSView!
 
     @IBOutlet weak var privacyEntryPointButton: MouseOverAnimationButton!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
@@ -139,6 +110,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private var tabCollectionViewModel: TabCollectionViewModel
     private var tabViewModel: TabViewModel?
+    private let popovers: NavigationBarPopovers
 
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     var controllerMode: AddressBarViewController.Mode? {
@@ -167,13 +139,11 @@ final class AddressBarButtonsViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var urlCancellable: AnyCancellable?
     private var bookmarkListCancellable: AnyCancellable?
-    private var privacyDashboadPendingUpdatesCancellable: AnyCancellable?
     private var effectiveAppearanceCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var privacyEntryPointIconUpdateCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
-    private var privacyInfoCancellable: AnyCancellable?
 
     private lazy var buttonsBadgeAnimator = NavigationBarBadgeAnimator()
 
@@ -182,8 +152,10 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel) {
+          tabCollectionViewModel: TabCollectionViewModel,
+          popovers: NavigationBarPopovers) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.popovers = popovers
 
         super.init(coder: coder)
     }
@@ -264,11 +236,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
         popupBlockedPopover?.close()
 
-        if privacyDashboardPopover.isShown {
-            closePrivacyDashboard()
-        } else {
-            openPrivacyDashboard()
-        }
+        popovers.togglePrivacyDashboardPopover(for: tabViewModel, from: privacyEntryPointButton)
     }
 
     private func updateBookmarkButtonVisibility() {
@@ -284,7 +252,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 isUrlBookmarked = true
             }
 
-            return clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true || isUrlBookmarked)
+            return clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || popovers.isEditBookmarkPopoverShown || isUrlBookmarked)
         }
 
         bookmarkButton.isShown = shouldShowBookmarkButton
@@ -297,15 +265,11 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        let bookmarkPopover = bookmarkPopoverCreatingIfNeeded()
-        if !bookmarkPopover.isShown {
-            bookmarkButton.isShown = true
-            bookmarkPopover.isNew = result.isNew
-            bookmarkPopover.bookmark = bookmark
-            bookmarkPopover.show(positionedBelow: bookmarkButton)
+        if !popovers.isEditBookmarkPopoverShown {
+            popovers.showEditBookmarkPopover(with: bookmark, isNew: result.isNew, from: bookmarkButton, withDelegate: self)
         } else {
             updateBookmarkButtonVisibility()
-            bookmarkPopover.close()
+            popovers.closeEditBookmarkPopover()
         }
     }
 
@@ -350,38 +314,12 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     func closePrivacyDashboard() {
-
-        // Prevent popover from being closed with Privacy Entry Point Button, while pending updates
-        guard let privacyDashboardViewController = privacyDashboardPopover.viewController,
-              privacyDashboardViewController.isPendingUpdates() == false else {
-            return
-        }
-
-        privacyDashboardPopover.close()
+        popovers.closePrivacyDashboard()
     }
 
     func openPrivacyDashboard() {
-        guard let tabViewModel,
-              let privacyDashboardViewController = privacyDashboardPopover.viewController else {
-            return
-        }
-
-        privacyDashboardViewController.updateTabViewModel(tabViewModel)
-
-        let positioningViewInWindow = privacyDashboardPositioningView.convert(privacyDashboardPositioningView.bounds, to: view.window?.contentView)
-        privacyDashboardPopover.setPreferredMaxHeight(positioningViewInWindow.origin.y)
-        privacyDashboardPopover.delegate = self
-        privacyDashboardPopover.show(positionedBelow: privacyDashboardPositioningView)
-
-        privacyEntryPointButton.state = .on
-
-        privacyInfoCancellable = tabViewModel.tab.privacyInfoPublisher
-            .dropFirst()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak privacyDashboardPopover, weak tabViewModel] _ in
-                guard privacyDashboardPopover?.isShown == true, let tabViewModel else { return }
-                privacyDashboardViewController.updateTabViewModel(tabViewModel)
-            }
+        guard let tabViewModel else { return }
+        popovers.openPrivacyDashboard(for: tabViewModel, from: privacyEntryPointButton)
     }
 
     func updateButtons() {
@@ -658,32 +596,6 @@ final class AddressBarButtonsViewController: NSViewController {
             guard let self else { return }
             updateBookmarkButtonImage()
             updateBookmarkButtonVisibility()
-        }
-    }
-
-    private func subscribePrivacyDashboardPendingUpdates(privacyDashboardPopover: PrivacyDashboardPopover) {
-        privacyDashboadPendingUpdatesCancellable?.cancel()
-        guard NSApp.runType.requiresEnvironment else { return }
-
-        guard let privacyDashboardViewController = privacyDashboardPopover.viewController else {
-            return
-        }
-
-        privacyDashboadPendingUpdatesCancellable = privacyDashboardViewController.rulesUpdateObserver
-            .$pendingUpdates.dropFirst().receive(on: DispatchQueue.main).sink { [weak privacyDashboardPopover] _ in
-                let isPendingUpdate = privacyDashboardViewController.isPendingUpdates()
-
-            // Prevent popover from being closed when clicking away, while pending updates
-            if isPendingUpdate {
-                privacyDashboardPopover?.behavior = .applicationDefined
-            } else {
-                privacyDashboardPopover?.close()
-#if DEBUG
-                privacyDashboardPopover?.behavior = .semitransient
-#else
-                privacyDashboardPopover?.behavior = .transient
-#endif
-            }
         }
     }
 
@@ -997,46 +909,15 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 
 extension AddressBarButtonsViewController: NSPopoverDelegate {
 
-    func popoverShouldClose(_ popover: NSPopover) -> Bool {
-        switch popover {
-        case bookmarkPopover:
-            // fix popover reopening on next bookmarkButtonAction (on macOS 11)
-            DispatchQueue.main.async { [weak self] in
-                if let bookmarkPopover = self?.bookmarkPopover, bookmarkPopover.isShown {
-                    bookmarkPopover.close()
-                }
-            }
-            return false
-
-        default:
-            return true
-        }
-    }
-
-    func popoverWillClose(_ notification: Notification) {
-        switch notification.object as? NSPopover {
-        case bookmarkPopover:
-            bookmarkPopover?.popoverWillClose()
-
-        default:
-            break
-        }
-    }
-
     func popoverDidClose(_ notification: Notification) {
         switch notification.object as? NSPopover {
-        case bookmarkPopover:
-            if bookmarkPopover?.isNew == true {
+        case popovers.bookmarkPopover:
+            if popovers.bookmarkPopover?.isNew == true {
                 NotificationCenter.default.post(name: .bookmarkPromptShouldShow, object: nil)
             }
             updateBookmarkButtonVisibility()
-            bookmarkPopover = nil
-        case privacyDashboardPopover:
-            privacyEntryPointButton.state = .off
-            _privacyDashboardPopover = nil
 
-        default:
-            break
+        default: break
         }
     }
 

@@ -32,10 +32,10 @@ protocol NetPPopoverManager: AnyObject {
     var ipcClient: NetworkProtectionIPCClient { get }
     var isShown: Bool { get }
 
-    func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate)
+    func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover
     func close()
 
-    func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate)
+    func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover?
 }
 
 extension PopoverPresenter {
@@ -45,7 +45,11 @@ extension PopoverPresenter {
     }
 }
 
-final class NavigationBarPopovers: PopoverPresenter {
+protocol PrivacyDashboardPopoverPresenter {
+
+}
+
+final class NavigationBarPopovers: NSObject, PopoverPresenter {
 
     enum Constants {
         static let downloadsPopoverAutoHidingInterval: TimeInterval = 10
@@ -58,7 +62,25 @@ final class NavigationBarPopovers: PopoverPresenter {
     private(set) var autofillPopoverPresenter: AutofillPopoverPresenter
     private(set) var downloadsPopover: DownloadsPopover?
 
+    private var privacyDashboardPopover: PrivacyDashboardPopover?
+    private var privacyInfoCancellable: AnyCancellable?
+    private var privacyDashboadPendingUpdatesCancellable: AnyCancellable?
+
+    private(set) var bookmarkPopover: AddBookmarkPopover?
+    private weak var bookmarkPopoverDelegate: NSPopoverDelegate?
+
+    private func bookmarkPopoverCreatingIfNeeded() -> AddBookmarkPopover {
+        return bookmarkPopover ?? {
+            let popover = AddBookmarkPopover()
+            popover.delegate = self
+            self.bookmarkPopover = popover
+            return popover
+        }()
+    }
+
     private let networkProtectionPopoverManager: NetPPopoverManager
+
+    private var popoverIsShownCancellables = Set<AnyCancellable>()
 
     init(networkProtectionPopoverManager: NetPPopoverManager, autofillPopoverPresenter: AutofillPopoverPresenter) {
         self.networkProtectionPopoverManager = networkProtectionPopoverManager
@@ -96,46 +118,58 @@ final class NavigationBarPopovers: PopoverPresenter {
         bookmarkListPopover?.isShown ?? false
     }
 
-    func bookmarksButtonPressed(anchorView: NSView, popoverDelegate delegate: NSPopoverDelegate, tab: Tab?) {
+    var isEditBookmarkPopoverShown: Bool {
+        bookmarkPopover?.isShown ?? false
+    }
+
+    func bookmarksButtonPressed(_ button: MouseOverButton, popoverDelegate delegate: NSPopoverDelegate, tab: Tab?) {
         if bookmarkListPopoverShown {
             bookmarkListPopover?.close()
         } else {
-            showBookmarkListPopover(usingView: anchorView, withDelegate: delegate, forTab: tab)
+            showBookmarkListPopover(from: button, withDelegate: delegate, forTab: tab)
         }
     }
 
-    func passwordManagementButtonPressed(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        if autofillPopoverPresenter.popoverIsShown == true && view.window == autofillPopoverPresenter.popoverPresentingWindow {
+    func passwordManagementButtonPressed(_ button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
+        if autofillPopoverPresenter.popoverIsShown == true && button.window == autofillPopoverPresenter.popoverPresentingWindow {
             autofillPopoverPresenter.dismiss()
         } else {
-            showPasswordManagementPopover(selectedCategory: nil, usingView: view, withDelegate: delegate)
+            showPasswordManagementPopover(selectedCategory: nil, from: button, withDelegate: delegate)
         }
     }
 
-    func toggleNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        networkProtectionPopoverManager.toggle(positionedBelow: view, withDelegate: delegate)
+    func toggleNetworkProtectionPopover(from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
+        if let popover = networkProtectionPopoverManager.toggle(positionedBelow: button, withDelegate: delegate) {
+            bindIsMouseDownState(of: button, to: popover)
+        }
     }
 
-    func toggleDownloadsPopover(usingView view: NSView, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
-
+    func toggleDownloadsPopover(from button: MouseOverButton, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
         if downloadsPopover?.isShown ?? false {
             downloadsPopover?.close()
             return
         }
         guard closeTransientPopovers(),
-              view.window != nil
-        else { return }
+              button.window != nil else { return }
 
         let popover = DownloadsPopover()
         popover.delegate = popoverDelegate
         popover.viewController.delegate = downloadsDelegate
         downloadsPopover = popover
 
-        show(popover, positionedBelow: view)
+        show(popover, positionedBelow: button)
+    }
+
+    func togglePrivacyDashboardPopover(for tabViewModel: TabViewModel?, from button: MouseOverButton) {
+        if privacyDashboardPopover?.isShown == true {
+            closePrivacyDashboard()
+        } else if let tabViewModel {
+            openPrivacyDashboard(for: tabViewModel, from: button)
+        }
     }
 
     private var downloadsPopoverTimer: Timer?
-    func showDownloadsPopoverAndAutoHide(usingView view: NSView, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
+    func showDownloadsPopoverAndAutoHide(usingView button: MouseOverButton, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
         let timerBlock: (Timer) -> Void = { [weak self] _ in
             self?.downloadsPopoverTimer?.invalidate()
             self?.downloadsPopoverTimer = nil
@@ -146,7 +180,7 @@ final class NavigationBarPopovers: PopoverPresenter {
         }
 
         if !isDownloadsPopoverShown {
-            self.toggleDownloadsPopover(usingView: view, popoverDelegate: popoverDelegate, downloadsDelegate: downloadsDelegate)
+            self.toggleDownloadsPopover(from: button, popoverDelegate: popoverDelegate, downloadsDelegate: downloadsDelegate)
 
             downloadsPopoverTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsPopoverAutoHidingInterval,
                                                          repeats: false,
@@ -175,10 +209,18 @@ final class NavigationBarPopovers: PopoverPresenter {
             networkProtectionPopoverManager.close()
         }
 
+        if bookmarkPopover?.isShown ?? false {
+            bookmarkPopover?.close()
+        }
+
+        if privacyDashboardPopover?.isShown ?? false {
+            privacyDashboardPopover?.close()
+        }
+
         return true
     }
 
-    func showBookmarkListPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate, forTab tab: Tab?) {
+    func showBookmarkListPopover(from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate, forTab tab: Tab?) {
         guard closeTransientPopovers() else { return }
 
         let popover = bookmarkListPopover ?? BookmarkListPopover()
@@ -190,17 +232,89 @@ final class NavigationBarPopovers: PopoverPresenter {
         }
 
         LocalBookmarkManager.shared.requestSync()
-        show(popover, positionedBelow: view)
+        show(popover, positionedBelow: button)
     }
 
-    func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+    func showEditBookmarkPopover(with bookmark: Bookmark, isNew: Bool, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
         guard closeTransientPopovers() else { return }
 
-        autofillPopoverPresenter.show(positionedBelow: view, withDomain: passwordManagementDomain, selectedCategory: selectedCategory)
+        let bookmarkPopover = bookmarkPopoverCreatingIfNeeded()
+        bookmarkPopover.isNew = isNew
+        bookmarkPopover.bookmark = bookmark
+        self.bookmarkPopoverDelegate = delegate
+        show(bookmarkPopover, positionedBelow: button)
     }
 
-    func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        autofillPopoverPresenter.show(positionedBelow: view, withSelectedAccount: selectedWebsiteAccount)
+    func closeEditBookmarkPopover() {
+        bookmarkPopover?.close()
+    }
+
+    func openPrivacyDashboard(for tabViewModel: TabViewModel, from button: MouseOverButton) {
+        guard closeTransientPopovers() else { return }
+
+        let popover = PrivacyDashboardPopover()
+        popover.delegate = self
+        self.privacyDashboardPopover = popover
+        self.subscribePrivacyDashboardPendingUpdates(for: popover)
+
+        popover.viewController.updateTabViewModel(tabViewModel)
+
+        let positioningRectInWindow = button.convert(button.bounds, to: button.window?.contentView)
+        popover.setPreferredMaxHeight(positioningRectInWindow.origin.y)
+
+        show(popover, positionedBelow: button)
+        bindIsMouseDownState(of: button, to: popover)
+
+        privacyInfoCancellable = tabViewModel.tab.privacyInfoPublisher
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak popover, weak tabViewModel] _ in
+                guard let popover, popover.isShown, let tabViewModel else { return }
+                popover.viewController.updateTabViewModel(tabViewModel)
+            }
+    }
+
+    private func subscribePrivacyDashboardPendingUpdates(for privacyDashboardPopover: PrivacyDashboardPopover) {
+        privacyDashboadPendingUpdatesCancellable?.cancel()
+        guard NSApp.runType.requiresEnvironment else { return }
+        let privacyDashboardViewController = privacyDashboardPopover.viewController
+
+        privacyDashboadPendingUpdatesCancellable = privacyDashboardViewController.rulesUpdateObserver
+            .$pendingUpdates.dropFirst().receive(on: DispatchQueue.main).sink { [weak privacyDashboardPopover] _ in
+                let isPendingUpdate = privacyDashboardViewController.isPendingUpdates()
+
+            // Prevent popover from being closed when clicking away, while pending updates
+            if isPendingUpdate {
+                privacyDashboardPopover?.behavior = .applicationDefined
+            } else {
+                privacyDashboardPopover?.close()
+#if DEBUG
+                privacyDashboardPopover?.behavior = .semitransient
+#else
+                privacyDashboardPopover?.behavior = .transient
+#endif
+            }
+        }
+    }
+
+    func closePrivacyDashboard() {
+        // Prevent popover from being closed with Privacy Entry Point Button, while pending updates
+        guard let popover = privacyDashboardPopover,
+              !popover.viewController.isPendingUpdates() else { return }
+
+        popover.close()
+    }
+
+    func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
+        guard closeTransientPopovers() else { return }
+
+        let popover = autofillPopoverPresenter.show(positionedBelow: button, withDomain: passwordManagementDomain, selectedCategory: selectedCategory)
+        bindIsMouseDownState(of: button, to: popover)
+    }
+
+    func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
+        let popover = autofillPopoverPresenter.show(positionedBelow: button, withSelectedAccount: selectedWebsiteAccount)
+        bindIsMouseDownState(of: button, to: popover)
     }
 
     func hasAnySavePopoversVisible() -> Bool {
@@ -269,19 +383,86 @@ final class NavigationBarPopovers: PopoverPresenter {
         show(popover, positionedBelow: view)
     }
 
-    func show(_ popover: NSPopover, positionedBelow view: NSView) {
-        view.isHidden = false
+    func show(_ popover: NSPopover, positionedBelow button: MouseOverButton) {
+        button.isHidden = false
 
-        popover.show(positionedBelow: view.bounds.insetFromLineOfDeath(flipped: view.isFlipped), in: view)
+        popover.show(positionedBelow: button.bounds.insetFromLineOfDeath(flipped: button.isFlipped), in: button)
+        bindIsMouseDownState(of: button, to: popover)
+    }
+
+    // keep button.isMouseDown ON while the popover is shown
+    func bindIsMouseDownState(of button: MouseOverButton, to popover: NSPopover) {
+        popoverIsShownCancellables.removeAll()
+
+        button.publisher(for: \.isMouseDown).sink { [weak button, weak popover] isMouseDown in
+            guard let button, let popover else { return }
+            if !isMouseDown && popover.isShown {
+                button.isMouseDown = true
+            }
+        }.store(in: &popoverIsShownCancellables)
+
+        popover.publisher(for: \.isShown).sink { [weak button] isShown in
+            guard let button else { return }
+            if isShown {
+                button.isMouseDown = true
+            } else {
+                button.isMouseDown = false
+            }
+        }.store(in: &popoverIsShownCancellables)
     }
 
     // MARK: - VPN
 
-    func showNetworkProtectionPopover(
-        positionedBelow view: NSView,
-        withDelegate delegate: NSPopoverDelegate) {
-            networkProtectionPopoverManager.show(positionedBelow: view, withDelegate: delegate)
+    func showNetworkProtectionPopover(positionedBelow button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
+        let popover = networkProtectionPopoverManager.show(positionedBelow: button, withDelegate: delegate)
+        bindIsMouseDownState(of: button, to: popover)
     }
+}
+
+extension NavigationBarPopovers: NSPopoverDelegate {
+
+    func popoverShouldClose(_ popover: NSPopover) -> Bool {
+        switch popover {
+        case bookmarkPopover:
+            // fix popover reopening on next bookmarkButtonAction (on macOS 11)
+            DispatchQueue.main.async { [weak self] in
+                if let bookmarkPopover = self?.bookmarkPopover, bookmarkPopover.isShown {
+                    bookmarkPopover.close()
+                }
+            }
+            return false
+
+        default:
+            return true
+        }
+    }
+
+    func popoverWillClose(_ notification: Notification) {
+        switch notification.object as? NSPopover {
+        case bookmarkPopover:
+            bookmarkPopoverDelegate?.popoverWillClose?(notification)
+            bookmarkPopover?.popoverWillClose()
+
+        default:
+            break
+        }
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+        switch notification.object as? NSPopover {
+        case bookmarkPopover:
+            bookmarkPopoverDelegate?.popoverDidClose?(notification)
+            bookmarkPopover = nil
+
+        case privacyDashboardPopover:
+            privacyDashboardPopover = nil
+            privacyInfoCancellable = nil
+            privacyDashboadPendingUpdatesCancellable = nil
+
+        default: break
+        }
+    }
+
 }
 
 extension Notification.Name {
