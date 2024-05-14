@@ -309,6 +309,12 @@ final class TabBarViewController: NSViewController {
                 return
             }
             bookmarkTab(with: url, title: tabViewModel.title)
+        case let .removeBookmark(tab):
+            guard let url = tab.url else {
+                os_log("TabBarViewController: Failed to get url from tab")
+                return
+            }
+            deleteBookmark(with: url)
         case let .fireproof(tab):
             fireproof(tab)
         case let .removeFireproofing(tab):
@@ -771,6 +777,14 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         if !bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
         }
+    }
+
+    private func deleteBookmark(with url: URL) {
+        guard let bookmark = bookmarkManager.getBookmark(for: url) else {
+            os_log("TabBarViewController: Failed to fetch bookmark for url \(url)", type: .error)
+            return
+        }
+        bookmarkManager.remove(bookmark: bookmark)
     }
 
     private func fireproof(_ tab: Tab) {
