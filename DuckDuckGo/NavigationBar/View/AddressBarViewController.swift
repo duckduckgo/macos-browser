@@ -25,7 +25,7 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var addressBarTextField: AddressBarTextField!
     @IBOutlet var passiveTextField: NSTextField!
     @IBOutlet var inactiveBackgroundView: NSView!
-    @IBOutlet var activeBackgroundView: NSView!
+    @IBOutlet var activeBackgroundView: ColorView!
     @IBOutlet var activeOuterBorderView: NSView!
     @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
     @IBOutlet var progressIndicator: LoadingProgressView!
@@ -319,10 +319,8 @@ final class AddressBarViewController: NSViewController {
         let isKey = self.view.window?.isKeyWindow ?? false
         activeOuterBorderView.alphaValue = isKey && isFirstResponder && isHomePage ? 1 : 0
 
-        activeOuterBorderView.layer?.backgroundColor = NSColor.controlAccentColor.withAlphaComponent(0.2).cgColor
-        activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.8).cgColor
         activeOuterBorderView.layer?.backgroundColor = accentColor.withAlphaComponent(0.2).cgColor
-        activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.8).cgColor
+        activeBackgroundView.borderColor = accentColor.withAlphaComponent(0.8)
 
         addressBarTextField.placeholderString = tabViewModel?.tab.content == .newtab ? UserText.addressBarPlaceholder : ""
     }
