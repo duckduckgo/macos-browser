@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "bhall/bump-bsk-5.14.0",
-        "revision" : "6dfc892cecfc0fe49df1981328252f9a50b12439"
+        "branch" : "bhall/bump-c-s-s-to-5.15.0",
+        "revision" : "b5852d5e90d95178728cbe75d382e72035ae1ec5"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "900c93f0cb048c5969d6735a15979478c56bb126",
-        "version" : "5.14.0"
+        "revision" : "bb8e7e62104ed6506c7bfd3ef7aa4aca3686ed4f",
+        "version" : "5.15.0"
       }
     },
     {
