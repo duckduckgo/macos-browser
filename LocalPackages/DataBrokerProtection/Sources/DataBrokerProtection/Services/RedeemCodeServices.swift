@@ -77,10 +77,7 @@ public final class RedeemUseCase: DataBrokerProtectionRedeemUseCase {
     }
 
     public func getAuthHeader() -> String? {
-        guard let token = authenticationRepository.getAccessToken() else {
-            return nil
-        }
-        return "bearer \(token)"
+        ServicesAuthHeaderBuilder().getAuthHeader(authenticationRepository.getAccessToken())
     }
 }
 
