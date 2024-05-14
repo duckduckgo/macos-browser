@@ -223,15 +223,15 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentDebugComman
     }
 
     public func startScheduledOperations(showWebView: Bool) {
-        // TODO
-        //scheduler.runQueuedOperations(showWebView: showWebView)
+        queueManager.startScheduledOperationsIfPermitted(showWebView: showWebView,
+                                                         operationDependencies: operationDependencies,
+                                                         completion: nil)
     }
 
     public func runAllOptOuts(showWebView: Bool) {
-        // TODO
-//        scheduler.runAllOptOuts(showWebView: showWebView) { _ in
-//
-//        }
+        queueManager.execute(.startOptOutOperations(showWebView: showWebView, 
+                                                    operationDependencies: operationDependencies,
+                                                    completion: nil))
     }
 
     public func getDebugMetadata() async -> DataBrokerProtection.DBPBackgroundAgentMetadata? {
