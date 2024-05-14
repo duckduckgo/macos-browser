@@ -133,7 +133,7 @@ final class ZoomPopover: NSPopover {
         super.init()
 
         self.animates = false
-        self.behavior = .transient
+        self.behavior = .semitransient
         setupContentController()
     }
 
@@ -154,5 +154,4 @@ final class ZoomPopover: NSPopover {
         self.addressBar = positioningView.superview
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
     }
-
 }

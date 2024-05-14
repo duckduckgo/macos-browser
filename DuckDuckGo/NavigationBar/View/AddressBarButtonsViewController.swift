@@ -318,7 +318,7 @@ final class AddressBarButtonsViewController: NSViewController {
         && !isTextFieldValueText
         && !isTextFieldEditorFirstResponder
         && !animation
-        && (hasNonDefaultZoom || zoomPopover?.isShown == true)
+        && (hasNonDefaultZoom || zoomPopover?.isShown == true || zoomPopover != nil)
 
         zoomButton.isHidden = !shouldShowZoom
     }
@@ -430,7 +430,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     @IBAction func zoomButtonAction(_ sender: Any) {
-        if zoomPopover != nil {
+        if zoomPopover?.isShown ?? false {
             zoomPopover?.close()
         } else {
             guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
@@ -1092,8 +1092,8 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
             privacyEntryPointButton.state = .off
             _privacyDashboardPopover = nil
         case zoomPopover:
-            updateZoomButtonVisibility()
             zoomPopover = nil
+            updateZoomButtonVisibility()
         default:
             break
         }

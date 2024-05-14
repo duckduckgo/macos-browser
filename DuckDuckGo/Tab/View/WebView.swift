@@ -94,7 +94,7 @@ final class WebView: WKWebView {
     // MARK: - Zoom
 
     var defaultZoomValue: DefaultZoomValue = .percent100
-    
+
     var zoomLevel: DefaultZoomValue {
         get {
             return DefaultZoomValue(rawValue: pageZoom) ?? .percent100
@@ -105,9 +105,8 @@ final class WebView: WKWebView {
             if pageZoom == newValue.rawValue {
                 // Slightly modify the value to force the API to trigger a change.
                 pageZoom = newValue.rawValue - 0.001
-            } else {
-                pageZoom = newValue.rawValue
             }
+            pageZoom = newValue.rawValue
         }
     }
 
