@@ -29,6 +29,7 @@ extension NSWorkspace {
         return bundle.displayName
     }
 
+    /// Detect if macOS Mission Control (three-finger swipe up to show the Spaces) is currently active
     static func isMissionControlActive() -> Bool {
         guard let visibleWindows = CGWindowListCopyWindowInfo(.optionOnScreenOnly, CGWindowID(0)) as? [[CFString: Any]] else {
             assertionFailure("CGWindowListCopyWindowInfo doesn‘t work anymore")

@@ -116,10 +116,22 @@ final class WebViewContainerView: NSView {
             .store(in: &cancellables)
     }
 
-    // fix a glitch scaling down Full Screen layer on next Full Screen activation
-    // after exiting Full Screen by dragging the window out in Mission Control
-    // (three-fingers-up swipe)
-    // see https://app.asana.com/0/1177771139624306/1204370242122745/f
+    /** 
+
+     Fix a glitch breaking the Full Screen presentation on a repeated
+     Full Screen mode activation after dragging out of Mission Control Spaces.
+
+     **Steps to reproduce:**
+     1. Enter full screen video
+     2. Open Mission Control (swipe three fingers up)
+     3. Drag the full screen video out of the top panel in the Mission Control
+     4. Enter full screen again - validate video opens in full screen
+     - The video would open in a shrinked (thumbnail) state without the fix
+
+     - Note: The bug is actual for macOS 12 and above
+
+     https://app.asana.com/0/1177771139624306/1204370242122745/f
+    */
     private func observeFullScreenWindowWillExitFullScreen(_ fullScreenWindow: NSWindow) {
         if #available(macOS 12.0, *) { // works fine on Big Sur
             NotificationCenter.default.publisher(for: NSWindow.willExitFullScreenNotification, object: fullScreenWindow)
