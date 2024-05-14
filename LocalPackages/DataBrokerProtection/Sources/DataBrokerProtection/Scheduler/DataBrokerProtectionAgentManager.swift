@@ -187,7 +187,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
                 self.userNotificationService.scheduleCheckInNotificationIfPossible()
             }
 
-            fireManualScanCompletionPixel(startTime: backgroundAgentManualScanStartTime)
+            fireImmediateScansCompletionPixel(startTime: backgroundAgentManualScanStartTime)
         }
     }
 
@@ -197,14 +197,14 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
                                                             operationDependencies, completion: nil)
     }
 
-    private func fireManualScanCompletionPixel(startTime: Date) {
+    private func fireImmediateScansCompletionPixel(startTime: Date) {
         do {
             let profileQueries = try dataManager.profileQueriesCount()
             let durationSinceStart = Date().timeIntervalSince(startTime) * 1000
             self.pixelHandler.fire(.initialScanTotalDuration(duration: durationSinceStart.rounded(.towardZero),
                                                              profileQueries: profileQueries))
         } catch {
-            os_log("Manual Scan Error when trying to fetch the profile to get the profile queries", log: .dataBrokerProtection)
+            os_log("Initial Scans Error when trying to fetch the profile to get the profile queries", log: .dataBrokerProtection)
         }
     }
 }
@@ -241,12 +241,12 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentDebugComman
 
             return DBPBackgroundAgentMetadata(backgroundAgentVersion: backgroundAgentVersion + " (build: \(buildNumber))",
                                               isAgentRunning: true,
-                                              agentSchedulerState: "TODO",
+                                              agentSchedulerState: queueManager.debugRunningStatusString,
                                               lastSchedulerSessionStartTimestamp: activityScheduler.lastTriggerTimestamp?.timeIntervalSince1970)
         } else {
             return DBPBackgroundAgentMetadata(backgroundAgentVersion: "ERROR: Error fetching background agent version",
                                               isAgentRunning: true,
-                                              agentSchedulerState: "TODO",
+                                              agentSchedulerState: queueManager.debugRunningStatusString,
                                               lastSchedulerSessionStartTimestamp: activityScheduler.lastTriggerTimestamp?.timeIntervalSince1970)
         }
     }
