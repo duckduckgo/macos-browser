@@ -124,7 +124,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
     init(defaults: UserDefaults = .netP) {
         let ipcClient = TunnelControllerIPCClient()
-        ipcClient.register()
+        ipcClient.register { _ in }
 
         self.ipcClient = ipcClient
         self.defaults = defaults

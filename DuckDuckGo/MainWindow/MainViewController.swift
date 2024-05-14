@@ -71,7 +71,9 @@ final class MainViewController: NSViewController {
 #endif
 
             let ipcClient = TunnelControllerIPCClient()
-            ipcClient.register()
+            ipcClient.register { error in
+                NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
+            }
 
             return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient, networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler())
         }()

@@ -111,9 +111,10 @@ final class TunnelControllerIPCService {
 
 extension TunnelControllerIPCService: IPCServerInterface {
 
-    func register() {
-        server.serverInfoChanged(statusReporter.serverInfoObserver.recentValue)
-        server.statusChanged(statusReporter.statusObserver.recentValue)
+    func register(completion: @escaping (Error?) -> Void) {
+        register(version: DefaultIPCMetadataCollector.version,
+                 bundlePath: DefaultIPCMetadataCollector.bundlePath,
+                 completion: completion)
     }
 
     func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void) {

@@ -167,9 +167,10 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
 // MARK: - Outgoing communication to the server
 
 extension TunnelControllerIPCClient: IPCServerInterface {
-    public func register() {
+    public func register(completion: @escaping (Error?) -> Void) {
         register(version: DefaultIPCMetadataCollector.version,
-                 bundlePath: DefaultIPCMetadataCollector.bundlePath) { _ in }
+                 bundlePath: DefaultIPCMetadataCollector.bundlePath,
+                 completion: self.onComplete(completion))
     }
 
     public func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void) {

@@ -27,7 +27,7 @@ public protocol IPCServerInterface: AnyObject {
     ///
     /// This is the point where the server will start sending status updates to the client.
     ///
-    func register()
+    func register(completion: @escaping (Error?) -> Void)
 
     func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void)
 
@@ -67,7 +67,7 @@ protocol XPCServerInterface {
     ///
     /// This is the point where the server will start sending status updates to the client.
     ///
-    func register()
+    func register(completion: @escaping (Error?) -> Void)
 
     func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void)
 
@@ -180,8 +180,8 @@ extension TunnelControllerIPCServer: IPCClientInterface {
 // MARK: - Incoming communication from a client
 
 extension TunnelControllerIPCServer: XPCServerInterface {
-    func register() {
-        serverDelegate?.register()
+    func register(completion: @escaping (Error?) -> Void) {
+        serverDelegate?.register(completion: completion)
     }
 
     func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void) {
