@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionSubscriptionHandling.swift
+//  DataBrokerProtectionSubscriptionManaging.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -57,4 +57,3 @@ public protocol DataBrokerProtectionAccountManaging {
     var accessToken: String? { get }
     func hasEntitlement(for cachePolicy: AccountManager.CachePolicy) async -> Result<Bool, Error>
 }
-
