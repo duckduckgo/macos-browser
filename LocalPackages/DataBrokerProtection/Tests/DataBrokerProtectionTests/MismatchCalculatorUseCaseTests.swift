@@ -40,7 +40,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             .mockParentWith(historyEvents: parentHistoryEvents),
             .mockChildtWith(historyEvents: childHistoryEvents)
         ]
-        let sut = MismatchCalculatorUseCase(
+        let sut = DefaultMismatchCalculator(
             database: database,
             pixelHandler: pixelHandler
         )
@@ -65,7 +65,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             .mockParentWith(historyEvents: parentHistoryEvents),
             .mockChildtWith(historyEvents: childHistoryEvents)
         ]
-        let sut = MismatchCalculatorUseCase(
+        let sut = DefaultMismatchCalculator(
             database: database,
             pixelHandler: pixelHandler
         )
@@ -90,7 +90,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             .mockParentWith(historyEvents: parentHistoryEvents),
             .mockChildtWith(historyEvents: childHistoryEvents)
         ]
-        let sut = MismatchCalculatorUseCase(
+        let sut = DefaultMismatchCalculator(
             database: database,
             pixelHandler: pixelHandler
         )
@@ -115,7 +115,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             .mockParentWith(historyEvents: parentHistoryEvents),
             .mockChildtWith(historyEvents: childHistoryEvents)
         ]
-        let sut = MismatchCalculatorUseCase(
+        let sut = DefaultMismatchCalculator(
             database: database,
             pixelHandler: pixelHandler
         )
@@ -136,7 +136,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
         database.brokerProfileQueryDataToReturn = [
             .mockParentWith(historyEvents: parentHistoryEvents)
         ]
-        let sut = MismatchCalculatorUseCase(
+        let sut = DefaultMismatchCalculator(
             database: database,
             pixelHandler: pixelHandler
         )

@@ -114,8 +114,8 @@ protocol XPCServerInterface {
     ///
     func openBrowser(domain: String)
 
-    func startManualScan(showWebView: Bool)
-    func runQueuedOperations(showWebView: Bool)
+    func startImmediateOperations(showWebView: Bool)
+    func startScheduledOperations(showWebView: Bool)
     func runAllOptOuts(showWebView: Bool)
     func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
 }
@@ -180,12 +180,12 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
         serverDelegate?.openBrowser(domain: domain)
     }
 
-    func startManualScan(showWebView: Bool) {
-        serverDelegate?.startManualScan(showWebView: showWebView)
+    func startImmediateOperations(showWebView: Bool) {
+        serverDelegate?.startImmediateOperations(showWebView: showWebView)
     }
 
-    func runQueuedOperations(showWebView: Bool) {
-        serverDelegate?.runQueuedOperations(showWebView: showWebView)
+    func startScheduledOperations(showWebView: Bool) {
+        serverDelegate?.startScheduledOperations(showWebView: showWebView)
     }
 
     func runAllOptOuts(showWebView: Bool) {

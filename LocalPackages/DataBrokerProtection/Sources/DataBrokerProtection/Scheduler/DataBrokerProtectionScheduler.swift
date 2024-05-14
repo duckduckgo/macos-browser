@@ -66,18 +66,35 @@ public final class DefaultDataBrokerProtectionScheduler {
 
     public var lastSchedulerSessionStartTimestamp: Date?
 
-    private lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
+    private lazy var queueManager: DataBrokerProtectionQueueManager = {
+           let operationQueue = OperationQueue()
+           let operationsBuilder = DefaultDataBrokerOperationsCreator()
+           let mismatchCalculator = DefaultMismatchCalculator(database: dataManager.database,
+                                                              pixelHandler: pixelHandler)
 
+           var brokerUpdater: DataBrokerProtectionBrokerUpdater?
+           if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: nil) {
+               brokerUpdater = DefaultDataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
+           }
+
+           return DefaultDataBrokerProtectionQueueManager(operationQueue: operationQueue,
+                                                          operationsCreator: operationsBuilder,
+                                                          mismatchCalculator: mismatchCalculator,
+                                                          brokerUpdater: brokerUpdater,
+                                                          pixelHandler: pixelHandler)
+       }()
+
+    private lazy var operationDependencies: DataBrokerOperationDependencies = {
         let runnerProvider = DataBrokerJobRunnerProvider(privacyConfigManager: privacyConfigManager,
-                                                               contentScopeProperties: contentScopeProperties,
-                                                               emailService: emailService,
-                                                               captchaService: captchaService)
+                                                         contentScopeProperties: contentScopeProperties,
+                                                         emailService: emailService,
+                                                         captchaService: captchaService)
 
-        return DataBrokerProtectionProcessor(database: dataManager.database,
-                                             jobRunnerProvider: runnerProvider,
-                                             notificationCenter: notificationCenter,
-                                             pixelHandler: pixelHandler,
-                                             userNotificationService: userNotificationService)
+        return DefaultDataBrokerOperationDependencies(database: dataManager.database,
+                                                      config: DataBrokerProtectionProcessorConfiguration(),
+                                                      runnerProvider: runnerProvider,
+                                                      notificationCenter: notificationCenter,
+                                                      pixelHandler: pixelHandler, userNotificationService: userNotificationService)
     }()
 
     public init(privacyConfigManager: PrivacyConfigurationManaging,
@@ -128,15 +145,15 @@ public final class DefaultDataBrokerProtectionScheduler {
             self.status = .running
             os_log("Scheduler running...", log: .dataBrokerProtection)
             self.currentOperation = .queued
-            self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] errors in
+            self.queueManager.startScheduledOperationsIfPermitted(showWebView: showWebView, operationDependencies: self.operationDependencies) { [weak self] errors in
                 if let errors = errors {
                     if let oneTimeError = errors.oneTimeError {
-                        os_log("Error during startScheduler in dataBrokerProcessor.runQueuedOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        os_log("Error during startScheduler in dataBrokerProcessor.startScheduledOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
                         self?.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.startScheduler"))
                     }
                     if let operationErrors = errors.operationErrors,
                               operationErrors.count != 0 {
-                        os_log("Operation error(s) during startScheduler in dataBrokerProcessor.runQueuedOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                        os_log("Operation error(s) during startScheduler in dataBrokerProcessor.startScheduledOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                     }
                 }
                 self?.status = .idle
@@ -150,33 +167,10 @@ public final class DefaultDataBrokerProtectionScheduler {
         os_log("Stopping scheduler...", log: .dataBrokerProtection)
         activity.invalidate()
         status = .stopped
-        dataBrokerProcessor.stopAllOperations()
+        queueManager.stopAllOperations()
     }
 
-    public func runAllOperations(showWebView: Bool = false) {
-        guard self.currentOperation != .manualScan else {
-            os_log("Manual scan in progress, returning...", log: .dataBrokerProtection)
-            return
-        }
-
-        os_log("Running all operations...", log: .dataBrokerProtection)
-        self.currentOperation = .all
-        self.dataBrokerProcessor.runAllOperations(showWebView: showWebView) { [weak self] errors in
-            if let errors = errors {
-                if let oneTimeError = errors.oneTimeError {
-                    os_log("Error during DefaultDataBrokerProtectionScheduler.runAllOperations in dataBrokerProcessor.runAllOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                    self?.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.runAllOperations"))
-                }
-                if let operationErrors = errors.operationErrors,
-                          operationErrors.count != 0 {
-                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.runAllOperations in dataBrokerProcessor.runAllOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
-                }
-            }
-            self?.currentOperation = .idle
-        }
-    }
-
-    public func runQueuedOperations(showWebView: Bool = false,
+    public func startScheduledOperations(showWebView: Bool = false,
                                     completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)? = nil) {
         guard self.currentOperation != .manualScan else {
             os_log("Manual scan in progress, returning...", log: .dataBrokerProtection)
@@ -185,16 +179,17 @@ public final class DefaultDataBrokerProtectionScheduler {
 
         os_log("Running queued operations...", log: .dataBrokerProtection)
         self.currentOperation = .queued
-        dataBrokerProcessor.runQueuedOperations(showWebView: showWebView,
-                                                completion: { [weak self] errors in
+        queueManager.startScheduledOperationsIfPermitted(showWebView: showWebView,
+                                                         operationDependencies: operationDependencies,
+                                                         completion: { [weak self] errors in
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
-                    os_log("Error during DefaultDataBrokerProtectionScheduler.runQueuedOperations in dataBrokerProcessor.runQueuedOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                    self?.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.runQueuedOperations"))
+                    os_log("Error during DefaultDataBrokerProtectionScheduler.startScheduledOperations in dataBrokerProcessor.startScheduledOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                    self?.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.startScheduledOperations"))
                 }
                 if let operationErrors = errors.operationErrors,
                           operationErrors.count != 0 {
-                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.runQueuedOperations in dataBrokerProcessor.runQueuedOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.startScheduledOperations in dataBrokerProcessor.startScheduledOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             }
             completion?(errors)
@@ -203,9 +198,9 @@ public final class DefaultDataBrokerProtectionScheduler {
 
     }
 
-    public func startManualScan(showWebView: Bool = false,
-                                startTime: Date,
-                                completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)? = nil) {
+    public func startImmediateOperations(showWebView: Bool = false,
+                                         startTime: Date,
+                                         completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)? = nil) {
         pixelHandler.fire(.initialScanPreStartDuration(duration: (Date().timeIntervalSince(startTime) * 1000).rounded(.towardZero)))
         let backgroundAgentManualScanStartTime = Date()
         stopScheduler()
@@ -213,7 +208,8 @@ public final class DefaultDataBrokerProtectionScheduler {
         userNotificationService.requestNotificationPermission()
         self.currentOperation = .manualScan
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
-        dataBrokerProcessor.startManualScans(showWebView: showWebView) { [weak self] errors in
+        queueManager.startImmediateOperationsIfPermitted(showWebView: showWebView,
+                                                         operationDependencies: operationDependencies) { [weak self] errors in
             guard let self = self else { return }
 
             self.startScheduler(showWebView: showWebView)
@@ -231,15 +227,15 @@ public final class DefaultDataBrokerProtectionScheduler {
                 if let oneTimeError = errors.oneTimeError {
                     switch oneTimeError {
                     case DataBrokerProtectionAgentInterfaceError.operationsInterrupted:
-                        os_log("Interrupted during DefaultDataBrokerProtectionScheduler.startManualScan in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        os_log("Interrupted during DefaultDataBrokerProtectionScheduler.startImmediateOperations in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
                     default:
-                        os_log("Error during DefaultDataBrokerProtectionScheduler.startManualScan in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                        self.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.startManualScan"))
+                        os_log("Error during DefaultDataBrokerProtectionScheduler.startImmediateOperations in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        self.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.startImmediateOperations"))
                     }
                 }
                 if let operationErrors = errors.operationErrors,
                           operationErrors.count != 0 {
-                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.startManualScan in dataBrokerProcessor.runAllScanOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.startImmediateOperations in dataBrokerProcessor.runAllScanOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             }
             self.currentOperation = .idle
@@ -269,8 +265,7 @@ public final class DefaultDataBrokerProtectionScheduler {
 
         os_log("Opting out all brokers...", log: .dataBrokerProtection)
         self.currentOperation = .optOutAll
-        self.dataBrokerProcessor.runAllOptOutOperations(showWebView: showWebView,
-                                                        completion: { [weak self] errors in
+        queueManager.execute(.startOptOutOperations(showWebView: showWebView, operationDependencies: operationDependencies) { [weak self] errors in
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
                     os_log("Error during DefaultDataBrokerProtectionScheduler.optOutAllBrokers in dataBrokerProcessor.runAllOptOutOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)

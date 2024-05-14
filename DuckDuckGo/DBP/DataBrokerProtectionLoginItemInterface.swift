@@ -81,12 +81,12 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
         ipcClient.openBrowser(domain: domain)
     }
 
-    func startManualScan(showWebView: Bool) {
-        ipcClient.startManualScan(showWebView: showWebView)
+    func startImmediateOperations(showWebView: Bool) {
+        ipcClient.startImmediateOperations(showWebView: showWebView)
     }
 
-    func runQueuedOperations(showWebView: Bool) {
-        ipcClient.runQueuedOperations(showWebView: showWebView)
+    func startScheduledOperations(showWebView: Bool) {
+        ipcClient.startScheduledOperations(showWebView: showWebView)
     }
 
     func runAllOptOuts(showWebView: Bool) {

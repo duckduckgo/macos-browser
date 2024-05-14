@@ -868,7 +868,7 @@ final class MockAppVersion: AppVersionNumberProvider {
 }
 
 final class MockStageDurationCalculator: StageDurationCalculator {
-    var isManualScan: Bool = false
+    var isImmediateOperation: Bool = false
     var attemptId: UUID = UUID()
     var stage: Stage?
 
@@ -962,7 +962,6 @@ final class MockDataBrokerProtectionBackendServicePixels: DataBrokerProtectionBa
 }
 
 final class MockRunnerProvider: JobRunnerProvider {
-
     func getJobRunner() -> any WebJobRunner {
         MockWebJobRunner()
     }
@@ -1024,5 +1023,187 @@ extension DataBroker {
                 maintenanceScan: 0
             )
         )
+    }
+}
+
+final class MockDataBrokerProtectionOperationQueue: DataBrokerProtectionOperationQueue {
+    var maxConcurrentOperationCount = 1
+
+    var operations: [Operation] = []
+    var operationCount: Int {
+        operations.count
+    }
+
+    private(set) var didCallCancelCount = 0
+    private(set) var didCallAddCount = 0
+    private(set) var didCallAddBarrierBlockCount = 0
+
+    private var barrierBlock: (@Sendable () -> Void)?
+
+    func cancelAllOperations() {
+        didCallCancelCount += 1
+        self.operations.forEach { $0.cancel() }
+    }
+
+    func addOperation(_ op: Operation) {
+        didCallAddCount += 1
+        self.operations.append(op)
+    }
+
+    func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void) {
+        didCallAddBarrierBlockCount += 1
+        self.barrierBlock = barrier
+    }
+
+    func completeAllOperations() {
+        operations.forEach { $0.start() }
+        operations.removeAll()
+        barrierBlock?()
+    }
+
+    func completeOperationsUpTo(index: Int) {
+        guard index < operationCount else { return }
+
+        (0..<index).forEach {
+            operations[$0].start()
+        }
+
+        (0..<index).forEach {
+            operations.remove(at: $0)
+        }
+    }
+}
+
+final class MockDataBrokerOperation: DataBrokerOperation {
+
+    private var shouldError = false
+    private var _isExecuting = false
+    private var _isFinished = false
+    private var _isCancelled = false
+    private var operationsManager: OperationsManager!
+
+    convenience init(id: Int64,
+                     operationType: OperationType,
+                     errorDelegate: DataBrokerOperationErrorDelegate,
+                     shouldError: Bool = false) {
+
+        self.init(dataBrokerID: id,
+                  operationType: operationType,
+                  showWebView: false,
+                  errorDelegate: errorDelegate,
+                  operationDependencies: DefaultDataBrokerOperationDependencies.mock)
+
+        self.shouldError = shouldError
+    }
+
+    override func main() {
+        if shouldError {
+            errorDelegate?.dataBrokerOperationDidError(DataBrokerProtectionError.noActionFound, withBrokerName: nil)
+        }
+
+        finish()
+    }
+
+    override func cancel() {
+        self._isCancelled = true
+    }
+
+    override var isCancelled: Bool {
+        _isCancelled
+    }
+
+    override var isAsynchronous: Bool {
+        return true
+    }
+
+    override var isExecuting: Bool {
+        return _isExecuting
+    }
+
+    override var isFinished: Bool {
+        return _isFinished
+    }
+
+    private func finish() {
+        willChangeValue(forKey: #keyPath(isExecuting))
+        willChangeValue(forKey: #keyPath(isFinished))
+
+        _isExecuting = false
+        _isFinished = true
+
+        didChangeValue(forKey: #keyPath(isExecuting))
+        didChangeValue(forKey: #keyPath(isFinished))
+    }
+}
+
+final class MockDataBrokerOperationErrorDelegate: DataBrokerOperationErrorDelegate {
+
+    var operationErrors: [Error] = []
+
+    func dataBrokerOperationDidError(_ error: any Error, withBrokerName brokerName: String?) {
+        operationErrors.append(error)
+    }
+}
+
+extension DefaultDataBrokerOperationDependencies {
+    static var mock: DefaultDataBrokerOperationDependencies {
+        DefaultDataBrokerOperationDependencies(database: MockDatabase(),
+                                               config: DataBrokerProtectionProcessorConfiguration(),
+                                               runnerProvider: MockRunnerProvider(),
+                                               notificationCenter: .default,
+                                               pixelHandler: MockPixelHandler(),
+                                               userNotificationService: MockUserNotification())
+    }
+}
+
+final class MockDataBrokerOperationsCreator: DataBrokerOperationsCreator {
+
+    var operationCollections: [DataBrokerOperation] = []
+    var shouldError = false
+    var priorityDate: Date?
+    var createdType: OperationType = .scan
+
+    init(operationCollections: [DataBrokerOperation] = []) {
+        self.operationCollections = operationCollections
+    }
+
+    func operations(forOperationType operationType: OperationType,
+                    withPriorityDate priorityDate: Date?,
+                    showWebView: Bool,
+                    errorDelegate: DataBrokerOperationErrorDelegate,
+                    operationDependencies: DataBrokerOperationDependencies) throws -> [DataBrokerOperation] {
+        guard !shouldError else { throw DataBrokerProtectionError.unknown("")}
+        self.createdType = operationType
+        self.priorityDate = priorityDate
+        return operationCollections
+    }
+}
+
+final class MockMismatchCalculator: MismatchCalculator {
+
+    private(set) var didCallCalculateMismatches = false
+
+    init(database: any DataBrokerProtectionRepository, pixelHandler: Common.EventMapping<DataBrokerProtectionPixels>) { }
+
+    func calculateMismatches() {
+        didCallCalculateMismatches = true
+    }
+}
+
+final class MockDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrokerUpdater {
+
+    private(set) var didCallUpdateBrokers = false
+    private(set) var didCallCheckForUpdates = false
+
+    static func provideForDebug() -> DefaultDataBrokerProtectionBrokerUpdater? {
+        nil
+    }
+
+    func updateBrokers() {
+        didCallUpdateBrokers = true
+    }
+
+    func checkForUpdatesInBrokerJSONFiles() {
+        didCallCheckForUpdates = true
     }
 }

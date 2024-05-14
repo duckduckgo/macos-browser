@@ -1,5 +1,5 @@
 //
-//  MismatchCalculatorUseCase.swift
+//  MismatchCalculator.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -36,7 +36,12 @@ enum MismatchValues: Int {
     }
 }
 
-struct MismatchCalculatorUseCase {
+protocol MismatchCalculator {
+    init(database: DataBrokerProtectionRepository, pixelHandler: EventMapping<DataBrokerProtectionPixels>)
+    func calculateMismatches()
+}
+
+struct DefaultMismatchCalculator: MismatchCalculator {
     let database: DataBrokerProtectionRepository
     let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 

@@ -25,7 +25,7 @@ final class DataBrokerProtectionProcessorConfigurationTests: XCTestCase {
     private let sut = DataBrokerProtectionProcessorConfiguration()
 
     func testWhenOperationIsManualScans_thenConcurrentOperationsBetweenBrokersIsSix() {
-        let value = sut.concurrentOperationsFor(.manualScan)
+        let value = sut.concurrentOperationsFor(.scan)
         let expectedValue = 6
         XCTAssertEqual(value, expectedValue)
     }
