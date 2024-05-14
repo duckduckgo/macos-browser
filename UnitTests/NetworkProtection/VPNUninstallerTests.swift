@@ -23,9 +23,9 @@ import XCTest
 
 final class VPNUninstallerTests: XCTestCase {
 
-    func testUninstallWorks() async {
+    func testUninstallWorks() async throws {
         let uninstaller = VPNUninstaller()
 
-        await uninstaller.uninstall(removeSystemExtension: true)
+        try await uninstaller.uninstall(removeSystemExtension: true)
     }
 }
