@@ -156,7 +156,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
     public func profileSaved() {
         let startTime = Date()
         pixelHandler.fire(.initialScanPreStartDuration(duration: (Date().timeIntervalSince(startTime) * 1000).rounded(.towardZero)))
-        let backgroundAgentManualScanStartTime = Date()
+        let backgroundAgentInitialScanStartTime = Date()
 
         userNotificationService.requestNotificationPermission()
         queueManager.startImmediateOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies) { [weak self] errors in
@@ -187,7 +187,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
                 self.userNotificationService.scheduleCheckInNotificationIfPossible()
             }
 
-            fireImmediateScansCompletionPixel(startTime: backgroundAgentManualScanStartTime)
+            fireImmediateScansCompletionPixel(startTime: backgroundAgentInitialScanStartTime)
         }
     }
 
