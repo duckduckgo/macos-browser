@@ -459,6 +459,10 @@ extension AddressBarViewController {
             guard let self else { return event }
             return self.mouseUp(with: event)
         }.store(in: &eventMonitorCancellables)
+        NSEvent.addLocalCancellableMonitor(forEventsMatching: .rightMouseDown) { [weak self] event in
+            guard let self else { return event }
+            return self.rightMouseDown(with: event)
+        }.store(in: &eventMonitorCancellables)
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
@@ -487,6 +491,20 @@ extension AddressBarViewController {
             self.clickPoint = event.locationInWindow
         }
         return event
+
+    }
+
+    func rightMouseDown(with event: NSEvent) -> NSEvent? {
+        guard event.window === self.view.window else { return event }
+        // Convert the point to view system
+        let pointInView = view.convert(event.locationInWindow, from: nil)
+
+        // Check if the farthest view of the point location is not a NSButton or LottieAnimationView
+        guard view.hitTest(pointInView)?.shouldShowArrowCursor == false else { return event }
+
+        // The event location is not a button so we can forward the event to the textfield
+        addressBarTextField.rightMouseDown(with: event)
+        return nil
     }
 
     private static let maxClickReleaseDistanceToResignFirstResponder: CGFloat = 4
