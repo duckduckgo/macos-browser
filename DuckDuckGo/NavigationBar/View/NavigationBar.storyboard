@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22689"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22690"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -474,7 +474,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
-                            <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="le0-Hn-ZAC">
+                            <textField focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="le0-Hn-ZAC">
                                 <rect key="frame" x="359" y="8" width="8" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" refusesFirstResponder="YES" alignment="center" usesSingleLineMode="YES" id="rpt-TE-48N">
                                     <font key="font" metaFont="system"/>
@@ -575,13 +575,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="578" height="34"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="lYD-6T-NGB">
-                                <rect key="frame" x="0.0" y="1" width="32" height="32"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="32" id="RjE-bU-jDw"/>
-                                    <constraint firstAttribute="height" constant="32" id="dh9-1Y-sAv"/>
-                                </constraints>
-                            </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="hdY-An-3W8">
                                 <rect key="frame" x="0.0" y="2" width="100" height="30"/>
                                 <constraints>
@@ -845,14 +838,12 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="taC-vG-1fV" secondAttribute="trailing" constant="1" id="26X-xU-JjT"/>
-                            <constraint firstItem="lYD-6T-NGB" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="6Ie-01-AzV"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="BRs-q1-MOh"/>
                             <constraint firstItem="1qw-sL-vFK" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="Cl5-vM-wFc"/>
                             <constraint firstItem="1qw-sL-vFK" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" constant="2" id="IGR-F0-d7K"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="JJu-Ej-iFq"/>
                             <constraint firstItem="kRc-0m-oqe" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="T0S-fo-y1J"/>
                             <constraint firstAttribute="trailing" secondItem="kRc-0m-oqe" secondAttribute="trailing" constant="6" id="WeU-Fb-omO"/>
-                            <constraint firstItem="lYD-6T-NGB" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="fCA-Av-xw2"/>
                             <constraint firstItem="taC-vG-1fV" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="j0x-vX-dys"/>
                             <constraint firstItem="hdY-An-3W8" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="rBY-us-BMz"/>
                             <constraint firstItem="hdY-An-3W8" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="xv6-0t-7td"/>
@@ -872,7 +863,6 @@
                         <outlet property="notificationAnimationView" destination="1qw-sL-vFK" id="b5X-px-pwG"/>
                         <outlet property="permissionButtons" destination="8UU-A8-1nD" id="gYJ-VW-MEG"/>
                         <outlet property="popupsButton" destination="qqY-h9-UQ7" id="1QY-I6-oNC"/>
-                        <outlet property="privacyDashboardPositioningView" destination="lYD-6T-NGB" id="y2g-pX-zea"/>
                         <outlet property="privacyEntryPointButton" destination="nOW-iY-XmO" id="r0A-EO-srN"/>
                     </connections>
                 </viewController>

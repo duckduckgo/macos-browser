@@ -165,6 +165,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 }
 
 final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
+
     var onboardStatusPublisher: AnyPublisher<NetworkProtectionUI.OnboardingStatus, Never> {
         Just(.default).eraseToAnyPublisher()
     }
@@ -197,7 +198,7 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         false
     }
 
-    func disableIfUserHasNoAccess() async -> Bool {
-        return false
+    func disableIfUserHasNoAccess() async {
+        // Intentional no-op
     }
 }

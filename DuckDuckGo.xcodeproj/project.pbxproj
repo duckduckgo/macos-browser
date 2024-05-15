@@ -690,7 +690,6 @@
 		3706FCCC293F65D500E42796 /* TabBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC7B256C46AA007083E7 /* TabBar.storyboard */; };
 		3706FCCD293F65D500E42796 /* shield-dot.json in Resources */ = {isa = PBXBuildFile; fileRef = AA34396B2754D4E300B241FA /* shield-dot.json */; };
 		3706FCD0293F65D500E42796 /* BookmarksBarCollectionViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4BE53369286912D40019DBFD /* BookmarksBarCollectionViewItem.xib */; };
-		3706FCD1293F65D500E42796 /* PrivacyDashboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */; };
 		3706FCD2293F65D500E42796 /* shield.json in Resources */ = {isa = PBXBuildFile; fileRef = AA34396A2754D4E200B241FA /* shield.json */; };
 		3706FCD4293F65D500E42796 /* TabBarViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA7412B124D0B3AC00D22FE0 /* TabBarViewItem.xib */; };
 		3706FCD6293F65D500E42796 /* httpsMobileV2FalsePositives.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B67742A255DBEB800025BD8 /* httpsMobileV2FalsePositives.json */; };
@@ -1198,8 +1197,8 @@
 		4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4B677428255DBEB800025BD8 /* httpsMobileV2Bloom.bin */; };
 		4B677435255DBEB800025BD8 /* httpsMobileV2FalsePositives.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B67742A255DBEB800025BD8 /* httpsMobileV2FalsePositives.json */; };
 		4B677442255DBEEA00025BD8 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677440255DBEEA00025BD8 /* Database.swift */; };
-		4B6785472AA8DE68008A5004 /* NetworkProtectionFeatureDisabler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6785432AA8DE1F008A5004 /* NetworkProtectionFeatureDisabler.swift */; };
-		4B6785482AA8DE69008A5004 /* NetworkProtectionFeatureDisabler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6785432AA8DE1F008A5004 /* NetworkProtectionFeatureDisabler.swift */; };
+		4B6785472AA8DE68008A5004 /* VPNUninstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6785432AA8DE1F008A5004 /* VPNUninstaller.swift */; };
+		4B6785482AA8DE69008A5004 /* VPNUninstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6785432AA8DE1F008A5004 /* VPNUninstaller.swift */; };
 		4B67854A2AA8DE75008A5004 /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */; };
 		4B67854B2AA8DE76008A5004 /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */; };
 		4B6B64842BA930420009FF9F /* WaitlistThankYouPromptPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6B64832BA930420009FF9F /* WaitlistThankYouPromptPresenter.swift */; };
@@ -1502,6 +1501,8 @@
 		7B37C7A52BAA32A50062546A /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = 7B37C7A42BAA32A50062546A /* Subscription */; };
 		7B430EA12A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B430EA22A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
+		7B4C5CF52BE51D640007A164 /* VPNUninstallerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4C5CF42BE51D640007A164 /* VPNUninstallerTests.swift */; };
+		7B4C5CF62BE51D640007A164 /* VPNUninstallerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4C5CF42BE51D640007A164 /* VPNUninstallerTests.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
 		7B4D8A212BDA857300852966 /* VPNOperationErrorRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4D8A202BDA857300852966 /* VPNOperationErrorRecorder.swift */; };
 		7B4D8A222BDA857300852966 /* VPNOperationErrorRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4D8A202BDA857300852966 /* VPNOperationErrorRecorder.swift */; };
@@ -2440,7 +2441,6 @@
 		B6F9BDDD2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */; };
 		B6F9BDE42B45CD1900677B33 /* ModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDE32B45CD1900677B33 /* ModalView.swift */; };
 		B6F9BDE52B45CD1900677B33 /* ModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDE32B45CD1900677B33 /* ModalView.swift */; };
-		B6FA893D269C423100588ECD /* PrivacyDashboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */; };
 		B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */; };
 		B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */; };
 		BB5789722B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */; };
@@ -3115,7 +3115,7 @@
 		4B67742A255DBEB800025BD8 /* httpsMobileV2FalsePositives.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = httpsMobileV2FalsePositives.json; sourceTree = "<group>"; };
 		4B677440255DBEEA00025BD8 /* Database.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		4B677454255DC18000025BD8 /* Bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bridging.h; sourceTree = "<group>"; };
-		4B6785432AA8DE1F008A5004 /* NetworkProtectionFeatureDisabler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionFeatureDisabler.swift; sourceTree = "<group>"; };
+		4B6785432AA8DE1F008A5004 /* VPNUninstaller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNUninstaller.swift; sourceTree = "<group>"; };
 		4B6B64832BA930420009FF9F /* WaitlistThankYouPromptPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistThankYouPromptPresenter.swift; sourceTree = "<group>"; };
 		4B70BFFF27B0793D000386ED /* DuckDuckGo-ExampleCrash.ips */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "DuckDuckGo-ExampleCrash.ips"; sourceTree = "<group>"; };
 		4B70C00027B0793D000386ED /* CrashReportTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashReportTests.swift; sourceTree = "<group>"; };
@@ -3323,6 +3323,7 @@
 		7B2E52242A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAgentNotificationsPresenter.swift; sourceTree = "<group>"; };
 		7B3618C12ADE75C8000D6154 /* NetworkProtectionNavBarPopoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionNavBarPopoverManager.swift; sourceTree = "<group>"; };
 		7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSimulateFailureMenu.swift; sourceTree = "<group>"; };
+		7B4C5CF42BE51D640007A164 /* VPNUninstallerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNUninstallerTests.swift; sourceTree = "<group>"; };
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
 		7B4D8A202BDA857300852966 /* VPNOperationErrorRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNOperationErrorRecorder.swift; sourceTree = "<group>"; };
@@ -4004,7 +4005,6 @@
 		B6F7128029F681EB00594A45 /* QuickLookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLookUI.framework; path = System/Library/Frameworks/QuickLookUI.framework; sourceTree = SDKROOT; };
 		B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteInfo.swift; sourceTree = "<group>"; };
 		B6F9BDE32B45CD1900677B33 /* ModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalView.swift; sourceTree = "<group>"; };
-		B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PrivacyDashboard.storyboard; sourceTree = "<group>"; };
 		B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardViewController.swift; sourceTree = "<group>"; };
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
 		BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionSubscriptionEventHandler.swift; sourceTree = "<group>"; };
@@ -5436,7 +5436,7 @@
 			isa = PBXGroup;
 			children = (
 				7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */,
-				4B6785432AA8DE1F008A5004 /* NetworkProtectionFeatureDisabler.swift */,
+				4B6785432AA8DE1F008A5004 /* VPNUninstaller.swift */,
 				7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */,
 				31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */,
 				31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */,
@@ -5686,6 +5686,7 @@
 				4BD57C032AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift */,
 				7B09CBA72BA4BE7000CF245B /* NetworkProtectionPixelEventTests.swift */,
 				BDA7648C2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift */,
+				7B4C5CF42BE51D640007A164 /* VPNUninstallerTests.swift */,
 			);
 			path = NetworkProtection;
 			sourceTree = "<group>";
@@ -8044,7 +8045,6 @@
 		B6FA893B269C41ED00588ECD /* View */ = {
 			isa = PBXGroup;
 			children = (
-				B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */,
 				B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */,
 				B63BDF7D27FDAA640072D75B /* PrivacyDashboardWebView.swift */,
 				B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */,
@@ -8891,7 +8891,6 @@
 				3706FCCC293F65D500E42796 /* TabBar.storyboard in Resources */,
 				3706FCCD293F65D500E42796 /* shield-dot.json in Resources */,
 				3706FCD0293F65D500E42796 /* BookmarksBarCollectionViewItem.xib in Resources */,
-				3706FCD1293F65D500E42796 /* PrivacyDashboard.storyboard in Resources */,
 				3706FCD2293F65D500E42796 /* shield.json in Resources */,
 				3706FCD4293F65D500E42796 /* TabBarViewItem.xib in Resources */,
 				3706FCD6293F65D500E42796 /* httpsMobileV2FalsePositives.json in Resources */,
@@ -9085,7 +9084,6 @@
 				AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */,
 				AA34396D2754D4E300B241FA /* shield-dot.json in Resources */,
 				4BE5336B286912D40019DBFD /* BookmarksBarCollectionViewItem.xib in Resources */,
-				B6FA893D269C423100588ECD /* PrivacyDashboard.storyboard in Resources */,
 				AA34396C2754D4E300B241FA /* shield.json in Resources */,
 				AA7412B324D0B3AC00D22FE0 /* TabBarViewItem.xib in Resources */,
 				4B677435255DBEB800025BD8 /* httpsMobileV2FalsePositives.json in Resources */,
@@ -9980,7 +9978,7 @@
 				3706FBE9293F65D500E42796 /* FireViewModel.swift in Sources */,
 				B68D21D02ACBC9FD002DA3C2 /* ContentBlockerRulesManagerMock.swift in Sources */,
 				3706FEC6293F6F0600E42796 /* BWKeyStorage.swift in Sources */,
-				4B6785482AA8DE69008A5004 /* NetworkProtectionFeatureDisabler.swift in Sources */,
+				4B6785482AA8DE69008A5004 /* VPNUninstaller.swift in Sources */,
 				3706FBEC293F65D500E42796 /* EditableTextView.swift in Sources */,
 				3706FBED293F65D500E42796 /* TabCollection.swift in Sources */,
 				B6C0BB6B29AF1C7000AE8E3C /* BrowserTabView.swift in Sources */,
@@ -10321,6 +10319,7 @@
 				3706FE0A293F661700E42796 /* UserAgentTests.swift in Sources */,
 				3706FE0B293F661700E42796 /* AVCaptureDeviceMock.swift in Sources */,
 				9FBD84572BB3ACFD00220859 /* AttributionOriginFileProviderTests.swift in Sources */,
+				7B4C5CF62BE51D640007A164 /* VPNUninstallerTests.swift in Sources */,
 				3706FE0C293F661700E42796 /* GeolocationProviderMock.swift in Sources */,
 				CBDD5DE429A6800300832877 /* MockConfigurationStore.swift in Sources */,
 				3706FE0D293F661700E42796 /* MainMenuTests.swift in Sources */,
@@ -11153,7 +11152,7 @@
 				4B9DB0352A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				AAB8203C26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift in Sources */,
 				AAADFD06264AA282001555EA /* TimeIntervalExtension.swift in Sources */,
-				4B6785472AA8DE68008A5004 /* NetworkProtectionFeatureDisabler.swift in Sources */,
+				4B6785472AA8DE68008A5004 /* VPNUninstaller.swift in Sources */,
 				4B0526642B1D55D80054955A /* VPNFeedbackCategory.swift in Sources */,
 				4B9292D42667123700AD2C21 /* BookmarkListViewController.swift in Sources */,
 				9F56CFB12B843F6C00BB7F11 /* BookmarksDialogViewFactory.swift in Sources */,
@@ -11825,6 +11824,7 @@
 				5681ED402BDB955100F59729 /* SyncCredentialsAdapterTests.swift in Sources */,
 				5681ED432BDBA5F900F59729 /* SyncBookmarksAdapterTests.swift in Sources */,
 				4BBF09232830812900EE1418 /* FileSystemDSL.swift in Sources */,
+				7B4C5CF52BE51D640007A164 /* VPNUninstallerTests.swift in Sources */,
 				4B9DB05C2A983B55000927DB /* WaitlistViewModelTests.swift in Sources */,
 				1D1C36E329FAE8DA001FA40C /* FaviconManagerTests.swift in Sources */,
 				9F0FFFB42BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift in Sources */,

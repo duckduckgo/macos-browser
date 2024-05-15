@@ -202,7 +202,8 @@ final class NavigationBarViewController: NSViewController {
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel,
-                                                                      isBurner: isBurner) else {
+                                                                      isBurner: isBurner,
+                                                                      popovers: popovers) else {
             fatalError("NavigationBarViewController: Failed to init AddressBarViewController")
         }
 
@@ -281,13 +282,11 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
-        popovers.bookmarksButtonPressed(anchorView: bookmarkListButton,
-                                        popoverDelegate: self,
-                                        tab: tabCollectionViewModel.selectedTabViewModel?.tab)
+        popovers.bookmarksButtonPressed(bookmarkListButton, popoverDelegate: self, tab: tabCollectionViewModel.selectedTabViewModel?.tab)
     }
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
-        popovers.passwordManagementButtonPressed(usingView: passwordManagementButton, withDelegate: self)
+        popovers.passwordManagementButtonPressed(passwordManagementButton, withDelegate: self)
     }
 
     @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
@@ -300,7 +299,7 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+        popovers.toggleNetworkProtectionPopover(from: networkProtectionButton, withDelegate: networkProtectionButtonModel)
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
@@ -472,19 +471,15 @@ final class NavigationBarViewController: NSViewController {
             setDownloadButtonHidingTimer()
         }
 
-        popovers.toggleDownloadsPopover(usingView: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
+        popovers.toggleDownloadsPopover(from: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
     }
 
     func showPasswordManagerPopover(selectedCategory: SecureVaultSorting.Category?) {
-        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory,
-                                               usingView: passwordManagementButton,
-                                               withDelegate: self)
+        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory, from: passwordManagementButton, withDelegate: self)
     }
 
     func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount) {
-        popovers.showPasswordManagerPopover(selectedWebsiteAccount: selectedWebsiteAccount,
-                                                     usingView: passwordManagementButton,
-                                                     withDelegate: self)
+        popovers.showPasswordManagerPopover(selectedWebsiteAccount: selectedWebsiteAccount, from: passwordManagementButton, withDelegate: self)
     }
 
     private func setupNavigationButtonMenus() {
@@ -636,7 +631,7 @@ final class NavigationBarViewController: NSViewController {
                     !update.item.isBurner,
                     WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window {
 
-                    self.popovers.showDownloadsPopoverAndAutoHide(usingView: downloadsButton,
+                    self.popovers.showDownloadsPopoverAndAutoHide(from: downloadsButton,
                                                                   popoverDelegate: self,
                                                                   downloadsDelegate: self)
                 } else if update.item.isBurner {
@@ -695,7 +690,7 @@ final class NavigationBarViewController: NSViewController {
         if LocalPinningManager.shared.isPinned(.autofill) {
             passwordManagementButton.isHidden = false
         } else {
-            passwordManagementButton.isHidden = !popovers.isPasswordManagementPopoverShown && !isAutoFillAutosaveMessageVisible
+            passwordManagementButton.isShown = popovers.isPasswordManagementPopoverShown || isAutoFillAutosaveMessageVisible
         }
 
         popovers.passwordManagementDomain = nil
@@ -736,15 +731,15 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
-        let menu = NSMenu()
-        let title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
-        menu.addItem(withTitle: title, action: #selector(toggleDownloadsPanelPinning(_:)), keyEquivalent: "")
-
-        downloadsButton.menu = menu
+        downloadsButton.menu = NSMenu {
+            NSMenuItem(title: LocalPinningManager.shared.shortcutTitle(for: .downloads),
+                       action: #selector(toggleDownloadsPanelPinning(_:)),
+                       keyEquivalent: "")
+        }
         downloadsButton.toolTip = UserText.downloadsShortcutTooltip
 
         if LocalPinningManager.shared.isPinned(.downloads) {
-            downloadsButton.isHidden = false
+            downloadsButton.isShown = true
             return
         }
 
@@ -752,21 +747,22 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.image = hasActiveDownloads ? .downloadsActive : .downloads
         let isTimerActive = downloadsButtonHidingTimer != nil
 
-        if popovers.isDownloadsPopoverShown {
-            downloadsButton.isHidden = false
+        downloadsButton.isShown = if popovers.isDownloadsPopoverShown {
+            true
         } else {
-            downloadsButton.isHidden = !(hasActiveDownloads || isTimerActive)
+            hasActiveDownloads || isTimerActive
         }
 
-        if !downloadsButton.isHidden { setDownloadButtonHidingTimer() }
-        downloadsButton.isMouseDown = popovers.isDownloadsPopoverShown
+        if downloadsButton.isShown {
+            setDownloadButtonHidingTimer()
+        }
 
         // If the user has selected Hide Downloads from the navigation bar context menu, and no downloads are active, then force it to be hidden
         // even if the timer is active.
         if updatingFromPinnedViewsNotification {
             if !LocalPinningManager.shared.isPinned(.downloads) {
                 invalidateDownloadButtonHidingTimer()
-                downloadsButton.isHidden = !hasActiveDownloads
+                downloadsButton.isShown = hasActiveDownloads
             }
         }
     }
@@ -997,9 +993,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
-        popovers.showBookmarkListPopover(usingView: bookmarkListButton,
-                                         withDelegate: self,
-                                         forTab: tabCollectionViewModel.selectedTabViewModel?.tab)
+        popovers.showBookmarkListPopover(from: bookmarkListButton, withDelegate: self, forTab: tabCollectionViewModel.selectedTabViewModel?.tab)
     }
 
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu) {
@@ -1015,9 +1009,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category) {
-        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory,
-                                               usingView: passwordManagementButton,
-                                               withDelegate: self)
+        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory, from: passwordManagementButton, withDelegate: self)
     }
 
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {

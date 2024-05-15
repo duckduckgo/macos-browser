@@ -36,6 +36,7 @@ import UserNotifications
 import Lottie
 import NetworkProtection
 import Subscription
+import NetworkProtectionIPC
 
 // @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -88,7 +89,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         subscriptionManager.accountManager
     }
     public let subscriptionManager: SubscriptionManaging
-
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
 #if DBP
     private var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler?
@@ -226,7 +226,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
 
         // Configure Event handlers
-        networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager)
+        let ipcClient = TunnelControllerIPCClient()
+        let tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+        let vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
+
+        networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager,
+                                                                                              tunnelController: tunnelController,
+                                                                                              vpnUninstaller: vpnUninstaller)
 #if DBP
         dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager)
 #endif
