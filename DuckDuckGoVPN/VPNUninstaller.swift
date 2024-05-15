@@ -31,27 +31,24 @@ protocol VPNUninstalling {
 @MainActor
 final class VPNUninstaller: VPNUninstalling {
 
-    private let tunnelController: TunnelController
+    private let tunnelController: NetworkProtectionTunnelController
     private let networkExtensionController: NetworkExtensionController
-    private let vpnConfiguration: VPNConfigurationManager
     private let defaults: UserDefaults
     private let pixelKit: PixelFiring?
 
-    init(tunnelController: TunnelController,
+    init(tunnelController: NetworkProtectionTunnelController,
          networkExtensionController: NetworkExtensionController,
-         vpnConfigurationManager: VPNConfigurationManager, defaults: UserDefaults = .netP,
+         defaults: UserDefaults = .netP,
          pixelKit: PixelFiring? = PixelKit.shared) {
 
         self.tunnelController = tunnelController
         self.networkExtensionController = networkExtensionController
-        self.vpnConfiguration = vpnConfigurationManager
         self.defaults = defaults
         self.pixelKit = pixelKit
     }
 
     func uninstall(includingSystemExtension: Bool) async throws {
         pixelKit?.fire(VPNUninstallAttempt.begin)
-        await tunnelController.stop()
 
         do {
             try await removeSystemExtension()
@@ -79,13 +76,21 @@ final class VPNUninstaller: VPNUninstalling {
 
     func removeSystemExtension() async throws {
 #if NETP_SYSTEM_EXTENSION
+        await tunnelController.stop()
         try await networkExtensionController.deactivateSystemExtension()
         defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowExtension)
 #endif
     }
 
     func removeVPNConfiguration() async throws {
-        try await VPNConfigurationManager().removeVPNConfiguration()
+        await tunnelController.stop()
+
+        guard let manager = await tunnelController.manager else {
+            // Nothing to remove, this is fine
+            return
+        }
+
+        try await manager.removeFromPreferences()
 
         if defaults.networkProtectionOnboardingStatus == .completed {
             defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)

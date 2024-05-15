@@ -246,8 +246,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var vpnUninstaller: VPNUninstaller = {
         VPNUninstaller(
             tunnelController: tunnelController,
-            networkExtensionController: networkExtensionController,
-            vpnConfigurationManager: VPNConfigurationManager())
+            networkExtensionController: networkExtensionController)
     }()
 
     /// The status bar NetworkProtection menu
