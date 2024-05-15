@@ -64,12 +64,15 @@ final class VPNUninstaller: VPNUninstalling {
             defaults.networkProtectionShouldShowVPNUninstalledMessage = true
             pixelKit?.fire(VPNUninstallAttempt.success, frequency: .dailyAndCount)
         } catch {
-            if case OSSystemExtensionError.requestCanceled = error {
-                pixelKit?.fire(VPNUninstallAttempt.cancelled, frequency: .dailyAndCount)
-                throw error
+            switch error {
+            case OSSystemExtensionError.requestCanceled:
+                pixelKit?.fire(VPNUninstallAttempt.cancelled(.sysexInstallationCancelled), frequency: .dailyAndCount)
+            case OSSystemExtensionError.authorizationRequired:
+                pixelKit?.fire(VPNUninstallAttempt.cancelled(.sysexInstallationRequiresAuthorization), frequency: .dailyAndCount)
+            default:
+                pixelKit?.fire(VPNUninstallAttempt.failure(error), frequency: .dailyAndCount)
             }
 
-            pixelKit?.fire(VPNUninstallAttempt.failure(error), frequency: .dailyAndCount)
             throw error
         }
     }
@@ -93,9 +96,14 @@ final class VPNUninstaller: VPNUninstalling {
 // MARK: - VPNUninstallAttempt
 
 extension VPNUninstaller {
+    enum UninstallCancellationReason: String {
+        case sysexInstallationCancelled
+        case sysexInstallationRequiresAuthorization
+    }
+
     enum VPNUninstallAttempt: PixelKitEventV2 {
         case begin
-        case cancelled
+        case cancelled(_ reason: UninstallCancellationReason)
         case success
         case failure(_ error: Error)
 
@@ -116,7 +124,14 @@ extension VPNUninstaller {
         }
 
         var parameters: [String: String]? {
-            return nil
+            switch self {
+            case .begin,
+                    .success,
+                    .failure:
+                return nil
+            case .cancelled(let reason):
+                return ["reason": reason.rawValue]
+            }
         }
 
         var error: Error? {

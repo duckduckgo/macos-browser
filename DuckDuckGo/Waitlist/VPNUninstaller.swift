@@ -36,6 +36,10 @@ final class VPNUninstaller: VPNUninstalling {
         case alreadyUninstalling
         case alreadyUninstalled
         case sysexInstallationCancelled
+
+        /// The user was asked for login / pwd or touchID and cancelled
+        ///
+        case sysexInstallationRequiresAuthorization
     }
 
     enum UninstallError: CustomNSError {
@@ -184,11 +188,14 @@ final class VPNUninstaller: VPNUninstalling {
             } catch {
                 print("Failed to uninstall VPN, with error: \(error.localizedDescription)")
 
-                if case OSSystemExtensionError.requestCanceled = error {
+                switch error {
+                case OSSystemExtensionError.requestCanceled:
                     throw UninstallError.cancelled(reason: .sysexInstallationCancelled)
+                case OSSystemExtensionError.authorizationRequired:
+                    throw UninstallError.cancelled(reason: .sysexInstallationRequiresAuthorization)
+                default:
+                    throw UninstallError.uninstallError(error)
                 }
-
-                throw UninstallError.uninstallError(error)
             }
 
             // We want to give some time for the login item to reset state before disabling it
