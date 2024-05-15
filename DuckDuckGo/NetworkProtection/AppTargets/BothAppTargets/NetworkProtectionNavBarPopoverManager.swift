@@ -45,12 +45,12 @@ extension TunnelControllerIPCClient: NetworkProtectionIPCClient {
 final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var networkProtectionPopover: NetworkProtectionPopover?
     let ipcClient: NetworkProtectionIPCClient
-    let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
+    let vpnUninstaller: VPNUninstalling
 
     init(ipcClient: TunnelControllerIPCClient,
-         networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling) {
+         vpnUninstaller: VPNUninstalling) {
         self.ipcClient = ipcClient
-        self.networkProtectionFeatureDisabler = networkProtectionFeatureDisabler
+        self.vpnUninstaller = vpnUninstaller
     }
 
     var isShown: Bool {
@@ -116,7 +116,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                                    userDefaults: .netP,
                                                    locationFormatter: DefaultVPNLocationFormatter(),
                                                    uninstallHandler: { [weak self] in
-                _ = await self?.networkProtectionFeatureDisabler.disable(uninstallSystemExtension: true)
+                _ = try? await self?.vpnUninstaller.uninstall(removeSystemExtension: true)
             })
             popover.delegate = delegate
 
