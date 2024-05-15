@@ -1026,6 +1026,166 @@ extension DataBroker {
     }
 }
 
+final class MockDataBrokerProtectionOperationQueueManager: DataBrokerProtectionQueueManager {
+    var debugRunningStatusString: String { return "" }
+
+    var startImmediateOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
+    var startScheduledOperationsIfPermittedCompletionError: DataBrokerProtectionAgentErrorCollection?
+
+    var startImmediateOperationsIfPermittedCalledCompletion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?
+    var startScheduledOperationsIfPermittedCalledCompletion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?
+
+    init(operationQueue: DataBrokerProtection.DataBrokerProtectionOperationQueue, operationsCreator: DataBrokerProtection.DataBrokerOperationsCreator, mismatchCalculator: DataBrokerProtection.MismatchCalculator, brokerUpdater: DataBrokerProtection.DataBrokerProtectionBrokerUpdater?, pixelHandler: Common.EventMapping<DataBrokerProtection.DataBrokerProtectionPixels>) {
+
+    }
+
+    func startImmediateOperationsIfPermitted(showWebView: Bool, operationDependencies: DataBrokerProtection.DataBrokerOperationDependencies, completion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+        completion?(startImmediateOperationsIfPermittedCompletionError)
+        startImmediateOperationsIfPermittedCalledCompletion?(startImmediateOperationsIfPermittedCompletionError)
+    }
+
+    func startScheduledOperationsIfPermitted(showWebView: Bool, operationDependencies: DataBrokerProtection.DataBrokerOperationDependencies, completion: ((DataBrokerProtection.DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+        completion?(startScheduledOperationsIfPermittedCompletionError)
+        startScheduledOperationsIfPermittedCalledCompletion?(startScheduledOperationsIfPermittedCompletionError)
+    }
+
+    func execute(_ command: DataBrokerProtection.DataBrokerProtectionQueueManagerDebugCommand) {
+    }
+}
+
+final class MockUserNotificationService: DataBrokerProtectionUserNotificationService {
+
+    var requestPermissionWasAsked = false
+    var firstScanNotificationWasSent = false
+    var firstRemovedNotificationWasSent = false
+    var checkInNotificationWasScheduled = false
+    var allInfoRemovedWasSent = false
+
+    func requestNotificationPermission() {
+        requestPermissionWasAsked = true
+    }
+
+    func sendFirstScanCompletedNotification() {
+        firstScanNotificationWasSent = true
+    }
+
+    func sendFirstRemovedNotificationIfPossible() {
+        firstRemovedNotificationWasSent = true
+    }
+
+    func sendAllInfoRemovedNotificationIfPossible() {
+        allInfoRemovedWasSent = true
+    }
+
+    func scheduleCheckInNotificationIfPossible() {
+        checkInNotificationWasScheduled = true
+    }
+
+    func reset() {
+        requestPermissionWasAsked = false
+        firstScanNotificationWasSent = false
+        firstRemovedNotificationWasSent = false
+        checkInNotificationWasScheduled = false
+        allInfoRemovedWasSent = false
+    }
+}
+
+final class MockDataBrokerProtectionBackgroundActivityScheduler: DataBrokerProtectionBackgroundActivityScheduler {
+
+    var delegate: DataBrokerProtection.DataBrokerProtectionBackgroundActivitySchedulerDelegate?
+    var lastTriggerTimestamp: Date?
+
+    var startSchedulerCompletion: (() -> Void)?
+
+    func startScheduler() {
+        startSchedulerCompletion?()
+    }
+
+    func triggerDelegateCall() {
+        delegate?.dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(self)
+    }
+}
+
+final class MockDataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
+
+    var profileToReturn: DataBrokerProtectionProfile?
+    var shouldReturnHasMatches = false
+
+    var cache: DataBrokerProtection.InMemoryDataCache
+    var delegate: DataBrokerProtection.DataBrokerProtectionDataManagerDelegate?
+
+    init(pixelHandler: Common.EventMapping<DataBrokerProtection.DataBrokerProtectionPixels>, fakeBrokerFlag: DataBrokerProtection.DataBrokerDebugFlag) {
+        cache = InMemoryDataCache()
+    }
+
+    func saveProfile(_ profile: DataBrokerProtection.DataBrokerProtectionProfile) async throws {
+    }
+
+    func fetchProfile() throws -> DataBrokerProtection.DataBrokerProtectionProfile? {
+        return profileToReturn
+    }
+
+    func prepareProfileCache() throws {
+    }
+
+    func fetchBrokerProfileQueryData(ignoresCache: Bool) throws -> [DataBrokerProtection.BrokerProfileQueryData] {
+        return []
+    }
+
+    func prepareBrokerProfileQueryDataCache() throws {
+    }
+
+    func hasMatches() throws -> Bool {
+        return shouldReturnHasMatches
+    }
+
+    func profileQueriesCount() throws -> Int {
+        return 0
+    }
+}
+
+final class MockIPCServer: DataBrokerProtectionIPCServer {
+
+    var serverDelegate: DataBrokerProtection.DataBrokerProtectionAppToAgentInterface?
+
+    init(machServiceName: String) {
+    }
+
+    func activate() {
+    }
+
+    func register() {
+    }
+
+    func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
+        serverDelegate?.profileSaved()
+    }
+
+    func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
+        serverDelegate?.appLaunched()
+    }
+
+    func openBrowser(domain: String) {
+        serverDelegate?.openBrowser(domain: domain)
+    }
+
+    func startImmediateOperations(showWebView: Bool) {
+        serverDelegate?.startImmediateOperations(showWebView: showWebView)
+    }
+
+    func startScheduledOperations(showWebView: Bool) {
+        serverDelegate?.startScheduledOperations(showWebView: showWebView)
+    }
+
+    func runAllOptOuts(showWebView: Bool) {
+        serverDelegate?.runAllOptOuts(showWebView: showWebView)
+    }
+
+    func getDebugMetadata(completion: @escaping (DataBrokerProtection.DBPBackgroundAgentMetadata?) -> Void) {
+        serverDelegate?.profileSaved()
+    }
+}
+
 final class MockDataBrokerProtectionOperationQueue: DataBrokerProtectionOperationQueue {
     var maxConcurrentOperationCount = 1
 
@@ -1148,11 +1308,11 @@ final class MockDataBrokerOperationErrorDelegate: DataBrokerOperationErrorDelega
 extension DefaultDataBrokerOperationDependencies {
     static var mock: DefaultDataBrokerOperationDependencies {
         DefaultDataBrokerOperationDependencies(database: MockDatabase(),
-                                               config: DataBrokerProtectionProcessorConfiguration(),
+                                               config: DataBrokerExecutionConfig(),
                                                runnerProvider: MockRunnerProvider(),
                                                notificationCenter: .default,
                                                pixelHandler: MockPixelHandler(),
-                                               userNotificationService: MockUserNotification())
+                                               userNotificationService: MockUserNotificationService())
     }
 }
 

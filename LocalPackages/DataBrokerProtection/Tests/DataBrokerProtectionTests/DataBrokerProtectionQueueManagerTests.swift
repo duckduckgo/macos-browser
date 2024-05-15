@@ -29,9 +29,9 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
     private var mockPixelHandler: MockPixelHandler!
     private var mockMismatchCalculator: MockMismatchCalculator!
     private var mockUpdater: MockDataBrokerProtectionBrokerUpdater!
-    private var mockSchedulerConfig = DataBrokerProtectionProcessorConfiguration()
+    private var mockSchedulerConfig = DataBrokerExecutionConfig()
     private var mockRunnerProvider: MockRunnerProvider!
-    private var mockUserNotification: MockUserNotification!
+    private var mockUserNotification: MockUserNotificationService!
     private var mockOperationErrorDelegate: MockDataBrokerOperationErrorDelegate!
     private var mockDependencies: DefaultDataBrokerOperationDependencies!
 
@@ -43,10 +43,10 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         mockMismatchCalculator = MockMismatchCalculator(database: mockDatabase, pixelHandler: mockPixelHandler)
         mockUpdater = MockDataBrokerProtectionBrokerUpdater()
         mockRunnerProvider = MockRunnerProvider()
-        mockUserNotification = MockUserNotification()
+        mockUserNotification = MockUserNotificationService()
 
         mockDependencies = DefaultDataBrokerOperationDependencies(database: mockDatabase,
-                                                                  config: DataBrokerProtectionProcessorConfiguration(),
+                                                                  config: DataBrokerExecutionConfig(),
                                                                   runnerProvider: mockRunnerProvider,
                                                                   notificationCenter: .default,
                                                                   pixelHandler: mockPixelHandler,
@@ -65,7 +65,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         mockOperationsCreator.operationCollections = [mockOperation, mockOperationWithError]
         let expectation = expectation(description: "Expected errors to be returned in completion")
         var errorCollection: DataBrokerProtectionAgentErrorCollection!
-        let expectedConcurrentOperations = DataBrokerProtectionProcessorConfiguration().concurrentOperationsFor(.scan)
+        let expectedConcurrentOperations = DataBrokerExecutionConfig().concurrentOperationsFor(.scan)
 
         // When
         sut.startImmediateOperationsIfPermitted(showWebView: false,
@@ -95,7 +95,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         mockOperationsCreator.operationCollections = [mockOperation, mockOperationWithError]
         let expectation = expectation(description: "Expected errors to be returned in completion")
         var errorCollection: DataBrokerProtectionAgentErrorCollection!
-        let expectedConcurrentOperations = DataBrokerProtectionProcessorConfiguration().concurrentOperationsFor(.all)
+        let expectedConcurrentOperations = DataBrokerExecutionConfig().concurrentOperationsFor(.all)
 
         // When
         sut.startScheduledOperationsIfPermitted(showWebView: false,
@@ -144,6 +144,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
 
         // Then
         XCTAssert(errorCollection.operationErrors?.count == 2)
+        let error = errorCollection.oneTimeError as? DataBrokerProtectionQueueError
+        XCTAssertEqual(error, .interrupted)
         XCTAssert(mockQueue.didCallCancelCount == 1)
         XCTAssert(mockQueue.operations.filter { !$0.isCancelled }.count == 4)
         XCTAssert(mockQueue.operations.filter { $0.isCancelled }.count >= 2)
@@ -180,6 +182,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
 
         // Then
         XCTAssert(errorCollection.operationErrors?.count == 2)
+        let error = errorCollection.oneTimeError as? DataBrokerProtectionQueueError
+        XCTAssertEqual(error, .interrupted)
         XCTAssert(mockQueue.didCallCancelCount == 1)
         XCTAssert(mockQueue.operations.filter { !$0.isCancelled }.count == 4)
         XCTAssert(mockQueue.operations.filter { $0.isCancelled }.count >= 2)
@@ -294,40 +298,6 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         XCTAssertNotNil(errorCollection.oneTimeError)
     }
 
-    func testWhenOperationsAreRunning_andStopAllIsCalled_thenAllAreCancelled_andCompletionIsCalledWithErrors() async throws {
-        // Given
-        sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
-                                                      operationsCreator: mockOperationsCreator,
-                                                      mismatchCalculator: mockMismatchCalculator,
-                                                      brokerUpdater: mockUpdater,
-                                                      pixelHandler: mockPixelHandler)
-        let mockOperationsWithError = (1...2).map { MockDataBrokerOperation(id: $0,
-                                                                             operationType: .scan,
-                                                                             errorDelegate: sut,
-                                                                             shouldError: true) }
-        let mockOperations = (3...4).map { MockDataBrokerOperation(id: $0,
-                                                                   operationType: .scan,
-                                                                   errorDelegate: sut) }
-        mockOperationsCreator.operationCollections = mockOperationsWithError + mockOperations
-        let expectation = expectation(description: "Expected completion to be called")
-        var errorCollection: DataBrokerProtectionAgentErrorCollection!
-
-        // When
-        sut.startImmediateOperationsIfPermitted(showWebView: false,
-                                                operationDependencies: mockDependencies) { errors in
-            errorCollection = errors
-            expectation.fulfill()
-        }
-
-        mockQueue.completeOperationsUpTo(index: 2)
-
-        sut.stopAllOperations()
-
-        // Then
-        await fulfillment(of: [expectation], timeout: 3)
-        XCTAssert(errorCollection.operationErrors?.count == 2)
-    }
-
     func testWhenCallDebugOptOutCommand_thenOptOutOperationsAreCreated() throws {
         // Given
         sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
@@ -335,7 +305,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
                                                       mismatchCalculator: mockMismatchCalculator,
                                                       brokerUpdater: mockUpdater,
                                                       pixelHandler: mockPixelHandler)
-        let expectedConcurrentOperations = DataBrokerProtectionProcessorConfiguration().concurrentOperationsFor(.optOut)
+        let expectedConcurrentOperations = DataBrokerExecutionConfig().concurrentOperationsFor(.optOut)
         XCTAssert(mockOperationsCreator.createdType == .scan)
 
         // When

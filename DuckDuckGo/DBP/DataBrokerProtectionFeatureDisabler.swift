@@ -42,10 +42,10 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
 
     func disableAndDelete() {
         if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist {
-            loginItemInterface.disableLoginItem()
 
             do {
                 try dataManager.removeAllData()
+                // the dataManagers delegate handles login item disabling
             } catch {
                 os_log("DataBrokerProtectionFeatureDisabler error: disableAndDelete, error: %{public}@", log: .error, error.localizedDescription)
             }

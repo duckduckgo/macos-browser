@@ -22,9 +22,8 @@ import Foundation
 import DataBrokerProtection
 import Common
 
-protocol DataBrokerProtectionLoginItemInterface: DataBrokerProtectionAgentInterface {
-    func disableLoginItem()
-    func enableLoginItem()
+protocol DataBrokerProtectionLoginItemInterface: DataBrokerProtectionAppToAgentInterface {
+    func dataDeleted()
 }
 
 /// Launches a login item and then communicates with it through IPC
@@ -32,10 +31,14 @@ protocol DataBrokerProtectionLoginItemInterface: DataBrokerProtectionAgentInterf
 final class DefaultDataBrokerProtectionLoginItemInterface {
     private let ipcClient: DataBrokerProtectionIPCClient
     private let loginItemsManager: LoginItemsManager
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
-    init(ipcClient: DataBrokerProtectionIPCClient, loginItemsManager: LoginItemsManager = .init()) {
+    init(ipcClient: DataBrokerProtectionIPCClient,
+         loginItemsManager: LoginItemsManager = .init(),
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
         self.ipcClient = ipcClient
         self.loginItemsManager = loginItemsManager
+        self.pixelHandler = pixelHandler
     }
 }
 
@@ -43,35 +46,50 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
 
     // MARK: - Login Item Management
 
-    func disableLoginItem() {
+    private func disableLoginItem() {
         DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerDisableLoginItemDaily, frequency: .daily)
         loginItemsManager.disableLoginItems([.dbpBackgroundAgent])
     }
 
-    func enableLoginItem() {
+    private func enableLoginItem() {
         DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerEnableLoginItemDaily, frequency: .daily)
         loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
     }
 
-    // MARK: - DataBrokerProtectionAgentInterface
+    // MARK: - DataBrokerProtectionLoginItemInterface
+
+    func dataDeleted() {
+        disableLoginItem()
+    }
+
+    // MARK: - DataBrokerProtectionAppToAgentInterface
     // MARK: - DataBrokerProtectionAgentAppEvents
 
     func profileSaved() {
         enableLoginItem()
-        ipcClient.profileSaved { error in
-            // TODO
-        }
-    }
 
-    func dataDeleted() {
-        ipcClient.dataDeleted { error in
-            // TODO
+        Task {
+            // Wait to make sure the agent has had time to launch
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            pixelHandler.fire(.ipcServerProfileSavedCalledByApp)
+            ipcClient.profileSaved { error in
+                if let error = error {
+                    self.pixelHandler.fire(.ipcServerProfileSavedXPCError(error: error))
+                } else {
+                    self.pixelHandler.fire(.ipcServerProfileSavedReceivedByAgent)
+                }
+            }
         }
     }
 
     func appLaunched() {
+        pixelHandler.fire(.ipcServerAppLaunchedCalledByApp)
         ipcClient.appLaunched { error in
-            // TODO
+            if let error = error {
+                self.pixelHandler.fire(.ipcServerAppLaunchedXPCError(error: error))
+            } else {
+                self.pixelHandler.fire(.ipcServerAppLaunchedReceivedByAgent)
+            }
         }
     }
 

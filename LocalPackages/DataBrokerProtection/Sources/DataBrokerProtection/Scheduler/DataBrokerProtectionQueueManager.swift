@@ -56,6 +56,7 @@ enum DataBrokerProtectionQueueMode {
 
 enum DataBrokerProtectionQueueError: Error {
     case cannotInterrupt
+    case interrupted
 }
 
 enum DataBrokerProtectionQueueManagerDebugCommand {
@@ -79,9 +80,8 @@ protocol DataBrokerProtectionQueueManager {
                                              operationDependencies: DataBrokerOperationDependencies,
                                              completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
 
-    func stopAllOperations()
-
     func execute(_ command: DataBrokerProtectionQueueManagerDebugCommand)
+    var debugRunningStatusString: String { get }
 }
 
 final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueManager {
@@ -94,6 +94,16 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
 
     private var mode = DataBrokerProtectionQueueMode.idle
     private var operationErrors: [Error] = []
+
+    var debugRunningStatusString: String {
+        switch mode {
+        case .idle:
+            return "idle"
+        case .immediate(let completion),
+                .scheduled(let completion):
+            return "running"
+        }
+    }
 
     init(operationQueue: DataBrokerProtectionOperationQueue,
          operationsCreator: DataBrokerOperationsCreator,
@@ -131,10 +141,6 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
                                    showWebView: showWebView,
                                    operationDependencies: operationDependencies,
                                    completion: completion)
-    }
-
-    func stopAllOperations() {
-        cancelCurrentModeAndResetIfNeeded()
     }
 
     func execute(_ command: DataBrokerProtectionQueueManagerDebugCommand) {
@@ -183,7 +189,8 @@ private extension DefaultDataBrokerProtectionQueueManager {
         switch mode {
         case .immediate(let completion), .scheduled(let completion):
             operationQueue.cancelAllOperations()
-            completion?(errorCollectionForCurrentOperations())
+            let errorCollection = DataBrokerProtectionAgentErrorCollection(oneTimeError: DataBrokerProtectionQueueError.interrupted, operationErrors: operationErrorsForCurrentOperations())
+            completion?(errorCollection)
             resetModeAndClearErrors()
         default:
             break
@@ -227,14 +234,14 @@ private extension DefaultDataBrokerProtectionQueueManager {
         }
 
         operationQueue.addBarrierBlock { [weak self] in
-            let errorCollection = self?.errorCollectionForCurrentOperations()
+            let errorCollection = DataBrokerProtectionAgentErrorCollection(oneTimeError: nil, operationErrors: self?.operationErrorsForCurrentOperations())
             completion?(errorCollection)
             self?.resetModeAndClearErrors()
         }
     }
 
-    func errorCollectionForCurrentOperations() -> DataBrokerProtectionAgentErrorCollection? {
-        return operationErrors.count != 0 ? DataBrokerProtectionAgentErrorCollection(operationErrors: operationErrors) : nil
+    func operationErrorsForCurrentOperations() -> [Error]? {
+        return operationErrors.count != 0 ? operationErrors : nil
     }
 
     func firePixels(operationDependencies: DataBrokerOperationDependencies) {

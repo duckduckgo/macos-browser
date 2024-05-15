@@ -85,7 +85,6 @@ public protocol IPCServerInterface: AnyObject, DataBrokerProtectionAgentDebugCom
     // MARK: - DataBrokerProtectionAgentAppEvents
 
     func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
-    func dataDeleted(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
     func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
 }
 
@@ -105,7 +104,6 @@ protocol XPCServerInterface {
     // MARK: - DataBrokerProtectionAgentAppEvents
 
     func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
-    func dataDeleted(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
     func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
 
     // MARK: - DataBrokerProtectionAgentDebugCommands
@@ -120,12 +118,18 @@ protocol XPCServerInterface {
     func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
 }
 
-public final class DataBrokerProtectionIPCServer {
+protocol DataBrokerProtectionIPCServer: IPCClientInterface, XPCServerInterface {
+    var serverDelegate: DataBrokerProtectionAppToAgentInterface? { get set }
+
+    init(machServiceName: String)
+
+    func activate()
+}
+
+public final class DefaultDataBrokerProtectionIPCServer: DataBrokerProtectionIPCServer {
     let xpc: XPCServer<XPCClientInterface, XPCServerInterface>
 
-    /// The delegate.
-    ///
-    public weak var serverDelegate: DataBrokerProtectionAgentInterface?
+    public weak var serverDelegate: DataBrokerProtectionAppToAgentInterface?
 
     public init(machServiceName: String) {
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
@@ -139,6 +143,8 @@ public final class DataBrokerProtectionIPCServer {
         xpc.delegate = self
     }
 
+    // DataBrokerProtectionIPCServer
+
     public func activate() {
         xpc.activate()
     }
@@ -146,15 +152,15 @@ public final class DataBrokerProtectionIPCServer {
 
 // MARK: - Outgoing communication to the clients
 
-extension DataBrokerProtectionIPCServer: IPCClientInterface {
+extension DefaultDataBrokerProtectionIPCServer: IPCClientInterface {
 }
 
 // MARK: - Incoming communication from a client
 
-extension DataBrokerProtectionIPCServer: XPCServerInterface {
+extension DefaultDataBrokerProtectionIPCServer: XPCServerInterface {
 
     func register() {
-        
+
     }
 
     // MARK: - DataBrokerProtectionAgentAppEvents
@@ -162,11 +168,6 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
     func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
         xpcMessageReceivedCompletion(nil)
         serverDelegate?.profileSaved()
-    }
-
-    func dataDeleted(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
-        xpcMessageReceivedCompletion(nil)
-        serverDelegate?.dataDeleted()
     }
 
     func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {

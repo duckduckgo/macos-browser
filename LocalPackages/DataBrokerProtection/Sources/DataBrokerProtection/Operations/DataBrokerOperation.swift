@@ -21,7 +21,7 @@ import Common
 
 protocol DataBrokerOperationDependencies {
     var database: DataBrokerProtectionRepository { get }
-    var config: DataBrokerProtectionProcessorConfiguration { get }
+    var config: DataBrokerExecutionConfig { get }
     var runnerProvider: JobRunnerProvider { get }
     var notificationCenter: NotificationCenter { get }
     var pixelHandler: EventMapping<DataBrokerProtectionPixels> { get }
@@ -30,7 +30,7 @@ protocol DataBrokerOperationDependencies {
 
 struct DefaultDataBrokerOperationDependencies: DataBrokerOperationDependencies {
     let database: DataBrokerProtectionRepository
-    var config: DataBrokerProtectionProcessorConfiguration
+    var config: DataBrokerExecutionConfig
     let runnerProvider: JobRunnerProvider
     let notificationCenter: NotificationCenter
     let pixelHandler: EventMapping<DataBrokerProtectionPixels>
