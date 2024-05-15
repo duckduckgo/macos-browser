@@ -27,8 +27,12 @@ final class NetPPopoverManagerMock: NetPPopoverManager {
     var isShown: Bool { false }
     var ipcClient: NetworkProtectionIPCClient = IPCClientMock()
 
-    func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) {}
-    func show(positionedBelow view: NSView, withDelegate delegate: any NSPopoverDelegate) {}
+    func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover? {
+        return nil
+    }
+    func show(positionedBelow view: NSView, withDelegate delegate: any NSPopoverDelegate) -> NSPopover {
+        return NSPopover()
+    }
     func close() {}
 }
 
