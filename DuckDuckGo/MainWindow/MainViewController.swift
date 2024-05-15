@@ -74,8 +74,11 @@ final class MainViewController: NSViewController {
             ipcClient.register { error in
                 NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
             }
+            let vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
 
-            return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient, networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler())
+            return NetworkProtectionNavBarPopoverManager(
+                ipcClient: ipcClient,
+                vpnUninstaller: vpnUninstaller)
         }()
         let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
             var connectivityIssuesObserver: ConnectivityIssueObserver!

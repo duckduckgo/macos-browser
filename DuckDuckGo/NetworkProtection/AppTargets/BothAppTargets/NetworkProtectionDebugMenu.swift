@@ -184,7 +184,12 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @objc func resetAllState(_ sender: Any?) {
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
-            await debugUtilities.resetAllState(keepAuthToken: false)
+
+            do {
+                try await debugUtilities.resetAllState(keepAuthToken: false)
+            } catch {
+                os_log("Error in resetAllState: %{public}@", log: .networkProtection, error.localizedDescription)
+            }
         }
     }
 
@@ -193,7 +198,11 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @objc func resetAllKeepingInvite(_ sender: Any?) {
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
-            await debugUtilities.resetAllState(keepAuthToken: true)
+            do {
+                try await debugUtilities.resetAllState(keepAuthToken: true)
+            } catch {
+                os_log("Error in resetAllState: %{public}@", log: .networkProtection, error.localizedDescription)
+            }
         }
     }
 

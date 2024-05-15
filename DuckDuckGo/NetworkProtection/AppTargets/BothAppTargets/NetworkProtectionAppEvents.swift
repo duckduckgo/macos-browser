@@ -47,15 +47,15 @@ final class NetworkProtectionAppEvents {
     // MARK: - Feature Visibility
 
     private let featureVisibility: NetworkProtectionFeatureVisibility
-    private let featureDisabler: NetworkProtectionFeatureDisabling
+    private let uninstaller: VPNUninstalling
     private let defaults: UserDefaults
 
     init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
-         featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
+         uninstaller: VPNUninstalling = VPNUninstaller(),
          defaults: UserDefaults = .netP) {
 
         self.defaults = defaults
-        self.featureDisabler = featureDisabler
+        self.uninstaller = uninstaller
         self.featureVisibility = featureVisibility
     }
 
@@ -65,12 +65,7 @@ final class NetworkProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
 
         Task { @MainActor in
-            let disabled = await featureVisibility.disableIfUserHasNoAccess()
-
-            guard !disabled else {
-                return
-            }
-
+            await featureVisibility.disableIfUserHasNoAccess()
             restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
         }
     }
