@@ -73,54 +73,47 @@ class DataBrokerProtectionAuthenticationManagerTests: XCTestCase {
     }
 
     func testValidEntitlementCheckWithSuccess() async {
-        subscriptionManager.entitlementResultValue = .success(true)
+        subscriptionManager.entitlementResultValue = true
 
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
-
-        let result = await authenticationManager.hasValidEntitlement()
-
-        switch result {
-        case .success(let isValid):
-            XCTAssertTrue(isValid, "Entitlement check should return true for valid entitlement")
-        case .failure(let error):
+        do {
+            let result = try await authenticationManager.hasValidEntitlement()
+            XCTAssertTrue(result, "Entitlement check should return true for valid entitlement")
+        } catch {
             XCTFail("Entitlement check should not fail: \(error)")
         }
     }
 
     func testValidEntitlementCheckWithSuccessFalse() async {
-        subscriptionManager.entitlementResultValue = .success(false)
+        subscriptionManager.entitlementResultValue = false
 
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
 
-        let result = await authenticationManager.hasValidEntitlement()
-
-        switch result {
-        case .success(let isValid):
-            XCTAssertFalse(isValid, "Entitlement check should return false for invalid entitlement")
-        case .failure(let error):
+        do {
+            let result = try await authenticationManager.hasValidEntitlement()
+            XCTAssertFalse(result, "Entitlement check should return false for valid entitlement")
+        } catch {
             XCTFail("Entitlement check should not fail: \(error)")
         }
     }
 
     func testValidEntitlementCheckWithFailure() async {
-        let testError = NSError(domain: "TestErrorDomain", code: 123, userInfo: nil)
-        subscriptionManager.entitlementResultValue = .failure(testError)
+        let mockError = NSError(domain: "TestErrorDomain", code: 123, userInfo: nil)
+        subscriptionManager.entitlementError = mockError
 
         authenticationManager = DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                                           subscriptionManager: subscriptionManager)
 
-        let result = await authenticationManager.hasValidEntitlement()
-
-        switch result {
-        case .success:
-            XCTFail("Entitlement check should not succeed")
-        case .failure(let error):
-            XCTAssertEqual(error as NSError, testError, "Entitlement check should return the expected error")
+        do {
+            _ = try await authenticationManager.hasValidEntitlement()
+            XCTFail("Entitlement check should fail")
+        } catch let error as NSError {
+            XCTAssertEqual(mockError.domain, error.domain)
+            XCTAssertEqual(mockError.code, error.code)
         }
     }
-
 }
 
 final class MockDataBrokerProtectionSubscriptionManaging: DataBrokerProtectionSubscriptionManaging {
@@ -128,7 +121,8 @@ final class MockDataBrokerProtectionSubscriptionManaging: DataBrokerProtectionSu
 
     var userAuthenticatedValue = false
     var accessTokenValue: String?
-    var entitlementResultValue: EntitlementResult = .success(true)
+    var entitlementResultValue = false
+    var entitlementError: Error?
 
     var isUserAuthenticated: Bool {
         userAuthenticatedValue
@@ -138,7 +132,10 @@ final class MockDataBrokerProtectionSubscriptionManaging: DataBrokerProtectionSu
         accessTokenValue
     }
 
-    func hasValidEntitlement() async -> Result<Bool, Error> {
-        entitlementResultValue
+    func hasValidEntitlement() async throws -> Bool {
+        if let error = entitlementError {
+            throw error
+        }
+        return entitlementResultValue
     }
 }

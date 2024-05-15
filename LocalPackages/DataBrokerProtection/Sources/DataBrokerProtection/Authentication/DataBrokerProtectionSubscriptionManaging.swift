@@ -23,7 +23,7 @@ import Common
 public protocol DataBrokerProtectionSubscriptionManaging {
     var isUserAuthenticated: Bool { get }
     var accessToken: String? { get }
-    func hasValidEntitlement() async -> Result<Bool, Error>
+    func hasValidEntitlement() async throws -> Bool
 }
 
 public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtectionSubscriptionManaging {
@@ -44,9 +44,15 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
         self.environmentManager = environmentManager
     }
 
-    public func hasValidEntitlement() async -> Result<Bool, Error> {
+    public func hasValidEntitlement() async throws -> Bool {
         environmentManager.updateEnvironment()
-        return await accountManager.hasEntitlement(for: .reloadIgnoringLocalCacheData)
+
+        switch await accountManager.hasEntitlement(for: .reloadIgnoringLocalCacheData) {
+        case let .success(result):
+            return result
+        case .failure(let error):
+            throw error
+        }
     }
 }
 

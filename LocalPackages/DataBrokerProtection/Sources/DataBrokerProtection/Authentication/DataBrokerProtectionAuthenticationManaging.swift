@@ -21,7 +21,7 @@ import Foundation
 public protocol DataBrokerProtectionAuthenticationManaging {
     var isUserAuthenticated: Bool { get }
     var accessToken: String? { get }
-    func hasValidEntitlement() async -> Result<Bool, Error>
+    func hasValidEntitlement() async throws -> Bool
     func shouldAskForInviteCode() -> Bool
     func redeem(inviteCode: String) async throws
     func getAuthHeader() -> String?
@@ -45,8 +45,8 @@ public final class DataBrokerProtectionAuthenticationManager: DataBrokerProtecti
         self.subscriptionManager = subscriptionManager
     }
 
-    public func hasValidEntitlement() async -> Result<Bool, any Error> {
-        await subscriptionManager.hasValidEntitlement()
+    public func hasValidEntitlement() async throws -> Bool {
+        try await subscriptionManager.hasValidEntitlement()
     }
 
     public func getAuthHeader() -> String? {

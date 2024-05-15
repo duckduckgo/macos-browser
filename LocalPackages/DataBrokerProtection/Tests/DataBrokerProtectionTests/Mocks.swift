@@ -972,8 +972,8 @@ final class MockAuthenticationManager: DataBrokerProtectionAuthenticationManagin
 
     var accessToken: String? { accessTokenValue }
 
-    func hasValidEntitlement() async -> Result<Bool, Error> {
-        return .success(true)
+    func hasValidEntitlement() async throws -> Bool {
+        return true
     }
 
     func shouldAskForInviteCode() -> Bool { shouldAskForInviteCodeValue }
