@@ -144,6 +144,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
 
         // Then
         XCTAssert(errorCollection.operationErrors?.count == 2)
+        let error = errorCollection.oneTimeError as? DataBrokerProtectionQueueError
+        XCTAssertEqual(error, .interrupted)
         XCTAssert(mockQueue.didCallCancelCount == 1)
         XCTAssert(mockQueue.operations.filter { !$0.isCancelled }.count == 4)
         XCTAssert(mockQueue.operations.filter { $0.isCancelled }.count >= 2)
@@ -180,6 +182,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
 
         // Then
         XCTAssert(errorCollection.operationErrors?.count == 2)
+        let error = errorCollection.oneTimeError as? DataBrokerProtectionQueueError
+        XCTAssertEqual(error, .interrupted)
         XCTAssert(mockQueue.didCallCancelCount == 1)
         XCTAssert(mockQueue.operations.filter { !$0.isCancelled }.count == 4)
         XCTAssert(mockQueue.operations.filter { $0.isCancelled }.count >= 2)
