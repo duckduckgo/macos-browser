@@ -480,6 +480,13 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
     }
 }
 
+final class FakeSleepObserver: SleepObserver {
+
+    func totalSleepTime() -> TimeInterval {
+        return 0
+    }
+}
+
 final class FakeStageDurationCalculator: StageDurationCalculator {
     var attemptId: UUID = UUID()
     var isManualScan: Bool = false

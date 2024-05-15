@@ -43,6 +43,7 @@ final class ScanOperation: DataBrokerOperation {
     let clickAwaitTime: TimeInterval
     let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     var postLoadingSiteStartTime: Date?
+    let sleepObserver: SleepObserver
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
@@ -54,6 +55,7 @@ final class ScanOperation: DataBrokerOperation {
          clickAwaitTime: TimeInterval = 0,
          stageDurationCalculator: StageDurationCalculator,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         sleepObserver: SleepObserver,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -67,6 +69,7 @@ final class ScanOperation: DataBrokerOperation {
         self.clickAwaitTime = clickAwaitTime
         self.cookieHandler = cookieHandler
         self.pixelHandler = pixelHandler
+        self.sleepObserver = sleepObserver
     }
 
     func run(inputValue: InputValue,
