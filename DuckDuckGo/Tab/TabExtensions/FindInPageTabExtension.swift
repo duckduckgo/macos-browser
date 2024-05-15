@@ -219,7 +219,7 @@ extension FindInPageTabExtension: NavigationResponder {
     }
 
     func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
-        if case .sessionStateReplace = navigationType {
+        if [.sessionStatePush, .sessionStatePop].contains(navigationType) {
             close()
         }
     }

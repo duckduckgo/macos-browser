@@ -51,10 +51,6 @@ final class AddressBarTextField: NSTextField {
         tabCollectionViewModel.isBurner
     }
 
-    var isFirstResponder: Bool {
-        window?.firstResponder == currentEditor()
-    }
-
     private var suggestionResultCancellable: AnyCancellable?
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
