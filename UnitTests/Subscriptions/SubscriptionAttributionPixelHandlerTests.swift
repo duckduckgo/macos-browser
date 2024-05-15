@@ -24,7 +24,6 @@ final class SubscriptionAttributionPixelHandlerTests: XCTestCase {
     private var sut: PrivacyProSubscriptionAttributionPixelHandler!
     private var capturedParams: PixelCapturedParameters!
     private var fireRequest: GenericAttributionPixelHandler.FireRequest!
-    private var mockAttributionOriginProvider: MockAttributionOriginProvider!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -39,47 +38,37 @@ final class SubscriptionAttributionPixelHandlerTests: XCTestCase {
             self.capturedParams.includeAppVersion = includeAppVersion
             self.capturedParams.onComplete = onComplete
         }
-        mockAttributionOriginProvider = MockAttributionOriginProvider()
     }
 
     override func tearDownWithError() throws {
         capturedParams = nil
         fireRequest = nil
-        mockAttributionOriginProvider = nil
         sut = nil
         try super.tearDownWithError()
     }
 
-    func testWhenPixelFiresThenNameIsSetToM_Mac_Subscribe() {
+    func testWhenPixelFiresThenNameIsSetToM_Mac_DistributionType_Subscribe() {
         // GIVEN
-        let decoratedPixelHandler = GenericAttributionPixelHandler(originProvider: mockAttributionOriginProvider, fireRequest: fireRequest, locale: .current)
-        sut = PrivacyProSubscriptionAttributionPixelHandler(attributionPixelHandler: decoratedPixelHandler, originStore: mockAttributionOriginProvider)
+        #if APPSTORE
+        let expectedPixelName = "m_mac_store_subscribe"
+        #else
+        let expectedPixelName = "m_mac_direct_subscribe"
+        #endif
+        let decoratedPixelHandler = GenericAttributionPixelHandler(fireRequest: fireRequest, locale: .current)
+        sut = PrivacyProSubscriptionAttributionPixelHandler(attributionPixelHandler: decoratedPixelHandler)
 
         // WHEN
         sut.fireSuccessfulSubscriptionAttributionPixel()
 
         // THEN
-        XCTAssertEqual(capturedParams.event?.name, "m_mac_subscribe")
-    }
-
-    func testwhenPixelFireThenOriginIsDeletedFromStorage() {
-        let origin = "test"
-        mockAttributionOriginProvider.origin = origin
-        let decoratedPixelHandler = GenericAttributionPixelHandler(originProvider: mockAttributionOriginProvider, fireRequest: fireRequest, locale: .current)
-        sut = PrivacyProSubscriptionAttributionPixelHandler(attributionPixelHandler: decoratedPixelHandler, originStore: mockAttributionOriginProvider)
-        XCTAssertEqual(mockAttributionOriginProvider.origin, origin)
-
-        // WHEN
-        sut.fireSuccessfulSubscriptionAttributionPixel()
-
-        XCTAssertNil(mockAttributionOriginProvider.origin)
+        XCTAssertEqual(capturedParams.event?.name, expectedPixelName)
     }
 
     func testWhenPixelFiresThenLanguageCodeIsSet() {
         // GIVEN
         let locale = Locale(identifier: "hu-HU")
-        let decoratedPixelHandler = GenericAttributionPixelHandler(originProvider: mockAttributionOriginProvider, fireRequest: fireRequest, locale: locale)
-        sut = PrivacyProSubscriptionAttributionPixelHandler(attributionPixelHandler: decoratedPixelHandler, originStore: mockAttributionOriginProvider)
+        let decoratedPixelHandler = GenericAttributionPixelHandler(fireRequest: fireRequest, locale: locale)
+        sut = PrivacyProSubscriptionAttributionPixelHandler(attributionPixelHandler: decoratedPixelHandler)
 
         // WHEN
         sut.fireSuccessfulSubscriptionAttributionPixel()
@@ -92,9 +81,9 @@ final class SubscriptionAttributionPixelHandlerTests: XCTestCase {
         // GIVEN
         let origin = "app_search"
         let locale = Locale(identifier: "en-US")
-        let originProvider = MockAttributionOriginProvider(origin: origin)
-        let decoratedPixelHandler = GenericAttributionPixelHandler(originProvider: originProvider, fireRequest: fireRequest, locale: locale)
-        sut = PrivacyProSubscriptionAttributionPixelHandler(attributionPixelHandler: decoratedPixelHandler, originStore: originProvider)
+        let decoratedPixelHandler = GenericAttributionPixelHandler(fireRequest: fireRequest, locale: locale)
+        sut = PrivacyProSubscriptionAttributionPixelHandler(attributionPixelHandler: decoratedPixelHandler)
+        sut.origin = origin
 
         // WHEN
         sut.fireSuccessfulSubscriptionAttributionPixel()
@@ -108,9 +97,9 @@ final class SubscriptionAttributionPixelHandlerTests: XCTestCase {
         // GIVEN
         let origin: String? = nil
         let locale = Locale(identifier: "en-US")
-        let originProvider = MockAttributionOriginProvider(origin: origin)
-        let decoratedPixelHandler = GenericAttributionPixelHandler(originProvider: originProvider, fireRequest: fireRequest, locale: locale)
-        sut = PrivacyProSubscriptionAttributionPixelHandler(attributionPixelHandler: decoratedPixelHandler, originStore: originProvider)
+        let decoratedPixelHandler = GenericAttributionPixelHandler(fireRequest: fireRequest, locale: locale)
+        sut = PrivacyProSubscriptionAttributionPixelHandler(attributionPixelHandler: decoratedPixelHandler)
+        sut.origin = origin
 
         // WHEN
         sut.fireSuccessfulSubscriptionAttributionPixel()
@@ -122,8 +111,8 @@ final class SubscriptionAttributionPixelHandlerTests: XCTestCase {
 
     func testWhenPixelFiresThenAddAppVersionIsTrueAndFrequencyIsStandard() {
         // GIVEN
-        let decoratedPixelHandler = GenericAttributionPixelHandler(originProvider: mockAttributionOriginProvider, fireRequest: fireRequest, locale: .current)
-        sut = PrivacyProSubscriptionAttributionPixelHandler(attributionPixelHandler: decoratedPixelHandler, originStore: mockAttributionOriginProvider)
+        let decoratedPixelHandler = GenericAttributionPixelHandler(fireRequest: fireRequest, locale: .current)
+        sut = PrivacyProSubscriptionAttributionPixelHandler(attributionPixelHandler: decoratedPixelHandler)
 
         // WHEN
         sut.fireSuccessfulSubscriptionAttributionPixel()

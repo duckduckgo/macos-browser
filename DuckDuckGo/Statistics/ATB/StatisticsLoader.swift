@@ -37,7 +37,7 @@ final class StatisticsLoader {
     init(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
         emailManager: EmailManager = EmailManager(),
-        attributionPixelHandler: InstallationAttributionsPixelHandler = GenericAttributionPixelHandler.installation
+        attributionPixelHandler: InstallationAttributionsPixelHandler = AppInstallationAttributionPixelHandler()
     ) {
         self.statisticsStore = statisticsStore
         self.emailManager = emailManager

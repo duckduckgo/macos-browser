@@ -22,17 +22,14 @@ import Subscription
 
 final class SubscriptionRedirectManagerTests: XCTestCase {
     private var sut: PrivacyProSubscriptionRedirectManager!
-    private var storeMock: SubscriptionOriginStoreMock!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-        storeMock = .init()
-        sut = PrivacyProSubscriptionRedirectManager(featureAvailabiltyProvider: true, originStore: storeMock)
+        sut = PrivacyProSubscriptionRedirectManager(featureAvailabiltyProvider: true)
         SubscriptionPurchaseEnvironment.canPurchase = true
     }
 
     override func tearDownWithError() throws {
-        storeMock = nil
         sut = nil
         try super.tearDownWithError()
     }
@@ -59,30 +56,6 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(result, expectedURL)
-    }
-
-    func testWhenURLIsPrivacyProAndHasOriginQueryParameterThenSetOriginValueInStore() throws {
-        // GIVEN
-        let url = try XCTUnwrap(URL(string: "https://www.duckduckgo.com/pro?origin=test"))
-        XCTAssertNil(storeMock.origin)
-
-        // WHEN
-        _ = sut.redirectURL(for: url)
-
-        // THEN
-        XCTAssertEqual(storeMock.origin, "test")
-    }
-
-    func testWhenURLIsPrivacyProAndDoesNotHaveOriginQueryParameterThenSetNilOriginValueInStore() throws {
-        // GIVEN
-        let url = try XCTUnwrap(URL(string: "https://www.duckduckgo.com/pro"))
-        storeMock.origin = "test"
-
-        // WHEN
-        _ = sut.redirectURL(for: url)
-
-        // THEN
-        XCTAssertNil(storeMock.origin)
     }
 
 }

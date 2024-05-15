@@ -92,7 +92,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     private let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
 
-    init(subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler.default) {
+    init(subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler()) {
         self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
     }
 
@@ -214,13 +214,15 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseAttempt, frequency: .dailyAndCount)
         struct SubscriptionSelection: Decodable {
             let id: String
         }
 
         let message = original
+
+        // Extract the origin from the webview URL to use for attribution pixel.
+        subscriptionSuccessPixelHandler.origin = await originFrom(originalMessage: message)
 
         if SubscriptionPurchaseEnvironment.current == .appStore {
             if #available(macOS 12.0, *) {
@@ -484,6 +486,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         }
 
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
+    }
+
+    @MainActor
+    private func originFrom(originalMessage: WKScriptMessage) -> String? {
+        let url = originalMessage.webView?.url
+        return url?.getParameter(named: AttributionParameter.origin)
     }
 }
 

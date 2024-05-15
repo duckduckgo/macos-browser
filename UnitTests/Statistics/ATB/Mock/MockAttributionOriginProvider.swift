@@ -20,8 +20,8 @@ import Foundation
 import Subscription
 @testable import DuckDuckGo_Privacy_Browser
 
-final class MockAttributionOriginProvider: AttributionOriginProvider, SubscriptionOriginStorage {
-    var origin: String?
+final class MockAttributionOriginProvider: AttributionOriginProvider {
+    let origin: String?
 
     init(origin: String? = nil) {
         self.origin = origin

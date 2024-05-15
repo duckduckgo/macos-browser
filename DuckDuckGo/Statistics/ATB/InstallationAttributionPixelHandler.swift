@@ -25,18 +25,24 @@ protocol InstallationAttributionsPixelHandler: AnyObject {
     func fireInstallationAttributionPixel()
 }
 
-extension GenericAttributionPixelHandler: InstallationAttributionsPixelHandler {
+final class AppInstallationAttributionPixelHandler: InstallationAttributionsPixelHandler {
+    private let originProvider: AttributionOriginProvider
+    private let decoratedAttributionPixelHandler: AttributionPixelHandler
 
-    func fireInstallationAttributionPixel() {
-        fireAttributionPixel(
-            event: GeneralPixel.installationAttribution,
-            frequency: .legacyInitial,
-            parameters: nil
-        )
+    init(
+        originProvider: AttributionOriginProvider = AttributionOriginFileProvider(),
+        attributionPixelHandler: AttributionPixelHandler = GenericAttributionPixelHandler()
+    ) {
+        self.originProvider = originProvider
+        decoratedAttributionPixelHandler = attributionPixelHandler
     }
 
-}
-
-extension GenericAttributionPixelHandler {
-    static let installation = GenericAttributionPixelHandler(originProvider: AttributionOriginFileProvider())
+    func fireInstallationAttributionPixel() {
+        decoratedAttributionPixelHandler.fireAttributionPixel(
+            event: GeneralPixel.installationAttribution,
+            frequency: .legacyInitial,
+            origin: originProvider.origin,
+            additionalParameters: nil
+        )
+    }
 }

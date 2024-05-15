@@ -21,7 +21,7 @@ import PixelKit
 @testable import DuckDuckGo_Privacy_Browser
 
 final class InstallationAttributionPixelHandlerTests: XCTestCase {
-    private var sut: InstallationAttributionsPixelHandler!
+    private var sut: AppInstallationAttributionPixelHandler!
     private var capturedParams: PixelCapturedParameters!
     private var fireRequest: GenericAttributionPixelHandler.FireRequest!
 
@@ -49,7 +49,8 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
 
     func testWhenPixelFiresThenNameIsSetToM_Mac_Install() {
         // GIVEN
-        sut = GenericAttributionPixelHandler(originProvider: MockAttributionOriginProvider(), fireRequest: fireRequest, locale: .current)
+        let decoratedPixelHandler = GenericAttributionPixelHandler(fireRequest: fireRequest, locale: .current)
+        sut = AppInstallationAttributionPixelHandler(originProvider: MockAttributionOriginProvider(), attributionPixelHandler: decoratedPixelHandler)
 
         // WHEN
         sut.fireInstallationAttributionPixel()
@@ -61,7 +62,8 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
     func testWhenPixelFiresThenLanguageCodeIsSet() {
         // GIVEN
         let locale = Locale(identifier: "hu-HU")
-        sut = GenericAttributionPixelHandler(originProvider: MockAttributionOriginProvider(), fireRequest: fireRequest, locale: locale)
+        let decoratedPixelHandler = GenericAttributionPixelHandler(fireRequest: fireRequest, locale: locale)
+        sut = AppInstallationAttributionPixelHandler(originProvider: MockAttributionOriginProvider(), attributionPixelHandler: decoratedPixelHandler)
 
         // WHEN
         sut.fireInstallationAttributionPixel()
@@ -75,7 +77,8 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
         let origin = "app_search"
         let locale = Locale(identifier: "en-US")
         let originProvider = MockAttributionOriginProvider(origin: origin)
-        sut = GenericAttributionPixelHandler(originProvider: originProvider, fireRequest: fireRequest, locale: locale)
+        let decoratedPixelHandler = GenericAttributionPixelHandler(fireRequest: fireRequest, locale: locale)
+        sut = AppInstallationAttributionPixelHandler(originProvider: originProvider, attributionPixelHandler: decoratedPixelHandler)
 
         // WHEN
         sut.fireInstallationAttributionPixel()
@@ -90,8 +93,8 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
         let origin: String? = nil
         let locale = Locale(identifier: "en-US")
         let originProvider = MockAttributionOriginProvider(origin: origin)
-        sut = GenericAttributionPixelHandler(originProvider: originProvider, fireRequest: fireRequest, locale: locale)
-
+        let decoratedPixelHandler = GenericAttributionPixelHandler(fireRequest: fireRequest, locale: locale)
+        sut = AppInstallationAttributionPixelHandler(originProvider: originProvider, attributionPixelHandler: decoratedPixelHandler)
         // WHEN
         sut.fireInstallationAttributionPixel()
 
@@ -102,7 +105,8 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
 
     func testWhenPixelFiresThenAddAppVersionIsTrueAndFrequencyIsLegacyInitial() {
         // GIVEN
-        sut = GenericAttributionPixelHandler(originProvider: MockAttributionOriginProvider(), fireRequest: fireRequest, locale: .current)
+        let decoratedPixelHandler = GenericAttributionPixelHandler(fireRequest: fireRequest, locale: .current)
+        sut = AppInstallationAttributionPixelHandler(originProvider: MockAttributionOriginProvider(), attributionPixelHandler: decoratedPixelHandler)
 
         // WHEN
         sut.fireInstallationAttributionPixel()

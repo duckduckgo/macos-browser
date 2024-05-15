@@ -24,7 +24,8 @@ protocol AttributionPixelHandler {
     func fireAttributionPixel(
         event: PixelKit.Event,
         frequency: PixelKit.Frequency,
-        parameters: [String: String]?
+        origin: String?,
+        additionalParameters: [String: String]?
     )
 }
 
@@ -35,34 +36,31 @@ final class GenericAttributionPixelHandler: AttributionPixelHandler {
     }
 
     private let fireRequest: FireRequest
-    private let originProvider: AttributionOriginProvider
     private let locale: Locale
 
     /// Creates an instance with the specified fire request, origin provider and locale.
     /// - Parameters:
     ///   - fireRequest: A function for sending the Pixel request.
-    ///   - originProvider: A provider for the origin used to track the acquisition funnel.
     ///   - locale: The locale of the device.
     init(
-        originProvider: AttributionOriginProvider,
         fireRequest: @escaping FireRequest = PixelKit.fire,
         locale: Locale = .current
     ) {
         self.fireRequest = fireRequest
-        self.originProvider = originProvider
         self.locale = locale
     }
 
     func fireAttributionPixel(
         event: PixelKit.Event,
         frequency: PixelKit.Frequency,
-        parameters: [String: String]?
+        origin: String?,
+        additionalParameters: [String: String]?
     ) {
         fireRequest(
             event,
             frequency,
             [:],
-            self.parameters(parameters, withOrigin: originProvider.origin, locale: locale.identifier),
+            self.parameters(additionalParameters, withOrigin: origin, locale: locale.identifier),
             nil,
             nil,
             true, { _, _ in }

@@ -19,46 +19,28 @@
 import Foundation
 import Subscription
 
-protocol SubscriptionAttributionPixelHandler {
+protocol SubscriptionAttributionPixelHandler: AnyObject {
+    var origin: String? { get set }
     func fireSuccessfulSubscriptionAttributionPixel()
 }
 
 // MARK: - SubscriptionAttributionPixelHandler
 
 final class PrivacyProSubscriptionAttributionPixelHandler: SubscriptionAttributionPixelHandler {
+    var origin: String?
     private let decoratedAttributionPixelHandler: AttributionPixelHandler
-    private let originStore: SubscriptionOriginStorage
 
-    init(attributionPixelHandler: AttributionPixelHandler, originStore: SubscriptionOriginStorage) {
+    init(attributionPixelHandler: AttributionPixelHandler = GenericAttributionPixelHandler()) {
         decoratedAttributionPixelHandler = attributionPixelHandler
-        self.originStore = originStore
     }
 
     func fireSuccessfulSubscriptionAttributionPixel() {
         decoratedAttributionPixelHandler.fireAttributionPixel(
             event: PrivacyProPixel.privacyProSuccessfulSubscriptionAttribution,
             frequency: .standard,
-            parameters: nil
+            origin: origin,
+            additionalParameters: nil
         )
-        originStore.origin = nil
     }
 
 }
-
-// MARK: -
-
-extension PrivacyProSubscriptionAttributionPixelHandler {
-
-    static let `default`: PrivacyProSubscriptionAttributionPixelHandler = {
-        let originStore = SubscriptionOriginStore(userDefaults: UserDefaults.subs)
-        return PrivacyProSubscriptionAttributionPixelHandler(
-            attributionPixelHandler: GenericAttributionPixelHandler(originProvider: originStore),
-            originStore: originStore
-        )
-    }()
-
-}
-
-// MARK: SubscriptionOriginStore + AttributionOriginProvider
-
-extension SubscriptionOriginStore: AttributionOriginProvider {}

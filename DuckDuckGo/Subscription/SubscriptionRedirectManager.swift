@@ -26,14 +26,9 @@ protocol SubscriptionRedirectManager: AnyObject {
 
 final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
     private let featureAvailabiltyProvider: () -> Bool
-    private let originStore: SubscriptionOriginStorage
 
-    init(
-        featureAvailabiltyProvider: @escaping @autoclosure () -> Bool = DefaultSubscriptionFeatureAvailability().isFeatureAvailable,
-        originStore: SubscriptionOriginStorage = SubscriptionOriginStore(userDefaults: .subs)
-    ) {
+    init(featureAvailabiltyProvider: @escaping @autoclosure () -> Bool = DefaultSubscriptionFeatureAvailability().isFeatureAvailable) {
         self.featureAvailabiltyProvider = featureAvailabiltyProvider
-        self.originStore = originStore
     }
 
     func redirectURL(for url: URL) -> URL? {
@@ -43,18 +38,24 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
             let isFeatureAvailable = featureAvailabiltyProvider()
             let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
             let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
-            // Look for `origin` query parameter and store in the UserDefaults.
-            let originQueryItem = url.getQueryItem(named: AttributionParameter.origin)
-            originStore.origin = originQueryItem?.value
-            // If origin query parameter exists forward it to the redirect URL
-            return isPurchasePageRedirectActive ? purchasePageRedirectURL(for: url, originQueryItem: originQueryItem) : nil
+            // If redirect url make sure to append any non nil query parameters to it
+            return isPurchasePageRedirectActive ? purchasePageRedirectURL(for: url) : nil
         }
 
         return nil
     }
 
-    private func purchasePageRedirectURL(for url: URL, originQueryItem: URLQueryItem?) -> URL {
-        originQueryItem
-            .flatMap(URL.subscriptionBaseURL.appending(percentEncodedQueryItem:)) ?? URL.subscriptionBaseURL
+    private func purchasePageRedirectURL(for url: URL) -> URL {
+        // If the origin value is of type "do+something" appending the percentEncodedQueryItem crashes the browser as + is replaced by a space.
+        // Perform encoding on the value to avoid the crash.
+        guard let queryItems = url.getQueryItems()?
+            .compactMap({ queryItem -> URLQueryItem? in
+                guard let value = queryItem.value else { return nil }
+                let encodedValue = value.percentEncoded(withAllowedCharacters: .urlQueryParameterAllowed)
+                return URLQueryItem(name: queryItem.name, value: encodedValue)
+            })
+        else { return URL.subscriptionBaseURL }
+
+        return URL.subscriptionBaseURL.appending(percentEncodedQueryItems: queryItems)
     }
 }
