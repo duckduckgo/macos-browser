@@ -80,13 +80,14 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
     private let settings = DataBrokerProtectionSettings()
     private var cancellables = Set<AnyCancellable>()
     private var statusBarMenu: StatusBarMenu?
+    private var manager: DataBrokerProtectionAgentManager?
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         os_log("DuckDuckGoAgent started", log: .dbpBackgroundAgent, type: .info)
 
-        let manager = DataBrokerProtectionAgentManagerProvider.agentManager()
-        manager.agentFinishedLaunching()
+        manager = DataBrokerProtectionAgentManagerProvider.agentManager()
+        manager?.agentFinishedLaunching()
 
         setupStatusBarMenu()
     }
