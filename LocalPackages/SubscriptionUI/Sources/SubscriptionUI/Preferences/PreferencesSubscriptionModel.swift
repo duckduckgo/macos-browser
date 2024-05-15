@@ -182,7 +182,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
     }
 
-    private func changePlanOrBilling(for environment: SubscriptionEnvironment.Platform) {
+    private func changePlanOrBilling(for environment: SubscriptionEnvironment.PurchasePlatform) {
         switch environment {
         case .appStore:
             NSWorkspace.shared.open(SubscriptionURL.manageSubscriptionsInAppStore.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment))
@@ -239,7 +239,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func refreshSubscriptionPendingState() {
-        if subscriptionManager.currentEnvironment.platform == .appStore {
+        if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
                 Task {
                     let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: subscriptionManager)

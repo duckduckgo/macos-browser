@@ -389,7 +389,7 @@ final class MoreOptionsMenu: NSMenu {
 
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
         let subscriptionManager = Application.appDelegate.subscriptionManager
-        let platform = subscriptionManager.currentEnvironment.platform
+        let platform = subscriptionManager.currentEnvironment.purchasePlatform
         let shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
         if shouldHidePrivacyProDueToNoProducts {
             return []

@@ -23,7 +23,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     var currentEnvironment: SubscriptionEnvironment
     var updateServiceEnvironment: (SubscriptionEnvironment.ServiceEnvironment) -> Void
-    var updatePurchasingPlatform: (SubscriptionEnvironment.Platform) -> Void
+    var updatePurchasingPlatform: (SubscriptionEnvironment.PurchasePlatform) -> Void
 
     var isInternalTestingEnabled: () -> Bool
     var updateInternalTestingFlag: (Bool) -> Void
@@ -52,7 +52,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     public init(currentEnvironment: SubscriptionEnvironment,
                 updateServiceEnvironment: @escaping (SubscriptionEnvironment.ServiceEnvironment) -> Void,
-                updatePurchasingPlatform: @escaping (SubscriptionEnvironment.Platform) -> Void,
+                updatePurchasingPlatform: @escaping (SubscriptionEnvironment.PurchasePlatform) -> Void,
                 isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
@@ -111,7 +111,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private func makePurchasePlatformSubmenu() -> NSMenu {
         let menu = NSMenu(title: "Select purchase platform:")
         let appStoreItem = NSMenuItem(title: "App Store", action: #selector(setPlatformToAppStore), target: self)
-        if currentEnvironment.platform == .appStore {
+        if currentEnvironment.purchasePlatform == .appStore {
             appStoreItem.state = .on
             appStoreItem.isEnabled = false
             appStoreItem.action = nil
@@ -120,7 +120,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(appStoreItem)
 
         let stripeItem = NSMenuItem(title: "Stripe", action: #selector(setPlatformToStripe), target: self)
-        if currentEnvironment.platform == .stripe {
+        if currentEnvironment.purchasePlatform == .stripe {
             stripeItem.state = .on
             stripeItem.isEnabled = false
             stripeItem.action = nil
@@ -259,7 +259,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         askAndUpdatePlatform(to: .stripe)
     }
 
-    private func askAndUpdatePlatform(to newPlatform: SubscriptionEnvironment.Platform) {
+    private func askAndUpdatePlatform(to newPlatform: SubscriptionEnvironment.PurchasePlatform) {
         let alert = makeAlert(title: "Are you sure you want to change the purchase platform to \(newPlatform.rawValue.capitalized)",
                               message: "This setting IS persisted between app runs. This action will close the app, do you want to proceed?",
                               buttonNames: ["Yes", "No"])

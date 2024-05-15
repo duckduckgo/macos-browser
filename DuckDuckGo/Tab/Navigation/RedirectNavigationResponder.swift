@@ -39,7 +39,7 @@ struct RedirectNavigationResponder: NavigationResponder {
         if url.pathComponents == URL.privacyPro.pathComponents {
             let isFeatureAvailable = DefaultSubscriptionFeatureAvailability().isFeatureAvailable
             let subscriptionManager = Application.appDelegate.subscriptionManager
-            let platform = subscriptionManager.currentEnvironment.platform
+            let platform = subscriptionManager.currentEnvironment.purchasePlatform
             let shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
             let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
             let url = SubscriptionURL.baseURL.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)

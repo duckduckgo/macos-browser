@@ -34,7 +34,7 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         self.actionHandlers = actionHandlers
         self.email = email
         self.subscriptionManager = subscriptionManager
-        self.description = UserText.shareModalDescription(platform: subscriptionManager.currentEnvironment.platform)
+        self.description = UserText.shareModalDescription(platform: subscriptionManager.currentEnvironment.purchasePlatform)
     }
 
     private var hasEmail: Bool { !(email?.isEmpty ?? true) }
@@ -50,7 +50,7 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         }
 
         Task {
-            if subscriptionManager.currentEnvironment.platform == .appStore {
+            if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
                 if #available(macOS 12.0, iOS 15.0, *) {
                     let appStoreAccountManagementFlow = AppStoreAccountManagementFlow(subscriptionManager: subscriptionManager)
                     await appStoreAccountManagementFlow.refreshAuthTokenIfNeeded()

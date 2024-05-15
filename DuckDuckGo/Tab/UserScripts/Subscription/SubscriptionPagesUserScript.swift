@@ -86,7 +86,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
     let subscriptionManager: SubscriptionManaging
     var accountManager: AccountManaging { subscriptionManager.accountManager }
-    var subscriptionPlatform: SubscriptionEnvironment.Platform { subscriptionManager.currentEnvironment.platform }
+    var subscriptionPlatform: SubscriptionEnvironment.PurchasePlatform { subscriptionManager.currentEnvironment.purchasePlatform }
 
     let stripePurchaseFlow: StripePurchaseFlow
     let subscriptionErrorReporter = SubscriptionErrorReporter()
@@ -220,7 +220,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         let message = original
 
-        if subscriptionManager.currentEnvironment.platform == .appStore {
+        if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
                 let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
                 let progressViewController = await ProgressViewController(title: UserText.purchasingSubscriptionTitle)

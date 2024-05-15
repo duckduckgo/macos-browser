@@ -39,9 +39,9 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, Pur
     public init(actionHandlers: SubscriptionAccessActionHandlers,
                 subscriptionEnvironment: SubscriptionEnvironment) {
         self.actionHandlers = actionHandlers
-        self.shouldShowRestorePurchase =  subscriptionEnvironment.platform == .appStore
+        self.shouldShowRestorePurchase =  subscriptionEnvironment.purchasePlatform == .appStore
         self.subscriptionEnvironment = subscriptionEnvironment
-        self.description = UserText.activateModalDescription(platform: subscriptionEnvironment.platform)
+        self.description = UserText.activateModalDescription(platform: subscriptionEnvironment.purchasePlatform)
     }
 
     public func handleEmailAction() {

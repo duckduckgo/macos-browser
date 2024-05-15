@@ -23,9 +23,9 @@ extension SubscriptionEnvironment {
 
     public static var `default`: SubscriptionEnvironment {
 #if APPSTORE || !STRIPE
-        let platform: SubscriptionEnvironment.Platform = .appStore
+        let platform: SubscriptionEnvironment.PurchasePlatform = .appStore
 #else
-        let platform: SubscriptionEnvironment.Platform = .stripe
+        let platform: SubscriptionEnvironment.PurchasePlatform = .stripe
 #endif
 
 #if ALPHA || DEBUG
@@ -33,7 +33,7 @@ extension SubscriptionEnvironment {
 #else
         let environment: SubscriptionEnvironment.ServiceEnvironment = .production
 #endif
-        return SubscriptionEnvironment(serviceEnvironment: environment, platform: platform)
+        return SubscriptionEnvironment(serviceEnvironment: environment, purchasePlatform: platform)
     }
 }
 

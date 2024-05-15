@@ -638,8 +638,8 @@ import SubscriptionUI
                     settings.selectedEnvironment = .staging
                 }
             }
-            let updatePurchasingPlatform: (SubscriptionEnvironment.Platform) -> Void = { platform in
-                currentEnvironment.platform = platform
+            let updatePurchasingPlatform: (SubscriptionEnvironment.PurchasePlatform) -> Void = { platform in
+                currentEnvironment.purchasePlatform = platform
                 SubscriptionManager.save(subscriptionEnvironment: currentEnvironment, userDefaults: subscriptionUserDefaults)
             }
 
