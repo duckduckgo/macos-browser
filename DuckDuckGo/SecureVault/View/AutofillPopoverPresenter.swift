@@ -24,8 +24,8 @@ protocol AutofillPopoverPresenter {
     var popoverIsDirty: Bool { get }
     var popoverIsShown: Bool { get }
     var popoverPresentingWindow: NSWindow? { get }
-    func show(positionedBelow view: NSView, withDomain domain: String?, selectedCategory category: SecureVaultSorting.Category?)
-    func show(positionedBelow view: NSView, withSelectedAccount: SecureVaultModels.WebsiteAccount)
+    func show(positionedBelow view: NSView, withDomain domain: String?, selectedCategory category: SecureVaultSorting.Category?) -> NSPopover
+    func show(positionedBelow view: NSView, withSelectedAccount: SecureVaultModels.WebsiteAccount) -> NSPopover
     func dismiss()
 }
 
@@ -55,12 +55,16 @@ final class DefaultAutofillPopoverPresenter: AutofillPopoverPresenter, PopoverPr
     }
 
     /// Note: Dismisses any previously displayed popover before showing a new one
-    func show(positionedBelow view: NSView, withDomain domain: String?, selectedCategory category: SecureVaultSorting.Category?) {
-        show(under: view, withDomain: domain).select(category: category)
+    func show(positionedBelow view: NSView, withDomain domain: String?, selectedCategory category: SecureVaultSorting.Category?) -> NSPopover {
+        let popover = show(under: view, withDomain: domain)
+        popover.select(category: category)
+        return popover
     }
 
-    func show(positionedBelow view: NSView, withSelectedAccount account: SecureVaultModels.WebsiteAccount) {
-        show(under: view, withDomain: nil).select(websiteAccount: account)
+    func show(positionedBelow view: NSView, withSelectedAccount account: SecureVaultModels.WebsiteAccount) -> NSPopover {
+        let popover = show(under: view, withDomain: nil)
+        popover.select(websiteAccount: account)
+        return popover
     }
 
     func dismiss() {
