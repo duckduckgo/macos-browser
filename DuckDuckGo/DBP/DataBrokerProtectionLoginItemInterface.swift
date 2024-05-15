@@ -31,10 +31,14 @@ protocol DataBrokerProtectionLoginItemInterface: DataBrokerProtectionAppToAgentI
 final class DefaultDataBrokerProtectionLoginItemInterface {
     private let ipcClient: DataBrokerProtectionIPCClient
     private let loginItemsManager: LoginItemsManager
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
-    init(ipcClient: DataBrokerProtectionIPCClient, loginItemsManager: LoginItemsManager = .init()) {
+    init(ipcClient: DataBrokerProtectionIPCClient,
+         loginItemsManager: LoginItemsManager = .init(),
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
         self.ipcClient = ipcClient
         self.loginItemsManager = loginItemsManager
+        self.pixelHandler = pixelHandler
     }
 }
 
@@ -67,6 +71,7 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
         Task {
             // Wait to make sure the agent has had time to launch
             try await Task.sleep(nanoseconds: 1_000_000_000)
+            pixelHandler.fire(.ipcServerProfileSavedCalledByApp)
             ipcClient.profileSaved { error in
                 if let error = error {
                     self.pixelHandler.fire(.ipcServerProfileSavedXPCError(error: error))
@@ -78,8 +83,13 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
     }
 
     func appLaunched() {
+        pixelHandler.fire(.ipcServerAppLaunchedCalledByApp)
         ipcClient.appLaunched { error in
-            // TODO
+            if let error = error {
+                self.pixelHandler.fire(.ipcServerAppLaunchedXPCError(error: error))
+            } else {
+                self.pixelHandler.fire(.ipcServerAppLaunchedReceivedByAgent)
+            }
         }
     }
 

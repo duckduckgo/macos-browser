@@ -94,21 +94,13 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
     public func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
         xpc.execute(call: { server in
             server.profileSaved(xpcMessageReceivedCompletion: xpcMessageReceivedCompletion)
-        }, xpcReplyErrorHandler: { error in
-            os_log("Error \(error.localizedDescription)")
-            // Intentional no-op as there's no completion block
-            // If you add a completion block, please remember to call it here too!
-        })
+        }, xpcReplyErrorHandler: xpcMessageReceivedCompletion)
     }
 
     public func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
         xpc.execute(call: { server in
             server.appLaunched(xpcMessageReceivedCompletion: xpcMessageReceivedCompletion)
-        }, xpcReplyErrorHandler: { error in
-            os_log("Error \(error.localizedDescription)")
-            // Intentional no-op as there's no completion block
-            // If you add a completion block, please remember to call it here too!
-        })
+        }, xpcReplyErrorHandler: xpcMessageReceivedCompletion)
     }
 
     // MARK: - DataBrokerProtectionAgentDebugCommands

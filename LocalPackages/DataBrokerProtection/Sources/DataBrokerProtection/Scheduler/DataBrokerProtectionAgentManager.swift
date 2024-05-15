@@ -128,7 +128,6 @@ public final class DataBrokerProtectionAgentManager {
     }
 
     public func agentFinishedLaunching() {
-        pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossible)
 
         do {
             // If there's no saved profile we don't need to start the scheduler
@@ -157,8 +156,6 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionBackgroundActivi
 extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
 
     public func profileSaved() {
-        let startTime = Date()
-        pixelHandler.fire(.initialScanPreStartDuration(duration: (Date().timeIntervalSince(startTime) * 1000).rounded(.towardZero)))
         let backgroundAgentInitialScanStartTime = Date()
 
         userNotificationService.requestNotificationPermission()
@@ -168,11 +165,12 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
                     switch oneTimeError {
-                    case DataBrokerProtectionAppToAgentInterfaceError.operationsInterrupted:
+                    case DataBrokerProtectionQueueError.interrupted:
+                        self.pixelHandler.fire(.ipcServerImmediateScansInterrupted)
                         os_log("Interrupted during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
                     default:
+                        self.pixelHandler.fire(.ipcServerImmediateScansFinishedWithError(error: oneTimeError))
                         os_log("Error during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted, error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                        self.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DataBrokerProtectionAgentManager.profileSaved"))
                     }
                 }
                 if let operationErrors = errors.operationErrors,
@@ -182,6 +180,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
             }
 
             if errors?.oneTimeError == nil {
+                self.pixelHandler.fire(.ipcServerImmediateScansFinishedWithoutError)
                 self.userNotificationService.sendFirstScanCompletedNotification()
             }
 
@@ -197,7 +196,33 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
     public func appLaunched() {
         queueManager.startScheduledOperationsIfPermitted(showWebView: false,
                                                          operationDependencies:
-                                                            operationDependencies, completion: nil)
+                                                            operationDependencies) { [weak self] errors in
+            guard let self = self else { return }
+
+            if let errors = errors {
+                if let oneTimeError = errors.oneTimeError {
+                    switch oneTimeError {
+                    case DataBrokerProtectionQueueError.interrupted:
+                        self.pixelHandler.fire(.ipcServerAppLaunchedScheduledScansInterrupted)
+                        os_log("Interrupted during DataBrokerProtectionAgentManager.appLaunched in queueManager.startScheduledOperationsIfPermitted(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                    case DataBrokerProtectionQueueError.cannotInterrupt:
+                        self.pixelHandler.fire(.ipcServerAppLaunchedScheduledScansBlocked)
+                        os_log("Cannot interrupt during DataBrokerProtectionAgentManager.appLaunched in queueManager.startScheduledOperationsIfPermitted()")
+                    default:
+                        self.pixelHandler.fire(.ipcServerAppLaunchedScheduledScansFinishedWithError(error: oneTimeError))
+                        os_log("Error during DataBrokerProtectionAgentManager.appLaunched in queueManager.startScheduledOperationsIfPermitted, error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                    }
+                }
+                if let operationErrors = errors.operationErrors,
+                          operationErrors.count != 0 {
+                    os_log("Operation error(s) during DataBrokerProtectionAgentManager.profileSaved in queueManager.startImmediateOperationsIfPermitted, count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                }
+            }
+
+            if errors?.oneTimeError == nil {
+                self.pixelHandler.fire(.ipcServerAppLaunchedScheduledScansFinishedWithoutError)
+            }
+        }
     }
 
     private func fireImmediateScansCompletionPixel(startTime: Date) {
@@ -232,7 +257,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentDebugComman
     }
 
     public func runAllOptOuts(showWebView: Bool) {
-        queueManager.execute(.startOptOutOperations(showWebView: showWebView, 
+        queueManager.execute(.startOptOutOperations(showWebView: showWebView,
                                                     operationDependencies: operationDependencies,
                                                     completion: nil))
     }

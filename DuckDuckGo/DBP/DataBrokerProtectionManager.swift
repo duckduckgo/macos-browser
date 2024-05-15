@@ -49,7 +49,7 @@ public final class DataBrokerProtectionManager {
     }()
 
     lazy var loginItemInterface: DataBrokerProtectionLoginItemInterface = {
-        return DefaultDataBrokerProtectionLoginItemInterface(ipcClient: ipcClient)
+        return DefaultDataBrokerProtectionLoginItemInterface(ipcClient: ipcClient, pixelHandler: pixelHandler)
     }()
 
     private init() {
