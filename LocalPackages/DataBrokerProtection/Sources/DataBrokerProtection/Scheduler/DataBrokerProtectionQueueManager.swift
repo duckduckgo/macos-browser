@@ -56,6 +56,7 @@ enum DataBrokerProtectionQueueMode {
 
 enum DataBrokerProtectionQueueError: Error {
     case cannotInterrupt
+    case interrupted
 }
 
 enum DataBrokerProtectionQueueManagerDebugCommand {
@@ -239,7 +240,9 @@ private extension DefaultDataBrokerProtectionQueueManager {
     }
 
     func errorCollectionForCurrentOperations() -> DataBrokerProtectionAgentErrorCollection? {
-        return operationErrors.count != 0 ? DataBrokerProtectionAgentErrorCollection(operationErrors: operationErrors) : nil
+        return DataBrokerProtectionAgentErrorCollection(
+            oneTimeError: DataBrokerProtectionQueueError.interrupted,
+            operationErrors: operationErrors.count != 0 ? operationErrors : nil)
     }
 
     func firePixels(operationDependencies: DataBrokerOperationDependencies) {

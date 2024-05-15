@@ -21,7 +21,6 @@ import Foundation
 public enum DataBrokerProtectionAppToAgentInterfaceError: Error {
     case loginItemDoesNotHaveNecessaryPermissions
     case appInWrongDirectory
-    case operationsInterrupted
 }
 
 @objc
