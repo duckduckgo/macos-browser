@@ -189,7 +189,8 @@ private extension DefaultDataBrokerProtectionQueueManager {
         switch mode {
         case .immediate(let completion), .scheduled(let completion):
             operationQueue.cancelAllOperations()
-            completion?(errorCollectionForCurrentOperations())
+            let errorCollection = DataBrokerProtectionAgentErrorCollection(oneTimeError: DataBrokerProtectionQueueError.interrupted, operationErrors: operationErrorsForCurrentOperations())
+            completion?(errorCollection)
             resetModeAndClearErrors()
         default:
             break
@@ -233,16 +234,14 @@ private extension DefaultDataBrokerProtectionQueueManager {
         }
 
         operationQueue.addBarrierBlock { [weak self] in
-            let errorCollection = self?.errorCollectionForCurrentOperations()
+            let errorCollection = DataBrokerProtectionAgentErrorCollection(oneTimeError: nil, operationErrors: self?.operationErrorsForCurrentOperations())
             completion?(errorCollection)
             self?.resetModeAndClearErrors()
         }
     }
 
-    func errorCollectionForCurrentOperations() -> DataBrokerProtectionAgentErrorCollection? {
-        return DataBrokerProtectionAgentErrorCollection(
-            oneTimeError: DataBrokerProtectionQueueError.interrupted,
-            operationErrors: operationErrors.count != 0 ? operationErrors : nil)
+    func operationErrorsForCurrentOperations() -> [Error]? {
+        return operationErrors.count != 0 ? operationErrors : nil
     }
 
     func firePixels(operationDependencies: DataBrokerOperationDependencies) {
