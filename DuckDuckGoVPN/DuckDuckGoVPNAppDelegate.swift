@@ -160,6 +160,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var tunnelControllerIPCService: TunnelControllerIPCService = {
         let ipcServer = TunnelControllerIPCService(
             tunnelController: tunnelController,
+            uninstaller: vpnUninstaller,
             networkExtensionController: networkExtensionController,
             statusReporter: statusReporter)
         ipcServer.activate()
@@ -262,7 +263,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             locationFormatter: DefaultVPNLocationFormatter(),
             uninstallHandler: { [weak self] in
                 guard let self else { return }
-                await self.vpnUninstaller.uninstall(includingSystemExtension: true)
+                try? await self.vpnUninstaller.uninstall(includingSystemExtension: true)
             }
         )
     }

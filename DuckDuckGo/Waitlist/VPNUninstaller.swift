@@ -225,7 +225,7 @@ final class VPNUninstaller: VPNUninstalling {
 
     func removeSystemExtension() async throws {
 #if NETP_SYSTEM_EXTENSION
-        try await ipcClient.debugCommand(.removeSystemExtension)
+        try await ipcClient.command(.removeSystemExtension)
 #endif
     }
 
@@ -235,7 +235,7 @@ final class VPNUninstaller: VPNUninstalling {
 
     private func removeVPNConfiguration() async throws {
         // Remove the agent VPN configuration
-        try await ipcClient.debugCommand(.removeVPNConfiguration)
+        try await ipcClient.command(.removeVPNConfiguration)
     }
 
     private func resetUserDefaults(uninstallSystemExtension: Bool) {
