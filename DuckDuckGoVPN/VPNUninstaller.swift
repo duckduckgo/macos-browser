@@ -37,7 +37,7 @@ final class VPNUninstaller: VPNUninstalling {
 
     init(networkExtensionController: NetworkExtensionController,
          vpnConfigurationManager: VPNConfigurationManager, defaults: UserDefaults = .netP,
-         pixelKit: PixelFiring?) {
+         pixelKit: PixelFiring? = PixelKit.shared) {
 
         self.networkExtensionController = networkExtensionController
         self.vpnConfiguration = vpnConfigurationManager
@@ -57,12 +57,11 @@ final class VPNUninstaller: VPNUninstalling {
             }
 
             defaults.networkProtectionShouldShowVPNUninstalledMessage = true
-            pixelKit?.fire(VPNUninstallAttempt.success)
-            exit(EXIT_SUCCESS)
+            pixelKit?.fire(VPNUninstallAttempt.success, frequency: .dailyAndCount)
         } catch OSSystemExtensionError.requestCanceled {
-            pixelKit?.fire(VPNUninstallAttempt.cancelled)
+            pixelKit?.fire(VPNUninstallAttempt.cancelled, frequency: .dailyAndCount)
         } catch {
-            pixelKit?.fire(VPNUninstallAttempt.failure(error))
+            pixelKit?.fire(VPNUninstallAttempt.failure(error), frequency: .dailyAndCount)
         }
     }
 

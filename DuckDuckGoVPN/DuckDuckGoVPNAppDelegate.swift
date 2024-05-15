@@ -263,7 +263,14 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             locationFormatter: DefaultVPNLocationFormatter(),
             uninstallHandler: { [weak self] in
                 guard let self else { return }
-                try? await self.vpnUninstaller.uninstall(includingSystemExtension: true)
+
+                do {
+                    try await self.vpnUninstaller.uninstall(includingSystemExtension: true)
+                    exit(EXIT_SUCCESS)
+                } catch {
+                    // Intentional no-op: we already track VPN uninstallation failures using
+                    // pixels within the vpn uninstaller.
+                }
             }
         )
     }

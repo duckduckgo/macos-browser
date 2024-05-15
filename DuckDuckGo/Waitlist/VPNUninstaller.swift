@@ -42,6 +42,7 @@ final class VPNUninstaller: VPNUninstalling {
         case runAgentError(_ error: Error)
         case systemExtensionError(_ error: Error)
         case vpnConfigurationError(_ error: Error)
+        case uninstallError(_ error: Error)
 
         var errorCode: Int {
             switch self {
@@ -49,6 +50,7 @@ final class VPNUninstaller: VPNUninstalling {
             case .runAgentError: return 1
             case .systemExtensionError: return 2
             case .vpnConfigurationError: return 3
+            case .uninstallError: return 4
             }
         }
 
@@ -58,7 +60,8 @@ final class VPNUninstaller: VPNUninstalling {
                 return ["reason": reason.rawValue]
             case .runAgentError(let error),
                     .systemExtensionError(let error),
-                    .vpnConfigurationError(let error):
+                    .vpnConfigurationError(let error),
+                    .uninstallError(let error):
                 return [NSUnderlyingErrorKey: error as NSError]
             }
         }
@@ -174,30 +177,12 @@ final class VPNUninstaller: VPNUninstalling {
             }
 
             // Allow some time for the login items to fully launch
-            try? await Task.sleep(interval: 0.5)
 
-            if removeSystemExtension {
-                do {
-                    try await self.removeSystemExtension()
-                } catch {
-                    throw UninstallError.systemExtensionError(error)
-                }
-            }
-
-            var attemptNumber = 1
-            while attemptNumber <= 3 {
-                do {
-                    try await removeVPNConfiguration()
-                    break // Removal succeeded, break out of the while loop and continue with the rest of uninstallation
-                } catch {
-                    print("Failed to remove VPN configuration, with error: \(error.localizedDescription)")
-
-                    if attemptNumber == 3 {
-                        throw UninstallError.vpnConfigurationError(error)
-                    }
-                }
-
-                attemptNumber += 1
+            do {
+                try await ipcClient.command(.uninstallVPN)
+            } catch {
+                print("Failed to uninstall VPN, with error: \(error.localizedDescription)")
+                throw UninstallError.uninstallError(error)
             }
 
             // We want to give some time for the login item to reset state before disabling it
@@ -225,7 +210,11 @@ final class VPNUninstaller: VPNUninstalling {
 
     func removeSystemExtension() async throws {
 #if NETP_SYSTEM_EXTENSION
-        try await ipcClient.command(.removeSystemExtension)
+        do {
+            try await ipcClient.command(.removeSystemExtension)
+        } catch {
+            throw UninstallError.systemExtensionError(error)
+        }
 #endif
     }
 
@@ -235,7 +224,11 @@ final class VPNUninstaller: VPNUninstalling {
 
     private func removeVPNConfiguration() async throws {
         // Remove the agent VPN configuration
-        try await ipcClient.command(.removeVPNConfiguration)
+        do {
+            try await ipcClient.command(.removeVPNConfiguration)
+        } catch {
+            throw UninstallError.vpnConfigurationError(error)
+        }
     }
 
     private func resetUserDefaults(uninstallSystemExtension: Bool) {
