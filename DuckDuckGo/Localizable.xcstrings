@@ -30741,7 +30741,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Add to Dock"
+            "value" : "Keep In Dock"
           }
         }
       }
@@ -30753,7 +30753,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Added to your Dock!"
+            "value" : "Added to Dock!"
           }
         }
       }
@@ -30765,7 +30765,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Access DuckDuckGo faster by adding it to your Dock"
+            "value" : "Get to DuckDuckGo faster by adding it to your Dock."
           }
         }
       }
@@ -30777,7 +30777,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Add App to the Dock"
+            "value" : "Keep in Your Dock"
           }
         }
       }
@@ -32601,7 +32601,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "One last thing. Would you like to keep DuckDuckGo in your dock so the browser is always within reach?"
+            "value" : "One last thing. Want to keep DuckDuckGo in your Dock so the browser's always within reach?"
           }
         }
       }
@@ -32913,7 +32913,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set! Find me in your Dock any time.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
           }
         }
       }
