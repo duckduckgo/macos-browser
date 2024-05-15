@@ -35,6 +35,7 @@ final class VPNUninstaller: VPNUninstalling {
     enum UninstallCancellationReason: String {
         case alreadyUninstalling
         case alreadyUninstalled
+        case sysexInstallationCancelled
     }
 
     enum UninstallError: CustomNSError {
@@ -182,6 +183,11 @@ final class VPNUninstaller: VPNUninstalling {
                 try await ipcClient.command(.uninstallVPN)
             } catch {
                 print("Failed to uninstall VPN, with error: \(error.localizedDescription)")
+
+                if case OSSystemExtensionError.requestCanceled = error {
+                    throw UninstallError.cancelled(reason: .sysexInstallationCancelled)
+                }
+
                 throw UninstallError.uninstallError(error)
             }
 

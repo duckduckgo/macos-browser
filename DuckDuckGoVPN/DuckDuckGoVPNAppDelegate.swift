@@ -43,6 +43,8 @@ final class DuckDuckGoVPNApplication: NSApplication {
         }
 
         super.init()
+
+        setupPixelKit()
         self.delegate = _delegate
 
 #if DEBUG
@@ -58,6 +60,41 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    @MainActor
+    private func setupPixelKit() {
+        let dryRun: Bool
+
+#if DEBUG
+        dryRun = true
+#else
+        dryRun = false
+#endif
+
+        let pixelSource: String
+
+#if NETP_SYSTEM_EXTENSION
+        pixelSource = "vpnAgent"
+#else
+        pixelSource = "vpnAgentAppStore"
+#endif
+
+        PixelKit.setUp(dryRun: dryRun,
+                       appVersion: AppVersion.shared.versionNumber,
+                       source: pixelSource,
+                       defaultHeaders: [:],
+                       defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
+
+            let url = URL.pixelUrl(forPixelNamed: pixelName)
+            let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
+            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
+            let request = APIRequest(configuration: configuration)
+
+            request.fetch { _, error in
+                onComplete(error == nil, error)
+            }
+        }
     }
 }
 
@@ -205,8 +242,12 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         VPNAppEventsHandler(tunnelController: tunnelController)
     }()
 
+    @MainActor
     private lazy var vpnUninstaller: VPNUninstaller = {
-        VPNUninstaller(networkExtensionController: networkExtensionController, vpnConfigurationManager: VPNConfigurationManager())
+        VPNUninstaller(
+            tunnelController: tunnelController,
+            networkExtensionController: networkExtensionController,
+            vpnConfigurationManager: VPNConfigurationManager())
     }()
 
     /// The status bar NetworkProtection menu
@@ -292,38 +333,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             // Initialize lazy properties
             _ = tunnelControllerIPCService
             _ = vpnProxyLauncher
-
-            let dryRun: Bool
-
-#if DEBUG
-            dryRun = true
-#else
-            dryRun = false
-#endif
-
-            let pixelSource: String
-
-#if NETP_SYSTEM_EXTENSION
-            pixelSource = "vpnAgent"
-#else
-            pixelSource = "vpnAgentAppStore"
-#endif
-
-            PixelKit.setUp(dryRun: dryRun,
-                           appVersion: AppVersion.shared.versionNumber,
-                           source: pixelSource,
-                           defaultHeaders: [:],
-                           defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
-
-                let url = URL.pixelUrl(forPixelNamed: pixelName)
-                let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
-                let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
-                let request = APIRequest(configuration: configuration)
-
-                request.fetch { _, error in
-                    onComplete(error == nil, error)
-                }
-            }
 
             vpnAppEventsHandler.appDidFinishLaunching()
 

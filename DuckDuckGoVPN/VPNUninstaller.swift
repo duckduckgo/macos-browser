@@ -28,17 +28,21 @@ protocol VPNUninstalling {
     func removeVPNConfiguration() async throws
 }
 
+@MainActor
 final class VPNUninstaller: VPNUninstalling {
 
-    let networkExtensionController: NetworkExtensionController
-    let vpnConfiguration: VPNConfigurationManager
-    let defaults: UserDefaults
-    let pixelKit: PixelFiring?
+    private let tunnelController: TunnelController
+    private let networkExtensionController: NetworkExtensionController
+    private let vpnConfiguration: VPNConfigurationManager
+    private let defaults: UserDefaults
+    private let pixelKit: PixelFiring?
 
-    init(networkExtensionController: NetworkExtensionController,
+    init(tunnelController: TunnelController,
+         networkExtensionController: NetworkExtensionController,
          vpnConfigurationManager: VPNConfigurationManager, defaults: UserDefaults = .netP,
          pixelKit: PixelFiring? = PixelKit.shared) {
 
+        self.tunnelController = tunnelController
         self.networkExtensionController = networkExtensionController
         self.vpnConfiguration = vpnConfigurationManager
         self.defaults = defaults
@@ -47,6 +51,7 @@ final class VPNUninstaller: VPNUninstalling {
 
     func uninstall(includingSystemExtension: Bool) async throws {
         pixelKit?.fire(VPNUninstallAttempt.begin)
+        await tunnelController.stop()
 
         do {
             try await removeSystemExtension()
@@ -58,10 +63,14 @@ final class VPNUninstaller: VPNUninstalling {
 
             defaults.networkProtectionShouldShowVPNUninstalledMessage = true
             pixelKit?.fire(VPNUninstallAttempt.success, frequency: .dailyAndCount)
-        } catch OSSystemExtensionError.requestCanceled {
-            pixelKit?.fire(VPNUninstallAttempt.cancelled, frequency: .dailyAndCount)
         } catch {
+            if case OSSystemExtensionError.requestCanceled = error {
+                pixelKit?.fire(VPNUninstallAttempt.cancelled, frequency: .dailyAndCount)
+                throw error
+            }
+
             pixelKit?.fire(VPNUninstallAttempt.failure(error), frequency: .dailyAndCount)
+            throw error
         }
     }
 
