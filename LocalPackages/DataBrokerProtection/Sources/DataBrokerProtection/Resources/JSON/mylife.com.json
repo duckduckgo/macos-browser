@@ -38,7 +38,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": ".hit-btn-lg"
+              "selector": ".hit-btn-lg",
+              "identifierType": "path",
+              "identifier": "https://www.mylife.com/${firstName}-${lastName}/${id}"
             }
           }
         }
