@@ -73,7 +73,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             )
 
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
-            _ = VPNSettings(defaults: .netP)
+//            _ = VPNSettings(defaults: .netP)
             let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
 
             let popover = NetworkProtectionPopover(controller: controller,

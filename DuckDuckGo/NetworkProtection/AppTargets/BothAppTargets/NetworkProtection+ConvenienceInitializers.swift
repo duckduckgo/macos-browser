@@ -27,7 +27,7 @@ extension NetworkProtectionDeviceManager {
 
     @MainActor
     static func create() -> NetworkProtectionDeviceManager {
-        let settings = VPNSettings(defaults: .netP)
+        let settings = Application.appDelegate.vpnSettings
         let keyStore = NetworkProtectionKeychainKeyStore()
         let tokenStore = NetworkProtectionKeychainTokenStore()
         return NetworkProtectionDeviceManager(environment: settings.selectedEnvironment,
@@ -40,7 +40,7 @@ extension NetworkProtectionDeviceManager {
 
 extension NetworkProtectionCodeRedemptionCoordinator {
     convenience init() {
-        let settings = VPNSettings(defaults: .netP)
+        let settings = Application.appDelegate.vpnSettings
         self.init(environment: settings.selectedEnvironment,
                   tokenStore: NetworkProtectionKeychainTokenStore(),
                   errorEvents: .networkProtectionAppDebugEvents,
@@ -71,7 +71,7 @@ extension NetworkProtectionKeychainKeyStore {
 
 extension NetworkProtectionLocationListCompositeRepository {
     convenience init() {
-        let settings = VPNSettings(defaults: .netP)
+        let settings = Application.appDelegate.vpnSettings
         self.init(
             environment: settings.selectedEnvironment,
             tokenStore: NetworkProtectionKeychainTokenStore(),

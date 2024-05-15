@@ -89,6 +89,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         subscriptionManager.accountManager
     }
     public let subscriptionManager: SubscriptionManaging
+    public let vpnSettings = VPNSettings(defaults: .netP)
+
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
 #if DBP
     private var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler?
@@ -184,6 +186,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
         let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+
+        vpnSettings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
+
         let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
                                                                  key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))

@@ -45,7 +45,6 @@ final class DuckDuckGoVPNApplication: NSApplication {
         }
 
         // MARK: - Configure Subscription
-        let settings = VPNSettings(defaults: UserDefaults.netP)
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
         let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
@@ -56,12 +55,13 @@ final class DuckDuckGoVPNApplication: NSApplication {
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
         let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
         accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
-                                            entitlementsCache: entitlementsCache,
-                                            subscriptionService: subscriptionService,
-                                            authService: authService)
+                                        entitlementsCache: entitlementsCache,
+                                        subscriptionService: subscriptionService,
+                                        authService: authService)
 
-        _delegate = DuckDuckGoVPNAppDelegate(bouncer: NetworkProtectionBouncer(accountManager: accountManager), accountManager: accountManager)
-
+        _delegate = DuckDuckGoVPNAppDelegate(bouncer: NetworkProtectionBouncer(accountManager: accountManager),
+                                             accountManager: accountManager,
+                                             subscriptionEnvironment: subscriptionEnvironment)
         super.init()
         self.delegate = _delegate
 
@@ -89,9 +89,12 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private let accountManager: AccountManaging
 
     public init(bouncer: NetworkProtectionBouncer,
-                accountManager: AccountManaging) {
+                accountManager: AccountManaging,
+                subscriptionEnvironment: SubscriptionEnvironment) {
         self.bouncer = bouncer
         self.accountManager = accountManager
+        self.tunnelSettings = VPNSettings(defaults: .netP)
+        self.tunnelSettings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
     }
 
     private var cancellables = Set<AnyCancellable>()
@@ -114,7 +117,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 #endif
     }
 
-    private lazy var tunnelSettings = VPNSettings(defaults: .netP)
+    private let tunnelSettings: VPNSettings
     private lazy var userDefaults = UserDefaults.netP
     private lazy var proxySettings = TransparentProxySettings(defaults: .netP)
 

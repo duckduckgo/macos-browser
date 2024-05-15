@@ -168,7 +168,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     // MARK: - Tunnel Settings
 
-    private let settings = VPNSettings(defaults: .netP)
+    private var settings: VPNSettings {
+        Application.appDelegate.vpnSettings
+    }
 
     // MARK: - Debug Logic
 
