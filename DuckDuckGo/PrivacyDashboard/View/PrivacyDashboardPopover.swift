@@ -31,8 +31,8 @@ final class PrivacyDashboardPopover: NSPopover {
         return frame
     }
 
-    var viewController: PrivacyDashboardViewController? {
-        contentViewController as? PrivacyDashboardViewController
+    var viewController: PrivacyDashboardViewController {
+        (contentViewController as? PrivacyDashboardViewController)!
     }
 
     override init() {
@@ -46,21 +46,17 @@ final class PrivacyDashboardPopover: NSPopover {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("PrivacyDashboardPopover: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     private func setupContentController() {
-        let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
-        guard let controller = storyboard.instantiateController(withIdentifier: "PrivacyDashboardViewController") as? PrivacyDashboardViewController else {
-            assertionFailure("PrivacyDashboard is missing PrivacyDashboardViewController")
-            return
-        }
+        let controller = PrivacyDashboardViewController()
         controller.sizeDelegate = self
         contentViewController = controller
     }
 
     func setPreferredMaxHeight(_ height: CGFloat) {
-        viewController?.setPreferredMaxHeight(height - 40) // Account for popover arrow height
+        viewController.setPreferredMaxHeight(height - 40) // Account for popover arrow height
     }
 
     override func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {

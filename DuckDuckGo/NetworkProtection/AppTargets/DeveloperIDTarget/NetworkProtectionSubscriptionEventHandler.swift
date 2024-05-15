@@ -26,18 +26,22 @@ import NetworkProtectionUI
 final class NetworkProtectionSubscriptionEventHandler {
 
     private let accountManager: AccountManager
+    private let tunnelController: TunnelController
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
-    private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
+    private let vpnUninstaller: VPNUninstalling
     private let userDefaults: UserDefaults
     private var cancellables = Set<AnyCancellable>()
 
     init(accountManager: AccountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)),
+         tunnelController: TunnelController,
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
-         networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
+         vpnUninstaller: VPNUninstalling,
          userDefaults: UserDefaults = .netP) {
+
         self.accountManager = accountManager
+        self.tunnelController = tunnelController
         self.networkProtectionTokenStorage = networkProtectionTokenStorage
-        self.networkProtectionFeatureDisabler = networkProtectionFeatureDisabler
+        self.vpnUninstaller = vpnUninstaller
         self.userDefaults = userDefaults
 
         subscribeToEntitlementChanges()
@@ -84,7 +88,7 @@ final class NetworkProtectionSubscriptionEventHandler {
         if hasEntitlements {
             UserDefaults.netP.networkProtectionEntitlementsExpired = false
         } else {
-            networkProtectionFeatureDisabler.stop()
+            await tunnelController.stop()
             UserDefaults.netP.networkProtectionEntitlementsExpired = true
         }
     }
@@ -106,7 +110,7 @@ final class NetworkProtectionSubscriptionEventHandler {
         print("[NetP Subscription] Deleted NetP auth token after signing out from Privacy Pro")
 
         Task {
-            await networkProtectionFeatureDisabler.disable(uninstallSystemExtension: false)
+            try? await vpnUninstaller.uninstall(removeSystemExtension: false)
         }
     }
 
