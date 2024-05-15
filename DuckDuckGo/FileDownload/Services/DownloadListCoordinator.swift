@@ -57,7 +57,10 @@ final class DownloadListCoordinator {
         case removed
         case updated(oldValue: DownloadListItem)
     }
-    typealias Update = (kind: UpdateKind, item: DownloadListItem)
+    struct Update {
+        let kind: UpdateKind
+        let item: DownloadListItem
+    }
     private let updatesSubject = PassthroughSubject<Update, Never>()
 
     let progress = Progress()
@@ -143,7 +146,7 @@ final class DownloadListCoordinator {
         guard let destinationFilePresenter = try presenters.destination.get() else { throw FileAddError.noDestinationUrl }
 
         self.subscribeToPresenters((destination: destinationFilePresenter, tempFile: try? presenters.tempFile.get()), of: item)
-        self.updatesSubject.send((.added, item))
+        self.updatesSubject.send(Update(kind: .added, item: item))
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -384,15 +387,15 @@ final class DownloadListCoordinator {
         case (.none, .none):
             break
         case (.none, .some(let item)):
-            self.updatesSubject.send((.added, item))
+            self.updatesSubject.send(Update(kind: .added, item: item))
             store.save(item)
         case (.some(let oldValue), .some(let item)):
-            self.updatesSubject.send((.updated(oldValue: oldValue), item))
+            self.updatesSubject.send(Update(kind: .updated(oldValue: oldValue), item: item))
             store.save(item)
         case (.some(let item), .none):
             item.progress?.cancel()
             if original != nil {
-                self.updatesSubject.send((.removed, item))
+                self.updatesSubject.send(Update(kind: .removed, item: item))
             }
             cleanupTempFiles(for: item)
             filePresenters[item.identifier] = nil
@@ -449,6 +452,10 @@ final class DownloadListCoordinator {
 
     var hasActiveDownloads: Bool {
         !downloadTaskCancellables.isEmpty
+    }
+
+    var isEmpty: Bool {
+        items.isEmpty
     }
 
     @MainActor
@@ -569,6 +576,19 @@ private extension DownloadListItem {
         var request = URLRequest(url: downloadURL)
         request.setValue(websiteURL?.absoluteString, forHTTPHeaderField: URLRequest.HeaderKey.referer.rawValue)
         return request
+    }
+
+}
+
+extension DownloadListCoordinator.Update {
+
+    var isDownloadCompletedUpdate: Bool {
+        if case .updated(let oldValue) = kind,
+           oldValue.progress != nil && item.progress == nil {
+            true
+        } else {
+            false
+        }
     }
 
 }

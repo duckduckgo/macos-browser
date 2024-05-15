@@ -34,6 +34,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var cookieHandler: CookieHandler { get }
     var stageCalculator: StageDurationCalculator { get }
     var pixelHandler: EventMapping<DataBrokerProtectionPixels> { get }
+    var sleepObserver: SleepObserver { get }
 
     var webViewHandler: WebViewHandler? { get set }
     var actionsHandler: ActionsHandler? { get }
@@ -202,7 +203,7 @@ extension DataBrokerOperation {
         if stageCalculator.isManualScan {
             let dataBrokerURL = self.query.dataBroker.url
             let durationInMs = (Date().timeIntervalSince(startTime) * 1000).rounded(.towardZero)
-            pixelHandler.fire(.initialScanSiteLoadDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL))
+            pixelHandler.fire(.initialScanSiteLoadDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL, sleepDuration: sleepObserver.totalSleepTime()))
         }
     }
 
@@ -210,7 +211,7 @@ extension DataBrokerOperation {
         if stageCalculator.isManualScan, let postLoadingSiteStartTime = self.postLoadingSiteStartTime {
             let dataBrokerURL = self.query.dataBroker.url
             let durationInMs = (Date().timeIntervalSince(postLoadingSiteStartTime) * 1000).rounded(.towardZero)
-            pixelHandler.fire(.initialScanPostLoadingDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL))
+            pixelHandler.fire(.initialScanPostLoadingDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL, sleepDuration: sleepObserver.totalSleepTime()))
         }
     }
 

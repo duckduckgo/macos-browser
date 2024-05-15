@@ -613,34 +613,31 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToDownloads() {
+        // show Downloads button on download completion for downloads started from non-Fire window
         downloadListCoordinator.updates
             .filter { update in
                 // filter download completion events only
-                if case .updated(let oldValue) = update.kind,
-                   oldValue.progress != nil && update.item.progress == nil {
-                    return true
-                } else {
-                    return false
-                }
+                !update.item.isBurner && update.isDownloadCompletedUpdate
             }
-            .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] update in
-                guard let self else { return }
+            .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] _ in
+                guard let self, !self.isDownloadsPopoverShown,
+                      DownloadsPreferences.shared.shouldOpenPopupOnCompletion,
+                      WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window else { return }
 
-                if DownloadsPreferences.shared.shouldOpenPopupOnCompletion,
-                    !update.item.isBurner,
-                    WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window {
-
-                    self.popovers.showDownloadsPopoverAndAutoHide(from: downloadsButton,
-                                                                  popoverDelegate: self,
-                                                                  downloadsDelegate: self)
-                } else if update.item.isBurner {
-                    invalidateDownloadButtonHidingTimer()
-                }
-                updateDownloadsButton()
+                self.popovers.showDownloadsPopoverAndAutoHide(from: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
             }
             .store(in: &downloadsCancellables)
 
+        // update Downloads button visibility and state
+        downloadListCoordinator.updates
+            .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] _ in
+                self?.updateDownloadsButton()
+            }
+            .store(in: &downloadsCancellables)
+
+        // update Downloads button total progress indicator
         downloadListCoordinator.progress.publisher(for: \.totalUnitCount)
             .combineLatest(downloadListCoordinator.progress.publisher(for: \.completedUnitCount))
             .map { (total, completed) -> Double? in
@@ -745,6 +742,10 @@ final class NavigationBarViewController: NSViewController {
 
         let hasActiveDownloads = downloadListCoordinator.hasActiveDownloads
         downloadsButton.image = hasActiveDownloads ? .downloadsActive : .downloads
+
+        if downloadListCoordinator.isEmpty {
+            invalidateDownloadButtonHidingTimer()
+        }
         let isTimerActive = downloadsButtonHidingTimer != nil
 
         downloadsButton.isShown = if popovers.isDownloadsPopoverShown {
