@@ -45,6 +45,7 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
         return nil
     }
 
+    // Redirect the `/pro` URL to `/subscriptions` URL. If there are any query items in the original URL it appends to the `/subscriptions` URL.
     private func purchasePageRedirectURL(for url: URL) -> URL {
         // If the origin value is of type "do+something" appending the percentEncodedQueryItem crashes the browser as + is replaced by a space.
         // Perform encoding on the value to avoid the crash.
