@@ -38,15 +38,18 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
             let isFeatureAvailable = featureAvailabiltyProvider()
             let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
             let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
-            // If redirect url make sure to append any non nil query parameters to it
-            return isPurchasePageRedirectActive ? purchasePageRedirectURL(for: url) : nil
+            // Redirect the `/pro` URL to `/subscriptions` URL. If there are any query items in the original URL it appends to the `/subscriptions` URL.
+            return isPurchasePageRedirectActive ? URL.subscriptionBaseURL.addingQueryItems(from: url) : nil
         }
 
         return nil
     }
 
-    // Redirect the `/pro` URL to `/subscriptions` URL. If there are any query items in the original URL it appends to the `/subscriptions` URL.
-    private func purchasePageRedirectURL(for url: URL) -> URL {
+}
+
+private extension URL {
+
+    func addingQueryItems(from url: URL) -> URL {
         // If the origin value is of type "do+something" appending the percentEncodedQueryItem crashes the browser as + is replaced by a space.
         // Perform encoding on the value to avoid the crash.
         guard let queryItems = url.getQueryItems()?
@@ -55,8 +58,9 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
                 let encodedValue = value.percentEncoded(withAllowedCharacters: .urlQueryParameterAllowed)
                 return URLQueryItem(name: queryItem.name, value: encodedValue)
             })
-        else { return URL.subscriptionBaseURL }
+        else { return self }
 
-        return URL.subscriptionBaseURL.appending(percentEncodedQueryItems: queryItems)
+        return self.appending(percentEncodedQueryItems: queryItems)
     }
+
 }
