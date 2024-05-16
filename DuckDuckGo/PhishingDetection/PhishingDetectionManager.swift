@@ -31,7 +31,7 @@ public final class PhishingDetectionManager {
         return await phishingDetectionService.isMalicious(url: url.absoluteString)
     }
 
-    func loadDataAsync() async {
+    func loadDataAsync() {
         Task {
             phishingDetectionService.loadData()
             await phishingDetectionDataActivities.run()

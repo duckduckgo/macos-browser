@@ -72,6 +72,7 @@ protocol TabExtensionDependencies {
     var duckPlayer: DuckPlayer { get }
     var certificateTrustEvaluator: CertificateTrustEvaluating { get }
     var tunnelController: NetworkProtectionIPCTunnelController? { get }
+    var phishingDetectionManager: PhishingDetectionManager { get }
 }
 
 // swiftlint:disable:next large_tuple
@@ -203,7 +204,8 @@ extension TabExtensionsBuilder {
 
         add {
             PhishingErrorPageTabExtension(webViewPublisher: args.webViewFuture,
-                                  scriptsPublisher: userScripts.compactMap { $0 })
+                                          scriptsPublisher: userScripts.compactMap { $0 },
+                                          phishingDetectionManager: dependencies.phishingDetectionManager)
         }
 
         if let tunnelController = dependencies.tunnelController {

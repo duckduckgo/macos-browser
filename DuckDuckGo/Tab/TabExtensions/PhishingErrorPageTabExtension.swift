@@ -33,16 +33,18 @@ final class PhishingErrorPageTabExtension {
     weak var webView: ErrorPageTabExtensionNavigationDelegate?
     private var urlCredentialCreator: URLCredentialCreating
     private weak var phishingErrorPageUserScript: PhishingErrorPageUserScript?
-    private var shouldBypassPhishingError = false
+    private var exemptionsList: [String] = ["about:blank", "https://duckduckgo.com"]
     private var featureFlagger: FeatureFlagger
-
     private var cancellables = Set<AnyCancellable>()
+    private var detectionManager: PhishingDetectionManager
 
     init(
         webViewPublisher: some Publisher<WKWebView, Never>,
         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
         scriptsPublisher: some Publisher<some PhishingErrorPageScriptProvider, Never>,
-        featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
+        featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
+        phishingDetectionManager: PhishingDetectionManager) {
+            self.detectionManager = phishingDetectionManager
             self.featureFlagger = featureFlagger
             self.urlCredentialCreator = urlCredentialCreator
             webViewPublisher.sink { [weak self] webView in
@@ -80,34 +82,23 @@ final class PhishingErrorPageTabExtension {
 }
 
 extension PhishingErrorPageTabExtension: NavigationResponder {
+
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        // Check if the navigation action is a reload action
-        if navigationAction.navigationType != .reload {
-            // If it's not a reload action, reset the flag
-            shouldBypassPhishingError = false
-        }
         let urlString = navigationAction.url.absoluteString
+        if exemptionsList.contains(urlString) {
+            return .allow
+        }
         // Check the URL
-        if urlString.contains("notarootkit.com") {
+        let isMalicious = await detectionManager.isMalicious(url: navigationAction.url)
+        if isMalicious {
             loadPhishingErrorHTML(url: navigationAction.url, alternate: false, errorCode: 1)
-            // Navigate back programmatically to fix the BackForwardList
+            // Navigate back programmatically to fix the BackForwardList?
             webView?.goBack()
             return .cancel
         }
         return .allow
     }
-
-//    @MainActor
-//    func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
-//        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust else { return nil }
-//        guard shouldBypassPhishingError else { return nil }
-//        guard navigation?.url == webView?.url else { return nil }
-//        guard let credential = urlCredentialCreator.urlCredentialFrom(trust: challenge.protectionSpace.serverTrust) else { return nil }
-//
-//        shouldBypassPhishingError = false
-//        return .credential(credential)
-//    }
 }
 
 protocol PhishingErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {}
@@ -133,7 +124,8 @@ extension PhishingErrorPageTabExtension: PhishingErrorPageUserScriptDelegate {
     }
 
     func visitSite() {
-        shouldBypassPhishingError = true
+        let urlString = webView?.url?.absoluteString
+        exemptionsList.append(urlString!)
         _ = webView?.reloadPage()
     }
 }

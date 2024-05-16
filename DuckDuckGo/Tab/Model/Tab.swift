@@ -54,6 +54,7 @@ protocol NewWindowPolicyDecisionMaker {
         var downloadManager: FileDownloadManagerProtocol
         var certificateTrustEvaluator: CertificateTrustEvaluating
         var tunnelController: NetworkProtectionIPCTunnelController?
+        var phishingDetectionManager: PhishingDetectionManager
     }
 
     fileprivate weak var delegate: TabDelegate?
@@ -108,7 +109,8 @@ protocol NewWindowPolicyDecisionMaker {
                      webViewSize: CGSize = CGSize(width: 1024, height: 768),
                      startupPreferences: StartupPreferences = StartupPreferences.shared,
                      certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator(),
-                     tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController
+                     tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController,
+                     phishingDetectionManager: PhishingDetectionManager = PhishingDetectionManager.shared
     ) {
 
         let duckPlayer = duckPlayer
@@ -150,7 +152,8 @@ protocol NewWindowPolicyDecisionMaker {
                   webViewSize: webViewSize,
                   startupPreferences: startupPreferences,
                   certificateTrustEvaluator: certificateTrustEvaluator,
-                  tunnelController: tunnelController)
+                  tunnelController: tunnelController,
+                  phishingDetectionManager: phishingDetectionManager)
     }
 
     @MainActor
@@ -183,7 +186,8 @@ protocol NewWindowPolicyDecisionMaker {
          webViewSize: CGSize,
          startupPreferences: StartupPreferences,
          certificateTrustEvaluator: CertificateTrustEvaluating,
-         tunnelController: NetworkProtectionIPCTunnelController?
+         tunnelController: NetworkProtectionIPCTunnelController?,
+         phishingDetectionManager: PhishingDetectionManager
     ) {
 
         self.content = content
@@ -243,7 +247,8 @@ protocol NewWindowPolicyDecisionMaker {
                                                        duckPlayer: duckPlayer,
                                                        downloadManager: downloadManager,
                                                        certificateTrustEvaluator: certificateTrustEvaluator,
-                                                       tunnelController: tunnelController))
+                                                       tunnelController: tunnelController,
+                                                       phishingDetectionManager: phishingDetectionManager))
 
         super.init()
         tabGetter = { [weak self] in self }
