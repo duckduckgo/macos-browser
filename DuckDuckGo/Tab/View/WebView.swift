@@ -38,6 +38,12 @@ final class WebView: WKWebView {
 
     private var isLoadingObserver: Any?
 
+    private var shouldShowWebInspector: Bool {
+        // When a new tab is open, we don't want the web inspector to be active on screen and gain focus.
+        // When a new tab is open the other tab views are removed from the window, hence, we should not show the web inspector.
+        isInspectorShown && window != nil
+    }
+
     override func addTrackingArea(_ trackingArea: NSTrackingArea) {
         /// disable mouseEntered/mouseMoved/mouseExited events passing to Web View while it‘s loading
         /// see https://app.asana.com/0/1177771139624306/1206990108527681/f
@@ -163,8 +169,8 @@ final class WebView: WKWebView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        if self.isInspectorShown {
-            self.openDeveloperTools()
+        if shouldShowWebInspector {
+            openDeveloperTools()
         }
     }
 

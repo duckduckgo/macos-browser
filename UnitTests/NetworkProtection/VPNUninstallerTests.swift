@@ -1,5 +1,5 @@
 //
-//  MockAttributionOriginProvider.swift
+//  VPNUninstallerTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,13 +17,15 @@
 //
 
 import Foundation
-import Subscription
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
+@testable import NetworkProtection
 
-final class MockAttributionOriginProvider: AttributionOriginProvider {
-    let origin: String?
+final class VPNUninstallerTests: XCTestCase {
 
-    init(origin: String? = nil) {
-        self.origin = origin
+    func testUninstallWorks() async throws {
+        let uninstaller = VPNUninstaller()
+
+        try await uninstaller.uninstall(removeSystemExtension: true)
     }
 }

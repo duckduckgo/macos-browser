@@ -30,14 +30,14 @@ final class StatisticsLoader {
 
     private let statisticsStore: StatisticsStore
     private let emailManager: EmailManager
-    private let attributionPixelHandler: AttributionsPixelHandler
+    private let attributionPixelHandler: InstallationAttributionsPixelHandler
     private let parser = AtbParser()
     private var isAppRetentionRequestInProgress = false
 
     init(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
         emailManager: EmailManager = EmailManager(),
-        attributionPixelHandler: AttributionsPixelHandler = InstallationAttributionPixelHandler()
+        attributionPixelHandler: InstallationAttributionsPixelHandler = AppInstallationAttributionPixelHandler()
     ) {
         self.statisticsStore = statisticsStore
         self.emailManager = emailManager
