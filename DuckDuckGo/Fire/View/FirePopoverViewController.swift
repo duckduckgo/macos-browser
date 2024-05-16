@@ -220,10 +220,14 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func setupOpenCloseDetailsButton() {
-        let paddedButtonTitle = "     \(UserText.fireDialogDetails)"
-        openDetailsButton.title = paddedButtonTitle
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.firstLineHeadIndent = 15
+        let title = NSMutableAttributedString(string: UserText.fireDialogDetails)
+        title.addAttributes([.paragraphStyle: paragraphStyle], range: NSRange(location: 0, length: title.length))
+
+        openDetailsButton.attributedTitle = title
         openDetailsButton.alignment = .left
-        closeDetailsButton.title = paddedButtonTitle
+        closeDetailsButton.attributedTitle = title
         closeDetailsButton.alignment = .left
     }
 

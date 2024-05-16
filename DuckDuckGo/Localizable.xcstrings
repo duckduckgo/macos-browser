@@ -19652,66 +19652,6 @@
         }
       }
     },
-    "fire.selected-domains.description" : {
-      "comment" : "Description of the 'Current Window' configuration option for the fire button",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daten nur für ausgewählte Domains löschen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear data only for selected domains"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Borrar datos solo para los dominios seleccionados"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "N'effacer les données que des domaines sélectionnés"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancella i dati solo per i domini selezionati"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alleen gegevens wissen voor de geselecteerde domeinen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wyczyść dane dotyczące tylko wybranych domen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Limpar dados apenas para domínios selecionados"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Функция Fire Button сотрет только данные выбранных сайтов"
-          }
-        }
-      }
-    },
     "fireproof" : {
       "comment" : "Fireproof button",
       "extractionState" : "extracted_with_value",
