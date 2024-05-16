@@ -1,5 +1,5 @@
 //
-//  InstallationAttributionPixelHandler.swift
+//  SubscriptionAttributionPixelHandler.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,32 +17,30 @@
 //
 
 import Foundation
-import PixelKit
+import Subscription
 
-/// A type that handles Pixels for acquisition attributions.
-protocol InstallationAttributionsPixelHandler: AnyObject {
-    /// Fire the Pixel to track the App install.
-    func fireInstallationAttributionPixel()
+protocol SubscriptionAttributionPixelHandler: AnyObject {
+    var origin: String? { get set }
+    func fireSuccessfulSubscriptionAttributionPixel()
 }
 
-final class AppInstallationAttributionPixelHandler: InstallationAttributionsPixelHandler {
-    private let originProvider: AttributionOriginProvider
+// MARK: - SubscriptionAttributionPixelHandler
+
+final class PrivacyProSubscriptionAttributionPixelHandler: SubscriptionAttributionPixelHandler {
+    var origin: String?
     private let decoratedAttributionPixelHandler: AttributionPixelHandler
 
-    init(
-        originProvider: AttributionOriginProvider = AttributionOriginFileProvider(),
-        attributionPixelHandler: AttributionPixelHandler = GenericAttributionPixelHandler()
-    ) {
-        self.originProvider = originProvider
+    init(attributionPixelHandler: AttributionPixelHandler = GenericAttributionPixelHandler()) {
         decoratedAttributionPixelHandler = attributionPixelHandler
     }
 
-    func fireInstallationAttributionPixel() {
+    func fireSuccessfulSubscriptionAttributionPixel() {
         decoratedAttributionPixelHandler.fireAttributionPixel(
-            event: GeneralPixel.installationAttribution,
-            frequency: .legacyInitial,
-            origin: originProvider.origin,
+            event: PrivacyProPixel.privacyProSuccessfulSubscriptionAttribution,
+            frequency: .standard,
+            origin: origin,
             additionalParameters: nil
         )
     }
+
 }

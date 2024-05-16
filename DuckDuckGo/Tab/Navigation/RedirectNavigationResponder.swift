@@ -18,13 +18,17 @@
 
 import Navigation
 import Foundation
-import Subscription
-import BrowserServicesKit
 
 struct RedirectNavigationResponder: NavigationResponder {
 
+    private let redirectManager: SubscriptionRedirectManager
+
+    init(redirectManager: SubscriptionRedirectManager = PrivacyProSubscriptionRedirectManager()) {
+        self.redirectManager = redirectManager
+    }
+
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        guard let mainFrame = navigationAction.mainFrameTarget, let redirectURL = redirectURL(for: navigationAction.url) else { return .next }
+        guard let mainFrame = navigationAction.mainFrameTarget, let redirectURL = redirectManager.redirectURL(for: navigationAction.url) else { return .next }
 
         return .redirect(mainFrame) { navigator in
             var request = navigationAction.request
@@ -33,17 +37,4 @@ struct RedirectNavigationResponder: NavigationResponder {
         }
     }
 
-    private func redirectURL(for url: URL) -> URL? {
-        guard url.isPart(ofDomain: "duckduckgo.com") else { return nil }
-
-        if url.pathComponents == URL.privacyPro.pathComponents {
-            let isFeatureAvailable = DefaultSubscriptionFeatureAvailability().isFeatureAvailable
-            let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
-            let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
-
-            return isPurchasePageRedirectActive ? URL.subscriptionBaseURL : nil
-        }
-
-        return nil
-    }
 }

@@ -1,5 +1,5 @@
 //
-//  MockAttributionOriginProvider.swift
+//  PixelCapturedParameters.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,13 +17,15 @@
 //
 
 import Foundation
-import Subscription
-@testable import DuckDuckGo_Privacy_Browser
+import PixelKit
 
-final class MockAttributionOriginProvider: AttributionOriginProvider {
-    let origin: String?
-
-    init(origin: String? = nil) {
-        self.origin = origin
-    }
+struct PixelCapturedParameters {
+    var event: PixelKit.Event?
+    var frequency: PixelKit.Frequency = .standard
+    var headers: [String: String] = [:]
+    var parameters: [String: String]?
+    var error: Error?
+    var reservedCharacters: CharacterSet?
+    var includeAppVersion: Bool?
+    var onComplete: (Bool, Error?) -> Void = { _, _ in }
 }
