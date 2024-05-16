@@ -19654,7 +19654,7 @@
     },
     "fire.selected-domains.description" : {
       "comment" : "Description of the 'Current Window' configuration option for the fire button",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

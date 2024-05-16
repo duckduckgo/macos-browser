@@ -108,7 +108,7 @@ final class FirePopoverViewController: NSViewController {
         setUpStrings()
         updateClearButtonAppearance()
         setupOptionsButton()
-        updateCloseDetailsButton()
+        setupOpenCloseDetailsButton()
         updateWarningWrapperView()
 
         subscribeToViewModel()
@@ -125,7 +125,6 @@ final class FirePopoverViewController: NSViewController {
         openFireWindowsTitleLabel.stringValue = UserText.fireDialogFireWindowTitle
         fireWindowDescriptionLabel.stringValue = UserText.fireDialogFireWindowDescription
         closeTabsLabel.stringValue = UserText.fireDialogCloseTabs
-        openDetailsButton.title = UserText.details
         closeBurnerWindowButton.title = UserText.fireDialogBurnWindowButton
         clearButton.title = UserText.clear
         cancelButton.title = UserText.cancel
@@ -137,7 +136,6 @@ final class FirePopoverViewController: NSViewController {
             return
         }
         firePopoverViewModel.clearingOption = clearingOption
-        updateCloseDetailsButton()
         updateWarningWrapperView()
     }
 
@@ -221,13 +219,12 @@ final class FirePopoverViewController: NSViewController {
         button.attributedTitle = attrTitle
     }
 
-    private func updateCloseDetailsButton() {
-        guard firePopoverViewModel.areAllSelected else {
-            closeDetailsButton.title = "     \(UserText.selectedDomainsDescription)"
-            return
-        }
-
-        closeDetailsButton.title = "     \(UserText.fireDialogDetails)"
+    private func setupOpenCloseDetailsButton() {
+        let paddedButtonTitle = "     \(UserText.fireDialogDetails)"
+        openDetailsButton.title = paddedButtonTitle
+        openDetailsButton.alignment = .left
+        closeDetailsButton.title = paddedButtonTitle
+        closeDetailsButton.alignment = .left
     }
 
     private func updateWarningWrapperView() {
@@ -288,7 +285,6 @@ final class FirePopoverViewController: NSViewController {
                 let selectionIndexPaths = Set(selected.map {IndexPath(item: $0, section: self.firePopoverViewModel.selectableSectionIndex)})
                 self.collectionView.selectionIndexPaths = selectionIndexPaths
                 self.updateInfoLabel()
-                self.updateCloseDetailsButton()
             }
     }
 
