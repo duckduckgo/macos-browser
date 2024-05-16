@@ -34,8 +34,9 @@ final class UserText {
     static let vpnLocationSelected = NSLocalizedString("network.protection.vpn.location.selected", value: "Selected Location", comment: "Description of the location type in the VPN status view")
     static let vpnDataVolume = NSLocalizedString("network.protection.vpn.data-volume", value: "Data Volume", comment: "Title for the data volume section in the VPN status view")
     static let vpnShareFeedback = NSLocalizedString("network.protection.vpn.share-feedback", value: "Share VPN Feedback…", comment: "Action button title for the Share VPN feedback option")
-    static let vpnOperationNotPermittedMessage = NSLocalizedString("network.protection.vpn.failure.operation-not-permitted", value: "Operation not permitted", comment: "Error message for the Operation Not Permitted error")
+    static let vpnOperationNotPermittedMessage = NSLocalizedString("network.protection.vpn.failure.operation-not-permitted", value: "Operation not permitted", comment: "Error message for the Operation not permitted error")
     static let vpnLoginItemVersionMismatchedMessage = NSLocalizedString("network.protection.vpn.failure.login-item-version-mismatched", value: "Login item version mismatched", comment: "Error message for the Login item version mismatched error")
+    static let vpnRegisteredServerFetchingFailedMessage = NSLocalizedString("network.protection.vpn.failure.registered-server-fetching-failed", value: "Failed to fetch registered server", comment: "Error message for the Failed to fetch registered server error")
 
     // MARK: - Onboarding
 

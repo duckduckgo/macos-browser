@@ -364,14 +364,14 @@ extension NetworkProtectionStatusView {
         private var knownFailure: KnownFailure?
 
         var warningViewModel: WarningView.Model? {
-            if let issueDescription {
-                return WarningView.Model(message: issueDescription, actionTitle: nil, action: nil)
-            }
-
             if let warningMessage = warningMessage(for: knownFailure) {
                 return WarningView.Model(message: warningMessage,
                                          actionTitle: UserText.vpnShareFeedback,
                                          action: openFeedbackForm)
+            }
+
+            if let issueDescription {
+                return WarningView.Model(message: issueDescription, actionTitle: nil, action: nil)
             }
 
             return nil
@@ -385,6 +385,8 @@ extension NetworkProtectionStatusView {
                 return UserText.vpnOperationNotPermittedMessage
             case ("NetworkProtection.NetworkProtectionClientError", 14):
                 return UserText.vpnLoginItemVersionMismatchedMessage
+            case ("NetworkProtection.NetworkProtectionClientError", 5):
+                return UserText.vpnRegisteredServerFetchingFailedMessage
             default:
                 return nil
             }
