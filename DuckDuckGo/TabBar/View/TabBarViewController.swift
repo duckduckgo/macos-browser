@@ -279,11 +279,32 @@ final class TabBarViewController: NSViewController {
     }
 
     private func pinnedTabsViewDidUpdateHoveredItem(to index: Int?) {
+        func shouldDismissPinnedTabPreview() -> Bool {
+            // If the point is not within the view we can safely dismiss the preview
+            guard let pointWithinView = self.view.mouseLocationInsideBounds(nil) else {
+                return true
+            }
+
+            // Calculate the rect of the standard tabs
+            let standardTabsTotalWidth = self.collectionView.visibleItems().reduce(into: 0.0) { partial, item in
+                partial += item.view.bounds.width
+            }
+
+            // Create a rect with the width of pinned and non pinned tabs
+            var standardAndPinnedTabsContainerRect = self.pinnedTabsContainerView.frame
+            standardAndPinnedTabsContainerRect.size.width += standardTabsTotalWidth
+
+            // If the point is not within the rect dismiss the preview
+            return !standardAndPinnedTabsContainerRect.contains(pointWithinView)
+        }
+
         if let index = index {
             showPinnedTabPreview(at: index)
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                if self.view.isMouseLocationInsideBounds() == false {
+                // When the mouse hover on top of the semaphore view we want to dismiss the preview to avoid the preview get stuck on screen when the popover to choose the screen size is shown.
+                // We don't want to dismiss the preview if the location of the mouse is within the rect that encompasses the pinned and standard tabs
+                if shouldDismissPinnedTabPreview() {
                     self.hideTabPreview(allowQuickRedisplay: true)
                 }
             }
