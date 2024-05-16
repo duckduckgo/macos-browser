@@ -294,13 +294,13 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     // MARK: - Debug Command support
 
-    func relay(_ command: DebugCommand) async throws {
+    func relay(_ command: VPNCommand) async throws {
         guard await isConnected,
               let session = await session else {
             return
         }
 
-        let errorMessage: ExtensionMessageString? = try await session.sendProviderRequest(.debugCommand(command))
+        let errorMessage: ExtensionMessageString? = try await session.sendProviderRequest(.command(command))
         if let errorMessage {
             throw TunnelFailureError(errorDescription: errorMessage.value)
         }
