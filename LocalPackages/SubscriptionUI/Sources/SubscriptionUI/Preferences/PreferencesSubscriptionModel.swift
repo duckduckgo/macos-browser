@@ -234,7 +234,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openFAQ() {
-        openURLHandler( SubscriptionURL.FAQ.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment))
+        openURLHandler( SubscriptionURL.faq.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment))
     }
 
     @MainActor
