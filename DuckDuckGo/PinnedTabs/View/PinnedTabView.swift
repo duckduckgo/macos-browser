@@ -89,11 +89,7 @@ struct PinnedTabView: View {
             collectionModel?.unpin(model)
         }
         Divider()
-        Button(UserText.bookmarkThisPage) { [weak collectionModel, weak model] in
-            guard let model = model else { return }
-            collectionModel?.bookmark(model)
-        }
-
+        bookmarkAction
         fireproofAction
         Divider()
         switch collectionModel.audioStateView {
@@ -124,6 +120,21 @@ struct PinnedTabView: View {
             Button(UserText.fireproofSite) { [weak collectionModel, weak model] in
                 guard let model = model else { return }
                 collectionModel?.fireproof(model)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var bookmarkAction: some View {
+        if collectionModel.isPinnedTabBookmarked(model) {
+            Button(UserText.deleteBookmark) { [weak collectionModel, weak model] in
+                guard let model = model else { return }
+                collectionModel?.removeBookmark(model)
+            }
+        } else {
+            Button(UserText.bookmarkThisPage) { [weak collectionModel, weak model] in
+                guard let model = model else { return }
+                collectionModel?.bookmark(model)
             }
         }
     }

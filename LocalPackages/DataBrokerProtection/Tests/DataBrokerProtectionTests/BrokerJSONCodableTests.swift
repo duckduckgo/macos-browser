@@ -79,7 +79,9 @@ final class BrokerJSONCodableTests: XCTestCase {
                              "findElements": true
                            },
                            "profileUrl": {
-                             "selector": "a"
+                             "selector": ".link-to-details",
+                             "identifierType": "path",
+                             "identifier": "https://www.advancedbackgroundchecks.com/${id}"
                            }
                          }
                        }
@@ -341,6 +343,18 @@ final class BrokerJSONCodableTests: XCTestCase {
             for mirror in broker.mirrorSites {
                 XCTAssertNotEqual(mirror.url, mirror.name)
             }
+        } catch {
+            XCTFail("JSON string should be parsed correctly.")
+        }
+    }
+
+    func testVerecorJSONProfileURLSelector_isCorrectlyParsed() {
+        do {
+            let broker = try JSONDecoder().decode(DataBroker.self, from: verecorWithURLJSONString.data(using: .utf8)!)
+            let scanStep = try broker.scanStep()
+            let extractAction = scanStep.actions.first(where: { $0.actionType == .extract })! as! ExtractAction
+            XCTAssertEqual(extractAction.profile.profileUrl?.identifierType, "path")
+            XCTAssertEqual(extractAction.profile.profileUrl?.identifier, "https://www.advancedbackgroundchecks.com/${id}")
         } catch {
             XCTFail("JSON string should be parsed correctly.")
         }

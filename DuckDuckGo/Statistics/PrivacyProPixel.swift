@@ -65,6 +65,7 @@ enum PrivacyProPixel: PixelKitEventV2 {
     case privacyProSubscriptionManagementPlanBilling
     case privacyProSubscriptionManagementRemoval
     case privacyProPurchaseStripeSuccess
+    case privacyProSuccessfulSubscriptionAttribution
     // Web pixels
     case privacyProOfferMonthlyPriceClick
     case privacyProOfferYearlyPriceClick
@@ -110,6 +111,7 @@ enum PrivacyProPixel: PixelKitEventV2 {
         case .privacyProSubscriptionManagementPlanBilling: return "m_mac_\(appDistribution)_privacy-pro_settings_change-plan-or-billing_click"
         case .privacyProSubscriptionManagementRemoval: return "m_mac_\(appDistribution)_privacy-pro_settings_remove-from-device_click"
         case .privacyProPurchaseStripeSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_stripe_success"
+        case .privacyProSuccessfulSubscriptionAttribution: return "m_mac_\(appDistribution)_subscribe"
             // Web
         case .privacyProOfferMonthlyPriceClick: return "m_mac_\(appDistribution)_privacy-pro_offer_monthly-price_click"
         case .privacyProOfferYearlyPriceClick: return "m_mac_\(appDistribution)_privacy-pro_offer_yearly-price_click"
