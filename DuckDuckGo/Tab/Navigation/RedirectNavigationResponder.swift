@@ -23,7 +23,7 @@ struct RedirectNavigationResponder: NavigationResponder {
 
     private let redirectManager: SubscriptionRedirectManager
 
-    init(redirectManager: SubscriptionRedirectManager = PrivacyProSubscriptionRedirectManager(subscriptionManager: Application.appDelegate.subscriptionManager)) {
+    init(redirectManager: SubscriptionRedirectManager) {
         self.redirectManager = redirectManager
     }
 

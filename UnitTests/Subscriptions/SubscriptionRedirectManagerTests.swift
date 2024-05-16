@@ -18,6 +18,7 @@
 
 import XCTest
 import Subscription
+import SubscriptionTestingUtilities
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SubscriptionRedirectManagerTests: XCTestCase {
@@ -25,8 +26,10 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-        sut = PrivacyProSubscriptionRedirectManager(featureAvailabiltyProvider: true)
-        SubscriptionPurchaseEnvironment.canPurchase = true
+        sut = PrivacyProSubscriptionRedirectManager(featureAvailabiltyProvider: true,
+                                                    subscriptionEnvironment: SubscriptionEnvironment(serviceEnvironment: .production,
+                                                                                                     purchasePlatform: .appStore),
+                                                    canPurchase: { true })
     }
 
     override func tearDownWithError() throws {
@@ -37,7 +40,8 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
     func testWhenURLIsPrivacyProAndHasOriginQueryParameterThenRedirectToSubscriptionBaseURLAndAppendQueryParameter() throws {
         // GIVEN
         let url = try XCTUnwrap(URL(string: "https://www.duckduckgo.com/pro?origin=test"))
-        let expectedURL = URL.subscriptionBaseURL.appending(percentEncodedQueryItem: .init(name: "origin", value: "test"))
+        let baseURL = SubscriptionURL.baseURL.subscriptionURL(environment: .production)
+        let expectedURL = baseURL.appending(percentEncodedQueryItem: .init(name: "origin", value: "test"))
 
         // WHEN
         let result = sut.redirectURL(for: url)
@@ -49,7 +53,7 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
     func testWhenURLIsPrivacyProAndDoesNotHaveOriginQueryParameterThenRedirectToSubscriptionBaseURL() throws {
         // GIVEN
         let url = try XCTUnwrap(URL(string: "https://www.duckduckgo.com/pro"))
-        let expectedURL = URL.subscriptionBaseURL
+        let expectedURL = SubscriptionURL.baseURL.subscriptionURL(environment: .production)
 
         // WHEN
         let result = sut.redirectURL(for: url)

@@ -25,14 +25,17 @@ protocol SubscriptionRedirectManager: AnyObject {
 }
 
 final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
-    
+
     private let featureAvailabiltyProvider: () -> Bool
-    private let subscriptionManager: SubscriptionManaging
+    private let subscriptionEnvironment: SubscriptionEnvironment
+    private let canPurchase: () -> Bool
 
     init(featureAvailabiltyProvider: @escaping @autoclosure () -> Bool = DefaultSubscriptionFeatureAvailability().isFeatureAvailable,
-         subscriptionManager: SubscriptionManaging) {
+         subscriptionEnvironment: SubscriptionEnvironment,
+         canPurchase: @escaping () -> Bool) {
         self.featureAvailabiltyProvider = featureAvailabiltyProvider
-        self.subscriptionManager = subscriptionManager
+        self.subscriptionEnvironment = subscriptionEnvironment
+        self.canPurchase = canPurchase
     }
 
     func redirectURL(for url: URL) -> URL? {
@@ -40,10 +43,10 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
 
         if url.pathComponents == URL.privacyPro.pathComponents {
             let isFeatureAvailable = featureAvailabiltyProvider()
-            let shouldHidePrivacyProDueToNoProducts = subscriptionManager.currentEnvironment.purchasePlatform == .appStore && subscriptionManager.canPurchase == false
+            let shouldHidePrivacyProDueToNoProducts = subscriptionEnvironment.purchasePlatform == .appStore && canPurchase() == false
             let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
             // Redirect the `/pro` URL to `/subscriptions` URL. If there are any query items in the original URL it appends to the `/subscriptions` URL.
-            let baseURL = SubscriptionURL.baseURL.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
+            let baseURL = SubscriptionURL.baseURL.subscriptionURL(environment: subscriptionEnvironment.serviceEnvironment)
             return isPurchasePageRedirectActive ? baseURL.addingQueryItems(from: url) : nil
         }
 
