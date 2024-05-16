@@ -90,6 +90,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         self.broker = broker
     }
 
+    private let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
+
+    init(subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler()) {
+        self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
+    }
+
     struct Handlers {
         static let getSubscription = "getSubscription"
         static let setSubscription = "setSubscription"
@@ -208,13 +214,15 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseAttempt, frequency: .dailyAndCount)
         struct SubscriptionSelection: Decodable {
             let id: String
         }
 
         let message = original
+
+        // Extract the origin from the webview URL to use for attribution pixel.
+        subscriptionSuccessPixelHandler.origin = await originFrom(originalMessage: message)
 
         if SubscriptionPurchaseEnvironment.current == .appStore {
             if #available(macOS 12.0, *) {
@@ -287,6 +295,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     os_log(.info, log: .subscription, "[Purchase] Purchase complete")
                     PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .dailyAndCount)
                     PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .unique)
+                    subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
                 case .failure(let error):
                     switch error {
@@ -420,6 +429,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         await mainViewController?.dismiss(progressViewController)
 
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
+        subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
         return [String: String]() // cannot be nil, the web app expect something back before redirecting the user to the final page
     }
 
@@ -476,6 +486,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         }
 
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
+    }
+
+    @MainActor
+    private func originFrom(originalMessage: WKScriptMessage) -> String? {
+        let url = originalMessage.webView?.url
+        return url?.getParameter(named: AttributionParameter.origin)
     }
 }
 
