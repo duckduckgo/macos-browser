@@ -17,8 +17,7 @@
 //
 
 import XCTest
-import Subscription
-
+@testable import Subscription
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor

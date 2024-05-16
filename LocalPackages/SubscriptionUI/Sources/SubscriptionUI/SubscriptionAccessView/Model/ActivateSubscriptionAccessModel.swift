@@ -34,18 +34,18 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, Pur
     public var restorePurchaseDescription = UserText.restorePurchaseDescription
     public var restorePurchaseButtonTitle = UserText.restorePurchaseButton
 
-    let subscriptionEnvironment: SubscriptionEnvironment
+    let subscriptionManager: SubscriptionManaging
 
     public init(actionHandlers: SubscriptionAccessActionHandlers,
-                subscriptionEnvironment: SubscriptionEnvironment) {
+                subscriptionManager: SubscriptionManaging) {
         self.actionHandlers = actionHandlers
-        self.shouldShowRestorePurchase =  subscriptionEnvironment.purchasePlatform == .appStore
-        self.subscriptionEnvironment = subscriptionEnvironment
-        self.description = UserText.activateModalDescription(platform: subscriptionEnvironment.purchasePlatform)
+        self.shouldShowRestorePurchase =  subscriptionManager.currentEnvironment.purchasePlatform == .appStore
+        self.subscriptionManager = subscriptionManager
+        self.description = UserText.activateModalDescription(platform: subscriptionManager.currentEnvironment.purchasePlatform)
     }
 
     public func handleEmailAction() {
-        actionHandlers.openURLHandler(SubscriptionURL.activateViaEmail.subscriptionURL(environment: subscriptionEnvironment.serviceEnvironment))
+        actionHandlers.openURLHandler(subscriptionManager.url(for: .activateViaEmail))
         actionHandlers.uiActionHandler(.activateAddEmailClick)
     }
 

@@ -47,7 +47,7 @@ struct SubscriptionAppStoreRestorer {
             mainViewController.presentAsSheet(progressViewController)
         }
 
-        let syncResult = await subscriptionManager.getStorePurchaseManager().syncAppleIDAccount()
+        let syncResult = await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
 
         switch syncResult {
         case .success:
@@ -122,7 +122,7 @@ extension SubscriptionAppStoreRestorer {
         guard let window else { return }
 
         window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
-            let url = SubscriptionURL.purchase.subscriptionURL(environment: self.subscriptionManager.currentEnvironment.serviceEnvironment)
+            let url = subscriptionManager.url(for: .purchase)
             WindowControllersManager.shared.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })
@@ -133,7 +133,7 @@ extension SubscriptionAppStoreRestorer {
         guard let window else { return }
 
         window.show(.subscriptionInactiveAlert(), firstButtonAction: {
-            let url = SubscriptionURL.purchase.subscriptionURL(environment: self.subscriptionManager.currentEnvironment.serviceEnvironment)
+            let url = subscriptionManager.url(for: .purchase)
             WindowControllersManager.shared.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })

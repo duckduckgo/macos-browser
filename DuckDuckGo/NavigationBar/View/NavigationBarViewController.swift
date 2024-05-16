@@ -1034,13 +1034,13 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
-        let url = SubscriptionURL.purchase.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
+        let url = subscriptionManager.url(for: .purchase)
         WindowControllersManager.shared.showTab(with: .subscription(url))
         PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
-        let url = SubscriptionURL.identityTheftRestoration.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
+        let url = subscriptionManager.url(for: .identityTheftRestoration)
         WindowControllersManager.shared.showTab(with: .identityTheftRestoration(url))
     }
 }

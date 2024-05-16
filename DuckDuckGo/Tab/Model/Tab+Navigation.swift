@@ -109,7 +109,9 @@ extension Tab: NavigationResponder {
 
     var redirectNavigationResponder: RedirectNavigationResponder {
         let subscriptionManager = Application.appDelegate.subscriptionManager
-        let redirectManager = PrivacyProSubscriptionRedirectManager(subscriptionEnvironment: subscriptionManager.currentEnvironment, canPurchase: {
+        let redirectManager = PrivacyProSubscriptionRedirectManager(subscriptionEnvironment: subscriptionManager.currentEnvironment,
+                                                                    baseURL: subscriptionManager.url(for: .baseURL),
+                                                                    canPurchase: {
             subscriptionManager.canPurchase
         })
         return RedirectNavigationResponder(redirectManager: redirectManager)

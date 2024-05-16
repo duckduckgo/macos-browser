@@ -29,13 +29,16 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
     private let featureAvailabiltyProvider: () -> Bool
     private let subscriptionEnvironment: SubscriptionEnvironment
     private let canPurchase: () -> Bool
+    private let baseURL: URL
 
     init(featureAvailabiltyProvider: @escaping @autoclosure () -> Bool = DefaultSubscriptionFeatureAvailability().isFeatureAvailable,
          subscriptionEnvironment: SubscriptionEnvironment,
+         baseURL: URL,
          canPurchase: @escaping () -> Bool) {
         self.featureAvailabiltyProvider = featureAvailabiltyProvider
         self.subscriptionEnvironment = subscriptionEnvironment
         self.canPurchase = canPurchase
+        self.baseURL = baseURL
     }
 
     func redirectURL(for url: URL) -> URL? {
@@ -46,7 +49,6 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
             let shouldHidePrivacyProDueToNoProducts = subscriptionEnvironment.purchasePlatform == .appStore && canPurchase() == false
             let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
             // Redirect the `/pro` URL to `/subscriptions` URL. If there are any query items in the original URL it appends to the `/subscriptions` URL.
-            let baseURL = SubscriptionURL.baseURL.subscriptionURL(environment: subscriptionEnvironment.serviceEnvironment)
             return isPurchasePageRedirectActive ? baseURL.addingQueryItems(from: url) : nil
         }
 

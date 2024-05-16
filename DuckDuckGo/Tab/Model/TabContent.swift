@@ -119,8 +119,8 @@ extension TabContent {
         if let url {
             let subscriptionManager = Application.appDelegate.subscriptionManager
             let environment = subscriptionManager.currentEnvironment.serviceEnvironment
-            let subscriptionBaseURL = SubscriptionURL.baseURL.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
-            let identityTheftRestorationURL = SubscriptionURL.identityTheftRestoration.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
+            let subscriptionBaseURL = subscriptionManager.url(for: .baseURL)
+            let identityTheftRestorationURL = subscriptionManager.url(for: .identityTheftRestoration)
             if url.isChild(of: subscriptionBaseURL) {
                 if environment == .staging, url.getParameter(named: "environment") == nil {
                     return .subscription(url.appendingParameter(name: "environment", value: "staging"))

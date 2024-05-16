@@ -58,7 +58,7 @@ public final class SubscriptionAccessViewController: NSViewController {
         if subscriptionManager.accountManager.isUserAuthenticated {
             ShareSubscriptionAccessModel(actionHandlers: actionHandlers, email: subscriptionManager.accountManager.email, subscriptionManager: subscriptionManager)
         } else {
-            ActivateSubscriptionAccessModel(actionHandlers: actionHandlers, subscriptionEnvironment: subscriptionManager.currentEnvironment)
+            ActivateSubscriptionAccessModel(actionHandlers: actionHandlers, subscriptionManager: subscriptionManager)
         }
     }
 }

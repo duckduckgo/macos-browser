@@ -17,7 +17,7 @@
 //
 
 import XCTest
-import Subscription
+@testable import Subscription
 import SubscriptionTestingUtilities
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -29,6 +29,7 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
         sut = PrivacyProSubscriptionRedirectManager(featureAvailabiltyProvider: true,
                                                     subscriptionEnvironment: SubscriptionEnvironment(serviceEnvironment: .production,
                                                                                                      purchasePlatform: .appStore),
+                                                    baseURL: SubscriptionURL.baseURL.subscriptionURL(environment: .production),
                                                     canPurchase: { true })
     }
 

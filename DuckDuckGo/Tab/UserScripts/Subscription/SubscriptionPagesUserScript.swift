@@ -199,7 +199,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         switch subscriptionPlatform {
         case .appStore:
             if #available(macOS 12.0, *) {
-                return await subscriptionManager.getStorePurchaseManager().subscriptionOptions()
+                return await subscriptionManager.storePurchaseManager().subscriptionOptions()
             }
         case .stripe:
             switch await stripePurchaseFlow.subscriptionOptions() {
@@ -246,7 +246,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 await mainViewController?.presentAsSheet(progressViewController)
 
                 // Check for active subscriptions
-                if await subscriptionManager.getStorePurchaseManager().hasActiveSubscription() {
+                if await subscriptionManager.storePurchaseManager().hasActiveSubscription() {
                     PixelKit.fire(PrivacyProPixel.privacyProRestoreAfterPurchaseAttempt)
                     os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
                     subscriptionErrorReporter.report(subscriptionActivationError: .hasActiveSubscription)
@@ -420,7 +420,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .unique)
-            let url = SubscriptionURL.identityTheftRestoration.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
+            let url = subscriptionManager.url(for: .identityTheftRestoration)
             await WindowControllersManager.shared.showTab(with: .identityTheftRestoration(url))
         }
 
@@ -524,7 +524,7 @@ extension SubscriptionPagesUseSubscriptionFeature {
         guard let window else { return }
 
         window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
-            let url = SubscriptionURL.purchase.subscriptionURL(environment: self.subscriptionManager.currentEnvironment.serviceEnvironment)
+            let url = self.subscriptionManager.url(for: .purchase)
             WindowControllersManager.shared.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })
@@ -535,7 +535,7 @@ extension SubscriptionPagesUseSubscriptionFeature {
         guard let window else { return }
 
         window.show(.subscriptionInactiveAlert(), firstButtonAction: {
-            let url = SubscriptionURL.purchase.subscriptionURL(environment: self.subscriptionManager.currentEnvironment.serviceEnvironment)
+            let url = self.subscriptionManager.url(for: .purchase)
             WindowControllersManager.shared.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })

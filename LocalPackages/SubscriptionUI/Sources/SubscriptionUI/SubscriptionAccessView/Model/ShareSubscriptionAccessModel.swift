@@ -41,7 +41,7 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
 
     public func handleEmailAction() {
         let type = hasEmail ? SubscriptionURL.manageEmail : SubscriptionURL.addEmail
-        let url: URL = type.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
+        let url: URL = subscriptionManager.url(for: type) 
 
         if hasEmail {
             actionHandlers.uiActionHandler(.postSubscriptionAddEmailClick)

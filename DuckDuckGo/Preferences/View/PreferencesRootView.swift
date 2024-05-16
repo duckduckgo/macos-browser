@@ -137,7 +137,7 @@ enum Preferences {
                         WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
                     case .openITR:
                         PixelKit.fire(PrivacyProPixel.privacyProIdentityRestorationSettings)
-                        let url = SubscriptionURL.identityTheftRestoration.subscriptionURL(environment: Application.appDelegate.subscriptionManager.currentEnvironment.serviceEnvironment)
+                        let url = Application.appDelegate.subscriptionManager.url(for: .identityTheftRestoration)
                         WindowControllersManager.shared.showTab(with: .identityTheftRestoration(url))
                     case .iHaveASubscriptionClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseClick)

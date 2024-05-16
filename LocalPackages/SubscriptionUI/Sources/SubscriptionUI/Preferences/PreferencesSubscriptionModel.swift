@@ -139,7 +139,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if accountManager.isUserAuthenticated {
             ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email, subscriptionManager: subscriptionManager)
         } else {
-            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, subscriptionEnvironment: subscriptionManager.currentEnvironment)
+            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, subscriptionManager: subscriptionManager)
         }
     }
 
@@ -150,7 +150,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func purchaseAction() {
-        openURLHandler(SubscriptionURL.purchase.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment))
+        openURLHandler(subscriptionManager.url(for: .purchase))
     }
 
     enum ChangePlanOrBillingAction {
@@ -185,7 +185,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private func changePlanOrBilling(for environment: SubscriptionEnvironment.PurchasePlatform) {
         switch environment {
         case .appStore:
-            NSWorkspace.shared.open(SubscriptionURL.manageSubscriptionsInAppStore.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment))
+            NSWorkspace.shared.open(subscriptionManager.url(for: .manageSubscriptionsInAppStore))
         case .stripe:
             Task {
                 guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
@@ -199,7 +199,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func confirmIfSignedInToSameAccount() async -> Bool {
         if #available(macOS 12.0, *) {
-            guard let lastTransactionJWSRepresentation = await subscriptionManager.getStorePurchaseManager().mostRecentTransaction() else { return false }
+            guard let lastTransactionJWSRepresentation = await subscriptionManager.storePurchaseManager().mostRecentTransaction() else { return false }
             switch await subscriptionManager.authService.storeLogin(signature: lastTransactionJWSRepresentation) {
             case .success(let response):
                 return response.externalID == accountManager.externalID
@@ -234,7 +234,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openFAQ() {
-        openURLHandler( SubscriptionURL.faq.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment))
+        openURLHandler(subscriptionManager.url(for: .faq))
     }
 
     @MainActor
