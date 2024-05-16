@@ -72,10 +72,10 @@ final class NetworkProtectionDebugUtilities {
     }
 
     func sendTestNotificationRequest() async throws {
-        try await ipcClient.debugCommand(.sendTestNotification)
+        try await ipcClient.command(.sendTestNotification)
     }
 
     func expireRegistrationKeyNow() async throws {
-        try await ipcClient.debugCommand(.expireRegistrationKey)
+        try await ipcClient.command(.expireRegistrationKey)
     }
 }
