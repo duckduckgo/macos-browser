@@ -99,8 +99,8 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
         switch mode {
         case .idle:
             return "idle"
-        case .immediate(_),
-                .scheduled(_):
+        case .immediate,
+                .scheduled:
             return "running"
         }
     }
