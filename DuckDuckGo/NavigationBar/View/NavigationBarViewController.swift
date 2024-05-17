@@ -1027,6 +1027,10 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
     }
 
+    func optionsButtonMenuRequestedAccessibilityPreferences(_ menu: NSMenu) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .accessibility)
+    }
+
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
         PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
