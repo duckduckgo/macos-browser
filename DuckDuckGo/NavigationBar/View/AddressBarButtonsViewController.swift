@@ -34,6 +34,8 @@ final class AddressBarButtonsViewController: NSViewController {
 
     weak var delegate: AddressBarButtonsViewControllerDelegate?
 
+    private let accessibilityPreferences: AccessibilityPreferences
+
     private var permissionAuthorizationPopover: PermissionAuthorizationPopover?
     private func permissionAuthorizationPopoverCreatingIfNeeded() -> PermissionAuthorizationPopover {
         return permissionAuthorizationPopover ?? {
@@ -53,6 +55,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }()
     }
 
+    @IBOutlet weak var zoomButton: NSButton!
     @IBOutlet weak var privacyEntryPointButton: MouseOverAnimationButton!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
     @IBOutlet weak var imageButtonWrapper: NSView!
@@ -66,6 +69,7 @@ final class AddressBarButtonsViewController: NSViewController {
     var trackerAnimationView3: LottieAnimationView!
     var shieldAnimationView: LottieAnimationView!
     var shieldDotAnimationView: LottieAnimationView!
+
     @IBOutlet weak var notificationAnimationView: NavigationBarBadgeAnimationView!
 
     @IBOutlet weak var permissionButtons: NSView!
@@ -108,7 +112,12 @@ final class AddressBarButtonsViewController: NSViewController {
     @Published private(set) var buttonsWidth: CGFloat = 0
 
     private var tabCollectionViewModel: TabCollectionViewModel
-    private var tabViewModel: TabViewModel?
+    private var tabViewModel: TabViewModel? {
+        didSet {
+            subscribeToTabZoomLevel()
+        }
+    }
+
     private let popovers: NavigationBarPopovers
 
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
@@ -139,6 +148,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var urlCancellable: AnyCancellable?
     private var bookmarkListCancellable: AnyCancellable?
     private var effectiveAppearanceCancellable: AnyCancellable?
+    private var accessibilityPreferencesCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var privacyEntryPointIconUpdateCancellable: AnyCancellable?
@@ -152,10 +162,11 @@ final class AddressBarButtonsViewController: NSViewController {
 
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
+          accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
           popovers: NavigationBarPopovers) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.accessibilityPreferences = accessibilityPreferences
         self.popovers = popovers
-
         super.init(coder: coder)
     }
 
@@ -257,6 +268,27 @@ final class AddressBarButtonsViewController: NSViewController {
         bookmarkButton.isShown = shouldShowBookmarkButton
     }
 
+    private func updateZoomButtonVisibility(animation: Bool = false) {
+        zoomButton.isHidden = true
+        let hasURL = tabViewModel?.tab.url != nil
+        let isEditingMode = controllerMode?.isEditing ?? false
+        let isTextFieldValueText = textFieldValue?.isText ?? false
+
+        var hasNonDefaultZoom = false
+        if tabViewModel?.zoomLevel != accessibilityPreferences.defaultPageZoom {
+            hasNonDefaultZoom = true
+        }
+
+        let shouldShowZoom = hasURL
+        && !isEditingMode
+        && !isTextFieldValueText
+        && !isTextFieldEditorFirstResponder
+        && !animation
+        && (hasNonDefaultZoom || popovers.isZoomPopoverShown == true || popovers.zoomPopover != nil)
+
+        zoomButton.isHidden = !shouldShowZoom
+    }
+
     func openBookmarkPopover(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) {
         let result = bookmarkForCurrentUrl(setFavorite: setFavorite, accessPoint: accessPoint)
         guard let bookmark = result.bookmark else {
@@ -330,6 +362,16 @@ final class AddressBarButtonsViewController: NSViewController {
         updateImageButton()
         updatePermissionButtons()
         updateBookmarkButtonVisibility()
+        updateZoomButtonVisibility()
+    }
+
+    @IBAction func zoomButtonAction(_ sender: Any) {
+        if popovers.isZoomPopoverShown {
+            popovers.closeZoomPopover()
+        } else {
+            guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+            popovers.showZoomPopover(for: tabViewModel, from: zoomButton, withDelegate: self)
+        }
     }
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
@@ -753,8 +795,10 @@ final class AddressBarButtonsViewController: NSViewController {
             }
 
             animationView.isHidden = false
-            animationView.play { _ in
+            updateZoomButtonVisibility(animation: true)
+            animationView.play { [weak self] _ in
                 animationView.isHidden = true
+                self?.updateZoomButtonVisibility(animation: false)
             }
         default:
             return
@@ -773,11 +817,13 @@ final class AddressBarButtonsViewController: NSViewController {
             }
             trackerAnimationView?.isHidden = false
             trackerAnimationView?.reloadImages()
+            self.updateZoomButtonVisibility(animation: true)
             trackerAnimationView?.play { [weak self] _ in
                 trackerAnimationView?.isHidden = true
                 self?.updatePrivacyEntryPointIcon()
                 self?.updatePermissionButtons()
                 self?.playBadgeAnimationIfNecessary()
+                self?.updateZoomButtonVisibility(animation: false)
             }
         }
 
@@ -862,6 +908,14 @@ final class AddressBarButtonsViewController: NSViewController {
             .sink { [weak self] _ in
                 self?.setupAnimationViews()
                 self?.updatePrivacyEntryPointIcon()
+                self?.updateZoomButtonVisibility()
+            }
+    }
+
+    private func subscribeToTabZoomLevel() {
+        accessibilityPreferencesCancellable = tabViewModel?.zoomLevelSubject
+            .sink { [weak self] _ in
+                self?.updateZoomButtonVisibility()
             }
     }
 
@@ -915,8 +969,10 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
                 NotificationCenter.default.post(name: .bookmarkPromptShouldShow, object: nil)
             }
             updateBookmarkButtonVisibility()
-
-        default: break
+        case popovers.zoomPopover:
+            updateZoomButtonVisibility()
+        default:
+            break
         }
     }
 

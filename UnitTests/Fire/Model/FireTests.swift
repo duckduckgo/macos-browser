@@ -100,6 +100,7 @@ final class FireTests: XCTestCase {
     func testWhenBurnAll_ThenAllWebsiteDataAreRemoved() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
+        let zoomLevelsCoordinator = MockSavedZoomCoordinator()
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
         let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
@@ -107,6 +108,7 @@ final class FireTests: XCTestCase {
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
+                        savedZoomLevelsCoordinating: zoomLevelsCoordinator,
                         windowControllerManager: WindowControllersManager.shared,
                         faviconManagement: faviconManager,
                         recentlyClosedCoordinator: recentlyClosedCoordinator,
@@ -124,6 +126,7 @@ final class FireTests: XCTestCase {
         XCTAssert(historyCoordinator.burnAllCalled)
         XCTAssert(permissionManager.burnPermissionsCalled)
         XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
+        XCTAssert(zoomLevelsCoordinator.burnAllZoomLevelsCalled)
     }
 
     func testWhenBurnAllThenBurningFlagToggles() {
@@ -190,6 +193,18 @@ final class FireTests: XCTestCase {
         XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
         fire.burnEntity(entity: .none(selectedDomains: Set()))
         XCTAssertFalse(appStateRestorationManager.canRestoreLastSessionState)
+    }
+
+    func testWhenBurnDomainsIsCalledThenSelectedDomainsZoomLevelsAreBurned() {
+        let domainsToBurn: Set<String> = ["test.com", "provola.co.uk"]
+        let zoomLevelsCoordinator = MockSavedZoomCoordinator()
+        let fire = Fire(savedZoomLevelsCoordinating: zoomLevelsCoordinator,
+                        tld: ContentBlocking.shared.tld)
+
+        fire.burnEntity(entity: .none(selectedDomains: domainsToBurn))
+
+        XCTAssertTrue(zoomLevelsCoordinator.burnZoomLevelsOfDomainsCalled)
+        XCTAssertEqual(zoomLevelsCoordinator.domainsBurned, domainsToBurn)
     }
 
     func testWhenBurnVisitIsCalledForTodayThenAllExistingTabsAreCleared() {
@@ -290,4 +305,19 @@ fileprivate extension TabCollectionViewModel {
         return tabCollectionViewModel
     }
 
+}
+
+class MockSavedZoomCoordinator: SavedZoomLevelsCoordinating {
+    var burnAllZoomLevelsCalled = false
+    var burnZoomLevelsOfDomainsCalled = false
+    var domainsBurned: Set<String> = []
+
+    func burnZoomLevels(except fireproofDomains: DuckDuckGo_Privacy_Browser.FireproofDomains) {
+        burnAllZoomLevelsCalled = true
+    }
+
+    func burnZoomLevel(of baseDomains: Set<String>) {
+        burnZoomLevelsOfDomainsCalled = true
+        domainsBurned = baseDomains
+    }
 }
