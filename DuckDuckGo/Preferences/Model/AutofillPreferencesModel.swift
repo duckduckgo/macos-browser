@@ -17,6 +17,8 @@
 //
 
 import Foundation
+import BrowserServicesKit
+import Common
 
 final class AutofillPreferencesModel: ObservableObject {
 
@@ -56,6 +58,12 @@ final class AutofillPreferencesModel: ObservableObject {
     @Published var autolockLocksFormFilling: Bool {
         didSet {
             persistor.autolockLocksFormFilling = autolockLocksFormFilling
+        }
+    }
+
+    @Published private(set) var autofillSurveyEnabled: Bool {
+        didSet {
+            persistor.autofillSurveyEnabled = autofillSurveyEnabled && Bundle.main.preferredLocalizations.first == "en"
         }
     }
 
@@ -153,6 +161,7 @@ final class AutofillPreferencesModel: ObservableObject {
         autolockLocksFormFilling = persistor.autolockLocksFormFilling
         passwordManager = persistor.passwordManager
         hasNeverPromptWebsites = !neverPromptWebsitesManager.neverPromptWebsites.isEmpty
+        autofillSurveyEnabled = persistor.autofillSurveyEnabled
     }
 
     private var persistor: AutofillPreferencesPersistor
@@ -192,4 +201,33 @@ final class AutofillPreferencesModel: ObservableObject {
         NSWorkspace.shared.open(.fullDiskAccess)
     }
 
+    func launchSurvey(statisticsStore: StatisticsStore = LocalStatisticsStore(),
+                      activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
+                      operatingSystemVersion: String = ProcessInfo.processInfo.operatingSystemVersion.description,
+                      appVersion: String = AppVersion.shared.versionNumber,
+                      hardwareModel: String? = HardwareModel.model) {
+
+        let surveyURLBuilder = SurveyURLBuilder(
+            statisticsStore: statisticsStore,
+            operatingSystemVersion: operatingSystemVersion,
+            appVersion: appVersion,
+            hardwareModel: hardwareModel,
+            daysSinceActivation: activationDateStore.daysSinceActivation(),
+            daysSinceLastActive: activationDateStore.daysSinceLastActive()
+        )
+
+        guard let surveyUrl = surveyURLBuilder.buildSurveyURLWithPasswordsCountSurveyParameter(from: "https://selfserve.decipherinc.com/survey/selfserve/32ab/240307") else {
+            return
+        }
+
+        DispatchQueue.main.async {
+            WindowControllersManager.shared.showTab(with: .url(surveyUrl, credential: nil, source: .appOpenUrl))
+        }
+
+        disableAutofillSurvey()
+    }
+
+    func disableAutofillSurvey() {
+        autofillSurveyEnabled = false
+    }
 }

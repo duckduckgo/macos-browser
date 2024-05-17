@@ -25,8 +25,9 @@ class MockBookmarkManager: BookmarkManager {
         return false
     }
 
+    var isUrlBookmarked = false
     func isUrlBookmarked(url: URL) -> Bool {
-        return false
+        return isUrlBookmarked
     }
 
     func allHosts() -> Set<String> {

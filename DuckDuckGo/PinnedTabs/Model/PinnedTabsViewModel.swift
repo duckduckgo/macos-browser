@@ -83,10 +83,15 @@ final class PinnedTabsViewModel: ObservableObject {
 
     // MARK: -
 
-    init(collection: TabCollection, fireproofDomains: FireproofDomains = .shared) {
+    init(
+        collection: TabCollection,
+        fireproofDomains: FireproofDomains = .shared,
+        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
+    ) {
         tabsDidReorderPublisher = tabsDidReorderSubject.eraseToAnyPublisher()
         contextMenuActionPublisher = contextMenuActionSubject.eraseToAnyPublisher()
         self.fireproofDomains = fireproofDomains
+        self.bookmarkManager = bookmarkManager
         tabsCancellable = collection.$tabs.assign(to: \.items, onWeaklyHeld: self)
 
         dragMovesWindowCancellable = $items
@@ -100,6 +105,7 @@ final class PinnedTabsViewModel: ObservableObject {
     private var tabsCancellable: AnyCancellable?
     private var dragMovesWindowCancellable: AnyCancellable?
     private var fireproofDomains: FireproofDomains
+    private var bookmarkManager: BookmarkManager
 
     private func updateItemsWithoutSeparator() {
         var items = Set<Tab>()
@@ -136,6 +142,7 @@ extension PinnedTabsViewModel {
         case unpin(Int)
         case duplicate(Int)
         case bookmark(Tab)
+        case removeBookmark(Tab)
         case fireproof(Tab)
         case removeFireproofing(Tab)
         case close(Int)
@@ -179,8 +186,17 @@ extension PinnedTabsViewModel {
         contextMenuActionSubject.send(.close(index))
     }
 
+    func isPinnedTabBookmarked(_ tab: Tab) -> Bool {
+        guard let url = tab.url else { return false }
+        return bookmarkManager.isUrlBookmarked(url: url)
+    }
+
     func bookmark(_ tab: Tab) {
         contextMenuActionSubject.send(.bookmark(tab))
+    }
+
+    func removeBookmark(_ tab: Tab) {
+        contextMenuActionSubject.send(.removeBookmark(tab))
     }
 
     func fireproof(_ tab: Tab) {

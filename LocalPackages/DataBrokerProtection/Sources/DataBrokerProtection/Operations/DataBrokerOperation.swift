@@ -189,7 +189,6 @@ class DataBrokerOperation: Operation {
                 let sleepInterval = operationDependencies.config.intervalBetweenSameBrokerOperations
                 os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
                 try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
-
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
 

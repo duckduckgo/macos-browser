@@ -25,7 +25,7 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var addressBarTextField: AddressBarTextField!
     @IBOutlet var passiveTextField: NSTextField!
     @IBOutlet var inactiveBackgroundView: NSView!
-    @IBOutlet var activeBackgroundView: NSView!
+    @IBOutlet var activeBackgroundView: ColorView!
     @IBOutlet var activeOuterBorderView: NSView!
     @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
     @IBOutlet var progressIndicator: LoadingProgressView!
@@ -33,6 +33,7 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var activeTextFieldMinXConstraint: NSLayoutConstraint!
     private static let defaultActiveTextFieldMinX: CGFloat = 40
 
+    private let popovers: NavigationBarPopovers
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
 
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -81,8 +82,9 @@ final class AddressBarViewController: NSViewController {
         fatalError("AddressBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, popovers: NavigationBarPopovers) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.popovers = popovers
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
             isHomePage: tabViewModel?.tab.content == .newtab,
             isBurner: isBurner,
@@ -174,7 +176,7 @@ final class AddressBarViewController: NSViewController {
     }
 
     @IBSegueAction func createAddressBarButtonsViewController(_ coder: NSCoder) -> AddressBarButtonsViewController? {
-        let controller = AddressBarButtonsViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+        let controller = AddressBarButtonsViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel, popovers: popovers)
 
         self.addressBarButtonsViewController = controller
         controller?.delegate = self
@@ -319,10 +321,8 @@ final class AddressBarViewController: NSViewController {
         let isKey = self.view.window?.isKeyWindow ?? false
         activeOuterBorderView.alphaValue = isKey && isFirstResponder && isHomePage ? 1 : 0
 
-        activeOuterBorderView.layer?.backgroundColor = NSColor.controlAccentColor.withAlphaComponent(0.2).cgColor
-        activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.8).cgColor
         activeOuterBorderView.layer?.backgroundColor = accentColor.withAlphaComponent(0.2).cgColor
-        activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.8).cgColor
+        activeBackgroundView.borderColor = accentColor.withAlphaComponent(0.8)
 
         addressBarTextField.placeholderString = tabViewModel?.tab.content == .newtab ? UserText.addressBarPlaceholder : ""
     }
@@ -461,11 +461,15 @@ extension AddressBarViewController {
             guard let self else { return event }
             return self.mouseUp(with: event)
         }.store(in: &eventMonitorCancellables)
+        NSEvent.addLocalCancellableMonitor(forEventsMatching: .rightMouseDown) { [weak self] event in
+            guard let self else { return event }
+            return self.rightMouseDown(with: event)
+        }.store(in: &eventMonitorCancellables)
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
         self.clickPoint = nil
-        guard event.window === self.view.window else { return event }
+        guard let window = self.view.window, event.window === window else { return event }
 
         if let point = self.view.mouseLocationInsideBounds(event.locationInWindow) {
             guard self.view.window?.firstResponder !== addressBarTextField.currentEditor(),
@@ -485,20 +489,36 @@ extension AddressBarViewController {
                 }
             }
 
-        } else if self.view.window?.isMainWindow == true {
-            self.clickPoint = event.locationInWindow
+        } else if window.isMainWindow {
+            self.clickPoint = window.convertPoint(toScreen: event.locationInWindow)
         }
         return event
+    }
+
+    func rightMouseDown(with event: NSEvent) -> NSEvent? {
+        guard event.window === self.view.window else { return event }
+        // Convert the point to view system
+        let pointInView = view.convert(event.locationInWindow, from: nil)
+
+        // If the view where the touch occurred is outside the AddressBar forward the event
+        guard let viewWithinAddressBar = view.hitTest(pointInView) else { return event }
+
+        // If the farthest view of the point location is a NSButton or LottieAnimationView don't show contextual menu
+        guard viewWithinAddressBar.shouldShowArrowCursor == false else { return nil }
+
+        // The event location is not a button so we can forward the event to the textfield
+        addressBarTextField.rightMouseDown(with: event)
+        return nil
     }
 
     private static let maxClickReleaseDistanceToResignFirstResponder: CGFloat = 4
 
     func mouseUp(with event: NSEvent) -> NSEvent? {
         // click (same position down+up) outside of the field: resign first responder
-        guard event.window === self.view.window,
-              self.view.window?.firstResponder === addressBarTextField.currentEditor(),
+        guard let window = self.view.window, event.window === window,
+              window.firstResponder === addressBarTextField.currentEditor(),
               let clickPoint,
-              clickPoint.distance(to: event.locationInWindow) <= Self.maxClickReleaseDistanceToResignFirstResponder else {
+              clickPoint.distance(to: window.convertPoint(toScreen: event.locationInWindow)) <= Self.maxClickReleaseDistanceToResignFirstResponder else {
             return event
         }
 

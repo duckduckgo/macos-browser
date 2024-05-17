@@ -69,6 +69,7 @@ public enum DataBrokerProtectionPixels {
         static let profileQueries = "profile_queries"
         static let hasError = "has_error"
         static let brokerURL = "broker_url"
+        static let sleepDuration = "sleep_duration"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -160,8 +161,8 @@ public enum DataBrokerProtectionPixels {
     // Initial scans pixels
     // https://app.asana.com/0/1204006570077678/1206981742767458/f
     case initialScanTotalDuration(duration: Double, profileQueries: Int)
-    case initialScanSiteLoadDuration(duration: Double, hasError: Bool, brokerURL: String)
-    case initialScanPostLoadingDuration(duration: Double, hasError: Bool, brokerURL: String)
+    case initialScanSiteLoadDuration(duration: Double, hasError: Bool, brokerURL: String, sleepDuration: Double)
+    case initialScanPostLoadingDuration(duration: Double, hasError: Bool, brokerURL: String, sleepDuration: Double)
     case initialScanPreStartDuration(duration: Double)
 }
 
@@ -394,10 +395,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                     Consts.backendServiceCallSite: backendServiceCallSite.rawValue]
         case .initialScanTotalDuration(let duration, let profileQueries):
             return [Consts.durationInMs: String(duration), Consts.profileQueries: String(profileQueries)]
-        case .initialScanSiteLoadDuration(let duration, let hasError, let brokerURL):
-            return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL]
-        case .initialScanPostLoadingDuration(let duration, let hasError, let brokerURL):
-            return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL]
+        case .initialScanSiteLoadDuration(let duration, let hasError, let brokerURL, let sleepDuration):
+            return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL, Consts.sleepDuration: String(sleepDuration)]
+        case .initialScanPostLoadingDuration(let duration, let hasError, let brokerURL, let sleepDuration):
+            return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL, Consts.sleepDuration: String(sleepDuration)]
         case .initialScanPreStartDuration(let duration):
             return [Consts.durationInMs: String(duration)]
         }

@@ -28,6 +28,7 @@ final class SyncDataProviders: DataProvidersSource {
     public let bookmarksAdapter: SyncBookmarksAdapter
     public let credentialsAdapter: SyncCredentialsAdapter
     public let settingsAdapter: SyncSettingsAdapter
+    public let syncErrorHandler: SyncErrorHandler
 
     @MainActor
     func makeDataProviders() -> [DataProviding] {
@@ -94,11 +95,12 @@ final class SyncDataProviders: DataProvidersSource {
         }
     }
 
-    init(bookmarksDatabase: CoreDataDatabase, secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
+    init(bookmarksDatabase: CoreDataDatabase, secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory, syncErrorHandler: SyncErrorHandler) {
         self.bookmarksDatabase = bookmarksDatabase
         self.secureVaultFactory = secureVaultFactory
-        bookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase)
-        credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory)
+        self.syncErrorHandler = syncErrorHandler
+        bookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, syncErrorHandler: syncErrorHandler)
+        credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory, syncErrorHandler: syncErrorHandler)
         settingsAdapter = SyncSettingsAdapter()
     }
 
