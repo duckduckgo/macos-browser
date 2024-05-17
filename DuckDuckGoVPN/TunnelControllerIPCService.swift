@@ -38,6 +38,10 @@ final class TunnelControllerIPCService {
     private var cancellables = Set<AnyCancellable>()
     private let defaults: UserDefaults
 
+    enum IPCError {
+        case versionMismatched
+    }
+
     init(tunnelController: NetworkProtectionTunnelController,
          networkExtensionController: NetworkExtensionController,
          statusReporter: NetworkProtectionStatusReporter,
@@ -122,7 +126,7 @@ extension TunnelControllerIPCService: IPCServerInterface {
         server.serverInfoChanged(statusReporter.serverInfoObserver.recentValue)
         server.statusChanged(statusReporter.statusObserver.recentValue)
         if DefaultIPCMetadataCollector.version != version {
-            let error = NetworkProtectionClientError.loginItemVersionMismatched
+            let error = TunnelControllerIPCService.IPCError.versionMismatched
             NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
             completion(error)
         } else {
@@ -196,6 +200,28 @@ extension TunnelControllerIPCService: IPCServerInterface {
         case .disableConnectOnDemandAndShutDown:
             // Not implemented on macOS yet
             break
+        }
+    }
+}
+
+// MARK: - Error Handling
+
+extension TunnelControllerIPCService.IPCError: LocalizedError, CustomNSError {
+    var errorDescription: String? {
+        switch self {
+        case .versionMismatched: return "Login item version mismatched"
+        }
+    }
+
+    var errorCode: Int {
+        switch self {
+        case .versionMismatched: return 0
+        }
+    }
+
+    var errorUserInfo: [String : Any] {
+        switch self {
+        case .versionMismatched: return [:]
         }
     }
 }

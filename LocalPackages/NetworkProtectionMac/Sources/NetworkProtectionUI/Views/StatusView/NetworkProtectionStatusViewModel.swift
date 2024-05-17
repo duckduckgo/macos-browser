@@ -383,13 +383,22 @@ extension NetworkProtectionStatusView {
             switch (knownFailure.domain, knownFailure.code) {
             case ("SMAppServiceErrorDomain", 1):
                 return UserText.vpnOperationNotPermittedMessage
-            case ("NetworkProtection.NetworkProtectionClientError", 14):
+            case ("TunnelControllerIPCService.IPCError", 0):
                 return UserText.vpnLoginItemVersionMismatchedMessage
             case ("NetworkProtection.NetworkProtectionClientError", 5):
                 return UserText.vpnRegisteredServerFetchingFailedMessage
             default:
                 return nil
             }
+        }
+    }
+}
+
+extension PacketTunnelProvider.TunnelError: InternalErrorWrapping {
+    public var internalError: Error? {
+        switch self {
+        case .startingTunnelWithoutAuthToken, .simulateTunnelFailureError, .vpnAccessRevoked: return nil
+        case .couldNotGenerateTunnelConfiguration(internalError: let error): return error
         }
     }
 }

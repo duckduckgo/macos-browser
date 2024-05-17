@@ -124,8 +124,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 return
             case .vpnAccessRevoked:
                 return
-            case .loginItemVersionMismatched:
-                return
             }
 
             PixelKit.fire(domainEvent, frequency: .dailyAndCount, includeAppVersionParameter: true)
