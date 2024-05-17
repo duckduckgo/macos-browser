@@ -75,11 +75,11 @@ final class NetworkProtectionDebugUtilities {
         try await ipcClient.command(.sendTestNotification)
     }
 
-    func simulateKnownFailure() async throws {
+    func simulateKnownFailure(domain: String, code: Int) async throws {
         do {
-            try await ipcClient.debugCommand(.simulateKnownFailure)
+            try await ipcClient.command(.simulateKnownFailure(domain, code))
         } catch {
-            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
+            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(NSError(domain: domain, code: code))
         }
     }
 

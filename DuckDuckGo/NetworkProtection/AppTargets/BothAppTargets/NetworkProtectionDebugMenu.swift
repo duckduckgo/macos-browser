@@ -92,8 +92,11 @@ final class NetworkProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Send Test Notification", action: #selector(NetworkProtectionDebugMenu.sendTestNotification))
                 .targetting(self)
 
-            NSMenuItem(title: "Simulate Known Failure", action: #selector(NetworkProtectionDebugMenu.simulateKnownFailure))
-                .targetting(self)
+            NSMenuItem(title: "Simulate Known Failure") {
+                menuItem(title: "Operation Not Permitted", action: #selector(NetworkProtectionDebugMenu.simulateKnownFailure), representedObject: ("SMAppServiceErrorDomain", 1))
+                menuItem(title: "Login Item Version Mismatched", action: #selector(NetworkProtectionDebugMenu.simulateKnownFailure), representedObject: ("TunnelControllerIPCService.IPCError", 0))
+                menuItem(title: "Failed to Fetch Registered Servers", action: #selector(NetworkProtectionDebugMenu.simulateKnownFailure), representedObject: ("NetworkProtection.NetworkProtectionClientError", 5))
+            }
 
             NSMenuItem(title: "Log Feedback Metadata to Console", action: #selector(NetworkProtectionDebugMenu.logFeedbackMetadataToConsole))
                 .targetting(self)
@@ -236,9 +239,11 @@ final class NetworkProtectionDebugMenu: NSMenu {
         }
     }
 
-    @objc func simulateKnownFailure(_ sender: Any?) throws {
+    @objc func simulateKnownFailure(_ sender: NSMenuItem?) throws {
         Task { @MainActor in
-            try await debugUtilities.simulateKnownFailure()
+            if let error = sender?.representedObject as? (String, Int) {
+                try await debugUtilities.simulateKnownFailure(domain: error.0, code: error.1)
+            }
         }
     }
 
@@ -412,6 +417,13 @@ final class NetworkProtectionDebugMenu: NSMenu {
             excludedRoutesMenu.addItem(menuItem)
         }
 
+    }
+
+    func menuItem(title: String, action: Selector, representedObject: Any?) -> NSMenuItem {
+        let menuItem = NSMenuItem(title: title, action: action, keyEquivalent: "")
+        menuItem.target = self
+        menuItem.representedObject = representedObject
+        return menuItem
     }
 
     // MARK: - Menu State Update
