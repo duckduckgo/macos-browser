@@ -681,6 +681,16 @@ extension MainViewController {
         fatalError("Fatal error triggered from the Debug menu")
     }
 
+    @objc func crashOnException(_ sender: Any?) {
+        do {
+            _=try Data(contentsOf: URL(fileURLWithPath: "/non/existent/path.txt"))
+        } catch let error as NSError {
+            DispatchQueue.main.async {
+                NSException(name: NSExceptionName(rawValue: error.domain), reason: error.localizedDescription, userInfo: ["NSError": error]).raise()
+            }
+        }
+    }
+
     @objc func resetSecureVaultData(_ sender: Any?) {
         let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
 
