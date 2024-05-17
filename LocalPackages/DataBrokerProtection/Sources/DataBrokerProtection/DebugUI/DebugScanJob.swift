@@ -78,8 +78,8 @@ final class DebugScanJob: DataBrokerJob {
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
-         emailService: EmailServiceProtocol = EmailService(),
-         captchaService: CaptchaServiceProtocol = CaptchaService(),
+         emailService: EmailServiceProtocol,
+         captchaService: CaptchaServiceProtocol,
          operationAwaitTime: TimeInterval = 3,
          clickAwaitTime: TimeInterval = 0,
          shouldRunNextStep: @escaping () -> Bool

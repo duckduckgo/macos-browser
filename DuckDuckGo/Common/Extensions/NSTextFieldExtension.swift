@@ -21,6 +21,10 @@ import Common
 
 extension NSTextField {
 
+    var isFirstResponder: Bool {
+        window?.firstResponder == currentEditor()
+    }
+
     static func label(titled title: String) -> NSTextField {
         let label = NSTextField(string: title)
 

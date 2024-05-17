@@ -24,7 +24,7 @@ import PixelKit
 // This is to avoid exposing all the dependancies outside of the DBP package
 public class DataBrokerProtectionAgentManagerProvider {
     // swiftlint:disable:next function_body_length
-    public static func agentManager() -> DataBrokerProtectionAgentManager {
+    public static func agentManager(authenticationManager: DataBrokerProtectionAuthenticationManaging) -> DataBrokerProtectionAgentManager {
         let pixelHandler = DataBrokerProtectionPixelsHandler()
 
         let executionConfig = DataBrokerExecutionConfig()
@@ -65,10 +65,8 @@ public class DataBrokerProtectionAgentManagerProvider {
                                                        brokerUpdater: brokerUpdater,
                                                        pixelHandler: pixelHandler)
 
-        let redeemUseCase = RedeemUseCase(authenticationService: AuthenticationService(),
-                                          authenticationRepository: KeychainAuthenticationData())
-        let emailService = EmailService(redeemUseCase: redeemUseCase)
-        let captchaService = CaptchaService(redeemUseCase: redeemUseCase)
+        let emailService = EmailService(authenticationManager: authenticationManager)
+        let captchaService = CaptchaService(authenticationManager: authenticationManager)
         let runnerProvider = DataBrokerJobRunnerProvider(privacyConfigManager: privacyConfigurationManager,
                                                          contentScopeProperties: contentScopeProperties,
                                                          emailService: emailService,

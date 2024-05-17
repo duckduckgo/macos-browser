@@ -29,9 +29,7 @@ public final class DataBrokerProtectionManager {
     static let shared = DataBrokerProtectionManager()
 
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
-    private let authenticationRepository: AuthenticationRepository = KeychainAuthenticationData()
-    private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
-    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
     private let dataBrokerProtectionWaitlistDataSource: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
 
@@ -53,13 +51,11 @@ public final class DataBrokerProtectionManager {
     }()
 
     private init() {
-        self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService,
-                                           authenticationRepository: authenticationRepository)
-
+        self.authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager()
     }
 
-    public func shouldAskForInviteCode() -> Bool {
-        redeemUseCase.shouldAskForInviteCode()
+    public func isUserAuthenticated() -> Bool {
+        authenticationManager.isUserAuthenticated
     }
 
     // MARK: - Debugging Features

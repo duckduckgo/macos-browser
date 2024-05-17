@@ -112,7 +112,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
         zoomSubmenu.performActionForItem(at: defaultZoomItemIndex)
 
-        XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedAppearancePreferencesCalled)
+        XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedAccessibilityPreferencesCalled)
     }
 
     // MARK: Preferences
