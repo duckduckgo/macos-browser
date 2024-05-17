@@ -21,6 +21,7 @@ import Common
 import BrowserServicesKit
 import DataBrokerProtection
 import PixelKit
+import Subscription
 
 public final class DataBrokerProtectionBackgroundManager {
 
@@ -30,7 +31,7 @@ public final class DataBrokerProtectionBackgroundManager {
 
     private let authenticationRepository: AuthenticationRepository = KeychainAuthenticationData()
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
-    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
 
     private lazy var ipcServiceManager = IPCServiceManager(scheduler: scheduler, pixelHandler: pixelHandler)
@@ -65,13 +66,15 @@ public final class DataBrokerProtectionBackgroundManager {
                                                     dataManager: dataManager,
                                                     notificationCenter: NotificationCenter.default,
                                                     pixelHandler: pixelHandler,
-                                                    redeemUseCase: redeemUseCase,
+                                                    authenticationManager: authenticationManager,
                                                     userNotificationService: userNotificationService)
     }()
 
     private init() {
-        self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService,
-                                           authenticationRepository: authenticationRepository)
+        let redeemUseCase = RedeemUseCase(authenticationService: authenticationService,
+                                          authenticationRepository: authenticationRepository)
+        self.authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(redeemUseCase: redeemUseCase)
+
         _ = ipcServiceManager
     }
 
