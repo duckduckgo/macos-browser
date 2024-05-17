@@ -567,12 +567,18 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     }
 
     deinit {
-        @MainActor(unsafe)
-        func performRegardlessOfMainThread() {
+        DispatchQueue.main.asyncOrNow { [download] in
+            // WebKit objects must be deallocated on the main thread
+            withExtendedLifetime(download) {}
+        }
+
+#if DEBUG
+        @MainActor(unsafe) func performRegardlessOfMainThread() {
             os_log(.debug, log: log, "<Task \(download)>.deinit")
             assert(state.isCompleted, "FileDownloadTask is deallocated without finish(with:) been called")
         }
         performRegardlessOfMainThread()
+#endif
     }
 
 }
