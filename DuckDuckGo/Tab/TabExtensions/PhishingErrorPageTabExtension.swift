@@ -57,32 +57,21 @@ final class PhishingErrorPageTabExtension {
         }
 
     @MainActor
-    private func loadPhishingErrorHTML(url: URL, alternate: Bool, errorCode: Int) {
+    private func loadPhishingErrorHTML(url: URL) {
         let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
         let html = PhishingErrorPageHTMLTemplate(domain: domain).makeHTMLFromTemplate()
         webView?.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
-        loadHTML(html: html, url: url, alternate: alternate)
     }
 
     @MainActor
-    private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL, alternate: Bool) {
+    private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL) {
         let html = ErrorPageHTMLTemplate(error: error, header: header).makeHTMLFromTemplate()
-        loadHTML(html: html, url: url, alternate: alternate)
-    }
-
-    @MainActor
-    private func loadHTML(html: String, url: URL, alternate: Bool) {
-        if alternate {
-            webView?.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
-        } else {
-            webView?.setDocumentHtml(html)
-        }
+        webView?.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
     }
 
 }
 
 extension PhishingErrorPageTabExtension: NavigationResponder {
-
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let urlString = navigationAction.url.absoluteString
@@ -92,9 +81,7 @@ extension PhishingErrorPageTabExtension: NavigationResponder {
         // Check the URL
         let isMalicious = await detectionManager.isMalicious(url: navigationAction.url)
         if isMalicious {
-            loadPhishingErrorHTML(url: navigationAction.url, alternate: false, errorCode: 1)
-            // Navigate back programmatically to fix the BackForwardList?
-            webView?.goBack()
+            loadPhishingErrorHTML(url: navigationAction.url)
             return .cancel
         }
         return .allow

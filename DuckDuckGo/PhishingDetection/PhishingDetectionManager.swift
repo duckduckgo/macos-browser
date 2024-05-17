@@ -28,7 +28,7 @@ public final class PhishingDetectionManager {
     private init() {}
 
     func isMalicious(url: URL) async -> Bool {
-        return await phishingDetectionService.isMalicious(url: url.absoluteString)
+        return await phishingDetectionService.isMalicious(url: url)
     }
 
     func loadDataAsync() {
