@@ -316,7 +316,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func runCustomJSON() {
-        let viewController = DataBrokerRunCustomJSONViewController()
+        let authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager()
+        let viewController = DataBrokerRunCustomJSONViewController(authenticationManager: authenticationManager)
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable],
                               backing: .buffered,

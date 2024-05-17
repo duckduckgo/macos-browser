@@ -39,6 +39,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
     func optionsButtonMenuRequestedPreferences(_ menu: NSMenu)
     func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu)
+    func optionsButtonMenuRequestedAccessibilityPreferences(_ menu: NSMenu)
 #if DBP
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
 #endif
@@ -221,6 +222,10 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func openAppearancePreferences(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedAppearancePreferences(self)
+    }
+
+    @objc func openAccessibilityPreferences(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedAccessibilityPreferences(self)
     }
 
     @objc func openSubscriptionPurchasePage(_ sender: NSMenuItem) {
@@ -606,7 +611,7 @@ final class ZoomSubMenu: NSMenu {
 
         addItem(.separator())
 
-        let globalZoomSettingItem = NSMenuItem(title: UserText.defaultZoomPageMoreOptionsItem, action: #selector(MoreOptionsMenu.openAppearancePreferences(_:)), keyEquivalent: "")
+        let globalZoomSettingItem = NSMenuItem(title: UserText.defaultZoomPageMoreOptionsItem, action: #selector(MoreOptionsMenu.openAccessibilityPreferences(_:)), keyEquivalent: "")
             .targetting(target)
         addItem(globalZoomSettingItem)
     }

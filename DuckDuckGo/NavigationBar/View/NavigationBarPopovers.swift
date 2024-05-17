@@ -65,6 +65,9 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     private(set) var bookmarkPopover: AddBookmarkPopover?
     private weak var bookmarkPopoverDelegate: NSPopoverDelegate?
 
+    private (set) var zoomPopover: ZoomPopover?
+    private weak var zoomPopoverDelegate: NSPopoverDelegate?
+
     private let networkProtectionPopoverManager: NetPPopoverManager
 
     private var popoverIsShownCancellables = Set<AnyCancellable>()
@@ -107,6 +110,10 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
 
     var isEditBookmarkPopoverShown: Bool {
         bookmarkPopover?.isShown ?? false
+    }
+
+    var isZoomPopoverShown: Bool {
+        zoomPopover?.isShown ?? false
     }
 
     func bookmarksButtonPressed(_ button: MouseOverButton, popoverDelegate delegate: NSPopoverDelegate, tab: Tab?) {
@@ -200,6 +207,10 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
             bookmarkPopover?.close()
         }
 
+        if zoomPopover?.isShown ?? false {
+            zoomPopover?.close()
+        }
+
         if privacyDashboardPopover?.isShown ?? false {
             privacyDashboardPopover?.close()
         }
@@ -234,8 +245,22 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         show(bookmarkPopover, positionedBelow: button)
     }
 
+    func showZoomPopover(for tabViewModel: TabViewModel, from button: NSButton, withDelegate delegate: NSPopoverDelegate) {
+        guard closeTransientPopovers() else { return }
+
+        let zoomPopover = ZoomPopover(tabViewModel: tabViewModel)
+        zoomPopover.delegate = self
+        self.zoomPopover = zoomPopover
+        self.zoomPopoverDelegate = delegate
+        show(zoomPopover, positionedBelow: button)
+    }
+
     func closeEditBookmarkPopover() {
         bookmarkPopover?.close()
+    }
+
+    func closeZoomPopover() {
+        zoomPopover?.close()
     }
 
     func openPrivacyDashboard(for tabViewModel: TabViewModel, from button: MouseOverButton) {
@@ -447,6 +472,10 @@ extension NavigationBarPopovers: NSPopoverDelegate {
             privacyDashboardPopover = nil
             privacyInfoCancellable = nil
             privacyDashboadPendingUpdatesCancellable = nil
+
+        case zoomPopover:
+            zoomPopoverDelegate?.popoverDidClose?(notification)
+            zoomPopover = nil
 
         default: break
         }
