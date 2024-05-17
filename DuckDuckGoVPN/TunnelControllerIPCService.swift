@@ -216,7 +216,7 @@ extension TunnelControllerIPCService.IPCError: LocalizedError, CustomNSError {
         }
     }
 
-    var errorUserInfo: [String : Any] {
+    var errorUserInfo: [String: Any] {
         switch self {
         case .versionMismatched: return [:]
         }
