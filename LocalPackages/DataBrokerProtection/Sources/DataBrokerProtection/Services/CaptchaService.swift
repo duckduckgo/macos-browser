@@ -123,16 +123,16 @@ struct CaptchaService: CaptchaServiceProtocol {
     }
 
     private let urlSession: URLSession
-    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let settings: DataBrokerProtectionSettings
     private let servicePixel: DataBrokerProtectionBackendServicePixels
 
     init(urlSession: URLSession = URLSession.shared,
-         redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
+         authenticationManager: DataBrokerProtectionAuthenticationManaging,
          settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings(),
          servicePixel: DataBrokerProtectionBackendServicePixels = DefaultDataBrokerProtectionBackendServicePixels()) {
         self.urlSession = urlSession
-        self.redeemUseCase = redeemUseCase
+        self.authenticationManager = authenticationManager
         self.settings = settings
         self.servicePixel = servicePixel
     }
@@ -186,7 +186,7 @@ struct CaptchaService: CaptchaServiceProtocol {
         os_log("Submitting captcha request ...", log: .service)
         var request = URLRequest(url: url)
 
-        guard let authHeader = redeemUseCase.getAuthHeader() else {
+        guard let authHeader = authenticationManager.getAuthHeader() else {
             servicePixel.fireEmptyAccessToken(callSite: .submitCaptchaInformationRequest)
             throw AuthenticationError.noAuthToken
         }
@@ -272,7 +272,7 @@ struct CaptchaService: CaptchaServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        guard let authHeader = redeemUseCase.getAuthHeader() else {
+        guard let authHeader = authenticationManager.getAuthHeader() else {
             servicePixel.fireEmptyAccessToken(callSite: .submitCaptchaToBeResolvedRequest)
             throw AuthenticationError.noAuthToken
         }

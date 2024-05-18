@@ -87,6 +87,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
               pixelHandler: EventMapping<DataBrokerProtectionPixels>,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
+        let sleepObserver = DataBrokerProtectionSleepObserver(brokerProfileQueryData: profileQuery)
         let scan = ScanOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
@@ -95,6 +96,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
             captchaService: captchaService,
             stageDurationCalculator: stageCalculator,
             pixelHandler: pixelHandler,
+            sleepObserver: sleepObserver,
             shouldRunNextStep: shouldRunNextStep
         )
         return try await scan.run(inputValue: (), showWebView: showWebView)
@@ -106,6 +108,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
                 pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
+        let sleepObserver = DataBrokerProtectionSleepObserver(brokerProfileQueryData: profileQuery)
         let optOut = OptOutOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
@@ -114,6 +117,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
             captchaService: captchaService,
             stageCalculator: stageCalculator,
             pixelHandler: pixelHandler,
+            sleepObserver: sleepObserver,
             shouldRunNextStep: shouldRunNextStep
         )
         try await optOut.run(inputValue: extractedProfile, showWebView: showWebView)

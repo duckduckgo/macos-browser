@@ -20,8 +20,19 @@ import Foundation
 import SwiftUI
 
 public final class DataBrokerRunCustomJSONViewController: NSViewController {
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
+
+    public init(authenticationManager: DataBrokerProtectionAuthenticationManaging) {
+        self.authenticationManager = authenticationManager
+        super.init()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     public override func loadView() {
-        let contentView = DataBrokerRunCustomJSONView(viewModel: DataBrokerRunCustomJSONViewModel())
+        let contentView = DataBrokerRunCustomJSONView(viewModel: DataBrokerRunCustomJSONViewModel(authenticationManager: authenticationManager))
         let hostingController = NSHostingController(rootView: contentView)
         hostingController.view.autoresizingMask = [.width, .height]
         self.view = hostingController.view

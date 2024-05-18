@@ -19,42 +19,135 @@
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
+import PixelKit
+import SystemExtensions
 
 protocol VPNUninstalling {
-    func uninstall(includingSystemExtension: Bool) async
+    func uninstall(includingSystemExtension: Bool) async throws
+    func removeSystemExtension() async throws
+    func removeVPNConfiguration() async throws
 }
 
+@MainActor
 final class VPNUninstaller: VPNUninstalling {
-    let networkExtensionController: NetworkExtensionController
-    let vpnConfiguration: VPNConfigurationManager
-    let defaults: UserDefaults
 
-    init(networkExtensionController: NetworkExtensionController, vpnConfigurationManager: VPNConfigurationManager, defaults: UserDefaults = .netP) {
+    private let tunnelController: NetworkProtectionTunnelController
+    private let networkExtensionController: NetworkExtensionController
+    private let defaults: UserDefaults
+    private let pixelKit: PixelFiring?
+
+    init(tunnelController: NetworkProtectionTunnelController,
+         networkExtensionController: NetworkExtensionController,
+         defaults: UserDefaults = .netP,
+         pixelKit: PixelFiring? = PixelKit.shared) {
+
+        self.tunnelController = tunnelController
         self.networkExtensionController = networkExtensionController
-        self.vpnConfiguration = vpnConfigurationManager
         self.defaults = defaults
+        self.pixelKit = pixelKit
     }
 
-    func uninstall(includingSystemExtension: Bool) async {
-#if NETP_SYSTEM_EXTENSION
-        if includingSystemExtension {
-            do {
-                try await networkExtensionController.deactivateSystemExtension()
-                defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowExtension)
-            } catch {
+    func uninstall(includingSystemExtension: Bool) async throws {
+        pixelKit?.fire(VPNUninstallAttempt.begin)
 
+        do {
+            try await removeSystemExtension()
+            try await removeVPNConfiguration()
+
+            if defaults.networkProtectionOnboardingStatus == .completed {
+                defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
             }
-        }
-#endif
 
-        await vpnConfiguration.removeVPNConfiguration()
+            defaults.networkProtectionShouldShowVPNUninstalledMessage = true
+            pixelKit?.fire(VPNUninstallAttempt.success, frequency: .dailyAndCount)
+        } catch {
+            switch error {
+            case OSSystemExtensionError.requestCanceled:
+                pixelKit?.fire(VPNUninstallAttempt.cancelled(.sysexInstallationCancelled), frequency: .dailyAndCount)
+            case OSSystemExtensionError.authorizationRequired:
+                pixelKit?.fire(VPNUninstallAttempt.cancelled(.sysexInstallationRequiresAuthorization), frequency: .dailyAndCount)
+            default:
+                pixelKit?.fire(VPNUninstallAttempt.failure(error), frequency: .dailyAndCount)
+            }
+
+            throw error
+        }
+    }
+
+    func removeSystemExtension() async throws {
+#if NETP_SYSTEM_EXTENSION
+        await tunnelController.stop()
+        try await networkExtensionController.deactivateSystemExtension()
+        defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowExtension)
+#endif
+    }
+
+    func removeVPNConfiguration() async throws {
+        await tunnelController.stop()
+
+        guard let manager = await tunnelController.manager else {
+            // Nothing to remove, this is fine
+            return
+        }
+
+        try await manager.removeFromPreferences()
 
         if defaults.networkProtectionOnboardingStatus == .completed {
             defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
         }
+    }
+}
 
-        defaults.networkProtectionShouldShowVPNUninstalledMessage = true
+// MARK: - VPNUninstallAttempt
 
-        exit(EXIT_SUCCESS)
+extension VPNUninstaller {
+    enum UninstallCancellationReason: String {
+        case sysexInstallationCancelled
+        case sysexInstallationRequiresAuthorization
+    }
+
+    enum VPNUninstallAttempt: PixelKitEventV2 {
+        case begin
+        case cancelled(_ reason: UninstallCancellationReason)
+        case success
+        case failure(_ error: Error)
+
+        var name: String {
+            switch self {
+            case .begin:
+                return "vpn_controller_uninstall_attempt"
+
+            case .cancelled:
+                return "vpn_controller_uninstall_cancelled"
+
+            case .success:
+                return "vpn_controller_uninstall_success"
+
+            case .failure:
+                return "vpn_controller_uninstall_failure"
+            }
+        }
+
+        var parameters: [String: String]? {
+            switch self {
+            case .begin,
+                    .success,
+                    .failure:
+                return nil
+            case .cancelled(let reason):
+                return ["reason": reason.rawValue]
+            }
+        }
+
+        var error: Error? {
+            switch self {
+            case .begin,
+                    .cancelled,
+                    .success:
+                return nil
+            case .failure(let error):
+                return error
+            }
+        }
     }
 }
