@@ -383,7 +383,7 @@ extension NetworkProtectionStatusView {
             switch (knownFailure.domain, knownFailure.code) {
             case ("SMAppServiceErrorDomain", 1):
                 return UserText.vpnOperationNotPermittedMessage
-            case ("TunnelControllerIPCService.IPCError", 0):
+            case ("TunnelControllerIPCService.IPCError", 0), ("OSSystemExtensionErrorDomain", 8):
                 return UserText.vpnLoginItemVersionMismatchedMessage
             case ("NetworkProtection.NetworkProtectionClientError", 5):
                 return UserText.vpnRegisteredServerFetchingFailedMessage

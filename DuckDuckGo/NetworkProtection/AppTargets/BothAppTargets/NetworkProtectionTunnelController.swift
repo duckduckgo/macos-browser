@@ -67,6 +67,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     private let controllerErrorStore = NetworkProtectionControllerErrorStore()
 
+    private let knownFailureStore = NetworkProtectionKnownFailureStore()
+
     // MARK: - VPN Tunnel & Configuration
 
     /// Auth token store
@@ -561,6 +563,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
         } catch {
             VPNOperationErrorRecorder().recordControllerStartFailure(error)
+            knownFailureStore.lastKnownFailure = KnownFailure(error)
 
             if case StartError.cancelled = error {
                 PixelKit.fire(
