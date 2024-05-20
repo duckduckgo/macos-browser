@@ -51,16 +51,16 @@ struct EmailService: EmailServiceProtocol {
     }
 
     public let urlSession: URLSession
-    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let settings: DataBrokerProtectionSettings
     private let servicePixel: DataBrokerProtectionBackendServicePixels
 
     init(urlSession: URLSession = URLSession.shared,
-         redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
+         authenticationManager: DataBrokerProtectionAuthenticationManaging,
          settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings(),
          servicePixel: DataBrokerProtectionBackendServicePixels = DefaultDataBrokerProtectionBackendServicePixels()) {
         self.urlSession = urlSession
-        self.redeemUseCase = redeemUseCase
+        self.authenticationManager = authenticationManager
         self.settings = settings
         self.servicePixel = servicePixel
     }
@@ -78,7 +78,7 @@ struct EmailService: EmailServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        guard let authHeader = redeemUseCase.getAuthHeader() else {
+        guard let authHeader = authenticationManager.getAuthHeader() else {
             servicePixel.fireEmptyAccessToken(callSite: .getEmail)
             throw AuthenticationError.noAuthToken
         }
@@ -161,7 +161,7 @@ struct EmailService: EmailServiceProtocol {
 
         var request = URLRequest(url: url)
 
-        guard let authHeader = redeemUseCase.getAuthHeader() else {
+        guard let authHeader = authenticationManager.getAuthHeader() else {
             servicePixel.fireEmptyAccessToken(callSite: .extractEmailLink)
             throw AuthenticationError.noAuthToken
         }

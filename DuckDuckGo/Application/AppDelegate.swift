@@ -200,7 +200,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                         subscriptionService: subscriptionService,
                                         authService: authService)
 
-        if #available(macOS 12.0, iOS 15.0, *) {
+        if #available(macOS 12.0, *) {
             let storePurchaseManager = StorePurchaseManager()
             subscriptionManager = SubscriptionManager(storePurchaseManager: storePurchaseManager,
                                                       accountManager: accountManager,

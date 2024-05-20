@@ -24,10 +24,12 @@ import DataBrokerProtection
 import BrowserServicesKit
 import PixelKit
 import Networking
+import Subscription
 
 @objc(Application)
 final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
-    private let _delegate = DuckDuckGoDBPBackgroundAgentAppDelegate()
+    private let _delegate: DuckDuckGoDBPBackgroundAgentAppDelegate
+    private let subscriptionManager: SubscriptionManaging
 
     override init() {
         os_log(.error, log: .dbpBackgroundAgent, "🟢 DBP background Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
@@ -65,6 +67,37 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
             exit(0)
         }
 
+        // MARK: - Configure Subscription
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
+                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
+                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
+        let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
+        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
+                                        entitlementsCache: entitlementsCache,
+                                        subscriptionService: subscriptionService,
+                                        authService: authService)
+
+        if #available(macOS 12.0, *) {
+            let storePurchaseManager = StorePurchaseManager()
+            subscriptionManager = SubscriptionManager(storePurchaseManager: storePurchaseManager,
+                                                      accountManager: accountManager,
+                                                      subscriptionService: subscriptionService,
+                                                      authService: authService,
+                                                      subscriptionEnvironment: subscriptionEnvironment)
+        } else {
+            subscriptionManager = SubscriptionManager(accountManager: accountManager,
+                                                      subscriptionService: subscriptionService,
+                                                      authService: authService,
+                                                      subscriptionEnvironment: subscriptionEnvironment)
+        }
+
+        _delegate = DuckDuckGoDBPBackgroundAgentAppDelegate(subscriptionManager: subscriptionManager)
+
         super.init()
         self.delegate = _delegate
     }
@@ -80,15 +113,24 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
     private let settings = DataBrokerProtectionSettings()
     private var cancellables = Set<AnyCancellable>()
     private var statusBarMenu: StatusBarMenu?
+    private let subscriptionManager: SubscriptionManaging
+    private let manager: DataBrokerProtectionBackgroundManager
+
+    init(subscriptionManager: SubscriptionManaging) {
+        self.subscriptionManager = subscriptionManager
+        self.manager = DataBrokerProtectionBackgroundManager(subscriptionManager: subscriptionManager)
+    }
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         os_log("DuckDuckGoAgent started", log: .dbpBackgroundAgent, type: .info)
 
-        let manager = DataBrokerProtectionBackgroundManager.shared
         manager.runOperationsAndStartSchedulerIfPossible()
 
         setupStatusBarMenu()
+
+        //Update environment
+        settings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
     }
 
     @MainActor

@@ -11,6 +11,7 @@
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(DBP_APP_GROUP)</string>
+		<string>$(SUBSCRIPTION_APP_GROUP)</string>
 	</array>
 </dict>
 </plist>

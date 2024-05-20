@@ -22,6 +22,7 @@ import Foundation
 
 final class EmailServiceTests: XCTestCase {
     private let servicePixel = MockDataBrokerProtectionBackendServicePixels()
+    private let mockAuthenticationManager = MockAuthenticationManager()
 
     enum MockError: Error {
         case someError
@@ -36,12 +37,13 @@ final class EmailServiceTests: XCTestCase {
     override func tearDown() async throws {
         MockURLProtocol.requestHandlerQueue.removeAll()
         servicePixel.reset()
+        mockAuthenticationManager.reset()
     }
 
     func testWhenSessionThrows_thenTheCorrectErrorIsThrown() async {
         MockURLProtocol.requestHandlerQueue.append({ _ in throw MockError.someError })
         let sut = EmailService(urlSession: mockURLSession,
-                               redeemUseCase: MockRedeemUseCase(),
+                               authenticationManager: mockAuthenticationManager,
                                settings: DataBrokerProtectionSettings(defaults: .standard),
                                servicePixel: servicePixel)
 
@@ -65,7 +67,7 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
         let sut = EmailService(urlSession: mockURLSession,
-                               redeemUseCase: MockRedeemUseCase(),
+                               authenticationManager: mockAuthenticationManager,
                                settings: DataBrokerProtectionSettings(defaults: .standard),
                                servicePixel: servicePixel)
 
@@ -87,7 +89,7 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
         let sut = EmailService(urlSession: mockURLSession,
-                               redeemUseCase: MockRedeemUseCase(),
+                               authenticationManager: mockAuthenticationManager,
                                settings: DataBrokerProtectionSettings(defaults: .standard),
                                servicePixel: servicePixel)
 
@@ -106,7 +108,7 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(unknownResponse)
 
         let sut = EmailService(urlSession: mockURLSession,
-                               redeemUseCase: MockRedeemUseCase(),
+                               authenticationManager: mockAuthenticationManager,
                                settings: DataBrokerProtectionSettings(defaults: .standard),
                                servicePixel: servicePixel)
 
@@ -136,7 +138,7 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
 
         let sut = EmailService(urlSession: mockURLSession,
-                               redeemUseCase: MockRedeemUseCase(),
+                               authenticationManager: mockAuthenticationManager,
                                settings: DataBrokerProtectionSettings(defaults: .standard),
                                servicePixel: servicePixel)
 
@@ -169,7 +171,7 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(successResponse)
 
         let sut = EmailService(urlSession: mockURLSession,
-                               redeemUseCase: MockRedeemUseCase(),
+                               authenticationManager: mockAuthenticationManager,
                                settings: DataBrokerProtectionSettings(defaults: .standard),
                                servicePixel: servicePixel)
 
@@ -193,7 +195,7 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
         let sut = EmailService(urlSession: mockURLSession,
-                               redeemUseCase: MockRedeemUseCase(),
+                               authenticationManager: mockAuthenticationManager,
                                settings: DataBrokerProtectionSettings(defaults: .standard),
                                servicePixel: servicePixel)
 
@@ -220,7 +222,7 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
         let sut = EmailService(urlSession: mockURLSession,
-                               redeemUseCase: MockRedeemUseCase(),
+                               authenticationManager: mockAuthenticationManager,
                                settings: DataBrokerProtectionSettings(defaults: .standard),
                                servicePixel: servicePixel)
 
@@ -247,7 +249,7 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
         let sut = EmailService(urlSession: mockURLSession,
-                               redeemUseCase: MockRedeemUseCase(),
+                               authenticationManager: mockAuthenticationManager,
                                settings: DataBrokerProtectionSettings(defaults: .standard),
                                servicePixel: servicePixel)
 
@@ -266,10 +268,9 @@ final class EmailServiceTests: XCTestCase {
     }
 
     func testWhenNoAuthTokenAvailable_noAuthTokenErrorIsThrown() async {
-        let redeemUseCase = MockRedeemUseCase()
-        redeemUseCase.shouldSendNilAuthHeader = true
+        mockAuthenticationManager.authHeaderValue = nil
         let sut = EmailService(urlSession: mockURLSession,
-                               redeemUseCase: redeemUseCase,
+                               authenticationManager: mockAuthenticationManager,
                                settings: DataBrokerProtectionSettings(defaults: .standard),
                                servicePixel: servicePixel)
 
@@ -290,7 +291,7 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.noAuth, nil) })
 
         let sut = EmailService(urlSession: mockURLSession,
-                               redeemUseCase: MockRedeemUseCase(),
+                               authenticationManager: mockAuthenticationManager,
                                settings: DataBrokerProtectionSettings(defaults: .standard),
                                servicePixel: servicePixel)
 
