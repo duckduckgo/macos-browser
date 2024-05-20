@@ -137,7 +137,7 @@ extension DuckPlayerTabExtension: NewWindowPolicyDecisionMaker {
         // from opening, and just load it inside the current one instead
         if navigationAction.targetFrame == nil,
            navigationAction.safeSourceFrame?.webView?.url?.isDuckPlayer == true,
-           navigationAction.request.url?.isYoutubeVideoRecommendation == true || navigationAction.request.url?.isYoutubeVideo == true,
+           navigationAction.request.url?.isYoutubeVideo == true,
            let webView, let url = navigationAction.request.url {
             webView.load(URLRequest(url: url))
             return .cancel
