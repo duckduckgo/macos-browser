@@ -48,11 +48,12 @@ public final class DefaultDataBrokerProtectionBackgroundActivityScheduler: DataB
     }
 
     public func startScheduler() {
-        activity.schedule { _ in
+        activity.schedule { completion in
 
             self.lastTriggerTimestamp = Date()
             os_log("Scheduler running...", log: .dataBrokerProtection)
             self.delegate?.dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(self)
+            completion(.finished)
         }
     }
 }
