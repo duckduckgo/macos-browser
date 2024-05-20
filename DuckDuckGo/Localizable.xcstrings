@@ -33200,55 +33200,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Du bist bereit! Du kannst mich jederzeit im Dock antreffen.\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglichu{00A0}🔒"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "¡Ya está todo listo! Puedes encontrarme en el Dock en cualquier momento.\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible{00A0}🔒"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tout est prêt ! Vous pouvez me trouver sur le Dock à tout moment.\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tutto pronto! Puoi trovarmi nel dock in qualsiasi momento.\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile{00A0} 🔒"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Je bent helemaal klaar! Je kunt me altijd vinden in het Dock.\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Wszystko gotowe! W każdej chwili możesz mnie znaleźć w Docku.\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Está tudo pronto! Podes encontrar-me na Dock em qualquer altura.\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Готово! Теперь меня всегда можно найти на док-панели.\nВам интересно, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. По возможности я заблокирую все трекеры и сделаю соединение более безопасным {00A0}🔒"
           }
         }
