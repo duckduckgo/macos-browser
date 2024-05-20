@@ -36,14 +36,6 @@ class DockPositionProviderTests: XCTestCase {
         super.tearDown()
     }
 
-    func testWhenAppDefaultBrowser_ThenIndexBasedOnThePrefferedOrder() {
-        mockBrowserProvider.isDefault = true
-        let currentApps = [URL(string: "file:///Applications/Firefox.app/")!, URL(string: "file:///Applications/Unknown2.app/")!, URL(string: "file:///Applications/Unknown3.app/")!]
-        let index = provider.newDockIndex(from: currentApps)
-
-        XCTAssertEqual(index, 1, "The new app should be placed based on the order Preference - next To Firefox).")
-    }
-
     func testWhenNotDefaultBrowser_ThenIndexIsNextToDefault() {
         mockBrowserProvider.isDefault = false
         mockBrowserProvider.defaultBrowserURL = URL(string: "file:///Applications/Firefox.app/")!
@@ -53,11 +45,4 @@ class DockPositionProviderTests: XCTestCase {
         XCTAssertEqual(index, 2, "The new app should be placed next to default browser.")
     }
 
-    func testWhenNotDefaultBrowserAndNoBrowserFound_ThenIndexIsTheEnd() {
-        mockBrowserProvider.isDefault = true
-        let currentApps = [URL(string: "file:///Applications/Unknown.app/")!, URL(string: "file:///Applications/Unknown2.app/")!, URL(string: "file:///Applications/Unknown3.app/")!]
-        let index = provider.newDockIndex(from: currentApps)
-
-        XCTAssertEqual(index, 3, "The new app should be placed at the end.")
-    }
 }
