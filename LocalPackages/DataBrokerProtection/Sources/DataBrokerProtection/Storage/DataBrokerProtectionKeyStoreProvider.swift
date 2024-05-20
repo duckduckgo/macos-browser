@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 import BrowserServicesKit
 import SecureStorage
@@ -28,7 +29,7 @@ final class DataBrokerProtectionKeyStoreProvider: SecureStorageKeyStoreProvider 
 
     // DO NOT CHANGE except if you want to deliberately invalidate all users's vaults.
     // The keys have a uid to deter casual hacker from easily seeing which keychain entry is related to what.
-    private enum EntryName: String {
+    enum EntryName: String, CaseIterable {
         case generatedPassword = "5FCE971A-DE67-4649-9A42-5E6DAB026E72"
         case l1Key = "9CA59EDC-5CE8-4F53-AAC6-286A7378F384"
         case l2Key = "E544DC56-1D72-4C5D-9738-FDFA6602C47E"
@@ -50,13 +51,127 @@ final class DataBrokerProtectionKeyStoreProvider: SecureStorageKeyStoreProvider 
         return Constants.defaultServiceName
     }
 
+    let keychainService: KeychainService
+    private let groupNameProvider: GroupNameProviding
+    private let getLog: () -> OSLog
+    private var log: OSLog {
+        getLog()
+    }
+
+    init(keychainService: KeychainService = DefaultKeychainService(),
+         groupNameProvider: GroupNameProviding = Bundle.main,
+         log: @escaping @autoclosure () -> OSLog = .disabled) {
+        self.keychainService = keychainService
+        self.groupNameProvider = groupNameProvider
+        self.getLog = log
+    }
+
+    func readData(named: String, serviceName: String) throws -> Data? {
+        try readOrMigrate(named: named, serviceName: serviceName)
+    }
+
     func attributesForEntry(named: String, serviceName: String) -> [String: Any] {
+        var attributes = legacyAttributesForEntry(named: named, serviceName: serviceName)
+        attributes[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
+        return attributes
+    }
+}
+
+private extension DataBrokerProtectionKeyStoreProvider {
+
+    var attributeUpdate: [String: Any] {
+        [kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked]
+    }
+
+    /// Reads data from the Keychain using the latest query attributes, or if not found, reads using old query attributes and if found, migrates
+    /// - Parameters:
+    ///   - name: Keychain item name
+    ///   - serviceName: Keychain service name
+    /// - Returns: Optional Data
+    func readOrMigrate(named name: String, serviceName: String) throws -> Data? {
+
+        // Try to read keychain data using attributes which include `kSecAttrAccessible` value of `kSecAttrAccessibleAfterFirstUnlock`
+        let attributes = attributesForEntry(named: name, serviceName: serviceName)
+
+        if let data = try read(serviceName: serviceName, queryAttributes: attributes) {
+            return data
+        } else {
+
+            // If we didn't find Keychain data, try using attributes WITHOUT `kSecAttrAccessible` value of `kSecAttrAccessibleAfterFirstUnlock`
+            let legacyAttributes = legacyAttributesForEntry(named: name, serviceName: serviceName)
+
+            let accessibilityValueString = legacyAttributes[kSecAttrAccessible as String] as? String ?? "[value unavailable]"
+            os_log("Attempting read and migrate of DBP Keychain data with kSecAttrAccessible value of \(accessibilityValueString)", log: .dataBrokerProtection, type: .debug)
+
+            if let data = try read(serviceName: serviceName, queryAttributes: legacyAttributes) {
+                // We found Keychain data, so update it's `kSecAttrAccessible` value to `kSecAttrAccessibleAfterFirstUnlock`
+                try update(serviceName: serviceName, queryAttributes: legacyAttributes, attributeUpdate: attributeUpdate)
+                return data
+            }
+        }
+
+        return nil
+    }
+
+    /// Reads a Keychain item
+    /// - Parameters:
+    ///   - serviceName: Keychain service name
+    ///   - queryAttributes: Attributes used to query the item
+    /// - Returns: Optional Data
+    func read(serviceName: String, queryAttributes: [String: Any]) throws -> Data? {
+        var query = queryAttributes
+        query[kSecReturnData as String] = true
+        query[kSecAttrService as String] = serviceName
+
+        var item: CFTypeRef?
+
+        let status = keychainService.itemMatching(query, &item)
+
+        switch status {
+
+        case errSecSuccess:
+            guard let itemData = item as? Data,
+                  let itemString = String(data: itemData, encoding: .utf8),
+                  let decodedData = Data(base64Encoded: itemString) else {
+                throw SecureStorageError.keystoreError(status: status)
+            }
+            return decodedData
+
+        case errSecItemNotFound:
+            return nil
+
+        default:
+            throw SecureStorageError.keystoreReadError(status: status)
+        }
+    }
+
+    /// Updates a Keychain item
+    /// - Parameters:
+    ///   - serviceName: Keychain service name
+    ///   - queryAttributes: Attributes used to query the item
+    ///   - attributeUpdate: Attribute updates
+    func update(serviceName: String, queryAttributes: [String: Any], attributeUpdate: [String: Any]) throws {
+        var query = queryAttributes
+        query[kSecAttrService as String] = serviceName
+
+        let status = keychainService.update(queryAttributes, attributeUpdate)
+
+        guard status == errSecSuccess else {
+            throw SecureStorageError.keystoreUpdateError(status: status)
+        }
+
+        let accessibilityValueString = attributeUpdate[kSecAttrAccessible as String] as? String ?? "[value unavailable]"
+        os_log("Updated DBP Keychain data kSecAttrAccessible value to \(accessibilityValueString)", log: .dataBrokerProtection, type: .debug)
+    }
+
+    func legacyAttributesForEntry(named entryName: String, serviceName: String) -> [String: Any] {
         return [
             kSecClass: kSecClassGenericPassword,
             kSecUseDataProtectionKeychain: true,
             kSecAttrSynchronizable: false,
-            kSecAttrAccessGroup: Bundle.main.appGroupName,
-            kSecAttrAccount: named
+            kSecAttrAccessGroup: groupNameProvider.appGroupName,
+            kSecAttrAccount: entryName,
+            kSecAttrAccessible: kSecAttrAccessibleWhenUnlocked
         ] as [String: Any]
     }
 }
