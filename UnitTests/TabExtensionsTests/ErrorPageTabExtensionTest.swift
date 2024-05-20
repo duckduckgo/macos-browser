@@ -38,7 +38,9 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         scriptPublisher = PassthroughSubject<MockSpecialErrorPageScriptProvider, Never>()
         credentialCreator = MockCredentialCreator()
         let featureFlagger = MockFeatureFlagger()
-        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger)
+        let mockPhishingDetectionManager = MockPhishingDetectionManager()
+        errorPageExtention = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger,
+        phishingDetectionManager: mockPhishingDetectionManager)
     }
 
     override func tearDownWithError() throws {
@@ -71,7 +73,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         errorPageExtention.navigation(navigation, didFailWith: error)
 
         // THEN
-        let expectedSpecificMessage = SpecialErrorType.expired.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
+        let expectedSpecificMessage = SSLErrorType.expired.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
         XCTAssertTrue(mockWebView.capturedHTML.contains(expectedSpecificMessage))
     }
 
@@ -87,7 +89,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         errorPageExtention.navigation(navigation, didFailWith: error)
 
         // THEN
-        let expectedSpecificMessage = SpecialErrorType.selfSigned.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
+        let expectedSpecificMessage = SSLErrorType.selfSigned.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
         XCTAssertTrue(mockWebView.capturedHTML.contains(expectedSpecificMessage))
     }
 
@@ -103,7 +105,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         errorPageExtention.navigation(navigation, didFailWith: error)
 
         // THEN
-        let expectedSpecificMessage = SpecialErrorType.wrongHost.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
+        let expectedSpecificMessage = SSLErrorType.wrongHost.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
         XCTAssertTrue(mockWebView.capturedHTML.contains(expectedSpecificMessage))
 
     }
@@ -352,10 +354,10 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
 }
 
 class MockSpecialErrorPageScriptProvider: SpecialErrorPageScriptProvider {
-    var SpecialErrorPageUserScript: SpecialErrorPageUserScript?
+    var specialErrorPageUserScript: DuckDuckGo_Privacy_Browser.SpecialErrorPageUserScript?
 
     init(script: SpecialErrorPageUserScript?) {
-        self.SpecialErrorPageUserScript = script
+        self.specialErrorPageUserScript = script
     }
 }
 

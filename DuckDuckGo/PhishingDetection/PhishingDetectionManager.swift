@@ -19,7 +19,13 @@
 import Foundation
 import PhishingDetection
 
-public final class PhishingDetectionManager {
+public protocol PhishingDetectionManaging {
+    func isMalicious(url: URL) async -> Bool
+    func loadDataAsync()
+    func startUpdateTasks() async
+}
+
+public final class PhishingDetectionManager: PhishingDetectionManaging {
     static let shared = PhishingDetectionManager()
 
     private let phishingDetectionService = PhishingDetectionService()
@@ -27,18 +33,18 @@ public final class PhishingDetectionManager {
 
     private init() {}
 
-    func isMalicious(url: URL) async -> Bool {
+    public func isMalicious(url: URL) async -> Bool {
         return await phishingDetectionService.isMalicious(url: url)
     }
 
-    func loadDataAsync() {
+    public func loadDataAsync() {
         Task {
             phishingDetectionService.loadData()
             await phishingDetectionDataActivities.run()
         }
     }
 
-    func startUpdateTasks() async {
+    public func startUpdateTasks() async {
         await phishingDetectionDataActivities.run()
     }
 }

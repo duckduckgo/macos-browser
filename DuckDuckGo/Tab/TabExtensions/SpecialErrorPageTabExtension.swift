@@ -41,7 +41,7 @@ final class SpecialErrorPageTabExtension {
     private var urlCredentialCreator: URLCredentialCreating
     private var featureFlagger: FeatureFlagger
     private var phishingUrlExemptions: [String] = ["about:blank", "https://duckduckgo.com"]
-    private var detectionManager: PhishingDetectionManager
+    private var detectionManager: PhishingDetectionManaging
     private var thisErrorType: ErrorType?
 
     private var cancellables = Set<AnyCancellable>()
@@ -51,7 +51,7 @@ final class SpecialErrorPageTabExtension {
         scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
-        phishingDetectionManager: PhishingDetectionManager) {
+        phishingDetectionManager: PhishingDetectionManaging) {
             self.detectionManager = phishingDetectionManager
             self.featureFlagger = featureFlagger
             self.urlCredentialCreator = urlCredentialCreator
