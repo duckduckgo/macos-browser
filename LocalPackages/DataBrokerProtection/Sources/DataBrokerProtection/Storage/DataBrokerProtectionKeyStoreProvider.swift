@@ -80,7 +80,7 @@ final class DataBrokerProtectionKeyStoreProvider: SecureStorageKeyStoreProvider 
 private extension DataBrokerProtectionKeyStoreProvider {
 
     var attributeUpdate: [String: Any] {
-        [kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked]
+        [kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock]
     }
 
     /// Reads data from the Keychain using the latest query attributes, or if not found, reads using old query attributes and if found, migrates

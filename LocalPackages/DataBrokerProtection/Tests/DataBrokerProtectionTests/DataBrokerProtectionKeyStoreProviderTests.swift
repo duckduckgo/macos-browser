@@ -125,7 +125,7 @@ final class DataBrokerProtectionKeyStoreProviderTests: XCTestCase {
     }
 
     func testWhenKeychainUpdateErrors_thenKeyStoreUpdateErrorIsThrown() throws {
-        
+
         try DataBrokerProtectionKeyStoreProvider.EntryName.allCases.forEach { entry in
             // Given
             let mockKeychainService = MockDBPKeychainService()
@@ -142,5 +142,3 @@ final class DataBrokerProtectionKeyStoreProviderTests: XCTestCase {
         }
     }
 }
-
-
