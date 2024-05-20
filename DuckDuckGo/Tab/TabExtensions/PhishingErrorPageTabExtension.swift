@@ -81,10 +81,16 @@ extension PhishingErrorPageTabExtension: NavigationResponder {
         // Check the URL
         let isMalicious = await detectionManager.isMalicious(url: navigationAction.url)
         if isMalicious {
+            phishingErrorPageUserScript?.failingURL = navigationAction.url
             loadPhishingErrorHTML(url: navigationAction.url)
             return .cancel
         }
         return .allow
+    }
+
+    @MainActor
+    func navigationDidFinish(_ navigation: Navigation) {
+        phishingErrorPageUserScript?.isEnabled = navigation.url == phishingErrorPageUserScript?.failingURL
     }
 }
 
