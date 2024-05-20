@@ -23,6 +23,9 @@ struct PinnedTabsView: View {
     @State private var draggedTab: Tab?
 
     var body: some View {
+        if #available(macOS 12, *) {
+            let _ = Self._printChanges()
+        }
         HStack(alignment: .bottom, spacing: 0) {
             ForEach(model.items) { item in
                 PinnedTabView(model: item, showsHover: draggedTab == nil)

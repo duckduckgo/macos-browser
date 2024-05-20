@@ -34,6 +34,9 @@ struct PinnedTabView: View {
     var showsHover: Bool
 
     var body: some View {
+        if #available(macOS 12, *) {
+            let _ = Self._printChanges()
+        }
         let stack = ZStack {
             Button { [weak collectionModel, weak model] in
                 if !isSelected {
@@ -184,9 +187,27 @@ struct PinnedTabInnerView: View {
     var foregroundColor: Color
     var drawSeparator: Bool = true
 
+    init(foregroundColor: Color, drawSeparator: Bool) {
+        self.foregroundColor = foregroundColor
+        self.drawSeparator = drawSeparator
+    }
+
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var model: Tab
     @Environment(\.controlActiveState) private var controlActiveState
+    @Environment(\.scenePhase) private var scenePhase
+
+    private var willEnterFullScreenNotification = NotificationCenter.default.publisher(for: NSWindow.willEnterFullScreenNotification)
+    private var willExitFullScreenNotification = NotificationCenter.default.publisher(for: NSWindow.willExitFullScreenNotification)
+
+    private var becomeKeyNotification = NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)
+    private var resignKeyNotification = NotificationCenter.default.publisher(for: NSWindow.didResignKeyNotification)
+
+    private var becomeMainNotification = NotificationCenter.default.publisher(for: NSWindow.didBecomeMainNotification)
+    private var resignMainNotification = NotificationCenter.default.publisher(for: NSWindow.didResignMainNotification)
+
+    @State var isFullScreen = false
+    @State var isKey = true
 
     var body: some View {
         ZStack {
@@ -201,12 +222,44 @@ struct PinnedTabInnerView: View {
                 }
             }
             favicon
-                .grayscale(controlActiveState == .key ? 0.0 : 1.0)
-                .opacity(controlActiveState == .key ? 1.0 : 0.60)
+                .grayscale(isKey ? 0.0 : 1.0)
+                .opacity(isKey ? 1.0 : 0.60)
                 .frame(maxWidth: 16, maxHeight: 16)
                 .aspectRatio(contentMode: .fit)
         }
         .frame(width: PinnedTabView.Const.dimension)
+//        .onChange(of: controlActiveState, perform: { state in
+//            switch state {
+//            case .key: 
+//                print("~~~CONTROL STATE KEY")
+//            case .active:
+//                print("~~~CONTROL STATE ACTIVE")
+//            case .inactive:
+//                print("~~~CONTROL STATE INACTIVE")
+//            @unknown default:
+//                print("~~~CONTROL STATE UNKNOWN")
+//            }
+//        })
+//        .onReceive(willEnterFullScreenNotification, perform: { _ in
+//           // isFullScreen = true
+//        })
+//        .onReceive(willExitFullScreenNotification, perform: { _ in
+//           // isFullScreen = false
+//        })
+        .onReceive(becomeKeyNotification, perform: { _ in
+            print("~~~WINDOW IS KEY")
+            isKey = true
+        })
+        .onReceive(resignKeyNotification, perform: { _ in
+            print("~~~WINDOW IS NON KEY")
+            isKey = false
+        })
+//        .onReceive(becomeMainNotification, perform: { _ in
+//            print("~~~MAIN")
+//        })
+//        .onReceive(resignMainNotification, perform: { _ in
+//            print("~~~NON MAIN")
+//        })
     }
 
     @ViewBuilder
