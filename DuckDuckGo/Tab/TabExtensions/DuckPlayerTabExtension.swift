@@ -133,11 +133,11 @@ extension DuckPlayerTabExtension: NewWindowPolicyDecisionMaker {
 
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
         // if a link was clicked inside duckplayer (like a recommendation)
-        // and has target=_blank - then we want to prevent a new tab
-        // opening, and just load it inside the current one instead
+        // and has target=_blank, or a similar target that would cause a new tab, then we want to prevent that new tab
+        // from opening, and just load it inside the current one instead
         if navigationAction.targetFrame == nil,
            navigationAction.safeSourceFrame?.webView?.url?.isDuckPlayer == true,
-           navigationAction.request.url?.isYoutubeVideoRecommendation == true,
+           navigationAction.request.url?.isYoutubeVideoRecommendation == true || navigationAction.request.url?.isYoutubeVideo == true,
            let webView, let url = navigationAction.request.url {
             webView.load(URLRequest(url: url))
             return .cancel
