@@ -24,7 +24,7 @@ public final class DataBrokerRunCustomJSONViewController: NSViewController {
 
     public init(authenticationManager: DataBrokerProtectionAuthenticationManaging) {
         self.authenticationManager = authenticationManager
-        super.init()
+        super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
