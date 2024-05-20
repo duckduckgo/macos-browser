@@ -28,7 +28,7 @@ public protocol DataBrokerProtectionBackgroundActivityScheduler {
 }
 
 public protocol DataBrokerProtectionBackgroundActivitySchedulerDelegate: AnyObject {
-    func dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(_ activityScheduler: DataBrokerProtectionBackgroundActivityScheduler)
+    func dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(_ activityScheduler: DataBrokerProtectionBackgroundActivityScheduler, completion: (() -> Void)?)
 }
 
 public final class DefaultDataBrokerProtectionBackgroundActivityScheduler: DataBrokerProtectionBackgroundActivityScheduler {
@@ -52,8 +52,10 @@ public final class DefaultDataBrokerProtectionBackgroundActivityScheduler: DataB
 
             self.lastTriggerTimestamp = Date()
             os_log("Scheduler running...", log: .dataBrokerProtection)
-            self.delegate?.dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(self)
-            completion(.finished)
+            self.delegate?.dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(self) {
+                os_log("Scheduler finished...", log: .dataBrokerProtection)
+                completion(.finished)
+            }
         }
     }
 }

@@ -1102,7 +1102,7 @@ final class MockDataBrokerProtectionBackgroundActivityScheduler: DataBrokerProte
     }
 
     func triggerDelegateCall() {
-        delegate?.dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(self)
+        delegate?.dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(self, completion: nil)
     }
 }
 
