@@ -122,11 +122,7 @@ extension AppDelegate {
     }
 
     @objc func openReportBrokenSite(_ sender: Any?) {
-        let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
-        let privacyDashboardViewController = storyboard.instantiateController(identifier: "PrivacyDashboardViewController") { coder in
-            PrivacyDashboardViewController(coder: coder, privacyInfo: nil, dashboardMode: .report)
-        }
-
+        let privacyDashboardViewController = PrivacyDashboardViewController(privacyInfo: nil, dashboardMode: .report)
         privacyDashboardViewController.sizeDelegate = self
 
         let window = NSWindow(contentViewController: privacyDashboardViewController)
@@ -482,13 +478,16 @@ extension MainViewController {
         }
 
         let dateString = sender.dateString
+        let isToday = sender.isToday
         let visits = sender.getVisits()
         let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString)
         alert.beginSheetModal(for: window, completionHandler: { response in
             guard case .alertFirstButtonReturn = response else {
                 return
             }
-            FireCoordinator.fireViewModel.fire.burnVisits(of: visits, except: FireproofDomains.shared)
+            FireCoordinator.fireViewModel.fire.burnVisits(of: visits,
+                                                          except: FireproofDomains.shared,
+                                                          isToday: isToday)
         })
     }
 

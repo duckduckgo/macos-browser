@@ -189,7 +189,7 @@ final class FirePopoverViewModel {
     // MARK: - Burning
 
     func burn() {
-        PixelKit.fire(GeneralPixel.fireButtonFirstBurn, frequency: .daily)
+        PixelKit.fire(GeneralPixel.fireButtonFirstBurn, frequency: .legacyDaily)
 
         switch (clearingOption, areAllSelected) {
         case (.currentTab, _):

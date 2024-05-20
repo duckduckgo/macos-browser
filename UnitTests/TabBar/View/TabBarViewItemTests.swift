@@ -46,7 +46,6 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertEqual(menu.item(at: 1)?.title, UserText.pinTab)
         XCTAssertTrue(menu.item(at: 2)?.isSeparatorItem ?? false)
         XCTAssertEqual(menu.item(at: 3)?.title, UserText.fireproofSite)
-        XCTAssertEqual(menu.item(at: 4)?.title, UserText.bookmarkThisPage)
         XCTAssertTrue(menu.item(at: 5)?.isSeparatorItem ?? false)
         XCTAssertEqual(menu.item(at: 6)?.title, UserText.bookmarkAllTabs)
         XCTAssertTrue(menu.item(at: 7)?.isSeparatorItem ?? false)
@@ -80,6 +79,28 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertFalse(menu.item(at: 1)?.isSeparatorItem ?? true)
         XCTAssertEqual(menu.item(at: 2)?.title, UserText.unmuteTab)
         XCTAssertTrue(menu.item(at: 3)?.isSeparatorItem ?? false)
+    }
+
+    func testWhenURLIsNotBookmarkedThenBookmarkThisPageIsShown() {
+        // GIVEN
+        delegate.isTabBarItemAlreadyBookmarked = false
+
+        // WHEN
+        tabBarViewItem.menuNeedsUpdate(menu)
+
+        // THEN
+        XCTAssertEqual(menu.item(at: 4)?.title, UserText.bookmarkThisPage)
+    }
+
+    func testWhenURLIsBookmarkedThenDeleteBookmarkIsShown() {
+        // GIVEN
+        delegate.isTabBarItemAlreadyBookmarked = true
+
+        // WHEN
+        tabBarViewItem.menuNeedsUpdate(menu)
+
+        // THEN
+        XCTAssertEqual(menu.item(at: 4)?.title, UserText.deleteBookmark)
     }
 
     func testWhenOneTabCloseThenOtherTabsItemIsDisabled() {
@@ -257,6 +278,34 @@ final class TabBarViewItemTests: XCTestCase {
 
         // THEN
         XCTAssertTrue(delegate.tabBarViewItemBookmarkAllOpenTabsActionCalled)
+    }
+
+    func testWhenClickingOnBookmarkThisPageThenTheActionDelegateIsNotified() throws {
+        // GIVEN
+        delegate.isTabBarItemAlreadyBookmarked = false
+        tabBarViewItem.menuNeedsUpdate(menu)
+        let index = try XCTUnwrap(menu.indexOfItem(withTitle: UserText.bookmarkThisPage))
+        XCTAssertFalse(delegate.tabBarViewItemBookmarkThisPageActionCalled)
+
+        // WHEN
+        menu.performActionForItem(at: index)
+
+        // THEN
+        XCTAssertTrue(delegate.tabBarViewItemBookmarkThisPageActionCalled)
+    }
+
+    func testWhenClickingOnDeleteBookmarkThenTheActionDelegateIsNotified() throws {
+        // GIVEN
+        delegate.isTabBarItemAlreadyBookmarked = true
+        tabBarViewItem.menuNeedsUpdate(menu)
+        let index = try XCTUnwrap(menu.indexOfItem(withTitle: UserText.deleteBookmark))
+        XCTAssertFalse(delegate.tabBarViewItemRemoveBookmarkActionCalled)
+
+        // WHEN
+        menu.performActionForItem(at: index)
+
+        // THEN
+        XCTAssertTrue(delegate.tabBarViewItemRemoveBookmarkActionCalled)
     }
 
 }

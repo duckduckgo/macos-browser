@@ -28,14 +28,13 @@ protocol DataBrokerOperationsCollectionErrorDelegate: AnyObject {
                                         didErrorBeforeStartingBrokerOperations error: Error)
 }
 
+enum OperationType {
+    case manualScan
+    case optOut
+    case all
+}
+
 final class DataBrokerOperationsCollection: Operation {
-
-    enum OperationType {
-        case manualScan
-        case optOut
-        case all
-    }
-
     public var error: Error?
     public weak var errorDelegate: DataBrokerOperationsCollectionErrorDelegate?
 

@@ -17,13 +17,15 @@
 //
 
 import AppKit
+import BrowserServicesKit
 import Carbon.HIToolbox
 import Combine
 import Common
+import PixelKit
 import Suggestions
 import Subscription
-import BrowserServicesKit
 
+// swiftlint:disable:next type_body_length
 final class AddressBarTextField: NSTextField {
 
     var tabCollectionViewModel: TabCollectionViewModel! {
@@ -47,10 +49,6 @@ final class AddressBarTextField: NSTextField {
 
     private var isBurner: Bool {
         tabCollectionViewModel.isBurner
-    }
-
-    var isFirstResponder: Bool {
-        window?.firstResponder == currentEditor()
     }
 
     private var suggestionResultCancellable: AnyCancellable?
@@ -299,6 +297,25 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func navigate(suggestion: Suggestion?) {
+        let pixel: GeneralPixel? = {
+            switch suggestion {
+            case .phrase:
+                return .autocompleteClickPhrase
+            case .website:
+                return .autocompleteClickWebsite
+            case .bookmark(_, _, let isFavorite, _):
+                return isFavorite ? .autocompleteClickFavorite : .autocompleteClickBookmark
+            case .historyEntry:
+                return .autocompleteClickHistory
+            default:
+                return nil
+            }
+        }()
+
+        if let pixel {
+            PixelKit.fire(pixel)
+        }
+
         if NSApp.isCommandPressed {
             openNew(NSApp.isOptionPressed ? .window : .tab, selected: NSApp.isShiftPressed, suggestion: suggestion)
         } else {

@@ -45,12 +45,12 @@ extension TunnelControllerIPCClient: NetworkProtectionIPCClient {
 final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var networkProtectionPopover: NetworkProtectionPopover?
     let ipcClient: NetworkProtectionIPCClient
-    let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
+    let vpnUninstaller: VPNUninstalling
 
     init(ipcClient: TunnelControllerIPCClient,
-         networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling) {
+         vpnUninstaller: VPNUninstalling) {
         self.ipcClient = ipcClient
-        self.networkProtectionFeatureDisabler = networkProtectionFeatureDisabler
+        self.vpnUninstaller = vpnUninstaller
     }
 
     var isShown: Bool {
@@ -58,7 +58,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     }
 
     // swiftlint:disable:next function_body_length
-    func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) {
+    func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover {
         let popover = {
 
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
@@ -116,7 +116,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                                    userDefaults: .netP,
                                                    locationFormatter: DefaultVPNLocationFormatter(),
                                                    uninstallHandler: { [weak self] in
-                _ = await self?.networkProtectionFeatureDisabler.disable(uninstallSystemExtension: true)
+                _ = try? await self?.vpnUninstaller.uninstall(removeSystemExtension: true)
             })
             popover.delegate = delegate
 
@@ -125,6 +125,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         }()
 
         show(popover, positionedBelow: view)
+        return popover
     }
 
     private func show(_ popover: NSPopover, positionedBelow view: NSView) {
@@ -133,12 +134,14 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         popover.show(positionedBelow: view.bounds.insetFromLineOfDeath(flipped: view.isFlipped), in: view)
     }
 
-    func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) {
+    func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover? {
         if let networkProtectionPopover, networkProtectionPopover.isShown {
             networkProtectionPopover.close()
             self.networkProtectionPopover = nil
+
+            return nil
         } else {
-            show(positionedBelow: view, withDelegate: delegate)
+            return show(positionedBelow: view, withDelegate: delegate)
         }
     }
 
