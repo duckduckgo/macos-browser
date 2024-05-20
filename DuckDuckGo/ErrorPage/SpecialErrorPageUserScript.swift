@@ -1,5 +1,5 @@
 //
-//  SSLErrorPageUserScript.swift
+//  SpecialErrorPageUserScript.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,20 +19,20 @@
 import Foundation
 import UserScript
 
-final class SSLErrorPageUserScript: NSObject, Subfeature {
+final class SpecialErrorPageUserScript: NSObject, Subfeature {
     enum MessageName: String, CaseIterable {
         case leaveSite
         case visitSite
     }
 
     public let messageOriginPolicy: MessageOriginPolicy = .all
-    public let featureName: String = "sslErrorPage"
+    public let featureName: String = "specialErrorPage"
 
     var isEnabled: Bool = false
     var failingURL: URL?
 
     weak var broker: UserScriptMessageBroker?
-    weak var delegate: SSLErrorPageUserScriptDelegate?
+    weak var delegate: SpecialErrorPageUserScriptDelegate?
 
     func with(broker: UserScriptMessageBroker) {
         self.broker = broker
@@ -47,7 +47,7 @@ final class SSLErrorPageUserScript: NSObject, Subfeature {
         case .visitSite:
             return handleVisitSiteAction
         default:
-            assertionFailure("SSLErrorPageUserScript: Failed to parse User Script message: \(methodName)")
+            assertionFailure("SpecialErrorPageUserScript: Failed to parse User Script message: \(methodName)")
             return nil
         }
     }
@@ -71,7 +71,7 @@ final class SSLErrorPageUserScript: NSObject, Subfeature {
     }
 }
 
-protocol SSLErrorPageUserScriptDelegate: AnyObject {
+protocol SpecialErrorPageUserScriptDelegate: AnyObject {
     func leaveSite()
     func visitSite()
 }

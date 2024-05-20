@@ -86,8 +86,8 @@ extension Tab: NavigationResponder {
             // Tab Snapshots
             .weak(nullable: self.tabSnapshots),
 
-            // Error Page
-            .weak(nullable: self.errorPage),
+            // SSL Error Page
+            .weak(nullable: self.sslErrorPage),
 
             // Phishing Error Page
             .weak(nullable: self.phishingErrorPage),

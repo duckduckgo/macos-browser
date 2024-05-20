@@ -24,7 +24,7 @@ import ContentScopeScripts
 import BrowserServicesKit
 
 protocol PhishingErrorPageScriptProvider {
-    var phishingErrorPageUserScript: PhishingErrorPageUserScript? { get }
+    var phishingErrorPageUserScript: SpecialErrorPageUserScript? { get }
 }
 
 extension UserScripts: PhishingErrorPageScriptProvider {}
@@ -32,7 +32,7 @@ extension UserScripts: PhishingErrorPageScriptProvider {}
 final class PhishingErrorPageTabExtension {
     weak var webView: ErrorPageTabExtensionNavigationDelegate?
     private var urlCredentialCreator: URLCredentialCreating
-    private weak var phishingErrorPageUserScript: PhishingErrorPageUserScript?
+    private weak var phishingErrorPageUserScript: SpecialErrorPageUserScript?
     private var exemptionsList: [String] = ["about:blank", "https://duckduckgo.com"]
     private var featureFlagger: FeatureFlagger
     private var cancellables = Set<AnyCancellable>()
@@ -88,6 +88,22 @@ extension PhishingErrorPageTabExtension: NavigationResponder {
     }
 }
 
+extension PhishingErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
+    public func leaveSite() {
+        guard webView?.canGoBack == true else {
+            webView?.close()
+            return
+        }
+        _ = webView?.goBack()
+    }
+
+    public func visitSite() {
+        let urlString = webView?.url?.absoluteString
+        exemptionsList.append(urlString!)
+        _ = webView?.reloadPage()
+    }
+}
+
 protocol PhishingErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {}
 
 extension PhishingErrorPageTabExtension: TabExtension, PhishingErrorPageTabExtensionProtocol {
@@ -98,21 +114,5 @@ extension PhishingErrorPageTabExtension: TabExtension, PhishingErrorPageTabExten
 extension TabExtensions {
     var phishingErrorPage: PhishingErrorPageTabExtensionProtocol? {
         resolve(PhishingErrorPageTabExtension.self)
-    }
-}
-
-extension PhishingErrorPageTabExtension: PhishingErrorPageUserScriptDelegate {
-    func leaveSite() {
-        guard webView?.canGoBack == true else {
-            webView?.close()
-            return
-        }
-        _ = webView?.goBack()
-    }
-
-    func visitSite() {
-        let urlString = webView?.url?.absoluteString
-        exemptionsList.append(urlString!)
-        _ = webView?.reloadPage()
     }
 }

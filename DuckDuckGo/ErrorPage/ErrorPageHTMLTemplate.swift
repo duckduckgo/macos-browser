@@ -51,7 +51,7 @@ struct SSLErrorPageHTMLTemplate {
     let tld = TLD()
 
     static var htmlTemplatePath: String {
-        guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/sslerrorpage") else {
+        guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/specialerrorpage") else {
             assertionFailure("HTML template not found")
             return ""
         }
@@ -177,7 +177,7 @@ struct PhishingErrorPageHTMLTemplate {
     let tld = TLD()
 
     static var htmlTemplatePath: String {
-        guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/phishingerrorpage") else {
+        guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/specialerrorpage") else {
             assertionFailure("HTML template not found")
             return ""
         }

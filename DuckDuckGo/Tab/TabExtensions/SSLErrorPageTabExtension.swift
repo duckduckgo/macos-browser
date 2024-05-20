@@ -24,14 +24,14 @@ import ContentScopeScripts
 import BrowserServicesKit
 
 protocol SSLErrorPageScriptProvider {
-    var sslErrorPageUserScript: SSLErrorPageUserScript? { get }
+    var sslErrorPageUserScript: SpecialErrorPageUserScript? { get }
 }
 
 extension UserScripts: SSLErrorPageScriptProvider {}
 
 final class SSLErrorPageTabExtension {
     weak var webView: ErrorPageTabExtensionNavigationDelegate?
-    private weak var sslErrorPageUserScript: SSLErrorPageUserScript?
+    private weak var sslErrorPageUserScript: SpecialErrorPageUserScript?
     private var shouldBypassSSLError = false
     private var urlCredentialCreator: URLCredentialCreating
     private var featureFlagger: FeatureFlagger
@@ -116,7 +116,7 @@ extension SSLErrorPageTabExtension: NavigationResponder {
     }
 }
 
-extension SSLErrorPageTabExtension: SSLErrorPageUserScriptDelegate {
+extension SSLErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
     func leaveSite() {
         guard webView?.canGoBack == true else {
             webView?.close()
@@ -131,15 +131,15 @@ extension SSLErrorPageTabExtension: SSLErrorPageUserScriptDelegate {
     }
 }
 
-protocol ErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {}
+protocol SSLErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {}
 
-extension SSLErrorPageTabExtension: TabExtension, ErrorPageTabExtensionProtocol {
-    typealias PublicProtocol = ErrorPageTabExtensionProtocol
+extension SSLErrorPageTabExtension: TabExtension, SSLErrorPageTabExtensionProtocol {
+    typealias PublicProtocol = SSLErrorPageTabExtensionProtocol
     func getPublicProtocol() -> PublicProtocol { self }
 }
 
 extension TabExtensions {
-    var errorPage: ErrorPageTabExtensionProtocol? {
+    var sslErrorPage: SSLErrorPageTabExtensionProtocol? {
         resolve(SSLErrorPageTabExtension.self)
     }
 }

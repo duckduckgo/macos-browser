@@ -23,12 +23,12 @@ import UserScript
 
 final class SSLErrorPageUserScriptTests: XCTestCase {
 
-    var delegate: CapturingSSLErrorPageUserScriptDelegate!
-    var userScript: SSLErrorPageUserScript!
+    var delegate: CapturingSpecialErrorPageUserScriptDelegate!
+    var userScript: SpecialErrorPageUserScript!
 
     override func setUpWithError() throws {
-        delegate = CapturingSSLErrorPageUserScriptDelegate()
-        userScript = SSLErrorPageUserScript()
+        delegate = CapturingSpecialErrorPageUserScriptDelegate()
+        userScript = SpecialErrorPageUserScript()
         userScript.delegate = delegate
     }
 
@@ -38,7 +38,7 @@ final class SSLErrorPageUserScriptTests: XCTestCase {
     }
 
     func test_FeatureHasCorrectName() throws {
-        XCTAssertEqual(userScript.featureName, "sslErrorPage")
+        XCTAssertEqual(userScript.featureName, "specialErrorPage")
     }
 
     func test_BrokerIsCorrectlyAdded() throws {
@@ -108,7 +108,7 @@ final class SSLErrorPageUserScriptTests: XCTestCase {
 
 }
 
-class CapturingSSLErrorPageUserScriptDelegate: SSLErrorPageUserScriptDelegate {
+class CapturingSpecialErrorPageUserScriptDelegate: SpecialErrorPageUserScriptDelegate {
     var leaveSiteCalled = false
     var visitSiteCalled = false
 
