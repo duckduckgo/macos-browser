@@ -23,34 +23,44 @@ import Combine
 import ContentScopeScripts
 import BrowserServicesKit
 
-protocol SSLErrorPageScriptProvider {
-    var sslErrorPageUserScript: SpecialErrorPageUserScript? { get }
+protocol SpecialErrorPageScriptProvider {
+    var specialErrorPageUserScript: SpecialErrorPageUserScript? { get }
 }
 
-extension UserScripts: SSLErrorPageScriptProvider {}
+extension UserScripts: SpecialErrorPageScriptProvider {}
 
-final class SSLErrorPageTabExtension {
+enum ErrorType {
+    case phishing
+    case ssl
+}
+
+final class SpecialErrorPageTabExtension {
     weak var webView: ErrorPageTabExtensionNavigationDelegate?
-    private weak var sslErrorPageUserScript: SpecialErrorPageUserScript?
+    private weak var specialErrorPageUserScript: SpecialErrorPageUserScript?
     private var shouldBypassSSLError = false
     private var urlCredentialCreator: URLCredentialCreating
     private var featureFlagger: FeatureFlagger
+    private var phishingUrlExemptions: [String] = ["about:blank", "https://duckduckgo.com"]
+    private var detectionManager: PhishingDetectionManager
+    private var thisErrorType: ErrorType?
 
     private var cancellables = Set<AnyCancellable>()
 
     init(
         webViewPublisher: some Publisher<WKWebView, Never>,
-        scriptsPublisher: some Publisher<some SSLErrorPageScriptProvider, Never>,
+        scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
-        featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
+        featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
+        phishingDetectionManager: PhishingDetectionManager) {
+            self.detectionManager = phishingDetectionManager
             self.featureFlagger = featureFlagger
             self.urlCredentialCreator = urlCredentialCreator
             webViewPublisher.sink { [weak self] webView in
                 self?.webView = webView
             }.store(in: &cancellables)
             scriptsPublisher.sink { [weak self] scripts in
-                self?.sslErrorPageUserScript = scripts.sslErrorPageUserScript
-                self?.sslErrorPageUserScript?.delegate = self
+                self?.specialErrorPageUserScript = scripts.specialErrorPageUserScript
+                self?.specialErrorPageUserScript?.delegate = self
             }.store(in: &cancellables)
         }
 
@@ -60,6 +70,13 @@ final class SSLErrorPageTabExtension {
         let html = SSLErrorPageHTMLTemplate(domain: domain, errorCode: errorCode).makeHTMLFromTemplate()
         webView?.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
         loadHTML(html: html, url: url, alternate: alternate)
+    }
+    
+    @MainActor
+    private func loadPhishingErrorHTML(url: URL) {
+        let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
+        let html = PhishingErrorPageHTMLTemplate(domain: domain).makeHTMLFromTemplate()
+        webView?.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
     }
 
     @MainActor
@@ -79,7 +96,24 @@ final class SSLErrorPageTabExtension {
 
 }
 
-extension SSLErrorPageTabExtension: NavigationResponder {
+extension SpecialErrorPageTabExtension: NavigationResponder {
+    @MainActor
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        let urlString = navigationAction.url.absoluteString
+        if phishingUrlExemptions.contains(urlString) {
+            return .allow
+        }
+        // Check the URL
+        let isMalicious = await detectionManager.isMalicious(url: navigationAction.url)
+        if isMalicious {
+            thisErrorType = .phishing
+            specialErrorPageUserScript?.failingURL = navigationAction.url
+            loadPhishingErrorHTML(url: navigationAction.url)
+            return .cancel
+        }
+        return .allow
+    }
+
     @MainActor
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         let url = error.failingUrl ?? navigation.url
@@ -93,7 +127,8 @@ extension SSLErrorPageTabExtension: NavigationResponder {
             if featureFlagger.isFeatureOn(.sslCertificatesBypass),
                error.errorCode == NSURLErrorServerCertificateUntrusted,
                let errorCode = error.userInfo["_kCFStreamErrorCodeKey"] as? Int {
-                sslErrorPageUserScript?.failingURL = url
+                thisErrorType = .ssl
+                specialErrorPageUserScript?.failingURL = url
                 loadSSLErrorHTML(url: url, alternate: shouldPerformAlternateNavigation, errorCode: errorCode)
             }
         }
@@ -101,7 +136,7 @@ extension SSLErrorPageTabExtension: NavigationResponder {
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
-        sslErrorPageUserScript?.isEnabled = navigation.url == sslErrorPageUserScript?.failingURL
+        specialErrorPageUserScript?.isEnabled = navigation.url == specialErrorPageUserScript?.failingURL
     }
 
     @MainActor
@@ -116,7 +151,7 @@ extension SSLErrorPageTabExtension: NavigationResponder {
     }
 }
 
-extension SSLErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
+extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
     func leaveSite() {
         guard webView?.canGoBack == true else {
             webView?.close()
@@ -126,21 +161,26 @@ extension SSLErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
     }
 
     func visitSite() {
-        shouldBypassSSLError = true
+        if thisErrorType == .phishing {
+            let urlString = webView?.url?.absoluteString
+            phishingUrlExemptions.append(urlString!)
+        } else if thisErrorType == .ssl {
+            shouldBypassSSLError = true
+        }
         _ = webView?.reloadPage()
     }
 }
 
-protocol SSLErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {}
+protocol SpecialErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {}
 
-extension SSLErrorPageTabExtension: TabExtension, SSLErrorPageTabExtensionProtocol {
-    typealias PublicProtocol = SSLErrorPageTabExtensionProtocol
+extension SpecialErrorPageTabExtension: TabExtension, SpecialErrorPageTabExtensionProtocol {
+    typealias PublicProtocol = SpecialErrorPageTabExtensionProtocol
     func getPublicProtocol() -> PublicProtocol { self }
 }
 
 extension TabExtensions {
-    var sslErrorPage: SSLErrorPageTabExtensionProtocol? {
-        resolve(SSLErrorPageTabExtension.self)
+    var specialErrorPage: SpecialErrorPageTabExtensionProtocol? {
+        resolve(SpecialErrorPageTabExtension.self)
     }
 }
 

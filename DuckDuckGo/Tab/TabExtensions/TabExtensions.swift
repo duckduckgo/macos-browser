@@ -198,14 +198,9 @@ extension TabExtensionsBuilder {
         }
 
         add {
-            SSLErrorPageTabExtension(webViewPublisher: args.webViewFuture,
-                                  scriptsPublisher: userScripts.compactMap { $0 })
-        }
-
-        add {
-            PhishingErrorPageTabExtension(webViewPublisher: args.webViewFuture,
-                                          scriptsPublisher: userScripts.compactMap { $0 },
-                                          phishingDetectionManager: dependencies.phishingDetectionManager)
+            SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
+                                  scriptsPublisher: userScripts.compactMap { $0 },
+                                 phishingDetectionManager: dependencies.phishingDetectionManager)
         }
 
         if let tunnelController = dependencies.tunnelController {

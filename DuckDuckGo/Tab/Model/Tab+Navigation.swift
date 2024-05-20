@@ -86,11 +86,8 @@ extension Tab: NavigationResponder {
             // Tab Snapshots
             .weak(nullable: self.tabSnapshots),
 
-            // SSL Error Page
-            .weak(nullable: self.sslErrorPage),
-
-            // Phishing Error Page
-            .weak(nullable: self.phishingErrorPage),
+            // Special Error Page
+            .weak(nullable: self.specialErrorPage),
 
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder),
