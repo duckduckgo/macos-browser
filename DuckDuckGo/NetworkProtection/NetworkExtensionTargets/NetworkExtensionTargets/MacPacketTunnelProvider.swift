@@ -143,6 +143,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #endif
         let settings = VPNSettings(defaults: defaults)
 
+        // Update the VPN environment and match the Subscription environment
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        settings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
+
         switch event {
         case .userBecameActive:
             PixelKit.fire(
@@ -340,7 +346,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = AppVersion.shared.versionAndBuildNumber
 
         // MARK: - Configure Subscription
-        let settings = VPNSettings(defaults: defaults)
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
         let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
@@ -362,6 +367,11 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                                             entitlementsCache: entitlementsCache,
                                             subscriptionService: subscriptionService,
                                             authService: authService)
+
+        let settings = VPNSettings(defaults: defaults)
+
+        // Update the VPN environment and match the Subscription environment
+        settings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
 
         let entitlementsCheck = {
             await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)

@@ -122,6 +122,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     private let ipcClient: TunnelControllerIPCClient
     private let defaults: UserDefaults
     private let accountManager: AccountManaging
+    private let settings: VPNSettings
 
     init(defaults: UserDefaults = .netP,
          accountManager: AccountManaging) {
@@ -143,6 +144,16 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         // Force refresh just in case. A refresh is requested when the IPC client is created, but distributed notifications don't guarantee delivery
         // so we'll play it safe and add one more attempt.
         self.statusReporter.forceRefresh()
+
+        self.settings = VPNSettings(defaults: defaults)
+        updateSettings()
+    }
+
+    func updateSettings() {
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        settings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
     }
 
     @MainActor
@@ -289,8 +300,6 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
     func collectVPNSettingsState() -> VPNMetadata.VPNSettingsState {
-        let settings = VPNSettings(defaults: defaults)
-
         return .init(
             connectOnLoginEnabled: settings.connectOnLogin,
             includeAllNetworksEnabled: settings.includeAllNetworks,

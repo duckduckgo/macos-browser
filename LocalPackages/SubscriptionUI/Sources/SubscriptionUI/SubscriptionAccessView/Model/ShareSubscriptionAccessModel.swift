@@ -41,7 +41,7 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
 
     public func handleEmailAction() {
         let type = hasEmail ? SubscriptionURL.manageEmail : SubscriptionURL.addEmail
-        let url: URL = subscriptionManager.url(for: type)
+        let mailURL: URL = subscriptionManager.url(for: type)
 
         if hasEmail {
             actionHandlers.uiActionHandler(.postSubscriptionAddEmailClick)
@@ -58,7 +58,7 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
             }
 
             DispatchQueue.main.async {
-                self.actionHandlers.openURLHandler(url)
+                self.actionHandlers.openURLHandler(mailURL)
             }
         }
     }

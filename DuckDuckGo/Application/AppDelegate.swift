@@ -37,6 +37,7 @@ import Lottie
 import NetworkProtection
 import Subscription
 import NetworkProtectionIPC
+import DataBrokerProtection
 
 // @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -182,37 +183,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
         )
 
-        // MARK: - Configure Subscription
-        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
-        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
-        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        // Configure Subscription
+        subscriptionManager = SubscriptionManager()
 
-        vpnSettings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
+        // Update VPN environment and match the Subscription environment
+        vpnSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
 
-        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
-                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
-                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
-        let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
-        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
-                                        entitlementsCache: entitlementsCache,
-                                        subscriptionService: subscriptionService,
-                                        authService: authService)
-
-        if #available(macOS 12.0, *) {
-            let storePurchaseManager = StorePurchaseManager()
-            subscriptionManager = SubscriptionManager(storePurchaseManager: storePurchaseManager,
-                                                      accountManager: accountManager,
-                                                      subscriptionService: subscriptionService,
-                                                      authService: authService,
-                                                      subscriptionEnvironment: subscriptionEnvironment)
-        } else {
-            subscriptionManager = SubscriptionManager(accountManager: accountManager,
-                                                      subscriptionService: subscriptionService,
-                                                      authService: authService,
-                                                      subscriptionEnvironment: subscriptionEnvironment)
-        }
+        // Update DBP environment and match the Subscription environment
+        DataBrokerProtectionSettings().alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {

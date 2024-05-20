@@ -31,7 +31,6 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
     private let _delegate: DuckDuckGoDBPBackgroundAgentAppDelegate
     private let subscriptionManager: SubscriptionManaging
 
-    // swiftlint:disable:next function_body_length
     override init() {
         os_log(.error, log: .dbpBackgroundAgent, "🟢 DBP background Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
 
@@ -68,34 +67,8 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
             exit(0)
         }
 
-        // MARK: - Configure Subscription
-        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
-        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
-        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
-        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
-                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
-                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
-        let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
-        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
-                                        entitlementsCache: entitlementsCache,
-                                        subscriptionService: subscriptionService,
-                                        authService: authService)
-
-        if #available(macOS 12.0, *) {
-            let storePurchaseManager = StorePurchaseManager()
-            subscriptionManager = SubscriptionManager(storePurchaseManager: storePurchaseManager,
-                                                      accountManager: accountManager,
-                                                      subscriptionService: subscriptionService,
-                                                      authService: authService,
-                                                      subscriptionEnvironment: subscriptionEnvironment)
-        } else {
-            subscriptionManager = SubscriptionManager(accountManager: accountManager,
-                                                      subscriptionService: subscriptionService,
-                                                      authService: authService,
-                                                      subscriptionEnvironment: subscriptionEnvironment)
-        }
+        // Configure Subscription
+        subscriptionManager = SubscriptionManager()
 
         _delegate = DuckDuckGoDBPBackgroundAgentAppDelegate(subscriptionManager: subscriptionManager)
 
@@ -130,7 +103,7 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
 
         setupStatusBarMenu()
 
-        // Update environment
+        // Aligning the environment with the Subscription one
         settings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
     }
 

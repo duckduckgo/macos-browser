@@ -54,7 +54,7 @@ public final class DataBrokerProtectionManager {
     }()
 
     private init() {
-        self.authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager()
+        self.authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(subscriptionManager: Application.appDelegate.subscriptionManager)
     }
 
     public func isUserAuthenticated() -> Bool {

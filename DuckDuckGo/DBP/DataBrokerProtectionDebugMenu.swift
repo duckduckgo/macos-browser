@@ -316,7 +316,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func runCustomJSON() {
-        let authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager()
+        let authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(subscriptionManager: Application.appDelegate.subscriptionManager)
         let viewController = DataBrokerRunCustomJSONViewController(authenticationManager: authenticationManager)
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable],
@@ -375,25 +375,13 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         settings.showInMenuBar.toggle()
     }
 
-    @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
-        let title = menuItem.title
-        let selectedEnvironment: DataBrokerProtectionSettings.SelectedEnvironment
-
-        if title == EnvironmentTitle.staging.rawValue {
-            selectedEnvironment = .staging
-        } else {
-            selectedEnvironment = .production
-        }
-
-        settings.selectedEnvironment = selectedEnvironment
-    }
-
     // MARK: - Utility Functions
 
     private func populateDataBrokerProtectionEnvironmentListMenuItems() {
         environmentMenu.items = [
-            NSMenuItem(title: EnvironmentTitle.production.rawValue, action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
-            NSMenuItem(title: EnvironmentTitle.staging.rawValue, action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+            NSMenuItem(title: "⚠️ The environment can be set in the Subscription > Environment menu", action: nil, target: nil),
+            NSMenuItem(title: EnvironmentTitle.production.rawValue, action: nil, target: nil, keyEquivalent: ""),
+            NSMenuItem(title: EnvironmentTitle.staging.rawValue, action: nil, target: nil, keyEquivalent: ""),
         ]
     }
 
@@ -453,9 +441,10 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     private func updateEnvironmentMenu() {
         let selectedEnvironment = settings.selectedEnvironment
+        guard environmentMenu.items.count == 3 else { return }
 
-        environmentMenu.items.first?.state = selectedEnvironment == .production ? .on: .off
-        environmentMenu.items.last?.state = selectedEnvironment == .staging ? .on: .off
+        environmentMenu.items[1].state = selectedEnvironment == .production ? .on: .off
+        environmentMenu.items[2].state = selectedEnvironment == .staging ? .on: .off
     }
 
     private func updateShowStatusMenuIconMenu() {
