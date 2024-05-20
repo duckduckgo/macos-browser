@@ -27,7 +27,7 @@ public protocol DataBrokerProtectionSubscriptionManaging {
 }
 
 public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtectionSubscriptionManaging {
-    
+
     let subscriptionManager: SubscriptionManaging
 
     public var isUserAuthenticated: Bool {

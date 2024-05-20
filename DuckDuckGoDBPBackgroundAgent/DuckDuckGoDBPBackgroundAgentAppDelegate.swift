@@ -31,6 +31,7 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
     private let _delegate: DuckDuckGoDBPBackgroundAgentAppDelegate
     private let subscriptionManager: SubscriptionManaging
 
+    // swiftlint:disable:next function_body_length
     override init() {
         os_log(.error, log: .dbpBackgroundAgent, "🟢 DBP background Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
 
@@ -129,7 +130,7 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
 
         setupStatusBarMenu()
 
-        //Update environment
+        // Update environment
         settings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
     }
 
