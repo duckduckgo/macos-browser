@@ -418,7 +418,11 @@ extension HomePage.Models {
         // We ignore the `networkProtectionRemoteMessage` case here to avoid it getting accidentally included - it has special handling and will get
         // included elsewhere.
         static var allCases: [HomePage.Models.FeatureType] {
+#if APPSTORE
+            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .permanentSurvey]
+#else
             [.duckplayer, .emailProtection, .defaultBrowser, .dock, .importBookmarksAndPasswords, .permanentSurvey]
+#endif
         }
 
         case duckplayer
