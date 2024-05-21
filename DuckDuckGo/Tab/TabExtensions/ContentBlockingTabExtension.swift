@@ -157,7 +157,7 @@ extension ContentBlockingTabExtension: SurrogatesUserScriptDelegate {
     }
 
     func surrogatesUserScriptShouldProcessCTLTrackers(_ script: SurrogatesUserScript) -> Bool {
-        return fbBlockingEnabledProvider.fbBlockingEnabled
+        fbBlockingEnabledProvider.fbBlockingEnabled
     }
 
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedRequest, withSurrogate host: String) {

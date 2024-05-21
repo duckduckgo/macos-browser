@@ -50,7 +50,7 @@ final class FBProtectionTabExtension {
 
     @MainActor
     public func trackerDetected() {
-        self.clickToLoadUserScript?.displayClickToLoadPlaceholders()
+        clickToLoadUserScript?.displayClickToLoadPlaceholders()
     }
 }
 
@@ -61,11 +61,11 @@ extension FBProtectionTabExtension {
         let privacyConfiguration = privacyConfigurationManager.privacyConfig
 
         let featureEnabled = privacyConfiguration.isFeature(.clickToLoad, enabledForDomain: url.host)
-        enableFBProtection(enable: featureEnabled)
+        setFBProtection(enable: featureEnabled)
     }
 
     @discardableResult
-    private func enableFBProtection(enable: Bool) -> Bool {
+    private func setFBProtection(enable: Bool) -> Bool {
         if #unavailable(OSX 11) {  // disable CTL for Catalina and earlier
             return false
         }
@@ -103,7 +103,7 @@ extension FBProtectionTabExtension: ClickToLoadUserScriptDelegate {
             return true
         }
 
-        if enableFBProtection(enable: false) {
+        if setFBProtection(enable: false) {
             return true
         } else {
             return false
