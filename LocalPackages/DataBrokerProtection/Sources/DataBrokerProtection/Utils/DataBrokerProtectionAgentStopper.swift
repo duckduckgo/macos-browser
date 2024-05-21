@@ -20,8 +20,13 @@ import Foundation
 import Common
 
 protocol DataBrokerProtectionAgentStopper {
+    /// Validates if the user has profile data, is authenticated, and has valid entitlement. If any of these conditions are not met, the agent will be stopped.
     func validateRunPreRequisitesAndStopAgentIfNecessary() async
+
+    /// Monitors the entitlement package. If the entitlement check returns false, the agent will be stopped.
     func monitorEntitlementAndStopAgentIfNecessary()
+
+    /// Stops the agent
     func stopAgent()
 }
 
