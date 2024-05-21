@@ -51,10 +51,11 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
         ipcClient.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    public func scanAllBrokers(showWebView: Bool,
-                               completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+    public func startManualScan(showWebView: Bool,
+                                startTime: Date,
+                                completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         let completion = completion ?? { _ in }
-        ipcClient.scanAllBrokers(showWebView: showWebView, completion: completion)
+        ipcClient.startManualScan(showWebView: showWebView, startTime: startTime, completion: completion)
     }
 
     public func runQueuedOperations(showWebView: Bool,

@@ -23,7 +23,7 @@ import BrowserServicesKit
 import Common
 
 protocol DBPUIScanOps: AnyObject {
-    func startScan() -> Bool
+    func startScan(startDate: Date) -> Bool
     func updateCacheWithCurrentScans() async
     func getBackgroundAgentMetadata() async -> DBPBackgroundAgentMetadata?
 }
@@ -74,8 +74,8 @@ final class DBPUIViewModel {
 }
 
 extension DBPUIViewModel: DBPUIScanOps {
-    func startScan() -> Bool {
-        scheduler.scanAllBrokers()
+    func startScan(startDate: Date) -> Bool {
+        scheduler.startManualScan(startTime: startDate)
         return true
     }
 

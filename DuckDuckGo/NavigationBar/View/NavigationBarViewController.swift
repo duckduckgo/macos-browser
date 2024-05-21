@@ -198,7 +198,8 @@ final class NavigationBarViewController: NSViewController {
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel,
-                                                                      isBurner: isBurner) else {
+                                                                      isBurner: isBurner,
+                                                                      popovers: popovers) else {
             fatalError("NavigationBarViewController: Failed to init AddressBarViewController")
         }
 
@@ -275,13 +276,11 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
-        popovers.bookmarksButtonPressed(anchorView: bookmarkListButton,
-                                        popoverDelegate: self,
-                                        tab: tabCollectionViewModel.selectedTabViewModel?.tab)
+        popovers.bookmarksButtonPressed(bookmarkListButton, popoverDelegate: self, tab: tabCollectionViewModel.selectedTabViewModel?.tab)
     }
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
-        popovers.passwordManagementButtonPressed(usingView: passwordManagementButton, withDelegate: self)
+        popovers.passwordManagementButtonPressed(passwordManagementButton, withDelegate: self)
     }
 
     @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
@@ -289,43 +288,12 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func toggleNetworkProtectionPopover() {
-        let featureVisibility = DefaultNetworkProtectionVisibility()
-        guard featureVisibility.isNetworkProtectionBetaVisible() else {
-            featureVisibility.disableForWaitlistUsers()
-            LocalPinningManager.shared.unpin(.networkProtection)
+        guard DefaultSubscriptionFeatureAvailability().isFeatureAvailable,
+              NetworkProtectionKeychainTokenStore().isFeatureActivated else {
             return
         }
 
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-            let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
-
-            if accountManager.accessToken != nil && (try? networkProtectionTokenStorage.fetchToken()) == nil {
-                print("[NetP Subscription] Got access token but not auth token, meaning token exchange failed")
-                return
-            }
-        }
-
-        // Note: the following code is quite contrived but we're aiming to hotfix issues without mixing subscription and
-        // waitlist logic.  This should be cleaned up once waitlist can safely be removed.
-
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-                popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
-            }
-        } else {
-            // 1. If the user is on the waitlist but hasn't been invited or accepted terms and conditions, show the waitlist screen.
-            // 2. If the user has no waitlist state but has an auth token, show the NetP popover.
-            // 3. If the user has no state of any kind, show the waitlist screen.
-
-            if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
-                NetworkProtectionWaitlistViewControllerPresenter.show()
-            } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-                popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
-            } else {
-                NetworkProtectionWaitlistViewControllerPresenter.show()
-            }
-        }
+        popovers.toggleNetworkProtectionPopover(from: networkProtectionButton, withDelegate: networkProtectionButtonModel)
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
@@ -497,19 +465,15 @@ final class NavigationBarViewController: NSViewController {
             setDownloadButtonHidingTimer()
         }
 
-        popovers.toggleDownloadsPopover(usingView: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
+        popovers.toggleDownloadsPopover(from: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
     }
 
     func showPasswordManagerPopover(selectedCategory: SecureVaultSorting.Category?) {
-        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory,
-                                               usingView: passwordManagementButton,
-                                               withDelegate: self)
+        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory, from: passwordManagementButton, withDelegate: self)
     }
 
     func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount) {
-        popovers.showPasswordManagerPopover(selectedWebsiteAccount: selectedWebsiteAccount,
-                                                     usingView: passwordManagementButton,
-                                                     withDelegate: self)
+        popovers.showPasswordManagerPopover(selectedWebsiteAccount: selectedWebsiteAccount, from: passwordManagementButton, withDelegate: self)
     }
 
     private func setupNavigationButtonMenus() {
@@ -610,7 +574,7 @@ final class NavigationBarViewController: NSViewController {
         }
 
         let heightChange: () -> Void
-        if animated && view.window != nil {
+        if animated, let window = view.window, window.isVisible == true {
             heightChange = {
                 NSAnimationContext.runAnimationGroup { ctx in
                     ctx.duration = 0.1
@@ -632,49 +596,57 @@ final class NavigationBarViewController: NSViewController {
                 performResize()
             }
         }
-        if view.window == nil {
-            // update synchronously for off-screen view
-            heightChange()
-        } else {
+        if let window = view.window, window.isVisible {
             let dispatchItem = DispatchWorkItem(block: heightChange)
             DispatchQueue.main.async(execute: dispatchItem)
             self.heightChangeAnimation = dispatchItem
+        } else {
+            // update synchronously for off-screen view
+            heightChange()
         }
     }
 
     private func subscribeToDownloads() {
+        // show Downloads button on download completion for downloads started from non-Fire window
         downloadListCoordinator.updates
-            .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] update in
-                guard let self else { return }
+            .filter { update in
+                // filter download completion events only
+                !update.item.isBurner && update.isDownloadCompletedUpdate
+            }
+            .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] _ in
+                guard let self, !self.isDownloadsPopoverShown,
+                      DownloadsPreferences.shared.shouldOpenPopupOnCompletion,
+                      WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window else { return }
 
-                if case .updated(let oldValue) = update.kind,
-                    DownloadsPreferences.shared.shouldOpenPopupOnCompletion,
-                    update.item.destinationURL != nil,
-                    update.item.tempURL == nil,
-                    oldValue.tempURL != nil, // download finished
-                    !update.item.isBurner,
-                    WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window {
-
-                    self.popovers.showDownloadsPopoverAndAutoHide(usingView: downloadsButton,
-                                                                  popoverDelegate: self,
-                                                                  downloadsDelegate: self)
-                } else if update.item.isBurner {
-                    invalidateDownloadButtonHidingTimer()
-                    updateDownloadsButton(updatingFromPinnedViewsNotification: false)
-                }
-                updateDownloadsButton()
+                self.popovers.showDownloadsPopoverAndAutoHide(from: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
             }
             .store(in: &downloadsCancellables)
+
+        // update Downloads button visibility and state
+        downloadListCoordinator.updates
+            .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] _ in
+                self?.updateDownloadsButton()
+            }
+            .store(in: &downloadsCancellables)
+
+        // update Downloads button total progress indicator
         downloadListCoordinator.progress.publisher(for: \.totalUnitCount)
             .combineLatest(downloadListCoordinator.progress.publisher(for: \.completedUnitCount))
-            .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .map { (total, completed) -> Double? in
                 guard total > 0, completed < total else { return nil }
                 return Double(completed) / Double(total)
             }
+            .dropFirst()
+            .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak downloadsProgressView] progress in
-                downloadsProgressView?.setProgress(progress, animated: true)
+                guard let downloadsProgressView else { return }
+                if progress == nil, downloadsProgressView.progress != 1 {
+                    // show download completed animation before hiding
+                    downloadsProgressView.setProgress(1, animated: true)
+                }
+                downloadsProgressView.setProgress(progress, animated: true)
             }
             .store(in: &downloadsCancellables)
     }
@@ -693,7 +665,7 @@ final class NavigationBarViewController: NSViewController {
         passwordManagementButton.menu = menu
         passwordManagementButton.toolTip = UserText.autofillShortcutTooltip
 
-        let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
+        let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.userEditableUrl
 
         passwordManagementButton.image = .passwordManagement
 
@@ -709,7 +681,7 @@ final class NavigationBarViewController: NSViewController {
         if LocalPinningManager.shared.isPinned(.autofill) {
             passwordManagementButton.isHidden = false
         } else {
-            passwordManagementButton.isHidden = !popovers.isPasswordManagementPopoverShown && !isAutoFillAutosaveMessageVisible
+            passwordManagementButton.isShown = popovers.isPasswordManagementPopoverShown || isAutoFillAutosaveMessageVisible
         }
 
         popovers.passwordManagementDomain = nil
@@ -750,37 +722,42 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
-        let menu = NSMenu()
-        let title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
-        menu.addItem(withTitle: title, action: #selector(toggleDownloadsPanelPinning(_:)), keyEquivalent: "")
-
-        downloadsButton.menu = menu
+        downloadsButton.menu = NSMenu {
+            NSMenuItem(title: LocalPinningManager.shared.shortcutTitle(for: .downloads),
+                       action: #selector(toggleDownloadsPanelPinning(_:)),
+                       keyEquivalent: "")
+        }
         downloadsButton.toolTip = UserText.downloadsShortcutTooltip
 
         if LocalPinningManager.shared.isPinned(.downloads) {
-            downloadsButton.isHidden = false
+            downloadsButton.isShown = true
             return
         }
 
         let hasActiveDownloads = downloadListCoordinator.hasActiveDownloads
         downloadsButton.image = hasActiveDownloads ? .downloadsActive : .downloads
+
+        if downloadListCoordinator.isEmpty {
+            invalidateDownloadButtonHidingTimer()
+        }
         let isTimerActive = downloadsButtonHidingTimer != nil
 
-        if popovers.isDownloadsPopoverShown {
-            downloadsButton.isHidden = false
+        downloadsButton.isShown = if popovers.isDownloadsPopoverShown {
+            true
         } else {
-            downloadsButton.isHidden = !(hasActiveDownloads || isTimerActive)
+            hasActiveDownloads || isTimerActive
         }
 
-        if !downloadsButton.isHidden { setDownloadButtonHidingTimer() }
-        downloadsButton.isMouseDown = popovers.isDownloadsPopoverShown
+        if downloadsButton.isShown {
+            setDownloadButtonHidingTimer()
+        }
 
         // If the user has selected Hide Downloads from the navigation bar context menu, and no downloads are active, then force it to be hidden
         // even if the timer is active.
         if updatingFromPinnedViewsNotification {
             if !LocalPinningManager.shared.isPinned(.downloads) {
                 invalidateDownloadButtonHidingTimer()
-                downloadsButton.isHidden = !hasActiveDownloads
+                downloadsButton.isShown = hasActiveDownloads
             }
         }
     }
@@ -946,14 +923,8 @@ extension NavigationBarViewController: NSMenuDelegate {
     // MARK: - VPN
 
     func showNetworkProtectionStatus() {
-        let featureVisibility = DefaultNetworkProtectionVisibility()
-
-        if featureVisibility.isNetworkProtectionBetaVisible() {
-            popovers.showNetworkProtectionPopover(positionedBelow: networkProtectionButton,
-                                                  withDelegate: networkProtectionButtonModel)
-        } else {
-            featureVisibility.disableForWaitlistUsers()
-        }
+        popovers.showNetworkProtectionPopover(positionedBelow: networkProtectionButton,
+                                              withDelegate: networkProtectionButtonModel)
     }
 
     /// Sets up the VPN button.
@@ -1011,10 +982,13 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
     }
 
+    func optionsButtonMenuRequestedBookmarkAllOpenTabs(_ sender: NSMenuItem) {
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
+    }
+
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
-        popovers.showBookmarkListPopover(usingView: bookmarkListButton,
-                                         withDelegate: self,
-                                         forTab: tabCollectionViewModel.selectedTabViewModel?.tab)
+        popovers.showBookmarkListPopover(from: bookmarkListButton, withDelegate: self, forTab: tabCollectionViewModel.selectedTabViewModel?.tab)
     }
 
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu) {
@@ -1030,9 +1004,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category) {
-        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory,
-                                               usingView: passwordManagementButton,
-                                               withDelegate: self)
+        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory, from: passwordManagementButton, withDelegate: self)
     }
 
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
@@ -1053,6 +1025,10 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu) {
         WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
+    }
+
+    func optionsButtonMenuRequestedAccessibilityPreferences(_ menu: NSMenu) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .accessibility)
     }
 
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {

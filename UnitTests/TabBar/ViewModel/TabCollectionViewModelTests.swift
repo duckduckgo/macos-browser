@@ -222,6 +222,16 @@ final class TabCollectionViewModelTests: XCTestCase {
 
     // MARK: - Insert
 
+    func testWhenInsertNewTabIsCalledThenNewTabIsAlsoSelected() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: .unpinned(0))
+        XCTAssertNotNil(tabCollectionViewModel.selectedTabViewModel)
+        tabCollectionViewModel.insertNewTab(after: tabCollectionViewModel.selectedTabViewModel!.tab)
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
+    }
+
     func testWhenInsertChildAndParentIsntPartOfTheTabCollection_ThenNoChildIsInserted() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
@@ -275,6 +285,28 @@ final class TabCollectionViewModelTests: XCTestCase {
         XCTAssert(tab === tabCollectionViewModel.tabViewModel(at: 2)?.tab)
     }
 
+    // MARK: - Insert or Append
+
+    func testWhenInsertOrAppendCalledPreferencesAreRespected() {
+        let persistor = MockTabsPreferencesPersistor()
+        var tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection(), pinnedTabsManager: PinnedTabsManager(),
+                                                            tabsPreferences: TabsPreferences(persistor: persistor))
+
+        let index = tabCollectionViewModel.tabCollection.tabs.count
+        tabCollectionViewModel.insertOrAppendNewTab()
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: index))
+
+        persistor.newTabPosition = .nextToCurrent
+        tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection(), pinnedTabsManager: PinnedTabsManager(),
+                                                        tabsPreferences: TabsPreferences(persistor: persistor))
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: .unpinned(0))
+        XCTAssertNotNil(tabCollectionViewModel.selectedTabViewModel)
+        tabCollectionViewModel.insertOrAppendNewTab()
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
+    }
+
     // MARK: - Remove
 
     func testWhenRemoveIsCalledWithIndexOutOfBoundsThenNoTabIsRemoved() {
@@ -316,6 +348,71 @@ final class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.removeAllTabs(except: 0)
 
         XCTAssertEqual(firstTab, tabCollectionViewModel.selectedTabViewModel?.tab)
+    }
+
+    func testWhenTabsToTheLeftAreRemovedAndSelectionIsRemoved_ThenSelectionIsCorrectlyUpdated() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+
+        tabCollectionViewModel.select(at: .unpinned(1))
+        tabCollectionViewModel.removeTabs(before: 2)
+
+        XCTAssertEqual(tabCollectionViewModel.selectionIndex?.item, 0)
+    }
+
+    func testWhenTabsToTheLeftAreRemovedAndSelectionRemains_ThenSelectionIsCorrectlyUpdated() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: .unpinned(3))
+        tabCollectionViewModel.removeTabs(before: 3)
+
+        XCTAssertEqual(tabCollectionViewModel.selectionIndex?.item, 0)
+    }
+
+    func testWhenTabsToTheLeftAreRemovedAndSelectionRemainsAndIsToTheRight_ThenSelectionIsCorrectlyUpdated() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: .unpinned(4))
+        tabCollectionViewModel.removeTabs(before: 2)
+
+        XCTAssertEqual(tabCollectionViewModel.selectionIndex?.item, 2)
+    }
+
+    func testWhenTabsToTheRightAreRemovedAndSelectionIsRemoved_ThenSelectionIsCorrectlyUpdated() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+
+        tabCollectionViewModel.select(at: .unpinned(1))
+        tabCollectionViewModel.removeTabs(after: 0)
+
+        XCTAssertEqual(tabCollectionViewModel.selectionIndex?.item, 0)
+    }
+
+    func testWhenTabsToTheRightAreRemovedAndSelectionRemains_ThenSelectionIsCorrectlyUpdated() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: .unpinned(1))
+        tabCollectionViewModel.removeTabs(after: 1)
+
+        XCTAssertEqual(tabCollectionViewModel.selectionIndex?.item, 1)
     }
 
     func testWhenLastTabIsRemoved_ThenSelectionIsNil() {
@@ -425,6 +522,79 @@ final class TabCollectionViewModelTests: XCTestCase {
         XCTAssertEqual(events.count, 1)
         XCTAssertIdentical(events[0], tabCollectionViewModel.selectedTabViewModel)
     }
+
+    // MARK: - Bookmark All Open Tabs
+
+    func testWhenOneEmptyTabOpenThenCanBookmarkAllOpenTabsIsFalse() throws {
+        // GIVEN
+        let sut = TabCollectionViewModel.aTabCollectionViewModel()
+        let firstTabViewModel = try XCTUnwrap(sut.tabViewModel(at: 0))
+        XCTAssertEqual(sut.tabViewModels.count, 1)
+        XCTAssertEqual(firstTabViewModel.tabContent, .newtab)
+
+        // WHEN
+        let result = sut.canBookmarkAllOpenTabs()
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenOneURLTabOpenThenCanBookmarkAllOpenTabsIsFalse() throws {
+        // GIVEN
+        let sut = TabCollectionViewModel.aTabCollectionViewModel()
+        sut.replaceTab(at: .unpinned(0), with: .init(content: .url(.duckDuckGo, credential: nil, source: .ui)))
+        let firstTabViewModel = try XCTUnwrap(sut.tabViewModel(at: 0))
+        XCTAssertEqual(sut.tabViewModels.count, 1)
+        XCTAssertEqual(firstTabViewModel.tabContent, .url(.duckDuckGo, credential: nil, source: .ui))
+
+        // WHEN
+        let result = sut.canBookmarkAllOpenTabs()
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenOneURLTabAndOnePinnedTabOpenThenCanBookmarkAllOpenTabsIsFalse() {
+        // GIVEN
+        let sut = TabCollectionViewModel.aTabCollectionViewModel()
+        sut.replaceTab(at: .unpinned(0), with: .init(content: .url(.duckDuckGo, credential: nil, source: .ui)))
+        sut.append(tab: .init(content: .url(.duckDuckGoEmail, credential: nil, source: .ui)))
+        sut.pinTab(at: 0)
+        XCTAssertEqual(sut.pinnedTabs.count, 1)
+        XCTAssertEqual(sut.tabViewModels.count, 1)
+
+        // WHEN
+        let result = sut.canBookmarkAllOpenTabs()
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenAtLeastTwoURLTabsOpenThenCanBookmarkAllOpenTabsIsTrue() {
+        // GIVEN
+        let sut = TabCollectionViewModel.aTabCollectionViewModel()
+        let pinnedTab = Tab(content: .url(.aboutDuckDuckGo, credential: nil, source: .ui))
+        sut.append(tabs: [
+            pinnedTab,
+            .init(content: .url(.duckDuckGo, credential: nil, source: .ui)),
+            .init(content: .newtab),
+            .init(content: .bookmarks),
+            .init(content: .anySettingsPane),
+            .init(content: .url(.duckDuckGoEmail, credential: nil, source: .ui)),
+        ])
+        sut.pinTab(at: 1)
+        XCTAssertEqual(sut.pinnedTabs.count, 1)
+        XCTAssertEqual(sut.tabViewModels.count, 6)
+        XCTAssertEqual(sut.pinnedTabs.first, pinnedTab)
+        XCTAssertNil(sut.tabViewModels[pinnedTab])
+
+        // WHEN
+        let result = sut.canBookmarkAllOpenTabs()
+
+        // THEN
+        XCTAssertTrue(result)
+    }
+
 }
 
 fileprivate extension TabCollectionViewModel {

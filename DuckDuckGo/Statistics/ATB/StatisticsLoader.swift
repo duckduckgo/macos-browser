@@ -30,14 +30,14 @@ final class StatisticsLoader {
 
     private let statisticsStore: StatisticsStore
     private let emailManager: EmailManager
-    private let attributionPixelHandler: AttributionsPixelHandler
+    private let attributionPixelHandler: InstallationAttributionsPixelHandler
     private let parser = AtbParser()
     private var isAppRetentionRequestInProgress = false
 
     init(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
         emailManager: EmailManager = EmailManager(),
-        attributionPixelHandler: AttributionsPixelHandler = InstallationAttributionPixelHandler()
+        attributionPixelHandler: InstallationAttributionsPixelHandler = AppInstallationAttributionPixelHandler()
     ) {
         self.statisticsStore = statisticsStore
         self.emailManager = emailManager
@@ -62,6 +62,7 @@ final class StatisticsLoader {
                 }
                 PixelKit.fire(GeneralPixel.serp)
                 self.fireDailyOsVersionCounterPixel()
+                self.fireDockPixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)
             } else {
@@ -228,6 +229,15 @@ final class StatisticsLoader {
             PixelKit.fire(GeneralPixel.dailyOsVersionCounter,
                           frequency: .legacyDaily,
                           includeAppVersionParameter: false)
+        }
+    }
+
+    private func fireDockPixel() {
+        DispatchQueue.global().asyncAfter(deadline: .now() + Double.random(in: 0.5...5)) {
+            if DockCustomizer().isAddedToDock {
+                PixelKit.fire(GeneralPixel.serpAddedToDock,
+                              includeAppVersionParameter: false)
+            }
         }
     }
 

@@ -31,7 +31,7 @@ final class LoadingProgressView: NSView, CAAnimationDelegate {
     private var targetProgress: Double = 0.0
     private var targetTime: CFTimeInterval = 0.0
 
-    var isShown: Bool {
+    var isProgressShown: Bool {
         progressMask.opacity == 1.0
     }
 

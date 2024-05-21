@@ -18,38 +18,33 @@
 
 import AppKit
 import Foundation
-import Subscription
+import BrowserServicesKit
 import PixelKit
 
 final class WaitlistThankYouPromptPresenter {
 
     private enum Constants {
         static let didShowThankYouPromptKey = "duckduckgo.macos.browser.did-show-thank-you-prompt"
-        static let didDismissVPNCardKey = "duckduckgo.macos.browser.did-dismiss-vpn-card"
         static let didDismissPIRCardKey = "duckduckgo.macos.browser.did-dismiss-pir-card"
     }
 
-    private let isVPNBetaTester: () -> Bool
     private let isPIRBetaTester: () -> Bool
     private let userDefaults: UserDefaults
 
     convenience init() {
-        self.init(isVPNBetaTester: {
-            return DefaultNetworkProtectionVisibility().isEligibleForThankYouMessage
-        }, isPIRBetaTester: {
+        self.init(isPIRBetaTester: {
             return DefaultDataBrokerProtectionFeatureVisibility().isEligibleForThankYouMessage()
         })
     }
 
-    init(isVPNBetaTester: @escaping () -> Bool, isPIRBetaTester: @escaping () -> Bool, userDefaults: UserDefaults = .standard) {
-        self.isVPNBetaTester = isVPNBetaTester
+    init(isPIRBetaTester: @escaping () -> Bool, userDefaults: UserDefaults = .standard) {
         self.isPIRBetaTester = isPIRBetaTester
         self.userDefaults = userDefaults
     }
 
     // MARK: - Presentation
 
-    // Presents a Thank You prompt to testers of the VPN or PIR.
+    // Presents a Thank You prompt to testers of PIR.
     // If the user tested both, the PIR prompt will be displayed.
     @MainActor
     func presentThankYouPromptIfNecessary(in window: NSWindow) {
@@ -67,19 +62,6 @@ final class WaitlistThankYouPromptPresenter {
             saveDidShowPromptCheck()
             PixelKit.fire(PrivacyProPixel.privacyProBetaUserThankYouDBP, frequency: .dailyAndCount)
             presentPIRThankYouPrompt(in: window)
-        } else if isVPNBetaTester() {
-            saveDidShowPromptCheck()
-            PixelKit.fire(PrivacyProPixel.privacyProBetaUserThankYouVPN, frequency: .dailyAndCount)
-            presentVPNThankYouPrompt(in: window)
-        }
-    }
-
-    @MainActor
-    func presentVPNThankYouPrompt(in window: NSWindow) {
-        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .vpn)
-        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
-        if let thankYouWindow = thankYouWindowController.window {
-            window.beginSheet(thankYouWindow)
         }
     }
 
@@ -93,14 +75,6 @@ final class WaitlistThankYouPromptPresenter {
     }
 
     // MARK: - Eligibility
-
-    var canShowVPNCard: Bool {
-        guard !self.userDefaults.bool(forKey: Constants.didDismissVPNCardKey) else {
-            return false
-        }
-
-        return isVPNBetaTester()
-    }
 
     var canShowPIRCard: Bool {
         guard !self.userDefaults.bool(forKey: Constants.didDismissPIRCardKey) else {
@@ -116,10 +90,6 @@ final class WaitlistThankYouPromptPresenter {
 
     // MARK: - Dismissal
 
-    func didDismissVPNThankYouCard() {
-        self.userDefaults.setValue(true, forKey: Constants.didDismissVPNCardKey)
-    }
-
     func didDismissPIRThankYouCard() {
         self.userDefaults.setValue(true, forKey: Constants.didDismissPIRCardKey)
     }
@@ -132,7 +102,6 @@ final class WaitlistThankYouPromptPresenter {
 
     func resetPromptCheck() {
         self.userDefaults.removeObject(forKey: Constants.didShowThankYouPromptKey)
-        self.userDefaults.removeObject(forKey: Constants.didDismissVPNCardKey)
         self.userDefaults.removeObject(forKey: Constants.didDismissPIRCardKey)
     }
 

@@ -24,12 +24,14 @@ protocol WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
               stageCalculator: StageDurationCalculator,
+              pixelHandler: EventMapping<DataBrokerProtectionPixels>,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile]
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
                 stageCalculator: StageDurationCalculator,
+                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws
 }
@@ -38,10 +40,12 @@ extension WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
               stageCalculator: StageDurationCalculator,
+              pixelHandler: EventMapping<DataBrokerProtectionPixels>,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
 
         try await scan(profileQuery,
                        stageCalculator: stageCalculator,
+                       pixelHandler: pixelHandler,
                        showWebView: false,
                        shouldRunNextStep: shouldRunNextStep)
     }
@@ -49,11 +53,13 @@ extension WebOperationRunner {
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
                 stageCalculator: StageDurationCalculator,
+                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
 
         try await optOut(profileQuery: profileQuery,
                          extractedProfile: extractedProfile,
                          stageCalculator: stageCalculator,
+                         pixelHandler: pixelHandler,
                          showWebView: false,
                          shouldRunNextStep: shouldRunNextStep)
     }
@@ -78,8 +84,10 @@ final class DataBrokerOperationRunner: WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
               stageCalculator: StageDurationCalculator,
+              pixelHandler: EventMapping<DataBrokerProtectionPixels>,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
+        let sleepObserver = DataBrokerProtectionSleepObserver(brokerProfileQueryData: profileQuery)
         let scan = ScanOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
@@ -87,6 +95,8 @@ final class DataBrokerOperationRunner: WebOperationRunner {
             emailService: emailService,
             captchaService: captchaService,
             stageDurationCalculator: stageCalculator,
+            pixelHandler: pixelHandler,
+            sleepObserver: sleepObserver,
             shouldRunNextStep: shouldRunNextStep
         )
         return try await scan.run(inputValue: (), showWebView: showWebView)
@@ -95,8 +105,10 @@ final class DataBrokerOperationRunner: WebOperationRunner {
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
                 stageCalculator: StageDurationCalculator,
+                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
+        let sleepObserver = DataBrokerProtectionSleepObserver(brokerProfileQueryData: profileQuery)
         let optOut = OptOutOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
@@ -104,6 +116,8 @@ final class DataBrokerOperationRunner: WebOperationRunner {
             emailService: emailService,
             captchaService: captchaService,
             stageCalculator: stageCalculator,
+            pixelHandler: pixelHandler,
+            sleepObserver: sleepObserver,
             shouldRunNextStep: shouldRunNextStep
         )
         try await optOut.run(inputValue: extractedProfile, showWebView: showWebView)

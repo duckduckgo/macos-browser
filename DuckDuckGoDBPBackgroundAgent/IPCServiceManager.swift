@@ -84,10 +84,11 @@ extension IPCServiceManager: IPCServerInterface {
         }
     }
 
-    func scanAllBrokers(showWebView: Bool,
-                        completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
+    func startManualScan(showWebView: Bool,
+                         startTime: Date,
+                         completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         pixelHandler.fire(.ipcServerScanAllBrokersReceivedByAgent)
-        scheduler.scanAllBrokers(showWebView: showWebView) { errors in
+        scheduler.startManualScan(showWebView: showWebView, startTime: startTime) { errors in
             if let error = errors?.oneTimeError {
                 switch error {
                 case DataBrokerProtectionSchedulerError.operationsInterrupted:

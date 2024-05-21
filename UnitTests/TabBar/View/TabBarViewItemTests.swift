@@ -45,37 +45,69 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertEqual(menu.item(at: 0)?.title, UserText.duplicateTab)
         XCTAssertEqual(menu.item(at: 1)?.title, UserText.pinTab)
         XCTAssertTrue(menu.item(at: 2)?.isSeparatorItem ?? false)
-        XCTAssertEqual(menu.item(at: 3)?.title, UserText.bookmarkThisPage)
-        XCTAssertEqual(menu.item(at: 4)?.title, UserText.fireproofSite)
+        XCTAssertEqual(menu.item(at: 3)?.title, UserText.fireproofSite)
         XCTAssertTrue(menu.item(at: 5)?.isSeparatorItem ?? false)
-        XCTAssertEqual(menu.item(at: 6)?.title, UserText.closeTab)
-        XCTAssertEqual(menu.item(at: 7)?.title, UserText.closeOtherTabs)
-        XCTAssertEqual(menu.item(at: 8)?.title, UserText.closeTabsToTheRight)
-        XCTAssertEqual(menu.item(at: 9)?.title, UserText.moveTabToNewWindow)
+        XCTAssertEqual(menu.item(at: 6)?.title, UserText.bookmarkAllTabs)
+        XCTAssertTrue(menu.item(at: 7)?.isSeparatorItem ?? false)
+        XCTAssertEqual(menu.item(at: 8)?.title, UserText.closeTab)
+        XCTAssertEqual(menu.item(at: 9)?.title, UserText.closeOtherTabs)
+        XCTAssertEqual(menu.item(at: 10)?.title, UserText.moveTabToNewWindow)
+
+        // Check "Close Other Tabs" submenu
+        guard let submenu = menu.item(at: 9)?.submenu else {
+            XCTFail("\"Close Other Tabs\" menu item should have a submenu")
+            return
+        }
+        XCTAssertEqual(submenu.item(at: 0)?.title, UserText.closeTabsToTheLeft)
+        XCTAssertEqual(submenu.item(at: 1)?.title, UserText.closeTabsToTheRight)
+        XCTAssertEqual(submenu.item(at: 2)?.title, UserText.closeAllOtherTabs)
     }
 
     func testThatMuteIsShownWhenCurrentAudioStateIsUnmuted() {
         delegate.audioState = .unmuted
         tabBarViewItem.menuNeedsUpdate(menu)
 
-        XCTAssertTrue(menu.item(at: 5)?.isSeparatorItem ?? false)
-        XCTAssertEqual(menu.item(at: 6)?.title, UserText.muteTab)
-        XCTAssertTrue(menu.item(at: 7)?.isSeparatorItem ?? false)
+        XCTAssertFalse(menu.item(at: 1)?.isSeparatorItem ?? true)
+        XCTAssertEqual(menu.item(at: 2)?.title, UserText.muteTab)
+        XCTAssertTrue(menu.item(at: 3)?.isSeparatorItem ?? false)
     }
 
     func testThatUnmuteIsShownWhenCurrentAudioStateIsMuted() {
         delegate.audioState = .muted
         tabBarViewItem.menuNeedsUpdate(menu)
 
-        XCTAssertTrue(menu.item(at: 5)?.isSeparatorItem ?? false)
-        XCTAssertEqual(menu.item(at: 6)?.title, UserText.unmuteTab)
-        XCTAssertTrue(menu.item(at: 7)?.isSeparatorItem ?? false)
+        XCTAssertFalse(menu.item(at: 1)?.isSeparatorItem ?? true)
+        XCTAssertEqual(menu.item(at: 2)?.title, UserText.unmuteTab)
+        XCTAssertTrue(menu.item(at: 3)?.isSeparatorItem ?? false)
+    }
+
+    func testWhenURLIsNotBookmarkedThenBookmarkThisPageIsShown() {
+        // GIVEN
+        delegate.isTabBarItemAlreadyBookmarked = false
+
+        // WHEN
+        tabBarViewItem.menuNeedsUpdate(menu)
+
+        // THEN
+        XCTAssertEqual(menu.item(at: 4)?.title, UserText.bookmarkThisPage)
+    }
+
+    func testWhenURLIsBookmarkedThenDeleteBookmarkIsShown() {
+        // GIVEN
+        delegate.isTabBarItemAlreadyBookmarked = true
+
+        // WHEN
+        tabBarViewItem.menuNeedsUpdate(menu)
+
+        // THEN
+        XCTAssertEqual(menu.item(at: 4)?.title, UserText.deleteBookmark)
     }
 
     func testWhenOneTabCloseThenOtherTabsItemIsDisabled() {
         tabBarViewItem.menuNeedsUpdate(menu)
 
-        let item = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let submenu = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let item = submenu?.submenu?.items .first { $0.title == UserText.closeAllOtherTabs }
         XCTAssertFalse(item?.isEnabled ?? true)
     }
 
@@ -83,7 +115,8 @@ final class TabBarViewItemTests: XCTestCase {
         delegate.hasItemsToTheRight = true
         tabBarViewItem.menuNeedsUpdate(menu)
 
-        let item = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let submenu = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let item = submenu?.submenu?.items .first { $0.title == UserText.closeAllOtherTabs }
         XCTAssertTrue(item?.isEnabled ?? false)
     }
 
@@ -102,10 +135,28 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertTrue(item?.isEnabled ?? false)
     }
 
+    func testWhenNoTabsToTheLeftThenCloseTabsToTheLeftIsDisabled() {
+        tabBarViewItem.menuNeedsUpdate(menu)
+
+        let submenu = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let item = submenu?.submenu?.items .first { $0.title == UserText.closeTabsToTheLeft }
+        XCTAssertFalse(item?.isEnabled ?? true)
+    }
+
+    func testWhenTabsToTheLeftThenCloseTabsToTheLeftIsEnabled() {
+        delegate.hasItemsToTheLeft = true
+        tabBarViewItem.menuNeedsUpdate(menu)
+
+        let submenu = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let item = submenu?.submenu?.items .first { $0.title == UserText.closeTabsToTheLeft }
+        XCTAssertTrue(item?.isEnabled ?? false)
+    }
+
     func testWhenNoTabsToTheRightThenCloseTabsToTheRightIsDisabled() {
         tabBarViewItem.menuNeedsUpdate(menu)
 
-        let item = menu.items .first { $0.title == UserText.closeTabsToTheRight }
+        let submenu = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let item = submenu?.submenu?.items .first { $0.title == UserText.closeTabsToTheRight }
         XCTAssertFalse(item?.isEnabled ?? true)
     }
 
@@ -113,7 +164,8 @@ final class TabBarViewItemTests: XCTestCase {
         delegate.hasItemsToTheRight = true
         tabBarViewItem.menuNeedsUpdate(menu)
 
-        let item = menu.items .first { $0.title == UserText.closeTabsToTheRight }
+        let submenu = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let item = submenu?.submenu?.items .first { $0.title == UserText.closeTabsToTheRight }
         XCTAssertTrue(item?.isEnabled ?? false)
     }
 
@@ -188,9 +240,72 @@ final class TabBarViewItemTests: XCTestCase {
 
         let pinItem = menu.items.first { $0.title == UserText.pinTab }
         XCTAssertFalse(pinItem?.isEnabled ?? true)
+    }
 
-        let bookmarkItem = menu.items.first { $0.title == UserText.bookmarkThisPage }
-        XCTAssertFalse(bookmarkItem?.isEnabled ?? true)
+    func testWhenCanBookmarkAllOpenTabsThenBookmarkAllOpenTabsItemIsEnabled() throws {
+        // GIVEN
+        delegate.canBookmarkAllOpenTabs = true
+        tabBarViewItem.menuNeedsUpdate(menu)
+
+        // WHEN
+        let item = try XCTUnwrap(menu.item(withTitle: UserText.bookmarkAllTabs))
+
+        // THEN
+        XCTAssertTrue(item.isEnabled)
+    }
+
+    func testWhenCannotBookmarkAllOpenTabsThenBookmarkAllOpenTabsItemIsDisabled() throws {
+        // GIVEN
+        delegate.canBookmarkAllOpenTabs = false
+        tabBarViewItem.menuNeedsUpdate(menu)
+
+        // WHEN
+        let item = try XCTUnwrap(menu.item(withTitle: UserText.bookmarkAllTabs))
+
+        // THEN
+        XCTAssertFalse(item.isEnabled)
+    }
+
+    func testWhenClickingOnBookmarkAllTabsThenTheActionDelegateIsNotified() throws {
+        // GIVEN
+        delegate.canBookmarkAllOpenTabs = true
+        tabBarViewItem.menuNeedsUpdate(menu)
+        let index = try XCTUnwrap(menu.indexOfItem(withTitle: UserText.bookmarkAllTabs))
+        XCTAssertFalse(delegate.tabBarViewItemBookmarkAllOpenTabsActionCalled)
+
+        // WHEN
+        menu.performActionForItem(at: index)
+
+        // THEN
+        XCTAssertTrue(delegate.tabBarViewItemBookmarkAllOpenTabsActionCalled)
+    }
+
+    func testWhenClickingOnBookmarkThisPageThenTheActionDelegateIsNotified() throws {
+        // GIVEN
+        delegate.isTabBarItemAlreadyBookmarked = false
+        tabBarViewItem.menuNeedsUpdate(menu)
+        let index = try XCTUnwrap(menu.indexOfItem(withTitle: UserText.bookmarkThisPage))
+        XCTAssertFalse(delegate.tabBarViewItemBookmarkThisPageActionCalled)
+
+        // WHEN
+        menu.performActionForItem(at: index)
+
+        // THEN
+        XCTAssertTrue(delegate.tabBarViewItemBookmarkThisPageActionCalled)
+    }
+
+    func testWhenClickingOnDeleteBookmarkThenTheActionDelegateIsNotified() throws {
+        // GIVEN
+        delegate.isTabBarItemAlreadyBookmarked = true
+        tabBarViewItem.menuNeedsUpdate(menu)
+        let index = try XCTUnwrap(menu.indexOfItem(withTitle: UserText.deleteBookmark))
+        XCTAssertFalse(delegate.tabBarViewItemRemoveBookmarkActionCalled)
+
+        // WHEN
+        menu.performActionForItem(at: index)
+
+        // THEN
+        XCTAssertTrue(delegate.tabBarViewItemRemoveBookmarkActionCalled)
     }
 
 }

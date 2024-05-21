@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import SecureStorage
 
 protocol ResourcesRepository {
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]?
@@ -118,7 +119,7 @@ public struct DataBrokerProtectionBrokerUpdater {
     }
 
     public static func provide() -> DataBrokerProtectionBrokerUpdater? {
-        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil) {
+        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: DataBrokerProtectionSecureVaultErrorReporter.shared) {
             return DataBrokerProtectionBrokerUpdater(vault: vault)
         }
 

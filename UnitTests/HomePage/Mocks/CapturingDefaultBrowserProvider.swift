@@ -21,6 +21,8 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 class CapturingDefaultBrowserProvider: DefaultBrowserProvider {
+    var defaultBrowserURL: URL?
+
     var presentDefaultBrowserPromptCalled = false
     var openSystemPreferencesCalled = false
     var throwError = false

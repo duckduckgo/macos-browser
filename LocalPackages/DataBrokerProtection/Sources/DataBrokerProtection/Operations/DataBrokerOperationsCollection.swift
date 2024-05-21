@@ -28,14 +28,13 @@ protocol DataBrokerOperationsCollectionErrorDelegate: AnyObject {
                                         didErrorBeforeStartingBrokerOperations error: Error)
 }
 
+enum OperationType {
+    case manualScan
+    case optOut
+    case all
+}
+
 final class DataBrokerOperationsCollection: Operation {
-
-    enum OperationType {
-        case scan
-        case optOut
-        case all
-    }
-
     public var error: Error?
     public weak var errorDelegate: DataBrokerOperationsCollectionErrorDelegate?
 
@@ -119,8 +118,8 @@ final class DataBrokerOperationsCollection: Operation {
         switch operationType {
         case .optOut:
             operationsData = brokerProfileQueriesData.flatMap { $0.optOutOperationsData }
-        case .scan:
-            operationsData = brokerProfileQueriesData.compactMap { $0.scanOperationData }
+        case .manualScan:
+            operationsData = brokerProfileQueriesData.filter { $0.profileQuery.deprecated == false }.compactMap { $0.scanOperationData }
         case .all:
             operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
         }
@@ -181,6 +180,7 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 runner: runner,
                                                                                 pixelHandler: pixelHandler,
                                                                                 showWebView: showWebView,
+                                                                                isManualScan: operationType == .manualScan,
                                                                                 userNotificationService: userNotificationService,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }
@@ -192,8 +192,6 @@ final class DataBrokerOperationsCollection: Operation {
                     try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
                 }
 
-                finish()
-
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
                 self.error = error
@@ -203,6 +201,8 @@ final class DataBrokerOperationsCollection: Operation {
                                                               withDataBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
             }
         }
+
+        finish()
     }
 
     private func finish() {

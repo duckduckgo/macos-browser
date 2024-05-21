@@ -18,6 +18,7 @@
 
 import Foundation
 import Subscription
+import BrowserServicesKit
 
 extension DefaultSubscriptionFeatureAvailability {
     convenience init() {

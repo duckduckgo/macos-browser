@@ -31,17 +31,20 @@ import NetworkProtectionUI
 final class TunnelControllerIPCService {
     private let tunnelController: NetworkProtectionTunnelController
     private let networkExtensionController: NetworkExtensionController
+    private let uninstaller: VPNUninstalling
     private let server: NetworkProtectionIPC.TunnelControllerIPCServer
     private let statusReporter: NetworkProtectionStatusReporter
     private var cancellables = Set<AnyCancellable>()
     private let defaults: UserDefaults
 
     init(tunnelController: NetworkProtectionTunnelController,
+         uninstaller: VPNUninstalling,
          networkExtensionController: NetworkExtensionController,
          statusReporter: NetworkProtectionStatusReporter,
          defaults: UserDefaults = .netP) {
 
         self.tunnelController = tunnelController
+        self.uninstaller = uninstaller
         self.networkExtensionController = networkExtensionController
         server = .init(machServiceName: Bundle.main.bundleIdentifier!)
         self.statusReporter = statusReporter
@@ -127,19 +130,29 @@ extension TunnelControllerIPCService: IPCServerInterface {
         completion(nil)
     }
 
+    func fetchLastError(completion: @escaping (Error?) -> Void) {
+        Task {
+            guard #available(macOS 13.0, *),
+                  let connection = await tunnelController.connection else {
+
+                completion(nil)
+                return
+            }
+
+            connection.fetchLastDisconnectError(completionHandler: completion)
+        }
+    }
+
     func resetAll(uninstallSystemExtension: Bool) async {
         try? await networkExtensionController.deactivateSystemExtension()
     }
 
-    func debugCommand(_ command: DebugCommand) async throws {
+    func command(_ command: VPNCommand) async throws {
         try await tunnelController.relay(command)
 
         switch command {
         case .removeSystemExtension:
-#if NETP_SYSTEM_EXTENSION
-            try await networkExtensionController.deactivateSystemExtension()
-            defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowExtension)
-#endif
+            try await uninstaller.removeSystemExtension()
         case .expireRegistrationKey:
             // Intentional no-op: handled by the extension
             break
@@ -147,11 +160,9 @@ extension TunnelControllerIPCService: IPCServerInterface {
             // Intentional no-op: handled by the extension
             break
         case .removeVPNConfiguration:
-            await VPNConfigurationManager().removeVPNConfiguration()
-
-            if defaults.networkProtectionOnboardingStatus == .completed {
-                defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
-            }
+            try await uninstaller.removeVPNConfiguration()
+        case .uninstallVPN:
+            try await uninstaller.uninstall(includingSystemExtension: true)
         case .disableConnectOnDemandAndShutDown:
             // Not implemented on macOS yet
             break

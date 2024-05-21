@@ -68,6 +68,9 @@ final class DebugScanOperation: DataBrokerOperation {
     var scanURL: String?
     let clickAwaitTime: TimeInterval
     let cookieHandler: CookieHandler
+    let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    var postLoadingSiteStartTime: Date?
+    let sleepObserver: SleepObserver
 
     private let fileManager = FileManager.default
     private let debugScanContentPath: String?
@@ -75,8 +78,8 @@ final class DebugScanOperation: DataBrokerOperation {
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
-         emailService: EmailServiceProtocol = EmailService(),
-         captchaService: CaptchaServiceProtocol = CaptchaService(),
+         emailService: EmailServiceProtocol,
+         captchaService: CaptchaServiceProtocol,
          operationAwaitTime: TimeInterval = 3,
          clickAwaitTime: TimeInterval = 0,
          shouldRunNextStep: @escaping () -> Bool
@@ -96,6 +99,10 @@ final class DebugScanOperation: DataBrokerOperation {
         }
         self.cookieHandler = EmptyCookieHandler()
         stageCalculator = FakeStageDurationCalculator()
+        pixelHandler =  EventMapping(mapping: { _, _, _, _ in
+            // We do not need the pixel handler for the debug
+        })
+        self.sleepObserver = FakeSleepObserver()
     }
 
     func run(inputValue: Void,

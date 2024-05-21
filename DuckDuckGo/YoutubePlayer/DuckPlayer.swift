@@ -109,16 +109,59 @@ final class DuckPlayer {
 
     // MARK: - Common Message Handlers
 
-    public func handleSetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
-        guard let userValues: UserValues = DecodableHelper.decode(from: params) else {
-            assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
-            return nil
+    // swiftlint:disable:next cyclomatic_complexity
+    public func handleSetUserValuesMessage(
+        from origin: YoutubeOverlayUserScript.MessageOrigin
+    ) -> (_ params: Any, _ message: UserScriptMessage) -> Encodable? {
+
+        return { [weak self] params, _ -> Encodable? in
+            guard let self else {
+                return nil
+            }
+            guard let userValues: UserValues = DecodableHelper.decode(from: params) else {
+                assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
+                return nil
+            }
+
+            let modeDidChange = self.preferences.duckPlayerMode != userValues.duckPlayerMode
+            let overlayDidInteract = !self.preferences.youtubeOverlayInteracted && userValues.overlayInteracted
+
+            if modeDidChange {
+                self.preferences.duckPlayerMode = userValues.duckPlayerMode
+                if case .enabled = userValues.duckPlayerMode {
+                    switch origin {
+                    case .duckPlayer:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysDuckPlayer)
+                    case .serpOverlay:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysOverlaySERP)
+                    case .youtubeOverlay:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysOverlayYoutube)
+                    }
+                }
+            }
+
+            if overlayDidInteract {
+                self.preferences.youtubeOverlayInteracted = userValues.overlayInteracted
+
+                // If user checks "Remember my choice" and clicks "Watch here", we won't show
+                // the overlay anymore, but will keep presenting Dax logos (the mode stays at
+                // "alwaysAsk" which may be a bit counterintuitive, but it's the overlayInteracted
+                // flag that plays a role here). We want to track users opting in to not showing overlays,
+                // hence firing the pixel here.
+                if userValues.duckPlayerMode == .alwaysAsk {
+                    switch origin {
+                    case .serpOverlay:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingNeverOverlaySERP)
+                    case .youtubeOverlay:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingNeverOverlayYoutube)
+                    default:
+                        break
+                    }
+                }
+            }
+
+            return self.encodeUserValues()
         }
-
-        self.preferences.youtubeOverlayInteracted = userValues.overlayInteracted
-        self.preferences.duckPlayerMode = userValues.duckPlayerMode
-
-        return encodeUserValues()
     }
 
     public func handleGetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
@@ -150,16 +193,6 @@ final class DuckPlayer {
             modeCancellable = preferences.$duckPlayerMode
                 .removeDuplicates()
                 .dropFirst(1)
-                .handleEvents(receiveOutput: { mode in
-                    switch mode {
-                    case .enabled:
-                        PixelKit.fire(GeneralPixel.duckPlayerSettingAlways)
-                    case .alwaysAsk:
-                        PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
-                    case .disabled:
-                        PixelKit.fire(GeneralPixel.duckPlayerSettingNever)
-                    }
-                })
                 .prepend(preferences.duckPlayerMode)
                 .assign(to: \.mode, onWeaklyHeld: self)
         } else {

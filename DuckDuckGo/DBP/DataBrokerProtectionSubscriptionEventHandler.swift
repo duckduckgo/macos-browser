@@ -23,32 +23,14 @@ import DataBrokerProtection
 import PixelKit
 
 final class DataBrokerProtectionSubscriptionEventHandler {
-
-    private let accountManager: AccountManaging
-    private let authRepository: AuthenticationRepository
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
-    init(accountManager: AccountManaging = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)),
-         authRepository: AuthenticationRepository = KeychainAuthenticationData(),
-         featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
-        self.accountManager = accountManager
-        self.authRepository = authRepository
+    init(featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
         self.featureDisabler = featureDisabler
     }
 
     func registerForSubscriptionAccountManagerEvents() {
-        NotificationCenter.default.addObserver(self, selector: #selector(handleAccountDidSignIn), name: .accountDidSignIn, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleAccountDidSignOut), name: .accountDidSignOut, object: nil)
-    }
-
-    @objc private func handleAccountDidSignIn() {
-        guard let token = accountManager.accessToken else {
-            PixelKit.fire(GeneralPixel.dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn)
-            assertionFailure("[DBP Subscription] AccountManager signed in but token could not be retrieved")
-            return
-        }
-
-        authRepository.save(accessToken: token)
     }
 
     @objc private func handleAccountDidSignOut() {

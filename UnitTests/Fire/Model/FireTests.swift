@@ -94,12 +94,13 @@ final class FireTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 0)
-        XCTAssertEqual(pinnedTabsManager.tabCollection.tabs.map(\.content.url), pinnedTabs.map(\.content.url))
+        XCTAssertEqual(pinnedTabsManager.tabCollection.tabs.map(\.content.userEditableUrl), pinnedTabs.map(\.content.userEditableUrl))
     }
 
     func testWhenBurnAll_ThenAllWebsiteDataAreRemoved() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
+        let zoomLevelsCoordinator = MockSavedZoomCoordinator()
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
         let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
@@ -107,6 +108,7 @@ final class FireTests: XCTestCase {
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
+                        savedZoomLevelsCoordinating: zoomLevelsCoordinator,
                         windowControllerManager: WindowControllersManager.shared,
                         faviconManagement: faviconManager,
                         recentlyClosedCoordinator: recentlyClosedCoordinator,
@@ -124,6 +126,7 @@ final class FireTests: XCTestCase {
         XCTAssert(historyCoordinator.burnAllCalled)
         XCTAssert(permissionManager.burnPermissionsCalled)
         XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
+        XCTAssert(zoomLevelsCoordinator.burnAllZoomLevelsCalled)
     }
 
     func testWhenBurnAllThenBurningFlagToggles() {
@@ -192,6 +195,91 @@ final class FireTests: XCTestCase {
         XCTAssertFalse(appStateRestorationManager.canRestoreLastSessionState)
     }
 
+    func testWhenBurnDomainsIsCalledThenSelectedDomainsZoomLevelsAreBurned() {
+        let domainsToBurn: Set<String> = ["test.com", "provola.co.uk"]
+        let zoomLevelsCoordinator = MockSavedZoomCoordinator()
+        let fire = Fire(savedZoomLevelsCoordinating: zoomLevelsCoordinator,
+                        tld: ContentBlocking.shared.tld)
+
+        fire.burnEntity(entity: .none(selectedDomains: domainsToBurn))
+
+        XCTAssertTrue(zoomLevelsCoordinator.burnZoomLevelsOfDomainsCalled)
+        XCTAssertEqual(zoomLevelsCoordinator.domainsBurned, domainsToBurn)
+    }
+
+    func testWhenBurnVisitIsCalledForTodayThenAllExistingTabsAreCleared() {
+        let manager = WebCacheManagerMock()
+        let historyCoordinator = HistoryCoordinatingMock()
+        let permissionManager = PermissionManagerMock()
+        let faviconManager = FaviconManagerMock()
+        let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
+
+        let fire = Fire(cacheManager: manager,
+                        historyCoordinating: historyCoordinator,
+                        permissionManager: permissionManager,
+                        windowControllerManager: WindowControllersManager.shared,
+                        faviconManagement: faviconManager,
+                        recentlyClosedCoordinator: recentlyClosedCoordinator,
+                        tld: ContentBlocking.shared.tld)
+        let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
+        _ = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
+        XCTAssertNotEqual(tabCollectionViewModel.allTabsCount, 0)
+
+        let finishedBurningExpectation = expectation(description: "Finished burning")
+        fire.burnVisits(of: [],
+                        except: FireproofDomains.shared,
+                        isToday: true,
+                        completion: {
+            finishedBurningExpectation.fulfill()
+        })
+
+        waitForExpectations(timeout: 5)
+        XCTAssertEqual(tabCollectionViewModel.allTabsCount, 0)
+        XCTAssert(manager.clearCalled)
+        XCTAssert(historyCoordinator.burnVisitsCalled)
+        XCTAssertFalse(historyCoordinator.burnAllCalled)
+        XCTAssert(permissionManager.burnPermissionsOfDomainsCalled)
+        XCTAssertFalse(permissionManager.burnPermissionsCalled)
+        XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
+    }
+
+    func testWhenBurnVisitIsCalledForOtherDayThenExistingTabsRemainOpen() {
+        let manager = WebCacheManagerMock()
+        let historyCoordinator = HistoryCoordinatingMock()
+        let permissionManager = PermissionManagerMock()
+        let faviconManager = FaviconManagerMock()
+        let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
+
+        let fire = Fire(cacheManager: manager,
+                        historyCoordinating: historyCoordinator,
+                        permissionManager: permissionManager,
+                        windowControllerManager: WindowControllersManager.shared,
+                        faviconManagement: faviconManager,
+                        recentlyClosedCoordinator: recentlyClosedCoordinator,
+                        tld: ContentBlocking.shared.tld)
+        let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
+        _ = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
+        XCTAssertNotEqual(tabCollectionViewModel.allTabsCount, 0)
+        let numberOfTabs = tabCollectionViewModel.allTabsCount
+
+        let finishedBurningExpectation = expectation(description: "Finished burning")
+        fire.burnVisits(of: [],
+                        except: FireproofDomains.shared,
+                        isToday: false,
+                        completion: {
+            finishedBurningExpectation.fulfill()
+        })
+
+        waitForExpectations(timeout: 5)
+        XCTAssertEqual(tabCollectionViewModel.allTabsCount, numberOfTabs)
+        XCTAssert(manager.clearCalled)
+        XCTAssert(historyCoordinator.burnVisitsCalled)
+        XCTAssertFalse(historyCoordinator.burnAllCalled)
+        XCTAssert(permissionManager.burnPermissionsOfDomainsCalled)
+        XCTAssertFalse(permissionManager.burnPermissionsCalled)
+        XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
+    }
+
     func preparePersistedState(withFileName fileName: String) -> FileStore {
         let fileStore = FileStoreMock()
         let state = SavedStateMock()
@@ -217,4 +305,19 @@ fileprivate extension TabCollectionViewModel {
         return tabCollectionViewModel
     }
 
+}
+
+class MockSavedZoomCoordinator: SavedZoomLevelsCoordinating {
+    var burnAllZoomLevelsCalled = false
+    var burnZoomLevelsOfDomainsCalled = false
+    var domainsBurned: Set<String> = []
+
+    func burnZoomLevels(except fireproofDomains: DuckDuckGo_Privacy_Browser.FireproofDomains) {
+        burnAllZoomLevelsCalled = true
+    }
+
+    func burnZoomLevel(of baseDomains: Set<String>) {
+        burnZoomLevelsOfDomainsCalled = true
+        domainsBurned = baseDomains
+    }
 }

@@ -89,14 +89,34 @@ final class SyncDebugMenu: NSMenu {
 
         context.performAndWait {
             let root = BookmarkUtils.fetchRootFolder(context)!
+            let favorites = BookmarkUtils.fetchFavoritesFolders(for: .displayNative(.desktop), in: context)
 
-            _ = BookmarkEntity.makeBookmark(title: "Non stub", url: "url", parent: root, context: context)
-            let stub = BookmarkEntity.makeBookmark(title: "Stub", url: "", parent: root, context: context)
-            stub.isStub = true
+            let nonStub1 = BookmarkEntity.makeBookmark(title: "Non stub", url: "url", parent: root, context: context)
+            nonStub1.addToFavorites(folders: favorites)
+
+            let stub1 = BookmarkEntity.makeBookmark(title: "Stub", url: "", parent: root, context: context)
+            stub1.isStub = true
+            stub1.addToFavorites(folders: favorites)
+
             let emptyStub = BookmarkEntity.makeBookmark(title: "", url: "", parent: root, context: context)
             emptyStub.isStub = true
             emptyStub.title = nil
             emptyStub.url = nil
+            emptyStub.addToFavorites(folders: favorites)
+
+            let nonStub2 = BookmarkEntity.makeBookmark(title: "Non stub 2", url: "url", parent: root, context: context)
+            nonStub2.addToFavorites(folders: favorites)
+
+            let stub2 = BookmarkEntity.makeBookmark(title: "Stub", url: "", parent: root, context: context)
+            stub2.isStub = true
+            stub2.addToFavorites(folders: favorites)
+
+            let stub3 = BookmarkEntity.makeBookmark(title: "Stub", url: "", parent: root, context: context)
+            stub3.isStub = true
+            stub3.addToFavorites(folders: favorites)
+
+            let nonStub3 = BookmarkEntity.makeBookmark(title: "Non stub 3", url: "url", parent: root, context: context)
+            nonStub3.addToFavorites(folders: favorites)
 
             try? context.save()
         }

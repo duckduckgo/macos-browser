@@ -24,6 +24,8 @@ struct ProfileSelector: Codable {
     let afterText: String?
     let beforeText: String?
     let separator: String?
+    let identifier: String?
+    let identifierType: String?
 }
 
 struct ExtractProfileSelectors: Codable, Sendable {

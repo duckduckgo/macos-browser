@@ -30,6 +30,7 @@ final class Fire {
     let webCacheManager: WebCacheManager
     let historyCoordinating: HistoryCoordinating
     let permissionManager: PermissionManagerProtocol
+    let savedZoomLevelsCoordinating: SavedZoomLevelsCoordinating
     let downloadListCoordinator: DownloadListCoordinator
     let windowControllerManager: WindowControllersManager
     let faviconManagement: FaviconManagement
@@ -88,6 +89,7 @@ final class Fire {
     init(cacheManager: WebCacheManager = WebCacheManager.shared,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
+         savedZoomLevelsCoordinating: SavedZoomLevelsCoordinating = AccessibilityPreferences.shared,
          downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared,
          windowControllerManager: WindowControllersManager = WindowControllersManager.shared,
          faviconManagement: FaviconManagement = FaviconManager.shared,
@@ -104,6 +106,7 @@ final class Fire {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
+        self.savedZoomLevelsCoordinating = savedZoomLevelsCoordinating
         self.downloadListCoordinator = downloadListCoordinator
         self.windowControllerManager = windowControllerManager
         self.faviconManagement = faviconManagement
@@ -167,6 +170,7 @@ final class Fire {
 
             self.burnRecentlyClosed(baseDomains: domains)
             self.burnAutoconsentCache()
+            self.burnZoomLevels(of: domains)
 
             group.notify(queue: .main) {
                 self.dispatchGroup = nil
@@ -218,6 +222,7 @@ final class Fire {
 
             self.burnRecentlyClosed()
             self.burnAutoconsentCache()
+            self.burnZoomLevels()
 
             group.notify(queue: .main) {
                 self.dispatchGroup = nil
@@ -235,6 +240,7 @@ final class Fire {
     @MainActor
     func burnVisits(of visits: [Visit],
                     except fireproofDomains: FireproofDomains,
+                    isToday: Bool,
                     completion: (() -> Void)? = nil) {
 
         // Get domains to burn
@@ -254,7 +260,16 @@ final class Fire {
         domains = domains.convertedToETLDPlus1(tld: tld)
 
         historyCoordinating.burnVisits(visits) {
-            self.burnEntity(entity: .none(selectedDomains: domains),
+            let entity: BurningEntity
+
+            // Burn all windows in case we are burning visits for today
+            if isToday {
+                entity = .allWindows(mainWindowControllers: self.windowControllerManager.mainWindowControllers, selectedDomains: domains)
+            } else {
+                entity = .none(selectedDomains: domains)
+            }
+
+            self.burnEntity(entity: entity,
                             includingHistory: false,
                             completion: completion)
         }
@@ -360,6 +375,16 @@ final class Fire {
         historyCoordinating.burnAll(completion: completion)
     }
 
+    // MARK: - Zoom levels
+
+     private func burnZoomLevels() {
+         savedZoomLevelsCoordinating.burnZoomLevels(except: FireproofDomains.shared)
+     }
+
+     private func burnZoomLevels(of baseDomains: Set<String>) {
+         savedZoomLevelsCoordinating.burnZoomLevel(of: baseDomains)
+     }
+
     // MARK: - Permissions
 
     private func burnPermissions(completion: @escaping () -> Void) {
@@ -385,7 +410,7 @@ final class Fire {
     // MARK: - Favicons
 
     private func autofillDomains() -> Set<String> {
-        guard let vault = try? secureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared),
+        guard let vault = try? secureVaultFactory.makeVault(reporter: SecureVaultReporter.shared),
               let accounts = try? vault.accounts() else {
             return []
         }

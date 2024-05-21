@@ -55,7 +55,7 @@ final class DataImportProviderTests: XCTestCase {
     override func setUp() {
         UserDefaultsWrapper<Any>.clearAll()
 
-        vault = try! MockSecureVaultFactory.makeVault(errorReporter: nil)
+        vault = try! MockSecureVaultFactory.makeVault(reporter: nil)
         vault.storedAccounts = notImportedAccounts
         vault.storedIdentities = []
         vault.storedCards = []

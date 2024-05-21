@@ -18,6 +18,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftUIExtensions
 
 fileprivate extension View {
     func applyStepTitleAttributes() -> some View {

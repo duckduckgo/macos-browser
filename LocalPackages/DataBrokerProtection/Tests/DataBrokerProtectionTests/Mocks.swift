@@ -868,6 +868,7 @@ final class MockAppVersion: AppVersionNumberProvider {
 }
 
 final class MockStageDurationCalculator: StageDurationCalculator {
+    var isManualScan: Bool = false
     var attemptId: UUID = UUID()
     var stage: Stage?
 
@@ -957,5 +958,37 @@ final class MockDataBrokerProtectionBackendServicePixels: DataBrokerProtectionBa
         fireEmptyAccessTokenWasCalled = false
         fireGenerateEmailHTTPErrorWasCalled = false
         statusCode = nil
+    }
+}
+
+final class MockAuthenticationManager: DataBrokerProtectionAuthenticationManaging {
+    var isUserAuthenticatedValue = false
+    var accessTokenValue: String? = "fake token"
+    var shouldAskForInviteCodeValue = false
+    var redeemCodeCalled = false
+    var authHeaderValue: String? = "fake auth header"
+
+    var isUserAuthenticated: Bool { isUserAuthenticatedValue }
+
+    var accessToken: String? { accessTokenValue }
+
+    func hasValidEntitlement() async throws -> Bool {
+        return true
+    }
+
+    func shouldAskForInviteCode() -> Bool { shouldAskForInviteCodeValue }
+
+    func redeem(inviteCode: String) async throws {
+        redeemCodeCalled = true
+    }
+
+    func getAuthHeader() -> String? { authHeaderValue }
+
+    func reset() {
+        isUserAuthenticatedValue = false
+        accessTokenValue = "fake token"
+        shouldAskForInviteCodeValue = false
+        redeemCodeCalled = false
+        authHeaderValue = "fake auth header"
     }
 }

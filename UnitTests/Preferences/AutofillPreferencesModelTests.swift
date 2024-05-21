@@ -29,6 +29,7 @@ final class AutofillPreferencesPersistorMock: AutofillPreferencesPersistor {
     var passwordManager: PasswordManager = .duckduckgo
     var autolockLocksFormFilling: Bool = false
     var debugScriptEnabled: Bool = false
+    var autofillSurveyEnabled: Bool = false
 }
 
 final class UserAuthenticatorMock: UserAuthenticating {
@@ -49,7 +50,7 @@ final class UserAuthenticatorMock: UserAuthenticating {
 final class AutofillPreferencesModelTests: XCTestCase {
 
     func neverPromptWebsitesManager() throws -> AutofillNeverPromptWebsitesManager {
-        try AutofillNeverPromptWebsitesManager(secureVault: MockSecureVaultFactory.makeVault(errorReporter: nil))
+        try AutofillNeverPromptWebsitesManager(secureVault: MockSecureVaultFactory.makeVault(reporter: nil))
     }
 
     @MainActor

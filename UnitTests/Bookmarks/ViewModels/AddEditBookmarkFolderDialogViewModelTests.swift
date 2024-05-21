@@ -329,7 +329,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         // THEN
         XCTAssertFalse(bookmarkStoreMock.updateFolderCalled)
         XCTAssertTrue(bookmarkStoreMock.saveFolderCalled)
-        XCTAssertEqual(bookmarkStoreMock.capturedFolder?.title, sut.folderName)
+        XCTAssertEqual(bookmarkStoreMock.capturedFolder?.title, #function)
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolder, folder)
     }
 
@@ -346,7 +346,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
 
         // THEN
         XCTAssertTrue(bookmarkStoreMock.updateFolderCalled)
-        XCTAssertEqual(bookmarkStoreMock.capturedFolder?.title, sut.folderName)
+        XCTAssertEqual(bookmarkStoreMock.capturedFolder?.title, "TEST")
     }
 
     func testShouldNotAskBookmarkStoreToUpdateFolderWhenNameIsNotChanged() {

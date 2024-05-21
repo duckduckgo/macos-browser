@@ -55,6 +55,8 @@ public struct UserDefaultsWrapper<T> {
         case grammarCheckEnabledOnce = "grammar.check.enabled.once"
 
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
+        case autoClearEnabled = "preferences.auto-clear-enabled"
+        case warnBeforeClearingEnabled = "preferences.warn-before-clearing-enabled"
         case gpcEnabled = "preferences.gpc-enabled"
         case selectedDownloadLocationKey = "preferences.download-location"
         case lastUsedCustomDownloadLocation = "preferences.custom-last-used-download-location"
@@ -72,12 +74,15 @@ public struct UserDefaultsWrapper<T> {
         case askToSavePaymentMethods = "preferences.ask-to-save.payment-methods"
         case autolockLocksFormFilling = "preferences.lock-autofill-form-fill"
         case autofillDebugScriptEnabled = "preferences.enable-autofill-debug-script"
+        case autofillSurveyEnabled = "preferences.enable-autofill-survey"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
         case lastCrashReportCheckDate = "last.crash.report.check.date"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
+        case appTerminationHandledCorrectly = "app.termination.handled.correctly"
+        case restoreTabsOnStartup = "restore.tabs.on.startup"
 
         case restorePreviousSession = "preferences.startup.restore-previous-session"
         case launchToCustomHomePage = "preferences.startup.launch-to-custom-home-page"
@@ -85,7 +90,11 @@ public struct UserDefaultsWrapper<T> {
         case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
         case showFullURL = "preferences.appearance.show-full-url"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
+        case preferNewTabsToWindows = "preferences.tabs.prefer-new-tabs-to-windows"
+        case switchToNewTabWhenOpened = "preferences.tabs.switch-to-new-tab-when-opened"
+        case newTabPosition = "preferences.tabs.new-tab-position"
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
+        case websitePageZoom = "preferences.appearance.website-page-zoom"
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
 
         case homeButtonPosition = "preferences.appeareance.home-button-position"
@@ -108,6 +117,7 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowAllFavorites = "home.page.show.all.favorites"
         case homePageShowAllFeatures = "home.page.show.all.features"
         case homePageShowMakeDefault = "home.page.show.make.default"
+        case homePageShowAddToDock = "home.page.show.add.to.dock"
         case homePageShowImport = "home.page.show.import"
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
@@ -174,13 +184,21 @@ public struct UserDefaultsWrapper<T> {
         case favoritesDisplayMode = "sync.favorites-display-mode"
         case syncBookmarksPaused = "sync.bookmarks-paused"
         case syncCredentialsPaused = "sync.credentials-paused"
+        case syncIsPaused = "sync.paused"
         case syncBookmarksPausedErrorDisplayed = "sync.bookmarks-paused-error-displayed"
         case syncCredentialsPausedErrorDisplayed = "sync.credentials-paused-error-displayed"
+        case syncInvalidLoginPausedErrorDisplayed = "sync.invalid-login-paused-error-displayed"
         case syncIsFaviconsFetcherEnabled = "sync.is-favicons-fetcher-enabled"
         case syncIsEligibleForFaviconsFetcherOnboarding = "sync.is-eligible-for-favicons-fetcher-onboarding"
         case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
         case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
         case syncDidShowSyncPausedByFeatureFlagAlert = "sync.did-show-sync-paused-by-feature-flag-alert"
+        case syncLastErrorNotificationTime = "sync.last-error-notification-time"
+        case syncLastSuccesfullTime = "sync.last-time-success"
+        case syncLastNonActionableErrorCount = "sync.non-actionable-error-count"
+        case syncCurrentAllPausedError = "sync.current-all-paused-error"
+        case syncCurrentBookmarksPausedError = "sync.current-bookmarks-paused-error"
+        case syncCurrentCredentialsPausedError = "sync.current-credentials-paused-error"
 
         // Subscription
 
