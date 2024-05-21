@@ -325,8 +325,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Initialization
 
-    @MainActor
-    @objc public init() {
+    // swiftlint:disable:next function_body_length
+    @MainActor @objc public init() {
         let isSubscriptionEnabled = false
 
 #if NETP_SYSTEM_EXTENSION
