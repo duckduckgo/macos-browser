@@ -25,8 +25,10 @@ protocol DataBrokerProtectionEntitlementMonitoring {
 
 extension DataBrokerProtectionEntitlementMonitoring {
     func start(checkEntitlementFunction: @escaping () async throws -> Bool, callback: @escaping (DataBrokerProtectionEntitlementMonitorResult) -> Void) {
+        let defaultMonitoringInterval = 20
+
         start(checkEntitlementFunction: checkEntitlementFunction,
-              intervalInMinutes: DataBrokerProtectionEntitlementMonitor.monitoringInterval,
+              intervalInMinutes: defaultMonitoringInterval,
               callback: callback)
     }
 }
@@ -39,7 +41,6 @@ public enum DataBrokerProtectionEntitlementMonitorResult {
 
 final class DataBrokerProtectionEntitlementMonitor: DataBrokerProtectionEntitlementMonitoring {
     private var timer: Timer?
-    static let monitoringInterval = 20
 
     func start(checkEntitlementFunction: @escaping () async throws -> Bool, intervalInMinutes: Int, callback: @escaping (DataBrokerProtectionEntitlementMonitorResult) -> Void) {
         timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(intervalInMinutes * 60), repeats: true) { _ in
