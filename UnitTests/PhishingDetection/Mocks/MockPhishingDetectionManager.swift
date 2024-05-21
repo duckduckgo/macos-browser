@@ -18,13 +18,11 @@
 
 import Foundation
 import PhishingDetection
-@testable import DuckDuckGo_Privacy_Browser
 
 final class MockPhishingDetectionManager: PhishingDetectionManaging {
     
     private var didLoadData = false
-    private var didStartUpdates = false
-    
+
     func isMalicious(url: URL) async -> Bool {
         return url == URL(string: "https://malicious.com")
     }
@@ -32,9 +30,6 @@ final class MockPhishingDetectionManager: PhishingDetectionManaging {
     func loadDataAsync() {
         self.didLoadData = true
     }
-    
-    func startUpdateTasks() async {
-        self.didStartUpdates = true
-    }
+
 }
 

@@ -22,7 +22,6 @@ import PhishingDetection
 public protocol PhishingDetectionManaging {
     func isMalicious(url: URL) async -> Bool
     func loadDataAsync()
-    func startUpdateTasks() async
 }
 
 public final class PhishingDetectionManager: PhishingDetectionManaging {
@@ -44,7 +43,4 @@ public final class PhishingDetectionManager: PhishingDetectionManaging {
         }
     }
 
-    public func startUpdateTasks() async {
-        await phishingDetectionDataActivities.run()
-    }
 }
