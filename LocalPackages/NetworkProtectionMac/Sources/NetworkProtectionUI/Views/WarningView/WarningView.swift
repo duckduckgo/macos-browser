@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 struct WarningView: View {
     let model: Model
@@ -36,6 +37,7 @@ struct WarningView: View {
                         if let actionTitle = model.actionTitle,
                            let action = model.action {
                             Button(actionTitle, action: action)
+                                .buttonStyle(DismissActionButtonStyle(textColor: Color(.defaultText)))
                                 .keyboardShortcut(.defaultAction)
                                 .padding(.top, 3)
                         }
