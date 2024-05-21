@@ -2222,8 +2222,8 @@
 		B6830963274CDEC7004B46BB /* FireproofDomainsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6830962274CDEC7004B46BB /* FireproofDomainsStore.swift */; };
 		B68412142B694BA10092F66A /* NSObject+performSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = B68412132B694BA10092F66A /* NSObject+performSelector.m */; };
 		B68412152B694BA10092F66A /* NSObject+performSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = B68412132B694BA10092F66A /* NSObject+performSelector.m */; };
-		B684121C2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684121B2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift */; };
-		B684121D2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684121B2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift */; };
+		B684121C2B6A1D880092F66A /* SSLErrorPageHTMLTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684121B2B6A1D880092F66A /* SSLErrorPageHTMLTemplate.swift */; };
+		B684121D2B6A1D880092F66A /* SSLErrorPageHTMLTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684121B2B6A1D880092F66A /* SSLErrorPageHTMLTemplate.swift */; };
 		B68412202B6A30680092F66A /* StringExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684121F2B6A30680092F66A /* StringExtensionTests.swift */; };
 		B68412212B6A30680092F66A /* StringExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684121F2B6A30680092F66A /* StringExtensionTests.swift */; };
 		B68412272B6A68C10092F66A /* WKBackForwardListItemExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68412242B6A67920092F66A /* WKBackForwardListItemExtension.swift */; };
@@ -2532,6 +2532,8 @@
 		CD2C47DC2BFCEDF000D197A9 /* PhishingDetection in Frameworks */ = {isa = PBXBuildFile; productRef = CD2C47DB2BFCEDF000D197A9 /* PhishingDetection */; };
 		CD2C47E02BFCF05000D197A9 /* MockPhishingDetectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C47DD2BFCF05000D197A9 /* MockPhishingDetectionManager.swift */; };
 		CD2C47E12BFCF05000D197A9 /* MockPhishingDetectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C47DD2BFCF05000D197A9 /* MockPhishingDetectionManager.swift */; };
+		CD2C47E32BFCF96900D197A9 /* PhishingErrorPageHTMLTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C47E22BFCF96900D197A9 /* PhishingErrorPageHTMLTemplate.swift */; };
+		CD2C47E42BFCF96900D197A9 /* PhishingErrorPageHTMLTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C47E22BFCF96900D197A9 /* PhishingErrorPageHTMLTemplate.swift */; };
 		D64A5FF82AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */; };
 		D64A5FF92AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */; };
 		EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */; };
@@ -3872,7 +3874,7 @@
 		B6830962274CDEC7004B46BB /* FireproofDomainsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofDomainsStore.swift; sourceTree = "<group>"; };
 		B68412122B694BA10092F66A /* NSObject+performSelector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSObject+performSelector.h"; sourceTree = "<group>"; };
 		B68412132B694BA10092F66A /* NSObject+performSelector.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+performSelector.m"; sourceTree = "<group>"; };
-		B684121B2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorPageHTMLTemplate.swift; sourceTree = "<group>"; };
+		B684121B2B6A1D880092F66A /* SSLErrorPageHTMLTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSLErrorPageHTMLTemplate.swift; sourceTree = "<group>"; };
 		B684121F2B6A30680092F66A /* StringExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensionTests.swift; sourceTree = "<group>"; };
 		B68412242B6A67920092F66A /* WKBackForwardListItemExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKBackForwardListItemExtension.swift; sourceTree = "<group>"; };
 		B68458AF25C7E76A00DC17B6 /* WindowManager+StateRestoration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WindowManager+StateRestoration.swift"; sourceTree = "<group>"; };
@@ -4072,6 +4074,7 @@
 		CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationStore.swift; sourceTree = "<group>"; };
 		CD224FB42BFCE5EC00409EBC /* PhishingDetectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhishingDetectionManager.swift; sourceTree = "<group>"; };
 		CD2C47DD2BFCF05000D197A9 /* MockPhishingDetectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockPhishingDetectionManager.swift; sourceTree = "<group>"; };
+		CD2C47E22BFCF96900D197A9 /* PhishingErrorPageHTMLTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhishingErrorPageHTMLTemplate.swift; sourceTree = "<group>"; };
 		CD3F046E2BFCE23B00C66DA0 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		CD3F046F2BFCE23B00C66DA0 /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../../content-scope-scripts"; sourceTree = "<group>"; };
 		D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeButtonMenuFactory.swift; sourceTree = "<group>"; };
@@ -7871,8 +7874,9 @@
 		B68412192B6A16030092F66A /* ErrorPage */ = {
 			isa = PBXGroup;
 			children = (
-				B684121B2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift */,
+				B684121B2B6A1D880092F66A /* SSLErrorPageHTMLTemplate.swift */,
 				56BA1E812BAC506F001CF69F /* SpecialErrorPageUserScript.swift */,
+				CD2C47E22BFCF96900D197A9 /* PhishingErrorPageHTMLTemplate.swift */,
 			);
 			path = ErrorPage;
 			sourceTree = "<group>";
@@ -10039,7 +10043,7 @@
 				3706FBD1293F65D500E42796 /* NSCoderExtensions.swift in Sources */,
 				B6D6A5DD2982A4CE001F5F11 /* Tab+Navigation.swift in Sources */,
 				B68412282B6A68C20092F66A /* WKBackForwardListItemExtension.swift in Sources */,
-				B684121D2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift in Sources */,
+				B684121D2B6A1D880092F66A /* SSLErrorPageHTMLTemplate.swift in Sources */,
 				3706FBD2293F65D500E42796 /* RunningApplicationCheck.swift in Sources */,
 				3706FBD3293F65D500E42796 /* StatePersistenceService.swift in Sources */,
 				3706FBD4293F65D500E42796 /* WindowManager+StateRestoration.swift in Sources */,
@@ -10305,6 +10309,7 @@
 				3706FC82293F65D500E42796 /* PermissionAuthorizationPopover.swift in Sources */,
 				4BCBE4552BA7E16600FC75A1 /* NetworkProtectionSubscriptionEventHandler.swift in Sources */,
 				3706FC83293F65D500E42796 /* PopoverMessageViewController.swift in Sources */,
+				CD2C47E42BFCF96900D197A9 /* PhishingErrorPageHTMLTemplate.swift in Sources */,
 				4BF97ADA2B43C5DC00EB4240 /* VPNFeedbackCategory.swift in Sources */,
 				9D9AE86E2AA76D1F0026E7DC /* LoginItem+NetworkProtection.swift in Sources */,
 				3707C721294B5D2900682A9F /* WKMenuItemIdentifier.swift in Sources */,
@@ -11006,7 +11011,7 @@
 				4BF0E5122AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				AA6EF9AD25066F42004754E6 /* WindowsManager.swift in Sources */,
 				1D43EB3A292B63B00065E5D6 /* BWRequest.swift in Sources */,
-				B684121C2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift in Sources */,
+				B684121C2B6A1D880092F66A /* SSLErrorPageHTMLTemplate.swift in Sources */,
 				B65C7DFB2B886CF0001E2D5C /* WKPDFHUDViewWrapper.swift in Sources */,
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
 				85AC7ADD27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift in Sources */,
@@ -11529,6 +11534,7 @@
 				AA9E9A5E25A4867200D1959D /* TabDragAndDropManager.swift in Sources */,
 				4BBD3C00285ACE090047A89D /* NSNotificationName+Favicons.swift in Sources */,
 				4B0DB5E528BD9D08007DD239 /* PinningManager.swift in Sources */,
+				CD2C47E32BFCF96900D197A9 /* PhishingErrorPageHTMLTemplate.swift in Sources */,
 				373D9B4829EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */,
 				B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
