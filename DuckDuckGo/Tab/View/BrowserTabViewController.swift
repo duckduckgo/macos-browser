@@ -41,6 +41,7 @@ final class BrowserTabViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let bookmarkManager: BookmarkManager
+    private let dockCustomizer = DockCustomizer()
 
     private var tabViewModelCancellables = Set<AnyCancellable>()
     private var activeUserDialogCancellable: Cancellable?
@@ -1137,6 +1138,11 @@ extension BrowserTabViewController: OnboardingDelegate {
                 completion()
             }
         }
+    }
+
+    func onboardingDidRequestAddToDock(completion: @escaping () -> Void) {
+        dockCustomizer.addToDock()
+        completion()
     }
 
     func onboardingHasFinished() {

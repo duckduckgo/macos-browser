@@ -30,6 +30,14 @@ struct OnboardingFlow: View {
     @State var daxInSpeechPosition = false
     @State var showDialogs = false
 
+    var startBrowsingText: String {
+        if model.addToDockPressed {
+            return UserText.onboardingStartBrowsingAddedToDockText
+        } else {
+            return UserText.onboardingStartBrowsingText
+        }
+    }
+
     var body: some View {
 
         VStack(alignment: daxInSpeechPosition ? .leading : .center) {
@@ -62,7 +70,14 @@ struct OnboardingFlow: View {
                         model.onSetDefaultSkipped()
                     }.visibility(model.state == .setDefault ? .visible : .gone)
 
-                    DaxSpeech(text: UserText.onboardingStartBrowsingText, onTypingFinished: nil)
+                    ActionSpeech(text: UserText.onboardingAddToDockText,
+                                 actionName: UserText.onboardingAddToDockButton) {
+                        model.onAddToDockPressed()
+                    } skip: {
+                        model.onAddToDockSkipped()
+                    }.visibility(model.state == .addToDock ? .visible : .gone)
+
+                    DaxSpeech(text: startBrowsingText, onTypingFinished: nil)
                         .visibility(model.state == .startBrowsing ? .visible : .gone)
 
                 }.visibility(showDialogs ? .visible : .gone)
