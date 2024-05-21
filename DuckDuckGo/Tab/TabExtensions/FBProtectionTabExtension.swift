@@ -78,14 +78,12 @@ extension FBProtectionTabExtension {
             do {
                 try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
             } catch {
-// FIXME                assertionFailure("Missing FB List")
                 return false
             }
         } else {
             do {
                 try userContentController.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
             } catch {
-// FIXME               assertionFailure("Missing FB List")
                 return false
             }
         }
