@@ -31,10 +31,15 @@ final class DataBrokerProtectionSubscriptionEventHandler {
 
     func registerForSubscriptionAccountManagerEvents() {
         NotificationCenter.default.addObserver(self, selector: #selector(handleAccountDidSignOut), name: .accountDidSignOut, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleAccountDidSignOut), name: .entitlementsDidChange, object: nil)
     }
 
     @objc private func handleAccountDidSignOut() {
         featureDisabler.disableAndDelete()
+    }
+
+    @objc private func entitlementsDidChange() {
+        #warning("Validate if valid and delete if necessary after sending pixels")
     }
 }
 

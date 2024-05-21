@@ -71,6 +71,11 @@ public class DataBrokerProtectionAgentManagerProvider {
                                                          contentScopeProperties: contentScopeProperties,
                                                          emailService: emailService,
                                                          captchaService: captchaService)
+        
+        let agentKiller = DefaultDataBrokerProtectionAgentKiller(dataManager: dataManager,
+                                                                 entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
+                                                                 authenticationManager: authenticationManager)
+
          let operationDependencies = DefaultDataBrokerOperationDependencies(
             database: dataManager.database,
             config: executionConfig,
@@ -86,7 +91,8 @@ public class DataBrokerProtectionAgentManagerProvider {
             queueManager: queueManager,
             dataManager: dataManager,
             operationDependencies: operationDependencies,
-            pixelHandler: pixelHandler)
+            pixelHandler: pixelHandler,
+            agentKiller: agentKiller)
     }
 }
 
@@ -99,6 +105,7 @@ public final class DataBrokerProtectionAgentManager {
     private let dataManager: DataBrokerProtectionDataManaging
     private let operationDependencies: DataBrokerOperationDependencies
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private let agentKiller: DataBrokerProtectionAgentKiller
 
     // Used for debug functions only, so not injected
     private lazy var browserWindowManager = BrowserWindowManager()
@@ -111,7 +118,9 @@ public final class DataBrokerProtectionAgentManager {
          queueManager: DataBrokerProtectionQueueManager,
          dataManager: DataBrokerProtectionDataManaging,
          operationDependencies: DataBrokerOperationDependencies,
-         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         agentKiller: DataBrokerProtectionAgentKiller
+    ) {
         self.userNotificationService = userNotificationService
         self.activityScheduler = activityScheduler
         self.ipcServer = ipcServer
@@ -119,6 +128,7 @@ public final class DataBrokerProtectionAgentManager {
         self.dataManager = dataManager
         self.operationDependencies = operationDependencies
         self.pixelHandler = pixelHandler
+        self.agentKiller = agentKiller
 
         self.activityScheduler.delegate = self
         self.ipcServer.serverDelegate = self
@@ -127,20 +137,17 @@ public final class DataBrokerProtectionAgentManager {
 
     public func agentFinishedLaunching() {
 
-        do {
-            // If there's no saved profile we don't need to start the scheduler
-            // Theoretically this should never happen, if there's no data, the agent shouldn't be running
-            guard (try dataManager.fetchProfile()) != nil else {
-                return
-            }
-        } catch {
-            os_log("Error during AgentManager.agentFinishedLaunching when trying to fetchProfile, error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-            return
-        }
+        Task { @MainActor in
+            // The browser shouldn't start the agent if these prerequisites aren't met
+            // But since the agent can auto-start after a reboot without the browser, we need to validate it again
+            await agentKiller.validatePreRequisitesAndKillAgentIfNecessary()
 
-        activityScheduler.startScheduler()
-        didStartActivityScheduler = true
-        queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: nil)
+            activityScheduler.startScheduler()
+            didStartActivityScheduler = true
+            queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: nil)
+
+            agentKiller.monitorEntitlementAndKillAgentIfNecessary()
+        }
     }
 }
 
@@ -283,3 +290,4 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentDebugComman
 extension DataBrokerProtectionAgentManager: DataBrokerProtectionAppToAgentInterface {
 
 }
+

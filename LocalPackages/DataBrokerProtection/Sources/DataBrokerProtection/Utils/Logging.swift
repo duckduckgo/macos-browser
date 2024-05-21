@@ -43,6 +43,10 @@ struct Logging {
 
     fileprivate static let backgroundAgentPixelLoggingEnabled = true
     fileprivate static let backgroundAgentPixel: OSLog = OSLog(subsystem: subsystem, category: "Data Broker Protection Background Agent Pixel")
+
+    fileprivate static let dataBrokerProtectionMonitoringEnabled = true
+    fileprivate static let dataBrokerProtectionMonitoring: OSLog = OSLog(subsystem: subsystem, category: "Data Broker Protection Monitoring")
+
 }
 
 extension OSLog {
@@ -73,5 +77,9 @@ extension OSLog {
 
     public static var dbpBackgroundAgentPixel: OSLog {
         Logging.backgroundAgentPixelLoggingEnabled ? Logging.backgroundAgentPixel : .disabled
+    }
+
+    public static var dataBrokerProtectionMonitoring: OSLog {
+        Logging.dataBrokerProtectionMonitoringEnabled ? Logging.dataBrokerProtectionMonitoring : .disabled
     }
 }
