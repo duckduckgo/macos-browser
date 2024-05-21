@@ -1,7 +1,7 @@
 {
   "name": "PeopleFinders",
   "url": "peoplefinders.com",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "addedDatetime": 1677132000000,
   "steps": [
     {
@@ -11,7 +11,7 @@
         {
           "actionType": "navigate",
           "id": "12c69911-415b-4904-8162-d7993d44e348",
-          "url": "https://www.peoplefinders.com/people/${firstName}-${lastName}/${state}/${city}?landing=all&age=${age}"
+          "url": "https://www.peoplefinders.com/people/${firstName}-${lastName}/${state}/${city}?landing=all"
         },
         {
           "actionType": "extract",
