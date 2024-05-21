@@ -185,7 +185,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Configure Subscription
         subscriptionManager = SubscriptionManager()
-        
+
         // Update VPN environment and match the Subscription environment
         vpnSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
 

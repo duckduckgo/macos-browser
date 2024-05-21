@@ -61,6 +61,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         _delegate = DuckDuckGoVPNAppDelegate(bouncer: NetworkProtectionBouncer(accountManager: accountManager),
                                              accountManager: accountManager,
+                                             accessTokenStorage: accessTokenStorage,
                                              subscriptionEnvironment: subscriptionEnvironment)
         super.init()
 
@@ -124,12 +125,15 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private let appLauncher = AppLauncher()
     private let bouncer: NetworkProtectionBouncer
     private let accountManager: AccountManaging
+    private let accessTokenStorage: SubscriptionTokenKeychainStorage
 
     public init(bouncer: NetworkProtectionBouncer,
                 accountManager: AccountManaging,
+                accessTokenStorage: SubscriptionTokenKeychainStorage,
                 subscriptionEnvironment: SubscriptionEnvironment) {
         self.bouncer = bouncer
         self.accountManager = accountManager
+        self.accessTokenStorage = accessTokenStorage
         self.tunnelSettings = VPNSettings(defaults: .netP)
         self.tunnelSettings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
     }
@@ -216,7 +220,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         networkExtensionController: networkExtensionController,
         settings: tunnelSettings,
         defaults: userDefaults,
-        accessTokenStorage: SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(Bundle.main.appGroup(bundle: .subs)))))
+        accessTokenStorage: accessTokenStorage)
 
     /// An IPC server that provides access to the tunnel controller.
     ///
