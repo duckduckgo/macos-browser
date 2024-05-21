@@ -35,33 +35,29 @@ struct ClickToLoadRulesSplitter {
     }
 
     func split() -> (withoutBlockCTL: ContentBlockerRulesList, withBlockCTL: ContentBlockerRulesList)? {
-        let splitTDS = rulesList.trackerData != nil ? split(trackerData: rulesList.trackerData!) : nil
+        guard let trackerData = rulesList.trackerData, let splitTDS = split(trackerData: trackerData) else { return nil }
 
-        if splitTDS != nil {
-            return (
-                ContentBlockerRulesList(name: rulesList.name,
-                                        trackerData: splitTDS?.withoutBlockCTL,
-                                        fallbackTrackerData: split(trackerData: rulesList.fallbackTrackerData)!.withoutBlockCTL),
-                ContentBlockerRulesList(name: ContentBlockerRulesLists.Constants.clickToLoadRulesListName,
-                                        trackerData: splitTDS?.withBlockCTL,
-                                        fallbackTrackerData: split(trackerData: rulesList.fallbackTrackerData)!.withBlockCTL)
-            )
-        }
-        return nil
+        return (
+            ContentBlockerRulesList(name: rulesList.name,
+                                    trackerData: splitTDS.withoutBlockCTL,
+                                    fallbackTrackerData: split(trackerData: rulesList.fallbackTrackerData)!.withoutBlockCTL),
+            ContentBlockerRulesList(name: ContentBlockerRulesLists.Constants.clickToLoadRulesListName,
+                                    trackerData: splitTDS.withBlockCTL,
+                                    fallbackTrackerData: split(trackerData: rulesList.fallbackTrackerData)!.withBlockCTL)
+        )
     }
 
     private func split(trackerData: TrackerDataManager.DataSet) -> (withoutBlockCTL: TrackerDataManager.DataSet, withBlockCTL: TrackerDataManager.DataSet)? {
         let (mainTrackers, ctlTrackers) = processCTLActions(trackerData.tds.trackers)
-        if !ctlTrackers.isEmpty {
-           let trackerDataWithoutBlockCTL = makeTrackerData(using: mainTrackers, originalTDS: trackerData.tds)
-           let trackerDataWithBlockCTL = makeTrackerData(using: ctlTrackers, originalTDS: trackerData.tds)
+        guard !ctlTrackers.isEmpty else { return nil }
 
-           return (
-               (tds: trackerDataWithoutBlockCTL, etag: Constants.tdsRuleListPrefix + trackerData.etag),
-               (tds: trackerDataWithBlockCTL, etag: Constants.clickToLoadRuleListPrefix + trackerData.etag)
-           )
-        }
-        return nil
+        let trackerDataWithoutBlockCTL = makeTrackerData(using: mainTrackers, originalTDS: trackerData.tds)
+        let trackerDataWithBlockCTL = makeTrackerData(using: ctlTrackers, originalTDS: trackerData.tds)
+
+        return (
+           (tds: trackerDataWithoutBlockCTL, etag: Constants.tdsRuleListPrefix + trackerData.etag),
+           (tds: trackerDataWithBlockCTL, etag: Constants.clickToLoadRuleListPrefix + trackerData.etag)
+        )
     }
 
     private func makeTrackerData(using trackers: [String: KnownTracker], originalTDS: TrackerData) -> TrackerData {
@@ -78,41 +74,41 @@ struct ClickToLoadRulesSplitter {
         var ctlTrackers: [String: KnownTracker] = [:]
 
         for (key, tracker) in trackers {
-            if tracker.containsCTLActions {
-                // if we found some CTL rules, split out into its own list
-                if let rules = tracker.rules as [KnownTracker.Rule]? {
-                    var normalRules: [KnownTracker.Rule] = []
-                    var ctlRules: [KnownTracker.Rule] = []
-
-                    for ruleIndex in rules.indices.reversed() {
-                        if let action = rules[ruleIndex].action, action == .blockCtlFB {
-                            ctlRules.insert(rules[ruleIndex], at: 0)
-                        } else {
-                            ctlRules.insert(rules[ruleIndex], at: 0)
-                            normalRules.insert(rules[ruleIndex], at: 0)
-                        }
-                    }
-
-                    let mainTracker = KnownTracker(domain: tracker.domain,
-                                                   defaultAction: tracker.defaultAction,
-                                                   owner: tracker.owner,
-                                                   prevalence: tracker.prevalence,
-                                                   subdomains: tracker.subdomains,
-                                                   categories: tracker.categories,
-                                                   rules: normalRules)
-                    let ctlTracker = KnownTracker(domain: tracker.domain,
-                                                  defaultAction: tracker.defaultAction,
-                                                  owner: tracker.owner,
-                                                  prevalence: tracker.prevalence,
-                                                  subdomains: tracker.subdomains,
-                                                  categories: tracker.categories,
-                                                  rules: ctlRules)
-                    mainTDSTrackers[key] = mainTracker
-                    ctlTrackers[key] = ctlTracker
-                }
-            } else {
-                // copy tracker as-is
+            guard tracker.containsCTLActions, let rules = tracker.rules else {
                 mainTDSTrackers[key] = tracker
+                continue
+            }
+
+            // if we found some CTL rules, split out into its own list
+            if let rules = tracker.rules as [KnownTracker.Rule]? {
+                var mainRules: [KnownTracker.Rule] = []
+                var ctlRules: [KnownTracker.Rule] = []
+
+                for rule in rules.reversed() {
+                    if let action = rule.action, action == .blockCtlFB {
+                        ctlRules.insert(rule, at: 0)
+                    } else {
+                        ctlRules.insert(rule, at: 0)
+                        mainRules.insert(rule, at: 0)
+                    }
+                }
+
+                let mainTracker = KnownTracker(domain: tracker.domain,
+                                               defaultAction: tracker.defaultAction,
+                                               owner: tracker.owner,
+                                               prevalence: tracker.prevalence,
+                                               subdomains: tracker.subdomains,
+                                               categories: tracker.categories,
+                                               rules: mainRules)
+                let ctlTracker = KnownTracker(domain: tracker.domain,
+                                              defaultAction: tracker.defaultAction,
+                                              owner: tracker.owner,
+                                              prevalence: tracker.prevalence,
+                                              subdomains: tracker.subdomains,
+                                              categories: tracker.categories,
+                                              rules: ctlRules)
+                mainTDSTrackers[key] = mainTracker
+                ctlTrackers[key] = ctlTracker
             }
         }
 
