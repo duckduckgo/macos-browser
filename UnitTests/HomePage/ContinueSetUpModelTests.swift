@@ -69,6 +69,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     var coookiePopupProtectionPreferences: MockCookiePopupProtectionPreferencesPersistor!
     var privacyConfigManager: MockPrivacyConfigurationManager!
     var randomNumberGenerator: MockRandomNumberGenerator!
+    var dockCustomizer: DockCustomization!
     let userDefaults = UserDefaults(suiteName: "\(Bundle.main.bundleIdentifier!).\(NSApplication.runType)")!
 
     @MainActor override func setUp() {
@@ -86,6 +87,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         let config = MockPrivacyConfiguration()
         privacyConfigManager.privacyConfig = config
         randomNumberGenerator = MockRandomNumberGenerator()
+        dockCustomizer = DockCustomizerMock()
 
 #if DBP
         let messaging = HomePageRemoteMessaging(
@@ -103,6 +105,7 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
+            dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
@@ -146,6 +149,7 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
+            dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
@@ -226,6 +230,7 @@ final class ContinueSetUpModelTests: XCTestCase {
 
     @MainActor func testWhenAskedToPerformActionForImportPromptThrowsThenItOpensImportWindow() {
         let numberOfFeatures = HomePage.Models.FeatureType.allCases.count - 1
+
         vm.shouldShowAllFeatures = true
         XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures)
 
@@ -353,10 +358,12 @@ final class ContinueSetUpModelTests: XCTestCase {
         emailStorage.isEmailProtectionEnabled = true
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         capturingDataImportProvider.didImport = true
+        dockCustomizer.addToDock()
         userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageShowPermanentSurvey.rawValue)
 
         vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
+            dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
@@ -384,6 +391,11 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.removeItem(for: .emailProtection)
         XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.emailProtection))
+
+#if !APPSTORE
+        vm.removeItem(for: .dock)
+        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.dock))
+#endif
 
         let vm2 = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults)
         XCTAssertTrue(vm2.visibleFeaturesMatrix.flatMap { $0 }.isEmpty)
@@ -461,6 +473,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
         let vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
+            dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
@@ -512,6 +525,27 @@ final class ContinueSetUpModelTests: XCTestCase {
 #endif
     }
 
+    @MainActor func test_WhenUserDoesntHaveApplicationInTheDock_ThenAddToDockCardIsDisplayed() {
+#if !APPSTORE
+        let dockCustomizer = DockCustomizerMock()
+
+        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, dockCustomizer: dockCustomizer)
+        vm.shouldShowAllFeatures = true
+
+        XCTAssert(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.dock))
+#endif
+    }
+
+    @MainActor func test_WhenUserHasApplicationInTheDock_ThenAddToDockCardIsNotDisplayed() {
+        let dockCustomizer = DockCustomizerMock()
+        dockCustomizer.addToDock()
+
+        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, dockCustomizer: dockCustomizer)
+        vm.shouldShowAllFeatures = true
+
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.dock))
+    }
+
 }
 
 extension HomePage.Models.ContinueSetUpModel {
@@ -523,7 +557,8 @@ extension HomePage.Models.ContinueSetUpModel {
         privacyConfig: MockPrivacyConfiguration = MockPrivacyConfiguration(),
         appGroupUserDefaults: UserDefaults,
         permanentSurveyManager: MockPermanentSurveyManager = MockPermanentSurveyManager(),
-        randomNumberGenerator: RandomNumberGenerating = MockRandomNumberGenerator()
+        randomNumberGenerator: RandomNumberGenerating = MockRandomNumberGenerator(),
+        dockCustomizer: DockCustomization = DockCustomizerMock()
     ) -> HomePage.Models.ContinueSetUpModel {
         privacyConfig.featureSettings = [
             "networkProtection": "disabled"
@@ -547,6 +582,7 @@ extension HomePage.Models.ContinueSetUpModel {
 
         return HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: defaultBrowserProvider,
+            dockCustomizer: dockCustomizer,
             dataImportProvider: dataImportProvider,
             tabCollectionViewModel: TabCollectionViewModel(),
             emailManager: emailManager,
