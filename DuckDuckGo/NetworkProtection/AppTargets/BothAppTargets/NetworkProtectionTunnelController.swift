@@ -174,7 +174,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         self.settings = settings
         self.defaults = defaults
         self.tokenStore = tokenStore
-        self.accessTokenStorage = accessTokenStorage // = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(Bundle.main.appGroup(bundle: .subs))))
+        self.accessTokenStorage = accessTokenStorage
 
         subscribeToSettingsChanges()
         subscribeToStatusChanges()
