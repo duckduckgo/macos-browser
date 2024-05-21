@@ -42,7 +42,7 @@ final class SpecialErrorPageTabExtension {
     private var featureFlagger: FeatureFlagger
     private var phishingUrlExemptions: [String] = ["about:blank", "https://duckduckgo.com"]
     private var detectionManager: PhishingDetectionManaging
-    private var thisErrorType: ErrorType?
+    private var errorPageType: ErrorType?
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -93,6 +93,14 @@ final class SpecialErrorPageTabExtension {
             webView?.setDocumentHtml(html)
         }
     }
+#if DEBUG
+    public func setSSLErrorPageType() {
+        errorPageType = .ssl
+    }
+    public func setPhishingErrorPageType() {
+        errorPageType = .phishing
+    }
+#endif
 
 }
 
@@ -106,7 +114,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         // Check the URL
         let isMalicious = await detectionManager.isMalicious(url: navigationAction.url)
         if isMalicious {
-            thisErrorType = .phishing
+            errorPageType = .phishing
             specialErrorPageUserScript?.failingURL = navigationAction.url
             loadPhishingErrorHTML(url: navigationAction.url)
             return .cancel
@@ -127,7 +135,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
             if featureFlagger.isFeatureOn(.sslCertificatesBypass),
                error.errorCode == NSURLErrorServerCertificateUntrusted,
                let errorCode = error.userInfo["_kCFStreamErrorCodeKey"] as? Int {
-                thisErrorType = .ssl
+                errorPageType = .ssl
                 specialErrorPageUserScript?.failingURL = url
                 loadSSLErrorHTML(url: url, alternate: shouldPerformAlternateNavigation, errorCode: errorCode)
             }
@@ -142,7 +150,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     @MainActor
     func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust else { return nil }
-        guard shouldBypassSSLError else { return nil}
+        guard shouldBypassSSLError else { return nil }
         guard navigation?.url == webView?.url else { return nil }
         guard let credential = urlCredentialCreator.urlCredentialFrom(trust: challenge.protectionSpace.serverTrust) else { return nil }
 
@@ -161,10 +169,10 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
     }
 
     func visitSite() {
-        if thisErrorType == .phishing {
+        if errorPageType == .phishing {
             let urlString = webView?.url?.absoluteString
             phishingUrlExemptions.append(urlString!)
-        } else if thisErrorType == .ssl {
+        } else if errorPageType == .ssl {
             shouldBypassSSLError = true
         }
         _ = webView?.reloadPage()

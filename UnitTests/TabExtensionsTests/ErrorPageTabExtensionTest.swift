@@ -245,6 +245,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
         let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
         let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        errorPageExtention.setSSLErrorPageType()
         errorPageExtention.webView = mockWebView
         errorPageExtention.visitSite()
 
