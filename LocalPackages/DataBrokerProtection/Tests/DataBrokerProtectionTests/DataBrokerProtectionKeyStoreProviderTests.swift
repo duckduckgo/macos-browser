@@ -102,7 +102,7 @@ final class DataBrokerProtectionKeyStoreProviderTests: XCTestCase {
 
             // Then
             XCTAssertEqual(mockKeychainService.addCallCount, 1)
-            XCTAssertEqual(mockKeychainService.latestAddQuery[kSecAttrAccessible as String] as! String, kSecAttrAccessibleWhenUnlocked as String)
+            XCTAssertEqual(mockKeychainService.latestAddQuery[kSecAttrAccessible as String] as! String, kSecAttrAccessibleAfterFirstUnlock as String)
         }
     }
 

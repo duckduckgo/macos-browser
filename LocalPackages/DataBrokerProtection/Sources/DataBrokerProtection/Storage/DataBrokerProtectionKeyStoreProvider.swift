@@ -51,6 +51,10 @@ final class DataBrokerProtectionKeyStoreProvider: SecureStorageKeyStoreProvider 
         return Constants.defaultServiceName
     }
 
+    var keychainAccessibilityValue: String {
+        kSecAttrAccessibleAfterFirstUnlock as String
+    }
+
     let keychainService: KeychainService
     private let groupNameProvider: GroupNameProviding
     private let getLog: () -> OSLog
@@ -71,16 +75,20 @@ final class DataBrokerProtectionKeyStoreProvider: SecureStorageKeyStoreProvider 
     }
 
     func attributesForEntry(named: String, serviceName: String) -> [String: Any] {
-        var attributes = legacyAttributesForEntry(named: named, serviceName: serviceName)
-        attributes[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
-        return attributes
+        [
+           kSecClass: kSecClassGenericPassword,
+           kSecUseDataProtectionKeychain: true,
+           kSecAttrSynchronizable: false,
+           kSecAttrAccessGroup: groupNameProvider.appGroupName,
+           kSecAttrAccount: named,
+       ] as [String: Any]
     }
 }
 
 private extension DataBrokerProtectionKeyStoreProvider {
 
-    var attributeUpdate: [String: Any] {
-        [kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock]
+    var afterFirstUnlockAttributeUpdate: [String: Any] {
+        [kSecAttrAccessible as String: keychainAccessibilityValue]
     }
 
     /// Reads data from the Keychain using the latest query attributes, or if not found, reads using old query attributes and if found, migrates
@@ -91,21 +99,21 @@ private extension DataBrokerProtectionKeyStoreProvider {
     func readOrMigrate(named name: String, serviceName: String) throws -> Data? {
 
         // Try to read keychain data using attributes which include `kSecAttrAccessible` value of `kSecAttrAccessibleAfterFirstUnlock`
-        let attributes = attributesForEntry(named: name, serviceName: serviceName)
+        let attributes = afterFirstUnlockQueryAttributes(named: name, serviceName: serviceName)
 
         if let data = try read(serviceName: serviceName, queryAttributes: attributes) {
             return data
         } else {
 
             // If we didn't find Keychain data, try using attributes WITHOUT `kSecAttrAccessible` value of `kSecAttrAccessibleAfterFirstUnlock`
-            let legacyAttributes = legacyAttributesForEntry(named: name, serviceName: serviceName)
+            let legacyAttributes = whenUnlockedQueryAttributes(named: name, serviceName: serviceName)
 
             let accessibilityValueString = legacyAttributes[kSecAttrAccessible as String] as? String ?? "[value unavailable]"
             os_log("Attempting read and migrate of DBP Keychain data with kSecAttrAccessible value of \(accessibilityValueString)", log: .dataBrokerProtection, type: .debug)
 
             if let data = try read(serviceName: serviceName, queryAttributes: legacyAttributes) {
                 // We found Keychain data, so update it's `kSecAttrAccessible` value to `kSecAttrAccessibleAfterFirstUnlock`
-                try update(serviceName: serviceName, queryAttributes: legacyAttributes, attributeUpdate: attributeUpdate)
+                try update(serviceName: serviceName, queryAttributes: legacyAttributes, attributeUpdate: afterFirstUnlockAttributeUpdate)
                 return data
             }
         }
@@ -164,14 +172,15 @@ private extension DataBrokerProtectionKeyStoreProvider {
         os_log("Updated DBP Keychain data kSecAttrAccessible value to \(accessibilityValueString)", log: .dataBrokerProtection, type: .debug)
     }
 
-    func legacyAttributesForEntry(named entryName: String, serviceName: String) -> [String: Any] {
-        return [
-            kSecClass: kSecClassGenericPassword,
-            kSecUseDataProtectionKeychain: true,
-            kSecAttrSynchronizable: false,
-            kSecAttrAccessGroup: groupNameProvider.appGroupName,
-            kSecAttrAccount: entryName,
-            kSecAttrAccessible: kSecAttrAccessibleWhenUnlocked
-        ] as [String: Any]
+    func afterFirstUnlockQueryAttributes(named name: String, serviceName: String) -> [String: Any] {
+        var attributes = attributesForEntry(named: name, serviceName: serviceName)
+        attributes[kSecAttrAccessible as String] = keychainAccessibilityValue
+        return attributes
+    }
+
+    func whenUnlockedQueryAttributes(named name: String, serviceName: String) -> [String: Any] {
+        var attributes = attributesForEntry(named: name, serviceName: serviceName)
+        attributes[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlocked
+        return attributes
     }
 }
