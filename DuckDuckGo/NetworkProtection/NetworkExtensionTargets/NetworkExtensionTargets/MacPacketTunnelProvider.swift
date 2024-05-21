@@ -141,14 +141,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #else
         let defaults = UserDefaults.netP
 #endif
-        let settings = VPNSettings(defaults: defaults)
-
-        // Update the VPN environment and match the Subscription environment
-        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
-        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
-        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
-        settings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
-
         switch event {
         case .userBecameActive:
             PixelKit.fire(
@@ -344,10 +336,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #endif
 
         NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = AppVersion.shared.versionAndBuildNumber
+        let settings = VPNSettings(defaults: defaults)
 
         // MARK: - Configure Subscription
-        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
-        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+        let subscriptionUserDefaults = UserDefaults(suiteName: MacPacketTunnelProvider.subscriptionsAppGroup)!
         let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
@@ -360,18 +352,21 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
                                                                  key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
-        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        // Align Subscription environment to the VPN environment
+        var subscriptionEnvironment = SubscriptionEnvironment.default
+        switch settings.selectedEnvironment {
+        case .production:
+            subscriptionEnvironment.serviceEnvironment = .production
+        case .staging:
+            subscriptionEnvironment.serviceEnvironment = .staging
+        }
+
         let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let accountManager = AccountManager(accessTokenStorage: tokenStore,
                                             entitlementsCache: entitlementsCache,
                                             subscriptionService: subscriptionService,
                                             authService: authService)
-
-        let settings = VPNSettings(defaults: defaults)
-
-        // Update the VPN environment and match the Subscription environment
-        settings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
 
         let entitlementsCheck = {
             await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
