@@ -23,16 +23,6 @@ protocol DataBrokerProtectionEntitlementMonitoring {
     func stop()
 }
 
-extension DataBrokerProtectionEntitlementMonitoring {
-    func start(checkEntitlementFunction: @escaping () async throws -> Bool, callback: @escaping (DataBrokerProtectionEntitlementMonitorResult) -> Void) {
-        let defaultMonitoringInterval = 20
-
-        start(checkEntitlementFunction: checkEntitlementFunction,
-              intervalInMinutes: defaultMonitoringInterval,
-              callback: callback)
-    }
-}
-
 public enum DataBrokerProtectionEntitlementMonitorResult {
     case enabled
     case disabled

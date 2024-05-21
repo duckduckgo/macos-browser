@@ -21,11 +21,12 @@ import Common
 
 protocol DataBrokerProtectionAgentStopper {
     /// Validates if the user has profile data, is authenticated, and has valid entitlement. If any of these conditions are not met, the agent will be stopped.
-    func validateRunPreRequisitesAndStopAgentIfNecessary() async
+    func validateRunPrerequisitesAndStopAgentIfNecessary() async
 
     /// Monitors the entitlement package. If the entitlement check returns false, the agent will be stopped.
-    func monitorEntitlementAndStopAgentIfNecessary()
-
+    /// This function ensures that the agent is stopped if the user's subscription has expired, even if the browser is not active. Regularly checking for entitlement is required since notifications are not posted to agents.
+    func monitorEntitlementAndStopAgentIfEntitlementIsInvalid()
+    
     /// Stops the agent
     func stopAgent()
 }
@@ -43,7 +44,7 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
         self.authenticationManager = authenticationManager
     }
 
-    public func validateRunPreRequisitesAndStopAgentIfNecessary() async {
+    public func validateRunPrerequisitesAndStopAgentIfNecessary() async {
         do {
             guard try dataManager.fetchProfile() != nil,
                   authenticationManager.isUserAuthenticated,
@@ -60,8 +61,8 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
         }
     }
 
-    public func monitorEntitlementAndStopAgentIfNecessary() {
-        entitlementMonitor.start(checkEntitlementFunction: authenticationManager.hasValidEntitlement) { result in
+    public func monitorEntitlementAndStopAgentIfEntitlementIsInvalid() {
+        entitlementMonitor.start(checkEntitlementFunction: authenticationManager.hasValidEntitlement, intervalInMinutes: 60) { result in
             switch result {
             case .enabled:
 #warning("Send pixel enabled")

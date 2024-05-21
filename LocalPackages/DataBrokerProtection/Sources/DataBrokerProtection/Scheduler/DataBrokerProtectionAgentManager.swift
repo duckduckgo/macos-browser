@@ -141,13 +141,13 @@ public final class DataBrokerProtectionAgentManager {
             // The browser shouldn't start the agent if these prerequisites aren't met.
             // However, since the agent can auto-start after a reboot without the browser, we need to validate it again.
             // If the agent needs to be stopped, this function will stop it, so the subsequent calls after it will not be made.
-            await agentStopper.validateRunPreRequisitesAndStopAgentIfNecessary()
+            await agentStopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
             activityScheduler.startScheduler()
             didStartActivityScheduler = true
             queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: nil)
 
-            agentStopper.monitorEntitlementAndStopAgentIfNecessary()
+            agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid()
         }
     }
 }
