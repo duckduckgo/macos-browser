@@ -295,6 +295,9 @@ final class SaveCredentialsViewController: NSViewController {
             delegate?.shouldCloseSaveCredentialsViewController(self)
         }
 
+        let existingCredentials = getExistingCredentialsFrom(credentials)
+        firePixels(for: .dismissed, credentials: existingCredentials)
+
         guard DataClearingPreferences.shared.isLoginDetectionEnabled else {
             notifyDelegate()
             return
@@ -321,8 +324,6 @@ final class SaveCredentialsViewController: NSViewController {
             notifyDelegate()
         }
 
-        let existingCredentials = getExistingCredentialsFrom(credentials)
-        firePixels(for: .dismissed, credentials: existingCredentials)
     }
 
     @objc func onNeverPromptClicked() {
