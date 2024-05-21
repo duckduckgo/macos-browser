@@ -18,11 +18,20 @@
 
 import PrivacyDashboard
 import XCTest
-
+import PixelKit
+import PixelKitTestingUtilities
 @testable import DuckDuckGo_Privacy_Browser
 @testable import Networking
 
 class WebsiteBreakageReportTests: XCTestCase {
+
+    func testReportBrokenSitePixel() {
+        fire(NonStandardEvent(NonStandardPixel.brokenSiteReport),
+             frequency: .standard,
+             and: .expect(pixelName: "epbf_macos_desktop"),
+             file: #filePath,
+             line: #line)
+    }
 
     func testCommonSetOfFields() throws {
         let breakage = BrokenSiteReport(
@@ -129,7 +138,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         APIRequest.Headers.setUserAgent("")
         var params = parameters
         params["test"] = "1"
-        let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: GeneralPixel.brokenSiteReport.name),
+        let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: NonStandardPixel.brokenSiteReport.name),
                                                      queryParameters: params,
                                                      allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters)
         return configuration.request

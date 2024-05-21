@@ -34,15 +34,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     weak var delegate: AddressBarButtonsViewControllerDelegate?
 
-    private var bookmarkPopover: AddBookmarkPopover?
-    private func bookmarkPopoverCreatingIfNeeded() -> AddBookmarkPopover {
-        return bookmarkPopover ?? {
-            let popover = AddBookmarkPopover()
-            popover.delegate = self
-            self.bookmarkPopover = popover
-            return popover
-        }()
-    }
+    private let accessibilityPreferences: AccessibilityPreferences
 
     private var permissionAuthorizationPopover: PermissionAuthorizationPopover?
     private func permissionAuthorizationPopoverCreatingIfNeeded() -> PermissionAuthorizationPopover {
@@ -63,26 +55,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }()
     }
 
-    private var _privacyDashboardPopover: PrivacyDashboardPopover?
-    private var privacyDashboardPopover: PrivacyDashboardPopover {
-        get {
-            if let result = _privacyDashboardPopover {
-                return result
-            } else {
-                let popover = PrivacyDashboardPopover()
-                popover.delegate = self
-                self.privacyDashboardPopover = popover
-                self.subscribePrivacyDashboardPendingUpdates(privacyDashboardPopover: popover)
-                return popover
-            }
-        }
-        set {
-            _privacyDashboardPopover = newValue
-        }
-    }
-
-    @IBOutlet weak var privacyDashboardPositioningView: NSView!
-
+    @IBOutlet weak var zoomButton: NSButton!
     @IBOutlet weak var privacyEntryPointButton: MouseOverAnimationButton!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
     @IBOutlet weak var imageButtonWrapper: NSView!
@@ -96,6 +69,7 @@ final class AddressBarButtonsViewController: NSViewController {
     var trackerAnimationView3: LottieAnimationView!
     var shieldAnimationView: LottieAnimationView!
     var shieldDotAnimationView: LottieAnimationView!
+
     @IBOutlet weak var notificationAnimationView: NavigationBarBadgeAnimationView!
 
     @IBOutlet weak var permissionButtons: NSView!
@@ -138,7 +112,13 @@ final class AddressBarButtonsViewController: NSViewController {
     @Published private(set) var buttonsWidth: CGFloat = 0
 
     private var tabCollectionViewModel: TabCollectionViewModel
-    private var tabViewModel: TabViewModel?
+    private var tabViewModel: TabViewModel? {
+        didSet {
+            subscribeToTabZoomLevel()
+        }
+    }
+
+    private let popovers: NavigationBarPopovers
 
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     var controllerMode: AddressBarViewController.Mode? {
@@ -167,13 +147,12 @@ final class AddressBarButtonsViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var urlCancellable: AnyCancellable?
     private var bookmarkListCancellable: AnyCancellable?
-    private var privacyDashboadPendingUpdatesCancellable: AnyCancellable?
     private var effectiveAppearanceCancellable: AnyCancellable?
+    private var accessibilityPreferencesCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var privacyEntryPointIconUpdateCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
-    private var privacyInfoCancellable: AnyCancellable?
 
     private lazy var buttonsBadgeAnimator = NavigationBarBadgeAnimator()
 
@@ -182,9 +161,12 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel) {
+          tabCollectionViewModel: TabCollectionViewModel,
+          accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
+          popovers: NavigationBarPopovers) {
         self.tabCollectionViewModel = tabCollectionViewModel
-
+        self.accessibilityPreferences = accessibilityPreferences
+        self.popovers = popovers
         super.init(coder: coder)
     }
 
@@ -264,30 +246,47 @@ final class AddressBarButtonsViewController: NSViewController {
         }
         popupBlockedPopover?.close()
 
-        if privacyDashboardPopover.isShown {
-            closePrivacyDashboard()
-        } else {
-            openPrivacyDashboard()
-        }
+        popovers.togglePrivacyDashboardPopover(for: tabViewModel, from: privacyEntryPointButton)
     }
 
     private func updateBookmarkButtonVisibility() {
         guard view.window?.isPopUpWindow == false else { return }
         bookmarkButton.setAccessibilityIdentifier("AddressBarButtonsViewController.bookmarkButton")
         let hasEmptyAddressBar = textFieldValue?.isEmpty ?? true
-        var showBookmarkButton: Bool {
+        var shouldShowBookmarkButton: Bool {
             guard let tabViewModel, tabViewModel.canBeBookmarked else { return false }
 
             var isUrlBookmarked = false
-            if let url = tabViewModel.tab.content.url,
+            if let url = tabViewModel.tab.content.userEditableUrl,
                bookmarkManager.isUrlBookmarked(url: url) {
                 isUrlBookmarked = true
             }
 
-            return clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true || isUrlBookmarked)
+            return clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || popovers.isEditBookmarkPopoverShown || isUrlBookmarked)
         }
 
-        bookmarkButton.isHidden = !showBookmarkButton
+        bookmarkButton.isShown = shouldShowBookmarkButton
+    }
+
+    private func updateZoomButtonVisibility(animation: Bool = false) {
+        zoomButton.isHidden = true
+        let hasURL = tabViewModel?.tab.url != nil
+        let isEditingMode = controllerMode?.isEditing ?? false
+        let isTextFieldValueText = textFieldValue?.isText ?? false
+
+        var hasNonDefaultZoom = false
+        if tabViewModel?.zoomLevel != accessibilityPreferences.defaultPageZoom {
+            hasNonDefaultZoom = true
+        }
+
+        let shouldShowZoom = hasURL
+        && !isEditingMode
+        && !isTextFieldValueText
+        && !isTextFieldEditorFirstResponder
+        && !animation
+        && (hasNonDefaultZoom || popovers.isZoomPopoverShown == true || popovers.zoomPopover != nil)
+
+        zoomButton.isHidden = !shouldShowZoom
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) {
@@ -297,15 +296,11 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        let bookmarkPopover = bookmarkPopoverCreatingIfNeeded()
-        if !bookmarkPopover.isShown {
-            bookmarkButton.isHidden = false
-            bookmarkPopover.isNew = result.isNew
-            bookmarkPopover.bookmark = bookmark
-            bookmarkPopover.show(positionedBelow: bookmarkButton)
+        if !popovers.isEditBookmarkPopoverShown {
+            popovers.showEditBookmarkPopover(with: bookmark, isNew: result.isNew, from: bookmarkButton, withDelegate: self)
         } else {
             updateBookmarkButtonVisibility()
-            bookmarkPopover.close()
+            popovers.closeEditBookmarkPopover()
         }
     }
 
@@ -319,7 +314,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }()
 
         if query.permissions.contains(.camera)
-            || (query.permissions.contains(.microphone) && microphoneButton.isHidden && !cameraButton.isHidden) {
+            || (query.permissions.contains(.microphone) && microphoneButton.isHidden && cameraButton.isShown) {
             button = cameraButton
         } else {
             assert(query.permissions.count == 1)
@@ -342,9 +337,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 return
             }
         }
-        guard !button.isHidden,
-              !permissionButtons.isHidden
-        else { return }
+        guard button.isShown, permissionButtons.isShown else { return }
 
         (popover.contentViewController as? PermissionAuthorizationViewController)?.query = query
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
@@ -352,49 +345,33 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     func closePrivacyDashboard() {
-
-        // Prevent popover from being closed with Privacy Entry Point Button, while pending updates
-        guard let privacyDashboardViewController = privacyDashboardPopover.viewController,
-              privacyDashboardViewController.isPendingUpdates() == false else {
-            return
-        }
-
-        privacyDashboardPopover.close()
+        popovers.closePrivacyDashboard()
     }
 
     func openPrivacyDashboard() {
-        guard let tabViewModel,
-              let privacyDashboardViewController = privacyDashboardPopover.viewController else {
-            return
-        }
-
-        privacyDashboardViewController.updateTabViewModel(tabViewModel)
-
-        let positioningViewInWindow = privacyDashboardPositioningView.convert(privacyDashboardPositioningView.bounds, to: view.window?.contentView)
-        privacyDashboardPopover.setPreferredMaxHeight(positioningViewInWindow.origin.y)
-        privacyDashboardPopover.delegate = self
-        privacyDashboardPopover.show(positionedBelow: privacyDashboardPositioningView)
-
-        privacyEntryPointButton.state = .on
-
-        privacyInfoCancellable = tabViewModel.tab.privacyInfoPublisher
-            .dropFirst()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak privacyDashboardPopover, weak tabViewModel] _ in
-                guard privacyDashboardPopover?.isShown == true, let tabViewModel else { return }
-                privacyDashboardViewController.updateTabViewModel(tabViewModel)
-            }
+        guard let tabViewModel else { return }
+        popovers.openPrivacyDashboard(for: tabViewModel, from: privacyEntryPointButton)
     }
 
     func updateButtons() {
         stopAnimationsAfterFocus()
 
-        clearButton.isHidden = !(isTextFieldEditorFirstResponder && !(textFieldValue?.isEmpty ?? true))
+        clearButton.isShown = isTextFieldEditorFirstResponder && !textFieldValue.isEmpty
 
         updatePrivacyEntryPointButton()
         updateImageButton()
         updatePermissionButtons()
         updateBookmarkButtonVisibility()
+        updateZoomButtonVisibility()
+    }
+
+    @IBAction func zoomButtonAction(_ sender: Any) {
+        if popovers.isZoomPopoverShown {
+            popovers.closeZoomPopover()
+        } else {
+            guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+            popovers.showZoomPopover(for: tabViewModel, from: zoomButton, withDelegate: self)
+        }
     }
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
@@ -413,7 +390,7 @@ final class AddressBarButtonsViewController: NSViewController {
             permissions.microphone = tabViewModel.usedPermissions.microphone
         }
 
-        let url = tabViewModel.tab.content.url ?? .empty
+        let url = tabViewModel.tab.content.urlForWebView ?? .empty
         let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
         PermissionContextMenu(permissions: permissions.map { ($0, $1) }, domain: domain, delegate: self)
@@ -432,7 +409,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        let url = tabViewModel.tab.content.url ?? .empty
+        let url = tabViewModel.tab.content.urlForWebView ?? .empty
         let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
         PermissionContextMenu(permissions: [(.microphone, state)], domain: domain, delegate: self)
@@ -451,7 +428,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        let url = tabViewModel.tab.content.url ?? .empty
+        let url = tabViewModel.tab.content.urlForWebView ?? .empty
         let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
         PermissionContextMenu(permissions: [(.geolocation, state)], domain: domain, delegate: self)
@@ -475,7 +452,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 $0.append( (.popups, .requested($1)) )
             }
         } else {
-            let url = tabViewModel.tab.content.url ?? .empty
+            let url = tabViewModel.tab.content.urlForWebView ?? .empty
             domain = url.isFileURL ? .localhost : (url.host ?? "")
             permissions = [(.popups, state)]
         }
@@ -499,7 +476,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         permissions = [(permissionType, state)]
-        let url = tabViewModel.tab.content.url ?? .empty
+        let url = tabViewModel.tab.content.urlForWebView ?? .empty
         let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
         PermissionContextMenu(permissions: permissions, domain: domain, delegate: self)
@@ -663,41 +640,15 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func subscribePrivacyDashboardPendingUpdates(privacyDashboardPopover: PrivacyDashboardPopover) {
-        privacyDashboadPendingUpdatesCancellable?.cancel()
-        guard NSApp.runType.requiresEnvironment else { return }
-
-        guard let privacyDashboardViewController = privacyDashboardPopover.viewController else {
-            return
-        }
-
-        privacyDashboadPendingUpdatesCancellable = privacyDashboardViewController.rulesUpdateObserver
-            .$pendingUpdates.dropFirst().receive(on: DispatchQueue.main).sink { [weak privacyDashboardPopover] _ in
-                let isPendingUpdate = privacyDashboardViewController.isPendingUpdates()
-
-            // Prevent popover from being closed when clicking away, while pending updates
-            if isPendingUpdate {
-                privacyDashboardPopover?.behavior = .applicationDefined
-            } else {
-                privacyDashboardPopover?.close()
-#if DEBUG
-                privacyDashboardPopover?.behavior = .semitransient
-#else
-                privacyDashboardPopover?.behavior = .transient
-#endif
-            }
-        }
-    }
-
     private func updatePermissionButtons() {
-        permissionButtons.isHidden = isTextFieldEditorFirstResponder
-        || isAnyTrackerAnimationPlaying
-        || (tabViewModel?.isShowingErrorPage ?? true)
+        guard let tabViewModel else { return }
+
+        permissionButtons.isShown = !isTextFieldEditorFirstResponder
+        && !isAnyTrackerAnimationPlaying
+        && !tabViewModel.isShowingErrorPage
         defer {
             showOrHidePermissionPopoverIfNeeded()
         }
-
-        guard let tabViewModel else { return }
 
         geolocationButton.buttonState = tabViewModel.usedPermissions.geolocation
 
@@ -733,7 +684,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updateBookmarkButtonImage(isUrlBookmarked: Bool = false) {
-        if let url = tabViewModel?.tab.content.url,
+        if let url = tabViewModel?.tab.content.userEditableUrl,
            isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url)
         {
             bookmarkButton.image = .bookmarkFilled
@@ -770,22 +721,25 @@ final class AddressBarButtonsViewController: NSViewController {
     private func updatePrivacyEntryPointButton() {
         guard let tabViewModel else { return }
 
-        let urlScheme = tabViewModel.tab.content.url?.scheme
-        let isHypertextUrl = urlScheme == "http" || urlScheme == "https"
+        let url = tabViewModel.tab.content.userEditableUrl
+        let isNewTabOrOnboarding = [.newtab, .onboarding].contains(tabViewModel.tab.content)
+        let isHypertextUrl = url?.navigationalScheme?.isHypertextScheme == true && url?.isDuckPlayer == false
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
-        let isLocalUrl = tabViewModel.tab.content.url?.isLocalURL ?? false
+        let isLocalUrl = url?.isLocalURL ?? false
 
         // Privacy entry point button
-        privacyEntryPointButton.isHidden = isEditingMode
-        || isTextFieldEditorFirstResponder
-        || !isHypertextUrl
-        || tabViewModel.isShowingErrorPage
-        || isTextFieldValueText
-        || isLocalUrl
-        imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
-        || !privacyEntryPointButton.isHidden
-        || isAnyTrackerAnimationPlaying
+        privacyEntryPointButton.isShown = !isEditingMode
+        && !isTextFieldEditorFirstResponder
+        && isHypertextUrl
+        && !tabViewModel.isShowingErrorPage
+        && !isTextFieldValueText
+        && !isLocalUrl
+
+        imageButtonWrapper.isShown = view.window?.isPopUpWindow != true
+        && (isHypertextUrl || isTextFieldEditorFirstResponder || isEditingMode || isNewTabOrOnboarding)
+        && privacyEntryPointButton.isHidden
+        && !isAnyTrackerAnimationPlaying
     }
 
     private func updatePrivacyEntryPointIcon() {
@@ -796,7 +750,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard !isAnyShieldAnimationPlaying else { return }
 
         switch tabViewModel.tab.content {
-        case .url(let url, _, _):
+        case .url(let url, _, _), .identityTheftRestoration(let url), .subscription(let url):
             guard let host = url.host else { break }
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
@@ -824,8 +778,7 @@ final class AddressBarButtonsViewController: NSViewController {
     let trackerAnimationImageProvider = TrackerAnimationImageProvider()
 
     private func animateTrackers() {
-        guard !privacyEntryPointButton.isHidden,
-              let tabViewModel else { return }
+        guard privacyEntryPointButton.isShown, let tabViewModel else { return }
 
         switch tabViewModel.tab.content {
         case .url(let url, _, _):
@@ -835,15 +788,17 @@ final class AddressBarButtonsViewController: NSViewController {
             }
 
             var animationView: LottieAnimationView
-            if url.scheme == "http" {
+            if url.navigationalScheme == .http {
                 animationView = shieldDotAnimationView
             } else {
                 animationView = shieldAnimationView
             }
 
             animationView.isHidden = false
-            animationView.play { _ in
+            updateZoomButtonVisibility(animation: true)
+            animationView.play { [weak self] _ in
                 animationView.isHidden = true
+                self?.updateZoomButtonVisibility(animation: false)
             }
         default:
             return
@@ -862,11 +817,13 @@ final class AddressBarButtonsViewController: NSViewController {
             }
             trackerAnimationView?.isHidden = false
             trackerAnimationView?.reloadImages()
+            self.updateZoomButtonVisibility(animation: true)
             trackerAnimationView?.play { [weak self] _ in
                 trackerAnimationView?.isHidden = true
                 self?.updatePrivacyEntryPointIcon()
                 self?.updatePermissionButtons()
                 self?.playBadgeAnimationIfNecessary()
+                self?.updateZoomButtonVisibility(animation: false)
             }
         }
 
@@ -878,7 +835,7 @@ final class AddressBarButtonsViewController: NSViewController {
                                 shieldAnimations: Bool = true,
                                 badgeAnimations: Bool = true) {
         func stopAnimation(_ animationView: LottieAnimationView) {
-            if animationView.isAnimationPlaying || !animationView.isHidden {
+            if animationView.isAnimationPlaying || animationView.isShown {
                 animationView.isHidden = true
                 animationView.stop()
             }
@@ -922,7 +879,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) -> (bookmark: Bookmark?, isNew: Bool) {
         guard let tabViewModel,
-              let url = tabViewModel.tab.content.url else {
+              let url = tabViewModel.tab.content.userEditableUrl else {
             assertionFailure("No URL for bookmarking")
             return (nil, false)
         }
@@ -951,6 +908,14 @@ final class AddressBarButtonsViewController: NSViewController {
             .sink { [weak self] _ in
                 self?.setupAnimationViews()
                 self?.updatePrivacyEntryPointIcon()
+                self?.updateZoomButtonVisibility()
+            }
+    }
+
+    private func subscribeToTabZoomLevel() {
+        accessibilityPreferencesCancellable = tabViewModel?.zoomLevelSubject
+            .sink { [weak self] _ in
+                self?.updateZoomButtonVisibility()
             }
     }
 
@@ -997,44 +962,15 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 
 extension AddressBarButtonsViewController: NSPopoverDelegate {
 
-    func popoverShouldClose(_ popover: NSPopover) -> Bool {
-        switch popover {
-        case bookmarkPopover:
-            // fix popover reopening on next bookmarkButtonAction (on macOS 11)
-            DispatchQueue.main.async { [weak self] in
-                if let bookmarkPopover = self?.bookmarkPopover, bookmarkPopover.isShown {
-                    bookmarkPopover.close()
-                }
-            }
-            return false
-
-        default:
-            return true
-        }
-    }
-
-    func popoverWillClose(_ notification: Notification) {
-        switch notification.object as? NSPopover {
-        case bookmarkPopover:
-            bookmarkPopover?.popoverWillClose()
-
-        default:
-            break
-        }
-    }
-
     func popoverDidClose(_ notification: Notification) {
         switch notification.object as? NSPopover {
-        case bookmarkPopover:
-            if bookmarkPopover?.isNew == true {
+        case popovers.bookmarkPopover:
+            if popovers.bookmarkPopover?.isNew == true {
                 NotificationCenter.default.post(name: .bookmarkPromptShouldShow, object: nil)
             }
             updateBookmarkButtonVisibility()
-            bookmarkPopover = nil
-        case privacyDashboardPopover:
-            privacyEntryPointButton.state = .off
-            _privacyDashboardPopover = nil
-
+        case popovers.zoomPopover:
+            updateZoomButtonVisibility()
         default:
             break
         }

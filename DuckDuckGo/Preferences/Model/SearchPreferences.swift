@@ -20,6 +20,7 @@ import Foundation
 import AppKit
 import Bookmarks
 import Common
+import PixelKit
 
 protocol SearchPreferencesPersistor {
     var showAutocompleteSuggestions: Bool { get set }
@@ -37,6 +38,7 @@ final class SearchPreferences: ObservableObject, PreferencesTabOpening {
     @Published var showAutocompleteSuggestions: Bool {
         didSet {
             persistor.showAutocompleteSuggestions = showAutocompleteSuggestions
+            PixelKit.fire(showAutocompleteSuggestions ? GeneralPixel.autocompleteToggledOn : GeneralPixel.autocompleteToggledOff)
         }
     }
 
@@ -59,6 +61,11 @@ extension PreferencesTabOpening {
     @MainActor
     func openNewTab(with url: URL) {
         WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+    }
+
+    @MainActor
+    func show(url: URL) {
+        WindowControllersManager.shared.show(url: url, source: .ui, newTab: false)
     }
 
 }

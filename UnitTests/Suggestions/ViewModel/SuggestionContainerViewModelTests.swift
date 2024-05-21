@@ -154,7 +154,7 @@ extension SuggestionResult {
         ]
         return SuggestionResult(topHits: topHits,
                                 duckduckgoSuggestions: [],
-                                historyAndBookmarks: [])
+                                localSuggestions: [])
     }
 
 }

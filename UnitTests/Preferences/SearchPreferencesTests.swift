@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import PixelKit
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -24,6 +25,16 @@ class MockSearchPreferencesPersistor: SearchPreferencesPersistor {
 }
 
 class SearchPreferencesTests: XCTestCase {
+
+    override func setUpWithError() throws {
+        PixelKit.setUp(appVersion: "",
+                       defaultHeaders: [:],
+                       defaults: UserDefaults()) { _, _, _, _, _, _ in }
+    }
+
+    override func tearDownWithError() throws {
+        PixelKit.tearDown()
+    }
 
     func testWhenInitializedThenItLoadsPersistedValues() {
         let mockPersistor = MockSearchPreferencesPersistor()

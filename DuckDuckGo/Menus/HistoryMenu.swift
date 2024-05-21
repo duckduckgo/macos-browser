@@ -53,7 +53,9 @@ final class HistoryMenu: NSMenu {
             reopenLastClosedMenuItem
             recentlyClosedMenuItem
             reopenAllWindowsFromLastSessionMenuItem
-            NSMenuItem.separator()
+
+            clearAllHistorySeparator
+            clearAllHistoryMenuItem
         }
 
         reopenMenuItemKeyEquivalentManager.reopenLastClosedMenuItem = reopenLastClosedMenuItem
@@ -246,7 +248,8 @@ final class HistoryMenu: NSMenu {
         let headerItem = ClearThisHistoryMenuItem(title: UserText.clearThisHistoryMenuItem,
                                                   action: #selector(AppDelegate.clearThisHistory(_:)),
                                                   keyEquivalent: "")
-        headerItem.setDateString(dateString)
+        let historyTimeWindow = ClearThisHistoryMenuItem.HistoryTimeWindow(dateString: dateString)
+        headerItem.setRepresentingObject(historyTimeWindow: historyTimeWindow)
         return [
             headerItem,
             .separator()

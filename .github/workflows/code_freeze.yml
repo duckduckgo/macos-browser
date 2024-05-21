@@ -47,7 +47,7 @@ jobs:
 
       - name: Get Asana user ID
         id: get-asana-user-id
-        uses: duckduckgo/apple-infra/actions/asana-get-user-id-for-github-handle@main
+        uses: duckduckgo/apple-toolbox/actions/asana-get-user-id-for-github-handle@main
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           github-handle: ${{ github.actor }}
@@ -172,6 +172,7 @@ jobs:
     uses: ./.github/workflows/tag_release.yml
     with:
       asana-task-url: ${{ needs.create_release_branch.outputs.asana_task_url }}
+      base-branch: ${{ github.ref_name }}
       branch: ${{ needs.create_release_branch.outputs.release_branch_name }}
       prerelease: true
     secrets:

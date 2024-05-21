@@ -31,6 +31,7 @@ class PinnedTabsViewModelTests: XCTestCase {
 
     var model: PinnedTabsViewModel!
     var collection: TabCollection!
+    var bookmarkManagerMock: MockBookmarkManager!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -41,7 +42,8 @@ class PinnedTabsViewModelTests: XCTestCase {
             Tab(content: .url("http://d.com".url!, source: .link)),
             Tab(content: .url("http://e.com".url!, source: .link))
         ])
-        model = PinnedTabsViewModel(collection: collection)
+        bookmarkManagerMock = .init()
+        model = PinnedTabsViewModel(collection: collection, bookmarkManager: bookmarkManagerMock)
     }
 
     func testInitialState() throws {
@@ -150,10 +152,11 @@ class PinnedTabsViewModelTests: XCTestCase {
         model.removeFireproofing(tabB)
         model.close(tabA)
         model.muteOrUmute(tabB)
+        model.removeBookmark(tabA)
 
         cancellable.cancel()
 
-        XCTAssertEqual(events.count, 7)
+        XCTAssertEqual(events.count, 8)
 
         guard case .bookmark(tabA) = events[0],
               case .unpin(1) = events[1],
@@ -161,11 +164,36 @@ class PinnedTabsViewModelTests: XCTestCase {
               case .fireproof(tabA) = events[3],
               case .removeFireproofing(tabB) = events[4],
               case .close(0) = events[5],
-              case .muteOrUnmute(tabB) = events[6]
+              case .muteOrUnmute(tabB) = events[6],
+              case .removeBookmark(tabA) = events[7]
         else {
             XCTFail("Incorrect context menu action")
             return
         }
+    }
+
+    func testWhenIsPinnedTabBookmarkedCalledAndURLIsBookmarkedThenReturnTrue() {
+        // GIVEN
+        bookmarkManagerMock.isUrlBookmarked = true
+        let tab = Tab(content: .url(URL.duckDuckGo, source: .link))
+
+        // WHEN
+        let result = model.isPinnedTabBookmarked(tab)
+
+        // THEN
+        XCTAssertTrue(result)
+    }
+
+    func testWhenIsPinnedTabBookmarkedCalledAndURLIsNotBookmarkedThenReturnFalse() {
+        // GIVEN
+        bookmarkManagerMock.isUrlBookmarked = false
+        let tab = Tab(content: .url(URL.duckDuckGo, source: .link))
+
+        // WHEN
+        let result = model.isPinnedTabBookmarked(tab)
+
+        // THEN
+        XCTAssertFalse(result)
     }
 
 }

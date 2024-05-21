@@ -45,7 +45,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private let brokenSiteReporter: BrokenSiteReporter = {
         BrokenSiteReporter(pixelHandler: { parameters in
-            PixelKit.fire(GeneralPixel.brokenSiteReport,
+            PixelKit.fire(NonStandardEvent(NonStandardPixel.brokenSiteReport),
                           withAdditionalParameters: parameters,
                           allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters)
         }, keyValueStoring: UserDefaults.standard)
@@ -77,23 +77,18 @@ final class PrivacyDashboardViewController: NSViewController {
     var sizeDelegate: PrivacyDashboardViewControllerSizeDelegate?
     private weak var tabViewModel: TabViewModel?
 
-    required init?(coder: NSCoder,
-                   privacyInfo: PrivacyInfo?,
-                   dashboardMode: PrivacyDashboardMode,
-                   privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
+    init(privacyInfo: PrivacyInfo? = nil,
+         dashboardMode: PrivacyDashboardMode = .dashboard,
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
         self.privacyDashboardController = PrivacyDashboardController(privacyInfo: privacyInfo,
                                                                      dashboardMode: dashboardMode,
                                                                      privacyConfigurationManager: privacyConfigurationManager,
                                                                      eventMapping: toggleReportEvents)
-        super.init(coder: coder)
+        super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
-        self.privacyDashboardController = PrivacyDashboardController(privacyInfo: nil,
-                                                                     dashboardMode: .dashboard,
-                                                                     privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
-                                                                     eventMapping: toggleReportEvents)
-        super.init(coder: coder)
+        fatalError("\(Self.self): Bad initializer")
     }
 
     public func updateTabViewModel(_ tabViewModel: TabViewModel) {
@@ -107,9 +102,14 @@ final class PrivacyDashboardViewController: NSViewController {
         }
     }
 
+    override func loadView() {
+        view = NSView(frame: NSRect(x: 0, y: 0, width: 360, height: 489))
+        initWebView()
+    }
+
     public override func viewDidLoad() {
         super.viewDidLoad()
-        initWebView()
+
         privacyDashboardController.setup(for: webView)
         privacyDashboardController.privacyDashboardNavigationDelegate = self
         privacyDashboardController.privacyDashboardDelegate = self
@@ -325,7 +325,7 @@ extension PrivacyDashboardViewController {
 
         // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
         guard let currentTab = tabViewModel?.tab,
-            let currentURL = currentTab.content.url?.trimmingQueryItemsAndFragment() else {
+            let currentURL = currentTab.content.urlForWebView?.trimmingQueryItemsAndFragment() else {
             throw BrokenSiteReportError.failedToFetchTheCurrentURL
         }
         let blockedTrackerDomains = currentTab.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
@@ -335,7 +335,7 @@ extension PrivacyDashboardViewController {
 
         // current domain's protection status
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-        let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab.content.url?.host)
+        let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab.content.urlForWebView?.host)
 
         let webVitals = await calculateWebVitals(performanceMetrics: currentTab.brokenSiteInfo?.performanceMetrics, privacyConfig: configuration)
 

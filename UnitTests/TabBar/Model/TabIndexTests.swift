@@ -51,6 +51,13 @@ final class TabIndexTests: XCTestCase {
         XCTAssertEqual(TabIndex.pinned(16).makeNext(), TabIndex.pinned(17))
     }
 
+    func testMakeNextUnpinned() {
+        XCTAssertEqual(TabIndex.unpinned(0).makeNextUnpinned(), TabIndex.unpinned(1))
+        XCTAssertEqual(TabIndex.unpinned(41).makeNextUnpinned(), TabIndex.unpinned(42))
+        XCTAssertEqual(TabIndex.pinned(0).makeNextUnpinned(), TabIndex.unpinned(0))
+        XCTAssertEqual(TabIndex.pinned(2).makeNextUnpinned(), TabIndex.unpinned(0))
+    }
+
     func testWhenViewModelHasNoPinnedTabsThenFirstTabIsUnpinned() {
         let tabCollectionViewModel = TabCollectionViewModel(
             tabCollection: tabCollection(tabsCount: 1),

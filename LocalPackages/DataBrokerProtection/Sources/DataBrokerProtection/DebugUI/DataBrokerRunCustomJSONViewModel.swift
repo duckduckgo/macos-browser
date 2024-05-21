@@ -145,10 +145,14 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
     private let runnerProvider: OperationRunnerProvider
     private let privacyConfigManager: PrivacyConfigurationManaging
+    private let fakePixelHandler: EventMapping<DataBrokerProtectionPixels> = EventMapping { event, _, _, _ in
+        print(event)
+    }
     private let contentScopeProperties: ContentScopeProperties
     private let csvColumns = ["name_input", "age_input", "city_input", "state_input", "name_scraped", "age_scraped", "address_scraped", "relatives_scraped", "url", "broker name", "screenshot_id", "error", "matched_fields", "result_match", "expected_match"]
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
 
-    init() {
+    init(authenticationManager: DataBrokerProtectionAuthenticationManaging) {
         let privacyConfigurationManager = PrivacyConfigurationManagingMock()
         let features = ContentScopeFeatureToggles(emailProtection: false,
                                                   emailProtectionIncontextSignup: false,
@@ -161,6 +165,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                                                   thirdPartyCredentialsProvider: false)
 
         let sessionKey = UUID().uuidString
+        self.authenticationManager = authenticationManager
         let contentScopeProperties = ContentScopeProperties(gpcEnabled: false,
                                                             sessionKey: sessionKey,
                                                             featureToggles: features)
@@ -168,8 +173,8 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
         self.runnerProvider = DataBrokerOperationRunnerProvider(
             privacyConfigManager: privacyConfigurationManager,
             contentScopeProperties: contentScopeProperties,
-            emailService: EmailService(),
-            captchaService: CaptchaService())
+            emailService: EmailService(authenticationManager: authenticationManager),
+            captchaService: CaptchaService(authenticationManager: authenticationManager))
         self.privacyConfigManager = privacyConfigurationManager
         self.contentScopeProperties = contentScopeProperties
 
@@ -187,7 +192,11 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
             try await withThrowingTaskGroup(of: DebugScanReturnValue.self) { group in
                 for queryData in brokerProfileQueryData {
-                    let debugScanOperation = DebugScanOperation(privacyConfig: self.privacyConfigManager, prefs: self.contentScopeProperties, query: queryData) {
+                    let debugScanOperation = DebugScanOperation(privacyConfig: self.privacyConfigManager,
+                                                                prefs: self.contentScopeProperties,
+                                                                query: queryData,
+                                                                emailService: EmailService(authenticationManager: self.authenticationManager),
+                                                                captchaService: CaptchaService(authenticationManager: self.authenticationManager)) {
                         true
                     }
 
@@ -347,7 +356,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
                     Task {
                         do {
-                            let extractedProfiles = try await runner.scan(query, stageCalculator: FakeStageDurationCalculator(), showWebView: true) { true }
+                            let extractedProfiles = try await runner.scan(query, stageCalculator: FakeStageDurationCalculator(), pixelHandler: fakePixelHandler, showWebView: true) { true }
 
                             DispatchQueue.main.async {
                                 for extractedProfile in extractedProfiles {
@@ -383,7 +392,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
         )
         Task {
             do {
-                try await runner.optOut(profileQuery: brokerProfileQueryData, extractedProfile: scanResult.extractedProfile, stageCalculator: FakeStageDurationCalculator(), showWebView: true) {
+                try await runner.optOut(profileQuery: brokerProfileQueryData, extractedProfile: scanResult.extractedProfile, stageCalculator: FakeStageDurationCalculator(), pixelHandler: fakePixelHandler, showWebView: true) {
                     true
                 }
 
@@ -471,8 +480,16 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
     }
 }
 
+final class FakeSleepObserver: SleepObserver {
+
+    func totalSleepTime() -> TimeInterval {
+        return 0
+    }
+}
+
 final class FakeStageDurationCalculator: StageDurationCalculator {
     var attemptId: UUID = UUID()
+    var isManualScan: Bool = false
 
     func durationSinceLastStage() -> Double {
         0.0

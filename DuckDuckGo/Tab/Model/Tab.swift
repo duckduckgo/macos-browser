@@ -70,6 +70,7 @@ protocol NewWindowPolicyDecisionMaker {
     private let webViewConfiguration: WKWebViewConfiguration
 
     let startupPreferences: StartupPreferences
+    let tabsPreferences: TabsPreferences
 
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
@@ -108,7 +109,8 @@ protocol NewWindowPolicyDecisionMaker {
                      webViewSize: CGSize = CGSize(width: 1024, height: 768),
                      startupPreferences: StartupPreferences = StartupPreferences.shared,
                      certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator(),
-                     tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController
+                     tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController,
+                     tabsPreferences: TabsPreferences = TabsPreferences.shared
     ) {
 
         let duckPlayer = duckPlayer
@@ -150,7 +152,8 @@ protocol NewWindowPolicyDecisionMaker {
                   webViewSize: webViewSize,
                   startupPreferences: startupPreferences,
                   certificateTrustEvaluator: certificateTrustEvaluator,
-                  tunnelController: tunnelController)
+                  tunnelController: tunnelController,
+                  tabsPreferences: tabsPreferences)
     }
 
     @MainActor
@@ -183,7 +186,8 @@ protocol NewWindowPolicyDecisionMaker {
          webViewSize: CGSize,
          startupPreferences: StartupPreferences,
          certificateTrustEvaluator: CertificateTrustEvaluating,
-         tunnelController: NetworkProtectionIPCTunnelController?
+         tunnelController: NetworkProtectionIPCTunnelController?,
+         tabsPreferences: TabsPreferences
     ) {
 
         self.content = content
@@ -200,6 +204,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.interactionState = interactionStateData.map(InteractionState.loadCachedFromTabContent) ?? .none
         self.lastSelectedAt = lastSelectedAt
         self.startupPreferences = startupPreferences
+        self.tabsPreferences = tabsPreferences
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
@@ -328,36 +333,18 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     deinit {
-        cleanUpBeforeClosing(onDeinit: true)
-    }
-
-    func cleanUpBeforeClosing() {
-        cleanUpBeforeClosing(onDeinit: false)
-    }
-
-    @MainActor(unsafe)
-    private func cleanUpBeforeClosing(onDeinit: Bool) {
-        let job = { [webView, userContentController] in
+        DispatchQueue.main.asyncOrNow { [webView, userContentController] in
+            // WebKit objects must be deallocated on the main thread
             webView.stopAllMedia(shouldStopLoading: true)
 
             userContentController?.cleanUpBeforeClosing()
+
 #if DEBUG
             if case .normal = NSApp.runType {
                 webView.assertObjectDeallocated(after: 4.0)
             }
 #endif
         }
-#if DEBUG
-        if !onDeinit, case .normal = NSApp.runType {
-            // Tab should be deallocated shortly after burning
-            self.assertObjectDeallocated(after: 4.0)
-        }
-#endif
-        guard Thread.isMainThread else {
-            DispatchQueue.main.async { job() }
-            return
-        }
-        job()
     }
 
     func stopAllMediaAndLoading() {
@@ -461,12 +448,15 @@ protocol NewWindowPolicyDecisionMaker {
         if let url = webView.url {
             let content = TabContent.contentFromURL(url, source: .webViewUpdated)
 
-            if self.content.isUrl, self.content.url == url {
+            if self.content.isUrl, self.content.urlForWebView == url {
                 // ignore content updates when tab.content has userEntered or credential set but equal url as it comes from the WebView url updated event
             } else if content != self.content {
                 self.content = content
             }
-        } else if self.content.isUrl {
+        } else if self.content.isUrl,
+                  // DuckURLSchemeHandler redirects duck:// address to a simulated request
+                  // ignore webView.url temporarily switching to `nil`
+                  self.content.urlForWebView?.isDuckPlayer != true {
             // when e.g. opening a download in new tab - web view restores `nil` after the navigation is interrupted
             // maybe it worths adding another content type like .interruptedLoad(URL) to display a URL in the address bar
             self.content = .none
@@ -579,7 +569,7 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor
     var currentHistoryItem: BackForwardListItem? {
         webView.backForwardList.currentItem.map(BackForwardListItem.init)
-        ?? (content.url ?? navigationDelegate.currentNavigation?.url).map { url in
+        ?? (content.urlForWebView ?? navigationDelegate.currentNavigation?.url).map { url in
             BackForwardListItem(kind: .url(url), title: webView.title ?? title, identity: nil)
         }
     }
@@ -608,7 +598,11 @@ protocol NewWindowPolicyDecisionMaker {
 
         let canGoBack = webView.canGoBack
         let canGoForward = webView.canGoForward
-        let canReload = self.content.userEditableUrl != nil
+        let canReload = if case .url(let url, credential: _, source: _) = content, !(url.isDuckPlayer || url.isDuckURLScheme) {
+            true
+        } else {
+            false
+        }
 
         if canGoBack != self.canGoBack {
             self.canGoBack = canGoBack
@@ -721,7 +715,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         if startupPreferences.launchToCustomHomePage,
            let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
-            setContent(.url(customURL, credential: nil, source: .ui))
+            setContent(.contentFromURL(customURL, source: .ui))
         } else {
             setContent(.newtab)
         }
@@ -895,9 +889,10 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     func requestFireproofToggle() {
-        guard let url = content.userEditableUrl,
-              let host = url.host
-        else { return }
+        guard case .url(let url, _, _) = content,
+              url.navigationalScheme?.isHypertextScheme == true,
+              !url.isDuckPlayer,
+              let host = url.host else { return }
 
         _ = FireproofDomains.shared.toggle(domain: host)
     }
@@ -992,7 +987,7 @@ protocol NewWindowPolicyDecisionMaker {
             if cachedFavicon != favicon {
                 favicon = cachedFavicon
             }
-        } else if oldValue?.url?.host != url.host {
+        } else if oldValue?.urlForWebView?.host != url.host {
             // If the domain matches the previous value, just keep the same favicon
             favicon = nil
         }
@@ -1031,7 +1026,7 @@ extension Tab: FaviconUserScriptDelegate {
                            for documentUrl: URL) {
         guard documentUrl != .error else { return }
         faviconManagement.handleFaviconLinks(faviconLinks, documentUrl: documentUrl) { favicon in
-            guard documentUrl == self.content.url, let favicon = favicon else {
+            guard documentUrl == self.content.urlForWebView, let favicon = favicon else {
                 return
             }
             self.favicon = favicon.image
@@ -1098,7 +1093,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                 // credential is removed from the URL and set to TabContent to be used on next Challenge
                 self.content = .url(navigationAction.url.removingBasicAuthCredential(), credential: credential, source: .webViewUpdated)
                 // reload URL without credentialss
-                request.url = self.content.url!
+                request.url = self.content.urlForWebView!
                 navigator.load(request)
             }
         }

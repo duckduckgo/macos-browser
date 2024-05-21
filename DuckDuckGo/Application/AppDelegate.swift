@@ -37,6 +37,7 @@ import Lottie
 
 import NetworkProtection
 import Subscription
+import NetworkProtectionIPC
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -74,6 +75,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let internalUserDecider: InternalUserDecider
     let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
+    private var autoClearHandler: AutoClearHandler!
 
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
@@ -85,7 +87,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var privacyDashboardWindow: NSWindow?
 
     // Needs to be lazy as indirectly depends on AppDelegate
-    private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
+    private lazy var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler = {
+
+        let ipcClient = TunnelControllerIPCClient()
+        let tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+        let vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
+
+        return NetworkProtectionSubscriptionEventHandler(
+            tunnelController: tunnelController,
+            vpnUninstaller: vpnUninstaller)
+    }()
 
 #if DBP
     private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
@@ -315,6 +326,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
 #endif
+
+        setUpAutoClearHandler()
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -322,10 +335,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
-
-        NetworkProtectionWaitlist().fetchNetworkProtectionInviteCodeIfAvailable { _ in
-            // Do nothing when code fetching fails, as the app will try again later
-        }
 
         NetworkProtectionAppEvents().applicationDidBecomeActive()
 
@@ -351,6 +360,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             DownloadListCoordinator.shared.sync()
         }
         stateRestorationManager?.applicationWillTerminate()
+
+        // Handling of "Burn on quit"
+        if let terminationReply = autoClearHandler.handleAppTermination() {
+            return terminationReply
+        }
 
         return .terminateNow
     }
@@ -420,7 +434,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #else
         let environment = defaultEnvironment
 #endif
-        let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
+        let syncErrorHandler = SyncErrorHandler()
+        let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db, syncErrorHandler: syncErrorHandler)
         let syncService = DDGSync(
             dataProvidersSource: syncDataProviders,
             errorEvents: SyncErrorHandler(),
@@ -445,7 +460,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .filter { $0 }
             .asVoid()
             .sink { [weak syncService] in
-                PixelKit.fire(GeneralPixel.syncDaily, frequency: .daily)
+                PixelKit.fire(GeneralPixel.syncDaily, frequency: .legacyDaily)
                 syncService?.syncDailyStats.sendStatsIfNeeded(handler: { params in
                     PixelKit.fire(GeneralPixel.syncSuccessRateDaily, withAdditionalParameters: params)
                 })
@@ -528,7 +543,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func emailDidSignInNotification(_ notification: Notification) {
-        PixelKit.fire(GeneralPixel.emailEnabled)
+        PixelKit.fire(NonStandardEvent(NonStandardPixel.emailEnabled))
         if AppDelegate.isNewUser {
             PixelKit.fire(GeneralPixel.emailEnabledInitial, frequency: .legacyInitial)
         }
@@ -539,7 +554,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func emailDidSignOutNotification(_ notification: Notification) {
-        PixelKit.fire(GeneralPixel.emailDisabled)
+        PixelKit.fire(NonStandardEvent(NonStandardPixel.emailDisabled))
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
             syncService?.scheduler.notifyDataChanged()
         }
@@ -550,6 +565,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             PixelKit.fire(GeneralPixel.importDataInitial, frequency: .legacyInitial)
         }
     }
+
+    private func setUpAutoClearHandler() {
+        autoClearHandler = AutoClearHandler(preferences: .shared,
+                                            fireViewModel: FireCoordinator.fireViewModel,
+                                            stateRestorationManager: stateRestorationManager)
+        autoClearHandler.handleAppLaunch()
+        autoClearHandler.onAutoClearCompleted = {
+            NSApplication.shared.reply(toApplicationShouldTerminate: true)
+        }
+    }
+
 }
 
 func updateSubscriptionStatus() {
@@ -580,12 +606,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
-
-            if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
-                if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                    NetworkProtectionWaitlistViewControllerPresenter.show()
-                }
-            }
 
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {

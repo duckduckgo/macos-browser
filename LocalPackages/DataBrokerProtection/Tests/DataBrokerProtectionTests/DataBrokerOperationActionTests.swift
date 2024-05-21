@@ -27,6 +27,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     let webViewHandler = WebViewHandlerMock()
     let emailService = EmailServiceMock()
     let captchaService = CaptchaServiceMock()
+    let pixelHandler = MockDataBrokerProtectionPixelsHandler()
     let stageCalulator = DataBrokerProtectionStageDurationCalculator(dataBroker: "broker", handler: MockDataBrokerProtectionPixelsHandler())
 
     override func tearDown() async throws {
@@ -47,6 +48,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
 
@@ -71,6 +74,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
 
@@ -102,6 +107,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
 
@@ -131,6 +138,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -153,6 +162,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
         emailService.shouldThrow = true
@@ -181,6 +192,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             operationAwaitTime: 0,
             clickAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -200,6 +213,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -221,6 +236,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -243,6 +260,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
         let actionsHandler = ActionsHandler(step: step)
@@ -272,6 +291,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -294,6 +315,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
         sut.retriesCountOnError = 0
@@ -317,6 +340,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -335,6 +360,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -355,6 +382,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: mockStageCalculator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
 
@@ -374,6 +403,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: mockStageCalculator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
 
@@ -393,6 +424,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: mockStageCalculator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
 
@@ -412,6 +445,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             stageCalculator: mockStageCalculator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
 
@@ -431,6 +466,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             cookieHandler: mockCookieHandler,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
 
@@ -452,6 +489,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             cookieHandler: mockCookieHandler,
             operationAwaitTime: 0,
             stageCalculator: stageCalulator,
+            pixelHandler: pixelHandler,
+            sleepObserver: FakeSleepObserver(),
             shouldRunNextStep: { true }
         )
 

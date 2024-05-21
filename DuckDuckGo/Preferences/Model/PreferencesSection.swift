@@ -19,6 +19,7 @@
 import Foundation
 import SwiftUI
 import Subscription
+import BrowserServicesKit
 
 struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
@@ -98,7 +99,7 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
 
 }
 
-enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
+enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIterable {
     case defaultBrowser
     case privateSearch
     case webTrackingProtection
@@ -152,9 +153,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         case .sync:
             let isSyncBookmarksPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
             let isSyncCredentialsPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
+            let isSyncPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncIsPaused.rawValue)
             let syncService = NSApp.delegateTyped.syncService
             let isDataSyncingDisabled = syncService?.featureFlags.contains(.dataSyncing) == false && syncService?.authState == .active
-            if isSyncBookmarksPaused || isSyncCredentialsPaused || isDataSyncingDisabled {
+            if isSyncPaused || isSyncBookmarksPaused || isSyncCredentialsPaused || isDataSyncingDisabled {
                 return UserText.sync + " ⚠️"
             }
             return UserText.sync

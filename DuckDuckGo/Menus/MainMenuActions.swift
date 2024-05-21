@@ -122,11 +122,7 @@ extension AppDelegate {
     }
 
     @objc func openReportBrokenSite(_ sender: Any?) {
-        let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
-        let privacyDashboardViewController = storyboard.instantiateController(identifier: "PrivacyDashboardViewController") { coder in
-            PrivacyDashboardViewController(coder: coder, privacyInfo: nil, dashboardMode: .report)
-        }
-
+        let privacyDashboardViewController = PrivacyDashboardViewController(privacyInfo: nil, dashboardMode: .report)
         privacyDashboardViewController.sizeDelegate = self
 
         let window = NSWindow(contentViewController: privacyDashboardViewController)
@@ -482,13 +478,16 @@ extension MainViewController {
         }
 
         let dateString = sender.dateString
+        let isToday = sender.isToday
         let visits = sender.getVisits()
         let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString)
         alert.beginSheetModal(for: window, completionHandler: { response in
             guard case .alertFirstButtonReturn = response else {
                 return
             }
-            FireCoordinator.fireViewModel.fire.burnVisits(of: visits, except: FireproofDomains.shared)
+            FireCoordinator.fireViewModel.fire.burnVisits(of: visits,
+                                                          except: FireproofDomains.shared,
+                                                          isToday: isToday)
         })
     }
 
@@ -505,6 +504,11 @@ extension MainViewController {
             .addressBarViewController?
             .addressBarButtonsViewController?
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
+    }
+
+    @objc func bookmarkAllOpenTabs(_ sender: Any) {
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
     }
 
     @objc func favoriteThisPage(_ sender: Any) {
@@ -655,6 +659,14 @@ extension MainViewController {
     }
 
     // MARK: - Debug
+
+    @objc func addDebugTabs(_ sender: AnyObject) {
+        let numberOfTabs = sender.representedObject as? Int ?? 1
+        (1...numberOfTabs).forEach { _ in
+            let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .ui))
+            tabCollectionViewModel.append(tab: tab)
+        }
+    }
 
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
         UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
@@ -925,8 +937,8 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(findInPage),
              #selector(findInPageNext),
              #selector(findInPagePrevious):
-            return activeTabViewModel?.canReload == true // must have content loaded
-                && view.window?.isKeyWindow == true // disable in full screen
+            return activeTabViewModel?.canFindInPage == true // must have content loaded
+                && view.window?.isKeyWindow == true // disable in video full screen
 
         case #selector(findInPageDone):
             return getActiveTabAndIndex()?.tab.findInPage?.isActive == true
@@ -944,6 +956,8 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.bookmarkThisPage(_:)),
              #selector(MainViewController.favoriteThisPage(_:)):
             return activeTabViewModel?.canBeBookmarked == true
+        case #selector(MainViewController.bookmarkAllOpenTabs(_:)):
+            return tabCollectionViewModel.canBookmarkAllOpenTabs()
         case #selector(MainViewController.openBookmark(_:)),
              #selector(MainViewController.showManageBookmarks(_:)):
             return true

@@ -227,7 +227,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         os_log("Running scan operations...", log: .dataBrokerProtection)
         let showWebView = sender.representedObject as? Bool ?? false
 
-        DataBrokerProtectionManager.shared.scheduler.startManualScan(showWebView: showWebView) { errors in
+        DataBrokerProtectionManager.shared.scheduler.startManualScan(showWebView: showWebView, startTime: Date()) { errors in
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
                     os_log("scan operations finished, error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
@@ -316,7 +316,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func runCustomJSON() {
-        let viewController = DataBrokerRunCustomJSONViewController()
+        let authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager()
+        let viewController = DataBrokerRunCustomJSONViewController(authenticationManager: authenticationManager)
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable],
                               backing: .buffered,

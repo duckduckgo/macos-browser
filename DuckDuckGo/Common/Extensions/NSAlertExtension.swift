@@ -168,23 +168,13 @@ extension NSAlert {
         return alert
     }
 
-    static func syncBookmarksPaused() -> NSAlert {
+    static func syncPaused(title: String, informative: String) -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = UserText.syncBookmarkPausedAlertTitle
-        alert.informativeText = UserText.syncBookmarkPausedAlertDescription
+        alert.messageText = title
+        alert.informativeText = informative
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.learnMore)
-        return alert
-    }
-
-    static func syncCredentialsPaused() -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.syncCredentialsPausedAlertTitle
-        alert.informativeText = UserText.syncCredentialsPausedAlertDescription
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.learnMore)
+        alert.addButton(withTitle: UserText.syncErrorAlertAction)
         return alert
     }
 
@@ -212,6 +202,37 @@ extension NSAlert {
         alert.accessoryView = textField
         alert.window.initialFirstResponder = alert.accessoryView
         textField.currentEditor()?.selectAll(nil)
+        return alert
+    }
+
+    static func autoClearAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.warnBeforeQuitDialogHeader
+        alert.alertStyle = .warning
+        alert.icon = .burnAlert
+        alert.addButton(withTitle: UserText.clearAndQuit)
+        alert.addButton(withTitle: UserText.quitWithoutClearing)
+        alert.addButton(withTitle: UserText.cancel)
+
+        let checkbox = NSButton(checkboxWithTitle: UserText.warnBeforeQuitDialogCheckboxMessage,
+                                target: DataClearingPreferences.shared,
+                                action: #selector(DataClearingPreferences.toggleWarnBeforeClearing))
+        checkbox.state = DataClearingPreferences.shared.isWarnBeforeClearingEnabled ? .on : .off
+        checkbox.lineBreakMode = .byWordWrapping
+        checkbox.translatesAutoresizingMaskIntoConstraints = false
+
+        // Create a container view for the checkbox with custom padding
+        let containerView = NSView(frame: NSRect(x: 0, y: 0, width: 240, height: 25))
+        containerView.addSubview(checkbox)
+
+        NSLayoutConstraint.activate([
+            checkbox.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            checkbox.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: -10), // Slightly up for better visual alignment
+            checkbox.widthAnchor.constraint(lessThanOrEqualTo: containerView.widthAnchor)
+        ])
+
+        alert.accessoryView = containerView
+
         return alert
     }
 

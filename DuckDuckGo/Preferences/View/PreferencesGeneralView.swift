@@ -28,6 +28,8 @@ extension Preferences {
         @ObservedObject var startupModel: StartupPreferences
         @ObservedObject var downloadsModel: DownloadsPreferences
         @ObservedObject var searchModel: SearchPreferences
+        @ObservedObject var tabsModel: TabsPreferences
+        @ObservedObject var dataClearingModel: DataClearingPreferences
         @State private var showingCustomHomePageSheet = false
 
         var body: some View {
@@ -43,13 +45,42 @@ extension Preferences {
                             Text(UserText.reopenAllWindowsFromLastSession).tag(true)
                                 .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker.reopenAllWindowsFromLastSession")
                         }, label: {})
-                            .pickerStyle(.radioGroup)
-                            .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
-                            .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker")
+                        .pickerStyle(.radioGroup)
+                        .disabled(dataClearingModel.isAutoClearEnabled)
+                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker")
+                        if dataClearingModel.isAutoClearEnabled {
+                            VStack(alignment: .leading, spacing: 1) {
+                                TextMenuItemCaption(UserText.disableAutoClearToEnableSessionRestore)
+                                TextButton(UserText.showDataClearingSettings) {
+                                    startupModel.show(url: .settingsPane(.dataClearing))
+                                }
+                            }
+                            .padding(.leading, 19)
+                        }
                     }
                 }
 
-                // SECTION 2: Home Page
+                // SECTION 2: Tabs
+                PreferencePaneSection(UserText.tabs) {
+                    PreferencePaneSubSection {
+                        ToggleMenuItem(UserText.preferNewTabsToWindows, isOn: $tabsModel.preferNewTabsToWindows)
+                        ToggleMenuItem(UserText.switchToNewTabWhenOpened, isOn: $tabsModel.switchToNewTabWhenOpened)
+                    }
+
+                    PreferencePaneSubSection {
+                        HStack {
+                            Picker(UserText.newTabPositionTitle, selection: $tabsModel.newTabPosition) {
+                                ForEach(NewTabPosition.allCases, id: \.self) { position in
+                                    Text(UserText.newTabPositionMode(for: position)).tag(position)
+                                }
+                            }
+                            .fixedSize()
+                        }
+                    }
+                }
+
+                // SECTION 3: Home Page
                 PreferencePaneSection(UserText.homePage) {
 
                     PreferencePaneSubSection {
@@ -93,12 +124,12 @@ extension Preferences {
                     CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }
 
-                // SECTION 3: Search Settings
+                // SECTION 4: Search Settings
                 PreferencePaneSection(UserText.privateSearch) {
                     ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions).accessibilityIdentifier("PreferencesGeneralView.showAutocompleteSuggestions")
                 }
 
-                // SECTION 4: Downloads
+                // SECTION 5: Downloads
                 PreferencePaneSection(UserText.downloads) {
                     PreferencePaneSubSection {
                         ToggleMenuItem(UserText.downloadsOpenPopupOnCompletion,

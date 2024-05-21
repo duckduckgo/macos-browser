@@ -28,6 +28,21 @@ protocol YoutubeOverlayUserScriptDelegate: AnyObject {
 
 final class YoutubeOverlayUserScript: NSObject, Subfeature {
 
+    enum MessageOrigin {
+        case duckPlayer, serpOverlay, youtubeOverlay
+
+        init?(url: URL) {
+            switch url.host {
+            case "duckduckgo.com":
+                self = .serpOverlay
+            case "www.youtube.com":
+                self = .youtubeOverlay
+            default:
+                return nil
+            }
+        }
+    }
+
     let duckPlayerPreferences: DuckPlayerPreferences
     weak var broker: UserScriptMessageBroker?
     weak var delegate: YoutubeOverlayUserScriptDelegate?
@@ -60,7 +75,11 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch MessageNames(rawValue: methodName) {
         case .setUserValues:
-            return DuckPlayer.shared.handleSetUserValues
+            guard let url = webView?.url, let origin = MessageOrigin(url: url) else {
+                assertionFailure("YoutubeOverlayUserScript: Unexpected message origin: \(String(describing: webView?.url))")
+                return nil
+            }
+            return DuckPlayer.shared.handleSetUserValuesMessage(from: origin)
         case .getUserValues:
             return DuckPlayer.shared.handleGetUserValues
         case .openDuckPlayer:
@@ -111,20 +130,24 @@ extension YoutubeOverlayUserScript {
             return nil
         }
         let pixelName = parameters["pixelName"] as? String
-        if pixelName == "play.use" || pixelName == "play.do_not_use" {
+
+        switch pixelName {
+        case "play.use":
             duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
-            if pixelName == "play.use" {
-                PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaMainOverlay)
+            PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaMainOverlay)
+            // Temporary pixel for first time user uses Duck Player
+            if AppDelegate.isNewUser {
+                PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .legacyInitial)
             }
+        case "play.do_not_use":
+            duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
+            PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeWatchHere)
+        case "overlay":
+            PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeImpressions)
+        default:
+            break
         }
 
-        // Temporary pixel for first time user uses Duck Player
-        if !AppDelegate.isNewUser {
-            return nil
-        }
-        if pixelName == "play.use" {
-            PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .legacyInitial)
-        }
         return nil
     }
 }

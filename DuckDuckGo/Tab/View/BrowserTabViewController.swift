@@ -547,7 +547,8 @@ final class BrowserTabViewController: NSViewController {
                       shouldLoadInBackground: true,
                       burnerMode: tabCollectionViewModel.burnerMode,
                       webViewSize: view.frame.size)
-        tabCollectionViewModel.append(tab: tab, selected: true)
+
+        tabCollectionViewModel.insertOrAppend(tab: tab, selected: true)
     }
 
     // MARK: - Browser Tabs
@@ -776,7 +777,7 @@ extension BrowserTabViewController: NSDraggingDestination {
             return true
         }
 
-        selectedTab.setContent(.url(url, source: .appOpenUrl))
+        selectedTab.setContent(.contentFromURL(url, source: .appOpenUrl))
         return true
     }
 
@@ -834,7 +835,7 @@ extension BrowserTabViewController: TabDelegate {
         case .window(active: let active, let isBurner):
             assert(isBurner == childTab.burnerMode.isBurner)
             WindowsManager.openNewWindow(with: childTab, showWindow: active)
-        case .tab(selected: let selected, _):
+        case .tab(selected: let selected, _, _):
             self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
         }
     }
