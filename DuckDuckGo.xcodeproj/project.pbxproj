@@ -2530,6 +2530,8 @@
 		CD224FB72BFCE5EC00409EBC /* PhishingDetectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD224FB42BFCE5EC00409EBC /* PhishingDetectionManager.swift */; };
 		CD2C47DA2BFCEDE500D197A9 /* PhishingDetection in Frameworks */ = {isa = PBXBuildFile; productRef = CD2C47D92BFCEDE500D197A9 /* PhishingDetection */; };
 		CD2C47DC2BFCEDF000D197A9 /* PhishingDetection in Frameworks */ = {isa = PBXBuildFile; productRef = CD2C47DB2BFCEDF000D197A9 /* PhishingDetection */; };
+		CD2C47E02BFCF05000D197A9 /* MockPhishingDetectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C47DD2BFCF05000D197A9 /* MockPhishingDetectionManager.swift */; };
+		CD2C47E12BFCF05000D197A9 /* MockPhishingDetectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C47DD2BFCF05000D197A9 /* MockPhishingDetectionManager.swift */; };
 		D64A5FF82AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */; };
 		D64A5FF92AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */; };
 		EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */; };
@@ -4069,6 +4071,7 @@
 		CB6BCDF827C6BEFF00CC76DC /* PrivacyFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyFeatures.swift; sourceTree = "<group>"; };
 		CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationStore.swift; sourceTree = "<group>"; };
 		CD224FB42BFCE5EC00409EBC /* PhishingDetectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhishingDetectionManager.swift; sourceTree = "<group>"; };
+		CD2C47DD2BFCF05000D197A9 /* MockPhishingDetectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockPhishingDetectionManager.swift; sourceTree = "<group>"; };
 		CD3F046E2BFCE23B00C66DA0 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		CD3F046F2BFCE23B00C66DA0 /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../../content-scope-scripts"; sourceTree = "<group>"; };
 		D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeButtonMenuFactory.swift; sourceTree = "<group>"; };
@@ -6716,6 +6719,7 @@
 				1D3B1AB7293405F5006F4388 /* PasswordManagers */,
 				B6106BA126A7BE430013B453 /* Permissions */,
 				37D2377E287EFECD00BCE03B /* PinnedTabs */,
+				CD2C47DF2BFCF05000D197A9 /* PhishingDetection */,
 				4B0511EE262CAEB300F6079C /* Preferences */,
 				31E163BB293A577200963C10 /* PrivacyReferenceTests */,
 				AA7E9174286DAFB700AB6B62 /* RecentlyClosed */,
@@ -8213,6 +8217,22 @@
 			path = PhishingDetection;
 			sourceTree = "<group>";
 		};
+		CD2C47DE2BFCF05000D197A9 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				CD2C47DD2BFCF05000D197A9 /* MockPhishingDetectionManager.swift */,
+			);
+			path = Mocks;
+			sourceTree = "<group>";
+		};
+		CD2C47DF2BFCF05000D197A9 /* PhishingDetection */ = {
+			isa = PBXGroup;
+			children = (
+				CD2C47DE2BFCF05000D197A9 /* Mocks */,
+			);
+			path = PhishingDetection;
+			sourceTree = "<group>";
+		};
 		EAA29AEB278D2E51007070CF /* fonts */ = {
 			isa = PBXGroup;
 			children = (
@@ -9585,6 +9605,7 @@
 				3706FA98293F65D500E42796 /* SecureVaultSorting.swift in Sources */,
 				3706FA99293F65D500E42796 /* PreferencesSidebarModel.swift in Sources */,
 				3706FA9A293F65D500E42796 /* DuckPlayerURLExtension.swift in Sources */,
+				CD2C47E12BFCF05000D197A9 /* MockPhishingDetectionManager.swift in Sources */,
 				3706FA9D293F65D500E42796 /* PermissionState.swift in Sources */,
 				3707C724294B5D2900682A9F /* StringExtension.swift in Sources */,
 				3706FA9F293F65D500E42796 /* FeedbackPresenter.swift in Sources */,
@@ -11100,6 +11121,7 @@
 				4B9292A026670D2A00AD2C21 /* SpacerNode.swift in Sources */,
 				3775913629AB9A1C00E26367 /* SyncManagementDialogViewController.swift in Sources */,
 				B6C0BB6729AEFF8100AE8E3C /* BookmarkExtension.swift in Sources */,
+				CD2C47E02BFCF05000D197A9 /* MockPhishingDetectionManager.swift in Sources */,
 				4BE6547F271FCD4D008D1D63 /* PasswordManagementCreditCardModel.swift in Sources */,
 				31B4AF532901A4F20013585E /* NSEventExtension.swift in Sources */,
 				85707F26276A335700DC0649 /* Onboarding.swift in Sources */,
