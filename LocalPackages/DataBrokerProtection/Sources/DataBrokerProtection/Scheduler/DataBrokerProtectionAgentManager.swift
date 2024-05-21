@@ -71,12 +71,12 @@ public class DataBrokerProtectionAgentManagerProvider {
                                                          contentScopeProperties: contentScopeProperties,
                                                          emailService: emailService,
                                                          captchaService: captchaService)
-        
-        let agentKiller = DefaultDataBrokerProtectionAgentKiller(dataManager: dataManager,
-                                                                 entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
-                                                                 authenticationManager: authenticationManager)
 
-         let operationDependencies = DefaultDataBrokerOperationDependencies(
+        let agentstopper = DefaultDataBrokerProtectionAgentStopper(dataManager: dataManager,
+                                                                   entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
+                                                                   authenticationManager: authenticationManager)
+
+        let operationDependencies = DefaultDataBrokerOperationDependencies(
             database: dataManager.database,
             config: executionConfig,
             runnerProvider: runnerProvider,
@@ -92,7 +92,7 @@ public class DataBrokerProtectionAgentManagerProvider {
             dataManager: dataManager,
             operationDependencies: operationDependencies,
             pixelHandler: pixelHandler,
-            agentKiller: agentKiller)
+            agentStopper: agentstopper)
     }
 }
 
@@ -105,7 +105,7 @@ public final class DataBrokerProtectionAgentManager {
     private let dataManager: DataBrokerProtectionDataManaging
     private let operationDependencies: DataBrokerOperationDependencies
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
-    private let agentKiller: DataBrokerProtectionAgentKiller
+    private let agentStopper: DataBrokerProtectionAgentStopper
 
     // Used for debug functions only, so not injected
     private lazy var browserWindowManager = BrowserWindowManager()
@@ -119,7 +119,7 @@ public final class DataBrokerProtectionAgentManager {
          dataManager: DataBrokerProtectionDataManaging,
          operationDependencies: DataBrokerOperationDependencies,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
-         agentKiller: DataBrokerProtectionAgentKiller
+         agentStopper: DataBrokerProtectionAgentStopper
     ) {
         self.userNotificationService = userNotificationService
         self.activityScheduler = activityScheduler
@@ -128,7 +128,7 @@ public final class DataBrokerProtectionAgentManager {
         self.dataManager = dataManager
         self.operationDependencies = operationDependencies
         self.pixelHandler = pixelHandler
-        self.agentKiller = agentKiller
+        self.agentStopper = agentStopper
 
         self.activityScheduler.delegate = self
         self.ipcServer.serverDelegate = self
@@ -140,13 +140,13 @@ public final class DataBrokerProtectionAgentManager {
         Task { @MainActor in
             // The browser shouldn't start the agent if these prerequisites aren't met
             // But since the agent can auto-start after a reboot without the browser, we need to validate it again
-            await agentKiller.validatePreRequisitesAndKillAgentIfNecessary()
+            await agentStopper.validateRunPreRequisitesAndStopAgentIfNecessary()
 
             activityScheduler.startScheduler()
             didStartActivityScheduler = true
             queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: nil)
 
-            agentKiller.monitorEntitlementAndKillAgentIfNecessary()
+            agentStopper.monitorEntitlementAndStopAgentIfNecessary()
         }
     }
 }

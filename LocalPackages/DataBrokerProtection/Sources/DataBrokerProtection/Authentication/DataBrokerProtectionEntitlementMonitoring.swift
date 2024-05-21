@@ -63,9 +63,3 @@ final class DataBrokerProtectionEntitlementMonitor: DataBrokerProtectionEntitlem
         timer = nil
     }
 }
-
-final class DataBrokerProtectionAgentBouncer {
-    func validatePreRequisitesAndKillIfNecessary() {
-        
-    }
-}

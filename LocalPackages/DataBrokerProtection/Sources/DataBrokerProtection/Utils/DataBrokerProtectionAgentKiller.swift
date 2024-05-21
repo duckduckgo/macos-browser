@@ -19,13 +19,13 @@
 import Foundation
 import Common
 
-protocol DataBrokerProtectionAgentKiller {
-    func validatePreRequisitesAndKillAgentIfNecessary() async
-    func monitorEntitlementAndKillAgentIfNecessary()
-    func killAgent()
+protocol DataBrokerProtectionAgentStopper {
+    func validateRunPreRequisitesAndStopAgentIfNecessary() async
+    func monitorEntitlementAndStopAgentIfNecessary()
+    func stopAgent()
 }
 
-struct DefaultDataBrokerProtectionAgentKiller: DataBrokerProtectionAgentKiller {
+struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper {
     private let dataManager: DataBrokerProtectionDataManaging
     private let entitlementMonitor: DataBrokerProtectionEntitlementMonitoring
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
@@ -38,29 +38,29 @@ struct DefaultDataBrokerProtectionAgentKiller: DataBrokerProtectionAgentKiller {
         self.authenticationManager = authenticationManager
     }
 
-    public func validatePreRequisitesAndKillAgentIfNecessary() async {
+    public func validateRunPreRequisitesAndStopAgentIfNecessary() async {
         do {
             guard try dataManager.fetchProfile() != nil,
                   authenticationManager.isUserAuthenticated,
                   try await authenticationManager.hasValidEntitlement() else {
 
                 os_log("Prerequisites are invalid", log: .dataBrokerProtection)
-                killAgent()
+                stopAgent()
                 return
             }
             os_log("Prerequisites are valid", log: .dataBrokerProtection)
         } catch {
             os_log("Error validating prerequisites, error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-            killAgent()
+            stopAgent()
         }
     }
 
-    public func monitorEntitlementAndKillAgentIfNecessary() {
+    public func monitorEntitlementAndStopAgentIfNecessary() {
         entitlementMonitor.start(checkEntitlementFunction: authenticationManager.hasValidEntitlement) { result in
             switch result {
             case .enabled:
 #warning("Send pixel enabled")
-                killAgent()
+                stopAgent()
             case .disabled:
 #warning("Send pixel disabled")
             case .error:
@@ -69,8 +69,8 @@ struct DefaultDataBrokerProtectionAgentKiller: DataBrokerProtectionAgentKiller {
         }
     }
 
-    func killAgent() {
-        os_log("Killing DataBrokerProtection Agent", log: .dataBrokerProtection)
+    func stopAgent() {
+        os_log("Stopping DataBrokerProtection Agent", log: .dataBrokerProtection)
         exit(EXIT_SUCCESS)
     }
 }
