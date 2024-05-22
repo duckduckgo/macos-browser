@@ -1374,13 +1374,18 @@ final class MockAuthenticationManager: DataBrokerProtectionAuthenticationManagin
     var shouldAskForInviteCodeValue = false
     var redeemCodeCalled = false
     var authHeaderValue: String? = "fake auth header"
+    var hasValidEntitlementValue = false
+    var shouldThrowEntitlementError = false
 
     var isUserAuthenticated: Bool { isUserAuthenticatedValue }
 
     var accessToken: String? { accessTokenValue }
 
     func hasValidEntitlement() async throws -> Bool {
-        return true
+        if shouldThrowEntitlementError {
+            throw NSError(domain: "duck.com", code: 0, userInfo: [NSLocalizedDescriptionKey: "Error"])
+        }
+        return hasValidEntitlementValue
     }
 
     func shouldAskForInviteCode() -> Bool { shouldAskForInviteCodeValue }
@@ -1397,5 +1402,39 @@ final class MockAuthenticationManager: DataBrokerProtectionAuthenticationManagin
         shouldAskForInviteCodeValue = false
         redeemCodeCalled = false
         authHeaderValue = "fake auth header"
+        hasValidEntitlementValue = false
+        shouldThrowEntitlementError = false
+    }
+}
+
+final class MockAgentStopper: DataBrokerProtectionAgentStopper {
+    var stopAgentWasCalled = false
+
+    func validateRunPrerequisitesAndStopAgentIfNecessary() async {
+
+    }
+
+    func monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: TimeInterval) {
+
+    }
+
+    func stopAgent() {
+        stopAgentWasCalled = true
+    }
+
+    func reset() {
+        stopAgentWasCalled = false
+    }
+}
+
+final class MockStopperUseCase: DataBrokerProtectionStopperUseCase {
+    var wasStopCalled = false
+
+    func stopAgent() {
+        wasStopCalled = true
+    }
+
+    func reset() {
+        wasStopCalled = false
     }
 }

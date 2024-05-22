@@ -19,7 +19,7 @@
 import Foundation
 
 protocol DataBrokerProtectionEntitlementMonitoring {
-    func start(checkEntitlementFunction: @escaping () async throws -> Bool, intervalInMinutes: Int, callback: @escaping (DataBrokerProtectionEntitlementMonitorResult) -> Void)
+    func start(checkEntitlementFunction: @escaping () async throws -> Bool, interval: TimeInterval, callback: @escaping (DataBrokerProtectionEntitlementMonitorResult) -> Void)
     func stop()
 }
 
@@ -32,8 +32,8 @@ public enum DataBrokerProtectionEntitlementMonitorResult {
 final class DataBrokerProtectionEntitlementMonitor: DataBrokerProtectionEntitlementMonitoring {
     private var timer: Timer?
 
-    func start(checkEntitlementFunction: @escaping () async throws -> Bool, intervalInMinutes: Int, callback: @escaping (DataBrokerProtectionEntitlementMonitorResult) -> Void) {
-        timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(intervalInMinutes * 60), repeats: true) { _ in
+    func start(checkEntitlementFunction: @escaping () async throws -> Bool, interval: TimeInterval, callback: @escaping (DataBrokerProtectionEntitlementMonitorResult) -> Void) {
+        timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
             Task {
                 do {
                     switch try await checkEntitlementFunction() {

@@ -148,7 +148,9 @@ public final class DataBrokerProtectionAgentManager {
             didStartActivityScheduler = true
             queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: nil)
 
-            agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid()
+            /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
+            /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
+            agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: .minutes(60))
         }
     }
 }

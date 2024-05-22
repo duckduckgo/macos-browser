@@ -25,7 +25,7 @@ protocol DataBrokerProtectionAgentStopper {
 
     /// Monitors the entitlement package. If the entitlement check returns false, the agent will be stopped.
     /// This function ensures that the agent is stopped if the user's subscription has expired, even if the browser is not active. Regularly checking for entitlement is required since notifications are not posted to agents.
-    func monitorEntitlementAndStopAgentIfEntitlementIsInvalid()
+    func monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: TimeInterval)
 
     /// Stops the agent
     func stopAgent()
@@ -36,15 +36,18 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     private let entitlementMonitor: DataBrokerProtectionEntitlementMonitoring
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private let stopperUseCase: DataBrokerProtectionStopperUseCase
 
     init(dataManager: DataBrokerProtectionDataManaging,
          entitlementMonitor: DataBrokerProtectionEntitlementMonitoring,
          authenticationManager: DataBrokerProtectionAuthenticationManaging,
-         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         stopperUseCase: DataBrokerProtectionStopperUseCase = AgentStopperUseCase()) {
         self.dataManager = dataManager
         self.entitlementMonitor = entitlementMonitor
         self.authenticationManager = authenticationManager
         self.pixelHandler = pixelHandler
+        self.stopperUseCase = stopperUseCase
     }
 
     public func validateRunPrerequisitesAndStopAgentIfNecessary() async {
@@ -69,18 +72,15 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
         }
     }
 
-    /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
-    /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
-    public func monitorEntitlementAndStopAgentIfEntitlementIsInvalid() {
+    public func monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: TimeInterval) {
         entitlementMonitor.start(checkEntitlementFunction: authenticationManager.hasValidEntitlement,
-                                 intervalInMinutes: 60) { result in
+                                 interval: interval) { result in
             stopAgentBasedOnEntitlementCheckResult(result)
         }
     }
 
     func stopAgent() {
-        os_log("Stopping DataBrokerProtection Agent", log: .dataBrokerProtection)
-        exit(EXIT_SUCCESS)
+        stopperUseCase.stopAgent()
     }
 
     private func stopAgentBasedOnEntitlementCheckResult(_ result: DataBrokerProtectionEntitlementMonitorResult) {
@@ -91,7 +91,6 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
         case .disabled:
             os_log("Invalid entitlement", log: .dataBrokerProtection)
             pixelHandler.fire(.entitlementCheckInvalid)
-            pixelHandler.fire(.entitlementCheckInvalid)
             stopAgent()
         case .error:
             os_log("Error when checking entitlement", log: .dataBrokerProtection)
@@ -99,5 +98,16 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
             /// Since this is a destructive action, the only situation that should cause the data to be deleted and the agent to be removed is .success(false)
             pixelHandler.fire(.entitlementCheckError)
         }
+    }
+}
+
+protocol DataBrokerProtectionStopperUseCase {
+    func stopAgent()
+}
+
+struct AgentStopperUseCase: DataBrokerProtectionStopperUseCase {
+    func stopAgent() {
+        os_log("Stopping DataBrokerProtection Agent", log: .dataBrokerProtection)
+        exit(EXIT_SUCCESS)
     }
 }
