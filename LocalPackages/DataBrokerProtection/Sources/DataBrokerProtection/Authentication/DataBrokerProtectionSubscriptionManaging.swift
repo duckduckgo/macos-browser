@@ -27,27 +27,24 @@ public protocol DataBrokerProtectionSubscriptionManaging {
 }
 
 public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtectionSubscriptionManaging {
-    private let accountManager: DataBrokerProtectionAccountManaging
-    private let environmentManager: DataBrokerProtectionSubscriptionPurchaseEnvironmentManaging
+
+    let subscriptionManager: SubscriptionManaging
 
     public var isUserAuthenticated: Bool {
-        accountManager.accessToken != nil
+        subscriptionManager.accountManager.accessToken != nil
     }
 
     public var accessToken: String? {
-        accountManager.accessToken
+        subscriptionManager.accountManager.accessToken
     }
 
-    public init(accountManager: DataBrokerProtectionAccountManaging,
-                environmentManager: DataBrokerProtectionSubscriptionPurchaseEnvironmentManaging) {
-        self.accountManager = accountManager
-        self.environmentManager = environmentManager
+    public init(subscriptionManager: SubscriptionManaging) {
+        self.subscriptionManager = subscriptionManager
     }
 
     public func hasValidEntitlement() async throws -> Bool {
-        environmentManager.updateEnvironment()
-
-        switch await accountManager.hasEntitlement(for: .reloadIgnoringLocalCacheData) {
+        switch await subscriptionManager.accountManager.hasEntitlement(for: .dataBrokerProtection,
+                                                                       cachePolicy: .reloadIgnoringLocalCacheData) {
         case let .success(result):
             return result
         case .failure(let error):

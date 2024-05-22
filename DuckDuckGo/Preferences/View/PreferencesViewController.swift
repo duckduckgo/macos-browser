@@ -34,7 +34,9 @@ final class PreferencesViewController: NSViewController {
     private var bitwardenManager: BWManagement = BWManager.shared
 
     init(syncService: DDGSyncing, duckPlayer: DuckPlayer = DuckPlayer.shared) {
-        model = PreferencesSidebarModel(syncService: syncService, includeDuckPlayer: duckPlayer.isAvailable)
+        model = PreferencesSidebarModel(syncService: syncService,
+                                        vpnVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
+                                        includeDuckPlayer: duckPlayer.isAvailable)
         super.init(nibName: nil, bundle: nil)
     }
 

@@ -24,10 +24,12 @@ import DataBrokerProtection
 import BrowserServicesKit
 import PixelKit
 import Networking
+import Subscription
 
 @objc(Application)
 final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
-    private let _delegate = DuckDuckGoDBPBackgroundAgentAppDelegate()
+    private let _delegate: DuckDuckGoDBPBackgroundAgentAppDelegate
+    private let subscriptionManager: SubscriptionManaging
 
     override init() {
         os_log(.error, log: .dbpBackgroundAgent, "🟢 DBP background Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
@@ -65,6 +67,11 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
             exit(0)
         }
 
+        // Configure Subscription
+        subscriptionManager = SubscriptionManager()
+
+        _delegate = DuckDuckGoDBPBackgroundAgentAppDelegate(subscriptionManager: subscriptionManager)
+
         super.init()
         self.delegate = _delegate
     }
@@ -80,7 +87,12 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
     private let settings = DataBrokerProtectionSettings()
     private var cancellables = Set<AnyCancellable>()
     private var statusBarMenu: StatusBarMenu?
+    private let subscriptionManager: SubscriptionManaging
     private var manager: DataBrokerProtectionAgentManager?
+
+    init(subscriptionManager: SubscriptionManaging) {
+        self.subscriptionManager = subscriptionManager
+    }
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -88,11 +100,15 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
 
         let redeemUseCase = RedeemUseCase(authenticationService: AuthenticationService(),
                                           authenticationRepository: KeychainAuthenticationData())
-        let authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(redeemUseCase: redeemUseCase)
+        let authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(redeemUseCase: redeemUseCase,
+                                                                                                      subscriptionManager: subscriptionManager)
         manager = DataBrokerProtectionAgentManagerProvider.agentManager(authenticationManager: authenticationManager)
         manager?.agentFinishedLaunching()
 
         setupStatusBarMenu()
+
+        // Aligning the environment with the Subscription one
+        settings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
     }
 
     @MainActor
