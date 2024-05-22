@@ -24,6 +24,7 @@ import PixelKit
 
 protocol DefaultBrowserProvider {
     var bundleIdentifier: String { get }
+    var defaultBrowserURL: URL? { get }
     var isDefault: Bool { get }
     func presentDefaultBrowserPrompt() throws
     func openSystemPreferences()
@@ -37,8 +38,12 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
 
     let bundleIdentifier: String
 
+    var defaultBrowserURL: URL? {
+        return NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!)
+    }
+
     var isDefault: Bool {
-        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!),
+        guard let defaultBrowserURL = defaultBrowserURL,
               let ddgBrowserURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
         else {
             return false

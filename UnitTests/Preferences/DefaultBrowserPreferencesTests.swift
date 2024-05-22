@@ -20,11 +20,13 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class DefaultBrowserProviderMock: DefaultBrowserProvider {
+
     enum MockError: Error {
         case generic
     }
 
     var bundleIdentifier: String = "com.duckduckgo.DefaultBrowserPreferencesTests"
+    var defaultBrowserURL: URL?
     var isDefault: Bool = false
     var _presentDefaultBrowserPrompt: () throws -> Void = {}
     var _openSystemPreferences: () -> Void = {}

@@ -1,7 +1,7 @@
 {
   "name": "Councilon",
   "url": "councilon.com",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "parent": "verecor.com",
   "addedDatetime": 1702965600000,
   "steps": [
@@ -12,7 +12,7 @@
         {
           "actionType": "navigate",
           "id": "ac6caadd-7930-4776-8473-9403b568611e",
-          "url": "https://councilon.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age}",
+          "url": "https://councilon.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
             "31-40",
