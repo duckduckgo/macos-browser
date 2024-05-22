@@ -231,6 +231,8 @@ final class SaveCredentialsViewController: NSViewController {
             PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
 
+        NotificationCenter.default.post(name: .autofillSaveEvent, object: nil, userInfo: nil)
+
         PixelKit.fire(GeneralPixel.autofillItemSaved(kind: .password))
 
         if passwordManagerCoordinator.isEnabled {
