@@ -296,6 +296,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
     public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         PixelKit.fire(GeneralPixel.formAutofilled(kind: type.formAutofillKind))
+        NotificationCenter.default.post(name: .autofillFillEvent, object: nil)
 
         if type.formAutofillKind == .password &&
             passwordManagerCoordinator.isEnabled {
