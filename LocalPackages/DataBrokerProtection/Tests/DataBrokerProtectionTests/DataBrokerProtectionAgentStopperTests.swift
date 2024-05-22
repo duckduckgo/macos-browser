@@ -23,11 +23,11 @@ import Common
 @testable import DataBrokerProtection
 
 final class DataBrokerProtectionAgentStopperTests: XCTestCase {
-    var mockPixelHandler: EventMapping<DataBrokerProtectionPixels>!
-    var mockAuthenticationManager: MockAuthenticationManager!
-    var mockEntitlementMonitor: DataBrokerProtectionEntitlementMonitor!
-    var mockDataManager: MockDataBrokerProtectionDataManager!
-    var mockStopAction: MockDataProtectionStopAction!
+   private var mockPixelHandler: EventMapping<DataBrokerProtectionPixels>!
+   private var mockAuthenticationManager: MockAuthenticationManager!
+   private var mockEntitlementMonitor: DataBrokerProtectionEntitlementMonitor!
+   private var mockDataManager: MockDataBrokerProtectionDataManager!
+   private var mockStopAction: MockDataProtectionStopAction!
 
     private var fakeProfile: DataBrokerProtectionProfile {
         let name = DataBrokerProtectionProfile.Name(firstName: "John", lastName: "Doe")
