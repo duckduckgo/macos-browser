@@ -32,8 +32,6 @@ final class CrashReporter {
 
     func checkForNewReports() {
 
-#if !DEBUG
-
         guard let lastCheckDate = lastCheckDate else {
             // Initial run
             self.lastCheckDate = Date()
@@ -59,8 +57,6 @@ final class CrashReporter {
                 await self.sender.send(contentData)
             }
         }
-
-#endif
 
     }
 }

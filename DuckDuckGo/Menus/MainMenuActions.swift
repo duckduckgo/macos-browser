@@ -682,12 +682,8 @@ extension MainViewController {
     }
 
     @objc func crashOnException(_ sender: Any?) {
-        do {
-            _=try Data(contentsOf: URL(fileURLWithPath: "/non/existent/path.txt"))
-        } catch let error as NSError {
-            DispatchQueue.main.async {
-                NSException(name: NSExceptionName(rawValue: error.domain), reason: error.localizedDescription, userInfo: ["NSError": error]).raise()
-            }
+        DispatchQueue.main.async {
+            NSException(name: .internalInconsistencyException, reason: "Exception raised from Main Menu", userInfo: nil).raise()
         }
     }
 

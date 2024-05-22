@@ -1579,6 +1579,8 @@
 		7BFE95562A9DF29B0081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */; };
 		7BFE95592A9DF2AF0081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */; };
 		7BFF850F2B0C09DA00ECACA2 /* DuckDuckGo Personal Information Removal.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGo Personal Information Removal.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		84E960B72BFB48C30021E3D6 /* CrashLogMessageExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E960B62BFB48C30021E3D6 /* CrashLogMessageExtractor.swift */; };
+		84E960B82BFB48C30021E3D6 /* CrashLogMessageExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E960B62BFB48C30021E3D6 /* CrashLogMessageExtractor.swift */; };
 		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
 		850E8DFB2A6FEC5E00691187 /* BookmarksBarAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
@@ -3373,6 +3375,7 @@
 		7BEC20412B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddBookmarkFolderPopoverView.swift; sourceTree = "<group>"; };
 		7BF1A9D72AE054D300FCA683 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+NetworkProtectionWaitlist.swift"; sourceTree = "<group>"; };
+		84E960B62BFB48C30021E3D6 /* CrashLogMessageExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashLogMessageExtractor.swift; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
 		850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarAppearance.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
@@ -7242,6 +7245,7 @@
 				AAC30A27268E045400D2D9CD /* CrashReportReader.swift */,
 				AAC30A2D268F1EE300D2D9CD /* CrashReportPromptPresenter.swift */,
 				AAC30A29268E239100D2D9CD /* CrashReport.swift */,
+				84E960B62BFB48C30021E3D6 /* CrashLogMessageExtractor.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -9984,6 +9988,7 @@
 				3706FBDE293F65D500E42796 /* EncryptionKeyStoring.swift in Sources */,
 				4B4D60E32A0C883A00BCD287 /* AppMain.swift in Sources */,
 				37197EA12942441700394917 /* Tab+UIDelegate.swift in Sources */,
+				84E960B82BFB48C30021E3D6 /* CrashLogMessageExtractor.swift in Sources */,
 				56D6A3D729DB2BAB0055215A /* ContinueSetUpView.swift in Sources */,
 				4BF97ADD2B43C5FC00EB4240 /* KeychainType+ClientDefault.swift in Sources */,
 				B6BCC51F2AFCD9ED002C5499 /* DataImportSourcePicker.swift in Sources */,
@@ -11597,6 +11602,7 @@
 				AA7412B224D0B3AC00D22FE0 /* TabBarViewItem.swift in Sources */,
 				856C98D52570116900A22F1F /* NSWindow+Toast.swift in Sources */,
 				B31055C427A1BA1D001AC618 /* AutoconsentUserScript.swift in Sources */,
+				84E960B72BFB48C30021E3D6 /* CrashLogMessageExtractor.swift in Sources */,
 				7B3618C22ADE75C8000D6154 /* NetworkProtectionNavBarPopoverManager.swift in Sources */,
 				859E7D6B27453BF3009C2B69 /* BookmarksExporter.swift in Sources */,
 				7B2DDCF82A93A8BB0039D884 /* NetworkProtectionAppEvents.swift in Sources */,
@@ -12902,7 +12908,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = ac1bd852e963386e6f46e2dfb257923a0880f526;
+				revision = 14d754f80487a484b0c83ce58a0513bb76b3dd28;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {

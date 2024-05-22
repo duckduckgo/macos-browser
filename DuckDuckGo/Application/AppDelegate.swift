@@ -117,6 +117,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // swiftlint:disable:next function_body_length
     override init() {
+        if case .normal = NSApplication.runType {
+            CrashLogMessageExtractor.installSignalHandlers()
+        }
+
         do {
             let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
@@ -294,13 +298,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         applyPreferredTheme()
 
 #if APPSTORE
-        crashCollection.start { pixelParameters, payloads, completion in
+        crashCollection.startAttachingCrashLogMessages { pixelParameters, payloads, completion in
             pixelParameters.forEach { _ in PixelKit.fire(GeneralPixel.crash) }
             guard let lastPayload = payloads.last else {
                 return
             }
             DispatchQueue.main.async {
-                CrashReportPromptPresenter().showPrompt(for: lastPayload, userDidAllowToReport: completion)
+                CrashReportPromptPresenter().showPrompt(for: CrashDataPayload(data: lastPayload), userDidAllowToReport: completion)
             }
         }
 #else

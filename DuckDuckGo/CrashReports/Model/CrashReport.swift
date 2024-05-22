@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+import Common
+import Crashes
 import Foundation
 import MetricKit
 
@@ -32,19 +34,31 @@ protocol CrashReport: CrashReportPresenting {
 
 }
 
-struct LegacyCrashReport: CrashReport {
+final class LegacyCrashReport: CrashReport {
 
     static let fileExtension = "crash"
 
-    static let headerItemsToFilter = [
+    private static let headerItemsToFilter = [
         "Anonymous UUID:",
         "Sleep/Wake UUID:"
     ]
+    private static let pidRegex = regex(#"^Process:.*\[(\d+)\]$"#)
+    private static let timestampRegex = regex(#"Date\/Time:\s+(.+)\s*$"#)
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS Z"
+        return formatter
+    }()
 
     let url: URL
 
-    var content: String? {
-        try? String(contentsOf: url)
+    init(url: URL) {
+        self.url = url
+    }
+
+    lazy var content: String? = {
+        guard var fileContents = try? String(contentsOf: url)
             .components(separatedBy: "\n")
             .filter({ line in
                 for headerItemToFilter in Self.headerItemsToFilter where line.hasPrefix(headerItemToFilter) {
@@ -52,8 +66,22 @@ struct LegacyCrashReport: CrashReport {
                 }
                 return true
             })
-            .joined(separator: "\n")
-    }
+            .joined(separator: "\n") else { return nil }
+
+        // prepend crash log message if loaded
+        let pid = fileContents.firstMatch(of: Self.pidRegex)?.range(at: 1, in: fileContents).flatMap { pid_t(fileContents[$0]) }
+        let timestamp = fileContents.firstMatch(of: Self.timestampRegex)?.range(at: 1, in: fileContents).flatMap {
+            Self.dateFormatter.date(from: String(fileContents[$0]))
+        }
+        let crashLogMessage = CrashLogMessageExtractor.crashLogMessage(for: timestamp, pid: pid).flatMap { message in
+            message.replacingOccurrences(of: "\n", with: "\\n") // escape newlines
+        }
+        if let crashLogMessage, !crashLogMessage.isEmpty {
+            fileContents = "Message: " + crashLogMessage + "\n" + fileContents
+        }
+
+        return fileContents
+    }()
 
     var contentData: Data? {
         content?.data(using: .utf8)
@@ -61,34 +89,55 @@ struct LegacyCrashReport: CrashReport {
 
 }
 
-struct JSONCrashReport: CrashReport {
+final class JSONCrashReport: CrashReport {
 
     static let fileExtension = "ips"
 
-    static let headerItemsToFilter = [
+    private static let headerItemsToFilter = [
         "sleepWakeUUID",
         "deviceIdentifierForVendor",
         "rolloutId"
     ]
+    private static let pidRegex = regex(#""pid"\s*:\s*(\d+)(?:,|$)"#)
+    private static let timestampRegex = regex(#""timestamp"\s*:\s*"([^"]+)""#)
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SS Z"
+        return formatter
+    }()
 
     let url: URL
 
-    var content: String? {
-        guard var fileContents = try? String(contentsOf: url) else {
-            return nil
-        }
+    init(url: URL) {
+        self.url = url
+    }
+
+    lazy var content: String? = {
+        guard var fileContents = try? String(contentsOf: self.url) else { return nil }
 
         for itemToFilter in Self.headerItemsToFilter {
             let patternToReplace = "\"\(itemToFilter)\"\\s*:\\s*\"[^\"]*\""
             let redactedKeyValuePair = "\"\(itemToFilter)\":\"<removed>\""
 
-            fileContents = fileContents.replacingOccurrences(of: patternToReplace,
-                                                             with: redactedKeyValuePair,
-                                                             options: .regularExpression)
+            fileContents = fileContents.replacingOccurrences(of: patternToReplace, with: redactedKeyValuePair, options: .regularExpression)
+        }
+
+        // append crash log message if loaded
+        let pid = fileContents.firstMatch(of: Self.pidRegex)?.range(at: 1, in: fileContents).flatMap { pid_t(fileContents[$0]) }
+        let timestamp = fileContents.firstMatch(of: Self.timestampRegex)?.range(at: 1, in: fileContents).flatMap {
+            Self.dateFormatter.date(from: String(fileContents[$0]))
+        }
+        let crashLogMessage = CrashLogMessageExtractor.crashLogMessage(for: timestamp, pid: pid).flatMap { message in
+            try? JSONSerialization.data(withJSONObject: message, options: .fragmentsAllowed).utf8String() // escape for json
+        }
+        if let openBraceIdx = fileContents.firstIndex(of: "{"), let crashLogMessage, !crashLogMessage.isEmpty {
+            let json = "\"message\": \(crashLogMessage),"
+            fileContents.insert(contentsOf: json, at: fileContents.index(after: openBraceIdx))
         }
 
         return fileContents
-    }
+    }()
 
     var contentData: Data? {
         content?.data(using: .utf8)
@@ -96,9 +145,56 @@ struct JSONCrashReport: CrashReport {
 
 }
 
-@available(macOS 12.0, *)
-extension MXDiagnosticPayload: CrashReportPresenting {
+@available(macOS 12, *)
+extension CrashCollection {
+
+    func startAttachingCrashLogMessages(didFindCrashReports: @escaping (_ pixelParameters: [[String: String]], _ payloads: [Data], _ uploadReports: @escaping () -> Void) -> Void) {
+        start(process: { payloads in
+            payloads.compactMap { payload in
+                var dict = payload.dictionaryRepresentation()
+
+                var pid: pid_t?
+                if #available(macOS 14.0, *) {
+                    pid = payload.crashDiagnostics?.first?.metaData.pid
+                }
+                var crashDiagnostics = dict["crashDiagnostics"] as? [[AnyHashable: Any]] ?? []
+                var crashDiagnosticsDict = crashDiagnostics.first ?? [:]
+                var diagnosticMetaDataDict = crashDiagnosticsDict["diagnosticMetaData"] as? [AnyHashable: Any] ?? [:]
+                var objCexceptionReason = diagnosticMetaDataDict["objectiveCexceptionReason"] as? [AnyHashable: Any] ?? [:]
+
+                var exceptionMessage = (objCexceptionReason["composedMessage"] as? String)?.sanitized()
+
+                // append crash log message if loaded
+                if let crashInfo = CrashLogMessageExtractor.crashLogMessage(for: payload.timeStampBegin, pid: pid), !crashInfo.isEmpty {
+                    if let existingMessage = exceptionMessage, !existingMessage.isEmpty {
+                        exceptionMessage = existingMessage + "\n\n---\n\n" + crashInfo
+                    } else {
+                        exceptionMessage = crashInfo
+                    }
+                }
+
+                objCexceptionReason["composedMessage"] = exceptionMessage
+                diagnosticMetaDataDict["objectiveCexceptionReason"] = objCexceptionReason
+                crashDiagnosticsDict["diagnosticMetaData"] = diagnosticMetaDataDict
+                crashDiagnostics[0] = crashDiagnosticsDict
+                dict["crashDiagnostics"] = crashDiagnostics
+
+                guard JSONSerialization.isValidJSONObject(dict) else {
+                    assertionFailure("Invalid JSON object: \(dict)")
+                    return nil
+                }
+                return try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys])
+            }
+
+        }, didFindCrashReports: didFindCrashReports)
+    }
+
+}
+
+struct CrashDataPayload: CrashReportPresenting {
+    let data: Data
+
     var content: String? {
-        jsonRepresentation().utf8String()
+        data.utf8String()
     }
 }
