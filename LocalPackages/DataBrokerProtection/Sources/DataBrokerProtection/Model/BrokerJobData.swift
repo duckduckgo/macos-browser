@@ -1,5 +1,5 @@
 //
-//  BrokerOperationData.swift
+//  BrokerJobData.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Foundation
 
-protocol BrokerOperationData {
+protocol BrokerJobData {
     var brokerId: Int64 { get }
     var profileQueryId: Int64 { get }
     var lastRunDate: Date? { get }
@@ -26,7 +26,7 @@ protocol BrokerOperationData {
     var historyEvents: [HistoryEvent] { get }
 }
 
-struct ScanOperationData: BrokerOperationData, Sendable {
+struct ScanJobData: BrokerJobData, Sendable {
     let brokerId: Int64
     let profileQueryId: Int64
     let preferredRunDate: Date?
@@ -67,7 +67,7 @@ struct ScanOperationData: BrokerOperationData, Sendable {
     }
 }
 
-struct OptOutOperationData: BrokerOperationData, Sendable {
+struct OptOutJobData: BrokerJobData, Sendable {
     let brokerId: Int64
     let profileQueryId: Int64
     let preferredRunDate: Date?
