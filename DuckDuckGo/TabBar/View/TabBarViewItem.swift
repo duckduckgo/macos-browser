@@ -29,6 +29,7 @@ struct OtherTabBarViewItemsState {
 protocol TabBarViewItemDelegate: AnyObject {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool)
+    func tabBarViewItemMouseIsMoving(_ tabBarViewItem: TabBarViewItem)
 
     func tabBarViewItemCanBeDuplicated(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool
@@ -645,6 +646,10 @@ extension TabBarViewItem: MouseClickViewDelegate {
         }
         self.isMouseOver = isMouseOver
         view.needsLayout = true
+    }
+
+    func mouseOverViewIsMoving(_ mouseOverView: MouseOverView) {
+        delegate?.tabBarViewItemMouseIsMoving(self)
     }
 
     func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent) {

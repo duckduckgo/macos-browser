@@ -60,6 +60,8 @@ final class TabBarViewController: NSViewController {
     private var mouseDownCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
+    private let tabPreviewEventsHandler: TabPreviewEventsHandler
+
     @IBOutlet weak var shadowView: TabShadowView!
 
     @IBOutlet weak var rightSideStackView: NSStackView!
@@ -89,10 +91,18 @@ final class TabBarViewController: NSViewController {
             self.pinnedTabsViewModel = pinnedTabsViewModel
             self.pinnedTabsView = pinnedTabsView
             self.pinnedTabsHostingView = PinnedTabsHostingView(rootView: pinnedTabsView)
+            tabPreviewEventsHandler = TabPreviewEventsHandler(
+                pinnedTabHoveredIndexPublisher: pinnedTabsViewModel.$hoveredItemIndex.eraseToAnyPublisher(),
+                pinnedTabMouseMovingPublisher: pinnedTabsViewModel.$mouseMoving.eraseToAnyPublisher()
+            )
         } else {
             self.pinnedTabsViewModel = nil
             self.pinnedTabsView = nil
             self.pinnedTabsHostingView = nil
+            tabPreviewEventsHandler = TabPreviewEventsHandler(
+                pinnedTabHoveredIndexPublisher: Just(nil).eraseToAnyPublisher(),
+                pinnedTabMouseMovingPublisher: Just(()).eraseToAnyPublisher()
+            )
         }
 
         super.init(coder: coder)
@@ -107,6 +117,7 @@ final class TabBarViewController: NSViewController {
         setupFireButton()
         setupPinnedTabsView()
         subscribeToTabModeChanges()
+        subscribeToTabPreviewEvents()
         setupAddTabButton()
         setupAsBurnerWindowIfNeeded()
     }
@@ -245,13 +256,6 @@ final class TabBarViewController: NSViewController {
             }
             .store(in: &cancellables)
 
-        pinnedTabsViewModel.$hoveredItemIndex.dropFirst().removeDuplicates()
-            .debounce(for: 0.05, scheduler: DispatchQueue.main)
-            .sink { [weak self] index in
-                self?.pinnedTabsViewDidUpdateHoveredItem(to: index)
-            }
-            .store(in: &cancellables)
-
         pinnedTabsViewModel.contextMenuActionPublisher
             .sink { [weak self] action in
                 self?.handlePinnedTabContextMenuAction(action)
@@ -278,37 +282,21 @@ final class TabBarViewController: NSViewController {
             .store(in: &cancellables)
     }
 
-    private func pinnedTabsViewDidUpdateHoveredItem(to index: Int?) {
-        func shouldDismissPinnedTabPreview() -> Bool {
-            // If the point is not within the view we can safely dismiss the preview
-            guard let pointWithinView = self.view.mouseLocationInsideBounds(nil) else {
-                return true
-            }
-
-            // Calculate the rect of the standard tabs
-            let standardTabsTotalWidth = self.collectionView.visibleItems().reduce(into: 0.0) { partial, item in
-                partial += item.view.bounds.width
-            }
-
-            // Create a rect with the width of pinned and non pinned tabs
-            var standardAndPinnedTabsContainerRect = self.pinnedTabsContainerView.frame
-            standardAndPinnedTabsContainerRect.size.width += standardTabsTotalWidth
-
-            // If the point is not within the rect dismiss the preview
-            return !standardAndPinnedTabsContainerRect.contains(pointWithinView)
-        }
-
-        if let index = index {
-            showPinnedTabPreview(at: index)
-        } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                // When the mouse hover on top of the semaphore view we want to dismiss the preview to avoid the preview get stuck on screen when the popover to choose the screen size is shown.
-                // We don't want to dismiss the preview if the location of the mouse is within the rect that encompasses the pinned and standard tabs
-                if shouldDismissPinnedTabPreview() {
-                    self.hideTabPreview(allowQuickRedisplay: true)
+    private func subscribeToTabPreviewEvents() {
+        tabPreviewEventsHandler.eventPublisher
+            .debounce(for: 0.05, scheduler: DispatchQueue.main)
+            .sink { [weak self] event in
+                guard let self else { return }
+                switch event {
+                case let .hide(allowQuickRedisplay, withDelay):
+                    self.hideTabPreview(allowQuickRedisplay: allowQuickRedisplay, withDelay: withDelay)
+                case let .show(.pinned(index)):
+                    self.showPinnedTabPreview(at: index)
+                case let .show(.unpinned(item)):
+                    self.showTabPreview(for: item)
                 }
             }
-        }
+            .store(in: &cancellables)
     }
 
     private func deselectTabAndSelectPinnedTab(at index: Int) {
@@ -634,8 +622,8 @@ final class TabBarViewController: NSViewController {
         tabPreviewWindowController.show(parentWindow: window, topLeftPointInWindow: pointInWindow)
     }
 
-    func hideTabPreview(allowQuickRedisplay: Bool = false) {
-        tabPreviewWindowController.hide(allowQuickRedisplay: allowQuickRedisplay)
+    func hideTabPreview(allowQuickRedisplay: Bool = false, withDelay: Bool = false) {
+        tabPreviewWindowController.hide(allowQuickRedisplay: allowQuickRedisplay, withDelay: withDelay)
     }
 
 }
@@ -1041,15 +1029,17 @@ extension TabBarViewController: NSCollectionViewDelegate {
 extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool) {
+        guard !isMouseOver else { return }
 
-        if isMouseOver {
-            // Show tab preview for visible tab bar items
-            if collectionView.visibleRect.intersects(tabBarViewItem.view.frame) {
-                showTabPreview(for: tabBarViewItem)
-            }
-        } else {
-            tabPreviewWindowController.hide(allowQuickRedisplay: true, withDelay: true)
-        }
+        // Send an event to dismiss the preview when the mouse exits the area
+        tabPreviewEventsHandler.unpinnedTabMouseExited()
+    }
+
+    func tabBarViewItemMouseIsMoving(_ tabBarViewItem: TabBarViewItem) {
+        guard collectionView.visibleRect.intersects(tabBarViewItem.view.frame) else { return }
+
+        // Send an event to show the preview when the mouse moves within the area
+        tabPreviewEventsHandler.unpinnedTabMouseEntered(tabBarViewItem: tabBarViewItem)
     }
 
     func tabBarViewItemCanBeDuplicated(_ tabBarViewItem: TabBarViewItem) -> Bool {

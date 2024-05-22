@@ -59,7 +59,7 @@ final class HoverTrackingArea: NSTrackingArea {
     private var observers: [NSKeyValueObservation]?
 
     init(owner: some Hoverable) {
-        super.init(rect: .zero, options: [.mouseEnteredAndExited, .activeInKeyWindow, .enabledDuringMouseDrag, .inVisibleRect], owner: owner, userInfo: nil)
+        super.init(rect: .zero, options: [.mouseEnteredAndExited, .mouseMoved, .activeInKeyWindow, .enabledDuringMouseDrag, .inVisibleRect], owner: owner, userInfo: nil)
 
         observers = [
             owner.observe(\.backgroundColor) { [weak self] _, _ in self?.updateLayer() },
@@ -113,6 +113,10 @@ final class HoverTrackingArea: NSTrackingArea {
         view?.isMouseOver = false
         updateLayer(animated: true)
         view?.mouseExited(with: event)
+    }
+
+    @objc func mouseMoved(_ event: NSEvent) {
+        view?.mouseMoved(with: event)
     }
 
     private func mouseDownDidChange() {
