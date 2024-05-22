@@ -99,7 +99,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }()
 
 #if DBP
-    private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
+    private lazy var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler = {
+        let authManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager()
+        return DataBrokerProtectionSubscriptionEventHandler(featureDisabler: DataBrokerProtectionFeatureDisabler(),
+                                                            authenticationManager: authManager,
+                                                            pixelHandler: DataBrokerProtectionPixelsHandler())
+    }()
 #endif
 
     private var didFinishLaunching = false

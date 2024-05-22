@@ -164,6 +164,11 @@ public enum DataBrokerProtectionPixels {
     case initialScanSiteLoadDuration(duration: Double, hasError: Bool, brokerURL: String, sleepDuration: Double)
     case initialScanPostLoadingDuration(duration: Double, hasError: Bool, brokerURL: String, sleepDuration: Double)
     case initialScanPreStartDuration(duration: Double)
+
+    // Entitlements
+    case entitlementCheckValid
+    case entitlementCheckInvalid
+    case entitlementCheckError
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -267,6 +272,11 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .initialScanSiteLoadDuration: return "m_mac_dbp_scan_broker_site_loaded"
         case .initialScanPostLoadingDuration: return "m_mac_dbp_initial_scan_broker_post_loading"
         case .initialScanPreStartDuration: return "m_mac_dbp_initial_scan_pre_start_duration"
+
+            // Entitlements
+        case .entitlementCheckValid: return "m_mac_dbp_macos_entitlement_valid"
+        case .entitlementCheckInvalid: return "m_mac_dbp_macos_entitlement_invalid"
+        case .entitlementCheckError: return "m_mac_dbp_macos_entitlement_error"
         }
     }
 
@@ -362,6 +372,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .homeViewCTAMoveApplicationClicked,
                 .homeViewCTAGrantPermissionClicked,
 
+                .entitlementCheckValid,
+                .entitlementCheckInvalid,
+                .entitlementCheckError,
+            
                 .secureVaultInitError,
                 .secureVaultError:
             return [:]
@@ -486,7 +500,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .homeViewShowWebUI,
                     .homeViewShowBadPathError,
                     .homeViewCTAMoveApplicationClicked,
-                    .homeViewCTAGrantPermissionClicked:
+                    .homeViewCTAGrantPermissionClicked,
+                    .entitlementCheckValid,
+                    .entitlementCheckInvalid,
+                    .entitlementCheckError:
                 PixelKit.fire(event, frequency: .dailyAndCount)
 
             }
