@@ -1,7 +1,7 @@
 {
   "name": "PeopleWhiz.com",
   "url": "peoplewhiz.com",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "addedDatetime": 1676160000000,
   "steps": [
     {
@@ -31,6 +31,9 @@
             "relativesList": {
               "selector": ".MuiGrid-item:nth-child(4) [class^='ResultsTable__AddressAndLocation-sc']",
               "findElements": true
+            }            },
+            "profileUrl": {
+              "identifierType": "hash"
             }
           }
         }
