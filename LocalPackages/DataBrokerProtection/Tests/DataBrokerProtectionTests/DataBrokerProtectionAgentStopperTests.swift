@@ -64,7 +64,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopAction)
+                                                              stopAction: mockStopAction)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -79,7 +79,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopAction)
+                                                              stopAction: mockStopAction)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -94,7 +94,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopAction)
+                                                              stopAction: mockStopAction)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertTrue(mockStopAction.wasStopCalled)
@@ -109,7 +109,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopAction)
+                                                              stopAction: mockStopAction)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertFalse(mockStopAction.wasStopCalled)
@@ -124,7 +124,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopAction)
+                                                              stopAction: mockStopAction)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
         XCTAssertFalse(mockStopAction.wasStopCalled)
@@ -139,7 +139,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopAction)
+                                                              stopAction: mockStopAction)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: 0.1)
@@ -161,7 +161,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopAction)
+                                                              stopAction: mockStopAction)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: 0.1)
@@ -183,7 +183,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopAction)
+                                                              stopAction: mockStopAction)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: 0.1)

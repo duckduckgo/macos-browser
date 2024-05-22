@@ -105,6 +105,42 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         XCTAssertTrue(startScheduledScansCalled)
     }
 
+    func testWhenAgentStart_andProfileDoesNotExist_thenActivityIsNotScheduled_andSheduledOpereationsNotRun() async throws {
+        // Given
+        sut = DataBrokerProtectionAgentManager(
+            userNotificationService: mockNotificationService,
+            activityScheduler: mockActivityScheduler,
+            ipcServer: mockIPCServer,
+            queueManager: mockQueueManager,
+            dataManager: mockDataManager,
+            operationDependencies: mockDependencies,
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper)
+
+        mockDataManager.profileToReturn = nil
+
+        var schedulerStarted = false
+        mockActivityScheduler.startSchedulerCompletion = {
+            schedulerStarted = true
+        }
+
+        var startScheduledScansCalled = false
+        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
+            startScheduledScansCalled = true
+        }
+
+        let agentFinishedLaunchingExpectation = XCTestExpectation(description: "Finished expectation")
+
+        // When
+        sut.agentFinishedLaunching(completion: {
+            agentFinishedLaunchingExpectation.fulfill()
+        })
+
+        // Then
+        XCTAssertFalse(schedulerStarted)
+        XCTAssertFalse(startScheduledScansCalled)
+    }
+
     func testWhenActivitySchedulerTriggers_thenSheduledOpereationsRun() async throws {
         // Given
         sut = DataBrokerProtectionAgentManager(
