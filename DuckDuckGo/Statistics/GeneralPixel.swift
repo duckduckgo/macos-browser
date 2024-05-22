@@ -140,14 +140,21 @@ enum GeneralPixel: PixelKitEventV2 {
     case dataBrokerResetLoginItemDaily
     case dataBrokerDisableAndDeleteDaily
 
-    // DataBrokerProtection Other
-    case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
-
     // Default Browser
     case defaultRequestedFromHomepage
     case defaultRequestedFromHomepageSetupView
     case defaultRequestedFromSettings
     case defaultRequestedFromOnboarding
+
+    // Adding to the Dock
+    case addToDockOnboardingStepPresented
+    case userAddedToDockDuringOnboarding
+    case userSkippedAddingToDockFromOnboarding
+    case startBrowsingOnboardingStepPresented
+    case addToDockNewTabPageCardPresented
+    case userAddedToDockFromNewTabPageCard
+    case userAddedToDockFromSettings
+    case serpAddedToDock
 
     case protectionToggledOffBreakageReport
     case toggleProtectionsDailyCount
@@ -507,8 +514,6 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_dbp_imp_terms"
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_dbp_ev_terms_accepted"
-        case .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn:
-            return "m_mac_dbp_error_when_fetching_subscription_auth_token_after_sign_in"
         case .dataBrokerProtectionRemoteMessageDisplayed(let messageID):
             return "m_mac_dbp_remote_message_displayed_\(messageID)"
         case .dataBrokerProtectionRemoteMessageDismissed(let messageID):
@@ -534,6 +539,15 @@ enum GeneralPixel: PixelKitEventV2 {
         case .defaultRequestedFromHomepageSetupView: return "m_mac_default_requested_from_homepage_setup_view"
         case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
         case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
+
+        case .addToDockOnboardingStepPresented: return "m_mac_add_to_dock_onboarding_step_presented"
+        case .userAddedToDockDuringOnboarding: return "m_mac_user_added_to_dock_during_onboarding"
+        case .userSkippedAddingToDockFromOnboarding: return "m_mac_user_skipped_adding_to_dock_from_onboarding"
+        case .startBrowsingOnboardingStepPresented: return "m_mac_start_browsing_onboarding_step_presented"
+        case .addToDockNewTabPageCardPresented: return "m_mac_add_to_dock_new_tab_page_card_presented_u"
+        case .userAddedToDockFromNewTabPageCard: return "m_mac_user_added_to_dock_from_new_tab_page_card"
+        case .userAddedToDockFromSettings: return "m_mac_user_added_to_dock_from_settings"
+        case .serpAddedToDock: return "m_mac_serp_added_to_dock"
 
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
         case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"

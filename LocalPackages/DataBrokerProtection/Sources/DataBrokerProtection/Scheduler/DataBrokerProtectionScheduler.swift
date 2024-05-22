@@ -131,6 +131,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     private let captchaService: CaptchaServiceProtocol
     private let userNotificationService: DataBrokerProtectionUserNotificationService
     private var currentOperation: DataBrokerProtectionCurrentOperation = .idle
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
 
     /// Ensures that only one scheduler operation is executed at the same time.
     ///
@@ -161,7 +162,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 dataManager: DataBrokerProtectionDataManager,
                 notificationCenter: NotificationCenter = NotificationCenter.default,
                 pixelHandler: EventMapping<DataBrokerProtectionPixels>,
-                redeemUseCase: DataBrokerProtectionRedeemUseCase,
+                authenticationManager: DataBrokerProtectionAuthenticationManaging,
                 userNotificationService: DataBrokerProtectionUserNotificationService
     ) {
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
@@ -176,9 +177,10 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         self.pixelHandler = pixelHandler
         self.notificationCenter = notificationCenter
         self.userNotificationService = userNotificationService
+        self.authenticationManager = authenticationManager
 
-        self.emailService = EmailService(redeemUseCase: redeemUseCase)
-        self.captchaService = CaptchaService(redeemUseCase: redeemUseCase)
+        self.emailService = EmailService(authenticationManager: authenticationManager)
+        self.captchaService = CaptchaService(authenticationManager: authenticationManager)
     }
 
     public func startScheduler(showWebView: Bool = false) {

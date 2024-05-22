@@ -23,6 +23,7 @@ import Foundation
 final class CaptchaServiceTests: XCTestCase {
     private let servicePixel = MockDataBrokerProtectionBackendServicePixels()
     let jsonEncoder = JSONEncoder()
+    private let mockAuthenticationManager = MockAuthenticationManager()
 
     enum MockError: Error {
         case someError
@@ -37,12 +38,13 @@ final class CaptchaServiceTests: XCTestCase {
     override func tearDown() async throws {
         MockURLProtocol.requestHandlerQueue.removeAll()
         servicePixel.reset()
+        mockAuthenticationManager.reset()
     }
 
     func testWhenSessionThrowsOnSubmittingCaptchaInfo_thenTheCorrectErrorIsThrown() async {
         MockURLProtocol.requestHandlerQueue.append({ _ in throw MockError.someError })
         let sut = CaptchaService(urlSession: mockURLSession,
-                                 redeemUseCase: MockRedeemUseCase(),
+                                 authenticationManager: mockAuthenticationManager,
                                  settings: DataBrokerProtectionSettings(defaults: .standard),
                                  servicePixel: servicePixel)
 
@@ -62,7 +64,7 @@ final class CaptchaServiceTests: XCTestCase {
         let response = CaptchaTransaction(message: .failureCritical, transactionId: nil)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(response)) })
         let sut = CaptchaService(urlSession: mockURLSession,
-                                 redeemUseCase: MockRedeemUseCase(),
+                                 authenticationManager: mockAuthenticationManager,
                                  settings: DataBrokerProtectionSettings(defaults: .standard),
                                  servicePixel: servicePixel)
 
@@ -82,7 +84,7 @@ final class CaptchaServiceTests: XCTestCase {
         let response = CaptchaTransaction(message: .invalidRequest, transactionId: nil)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(response)) })
         let sut = CaptchaService(urlSession: mockURLSession,
-                                 redeemUseCase: MockRedeemUseCase(),
+                                 authenticationManager: mockAuthenticationManager,
                                  settings: DataBrokerProtectionSettings(defaults: .standard),
                                  servicePixel: servicePixel)
 
@@ -106,7 +108,7 @@ final class CaptchaServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
         let sut = CaptchaService(urlSession: mockURLSession,
-                                 redeemUseCase: MockRedeemUseCase(),
+                                 authenticationManager: mockAuthenticationManager,
                                  settings: DataBrokerProtectionSettings(defaults: .standard),
                                  servicePixel: servicePixel)
 
@@ -128,7 +130,7 @@ final class CaptchaServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
         let sut = CaptchaService(urlSession: mockURLSession,
-                                 redeemUseCase: MockRedeemUseCase(),
+                                 authenticationManager: mockAuthenticationManager,
                                  settings: DataBrokerProtectionSettings(defaults: .standard),
                                  servicePixel: servicePixel)
 
@@ -150,7 +152,7 @@ final class CaptchaServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
         let sut = CaptchaService(urlSession: mockURLSession,
-                                 redeemUseCase: MockRedeemUseCase(),
+                                 authenticationManager: mockAuthenticationManager,
                                  settings: DataBrokerProtectionSettings(defaults: .standard),
                                  servicePixel: servicePixel)
 
@@ -172,7 +174,7 @@ final class CaptchaServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
         let sut = CaptchaService(urlSession: mockURLSession,
-                                 redeemUseCase: MockRedeemUseCase(),
+                                 authenticationManager: mockAuthenticationManager,
                                  settings: DataBrokerProtectionSettings(defaults: .standard),
                                  servicePixel: servicePixel)
 
@@ -196,7 +198,7 @@ final class CaptchaServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
         let sut = CaptchaService(urlSession: mockURLSession,
-                                 redeemUseCase: MockRedeemUseCase(),
+                                 authenticationManager: mockAuthenticationManager,
                                  settings: DataBrokerProtectionSettings(defaults: .standard),
                                  servicePixel: servicePixel)
 
@@ -218,7 +220,7 @@ final class CaptchaServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
         let sut = CaptchaService(urlSession: mockURLSession,
-                                 redeemUseCase: MockRedeemUseCase(),
+                                 authenticationManager: mockAuthenticationManager,
                                  settings: DataBrokerProtectionSettings(defaults: .standard),
                                  servicePixel: servicePixel)
 
@@ -231,11 +233,10 @@ final class CaptchaServiceTests: XCTestCase {
     }
 
     func testWhenNoAuthTokenAvailable_noAuthTokenErrorIsThrown() async {
-        let redeemUseCase = MockRedeemUseCase()
-        redeemUseCase.shouldSendNilAuthHeader = true
+        mockAuthenticationManager.authHeaderValue = nil
 
         let sut = CaptchaService(urlSession: mockURLSession,
-                                 redeemUseCase: redeemUseCase,
+                                 authenticationManager: mockAuthenticationManager,
                                  settings: DataBrokerProtectionSettings(defaults: .standard),
                                  servicePixel: servicePixel)
 

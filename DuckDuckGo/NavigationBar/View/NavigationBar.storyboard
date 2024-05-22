@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22690"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
@@ -692,6 +692,30 @@
                                             <constraint firstAttribute="height" constant="32" id="fQf-sl-KYI"/>
                                         </constraints>
                                     </customView>
+                                    <button hidden="YES" id="b30-aJ-fvG" userLabel="ZoomButton" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="84" y="0.0" width="32" height="32"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ZoomIncrease" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Rfs-eh-Yrh">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="ButtonColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="32" id="6TS-h0-8pK"/>
+                                            <constraint firstAttribute="width" constant="32" id="JvZ-46-TUe"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="zoomButtonAction:" target="mcr-nj-GmC" id="xCK-4c-baX"/>
+                                        </connections>
+                                    </button>
                                     <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8UU-A8-1nD">
                                         <rect key="frame" x="34" y="0.0" width="160" height="32"/>
                                         <subviews>
@@ -828,8 +852,10 @@
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
+                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
@@ -864,6 +890,7 @@
                         <outlet property="permissionButtons" destination="8UU-A8-1nD" id="gYJ-VW-MEG"/>
                         <outlet property="popupsButton" destination="qqY-h9-UQ7" id="1QY-I6-oNC"/>
                         <outlet property="privacyEntryPointButton" destination="nOW-iY-XmO" id="r0A-EO-srN"/>
+                        <outlet property="zoomButton" destination="b30-aJ-fvG" id="24G-cW-Qmg"/>
                     </connections>
                 </viewController>
                 <customObject id="PAh-HG-vQt" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -893,6 +920,7 @@
         <image name="Refresh" width="16" height="16"/>
         <image name="Search" width="14" height="14"/>
         <image name="Settings" width="16" height="16"/>
+        <image name="ZoomIncrease" width="16" height="16"/>
         <namedColor name="AddressBarBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
