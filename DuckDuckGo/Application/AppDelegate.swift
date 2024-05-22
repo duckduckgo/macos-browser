@@ -230,8 +230,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             HistoryCoordinator.shared.migrateModelV5toV6IfNeeded()
         }
 
-        PhishingDetectionManager.shared.loadDataAsync()
-
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         bookmarksManager.loadBookmarks()
 

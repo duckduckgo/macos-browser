@@ -30,7 +30,9 @@ public final class PhishingDetectionManager: PhishingDetectionManaging {
     private let phishingDetectionService = PhishingDetectionService()
     private let phishingDetectionDataActivities = PhishingDetectionDataActivities()
 
-    private init() {}
+    private init() {
+        loadDataAsync()
+    }
 
     public func isMalicious(url: URL) async -> Bool {
         return await phishingDetectionService.isMalicious(url: url)
