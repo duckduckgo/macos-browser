@@ -45,6 +45,12 @@ enum GeneralPixel: PixelKitEventV2 {
     case autofillLoginsSettingsResetExcludedConfirmed
     case autofillLoginsSettingsResetExcludedDismissed
 
+    case autofillActiveUser
+    case autofillEnabledUser
+    case autofillOnboardedUser
+    case autofillLoginsStacked
+    case autofillCreditCardsStacked
+
     case bitwardenPasswordAutofilled
     case bitwardenPasswordSaved
 
@@ -369,6 +375,17 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_autofill_settings_reset_excluded_confirmed"
         case .autofillLoginsSettingsResetExcludedDismissed:
             return "m_mac_autofill_settings_reset_excluded_dismissed"
+
+        case .autofillActiveUser:
+            return "m_mac_autofill_activeuser"
+        case .autofillEnabledUser:
+            return "m_mac_autofill_enableduser"
+        case .autofillOnboardedUser:
+            return "m_mac_autofill_onboardeduser"
+        case .autofillLoginsStacked:
+            return "m_mac_autofill_logins_stacked"
+        case .autofillCreditCardsStacked:
+            return "m_mac_autofill_creditcards_stacked"
 
         case .bitwardenPasswordAutofilled:
             return "m_mac_bitwarden_autofill_password"
