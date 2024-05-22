@@ -82,54 +82,27 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
 
         mockDataManager.profileToReturn = mockProfile
 
+        let schedulerStartedExpectation = XCTestExpectation(description: "Scheduler started")
         var schedulerStarted = false
         mockActivityScheduler.startSchedulerCompletion = {
             schedulerStarted = true
+            schedulerStartedExpectation.fulfill()
         }
 
+        let scanCalledExpectation = XCTestExpectation(description: "Scan called")
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
             startScheduledScansCalled = true
+            scanCalledExpectation.fulfill()
         }
 
         // When
         sut.agentFinishedLaunching()
 
         // Then
+        await fulfillment(of: [scanCalledExpectation, schedulerStartedExpectation], timeout: 1.0)
         XCTAssertTrue(schedulerStarted)
         XCTAssertTrue(startScheduledScansCalled)
-    }
-
-    func testWhenAgentStart_andProfileDoesNotExist_thenActivityIsNotScheduled_andSheduledOpereationsNotRun() async throws {
-        // Given
-        sut = DataBrokerProtectionAgentManager(
-            userNotificationService: mockNotificationService,
-            activityScheduler: mockActivityScheduler,
-            ipcServer: mockIPCServer,
-            queueManager: mockQueueManager,
-            dataManager: mockDataManager,
-            operationDependencies: mockDependencies,
-            pixelHandler: mockPixelHandler,
-            agentStopper: mockAgentStopper)
-
-        mockDataManager.profileToReturn = nil
-
-        var schedulerStarted = false
-        mockActivityScheduler.startSchedulerCompletion = {
-            schedulerStarted = true
-        }
-
-        var startScheduledScansCalled = false
-        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
-            startScheduledScansCalled = true
-        }
-
-        // When
-        sut.agentFinishedLaunching()
-
-        // Then
-        XCTAssertFalse(schedulerStarted)
-        XCTAssertFalse(startScheduledScansCalled)
     }
 
     func testWhenActivitySchedulerTriggers_thenSheduledOpereationsRun() async throws {

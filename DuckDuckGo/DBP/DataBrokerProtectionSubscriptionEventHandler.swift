@@ -37,7 +37,7 @@ final class DataBrokerProtectionSubscriptionEventHandler {
     }
 
     func registerForSubscriptionAccountManagerEvents() {
-        NotificationCenter.default.addObserver(self, 
+        NotificationCenter.default.addObserver(self,
                                                selector: #selector(handleAccountDidSignOut),
                                                name: .accountDidSignOut,
                                                object: nil)
