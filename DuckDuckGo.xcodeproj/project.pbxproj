@@ -681,7 +681,6 @@
 		3706FCA7293F65D500E42796 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA71293F65D500E42796 /* BrowserServicesKit */; };
 		3706FCA9293F65D500E42796 /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA76293F65D500E42796 /* ContentBlocking */; };
 		3706FCAA293F65D500E42796 /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA78293F65D500E42796 /* UserScript */; };
-		3706FCAB293F65D500E42796 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA6B293F65D500E42796 /* TrackerRadarKit */; };
 		3706FCAF293F65D500E42796 /* PrivacyDashboard in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA77293F65D500E42796 /* PrivacyDashboard */; };
 		3706FCB4293F65D500E42796 /* CrashReports.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA693E5D2696E5B90007BB78 /* CrashReports.storyboard */; };
 		3706FCB5293F65D500E42796 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 9833913027AAA4B500DAF119 /* trackerData.json */; };
@@ -4195,7 +4194,6 @@
 				B6EC37FF29B8D915001ACE79 /* Configuration in Frameworks */,
 				372217822B33380700B8E9C2 /* TestUtils in Frameworks */,
 				3706FCAA293F65D500E42796 /* UserScript in Frameworks */,
-				3706FCAB293F65D500E42796 /* TrackerRadarKit in Frameworks */,
 				85E2BBD02B8F534A00DBEC7A /* History in Frameworks */,
 				4BF97AD52B43C43F00EB4240 /* NetworkProtection in Frameworks */,
 				3739326529AE4B39009346AE /* DDGSync in Frameworks */,
@@ -8356,7 +8354,6 @@
 			);
 			name = "DuckDuckGo Privacy Browser App Store";
 			packageProductDependencies = (
-				3706FA6B293F65D500E42796 /* TrackerRadarKit */,
 				3706FA71293F65D500E42796 /* BrowserServicesKit */,
 				3706FA76293F65D500E42796 /* ContentBlocking */,
 				3706FA77293F65D500E42796 /* PrivacyDashboard */,
@@ -13165,10 +13162,6 @@
 		31A3A4E22B0C115F0021063C /* DataBrokerProtection */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DataBrokerProtection;
-		};
-		3706FA6B293F65D500E42796 /* TrackerRadarKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = TrackerRadarKit;
 		};
 		3706FA71293F65D500E42796 /* BrowserServicesKit */ = {
 			isa = XCSwiftPackageProductDependency;
