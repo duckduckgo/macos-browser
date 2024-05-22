@@ -154,7 +154,7 @@ final class HomePageViewController: NSViewController {
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
             tabCollectionViewModel: tabCollectionViewModel,
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(),
-            homePageRemoteMessaging: .defaultMessaging()
+            surveyRemoteMessaging: DefaultSurveyRemoteMessaging()
         )
     }
 

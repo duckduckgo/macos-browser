@@ -27,26 +27,14 @@ protocol HomePageRemoteMessagingRequest {
 
 final class DefaultHomePageRemoteMessagingRequest: HomePageRemoteMessagingRequest {
 
-    enum NetworkProtectionEndpoint {
+    enum SurveysEndpoint {
         case debug
         case production
 
         var url: URL {
             switch self {
-            case .debug: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/network-protection/messages-v2-debug.json")!
-            case .production: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/network-protection/messages-v2.json")!
-            }
-        }
-    }
-
-    enum DataBrokerProtectionEndpoint {
-        case debug
-        case production
-
-        var url: URL {
-            switch self {
-            case .debug: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/dbp/messages-debug.json")!
-            case .production: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/dbp/messages.json")!
+            case .debug: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/surveys/surveys-debug.json")!
+            case .production: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/surveys/surveys.json")!
             }
         }
     }
@@ -56,19 +44,11 @@ final class DefaultHomePageRemoteMessagingRequest: HomePageRemoteMessagingReques
         case requestCompletedWithoutErrorOrResponse
     }
 
-    static func networkProtectionMessagesRequest() -> HomePageRemoteMessagingRequest {
+    static func surveysRequest() -> HomePageRemoteMessagingRequest {
 #if DEBUG || REVIEW
-        return DefaultHomePageRemoteMessagingRequest(endpointURL: NetworkProtectionEndpoint.debug.url)
+        return DefaultHomePageRemoteMessagingRequest(endpointURL: SurveysEndpoint.debug.url)
 #else
-        return DefaultHomePageRemoteMessagingRequest(endpointURL: NetworkProtectionEndpoint.production.url)
-#endif
-    }
-
-    static func dataBrokerProtectionMessagesRequest() -> HomePageRemoteMessagingRequest {
-#if DEBUG || REVIEW
-        return DefaultHomePageRemoteMessagingRequest(endpointURL: DataBrokerProtectionEndpoint.debug.url)
-#else
-        return DefaultHomePageRemoteMessagingRequest(endpointURL: DataBrokerProtectionEndpoint.production.url)
+        return DefaultHomePageRemoteMessagingRequest(endpointURL: SurveysEndpoint.production.url)
 #endif
     }
 

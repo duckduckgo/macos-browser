@@ -192,13 +192,7 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
-
-        refreshNetworkProtectionMessages()
-
-#if DBP
-        DataBrokerProtectionAppEvents().windowDidBecomeMain()
-        refreshDataBrokerProtectionMessages()
-#endif
+        refreshSurveyMessages()
     }
 
     func windowDidResignKey() {
@@ -220,19 +214,11 @@ final class MainViewController: NSViewController {
         }
     }
 
-    private let networkProtectionMessaging = DefaultNetworkProtectionRemoteMessaging()
+    private let surveyMessaging = DefaultSurveyRemoteMessaging()
 
-    func refreshNetworkProtectionMessages() {
-        networkProtectionMessaging.fetchRemoteMessages()
+    func refreshSurveyMessages() {
+        surveyMessaging.fetchRemoteMessages()
     }
-
-#if DBP
-    private let dataBrokerProtectionMessaging = DefaultDataBrokerProtectionRemoteMessaging()
-
-    func refreshDataBrokerProtectionMessages() {
-        dataBrokerProtectionMessaging.fetchRemoteMessages()
-    }
-#endif
 
     override func encodeRestorableState(with coder: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")

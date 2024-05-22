@@ -11,22 +11,22 @@
     },
     {
         "id": "456",
-        "daysSinceNetworkProtectionEnabled": 1,
         "cardTitle": "Title 2",
         "cardDescription": "Description 2",
         "requiresNetworkProtectionAccess": true,
         "requiresNetworkProtectionUsage": true,
+        "daysSinceNetworkProtectionEnabled": 1,
         "action": {
             "actionTitle": "Action 2"
         }
     },
     {
         "id": "789",
-        "daysSinceNetworkProtectionEnabled": 5,
         "cardTitle": "Title 3",
         "cardDescription": "Description 3",
         "requiresNetworkProtectionAccess": true,
         "requiresNetworkProtectionUsage": true,
+        "daysSinceNetworkProtectionEnabled": 5,
         "action": {
             "actionTitle": "Action 3",
             "actionType": "openSurveyURL",

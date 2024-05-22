@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionRemoteMessaging.swift
+//  SurveyRemoteMessaging.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -20,23 +20,22 @@ import Foundation
 import Networking
 import PixelKit
 
-protocol NetworkProtectionRemoteMessaging {
+protocol SurveyRemoteMessaging {
 
     func fetchRemoteMessages(completion: (() -> Void)?)
-    func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage]
-    func dismiss(message: NetworkProtectionRemoteMessage)
+    func presentableRemoteMessages() -> [SurveyRemoteMessage]
+    func dismiss(message: SurveyRemoteMessage)
 
 }
 
-final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging {
+final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
     enum Constants {
-        static let lastRefreshDateKey = "network-protection.remote-messaging.last-refresh-date"
+        static let lastRefreshDateKey = "surveys.remote-messaging.last-refresh-date"
     }
 
     private let messageRequest: HomePageRemoteMessagingRequest
     private let messageStorage: HomePageRemoteMessagingStorage
-    private let waitlistStorage: WaitlistStorage
     private let waitlistActivationDateStore: WaitlistActivationDateStore
     private let networkProtectionVisibility: NetworkProtectionFeatureVisibility
     private let minimumRefreshInterval: TimeInterval
@@ -51,9 +50,8 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
     init(
-        messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.networkProtectionMessagesRequest(),
-        messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.networkProtection(),
-        waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "networkprotection", keychainAppGroup: Bundle.main.appGroup(bundle: .netP)),
+        messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.surveysRequest(),
+        messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.surveys(),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
         networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
         minimumRefreshInterval: TimeInterval,
@@ -61,7 +59,6 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     ) {
         self.messageRequest = messageRequest
         self.messageStorage = messageStorage
-        self.waitlistStorage = waitlistStorage
         self.waitlistActivationDateStore = waitlistActivationDateStore
         self.networkProtectionVisibility = networkProtectionVisibility
         self.minimumRefreshInterval = minimumRefreshInterval
@@ -83,7 +80,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             guard let self else { return }
 
             // Cast the generic parameter to a concrete type:
-            let result: Result<[NetworkProtectionRemoteMessage], Error> = result
+            let result: Result<[SurveyRemoteMessage], Error> = result
 
             switch result {
             case .success(let messages):
@@ -107,9 +104,9 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
     /// Uses the "days since VPN activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
-    func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage] {
+    func presentableRemoteMessages() -> [SurveyRemoteMessage] {
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
-        let possibleMessages: [NetworkProtectionRemoteMessage] = messageStorage.storedMessages()
+        let possibleMessages: [SurveyRemoteMessage] = messageStorage.storedMessages()
 
         // Only show messages that haven't been dismissed, and check whether they have a
         // requirement on how long the user has used the VPN for.
@@ -148,7 +145,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         return filteredMessages
     }
 
-    func dismiss(message: NetworkProtectionRemoteMessage) {
+    func dismiss(message: SurveyRemoteMessage) {
         messageStorage.dismissRemoteMessage(with: message.id)
     }
 

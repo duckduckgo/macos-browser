@@ -30,14 +30,9 @@ protocol HomePageRemoteMessagingStorage {
 
 final class DefaultHomePageRemoteMessagingStorage: HomePageRemoteMessagingStorage {
 
-    enum NetworkProtectionConstants {
-        static let dismissedMessageIdentifiersKey = "home.page.network-protection.dismissed-message-identifiers"
-        static let networkProtectionMessagesFileName = "network-protection-messages.json"
-    }
-
-    enum DataBrokerProtectionConstants {
-        static let dismissedMessageIdentifiersKey = "home.page.dbp.dismissed-message-identifiers"
-        static let networkProtectionMessagesFileName = "dbp-messages.json"
+    enum SurveyConstants {
+        static let dismissedMessageIdentifiersKey = "home.page.survey.dismissed-message-identifiers"
+        static let networkProtectionMessagesFileName = "survey-messages.json"
     }
 
     private let userDefaults: UserDefaults
@@ -48,17 +43,10 @@ final class DefaultHomePageRemoteMessagingStorage: HomePageRemoteMessagingStorag
         URL.sandboxApplicationSupportURL
     }
 
-    static func networkProtection() -> DefaultHomePageRemoteMessagingStorage {
+    static func surveys() -> DefaultHomePageRemoteMessagingStorage {
         return DefaultHomePageRemoteMessagingStorage(
-            messagesFileName: NetworkProtectionConstants.networkProtectionMessagesFileName,
-            dismissedMessageIdentifiersKey: NetworkProtectionConstants.dismissedMessageIdentifiersKey
-        )
-    }
-
-    static func dataBrokerProtection() -> DefaultHomePageRemoteMessagingStorage {
-        return DefaultHomePageRemoteMessagingStorage(
-            messagesFileName: DataBrokerProtectionConstants.networkProtectionMessagesFileName,
-            dismissedMessageIdentifiersKey: DataBrokerProtectionConstants.dismissedMessageIdentifiersKey
+            messagesFileName: SurveyConstants.networkProtectionMessagesFileName,
+            dismissedMessageIdentifiersKey: SurveyConstants.dismissedMessageIdentifiersKey
         )
     }
 

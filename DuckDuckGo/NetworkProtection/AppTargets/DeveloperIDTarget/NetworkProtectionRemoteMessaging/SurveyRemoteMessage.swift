@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionRemoteMessage.swift
+//  SurveyRemoteMessage.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Foundation
 import Common
 
-struct NetworkProtectionRemoteMessageAction: Codable, Equatable, Hashable {
+struct SurveyRemoteMessageAction: Codable, Equatable, Hashable {
     enum Action: String, Codable {
         case openNetworkProtection
         case openSurveyURL
@@ -31,7 +31,7 @@ struct NetworkProtectionRemoteMessageAction: Codable, Equatable, Hashable {
     let actionURL: String?
 }
 
-struct NetworkProtectionRemoteMessage: Codable, Equatable, Identifiable, Hashable {
+struct SurveyRemoteMessage: Codable, Equatable, Identifiable, Hashable {
 
     let id: String
     let cardTitle: String
@@ -40,7 +40,7 @@ struct NetworkProtectionRemoteMessage: Codable, Equatable, Identifiable, Hashabl
     let daysSinceNetworkProtectionEnabled: Int?
     let requiresNetworkProtectionUsage: Bool
     let requiresNetworkProtectionAccess: Bool
-    let action: NetworkProtectionRemoteMessageAction
+    let action: SurveyRemoteMessageAction
 
     func presentableSurveyURL(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),

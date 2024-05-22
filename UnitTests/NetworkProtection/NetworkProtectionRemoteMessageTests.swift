@@ -34,7 +34,7 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
         let data = try Data(contentsOf: fileURL)
 
         let decoder = JSONDecoder()
-        let decodedMessages = try decoder.decode([NetworkProtectionRemoteMessage].self, from: data)
+        let decodedMessages = try decoder.decode([SurveyRemoteMessage].self, from: data)
 
         XCTAssertEqual(decodedMessages.count, 3)
 
@@ -114,9 +114,9 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
         """
 
         let decoder = JSONDecoder()
-        let message: NetworkProtectionRemoteMessage
+        let message: SurveyRemoteMessage
         do {
-            message = try decoder.decode(NetworkProtectionRemoteMessage.self, from: remoteMessageJSON.data(using: .utf8)!)
+            message = try decoder.decode(SurveyRemoteMessage.self, from: remoteMessageJSON.data(using: .utf8)!)
         } catch {
             XCTFail("Failed to decode with error: \(error.localizedDescription)")
             return
