@@ -105,7 +105,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Operations") {
                 NSMenuItem(title: "Hidden WebView") {
                     menuItem(withTitle: "Run queued operations",
-                             action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations(_:)),
+                             action: #selector(DataBrokerProtectionDebugMenu.startScheduledOperations(_:)),
                              representedObject: false)
 
                     menuItem(withTitle: "Run scan operations",
@@ -119,7 +119,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
                 NSMenuItem(title: "Visible WebView") {
                     menuItem(withTitle: "Run queued operations",
-                             action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations(_:)),
+                             action: #selector(DataBrokerProtectionDebugMenu.startScheduledOperations(_:)),
                              representedObject: true)
 
                     menuItem(withTitle: "Run scan operations",
@@ -204,61 +204,25 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         }
     }
 
-    @objc private func runQueuedOperations(_ sender: NSMenuItem) {
+    @objc private func startScheduledOperations(_ sender: NSMenuItem) {
         os_log("Running queued operations...", log: .dataBrokerProtection)
         let showWebView = sender.representedObject as? Bool ?? false
 
-        DataBrokerProtectionManager.shared.scheduler.runQueuedOperations(showWebView: showWebView) { errors in
-            if let errors = errors {
-                if let oneTimeError = errors.oneTimeError {
-                    os_log("Queued operations finished,  error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                }
-                if let operationErrors = errors.operationErrors,
-                          operationErrors.count != 0 {
-                    os_log("Queued operations finished, operation errors count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
-                }
-            } else {
-                os_log("Queued operations finished", log: .dataBrokerProtection)
-            }
-        }
+        DataBrokerProtectionManager.shared.loginItemInterface.startScheduledOperations(showWebView: showWebView)
     }
 
     @objc private func runScanOperations(_ sender: NSMenuItem) {
         os_log("Running scan operations...", log: .dataBrokerProtection)
         let showWebView = sender.representedObject as? Bool ?? false
 
-        DataBrokerProtectionManager.shared.scheduler.startManualScan(showWebView: showWebView, startTime: Date()) { errors in
-            if let errors = errors {
-                if let oneTimeError = errors.oneTimeError {
-                    os_log("scan operations finished, error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                }
-                if let operationErrors = errors.operationErrors,
-                          operationErrors.count != 0 {
-                    os_log("scan operations finished, operation errors count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
-                }
-            } else {
-                os_log("Scan operations finished", log: .dataBrokerProtection)
-            }
-        }
+        DataBrokerProtectionManager.shared.loginItemInterface.startImmediateOperations(showWebView: showWebView)
     }
 
     @objc private func runOptoutOperations(_ sender: NSMenuItem) {
         os_log("Running Optout operations...", log: .dataBrokerProtection)
         let showWebView = sender.representedObject as? Bool ?? false
 
-        DataBrokerProtectionManager.shared.scheduler.optOutAllBrokers(showWebView: showWebView) { errors in
-            if let errors = errors {
-                if let oneTimeError = errors.oneTimeError {
-                    os_log("Optout operations finished,  error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                }
-                if let operationErrors = errors.operationErrors,
-                          operationErrors.count != 0 {
-                    os_log("Optout operations finished, operation errors count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
-                }
-            } else {
-                os_log("Optout operations finished", log: .dataBrokerProtection)
-            }
-        }
+        DataBrokerProtectionManager.shared.loginItemInterface.runAllOptOuts(showWebView: showWebView)
     }
 
     @objc private func backgroundAgentRestart() {
@@ -332,7 +296,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func forceBrokerJSONFilesUpdate() {
-        if let updater = DataBrokerProtectionBrokerUpdater.provide() {
+        if let updater = DefaultDataBrokerProtectionBrokerUpdater.provideForDebug() {
             updater.updateBrokers()
         }
     }

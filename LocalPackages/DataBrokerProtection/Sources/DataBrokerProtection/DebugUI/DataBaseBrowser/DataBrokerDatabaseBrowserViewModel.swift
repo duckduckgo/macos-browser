@@ -57,15 +57,15 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
             let dataBrokers = Array(Set(profileBrokers)).sorted { $0.id ?? 0 < $1.id ?? 0 }
 
             let profileQuery = Array(Set(data.map { $0.profileQuery }))
-            let scanOperations = data.map { $0.scanOperationData }
-            let optOutOperations = data.flatMap { $0.optOutOperationsData }
+            let scanJobs = data.map { $0.scanJobData }
+            let optOutJobs = data.flatMap { $0.optOutJobData }
             let extractedProfiles = data.flatMap { $0.extractedProfiles }
             let events = data.flatMap { $0.events }
 
             let brokersTable = createTable(using: dataBrokers, tableName: "DataBrokers")
             let profileQueriesTable = createTable(using: profileQuery, tableName: "ProfileQuery")
-            let scansTable = createTable(using: scanOperations, tableName: "ScanOperation")
-            let optOutsTable = createTable(using: optOutOperations, tableName: "OptOutOperation")
+            let scansTable = createTable(using: scanJobs, tableName: "ScanOperation")
+            let optOutsTable = createTable(using: optOutJobs, tableName: "OptOutOperation")
             let extractedProfilesTable = createTable(using: extractedProfiles, tableName: "ExtractedProfile")
             let eventsTable = createTable(using: events.sorted(by: { $0.date < $1.date }), tableName: "Events")
 
