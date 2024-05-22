@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1715350028654,
+    "version": 1716212212537,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -301,6 +301,9 @@
                     "domain": "hertz.com"
                 },
                 {
+                    "domain": "www.thrifty.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -315,7 +318,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "cf3197bc061274e9c23a870dea493b9a"
+            "hash": "6ea22969c48f1cb624808cd49a296f4d"
         },
         "autofill": {
             "exceptions": [
@@ -2637,6 +2640,15 @@
                         ]
                     },
                     {
+                        "domain": "genius.com",
+                        "rules": [
+                            {
+                                "selector": "[class^='DfpAd']",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "getpocket.com",
                         "rules": [
                             {
@@ -3027,6 +3039,27 @@
                         ]
                     },
                     {
+                        "domain": "livestrong.com",
+                        "rules": [
+                            {
+                                "selector": ".component-ar-horizontal-bar-ad",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".component-article-section-votd-container-outer",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".inline-ad",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".component-header-sticky-ad",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "macrumors.com",
                         "rules": [
                             {
@@ -3290,6 +3323,19 @@
                         ]
                     },
                     {
+                        "domain": "obsev.com",
+                        "rules": [
+                            {
+                                "selector": ".my-10",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[class^='Ad_ad']",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "oceanofcompressed.xyz",
                         "rules": [
                             {
@@ -3469,6 +3515,15 @@
                             },
                             {
                                 "selector": "#sc_intxt_container",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "quora.com",
+                        "rules": [
+                            {
+                                "selector": "#onetap_google_intermediate_iframe",
                                 "type": "hide"
                             }
                         ]
@@ -4237,6 +4292,15 @@
                         ]
                     },
                     {
+                        "domain": "xhamster.com",
+                        "rules": [
+                            {
+                                "selector": "#credential_picker_container",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "first-party.site",
                         "rules": [
                             {
@@ -4290,7 +4354,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "893bd7422971b3a7b4c6e02cdfc6332d"
+            "hash": "9a895fea083dabb6e3496242636a8370"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -6839,6 +6903,16 @@
                             }
                         ]
                     },
+                    "igodigital.com": {
+                        "rules": [
+                            {
+                                "rule": "collect.igodigital.com/collect.js",
+                                "domains": [
+                                    "goodwillfinds.com"
+                                ]
+                            }
+                        ]
+                    },
                     "iheart.com": {
                         "rules": [
                             {
@@ -7936,7 +8010,8 @@
                             {
                                 "rule": "sundaysky.com",
                                 "domains": [
-                                    "bankofamerica.com"
+                                    "bankofamerica.com",
+                                    "idnotify.com"
                                 ]
                             }
                         ]
@@ -8333,6 +8408,16 @@
                             }
                         ]
                     },
+                    "rbcroyalbank.com": {
+                        "rules": [
+                            {
+                                "rule": "collect.rbcroyalbank.com/collect.js",
+                                "domains": [
+                                    "goodwillfinds.com"
+                                ]
+                            }
+                        ]
+                    },
                     "canadapost-postescanada.ca": {
                         "rules": [
                             {
@@ -8373,7 +8458,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "2dd3c945cc9811719be893edcd79682e"
+            "hash": "d9db93f32201ee8d2e545eeead7cc66f"
         },
         "trackingCookies1p": {
             "settings": {

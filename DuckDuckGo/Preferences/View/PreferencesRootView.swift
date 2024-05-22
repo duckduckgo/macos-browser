@@ -89,7 +89,8 @@ enum Preferences {
                                 downloadsModel: DownloadsPreferences.shared,
                                 searchModel: SearchPreferences.shared,
                                 tabsModel: TabsPreferences.shared,
-                                dataClearingModel: DataClearingPreferences.shared)
+                                dataClearingModel: DataClearingPreferences.shared,
+                                dockCustomizer: DockCustomizer())
                 case .sync:
                     SyncView()
                 case .appearance:
