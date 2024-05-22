@@ -1408,8 +1408,6 @@ final class MockAuthenticationManager: DataBrokerProtectionAuthenticationManagin
 }
 
 final class MockAgentStopper: DataBrokerProtectionAgentStopper {
-    var stopAgentWasCalled = false
-
     func validateRunPrerequisitesAndStopAgentIfNecessary() async {
 
     }
@@ -1417,17 +1415,9 @@ final class MockAgentStopper: DataBrokerProtectionAgentStopper {
     func monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: TimeInterval) {
 
     }
-
-    func stopAgent() {
-        stopAgentWasCalled = true
-    }
-
-    func reset() {
-        stopAgentWasCalled = false
-    }
 }
 
-final class MockStopperUseCase: DataBrokerProtectionStopperUseCase {
+final class MockDataProtectionStopAction: DataProtectionStopAction {
     var wasStopCalled = false
 
     func stopAgent() {

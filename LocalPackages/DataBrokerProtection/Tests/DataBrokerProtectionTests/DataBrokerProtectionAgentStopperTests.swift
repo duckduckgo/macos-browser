@@ -27,7 +27,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
     var mockAuthenticationManager: MockAuthenticationManager!
     var mockEntitlementMonitor: DataBrokerProtectionEntitlementMonitor!
     var mockDataManager: MockDataBrokerProtectionDataManager!
-    var mockStopperUseCase: MockStopperUseCase!
+    var mockStopAction: MockDataProtectionStopAction!
 
     private var fakeProfile: DataBrokerProtectionProfile {
         let name = DataBrokerProtectionProfile.Name(firstName: "John", lastName: "Doe")
@@ -43,7 +43,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
         mockEntitlementMonitor = DataBrokerProtectionEntitlementMonitor()
         mockDataManager = MockDataBrokerProtectionDataManager(pixelHandler: mockPixelHandler,
                                                               fakeBrokerFlag: DataBrokerDebugFlagFakeBroker())
-        mockStopperUseCase = MockStopperUseCase()
+        mockStopAction = MockDataProtectionStopAction()
     }
 
     override func tearDown() {
@@ -52,7 +52,7 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
         mockPixelHandler = nil
         mockEntitlementMonitor = nil
         mockDataManager = nil
-        mockStopperUseCase = nil
+        mockStopAction = nil
     }
 
     func testNoProfile_thenStopAgentIsCalled() async {
@@ -64,10 +64,10 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopperUseCase)
+                                                              stopperUseCase: mockStopAction)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
-        XCTAssertTrue(mockStopperUseCase.wasStopCalled)
+        XCTAssertTrue(mockStopAction.wasStopCalled)
     }
 
     func testInvalidEntitlement_thenStopAgentIsCalled() async {
@@ -79,10 +79,10 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopperUseCase)
+                                                              stopperUseCase: mockStopAction)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
-        XCTAssertTrue(mockStopperUseCase.wasStopCalled)
+        XCTAssertTrue(mockStopAction.wasStopCalled)
     }
 
     func testUserNotAuthenticated_thenStopAgentIsCalled() async {
@@ -94,10 +94,10 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopperUseCase)
+                                                              stopperUseCase: mockStopAction)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
-        XCTAssertTrue(mockStopperUseCase.wasStopCalled)
+        XCTAssertTrue(mockStopAction.wasStopCalled)
     }
 
     func testErrorEntitlement_thenStopAgentIsNotCalled() async {
@@ -109,10 +109,10 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopperUseCase)
+                                                              stopperUseCase: mockStopAction)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
-        XCTAssertFalse(mockStopperUseCase.wasStopCalled)
+        XCTAssertFalse(mockStopAction.wasStopCalled)
     }
 
     func testValidEntitlement_thenStopAgentIsNotCalled() async {
@@ -124,10 +124,10 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopperUseCase)
+                                                              stopperUseCase: mockStopAction)
         await stopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
-        XCTAssertFalse(mockStopperUseCase.wasStopCalled)
+        XCTAssertFalse(mockStopAction.wasStopCalled)
     }
 
     func testEntitlementMonitorWithValidResult_thenStopAgentIsNotCalled() {
@@ -139,13 +139,13 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopperUseCase)
+                                                              stopperUseCase: mockStopAction)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: 0.1)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
-            XCTAssertFalse(mockStopperUseCase.wasStopCalled)
+            XCTAssertFalse(mockStopAction.wasStopCalled)
             expectation.fulfill()
         }
 
@@ -161,13 +161,13 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopperUseCase)
+                                                              stopperUseCase: mockStopAction)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: 0.1)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
-            XCTAssertTrue(mockStopperUseCase.wasStopCalled)
+            XCTAssertTrue(mockStopAction.wasStopCalled)
             expectation.fulfill()
         }
 
@@ -183,13 +183,13 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
                                                               entitlementMonitor: mockEntitlementMonitor,
                                                               authenticationManager: mockAuthenticationManager,
                                                               pixelHandler: mockPixelHandler,
-                                                              stopperUseCase: mockStopperUseCase)
+                                                              stopperUseCase: mockStopAction)
 
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: 0.1)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
-            XCTAssertFalse(mockStopperUseCase.wasStopCalled)
+            XCTAssertFalse(mockStopAction.wasStopCalled)
             expectation.fulfill()
         }
 

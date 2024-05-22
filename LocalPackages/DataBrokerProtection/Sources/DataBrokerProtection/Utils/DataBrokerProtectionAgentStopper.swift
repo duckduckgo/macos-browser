@@ -26,9 +26,6 @@ protocol DataBrokerProtectionAgentStopper {
     /// Monitors the entitlement package. If the entitlement check returns false, the agent will be stopped.
     /// This function ensures that the agent is stopped if the user's subscription has expired, even if the browser is not active. Regularly checking for entitlement is required since notifications are not posted to agents.
     func monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: TimeInterval)
-
-    /// Stops the agent
-    func stopAgent()
 }
 
 struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper {
@@ -36,18 +33,18 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     private let entitlementMonitor: DataBrokerProtectionEntitlementMonitoring
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
-    private let stopperUseCase: DataBrokerProtectionStopperUseCase
+    private let stopAction: DataProtectionStopAction
 
     init(dataManager: DataBrokerProtectionDataManaging,
          entitlementMonitor: DataBrokerProtectionEntitlementMonitoring,
          authenticationManager: DataBrokerProtectionAuthenticationManaging,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
-         stopperUseCase: DataBrokerProtectionStopperUseCase = AgentStopperUseCase()) {
+         stopAction: DataProtectionStopAction = DefaultDataProtectionStopAction()) {
         self.dataManager = dataManager
         self.entitlementMonitor = entitlementMonitor
         self.authenticationManager = authenticationManager
         self.pixelHandler = pixelHandler
-        self.stopperUseCase = stopperUseCase
+        self.stopAction = stopAction
     }
 
     public func validateRunPrerequisitesAndStopAgentIfNecessary() async {
@@ -79,8 +76,8 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
         }
     }
 
-    func stopAgent() {
-        stopperUseCase.stopAgent()
+    private func stopAgent() {
+        stopAction.stopAgent()
     }
 
     private func stopAgentBasedOnEntitlementCheckResult(_ result: DataBrokerProtectionEntitlementMonitorResult) {
@@ -101,11 +98,11 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     }
 }
 
-protocol DataBrokerProtectionStopperUseCase {
+protocol DataProtectionStopAction {
     func stopAgent()
 }
 
-struct AgentStopperUseCase: DataBrokerProtectionStopperUseCase {
+struct DefaultDataProtectionStopAction: DataProtectionStopAction {
     func stopAgent() {
         os_log("Stopping DataBrokerProtection Agent", log: .dataBrokerProtection)
         exit(EXIT_SUCCESS)
