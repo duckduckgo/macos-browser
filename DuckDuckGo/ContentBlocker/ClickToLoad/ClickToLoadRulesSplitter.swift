@@ -74,7 +74,7 @@ struct ClickToLoadRulesSplitter {
         var ctlTrackers: [String: KnownTracker] = [:]
 
         for (key, tracker) in trackers {
-            guard tracker.containsCTLActions, let rules = tracker.rules else {
+            guard tracker.containsCTLActions else {
                 mainTDSTrackers[key] = tracker
                 continue
             }
