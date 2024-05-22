@@ -52,6 +52,7 @@ struct VPNMetadata: Encodable {
         let connectionState: String
         let lastStartErrorDescription: String
         let lastTunnelErrorDescription: String
+        let lastKnownFailureDescription: String
         let connectedServer: String
         let connectedServerIP: String
     }
@@ -254,12 +255,14 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
         let connectionState = String(describing: statusReporter.statusObserver.recentValue)
         let lastTunnelErrorDescription = await errorHistory.lastTunnelErrorDescription
+        let lastKnownFailureDescription = NetworkProtectionKnownFailureStore().lastKnownFailure?.description ?? "none"
         let connectedServer = statusReporter.serverInfoObserver.recentValue.serverLocation?.serverLocation ?? "none"
         let connectedServerIP = statusReporter.serverInfoObserver.recentValue.serverAddress ?? "none"
         return .init(onboardingState: onboardingState,
                      connectionState: connectionState,
                      lastStartErrorDescription: errorHistory.lastStartErrorDescription,
                      lastTunnelErrorDescription: lastTunnelErrorDescription,
+                     lastKnownFailureDescription: lastKnownFailureDescription,
                      connectedServer: connectedServer,
                      connectedServerIP: connectedServerIP)
     }
