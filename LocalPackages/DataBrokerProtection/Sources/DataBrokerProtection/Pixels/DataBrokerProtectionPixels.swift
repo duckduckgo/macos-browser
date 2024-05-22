@@ -371,11 +371,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .homeViewShowBadPathError,
                 .homeViewCTAMoveApplicationClicked,
                 .homeViewCTAGrantPermissionClicked,
-
                 .entitlementCheckValid,
                 .entitlementCheckInvalid,
                 .entitlementCheckError,
-            
                 .secureVaultInitError,
                 .secureVaultError:
             return [:]
