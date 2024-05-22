@@ -22,6 +22,7 @@ import WebKit
 import Combine
 import ContentScopeScripts
 import BrowserServicesKit
+import PhishingDetection
 
 protocol SpecialErrorPageScriptProvider {
     var specialErrorPageUserScript: SpecialErrorPageUserScript? { get }

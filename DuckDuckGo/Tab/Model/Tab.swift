@@ -25,6 +25,7 @@ import UserScript
 import WebKit
 import History
 import PixelKit
+import PhishingDetection
 
 // swiftlint:disable file_length
 

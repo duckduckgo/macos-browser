@@ -22,6 +22,7 @@ import ContentBlocking
 import Foundation
 import PrivacyDashboard
 import History
+import PhishingDetection
 
 /**
  Tab Extensions should conform to TabExtension protocol
