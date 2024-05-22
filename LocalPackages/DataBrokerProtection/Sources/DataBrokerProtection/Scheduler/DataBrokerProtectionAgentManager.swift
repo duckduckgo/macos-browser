@@ -74,7 +74,8 @@ public class DataBrokerProtectionAgentManagerProvider {
 
         let agentstopper = DefaultDataBrokerProtectionAgentStopper(dataManager: dataManager,
                                                                    entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
-                                                                   authenticationManager: authenticationManager)
+                                                                   authenticationManager: authenticationManager,
+                                                                   pixelHandler: pixelHandler)
 
         let operationDependencies = DefaultDataBrokerOperationDependencies(
             database: dataManager.database,
