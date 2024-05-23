@@ -26,7 +26,7 @@ import Common
  We ideally should refactor the privacy config out of the main app
  Into a local package, so that it can be be used here
  */
-final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
+public final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
 
     var data: Data {
         let configString = """
@@ -47,13 +47,13 @@ final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
         return data!
     }
 
-    var currentConfig: Data {
+    public var currentConfig: Data {
         data
     }
 
-    var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
+    public var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
 
-    var privacyConfig: BrowserServicesKit.PrivacyConfiguration {
+    public var privacyConfig: BrowserServicesKit.PrivacyConfiguration {
         guard let privacyConfigurationData = try? PrivacyConfigurationData(data: data) else {
             fatalError("Could not retrieve privacy configuration data")
         }
@@ -63,11 +63,11 @@ final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
         return privacyConfig
     }
 
-    var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: InternalUserDeciderStoreMock())
-    var toggleProtectionsCounter: ToggleProtectionsCounter = ToggleProtectionsCounter(eventReporting: EventMapping<ToggleProtectionsCounterEvent> { _, _, _, _ in
+    public var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: InternalUserDeciderStoreMock())
+    public var toggleProtectionsCounter: ToggleProtectionsCounter = ToggleProtectionsCounter(eventReporting: EventMapping<ToggleProtectionsCounterEvent> { _, _, _, _ in
     })
 
-    func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {
+    public func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {
         .downloaded
     }
 }

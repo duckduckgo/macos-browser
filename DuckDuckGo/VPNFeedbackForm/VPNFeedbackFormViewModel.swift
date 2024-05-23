@@ -67,7 +67,8 @@ final class VPNFeedbackFormViewModel: ObservableObject {
     private let metadataCollector: VPNMetadataCollector
     private let feedbackSender: VPNFeedbackSender
 
-    init(metadataCollector: VPNMetadataCollector = DefaultVPNMetadataCollector(), feedbackSender: VPNFeedbackSender = DefaultVPNFeedbackSender()) {
+    init(metadataCollector: VPNMetadataCollector,
+         feedbackSender: VPNFeedbackSender = DefaultVPNFeedbackSender()) {
         self.viewState = .feedbackPending
         self.selectedFeedbackCategory = .landingPage
 

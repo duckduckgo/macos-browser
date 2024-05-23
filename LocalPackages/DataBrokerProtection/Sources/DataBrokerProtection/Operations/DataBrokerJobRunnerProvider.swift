@@ -1,5 +1,5 @@
 //
-//  DataBrokerOperationRunnerProvider.swift
+//  DataBrokerJobRunnerProvider.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,15 +19,19 @@
 import Foundation
 import BrowserServicesKit
 
-struct DataBrokerOperationRunnerProvider: OperationRunnerProvider {
+protocol JobRunnerProvider {
+    func getJobRunner() -> WebJobRunner
+}
+
+struct DataBrokerJobRunnerProvider: JobRunnerProvider {
     var privacyConfigManager: PrivacyConfigurationManaging
     var contentScopeProperties: ContentScopeProperties
     var emailService: EmailServiceProtocol
     var captchaService: CaptchaServiceProtocol
 
     @MainActor
-    func getOperationRunner() -> WebOperationRunner {
-        DataBrokerOperationRunner(privacyConfigManager: privacyConfigManager,
+    func getJobRunner() -> WebJobRunner {
+        DataBrokerJobRunner(privacyConfigManager: privacyConfigManager,
                                   contentScopeProperties: contentScopeProperties,
                                   emailService: emailService,
                                   captchaService: captchaService
