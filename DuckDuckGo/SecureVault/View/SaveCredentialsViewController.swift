@@ -147,7 +147,7 @@ final class SaveCredentialsViewController: NSViewController {
         updateViewState(editable: !condition)
 
         let existingCredentials = getExistingCredentialsFrom(credentials)
-        firePixels(for: .displayed, credentials: existingCredentials)
+        evaluateCredentialsAndFirePixels(for: .displayed, credentials: existingCredentials)
     }
 
     private func updateViewState(editable: Bool) {
@@ -241,7 +241,7 @@ final class SaveCredentialsViewController: NSViewController {
             PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
 
-        firePixels(for: .confirmed, credentials: existingCredentials)
+        evaluateCredentialsAndFirePixels(for: .confirmed, credentials: existingCredentials)
 
         PixelKit.fire(GeneralPixel.autofillItemSaved(kind: .password))
 
@@ -264,7 +264,7 @@ final class SaveCredentialsViewController: NSViewController {
         delegate?.shouldCloseSaveCredentialsViewController(self)
 
         let existingCredentials = getExistingCredentialsFrom(credentials)
-        firePixels(for: .dismissed, credentials: existingCredentials)
+        evaluateCredentialsAndFirePixels(for: .dismissed, credentials: existingCredentials)
     }
 
     @IBAction func onNotNowSegmentedControlClicked(_ sender: Any) {
@@ -296,7 +296,7 @@ final class SaveCredentialsViewController: NSViewController {
         }
 
         let existingCredentials = getExistingCredentialsFrom(credentials)
-        firePixels(for: .dismissed, credentials: existingCredentials)
+        evaluateCredentialsAndFirePixels(for: .dismissed, credentials: existingCredentials)
 
         guard DataClearingPreferences.shared.isLoginDetectionEnabled else {
             notifyDelegate()
@@ -422,7 +422,7 @@ final class SaveCredentialsViewController: NSViewController {
         return false
     }
 
-    private func firePixels(for action: Action, credentials: SecureVaultModels.WebsiteCredentials?) {
+    private func evaluateCredentialsAndFirePixels(for action: Action, credentials: SecureVaultModels.WebsiteCredentials?) {
         switch action {
         case .displayed:
             if let credentials = credentials {
