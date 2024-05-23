@@ -136,7 +136,7 @@ public final class DataBrokerProtectionAgentManager {
         self.ipcServer.activate()
     }
 
-    public func agentFinishedLaunching(completion: (() -> Void)? = nil) {
+    public func agentFinishedLaunching() {
 
         Task { @MainActor in
             // The browser shouldn't start the agent if these prerequisites aren't met.
@@ -151,7 +151,6 @@ public final class DataBrokerProtectionAgentManager {
             /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
             /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
             agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: .minutes(60))
-            completion?()
         }
     }
 }

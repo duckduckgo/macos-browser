@@ -105,8 +105,46 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         XCTAssertTrue(startScheduledScansCalled)
     }
 
-    func testWhenAgentStart_andProfileDoesNotExist_thenActivityIsNotScheduled_andSheduledOpereationsNotRun() async throws {
+    func testWhenAgentStart_andProfileDoesNotExist_thenActivityIsNotScheduled_andStopAgentIsCalled() async throws {
         // Given
+        let mockStopAction = MockDataProtectionStopAction()
+        let agentStopper = DefaultDataBrokerProtectionAgentStopper(dataManager: mockDataManager,
+                                                                   entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
+                                                                   authenticationManager: MockAuthenticationManager(),
+                                                                   pixelHandler: mockPixelHandler,
+                                                                   stopAction: mockStopAction)
+        sut = DataBrokerProtectionAgentManager(
+            userNotificationService: mockNotificationService,
+            activityScheduler: mockActivityScheduler,
+            ipcServer: mockIPCServer,
+            queueManager: mockQueueManager,
+            dataManager: mockDataManager,
+            operationDependencies: mockDependencies,
+            pixelHandler: mockPixelHandler,
+            agentStopper: agentStopper)
+
+        mockDataManager.profileToReturn = nil
+
+        let stopAgentExpectation = XCTestExpectation(description: "Stop agent expectation")
+
+        var stopAgentWasCalled = false
+        mockStopAction.stopAgentCompletion = {
+            stopAgentWasCalled = true
+            stopAgentExpectation.fulfill()
+        }
+
+        // When
+        sut.agentFinishedLaunching()
+        await fulfillment(of: [stopAgentExpectation], timeout: 1.0)
+
+        // Then
+        XCTAssertTrue(stopAgentWasCalled)
+    }
+
+    func testWhenAgentStart_thenPrerequisitesAreValidated_andEntitlementsAreMonitored() async {
+        // Given
+        let mockAgentStopper = MockAgentStopper()
+
         sut = DataBrokerProtectionAgentManager(
             userNotificationService: mockNotificationService,
             activityScheduler: mockActivityScheduler,
@@ -119,26 +157,27 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
 
         mockDataManager.profileToReturn = nil
 
-        var schedulerStarted = false
-        mockActivityScheduler.startSchedulerCompletion = {
-            schedulerStarted = true
+        let preRequisitesExpectation = XCTestExpectation(description: "preRequisitesExpectation expectation")
+        var runPrerequisitesWasCalled = false
+        mockAgentStopper.validateRunPrerequisitesCompletion = {
+            runPrerequisitesWasCalled = true
+            preRequisitesExpectation.fulfill()
         }
 
-        var startScheduledScansCalled = false
-        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
-            startScheduledScansCalled = true
+        let monitorEntitlementExpectation = XCTestExpectation(description: "monitorEntitlement expectation")
+        var monitorEntitlementWasCalled = false
+        mockAgentStopper.monitorEntitlementCompletion = {
+            monitorEntitlementWasCalled = true
+            monitorEntitlementExpectation.fulfill()
         }
-
-        let agentFinishedLaunchingExpectation = XCTestExpectation(description: "Finished expectation")
 
         // When
-        sut.agentFinishedLaunching(completion: {
-            agentFinishedLaunchingExpectation.fulfill()
-        })
+        sut.agentFinishedLaunching()
+        await fulfillment(of: [preRequisitesExpectation, monitorEntitlementExpectation], timeout: 1.0)
 
         // Then
-        XCTAssertFalse(schedulerStarted)
-        XCTAssertFalse(startScheduledScansCalled)
+        XCTAssertTrue(runPrerequisitesWasCalled)
+        XCTAssertTrue(monitorEntitlementWasCalled)
     }
 
     func testWhenActivitySchedulerTriggers_thenSheduledOpereationsRun() async throws {
