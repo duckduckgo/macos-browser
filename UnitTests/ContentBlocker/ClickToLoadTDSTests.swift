@@ -112,27 +112,27 @@ class ClickToLoadTDSTests: XCTestCase {
         let ctlTrackers = ctlTrackerData?.tds.trackers
 
         let fbMainTracker = mainTrackers?["facebook.net"]
-        let fbCtlTracker = ctlTrackers?["facebook.net"]
+        let fbCTLTracker = ctlTrackers?["facebook.net"]
 
         let fbMainRules = fbMainTracker?.rules
-        let fbCtlRules = fbCtlTracker?.rules
+        let fbCTLRules = fbCTLTracker?.rules
 
         let fbMainRuleCount = fbMainRules!.count
-        let fbCtlRuleCount = fbCtlRules!.count
+        let fbCTLRuleCount = fbCTLRules!.count
 
-        let mainCtlRuleCount = fbMainTracker!.countCTLActions
-        let ctlCtlRuleCount = fbCtlTracker!.countCTLActions
+        let mainCTLRuleCount = fbMainTracker!.countCTLActions
+        let ctlCTLRuleCount = fbCTLTracker!.countCTLActions
 
         // ensure both rulesets contains facebook.net rules
         XCTAssert(fbMainRuleCount > 0)
-        XCTAssert(fbCtlRuleCount > 0)
+        XCTAssert(fbCTLRuleCount > 0)
 
         // ensure FB CTL rules include CTL custom actions, and main rules FB do not
-        XCTAssert(mainCtlRuleCount == 0)
-        XCTAssert(ctlCtlRuleCount > 0)
+        XCTAssert(mainCTLRuleCount == 0)
+        XCTAssert(ctlCTLRuleCount > 0)
 
         // ensure FB CTL rules are the sum of the main rules + CTL custom action rules
-        XCTAssert(fbMainRuleCount + ctlCtlRuleCount == fbCtlRuleCount)
+        XCTAssert(fbMainRuleCount + ctlCTLRuleCount == fbCTLRuleCount)
 
     }
 }
