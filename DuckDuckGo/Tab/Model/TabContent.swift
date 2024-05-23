@@ -117,12 +117,16 @@ extension TabContent {
         }
 
         if let url {
-            if url.isChild(of: URL.subscriptionBaseURL) {
-                if SubscriptionPurchaseEnvironment.currentServiceEnvironment == .staging, url.getParameter(named: "environment") == nil {
+            let subscriptionManager = Application.appDelegate.subscriptionManager
+            let environment = subscriptionManager.currentEnvironment.serviceEnvironment
+            let subscriptionBaseURL = subscriptionManager.url(for: .baseURL)
+            let identityTheftRestorationURL = subscriptionManager.url(for: .identityTheftRestoration)
+            if url.isChild(of: subscriptionBaseURL) {
+                if environment == .staging, url.getParameter(named: "environment") == nil {
                     return .subscription(url.appendingParameter(name: "environment", value: "staging"))
                 }
                 return .subscription(url)
-            } else if url.isChild(of: URL.identityTheftRestoration) {
+            } else if url.isChild(of: identityTheftRestorationURL) {
                 return .identityTheftRestoration(url)
             }
         }

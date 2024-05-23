@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionProcessorConfigurationTests.swift
+//  DataBrokerExecutionConfigTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -20,12 +20,12 @@ import XCTest
 import Foundation
 @testable import DataBrokerProtection
 
-final class DataBrokerProtectionProcessorConfigurationTests: XCTestCase {
+final class DataBrokerExecutionConfigTests: XCTestCase {
 
-    private let sut = DataBrokerProtectionProcessorConfiguration()
+    private let sut = DataBrokerExecutionConfig()
 
     func testWhenOperationIsManualScans_thenConcurrentOperationsBetweenBrokersIsSix() {
-        let value = sut.concurrentOperationsFor(.manualScan)
+        let value = sut.concurrentOperationsFor(.scan)
         let expectedValue = 6
         XCTAssertEqual(value, expectedValue)
     }

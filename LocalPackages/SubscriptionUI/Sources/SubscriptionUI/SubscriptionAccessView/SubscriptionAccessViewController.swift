@@ -22,18 +22,17 @@ import SwiftUI
 
 public final class SubscriptionAccessViewController: NSViewController {
 
-    private let accountManager: AccountManager
+    private let subscriptionManager: SubscriptionManaging
     private var actionHandlers: SubscriptionAccessActionHandlers
-    private let subscriptionAppGroup: String
 
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(accountManager: AccountManager, actionHandlers: SubscriptionAccessActionHandlers, subscriptionAppGroup: String) {
-        self.accountManager = accountManager
+    public init(subscriptionManager: SubscriptionManaging,
+                actionHandlers: SubscriptionAccessActionHandlers) {
+        self.subscriptionManager = subscriptionManager
         self.actionHandlers = actionHandlers
-        self.subscriptionAppGroup = subscriptionAppGroup
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -56,10 +55,10 @@ public final class SubscriptionAccessViewController: NSViewController {
     }
 
     private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
-        if accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: actionHandlers, email: accountManager.email, subscriptionAppGroup: subscriptionAppGroup)
+        if subscriptionManager.accountManager.isUserAuthenticated {
+            ShareSubscriptionAccessModel(actionHandlers: actionHandlers, email: subscriptionManager.accountManager.email, subscriptionManager: subscriptionManager)
         } else {
-            ActivateSubscriptionAccessModel(actionHandlers: actionHandlers, shouldShowRestorePurchase: SubscriptionPurchaseEnvironment.current == .appStore)
+            ActivateSubscriptionAccessModel(actionHandlers: actionHandlers, subscriptionManager: subscriptionManager)
         }
     }
 }

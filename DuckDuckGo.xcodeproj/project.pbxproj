@@ -169,12 +169,11 @@
 		3158B1492B0BF73000AF130C /* DBPHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */; };
 		3158B14A2B0BF74300AF130C /* DataBrokerProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316850712AF3AD58009A2828 /* DataBrokerProtectionDebugMenu.swift */; };
 		3158B14D2B0BF74D00AF130C /* DataBrokerProtectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */; };
-		3158B1502B0BF75200AF130C /* DataBrokerProtectionLoginItemScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemScheduler.swift */; };
+		3158B1502B0BF75200AF130C /* DataBrokerProtectionLoginItemInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemInterface.swift */; };
 		3158B1532B0BF75700AF130C /* LoginItem+DataBrokerProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8FA00B2AC5BDCE005DD0D0 /* LoginItem+DataBrokerProtection.swift */; };
 		3158B1562B0BF75D00AF130C /* DataBrokerProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C5FFB82AF64D120008A79F /* DataBrokerProtectionFeatureVisibility.swift */; };
 		3158B1592B0BF76400AF130C /* DataBrokerProtectionFeatureDisabler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199C6F82AF94F5B002A7BA1 /* DataBrokerProtectionFeatureDisabler.swift */; };
 		3158B15C2B0BF76D00AF130C /* DataBrokerProtectionAppEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199C6FC2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift */; };
-		315A023D2B64216B00BFA577 /* IPCServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD01C182AD8319C0088B32E /* IPCServiceManager.swift */; };
 		315A023F2B6421AE00BFA577 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 315A023E2B6421AE00BFA577 /* Networking */; };
 		315AA07028CA5CC800200030 /* YoutubePlayerNavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */; };
 		3168506D2AF3AD1D009A2828 /* WaitlistViewControllerPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3168506C2AF3AD1C009A2828 /* WaitlistViewControllerPresenter.swift */; };
@@ -222,7 +221,7 @@
 		31ECDA142BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31ECDA102BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift */; };
 		31EF1E802B63FFA800E6DB17 /* DBPHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */; };
 		31EF1E812B63FFB800E6DB17 /* DataBrokerProtectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */; };
-		31EF1E822B63FFC200E6DB17 /* DataBrokerProtectionLoginItemScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemScheduler.swift */; };
+		31EF1E822B63FFC200E6DB17 /* DataBrokerProtectionLoginItemInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemInterface.swift */; };
 		31EF1E832B63FFCA00E6DB17 /* LoginItem+DataBrokerProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8FA00B2AC5BDCE005DD0D0 /* LoginItem+DataBrokerProtection.swift */; };
 		31EF1E842B63FFD100E6DB17 /* DataBrokerProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316850712AF3AD58009A2828 /* DataBrokerProtectionDebugMenu.swift */; };
 		31F28C4F28C8EEC500119F70 /* YoutubePlayerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */; };
@@ -1494,14 +1493,12 @@
 		56D145F229E6F06D00E3488A /* MockBookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145F029E6F06D00E3488A /* MockBookmarkManager.swift */; };
 		56D6A3D629DB2BAB0055215A /* ContinueSetUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */; };
 		56D6A3D729DB2BAB0055215A /* ContinueSetUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */; };
-		7B0099792B65013800FE7C31 /* BrowserWindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0099782B65013800FE7C31 /* BrowserWindowManager.swift */; };
 		7B00997D2B6508B700FE7C31 /* NetworkProtectionProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 7B00997C2B6508B700FE7C31 /* NetworkProtectionProxy */; };
 		7B00997F2B6508C200FE7C31 /* NetworkProtectionProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 7B00997E2B6508C200FE7C31 /* NetworkProtectionProxy */; };
 		7B0099822B65C6B300FE7C31 /* MacTransparentProxyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0099802B65C6B300FE7C31 /* MacTransparentProxyProvider.swift */; };
 		7B0694982B6E980F00FA4DBA /* VPNProxyLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0694972B6E980F00FA4DBA /* VPNProxyLauncher.swift */; };
 		7B09CBA92BA4BE8100CF245B /* NetworkProtectionPixelEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B09CBA72BA4BE7000CF245B /* NetworkProtectionPixelEventTests.swift */; };
 		7B09CBAA2BA4BE8200CF245B /* NetworkProtectionPixelEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B09CBA72BA4BE7000CF245B /* NetworkProtectionPixelEventTests.swift */; };
-		7B1459542B7D437200047F2C /* BrowserWindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0099782B65013800FE7C31 /* BrowserWindowManager.swift */; };
 		7B1459552B7D438F00047F2C /* VPNProxyLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0694972B6E980F00FA4DBA /* VPNProxyLauncher.swift */; };
 		7B1459572B7D43E500047F2C /* NetworkProtectionProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 7B1459562B7D43E500047F2C /* NetworkProtectionProxy */; };
 		7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */; };
@@ -1571,12 +1568,9 @@
 		7BAF9E4C2A8A3CCA002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
 		7BAF9E4D2A8A3CCB002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
 		7BB108592A43375D000AB95F /* PFMoveApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB108582A43375D000AB95F /* PFMoveApplication.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		7BBA7CE62BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBA7CE52BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */; };
-		7BBA7CE72BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBA7CE52BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */; };
 		7BBD45B12A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
 		7BBD45B22A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
 		7BBE2B7B2B61663C00697445 /* NetworkProtectionProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 7BBE2B7A2B61663C00697445 /* NetworkProtectionProxy */; };
-		7BD01C192AD8319C0088B32E /* IPCServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD01C182AD8319C0088B32E /* IPCServiceManager.swift */; };
 		7BD1688E2AD4A4C400D24876 /* NetworkExtensionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */; };
 		7BD3AF5D2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
 		7BDA36E62B7E037100AD5388 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B4D603E2A0B290200BCD287 /* NetworkExtension.framework */; };
@@ -1725,10 +1719,6 @@
 		9D9AE9202AAA3B450026E7DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9162AAA3B450026E7DC /* Assets.xcassets */; };
 		9D9AE9212AAA3B450026E7DC /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9172AAA3B450026E7DC /* UserText.swift */; };
 		9D9AE9222AAA3B450026E7DC /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9172AAA3B450026E7DC /* UserText.swift */; };
-		9D9AE9292AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */; };
-		9D9AE92A2AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */; };
-		9D9AE92C2AAB84FF0026E7DC /* DBPMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */; };
-		9D9AE92D2AAB84FF0026E7DC /* DBPMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */; };
 		9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC70B192AA1FA5B005A844B /* LoginItems */; };
 		9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 9DEF97E02B06C4EE00764F03 /* Networking */; };
 		9F0660732BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0660722BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift */; };
@@ -1771,10 +1761,6 @@
 		9F56CFB22B843F6C00BB7F11 /* BookmarksDialogViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F56CFB02B843F6C00BB7F11 /* BookmarksDialogViewFactory.swift */; };
 		9F6434612BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6434602BEC82B700D2D8A0 /* AttributionPixelHandler.swift */; };
 		9F6434622BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6434602BEC82B700D2D8A0 /* AttributionPixelHandler.swift */; };
-		9F6434682BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6434672BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift */; };
-		9F6434692BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6434672BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift */; };
-		9F64346B2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F64346A2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift */; };
-		9F64346C2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F64346A2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift */; };
 		9F6434702BECBA2800D2D8A0 /* SubscriptionRedirectManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F64346F2BECBA2800D2D8A0 /* SubscriptionRedirectManagerTests.swift */; };
 		9F6434712BECBA2800D2D8A0 /* SubscriptionRedirectManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F64346F2BECBA2800D2D8A0 /* SubscriptionRedirectManagerTests.swift */; };
 		9F872D982B8DA9F800138637 /* Bookmarks+Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F872D972B8DA9F800138637 /* Bookmarks+Tab.swift */; };
@@ -2597,6 +2583,8 @@
 		F116A7C32BD1924B00F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C22BD1924B00F3FCF7 /* PixelKitTestingUtilities */; };
 		F116A7C72BD1925500F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C62BD1925500F3FCF7 /* PixelKitTestingUtilities */; };
 		F116A7C92BD1929000F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C82BD1929000F3FCF7 /* PixelKitTestingUtilities */; };
+		F118EA7D2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */; };
+		F118EA7E2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */; };
 		F118EA852BEACC7000F77634 /* NonStandardPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118EA842BEACC7000F77634 /* NonStandardPixel.swift */; };
 		F118EA862BEACC7000F77634 /* NonStandardPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118EA842BEACC7000F77634 /* NonStandardPixel.swift */; };
 		F188267C2BBEB3AA00D9AC4F /* GeneralPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */; };
@@ -2623,14 +2611,62 @@
 		F1B33DF32BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B33DF12BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift */; };
 		F1B33DF62BAD970E001128B3 /* SubscriptionErrorReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B33DF52BAD970E001128B3 /* SubscriptionErrorReporter.swift */; };
 		F1B33DF72BAD970E001128B3 /* SubscriptionErrorReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B33DF52BAD970E001128B3 /* SubscriptionErrorReporter.swift */; };
+		F1D0428E2BFB9F9C00A31506 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = F1D0428D2BFB9F9C00A31506 /* Subscription */; };
+		F1D042902BFB9FA300A31506 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = F1D0428F2BFB9FA300A31506 /* Subscription */; };
+		F1D042912BFB9FD700A31506 /* SubscriptionEnvironment+Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9282BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift */; };
+		F1D042922BFB9FD800A31506 /* SubscriptionEnvironment+Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9282BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift */; };
+		F1D042942BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */; };
+		F1D042952BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */; };
+		F1D042992BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
+		F1D0429A2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
+		F1D0429B2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
+		F1D0429C2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
+		F1D0429D2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
+		F1D0429E2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
+		F1D0429F2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
+		F1D042A02BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */; };
+		F1D042A12BFBB4DD00A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */; };
+		F1D042A22BFBB4DD00A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */; };
 		F1D43AEE2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */; };
 		F1D43AEF2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */; };
 		F1D43AF32B98E47800BAB743 /* BareBonesBrowserKit in Frameworks */ = {isa = PBXBuildFile; productRef = F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */; };
 		F1D43AF52B98E48900BAB743 /* BareBonesBrowserKit in Frameworks */ = {isa = PBXBuildFile; productRef = F1D43AF42B98E48900BAB743 /* BareBonesBrowserKit */; };
+		F1DA51862BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DA51842BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift */; };
+		F1DA51872BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DA51842BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift */; };
+		F1DA51882BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DA51842BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift */; };
+		F1DA51892BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DA51842BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift */; };
+		F1DA518A2BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DA51842BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift */; };
+		F1DA518B2BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DA51842BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift */; };
+		F1DA518C2BF607D200CF29FA /* SubscriptionRedirectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DA51852BF607D200CF29FA /* SubscriptionRedirectManager.swift */; };
+		F1DA518D2BF607D200CF29FA /* SubscriptionRedirectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DA51852BF607D200CF29FA /* SubscriptionRedirectManager.swift */; };
+		F1DA51922BF6081C00CF29FA /* AttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6434602BEC82B700D2D8A0 /* AttributionPixelHandler.swift */; };
+		F1DA51932BF6081D00CF29FA /* AttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6434602BEC82B700D2D8A0 /* AttributionPixelHandler.swift */; };
+		F1DA51942BF6081E00CF29FA /* AttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6434602BEC82B700D2D8A0 /* AttributionPixelHandler.swift */; };
+		F1DA51952BF6081E00CF29FA /* AttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6434602BEC82B700D2D8A0 /* AttributionPixelHandler.swift */; };
+		F1DA51962BF6083700CF29FA /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */; };
+		F1DA51972BF6083A00CF29FA /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */; };
+		F1DA51982BF6083B00CF29FA /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */; };
+		F1DA51992BF6083B00CF29FA /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */; };
+		F1DA51A32BF6114200CF29FA /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = F1DA51A22BF6114200CF29FA /* Subscription */; };
+		F1DA51A52BF6114200CF29FA /* SubscriptionTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F1DA51A42BF6114200CF29FA /* SubscriptionTestingUtilities */; };
+		F1DA51A72BF6114B00CF29FA /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = F1DA51A62BF6114B00CF29FA /* Subscription */; };
+		F1DA51A92BF6114C00CF29FA /* SubscriptionTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F1DA51A82BF6114C00CF29FA /* SubscriptionTestingUtilities */; };
 		F1DF95E32BD1807C0045E591 /* Crashes in Frameworks */ = {isa = PBXBuildFile; productRef = 08D4923DC968236E22E373E2 /* Crashes */; };
 		F1DF95E42BD1807C0045E591 /* Crashes in Frameworks */ = {isa = PBXBuildFile; productRef = 537FC71EA5115A983FAF3170 /* Crashes */; };
 		F1DF95E52BD1807C0045E591 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = DC3F73D49B2D44464AFEFCD8 /* Subscription */; };
 		F1DF95E72BD188B60045E591 /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = F1DF95E62BD188B60045E591 /* LoginItems */; };
+		F1FDC9292BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9282BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift */; };
+		F1FDC92A2BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9282BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift */; };
+		F1FDC92B2BF4DFEC006B1435 /* SubscriptionEnvironment+Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9282BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift */; };
+		F1FDC92C2BF4DFED006B1435 /* SubscriptionEnvironment+Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9282BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift */; };
+		F1FDC92D2BF4E001006B1435 /* SubscriptionEnvironment+Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9282BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift */; };
+		F1FDC92E2BF4E001006B1435 /* SubscriptionEnvironment+Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9282BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift */; };
+		F1FDC9382BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */; };
+		F1FDC9392BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */; };
+		F1FDC93A2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */; };
+		F1FDC93B2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */; };
+		F1FDC93C2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */; };
+		F1FDC93D2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */; };
 		F41D174125CB131900472416 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D174025CB131900472416 /* NSColorExtension.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
 		F4A6198C283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */; };
@@ -3338,7 +3374,6 @@
 		56D145ED29E6DAD900E3488A /* DataImportProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportProviderTests.swift; sourceTree = "<group>"; };
 		56D145F029E6F06D00E3488A /* MockBookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBookmarkManager.swift; sourceTree = "<group>"; };
 		56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContinueSetUpView.swift; sourceTree = "<group>"; };
-		7B0099782B65013800FE7C31 /* BrowserWindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWindowManager.swift; sourceTree = "<group>"; };
 		7B0099802B65C6B300FE7C31 /* MacTransparentProxyProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacTransparentProxyProvider.swift; sourceTree = "<group>"; };
 		7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
 		7B0694972B6E980F00FA4DBA /* VPNProxyLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNProxyLauncher.swift; sourceTree = "<group>"; };
@@ -3357,7 +3392,7 @@
 		7B4D8A202BDA857300852966 /* VPNOperationErrorRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNOperationErrorRecorder.swift; sourceTree = "<group>"; };
 		7B5291882A1697680022E406 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B5291892A169BC90022E406 /* DeveloperID.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DeveloperID.xcconfig; sourceTree = "<group>"; };
-		7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionLoginItemScheduler.swift; sourceTree = "<group>"; };
+		7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionLoginItemInterface.swift; sourceTree = "<group>"; };
 		7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBPAgentAppStore.xcconfig; sourceTree = "<group>"; };
 		7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBPAgent.xcconfig; sourceTree = "<group>"; };
 		7B76E6852AD5D77600186A84 /* XPCHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = XPCHelper; sourceTree = "<group>"; };
@@ -3381,9 +3416,7 @@
 		7BA7CC4D2AD11F6F0042E5CE /* NetworkProtectionIPCTunnelController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionIPCTunnelController.swift; sourceTree = "<group>"; };
 		7BB108572A43375D000AB95F /* PFMoveApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFMoveApplication.h; sourceTree = "<group>"; };
 		7BB108582A43375D000AB95F /* PFMoveApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMoveApplication.m; sourceTree = "<group>"; };
-		7BBA7CE52BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift"; sourceTree = "<group>"; };
 		7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugUtilities.swift; sourceTree = "<group>"; };
-		7BD01C182AD8319C0088B32E /* IPCServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCServiceManager.swift; sourceTree = "<group>"; };
 		7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkExtensionController.swift; sourceTree = "<group>"; };
 		7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainType+ClientDefault.swift"; sourceTree = "<group>"; };
 		7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionFeatureVisibility.swift; sourceTree = "<group>"; };
@@ -3508,8 +3541,6 @@
 		9D9AE9182AAA3B450026E7DC /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D9AE9192AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoDBPBackgroundAgentAppStore.entitlements; sourceTree = "<group>"; };
 		9D9AE91A2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgent.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoDBPBackgroundAgent.entitlements; sourceTree = "<group>"; };
-		9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionBackgroundManager.swift; sourceTree = "<group>"; };
-		9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBPMocks.swift; sourceTree = "<group>"; };
 		9DB6E7222AA0DA7A00A17F3C /* LoginItems */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LoginItems; sourceTree = "<group>"; };
 		9F0660722BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAttributionPixelHandlerTests.swift; sourceTree = "<group>"; };
 		9F0660762BECC81800B8EEF1 /* PixelCapturedParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelCapturedParameters.swift; sourceTree = "<group>"; };
@@ -3531,8 +3562,6 @@
 		9F56CFAC2B84326C00BB7F11 /* AddEditBookmarkDialogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkDialogViewModel.swift; sourceTree = "<group>"; };
 		9F56CFB02B843F6C00BB7F11 /* BookmarksDialogViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksDialogViewFactory.swift; sourceTree = "<group>"; };
 		9F6434602BEC82B700D2D8A0 /* AttributionPixelHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributionPixelHandler.swift; sourceTree = "<group>"; };
-		9F6434672BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionRedirectManager.swift; sourceTree = "<group>"; };
-		9F64346A2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAttributionPixelHandler.swift; sourceTree = "<group>"; };
 		9F64346F2BECBA2800D2D8A0 /* SubscriptionRedirectManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionRedirectManagerTests.swift; sourceTree = "<group>"; };
 		9F872D972B8DA9F800138637 /* Bookmarks+Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmarks+Tab.swift"; sourceTree = "<group>"; };
 		9F872D9C2B9058D000138637 /* Bookmarks+TabTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmarks+TabTests.swift"; sourceTree = "<group>"; };
@@ -4102,13 +4131,20 @@
 		EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtection+VPNAgentConvenienceInitializers.swift"; sourceTree = "<group>"; };
 		EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPacketTunnelProvider.swift; sourceTree = "<group>"; };
 		EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModelTests.swift; sourceTree = "<group>"; };
+		F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift"; sourceTree = "<group>"; };
 		F118EA842BEACC7000F77634 /* NonStandardPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonStandardPixel.swift; sourceTree = "<group>"; };
 		F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPixel.swift; sourceTree = "<group>"; };
 		F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyProPixel.swift; sourceTree = "<group>"; };
 		F18826832BBEE31700D9AC4F /* PixelKit+Assertion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PixelKit+Assertion.swift"; sourceTree = "<group>"; };
 		F1B33DF12BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAppStoreRestorer.swift; sourceTree = "<group>"; };
 		F1B33DF52BAD970E001128B3 /* SubscriptionErrorReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionErrorReporter.swift; sourceTree = "<group>"; };
+		F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DataBrokerProtectionSettings+Environment.swift"; sourceTree = "<group>"; };
+		F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SubscriptionManager+StandardConfiguration.swift"; sourceTree = "<group>"; };
 		F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MainMenuActions+VanillaBrowser.swift"; sourceTree = "<group>"; };
+		F1DA51842BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscriptionAttributionPixelHandler.swift; sourceTree = "<group>"; };
+		F1DA51852BF607D200CF29FA /* SubscriptionRedirectManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscriptionRedirectManager.swift; sourceTree = "<group>"; };
+		F1FDC9282BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscriptionEnvironment+Default.swift"; sourceTree = "<group>"; };
+		F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VPNSettings+Environment.swift"; sourceTree = "<group>"; };
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
 		F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentScopeFeatureFlagging.swift; sourceTree = "<group>"; };
@@ -4162,6 +4198,8 @@
 				3706FE88293F661700E42796 /* OHHTTPStubs in Frameworks */,
 				F116A7C72BD1925500F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CF2B316E0200A595BB /* SnapshotTesting in Frameworks */,
+				F1DA51A52BF6114200CF29FA /* SubscriptionTestingUtilities in Frameworks */,
+				F1DA51A32BF6114200CF29FA /* Subscription in Frameworks */,
 				3706FE89293F661700E42796 /* OHHTTPStubsSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4296,6 +4334,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */,
+				F1D0428E2BFB9F9C00A31506 /* Subscription in Frameworks */,
 				9D9AE8F92AAA3AD00026E7DC /* DataBrokerProtection in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4305,6 +4344,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				315A023F2B6421AE00BFA577 /* Networking in Frameworks */,
+				F1D042902BFB9FA300A31506 /* Subscription in Frameworks */,
 				9D9AE8FB2AAA3AD90026E7DC /* DataBrokerProtection in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4356,6 +4396,8 @@
 				B6DA44172616C13800DD1EC2 /* OHHTTPStubs in Frameworks */,
 				F116A7C32BD1924B00F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CB2B316DF100A595BB /* SnapshotTesting in Frameworks */,
+				F1DA51A92BF6114C00CF29FA /* SubscriptionTestingUtilities in Frameworks */,
+				F1DA51A72BF6114B00CF29FA /* Subscription in Frameworks */,
 				B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4553,16 +4595,6 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		1EA7B8D62B7E124E000330A4 /* Subscription */ = {
-			isa = PBXGroup;
-			children = (
-				7BBA7CE52BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */,
-				9F6434672BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift */,
-				9F64346A2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift */,
-			);
-			path = Subscription;
-			sourceTree = "<group>";
-		};
 		3169132B2BD2C7960051B46D /* ErrorView */ = {
 			isa = PBXGroup;
 			children = (
@@ -4598,7 +4630,7 @@
 				316850712AF3AD58009A2828 /* DataBrokerProtectionDebugMenu.swift */,
 				3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */,
 				3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */,
-				7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemScheduler.swift */,
+				7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemInterface.swift */,
 				9D8FA00B2AC5BDCE005DD0D0 /* LoginItem+DataBrokerProtection.swift */,
 				31C5FFB82AF64D120008A79F /* DataBrokerProtectionFeatureVisibility.swift */,
 				3199C6F82AF94F5B002A7BA1 /* DataBrokerProtectionFeatureDisabler.swift */,
@@ -6334,10 +6366,6 @@
 			isa = PBXGroup;
 			children = (
 				9D9AE9152AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift */,
-				9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */,
-				7BD01C182AD8319C0088B32E /* IPCServiceManager.swift */,
-				7B0099782B65013800FE7C31 /* BrowserWindowManager.swift */,
-				9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */,
 				9D9AE9172AAA3B450026E7DC /* UserText.swift */,
 				31ECDA102BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift */,
 				9D9AE9162AAA3B450026E7DC /* Assets.xcassets */,
@@ -6650,7 +6678,7 @@
 				4B677422255DBEB800025BD8 /* SmarterEncryption */,
 				B68458AE25C7E75100DC17B6 /* StateRestoration */,
 				B6A9E44E26142AF90067D1B9 /* Statistics */,
-				1EA7B8D62B7E124E000330A4 /* Subscription */,
+				F118EA7B2BEA2B8700F77634 /* Subscription */,
 				AACB8E7224A4C8BC005F2218 /* Suggestions */,
 				3775913429AB99DA00E26367 /* Sync */,
 				AA86491B24D837DE001BABEE /* Tab */,
@@ -8261,6 +8289,20 @@
 			path = JSAlert;
 			sourceTree = "<group>";
 		};
+		F118EA7B2BEA2B8700F77634 /* Subscription */ = {
+			isa = PBXGroup;
+			children = (
+				F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */,
+				F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */,
+				F1DA51842BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift */,
+				F1FDC9282BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift */,
+				F1D042982BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift */,
+				F1DA51852BF607D200CF29FA /* SubscriptionRedirectManager.swift */,
+				F1FDC9372BF51F41006B1435 /* VPNSettings+Environment.swift */,
+			);
+			path = Subscription;
+			sourceTree = "<group>";
+		};
 		F1B33DF92BAD9C83001128B3 /* Subscription */ = {
 			isa = PBXGroup;
 			children = (
@@ -8351,6 +8393,8 @@
 				3706FDD8293F661700E42796 /* OHHTTPStubsSwift */,
 				B65CD8CE2B316E0200A595BB /* SnapshotTesting */,
 				F116A7C62BD1925500F3FCF7 /* PixelKitTestingUtilities */,
+				F1DA51A22BF6114200CF29FA /* Subscription */,
+				F1DA51A42BF6114200CF29FA /* SubscriptionTestingUtilities */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = 3706FE99293F661700E42796 /* Unit Tests App Store.xctest */;
@@ -8640,6 +8684,7 @@
 			packageProductDependencies = (
 				9D9AE8F82AAA3AD00026E7DC /* DataBrokerProtection */,
 				9DEF97E02B06C4EE00764F03 /* Networking */,
+				F1D0428D2BFB9F9C00A31506 /* Subscription */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGo Personal Information Removal.app */;
@@ -8662,6 +8707,7 @@
 			packageProductDependencies = (
 				9D9AE8FA2AAA3AD90026E7DC /* DataBrokerProtection */,
 				315A023E2B6421AE00BFA577 /* Networking */,
+				F1D0428F2BFB9FA300A31506 /* Subscription */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal App Store.app */;
@@ -8746,6 +8792,8 @@
 				B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */,
 				B65CD8CA2B316DF100A595BB /* SnapshotTesting */,
 				F116A7C22BD1924B00F3FCF7 /* PixelKitTestingUtilities */,
+				F1DA51A62BF6114B00CF29FA /* Subscription */,
+				F1DA51A82BF6114C00CF29FA /* SubscriptionTestingUtilities */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */;
@@ -9525,6 +9573,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B41EDA82B1543C9001EEDF4 /* PreferencesVPNView.swift in Sources */,
+				F1DA518D2BF607D200CF29FA /* SubscriptionRedirectManager.swift in Sources */,
 				3706FA7B293F65D500E42796 /* FaviconUserScript.swift in Sources */,
 				3706FA7E293F65D500E42796 /* LottieAnimationCache.swift in Sources */,
 				9F982F0E2B8224BF00231028 /* AddEditBookmarkFolderDialogViewModel.swift in Sources */,
@@ -9571,6 +9620,7 @@
 				3706FAA2293F65D500E42796 /* MainWindow.swift in Sources */,
 				3707C727294B5D2900682A9F /* WKWebView+SessionState.swift in Sources */,
 				4B44FEF42B1FEF5A000619D8 /* FocusableTextEditor.swift in Sources */,
+				F1D042A22BFBB4DD00A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */,
 				3706FAA3293F65D500E42796 /* CrashReportPromptViewController.swift in Sources */,
 				3706FAA4293F65D500E42796 /* ContextMenuManager.swift in Sources */,
 				31AA6B982B960BA50025014E /* DataBrokerProtectionLoginItemPixels.swift in Sources */,
@@ -9598,7 +9648,6 @@
 				3706FABA293F65D500E42796 /* BookmarkOutlineViewDataSource.swift in Sources */,
 				3706FABB293F65D500E42796 /* PasswordManagementBitwardenItemView.swift in Sources */,
 				1D220BF92B86192200F8BBC6 /* PreferencesEmailProtectionView.swift in Sources */,
-				9F6434692BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift in Sources */,
 				9FA173E42B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift in Sources */,
 				3706FABD293F65D500E42796 /* NSNotificationName+PasswordManager.swift in Sources */,
 				3706FABE293F65D500E42796 /* RulesCompilationMonitor.swift in Sources */,
@@ -9730,6 +9779,7 @@
 				85774B042A71CDD000DE0561 /* BlockMenuItem.swift in Sources */,
 				3706FB19293F65D500E42796 /* FireViewController.swift in Sources */,
 				B6E3E55C2BC0041A00A41922 /* DownloadListStoreMock.swift in Sources */,
+				F1D0429A2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
 				4B4D60D42A0C84F700BCD287 /* UserText+NetworkProtection.swift in Sources */,
 				3707C71F294B5D2900682A9F /* WKUserContentControllerExtension.swift in Sources */,
 				3706FB1A293F65D500E42796 /* OutlineSeparatorViewCell.swift in Sources */,
@@ -9777,6 +9827,7 @@
 				3706FB3D293F65D500E42796 /* FocusRingView.swift in Sources */,
 				3706FB3E293F65D500E42796 /* BookmarksBarViewModel.swift in Sources */,
 				3706FB3F293F65D500E42796 /* NSPopUpButtonView.swift in Sources */,
+				F1FDC9392BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */,
 				1ED910D62B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */,
 				3706FB40293F65D500E42796 /* ContextualMenu.swift in Sources */,
 				3706FB41293F65D500E42796 /* NavigationBarViewController.swift in Sources */,
@@ -9785,6 +9836,7 @@
 				3706FB43293F65D500E42796 /* DuckPlayer.swift in Sources */,
 				3706FB44293F65D500E42796 /* Favicon.swift in Sources */,
 				3706FB45293F65D500E42796 /* SuggestionContainerViewModel.swift in Sources */,
+				F1FDC92A2BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift in Sources */,
 				3706FB46293F65D500E42796 /* FirePopoverWrapperViewController.swift in Sources */,
 				3706FB47293F65D500E42796 /* NSPasteboardItemExtension.swift in Sources */,
 				3706FB48293F65D500E42796 /* AutofillPreferencesModel.swift in Sources */,
@@ -9819,6 +9871,7 @@
 				3706FB5C293F65D500E42796 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */,
 				3706FB5D293F65D500E42796 /* VisitMenuItem.swift in Sources */,
 				3706FB5E293F65D500E42796 /* EncryptionKeyStore.swift in Sources */,
+				F1DA51872BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */,
 				3706FB60293F65D500E42796 /* PasswordManagementIdentityItemView.swift in Sources */,
 				3706FB61293F65D500E42796 /* ProgressExtension.swift in Sources */,
 				3706FB62293F65D500E42796 /* CSVParser.swift in Sources */,
@@ -10035,7 +10088,6 @@
 				B68D21D02ACBC9FD002DA3C2 /* ContentBlockerRulesManagerMock.swift in Sources */,
 				3706FEC6293F6F0600E42796 /* BWKeyStorage.swift in Sources */,
 				4B6785482AA8DE69008A5004 /* VPNUninstaller.swift in Sources */,
-				9F64346C2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift in Sources */,
 				3706FBEC293F65D500E42796 /* EditableTextView.swift in Sources */,
 				3706FBED293F65D500E42796 /* TabCollection.swift in Sources */,
 				B6C0BB6B29AF1C7000AE8E3C /* BrowserTabView.swift in Sources */,
@@ -10109,7 +10161,6 @@
 				3706FC19293F65D500E42796 /* NSNotificationName+Favicons.swift in Sources */,
 				3706FC1A293F65D500E42796 /* PinningManager.swift in Sources */,
 				4B37EE782B4CFF3900A89A61 /* DataBrokerProtectionRemoteMessage.swift in Sources */,
-				7BBA7CE72BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */,
 				3706FC1B293F65D500E42796 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
 				3706FC1D293F65D500E42796 /* EmailManagerRequestDelegate.swift in Sources */,
 				3706FC1E293F65D500E42796 /* ApplicationVersionReader.swift in Sources */,
@@ -10118,6 +10169,7 @@
 				1DDC85042B83903E00670238 /* PreferencesWebTrackingProtectionView.swift in Sources */,
 				3706FC20293F65D500E42796 /* PreferencesAutofillView.swift in Sources */,
 				3706FC21293F65D500E42796 /* UserText+PasswordManager.swift in Sources */,
+				F118EA7E2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */,
 				3706FC22293F65D500E42796 /* LoadingProgressView.swift in Sources */,
 				3706FC23293F65D500E42796 /* StatisticsStore.swift in Sources */,
 				1DDD3EBD2B84DCB9004CBF2B /* WebTrackingProtectionPreferences.swift in Sources */,
@@ -10149,7 +10201,7 @@
 				3706FC34293F65D500E42796 /* PermissionAuthorizationViewController.swift in Sources */,
 				3706FC35293F65D500E42796 /* BookmarkNode.swift in Sources */,
 				B6ABD0CB2BC03F610000EB69 /* SecurityScopedFileURLController.swift in Sources */,
-				31EF1E822B63FFC200E6DB17 /* DataBrokerProtectionLoginItemScheduler.swift in Sources */,
+				31EF1E822B63FFC200E6DB17 /* DataBrokerProtectionLoginItemInterface.swift in Sources */,
 				B6B140892ABDBCC1004F8E85 /* HoverTrackingArea.swift in Sources */,
 				3706FC36293F65D500E42796 /* LongPressButton.swift in Sources */,
 				3706FC37293F65D500E42796 /* CoreDataStore.swift in Sources */,
@@ -10682,11 +10734,15 @@
 				B65DA5F42A77D3FA00CBEE8D /* BundleExtension.swift in Sources */,
 				EE66418D2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift in Sources */,
 				EEBCA0C72BD7CE2C004DF19C /* VPNFailureRecoveryPixel.swift in Sources */,
+				F1DA51932BF6081D00CF29FA /* AttributionPixelHandler.swift in Sources */,
+				F1FDC92C2BF4DFED006B1435 /* SubscriptionEnvironment+Default.swift in Sources */,
 				7B2E52252A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift in Sources */,
+				F1DA51892BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */,
 				B602E8232A1E260E006D261F /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				4B2D062A2A11C0C900DE1F49 /* NetworkProtectionOptionKeyExtension.swift in Sources */,
 				B602E8192A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				4B2D06322A11C1D300DE1F49 /* NSApplicationExtension.swift in Sources */,
+				F1FDC93B2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */,
 				4B2D06332A11C1E300DE1F49 /* OptionalExtension.swift in Sources */,
 				4BF0E50B2AD2552200FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				4B41EDA12B15437A001EEDF4 /* NetworkProtectionNotificationsPresenterFactory.swift in Sources */,
@@ -10695,6 +10751,8 @@
 				4B2537722A11BF8B00610219 /* main.swift in Sources */,
 				EEF12E6F2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */,
 				4B2D06292A11C0C900DE1F49 /* Bundle+VPN.swift in Sources */,
+				F1D0429C2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
+				F1DA51972BF6083A00CF29FA /* PrivacyProPixel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10708,9 +10766,11 @@
 				7BAF9E4C2A8A3CCA002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */,
 				7BA7CC592AD1203B0042E5CE /* UserText+NetworkProtection.swift in Sources */,
 				EEDE50112BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift in Sources */,
+				F1DA51942BF6081E00CF29FA /* AttributionPixelHandler.swift in Sources */,
 				7BA7CC562AD11FFB0042E5CE /* NetworkProtectionOptionKeyExtension.swift in Sources */,
 				7B2DDCFA2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */,
 				7BA7CC4C2AD11EC70042E5CE /* NetworkProtectionControllerErrorStore.swift in Sources */,
+				F1D0429D2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
 				B6F92BAC2A6937B3002ABA6B /* OptionalExtension.swift in Sources */,
 				7B8DB31A2B504D7500EC16DA /* VPNAppEventsHandler.swift in Sources */,
 				7BA7CC532AD11FCE0042E5CE /* Bundle+VPN.swift in Sources */,
@@ -10721,6 +10781,8 @@
 				7B4D8A232BDA857300852966 /* VPNOperationErrorRecorder.swift in Sources */,
 				7BD1688E2AD4A4C400D24876 /* NetworkExtensionController.swift in Sources */,
 				7BA7CC3E2AD11E380042E5CE /* TunnelControllerIPCService.swift in Sources */,
+				F1DA51982BF6083B00CF29FA /* PrivacyProPixel.swift in Sources */,
+				F1FDC92D2BF4E001006B1435 /* SubscriptionEnvironment+Default.swift in Sources */,
 				7BA7CC402AD11E3D0042E5CE /* AppLauncher+DefaultInitializer.swift in Sources */,
 				7B0694982B6E980F00FA4DBA /* VPNProxyLauncher.swift in Sources */,
 				BDA764842BC49E3F00D0400C /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */,
@@ -10728,8 +10790,10 @@
 				B65DA5EF2A77CC3A00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				BDA7647F2BC4998900D0400C /* DefaultVPNLocationFormatter.swift in Sources */,
 				4BF0E5072AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
+				F1DA518A2BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */,
 				7BA7CC442AD11E490042E5CE /* UserText.swift in Sources */,
 				4BF0E5142AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
+				F1FDC93C2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */,
 				7BA7CC422AD11E420042E5CE /* NetworkProtectionBouncer.swift in Sources */,
 				B65DA5F12A77D2BC00CBEE8D /* BundleExtension.swift in Sources */,
 			);
@@ -10745,9 +10809,11 @@
 				4B2D067C2A13340900DE1F49 /* Logging.swift in Sources */,
 				7B1459552B7D438F00047F2C /* VPNProxyLauncher.swift in Sources */,
 				EEDE50122BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift in Sources */,
+				F1DA51952BF6081E00CF29FA /* AttributionPixelHandler.swift in Sources */,
 				B6F92BAD2A6937B5002ABA6B /* OptionalExtension.swift in Sources */,
 				4BA7C4D92B3F61FB00AFE511 /* BundleExtension.swift in Sources */,
 				EEC589DC2A4F1CE800BCD60C /* AppLauncher.swift in Sources */,
+				F1D0429E2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
 				7BA7CC3F2AD11E3D0042E5CE /* AppLauncher+DefaultInitializer.swift in Sources */,
 				4B0EF7292B5780EB009D6481 /* VPNAppEventsHandler.swift in Sources */,
 				7BA7CC412AD11E420042E5CE /* NetworkProtectionBouncer.swift in Sources */,
@@ -10758,6 +10824,8 @@
 				7B4D8A242BDA857300852966 /* VPNOperationErrorRecorder.swift in Sources */,
 				4BF0E5152AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				7BFE95592A9DF2AF0081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */,
+				F1DA51992BF6083B00CF29FA /* PrivacyProPixel.swift in Sources */,
+				F1FDC92E2BF4E001006B1435 /* SubscriptionEnvironment+Default.swift in Sources */,
 				7BA7CC5C2AD120C30042E5CE /* EventMapping+NetworkProtectionError.swift in Sources */,
 				B65DA5F02A77CC3C00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				BDA764852BC49E4000D0400C /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */,
@@ -10765,8 +10833,10 @@
 				7BA7CC392AD11E2D0042E5CE /* DuckDuckGoVPNAppDelegate.swift in Sources */,
 				BDA764802BC4998A00D0400C /* DefaultVPNLocationFormatter.swift in Sources */,
 				7BA7CC552AD11FFB0042E5CE /* NetworkProtectionOptionKeyExtension.swift in Sources */,
+				F1DA518B2BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */,
 				7BA7CC3D2AD11E380042E5CE /* TunnelControllerIPCService.swift in Sources */,
 				4BA7C4DA2B3F639800AFE511 /* NetworkProtectionTunnelController.swift in Sources */,
+				F1FDC93D2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */,
 				7BA7CC432AD11E480042E5CE /* UserText.swift in Sources */,
 				7BA7CC542AD11FCE0042E5CE /* Bundle+VPN.swift in Sources */,
 			);
@@ -10801,17 +10871,23 @@
 				4B4D609F2A0B2C7300BCD287 /* Logging.swift in Sources */,
 				EE66418C2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift in Sources */,
 				7B7DFB202B7E736B009EA1A3 /* MacPacketTunnelProvider.swift in Sources */,
+				F1DA51962BF6083700CF29FA /* PrivacyProPixel.swift in Sources */,
 				EEBCA0C62BD7CE2C004DF19C /* VPNFailureRecoveryPixel.swift in Sources */,
 				4B4D60A12A0B2D6100BCD287 /* NetworkProtectionOptionKeyExtension.swift in Sources */,
+				F1D0429B2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
 				B602E8182A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				B65DA5F52A77D3FA00CBEE8D /* BundleExtension.swift in Sources */,
 				4B4D60892A0B2A1C00BCD287 /* NetworkProtectionUNNotificationsPresenter.swift in Sources */,
 				4B4D60A02A0B2D5B00BCD287 /* Bundle+VPN.swift in Sources */,
 				4B4D60AD2A0C807300BCD287 /* NSApplicationExtension.swift in Sources */,
+				F1DA51922BF6081C00CF29FA /* AttributionPixelHandler.swift in Sources */,
 				4B4D60A52A0B2EC000BCD287 /* UserText+NetworkProtectionExtensions.swift in Sources */,
 				4BF0E50C2AD2552300FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				4B4D60AC2A0C804B00BCD287 /* OptionalExtension.swift in Sources */,
 				B65DA5F22A77D3C600CBEE8D /* UserDefaultsWrapper.swift in Sources */,
+				F1FDC92B2BF4DFEC006B1435 /* SubscriptionEnvironment+Default.swift in Sources */,
+				F1DA51882BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */,
+				F1FDC93A2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10862,13 +10938,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				31A83FB72BE28D8A00F74E67 /* UserText+DBP.swift in Sources */,
+				F1D042942BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */,
 				9D9AE92C2AAB84FF0026E7DC /* DBPMocks.swift in Sources */,
+				F1D042912BFB9FD700A31506 /* SubscriptionEnvironment+Default.swift in Sources */,
 				7B0099792B65013800FE7C31 /* BrowserWindowManager.swift in Sources */,
 				9D9AE9292AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */,
 				9D9AE91D2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
 				9D9AE9212AAA3B450026E7DC /* UserText.swift in Sources */,
-				7BD01C192AD8319C0088B32E /* IPCServiceManager.swift in Sources */,
 				31ECDA132BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
+				F1D0429F2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
 				31ECDA0E2BED317300AE679F /* BundleExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -10878,13 +10956,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				31A83FB82BE28D8A00F74E67 /* UserText+DBP.swift in Sources */,
+				F1D042952BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */,
 				7B1459542B7D437200047F2C /* BrowserWindowManager.swift in Sources */,
+				F1D042922BFB9FD800A31506 /* SubscriptionEnvironment+Default.swift in Sources */,
 				9D9AE92D2AAB84FF0026E7DC /* DBPMocks.swift in Sources */,
 				9D9AE92A2AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */,
 				9D9AE91E2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
 				9D9AE9222AAA3B450026E7DC /* UserText.swift in Sources */,
-				315A023D2B64216B00BFA577 /* IPCServiceManager.swift in Sources */,
 				31ECDA142BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
+				F1D042A02BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
 				31ECDA0F2BED317300AE679F /* BundleExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -10900,6 +10980,7 @@
 				4B9DB0412A983B24000927DB /* WaitlistDialogView.swift in Sources */,
 				37D2377A287EB8CA00BCE03B /* TabIndex.swift in Sources */,
 				B60C6F8D29B200AB007BFAA8 /* SavePanelAccessoryView.swift in Sources */,
+				F1D042992BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
 				37534CA3281132CB002621E7 /* TabLazyLoaderDataSource.swift in Sources */,
 				3158B15C2B0BF76D00AF130C /* DataBrokerProtectionAppEvents.swift in Sources */,
 				4B723E0E26B0006300E14D75 /* LoginImport.swift in Sources */,
@@ -11050,6 +11131,7 @@
 				1DFAB51D2A8982A600A0F7F6 /* SetExtension.swift in Sources */,
 				315AA07028CA5CC800200030 /* YoutubePlayerNavigationHandler.swift in Sources */,
 				37AFCE9227DB8CAD00471A10 /* PreferencesAboutView.swift in Sources */,
+				F1D042A12BFBB4DD00A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */,
 				4B2F565C2B38F93E001214C0 /* NetworkProtectionSubscriptionEventHandler.swift in Sources */,
 				9826B0A02747DF3D0092F683 /* ContentBlocking.swift in Sources */,
 				4B379C2227BDBA29008A968E /* LocalAuthenticationService.swift in Sources */,
@@ -11078,6 +11160,7 @@
 				85707F26276A335700DC0649 /* Onboarding.swift in Sources */,
 				B68C92C1274E3EF4002AC6B0 /* PopUpWindow.swift in Sources */,
 				AA5FA6A0275F948900DCE9C9 /* Favicons.xcdatamodeld in Sources */,
+				3158B1502B0BF75200AF130C /* DataBrokerProtectionLoginItemInterface.swift in Sources */,
 				9F6434612BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */,
 				3158B1502B0BF75200AF130C /* DataBrokerProtectionLoginItemScheduler.swift in Sources */,
 				7BBA7CE62BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */,
@@ -11148,6 +11231,7 @@
 				B626A7602992407D00053070 /* CancellableExtension.swift in Sources */,
 				37D23785287F4E6500BCE03B /* PinnedTabsHostingView.swift in Sources */,
 				4BB99CFE26FE191E001E4761 /* FirefoxBookmarksReader.swift in Sources */,
+				F1DA518C2BF607D200CF29FA /* SubscriptionRedirectManager.swift in Sources */,
 				4BBC16A227C485BC00E00A38 /* DeviceIdleStateDetector.swift in Sources */,
 				4B379C2427BDE1B0008A968E /* FlatButton.swift in Sources */,
 				37054FC92873301700033B6F /* PinnedTabView.swift in Sources */,
@@ -11155,6 +11239,7 @@
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
 				B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */,
 				B626A76D29928B1600053070 /* TestsClosureNavigationResponder.swift in Sources */,
+				F1DA51862BF607D200CF29FA /* SubscriptionAttributionPixelHandler.swift in Sources */,
 				85B7184E27677CBB00B4277F /* RootView.swift in Sources */,
 				AABEE6AF24AD22B90043105B /* AddressBarTextField.swift in Sources */,
 				B693954C26F04BEB0015B914 /* FocusRingView.swift in Sources */,
@@ -11189,7 +11274,6 @@
 				31ECDA112BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
 				4B4D60E02A0C875F00BCD287 /* Bundle+VPN.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
-				9F64346B2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift in Sources */,
 				B6F9BDDC2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */,
 				4B67854A2AA8DE75008A5004 /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				B64C852A26942AC90048FEBE /* PermissionContextMenu.swift in Sources */,
@@ -11247,7 +11331,6 @@
 				B6BCC54F2AFE4F7D002C5499 /* DataImportTypePicker.swift in Sources */,
 				AAEEC6A927088ADB008445F7 /* FireCoordinator.swift in Sources */,
 				4B37EE752B4CFF3300A89A61 /* DataBrokerProtectionRemoteMessaging.swift in Sources */,
-				9F6434682BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift in Sources */,
 				B655369B268442EE00085A79 /* GeolocationProvider.swift in Sources */,
 				B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
@@ -11492,6 +11575,7 @@
 				858A797F26A79EAA00A75A42 /* UserText+PasswordManager.swift in Sources */,
 				B693954E26F04BEB0015B914 /* LoadingProgressView.swift in Sources */,
 				B69B503C2726A12500758A2B /* StatisticsStore.swift in Sources */,
+				F1FDC9382BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */,
 				3158B14A2B0BF74300AF130C /* DataBrokerProtectionDebugMenu.swift in Sources */,
 				4BBDEE9128FC14760092FAA6 /* BWInstallationService.swift in Sources */,
 				7B4D8A212BDA857300852966 /* VPNOperationErrorRecorder.swift in Sources */,
@@ -11561,6 +11645,7 @@
 				AAC82C60258B6CB5009B6B42 /* TabPreviewWindowController.swift in Sources */,
 				AAC5E4E425D6BA9C007F5990 /* NSSizeExtension.swift in Sources */,
 				AA6820EB25503D6A005ED0D5 /* Fire.swift in Sources */,
+				F1FDC9292BF4DF48006B1435 /* SubscriptionEnvironment+Default.swift in Sources */,
 				3158B1492B0BF73000AF130C /* DBPHomeViewController.swift in Sources */,
 				9F56CFA92B82DC4300BB7F11 /* AddEditBookmarkFolderView.swift in Sources */,
 				37445F9C2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */,
@@ -11601,6 +11686,7 @@
 				B6C00ECB292F839D009C73A6 /* AutofillTabExtension.swift in Sources */,
 				B6E319382953446000DD3BCF /* Assertions.swift in Sources */,
 				AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */,
+				F118EA7D2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */,
 				85707F28276A34D900DC0649 /* DaxSpeech.swift in Sources */,
 				31F28C5328C8EECA00119F70 /* DuckURLSchemeHandler.swift in Sources */,
 				AA13DCB4271480B0006D48D3 /* FirePopoverViewModel.swift in Sources */,
@@ -13598,6 +13684,16 @@
 			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
 			productName = SwiftLintTool;
 		};
+		F1D0428D2BFB9F9C00A31506 /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
+		F1D0428F2BFB9FA300A31506 /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
 		F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */;
@@ -13607,6 +13703,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */;
 			productName = BareBonesBrowserKit;
+		};
+		F1DA51A22BF6114200CF29FA /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
+		F1DA51A42BF6114200CF29FA /* SubscriptionTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = SubscriptionTestingUtilities;
+		};
+		F1DA51A62BF6114B00CF29FA /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
+		F1DA51A82BF6114C00CF29FA /* SubscriptionTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = SubscriptionTestingUtilities;
 		};
 		F1DF95E62BD188B60045E591 /* LoginItems */ = {
 			isa = XCSwiftPackageProductDependency;

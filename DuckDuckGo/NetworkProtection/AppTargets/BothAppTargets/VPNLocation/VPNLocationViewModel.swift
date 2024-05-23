@@ -190,7 +190,7 @@ extension VPNLocationViewModel {
         let locationListRepository = NetworkProtectionLocationListCompositeRepository()
         self.init(
             locationListRepository: locationListRepository,
-            settings: VPNSettings(defaults: .netP)
+            settings: Application.appDelegate.vpnSettings
         )
     }
 }
