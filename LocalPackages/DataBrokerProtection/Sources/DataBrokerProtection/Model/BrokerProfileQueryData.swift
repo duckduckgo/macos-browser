@@ -22,15 +22,15 @@ import Common
 public struct BrokerProfileQueryData: Sendable {
     let dataBroker: DataBroker
     let profileQuery: ProfileQuery
-    let scanOperationData: ScanOperationData
-    let optOutOperationsData: [OptOutOperationData]
+    let scanJobData: ScanJobData
+    let optOutJobData: [OptOutJobData]
 
-    var operationsData: [BrokerOperationData] {
-        optOutOperationsData + [scanOperationData]
+    var operationsData: [BrokerJobData] {
+        optOutJobData + [scanJobData]
     }
 
     var extractedProfiles: [ExtractedProfile] {
-        optOutOperationsData.map { $0.extractedProfile }
+        optOutJobData.map { $0.extractedProfile }
     }
 
     var events: [HistoryEvent] {
@@ -38,16 +38,16 @@ public struct BrokerProfileQueryData: Sendable {
     }
 
     var hasMatches: Bool {
-        !optOutOperationsData.isEmpty
+        !optOutJobData.isEmpty
     }
 
     init(dataBroker: DataBroker,
          profileQuery: ProfileQuery,
-         scanOperationData: ScanOperationData,
-         optOutOperationsData: [OptOutOperationData] = [OptOutOperationData]()) {
+         scanJobData: ScanJobData,
+         optOutJobData: [OptOutJobData] = [OptOutJobData]()) {
         self.profileQuery = profileQuery
         self.dataBroker = dataBroker
-        self.scanOperationData = scanOperationData
-        self.optOutOperationsData = optOutOperationsData
+        self.scanJobData = scanJobData
+        self.optOutJobData = optOutJobData
     }
 }
