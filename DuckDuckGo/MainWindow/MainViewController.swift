@@ -214,7 +214,9 @@ final class MainViewController: NSViewController {
         }
     }
 
-    private let surveyMessaging = DefaultSurveyRemoteMessaging()
+    private lazy var surveyMessaging: DefaultSurveyRemoteMessaging = {
+        return DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager)
+    }()
 
     func refreshSurveyMessages() {
         surveyMessaging.fetchRemoteMessages()

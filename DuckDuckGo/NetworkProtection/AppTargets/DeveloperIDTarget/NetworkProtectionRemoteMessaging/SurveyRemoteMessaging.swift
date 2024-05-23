@@ -19,6 +19,7 @@
 import Foundation
 import Networking
 import PixelKit
+import Subscription
 
 protocol SurveyRemoteMessaging {
 
@@ -36,21 +37,23 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
     private let messageRequest: HomePageRemoteMessagingRequest
     private let messageStorage: HomePageRemoteMessagingStorage
+    private let subscriptionManager: SubscriptionManaging
     private let waitlistActivationDateStore: WaitlistActivationDateStore
     private let minimumRefreshInterval: TimeInterval
     private let userDefaults: UserDefaults
 
-    convenience init() {
+    convenience init(subscriptionManager: SubscriptionManaging) {
         #if DEBUG || REVIEW
-        self.init(minimumRefreshInterval: .seconds(30))
+        self.init(subscriptionManager: subscriptionManager, minimumRefreshInterval: .seconds(30))
         #else
-        self.init(minimumRefreshInterval: .hours(1))
+        self.init(subscriptionManager: subscriptionManager, minimumRefreshInterval: .hours(1))
         #endif
     }
 
     init(
         messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.surveysRequest(),
         messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.surveys(),
+        subscriptionManager: SubscriptionManaging,
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
         networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
         minimumRefreshInterval: TimeInterval,
@@ -58,13 +61,13 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
     ) {
         self.messageRequest = messageRequest
         self.messageStorage = messageStorage
+        self.subscriptionManager = subscriptionManager
         self.waitlistActivationDateStore = waitlistActivationDateStore
         self.minimumRefreshInterval = minimumRefreshInterval
         self.userDefaults = userDefaults
     }
 
     func fetchRemoteMessages(completion fetchCompletion: (() -> Void)? = nil) {
-
         if let lastRefreshDate = lastRefreshDate(), lastRefreshDate.addingTimeInterval(minimumRefreshInterval) > Date() {
             fetchCompletion?()
             return
@@ -113,6 +116,12 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
                 return false
             }
 
+            // Check subscription status:
+
+            if let subscriptionStatus = message.attributes.subscriptionStatus {
+
+            }
+
             // Check VPN usage:
             
             if let requiredDaysSinceActivation = message.attributes.daysSinceVPNEnabled,
@@ -124,7 +133,8 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
                 }
             }
 
-            return true
+            // Don't show messages unless at least one attribute matches:
+            return false
 
         }
 
