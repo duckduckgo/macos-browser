@@ -23,11 +23,13 @@ import ContentBlocking
 import Foundation
 import Navigation
 import PrivacyDashboard
+import PhishingDetection
 
 final class PrivacyDashboardTabExtension {
 
     private let contentBlocking: any ContentBlockingProtocol
     private let certificateTrustEvaluator: CertificateTrustEvaluating
+    private let phishingDetectionManager: PhishingDetectionManaging
 
     @Published private(set) var privacyInfo: PrivacyInfo?
 
@@ -42,10 +44,12 @@ final class PrivacyDashboardTabExtension {
          autoconsentUserScriptPublisher: some Publisher<UserScriptWithAutoconsent?, Never>,
          didUpgradeToHttpsPublisher: some Publisher<URL, Never>,
          trackersPublisher: some Publisher<DetectedTracker, Never>,
-         webViewPublisher: some Publisher<WKWebView, Never>) {
+         webViewPublisher: some Publisher<WKWebView, Never>,
+         phishingDetectionManager: some PhishingDetectionManaging) {
 
         self.contentBlocking = contentBlocking
         self.certificateTrustEvaluator = certificateTrustEvaluator
+        self.phishingDetectionManager = phishingDetectionManager
 
         autoconsentUserScriptPublisher.sink { [weak self] autoconsentUserScript in
             autoconsentUserScript?.delegate = self
@@ -80,6 +84,15 @@ final class PrivacyDashboardTabExtension {
         }
         .store(in: &cancellables)
 
+        webViewPublisher
+            .flatMap { $0.publisher(for: \.url) }
+            .sink { [weak self] url in
+                Task { [weak self] in
+                    await self?.updatePrivacyInfo(with: url)
+                }
+            }
+            .store(in: &cancellables)
+
     }
 
     private func updatePrivacyInfo(with trust: SecTrust?) async {
@@ -91,6 +104,15 @@ final class PrivacyDashboardTabExtension {
             } else {
                 self.privacyInfo?.serverTrust = nil
             }
+        }
+    }
+
+    private func updatePrivacyInfo(with url: URL?) async {
+        guard let url = url else { return }
+        let malicious = await phishingDetectionManager.isMalicious(url: url)
+        await MainActor.run {
+            print("Privacy info: ", self.privacyInfo ?? "nil")
+            self.privacyInfo?.isPhishing = malicious
         }
     }
 

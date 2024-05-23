@@ -130,7 +130,8 @@ extension TabExtensionsBuilder {
                                          autoconsentUserScriptPublisher: userScripts.map(\.?.autoconsentUserScript),
                                          didUpgradeToHttpsPublisher: httpsUpgrade.didUpgradeToHttpsPublisher,
                                          trackersPublisher: contentBlocking.trackersPublisher,
-                                         webViewPublisher: args.webViewFuture)
+                                         webViewPublisher: args.webViewFuture,
+                                         phishingDetectionManager: dependencies.phishingDetectionManager)
         }
 
         add {
