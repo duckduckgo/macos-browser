@@ -78,7 +78,7 @@ struct OperationPreferredDateCalculator {
                 return currentPreferredRunDate
             }
         case .error:
-            return date.now.addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
+            return date.now.addingTimeInterval(calculateNextRunDate(schedulingConfig: schedulingConfig, historyEvents: historyEvents))
         case .optOutStarted, .scanStarted, .noMatchFound:
             return currentPreferredRunDate
         case .optOutConfirmed, .optOutRequested:
@@ -96,5 +96,11 @@ struct OperationPreferredDateCalculator {
 
         let lastRemovalEventDate = lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
         return lastRemovalEventDate < Date()
+    }
+
+    private func calculateNextRunDate(schedulingConfig: DataBrokerScheduleConfig,
+                                      historyEvents: [HistoryEvent]) -> TimeInterval {
+        let pastTries = historyEvents.filter { $0.isError }.count
+        return min(Int(pow(2.0, Double(pastTries))), schedulingConfig.retryError).hoursToSeconds
     }
 }
