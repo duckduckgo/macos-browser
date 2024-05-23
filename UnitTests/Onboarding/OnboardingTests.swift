@@ -43,13 +43,23 @@ class OnboardingTests: XCTestCase {
         assertStateChange(model, .startFlow, .welcome, model.onSplashFinished)
         assertStateChange(model, .welcome, .importData, model.onStartPressed)
         assertStateChange(model, .importData, .setDefault, model.onImportPressed)
+#if APPSTORE
         assertStateChange(model, .setDefault, .startBrowsing, model.onSetDefaultPressed)
+#else
+        assertStateChange(model, .setDefault, .addToDock, model.onSetDefaultPressed)
+        assertStateChange(model, .addToDock, .startBrowsing, model.onAddToDockPressed)
+#endif
 
         model.state = .importData
         assertStateChange(model, .importData, .setDefault, model.onImportSkipped)
 
         model.state = .setDefault
+#if APPSTORE
         assertStateChange(model, .setDefault, .startBrowsing, model.onSetDefaultSkipped)
+#else
+        assertStateChange(model, .setDefault, .addToDock, model.onSetDefaultSkipped)
+        assertStateChange(model, .addToDock, .startBrowsing, model.onAddToDockSkipped)
+#endif
     }
 
     func testWhenImportPressedDelegateIsCalled() {
@@ -79,12 +89,37 @@ class OnboardingTests: XCTestCase {
         model.onSetDefaultSkipped()
         XCTAssertEqual(0, delegate.didRequestImportDataCalled)
         XCTAssertEqual(0, delegate.didRequestSetDefaultCalled)
+        XCTAssertEqual(0, delegate.didRequestAddToDockCalled)
+#if APPSTORE
         XCTAssertEqual(1, delegate.hasFinishedCalled)
+#else
+        XCTAssertEqual(0, delegate.hasFinishedCalled)
+#endif
 
         model.onSetDefaultPressed()
         XCTAssertEqual(0, delegate.didRequestImportDataCalled)
+        XCTAssertEqual(0, delegate.didRequestAddToDockCalled)
+        XCTAssertEqual(1, delegate.didRequestSetDefaultCalled)
+#if APPSTORE
+        XCTAssertEqual(2, delegate.hasFinishedCalled)
+#else
+        XCTAssertEqual(0, delegate.hasFinishedCalled)
+#endif
+
+#if !APPSTORE
+        model.onAddToDockSkipped()
+        XCTAssertEqual(0, delegate.didRequestImportDataCalled)
+        XCTAssertEqual(1, delegate.didRequestSetDefaultCalled)
+        XCTAssertEqual(0, delegate.didRequestAddToDockCalled)
+        XCTAssertEqual(1, delegate.hasFinishedCalled)
+#endif
+
+#if !APPSTORE
+        model.onAddToDockPressed()
+        XCTAssertEqual(0, delegate.didRequestImportDataCalled)
         XCTAssertEqual(1, delegate.didRequestSetDefaultCalled)
         XCTAssertEqual(2, delegate.hasFinishedCalled)
+#endif
 
         XCTAssertTrue(onboardingFinished)
     }
@@ -114,6 +149,7 @@ class OnboardingTests: XCTestCase {
 final class MockOnboardingDelegate: NSObject, OnboardingDelegate {
     var didRequestImportDataCalled = 0
     var didRequestSetDefaultCalled = 0
+    var didRequestAddToDockCalled = 0
     var hasFinishedCalled = 0
 
     func onboardingDidRequestImportData(completion: @escaping () -> Void) {
@@ -123,6 +159,11 @@ final class MockOnboardingDelegate: NSObject, OnboardingDelegate {
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
         didRequestSetDefaultCalled += 1
+        completion()
+    }
+
+    func onboardingDidRequestAddToDock(completion: @escaping () -> Void) {
+        didRequestAddToDockCalled += 1
         completion()
     }
 

@@ -29,9 +29,7 @@ public final class DataBrokerProtectionManager {
     static let shared = DataBrokerProtectionManager()
 
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
-    private let authenticationRepository: AuthenticationRepository = KeychainAuthenticationData()
-    private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
-    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
     private let dataBrokerProtectionWaitlistDataSource: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
 
@@ -48,21 +46,16 @@ public final class DataBrokerProtectionManager {
                                              loginItemStatusChecker: loginItemStatusChecker)
     }()
 
-    lazy var scheduler: DataBrokerProtectionLoginItemScheduler = {
-
-        let ipcScheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
-
-        return DataBrokerProtectionLoginItemScheduler(ipcScheduler: ipcScheduler)
+    lazy var loginItemInterface: DataBrokerProtectionLoginItemInterface = {
+        return DefaultDataBrokerProtectionLoginItemInterface(ipcClient: ipcClient, pixelHandler: pixelHandler)
     }()
 
     private init() {
-        self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService,
-                                           authenticationRepository: authenticationRepository)
-
+        self.authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(subscriptionManager: Application.appDelegate.subscriptionManager)
     }
 
-    public func shouldAskForInviteCode() -> Bool {
-        redeemUseCase.shouldAskForInviteCode()
+    public func isUserAuthenticated() -> Bool {
+        authenticationManager.isUserAuthenticated
     }
 
     // MARK: - Debugging Features
@@ -74,14 +67,14 @@ public final class DataBrokerProtectionManager {
 
 extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
     public func dataBrokerProtectionDataManagerDidUpdateData() {
-        scheduler.startScheduler()
+        loginItemInterface.profileSaved()
 
         let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
         dbpDateStore.setActivationDateIfNecessary()
     }
 
     public func dataBrokerProtectionDataManagerDidDeleteData() {
-        scheduler.stopScheduler()
+        loginItemInterface.dataDeleted()
     }
 }
 

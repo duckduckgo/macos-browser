@@ -20,72 +20,29 @@ import Foundation
 import PixelKit
 
 /// A type that handles Pixels for acquisition attributions.
-protocol AttributionsPixelHandler: AnyObject {
+protocol InstallationAttributionsPixelHandler: AnyObject {
     /// Fire the Pixel to track the App install.
     func fireInstallationAttributionPixel()
 }
 
-final class InstallationAttributionPixelHandler: AttributionsPixelHandler {
-    enum Parameters {
-        static let origin = "origin"
-        static let locale = "locale"
-    }
-
-    private let fireRequest: FireRequest
+final class AppInstallationAttributionPixelHandler: InstallationAttributionsPixelHandler {
     private let originProvider: AttributionOriginProvider
-    private let locale: Locale
+    private let decoratedAttributionPixelHandler: AttributionPixelHandler
 
-    /// Creates an instance with the specified fire request, origin provider and locale.
-    /// - Parameters:
-    ///   - fireRequest: A function for sending the Pixel request.
-    ///   - originProvider: A provider for the origin used to track the acquisition funnel.
-    ///   - locale: The locale of the device.
     init(
-        fireRequest: @escaping FireRequest = PixelKit.fire,
         originProvider: AttributionOriginProvider = AttributionOriginFileProvider(),
-        locale: Locale = .current
+        attributionPixelHandler: AttributionPixelHandler = GenericAttributionPixelHandler()
     ) {
-        self.fireRequest = fireRequest
         self.originProvider = originProvider
-        self.locale = locale
+        decoratedAttributionPixelHandler = attributionPixelHandler
     }
 
     func fireInstallationAttributionPixel() {
-        fireRequest(
-            GeneralPixel.installationAttribution,
-            .legacyInitial,
-            [:],
-            additionalParameters(origin: originProvider.origin, locale: locale.identifier),
-            nil,
-            nil,
-            true, { _, _ in }
+        decoratedAttributionPixelHandler.fireAttributionPixel(
+            event: GeneralPixel.installationAttribution,
+            frequency: .legacyInitial,
+            origin: originProvider.origin,
+            additionalParameters: nil
         )
     }
-}
-
-// MARK: - Parameter
-
-private extension InstallationAttributionPixelHandler {
-    func additionalParameters(origin: String?, locale: String) -> [String: String] {
-        var dictionary = [Self.Parameters.locale: locale]
-        if let origin {
-            dictionary[Self.Parameters.origin] = origin
-        }
-        return dictionary
-    }
-}
-
-// MARK: - FireRequest
-
-extension InstallationAttributionPixelHandler {
-    typealias FireRequest = (
-        _ event: PixelKit.Event,
-        _ frequency: PixelKit.Frequency,
-        _ headers: [String: String],
-        _ parameters: [String: String]?,
-        _ error: Error?,
-        _ allowedQueryReservedCharacters: CharacterSet?,
-        _ includeAppVersionParameter: Bool,
-        _ onComplete: @escaping (Bool, Error?) -> Void
-    ) -> Void
 }

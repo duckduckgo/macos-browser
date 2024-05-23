@@ -40,10 +40,32 @@ enum GeneralPixel: PixelKitEventV2 {
     case formAutofilled(kind: FormAutofillKind)
     case autofillItemSaved(kind: FormAutofillKind)
 
+    case autofillLoginsSaveLoginInlineDisplayed
+    case autofillLoginsSaveLoginInlineConfirmed
+    case autofillLoginsSaveLoginInlineDismissed
+
+    case autofillLoginsSavePasswordInlineDisplayed
+    case autofillLoginsSavePasswordInlineConfirmed
+    case autofillLoginsSavePasswordInlineDismissed
+
     case autofillLoginsSaveLoginModalExcludeSiteConfirmed
     case autofillLoginsSettingsResetExcludedDisplayed
     case autofillLoginsSettingsResetExcludedConfirmed
     case autofillLoginsSettingsResetExcludedDismissed
+
+    case autofillLoginsUpdatePasswordInlineDisplayed
+    case autofillLoginsUpdatePasswordInlineConfirmed
+    case autofillLoginsUpdatePasswordInlineDismissed
+
+    case autofillLoginsUpdateUsernameInlineDisplayed
+    case autofillLoginsUpdateUsernameInlineConfirmed
+    case autofillLoginsUpdateUsernameInlineDismissed
+
+    case autofillActiveUser
+    case autofillEnabledUser
+    case autofillOnboardedUser
+    case autofillLoginsStacked
+    case autofillCreditCardsStacked
 
     case bitwardenPasswordAutofilled
     case bitwardenPasswordSaved
@@ -140,14 +162,21 @@ enum GeneralPixel: PixelKitEventV2 {
     case dataBrokerResetLoginItemDaily
     case dataBrokerDisableAndDeleteDaily
 
-    // DataBrokerProtection Other
-    case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
-
     // Default Browser
     case defaultRequestedFromHomepage
     case defaultRequestedFromHomepageSetupView
     case defaultRequestedFromSettings
     case defaultRequestedFromOnboarding
+
+    // Adding to the Dock
+    case addToDockOnboardingStepPresented
+    case userAddedToDockDuringOnboarding
+    case userSkippedAddingToDockFromOnboarding
+    case startBrowsingOnboardingStepPresented
+    case addToDockNewTabPageCardPresented
+    case userAddedToDockFromNewTabPageCard
+    case userAddedToDockFromSettings
+    case serpAddedToDock
 
     case protectionToggledOffBreakageReport
     case toggleProtectionsDailyCount
@@ -354,6 +383,20 @@ enum GeneralPixel: PixelKitEventV2 {
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
 
+        case .autofillLoginsSaveLoginInlineDisplayed:
+            return "m_mac_autofill_logins_save_login_inline_displayed"
+        case .autofillLoginsSaveLoginInlineConfirmed:
+            return "m_mac_autofill_logins_save_login_inline_confirmed"
+        case .autofillLoginsSaveLoginInlineDismissed:
+            return "m_mac_autofill_logins_save_login_inline_dismissed"
+
+        case .autofillLoginsSavePasswordInlineDisplayed:
+            return "m_mac_autofill_logins_save_password_inline_displayed"
+        case .autofillLoginsSavePasswordInlineConfirmed:
+            return "m_mac_autofill_logins_save_password_inline_confirmed"
+        case .autofillLoginsSavePasswordInlineDismissed:
+            return "m_mac_autofill_logins_save_password_inline_dismissed"
+
         case .autofillLoginsSaveLoginModalExcludeSiteConfirmed:
             return "m_mac_autofill_logins_save_login_exclude_site_confirmed"
         case .autofillLoginsSettingsResetExcludedDisplayed:
@@ -362,6 +405,31 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_autofill_settings_reset_excluded_confirmed"
         case .autofillLoginsSettingsResetExcludedDismissed:
             return "m_mac_autofill_settings_reset_excluded_dismissed"
+
+        case .autofillLoginsUpdatePasswordInlineDisplayed:
+            return "m_mac_autofill_logins_update_password_inline_displayed"
+        case .autofillLoginsUpdatePasswordInlineConfirmed:
+            return "m_mac_autofill_logins_update_password_inline_confirmed"
+        case .autofillLoginsUpdatePasswordInlineDismissed:
+            return "m_mac_autofill_logins_update_password_inline_dismissed"
+
+        case .autofillLoginsUpdateUsernameInlineDisplayed:
+            return "m_mac_autofill_logins_update_username_inline_displayed"
+        case .autofillLoginsUpdateUsernameInlineConfirmed:
+            return "m_mac_autofill_logins_update_username_inline_confirmed"
+        case .autofillLoginsUpdateUsernameInlineDismissed:
+            return "m_mac_autofill_logins_update_username_inline_dismissed"
+
+        case .autofillActiveUser:
+            return "m_mac_autofill_activeuser"
+        case .autofillEnabledUser:
+            return "m_mac_autofill_enableduser"
+        case .autofillOnboardedUser:
+            return "m_mac_autofill_onboardeduser"
+        case .autofillLoginsStacked:
+            return "m_mac_autofill_logins_stacked"
+        case .autofillCreditCardsStacked:
+            return "m_mac_autofill_creditcards_stacked"
 
         case .bitwardenPasswordAutofilled:
             return "m_mac_bitwarden_autofill_password"
@@ -507,8 +575,6 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_dbp_imp_terms"
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_dbp_ev_terms_accepted"
-        case .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn:
-            return "m_mac_dbp_error_when_fetching_subscription_auth_token_after_sign_in"
         case .dataBrokerProtectionRemoteMessageDisplayed(let messageID):
             return "m_mac_dbp_remote_message_displayed_\(messageID)"
         case .dataBrokerProtectionRemoteMessageDismissed(let messageID):
@@ -534,6 +600,15 @@ enum GeneralPixel: PixelKitEventV2 {
         case .defaultRequestedFromHomepageSetupView: return "m_mac_default_requested_from_homepage_setup_view"
         case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
         case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
+
+        case .addToDockOnboardingStepPresented: return "m_mac_add_to_dock_onboarding_step_presented"
+        case .userAddedToDockDuringOnboarding: return "m_mac_user_added_to_dock_during_onboarding"
+        case .userSkippedAddingToDockFromOnboarding: return "m_mac_user_skipped_adding_to_dock_from_onboarding"
+        case .startBrowsingOnboardingStepPresented: return "m_mac_start_browsing_onboarding_step_presented"
+        case .addToDockNewTabPageCardPresented: return "m_mac_add_to_dock_new_tab_page_card_presented_u"
+        case .userAddedToDockFromNewTabPageCard: return "m_mac_user_added_to_dock_from_new_tab_page_card"
+        case .userAddedToDockFromSettings: return "m_mac_user_added_to_dock_from_settings"
+        case .serpAddedToDock: return "m_mac_serp_added_to_dock"
 
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
         case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"

@@ -124,7 +124,9 @@ final class HoverTrackingArea: NSTrackingArea {
 
             mouseExited(event)
         } else {
-            updateLayer(animated: false)
+            // mouse-down: non-animated
+            // mouse-up: animated when mouse is outside
+            updateLayer(animated: !view.isMouseDown && !view.isMouseLocationInsideBounds())
         }
     }
 

@@ -61,7 +61,7 @@ final class DBPHomeViewController: NSViewController {
                                            featureToggles: features)
 
         return DataBrokerProtectionViewController(
-            scheduler: dataBrokerProtectionManager.scheduler,
+            agentInterface: dataBrokerProtectionManager.loginItemInterface,
             dataManager: dataBrokerProtectionManager.dataManager,
             privacyConfig: privacyConfigurationManager,
             prefs: prefs,
@@ -105,8 +105,9 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
 
-        if shouldAskForInviteCode() {
-            presentInviteCodeFlow()
+        if !dataBrokerProtectionManager.isUserAuthenticated() {
+            assertionFailure("This UI should never be presented if the user is not authenticated")
+            closeUI()
         }
     }
 
@@ -118,9 +119,7 @@ final class DBPHomeViewController: NSViewController {
     }
 
     private func setupUI() {
-        if !shouldAskForInviteCode() {
-            setupUIWithCurrentStatus()
-        }
+        setupUIWithCurrentStatus()
     }
 
     private func setupObserver() {
@@ -163,10 +162,6 @@ final class DBPHomeViewController: NSViewController {
         }
     }
 
-    private func shouldAskForInviteCode() -> Bool {
-        prerequisiteVerifier.checkStatus() == .valid && dataBrokerProtectionManager.shouldAskForInviteCode()
-    }
-
     private func displayDBPUI() {
         replaceChildController(dataBrokerProtectionViewController)
     }
@@ -185,6 +180,12 @@ final class DBPHomeViewController: NSViewController {
             NotificationCenter.default.removeObserver(observer)
         }
     }
+
+    private func closeUI() {
+        presentedWindowController?.window?.close()
+        presentedWindowController = nil
+        NotificationCenter.default.post(name: .dbpDidClose, object: nil)
+    }
 }
 
 extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDelegate {
@@ -195,9 +196,7 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
     }
 
     func dataBrokerProtectionInviteDialogsViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
-        presentedWindowController?.window?.close()
-        presentedWindowController = nil
-        NotificationCenter.default.post(name: .dbpDidClose, object: nil)
+      closeUI()
     }
 }
 

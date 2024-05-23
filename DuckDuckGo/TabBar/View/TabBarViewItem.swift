@@ -33,6 +33,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemCanBeDuplicated(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewItemCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool
+    func tabBarViewItemIsAlreadyBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewAllItemsCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
@@ -43,6 +44,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemRemoveBookmarkAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkAllOpenTabsAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewBurnerWindowAction(_ tabBarViewItem: TabBarViewItem)
@@ -197,6 +199,10 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @objc func bookmarkThisPageAction(_ sender: Any) {
         delegate?.tabBarViewItemBookmarkThisPageAction(self)
+    }
+
+    @objc func removeFromBookmarksAction(_ sender: Any) {
+        delegate?.tabBarViewItemRemoveBookmarkAction(self)
     }
 
     @objc func bookmarkAllOpenTabsAction(_ sender: Any) {
@@ -502,7 +508,11 @@ extension TabBarViewItem: NSMenuDelegate {
 
         // Section 2
         addFireproofMenuItem(to: menu)
-        addBookmarkMenuItem(to: menu)
+        if let delegate, delegate.tabBarViewItemIsAlreadyBookmarked(self) {
+            removeBookmarkMenuItem(to: menu)
+        } else {
+            addBookmarkMenuItem(to: menu)
+        }
         menu.addItem(.separator())
 
         // Section 3
@@ -535,6 +545,12 @@ extension TabBarViewItem: NSMenuDelegate {
         let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(bookmarkThisPageAction(_:)), keyEquivalent: "")
         bookmarkMenuItem.target = self
         bookmarkMenuItem.isEnabled = delegate?.tabBarViewItemCanBeBookmarked(self) ?? false
+        menu.addItem(bookmarkMenuItem)
+    }
+
+    private func removeBookmarkMenuItem(to menu: NSMenu) {
+        let bookmarkMenuItem = NSMenuItem(title: UserText.deleteBookmark, action: #selector(removeFromBookmarksAction(_:)), keyEquivalent: "")
+        bookmarkMenuItem.target = self
         menu.addItem(bookmarkMenuItem)
     }
 

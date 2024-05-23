@@ -19935,66 +19935,6 @@
         }
       }
     },
-    "fire.selected-domains.description" : {
-      "comment" : "Description of the 'Current Window' configuration option for the fire button",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daten nur für ausgewählte Domains löschen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear data only for selected domains"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Borrar datos solo para los dominios seleccionados"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "N'effacer les données que des domaines sélectionnés"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancella i dati solo per i domini selezionati"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alleen gegevens wissen voor de geselecteerde domeinen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wyczyść dane dotyczące tylko wybranych domen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Limpar dados apenas para domínios selecionados"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Функция Fire Button сотрет только данные выбранных сайтов"
-          }
-        }
-      }
-    },
     "fireproof" : {
       "comment" : "Fireproof button",
       "extractionState" : "extracted_with_value",
@@ -20711,6 +20651,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Переименовать папку"
+          }
+        }
+      }
+    },
+    "generic.delete.button" : {
+      "comment" : "Label of a button that allows the user to delete an item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijderen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
           }
         }
       }
@@ -30609,6 +30609,246 @@
         }
       }
     },
+    "newTab.setup.dock.action" : {
+      "comment" : "Action title on the action menu of the 'Add App to the Dock' card",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Dock behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep In Dock"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener en Dock"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder dans le Dock"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resta nel dock"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In het Dock houden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trzymaj w Docku"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manter na Dock"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык для док-панели"
+          }
+        }
+      }
+    },
+    "newTab.setup.dock.confirmation" : {
+      "comment" : "Confirmation title after user clicks on 'Add to Dock' card",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Dock hinzugefügt!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Added to Dock!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Añadido al Dock!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouté au Dock !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiunto al dock!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toegevoegd aan Dock!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodano do Docka!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionado à Dock!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык добавлен на док-панель."
+          }
+        }
+      }
+    },
+    "newTab.setup.dock.summary" : {
+      "comment" : "Summary of the 'Add App to the Dock' card",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst DuckDuckGo schneller erreichen, indem du es zu deinem Dock hinzufügst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Get to DuckDuckGo faster by adding it to your Dock."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accede a DuckDuckGo más rápido añadiéndolo a tu Dock."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accédez plus rapidement à DuckDuckGo en l'ajoutant à votre Dock."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accedi più velocemente a DuckDuckGo aggiungendolo al tuo dock."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ga sneller naar DuckDuckGo door het aan je Dock toe te voegen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uzyskuj szybszy dostęp do przeglądarki DuckDuckGo dzięki jej dodaniu do Docka."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acede ao DuckDuckGo mais rapidamente adicionando-o à tua Dock."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте DuckDuckGo на док-панель для быстрого запуска."
+          }
+        }
+      }
+    },
+    "newTab.setup.dock.title" : {
+      "comment" : "Title of the new tab page card for adding application to the Dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In deinem Dock behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep in Your Dock"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener en tu Dock"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder dans votre Dock"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tieni nel tuo dock"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewaar in je dock"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trzymaj w Docku"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manter na tua Dock"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык для док-панели"
+          }
+        }
+      }
+    },
     "newTab.setup.duck.player.action" : {
       "comment" : "Action title on the action menu of the Duck Player card of the Set Up section in the home page",
       "extractionState" : "extracted_with_value",
@@ -31749,6 +31989,126 @@
         }
       }
     },
+    "onboarding.addtodock.button" : {
+      "comment" : "Button label to add application to the macOS system dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Dock behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep in Dock"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener en Dock"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder dans le Dock"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tieni nel Dock"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Dock bewaren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trzymaj w Docku"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manter na Dock"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Держать на док-панели"
+          }
+        }
+      }
+    },
+    "onboarding.addtodock.text" : {
+      "comment" : "Call to action to add the DuckDuckGo app icon to the macOS system dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine letzte Sache. Du möchtest DuckDuckGo in deinem Dock haben, damit der Browser immer in Reichweite ist?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "One last thing. Want to keep DuckDuckGo in your Dock so the browser's always within reach?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una última cosa. ¿Quieres tener DuckDuckGo en tu Dock para que el navegador esté siempre al alcance de la mano?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une dernière chose. Vous voulez garder DuckDuckGo dans votre Dock pour que le navigateur reste à portée de main ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un'ultima cosa. Vuoi tenere DuckDuckGo nel tuo dock in modo che il browser sia sempre disponibile?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nog een laatste ding. Wil je DuckDuckGo in je Dock houden zodat de browser altijd binnen handbereik is?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatnia sprawa. Czy chcesz trzymać przeglądarkę DuckDuckGo w Docku, aby zawsze ją mieć pod ręką?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Só mais uma coisa. Queres ter o navegador DuckDuckGo na tua Dock estar sempre à mão?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "И кое-что еще... Хотите сохранить DuckDuckGo на док-панели, чтобы наш браузер всегда был под рукой?"
+          }
+        }
+      }
+    },
     "onboarding.importdata.button" : {
       "comment" : "Launch the import data UI",
       "extractionState" : "extracted_with_value",
@@ -32045,6 +32405,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Затем задайте DuckDuckGo как браузер по умолчанию, чтобы открывать ссылки без каких-либо опасений."
+          }
+        }
+      }
+    },
+    "onboarding.startbrowsing.added-to-dock.text" : {
+      "comment" : "Call to action to start using the app as a browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Du bist bereit! Du kannst mich jederzeit im Dock antreffen.\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglichu{00A0}🔒"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "¡Ya está todo listo! Puedes encontrarme en el Dock en cualquier momento.\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible{00A0}🔒"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tout est prêt ! Vous pouvez me trouver sur le Dock à tout moment.\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tutto pronto! Puoi trovarmi nel dock in qualsiasi momento.\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile{00A0} 🔒"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Je bent helemaal klaar! Je kunt me altijd vinden in het Dock.\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wszystko gotowe! W każdej chwili możesz mnie znaleźć w Docku.\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Está tudo pronto! Podes encontrar-me na Dock em qualquer altura.\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Готово! Теперь меня всегда можно найти на док-панели.\nВам интересно, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. По возможности я заблокирую все трекеры и сделаю соединение более безопасным {00A0}🔒"
           }
         }
       }
@@ -43887,6 +44307,66 @@
         }
       }
     },
+    "preferences.add-to-dock" : {
+      "comment" : "Action button to add the app to the Dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Dock hinzufügen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add to Dock…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir al Dock…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter au Dock…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi al dock…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App toevoegen aan je dock…"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj do Docka…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar à Dock…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить на док-панель…"
+          }
+        }
+      }
+    },
     "preferences.always-on" : {
       "comment" : "Status indicator of a browser privacy protection feature.",
       "extractionState" : "extracted_with_value",
@@ -45267,6 +45747,66 @@
         }
       }
     },
+    "preferences.is-added-to-dock" : {
+      "comment" : "Indicates that the browser is added to the macOS system Dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo wird zum Dock hinzugefügt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo is added to the Dock."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo se ha añadido al Dock."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo a été ajouté au Dock."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo è stato aggiunto al dock."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo is toegevoegd aan het Dock."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przeglądarka DuckDuckGo została dodana do Docka."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O DuckDuckGo foi adicionado à Dock."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык DuckDuckGo добавлен на док-панель."
+          }
+        }
+      }
+    },
     "preferences.main-settings" : {
       "comment" : "Section header in Preferences for main settings",
       "extractionState" : "extracted_with_value",
@@ -45323,6 +45863,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Основные настройки"
+          }
+        }
+      }
+    },
+    "preferences.not-added-to-dock" : {
+      "comment" : "Indicate that the browser is not added to macOS system Dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo wird nicht zum Dock hinzugefügt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo is not added to the Dock."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo no se ha añadido al Dock."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo n'a pas été ajouté au Dock."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo non è stato aggiunto al dock."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo is niet toegevoegd aan het Dock."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przeglądarka DuckDuckGo nie została dodana do Docka."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O DuckDuckGo não foi adicionado à Dock."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык DuckDuckGo не добавлен на док-панель."
           }
         }
       }
@@ -45683,6 +46283,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Заново открыть все окна из последнего сеанса"
+          }
+        }
+      }
+    },
+    "preferences.shortcuts" : {
+      "comment" : "Name of the preferences section related to shortcuts",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcuts"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Shortcuts"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accesos directos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourcis"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scorciatoie"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sneltoetsen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skróty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atalhos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлыки"
           }
         }
       }
@@ -47394,6 +48054,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сообщить о неработающем сайте"
+          }
+        }
+      }
+    },
+    "reset-zoom" : {
+      "comment" : "Button that allows the user to reset the zoom level of the browser page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reset"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ripristina"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herstel"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resetowanie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сбросить"
           }
         }
       }
