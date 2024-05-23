@@ -1,7 +1,7 @@
 {
   "name": "AdvancedBackgroundChecks",
   "url": "advancedbackgroundchecks.com",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678060800000,
   "steps": [
@@ -12,7 +12,7 @@
         {
           "actionType": "navigate",
           "id": "070b6417-8ccd-4111-b5ae-7ae470b0399a",
-          "url": "https://www.advancedbackgroundchecks.com/names/${firstName}-${lastName}_${city}-${state}_age_${age}"
+          "url": "https://www.advancedbackgroundchecks.com/names/${firstName}-${lastName}_${city}-${state}"
         },
         {
           "actionType": "extract",

@@ -21,10 +21,10 @@ import DataBrokerProtection
 import Subscription
 
 final public class DataBrokerAuthenticationManagerBuilder {
-    static func buildAuthenticationManager(redeemUseCase: RedeemUseCase = RedeemUseCase()) -> DataBrokerProtectionAuthenticationManager {
-        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-        let subscriptionManager = DataBrokerProtectionSubscriptionManager(accountManager: accountManager,
-                                                                          environmentManager: DataBrokerProtectionSubscriptionPurchaseEnvironmentManager())
+
+    static func buildAuthenticationManager(redeemUseCase: RedeemUseCase = RedeemUseCase(),
+                                           subscriptionManager: SubscriptionManaging) -> DataBrokerProtectionAuthenticationManager {
+        let subscriptionManager = DataBrokerProtectionSubscriptionManager(subscriptionManager: subscriptionManager)
         return DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                          subscriptionManager: subscriptionManager)
 

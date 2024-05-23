@@ -34,6 +34,7 @@ struct DataBrokerProtectionAppEvents {
     func applicationDidFinishLaunching() {
         let loginItemsManager = LoginItemsManager()
         let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
+        let loginItemInterface = DataBrokerProtectionManager.shared.loginItemInterface
 
         guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
@@ -52,6 +53,10 @@ struct DataBrokerProtectionAppEvents {
             if let profileQueriesCount = try? DataBrokerProtectionManager.shared.dataManager.profileQueriesCount(),
                profileQueriesCount > 0 {
                 restartBackgroundAgent(loginItemsManager: loginItemsManager)
+
+                // Wait to make sure the agent has had time to restart before attempting to call a method on it
+                try await Task.sleep(nanoseconds: 1_000_000_000)
+                loginItemInterface.appLaunched()
             } else {
                 featureVisibility.disableAndDeleteForWaitlistUsers()
             }

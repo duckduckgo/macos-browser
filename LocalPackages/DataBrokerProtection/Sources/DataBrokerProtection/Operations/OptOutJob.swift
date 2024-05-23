@@ -1,5 +1,5 @@
 //
-//  ScanOperation.swift
+//  OptOutJob.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,9 +22,9 @@ import BrowserServicesKit
 import UserScript
 import Common
 
-final class ScanOperation: DataBrokerOperation {
-    typealias ReturnValue = [ExtractedProfile]
-    typealias InputValue = Void
+final class OptOutJob: DataBrokerJob {
+    typealias ReturnValue = Void
+    typealias InputValue = ExtractedProfile
 
     let privacyConfig: PrivacyConfigurationManaging
     let prefs: ContentScopeProperties
@@ -35,15 +35,21 @@ final class ScanOperation: DataBrokerOperation {
     let stageCalculator: StageDurationCalculator
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
-    var continuation: CheckedContinuation<[ExtractedProfile], Error>?
+    var continuation: CheckedContinuation<Void, Error>?
     var extractedProfile: ExtractedProfile?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
-    var retriesCountOnError: Int = 0
     let clickAwaitTime: TimeInterval
     let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     var postLoadingSiteStartTime: Date?
     let sleepObserver: SleepObserver
+
+    // Captcha is a third-party resource that sometimes takes more time to load
+    // if we are not able to get the captcha information. We will try to run the action again
+    // instead of failing the whole thing.
+    //
+    // https://app.asana.com/0/1203581873609357/1205476538384291/f
+    var retriesCountOnError: Int = 3
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
@@ -52,8 +58,8 @@ final class ScanOperation: DataBrokerOperation {
          captchaService: CaptchaServiceProtocol,
          cookieHandler: CookieHandler = BrokerCookieHandler(),
          operationAwaitTime: TimeInterval = 3,
-         clickAwaitTime: TimeInterval = 0,
-         stageDurationCalculator: StageDurationCalculator,
+         clickAwaitTime: TimeInterval = 40,
+         stageCalculator: StageDurationCalculator,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          sleepObserver: SleepObserver,
          shouldRunNextStep: @escaping () -> Bool
@@ -64,7 +70,7 @@ final class ScanOperation: DataBrokerOperation {
         self.emailService = emailService
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
-        self.stageCalculator = stageDurationCalculator
+        self.stageCalculator = stageCalculator
         self.shouldRunNextStep = shouldRunNextStep
         self.clickAwaitTime = clickAwaitTime
         self.cookieHandler = cookieHandler
@@ -72,51 +78,55 @@ final class ScanOperation: DataBrokerOperation {
         self.sleepObserver = sleepObserver
     }
 
-    func run(inputValue: InputValue,
+    func run(inputValue: ExtractedProfile,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
-             showWebView: Bool) async throws -> [ExtractedProfile] {
+             showWebView: Bool = false) async throws {
         try await withCheckedThrowingContinuation { continuation in
+            self.extractedProfile = inputValue.merge(with: query.profileQuery)
             self.continuation = continuation
-            Task {
-                await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker, showWebView: showWebView)
 
-                do {
-                    let scanStep = try query.dataBroker.scanStep()
+            Task {
+                await initialize(handler: webViewHandler,
+                                 isFakeBroker: query.dataBroker.isFakeBroker,
+                                 showWebView: showWebView)
+
+                if let optOutStep = query.dataBroker.optOutStep() {
                     if let actionsHandler = actionsHandler {
                         self.actionsHandler = actionsHandler
                     } else {
-                        self.actionsHandler = ActionsHandler(step: scanStep)
+                        self.actionsHandler = ActionsHandler(step: optOutStep)
                     }
+
                     if self.shouldRunNextStep() {
                         await executeNextStep()
                     } else {
                         failed(with: DataBrokerProtectionError.cancelled)
                     }
-                } catch {
-                    failed(with: DataBrokerProtectionError.unknown(error.localizedDescription))
+
+                } else {
+                    // If we try to run an optout on a broker without an optout step, we throw.
+                    failed(with: DataBrokerProtectionError.noOptOutStep)
                 }
             }
         }
     }
 
     func extractedProfiles(profiles: [ExtractedProfile], meta: [String: Any]?) async {
-        complete(profiles)
-        await executeNextStep()
+        // No - op
     }
 
     func executeNextStep() async {
         retriesCountOnError = 0 // We reset the retries on error when it is successful
-        os_log("SCAN Waiting %{public}f seconds...", log: .action, operationAwaitTime)
-
+        os_log("OPTOUT Waiting %{public}f seconds...", log: .action, operationAwaitTime)
         try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
 
-        if let action = actionsHandler?.nextAction() {
-            os_log("Next action: %{public}@", log: .action, String(describing: action.actionType.rawValue))
+        if let action = actionsHandler?.nextAction(), self.shouldRunNextStep() {
+            stageCalculator.setLastActionId(action.id)
             await runNextAction(action)
         } else {
-            os_log("Releasing the web view", log: .action)
             await webViewHandler?.finish() // If we executed all steps we release the web view
+            complete(())
         }
     }
 }
