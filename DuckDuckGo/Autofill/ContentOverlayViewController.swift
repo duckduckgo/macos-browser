@@ -325,7 +325,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
             self.emailManager.updateLastUseDate()
 
-            PixelKit.fire(GeneralPixel.jsPixel(pixel), withAdditionalParameters: pixelParameters)
+            PixelKit.fire(NonStandardEvent(GeneralPixel.jsPixel(pixel)), withAdditionalParameters: pixelParameters)
         } else {
             PixelKit.fire(GeneralPixel.jsPixel(pixel), withAdditionalParameters: pixel.pixelParameters)
         }
