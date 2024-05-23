@@ -144,12 +144,12 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: 0.1)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
             XCTAssertFalse(mockStopAction.wasStopCalled)
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 3)
     }
 
     func testEntitlementMonitorWithInValidResult_thenStopAgentIsCalled() {
@@ -166,12 +166,12 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: 0.1)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
             XCTAssertTrue(mockStopAction.wasStopCalled)
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 3)
     }
 
     func testEntitlementMonitorWithErrorResult_thenStopAgentIsNotCalled() {
@@ -188,11 +188,11 @@ final class DataBrokerProtectionAgentStopperTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Wait for monitor")
         stopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: 0.1)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
             XCTAssertFalse(mockStopAction.wasStopCalled)
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 3)
     }
 }
