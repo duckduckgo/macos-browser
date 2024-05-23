@@ -124,7 +124,7 @@ enum UserText {
         }
     }
 
-    static let shareModalHasEmailDescription = NSLocalizedString("subscription.share.modal.has.email.description", value: "Use this email to activate your subscription on other devices. Open the DuckDuckGo app on another device and find Privacy Pro in browser settings.", comment: "Share subscription modal description for email address channel")
+    static let shareModalHasEmailDescription = NSLocalizedString("subscription.share.modal.has.email.description", value: "Use this email to activate your subscription from browser settings in the DuckDuckGo app on other devices", comment: "Share subscription modal description for email address channel")
     static let shareModalNoEmailDescription = NSLocalizedString("subscription.share.modal.no.email.description", value: "Add an email address to access your subscription in DuckDuckGo on other devices. We’ll only use this address to verify your subscription.", comment: "Share subscription modal description for email address channel")
 
     static let restorePurchasesDescription = NSLocalizedString("subscription.share.modal.restore.purchases.description", value: "Your subscription is automatically available in DuckDuckGo on any device signed in to your Apple ID.", comment: "Share subscription modal description for restoring Apple ID purchases")
