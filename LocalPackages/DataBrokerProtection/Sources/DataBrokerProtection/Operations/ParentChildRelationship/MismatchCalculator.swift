@@ -1,5 +1,5 @@
 //
-//  MismatchCalculatorUseCase.swift
+//  MismatchCalculator.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -36,7 +36,12 @@ enum MismatchValues: Int {
     }
 }
 
-struct MismatchCalculatorUseCase {
+protocol MismatchCalculator {
+    init(database: DataBrokerProtectionRepository, pixelHandler: EventMapping<DataBrokerProtectionPixels>)
+    func calculateMismatches()
+}
+
+struct DefaultMismatchCalculator: MismatchCalculator {
     let database: DataBrokerProtectionRepository
     let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
@@ -52,14 +57,14 @@ struct MismatchCalculatorUseCase {
         let parentBrokerProfileQueryData = brokerProfileQueryData.filter { $0.dataBroker.parent == nil }
 
         for parent in parentBrokerProfileQueryData {
-            guard let parentMatches = parent.scanOperationData.historyEvents.matchesForLastEvent() else { continue }
+            guard let parentMatches = parent.scanJobData.historyEvents.matchesForLastEvent() else { continue }
             let children = brokerProfileQueryData.filter {
                 $0.dataBroker.parent == parent.dataBroker.url &&
                 $0.profileQuery.id == parent.profileQuery.id
             }
 
             for child in children {
-                guard let childMatches = child.scanOperationData.historyEvents.matchesForLastEvent() else { continue }
+                guard let childMatches = child.scanJobData.historyEvents.matchesForLastEvent() else { continue }
                 let mismatchValue = MismatchValues.calculate(parent: parentMatches, child: childMatches)
 
                 pixelHandler.fire(

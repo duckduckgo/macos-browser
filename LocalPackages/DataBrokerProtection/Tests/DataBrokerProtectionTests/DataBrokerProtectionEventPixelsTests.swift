@@ -96,7 +96,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let dataBrokerProfileQueryWithReAppereance: [BrokerProfileQueryData] = [
             .init(dataBroker: .mock,
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [reAppereanceThisWeekEvent]))
+                  scanJobData: .mockWith(historyEvents: [reAppereanceThisWeekEvent]))
         ]
         let sut = DataBrokerProtectionEventPixels(database: database, repository: repository, handler: handler)
         database.brokerProfileQueryDataToReturn = dataBrokerProfileQueryWithReAppereance
@@ -120,7 +120,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let dataBrokerProfileQueryWithReAppereance: [BrokerProfileQueryData] = [
             .init(dataBroker: .mock,
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [reAppereanceThisWeekEvent]))
+                  scanJobData: .mockWith(historyEvents: [reAppereanceThisWeekEvent]))
         ]
         let sut = DataBrokerProtectionEventPixels(database: database, repository: repository, handler: handler)
         database.brokerProfileQueryDataToReturn = dataBrokerProfileQueryWithReAppereance
@@ -144,7 +144,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let dataBrokerProfileQueryWithMatches: [BrokerProfileQueryData] = [
             .init(dataBroker: .mock,
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [newMatchesPriorToThisWeekEvent]))
+                  scanJobData: .mockWith(historyEvents: [newMatchesPriorToThisWeekEvent]))
         ]
         let sut = DataBrokerProtectionEventPixels(database: database, repository: repository, handler: handler)
         database.brokerProfileQueryDataToReturn = dataBrokerProfileQueryWithMatches
@@ -168,7 +168,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let dataBrokerProfileQueryWithMatches: [BrokerProfileQueryData] = [
             .init(dataBroker: .mock,
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [newMatchesThisWeekEvent]))
+                  scanJobData: .mockWith(historyEvents: [newMatchesThisWeekEvent]))
         ]
         let sut = DataBrokerProtectionEventPixels(database: database, repository: repository, handler: handler)
         database.brokerProfileQueryDataToReturn = dataBrokerProfileQueryWithMatches
@@ -192,7 +192,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let dataBrokerProfileQueryWithRemovals: [BrokerProfileQueryData] = [
             .init(dataBroker: .mock,
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [removalsPriorToThisWeekEvent]))
+                  scanJobData: .mockWith(historyEvents: [removalsPriorToThisWeekEvent]))
         ]
         let sut = DataBrokerProtectionEventPixels(database: database, repository: repository, handler: handler)
         database.brokerProfileQueryDataToReturn = dataBrokerProfileQueryWithRemovals
@@ -217,7 +217,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let dataBrokerProfileQueryWithRemovals: [BrokerProfileQueryData] = [
             .init(dataBroker: .mock,
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [removalThisWeekEventOne, removalThisWeekEventTwo]))
+                  scanJobData: .mockWith(historyEvents: [removalThisWeekEventOne, removalThisWeekEventTwo]))
         ]
         let sut = DataBrokerProtectionEventPixels(database: database, repository: repository, handler: handler)
         database.brokerProfileQueryDataToReturn = dataBrokerProfileQueryWithRemovals
@@ -244,7 +244,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let dataBrokerProfileQueries: [BrokerProfileQueryData] = [
             .init(dataBroker: .mock,
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventOne, eventTwo, eventThree, eventFour]))
+                  scanJobData: .mockWith(historyEvents: [eventOne, eventTwo, eventThree, eventFour]))
         ]
         let sut = DataBrokerProtectionEventPixels(database: database, repository: repository, handler: handler)
         database.brokerProfileQueryDataToReturn = dataBrokerProfileQueries
@@ -274,16 +274,16 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let dataBrokerProfileQueries: [BrokerProfileQueryData] = [
             .init(dataBroker: .mockWithURL("www.brokerone.com"),
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventOne])),
+                  scanJobData: .mockWith(historyEvents: [eventOne])),
             .init(dataBroker: .mockWithURL("www.brokertwo.com"),
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventOne])),
+                  scanJobData: .mockWith(historyEvents: [eventOne])),
             .init(dataBroker: .mockWithURL("www.brokerthree.com"),
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventOne])),
+                  scanJobData: .mockWith(historyEvents: [eventOne])),
             .init(dataBroker: .mockWithURL("www.brokerfour.com"),
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventTwo]))
+                  scanJobData: .mockWith(historyEvents: [eventTwo]))
         ]
         let sut = DataBrokerProtectionEventPixels(database: database, repository: repository, handler: handler)
         database.brokerProfileQueryDataToReturn = dataBrokerProfileQueries
@@ -313,16 +313,16 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let dataBrokerProfileQueries: [BrokerProfileQueryData] = [
             .init(dataBroker: .mockWithURL("www.brokerone.com"),
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventOne])),
+                  scanJobData: .mockWith(historyEvents: [eventOne])),
             .init(dataBroker: .mockWithURL("www.brokertwo.com"),
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventOne])),
+                  scanJobData: .mockWith(historyEvents: [eventOne])),
             .init(dataBroker: .mockWithURL("www.brokerthree.com"),
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventTwo])),
+                  scanJobData: .mockWith(historyEvents: [eventTwo])),
             .init(dataBroker: .mockWithURL("www.brokerfour.com"),
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventTwo]))
+                  scanJobData: .mockWith(historyEvents: [eventTwo]))
         ]
         let sut = DataBrokerProtectionEventPixels(database: database, repository: repository, handler: handler)
         database.brokerProfileQueryDataToReturn = dataBrokerProfileQueries
@@ -352,16 +352,16 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let dataBrokerProfileQueries: [BrokerProfileQueryData] = [
             .init(dataBroker: .mockWithURL("www.brokerone.com"),
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventTwo])),
+                  scanJobData: .mockWith(historyEvents: [eventTwo])),
             .init(dataBroker: .mockWithURL("www.brokertwo.com"),
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventTwo])),
+                  scanJobData: .mockWith(historyEvents: [eventTwo])),
             .init(dataBroker: .mockWithURL("www.brokerthree.com"),
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventTwo])),
+                  scanJobData: .mockWith(historyEvents: [eventTwo])),
             .init(dataBroker: .mockWithURL("www.brokerfour.com"),
                   profileQuery: .mock,
-                  scanOperationData: .mockWith(historyEvents: [eventTwo]))
+                  scanJobData: .mockWith(historyEvents: [eventTwo]))
         ]
         let sut = DataBrokerProtectionEventPixels(database: database, repository: repository, handler: handler)
         database.brokerProfileQueryDataToReturn = dataBrokerProfileQueries
