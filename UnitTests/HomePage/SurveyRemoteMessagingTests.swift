@@ -17,19 +17,33 @@
 //
 
 import XCTest
+import Subscription
+import SubscriptionTestingUtilities
 @testable import DuckDuckGo_Privacy_Browser
 
+@available(macOS 12.0, *)
 final class SurveyRemoteMessagingTests: XCTestCase {
 
     private var defaults: UserDefaults!
     private let testGroupName = "remote-messaging"
 
+    private var subscriptionManager: SubscriptionManaging!
+
     override func setUp() {
         defaults = UserDefaults(suiteName: testGroupName)!
         defaults.removePersistentDomain(forName: testGroupName)
+
+        subscriptionManager = SubscriptionManagerMock(
+            accountManager: AccountManagerMock(isUserAuthenticated: true),
+            subscriptionService: SubscriptionService(currentServiceEnvironment: .staging),
+            authService: AuthService(currentServiceEnvironment: .staging),
+            storePurchaseManager: StorePurchaseManager(),
+            currentEnvironment: .default,
+            canPurchase: true
+        )
     }
 
-    func testWhenFetchingRemoteMessages_AndTheUserDidNotSignUpViaWaitlist_ThenMessagesAreFetched() {
+    func testWhenFetchingRemoteMessages_AndTheUserDidNotSignUpViaWaitlist_ThenMessagesAreFetched() async {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         request.result = .success([])
         let storage = MockSurveyRemoteMessagingStorage()
@@ -38,6 +52,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
+            subscriptionManager: subscriptionManager,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
@@ -45,16 +60,15 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
         let expectation = expectation(description: "Remote Message Fetch")
 
-        messaging.fetchRemoteMessages {
-            expectation.fulfill()
-        }
+        await messaging.fetchRemoteMessages()
+        expectation.fulfill()
 
         wait(for: [expectation], timeout: 1.0)
 
         XCTAssertTrue(request.didFetchMessages)
     }
 
-    func testWhenFetchingRemoteMessages_AndTheUserDidSignUpViaWaitlist_ButUserHasNotActivatedNetP_ThenMessagesAreFetched() {
+    func testWhenFetchingRemoteMessages_AndTheUserDidSignUpViaWaitlist_ButUserHasNotActivatedNetP_ThenMessagesAreFetched() async {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
@@ -64,6 +78,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
+            subscriptionManager: subscriptionManager,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
@@ -73,16 +88,13 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
         let expectation = expectation(description: "Remote Message Fetch")
 
-        messaging.fetchRemoteMessages {
-            expectation.fulfill()
-        }
-
-        wait(for: [expectation], timeout: 1.0)
+        await messaging.fetchRemoteMessages()
+        await fulfillment(of: [expectation], timeout: 1.0)
 
         XCTAssertTrue(request.didFetchMessages)
     }
 
-    func testWhenFetchingRemoteMessages_AndWaitlistUserHasActivatedNetP_ThenMessagesAreFetched_AndMessagesAreStored() {
+    func testWhenFetchingRemoteMessages_AndWaitlistUserHasActivatedNetP_ThenMessagesAreFetched_AndMessagesAreStored() async {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
@@ -95,6 +107,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
+            subscriptionManager: subscriptionManager,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
@@ -105,17 +118,14 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
         let expectation = expectation(description: "Remote Message Fetch")
 
-        messaging.fetchRemoteMessages {
-            expectation.fulfill()
-        }
-
-        wait(for: [expectation], timeout: 1.0)
+        await messaging.fetchRemoteMessages()
+        await fulfillment(of: [expectation], timeout: 1.0)
 
         XCTAssertTrue(request.didFetchMessages)
         XCTAssertEqual(storage.storedMessages(), messages)
     }
 
-    func testWhenFetchingRemoteMessages_AndWaitlistUserHasActivatedNetP_ButRateLimitedOperationCannotRunAgain_ThenMessagesAreNotFetched() {
+    func testWhenFetchingRemoteMessages_AndWaitlistUserHasActivatedNetP_ButRateLimitedOperationCannotRunAgain_ThenMessagesAreNotFetched() async {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
@@ -127,6 +137,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
+            subscriptionManager: subscriptionManager,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: .days(7), // Use a large number to hit the refresh check
             userDefaults: defaults
@@ -136,11 +147,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
         let expectation = expectation(description: "Remote Message Fetch")
 
-        messaging.fetchRemoteMessages {
-            expectation.fulfill()
-        }
-
-        wait(for: [expectation], timeout: 1.0)
+        await messaging.fetchRemoteMessages()
+        await fulfillment(of: [expectation], timeout: 1.0)
 
         XCTAssertFalse(request.didFetchMessages)
         XCTAssertEqual(storage.storedMessages(), [])
@@ -159,6 +167,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
+            subscriptionManager: subscriptionManager,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
@@ -184,6 +193,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
+            subscriptionManager: subscriptionManager,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
@@ -204,6 +214,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
+            subscriptionManager: subscriptionManager,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
@@ -224,6 +235,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
+            subscriptionManager: subscriptionManager,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
@@ -265,14 +277,9 @@ private final class MockNetworkProtectionRemoteMessagingRequest: HomePageRemoteM
     var result: Result<[SurveyRemoteMessage], Error>!
     var didFetchMessages: Bool = false
 
-    func fetchHomePageRemoteMessages<T>(completion: @escaping (Result<[T], Error>) -> Void) where T: Decodable {
+    func fetchHomePageRemoteMessages() async -> Result<[SurveyRemoteMessage], any Error> {
         didFetchMessages = true
-
-        if let castResult = self.result as? Result<[T], Error> {
-            completion(castResult)
-        } else {
-            fatalError("Could not cast result to expected type")
-        }
+        return result
     }
 
 }

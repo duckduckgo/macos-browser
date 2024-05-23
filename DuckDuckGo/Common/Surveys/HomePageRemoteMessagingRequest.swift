@@ -21,7 +21,7 @@ import Networking
 
 protocol HomePageRemoteMessagingRequest {
 
-    func fetchHomePageRemoteMessages<T: Decodable>(completion: @escaping (Result<[T], Error>) -> Void)
+    func fetchHomePageRemoteMessages() async -> Result<[SurveyRemoteMessage], Error>
 
 }
 
@@ -58,25 +58,27 @@ final class DefaultHomePageRemoteMessagingRequest: HomePageRemoteMessagingReques
         self.endpointURL = endpointURL
     }
 
-    func fetchHomePageRemoteMessages<T: Decodable>(completion: @escaping (Result<[T], Error>) -> Void) {
+    func fetchHomePageRemoteMessages() async -> Result<[SurveyRemoteMessage], Error> {
         let httpMethod = APIRequest.HTTPMethod.get
         let configuration = APIRequest.Configuration(url: endpointURL, method: httpMethod, body: nil)
         let request = APIRequest(configuration: configuration)
 
-        request.fetch { response, error in
-            if let error {
-                completion(Result.failure(error))
-            } else if let responseData = response?.data {
-                do {
-                    let decoder = JSONDecoder()
-                    let decoded = try decoder.decode([T].self, from: responseData)
-                    completion(Result.success(decoded))
-                } catch {
-                    completion(.failure(HomePageRemoteMessagingRequestError.failedToDecodeMessages))
-                }
-            } else {
-                completion(.failure(HomePageRemoteMessagingRequestError.requestCompletedWithoutErrorOrResponse))
+        do {
+            let response = try await request.fetch()
+
+            guard let data = response.data else {
+                return .failure(HomePageRemoteMessagingRequestError.requestCompletedWithoutErrorOrResponse)
             }
+
+            do {
+                let decoder = JSONDecoder()
+                let decoded = try decoder.decode([SurveyRemoteMessage].self, from: data)
+                return .success(decoded)
+            } catch {
+                return .failure(HomePageRemoteMessagingRequestError.failedToDecodeMessages)
+            }
+        } catch {
+            return .failure(error)
         }
     }
 

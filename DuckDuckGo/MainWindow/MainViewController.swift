@@ -219,7 +219,9 @@ final class MainViewController: NSViewController {
     }()
 
     func refreshSurveyMessages() {
-        surveyMessaging.fetchRemoteMessages()
+        Task {
+            await surveyMessaging.fetchRemoteMessages()
+        }
     }
 
     override func encodeRestorableState(with coder: NSCoder) {

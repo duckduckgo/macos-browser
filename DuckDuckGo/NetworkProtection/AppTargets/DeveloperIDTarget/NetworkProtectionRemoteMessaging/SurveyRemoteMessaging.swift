@@ -23,7 +23,7 @@ import Subscription
 
 protocol SurveyRemoteMessaging {
 
-    func fetchRemoteMessages(completion: (() -> Void)?)
+    func fetchRemoteMessages() async
     func presentableRemoteMessages() -> [SurveyRemoteMessage]
     func dismiss(message: SurveyRemoteMessage)
 
@@ -67,56 +67,80 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         self.userDefaults = userDefaults
     }
 
-    func fetchRemoteMessages(completion fetchCompletion: (() -> Void)? = nil) {
+    func fetchRemoteMessages() async {
         if let lastRefreshDate = lastRefreshDate(), lastRefreshDate.addingTimeInterval(minimumRefreshInterval) > Date() {
-            fetchCompletion?()
             return
         }
 
-        self.messageRequest.fetchHomePageRemoteMessages { [weak self] result in
-            defer {
-                fetchCompletion?()
+        let messageFetchResult = await self.messageRequest.fetchHomePageRemoteMessages()
+
+        switch messageFetchResult {
+        case .success(let messages):
+            do {
+                let processedMessages = await self.process(messages: messages)
+                try self.messageStorage.store(messages: processedMessages)
+                self.updateLastRefreshDate()
+            } catch {
+                PixelKit.fire(DebugEvent(GeneralPixel.networkProtectionRemoteMessageStorageFailed, error: error))
+            }
+        case .failure(let error):
+            // Ignore 403 errors, those happen when a file can't be found on S3
+            if case APIRequest.Error.invalidStatusCode(403) = error {
+                self.updateLastRefreshDate()
+                return
             }
 
-            guard let self else { return }
-
-            // Cast the generic parameter to a concrete type:
-            let result: Result<[SurveyRemoteMessage], Error> = result
-
-            switch result {
-            case .success(let messages):
-                do {
-                    try self.messageStorage.store(messages: messages)
-                    self.updateLastRefreshDate() // Update last refresh date on success, otherwise let the app try again next time
-                } catch {
-                    PixelKit.fire(DebugEvent(GeneralPixel.networkProtectionRemoteMessageStorageFailed, error: error))
-                }
-            case .failure(let error):
-                // Ignore 403 errors, those happen when a file can't be found on S3
-                if case APIRequest.Error.invalidStatusCode(403) = error {
-                    self.updateLastRefreshDate() // Avoid refreshing constantly when the file isn't available
-                    return
-                }
-
-                PixelKit.fire(DebugEvent(GeneralPixel.networkProtectionRemoteMessageFetchingFailed, error: error))
-            }
+            PixelKit.fire(DebugEvent(GeneralPixel.networkProtectionRemoteMessageFetchingFailed, error: error))
         }
-
     }
 
     /// Processes the messages received from S3 and returns those which the user is eligible for. This is done by checking each of the attributes against the user's local state.
     /// Because the result of the message fetch is cached, it means that they won't be immediately updated if the user suddenly qualifies, but the refresh interval for remote messages is only 1 hour so it
     /// won't take long for the message to appear to the user.
     private func process(messages: [SurveyRemoteMessage]) async -> [SurveyRemoteMessage] {
-        let filteredMessages = messages.filter { message in
+        guard let token = subscriptionManager.accountManager.accessToken else {
+            return []
+        }
+
+        guard case let .success(subscription) = await subscriptionManager.subscriptionService.getSubscription(accessToken: token) else {
+            return []
+        }
+
+        return messages.filter { message in
+
             // Check subscription status:
+            if let messageSubscriptionStatus = message.attributes.subscriptionStatus {
+                if let subscriptionStatus = Subscription.Status(rawValue: messageSubscriptionStatus) {
+                    return subscription.status == subscriptionStatus
+                } else {
+                    // If we received a subscription status but can't map it to a valid type, don't show the message.
+                    return false
+                }
+            }
 
-            if let subscriptionStatus = message.attributes.subscriptionStatus {
+            // Check subscription start date:
+            if let messageDaysSinceSubscriptionStarted = message.attributes.minimumDaysSinceSubscriptionStarted {
+                guard let daysSinceSubscriptionStartDate = Calendar.current.dateComponents(
+                    [.day], from: subscription.startedAt, to: Date()
+                ).day else {
+                    return false
+                }
 
+                return daysSinceSubscriptionStartDate >= messageDaysSinceSubscriptionStarted
+            }
+
+            // Check subscription end/expiration date:
+            if let messageDaysUntilSubscriptionExpiration = message.attributes.maximumDaysUntilSubscriptionExpirationOrRenewal {
+                guard let daysUntilSubscriptionExpiration = Calendar.current.dateComponents(
+                    [.day], from: subscription.expiresOrRenewsAt, to: Date()
+                ).day else {
+                    return false
+                }
+
+                return daysUntilSubscriptionExpiration <= messageDaysUntilSubscriptionExpiration
             }
 
             // Check VPN usage:
-
             if let requiredDaysSinceActivation = message.attributes.daysSinceVPNEnabled,
                let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() {
                 if requiredDaysSinceActivation <= daysSinceActivation {

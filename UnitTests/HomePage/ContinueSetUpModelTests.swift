@@ -25,8 +25,8 @@ final class MockSurveyRemoteMessaging: SurveyRemoteMessaging {
 
     var messages: [SurveyRemoteMessage] = []
 
-    func fetchRemoteMessages(completion fetchCompletion: (() -> Void)? = nil) {
-        fetchCompletion?()
+    func fetchRemoteMessages() async {
+        return
     }
 
     func presentableRemoteMessages() -> [SurveyRemoteMessage] {
