@@ -98,7 +98,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .homeViewShowWebUI,
                     .homeViewShowBadPathError,
                     .homeViewCTAMoveApplicationClicked,
-                    .homeViewCTAGrantPermissionClicked:
+                    .homeViewCTAGrantPermissionClicked,
+
+                    .entitlementCheckValid,
+                    .entitlementCheckInvalid,
+                    .entitlementCheckError:
                 PixelKit.fire(event, frequency: .dailyAndCount)
             }
         }

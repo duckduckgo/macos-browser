@@ -76,6 +76,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
     private var autoClearHandler: AutoClearHandler!
+    private(set) var autofillPixelReporter: AutofillPixelReporter?
 
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
@@ -94,7 +95,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
 #if DBP
-    private var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler?
+    private lazy var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler = {
+        let authManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(subscriptionManager: subscriptionManager)
+        return DataBrokerProtectionSubscriptionEventHandler(featureDisabler: DataBrokerProtectionFeatureDisabler(),
+                                                            authenticationManager: authManager,
+                                                            pixelHandler: DataBrokerProtectionPixelsHandler())
+    }()
+
 #endif
 
     private var didFinishLaunching = false
@@ -216,9 +223,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager,
                                                                                               tunnelController: tunnelController,
                                                                                               vpnUninstaller: vpnUninstaller)
-#if DBP
-        dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager)
-#endif
     }
 
     // swiftlint:disable:next function_body_length
@@ -310,7 +314,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
 
 #if DBP
-        dataBrokerProtectionSubscriptionEventHandler?.registerForSubscriptionAccountManagerEvents()
+        dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 #endif
 
 #if DBP
@@ -318,6 +322,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
         setUpAutoClearHandler()
+
+        setUpAutofillPixelReporter()
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -583,6 +589,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 NSApplication.shared.reply(toApplicationShouldTerminate: true)
             }
         }
+    }
+
+    private func setUpAutofillPixelReporter() {
+        autofillPixelReporter = AutofillPixelReporter(
+                userDefaults: .standard,
+                eventMapping: EventMapping<AutofillPixelEvent> {event, _, params, _ in
+                    switch event {
+                    case .autofillActiveUser:
+                        PixelKit.fire(GeneralPixel.autofillActiveUser)
+                    case .autofillEnabledUser:
+                        PixelKit.fire(GeneralPixel.autofillEnabledUser)
+                    case .autofillOnboardedUser:
+                        PixelKit.fire(GeneralPixel.autofillOnboardedUser)
+                    case .autofillLoginsStacked:
+                        PixelKit.fire(GeneralPixel.autofillLoginsStacked, withAdditionalParameters: params)
+                    case .autofillCreditCardsStacked:
+                        PixelKit.fire(GeneralPixel.autofillCreditCardsStacked, withAdditionalParameters: params)
+                    }
+                },
+                passwordManager: PasswordManagerCoordinator.shared,
+                installDate: AppDelegate.firstLaunchDate)
     }
 }
 

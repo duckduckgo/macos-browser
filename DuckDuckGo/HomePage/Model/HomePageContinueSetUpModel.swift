@@ -274,12 +274,10 @@ extension HomePage.Models {
         }
 
         var randomisedFeatures: [FeatureType] {
-            var features = FeatureType.allCases
-            features.shuffle()
-            for (index, feature) in features.enumerated() where feature == .defaultBrowser {
-                features.remove(at: index)
-                features.insert(feature, at: 0)
-            }
+            var features: [FeatureType]  = [.permanentSurvey, .defaultBrowser]
+            var shuffledFeatures = FeatureType.allCases.filter { $0 != .defaultBrowser && $0 != .permanentSurvey }
+            shuffledFeatures.shuffle()
+            features.append(contentsOf: shuffledFeatures)
             return features
         }
 

@@ -71,7 +71,13 @@ public class DataBrokerProtectionAgentManagerProvider {
                                                          contentScopeProperties: contentScopeProperties,
                                                          emailService: emailService,
                                                          captchaService: captchaService)
-         let operationDependencies = DefaultDataBrokerOperationDependencies(
+
+        let agentstopper = DefaultDataBrokerProtectionAgentStopper(dataManager: dataManager,
+                                                                   entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
+                                                                   authenticationManager: authenticationManager,
+                                                                   pixelHandler: pixelHandler)
+
+        let operationDependencies = DefaultDataBrokerOperationDependencies(
             database: dataManager.database,
             config: executionConfig,
             runnerProvider: runnerProvider,
@@ -86,7 +92,8 @@ public class DataBrokerProtectionAgentManagerProvider {
             queueManager: queueManager,
             dataManager: dataManager,
             operationDependencies: operationDependencies,
-            pixelHandler: pixelHandler)
+            pixelHandler: pixelHandler,
+            agentStopper: agentstopper)
     }
 }
 
@@ -99,6 +106,7 @@ public final class DataBrokerProtectionAgentManager {
     private let dataManager: DataBrokerProtectionDataManaging
     private let operationDependencies: DataBrokerOperationDependencies
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private let agentStopper: DataBrokerProtectionAgentStopper
 
     // Used for debug functions only, so not injected
     private lazy var browserWindowManager = BrowserWindowManager()
@@ -111,7 +119,9 @@ public final class DataBrokerProtectionAgentManager {
          queueManager: DataBrokerProtectionQueueManager,
          dataManager: DataBrokerProtectionDataManaging,
          operationDependencies: DataBrokerOperationDependencies,
-         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         agentStopper: DataBrokerProtectionAgentStopper
+    ) {
         self.userNotificationService = userNotificationService
         self.activityScheduler = activityScheduler
         self.ipcServer = ipcServer
@@ -119,6 +129,7 @@ public final class DataBrokerProtectionAgentManager {
         self.dataManager = dataManager
         self.operationDependencies = operationDependencies
         self.pixelHandler = pixelHandler
+        self.agentStopper = agentStopper
 
         self.activityScheduler.delegate = self
         self.ipcServer.serverDelegate = self
@@ -127,20 +138,20 @@ public final class DataBrokerProtectionAgentManager {
 
     public func agentFinishedLaunching() {
 
-        do {
-            // If there's no saved profile we don't need to start the scheduler
-            // Theoretically this should never happen, if there's no data, the agent shouldn't be running
-            guard (try dataManager.fetchProfile()) != nil else {
-                return
-            }
-        } catch {
-            os_log("Error during AgentManager.agentFinishedLaunching when trying to fetchProfile, error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-            return
-        }
+        Task { @MainActor in
+            // The browser shouldn't start the agent if these prerequisites aren't met.
+            // However, since the agent can auto-start after a reboot without the browser, we need to validate it again.
+            // If the agent needs to be stopped, this function will stop it, so the subsequent calls after it will not be made.
+            await agentStopper.validateRunPrerequisitesAndStopAgentIfNecessary()
 
-        activityScheduler.startScheduler()
-        didStartActivityScheduler = true
-        queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: nil)
+            activityScheduler.startScheduler()
+            didStartActivityScheduler = true
+            queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: nil)
+
+            /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
+            /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
+            agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: .minutes(60))
+        }
     }
 }
 
