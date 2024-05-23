@@ -24,8 +24,9 @@ import PixelKit
 import Common
 
 final class DataBrokerProtectionSubscriptionEventHandler {
-    private let featureDisabler: DataBrokerProtectionFeatureDisabling
+
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
+    private let featureDisabler: DataBrokerProtectionFeatureDisabling
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     init(featureDisabler: DataBrokerProtectionFeatureDisabling,

@@ -1,7 +1,7 @@
 {
   "name": "Kwold",
   "url": "kwold.com",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "parent": "verecor.com",
   "addedDatetime": 1702965600000,
   "steps": [
@@ -12,7 +12,7 @@
         {
           "actionType": "navigate",
           "id": "878e00ab-dbad-4ca9-a303-645702a36ee2",
-          "url": "https://kwold.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age}",
+          "url": "https://kwold.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
             "31-40",
