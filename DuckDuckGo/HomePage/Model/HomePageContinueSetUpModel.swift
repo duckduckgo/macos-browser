@@ -205,7 +205,7 @@ extension HomePage.Models {
                 shouldShowPermanentSurvey = false
             case .surveyRemoteMessage(let message):
                 surveyRemoteMessaging.dismiss(message: message)
-                PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDismissed(messageID: message.id))
+                PixelKit.fire(GeneralPixel.surveyRemoteMessageDismissed(messageID: message.id))
             case .dataBrokerProtectionWaitlistInvited:
                 shouldShowDBPWaitlistInvitedCardUI = false
             }
@@ -350,7 +350,7 @@ extension HomePage.Models {
 
         @MainActor private func handle(remoteMessage: SurveyRemoteMessage) {
             guard let actionType = remoteMessage.action.actionType else {
-                PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
+                PixelKit.fire(GeneralPixel.surveyRemoteMessageDismissed(messageID: remoteMessage.id))
                 surveyRemoteMessaging.dismiss(message: remoteMessage)
                 refreshFeaturesMatrix()
                 return
@@ -361,7 +361,7 @@ extension HomePage.Models {
                 if let surveyURL = remoteMessage.presentableSurveyURL() {
                     let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
                     tabCollectionViewModel.append(tab: tab)
-                    PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
+                    PixelKit.fire(GeneralPixel.surveyRemoteMessageOpened(messageID: remoteMessage.id))
 
                     // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
                     surveyRemoteMessaging.dismiss(message: remoteMessage)

@@ -1132,7 +1132,6 @@
 		4B37EE5F2B4CFC3C00A89A61 /* HomePageRemoteMessagingStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B37EE5C2B4CFC3C00A89A61 /* HomePageRemoteMessagingStorage.swift */; };
 		4B37EE612B4CFC3C00A89A61 /* SurveyURLBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B37EE5D2B4CFC3C00A89A61 /* SurveyURLBuilder.swift */; };
 		4B37EE632B4CFC3C00A89A61 /* HomePageRemoteMessagingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B37EE5E2B4CFC3C00A89A61 /* HomePageRemoteMessagingRequest.swift */; };
-		4B37EE6F2B4CFE8500A89A61 /* dbp-messages.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B37EE6E2B4CFE8500A89A61 /* dbp-messages.json */; };
 		4B37EE722B4CFEE400A89A61 /* SurveyURLBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B37EE5D2B4CFC3C00A89A61 /* SurveyURLBuilder.swift */; };
 		4B37EE732B4CFF0800A89A61 /* HomePageRemoteMessagingStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B37EE5C2B4CFC3C00A89A61 /* HomePageRemoteMessagingStorage.swift */; };
 		4B37EE742B4CFF0A00A89A61 /* HomePageRemoteMessagingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B37EE5E2B4CFC3C00A89A61 /* HomePageRemoteMessagingRequest.swift */; };
@@ -1353,8 +1352,7 @@
 		4BBDEE9428FC14760092FAA6 /* ConnectBitwardenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDEE9028FC14760092FAA6 /* ConnectBitwardenViewController.swift */; };
 		4BBE0AA727B9B027003B37A8 /* PopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBE0AA627B9B027003B37A8 /* PopUpButton.swift */; };
 		4BBEE8DE2BFEDE3E00E5E111 /* SurveyRemoteMessageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15E42ABB98990083F6DF /* SurveyRemoteMessageTests.swift */; };
-		4BBEE8DF2BFEE07D00E5E111 /* network-protection-messages.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BCF15E92ABB99470083F6DF /* network-protection-messages.json */; };
-		4BBEE8E02BFEE08100E5E111 /* dbp-messages.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B37EE6E2B4CFE8500A89A61 /* dbp-messages.json */; };
+		4BBEE8DF2BFEE07D00E5E111 /* survey-messages.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BCF15E92ABB99470083F6DF /* survey-messages.json */; };
 		4BBF0915282DD40100EE1418 /* TemporaryFileHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF0914282DD40100EE1418 /* TemporaryFileHandler.swift */; };
 		4BBF0917282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF0916282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift */; };
 		4BBF09232830812900EE1418 /* FileSystemDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF09222830812900EE1418 /* FileSystemDSL.swift */; };
@@ -1367,7 +1365,7 @@
 		4BCF15D72ABB8A110083F6DF /* SurveyRemoteMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D62ABB8A110083F6DF /* SurveyRemoteMessaging.swift */; };
 		4BCF15D92ABB8A7F0083F6DF /* SurveyRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D82ABB8A7F0083F6DF /* SurveyRemoteMessage.swift */; };
 		4BCF15EC2ABB9AF80083F6DF /* SurveyRemoteMessageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15E42ABB98990083F6DF /* SurveyRemoteMessageTests.swift */; };
-		4BCF15ED2ABB9B180083F6DF /* network-protection-messages.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BCF15E92ABB99470083F6DF /* network-protection-messages.json */; };
+		4BCF15ED2ABB9B180083F6DF /* survey-messages.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BCF15E92ABB99470083F6DF /* survey-messages.json */; };
 		4BCF15EE2ABBDBFD0083F6DF /* SurveyRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D82ABB8A7F0083F6DF /* SurveyRemoteMessage.swift */; };
 		4BCF15EF2ABBDBFF0083F6DF /* SurveyRemoteMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D62ABB8A110083F6DF /* SurveyRemoteMessaging.swift */; };
 		4BD18F01283F0BC500058124 /* BookmarksBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */; };
@@ -3121,7 +3119,6 @@
 		4B37EE5C2B4CFC3C00A89A61 /* HomePageRemoteMessagingStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomePageRemoteMessagingStorage.swift; sourceTree = "<group>"; };
 		4B37EE5D2B4CFC3C00A89A61 /* SurveyURLBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SurveyURLBuilder.swift; sourceTree = "<group>"; };
 		4B37EE5E2B4CFC3C00A89A61 /* HomePageRemoteMessagingRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomePageRemoteMessagingRequest.swift; sourceTree = "<group>"; };
-		4B37EE6E2B4CFE8500A89A61 /* dbp-messages.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dbp-messages.json"; sourceTree = "<group>"; };
 		4B39AAF527D9B2C700A73FD5 /* NSStackViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStackViewExtension.swift; sourceTree = "<group>"; };
 		4B3B848F297A0E1000A384BD /* EmailManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailManagerExtension.swift; sourceTree = "<group>"; };
 		4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserProfileTests.swift; sourceTree = "<group>"; };
@@ -3302,7 +3299,7 @@
 		4BCF15D62ABB8A110083F6DF /* SurveyRemoteMessaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyRemoteMessaging.swift; sourceTree = "<group>"; };
 		4BCF15D82ABB8A7F0083F6DF /* SurveyRemoteMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyRemoteMessage.swift; sourceTree = "<group>"; };
 		4BCF15E42ABB98990083F6DF /* SurveyRemoteMessageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyRemoteMessageTests.swift; sourceTree = "<group>"; };
-		4BCF15E92ABB99470083F6DF /* network-protection-messages.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "network-protection-messages.json"; sourceTree = "<group>"; };
+		4BCF15E92ABB99470083F6DF /* survey-messages.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "survey-messages.json"; sourceTree = "<group>"; };
 		4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewController.swift; sourceTree = "<group>"; };
 		4BD18F04283F151F00058124 /* BookmarksBar.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BookmarksBar.storyboard; sourceTree = "<group>"; };
 		4BD57C032AC112DF00B580EE /* SurveyRemoteMessagingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyRemoteMessagingTests.swift; sourceTree = "<group>"; };
@@ -5722,6 +5719,14 @@
 			path = View;
 			sourceTree = "<group>";
 		};
+		4BBEE8E12BFEE54100E5E111 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4BCF15E92ABB99470083F6DF /* survey-messages.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		4BCF15D52ABB83D70083F6DF /* NetworkProtectionRemoteMessaging */ = {
 			isa = PBXGroup;
 			children = (
@@ -5735,21 +5740,11 @@
 			isa = PBXGroup;
 			children = (
 				BDA7648F2BC4E56200D0400C /* Mocks */,
-				4BCF15E62ABB98A20083F6DF /* Resources */,
 				7B09CBA72BA4BE7000CF245B /* NetworkProtectionPixelEventTests.swift */,
 				BDA7648C2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift */,
 				7B4C5CF42BE51D640007A164 /* VPNUninstallerTests.swift */,
 			);
 			path = NetworkProtection;
-			sourceTree = "<group>";
-		};
-		4BCF15E62ABB98A20083F6DF /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				4B37EE6E2B4CFE8500A89A61 /* dbp-messages.json */,
-				4BCF15E92ABB99470083F6DF /* network-protection-messages.json */,
-			);
-			path = Resources;
 			sourceTree = "<group>";
 		};
 		4BD18F02283F0F1000058124 /* View */ = {
@@ -5778,6 +5773,7 @@
 		4BF6961B28BE90E800D402D4 /* HomePage */ = {
 			isa = PBXGroup;
 			children = (
+				4BBEE8E12BFEE54100E5E111 /* Resources */,
 				56534DEB29DF251C00121467 /* Mocks */,
 				4BF6961C28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift */,
 				569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */,
@@ -9022,10 +9018,9 @@
 				3706FE8B293F661700E42796 /* empty in Resources */,
 				376E2D282942843D001CD31B /* privacy-reference-tests in Resources */,
 				3706FE8C293F661700E42796 /* atb-with-update.json in Resources */,
-				4BBEE8E02BFEE08100E5E111 /* dbp-messages.json in Resources */,
 				9FBD84622BB3BC6400220859 /* Origin-empty.txt in Resources */,
 				3706FE8D293F661700E42796 /* DataImportResources in Resources */,
-				4BBEE8DF2BFEE07D00E5E111 /* network-protection-messages.json in Resources */,
+				4BBEE8DF2BFEE07D00E5E111 /* survey-messages.json in Resources */,
 				3706FE8E293F661700E42796 /* atb.json in Resources */,
 				9FBD845E2BB3B80300220859 /* Origin.txt in Resources */,
 				3706FE8F293F661700E42796 /* DuckDuckGo-ExampleCrash.ips in Resources */,
@@ -9219,10 +9214,9 @@
 				B69B50542726CD8100758A2B /* atb-with-update.json in Resources */,
 				37A803DB27FD69D300052F4C /* DataImportResources in Resources */,
 				B65CD8D52B316FCA00A595BB /* __Snapshots__ in Resources */,
-				4B37EE6F2B4CFE8500A89A61 /* dbp-messages.json in Resources */,
 				B69B50522726CD8100758A2B /* atb.json in Resources */,
 				4B70C00127B0793D000386ED /* DuckDuckGo-ExampleCrash.ips in Resources */,
-				4BCF15ED2ABB9B180083F6DF /* network-protection-messages.json in Resources */,
+				4BCF15ED2ABB9B180083F6DF /* survey-messages.json in Resources */,
 				B67C6C422654BF49006C872E /* DuckDuckGo-Symbol.jpg in Resources */,
 				B69B50552726CD8100758A2B /* invalid.json in Resources */,
 				9FBD84612BB3BC6400220859 /* Origin-empty.txt in Resources */,
@@ -10148,7 +10142,6 @@
 				1DC669712B6CF0D700AA0645 /* TabSnapshotStore.swift in Sources */,
 				3706FC19293F65D500E42796 /* NSNotificationName+Favicons.swift in Sources */,
 				3706FC1A293F65D500E42796 /* PinningManager.swift in Sources */,
-				4B37EE782B4CFF3900A89A61 /* DataBrokerProtectionRemoteMessage.swift in Sources */,
 				3706FC1B293F65D500E42796 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
 				3706FC1D293F65D500E42796 /* EmailManagerRequestDelegate.swift in Sources */,
 				3706FC1E293F65D500E42796 /* ApplicationVersionReader.swift in Sources */,
@@ -10928,10 +10921,7 @@
 			files = (
 				31A83FB72BE28D8A00F74E67 /* UserText+DBP.swift in Sources */,
 				F1D042942BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */,
-				9D9AE92C2AAB84FF0026E7DC /* DBPMocks.swift in Sources */,
 				F1D042912BFB9FD700A31506 /* SubscriptionEnvironment+Default.swift in Sources */,
-				7B0099792B65013800FE7C31 /* BrowserWindowManager.swift in Sources */,
-				9D9AE9292AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */,
 				9D9AE91D2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
 				9D9AE9212AAA3B450026E7DC /* UserText.swift in Sources */,
 				31ECDA132BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
@@ -10946,10 +10936,7 @@
 			files = (
 				31A83FB82BE28D8A00F74E67 /* UserText+DBP.swift in Sources */,
 				F1D042952BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */,
-				7B1459542B7D437200047F2C /* BrowserWindowManager.swift in Sources */,
 				F1D042922BFB9FD800A31506 /* SubscriptionEnvironment+Default.swift in Sources */,
-				9D9AE92D2AAB84FF0026E7DC /* DBPMocks.swift in Sources */,
-				9D9AE92A2AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */,
 				9D9AE91E2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
 				9D9AE9222AAA3B450026E7DC /* UserText.swift in Sources */,
 				31ECDA142BED339600AE679F /* DataBrokerAuthenticationManagerBuilder.swift in Sources */,
@@ -11151,8 +11138,7 @@
 				AA5FA6A0275F948900DCE9C9 /* Favicons.xcdatamodeld in Sources */,
 				3158B1502B0BF75200AF130C /* DataBrokerProtectionLoginItemInterface.swift in Sources */,
 				9F6434612BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */,
-				3158B1502B0BF75200AF130C /* DataBrokerProtectionLoginItemScheduler.swift in Sources */,
-				7BBA7CE62BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */,
+				3158B1502B0BF75200AF130C /* DataBrokerProtectionLoginItemInterface.swift in Sources */,
 				B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */,
 				4B9DB01D2A983B24000927DB /* Waitlist.swift in Sources */,
 				BBDFDC5A2B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */,
@@ -11318,7 +11304,6 @@
 				B66260E029AC6EBD00E9E3EE /* HistoryTabExtension.swift in Sources */,
 				B6BCC54F2AFE4F7D002C5499 /* DataImportTypePicker.swift in Sources */,
 				AAEEC6A927088ADB008445F7 /* FireCoordinator.swift in Sources */,
-				4B37EE752B4CFF3300A89A61 /* DataBrokerProtectionRemoteMessaging.swift in Sources */,
 				B655369B268442EE00085A79 /* GeolocationProvider.swift in Sources */,
 				B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,

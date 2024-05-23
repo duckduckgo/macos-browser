@@ -106,6 +106,8 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
         let possibleMessages: [SurveyRemoteMessage] = messageStorage.storedMessages()
 
+        // TODO: Check all attributes
+
         let filteredMessages = possibleMessages.filter { message in
             if dismissedMessageIDs.contains(message.id) {
                 return false
