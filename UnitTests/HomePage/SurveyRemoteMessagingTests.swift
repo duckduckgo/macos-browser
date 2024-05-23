@@ -32,7 +32,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
     func testWhenFetchingRemoteMessages_AndTheUserDidNotSignUpViaWaitlist_ThenMessagesAreFetched() {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         request.result = .success([])
-        let storage = MockNetworkProtectionRemoteMessagingStorage()
+        let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
 
         let messaging = DefaultSurveyRemoteMessaging(
@@ -56,7 +56,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
     func testWhenFetchingRemoteMessages_AndTheUserDidSignUpViaWaitlist_ButUserHasNotActivatedNetP_ThenMessagesAreFetched() {
         let request = MockNetworkProtectionRemoteMessagingRequest()
-        let storage = MockNetworkProtectionRemoteMessagingStorage()
+        let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
 
         request.result = .success([])
@@ -84,7 +84,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
     func testWhenFetchingRemoteMessages_AndWaitlistUserHasActivatedNetP_ThenMessagesAreFetched_AndMessagesAreStored() {
         let request = MockNetworkProtectionRemoteMessagingRequest()
-        let storage = MockNetworkProtectionRemoteMessagingStorage()
+        let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
 
         let messages = [mockMessage(id: "123")]
@@ -117,7 +117,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
     func testWhenFetchingRemoteMessages_AndWaitlistUserHasActivatedNetP_ButRateLimitedOperationCannotRunAgain_ThenMessagesAreNotFetched() {
         let request = MockNetworkProtectionRemoteMessagingRequest()
-        let storage = MockNetworkProtectionRemoteMessagingStorage()
+        let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
 
         activationDateStorage._daysSinceActivation = 10
@@ -148,7 +148,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
     func testWhenStoredMessagesExist_AndSomeMessagesHaveBeenDismissed_ThenPresentableMessagesDoNotIncludeDismissedMessages() {
         let request = MockNetworkProtectionRemoteMessagingRequest()
-        let storage = MockNetworkProtectionRemoteMessagingStorage()
+        let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
 
         let dismissedMessage = mockMessage(id: "123")
@@ -173,7 +173,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
     func testWhenStoredMessagesExist_AndSomeMessagesRequireDaysActive_ThenPresentableMessagesDoNotIncludeInvalidMessages() {
         let request = MockNetworkProtectionRemoteMessagingRequest()
-        let storage = MockNetworkProtectionRemoteMessagingStorage()
+        let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
 
         let hiddenMessage = mockMessage(id: "123", daysSinceNetworkProtectionEnabled: 10)
@@ -195,7 +195,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
     func testWhenStoredMessagesExist_AndSomeMessagesNetPVisibility_ThenPresentableMessagesDoNotIncludeInvalidMessages() {
         let request = MockNetworkProtectionRemoteMessagingRequest()
-        let storage = MockNetworkProtectionRemoteMessagingStorage()
+        let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
 
         let hiddenMessage = mockMessage(id: "123", requiresNetPAccess: true)
@@ -215,7 +215,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
     func testWhenStoredMessagesExist_AndSomeMessagesRequireNetPUsage_ThenPresentableMessagesDoNotIncludeInvalidMessages() {
         let request = MockNetworkProtectionRemoteMessagingRequest()
-        let storage = MockNetworkProtectionRemoteMessagingStorage()
+        let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
 
         let message = mockMessage(id: "123", requiresNetPUsage: false, requiresNetPAccess: true)
@@ -277,7 +277,7 @@ private final class MockNetworkProtectionRemoteMessagingRequest: HomePageRemoteM
 
 }
 
-private final class MockNetworkProtectionRemoteMessagingStorage: HomePageRemoteMessagingStorage {
+private final class MockSurveyRemoteMessagingStorage: SurveyRemoteMessagingStorage {
 
     var _storedMessages: [SurveyRemoteMessage] = []
     var _storedDismissedMessageIDs: [String] = []
@@ -288,18 +288,6 @@ private final class MockNetworkProtectionRemoteMessagingStorage: HomePageRemoteM
 
     func storedMessages() -> [SurveyRemoteMessage] {
         _storedMessages
-    }
-
-    func store<Message: Codable>(messages: [Message]) throws {
-        if let messages = messages as? [SurveyRemoteMessage] {
-            self._storedMessages = messages
-        } else {
-            fatalError("Failed to cast messages")
-        }
-    }
-
-    func storedMessages<Message: Codable>() -> [Message] {
-        return _storedMessages as! [Message]
     }
 
     func dismissRemoteMessage(with id: String) {

@@ -18,21 +18,21 @@
 
 import Foundation
 
-protocol HomePageRemoteMessagingStorage {
+protocol SurveyRemoteMessagingStorage {
 
-    func store<Message: Codable>(messages: [Message]) throws
-    func storedMessages<Message: Codable>() -> [Message]
+    func store(messages: [SurveyRemoteMessage]) throws
+    func storedMessages() -> [SurveyRemoteMessage]
 
     func dismissRemoteMessage(with id: String)
     func dismissedMessageIDs() -> [String]
 
 }
 
-final class DefaultHomePageRemoteMessagingStorage: HomePageRemoteMessagingStorage {
+final class DefaultSurveyRemoteMessagingStorage: SurveyRemoteMessagingStorage {
 
     enum SurveyConstants {
         static let dismissedMessageIdentifiersKey = "home.page.survey.dismissed-message-identifiers"
-        static let networkProtectionMessagesFileName = "survey-messages.json"
+        static let surveyMessagesFileName = "survey-messages.json"
     }
 
     private let userDefaults: UserDefaults
@@ -43,16 +43,16 @@ final class DefaultHomePageRemoteMessagingStorage: HomePageRemoteMessagingStorag
         URL.sandboxApplicationSupportURL
     }
 
-    static func surveys() -> DefaultHomePageRemoteMessagingStorage {
-        return DefaultHomePageRemoteMessagingStorage(
-            messagesFileName: SurveyConstants.networkProtectionMessagesFileName,
+    static func surveys() -> DefaultSurveyRemoteMessagingStorage {
+        return DefaultSurveyRemoteMessagingStorage(
+            messagesFileName: SurveyConstants.surveyMessagesFileName,
             dismissedMessageIdentifiersKey: SurveyConstants.dismissedMessageIdentifiersKey
         )
     }
 
     init(
         userDefaults: UserDefaults = .standard,
-        messagesDirectoryURL: URL = DefaultHomePageRemoteMessagingStorage.applicationSupportURL,
+        messagesDirectoryURL: URL = DefaultSurveyRemoteMessagingStorage.applicationSupportURL,
         messagesFileName: String,
         dismissedMessageIdentifiersKey: String
     ) {
@@ -61,15 +61,15 @@ final class DefaultHomePageRemoteMessagingStorage: HomePageRemoteMessagingStorag
         self.dismissedMessageIdentifiersKey = dismissedMessageIdentifiersKey
     }
 
-    func store<Message: Codable>(messages: [Message]) throws {
+    func store(messages: [SurveyRemoteMessage]) throws {
         let encoded = try JSONEncoder().encode(messages)
         try encoded.write(to: messagesURL)
     }
 
-    func storedMessages<Message: Codable>() -> [Message] {
+    func storedMessages() -> [SurveyRemoteMessage] {
         do {
             let messagesData = try Data(contentsOf: messagesURL)
-            let messages = try JSONDecoder().decode([Message].self, from: messagesData)
+            let messages = try JSONDecoder().decode([SurveyRemoteMessage].self, from: messagesData)
 
             return messages
         } catch {

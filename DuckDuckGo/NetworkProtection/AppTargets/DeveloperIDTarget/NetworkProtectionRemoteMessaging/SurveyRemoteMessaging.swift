@@ -36,7 +36,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
     }
 
     private let messageRequest: HomePageRemoteMessagingRequest
-    private let messageStorage: HomePageRemoteMessagingStorage
+    private let messageStorage: SurveyRemoteMessagingStorage
     private let subscriptionManager: SubscriptionManaging
     private let waitlistActivationDateStore: WaitlistActivationDateStore
     private let minimumRefreshInterval: TimeInterval
@@ -52,7 +52,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
     init(
         messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.surveysRequest(),
-        messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.surveys(),
+        messageStorage: SurveyRemoteMessagingStorage = DefaultSurveyRemoteMessagingStorage.surveys(),
         subscriptionManager: SubscriptionManaging,
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
         networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
@@ -104,18 +104,11 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
     }
 
-    /// Uses the "days since VPN activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
-    func presentableRemoteMessages() -> [SurveyRemoteMessage] {
-        let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
-        let possibleMessages: [SurveyRemoteMessage] = messageStorage.storedMessages()
-
-        // TODO: Check all attributes
-
-        let filteredMessages = possibleMessages.filter { message in
-            if dismissedMessageIDs.contains(message.id) {
-                return false
-            }
-
+    /// Processes the messages received from S3 and returns those which the user is eligible for. This is done by checking each of the attributes against the user's local state.
+    /// Because the result of the message fetch is cached, it means that they won't be immediately updated if the user suddenly qualifies, but the refresh interval for remote messages is only 1 hour so it
+    /// won't take long for the message to appear to the user.
+    private func process(messages: [SurveyRemoteMessage]) async -> [SurveyRemoteMessage] {
+        let filteredMessages = messages.filter { message in
             // Check subscription status:
 
             if let subscriptionStatus = message.attributes.subscriptionStatus {
@@ -123,7 +116,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
             }
 
             // Check VPN usage:
-            
+
             if let requiredDaysSinceActivation = message.attributes.daysSinceVPNEnabled,
                let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() {
                 if requiredDaysSinceActivation <= daysSinceActivation {
@@ -135,6 +128,20 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
             // Don't show messages unless at least one attribute matches:
             return false
+
+        }
+    }
+
+    func presentableRemoteMessages() -> [SurveyRemoteMessage] {
+        let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
+        let possibleMessages: [SurveyRemoteMessage] = messageStorage.storedMessages()
+
+        let filteredMessages = possibleMessages.filter { message in
+            if dismissedMessageIDs.contains(message.id) {
+                return false
+            }
+
+            return true
 
         }
 

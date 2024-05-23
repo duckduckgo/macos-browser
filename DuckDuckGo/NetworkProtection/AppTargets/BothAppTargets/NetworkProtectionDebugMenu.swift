@@ -484,7 +484,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     @objc func resetNetworkProtectionRemoteMessages(_ sender: Any?) {
-        DefaultHomePageRemoteMessagingStorage.surveys().removeStoredAndDismissedMessages()
+        DefaultSurveyRemoteMessagingStorage.surveys().removeStoredAndDismissedMessages()
         DefaultSurveyRemoteMessaging(
             subscriptionManager: Application.appDelegate.subscriptionManager,
             minimumRefreshInterval: 0
