@@ -337,7 +337,8 @@ extension HomePage.Models {
 
         private var shouldPermanentSurveyBeVisible: Bool {
             return shouldShowPermanentSurvey &&
-            permanentSurveyManager.isSurveyAvailable
+            permanentSurveyManager.isSurveyAvailable &&
+            surveyRemoteMessaging.presentableRemoteMessages().isEmpty // When Privacy Pro survey is visible, ensure we do not show multiple at once
         }
 
         @MainActor private func visitSurvey() {
@@ -484,7 +485,7 @@ extension HomePage.Models {
             case .permanentSurvey:
                 return .survey128.resized(to: iconSize)!
             case .surveyRemoteMessage:
-                return .survey128.resized(to: iconSize)!
+                return .privacyProSurvey.resized(to: iconSize)!
             case .dataBrokerProtectionWaitlistInvited:
                 return .dbpInformationRemover.resized(to: iconSize)!
             }

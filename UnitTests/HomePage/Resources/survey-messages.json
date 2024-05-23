@@ -4,7 +4,7 @@
         "cardTitle": "Title 1",
         "cardDescription": "Description 1",
         "attributes": {
-            "subscriptionStatus": "",
+            "subscriptionStatus": "Auto-Renewable",
             "minimumDaysSinceSubscriptionStarted": 1,
             "maximumDaysUntilSubscriptionExpirationOrRenewal": 30,
             "daysSinceVPNEnabled": 2,
