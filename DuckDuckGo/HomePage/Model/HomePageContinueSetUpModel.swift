@@ -357,8 +357,6 @@ extension HomePage.Models {
             }
 
             switch actionType {
-            case .openNetworkProtection:
-                NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
             case .openSurveyURL, .openURL:
                 if let surveyURL = remoteMessage.presentableSurveyURL() {
                     let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)

@@ -21,7 +21,6 @@ import Common
 
 struct SurveyRemoteMessageAction: Codable, Equatable, Hashable {
     enum Action: String, Codable {
-        case openNetworkProtection
         case openSurveyURL
         case openURL
     }
@@ -33,13 +32,18 @@ struct SurveyRemoteMessageAction: Codable, Equatable, Hashable {
 
 struct SurveyRemoteMessage: Codable, Equatable, Identifiable, Hashable {
 
+    struct Attributes: Codable, Equatable, Hashable {
+        let subscriptionStatus: String?
+        let minimumDaysSinceSubscriptionStarted: Int?
+        let maximumDaysUntilSubscriptionExpirationOrRenewal: Int?
+        let daysSinceVPNEnabled: Int?
+        let daysSincePIREnabled: Int?
+    }
+
     let id: String
     let cardTitle: String
     let cardDescription: String
-    /// If this is set, the message won't be displayed if NetP hasn't been used, even if the usage and access booleans are false
-    let daysSinceNetworkProtectionEnabled: Int?
-    let requiresNetworkProtectionUsage: Bool
-    let requiresNetworkProtectionAccess: Bool
+    let attributes: Attributes
     let action: SurveyRemoteMessageAction
 
     func presentableSurveyURL(

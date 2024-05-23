@@ -34,13 +34,11 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         request.result = .success([])
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
             waitlistActivationDateStore: activationDateStorage,
-            networkProtectionVisibility: visibility,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -60,7 +58,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         request.result = .success([])
 
@@ -68,7 +65,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageRequest: request,
             messageStorage: storage,
             waitlistActivationDateStore: activationDateStorage,
-            networkProtectionVisibility: visibility,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -90,7 +86,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         let messages = [mockMessage(id: "123")]
 
@@ -101,7 +96,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageRequest: request,
             messageStorage: storage,
             waitlistActivationDateStore: activationDateStorage,
-            networkProtectionVisibility: visibility,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -125,7 +119,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         activationDateStorage._daysSinceActivation = 10
 
@@ -135,7 +128,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageRequest: request,
             messageStorage: storage,
             waitlistActivationDateStore: activationDateStorage,
-            networkProtectionVisibility: visibility,
             minimumRefreshInterval: .days(7), // Use a large number to hit the refresh check
             userDefaults: defaults
         )
@@ -158,7 +150,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         let dismissedMessage = mockMessage(id: "123")
         let activeMessage = mockMessage(id: "456")
@@ -169,7 +160,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageRequest: request,
             messageStorage: storage,
             waitlistActivationDateStore: activationDateStorage,
-            networkProtectionVisibility: visibility,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -185,7 +175,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         let hiddenMessage = mockMessage(id: "123", daysSinceNetworkProtectionEnabled: 10)
         let activeMessage = mockMessage(id: "456")
@@ -196,7 +185,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageRequest: request,
             messageStorage: storage,
             waitlistActivationDateStore: activationDateStorage,
-            networkProtectionVisibility: visibility,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -209,7 +197,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: false)
 
         let hiddenMessage = mockMessage(id: "123", requiresNetPAccess: true)
         try? storage.store(messages: [hiddenMessage])
@@ -218,7 +205,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageRequest: request,
             messageStorage: storage,
             waitlistActivationDateStore: activationDateStorage,
-            networkProtectionVisibility: visibility,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -231,7 +217,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         let message = mockMessage(id: "123", requiresNetPUsage: false, requiresNetPAccess: true)
         try? storage.store(messages: [message])
@@ -240,7 +225,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageRequest: request,
             messageStorage: storage,
             waitlistActivationDateStore: activationDateStorage,
-            networkProtectionVisibility: visibility,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )

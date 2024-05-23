@@ -37,7 +37,6 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
     private let messageRequest: HomePageRemoteMessagingRequest
     private let messageStorage: HomePageRemoteMessagingStorage
     private let waitlistActivationDateStore: WaitlistActivationDateStore
-    private let networkProtectionVisibility: NetworkProtectionFeatureVisibility
     private let minimumRefreshInterval: TimeInterval
     private let userDefaults: UserDefaults
 
@@ -53,14 +52,12 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.surveysRequest(),
         messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.surveys(),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
-        networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
         minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard
     ) {
         self.messageRequest = messageRequest
         self.messageStorage = messageStorage
         self.waitlistActivationDateStore = waitlistActivationDateStore
-        self.networkProtectionVisibility = networkProtectionVisibility
         self.minimumRefreshInterval = minimumRefreshInterval
         self.userDefaults = userDefaults
     }
@@ -108,34 +105,20 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
         let possibleMessages: [SurveyRemoteMessage] = messageStorage.storedMessages()
 
-        // Only show messages that haven't been dismissed, and check whether they have a
-        // requirement on how long the user has used the VPN for.
         let filteredMessages = possibleMessages.filter { message in
-
-            // Don't show messages that have already been dismissed. If you need to show the same message to a user again,
-            // it should get a new message ID.
             if dismissedMessageIDs.contains(message.id) {
                 return false
             }
 
-            // First, check messages that require a number of days of NetP usage
-            if let requiredDaysSinceActivation = message.daysSinceNetworkProtectionEnabled,
+            // Check VPN usage:
+            
+            if let requiredDaysSinceActivation = message.attributes.daysSinceVPNEnabled,
                let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() {
                 if requiredDaysSinceActivation <= daysSinceActivation {
                     return true
                 } else {
                     return false
                 }
-            }
-
-            // Next, check if the message requires access to NetP but it's not visible:
-            if message.requiresNetworkProtectionAccess, !networkProtectionVisibility.isVPNVisible() {
-                return false
-            }
-
-            // Finally, check if the message requires NetP usage, and check if the user has used it at all:
-            if message.requiresNetworkProtectionUsage, waitlistActivationDateStore.daysSinceActivation() == nil {
-                return false
             }
 
             return true

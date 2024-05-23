@@ -55,7 +55,7 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
         XCTAssertEqual(firstMessage.cardDescription, "Description 1")
         XCTAssertEqual(firstMessage.action.actionTitle, "Action 1")
         XCTAssertNil(firstMessagePresentableSurveyURL)
-        XCTAssertNil(firstMessage.daysSinceNetworkProtectionEnabled)
+        XCTAssertNil(firstMessage.attributes.daysSinceVPNEnabled)
 
         guard let secondMessage = decodedMessages.first(where: { $0.id == "456"}) else {
             XCTFail("Failed to find expected message")
@@ -70,7 +70,7 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
             hardwareModel: "MacBookPro,123"
         )
 
-        XCTAssertEqual(secondMessage.daysSinceNetworkProtectionEnabled, 1)
+        XCTAssertEqual(secondMessage.attributes.daysSinceVPNEnabled, 1)
         XCTAssertEqual(secondMessage.cardTitle, "Title 2")
         XCTAssertEqual(secondMessage.cardDescription, "Description 2")
         XCTAssertEqual(secondMessage.action.actionTitle, "Action 2")
@@ -89,7 +89,7 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
             hardwareModel: "MacBookPro,123"
         )
 
-        XCTAssertEqual(thirdMessage.daysSinceNetworkProtectionEnabled, 5)
+        XCTAssertEqual(thirdMessage.attributes.daysSinceVPNEnabled, 5)
         XCTAssertEqual(thirdMessage.cardTitle, "Title 3")
         XCTAssertEqual(thirdMessage.cardDescription, "Description 3")
         XCTAssertEqual(thirdMessage.action.actionTitle, "Action 3")
@@ -103,8 +103,13 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
             "daysSinceNetworkProtectionEnabled": 0,
             "cardTitle": "Title",
             "cardDescription": "Description",
-            "requiresNetworkProtectionAccess": true,
-            "requiresNetworkProtectionUsage": true,
+            "attributes": {
+                "subscriptionStatus": ""
+                "minimumDaysSinceSubscriptionStarted: 1
+                "maximumDaysUntilSubscriptionExpirationOrRenewal": 30
+                "daysSinceNetworkProtectionEnabled": 1
+                "daysSincePersonalInformationRemovalEnabled": 1
+            }
             "action": {
                 "actionTitle": "Action",
                 "actionType": "openSurveyURL",
