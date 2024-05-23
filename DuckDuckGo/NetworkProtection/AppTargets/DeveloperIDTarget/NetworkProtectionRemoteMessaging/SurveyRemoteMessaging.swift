@@ -29,6 +29,12 @@ protocol SurveyRemoteMessaging {
 
 }
 
+protocol SurveyRemoteMessageSubscriptionFetching {
+
+    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionService.SubscriptionServiceError>
+
+}
+
 final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
     enum Constants {
@@ -37,23 +43,33 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
     private let messageRequest: HomePageRemoteMessagingRequest
     private let messageStorage: SurveyRemoteMessagingStorage
-    private let subscriptionManager: SubscriptionManaging
+    private let accountManager: AccountManaging
+    private let subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching
     private let waitlistActivationDateStore: WaitlistActivationDateStore
     private let minimumRefreshInterval: TimeInterval
     private let userDefaults: UserDefaults
 
     convenience init(subscriptionManager: SubscriptionManaging) {
         #if DEBUG || REVIEW
-        self.init(subscriptionManager: subscriptionManager, minimumRefreshInterval: .seconds(30))
+        self.init(
+            accountManager: subscriptionManager.accountManager,
+            subscriptionFetcher: subscriptionManager.subscriptionService,
+            minimumRefreshInterval: .seconds(30)
+        )
         #else
-        self.init(subscriptionManager: subscriptionManager, minimumRefreshInterval: .hours(1))
+        self.init(
+            accountManager: subscriptionManager.accountManager,
+            subscriptionFetcher: subscriptionManager.subscriptionService,
+            minimumRefreshInterval: .hours(1)
+        )
         #endif
     }
 
     init(
         messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.surveysRequest(),
         messageStorage: SurveyRemoteMessagingStorage = DefaultSurveyRemoteMessagingStorage.surveys(),
-        subscriptionManager: SubscriptionManaging,
+        accountManager: AccountManaging,
+        subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching,
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
         networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
         minimumRefreshInterval: TimeInterval,
@@ -61,7 +77,8 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
     ) {
         self.messageRequest = messageRequest
         self.messageStorage = messageStorage
-        self.subscriptionManager = subscriptionManager
+        self.accountManager = accountManager
+        self.subscriptionFetcher = subscriptionFetcher
         self.waitlistActivationDateStore = waitlistActivationDateStore
         self.minimumRefreshInterval = minimumRefreshInterval
         self.userDefaults = userDefaults
@@ -98,11 +115,11 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
     /// Because the result of the message fetch is cached, it means that they won't be immediately updated if the user suddenly qualifies, but the refresh interval for remote messages is only 1 hour so it
     /// won't take long for the message to appear to the user.
     private func process(messages: [SurveyRemoteMessage]) async -> [SurveyRemoteMessage] {
-        guard let token = subscriptionManager.accountManager.accessToken else {
+        guard let token = accountManager.accessToken else {
             return []
         }
 
-        guard case let .success(subscription) = await subscriptionManager.subscriptionService.getSubscription(accessToken: token) else {
+        guard case let .success(subscription) = await subscriptionFetcher.getSubscription(accessToken: token) else {
             return []
         }
 
@@ -198,6 +215,14 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
     private func updateLastRefreshDate() {
         userDefaults.setValue(Date(), forKey: Constants.lastRefreshDateKey)
+    }
+
+}
+
+extension SubscriptionService: SurveyRemoteMessageSubscriptionFetching {
+
+    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionServiceError> {
+        return await self.getSubscription(accessToken: accessToken, cachePolicy: .returnCacheDataElseLoad)
     }
 
 }

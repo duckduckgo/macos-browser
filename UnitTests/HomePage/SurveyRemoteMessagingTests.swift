@@ -17,8 +17,8 @@
 //
 
 import XCTest
-import Subscription
 import SubscriptionTestingUtilities
+@testable import Subscription
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -27,20 +27,15 @@ final class SurveyRemoteMessagingTests: XCTestCase {
     private var defaults: UserDefaults!
     private let testGroupName = "remote-messaging"
 
-    private var subscriptionManager: SubscriptionManaging!
+    private var accountManager: AccountManaging!
+    private var subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching!
 
     override func setUp() {
         defaults = UserDefaults(suiteName: testGroupName)!
         defaults.removePersistentDomain(forName: testGroupName)
 
-        subscriptionManager = SubscriptionManagerMock(
-            accountManager: AccountManagerMock(isUserAuthenticated: true),
-            subscriptionService: SubscriptionService(currentServiceEnvironment: .staging),
-            authService: AuthService(currentServiceEnvironment: .staging),
-            storePurchaseManager: StorePurchaseManager(),
-            currentEnvironment: .default,
-            canPurchase: true
-        )
+        accountManager = AccountManagerMock(isUserAuthenticated: true, accessToken: "mock-token")
+        subscriptionFetcher = MockSubscriptionFetcher()
     }
 
     func testWhenFetchingRemoteMessages_AndTheUserDidNotSignUpViaWaitlist_ThenMessagesAreFetched() async {
@@ -52,7 +47,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
-            subscriptionManager: subscriptionManager,
+            accountManager: accountManager,
+            subscriptionFetcher: subscriptionFetcher,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
@@ -73,7 +69,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
-            subscriptionManager: subscriptionManager,
+            accountManager: accountManager,
+            subscriptionFetcher: subscriptionFetcher,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
@@ -99,7 +96,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
-            subscriptionManager: subscriptionManager,
+            accountManager: accountManager,
+            subscriptionFetcher: subscriptionFetcher,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
@@ -126,7 +124,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
-            subscriptionManager: subscriptionManager,
+            accountManager: accountManager,
+            subscriptionFetcher: subscriptionFetcher,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: .days(7), // Use a large number to hit the refresh check
             userDefaults: defaults
@@ -153,7 +152,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
-            subscriptionManager: subscriptionManager,
+            accountManager: accountManager,
+            subscriptionFetcher: subscriptionFetcher,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
@@ -164,50 +164,6 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         messaging.dismiss(message: dismissedMessage)
         let presentableMessagesAfter = messaging.presentableRemoteMessages()
         XCTAssertEqual(presentableMessagesAfter, [activeMessage])
-    }
-
-    func testWhenStoredMessagesExist_AndSomeMessagesRequireDaysActive_ThenPresentableMessagesDoNotIncludeInvalidMessages() {
-        let request = MockNetworkProtectionRemoteMessagingRequest()
-        let storage = MockSurveyRemoteMessagingStorage()
-        let activationDateStorage = MockWaitlistActivationDateStore()
-
-        let hiddenMessage = mockMessage(id: "123", daysSinceVPNEnabled: 10)
-        let activeMessage = mockMessage(id: "456")
-        try? storage.store(messages: [hiddenMessage, activeMessage])
-        activationDateStorage._daysSinceActivation = 5
-
-        let messaging = DefaultSurveyRemoteMessaging(
-            messageRequest: request,
-            messageStorage: storage,
-            subscriptionManager: subscriptionManager,
-            waitlistActivationDateStore: activationDateStorage,
-            minimumRefreshInterval: 0,
-            userDefaults: defaults
-        )
-
-        let presentableMessagesAfter = messaging.presentableRemoteMessages()
-        XCTAssertEqual(presentableMessagesAfter, [activeMessage])
-    }
-
-    func testWhenStoredMessagesExist_AndSomeMessagesNetPVisibility_ThenPresentableMessagesDoNotIncludeInvalidMessages() {
-        let request = MockNetworkProtectionRemoteMessagingRequest()
-        let storage = MockSurveyRemoteMessagingStorage()
-        let activationDateStorage = MockWaitlistActivationDateStore()
-
-        let hiddenMessage = mockMessage(id: "123")
-        try? storage.store(messages: [hiddenMessage])
-
-        let messaging = DefaultSurveyRemoteMessaging(
-            messageRequest: request,
-            messageStorage: storage,
-            subscriptionManager: subscriptionManager,
-            waitlistActivationDateStore: activationDateStorage,
-            minimumRefreshInterval: 0,
-            userDefaults: defaults
-        )
-
-        let presentableMessages = messaging.presentableRemoteMessages()
-        XCTAssertEqual(presentableMessages, [])
     }
 
     func testWhenStoredMessagesExist_AndSomeMessagesRequireNetPUsage_ThenPresentableMessagesDoNotIncludeInvalidMessages() {
@@ -221,7 +177,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let messaging = DefaultSurveyRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
-            subscriptionManager: subscriptionManager,
+            accountManager: accountManager,
+            subscriptionFetcher: subscriptionFetcher,
             waitlistActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
@@ -232,7 +189,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
     }
 
     private func mockMessage(id: String,
-                             subscriptionStatus: String = "",
+                             subscriptionStatus: String = Subscription.Status.autoRenewable.rawValue,
                              minimumDaysSinceSubscriptionStarted: Int = 0,
                              maximumDaysUntilSubscriptionExpirationOrRenewal: Int = 0,
                              daysSinceVPNEnabled: Int = 0,
@@ -311,6 +268,23 @@ final class MockWaitlistActivationDateStore: WaitlistActivationDateStore {
 
     func daysSinceLastActive() -> Int? {
         _daysSinceLastActive
+    }
+
+}
+
+final class MockSubscriptionFetcher: SurveyRemoteMessageSubscriptionFetching {
+
+    var subscription: Subscription = Subscription(
+        productId: "product",
+        name: "name",
+        billingPeriod: .monthly,
+        startedAt: Date(),
+        expiresOrRenewsAt: Date(),
+        platform: .apple,
+        status: .autoRenewable)
+
+    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionService.SubscriptionServiceError> {
+        return .success(subscription)
     }
 
 }
