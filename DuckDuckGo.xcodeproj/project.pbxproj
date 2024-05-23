@@ -864,7 +864,6 @@
 		3706FE6D293F661700E42796 /* ChromiumBookmarksReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0C26FE1A83001E4761 /* ChromiumBookmarksReaderTests.swift */; };
 		3706FE6E293F661700E42796 /* FirefoxBookmarksReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0D26FE1A83001E4761 /* FirefoxBookmarksReaderTests.swift */; };
 		3706FE6F293F661700E42796 /* LocalStatisticsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B117F7C276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift */; };
-		3706FE70293F661700E42796 /* HistoryCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B32642C69300C2EFBC /* HistoryCoordinatorTests.swift */; };
 		3706FE71293F661700E42796 /* SavedStateMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378205F52837CBA800D1D4AA /* SavedStateMock.swift */; };
 		3706FE72293F661700E42796 /* ClickToLoadTDSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8AE769279FBDB20078943E /* ClickToLoadTDSTests.swift */; };
 		3706FE73293F661700E42796 /* PermissionManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0D926AE7AF400A9DAD1 /* PermissionManagerMock.swift */; };
@@ -872,7 +871,6 @@
 		3706FE75293F661700E42796 /* WebsiteBreakageReportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776582C27F71652009A6B35 /* WebsiteBreakageReportTests.swift */; };
 		3706FE76293F661700E42796 /* MockSecureVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E0326B0003E00E14D75 /* MockSecureVault.swift */; };
 		3706FE77293F661700E42796 /* PreferencesSidebarModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD54B427F1AC1300F1F7B9 /* PreferencesSidebarModelTests.swift */; };
-		3706FE78293F661700E42796 /* HistoryCoordinatingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */; };
 		3706FE79293F661700E42796 /* AppearancePreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD54B827F1F8AC00F1F7B9 /* AppearancePreferencesTests.swift */; };
 		3706FE7A293F661700E42796 /* FirePopoverViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376C4DB828A1A48A00CC0F5B /* FirePopoverViewModelTests.swift */; };
 		3706FE7B293F661700E42796 /* HistoryStoringMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B52642CC6A00C2EFBC /* HistoryStoringMock.swift */; };
@@ -1980,8 +1978,6 @@
 		AAE7527C263B056C00B973F8 /* EncryptedHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7527B263B056C00B973F8 /* EncryptedHistoryStore.swift */; };
 		AAE8B110258A456C00E81239 /* TabPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE8B10F258A456C00E81239 /* TabPreviewViewController.swift */; };
 		AAE99B8927088A19008B6BD9 /* FirePopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE99B8827088A19008B6BD9 /* FirePopover.swift */; };
-		AAEC74B22642C57200C2EFBC /* HistoryCoordinatingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */; };
-		AAEC74B42642C69300C2EFBC /* HistoryCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B32642C69300C2EFBC /* HistoryCoordinatorTests.swift */; };
 		AAEC74B62642CC6A00C2EFBC /* HistoryStoringMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B52642CC6A00C2EFBC /* HistoryStoringMock.swift */; };
 		AAEC74B82642E43800C2EFBC /* HistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B72642E43800C2EFBC /* HistoryStoreTests.swift */; };
 		AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */; };
@@ -3753,8 +3749,6 @@
 		AAE7527B263B056C00B973F8 /* EncryptedHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedHistoryStore.swift; sourceTree = "<group>"; };
 		AAE8B10F258A456C00E81239 /* TabPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPreviewViewController.swift; sourceTree = "<group>"; };
 		AAE99B8827088A19008B6BD9 /* FirePopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopover.swift; sourceTree = "<group>"; };
-		AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCoordinatingMock.swift; sourceTree = "<group>"; };
-		AAEC74B32642C69300C2EFBC /* HistoryCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCoordinatorTests.swift; sourceTree = "<group>"; };
 		AAEC74B52642CC6A00C2EFBC /* HistoryStoringMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStoringMock.swift; sourceTree = "<group>"; };
 		AAEC74B72642E43800C2EFBC /* HistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStoreTests.swift; sourceTree = "<group>"; };
 		AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexPathExtension.swift; sourceTree = "<group>"; };
@@ -7616,19 +7610,9 @@
 		AAEC74AE2642C47300C2EFBC /* History */ = {
 			isa = PBXGroup;
 			children = (
-				AAEC74AF2642C48800C2EFBC /* Model */,
 				AAEC74B02642C48B00C2EFBC /* Services */,
 			);
 			path = History;
-			sourceTree = "<group>";
-		};
-		AAEC74AF2642C48800C2EFBC /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */,
-				AAEC74B32642C69300C2EFBC /* HistoryCoordinatorTests.swift */,
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		AAEC74B02642C48B00C2EFBC /* Services */ = {
@@ -10598,7 +10582,6 @@
 				028904212A7B25770028369C /* AppConfigurationURLProviderTests.swift in Sources */,
 				3706FE6F293F661700E42796 /* LocalStatisticsStoreTests.swift in Sources */,
 				31DC2F232BD6E028001354EF /* DataBrokerPrerequisitesStatusVerifierTests.swift in Sources */,
-				3706FE70293F661700E42796 /* HistoryCoordinatorTests.swift in Sources */,
 				9F3344632BBFBDA40040CBEB /* BookmarksBarVisibilityManagerTests.swift in Sources */,
 				3706FE71293F661700E42796 /* SavedStateMock.swift in Sources */,
 				3706FE72293F661700E42796 /* ClickToLoadTDSTests.swift in Sources */,
@@ -10615,7 +10598,6 @@
 				021EA0852BD6E0EB00772C9A /* TabsPreferencesTests.swift in Sources */,
 				5682C69429B79B57004DE3C8 /* TabBarViewItemTests.swift in Sources */,
 				3706FE77293F661700E42796 /* PreferencesSidebarModelTests.swift in Sources */,
-				3706FE78293F661700E42796 /* HistoryCoordinatingMock.swift in Sources */,
 				3706FE79293F661700E42796 /* AppearancePreferencesTests.swift in Sources */,
 				3706FE7A293F661700E42796 /* FirePopoverViewModelTests.swift in Sources */,
 				7B09CBAA2BA4BE8200CF245B /* NetworkProtectionPixelEventTests.swift in Sources */,
@@ -12012,7 +11994,6 @@
 				4BB99D1026FE1A84001E4761 /* FirefoxBookmarksReaderTests.swift in Sources */,
 				9FBD84702BB3DD8400220859 /* MockAttributionsPixelHandler.swift in Sources */,
 				4B117F7D276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift in Sources */,
-				AAEC74B42642C69300C2EFBC /* HistoryCoordinatorTests.swift in Sources */,
 				378205F62837CBA800D1D4AA /* SavedStateMock.swift in Sources */,
 				3783F92329432E1800BCA897 /* WebViewTests.swift in Sources */,
 				EA8AE76A279FBDB20078943E /* ClickToLoadTDSTests.swift in Sources */,
@@ -12028,7 +12009,6 @@
 				4B723E0826B0003E00E14D75 /* MockSecureVault.swift in Sources */,
 				37CD54B527F1AC1300F1F7B9 /* PreferencesSidebarModelTests.swift in Sources */,
 				B6CA4824298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift in Sources */,
-				AAEC74B22642C57200C2EFBC /* HistoryCoordinatingMock.swift in Sources */,
 				37CD54B927F1F8AC00F1F7B9 /* AppearancePreferencesTests.swift in Sources */,
 				EEF53E182950CED5002D78F4 /* JSAlertViewModelTests.swift in Sources */,
 				376C4DB928A1A48A00CC0F5B /* FirePopoverViewModelTests.swift in Sources */,
