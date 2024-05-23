@@ -22,6 +22,12 @@ import Foundation
 
 final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
 
+    private let handler = MockDataBrokerProtectionPixelsHandler()
+
+    override func tearDown() {
+        handler.clear()
+    }
+
     func testNumberOfNewMatchesIsCalculatedCorrectly() {
         let historyEvents: [HistoryEvent] = [
             .init(brokerId: 1, profileQueryId: 1, type: .matchesFound(count: 2)),
@@ -35,7 +41,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
             scanJobData: .mockWith(historyEvents: historyEvents),
             optOutJobData: [.mock(with: .mockWithoutRemovedDate)])
         let sut = DataBrokerProtectionStatsPixels(database: MockDatabase(),
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: MockDataBrokerProtectionStatsPixelsRepository())
 
         let result = sut.calculateNumberOfNewMatchesFound([brokerProfileQueryData])
@@ -60,7 +66,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
             scanJobData: .mockWith(historyEvents: historyEvents),
             optOutJobData: [.mock(with: .mockWithoutRemovedDate)])
         let sut = DataBrokerProtectionStatsPixels(database: MockDatabase(),
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: MockDataBrokerProtectionStatsPixelsRepository())
 
         let result = sut.calculateNumberOfNewMatchesFound([brokerProfileQueryData])
@@ -81,7 +87,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
             scanJobData: .mockWith(historyEvents: historyEventsForScan),
             optOutJobData: [.mock(with: .mockWithoutRemovedDate, historyEvents: historyEventsForOptOut)])
         let sut = DataBrokerProtectionStatsPixels(database: MockDatabase(),
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: MockDataBrokerProtectionStatsPixelsRepository())
 
         let result = sut.calculateDurationOfFirstOptOut([brokerProfileQueryData])
@@ -102,7 +108,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
             scanJobData: .mockWith(historyEvents: historyEventsForScan),
             optOutJobData: [.mock(with: .mockWithoutRemovedDate, historyEvents: historyEventsForOptOut)])
         let sut = DataBrokerProtectionStatsPixels(database: MockDatabase(),
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: MockDataBrokerProtectionStatsPixelsRepository())
 
         let result = sut.calculateDurationOfFirstOptOut([brokerProfileQueryData])
@@ -127,7 +133,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
             scanJobData: .mockWith(historyEvents: historyEventsForScan),
             optOutJobData: [.mock(with: .mockWithoutRemovedDate, historyEvents: historyEventsForOptOut)])
         let sut = DataBrokerProtectionStatsPixels(database: MockDatabase(),
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: MockDataBrokerProtectionStatsPixelsRepository())
 
         let result = sut.calculateDurationOfFirstOptOut([brokerProfileQueryData])
@@ -180,7 +186,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
                 .mock(with: .mockWithRemovedDate, historyEvents: historyEventForOptOutWithSubmittedRequest),
             ])
         let sut = DataBrokerProtectionStatsPixels(database: MockDatabase(),
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: MockDataBrokerProtectionStatsPixelsRepository())
 
         let result = sut.calculateByBroker(broker, data: [brokerProfileQueryData])
@@ -218,7 +224,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
                 .mock(with: .mockWithoutRemovedDate, historyEvents: [HistoryEvent]())
             ])
         let sut = DataBrokerProtectionStatsPixels(database: MockDatabase(),
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: MockDataBrokerProtectionStatsPixelsRepository())
 
         let result = sut.calculateByBroker(broker, data: [brokerProfileQueryData])
@@ -231,7 +237,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
     func testWhenDateOfFirstScanIsNil_thenWeDoNotFireAnyPixel() {
         let repository = MockDataBrokerProtectionStatsPixelsRepository()
         let sut = DataBrokerProtectionStatsPixels(database: MockDatabase(),
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: repository)
 
         sut.tryToFireStatsPixels()
@@ -251,7 +257,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         ]
         let repository = MockDataBrokerProtectionStatsPixelsRepository()
         let sut = DataBrokerProtectionStatsPixels(database: database,
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: repository)
 
         sut.tryToFireStatsPixels()
@@ -271,7 +277,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         let repository = MockDataBrokerProtectionStatsPixelsRepository()
         repository.latestStatsWeeklyPixelDate = Date().yesterday!
         let sut = DataBrokerProtectionStatsPixels(database: database,
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: repository)
 
         sut.tryToFireStatsPixels()
@@ -292,7 +298,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         let repository = MockDataBrokerProtectionStatsPixelsRepository()
         repository.latestStatsWeeklyPixelDate = eightDaysAgo
         let sut = DataBrokerProtectionStatsPixels(database: database,
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: repository)
 
         sut.tryToFireStatsPixels()
@@ -312,7 +318,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         ]
         let repository = MockDataBrokerProtectionStatsPixelsRepository()
         let sut = DataBrokerProtectionStatsPixels(database: database,
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: repository)
 
         sut.tryToFireStatsPixels()
@@ -333,7 +339,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         let repository = MockDataBrokerProtectionStatsPixelsRepository()
         repository.latestStatsMonthlyPixelDate = twentyDaysAgo
         let sut = DataBrokerProtectionStatsPixels(database: database,
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: repository)
 
         sut.tryToFireStatsPixels()
@@ -354,7 +360,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         let repository = MockDataBrokerProtectionStatsPixelsRepository()
         repository.latestStatsMonthlyPixelDate = thirtyDaysAgo
         let sut = DataBrokerProtectionStatsPixels(database: database,
-                                                  handler: MockDataBrokerProtectionPixelsHandler(),
+                                                  handler: handler,
                                                   repository: repository)
 
         sut.tryToFireStatsPixels()
