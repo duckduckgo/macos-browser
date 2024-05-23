@@ -58,12 +58,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             userDefaults: defaults
         )
 
-        let expectation = expectation(description: "Remote Message Fetch")
-
         await messaging.fetchRemoteMessages()
-        expectation.fulfill()
-
-        wait(for: [expectation], timeout: 1.0)
 
         XCTAssertTrue(request.didFetchMessages)
     }
@@ -86,10 +81,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
         XCTAssertNil(activationDateStorage.daysSinceActivation())
 
-        let expectation = expectation(description: "Remote Message Fetch")
-
         await messaging.fetchRemoteMessages()
-        await fulfillment(of: [expectation], timeout: 1.0)
 
         XCTAssertTrue(request.didFetchMessages)
     }
@@ -116,10 +108,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         XCTAssertEqual(storage.storedMessages(), [])
         XCTAssertNotNil(activationDateStorage.daysSinceActivation())
 
-        let expectation = expectation(description: "Remote Message Fetch")
-
         await messaging.fetchRemoteMessages()
-        await fulfillment(of: [expectation], timeout: 1.0)
 
         XCTAssertTrue(request.didFetchMessages)
         XCTAssertEqual(storage.storedMessages(), messages)
@@ -145,10 +134,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
 
         XCTAssertNotNil(activationDateStorage.daysSinceActivation())
 
-        let expectation = expectation(description: "Remote Message Fetch")
-
         await messaging.fetchRemoteMessages()
-        await fulfillment(of: [expectation], timeout: 1.0)
 
         XCTAssertFalse(request.didFetchMessages)
         XCTAssertEqual(storage.storedMessages(), [])
@@ -185,7 +171,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
 
-        let hiddenMessage = mockMessage(id: "123", daysSinceNetworkProtectionEnabled: 10)
+        let hiddenMessage = mockMessage(id: "123", daysSinceVPNEnabled: 10)
         let activeMessage = mockMessage(id: "456")
         try? storage.store(messages: [hiddenMessage, activeMessage])
         activationDateStorage._daysSinceActivation = 5
@@ -208,7 +194,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
 
-        let hiddenMessage = mockMessage(id: "123", requiresNetPAccess: true)
+        let hiddenMessage = mockMessage(id: "123")
         try? storage.store(messages: [hiddenMessage])
 
         let messaging = DefaultSurveyRemoteMessaging(
@@ -229,7 +215,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         let storage = MockSurveyRemoteMessagingStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
 
-        let message = mockMessage(id: "123", requiresNetPUsage: false, requiresNetPAccess: true)
+        let message = mockMessage(id: "123")
         try? storage.store(messages: [message])
 
         let messaging = DefaultSurveyRemoteMessaging(
@@ -246,20 +232,25 @@ final class SurveyRemoteMessagingTests: XCTestCase {
     }
 
     private func mockMessage(id: String,
-                             daysSinceNetworkProtectionEnabled: Int = 0,
-                             requiresNetPUsage: Bool = true,
-                             requiresNetPAccess: Bool = true) -> SurveyRemoteMessage {
+                             subscriptionStatus: String = "",
+                             minimumDaysSinceSubscriptionStarted: Int = 0,
+                             maximumDaysUntilSubscriptionExpirationOrRenewal: Int = 0,
+                             daysSinceVPNEnabled: Int = 0,
+                             daysSincePIREnabled: Int = 0) -> SurveyRemoteMessage {
         let remoteMessageJSON = """
         {
             "id": "\(id)",
-            "daysSinceNetworkProtectionEnabled": \(daysSinceNetworkProtectionEnabled),
             "cardTitle": "Title",
-            "cardDescription": "Description",
-            "surveyURL": "https://duckduckgo.com/",
-            "requiresNetworkProtectionUsage": \(String(describing: requiresNetPUsage)),
-            "requiresNetworkProtectionAccess": \(String(describing: requiresNetPAccess)),
+            "cardDescription": "Description 1",
+            "attributes": {
+                    "subscriptionStatus": "\(subscriptionStatus)",
+                    "minimumDaysSinceSubscriptionStarted": \(minimumDaysSinceSubscriptionStarted),
+                    "maximumDaysUntilSubscriptionExpirationOrRenewal": \(maximumDaysUntilSubscriptionExpirationOrRenewal),
+                    "daysSinceVPNEnabled": \(daysSinceVPNEnabled),
+                    "daysSincePIREnabled": \(daysSincePIREnabled)
+            },
             "action": {
-                "actionTitle": "Action"
+                "actionTitle": "Action 1"
             }
         }
         """
