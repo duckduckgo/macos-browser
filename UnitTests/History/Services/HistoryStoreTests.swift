@@ -262,7 +262,7 @@ final class HistoryStoreTests: XCTestCase {
                             lastVisit: newVisitDate,
                             expectation: secondSavingExpectation)
 
-        waitForExpectations(timeout: 5, handler: nil)
+        waitForExpectations(timeout: 2, handler: nil)
     }
 
     func testWhenRemoveVisitsIsCalled_ThenFollowingSaveShouldSucceed() {
