@@ -22,6 +22,7 @@ import Sparkle
 import BrowserServicesKit
 import SwiftUIExtensions
 import PixelKit
+import SwiftUI
 
 #if SPARKLE
 
@@ -30,6 +31,8 @@ final class UpdateController: NSObject {
     enum Constants {
         static let internalChannelName = "internal-channel"
     }
+
+    lazy var notificationPresenter = UpdateNotificationPresenter()
 
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
@@ -67,10 +70,13 @@ final class UpdateController: NSObject {
     // The default configuration of Sparkle updates is in Info.plist
     updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
 
-#if DEBUG
-        updater.updater.automaticallyChecksForUpdates = false
-        updater.updater.updateCheckInterval = 0
-#endif
+    //TODO: Uncomment
+//#if DEBUG
+//        updater.updater.automaticallyChecksForUpdates = false
+//        updater.updater.updateCheckInterval = 0
+//#endif
+
+        updater.checkForUpdates(nil)
     }
 
     private func showNotSupportedInfo() {
@@ -125,6 +131,11 @@ extension UpdateController: SPUUpdaterDelegate {
         @unknown default:
             break
         }
+    }
+
+    func updater(_ updater: SPUUpdater, didFinishLoading appcast: SUAppcast) {
+        // Example to show a notification when appcast finishes loading
+        notificationPresenter.showUpdateNotification(icon: NSImage(named: NSImage.cautionName)!, text: "New version available. Relaunch to update.")
     }
 
 }
