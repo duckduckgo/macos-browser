@@ -21,6 +21,23 @@ import TrackerRadarKit
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
+private extension KnownTracker {
+
+    var countCTLActions: Int {
+        var count = 0
+
+        if let rules = rules {
+            for rule in rules {
+                if let action = rule.action, action == .blockCTLFB {
+                    count += 1
+                }
+            }
+        }
+        return count
+    }
+
+}
+
 class ClickToLoadTDSTests: XCTestCase {
 
     func testEnsureClickToLoadTDSCompiles() throws {
@@ -69,5 +86,53 @@ class ClickToLoadTDSTests: XCTestCase {
         }
 
         wait(for: [removed], timeout: 5.0)
+    }
+
+    func testClickToLoadTDSSplit() throws {
+
+        let trackerData = AppTrackerDataSetProvider().embeddedData
+        let etag = AppTrackerDataSetProvider().embeddedDataEtag
+        let trackerManager = TrackerDataManager(etag: etag,
+                                         data: trackerData,
+                                         embeddedDataProvider: AppTrackerDataSetProvider())
+        let mockAdAttributing = MockAttributing()
+
+        let cbrLists = ContentBlockerRulesLists(trackerDataManager: trackerManager, adClickAttribution: mockAdAttributing)
+        let ruleSets = cbrLists.contentBlockerRulesLists
+        let ctlTdsName = ContentBlockerRulesLists.Constants.clickToLoadRulesListName
+        let mainTdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
+
+        let mainRules = ruleSets.first(where: { $0.name == mainTdsName})
+        let ctlRules = ruleSets.first(where: { $0.name == ctlTdsName})
+
+        let mainTrackerData = mainRules?.trackerData
+        let mainTrackers = mainTrackerData?.tds.trackers
+
+        let ctlTrackerData = ctlRules?.trackerData
+        let ctlTrackers = ctlTrackerData?.tds.trackers
+
+        let fbMainTracker = mainTrackers?["facebook.net"]
+        let fbCtlTracker = ctlTrackers?["facebook.net"]
+
+        let fbMainRules = fbMainTracker?.rules
+        let fbCtlRules = fbCtlTracker?.rules
+
+        let fbMainRuleCount = fbMainRules!.count
+        let fbCtlRuleCount = fbCtlRules!.count
+
+        let mainCtlRuleCount = fbMainTracker!.countCTLActions
+        let ctlCtlRuleCount = fbCtlTracker!.countCTLActions
+
+        // ensure both rulesets contains facebook.net rules
+        XCTAssert(fbMainRuleCount > 0)
+        XCTAssert(fbCtlRuleCount > 0)
+
+        // ensure FB CTL rules include CTL custom actions, and main rules FB do not
+        XCTAssert(mainCtlRuleCount == 0)
+        XCTAssert(ctlCtlRuleCount > 0)
+
+        // ensure FB CTL rules are the sum of the main rules + CTL custom action rules
+        XCTAssert(fbMainRuleCount + ctlCtlRuleCount == fbCtlRuleCount)
+
     }
 }
