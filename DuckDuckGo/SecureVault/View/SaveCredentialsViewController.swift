@@ -217,7 +217,7 @@ final class SaveCredentialsViewController: NSViewController {
                                                        domain: domainLabel.stringValue)
         account.id = credentials?.account.id
         let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: passwordData)
-        var existingCredentials = getExistingCredentialsFrom(credentials)
+        let existingCredentials = getExistingCredentialsFrom(credentials)
 
         do {
             if passwordManagerCoordinator.isEnabled {
