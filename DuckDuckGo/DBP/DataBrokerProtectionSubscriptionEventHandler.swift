@@ -23,9 +23,16 @@ import DataBrokerProtection
 import PixelKit
 
 final class DataBrokerProtectionSubscriptionEventHandler {
+
+    private let subscriptionManager: SubscriptionManaging
+    private let authRepository: AuthenticationRepository
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
-    init(featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
+    init(subscriptionManager: SubscriptionManaging,
+         authRepository: AuthenticationRepository = KeychainAuthenticationData(),
+         featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
+        self.subscriptionManager = subscriptionManager
+        self.authRepository = authRepository
         self.featureDisabler = featureDisabler
     }
 

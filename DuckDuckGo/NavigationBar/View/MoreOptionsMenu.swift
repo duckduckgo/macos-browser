@@ -57,7 +57,7 @@ final class MoreOptionsMenu: NSMenu {
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
-    private lazy var accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+    private let accountManager: AccountManaging
 
     private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
 
@@ -68,15 +68,17 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
-         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility,
          sharingMenu: NSMenu? = nil,
-         internalUserDecider: InternalUserDecider) {
+         internalUserDecider: InternalUserDecider,
+         accountManager: AccountManaging) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
         self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
         self.internalUserDecider = internalUserDecider
+        self.accountManager = accountManager
 
         super.init(title: "")
 
@@ -391,7 +393,9 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
-        let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
+        let subscriptionManager = Application.appDelegate.subscriptionManager
+        let platform = subscriptionManager.currentEnvironment.purchasePlatform
+        let shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
         if shouldHidePrivacyProDueToNoProducts {
             return []
         }

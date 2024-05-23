@@ -1,5 +1,5 @@
 //
-//  DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift
+//  VPNSettings+Environment.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,14 +17,18 @@
 //
 
 import Foundation
-import AppKit
+import NetworkProtection
 import Subscription
-import BrowserServicesKit
 
-extension DefaultSubscriptionFeatureAvailability {
+public extension VPNSettings {
 
-    convenience init() {
-        self.init(privacyConfigurationManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-                  purchasePlatform: Application.appDelegate.subscriptionManager.currentEnvironment.purchasePlatform)
+    /// Align VPN environment to the Subscription environment
+    func alignTo(subscriptionEnvironment: SubscriptionEnvironment) {
+        switch subscriptionEnvironment.serviceEnvironment {
+        case .production:
+            self.selectedEnvironment = .production
+        case .staging:
+            self.selectedEnvironment = .staging
+        }
     }
 }

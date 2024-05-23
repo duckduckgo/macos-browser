@@ -52,6 +52,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.surveysRequest(),
         messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.surveys(),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
+        networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
         minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard
     ) {
