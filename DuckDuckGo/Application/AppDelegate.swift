@@ -94,7 +94,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
 #if DBP
-    private var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler?
+    private lazy var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler = {
+        let authManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(subscriptionManager: subscriptionManager)
+        return DataBrokerProtectionSubscriptionEventHandler(featureDisabler: DataBrokerProtectionFeatureDisabler(),
+                                                            authenticationManager: authManager,
+                                                            pixelHandler: DataBrokerProtectionPixelsHandler())
+    }()
+
 #endif
 
     private var didFinishLaunching = false
@@ -216,9 +222,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager,
                                                                                               tunnelController: tunnelController,
                                                                                               vpnUninstaller: vpnUninstaller)
-#if DBP
-        dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager)
-#endif
     }
 
     // swiftlint:disable:next function_body_length
@@ -310,7 +313,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
 
 #if DBP
-        dataBrokerProtectionSubscriptionEventHandler?.registerForSubscriptionAccountManagerEvents()
+        dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 #endif
 
 #if DBP

@@ -31,12 +31,14 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
     private var mockPixelHandler: MockPixelHandler!
     private var mockDependencies: DefaultDataBrokerOperationDependencies!
     private var mockProfile: DataBrokerProtectionProfile!
+    private var mockAgentStopper: MockAgentStopper!
 
     override func setUpWithError() throws {
 
         mockPixelHandler = MockPixelHandler()
         mockActivityScheduler = MockDataBrokerProtectionBackgroundActivityScheduler()
         mockNotificationService = MockUserNotificationService()
+        mockAgentStopper = MockAgentStopper()
 
         let mockDatabase = MockDatabase()
         let mockMismatchCalculator = MockMismatchCalculator(database: mockDatabase, pixelHandler: mockPixelHandler)
@@ -75,30 +77,42 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             queueManager: mockQueueManager,
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
-            pixelHandler: mockPixelHandler)
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper)
 
         mockDataManager.profileToReturn = mockProfile
 
+        let schedulerStartedExpectation = XCTestExpectation(description: "Scheduler started")
         var schedulerStarted = false
         mockActivityScheduler.startSchedulerCompletion = {
             schedulerStarted = true
+            schedulerStartedExpectation.fulfill()
         }
 
+        let scanCalledExpectation = XCTestExpectation(description: "Scan called")
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
             startScheduledScansCalled = true
+            scanCalledExpectation.fulfill()
         }
 
         // When
         sut.agentFinishedLaunching()
 
         // Then
+        await fulfillment(of: [scanCalledExpectation, schedulerStartedExpectation], timeout: 1.0)
         XCTAssertTrue(schedulerStarted)
         XCTAssertTrue(startScheduledScansCalled)
     }
 
-    func testWhenAgentStart_andProfileDoesNotExist_thenActivityIsNotScheduled_andSheduledOpereationsNotRun() async throws {
+    func testWhenAgentStart_andProfileDoesNotExist_thenActivityIsNotScheduled_andStopAgentIsCalled() async throws {
         // Given
+        let mockStopAction = MockDataProtectionStopAction()
+        let agentStopper = DefaultDataBrokerProtectionAgentStopper(dataManager: mockDataManager,
+                                                                   entitlementMonitor: DataBrokerProtectionEntitlementMonitor(),
+                                                                   authenticationManager: MockAuthenticationManager(),
+                                                                   pixelHandler: mockPixelHandler,
+                                                                   stopAction: mockStopAction)
         sut = DataBrokerProtectionAgentManager(
             userNotificationService: mockNotificationService,
             activityScheduler: mockActivityScheduler,
@@ -106,26 +120,64 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             queueManager: mockQueueManager,
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
-            pixelHandler: mockPixelHandler)
+            pixelHandler: mockPixelHandler,
+            agentStopper: agentStopper)
 
         mockDataManager.profileToReturn = nil
 
-        var schedulerStarted = false
-        mockActivityScheduler.startSchedulerCompletion = {
-            schedulerStarted = true
-        }
+        let stopAgentExpectation = XCTestExpectation(description: "Stop agent expectation")
 
-        var startScheduledScansCalled = false
-        mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
-            startScheduledScansCalled = true
+        var stopAgentWasCalled = false
+        mockStopAction.stopAgentCompletion = {
+            stopAgentWasCalled = true
+            stopAgentExpectation.fulfill()
         }
 
         // When
         sut.agentFinishedLaunching()
+        await fulfillment(of: [stopAgentExpectation], timeout: 1.0)
 
         // Then
-        XCTAssertFalse(schedulerStarted)
-        XCTAssertFalse(startScheduledScansCalled)
+        XCTAssertTrue(stopAgentWasCalled)
+    }
+
+    func testWhenAgentStart_thenPrerequisitesAreValidated_andEntitlementsAreMonitored() async {
+        // Given
+        let mockAgentStopper = MockAgentStopper()
+
+        sut = DataBrokerProtectionAgentManager(
+            userNotificationService: mockNotificationService,
+            activityScheduler: mockActivityScheduler,
+            ipcServer: mockIPCServer,
+            queueManager: mockQueueManager,
+            dataManager: mockDataManager,
+            operationDependencies: mockDependencies,
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper)
+
+        mockDataManager.profileToReturn = nil
+
+        let preRequisitesExpectation = XCTestExpectation(description: "preRequisitesExpectation expectation")
+        var runPrerequisitesWasCalled = false
+        mockAgentStopper.validateRunPrerequisitesCompletion = {
+            runPrerequisitesWasCalled = true
+            preRequisitesExpectation.fulfill()
+        }
+
+        let monitorEntitlementExpectation = XCTestExpectation(description: "monitorEntitlement expectation")
+        var monitorEntitlementWasCalled = false
+        mockAgentStopper.monitorEntitlementCompletion = {
+            monitorEntitlementWasCalled = true
+            monitorEntitlementExpectation.fulfill()
+        }
+
+        // When
+        sut.agentFinishedLaunching()
+        await fulfillment(of: [preRequisitesExpectation, monitorEntitlementExpectation], timeout: 1.0)
+
+        // Then
+        XCTAssertTrue(runPrerequisitesWasCalled)
+        XCTAssertTrue(monitorEntitlementWasCalled)
     }
 
     func testWhenActivitySchedulerTriggers_thenSheduledOpereationsRun() async throws {
@@ -137,7 +189,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             queueManager: mockQueueManager,
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
-            pixelHandler: mockPixelHandler)
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper)
 
         mockDataManager.profileToReturn = mockProfile
 
@@ -162,7 +215,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             queueManager: mockQueueManager,
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
-            pixelHandler: mockPixelHandler)
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper)
 
         mockDataManager.profileToReturn = mockProfile
 
@@ -187,7 +241,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             queueManager: mockQueueManager,
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
-            pixelHandler: mockPixelHandler)
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper)
 
         mockNotificationService.reset()
 
@@ -207,7 +262,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             queueManager: mockQueueManager,
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
-            pixelHandler: mockPixelHandler)
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper)
 
         mockNotificationService.reset()
 
@@ -227,7 +283,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             queueManager: mockQueueManager,
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
-            pixelHandler: mockPixelHandler)
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper)
 
         mockNotificationService.reset()
         mockQueueManager.startImmediateOperationsIfPermittedCompletionError = DataBrokerProtectionAgentErrorCollection(oneTimeError: NSError(domain: "test", code: 10))
@@ -248,7 +305,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             queueManager: mockQueueManager,
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
-            pixelHandler: mockPixelHandler)
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper)
 
         mockNotificationService.reset()
         mockDataManager.shouldReturnHasMatches = true
@@ -269,7 +327,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             queueManager: mockQueueManager,
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
-            pixelHandler: mockPixelHandler)
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper)
 
         mockNotificationService.reset()
         mockDataManager.shouldReturnHasMatches = false
@@ -290,7 +349,8 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
             queueManager: mockQueueManager,
             dataManager: mockDataManager,
             operationDependencies: mockDependencies,
-            pixelHandler: mockPixelHandler)
+            pixelHandler: mockPixelHandler,
+            agentStopper: mockAgentStopper)
 
         var startScheduledScansCalled = false
         mockQueueManager.startScheduledOperationsIfPermittedCalledCompletion = { _ in
