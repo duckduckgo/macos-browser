@@ -580,21 +580,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setUpAutofillPixelReporter() {
-        autofillPixelReporter = AutofillPixelReporter(userDefaults: .standard,
-                                                      eventMapping: EventMapping<AutofillPixelEvent> {event, _, params, _ in
-            switch event {
-            case .autofillActiveUser:
-                PixelKit.fire(GeneralPixel.autofillActiveUser)
-            case .autofillEnabledUser:
-                PixelKit.fire(GeneralPixel.autofillEnabledUser)
-            case .autofillOnboardedUser:
-                PixelKit.fire(GeneralPixel.autofillOnboardedUser)
-            case .autofillLoginsStacked:
-                PixelKit.fire(GeneralPixel.autofillLoginsStacked, withAdditionalParameters: params)
-            case .autofillCreditCardsStacked:
-                PixelKit.fire(GeneralPixel.autofillCreditCardsStacked, withAdditionalParameters: params)
-            }
-        }, installDate: AppDelegate.firstLaunchDate)
+        autofillPixelReporter = AutofillPixelReporter(
+            userDefaults: .standard,
+            eventMapping: EventMapping<AutofillPixelEvent> {event, _, params, _ in
+                switch event {
+                case .autofillActiveUser:
+                    PixelKit.fire(GeneralPixel.autofillActiveUser)
+                case .autofillEnabledUser:
+                    PixelKit.fire(GeneralPixel.autofillEnabledUser)
+                case .autofillOnboardedUser:
+                    PixelKit.fire(GeneralPixel.autofillOnboardedUser)
+                case .autofillLoginsStacked:
+                    PixelKit.fire(GeneralPixel.autofillLoginsStacked, withAdditionalParameters: params)
+                case .autofillCreditCardsStacked:
+                    PixelKit.fire(GeneralPixel.autofillCreditCardsStacked, withAdditionalParameters: params)
+                }
+            },
+            passwordManager: PasswordManagerCoordinator.shared,
+            installDate: AppDelegate.firstLaunchDate)
     }
 }
 
