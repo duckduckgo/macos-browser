@@ -85,7 +85,7 @@ struct ClickToLoadRulesSplitter {
                 var ctlRules: [KnownTracker.Rule] = []
 
                 for rule in rules.reversed() {
-                    if let action = rule.action, action == .blockCtlFB {
+                    if let action = rule.action, action == .blockCTLFB {
                         ctlRules.insert(rule, at: 0)
                     } else {
                         ctlRules.insert(rule, at: 0)
@@ -142,7 +142,7 @@ private extension KnownTracker {
     var containsCTLActions: Bool {
         if let rules = rules {
             for rule in rules {
-                if let action = rule.action, action == .blockCtlFB {
+                if let action = rule.action, action == .blockCTLFB {
                     return true
                 }
             }

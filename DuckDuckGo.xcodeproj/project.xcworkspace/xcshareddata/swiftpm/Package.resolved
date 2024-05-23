@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "la/clicktoload-redux",
-        "revision" : "1a4a2b86804812d2286bfbfb4f692d18c5e19f19"
+        "revision" : "134d01bda3fae9ff68064489ff0381c7bc9679bc"
       }
     },
     {
@@ -176,8 +176,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/TrackerRadarKit",
       "state" : {
-        "revision" : "c01e6a59d000356b58ec77053e0a99d538be56a5",
-        "version" : "2.1.1"
+        "branch" : "la/blockCTLFB",
+        "revision" : "af2ade8afe86cc55b292b22a58ca6bc022927baf"
       }
     },
     {
