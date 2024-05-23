@@ -40,10 +40,26 @@ enum GeneralPixel: PixelKitEventV2 {
     case formAutofilled(kind: FormAutofillKind)
     case autofillItemSaved(kind: FormAutofillKind)
 
+    case autofillLoginsSaveLoginInlineDisplayed
+    case autofillLoginsSaveLoginInlineConfirmed
+    case autofillLoginsSaveLoginInlineDismissed
+
+    case autofillLoginsSavePasswordInlineDisplayed
+    case autofillLoginsSavePasswordInlineConfirmed
+    case autofillLoginsSavePasswordInlineDismissed
+
     case autofillLoginsSaveLoginModalExcludeSiteConfirmed
     case autofillLoginsSettingsResetExcludedDisplayed
     case autofillLoginsSettingsResetExcludedConfirmed
     case autofillLoginsSettingsResetExcludedDismissed
+
+    case autofillLoginsUpdatePasswordInlineDisplayed
+    case autofillLoginsUpdatePasswordInlineConfirmed
+    case autofillLoginsUpdatePasswordInlineDismissed
+
+    case autofillLoginsUpdateUsernameInlineDisplayed
+    case autofillLoginsUpdateUsernameInlineConfirmed
+    case autofillLoginsUpdateUsernameInlineDismissed
 
     case autofillActiveUser
     case autofillEnabledUser
@@ -367,6 +383,20 @@ enum GeneralPixel: PixelKitEventV2 {
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
 
+        case .autofillLoginsSaveLoginInlineDisplayed:
+            return "m_mac_autofill_logins_save_login_inline_displayed"
+        case .autofillLoginsSaveLoginInlineConfirmed:
+            return "m_mac_autofill_logins_save_login_inline_confirmed"
+        case .autofillLoginsSaveLoginInlineDismissed:
+            return "m_mac_autofill_logins_save_login_inline_dismissed"
+
+        case .autofillLoginsSavePasswordInlineDisplayed:
+            return "m_mac_autofill_logins_save_password_inline_displayed"
+        case .autofillLoginsSavePasswordInlineConfirmed:
+            return "m_mac_autofill_logins_save_password_inline_confirmed"
+        case .autofillLoginsSavePasswordInlineDismissed:
+            return "m_mac_autofill_logins_save_password_inline_dismissed"
+
         case .autofillLoginsSaveLoginModalExcludeSiteConfirmed:
             return "m_mac_autofill_logins_save_login_exclude_site_confirmed"
         case .autofillLoginsSettingsResetExcludedDisplayed:
@@ -375,6 +405,20 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_autofill_settings_reset_excluded_confirmed"
         case .autofillLoginsSettingsResetExcludedDismissed:
             return "m_mac_autofill_settings_reset_excluded_dismissed"
+
+        case .autofillLoginsUpdatePasswordInlineDisplayed:
+            return "m_mac_autofill_logins_update_password_inline_displayed"
+        case .autofillLoginsUpdatePasswordInlineConfirmed:
+            return "m_mac_autofill_logins_update_password_inline_confirmed"
+        case .autofillLoginsUpdatePasswordInlineDismissed:
+            return "m_mac_autofill_logins_update_password_inline_dismissed"
+
+        case .autofillLoginsUpdateUsernameInlineDisplayed:
+            return "m_mac_autofill_logins_update_username_inline_displayed"
+        case .autofillLoginsUpdateUsernameInlineConfirmed:
+            return "m_mac_autofill_logins_update_username_inline_confirmed"
+        case .autofillLoginsUpdateUsernameInlineDismissed:
+            return "m_mac_autofill_logins_update_username_inline_dismissed"
 
         case .autofillActiveUser:
             return "m_mac_autofill_activeuser"

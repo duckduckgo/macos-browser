@@ -19,7 +19,7 @@
 import Foundation
 
 struct ProfileSelector: Codable {
-    let selector: String
+    let selector: String?
     let findElements: Bool?
     let afterText: String?
     let beforeText: String?
