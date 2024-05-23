@@ -440,14 +440,14 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.numberOfRecordsFound: String(profilesFound),
                     Consts.numberOfOptOutsInProgress: String(optOutsInProgress),
                     Consts.numberOfSucessfulOptOuts: String(successfulOptOuts),
-                    Consts.numberOfOptOutsFailure: String(failedOptOuts), 
+                    Consts.numberOfOptOutsFailure: String(failedOptOuts),
                     Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
                     Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound)]
         case .globalMetricsMonthlyStats(let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound):
             return [Consts.numberOfRecordsFound: String(profilesFound),
                     Consts.numberOfOptOutsInProgress: String(optOutsInProgress),
                     Consts.numberOfSucessfulOptOuts: String(successfulOptOuts),
-                    Consts.numberOfOptOutsFailure: String(failedOptOuts), 
+                    Consts.numberOfOptOutsFailure: String(failedOptOuts),
                     Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
                     Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound)]
         case .dataBrokerMetricsWeeklyStats(let dataBrokerURL, let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound, let numberOfReappereances):
@@ -547,7 +547,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .initialScanTotalDuration,
                     .initialScanSiteLoadDuration,
                     .initialScanPostLoadingDuration,
-                    .initialScanPreStartDuration, 
+                    .initialScanPreStartDuration,
                     .globalMetricsWeeklyStats,
                     .globalMetricsMonthlyStats,
                     .dataBrokerMetricsWeeklyStats,

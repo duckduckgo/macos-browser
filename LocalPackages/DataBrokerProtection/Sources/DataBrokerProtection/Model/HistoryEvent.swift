@@ -63,7 +63,7 @@ public struct HistoryEvent: Identifiable, Sendable {
 
     func isMatchEvent() -> Bool {
         switch type {
-        case .noMatchFound, .matchesFound(_):
+        case .noMatchFound, .matchesFound:
             return true
         default:
             return false
