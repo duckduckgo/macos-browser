@@ -76,6 +76,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
     private var autoClearHandler: AutoClearHandler!
+    private(set) var autofillPixelReporter: AutofillPixelReporter?
 
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
@@ -321,6 +322,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
         setUpAutoClearHandler()
+
+        setUpAutofillPixelReporter()
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -586,6 +589,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 NSApplication.shared.reply(toApplicationShouldTerminate: true)
             }
         }
+    }
+
+    private func setUpAutofillPixelReporter() {
+        autofillPixelReporter = AutofillPixelReporter(
+                userDefaults: .standard,
+                eventMapping: EventMapping<AutofillPixelEvent> {event, _, params, _ in
+                    switch event {
+                    case .autofillActiveUser:
+                        PixelKit.fire(GeneralPixel.autofillActiveUser)
+                    case .autofillEnabledUser:
+                        PixelKit.fire(GeneralPixel.autofillEnabledUser)
+                    case .autofillOnboardedUser:
+                        PixelKit.fire(GeneralPixel.autofillOnboardedUser)
+                    case .autofillLoginsStacked:
+                        PixelKit.fire(GeneralPixel.autofillLoginsStacked, withAdditionalParameters: params)
+                    case .autofillCreditCardsStacked:
+                        PixelKit.fire(GeneralPixel.autofillCreditCardsStacked, withAdditionalParameters: params)
+                    }
+                },
+                passwordManager: PasswordManagerCoordinator.shared,
+                installDate: AppDelegate.firstLaunchDate)
     }
 }
 
