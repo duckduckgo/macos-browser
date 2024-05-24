@@ -212,6 +212,7 @@ final class AutofillPreferencesModel: ObservableObject {
             operatingSystemVersion: operatingSystemVersion,
             appVersion: appVersion,
             hardwareModel: hardwareModel,
+            subscription: nil,
             daysSinceVPNActivated: nil,
             daysSinceVPNLastActive: nil,
             daysSincePIRActivated: nil,

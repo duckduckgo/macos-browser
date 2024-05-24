@@ -48,7 +48,8 @@ final class SurveyRemoteMessageTests: XCTestCase {
             vpnActivationDateStore: mockActivationDateStore,
             operatingSystemVersion: "1.2.3",
             appVersion: "4.5.6",
-            hardwareModel: "MacBookPro,123"
+            hardwareModel: "MacBookPro,123",
+            subscription: nil
         )
 
         XCTAssertEqual(firstMessage.cardTitle, "Title 1")
@@ -105,7 +106,8 @@ final class SurveyRemoteMessageTests: XCTestCase {
             vpnActivationDateStore: mockActivationDateStore,
             operatingSystemVersion: "1.2.3",
             appVersion: "4.5.6",
-            hardwareModel: "MacBookPro,123"
+            hardwareModel: "MacBookPro,123",
+            subscription: nil
         )
 
         let expectedURL = """

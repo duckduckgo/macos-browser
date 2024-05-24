@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Common
 import Foundation
 import PixelKit
+import Subscription
 
 import NetworkProtection
 import NetworkProtectionUI
@@ -53,6 +54,7 @@ extension HomePage.Models {
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
+        private let subscriptionManager: SubscriptionManaging
 
         @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
         var shouldShowAllFeatures: Bool {
@@ -111,7 +113,8 @@ extension HomePage.Models {
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              surveyRemoteMessaging: SurveyRemoteMessaging,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-             permanentSurveyManager: SurveyManager = PermanentSurveyManager()) {
+             permanentSurveyManager: SurveyManager = PermanentSurveyManager(),
+             subscriptionManager: SubscriptionManaging = Application.appDelegate.subscriptionManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dockCustomizer = dockCustomizer
             self.dataImportProvider = dataImportProvider
@@ -121,6 +124,7 @@ extension HomePage.Models {
             self.surveyRemoteMessaging = surveyRemoteMessaging
             self.privacyConfigurationManager = privacyConfigurationManager
             self.permanentSurveyManager = permanentSurveyManager
+            self.subscriptionManager = subscriptionManager
 
             refreshFeaturesMatrix()
 
@@ -357,14 +361,30 @@ extension HomePage.Models {
 
             switch actionType {
             case .openSurveyURL, .openURL:
-                if let surveyURL = remoteMessage.presentableSurveyURL() {
-                    let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
-                    tabCollectionViewModel.append(tab: tab)
-                    PixelKit.fire(GeneralPixel.surveyRemoteMessageOpened(messageID: remoteMessage.id))
+                Task { @MainActor in
+                    var subscription: Subscription?
 
-                    // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
-                    surveyRemoteMessaging.dismiss(message: remoteMessage)
-                    refreshFeaturesMatrix()
+                    if let token = subscriptionManager.accountManager.accessToken {
+                        switch await subscriptionManager.subscriptionService.getSubscription(
+                            accessToken: token,
+                            cachePolicy: .returnCacheDataElseLoad
+                        ) {
+                        case .success(let fetchedSubscription):
+                            subscription = fetchedSubscription
+                        case .failure:
+                            break
+                        }
+                    }
+
+                    if let surveyURL = remoteMessage.presentableSurveyURL(subscription: subscription) {
+                        let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
+                        tabCollectionViewModel.append(tab: tab)
+                        PixelKit.fire(GeneralPixel.surveyRemoteMessageOpened(messageID: remoteMessage.id))
+
+                        // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
+                        surveyRemoteMessaging.dismiss(message: remoteMessage)
+                        refreshFeaturesMatrix()
+                    }
                 }
             }
         }

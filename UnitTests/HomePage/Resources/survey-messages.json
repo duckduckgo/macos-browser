@@ -5,6 +5,7 @@
         "cardDescription": "Description 1",
         "attributes": {
             "subscriptionStatus": "Auto-Renewable",
+            "subscriptionBillingPeriod": "Monthly",
             "minimumDaysSinceSubscriptionStarted": 1,
             "maximumDaysUntilSubscriptionExpirationOrRenewal": 30,
             "daysSinceVPNEnabled": 2,

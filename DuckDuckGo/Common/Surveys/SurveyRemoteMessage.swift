@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import Subscription
 
 struct SurveyRemoteMessageAction: Codable, Equatable, Hashable {
     enum Action: String, Codable {
@@ -53,7 +54,8 @@ struct SurveyRemoteMessage: Codable, Equatable, Identifiable, Hashable {
         pirActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp),
         operatingSystemVersion: String = ProcessInfo.processInfo.operatingSystemVersion.description,
         appVersion: String = AppVersion.shared.versionNumber,
-        hardwareModel: String? = HardwareModel.model
+        hardwareModel: String? = HardwareModel.model,
+        subscription: Subscription?
     ) -> URL? {
         if let actionType = action.actionType, actionType == .openURL, let urlString = action.actionURL, let url = URL(string: urlString) {
             return url
@@ -68,6 +70,7 @@ struct SurveyRemoteMessage: Codable, Equatable, Identifiable, Hashable {
             operatingSystemVersion: operatingSystemVersion,
             appVersion: appVersion,
             hardwareModel: hardwareModel,
+            subscription: subscription,
             daysSinceVPNActivated: vpnActivationDateStore.daysSinceActivation(),
             daysSinceVPNLastActive: vpnActivationDateStore.daysSinceLastActive(),
             daysSincePIRActivated: pirActivationDateStore.daysSinceActivation(),
