@@ -307,14 +307,13 @@ final class AddressBarTextEditor: NSTextView {
         guard selectionAffinity == .downstream || selectedRange.length == 0 else {
             // current selection is from right to left: reset selection to the upper bound
             self.selectedRange = NSRange(location: selectedRange.upperBound, length: 0)
-            scrollToCaret()
             return
         }
         guard let index = nextWordSelectionIndex(backwards: false) else { return }
 
         let range = NSRange(location: selectedRange.location, length: index - selectedRange.location)
         self.setSelectedRange(range, affinity: .downstream, stillSelecting: false)
-        scrollToCaret()
+        self.scrollToSelectionEnd()
     }
 
     override func moveWordLeftAndModifySelection(_ sender: Any?) {
@@ -322,14 +321,13 @@ final class AddressBarTextEditor: NSTextView {
         guard selectionAffinity == .upstream || selectedRange.length == 0 else {
             // current selection is from left to right: reset selection to the upper bound
             self.selectedRange = NSRange(location: selectedRange.lowerBound, length: 0)
-            scrollToCaret()
             return
         }
         guard let index = nextWordSelectionIndex(backwards: true) else { return }
 
         let range = NSRange(location: index, length: selectedRange.upperBound - index)
         self.setSelectedRange(range, affinity: .upstream, stillSelecting: false)
-        scrollToCaret()
+        self.scrollToSelectionStart()
     }
 
     override func deleteForward(_ sender: Any?) {
@@ -433,6 +431,17 @@ final class AddressBarTextEditor: NSTextView {
         let caretRect = layoutManager.boundingRect(forGlyphRange: selectedRange(), in: textContainer)
         scrollToVisible(caretRect)
     }
+
+    private func scrollToSelectionStart() {
+        let startRange = NSRange(location: selectedRange().location, length: 0)
+        self.scrollRangeToVisible(startRange)
+    }
+
+    private func scrollToSelectionEnd() {
+        let endRange = NSRange(location: selectedRange.location + selectedRange.length, length: 0)
+        self.scrollRangeToVisible(endRange)
+    }
+
 }
 
 final class AddressBarTextFieldCell: NSTextFieldCell {
