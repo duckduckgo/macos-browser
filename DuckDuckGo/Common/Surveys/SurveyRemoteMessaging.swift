@@ -45,7 +45,8 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
     private let messageStorage: SurveyRemoteMessagingStorage
     private let accountManager: AccountManaging
     private let subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching
-    private let waitlistActivationDateStore: WaitlistActivationDateStore
+    private let vpnActivationDateStore: WaitlistActivationDateStore
+    private let pirActivationDateStore: WaitlistActivationDateStore
     private let minimumRefreshInterval: TimeInterval
     private let userDefaults: UserDefaults
 
@@ -70,7 +71,8 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         messageStorage: SurveyRemoteMessagingStorage = DefaultSurveyRemoteMessagingStorage.surveys(),
         accountManager: AccountManaging,
         subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching,
-        waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
+        vpnActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
+        pirActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp),
         networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
         minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard
@@ -79,7 +81,8 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         self.messageStorage = messageStorage
         self.accountManager = accountManager
         self.subscriptionFetcher = subscriptionFetcher
-        self.waitlistActivationDateStore = waitlistActivationDateStore
+        self.vpnActivationDateStore = vpnActivationDateStore
+        self.pirActivationDateStore = pirActivationDateStore
         self.minimumRefreshInterval = minimumRefreshInterval
         self.userDefaults = userDefaults
     }
@@ -188,8 +191,17 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
             }
 
             // Check VPN usage:
-            if let requiredDaysSinceActivation = message.attributes.daysSinceVPNEnabled {
-                if let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation(), requiredDaysSinceActivation <= daysSinceActivation {
+            if let requiredDaysSinceVPNActivation = message.attributes.daysSinceVPNEnabled {
+                if let daysSinceActivation = vpnActivationDateStore.daysSinceActivation(), requiredDaysSinceVPNActivation <= daysSinceActivation {
+                    attributeMatchStatus = true
+                } else {
+                    return false
+                }
+            }
+
+            // Check PIR usage:
+            if let requiredDaysSincePIRActivation = message.attributes.daysSincePIREnabled {
+                if let daysSinceActivation = pirActivationDateStore.daysSinceActivation(), requiredDaysSincePIRActivation <= daysSinceActivation {
                     attributeMatchStatus = true
                 } else {
                     return false

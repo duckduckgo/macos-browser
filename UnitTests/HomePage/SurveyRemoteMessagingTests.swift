@@ -49,7 +49,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             accountManager: accountManager,
             subscriptionFetcher: subscriptionFetcher,
-            waitlistActivationDateStore: activationDateStorage,
+            vpnActivationDateStore: activationDateStorage,
+            pirActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -71,7 +72,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             accountManager: accountManager,
             subscriptionFetcher: subscriptionFetcher,
-            waitlistActivationDateStore: activationDateStorage,
+            vpnActivationDateStore: activationDateStorage,
+            pirActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -98,7 +100,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             accountManager: accountManager,
             subscriptionFetcher: subscriptionFetcher,
-            waitlistActivationDateStore: activationDateStorage,
+            vpnActivationDateStore: activationDateStorage,
+            pirActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -126,7 +129,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             accountManager: accountManager,
             subscriptionFetcher: subscriptionFetcher,
-            waitlistActivationDateStore: activationDateStorage,
+            vpnActivationDateStore: activationDateStorage,
+            pirActivationDateStore: activationDateStorage,
             minimumRefreshInterval: .days(7), // Use a large number to hit the refresh check
             userDefaults: defaults
         )
@@ -154,7 +158,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             accountManager: accountManager,
             subscriptionFetcher: subscriptionFetcher,
-            waitlistActivationDateStore: activationDateStorage,
+            vpnActivationDateStore: activationDateStorage,
+            pirActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -179,7 +184,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             accountManager: accountManager,
             subscriptionFetcher: subscriptionFetcher,
-            waitlistActivationDateStore: activationDateStorage,
+            vpnActivationDateStore: activationDateStorage,
+            pirActivationDateStore: activationDateStorage,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
