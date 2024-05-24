@@ -25,32 +25,41 @@ final class SurveyURLBuilder {
     enum SurveyURLParameters: String, CaseIterable {
         case atb = "atb"
         case atbVariant = "var"
-        case daysSinceActivated = "delta"
-        case macOSVersion = "mv"
+        case macOSVersion = "osv"
         case appVersion = "ddgv"
         case hardwareModel = "mo"
-        case lastDayActive = "da"
+
+        case vpnFirstUsed = "vpn_first_used"
+        case vpnLastUsed = "vpn_last_used"
+        case pirFirstUsed = "pir_first_used"
+        case pirLastUsed = "pir_last_used"
     }
 
     private let statisticsStore: StatisticsStore
     private let operatingSystemVersion: String
     private let appVersion: String
     private let hardwareModel: String?
-    private let daysSinceActivation: Int?
-    private let daysSinceLastActive: Int?
+    private let daysSinceVPNActivated: Int?
+    private let daysSinceVPNLastActive: Int?
+    private let daysSincePIRActivated: Int?
+    private let daysSincePIRLastActive: Int?
 
     init(statisticsStore: StatisticsStore,
          operatingSystemVersion: String,
          appVersion: String,
          hardwareModel: String?,
-         daysSinceActivation: Int?,
-         daysSinceLastActive: Int?) {
+         daysSinceVPNActivated: Int?,
+         daysSinceVPNLastActive: Int?,
+         daysSincePIRActivated: Int?,
+         daysSincePIRLastActive: Int?) {
         self.statisticsStore = statisticsStore
         self.operatingSystemVersion = operatingSystemVersion
         self.appVersion = appVersion
         self.hardwareModel = hardwareModel
-        self.daysSinceActivation = daysSinceActivation
-        self.daysSinceLastActive = daysSinceLastActive
+        self.daysSinceVPNActivated = daysSinceVPNActivated
+        self.daysSinceVPNLastActive = daysSinceVPNLastActive
+        self.daysSincePIRActivated = daysSincePIRActivated
+        self.daysSincePIRLastActive = daysSincePIRLastActive
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -72,10 +81,6 @@ final class SurveyURLBuilder {
                 if let variant = statisticsStore.variant {
                     queryItems.append(queryItem(parameter: parameter, value: variant))
                 }
-            case .daysSinceActivated:
-                if let daysSinceActivation {
-                    queryItems.append(queryItem(parameter: parameter, value: daysSinceActivation))
-                }
             case .macOSVersion:
                 queryItems.append(queryItem(parameter: parameter, value: operatingSystemVersion))
             case .appVersion:
@@ -84,9 +89,21 @@ final class SurveyURLBuilder {
                 if let hardwareModel = hardwareModel {
                     queryItems.append(queryItem(parameter: parameter, value: hardwareModel))
                 }
-            case .lastDayActive:
-                if let daysSinceLastActive {
-                    queryItems.append(queryItem(parameter: parameter, value: daysSinceLastActive))
+            case .vpnFirstUsed:
+                if let daysSinceVPNActivated {
+                    queryItems.append(queryItem(parameter: parameter, value: daysSinceVPNActivated))
+                }
+            case .vpnLastUsed:
+                if let daysSinceVPNLastActive {
+                    queryItems.append(queryItem(parameter: parameter, value: daysSinceVPNLastActive))
+                }
+            case .pirFirstUsed:
+                if let daysSincePIRActivated {
+                    queryItems.append(queryItem(parameter: parameter, value: daysSincePIRActivated))
+                }
+            case .pirLastUsed:
+                if let daysSincePIRLastActive {
+                    queryItems.append(queryItem(parameter: parameter, value: daysSincePIRLastActive))
                 }
             }
         }

@@ -212,8 +212,10 @@ final class AutofillPreferencesModel: ObservableObject {
             operatingSystemVersion: operatingSystemVersion,
             appVersion: appVersion,
             hardwareModel: hardwareModel,
-            daysSinceActivation: activationDateStore.daysSinceActivation(),
-            daysSinceLastActive: activationDateStore.daysSinceLastActive()
+            daysSinceVPNActivated: nil,
+            daysSinceVPNLastActive: nil,
+            daysSincePIRActivated: nil,
+            daysSincePIRLastActive: nil
         )
 
         guard let surveyUrl = surveyURLBuilder.buildSurveyURLWithPasswordsCountSurveyParameter(from: "https://selfserve.decipherinc.com/survey/selfserve/32ab/240307") else {

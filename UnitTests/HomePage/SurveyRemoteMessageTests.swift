@@ -45,7 +45,7 @@ final class SurveyRemoteMessageTests: XCTestCase {
 
         let firstMessagePresentableSurveyURL = firstMessage.presentableSurveyURL(
             statisticsStore: mockStatisticsStore,
-            activationDateStore: mockActivationDateStore,
+            vpnActivationDateStore: mockActivationDateStore,
             operatingSystemVersion: "1.2.3",
             appVersion: "4.5.6",
             hardwareModel: "MacBookPro,123"
@@ -102,13 +102,16 @@ final class SurveyRemoteMessageTests: XCTestCase {
 
         let presentableSurveyURL = message.presentableSurveyURL(
             statisticsStore: mockStatisticsStore,
-            activationDateStore: mockActivationDateStore,
+            vpnActivationDateStore: mockActivationDateStore,
             operatingSystemVersion: "1.2.3",
             appVersion: "4.5.6",
             hardwareModel: "MacBookPro,123"
         )
 
-        let expectedURL = "https://duckduckgo.com/?atb=atb-123&var=variant&delta=2&mv=1.2.3&ddgv=4.5.6&mo=MacBookPro%252C123&da=1"
+        let expectedURL = """
+        https://duckduckgo.com/?atb=atb-123&var=variant&osv=1.2.3&ddgv=4.5.6&mo=MacBookPro%252C123&vpn_first_used=2&vpn_last_used=1
+        """
+
         XCTAssertEqual(presentableSurveyURL!.absoluteString, expectedURL)
     }
 

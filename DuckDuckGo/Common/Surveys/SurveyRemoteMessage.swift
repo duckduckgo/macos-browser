@@ -49,7 +49,8 @@ struct SurveyRemoteMessage: Codable, Equatable, Identifiable, Hashable {
 
     func presentableSurveyURL(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
-        activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
+        vpnActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
+        pirActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp),
         operatingSystemVersion: String = ProcessInfo.processInfo.operatingSystemVersion.description,
         appVersion: String = AppVersion.shared.versionNumber,
         hardwareModel: String? = HardwareModel.model
@@ -67,8 +68,10 @@ struct SurveyRemoteMessage: Codable, Equatable, Identifiable, Hashable {
             operatingSystemVersion: operatingSystemVersion,
             appVersion: appVersion,
             hardwareModel: hardwareModel,
-            daysSinceActivation: activationDateStore.daysSinceActivation(),
-            daysSinceLastActive: activationDateStore.daysSinceLastActive()
+            daysSinceVPNActivated: vpnActivationDateStore.daysSinceActivation(),
+            daysSinceVPNLastActive: vpnActivationDateStore.daysSinceLastActive(),
+            daysSincePIRActivated: pirActivationDateStore.daysSinceActivation(),
+            daysSincePIRLastActive: pirActivationDateStore.daysSinceLastActive()
         )
 
         return surveyURLBuilder.buildSurveyURL(from: surveyURL)
