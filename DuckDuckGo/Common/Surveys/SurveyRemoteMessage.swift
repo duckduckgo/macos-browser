@@ -34,6 +34,7 @@ struct SurveyRemoteMessage: Codable, Equatable, Identifiable, Hashable {
 
     struct Attributes: Codable, Equatable, Hashable {
         let subscriptionStatus: String?
+        let subscriptionBillingPeriod: String?
         let minimumDaysSinceSubscriptionStarted: Int?
         let maximumDaysUntilSubscriptionExpirationOrRenewal: Int?
         let daysSinceVPNEnabled: Int?

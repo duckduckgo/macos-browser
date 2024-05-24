@@ -98,7 +98,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
                 try self.messageStorage.store(messages: processedMessages)
                 self.updateLastRefreshDate()
             } catch {
-                PixelKit.fire(DebugEvent(GeneralPixel.networkProtectionRemoteMessageStorageFailed, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.surveyRemoteMessageStorageFailed, error: error))
             }
         case .failure(let error):
             // Ignore 403 errors, those happen when a file can't be found on S3
@@ -107,10 +107,11 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
                 return
             }
 
-            PixelKit.fire(DebugEvent(GeneralPixel.networkProtectionRemoteMessageFetchingFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.surveyRemoteMessageFetchingFailed, error: error))
         }
     }
 
+    // swiftlint:disable cyclomatic_complexity
     /// Processes the messages received from S3 and returns those which the user is eligible for. This is done by checking each of the attributes against the user's local state.
     /// Because the result of the message fetch is cached, it means that they won't be immediately updated if the user suddenly qualifies, but the refresh interval for remote messages is only 1 hour so it
     /// won't take long for the message to appear to the user.
@@ -125,12 +126,25 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
         return messages.filter { message in
 
+            // TODO: Make it so that we check all attributes, not just the first one
+            var didMatch = false
+
             // Check subscription status:
             if let messageSubscriptionStatus = message.attributes.subscriptionStatus {
                 if let subscriptionStatus = Subscription.Status(rawValue: messageSubscriptionStatus) {
                     return subscription.status == subscriptionStatus
                 } else {
                     // If we received a subscription status but can't map it to a valid type, don't show the message.
+                    return false
+                }
+            }
+
+            // Check subscription billing period:
+            if let messageSubscriptionBillingPeriod = message.attributes.subscriptionBillingPeriod {
+                if let subscriptionBillingPeriod = Subscription.BillingPeriod(rawValue: messageSubscriptionBillingPeriod) {
+                    return subscription.billingPeriod == subscriptionBillingPeriod
+                } else {
+                    // If we received a subscription billing period but can't map it to a valid type, don't show the message.
                     return false
                 }
             }
@@ -171,6 +185,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 
     func presentableRemoteMessages() -> [SurveyRemoteMessage] {
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()

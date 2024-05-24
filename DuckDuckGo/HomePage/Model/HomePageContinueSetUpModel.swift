@@ -221,7 +221,7 @@ extension HomePage.Models {
 
             for message in surveyRemoteMessaging.presentableRemoteMessages() {
                 features.append(.surveyRemoteMessage(message))
-                PixelKit.fire(GeneralPixel.dataBrokerProtectionRemoteMessageDisplayed(messageID: message.id), frequency: .daily)
+                PixelKit.fire(GeneralPixel.surveyRemoteMessageDisplayed(messageID: message.id), frequency: .daily)
             }
 
             appendFeatureCards(&features)
