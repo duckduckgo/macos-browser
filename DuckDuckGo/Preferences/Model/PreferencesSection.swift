@@ -29,10 +29,6 @@ struct PreferencesSection: Hashable, Identifiable {
     static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
         var privacyPanes: [PreferencePaneIdentifier] = [.defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection]
 
-        if includingVPN {
-            privacyPanes.append(.vpn)
-        }
-
         let regularPanes: [PreferencePaneIdentifier] = {
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .accessibility, .dataClearing]
 
@@ -70,7 +66,12 @@ struct PreferencesSection: Hashable, Identifiable {
             }
 
             if !shouldHidePrivacyProDueToNoProducts {
-                let subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
+                var subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
+
+                if includingVPN {
+                    subscriptionPanes.append(.vpn)
+                }
+
                 sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
             }
         }
