@@ -126,13 +126,16 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
         return messages.filter { message in
 
-            // TODO: Make it so that we check all attributes, not just the first one
-            var didMatch = false
+            var attributeMatchStatus = false
 
             // Check subscription status:
             if let messageSubscriptionStatus = message.attributes.subscriptionStatus {
                 if let subscriptionStatus = Subscription.Status(rawValue: messageSubscriptionStatus) {
-                    return subscription.status == subscriptionStatus
+                    if subscription.status == subscriptionStatus {
+                        attributeMatchStatus = true
+                    } else {
+                        return false
+                    }
                 } else {
                     // If we received a subscription status but can't map it to a valid type, don't show the message.
                     return false
@@ -142,7 +145,11 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
             // Check subscription billing period:
             if let messageSubscriptionBillingPeriod = message.attributes.subscriptionBillingPeriod {
                 if let subscriptionBillingPeriod = Subscription.BillingPeriod(rawValue: messageSubscriptionBillingPeriod) {
-                    return subscription.billingPeriod == subscriptionBillingPeriod
+                    if subscription.billingPeriod == subscriptionBillingPeriod {
+                        attributeMatchStatus = true
+                    } else {
+                        return false
+                    }
                 } else {
                     // If we received a subscription billing period but can't map it to a valid type, don't show the message.
                     return false
@@ -157,7 +164,11 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
                     return false
                 }
 
-                return daysSinceSubscriptionStartDate >= messageDaysSinceSubscriptionStarted
+                if daysSinceSubscriptionStartDate >= messageDaysSinceSubscriptionStarted {
+                    attributeMatchStatus = true
+                } else {
+                    return false
+                }
             }
 
             // Check subscription end/expiration date:
@@ -168,20 +179,23 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
                     return false
                 }
 
-                return daysUntilSubscriptionExpiration <= messageDaysUntilSubscriptionExpiration
-            }
-
-            // Check VPN usage:
-            if let requiredDaysSinceActivation = message.attributes.daysSinceVPNEnabled {
-                if let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation(), requiredDaysSinceActivation <= daysSinceActivation {
-                    return true
+                if daysUntilSubscriptionExpiration <= messageDaysUntilSubscriptionExpiration {
+                    attributeMatchStatus = true
                 } else {
                     return false
                 }
             }
 
-            // Don't show messages unless at least one attribute matches:
-            return false
+            // Check VPN usage:
+            if let requiredDaysSinceActivation = message.attributes.daysSinceVPNEnabled {
+                if let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation(), requiredDaysSinceActivation <= daysSinceActivation {
+                    attributeMatchStatus = true
+                } else {
+                    return false
+                }
+            }
+
+            return attributeMatchStatus
 
         }
     }
