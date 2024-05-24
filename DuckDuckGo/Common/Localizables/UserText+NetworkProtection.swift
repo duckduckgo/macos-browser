@@ -161,7 +161,7 @@ extension UserText {
 
     // MARK: - Settings
     // "vpn.setting.title.connect.on.login" - Connect on Login setting title
-    static let vpnConnectOnLoginSettingTitle = "Connect on login"
+    static let vpnConnectOnLoginSettingTitle = "Connect to VPN when logging in to your computer"
     // "vpn.setting.title.show.in.menu.bar" - Display VPN status in the menu bar
     static let vpnShowInMenuBarSettingTitle = "Show VPN in menu bar"
     // "vpn.setting.title.show.in.browser.toolbar" - Display VPN status in the browser toolbar
