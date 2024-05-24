@@ -27,23 +27,23 @@ struct UpdateNotificationView: View {
         HStack {
             Image(nsImage: icon)
                 .resizable()
-                .frame(width: 20, height: 20)
+                .frame(width: 16, height: 16)
                 .padding(.leading, 10)
 
             Text(text)
-                .padding(.leading, 10)
 
             Spacer()
 
             Button(action: {
                 onClose()
             }) {
-                Text("✕")
+                Image(.updateNotificationClose)
+                    .frame(width: 20, height: 20)
             }
             .buttonStyle(PlainButtonStyle())
             .padding(.trailing, 10)
         }
-        .frame(height: 40)
+        .frame(height: 60)
         .background(Color(NSColor.windowBackgroundColor))
         .cornerRadius(8)
         .shadow(radius: 10)

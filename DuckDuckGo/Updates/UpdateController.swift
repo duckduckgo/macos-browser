@@ -135,7 +135,7 @@ extension UpdateController: SPUUpdaterDelegate {
 
     func updater(_ updater: SPUUpdater, didFinishLoading appcast: SUAppcast) {
         // Example to show a notification when appcast finishes loading
-        notificationPresenter.showUpdateNotification(icon: NSImage(named: NSImage.cautionName)!, text: "New version available. Relaunch to update.")
+        notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Relaunch to update.")
     }
 
 }

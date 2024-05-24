@@ -28,7 +28,7 @@ final class UpdateNotificationPresenter {
         // Close the current notification if it's still visible
         closeUpdateNotification()
 
-        let notificationSize = NSRect(x: 0, y: 0, width: 300, height: 40)
+        let notificationSize = NSRect(x: 0, y: 0, width: 300, height: 60)
 
         let updateNotificationView = UpdateNotificationView(icon: icon, text: text) { [weak self] in
             self?.closeUpdateNotification()
