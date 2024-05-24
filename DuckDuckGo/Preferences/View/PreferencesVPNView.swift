@@ -42,10 +42,6 @@ extension Preferences {
                     }
 
                     SpacedCheckbox {
-                        ToggleMenuItem(UserText.vpnShowInMenuBarSettingTitle, isOn: $model.showInMenuBar)
-                    }
-
-                    SpacedCheckbox {
                         ToggleMenuItemWithDescription(
                             UserText.vpnExcludeLocalNetworksSettingTitle,
                             UserText.vpnExcludeLocalNetworksSettingDescription,
@@ -79,6 +75,18 @@ extension Preferences {
                         .padding(10)
                         .background(Color(.blackWhite1))
                         .roundedBorder()
+                }
+
+                // SECTION: Shortcuts
+
+                PreferencePaneSection(UserText.vpnShortcutsSettingsTitle) {
+                    SpacedCheckbox {
+                        ToggleMenuItem(UserText.vpnShowInMenuBarSettingTitle, isOn: $model.showInMenuBar)
+                    }
+
+                    SpacedCheckbox {
+                        ToggleMenuItem(UserText.vpnShowInBrowserToolbarSettingTitle, isOn: $model.showInBrowserToolbar)
+                    }
                 }
 
                 // SECTION: VPN Notifications

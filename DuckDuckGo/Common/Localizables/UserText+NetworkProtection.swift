@@ -126,6 +126,8 @@ extension UserText {
     static let vpnLocationTitle = "Location"
     // "vpn.general.title" - General section title in VPN settings
     static let vpnGeneralTitle = "General"
+    // "vpn.shortcuts.settings.title" - Shortcuts section title in VPN settings
+    static let vpnShortcutsSettingsTitle = "Shortcuts"
     // "vpn.notifications.settings.title" - Notifications section title in VPN settings
     static let vpnNotificationsSettingsTitle = "Notifications"
     // "vpn.advanced.settings.title" - VPN Advanced section title in VPN settings
@@ -160,8 +162,10 @@ extension UserText {
     // MARK: - Settings
     // "vpn.setting.title.connect.on.login" - Connect on Login setting title
     static let vpnConnectOnLoginSettingTitle = "Connect on login"
-    // "vpn.setting.title.connect.on.login" - Display VPN status in the menu bar.
+    // "vpn.setting.title.show.in.menu.bar" - Display VPN status in the menu bar
     static let vpnShowInMenuBarSettingTitle = "Show VPN in menu bar"
+    // "vpn.setting.title.show.in.browser.toolbar" - Display VPN status in the browser toolbar
+    static let vpnShowInBrowserToolbarSettingTitle = "Show VPN in browser toolbar"
     // "vpn.setting.description.always.on" - Always ON setting description
     static let vpnAlwaysOnSettingDescription = "Automatically restores the VPN connection after interruption. For your security, this setting cannot be disabled."
     // "vpn.setting.title.exclude.local.networks" - Exclude Local Networks setting title
