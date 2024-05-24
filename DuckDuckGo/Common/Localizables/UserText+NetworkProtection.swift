@@ -47,7 +47,7 @@ extension UserText {
     // "network.protection.status.menu.vpn.settings" - The status menu 'VPN Settings' menu item
     static let networkProtectionNavBarStatusMenuVPNSettings = "VPN Settings…"
     // "network.protection.status.menu.faq" - The status menu 'FAQ' menu item
-    static let networkProtectionNavBarStatusMenuFAQ = "Frequently Asked Questions…"
+    static let networkProtectionNavBarStatusMenuFAQ = "FAQs and Support…"
 
     // MARK: - System Extension Installation Messages
     // "network.protection.configuration.system-settings.legacy" - Text for a label in the VPN popover, displayed after attempting to enable the VPN for the first time while using macOS 12 and below
