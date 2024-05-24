@@ -22,8 +22,12 @@ import SwiftUI
 final class UpdateNotificationPresenter {
 
     private var notificationWindow: UpdateNotificationWindow?
+    private var hideTimer: Timer?
 
     func showUpdateNotification(icon: NSImage, text: String) {
+        // Close the current notification if it's still visible
+        closeUpdateNotification()
+
         let notificationSize = NSRect(x: 0, y: 0, width: 300, height: 40)
 
         let updateNotificationView = UpdateNotificationView(icon: icon, text: text) { [weak self] in
@@ -37,10 +41,26 @@ final class UpdateNotificationPresenter {
         notificationWindow.setFrameOrigin(NSPoint(x: screenFrame.width - notificationSize.width - 20, y: screenFrame.height - notificationSize.height - 40))
 
         self.notificationWindow = notificationWindow
+
+        // Set a timer to automatically hide the notification after 10 seconds
+        hideTimer = Timer.scheduledTimer(timeInterval: 10.0, target: self, selector: #selector(fadeOutNotification), userInfo: nil, repeats: false)
     }
 
     func closeUpdateNotification() {
+        hideTimer?.invalidate()
+        hideTimer = nil
         notificationWindow?.orderOut(nil)
         notificationWindow = nil
     }
+
+    @objc private func fadeOutNotification() {
+        guard let window = notificationWindow else { return }
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 1/3
+            window.animator().alphaValue = 0
+        } completionHandler: { [weak self] in
+            self?.closeUpdateNotification()
+        }
+    }
+
 }
