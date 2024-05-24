@@ -48,6 +48,7 @@ extension HomePage.Models {
         }
 
         private let defaultBrowserProvider: DefaultBrowserProvider
+        private let dockCustomizer: DockCustomization
         private let dataImportProvider: DataImportStatusProviding
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
@@ -62,6 +63,9 @@ extension HomePage.Models {
 
         @UserDefaultsWrapper(key: .homePageShowMakeDefault, defaultValue: true)
         private var shouldShowMakeDefaultSetting: Bool
+
+        @UserDefaultsWrapper(key: .homePageShowAddToDock, defaultValue: true)
+        private var shouldShowAddToDockSetting: Bool
 
         @UserDefaultsWrapper(key: .homePageShowImport, defaultValue: true)
         private var shouldShowImportSetting: Bool
@@ -100,6 +104,7 @@ extension HomePage.Models {
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
         init(defaultBrowserProvider: DefaultBrowserProvider,
+             dockCustomizer: DockCustomization,
              dataImportProvider: DataImportStatusProviding,
              tabCollectionViewModel: TabCollectionViewModel,
              emailManager: EmailManager = EmailManager(),
@@ -108,6 +113,7 @@ extension HomePage.Models {
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
              permanentSurveyManager: SurveyManager = PermanentSurveyManager()) {
             self.defaultBrowserProvider = defaultBrowserProvider
+            self.dockCustomizer = dockCustomizer
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
             self.emailManager = emailManager
@@ -125,22 +131,15 @@ extension HomePage.Models {
         @MainActor func performAction(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
-                do {
-                    PixelKit.fire(GeneralPixel.defaultRequestedFromHomepageSetupView)
-                    try defaultBrowserProvider.presentDefaultBrowserPrompt()
-                } catch {
-                    defaultBrowserProvider.openSystemPreferences()
-                }
+                performDefaultBrowserAction()
+            case .dock:
+                performDockAction()
             case .importBookmarksAndPasswords:
-                dataImportProvider.showImportWindow(completion: {self.refreshFeaturesMatrix()})
+                performImportBookmarksAndPasswordsAction()
             case .duckplayer:
-                if let videoUrl = URL(string: duckPlayerURL) {
-                    let tab = Tab(content: .url(videoUrl, source: .link), shouldLoadInBackground: true)
-                    tabCollectionViewModel.append(tab: tab)
-                }
+                performDuckPlayerAction()
             case .emailProtection:
-                let tab = Tab(content: .url(EmailUrls().emailProtectionLink, source: .ui), shouldLoadInBackground: true)
-                tabCollectionViewModel.append(tab: tab)
+                performEmailProtectionAction()
             case .permanentSurvey:
                 visitSurvey()
             case .networkProtectionRemoteMessage(let message):
@@ -148,16 +147,56 @@ extension HomePage.Models {
             case .dataBrokerProtectionRemoteMessage(let message):
                 handle(remoteMessage: message)
             case .dataBrokerProtectionWaitlistInvited:
-#if DBP
-                DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
-#endif
+                performDataBrokerProtectionWaitlistInvitedAction()
             }
+        }
+
+        private func performDefaultBrowserAction() {
+            do {
+                PixelKit.fire(GeneralPixel.defaultRequestedFromHomepageSetupView)
+                try defaultBrowserProvider.presentDefaultBrowserPrompt()
+            } catch {
+                defaultBrowserProvider.openSystemPreferences()
+            }
+        }
+
+        private func performImportBookmarksAndPasswordsAction() {
+            dataImportProvider.showImportWindow(completion: { self.refreshFeaturesMatrix() })
+        }
+
+        @MainActor
+        private func performDuckPlayerAction() {
+            if let videoUrl = URL(string: duckPlayerURL) {
+                let tab = Tab(content: .url(videoUrl, source: .link), shouldLoadInBackground: true)
+                tabCollectionViewModel.append(tab: tab)
+            }
+        }
+
+        @MainActor
+        private func performEmailProtectionAction() {
+            let tab = Tab(content: .url(EmailUrls().emailProtectionLink, source: .ui), shouldLoadInBackground: true)
+            tabCollectionViewModel.append(tab: tab)
+        }
+
+        @MainActor
+        private func performDataBrokerProtectionWaitlistInvitedAction() {
+        #if DBP
+            DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
+        #endif
+        }
+
+        func performDockAction() {
+            PixelKit.fire(GeneralPixel.userAddedToDockFromNewTabPageCard,
+                          includeAppVersionParameter: false)
+            dockCustomizer.addToDock()
         }
 
         func removeItem(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
                 shouldShowMakeDefaultSetting = false
+            case .dock:
+                shouldShowAddToDockSetting = false
             case .importBookmarksAndPasswords:
                 shouldShowImportSetting = false
             case .duckplayer:
@@ -196,7 +235,6 @@ extension HomePage.Models {
             for message in homePageRemoteMessaging.networkProtectionRemoteMessaging.presentableRemoteMessages() {
                 PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDisplayed(messageID: message.id), frequency: .daily)
             }
-
             appendFeatureCards(&features)
 
             featuresMatrix = features.chunked(into: itemsPerRow)
@@ -214,6 +252,8 @@ extension HomePage.Models {
                 return shouldMakeDefaultCardBeVisible
             case .importBookmarksAndPasswords:
                 return shouldImportCardBeVisible
+            case .dock:
+                return shouldDockCardBeVisible
             case .duckplayer:
                 return shouldDuckPlayerCardBeVisible
             case .emailProtection:
@@ -246,12 +286,10 @@ extension HomePage.Models {
         }
 
         var randomisedFeatures: [FeatureType] {
-            var features = FeatureType.allCases
-            features.shuffle()
-            for (index, feature) in features.enumerated() where feature == .defaultBrowser {
-                features.remove(at: index)
-                features.insert(feature, at: 0)
-            }
+            var features: [FeatureType]  = [.permanentSurvey, .defaultBrowser]
+            var shuffledFeatures = FeatureType.allCases.filter { $0 != .defaultBrowser && $0 != .permanentSurvey }
+            shuffledFeatures.shuffle()
+            features.append(contentsOf: shuffledFeatures)
             return features
         }
 
@@ -272,6 +310,15 @@ extension HomePage.Models {
         private var shouldMakeDefaultCardBeVisible: Bool {
             shouldShowMakeDefaultSetting &&
             !defaultBrowserProvider.isDefault
+        }
+
+        private var shouldDockCardBeVisible: Bool {
+#if !APPSTORE
+            shouldShowAddToDockSetting &&
+            !dockCustomizer.isAddedToDock
+#else
+            return false
+#endif
         }
 
         private var shouldImportCardBeVisible: Bool {
@@ -369,12 +416,17 @@ extension HomePage.Models {
         // We ignore the `networkProtectionRemoteMessage` case here to avoid it getting accidentally included - it has special handling and will get
         // included elsewhere.
         static var allCases: [HomePage.Models.FeatureType] {
+#if APPSTORE
             [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .permanentSurvey]
+#else
+            [.duckplayer, .emailProtection, .defaultBrowser, .dock, .importBookmarksAndPasswords, .permanentSurvey]
+#endif
         }
 
         case duckplayer
         case emailProtection
         case defaultBrowser
+        case dock
         case importBookmarksAndPasswords
         case permanentSurvey
         case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
@@ -385,6 +437,8 @@ extension HomePage.Models {
             switch self {
             case .defaultBrowser:
                 return UserText.newTabSetUpDefaultBrowserCardTitle
+            case .dock:
+                return UserText.newTabSetUpDockCardTitle
             case .importBookmarksAndPasswords:
                 return UserText.newTabSetUpImportCardTitle
             case .duckplayer:
@@ -406,6 +460,8 @@ extension HomePage.Models {
             switch self {
             case .defaultBrowser:
                 return UserText.newTabSetUpDefaultBrowserSummary
+            case .dock:
+                return UserText.newTabSetUpDockSummary
             case .importBookmarksAndPasswords:
                 return UserText.newTabSetUpImportSummary
             case .duckplayer:
@@ -427,6 +483,8 @@ extension HomePage.Models {
             switch self {
             case .defaultBrowser:
                 return UserText.newTabSetUpDefaultBrowserAction
+            case .dock:
+                return UserText.newTabSetUpDockAction
             case .importBookmarksAndPasswords:
                 return UserText.newTabSetUpImportAction
             case .duckplayer:
@@ -444,12 +502,23 @@ extension HomePage.Models {
             }
         }
 
+        var confirmation: String? {
+            switch self {
+            case .dock:
+                return UserText.newTabSetUpDockConfirmation
+            default:
+                return nil
+            }
+        }
+
         var icon: NSImage {
             let iconSize = NSSize(width: 64, height: 48)
 
             switch self {
             case .defaultBrowser:
                 return .defaultApp128.resized(to: iconSize)!
+            case .dock:
+                return .dock128.resized(to: iconSize)!
             case .importBookmarksAndPasswords:
                 return .import128.resized(to: iconSize)!
             case .duckplayer:

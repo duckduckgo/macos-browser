@@ -25,20 +25,19 @@ import NetworkProtectionUI
 
 final class NetworkProtectionSubscriptionEventHandler {
 
-    private let accountManager: AccountManager
+    private let subscriptionManager: SubscriptionManaging
     private let tunnelController: TunnelController
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let vpnUninstaller: VPNUninstalling
     private let userDefaults: UserDefaults
     private var cancellables = Set<AnyCancellable>()
 
-    init(accountManager: AccountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)),
+    init(subscriptionManager: SubscriptionManaging,
          tunnelController: TunnelController,
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          vpnUninstaller: VPNUninstalling,
          userDefaults: UserDefaults = .netP) {
-
-        self.accountManager = accountManager
+        self.subscriptionManager = subscriptionManager
         self.tunnelController = tunnelController
         self.networkProtectionTokenStorage = networkProtectionTokenStorage
         self.vpnUninstaller = vpnUninstaller
@@ -49,7 +48,7 @@ final class NetworkProtectionSubscriptionEventHandler {
 
     private func subscribeToEntitlementChanges() {
         Task {
-            switch await accountManager.hasEntitlement(for: .networkProtection) {
+            switch await subscriptionManager.accountManager.hasEntitlement(for: .networkProtection) {
             case .success(let hasEntitlements):
                 Task {
                     await handleEntitlementsChange(hasEntitlements: hasEntitlements)
@@ -99,7 +98,7 @@ final class NetworkProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignIn() {
-        guard accountManager.accessToken != nil else {
+        guard subscriptionManager.accountManager.accessToken != nil else {
             assertionFailure("[NetP Subscription] AccountManager signed in but token could not be retrieved")
             return
         }

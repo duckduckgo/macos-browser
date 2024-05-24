@@ -20,27 +20,28 @@ import Foundation
 import Subscription
 
 public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
+
     public var title = UserText.shareModalTitle
-    public var description = UserText.shareModalDescription(platform: SubscriptionPurchaseEnvironment.current)
-
-    private let subscriptionAppGroup: String
+    public let description: String
     private var actionHandlers: SubscriptionAccessActionHandlers
-
     public var email: String?
     public var emailLabel: String { UserText.email }
     public var emailDescription: String { hasEmail ? UserText.shareModalHasEmailDescription : UserText.shareModalNoEmailDescription }
     public var emailButtonTitle: String { hasEmail ? UserText.manageEmailButton : UserText.addEmailButton }
+    private let subscriptionManager: SubscriptionManaging
 
-    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?, subscriptionAppGroup: String) {
+    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?, subscriptionManager: SubscriptionManaging) {
         self.actionHandlers = actionHandlers
         self.email = email
-        self.subscriptionAppGroup = subscriptionAppGroup
+        self.subscriptionManager = subscriptionManager
+        self.description = UserText.shareModalDescription(platform: subscriptionManager.currentEnvironment.purchasePlatform)
     }
 
     private var hasEmail: Bool { !(email?.isEmpty ?? true) }
 
     public func handleEmailAction() {
-        let url: URL = hasEmail ? .manageSubscriptionEmail : .addEmailToSubscription
+        let type = hasEmail ? SubscriptionURL.manageEmail : SubscriptionURL.addEmail
+        let mailURL: URL = subscriptionManager.url(for: type)
 
         if hasEmail {
             actionHandlers.uiActionHandler(.postSubscriptionAddEmailClick)
@@ -49,14 +50,15 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         }
 
         Task {
-            if SubscriptionPurchaseEnvironment.current == .appStore {
+            if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
                 if #available(macOS 12.0, iOS 15.0, *) {
-                    await AppStoreAccountManagementFlow.refreshAuthTokenIfNeeded(subscriptionAppGroup: subscriptionAppGroup)
+                    let appStoreAccountManagementFlow = AppStoreAccountManagementFlow(subscriptionManager: subscriptionManager)
+                    await appStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
                 }
             }
 
             DispatchQueue.main.async {
-                self.actionHandlers.openURLHandler(url)
+                self.actionHandlers.openURLHandler(mailURL)
             }
         }
     }

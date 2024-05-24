@@ -35,11 +35,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
-    private let accountManager: AccountManager
+    private let subscriptionManager: SubscriptionManaging
+    private var accountManager: AccountManaging {
+        subscriptionManager.accountManager
+    }
     private let openURLHandler: (URL) -> Void
     public let userEventHandler: (UserEvent) -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
-    private let subscriptionAppGroup: String
 
     private var fetchSubscriptionDetailsTask: Task<(), Never>?
 
@@ -89,12 +91,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     public init(openURLHandler: @escaping (URL) -> Void,
                 userEventHandler: @escaping (UserEvent) -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
-                subscriptionAppGroup: String) {
-        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
+                subscriptionManager: SubscriptionManaging) {
+        self.subscriptionManager = subscriptionManager
         self.openURLHandler = openURLHandler
         self.userEventHandler = userEventHandler
         self.sheetActionHandler = sheetActionHandler
-        self.subscriptionAppGroup = subscriptionAppGroup
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
@@ -136,9 +137,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
         if accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email, subscriptionAppGroup: subscriptionAppGroup)
+            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email, subscriptionManager: subscriptionManager)
         } else {
-            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, shouldShowRestorePurchase: SubscriptionPurchaseEnvironment.current == .appStore)
+            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, subscriptionManager: subscriptionManager)
         }
     }
 
@@ -149,7 +150,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func purchaseAction() {
-        openURLHandler(.subscriptionPurchase)
+        openURLHandler(subscriptionManager.url(for: .purchase))
     }
 
     enum ChangePlanOrBillingAction {
@@ -181,14 +182,14 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
     }
 
-    private func changePlanOrBilling(for environment: SubscriptionPurchaseEnvironment.Environment) {
+    private func changePlanOrBilling(for environment: SubscriptionEnvironment.PurchasePlatform) {
         switch environment {
         case .appStore:
-            NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
+            NSWorkspace.shared.open(subscriptionManager.url(for: .manageSubscriptionsInAppStore))
         case .stripe:
             Task {
                 guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
-                      case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
+                      case let .success(response) = await subscriptionManager.subscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
                 openURLHandler(customerPortalURL)
@@ -198,9 +199,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func confirmIfSignedInToSameAccount() async -> Bool {
         if #available(macOS 12.0, *) {
-            guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else { return false }
-
-            switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
+            guard let lastTransactionJWSRepresentation = await subscriptionManager.storePurchaseManager().mostRecentTransaction() else { return false }
+            switch await subscriptionManager.authService.storeLogin(signature: lastTransactionJWSRepresentation) {
             case .success(let response):
                 return response.externalID == accountManager.externalID
             case .failure:
@@ -234,15 +234,16 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openFAQ() {
-        openURLHandler(.subscriptionFAQ)
+        openURLHandler(subscriptionManager.url(for: .faq))
     }
 
     @MainActor
     func refreshSubscriptionPendingState() {
-        if SubscriptionPurchaseEnvironment.current == .appStore {
+        if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
                 Task {
-                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: subscriptionAppGroup)
+                    let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: subscriptionManager)
+                    await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                     fetchAndUpdateSubscriptionDetails()
                 }
             }
@@ -270,11 +271,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @MainActor
     private func updateSubscription(with cachePolicy: SubscriptionService.CachePolicy) async {
         guard let token = accountManager.accessToken else {
-            SubscriptionService.signOut()
+            subscriptionManager.subscriptionService.signOut()
             return
         }
 
-        switch await SubscriptionService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
+        switch await subscriptionManager.subscriptionService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
         case .success(let subscription):
             updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
             subscriptionPlatform = subscription.platform
@@ -285,7 +286,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    private func updateAllEntitlement(with cachePolicy: AccountManager.CachePolicy) async {
+    private func updateAllEntitlement(with cachePolicy: AccountManaging.CachePolicy) async {
         switch await self.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: cachePolicy) {
         case let .success(result):
             hasAccessToVPN = result
