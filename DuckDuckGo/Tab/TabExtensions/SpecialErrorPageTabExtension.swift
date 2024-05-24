@@ -42,8 +42,8 @@ final class SpecialErrorPageTabExtension {
     private var urlCredentialCreator: URLCredentialCreating
     private var featureFlagger: FeatureFlagger
     private var phishingUrlExemptions: [String] = ["about:blank", "https://duckduckgo.com"]
-    private var detectionManager: PhishingDetectionManaging
     private var errorPageType: ErrorType?
+    private var phishingStateManager: PhishingStateManager
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -52,10 +52,10 @@ final class SpecialErrorPageTabExtension {
         scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
-        phishingDetectionManager: PhishingDetectionManaging) {
-            self.detectionManager = phishingDetectionManager
+        phishingStateManager: PhishingStateManager) {
             self.featureFlagger = featureFlagger
             self.urlCredentialCreator = urlCredentialCreator
+            self.phishingStateManager = phishingStateManager
             webViewPublisher.sink { [weak self] webView in
                 self?.webView = webView
             }.store(in: &cancellables)
@@ -113,7 +113,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
             return .allow
         }
         // Check the URL
-        let isMalicious = await detectionManager.isCachedMalicious(url: navigationAction.url)
+        let isMalicious = phishingStateManager.tabIsPhishing
         if isMalicious {
             errorPageType = .phishing
             specialErrorPageUserScript?.failingURL = navigationAction.url

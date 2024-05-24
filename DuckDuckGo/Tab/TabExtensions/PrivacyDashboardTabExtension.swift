@@ -30,6 +30,7 @@ final class PrivacyDashboardTabExtension {
     private let contentBlocking: any ContentBlockingProtocol
     private let certificateTrustEvaluator: CertificateTrustEvaluating
     private let phishingDetectionManager: PhishingDetectionManaging
+    private var phishingStateManager: PhishingStateManager
 
     @Published private(set) var privacyInfo: PrivacyInfo?
 
@@ -45,11 +46,13 @@ final class PrivacyDashboardTabExtension {
          didUpgradeToHttpsPublisher: some Publisher<URL, Never>,
          trackersPublisher: some Publisher<DetectedTracker, Never>,
          webViewPublisher: some Publisher<WKWebView, Never>,
-         phishingDetectionManager: some PhishingDetectionManaging) {
+         phishingDetectionManager: some PhishingDetectionManaging,
+         phishingStateManager: PhishingStateManager) {
 
         self.contentBlocking = contentBlocking
         self.certificateTrustEvaluator = certificateTrustEvaluator
         self.phishingDetectionManager = phishingDetectionManager
+        self.phishingStateManager = phishingStateManager
 
         autoconsentUserScriptPublisher.sink { [weak self] autoconsentUserScript in
             autoconsentUserScript?.delegate = self
@@ -110,9 +113,10 @@ final class PrivacyDashboardTabExtension {
     private func updatePrivacyInfo(with url: URL?) async {
         guard let url = url else { return }
         let malicious = await phishingDetectionManager.isMalicious(url: url)
+        self.phishingStateManager.setIsPhishing(malicious)
         await MainActor.run {
-            print("Privacy info: ", self.privacyInfo ?? "nil")
             self.privacyInfo?.isPhishing = malicious
+            print("self.privacyInfo?.isPhishing: ", self.privacyInfo?.isPhishing ?? "nil")
         }
     }
 
@@ -140,7 +144,8 @@ extension PrivacyDashboardTabExtension {
 
         privacyInfo = PrivacyInfo(url: url,
                                   parentEntity: entity,
-                                  protectionStatus: makeProtectionStatus(for: host))
+                                  protectionStatus: makeProtectionStatus(for: host),
+                                  isPhishing: self.phishingStateManager.tabIsPhishing)
 
         previousPrivacyInfosByURL[url.absoluteString] = privacyInfo
 

@@ -56,6 +56,7 @@ protocol NewWindowPolicyDecisionMaker {
         var certificateTrustEvaluator: CertificateTrustEvaluating
         var tunnelController: NetworkProtectionIPCTunnelController?
         var phishingDetectionManager: PhishingDetectionManager
+        var phishingStateManager: PhishingStateManager
     }
 
     fileprivate weak var delegate: TabDelegate?
@@ -73,6 +74,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
+    let phishingState: PhishingStateManager = PhishingStateManager()
 
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
@@ -254,7 +256,8 @@ protocol NewWindowPolicyDecisionMaker {
                                                        downloadManager: downloadManager,
                                                        certificateTrustEvaluator: certificateTrustEvaluator,
                                                        tunnelController: tunnelController,
-                                                       phishingDetectionManager: phishingDetectionManager))
+                                                       phishingDetectionManager: phishingDetectionManager,
+                                                       phishingStateManager: phishingState))
 
         super.init()
         tabGetter = { [weak self] in self }

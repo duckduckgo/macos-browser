@@ -74,6 +74,7 @@ protocol TabExtensionDependencies {
     var certificateTrustEvaluator: CertificateTrustEvaluating { get }
     var tunnelController: NetworkProtectionIPCTunnelController? { get }
     var phishingDetectionManager: PhishingDetectionManager { get }
+    var phishingStateManager: PhishingStateManager { get }
 }
 
 // swiftlint:disable:next large_tuple
@@ -131,7 +132,8 @@ extension TabExtensionsBuilder {
                                          didUpgradeToHttpsPublisher: httpsUpgrade.didUpgradeToHttpsPublisher,
                                          trackersPublisher: contentBlocking.trackersPublisher,
                                          webViewPublisher: args.webViewFuture,
-                                         phishingDetectionManager: dependencies.phishingDetectionManager)
+                                         phishingDetectionManager: dependencies.phishingDetectionManager,
+                                         phishingStateManager: dependencies.phishingStateManager)
         }
 
         add {
@@ -202,7 +204,7 @@ extension TabExtensionsBuilder {
         add {
             SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
                                   scriptsPublisher: userScripts.compactMap { $0 },
-                                 phishingDetectionManager: dependencies.phishingDetectionManager)
+                                  phishingStateManager: dependencies.phishingStateManager)
         }
 
         if let tunnelController = dependencies.tunnelController {
