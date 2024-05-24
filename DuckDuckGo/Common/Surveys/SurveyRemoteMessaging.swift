@@ -158,9 +158,8 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
             }
 
             // Check VPN usage:
-            if let requiredDaysSinceActivation = message.attributes.daysSinceVPNEnabled,
-               let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() {
-                if requiredDaysSinceActivation <= daysSinceActivation {
+            if let requiredDaysSinceActivation = message.attributes.daysSinceVPNEnabled {
+                if let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation(), requiredDaysSinceActivation <= daysSinceActivation {
                     return true
                 } else {
                     return false
