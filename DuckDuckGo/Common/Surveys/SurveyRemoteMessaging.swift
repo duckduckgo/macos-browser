@@ -248,7 +248,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
         guard let date = object as? Date else {
             assertionFailure("Got rate limited date, but couldn't convert it to Date")
-            userDefaults.removeObject(forKey: Constants.lastRefreshDateKey)
+            resetLastRefreshTimestamp()
             return nil
         }
 
