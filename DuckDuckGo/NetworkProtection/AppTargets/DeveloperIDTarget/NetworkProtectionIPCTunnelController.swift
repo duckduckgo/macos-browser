@@ -54,7 +54,7 @@ final class NetworkProtectionIPCTunnelController {
     private let errorRecorder: VPNOperationErrorRecorder
     private let knownFailureStore = NetworkProtectionKnownFailureStore()
 
-    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
          loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          ipcClient: NetworkProtectionIPCClient,
          pixelKit: PixelFiring? = PixelKit.shared,

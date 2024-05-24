@@ -294,7 +294,7 @@ final class TabViewModelTests: XCTestCase {
         let filteredCases = DefaultZoomValue.allCases.filter { $0 != AccessibilityPreferences.shared.defaultPageZoom }
         let randomZoomLevel = filteredCases.randomElement()!
         AccessibilityPreferences.shared.updateZoomPerWebsite(zoomLevel: randomZoomLevel, url: hostURL)
-        var tab = Tab(url: url)
+        let tab = Tab(url: url)
         var tabVM = TabViewModel(tab: tab)
 
         // WHEN

@@ -174,7 +174,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     // MARK: - Tunnel Settings
 
-    private let settings = VPNSettings(defaults: .netP)
+    private var settings: VPNSettings {
+        Application.appDelegate.vpnSettings
+    }
 
     // MARK: - Debug Logic
 
@@ -251,7 +253,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     ///
     @objc func logFeedbackMetadataToConsole(_ sender: Any?) {
         Task { @MainActor in
-            let collector = DefaultVPNMetadataCollector()
+            let collector = DefaultVPNMetadataCollector(accountManager: Application.appDelegate.subscriptionManager.accountManager)
             let metadata = await collector.collectMetadata()
 
             print(metadata.toPrettyPrintedJSON()!)
@@ -333,8 +335,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private func populateNetworkProtectionEnvironmentListMenuItems() {
         environmentMenu.items = [
-            NSMenuItem(title: "Production", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
-            NSMenuItem(title: "Staging", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+            NSMenuItem(title: "⚠️ The environment can be set in the Subscription > Environment menu", action: nil, target: nil),
+            NSMenuItem(title: "Production", action: nil, target: nil, keyEquivalent: ""),
+            NSMenuItem(title: "Staging", action: nil, target: nil, keyEquivalent: ""),
         ]
     }
 
@@ -438,15 +441,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private func updateEnvironmentMenu() {
         let selectedEnvironment = settings.selectedEnvironment
+        guard environmentMenu.items.count == 3 else { return }
 
-        switch selectedEnvironment {
-        case .production:
-            environmentMenu.items.first?.state = .on
-            environmentMenu.items.last?.state = .off
-        case .staging:
-            environmentMenu.items.first?.state = .off
-            environmentMenu.items.last?.state = .on
-        }
+        environmentMenu.items[1].state = selectedEnvironment == .production ? .on: .off
+        environmentMenu.items[2].state = selectedEnvironment == .staging ? .on: .off
     }
 
     private func updatePreferredServerMenu() {
@@ -530,28 +528,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
             store.updateActivationDate(date)
         } else {
             store.removeDates()
-        }
-    }
-
-    // MARK: Environment
-
-    @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
-        let title = menuItem.title
-        let selectedEnvironment: VPNSettings.SelectedEnvironment
-
-        if title == "Staging" {
-            selectedEnvironment = .staging
-        } else {
-            selectedEnvironment = .production
-        }
-
-        settings.selectedEnvironment = selectedEnvironment
-
-        Task {
-            _ = try await NetworkProtectionDeviceManager.create().refreshServerList()
-            try? await populateNetworkProtectionServerListMenuItems()
-
-            settings.selectedServer = .automatic
         }
     }
 

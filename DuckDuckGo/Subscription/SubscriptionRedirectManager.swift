@@ -25,10 +25,20 @@ protocol SubscriptionRedirectManager: AnyObject {
 }
 
 final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
-    private let featureAvailabiltyProvider: () -> Bool
 
-    init(featureAvailabiltyProvider: @escaping @autoclosure () -> Bool = DefaultSubscriptionFeatureAvailability().isFeatureAvailable) {
+    private let featureAvailabiltyProvider: () -> Bool
+    private let subscriptionEnvironment: SubscriptionEnvironment
+    private let canPurchase: () -> Bool
+    private let baseURL: URL
+
+    init(featureAvailabiltyProvider: @escaping @autoclosure () -> Bool = DefaultSubscriptionFeatureAvailability().isFeatureAvailable,
+         subscriptionEnvironment: SubscriptionEnvironment,
+         baseURL: URL,
+         canPurchase: @escaping () -> Bool) {
         self.featureAvailabiltyProvider = featureAvailabiltyProvider
+        self.subscriptionEnvironment = subscriptionEnvironment
+        self.canPurchase = canPurchase
+        self.baseURL = baseURL
     }
 
     func redirectURL(for url: URL) -> URL? {
@@ -36,15 +46,14 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
 
         if url.pathComponents == URL.privacyPro.pathComponents {
             let isFeatureAvailable = featureAvailabiltyProvider()
-            let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
+            let shouldHidePrivacyProDueToNoProducts = subscriptionEnvironment.purchasePlatform == .appStore && canPurchase() == false
             let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
             // Redirect the `/pro` URL to `/subscriptions` URL. If there are any query items in the original URL it appends to the `/subscriptions` URL.
-            return isPurchasePageRedirectActive ? URL.subscriptionBaseURL.addingQueryItems(from: url) : nil
+            return isPurchasePageRedirectActive ? baseURL.addingQueryItems(from: url) : nil
         }
 
         return nil
     }
-
 }
 
 private extension URL {
