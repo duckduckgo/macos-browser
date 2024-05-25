@@ -196,7 +196,11 @@ final class SurveyURLBuilder {
     }
 
     private func daysSince(date storedDate: Date) -> Int? {
-        return Calendar.current.dateComponents([.day], from: storedDate, to: Date()).day
+        if let days = Calendar.current.dateComponents([.day], from: storedDate, to: Date()).day {
+            return abs(days)
+        }
+
+        return nil
     }
 
 }
