@@ -44,6 +44,26 @@ final class PrivacyProtectionStatus: ObservableObject {
             return PrivacyProtectionStatus(statusPublisher: publisher, initialValue: EmailManager().isSignedIn ? .on : .off) { _ in
                 EmailManager().isSignedIn ? .on : .off
             }
+        case .vpn:
+            let recentConnectionStatus = Application.appDelegate.vpnTunnelIPCClient.connectionStatusObserver.recentValue
+            let initialValue: Bool
+
+            if case .connected = recentConnectionStatus {
+                initialValue = true
+            } else {
+                initialValue = false
+            }
+
+            return PrivacyProtectionStatus(
+                statusPublisher: Application.appDelegate.vpnTunnelIPCClient.connectionStatusObserver.publisher.receive(on: RunLoop.main),
+                initialValue: initialValue ? .on : .off
+            ) { newStatus in
+                if case .connected = newStatus {
+                    return .on
+                } else {
+                    return .off
+                }
+            }
         default:
             return PrivacyProtectionStatus()
         }

@@ -27,7 +27,9 @@ struct PreferencesSection: Hashable, Identifiable {
 
     @MainActor
     static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
-        var privacyPanes: [PreferencePaneIdentifier] = [.defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection]
+        let privacyPanes: [PreferencePaneIdentifier] = [
+            .defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection
+        ]
 
         let regularPanes: [PreferencePaneIdentifier] = {
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .accessibility, .dataClearing]
