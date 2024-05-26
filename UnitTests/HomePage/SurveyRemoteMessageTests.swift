@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionRemoteMessageTests.swift
+//  SurveyRemoteMessageTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class NetworkProtectionRemoteMessageTests: XCTestCase {
+final class SurveyRemoteMessageTests: XCTestCase {
 
     func testWhenDecodingMessages_ThenMessagesDecodeSuccessfully() throws {
         let mockStatisticsStore = MockStatisticsStore()
@@ -34,66 +34,32 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
         let data = try Data(contentsOf: fileURL)
 
         let decoder = JSONDecoder()
-        let decodedMessages = try decoder.decode([NetworkProtectionRemoteMessage].self, from: data)
+        let decodedMessages = try decoder.decode([SurveyRemoteMessage].self, from: data)
 
-        XCTAssertEqual(decodedMessages.count, 3)
+        XCTAssertEqual(decodedMessages.count, 1)
 
-        guard let firstMessage = decodedMessages.first(where: { $0.id == "123"}) else {
+        guard let firstMessage = decodedMessages.first(where: { $0.id == "message-1"}) else {
             XCTFail("Failed to find expected message")
             return
         }
 
         let firstMessagePresentableSurveyURL = firstMessage.presentableSurveyURL(
             statisticsStore: mockStatisticsStore,
-            activationDateStore: mockActivationDateStore,
+            vpnActivationDateStore: mockActivationDateStore,
             operatingSystemVersion: "1.2.3",
             appVersion: "4.5.6",
-            hardwareModel: "MacBookPro,123"
+            hardwareModel: "MacBookPro,123",
+            subscription: nil
         )
 
         XCTAssertEqual(firstMessage.cardTitle, "Title 1")
         XCTAssertEqual(firstMessage.cardDescription, "Description 1")
         XCTAssertEqual(firstMessage.action.actionTitle, "Action 1")
-        XCTAssertNil(firstMessagePresentableSurveyURL)
-        XCTAssertNil(firstMessage.daysSinceNetworkProtectionEnabled)
-
-        guard let secondMessage = decodedMessages.first(where: { $0.id == "456"}) else {
-            XCTFail("Failed to find expected message")
-            return
-        }
-
-        let secondMessagePresentableSurveyURL = secondMessage.presentableSurveyURL(
-            statisticsStore: mockStatisticsStore,
-            activationDateStore: mockActivationDateStore,
-            operatingSystemVersion: "1.2.3",
-            appVersion: "4.5.6",
-            hardwareModel: "MacBookPro,123"
-        )
-
-        XCTAssertEqual(secondMessage.daysSinceNetworkProtectionEnabled, 1)
-        XCTAssertEqual(secondMessage.cardTitle, "Title 2")
-        XCTAssertEqual(secondMessage.cardDescription, "Description 2")
-        XCTAssertEqual(secondMessage.action.actionTitle, "Action 2")
-        XCTAssertNil(secondMessagePresentableSurveyURL)
-
-        guard let thirdMessage = decodedMessages.first(where: { $0.id == "789"}) else {
-            XCTFail("Failed to find expected message")
-            return
-        }
-
-        let thirdMessagePresentableSurveyURL = thirdMessage.presentableSurveyURL(
-            statisticsStore: mockStatisticsStore,
-            activationDateStore: mockActivationDateStore,
-            operatingSystemVersion: "1.2.3",
-            appVersion: "4.5.6",
-            hardwareModel: "MacBookPro,123"
-        )
-
-        XCTAssertEqual(thirdMessage.daysSinceNetworkProtectionEnabled, 5)
-        XCTAssertEqual(thirdMessage.cardTitle, "Title 3")
-        XCTAssertEqual(thirdMessage.cardDescription, "Description 3")
-        XCTAssertEqual(thirdMessage.action.actionTitle, "Action 3")
-        XCTAssertTrue(thirdMessagePresentableSurveyURL!.absoluteString.hasPrefix("https://duckduckgo.com/"))
+        XCTAssertEqual(firstMessage.attributes.minimumDaysSinceSubscriptionStarted, 1)
+        XCTAssertEqual(firstMessage.attributes.daysSinceVPNEnabled, 2)
+        XCTAssertEqual(firstMessage.attributes.daysSincePIREnabled, 3)
+        XCTAssertEqual(firstMessage.attributes.maximumDaysUntilSubscriptionExpirationOrRenewal, 30)
+        XCTAssertNotNil(firstMessagePresentableSurveyURL)
     }
 
     func testWhenGettingSurveyURL_AndSurveyURLHasParameters_ThenParametersAreReplaced() {
@@ -103,8 +69,13 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
             "daysSinceNetworkProtectionEnabled": 0,
             "cardTitle": "Title",
             "cardDescription": "Description",
-            "requiresNetworkProtectionAccess": true,
-            "requiresNetworkProtectionUsage": true,
+            "attributes": {
+                "subscriptionStatus": "",
+                "minimumDaysSinceSubscriptionStarted": 1,
+                "maximumDaysUntilSubscriptionExpirationOrRenewal": 30,
+                "daysSinceVPNEnabled": 1,
+                "daysSincePIREnabled": 1
+            },
             "action": {
                 "actionTitle": "Action",
                 "actionType": "openSurveyURL",
@@ -114,9 +85,9 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
         """
 
         let decoder = JSONDecoder()
-        let message: NetworkProtectionRemoteMessage
+        let message: SurveyRemoteMessage
         do {
-            message = try decoder.decode(NetworkProtectionRemoteMessage.self, from: remoteMessageJSON.data(using: .utf8)!)
+            message = try decoder.decode(SurveyRemoteMessage.self, from: remoteMessageJSON.data(using: .utf8)!)
         } catch {
             XCTFail("Failed to decode with error: \(error.localizedDescription)")
             return
@@ -132,19 +103,23 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
 
         let presentableSurveyURL = message.presentableSurveyURL(
             statisticsStore: mockStatisticsStore,
-            activationDateStore: mockActivationDateStore,
+            vpnActivationDateStore: mockActivationDateStore,
             operatingSystemVersion: "1.2.3",
             appVersion: "4.5.6",
-            hardwareModel: "MacBookPro,123"
+            hardwareModel: "MacBookPro,123",
+            subscription: nil
         )
 
-        let expectedURL = "https://duckduckgo.com/?atb=atb-123&var=variant&delta=2&mv=1.2.3&ddgv=4.5.6&mo=MacBookPro%252C123&da=1"
+        let expectedURL = """
+        https://duckduckgo.com/?atb=atb-123&var=variant&osv=1.2.3&ddgv=4.5.6&mo=MacBookPro%252C123&vpn_first_used=2&vpn_last_used=1
+        """
+
         XCTAssertEqual(presentableSurveyURL!.absoluteString, expectedURL)
     }
 
     private func mockMessagesURL() -> URL {
-        let bundle = Bundle(for: NetworkProtectionRemoteMessageTests.self)
-        return bundle.resourceURL!.appendingPathComponent("network-protection-messages.json")
+        let bundle = Bundle(for: SurveyRemoteMessageTests.self)
+        return bundle.resourceURL!.appendingPathComponent("survey-messages.json")
     }
 
 }

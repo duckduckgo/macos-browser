@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionRemoteMessage.swift
+//  SurveyRemoteMessage.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,10 +18,10 @@
 
 import Foundation
 import Common
+import Subscription
 
-struct NetworkProtectionRemoteMessageAction: Codable, Equatable, Hashable {
+struct SurveyRemoteMessageAction: Codable, Equatable, Hashable {
     enum Action: String, Codable {
-        case openNetworkProtection
         case openSurveyURL
         case openURL
     }
@@ -31,23 +31,31 @@ struct NetworkProtectionRemoteMessageAction: Codable, Equatable, Hashable {
     let actionURL: String?
 }
 
-struct NetworkProtectionRemoteMessage: Codable, Equatable, Identifiable, Hashable {
+struct SurveyRemoteMessage: Codable, Equatable, Identifiable, Hashable {
+
+    struct Attributes: Codable, Equatable, Hashable {
+        let subscriptionStatus: String?
+        let subscriptionBillingPeriod: String?
+        let minimumDaysSinceSubscriptionStarted: Int?
+        let maximumDaysUntilSubscriptionExpirationOrRenewal: Int?
+        let daysSinceVPNEnabled: Int?
+        let daysSincePIREnabled: Int?
+    }
 
     let id: String
     let cardTitle: String
     let cardDescription: String
-    /// If this is set, the message won't be displayed if NetP hasn't been used, even if the usage and access booleans are false
-    let daysSinceNetworkProtectionEnabled: Int?
-    let requiresNetworkProtectionUsage: Bool
-    let requiresNetworkProtectionAccess: Bool
-    let action: NetworkProtectionRemoteMessageAction
+    let attributes: Attributes
+    let action: SurveyRemoteMessageAction
 
     func presentableSurveyURL(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
-        activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
+        vpnActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
+        pirActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp),
         operatingSystemVersion: String = ProcessInfo.processInfo.operatingSystemVersion.description,
         appVersion: String = AppVersion.shared.versionNumber,
-        hardwareModel: String? = HardwareModel.model
+        hardwareModel: String? = HardwareModel.model,
+        subscription: Subscription?
     ) -> URL? {
         if let actionType = action.actionType, actionType == .openURL, let urlString = action.actionURL, let url = URL(string: urlString) {
             return url
@@ -62,8 +70,11 @@ struct NetworkProtectionRemoteMessage: Codable, Equatable, Identifiable, Hashabl
             operatingSystemVersion: operatingSystemVersion,
             appVersion: appVersion,
             hardwareModel: hardwareModel,
-            daysSinceActivation: activationDateStore.daysSinceActivation(),
-            daysSinceLastActive: activationDateStore.daysSinceLastActive()
+            subscription: subscription,
+            daysSinceVPNActivated: vpnActivationDateStore.daysSinceActivation(),
+            daysSinceVPNLastActive: vpnActivationDateStore.daysSinceLastActive(),
+            daysSincePIRActivated: pirActivationDateStore.daysSinceActivation(),
+            daysSincePIRLastActive: pirActivationDateStore.daysSinceLastActive()
         )
 
         return surveyURLBuilder.buildSurveyURL(from: surveyURL)

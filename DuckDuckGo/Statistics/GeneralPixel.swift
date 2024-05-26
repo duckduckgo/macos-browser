@@ -117,13 +117,14 @@ enum GeneralPixel: PixelKitEventV2 {
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
 
+    // Survey
+    case surveyRemoteMessageDisplayed(messageID: String)
+    case surveyRemoteMessageDismissed(messageID: String)
+    case surveyRemoteMessageOpened(messageID: String)
+
     // VPN
     case vpnBreakageReport(category: String, description: String, metadata: String)
 
-    // VPN
-    case networkProtectionRemoteMessageDisplayed(messageID: String)
-    case networkProtectionRemoteMessageDismissed(messageID: String)
-    case networkProtectionRemoteMessageOpened(messageID: String)
     case networkProtectionEnabledOnSearch
     case networkProtectionGeoswitchingOpened
     case networkProtectionGeoswitchingSetNearest
@@ -152,9 +153,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case dataBrokerProtectionWaitlistCardUITapped
     case dataBrokerProtectionWaitlistTermsAndConditionsDisplayed
     case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
-    case dataBrokerProtectionRemoteMessageDisplayed(messageID: String)
-    case dataBrokerProtectionRemoteMessageDismissed(messageID: String)
-    case dataBrokerProtectionRemoteMessageOpened(messageID: String)
 
     // Login Item events
     case dataBrokerEnableLoginItemDaily
@@ -343,11 +341,8 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case burnerTabMisplaced
 
-    case networkProtectionRemoteMessageFetchingFailed
-    case networkProtectionRemoteMessageStorageFailed
-    case dataBrokerProtectionRemoteMessageFetchingFailed
-    case dataBrokerProtectionRemoteMessageStorageFailed
-
+    case surveyRemoteMessageFetchingFailed
+    case surveyRemoteMessageStorageFailed
     case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
 
     // Tracks installation without tracking retention.
@@ -530,12 +525,12 @@ enum GeneralPixel: PixelKitEventV2 {
         case .vpnBreakageReport:
             return "m_mac_vpn_breakage_report"
 
-        case .networkProtectionRemoteMessageDisplayed(let messageID):
-            return "m_mac_netp_remote_message_displayed_\(messageID)"
-        case .networkProtectionRemoteMessageDismissed(let messageID):
-            return "m_mac_netp_remote_message_dismissed_\(messageID)"
-        case .networkProtectionRemoteMessageOpened(let messageID):
-            return "m_mac_netp_remote_message_opened_\(messageID)"
+        case .surveyRemoteMessageDisplayed(let messageID):
+            return "m_mac_survey_remote_message_displayed_\(messageID)"
+        case .surveyRemoteMessageDismissed(let messageID):
+            return "m_mac_survey_remote_message_dismissed_\(messageID)"
+        case .surveyRemoteMessageOpened(let messageID):
+            return "m_mac_survey_remote_message_opened_\(messageID)"
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
 
@@ -575,12 +570,6 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_dbp_imp_terms"
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_dbp_ev_terms_accepted"
-        case .dataBrokerProtectionRemoteMessageDisplayed(let messageID):
-            return "m_mac_dbp_remote_message_displayed_\(messageID)"
-        case .dataBrokerProtectionRemoteMessageDismissed(let messageID):
-            return "m_mac_dbp_remote_message_dismissed_\(messageID)"
-        case .dataBrokerProtectionRemoteMessageOpened(let messageID):
-            return "m_mac_dbp_remote_message_opened_\(messageID)"
 
         case .dataBrokerEnableLoginItemDaily: return "m_mac_dbp_daily_login-item_enable"
         case .dataBrokerDisableLoginItemDaily: return "m_mac_dbp_daily_login-item_disable"
@@ -863,12 +852,8 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .burnerTabMisplaced: return "burner_tab_misplaced"
 
-        case .networkProtectionRemoteMessageFetchingFailed: return "netp_remote_message_fetching_failed"
-        case .networkProtectionRemoteMessageStorageFailed: return "netp_remote_message_storage_failed"
-
-        case .dataBrokerProtectionRemoteMessageFetchingFailed: return "dbp_remote_message_fetching_failed"
-        case .dataBrokerProtectionRemoteMessageStorageFailed: return "dbp_remote_message_storage_failed"
-
+        case .surveyRemoteMessageFetchingFailed: return "survey_remote_message_fetching_failed"
+        case .surveyRemoteMessageStorageFailed: return "survey_remote_message_storage_failed"
         case .loginItemUpdateError: return "login-item_update-error"
 
             // Installation Attribution
