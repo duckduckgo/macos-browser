@@ -72,7 +72,7 @@ final class SurveyURLBuilder {
         self.daysSincePIRLastActive = daysSincePIRLastActive
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func buildSurveyURL(from originalURLString: String) -> URL? {
         guard var components = URLComponents(string: originalURLString) else {
             assertionFailure("Could not build components from survey URL")
