@@ -372,6 +372,11 @@ final class NavigationBarViewController: NSViewController {
                                                object: nil)
 
         NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showPasswordsAutoPinnedFeedback(_:)),
+                                               name: .passwordsAutoPinned,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
                                                selector: #selector(showAutoconsentFeedback(_:)),
                                                name: AutoconsentUserScript.newSitePopupHiddenNotification,
                                                object: nil)
@@ -440,6 +445,13 @@ final class NavigationBarViewController: NSViewController {
                                                               )
             self.isAutoFillAutosaveMessageVisible = true
             self.passwordManagementButton.isHidden = false
+            popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
+        }
+    }
+
+    @objc private func showPasswordsAutoPinnedFeedback(_ sender: Notification) {
+        DispatchQueue.main.async {
+            let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerAutoPinnedPopoverText)
             popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
         }
     }

@@ -77,21 +77,27 @@ struct DataImportView: ModalView {
 
     private func viewHeader() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(UserText.importDataTitle)
-                .font(.title2.weight(.semibold))
-                .padding(.bottom, 24)
+            if case .shortcuts = model.screen {
+                Text(UserText.importDataShortcutsTitle)
+                    .font(.title2.weight(.semibold))
+                    .padding(.bottom, 24)
 
-            Text(UserText.importDataSourceTitle)
-                .bold()
-                .padding(.bottom, 16)
+            } else {
+                Text(UserText.importDataTitle)
+                    .font(.title2.weight(.semibold))
+                    .padding(.bottom, 24)
 
-            // browser to import data from picker popup
-            if case .feedback = model.screen {} else {
-                DataImportSourcePicker(importSources: model.availableImportSources, selectedSource: model.importSource) { importSource in
-                    model.update(with: importSource)
+                Text(UserText.importDataSourceTitle)
+                    .padding(.bottom, 16)
+
+                // browser to import data from picker popup
+                if case .feedback = model.screen {} else {
+                    DataImportSourcePicker(importSources: model.availableImportSources, selectedSource: model.importSource) { importSource in
+                        model.update(with: importSource)
+                    }
+                    .disabled(model.isImportSourcePickerDisabled)
+                    .padding(.bottom, 16)
                 }
-                .disabled(model.isImportSourcePickerDisabled)
-                .padding(.bottom, 16)
             }
         }
     }
@@ -165,6 +171,9 @@ struct DataImportView: ModalView {
                 .padding(.bottom, 20)
 
                 ReportFeedbackView(model: $model.reportModel)
+
+            case .shortcuts:
+                DataImportShortcutsView()
             }
         }
     }
@@ -203,6 +212,7 @@ struct DataImportView: ModalView {
     private func importPasswordSubtitle() -> some View {
         Text(UserText.importDataSubtitle)
             .font(.subheadline)
+            .foregroundColor(Color(.greyText))
             .padding(.top, 16)
     }
 

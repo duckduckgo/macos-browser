@@ -34,7 +34,7 @@ struct DataImportSummaryView: View {
         self.model = model
     }
 
-    private let zeroString = "0"
+    private let zero = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -56,132 +56,142 @@ struct DataImportSummaryView: View {
                 ForEach(model.resultsFiltered(by: .bookmarks), id: \.dataType) { item in
                     switch item.result {
                     case (.success(let summary)):
-                        HStack {
-                            successImage()
-                            Text("Bookmarks:",
-                                 comment: "Data import summary format of how many bookmarks (%lld) were successfully imported.")
-                            + Text(" " as String)
-                            + Text(String(summary.successful)).bold()
-                            Spacer()
-                        }
-                        if summary.duplicate > 0 {
-                            lineSeparator()
-                            HStack {
-                                skippedImage()
-                                Text("Duplicate Bookmarks Skipped:",
-                                     comment: "Data import summary format of how many duplicate bookmarks (%lld) were skipped during import.")
-                                + Text(" " as String)
-                                + Text(String(summary.duplicate)).bold()
-                                Spacer()
-                            }
-                        }
-                        if summary.failed > 0 {
-                            lineSeparator()
-                            HStack {
-                                failureImage()
-                                Text("Bookmark import failed:",
-                                     comment: "Data import summary format of how many bookmarks (%lld) failed to import.")
-                                + Text(" " as String)
-                                + Text(String(summary.failed)).bold()
-                                Spacer()
-                            }
-                        }
-
+                        bookmarksSuccessSummary(summary)
                     case (.failure(let error)) where error.errorType == .noData:
-                        HStack {
-                            skippedImage()
-                            Text("Bookmarks:",
-                                 comment: "Data import summary format of how many bookmarks were successfully imported.")
-                            + Text(" " as String)
-                            + Text(zeroString).bold()
-                            Spacer()
-                        }
-
+                        importSummaryRow(image: .failed,
+                                         text: "Bookmarks:",
+                                         comment: "Data import summary format of how many bookmarks were successfully imported.",
+                                         count: zero)
                     case (.failure):
-                        HStack {
-                            failureImage()
-                            Text("Bookmark import failed.",
-                                 comment: "Data import summary message of failed bookmarks import.")
-                            Spacer()
-                        }
+                        importSummaryRow(image: .failed,
+                                         text: "Bookmark import failed.",
+                                         comment: "Data import summary message of failed bookmarks import.",
+                                         count: nil)
                     }
                 }
             }
-            .padding()
-            .roundedBorder()
+            .applyConditionalModifiers(!model.resultsFiltered(by: .bookmarks).isEmpty)
 
             VStack {
                 ForEach(model.resultsFiltered(by: .passwords), id: \.dataType) { item in
                     switch item.result {
                     case (.failure(let error)):
                         if error.errorType == .noData {
-                            HStack {
-                                skippedImage()
-                                Text("Passwords:",
-                                     comment: "Data import summary format of how many passwords were successfully imported.")
-                                + Text(" " as String)
-                                + Text(zeroString).bold()
-                                Spacer()
-                            }
+                            importSummaryRow(image: .failed,
+                                             text: "Passwords:",
+                                             comment: "Data import summary format of how many passwords were successfully imported.",
+                                             count: zero)
                         } else {
-                            HStack {
-                                failureImage()
-                                Text("Password import failed.",
-                                     comment: "Data import summary message of failed passwords import.")
-                                Spacer()
-                            }
+                            importSummaryRow(image: .failed,
+                                             text: "Password import failed.",
+                                             comment: "Data import summary message of failed passwords import.",
+                                             count: nil)
                         }
 
                     case (.success(let summary)):
-                        HStack {
-                            successImage()
-                            Text("Passwords:",
-                                 comment: "Data import summary format of how many passwords (%lld) were successfully imported.")
-                            + Text(" " as String)
-                            + Text(String(summary.successful)).bold()
-                            Spacer()
-                        }
-                        if summary.failed > 0 {
-                            lineSeparator()
-                            HStack {
-                                failureImage()
-                                Text("Password import failed: ",
-                                     comment: "Data import summary format of how many passwords (%lld) failed to import.")
-                                + Text(" " as String)
-                                + Text(String(summary.failed)).bold()
-                                Spacer()
-                            }
-                        }
+                        passwordsSuccessSummary(summary)
                     }
                 }
             }
-            .padding()
-            .roundedBorder()
+            .applyConditionalModifiers(!model.resultsFiltered(by: .passwords).isEmpty)
 
+            if !model.resultsFiltered(by: .passwords).isEmpty {
+                importPasswordSubtitle()
+            }
         }
     }
 }
 
-private func successImage() -> some View {
-    Image(.successCheckmark)
-        .frame(width: 16, height: 16)
+func bookmarksSuccessSummary(_ summary: DataImport.DataTypeSummary) -> some View {
+    VStack {
+        importSummaryRow(image: .success,
+                         text: "Bookmarks:",
+                         comment: "Data import summary format of how many bookmarks (%lld) were successfully imported.",
+                         count: summary.successful)
+        if summary.duplicate > 0 {
+            lineSeparator()
+            importSummaryRow(image: .failed,
+                             text: "Duplicate Bookmarks Skipped:",
+                             comment: "Data import summary format of how many duplicate bookmarks (%lld) were skipped during import.",
+                             count: summary.duplicate)
+        }
+        if summary.failed > 0 {
+            lineSeparator()
+            importSummaryRow(image: .failed,
+                             text: "Bookmark import failed:",
+                             comment: "Data import summary format of how many bookmarks (%lld) failed to import.",
+                             count: summary.failed)
+        }
+    }
 }
 
-private func failureImage() -> some View {
-    Image(.error)
-        .frame(width: 16, height: 16)
+private func passwordsSuccessSummary(_ summary: DataImport.DataTypeSummary) -> some View {
+    VStack {
+        importSummaryRow(image: .success,
+                         text: "Passwords:",
+                         comment: "Data import summary format of how many passwords (%lld) were successfully imported.",
+                         count: summary.successful)
+        if summary.failed > 0 {
+            lineSeparator()
+            importSummaryRow(image: .failed,
+                             text: "Password import failed: ",
+                             comment: "Data import summary format of how many passwords (%lld) failed to import.",
+                             count: summary.failed)
+        }
+    }
 }
 
-private func skippedImage() -> some View {
-    Image(.skipped)
-        .frame(width: 16, height: 16)
+private func importPasswordSubtitle() -> some View {
+    Text(UserText.importDataSubtitle)
+        .font(.subheadline)
+        .foregroundColor(Color(.greyText))
+        .padding(.top, -2)
+        .padding(.leading, 8)
+}
+
+private func importSummaryRow(image: Image, text: LocalizedStringKey, comment: StaticString, count: Int?) -> some View {
+    HStack(spacing: 0) {
+        image
+            .frame(width: 16, height: 16)
+            .padding(.trailing, 14)
+        Text(text, comment: comment)
+        Text(verbatim: " ")
+        if let count = count {
+            Text(String(count)).bold()
+        }
+        Spacer()
+    }
 }
 
 private func lineSeparator() -> some View {
-    Rectangle()
-        .fill(Color(.blackWhite10))
-        .frame(height: 1)
-        .padding(.init(top: 5, leading: 10, bottom: 8, trailing: 0))
+    Divider()
+        .padding(EdgeInsets(top: 5, leading: 0, bottom: 8, trailing: 0))
+}
+
+private extension Image {
+    static let success = Image(.successCheckmark)
+    static let failed = Image(.clearRecolorable16)
+}
+
+private struct ConditionalModifier: ViewModifier {
+    let applyModifiers: Bool
+
+    func body(content: Content) -> some View {
+        if applyModifiers {
+            content
+                .padding([.leading, .vertical])
+                .padding(.trailing, 0)
+                .roundedBorder()
+        } else {
+            content
+        }
+    }
+}
+
+private extension View {
+    func applyConditionalModifiers(_ condition: Bool) -> some View {
+        modifier(ConditionalModifier(applyModifiers: condition))
+    }
 }
 
 #if DEBUG
