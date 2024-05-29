@@ -28,47 +28,59 @@ struct DataImportShortcutsView: ModalView {
 
     var body: some View {
 
-        VStack(spacing: 0) {
-            HStack {
-                Image(.bookmarksFavoritesColor24)
-                VStack(alignment: .leading) {
-                    Text("Show Bookmarks Bar", comment: "Title for the setting to enable the bookmarks bar")
-                        .font(.system(size: 16))
-                    Text("Put your favorite bookmarks in easy reach", comment: "Description for the setting to enable the bookmarks bar")
-                        .font(.system(size: 13))
-                        .foregroundColor(.greyText)
+        VStack(alignment: .leading, spacing: 8) {
+            VStack(spacing: 0) {
+                HStack {
+                    Image(.bookmarksFavoritesColor24)
+                    VStack(alignment: .leading) {
+                        Text("Show Bookmarks Bar", comment: "Title for the setting to enable the bookmarks bar")
+                                .font(.system(size: 16))
+                        Text("Put your favorite bookmarks in easy reach", comment: "Description for the setting to enable the bookmarks bar")
+                                .font(.system(size: 13))
+                                .foregroundColor(.greyText)
+                    }
+                            .padding(.top, 0)
+                            .padding(.bottom, 1)
+                    Spacer()
+                    Toggle("", isOn: $model.showBookmarksBarStatus)
+                            .toggleStyle(.switch)
                 }
-                .padding(.top, 0)
-                .padding(.bottom, 1)
-                Spacer()
-                Toggle("", isOn: $model.showBookmarksBarStatus)
-                    .toggleStyle(.switch)
-            }
-            .padding()
+                        .padding()
 
-            Divider()
-                .padding(.leading)
+                Divider()
+                        .padding(.leading)
 
-            HStack {
-                Image(.keyColor24)
-                VStack(alignment: .leading) {
-                    Text("Show Passwords Shortcut", comment: "Title for the setting to enable the passwords shortcut")
-                        .font(.system(size: 16))
-                    Text("Keep passwords nearby in the address bar", comment: "Description for the setting to enable the passwords shortcut")
-                        .font(.system(size: 13))
-                        .foregroundColor(.greyText)
+                HStack {
+                    Image(.keyColor24)
+                    VStack(alignment: .leading) {
+                        Text("Show Passwords Shortcut", comment: "Title for the setting to enable the passwords shortcut")
+                                .font(.system(size: 16))
+                        Text("Keep passwords nearby in the address bar", comment: "Description for the setting to enable the passwords shortcut")
+                                .font(.system(size: 13))
+                                .foregroundColor(.greyText)
+                    }
+                            .padding(.top, 0)
+                            .padding(.bottom, 1)
+
+                    Spacer()
+                    Toggle("", isOn: $model.showPasswordsPinnedStatus)
+                            .toggleStyle(.switch)
                 }
-                .padding(.top, 0)
-                .padding(.bottom, 1)
-
-                Spacer()
-                Toggle("", isOn: $model.showPasswordsPinnedStatus)
-                    .toggleStyle(.switch)
+                        .padding()
             }
-            .padding()
+                    .roundedBorder()
         }
-        .roundedBorder()
+
+        importShortcutsSubtitle()
     }
+}
+
+private func importShortcutsSubtitle() -> some View {
+    Text(UserText.importDataShortcutsSubtitle)
+            .font(.subheadline)
+            .foregroundColor(Color(.greyText))
+            .padding(.top, 8)
+            .padding(.leading, 8)
 }
 
 #Preview {

@@ -1239,6 +1239,9 @@
         }
       }
     },
+    "After clicking import, your computer may ask you to enter a password. You may need to enter your password two times before importing starts. DuckDuckGo will not see that password.\n\nImported passwords are stored securely using encryption." : {
+      "comment" : "Warning that Chromium data import would require entering system passwords."
+    },
     "after.bitwarden.installation.info" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -4665,7 +4668,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Lock access to passwords and autofill info after computer is idle for"
+            "value" : "Lock autofill after computer is idle for"
           }
         },
         "es" : {
@@ -4965,7 +4968,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "If not locked, anyone with access to your device will be able to use and modify your autofill info. For security purposes, payment method form fill always requires authentication."
+            "value" : "If not locked, anyone with access to your device will be able to use and modify your autofill data. For security purposes, credit card form fill always requires authentication."
           }
         },
         "es" : {
@@ -22369,6 +22372,7 @@
     },
     "If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.\n\nImported passwords are stored securely using encryption." : {
       "comment" : "Warning that Chromium data import would require entering system passwords.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -23179,7 +23183,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Customize your experience"
+            "value" : "Almost done!"
+          }
+        }
+      }
+    },
+    "import.browser.data.shortcuts.subtitle" : {
+      "comment" : "Subtitle explaining how users can find toolbar shortcuts.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can always right-click on the browser toolbar to find more shortcuts like these."
           }
         }
       }
@@ -34727,55 +34743,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Fireproof?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Fireproof?"
+            "value" : "Fireproof this website"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "¿Marcar como Fireproof?"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Mode coupe-feu (Fireproof) ?"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Attivare Fireproof?"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Fireproof?"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ustawić jako Fireproof?"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Utilizar o Fireproof?"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Сделать огнеупорным?"
           }
         }
