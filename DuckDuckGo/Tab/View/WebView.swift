@@ -30,13 +30,24 @@ protocol WebViewInteractionEventsDelegate: AnyObject {
     func webView(_ webView: WebView, scrollWheel event: NSEvent)
 }
 
+protocol WebViewZoomLevelDelegate: AnyObject {
+     func zoomWasSet(to level: DefaultZoomValue)
+ }
+
 @objc(DuckDuckGo_WebView)
 final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
     weak var interactionEventsDelegate: WebViewInteractionEventsDelegate?
+    weak var zoomLevelDelegate: WebViewZoomLevelDelegate?
 
     private var isLoadingObserver: Any?
+
+    private var shouldShowWebInspector: Bool {
+        // When a new tab is open, we don't want the web inspector to be active on screen and gain focus.
+        // When a new tab is open the other tab views are removed from the window, hence, we should not show the web inspector.
+        isInspectorShown && window != nil
+    }
 
     override func addTrackingArea(_ trackingArea: NSTrackingArea) {
         /// disable mouseEntered/mouseMoved/mouseExited events passing to Web View while it‘s loading
@@ -95,6 +106,12 @@ final class WebView: WKWebView {
             return DefaultZoomValue(rawValue: pageZoom) ?? .percent100
         }
         set {
+            // There are cases where the pageZoom does not reflect the actual display, such as after a command-click on a link.
+            // The API may not trigger a change if the new value is the same as the current value.
+            if pageZoom == newValue.rawValue {
+                // Slightly modify the value to force the API to trigger a change.
+                pageZoom = newValue.rawValue - 0.001
+            }
             pageZoom = newValue.rawValue
         }
     }
@@ -118,16 +135,19 @@ final class WebView: WKWebView {
     func resetZoomLevel() {
         magnification = 1
         zoomLevel = defaultZoomValue
+        zoomLevelDelegate?.zoomWasSet(to: zoomLevel)
     }
 
     func zoomIn() {
         guard canZoomIn else { return }
         zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index + 1]
+        zoomLevelDelegate?.zoomWasSet(to: zoomLevel)
     }
 
     func zoomOut() {
         guard canZoomOut else { return }
         zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index - 1]
+        zoomLevelDelegate?.zoomWasSet(to: zoomLevel)
     }
 
     // MARK: - Menu
@@ -163,8 +183,8 @@ final class WebView: WKWebView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        if self.isInspectorShown {
-            self.openDeveloperTools()
+        if shouldShowWebInspector {
+            openDeveloperTools()
         }
     }
 

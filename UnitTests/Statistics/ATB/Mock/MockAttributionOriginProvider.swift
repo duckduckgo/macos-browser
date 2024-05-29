@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Subscription
 @testable import DuckDuckGo_Privacy_Browser
 
 final class MockAttributionOriginProvider: AttributionOriginProvider {

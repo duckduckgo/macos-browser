@@ -49,9 +49,9 @@ public protocol IPCServerInterface: AnyObject {
     ///
     func fetchLastError(completion: @escaping (Error?) -> Void)
 
-    /// Debug commands
+    /// Commands
     ///
-    func debugCommand(_ command: DebugCommand) async throws
+    func command(_ command: VPNCommand) async throws
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -79,9 +79,9 @@ protocol XPCServerInterface {
     ///
     func fetchLastError(completion: @escaping (Error?) -> Void)
 
-    /// Debug commands
+    /// Commands
     ///
-    func debugCommand(_ payload: Data, completion: @escaping (Error?) -> Void)
+    func command(_ payload: Data, completion: @escaping (Error?) -> Void)
 }
 
 public final class TunnelControllerIPCServer {
@@ -186,15 +186,15 @@ extension TunnelControllerIPCServer: XPCServerInterface {
         serverDelegate?.fetchLastError(completion: completion)
     }
 
-    func debugCommand(_ payload: Data, completion: @escaping (Error?) -> Void) {
-        guard let command = try? JSONDecoder().decode(DebugCommand.self, from: payload) else {
+    func command(_ payload: Data, completion: @escaping (Error?) -> Void) {
+        guard let command = try? JSONDecoder().decode(VPNCommand.self, from: payload) else {
             completion(IPCError.cannotDecodeDebugCommand)
             return
         }
 
         Task {
             do {
-                try await serverDelegate?.debugCommand(command)
+                try await serverDelegate?.command(command)
                 completion(nil)
             } catch {
                 completion(error)

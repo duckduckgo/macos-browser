@@ -78,6 +78,11 @@ final class TabCollection: NSObject {
         tabs = tab.map { [$0] } ?? []
     }
 
+    func removeTabs(before index: Int) {
+        tabsWillClose(range: 0..<index)
+        tabs.removeSubrange(0..<index)
+    }
+
     func removeTabs(after index: Int) {
         tabsWillClose(range: (index + 1)..<tabs.count)
         tabs.removeSubrange((index + 1)...)

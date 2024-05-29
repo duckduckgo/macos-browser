@@ -24,9 +24,13 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
     var mockedCurrentTab: Tab?
 
     var canBookmarkAllOpenTabs = false
+    var hasItemsToTheLeft = false
     var hasItemsToTheRight = false
     var audioState: WKWebView.AudioState?
+    var isTabBarItemAlreadyBookmarked = false
 
+    private(set) var tabBarViewItemBookmarkThisPageActionCalled = false
+    private(set) var tabBarViewItemRemoveBookmarkActionCalled = false
     private(set) var tabBarViewItemBookmarkAllOpenTabsActionCalled = false
 
     func tabBarViewItem(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem, isMouseOver: Bool) {
@@ -42,6 +46,10 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
+
+    }
+
+    func tabBarViewItemCloseToTheLeftAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
 
     }
 
@@ -69,8 +77,16 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
         mockedCurrentTab?.content.canBeBookmarked ?? true
     }
 
-    func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
+    func tabBarViewItemIsAlreadyBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool {
+        isTabBarItemAlreadyBookmarked
+    }
 
+    func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
+        tabBarViewItemBookmarkThisPageActionCalled = true
+    }
+
+    func tabBarViewItemRemoveBookmarkAction(_ tabBarViewItem: TabBarViewItem) {
+        tabBarViewItemRemoveBookmarkActionCalled = true
     }
 
     func tabBarViewAllItemsCanBeBookmarked(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> Bool {
@@ -106,7 +122,7 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> DuckDuckGo_Privacy_Browser.OtherTabBarViewItemsState {
-        OtherTabBarViewItemsState(hasItemsToTheLeft: false, hasItemsToTheRight: hasItemsToTheRight)
+        OtherTabBarViewItemsState(hasItemsToTheLeft: hasItemsToTheLeft, hasItemsToTheRight: hasItemsToTheRight)
     }
 
     func clear() {

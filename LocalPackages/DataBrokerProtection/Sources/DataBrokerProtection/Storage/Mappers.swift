@@ -199,7 +199,7 @@ struct MapperToModel {
         )
     }
 
-    func mapToModel(_ scanDB: ScanDB, events: [ScanHistoryEventDB]) throws -> ScanOperationData {
+    func mapToModel(_ scanDB: ScanDB, events: [ScanHistoryEventDB]) throws -> ScanJobData {
         .init(
             brokerId: scanDB.brokerId,
             profileQueryId: scanDB.profileQueryId,
@@ -209,7 +209,7 @@ struct MapperToModel {
         )
     }
 
-    func mapToModel(_ optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB, events: [OptOutHistoryEventDB]) throws -> OptOutOperationData {
+    func mapToModel(_ optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB, events: [OptOutHistoryEventDB]) throws -> OptOutJobData {
         .init(
             brokerId: optOutDB.brokerId,
             profileQueryId: optOutDB.profileQueryId,

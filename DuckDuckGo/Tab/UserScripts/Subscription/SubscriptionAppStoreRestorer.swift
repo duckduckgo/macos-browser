@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import Subscription
 import SubscriptionUI
 import enum StoreKit.StoreKitError
@@ -25,8 +25,16 @@ import PixelKit
 @available(macOS 12.0, *)
 struct SubscriptionAppStoreRestorer {
 
-    // swiftlint:disable:next cyclomatic_complexity
-    static func restoreAppStoreSubscription(mainViewController: MainViewController, windowController: MainWindowController) async {
+    private let subscriptionManager: SubscriptionManaging
+    @MainActor var window: NSWindow? { WindowControllersManager.shared.lastKeyMainWindowController?.window }
+    let subscriptionErrorReporter = SubscriptionErrorReporter()
+
+    public init(subscriptionManager: SubscriptionManaging) {
+        self.subscriptionManager = subscriptionManager
+    }
+
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
+    func restoreAppStoreSubscription(mainViewController: MainViewController, windowController: MainWindowController) async {
 
         let progressViewController = await ProgressViewController(title: UserText.restoringSubscriptionTitle)
         defer {
@@ -39,7 +47,7 @@ struct SubscriptionAppStoreRestorer {
             mainViewController.presentAsSheet(progressViewController)
         }
 
-        let syncResult = await PurchaseManager.shared.syncAppleIDAccount()
+        let syncResult = await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
 
         switch syncResult {
         case .success:
@@ -63,7 +71,8 @@ struct SubscriptionAppStoreRestorer {
             }
         }
 
-        let result = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: subscriptionManager)
+        let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
 
         switch result {
         case .success:
@@ -77,15 +86,56 @@ struct SubscriptionAppStoreRestorer {
 
             switch error {
             case .missingAccountOrTransactions:
-                SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
-                await windowController.showSubscriptionNotFoundAlert()
+                subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
+                await showSubscriptionNotFoundAlert()
             case .subscriptionExpired:
-                SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionExpired)
-                await windowController.showSubscriptionInactiveAlert()
+                subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionExpired)
+                await showSubscriptionInactiveAlert()
             case .pastTransactionAuthenticationError, .failedToObtainAccessToken, .failedToFetchAccountDetails, .failedToFetchSubscriptionDetails:
-                SubscriptionErrorReporter.report(subscriptionActivationError: .generalError)
-                await windowController.showSomethingWentWrongAlert()
+                subscriptionErrorReporter.report(subscriptionActivationError: .generalError)
+                await showSomethingWentWrongAlert()
             }
         }
+    }
+}
+
+@available(macOS 12.0, *)
+extension SubscriptionAppStoreRestorer {
+
+    /*
+     WARNING: DUPLICATED CODE
+     This code will be moved as part of https://app.asana.com/0/0/1207157941206686/f
+     */
+
+    // MARK: - UI interactions
+
+    @MainActor
+    func showSomethingWentWrongAlert() {
+        PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
+        guard let window else { return }
+
+        window.show(.somethingWentWrongAlert())
+    }
+
+    @MainActor
+    func showSubscriptionNotFoundAlert() {
+        guard let window else { return }
+
+        window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
+            let url = subscriptionManager.url(for: .purchase)
+            WindowControllersManager.shared.showTab(with: .subscription(url))
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+        })
+    }
+
+    @MainActor
+    func showSubscriptionInactiveAlert() {
+        guard let window else { return }
+
+        window.show(.subscriptionInactiveAlert(), firstButtonAction: {
+            let url = subscriptionManager.url(for: .purchase)
+            WindowControllersManager.shared.showTab(with: .subscription(url))
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+        })
     }
 }

@@ -17,295 +17,199 @@
 //
 
 import Foundation
-import WebKit
-import BrowserServicesKit
-import UserScript
 import Common
 
-protocol DataBrokerOperation: CCFCommunicationDelegate {
-    associatedtype ReturnValue
-    associatedtype InputValue
-
-    var privacyConfig: PrivacyConfigurationManaging { get }
-    var prefs: ContentScopeProperties { get }
-    var query: BrokerProfileQueryData { get }
-    var emailService: EmailServiceProtocol { get }
-    var captchaService: CaptchaServiceProtocol { get }
-    var cookieHandler: CookieHandler { get }
-    var stageCalculator: StageDurationCalculator { get }
+protocol DataBrokerOperationDependencies {
+    var database: DataBrokerProtectionRepository { get }
+    var config: DataBrokerExecutionConfig { get }
+    var runnerProvider: JobRunnerProvider { get }
+    var notificationCenter: NotificationCenter { get }
     var pixelHandler: EventMapping<DataBrokerProtectionPixels> { get }
-
-    var webViewHandler: WebViewHandler? { get set }
-    var actionsHandler: ActionsHandler? { get }
-    var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
-    var extractedProfile: ExtractedProfile? { get set }
-    var shouldRunNextStep: () -> Bool { get }
-    var retriesCountOnError: Int { get set }
-    var clickAwaitTime: TimeInterval { get }
-    var postLoadingSiteStartTime: Date? { get set }
-
-    func run(inputValue: InputValue,
-             webViewHandler: WebViewHandler?,
-             actionsHandler: ActionsHandler?,
-             showWebView: Bool) async throws -> ReturnValue
-
-    func executeNextStep() async
-    func executeCurrentAction() async
+    var userNotificationService: DataBrokerProtectionUserNotificationService { get }
 }
 
-extension DataBrokerOperation {
-    func run(inputValue: InputValue,
-             webViewHandler: WebViewHandler?,
-             actionsHandler: ActionsHandler?,
-             shouldRunNextStep: @escaping () -> Bool) async throws -> ReturnValue {
+struct DefaultDataBrokerOperationDependencies: DataBrokerOperationDependencies {
+    let database: DataBrokerProtectionRepository
+    var config: DataBrokerExecutionConfig
+    let runnerProvider: JobRunnerProvider
+    let notificationCenter: NotificationCenter
+    let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    let userNotificationService: DataBrokerProtectionUserNotificationService
+}
 
-        try await run(inputValue: inputValue,
-                      webViewHandler: webViewHandler,
-                      actionsHandler: actionsHandler,
-                      showWebView: false)
+enum OperationType {
+    case scan
+    case optOut
+    case all
+}
+
+protocol DataBrokerOperationErrorDelegate: AnyObject {
+    func dataBrokerOperationDidError(_ error: Error, withBrokerName brokerName: String?)
+}
+
+// swiftlint:disable explicit_non_final_class
+class DataBrokerOperation: Operation {
+
+    private let dataBrokerID: Int64
+    private let operationType: OperationType
+    private let priorityDate: Date? // The date to filter and sort operations priorities
+    private let showWebView: Bool
+    private(set) weak var errorDelegate: DataBrokerOperationErrorDelegate? // Internal read-only to enable mocking
+    private let operationDependencies: DataBrokerOperationDependencies
+
+    private let id = UUID()
+    private var _isExecuting = false
+    private var _isFinished = false
+
+    deinit {
+        os_log("Deinit operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
     }
-}
 
-extension DataBrokerOperation {
+    init(dataBrokerID: Int64,
+         operationType: OperationType,
+         priorityDate: Date? = nil,
+         showWebView: Bool,
+         errorDelegate: DataBrokerOperationErrorDelegate,
+         operationDependencies: DataBrokerOperationDependencies) {
 
-    // MARK: - Shared functions
+        self.dataBrokerID = dataBrokerID
+        self.priorityDate = priorityDate
+        self.operationType = operationType
+        self.showWebView = showWebView
+        self.errorDelegate = errorDelegate
+        self.operationDependencies = operationDependencies
+        super.init()
+    }
 
-    // swiftlint:disable:next cyclomatic_complexity
-    func runNextAction(_ action: Action) async {
-        switch action {
-        case is GetCaptchaInfoAction:
-            stageCalculator.setStage(.captchaParse)
-        case is ClickAction:
-            stageCalculator.setStage(.fillForm)
-        case is FillFormAction:
-            stageCalculator.setStage(.fillForm)
-        case is ExpectationAction:
-            stageCalculator.setStage(.submit)
-        default: ()
-        }
-
-        if let emailConfirmationAction = action as? EmailConfirmationAction {
-            do {
-                stageCalculator.fireOptOutSubmit()
-                try await runEmailConfirmationAction(action: emailConfirmationAction)
-                await executeNextStep()
-            } catch {
-                await onError(error: DataBrokerProtectionError.emailError(error as? EmailError))
-            }
-
+    override func start() {
+        if isCancelled {
+            finish()
             return
         }
 
-        if action as? SolveCaptchaAction != nil, let captchaTransactionId = actionsHandler?.captchaTransactionId {
-            actionsHandler?.captchaTransactionId = nil
-            stageCalculator.setStage(.captchaSolve)
-            if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId,
-                                                                                     attemptId: stageCalculator.attemptId,
-                                                                                     shouldRunNextStep: shouldRunNextStep) {
-                stageCalculator.fireOptOutCaptchaSolve()
-                await webViewHandler?.execute(action: action, data: .solveCaptcha(CaptchaToken(token: captchaData)))
-            } else {
-                await onError(error: DataBrokerProtectionError.captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
-            }
+        willChangeValue(forKey: #keyPath(isExecuting))
+        _isExecuting = true
+        didChangeValue(forKey: #keyPath(isExecuting))
 
+        main()
+    }
+
+    override var isAsynchronous: Bool {
+        return true
+    }
+
+    override var isExecuting: Bool {
+        return _isExecuting
+    }
+
+    override var isFinished: Bool {
+        return _isFinished
+    }
+
+    override func main() {
+        Task {
+            await runOperation()
+            finish()
+        }
+    }
+
+    private func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData], operationType: OperationType, priorityDate: Date?) -> [BrokerJobData] {
+        let operationsData: [BrokerJobData]
+
+        switch operationType {
+        case .optOut:
+            operationsData = brokerProfileQueriesData.flatMap { $0.optOutJobData }
+        case .scan:
+            operationsData = brokerProfileQueriesData.filter { $0.profileQuery.deprecated == false }.compactMap { $0.scanJobData }
+        case .all:
+            operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
+        }
+
+        let filteredAndSortedOperationsData: [BrokerJobData]
+
+        if let priorityDate = priorityDate {
+            filteredAndSortedOperationsData = operationsData
+                .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= priorityDate }
+                .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
+        } else {
+            filteredAndSortedOperationsData = operationsData
+        }
+
+        return filteredAndSortedOperationsData
+    }
+
+    private func runOperation() async {
+        let allBrokerProfileQueryData: [BrokerProfileQueryData]
+
+        do {
+            allBrokerProfileQueryData = try operationDependencies.database.fetchAllBrokerProfileQueryData()
+        } catch {
+            os_log("DataBrokerOperationsCollection error: runOperation, error: %{public}@", log: .error, error.localizedDescription)
             return
         }
 
-        if action.needsEmail {
-            do {
-                stageCalculator.setStage(.emailGenerate)
-                let emailData = try await emailService.getEmail(dataBrokerURL: query.dataBroker.url, attemptId: stageCalculator.attemptId)
-                extractedProfile?.email = emailData.emailAddress
-                stageCalculator.setEmailPattern(emailData.pattern)
-                stageCalculator.fireOptOutEmailGenerate()
-            } catch {
-                await onError(error: DataBrokerProtectionError.emailError(error as? EmailError))
-                return
-            }
-        }
+        let brokerProfileQueriesData = allBrokerProfileQueryData.filter { $0.dataBroker.id == dataBrokerID }
 
-        await webViewHandler?.execute(action: action, data: .userData(query.profileQuery, self.extractedProfile))
-    }
+        let filteredAndSortedOperationsData = filterAndSortOperationsData(brokerProfileQueriesData: brokerProfileQueriesData,
+                                                                          operationType: operationType,
+                                                                          priorityDate: priorityDate)
 
-    private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {
-        if let email = extractedProfile?.email {
-            stageCalculator.setStage(.emailReceive)
-            let url =  try await emailService.getConfirmationLink(
-                from: email,
-                numberOfRetries: 100, // Move to constant
-                pollingInterval: action.pollingTime,
-                attemptId: stageCalculator.attemptId,
-                shouldRunNextStep: shouldRunNextStep
-            )
-            stageCalculator.fireOptOutEmailReceive()
-            stageCalculator.setStage(.emailReceive)
-            do {
-                try await webViewHandler?.load(url: url)
-            } catch {
-                await onError(error: error)
+        os_log("filteredAndSortedOperationsData count: %{public}d for brokerID %{public}d", log: .dataBrokerProtection, filteredAndSortedOperationsData.count, dataBrokerID)
+
+        for operationData in filteredAndSortedOperationsData {
+            if isCancelled {
+                os_log("Cancelled operation, returning...", log: .dataBrokerProtection)
                 return
             }
 
-            stageCalculator.fireOptOutEmailConfirm()
-        } else {
-            throw EmailError.cantFindEmail
-        }
-    }
+            let brokerProfileData = brokerProfileQueriesData.filter {
+                $0.dataBroker.id == operationData.brokerId && $0.profileQuery.id == operationData.profileQueryId
+            }.first
 
-    func complete(_ value: ReturnValue) {
-        self.firePostLoadingDurationPixel(hasError: false)
-        self.continuation?.resume(returning: value)
-        self.continuation = nil
-    }
-
-    func failed(with error: Error) {
-        self.firePostLoadingDurationPixel(hasError: true)
-        self.continuation?.resume(throwing: error)
-        self.continuation = nil
-    }
-
-    func initialize(handler: WebViewHandler?,
-                    isFakeBroker: Bool = false,
-                    showWebView: Bool) async {
-        if let handler = handler { // This help us swapping up the WebViewHandler on tests
-            self.webViewHandler = handler
-        } else {
-            self.webViewHandler = await DataBrokerProtectionWebViewHandler(privacyConfig: privacyConfig, prefs: prefs, delegate: self, isFakeBroker: isFakeBroker)
-        }
-
-        await webViewHandler?.initializeWebView(showWebView: showWebView)
-    }
-
-    // MARK: - CSSCommunicationDelegate
-
-    func loadURL(url: URL) async {
-        let webSiteStartLoadingTime = Date()
-
-        do {
-            // https://app.asana.com/0/1204167627774280/1206912494469284/f
-            if query.dataBroker.url == "spokeo.com" {
-                if let cookies = await cookieHandler.getAllCookiesFromDomain(url) {
-                    await webViewHandler?.setCookies(cookies)
-                }
+            guard let brokerProfileData = brokerProfileData else {
+                continue
             }
-            try await webViewHandler?.load(url: url)
-            fireSiteLoadingPixel(startTime: webSiteStartLoadingTime, hasError: false)
-            postLoadingSiteStartTime = Date()
-            await executeNextStep()
-        } catch {
-            fireSiteLoadingPixel(startTime: webSiteStartLoadingTime, hasError: true)
-            await onError(error: error)
-        }
-    }
+            do {
+                os_log("Running operation: %{public}@", log: .dataBrokerProtection, String(describing: operationData))
 
-    private func fireSiteLoadingPixel(startTime: Date, hasError: Bool) {
-        if stageCalculator.isManualScan {
-            let dataBrokerURL = self.query.dataBroker.url
-            let durationInMs = (Date().timeIntervalSince(startTime) * 1000).rounded(.towardZero)
-            pixelHandler.fire(.initialScanSiteLoadDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL))
-        }
-    }
+                try await DataBrokerProfileQueryOperationManager().runOperation(operationData: operationData,
+                                                                                brokerProfileQueryData: brokerProfileData,
+                                                                                database: operationDependencies.database,
+                                                                                notificationCenter: operationDependencies.notificationCenter,
+                                                                                runner: operationDependencies.runnerProvider.getJobRunner(),
+                                                                                pixelHandler: operationDependencies.pixelHandler,
+                                                                                showWebView: showWebView,
+                                                                                isImmediateOperation: operationType == .scan,
+                                                                                userNotificationService: operationDependencies.userNotificationService,
+                                                                                shouldRunNextStep: { [weak self] in
+                    guard let self = self else { return false }
+                    return !self.isCancelled
+                })
 
-    func firePostLoadingDurationPixel(hasError: Bool) {
-        if stageCalculator.isManualScan, let postLoadingSiteStartTime = self.postLoadingSiteStartTime {
-            let dataBrokerURL = self.query.dataBroker.url
-            let durationInMs = (Date().timeIntervalSince(postLoadingSiteStartTime) * 1000).rounded(.towardZero)
-            pixelHandler.fire(.initialScanPostLoadingDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL))
-        }
-    }
+                let sleepInterval = operationDependencies.config.intervalBetweenSameBrokerOperations
+                os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
+                try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
+            } catch {
+                os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
 
-    func success(actionId: String, actionType: ActionType) async {
-        switch actionType {
-        case .click:
-            stageCalculator.fireOptOutFillForm()
-            // We wait 40 seconds before tapping
-            try? await Task.sleep(nanoseconds: UInt64(clickAwaitTime) * 1_000_000_000)
-            await executeNextStep()
-        case .fillForm:
-            stageCalculator.fireOptOutFillForm()
-            await executeNextStep()
-        default: await executeNextStep()
-        }
-    }
-
-    func captchaInformation(captchaInfo: GetCaptchaInfoResponse) async {
-        do {
-            stageCalculator.fireOptOutCaptchaParse()
-            stageCalculator.setStage(.captchaSend)
-            actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(
-                captchaInfo,
-                attemptId: stageCalculator.attemptId,
-                shouldRunNextStep: shouldRunNextStep)
-            stageCalculator.fireOptOutCaptchaSend()
-            await executeNextStep()
-        } catch {
-            if let captchaError = error as? CaptchaServiceError {
-                await onError(error: DataBrokerProtectionError.captchaServiceError(captchaError))
-            } else {
-                await onError(error: DataBrokerProtectionError.captchaServiceError(.errorWhenSubmittingCaptcha))
+                errorDelegate?.dataBrokerOperationDidError(error, withBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
             }
         }
+
+        finish()
     }
 
-    func solveCaptcha(with response: SolveCaptchaResponse) async {
-        do {
-            try await webViewHandler?.evaluateJavaScript(response.callback.eval)
+    private func finish() {
+        willChangeValue(forKey: #keyPath(isExecuting))
+        willChangeValue(forKey: #keyPath(isFinished))
 
-            await executeNextStep()
-        } catch {
-            await onError(error: DataBrokerProtectionError.solvingCaptchaWithCallbackError)
-        }
-    }
+        _isExecuting = false
+        _isFinished = true
 
-    func onError(error: Error) async {
-        if retriesCountOnError > 0 {
-            await executeCurrentAction()
-        } else {
-            await webViewHandler?.finish()
-            failed(with: error)
-        }
-    }
+        didChangeValue(forKey: #keyPath(isExecuting))
+        didChangeValue(forKey: #keyPath(isFinished))
 
-    func executeCurrentAction() async {
-        let waitTimeUntilRunningTheActionAgain: TimeInterval = 3
-        try? await Task.sleep(nanoseconds: UInt64(waitTimeUntilRunningTheActionAgain) * 1_000_000_000)
-
-        if let currentAction = self.actionsHandler?.currentAction() {
-            retriesCountOnError -= 1
-            await runNextAction(currentAction)
-        } else {
-            retriesCountOnError = 0
-            await onError(error: DataBrokerProtectionError.unknown("No current action to execute"))
-        }
+        os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
     }
 }
-
-protocol CookieHandler {
-    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]?
-}
-
-struct BrokerCookieHandler: CookieHandler {
-
-    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]? {
-        guard let domainURL = extractSchemeAndHostAsURL(from: url.absoluteString) else { return nil }
-        do {
-            let (_, response) = try await URLSession.shared.data(from: domainURL)
-            guard let httpResponse = response as? HTTPURLResponse,
-                  let allHeaderFields = httpResponse.allHeaderFields as? [String: String] else { return nil }
-
-            let cookies = HTTPCookie.cookies(withResponseHeaderFields: allHeaderFields, for: domainURL)
-            return cookies
-        } catch {
-            print("Error fetching data: \(error)")
-        }
-
-        return nil
-    }
-
-    private func extractSchemeAndHostAsURL(from url: String) -> URL? {
-        if let urlComponents = URLComponents(string: url), let scheme = urlComponents.scheme, let host = urlComponents.host {
-            return URL(string: "\(scheme)://\(host)")
-        }
-        return nil
-    }
-}
+// swiftlint:enable explicit_non_final_class

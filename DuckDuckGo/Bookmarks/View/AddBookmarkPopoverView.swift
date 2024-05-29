@@ -48,7 +48,7 @@ struct AddBookmarkPopoverView: View {
             selectedFolder: $model.selectedFolder,
             isURLFieldHidden: true,
             addFolderAction: model.addFolderButtonAction,
-            otherActionTitle: UserText.remove,
+            otherActionTitle: UserText.delete,
             isOtherActionDisabled: false,
             otherAction: model.removeButtonAction,
             defaultActionTitle: UserText.done,

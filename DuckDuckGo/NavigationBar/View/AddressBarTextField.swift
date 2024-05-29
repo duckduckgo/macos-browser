@@ -17,13 +17,15 @@
 //
 
 import AppKit
+import BrowserServicesKit
 import Carbon.HIToolbox
 import Combine
 import Common
+import PixelKit
 import Suggestions
 import Subscription
-import BrowserServicesKit
 
+// swiftlint:disable:next type_body_length
 final class AddressBarTextField: NSTextField {
 
     var tabCollectionViewModel: TabCollectionViewModel! {
@@ -49,10 +51,6 @@ final class AddressBarTextField: NSTextField {
         tabCollectionViewModel.isBurner
     }
 
-    var isFirstResponder: Bool {
-        window?.firstResponder == currentEditor()
-    }
-
     private var suggestionResultCancellable: AnyCancellable?
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
@@ -68,6 +66,10 @@ final class AddressBarTextField: NSTextField {
     }
     // flag when updating the Value from `handleTextDidChange()`
     private var currentTextDidChangeEvent: TextDidChangeEventType = .none
+
+//    var subscriptionEnvironment: SubscriptionEnvironment {
+//        Application.appDelegate.subscriptionManager.currentEnvironment
+//    }
 
     // MARK: - Lifecycle
 
@@ -299,6 +301,25 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func navigate(suggestion: Suggestion?) {
+        let pixel: GeneralPixel? = {
+            switch suggestion {
+            case .phrase:
+                return .autocompleteClickPhrase
+            case .website:
+                return .autocompleteClickWebsite
+            case .bookmark(_, _, let isFavorite, _):
+                return isFavorite ? .autocompleteClickFavorite : .autocompleteClickBookmark
+            case .historyEntry:
+                return .autocompleteClickHistory
+            default:
+                return nil
+            }
+        }()
+
+        if let pixel {
+            PixelKit.fire(pixel)
+        }
+
         if NSApp.isCommandPressed {
             openNew(NSApp.isOptionPressed ? .window : .tab, selected: NSApp.isShiftPressed, suggestion: suggestion)
         } else {
@@ -351,7 +372,9 @@ final class AddressBarTextField: NSTextField {
 #endif
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            if providedUrl.isChild(of: URL.subscriptionBaseURL) || providedUrl.isChild(of: URL.identityTheftRestoration) {
+            let baseURL = Application.appDelegate.subscriptionManager.url(for: .baseURL)
+            let identityTheftRestorationURL = Application.appDelegate.subscriptionManager.url(for: .identityTheftRestoration)
+            if providedUrl.isChild(of: baseURL) || providedUrl.isChild(of: identityTheftRestorationURL) {
                 self.updateValue(selectedTabViewModel: nil, addressBarString: nil) // reset
                 self.window?.makeFirstResponder(nil)
                 return

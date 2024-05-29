@@ -143,15 +143,16 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
     let brokers: [DataBroker]
 
-    private let runnerProvider: OperationRunnerProvider
+    private let runnerProvider: JobRunnerProvider
     private let privacyConfigManager: PrivacyConfigurationManaging
     private let fakePixelHandler: EventMapping<DataBrokerProtectionPixels> = EventMapping { event, _, _, _ in
         print(event)
     }
     private let contentScopeProperties: ContentScopeProperties
     private let csvColumns = ["name_input", "age_input", "city_input", "state_input", "name_scraped", "age_scraped", "address_scraped", "relatives_scraped", "url", "broker name", "screenshot_id", "error", "matched_fields", "result_match", "expected_match"]
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
 
-    init() {
+    init(authenticationManager: DataBrokerProtectionAuthenticationManaging) {
         let privacyConfigurationManager = PrivacyConfigurationManagingMock()
         let features = ContentScopeFeatureToggles(emailProtection: false,
                                                   emailProtectionIncontextSignup: false,
@@ -164,15 +165,16 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                                                   thirdPartyCredentialsProvider: false)
 
         let sessionKey = UUID().uuidString
+        self.authenticationManager = authenticationManager
         let contentScopeProperties = ContentScopeProperties(gpcEnabled: false,
                                                             sessionKey: sessionKey,
                                                             featureToggles: features)
 
-        self.runnerProvider = DataBrokerOperationRunnerProvider(
+        self.runnerProvider = DataBrokerJobRunnerProvider(
             privacyConfigManager: privacyConfigurationManager,
             contentScopeProperties: contentScopeProperties,
-            emailService: EmailService(),
-            captchaService: CaptchaService())
+            emailService: EmailService(authenticationManager: authenticationManager),
+            captchaService: CaptchaService(authenticationManager: authenticationManager))
         self.privacyConfigManager = privacyConfigurationManager
         self.contentScopeProperties = contentScopeProperties
 
@@ -190,13 +192,17 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
             try await withThrowingTaskGroup(of: DebugScanReturnValue.self) { group in
                 for queryData in brokerProfileQueryData {
-                    let debugScanOperation = DebugScanOperation(privacyConfig: self.privacyConfigManager, prefs: self.contentScopeProperties, query: queryData) {
+                    let debugScanJob = DebugScanJob(privacyConfig: self.privacyConfigManager,
+                                                    prefs: self.contentScopeProperties,
+                                                    query: queryData,
+                                                    emailService: EmailService(authenticationManager: self.authenticationManager),
+                                                    captchaService: CaptchaService(authenticationManager: self.authenticationManager)) {
                         true
                     }
 
                     group.addTask {
                         do {
-                            return try await debugScanOperation.run(inputValue: (), showWebView: false)
+                            return try await debugScanJob.run(inputValue: (), showWebView: false)
                         } catch {
                             return DebugScanReturnValue(brokerURL: "ERROR - with broker: \(queryData.dataBroker.name)", extractedProfiles: [ExtractedProfile](), brokerProfileQueryData: queryData)
                         }
@@ -342,7 +348,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                 let dataBroker = try decoder.decode(DataBroker.self, from: data)
                 self.selectedDataBroker = dataBroker
                 let brokerProfileQueryData = createBrokerProfileQueryData(for: dataBroker)
-                let runner = runnerProvider.getOperationRunner()
+                let runner = runnerProvider.getJobRunner()
                 let group = DispatchGroup()
 
                 for query in brokerProfileQueryData {
@@ -378,11 +384,11 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
     }
 
     func runOptOut(scanResult: ScanResult) {
-        let runner = runnerProvider.getOperationRunner()
+        let runner = runnerProvider.getJobRunner()
         let brokerProfileQueryData = BrokerProfileQueryData(
             dataBroker: scanResult.dataBroker,
             profileQuery: scanResult.profileQuery,
-            scanOperationData: ScanOperationData(brokerId: 1, profileQueryId: 1, historyEvents: [HistoryEvent]())
+            scanJobData: ScanJobData(brokerId: 1, profileQueryId: 1, historyEvents: [HistoryEvent]())
         )
         Task {
             do {
@@ -414,9 +420,9 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
         var profileQueryIndex: Int64 = 1
         for profileQuery in profileQueries {
-            let fakeScanOperationData = ScanOperationData(brokerId: 0, profileQueryId: profileQueryIndex, historyEvents: [HistoryEvent]())
+            let fakeScanJobData = ScanJobData(brokerId: 0, profileQueryId: profileQueryIndex, historyEvents: [HistoryEvent]())
             brokerProfileQueryData.append(
-                .init(dataBroker: broker, profileQuery: profileQuery.with(id: profileQueryIndex), scanOperationData: fakeScanOperationData)
+                .init(dataBroker: broker, profileQuery: profileQuery.with(id: profileQueryIndex), scanJobData: fakeScanJobData)
             )
 
             profileQueryIndex += 1
@@ -438,10 +444,10 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
         var profileQueryIndex: Int64 = 1
         for profileQuery in profileQueries {
-            let fakeScanOperationData = ScanOperationData(brokerId: 0, profileQueryId: profileQueryIndex, historyEvents: [HistoryEvent]())
+            let fakeScanJobData = ScanJobData(brokerId: 0, profileQueryId: profileQueryIndex, historyEvents: [HistoryEvent]())
             for broker in brokers {
                 brokerProfileQueryData.append(
-                    .init(dataBroker: broker, profileQuery: profileQuery.with(id: profileQueryIndex), scanOperationData: fakeScanOperationData)
+                    .init(dataBroker: broker, profileQuery: profileQuery.with(id: profileQueryIndex), scanJobData: fakeScanJobData)
                 )
             }
 
@@ -474,9 +480,16 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
     }
 }
 
+final class FakeSleepObserver: SleepObserver {
+
+    func totalSleepTime() -> TimeInterval {
+        return 0
+    }
+}
+
 final class FakeStageDurationCalculator: StageDurationCalculator {
     var attemptId: UUID = UUID()
-    var isManualScan: Bool = false
+    var isImmediateOperation: Bool = false
 
     func durationSinceLastStage() -> Double {
         0.0
@@ -539,83 +552,6 @@ final class FakeStageDurationCalculator: StageDurationCalculator {
 
     func setLastActionId(_ actionID: String) {
     }
-}
-
-/*
- I wasn't able to import this mock from the background agent project, so I had to re-use it here.
- */
-private final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
-
-    var data: Data {
-        let configString = """
-    {
-            "readme": "https://github.com/duckduckgo/privacy-configuration",
-            "version": 1693838894358,
-            "features": {
-                "brokerProtection": {
-                    "state": "enabled",
-                    "exceptions": [],
-                    "settings": {}
-                }
-            },
-            "unprotectedTemporary": []
-        }
-    """
-        let data = configString.data(using: .utf8)
-        return data!
-    }
-
-    var currentConfig: Data {
-        data
-    }
-
-    var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
-
-    var privacyConfig: BrowserServicesKit.PrivacyConfiguration {
-        guard let privacyConfigurationData = try? PrivacyConfigurationData(data: data) else {
-            fatalError("Could not retrieve privacy configuration data")
-        }
-        let privacyConfig = privacyConfiguration(withData: privacyConfigurationData,
-                                                 internalUserDecider: internalUserDecider,
-                                                 toggleProtectionsCounter: toggleProtectionsCounter)
-        return privacyConfig
-    }
-
-    var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: InternalUserDeciderStoreMock())
-
-    var toggleProtectionsCounter: ToggleProtectionsCounter = ToggleProtectionsCounter(eventReporting: EventMapping<ToggleProtectionsCounterEvent> { _, _, _, _ in
-    })
-
-    func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {
-        .downloaded
-    }
-}
-
-func privacyConfiguration(withData data: PrivacyConfigurationData,
-                          internalUserDecider: InternalUserDecider,
-                          toggleProtectionsCounter: ToggleProtectionsCounter) -> PrivacyConfiguration {
-    let domain = MockDomainsProtectionStore()
-    return AppPrivacyConfiguration(data: data,
-                                   identifier: UUID().uuidString,
-                                   localProtection: domain,
-                                   internalUserDecider: internalUserDecider,
-                                   toggleProtectionsCounter: toggleProtectionsCounter)
-}
-
-final class MockDomainsProtectionStore: DomainsProtectionStore {
-    var unprotectedDomains = Set<String>()
-
-    func disableProtection(forDomain domain: String) {
-        unprotectedDomains.insert(domain)
-    }
-
-    func enableProtection(forDomain domain: String) {
-        unprotectedDomains.remove(domain)
-    }
-}
-
-final class InternalUserDeciderStoreMock: InternalUserStoring {
-    var isInternalUser: Bool = false
 }
 
 extension DataBroker {

@@ -61,10 +61,11 @@ struct PreferencesSection: Hashable, Identifiable {
         ]
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+            let subscriptionManager = Application.appDelegate.subscriptionManager
+            let platform = subscriptionManager.currentEnvironment.purchasePlatform
+            var shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
 
-            var shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
-
-            if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
+            if subscriptionManager.accountManager.isUserAuthenticated {
                 shouldHidePrivacyProDueToNoProducts = false
             }
 
@@ -153,9 +154,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIt
         case .sync:
             let isSyncBookmarksPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
             let isSyncCredentialsPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
+            let isSyncPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncIsPaused.rawValue)
             let syncService = NSApp.delegateTyped.syncService
             let isDataSyncingDisabled = syncService?.featureFlags.contains(.dataSyncing) == false && syncService?.authState == .active
-            if isSyncBookmarksPaused || isSyncCredentialsPaused || isDataSyncingDisabled {
+            if isSyncPaused || isSyncBookmarksPaused || isSyncCredentialsPaused || isDataSyncingDisabled {
                 return UserText.sync + " ⚠️"
             }
             return UserText.sync

@@ -316,59 +316,6 @@
         }
       }
     },
-    "••••••••••••" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "••••••••••••"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "••••••••••••"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "••••••••••••"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "••••••••••••"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "••••••••••••"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "••••••••••••"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "••••••••••••"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "••••••••••••"
-          }
-        }
-      }
-    },
     "`continue`" : {
       "comment" : "Continue button",
       "extractionState" : "extracted_with_value",
@@ -819,60 +766,6 @@
         }
       }
     },
-    "Add Folder" : {
-      "comment" : "Add Folder popover: Create folder button",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ordner hinzufügen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añadir carpeta"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter le dossier"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aggiungi cartella"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Map toevoegen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dodaj folder"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adicionar pasta"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Добавить папку"
-          }
-        }
-      }
-    },
     "add.bookmark.name" : {
       "comment" : "New bookmark folder dialog folder name field heading",
       "extractionState" : "extracted_with_value",
@@ -1166,60 +1059,6 @@
         }
       }
     },
-    "Address:" : {
-      "comment" : "Add Bookmark dialog bookmark url field heading",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adresse:"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dirección:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adresse :"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Indirizzo:"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adres:"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adres:"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Endereço:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Адрес:"
-          }
-        }
-      }
-    },
     "address.bar.placeholder" : {
       "comment" : "Empty Address Bar placeholder text displayed on the new tab page.",
       "extractionState" : "extracted_with_value",
@@ -1460,6 +1299,66 @@
         }
       }
     },
+    "alert.sync-bookmarks-bad-data-error-description" : {
+      "comment" : "Description for alert shown when sync error occurs because of bad data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Lesezeichen sind falsch formatiert oder zu lang und wurden nicht synchronisiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some bookmarks are formatted incorrectly or too long and were not synced."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunos marcadores tienen un formato incorrecto o demasiado largo y no se han sincronizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains signets sont mal formatés ou trop longs et n'ont pas été synchronisés.\n"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcuni segnalibri sono formattati in modo errato o sono troppo lunghi e non sono stati sincronizzati."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommige bladwijzers hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektóre zakładki mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alguns marcadores estão formatados incorretamente ou são demasiado longos e não foram sincronizados."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторые закладки не синхронизируются из-за неверного формата или превышения ограничений по длине."
+          }
+        }
+      }
+    },
     "alert.sync-bookmarks-paused-description" : {
       "comment" : "Description for alert shown when sync bookmarks paused for too many items",
       "extractionState" : "extracted_with_value",
@@ -1467,55 +1366,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du hast das Limit für die Synchronisierung von Lesezeichen überschritten. Versuche, einige Lesezeichen zu löschen. Bis dieses Problem behoben ist, werden deine Lesezeichen nicht gesichert."
+            "value" : "Du hast die maximale Anzahl von Lesezeichen erreicht. Bitte lösche einige Lesezeichen, um die Synchronisierung fortzusetzen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You have exceeded the bookmarks sync limit. Try deleting some bookmarks. Until this is resolved your bookmarks will not be backed up."
+            "value" : "You've reached the maximum number of bookmarks. Please delete some bookmarks to resume sync."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Has superado el límite de sincronización de marcadores. Prueba a eliminar algunos marcadores. No se realizará una copia de seguridad de los marcadores hasta que se resuelva esto."
+            "value" : "Has alcanzado el número máximo de marcadores. Elimina algunos marcadores para reanudar la sincronización."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous avez dépassé le nombre maximal de signets à synchroniser. Veuillez en supprimer quelques-uns pour pouvoir sauvegarder vos signets."
+            "value" : "Vous avez atteint le nombre maximal de signets. Veuillez en supprimer quelques-uns pour reprendre la synchronisation."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hai superato il limite di sincronizzazione dei segnalibri. Prova a eliminarne qualcuno. Fino a quando il problema non verrà risolto, non sarà eseguito il backup dei tuoi segnalibri."
+            "value" : "Hai raggiunto il numero massimo di segnalibri. Elimina alcuni segnalibri per riprendere la sincronizzazione."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je hebt de synchronisatielimiet voor bladwijzers overschreden. Probeer enkele bladwijzers te verwijderen. Er wordt geen back-up van je bladwijzers gemaakt totdat dit probleem is opgelost."
+            "value" : "Je hebt het maximumaantal bladwijzers bereikt. Verwijder enkele bladwijzers om de synchronisatie te hervatten."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Przekroczono limit synchronizacji zakładek. Spróbuj usunąć niektóre zakładki. Dopóki ten problem nie zostanie rozwiązany, nie będzie tworzona kopia zapasowa zakładek."
+            "value" : "Osiągnięto maksymalną liczbę zakładek. Usuń część zakładek, aby wznowić synchronizację."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Excedeste o limite de sincronização de favoritos. Experimenta eliminar alguns favoritos. Não é possível fazer uma cópia de segurança dos favoritos até este problema estar resolvido."
+            "value" : "Atingiste o número máximo de marcadores. Elimina alguns marcadores para retomar a sincronização."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вы превысили лимит синхронизации закладок. Попробуйте удалить некоторые из них. Пока вы не устраните эту проблему, резервная копия закладок создаваться не будет."
+            "value" : "Достигнуто максимальное число закладок. Чтобы возобновить синхронизацию, удалите некоторые из них."
           }
         }
       }
@@ -1533,7 +1432,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Bookmarks Sync is Paused"
+            "value" : "Bookmark Sync is Paused"
           }
         },
         "es" : {
@@ -1551,7 +1450,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La sincronizzazione dei segnalibri è in pausa"
+            "value" : "Sync dei segnalibri è in pausa"
           }
         },
         "nl" : {
@@ -1569,13 +1468,73 @@
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A sincronização de favoritos está em pausa"
+            "value" : "A sincronização de marcadores está em pausa"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Синхронизация закладок приостановлена"
+          }
+        }
+      }
+    },
+    "alert.sync-credentials-bad-data-error-description" : {
+      "comment" : "Description for alert shown when sync error occurs because of bad data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Passwörter sind falsch formatiert oder zu lang und wurden nicht synchronisiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some passwords are formatted incorrectly or too long and were not synced."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunas contraseñas tienen un formato incorrecto o demasiado largo y no se han sincronizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains mots de passe sont mal formatés ou trop longs et n'ont pas été synchronisés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcune password sono formattate in modo errato o sono troppo lunghe e non sono state sincronizzate."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommige wachtwoorden hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektóre hasła mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algumas palavras-passe estão formatadas incorretamente ou são demasiado longas e não foram sincronizadas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторые пароли не синхронизируются из-за неверного формата или превышения ограничений по длине."
           }
         }
       }
@@ -1587,55 +1546,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du hast das Limit für die Synchronisierung von Passwörtern überschritten. Versuche, einige Passwörter zu löschen. Bis dieses Problem behoben ist, werden deine Passwörter nicht gesichert."
+            "value" : "Du hast die maximale Anzahl von Passwörtern erreicht. Lösche Passwörter, um die Synchronisierung fortzusetzen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You have exceeded the passwords sync limit. Try deleting some passwords. Until this is resolved your passwords will not be backed up."
+            "value" : "You've reached the maximum number of passwords. Please delete some passwords to resume sync."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ha superado el límite de sincronización de contraseñas. Prueba a eliminar algunas contraseñas. No se realizará una copia de seguridad de las contraseñas hasta que se resuelva esto."
+            "value" : "Has alcanzado el número máximo de contraseñas. Elimina algunas contraseñas para reanudar la sincronización."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous avez dépassé le nombre maximal de mots de passe à synchroniser. Veuillez en supprimer quelques-uns pour pouvoir sauvegarder vos mots de passe."
+            "value" : "Vous avez atteint le nombre maximal de mots de passe. Veuillez en supprimer quelques-uns pour reprendre la synchronisation."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hai superato il limite di sincronizzazione delle password. Prova a eliminarne qualcuna. Fino a quando il problema non verrà risolto, non sarà eseguito il backup delle tue password."
+            "value" : "Hai raggiunto il numero massimo di password. Elimina alcune password per riprendere la sincronizzazione."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je hebt de synchronisatielimiet voor wachtwoorden overschreden. Probeer enkele wachtwoorden te verwijderen. Er wordt geen back-up van je wachtwoorden gemaakt totdat dit probleem is opgelost."
+            "value" : "Je hebt het maximumaantal wachtwoorden bereikt. Verwijder enkele wachtwoorden om de synchronisatie te hervatten."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Przekroczono limit synchronizacji haseł. Spróbuj usunąć niektóre hasła. Dopóki ten problem nie zostanie rozwiązany, nie będzie tworzona kopia zapasowa haseł."
+            "value" : "Osiągnięto maksymalną liczbę haseł. Usuń część haseł, aby wznowić synchronizację."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Excedeste o limite de sincronização de palavras-passe. Experimenta eliminar algumas palavras-passe. Não é possível fazer uma cópia de segurança das palavras-passe até este problema estar resolvido."
+            "value" : "Atingiste o número máximo de palavras-passe. Elimina algumas palavras-passe para retomar a sincronização."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вы превысили лимит синхронизации паролей. Попробуйте удалить некоторые из них. Пока вы не устраните эту проблему, резервная копия закладок создаваться не будет."
+            "value" : "Достигнуто максимальное число паролей. Чтобы возобновить синхронизацию, удалите некоторые из них."
           }
         }
       }
@@ -1647,13 +1606,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Passwortsynchronisierung ist angehalten"
+            "value" : "Kennwortsynchronisierung ist angehalten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Passwords Sync is Paused"
+            "value" : "Password Sync is Paused"
           }
         },
         "es" : {
@@ -1671,7 +1630,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La sincronizzazione delle password è in pausa"
+            "value" : "Sync delle password è in pausa"
           }
         },
         "nl" : {
@@ -1696,6 +1655,306 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Синхронизация паролей приостановлена"
+          }
+        }
+      }
+    },
+    "alert.sync-error-action" : {
+      "comment" : "Sync error alert action button title, takes the user to the sync settings page.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierungseinstellungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes de sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages de synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impostazioni Sync"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie-instellingen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustawienia synchronizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definições de sincronização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация настроек"
+          }
+        }
+      }
+    },
+    "alert.sync-error-title" : {
+      "comment" : "Title for alert shown when sync error occurs",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierungsfehler"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync Error"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Errore di sincronizzazione"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatiefout"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Błąd synchronizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erro de sincronização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка синхронизации"
+          }
+        }
+      }
+    },
+    "alert.sync-invalid-login-error-description" : {
+      "comment" : "Description for alert shown when sync error occurs because of invalid login credentials",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung wurde angehalten. Wenn du die Synchronisierung dieses Geräts fortsetzen möchtest, stelle die Verbindung mit einem anderen Gerät oder deinem Wiederherstellungscode wieder her."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync has been paused. If you want to continue syncing this device, reconnect using another device or your recovery code."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización se ha pausado. Si quieres seguir sincronizando este dispositivo, vuelve a conectarte con otro dispositivo o con tu código de recuperación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation a été suspendue. Si vous souhaitez continuer à synchroniser cet appareil, reconnectez-vous à l’aide d’un autre appareil ou de votre code de récupération."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronizzazione è stata sospesa. Se vuoi continuare a sincronizzare questo dispositivo, riconnettiti utilizzando un altro dispositivo o il tuo codice di ripristino."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie is onderbroken. Als je dit apparaat wilt blijven synchroniseren, maak dan opnieuw verbinding met een ander apparaat of met je herstelcode."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizacja została wstrzymana. Jeśli chcesz kontynuować synchronizowanie tego urządzenia, ponownie nawiąż połączenie za pomocą innego urządzenia lub użyj kodu odzyskiwania."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A sincronização foi pausada. Se quiseres continuar a sincronizar este dispositivo, inicia sessão novamente noutro dispositivo ou com o teu código de recuperação."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация приостановлена. Чтобы возобновить ее, выполните повторную привязку, используя другое устройство или код восстановления."
+          }
+        }
+      }
+    },
+    "alert.sync-paused-title" : {
+      "comment" : "Title for alert shown when sync paused for an error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung angehalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync is Paused"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización está en pausa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation est suspendue"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync è in pausa"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie is gepauzeerd"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizacja jest wstrzymana"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A sincronização está em pausa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация приостановлена"
+          }
+        }
+      }
+    },
+    "alert.sync-too-many-requests-error-description" : {
+      "comment" : "Description for alert shown when sync error occurs because of too many requests",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync & Backup ist vorübergehend nicht verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Backup is temporarily unavailable."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización y la copia de seguridad no están disponibles temporalmente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync & Backup est temporairement indisponible."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync & Backup non è temporaneamente disponibile."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "'Synchronisatie en back-up' is tijdelijk niet beschikbaar."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funkcja Sync & Backup jest tymczasowo niedostępna."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Sync & Backup está temporariamente indisponível."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Функция «Синхронизация и резервное копирование» временно недоступна."
           }
         }
       }
@@ -1756,6 +2015,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "К сожалению, функция «Синхронизация и резервное копирование» больше не работает в этой версии приложения. Чтобы продолжить, обновите DuckDuckGo до последней версии."
+          }
+        }
+      }
+    },
+    "alert.sync.warning.sync-error" : {
+      "comment" : "Title of the warning message that tells the user that there was an error with the sync feature.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierungsfehler"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync Error"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Errore di sincronizzazione"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatiefout"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Błąd synchronizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erro de sincronização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка синхронизации"
           }
         }
       }
@@ -3009,66 +3328,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Похоже, на этом сайте есть всплывающее окно выбора куки-файлов 👇"
-          }
-        }
-      }
-    },
-    "autoconsent.title" : {
-      "comment" : "Autoconsent settings section title",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cookie-Pop-ups"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Cookie Pop-ups"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ventanas emergentes de cookies"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenêtres contextuelles de cookies"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pop-up per i cookie"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pop-ups voor cookies"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wyskakujące okienka dotyczące plików cookie"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pop-ups de cookies"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Всплывающие окна куки"
           }
         }
       }
@@ -6491,55 +6750,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Die folgenden Bitwarden-Versionen sind mit DuckDuckGo inkompatibel: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Bitte kehre zu einer älteren Version zurück, indem du die folgenden Schritte ausführst:"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please revert to an older version by following these steps:"
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Las siguientes versiones de Bitwarden son incompatibles con DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Vuelve a una versión anterior siguiendo estos pasos:"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Les versions suivantes de Bitwarden sont incompatibles avec DuckDuckGo : v2024.3.0, v2024.3.2, v2024.4.0 et v2024.4.1. Veuillez revenir à une version antérieure en procédant comme suit :"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Le seguenti versioni di Bitwarden non sono compatibili con DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. È necessario tornare a una versione precedente seguendo questi passaggi:"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "De volgende versies van Bitwarden zijn niet compatibel met DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Volg deze stappen om terug te gaan naar een oudere versie:"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Następujące wersje Bitwarden są niezgodne z DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Przywróć starszą wersję, wykonując następujące czynności:"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "As seguintes versões do Bitwarden são incompatíveis com o DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0 e v2024.4.1. Reverte para uma versão mais antiga seguindo estes passos:"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "С DuckDuckGo несовместимы следующие версии Bitwarden: 2024.3.0, 2024.3.2, 2024.4.0, 2024.4.1. Вернитесь к более старой версии, выполнив следующие действия:"
           }
         }
@@ -6551,55 +6810,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "V2014.2.1 herunterladen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Download v2014.2.1"
+            "value" : "Download v2024.4.3"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Descargar v2014.2.1"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Télécharger v2014.2.1"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Scarica la versione v2014.2.1"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2014.2.1"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Pobierz v2014.2.1"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Transfere a versão v2014.2.1"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Скачайте версию 2014.2.1"
           }
         }
@@ -7680,60 +7939,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ожидается ответ о состоянии из Bitwarden"
-          }
-        }
-      }
-    },
-    "Bookmark Added" : {
-      "comment" : "Bookmark Added popover title",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lesezeichen hinzugefügt"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Marcador añadido"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Signet ajouté"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Segnalibro aggiunto"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bladwijzer toegevoegd"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dodano zakładkę"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Marcador adicionado"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Закладка добавлена"
           }
         }
       }
@@ -11529,6 +11734,66 @@
         }
       }
     },
+    "close.all.other.tabs" : {
+      "comment" : "Menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle anderen Tabs schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close All Other Tabs"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar todas las demás pestañas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer tous les autres onglets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi tutte le altre schede"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle andere tabbladen sluiten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zamknij wszystkie inne karty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar todos os outros separadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть все остальные вкладки"
+          }
+        }
+      }
+    },
     "close.other.tabs" : {
       "comment" : "Menu item",
       "extractionState" : "extracted_with_value",
@@ -11765,6 +12030,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закрыть и вернуться ко вкладке «%@»"
+          }
+        }
+      }
+    },
+    "close.tabs.to.the.left" : {
+      "comment" : "Menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabs auf der linken Seite schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close Tabs to the Left"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar las pestañas a la izquierda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer les onglets à gauche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi le schede a sinistra"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabbladen links sluiten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zamknij karty po lewej stronie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar separadores à esquerda"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть вкладки слева"
           }
         }
       }
@@ -12062,6 +12387,126 @@
         }
       }
     },
+    "context.menu.new.tab.mode.at.end" : {
+      "comment" : "Preferences > Tabs > At end of list",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechts neben anderen Tabs hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add to the right of other tabs"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a la derecha de otras pestañas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter à droite des autres onglets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi a destra di altre schede"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toevoegen aan de rechterkant van andere tabbladen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj po prawej stronie innych kart"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar à direita dos outros separadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить справа от остальных вкладок"
+          }
+        }
+      }
+    },
+    "context.menu.new.tab.mode.next.to.current" : {
+      "comment" : "Preferences > Tabs > Next to current tab",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechts neben dem aktuellen Tab hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add to the right of the current tab"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a la derecha de la pestaña actual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter à droite de l'onglet actuel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi a destra della scheda attuale"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toevoegen aan de rechterkant van het huidige tabblad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj po prawej stronie bieżącej karty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar à direita do separador atual"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить справа от текущей вкладки"
+          }
+        }
+      }
+    },
     "copy" : {
       "comment" : "Copy button",
       "extractionState" : "extracted_with_value",
@@ -12076,60 +12521,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Copy"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copier"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copia"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kopiëren"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kopiuj"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Копировать"
-          }
-        }
-      }
-    },
-    "Copy" : {
-      "comment" : "Command",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kopieren"
           }
         },
         "es" : {
@@ -13358,60 +13749,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выберите DuckGo браузером по умолчанию"
-          }
-        }
-      }
-    },
-    "Delete" : {
-      "comment" : "Command",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Löschen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eliminar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Supprimer"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancella"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verwijderen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Usuń"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eliminar"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Удалить"
           }
         }
       }
@@ -16619,60 +16956,6 @@
         }
       }
     },
-    "Edit…" : {
-      "comment" : "Command",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bearbeiten…"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar..."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifier…"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifica..."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bewerken …"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edytuj..."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar…"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Изменить..."
-          }
-        }
-      }
-    },
     "edit.favorite" : {
       "comment" : "Header of the view that edits a favorite bookmark",
       "extractionState" : "extracted_with_value",
@@ -18039,55 +18322,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Berichte, die an DuckDuckGo gesendet werden, sind 100 % anonym und enthalten nur deine Nachricht, die DuckDuckGo-App-Version und deine macOS-Version."
+            "value" : "Berichte, die an DuckDuckGo gesendet werden, sind 100% anonym und enthalten nur deine Nachricht, die DuckDuckGo-Browser-Version und deine macOS-Version."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo app version, and your macOS version."
+            "value" : "Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo browser version, and your macOS version."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los informes enviados a DuckDuckGo son 100 % anónimos y solo incluyen tu mensaje, la versión de la aplicación DuckDuckGo y tu versión de macOS."
+            "value" : "Los informes enviados a DuckDuckGo son 100% anónimos y solo incluyen tu mensaje, la versión de navegador de DuckDuckGo y tu versión de macOS."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les rapports envoyés à DuckDuckGo sont 100 % anonymes et n'incluent que votre message, la version de l'application DuckDuckGo et la version de votre macOS."
+            "value" : "Les rapports envoyés à DuckDuckGo sont 100% anonymes et n'incluent que votre message, la version du navigateur DuckDuckGo et la version de votre macOS."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I report inviati a DuckDuckGo sono anonimi al 100% e includono solo il tuo messaggio, la versione dell'app DuckDuckGo e la tua versione macOS."
+            "value" : "I report inviati a DuckDuckGo sono anonimi al 100% e includono solo il tuo messaggio, la versione del browser DuckDuckGo e la tua versione macOS."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rapporten die naar DuckDuckGo worden verzonden, zijn 100% anoniem en bevatten alleen je bericht, de versie van de DuckDuckGo-app en je versie van macOS."
+            "value" : "Rapporten die naar DuckDuckGo worden verzonden, zijn 100% anoniem en bevatten alleen je bericht, de versie van de DuckDuckGo-browser en je versie van macOS."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Raporty wysyłane do DuckDuckGo są stuprocentowo anonimowe i zawierają jedynie wiadomość, wersję aplikacji DuckDuckGo oraz wersję systemu macOS."
+            "value" : "Raporty wysyłane do DuckDuckGo są w 100% anonimowe i zawierają jedynie wiadomość, wersję przeglądarki DuckDuckGo oraz wersję systemu macOS."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Os relatórios enviados para a DuckDuckGo são 100% anónimos e incluem apenas a tua mensagem, a versão da aplicação DuckDuckGo e a versão do teu macOS."
+            "value" : "Os relatórios enviados para a DuckDuckGo são 100% anónimos e incluem apenas a tua mensagem, a versão do navegador DuckDuckGo e a versão do teu macOS."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Отчеты, отправляемые в DuckDuckGo, на 100% анонимны. В отчет входит только написанное вами сообщение и сведения о версии приложения DuckDuckGo и операционной системы (macOS)."
+            "value" : "Отчеты, отправляемые в DuckDuckGo, на 100% анонимны. В отчет входит только написанное вами сообщение и сведения о версии браузера DuckDuckGo и операционной системы (macOS)."
           }
         }
       }
@@ -19712,66 +19995,6 @@
         }
       }
     },
-    "fire.selected-domains.description" : {
-      "comment" : "Description of the 'Current Window' configuration option for the fire button",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daten nur für ausgewählte Domains löschen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear data only for selected domains"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Borrar datos solo para los dominios seleccionados"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "N'effacer les données que des domaines sélectionnés"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancella i dati solo per i domini selezionati"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alleen gegevens wissen voor de geselecteerde domeinen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wyczyść dane dotyczące tylko wybranych domen"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Limpar dados apenas para domínios selecionados"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Функция Fire Button сотрет только данные выбранных сайтов"
-          }
-        }
-      }
-    },
     "fireproof" : {
       "comment" : "Fireproof button",
       "extractionState" : "extracted_with_value",
@@ -20492,6 +20715,66 @@
         }
       }
     },
+    "generic.delete.button" : {
+      "comment" : "Label of a button that allows the user to delete an item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijderen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
+          }
+        }
+      }
+    },
     "generic.discard.button" : {
       "comment" : "Label of a button that allows the user discard an action/change",
       "extractionState" : "extracted_with_value",
@@ -20792,66 +21075,6 @@
         }
       }
     },
-    "gpc.title" : {
-      "comment" : "GPC settings title",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Global Privacy Control (GPC)"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Global Privacy Control (GPC)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Control Global de Privacidad (GPC)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Global Privacy Control (GPC)"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Global Privacy Control (GPC)"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Global Privacy Control (GPC)"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Globalna Kontrola Prywatności (GPC)"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Controlo Global de Privacidade (CGP)"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Глобальный контроль конфиденциальности (GPC)"
-          }
-        }
-      }
-    },
     "Help" : {
       "comment" : "Main Menu Help",
       "localizations" : {
@@ -20901,60 +21124,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Справка"
-          }
-        }
-      }
-    },
-    "Hide" : {
-      "comment" : "Main Menu > View > Home Button > None item\n   Preferences > Home Button > None item",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ausblenden"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ocultar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Masquer"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nascondi"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verbergen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ukryj"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ocultar"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скрыть"
           }
         }
       }
@@ -26148,60 +26317,6 @@
         }
       }
     },
-    "Location:" : {
-      "comment" : "Add Folder popover: parent folder picker title",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Standort:"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ubicación:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Emplacement :"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Posizione:"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Locatie:"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lokalizacja:"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Localização:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Папка:"
-          }
-        }
-      }
-    },
     "looking.for.bitwarden" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -30593,6 +30708,246 @@
         }
       }
     },
+    "newTab.setup.dock.action" : {
+      "comment" : "Action title on the action menu of the 'Add App to the Dock' card",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Dock behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep In Dock"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener en Dock"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder dans le Dock"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resta nel dock"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In het Dock houden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trzymaj w Docku"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manter na Dock"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык для док-панели"
+          }
+        }
+      }
+    },
+    "newTab.setup.dock.confirmation" : {
+      "comment" : "Confirmation title after user clicks on 'Add to Dock' card",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Dock hinzugefügt!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Added to Dock!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Añadido al Dock!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouté au Dock !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiunto al dock!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toegevoegd aan Dock!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodano do Docka!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionado à Dock!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык добавлен на док-панель."
+          }
+        }
+      }
+    },
+    "newTab.setup.dock.summary" : {
+      "comment" : "Summary of the 'Add App to the Dock' card",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst DuckDuckGo schneller erreichen, indem du es zu deinem Dock hinzufügst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Get to DuckDuckGo faster by adding it to your Dock."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accede a DuckDuckGo más rápido añadiéndolo a tu Dock."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accédez plus rapidement à DuckDuckGo en l'ajoutant à votre Dock."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accedi più velocemente a DuckDuckGo aggiungendolo al tuo dock."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ga sneller naar DuckDuckGo door het aan je Dock toe te voegen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uzyskuj szybszy dostęp do przeglądarki DuckDuckGo dzięki jej dodaniu do Docka."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acede ao DuckDuckGo mais rapidamente adicionando-o à tua Dock."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавьте DuckDuckGo на док-панель для быстрого запуска."
+          }
+        }
+      }
+    },
+    "newTab.setup.dock.title" : {
+      "comment" : "Title of the new tab page card for adding application to the Dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In deinem Dock behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep in Your Dock"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener en tu Dock"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder dans votre Dock"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tieni nel tuo dock"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewaar in je dock"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trzymaj w Docku"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manter na tua Dock"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык для док-панели"
+          }
+        }
+      }
+    },
     "newTab.setup.duck.player.action" : {
       "comment" : "Action title on the action menu of the Duck Player card of the Set Up section in the home page",
       "extractionState" : "extracted_with_value",
@@ -31253,546 +31608,6 @@
         }
       }
     },
-    "newTab.setup.survey.day.0.action" : {
-      "comment" : "Action title of the Day 0 survey of the Set Up section in the home page",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        }
-      }
-    },
-    "newTab.setup.survey.day.0.summary" : {
-      "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        }
-      }
-    },
-    "newTab.setup.survey.day.0.title" : {
-      "comment" : "Title of the Day 0 durvey of the Set Up section in the home page",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        }
-      }
-    },
-    "newTab.setup.survey.day.7.action" : {
-      "comment" : "Action title of the Day 7 durvey of the Set Up section in the home page",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Teile deine Gedanken"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Share Your Thoughts"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comparte tus ideas"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partagez votre avis"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comunicaci la tua opinione"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deel je mening"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Podziel się przemyśleniami"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partilha as tuas opiniões"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поделитесь своими впечатлениями"
-          }
-        }
-      }
-    },
-    "newTab.setup.survey.day.7.summary" : {
-      "comment" : "Summary of the Day 7 durvey of the Set Up section in the home page",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nimm an unserer kurzen Umfrage teil und hilf uns, den besten Browser zu entwickeln."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Take our short survey and help us build the best browser."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Responde a nuestra breve encuesta y ayúdanos a crear el mejor navegador."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Répondez à notre courte enquête et aidez-nous à créer le meilleur navigateur."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rispondi al nostro breve sondaggio e aiutaci a creare il browser migliore."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vul onze korte enquête in en help ons de beste browser te bouwen."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weź udział w krótkiej ankiecie i pomóż nam opracować najlepszą przeglądarkę."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Responde ao nosso curto inquérito e ajuda-nos a criar o melhor navegador."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Заполните короткий опрос, чтобы помочь нам создать лучший на свете браузер."
-          }
-        }
-      }
-    },
-    "newTab.setup.survey.day.7.title" : {
-      "comment" : "Title of the Day 7 durvey of the Set Up section in the home page",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hilf uns, uns zu verbessern"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Help Us Improve"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ayúdanos a mejorar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aidez-nous à nous améliorer"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aiutaci a migliorare"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Help ons om te verbeteren"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pomóż nam we wprowadzaniu ulepszeń"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajuda-nos a melhorar"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Помогите нам стать лучше"
-          }
-        }
-      }
-    },
-    "newTab.setup.survey.day.14.action" : {
-      "comment" : "Action title of the Day 14 survey of the Set Up section in the home page",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign Up To Participate"
-          }
-        }
-      }
-    },
-    "newTab.setup.survey.day.14.summary" : {
-      "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        }
-      }
-    },
-    "newTab.setup.survey.day.14.title" : {
-      "comment" : "Title of the Day 14 durvey of the Set Up section in the home page",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Your Thoughts With Us"
-          }
-        }
-      }
-    },
     "next" : {
       "comment" : "Next button",
       "extractionState" : "extracted_with_value",
@@ -32033,126 +31848,6 @@
         }
       }
     },
-    "no.access.to.selected.folder" : {
-      "comment" : "Alert presented to user if the app doesn't have rights to access selected folder",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erlaube den Zugriff auf den Ort des Downloads."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Grant access to the location of download."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Concede acceso a la ubicación de descarga."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Accordez l'accès à l'emplacement du téléchargement."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Concedi l'accesso al percorso di download."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geef toegang tot de downloadlocatie."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Przyznaj dostęp do lokalizacji pobierania."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Concede acesso à localização da transferência."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Нужен доступ к папке для сохранения загрузки."
-          }
-        }
-      }
-    },
-    "no.access.to.selected.folder.header" : {
-      "comment" : "Header of the alert dialog informing user about failed download",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo benötigt die Erlaubnis, auf den ausgewählten Ordner zuzugreifen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "DuckDuckGo needs permission to access selected folder"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo necesita permiso para acceder a la carpeta seleccionada"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo a besoin d'une autorisation pour accéder au dossier sélectionné"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo necessita dell'autorizzazione per accedere alla cartella selezionata"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo heeft toestemming nodig om toegang te krijgen tot de geselecteerde map"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo potrzebuje pozwolenia na dostęp do wybranego folderu"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O DuckDuckGo precisa de permissão para aceder à pasta selecionada"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DuckDuckGo запрашивает доступ к выбранной папке"
-          }
-        }
-      }
-    },
     "notification.badge.cookiesmanaged" : {
       "comment" : "Notification that appears when browser automatically handle cookies",
       "extractionState" : "extracted_with_value",
@@ -32389,6 +32084,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хорошо"
+          }
+        }
+      }
+    },
+    "onboarding.addtodock.button" : {
+      "comment" : "Button label to add application to the macOS system dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Dock behalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep in Dock"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener en Dock"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder dans le Dock"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tieni nel Dock"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Dock bewaren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trzymaj w Docku"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manter na Dock"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Держать на док-панели"
+          }
+        }
+      }
+    },
+    "onboarding.addtodock.text" : {
+      "comment" : "Call to action to add the DuckDuckGo app icon to the macOS system dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine letzte Sache. Du möchtest DuckDuckGo in deinem Dock haben, damit der Browser immer in Reichweite ist?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "One last thing. Want to keep DuckDuckGo in your Dock so the browser's always within reach?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una última cosa. ¿Quieres tener DuckDuckGo en tu Dock para que el navegador esté siempre al alcance de la mano?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une dernière chose. Vous voulez garder DuckDuckGo dans votre Dock pour que le navigateur reste à portée de main ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un'ultima cosa. Vuoi tenere DuckDuckGo nel tuo dock in modo che il browser sia sempre disponibile?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nog een laatste ding. Wil je DuckDuckGo in je Dock houden zodat de browser altijd binnen handbereik is?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatnia sprawa. Czy chcesz trzymać przeglądarkę DuckDuckGo w Docku, aby zawsze ją mieć pod ręką?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Só mais uma coisa. Queres ter o navegador DuckDuckGo na tua Dock estar sempre à mão?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "И кое-что еще... Хотите сохранить DuckDuckGo на док-панели, чтобы наш браузер всегда был под рукой?"
           }
         }
       }
@@ -32689,6 +32504,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Затем задайте DuckDuckGo как браузер по умолчанию, чтобы открывать ссылки без каких-либо опасений."
+          }
+        }
+      }
+    },
+    "onboarding.startbrowsing.added-to-dock.text" : {
+      "comment" : "Call to action to start using the app as a browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Du bist bereit! Du kannst mich jederzeit im Dock antreffen.\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglichu{00A0}🔒"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You’re all set! You can find me hanging out in the Dock anytime.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "¡Ya está todo listo! Puedes encontrarme en el Dock en cualquier momento.\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible{00A0}🔒"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tout est prêt ! Vous pouvez me trouver sur le Dock à tout moment.\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tutto pronto! Puoi trovarmi nel dock in qualsiasi momento.\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile{00A0} 🔒"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Je bent helemaal klaar! Je kunt me altijd vinden in het Dock.\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wszystko gotowe! W każdej chwili możesz mnie znaleźć w Docku.\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Está tudo pronto! Podes encontrar-me na Dock em qualquer altura.\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Готово! Теперь меня всегда можно найти на док-панели.\nВам интересно, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. По возможности я заблокирую все трекеры и сделаю соединение более безопасным {00A0}🔒"
           }
         }
       }
@@ -43775,6 +43650,246 @@
         }
       }
     },
+    "preferences-tabs.new.tab.position.title" : {
+      "comment" : "Title for new tab positioning",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Erstellen eines neuen Tabs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "When creating a new tab"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al crear una nueva pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lors de la création d'un nouvel onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando si crea una nuova scheda"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bij het maken van een nieuw tabblad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podczas tworzenia nowej karty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao criar um novo separador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При создании новой вкладки"
+          }
+        }
+      }
+    },
+    "preferences-tabs.prefer.new.tabs.to.windows" : {
+      "comment" : "Option to prefer opening new tabs instead of windows when opening links",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links nach Möglichkeit in neuen Tabs statt in neuen Fenstern öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open links in new tabs instead of new windows whenever possible"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlaces en nuevas pestañas en lugar de nuevas ventanas siempre que sea posible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les liens dans de nouveaux onglets plutôt que dans de nouvelles fenêtres si possible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri i collegamenti in nuove schede anziché in nuove finestre quando possibile"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links waar mogelijk openen in nieuwe tabbladen in plaats van in nieuwe vensters"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwieraj linki w nowych kartach zamiast w nowych oknach, gdy tylko jest to możliwe"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir links em separadores novos em vez de novas janelas sempre que possível"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По возможности открывать ссылки в новых вкладках, а не окнах"
+          }
+        }
+      }
+    },
+    "preferences-tabs.switch.tab.when.opened" : {
+      "comment" : "Option to switch to a new tab/window when it is opened",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Öffnen von Links sofort zu einem neuen Tab oder Fenster wechseln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "When opening links, switch to the new tab or window immediately"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al abrir enlaces, cambiar a la nueva pestaña o ventana inmediatamente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À l'ouverture des liens, basculer immédiatement sur le nouvel onglet ou la nouvelle fenêtre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando apri i collegamenti, passa immediatamente alla nuova scheda o finestra"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meteen overschakelen naar het nieuwe tabblad of venster bij het openen van links"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwierając linki, natychmiast przełącz na nową kartę lub nowe okno"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao abrir links, mudar imediatamente para o novo separador ou janela"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При открытии ссылки сразу переключаться на ее вкладку или окно"
+          }
+        }
+      }
+    },
+    "preferences-tabs.title" : {
+      "comment" : "Title for tabs section in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Tabs"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pestañas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onglets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schede"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabbladen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Karty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Separadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вкладки"
+          }
+        }
+      }
+    },
     "preferences.about" : {
       "comment" : "Title of the option to show the About screen",
       "extractionState" : "extracted_with_value",
@@ -44315,6 +44430,66 @@
         }
       }
     },
+    "preferences.add-to-dock" : {
+      "comment" : "Action button to add the app to the Dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Dock hinzufügen …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add to Dock…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir al Dock…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter au Dock…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi al dock…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App toevoegen aan je dock…"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj do Docka…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar à Dock…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить на док-панель…"
+          }
+        }
+      }
+    },
     "preferences.always-on" : {
       "comment" : "Status indicator of a browser privacy protection feature.",
       "extractionState" : "extracted_with_value",
@@ -44851,66 +45026,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Тема системы"
-          }
-        }
-      }
-    },
-    "preferences.appearance.zoom" : {
-      "comment" : "Zoom settings section title",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoom"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Zoom"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoom"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoom"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoom"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoomniveau"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoom"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoom"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Масштаб"
           }
         }
       }
@@ -45755,6 +45870,66 @@
         }
       }
     },
+    "preferences.is-added-to-dock" : {
+      "comment" : "Indicates that the browser is added to the macOS system Dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo wird zum Dock hinzugefügt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo is added to the Dock."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo se ha añadido al Dock."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo a été ajouté au Dock."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo è stato aggiunto al dock."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo is toegevoegd aan het Dock."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przeglądarka DuckDuckGo została dodana do Docka."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O DuckDuckGo foi adicionado à Dock."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык DuckDuckGo добавлен на док-панель."
+          }
+        }
+      }
+    },
     "preferences.main-settings" : {
       "comment" : "Section header in Preferences for main settings",
       "extractionState" : "extracted_with_value",
@@ -45811,6 +45986,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Основные настройки"
+          }
+        }
+      }
+    },
+    "preferences.not-added-to-dock" : {
+      "comment" : "Indicate that the browser is not added to macOS system Dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo wird nicht zum Dock hinzugefügt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo is not added to the Dock."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo no se ha añadido al Dock."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo n'a pas été ajouté au Dock."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo non è stato aggiunto al dock."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo is niet toegevoegd aan het Dock."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przeglądarka DuckDuckGo nie została dodana do Docka."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O DuckDuckGo não foi adicionado à Dock."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык DuckDuckGo не добавлен на док-панель."
           }
         }
       }
@@ -45995,66 +46230,6 @@
         }
       }
     },
-    "preferences.privacy" : {
-      "comment" : "Show privacy browser preferences",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privatsphäre"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacidad"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confidentialité"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacy"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacy"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prywatność"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacidade"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Настройки конфиденциальности"
-          }
-        }
-      }
-    },
     "preferences.privacy-protections" : {
       "comment" : "The section header in Preferences representing browser features related to privacy protection",
       "extractionState" : "extracted_with_value",
@@ -46231,6 +46406,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Заново открыть все окна из последнего сеанса"
+          }
+        }
+      }
+    },
+    "preferences.shortcuts" : {
+      "comment" : "Name of the preferences section related to shortcuts",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcuts"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Shortcuts"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accesos directos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourcis"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scorciatoie"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sneltoetsen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skróty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atalhos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлыки"
           }
         }
       }
@@ -46595,6 +46830,546 @@
         }
       }
     },
+    "prefrences.sync.bad.request.description" : {
+      "comment" : "Description of incorrectly formatted data error when syncing.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Lesezeichen sind falsch formatiert oder zu lang und wurden nicht synchronisiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some bookmarks are formatted incorrectly or too long and were not synced."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunos marcadores tienen un formato incorrecto o demasiado largo y no se han sincronizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains signets sont mal formatés ou trop longs et n'ont pas été synchronisés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcuni segnalibri sono formattati in modo errato o sono troppo lunghi e non sono stati sincronizzati."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommige bladwijzers hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektóre zakładki mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alguns marcadores estão formatados incorretamente ou são demasiado longos e não foram sincronizados."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторые закладки не синхронизируются из-за неверного формата или превышения ограничений по длине."
+          }
+        }
+      }
+    },
+    "prefrences.sync.bookmarks-limit-exceeded-action" : {
+      "comment" : "Button title for sync bookmarks limits exceeded warning to go to manage bookmarks",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen verwalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manage Bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestionar marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gérer les signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestisci segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers beheren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zarządzaj zakładkami"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerir marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Управление закладками"
+          }
+        }
+      }
+    },
+    "prefrences.sync.bookmarks-limit-exceeded-description" : {
+      "comment" : "Description for sync bookmarks limits exceeded warning",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast die maximale Anzahl von Lesezeichen erreicht. Lösche Lesezeichen, um die Synchronisierung fortzusetzen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You've reached the maximum number of bookmarks. Please delete some to resume sync."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Has alcanzado el número máximo de marcadores. Elimina algunos para reanudar la sincronización."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez atteint le nombre maximal de signets. Veuillez en supprimer quelques-uns pour reprendre la synchronisation."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai raggiunto il numero massimo di segnalibri. Eliminane alcuni per riprendere la sincronizzazione."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt het maximumaantal bladwijzers bereikt. Verwijder er een paar om de synchronisatie te hervatten."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Osiągnięto maksymalną liczbę zakładek. Usuń część z nich, aby wznowić synchronizację."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atingiste o número máximo de marcadores. Elimina algumas para retomar a sincronização."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Достигнуто максимальное число закладок. Чтобы возобновить синхронизацию, удалите некоторые из них."
+          }
+        }
+      }
+    },
+    "prefrences.sync.bookmarks.too-many-requests" : {
+      "comment" : "Description of too many requests error when syncing.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync & Backup ist vorübergehend nicht verfügbar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Backup is temporarily unavailable."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización y la copia de seguridad no están disponibles temporalmente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync & Backup est temporairement indisponible."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync & Backup non è temporaneamente disponibile."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "'Synchronisatie en back-up' is tijdelijk niet beschikbaar."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funkcja Sync & Backup jest tymczasowo niedostępna."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Sync & Backup está temporariamente indisponível."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Функция «Синхронизация и резервное копирование» временно недоступна."
+          }
+        }
+      }
+    },
+    "prefrences.sync.credentials-limit-exceeded-action" : {
+      "comment" : "Button title for sync credentials limits exceeded warning to go to manage passwords",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter verwalten …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manage passwords…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Administrar contraseñas..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gérer les mots de passe…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestisci password…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden beheren …"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zarządzaj hasłami…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerir palavras-passe…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Управление паролями..."
+          }
+        }
+      }
+    },
+    "prefrences.sync.credentials-limit-exceeded-description" : {
+      "comment" : "Description for sync credentials limits exceeded warning",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast die maximale Anzahl von Passwörtern erreicht. Lösche einige, um die Synchronisierung fortzusetzen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You've reached the maximum number of passwords. Please delete some to resume sync."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Has alcanzado el número máximo de contraseñas. Elimina algunas para reanudar la sincronización."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez atteint le nombre maximal de mots de passe. Veuillez en supprimer quelques-uns pour reprendre la synchronisation."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai raggiunto il numero massimo di password. Eliminane alcuni per riprendere la sincronizzazione."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt het maximumaantal wachtwoorden bereikt. Verwijder er een paar om de synchronisatie te hervatten."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Osiągnięto maksymalną liczbę haseł. Usuń część z nich, aby wznowić synchronizację."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atingiste o número máximo de palavras-passe. Elimina algumas para retomar a sincronização."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Достигнуто максимальное число паролей. Чтобы возобновить синхронизацию, удалите некоторые из них."
+          }
+        }
+      }
+    },
+    "prefrences.sync.credentials.bad.request.description" : {
+      "comment" : "Description of incorrectly formatted data error when syncing.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Passwörter sind falsch formatiert oder zu lang und wurden nicht synchronisiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some passwords are formatted incorrectly or too long and were not synced."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunas contraseñas tienen un formato incorrecto o demasiado largo y no se han sincronizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains mots de passe sont mal formatés ou trop longs et n'ont pas été synchronisés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcune password sono formattate in modo errato o sono troppo lunghe e non sono state sincronizzate."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommige wachtwoorden hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektóre hasła mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algumas palavras-passe estão formatadas incorretamente ou são demasiado longas e não foram sincronizadas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторые пароли не синхронизируются из-за неверного формата или превышения ограничений по длине."
+          }
+        }
+      }
+    },
+    "prefrences.sync.invalid-login-description" : {
+      "comment" : "Description invalid credentials error when syncing.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei der Synchronisierung ist ein Fehler aufgetreten. Versuche, die Synchronisierung auf diesem Gerät zu deaktivieren, und stelle dann die Verbindung mit einem anderen Gerät oder deinem Wiederherstellungscode wieder her."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync encountered an error. Try disabling sync on this device and then reconnect using another device or your recovery code."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha producido un error en la sincronización. Intenta desactivar la sincronización en este dispositivo y, a continuación, vuelve a conectarte con otro dispositivo o con tu código de recuperación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation a rencontré une erreur. Essayez de désactiver la synchronisation sur cet appareil, puis reconnectez-vous à l’aide d’un autre appareil ou de votre code de récupération."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync ha riscontrato un errore. Prova a disattivare la sincronizzazione su questo dispositivo e riconnettiti utilizzando un altro dispositivo o il codice di ripristino."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er is een fout opgetreden bij het synchroniseren. Probeer synchronisatie op dit apparaat uit te schakelen en maak dan opnieuw verbinding met een ander apparaat of met je herstelcode."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podczas synchronizacji wystąpił błąd. Spróbuj wyłączyć synchronizację na tym urządzeniu, a następnie ponownie nawiąż połączenie za pomocą innego urządzenia lub kodu odzyskiwania."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erro durante a sincronização. Experimenta desativar a sincronização neste dispositivo e, em seguida, inicia sessão novamente noutro dispositivo ou com o teu código de recuperação."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка синхронизации. Попробуйте отключить синхронизацию на этом устройстве, а затем выполнить повторную привязку с помощью другого устройства или кода восстановления."
+          }
+        }
+      }
+    },
+    "prefrences.sync.limit-exceeded-title" : {
+      "comment" : "Title for sync limits exceeded warning",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung angehalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync Paused"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización pausada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation suspendue"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzazione in pausa"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie onderbroken"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizacja wstrzymana"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronização em pausa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация на паузе"
+          }
+        }
+      }
+    },
     "print.menu.item" : {
       "comment" : "Menu item title",
       "extractionState" : "extracted_with_value",
@@ -46656,7 +47431,56 @@
       }
     },
     "Privacy Pro" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        }
+      }
     },
     "private.search.explenation" : {
       "comment" : "feature explanation in settings",
@@ -47003,60 +47827,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перезагрузить страницу"
-          }
-        }
-      }
-    },
-    "Remove" : {
-      "comment" : "Remove bookmark button title",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entfernen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eliminar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Supprimer"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rimuovi"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verwijderen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Usuń"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remover"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Удалить"
           }
         }
       }
@@ -47410,6 +48180,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сообщить о неработающем сайте"
+          }
+        }
+      }
+    },
+    "reset-zoom" : {
+      "comment" : "Button that allows the user to reset the zoom level of the browser page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reset"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ripristina"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herstel"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resetowanie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сбросить"
           }
         }
       }
@@ -48119,55 +48949,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Feedback hilft uns, die DuckDuckGo-App zu verbessern."
+            "value" : "Dein Feedback hilft uns, den DuckDuckGo-Browser zu verbessern."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your feedback will help us improve the DuckDuckGo app."
+            "value" : "Your feedback will help us improve the DuckDuckGo browser."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tus comentarios nos ayudarán a mejorar la aplicación DuckDuckGo."
+            "value" : "Tus comentarios nos ayudarán a mejorar el navegador DuckDuckGo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vos commentaires nous aideront à améliorer l'application DuckDuckGo."
+            "value" : "Vos commentaires nous aideront à améliorer le navigateur DuckDuckGo."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il tuo feedback ci aiuterà a migliorare l'app DuckDuckGo."
+            "value" : "Il tuo feedback ci aiuterà a migliorare il browser DuckDuckGo."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jouw feedback zal ons helpen de DuckDuckGo-app te verbeteren."
+            "value" : "Jouw feedback helpt ons de DuckDuckGo-browser te verbeteren."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Twoja opinia pomoże nam w ulepszaniu aplikacji DuckDuckGo."
+            "value" : "Twoja opinia pomoże nam ulepszyć przeglądarkę DuckDuckGo."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O teu feedback ajuda-nos a melhorar a aplicação DuckDuckGo."
+            "value" : "O teu feedback ajuda-nos a melhorar o navegador DuckDuckGo."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ваш отзыв поможет нам улучшить приложение DuckDuckGo."
+            "value" : "Ваш ответ поможет браузеру DuckDuckGo стать еще лучше."
           }
         }
       }
@@ -48987,114 +49817,6 @@
         }
       }
     },
-    "Show left of the back button" : {
-      "comment" : "Preferences > Home Button > left position item",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Links neben der Zurück-Schaltfläche anzeigen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar a la izquierda del botón Atrás"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher la gauche du bouton de retour"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostra a sinistra del pulsante Indietro"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Links van de 'Terug'-knop weergeven"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pokaż na lewo od przycisku Wstecz"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar à esquerda do botão de retrocesso"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Показывать слева от кнопки «Назад»"
-          }
-        }
-      }
-    },
-    "Show Left of the Back Button" : {
-      "comment" : "Main Menu > View > Home Button > left position item",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Links vom Zurück-Button anzeigen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar a la izquierda del botón Atrás"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher la gauche du bouton Retour"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostra a sinistra del pulsante Indietro"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Links van de 'Terug'-knop weergeven"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pokaż na lewo od przycisku Wstecz"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar à esquerda do botão Retroceder"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Показывать слева от кнопки «Назад»"
-          }
-        }
-      }
-    },
     "Show Next Tab" : {
       "comment" : "Main Menu Window item",
       "localizations" : {
@@ -49306,114 +50028,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показать ресурсы"
-          }
-        }
-      }
-    },
-    "Show right of the reload button" : {
-      "comment" : "Preferences > Home Button > right position item",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechts neben der Schaltfläche „Neu laden“ anzeigen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar a la derecha del botón Volver a cargar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher la droite du bouton de rechargement"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostra a destra del pulsante Ricarica"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechts van de knop 'Opnieuw laden' weergeven"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pokaż na prawo od przycisku ponownego ładowania"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar à direita do botão de recarga"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Показывать справа от кнопки «Перезагрузить»"
-          }
-        }
-      }
-    },
-    "Show Right of the Reload Button" : {
-      "comment" : "Main Menu > View > Home Button > right position item",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechts vom Reload-Button anzeigen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar a la derecha del botón Volver a cargar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher la droite du bouton Recharger"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostra a destra del pulsante Ricarica"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechts van de knop 'Opnieuw laden' weergeven"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pokaż na prawo od przycisku ponownego ładowania"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar à direita do botão Recarregar"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Показывать справа от кнопки «Перезагрузить»"
           }
         }
       }
@@ -50946,7 +51560,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ohne Titel"
+            "value" : "Senza titolo"
           }
         },
         "nl" : {
@@ -53096,114 +53710,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Преобразования"
-          }
-        }
-      }
-    },
-    "Try importing bookmarks manually instead." : {
-      "comment" : "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Versuche stattdessen, Lesezeichen manuell zu importieren."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En su lugar, intenta importar los marcadores de forma manual."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Essayez plutôt d'importer les signets manuellement."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prova a importare i segnalibri manualmente."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Probeer bladwijzers handmatig te importeren."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zamiast tego spróbuj zaimportować zakładki ręcznie."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Em vez disso, tenta importar os marcadores manualmente."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Попробуйте импортировать закладки вручную."
-          }
-        }
-      }
-    },
-    "Try importing passwords manually instead." : {
-      "comment" : "Data import error subtitle: suggestion to import Passwords manually by selecting a CSV or HTML file.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Versuche stattdessen, Passwörter manuell zu importieren."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En su lugar, intenta importar las contraseñas de forma manual."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Essayez plutôt d'importer les mots de passe manuellement."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prova a importare le password manualmente."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Probeer wachtwoorden handmatig te importeren."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zamiast tego spróbuj zaimportować hasła ręcznie."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Em vez disso, tenta importar as palavras-passe manualmente."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Попробуйте импортировать пароли вручную."
           }
         }
       }

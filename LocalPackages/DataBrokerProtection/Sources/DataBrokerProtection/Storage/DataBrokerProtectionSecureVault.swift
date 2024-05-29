@@ -56,16 +56,16 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
     func save(brokerId: Int64, profileQueryId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws
-    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanOperationData?
-    func fetchAllScans() throws -> [ScanOperationData]
+    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanJobData?
+    func fetchAllScans() throws -> [ScanJobData]
 
     func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfile, lastRunDate: Date?, preferredRunDate: Date?) throws
     func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
-    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutOperationData?
-    func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutOperationData]
-    func fetchAllOptOuts() throws -> [OptOutOperationData]
+    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutJobData?
+    func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutJobData]
+    func fetchAllOptOuts() throws -> [OptOutJobData]
 
     func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64) throws
     func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
@@ -206,7 +206,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         try self.providers.database.updateLastRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
     }
 
-    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanOperationData? {
+    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanJobData? {
         if let scanDB = try self.providers.database.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) {
             let scanEvents = try self.providers.database.fetchScanEvents(brokerId: brokerId, profileQueryId: profileQueryId)
             let mapper = MapperToModel(mechanism: l2Decrypt(data:))
@@ -217,9 +217,9 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         }
     }
 
-    func fetchAllScans() throws -> [ScanOperationData] {
+    func fetchAllScans() throws -> [ScanJobData] {
         let mapper = MapperToModel(mechanism: l2Decrypt(data:))
-        var scans = [ScanOperationData]()
+        var scans = [ScanJobData]()
         let scansDB = try self.providers.database.fetchAllScans()
 
         for scan in scansDB {
@@ -260,7 +260,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         try self.providers.database.updateLastRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
     }
 
-    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutOperationData? {
+    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutJobData? {
         let mapper = MapperToModel(mechanism: l2Decrypt(data:))
         if let optOutResult = try self.providers.database.fetchOptOut(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId) {
             let optOutEvents = try self.providers.database.fetchOptOutEvents(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
@@ -270,7 +270,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         }
     }
 
-    func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutOperationData] {
+    func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutJobData] {
         let mapper = MapperToModel(mechanism: l2Decrypt(data:))
 
         return try self.providers.database.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId).map {
@@ -283,7 +283,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         }
     }
 
-    func fetchAllOptOuts() throws -> [OptOutOperationData] {
+    func fetchAllOptOuts() throws -> [OptOutJobData] {
         let mapper = MapperToModel(mechanism: l2Decrypt(data:))
 
         return try self.providers.database.fetchAllOptOuts().map {

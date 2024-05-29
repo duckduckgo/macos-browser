@@ -178,14 +178,14 @@ extension TunnelControllerIPCClient: IPCServerInterface {
         }, xpcReplyErrorHandler: completion)
     }
 
-    public func debugCommand(_ command: DebugCommand) async throws {
+    public func command(_ command: VPNCommand) async throws {
         guard let payload = try? JSONEncoder().encode(command) else {
             return
         }
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             xpc.execute(call: { server in
-                server.debugCommand(payload) { error in
+                server.command(payload) { error in
                     if let error {
                         continuation.resume(throwing: error)
                     } else {

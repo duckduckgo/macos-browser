@@ -37,13 +37,13 @@ final class DataBrokerForceOptOutViewModel: ObservableObject {
             }
             self.optOutData = brokerProfileData
                 .flatMap { profileData in
-                    profileData.optOutOperationsData.map { ($0, profileData.dataBroker.name) }
+                    profileData.optOutJobData.map { ($0, profileData.dataBroker.name) }
                 }
                 .filter { operationData, _ in
                     operationData.extractedProfile.removedDate == nil
                 }
                 .map { operationData, brokerName in
-                    OptOutViewData(optOutOperationData: operationData, brokerName: brokerName)
+                    OptOutViewData(optOutJobData: operationData, brokerName: brokerName)
                 }.sorted(by: { $0.brokerName < $1.brokerName })
         }
     }
@@ -57,16 +57,16 @@ final class DataBrokerForceOptOutViewModel: ObservableObject {
 
 struct OptOutViewData: Identifiable {
     let id: UUID
-    let optOutOperationData: OptOutOperationData
+    let optOutJobData: OptOutJobData
     let profileName: String
     let brokerName: String
     let extractedProfileID: Int64?
 
-    internal init(optOutOperationData: OptOutOperationData, brokerName: String) {
-        self.optOutOperationData = optOutOperationData
-        self.extractedProfileID = optOutOperationData.extractedProfile.id
+    internal init(optOutJobData: OptOutJobData, brokerName: String) {
+        self.optOutJobData = optOutJobData
+        self.extractedProfileID = optOutJobData.extractedProfile.id
         self.brokerName = brokerName
-        self.profileName = "\(extractedProfileID ?? 0) \(optOutOperationData.extractedProfile.fullName ?? "No Name")"
+        self.profileName = "\(extractedProfileID ?? 0) \(optOutJobData.extractedProfile.fullName ?? "No Name")"
         self.id = UUID()
     }
 }

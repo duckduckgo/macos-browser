@@ -184,6 +184,11 @@ extension Tab {
     convenience override init() {
         self.init(content: .newtab)
     }
+
+    @MainActor
+     convenience init(url: URL) {
+         self.init(content: .url(url, credential: nil, source: .userEntered(url.absoluteString, downloadRequested: false)))
+     }
 }
 
 class HistoryTabExtensionMock: TabExtension, HistoryExtensionProtocol {
