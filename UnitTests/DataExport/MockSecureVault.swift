@@ -58,6 +58,14 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         return storedAccounts
     }
 
+    func accountsCount() throws -> Int {
+        return storedAccounts.count
+    }
+
+    func accountsCountBucket() throws -> String {
+        return ""
+    }
+
     func accountsFor(domain: String) throws -> [SecureVaultModels.WebsiteAccount] {
         return storedAccounts.filter { $0.domain == domain }
     }
@@ -151,6 +159,10 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
     func creditCards() throws -> [SecureVaultModels.CreditCard] {
         return storedCards
+    }
+
+    func creditCardsCount() throws -> Int {
+        return storedCards.count
     }
 
     func creditCardFor(id: Int64) throws -> SecureVaultModels.CreditCard? {
@@ -327,6 +339,10 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
         return _accounts
     }
 
+    func accountsCount() throws -> Int {
+        return _accounts.count
+    }
+
     func neverPromptWebsites() throws -> [SecureVaultModels.NeverPromptWebsites] {
         return _neverPromptWebsites
     }
@@ -394,6 +410,10 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
 
     func creditCards() throws -> [SecureVaultModels.CreditCard] {
         return Array(_creditCards.values)
+    }
+
+    func creditCardsCount() throws -> Int {
+        return _creditCards.count
     }
 
     func creditCardForCardId(_ cardId: Int64) throws -> SecureVaultModels.CreditCard? {

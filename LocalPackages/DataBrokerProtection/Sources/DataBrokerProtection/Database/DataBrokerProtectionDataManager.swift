@@ -294,7 +294,10 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
     }
 
     func startScanAndOptOut() -> Bool {
-        return scanDelegate?.startScan(startDate: Date()) ?? false
+        // This is now unusused as we decided the web UI shouldn't issue commands directly
+        // The background agent itself instead decides to start scans based on events
+        // This should be removed once we can remove it from the web side
+        return true
     }
 
     func getInitialScanState() async -> DBPUIInitialScanState {

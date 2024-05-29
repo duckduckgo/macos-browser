@@ -59,7 +59,7 @@ final class VPNPreferencesModel: ObservableObject {
 
     private var onboardingStatus: OnboardingStatus {
         didSet {
-            showUninstallVPN = DefaultNetworkProtectionVisibility().isInstalled
+            showUninstallVPN = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager).isInstalled
         }
     }
 
@@ -109,7 +109,7 @@ final class VPNPreferencesModel: ObservableObject {
 
         switch response {
         case .OK:
-            await NetworkProtectionFeatureDisabler().disable(uninstallSystemExtension: true)
+            try? await VPNUninstaller().uninstall(removeSystemExtension: true)
         default:
             // intentional no-op
             break

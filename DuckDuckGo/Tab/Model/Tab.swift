@@ -70,6 +70,7 @@ protocol NewWindowPolicyDecisionMaker {
     private let webViewConfiguration: WKWebViewConfiguration
 
     let startupPreferences: StartupPreferences
+    let tabsPreferences: TabsPreferences
 
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
@@ -108,7 +109,8 @@ protocol NewWindowPolicyDecisionMaker {
                      webViewSize: CGSize = CGSize(width: 1024, height: 768),
                      startupPreferences: StartupPreferences = StartupPreferences.shared,
                      certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator(),
-                     tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController
+                     tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController,
+                     tabsPreferences: TabsPreferences = TabsPreferences.shared
     ) {
 
         let duckPlayer = duckPlayer
@@ -150,7 +152,8 @@ protocol NewWindowPolicyDecisionMaker {
                   webViewSize: webViewSize,
                   startupPreferences: startupPreferences,
                   certificateTrustEvaluator: certificateTrustEvaluator,
-                  tunnelController: tunnelController)
+                  tunnelController: tunnelController,
+                  tabsPreferences: tabsPreferences)
     }
 
     @MainActor
@@ -183,7 +186,8 @@ protocol NewWindowPolicyDecisionMaker {
          webViewSize: CGSize,
          startupPreferences: StartupPreferences,
          certificateTrustEvaluator: CertificateTrustEvaluating,
-         tunnelController: NetworkProtectionIPCTunnelController?
+         tunnelController: NetworkProtectionIPCTunnelController?,
+         tabsPreferences: TabsPreferences
     ) {
 
         self.content = content
@@ -200,6 +204,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.interactionState = interactionStateData.map(InteractionState.loadCachedFromTabContent) ?? .none
         self.lastSelectedAt = lastSelectedAt
         self.startupPreferences = startupPreferences
+        self.tabsPreferences = tabsPreferences
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
@@ -328,36 +333,18 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     deinit {
-        cleanUpBeforeClosing(onDeinit: true, webView: webView, userContentController: userContentController)
-    }
-
-    func cleanUpBeforeClosing() {
-        cleanUpBeforeClosing(onDeinit: false, webView: webView, userContentController: userContentController)
-    }
-
-    @MainActor(unsafe)
-    private func cleanUpBeforeClosing(onDeinit: Bool, webView: WebView, userContentController: UserContentController?) {
-        let job = { [webView, userContentController] in
+        DispatchQueue.main.asyncOrNow { [webView, userContentController] in
+            // WebKit objects must be deallocated on the main thread
             webView.stopAllMedia(shouldStopLoading: true)
 
             userContentController?.cleanUpBeforeClosing()
+
 #if DEBUG
             if case .normal = NSApp.runType {
                 webView.assertObjectDeallocated(after: 4.0)
             }
 #endif
         }
-#if DEBUG
-        if !onDeinit, case .normal = NSApp.runType {
-            // Tab should be deallocated shortly after burning
-            self.assertObjectDeallocated(after: 4.0)
-        }
-#endif
-        guard Thread.isMainThread else {
-            DispatchQueue.main.async { job() }
-            return
-        }
-        job()
     }
 
     func stopAllMediaAndLoading() {

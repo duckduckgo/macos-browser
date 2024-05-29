@@ -33,15 +33,18 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemCanBeDuplicated(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewItemCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool
+    func tabBarViewItemIsAlreadyBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewAllItemsCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemCloseToTheLeftAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemRemoveBookmarkAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkAllOpenTabsAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewBurnerWindowAction(_ tabBarViewItem: TabBarViewItem)
@@ -198,6 +201,10 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemBookmarkThisPageAction(self)
     }
 
+    @objc func removeFromBookmarksAction(_ sender: Any) {
+        delegate?.tabBarViewItemRemoveBookmarkAction(self)
+    }
+
     @objc func bookmarkAllOpenTabsAction(_ sender: Any) {
         delegate?.tabBarViewItemBookmarkAllOpenTabsAction(self)
     }
@@ -233,6 +240,10 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @objc func closeOtherAction(_ sender: NSMenuItem) {
         delegate?.tabBarViewItemCloseOtherAction(self)
+    }
+
+    @objc func closeToTheLeftAction(_ sender: NSMenuItem) {
+        delegate?.tabBarViewItemCloseToTheLeftAction(self)
     }
 
     @objc func closeToTheRightAction(_ sender: NSMenuItem) {
@@ -497,7 +508,11 @@ extension TabBarViewItem: NSMenuDelegate {
 
         // Section 2
         addFireproofMenuItem(to: menu)
-        addBookmarkMenuItem(to: menu)
+        if let delegate, delegate.tabBarViewItemIsAlreadyBookmarked(self) {
+            removeBookmarkMenuItem(to: menu)
+        } else {
+            addBookmarkMenuItem(to: menu)
+        }
         menu.addItem(.separator())
 
         // Section 3
@@ -506,8 +521,7 @@ extension TabBarViewItem: NSMenuDelegate {
 
         // Section 4
         addCloseMenuItem(to: menu)
-        addCloseOtherMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
-        addCloseTabsToTheRightMenuItem(to: menu, areThereTabsToTheRight: otherItemsState.hasItemsToTheRight)
+        addCloseOtherSubmenu(to: menu, tabBarItemState: otherItemsState)
         if !isBurner {
             addMoveToNewWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         }
@@ -531,6 +545,12 @@ extension TabBarViewItem: NSMenuDelegate {
         let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(bookmarkThisPageAction(_:)), keyEquivalent: "")
         bookmarkMenuItem.target = self
         bookmarkMenuItem.isEnabled = delegate?.tabBarViewItemCanBeBookmarked(self) ?? false
+        menu.addItem(bookmarkMenuItem)
+    }
+
+    private func removeBookmarkMenuItem(to menu: NSMenu) {
+        let bookmarkMenuItem = NSMenuItem(title: UserText.deleteBookmark, action: #selector(removeFromBookmarksAction(_:)), keyEquivalent: "")
+        bookmarkMenuItem.target = self
         menu.addItem(bookmarkMenuItem)
     }
 
@@ -570,11 +590,33 @@ extension TabBarViewItem: NSMenuDelegate {
         menu.addItem(closeMenuItem)
     }
 
+    private func addCloseOtherSubmenu(to menu: NSMenu, tabBarItemState: OtherTabBarViewItemsState) {
+        let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs)
+        let submenu = NSMenu()
+        submenu.autoenablesItems = false
+
+        addCloseTabsToTheLeftMenuItem(to: submenu, areThereTabsToTheLeft: tabBarItemState.hasItemsToTheLeft)
+        addCloseTabsToTheRightMenuItem(to: submenu, areThereTabsToTheRight: tabBarItemState.hasItemsToTheRight)
+        addCloseOtherMenuItem(to: submenu, areThereOtherTabs: tabBarItemState.hasItemsToTheLeft || tabBarItemState.hasItemsToTheRight)
+
+        closeOtherMenuItem.submenu = submenu
+        menu.addItem(closeOtherMenuItem)
+    }
+
     private func addCloseOtherMenuItem(to menu: NSMenu, areThereOtherTabs: Bool) {
-        let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
+        let closeOtherMenuItem = NSMenuItem(title: UserText.closeAllOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
         closeOtherMenuItem.target = self
         closeOtherMenuItem.isEnabled = areThereOtherTabs
         menu.addItem(closeOtherMenuItem)
+    }
+
+    private func addCloseTabsToTheLeftMenuItem(to menu: NSMenu, areThereTabsToTheLeft: Bool) {
+        let closeTabsToTheLeftMenuItem = NSMenuItem(title: UserText.closeTabsToTheLeft,
+                                                     action: #selector(closeToTheLeftAction(_:)),
+                                                     keyEquivalent: "")
+        closeTabsToTheLeftMenuItem.target = self
+        closeTabsToTheLeftMenuItem.isEnabled = areThereTabsToTheLeft
+        menu.addItem(closeTabsToTheLeftMenuItem)
     }
 
     private func addCloseTabsToTheRightMenuItem(to menu: NSMenu, areThereTabsToTheRight: Bool) {

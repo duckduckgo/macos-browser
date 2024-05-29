@@ -20,14 +20,24 @@ import Foundation
 import AppKit
 import Bookmarks
 import Common
+import Combine
 
 protocol AccessibilityPreferencesPersistor {
     var defaultPageZoom: CGFloat { get set }
+    var zoomPerWebsite: [String: CGFloat] { get set }
+}
+
+protocol SavedZoomLevelsCoordinating {
+    func burnZoomLevels(except fireproofDomains: FireproofDomains)
+    func burnZoomLevel(of baseDomains: Set<String>)
 }
 
 struct AccessibilityPreferencesUserDefaultsPersistor: AccessibilityPreferencesPersistor {
     @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue)
     var defaultPageZoom: CGFloat
+
+    @UserDefaultsWrapper(key: .websitePageZoom, defaultValue: [:])
+    var zoomPerWebsite: [String: CGFloat]
 }
 
 enum DefaultZoomValue: CGFloat, CaseIterable {
@@ -60,10 +70,47 @@ final class AccessibilityPreferences: ObservableObject {
         }
     }
 
-    init(persistor: AccessibilityPreferencesPersistor = AccessibilityPreferencesUserDefaultsPersistor()) {
-        self.persistor = persistor
-        defaultPageZoom =  .init(rawValue: persistor.defaultPageZoom) ?? .percent100
+    let zoomPerWebsiteUpdatedSubject = PassthroughSubject<Void, Never>()
+    private var zoomPerWebsite: [String: DefaultZoomValue] {
+        didSet {
+            persistor.zoomPerWebsite = zoomPerWebsite.mapValues { $0.rawValue }
+            zoomPerWebsiteUpdatedSubject.send()
+        }
     }
 
     private var persistor: AccessibilityPreferencesPersistor
+
+    init(persistor: AccessibilityPreferencesPersistor = AccessibilityPreferencesUserDefaultsPersistor()) {
+        self.persistor = persistor
+        defaultPageZoom =  .init(rawValue: persistor.defaultPageZoom) ?? .percent100
+        zoomPerWebsite = persistor.zoomPerWebsite.compactMapValues { DefaultZoomValue(rawValue: $0) }
+    }
+
+    func zoomPerWebsite(url: String) -> DefaultZoomValue? {
+        guard let domain = TLD().eTLDplus1(forStringURL: url) else { return nil }
+        return zoomPerWebsite[domain]
+    }
+
+    func updateZoomPerWebsite(zoomLevel: DefaultZoomValue, url: String) {
+        guard let domain = TLD().eTLDplus1(forStringURL: url) else { return }
+        if zoomLevel == defaultPageZoom {
+            zoomPerWebsite[domain] = nil
+        } else {
+            zoomPerWebsite[domain] = zoomLevel
+        }
+    }
+}
+
+extension AccessibilityPreferences: SavedZoomLevelsCoordinating {
+    func burnZoomLevels(except fireproofDomains: FireproofDomains) {
+        zoomPerWebsite = zoomPerWebsite.filter {
+            fireproofDomains.isFireproof(fireproofDomain: $0.key)
+        }
+    }
+
+    func burnZoomLevel(of baseDomains: Set<String>) {
+        for website in zoomPerWebsite.keys where baseDomains.contains(website) {
+            zoomPerWebsite[website] = nil
+        }
+    }
 }

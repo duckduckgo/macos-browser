@@ -56,10 +56,15 @@ struct MapperToUI {
         // not by the total real cans that the app is doing.
         let profileQueriesGroupedByBroker = Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.name })
 
-        let totalScans = profileQueriesGroupedByBroker.reduce(0) { accumulator, element in
+        // We don't want to consider deprecated queries when reporting manual scans to the UI
+        let filteredProfileQueriesGroupedByBroker = profileQueriesGroupedByBroker.mapValues { queries in
+            queries.filter { !$0.profileQuery.deprecated }
+        }
+
+        let totalScans = filteredProfileQueriesGroupedByBroker.reduce(0) { accumulator, element in
             return accumulator + element.value.totalScans
         }
-        let currentScans = profileQueriesGroupedByBroker.reduce(0) { accumulator, element in
+        let currentScans = filteredProfileQueriesGroupedByBroker.reduce(0) { accumulator, element in
             return accumulator + element.value.currentScans
         }
 
@@ -100,9 +105,9 @@ struct MapperToUI {
 
         brokerProfileQueryData.forEach {
             let dataBroker = $0.dataBroker
-            let scanOperation = $0.scanOperationData
-            for optOutOperation in $0.optOutOperationsData {
-                let extractedProfile = optOutOperation.extractedProfile
+            let scanJob = $0.scanJobData
+            for optOutJob in $0.optOutJobData {
+                let extractedProfile = optOutJob.extractedProfile
                 let profileMatch = mapToUI(dataBroker, extractedProfile: extractedProfile)
 
                 if extractedProfile.removedDate == nil {
@@ -111,7 +116,7 @@ struct MapperToUI {
                     removedProfiles.append(profileMatch)
                 }
 
-                if let closestMatchesFoundEvent = scanOperation.closestMatchesFoundEvent() {
+                if let closestMatchesFoundEvent = scanJob.closestMatchesFoundEvent() {
                     for mirrorSite in dataBroker.mirrorSites where mirrorSite.shouldWeIncludeMirrorSite(for: closestMatchesFoundEvent.date) {
                         let mirrorSiteMatch = mapToUI(mirrorSite.name, databrokerURL: mirrorSite.url, extractedProfile: extractedProfile)
 
@@ -155,8 +160,8 @@ struct MapperToUI {
                                          format: String = "dd/MM/yyyy") -> DBPUIScanDate {
         let eightDaysBeforeToday = currentDate.addingTimeInterval(-8 * 24 * 60 * 60)
         let scansInTheLastEightDays = brokerProfileQueryData
-            .filter { $0.scanOperationData.lastRunDate != nil && $0.scanOperationData.lastRunDate! <= currentDate && $0.scanOperationData.lastRunDate! > eightDaysBeforeToday }
-            .sorted { $0.scanOperationData.lastRunDate! < $1.scanOperationData.lastRunDate! }
+            .filter { $0.scanJobData.lastRunDate != nil && $0.scanJobData.lastRunDate! <= currentDate && $0.scanJobData.lastRunDate! > eightDaysBeforeToday }
+            .sorted { $0.scanJobData.lastRunDate! < $1.scanJobData.lastRunDate! }
             .reduce(into: [BrokerProfileQueryData]()) { result, element in
                 if !result.contains(where: { $0.dataBroker.url == element.dataBroker.url }) {
                     result.append(element)
@@ -164,10 +169,10 @@ struct MapperToUI {
             }
             .flatMap {
                 var brokers = [DBPUIDataBroker]()
-                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: $0.scanOperationData.lastRunDate!.timeIntervalSince1970))
+                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: $0.scanJobData.lastRunDate!.timeIntervalSince1970))
 
-                for mirrorSite in $0.dataBroker.mirrorSites where mirrorSite.addedAt < $0.scanOperationData.lastRunDate! {
-                    brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanOperationData.lastRunDate!.timeIntervalSince1970))
+                for mirrorSite in $0.dataBroker.mirrorSites where mirrorSite.addedAt < $0.scanJobData.lastRunDate! {
+                    brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanJobData.lastRunDate!.timeIntervalSince1970))
                 }
 
                 return brokers
@@ -185,8 +190,8 @@ struct MapperToUI {
                                          format: String = "dd/MM/yyyy") -> DBPUIScanDate {
         let eightDaysAfterToday = currentDate.addingTimeInterval(8 * 24 * 60 * 60)
         let scansHappeningInTheNextEightDays = brokerProfileQueryData
-            .filter { $0.scanOperationData.preferredRunDate != nil && $0.scanOperationData.preferredRunDate! > currentDate && $0.scanOperationData.preferredRunDate! < eightDaysAfterToday }
-            .sorted { $0.scanOperationData.preferredRunDate! < $1.scanOperationData.preferredRunDate! }
+            .filter { $0.scanJobData.preferredRunDate != nil && $0.scanJobData.preferredRunDate! > currentDate && $0.scanJobData.preferredRunDate! < eightDaysAfterToday }
+            .sorted { $0.scanJobData.preferredRunDate! < $1.scanJobData.preferredRunDate! }
             .reduce(into: [BrokerProfileQueryData]()) { result, element in
                 if !result.contains(where: { $0.dataBroker.url == element.dataBroker.url }) {
                     result.append(element)
@@ -194,15 +199,15 @@ struct MapperToUI {
             }
             .flatMap {
                 var brokers = [DBPUIDataBroker]()
-                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: $0.scanOperationData.preferredRunDate!.timeIntervalSince1970))
+                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970))
 
                 for mirrorSite in $0.dataBroker.mirrorSites {
                     if let removedDate = mirrorSite.removedAt {
-                        if removedDate > $0.scanOperationData.preferredRunDate! {
-                            brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanOperationData.preferredRunDate!.timeIntervalSince1970))
+                        if removedDate > $0.scanJobData.preferredRunDate! {
+                            brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970))
                         }
                     } else {
-                        brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanOperationData.preferredRunDate!.timeIntervalSince1970))
+                        brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanJobData.preferredRunDate!.timeIntervalSince1970))
                     }
                 }
 
@@ -308,8 +313,8 @@ fileprivate extension BrokerProfileQueryData {
     }
 
     var sitesScanned: [String] {
-        if scanOperationData.lastRunDate != nil {
-            let scanEvents = scanOperationData.scanStartedEvents()
+        if scanJobData.lastRunDate != nil {
+            let scanEvents = scanJobData.scanStartedEvents()
             var sitesScanned = [dataBroker.name]
 
             for mirrorSite in dataBroker.mirrorSites {
@@ -333,30 +338,22 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
 
     var totalScans: Int {
         guard let broker = self.first?.dataBroker else { return 0 }
-
-        let areAllQueriesDeprecated = allSatisfy { $0.profileQuery.deprecated }
-
-        if areAllQueriesDeprecated {
-            return 0
-        } else {
-            return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
-        }
+        return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
     }
 
     var currentScans: Int {
         guard let broker = self.first?.dataBroker else { return 0 }
 
-        let areAllQueriesDeprecated = allSatisfy { $0.profileQuery.deprecated }
-        let didAllQueriesFinished = allSatisfy { $0.scanOperationData.lastRunDate != nil }
+        let didAllQueriesFinished = allSatisfy { $0.scanJobData.lastRunDate != nil }
 
-        if areAllQueriesDeprecated || !didAllQueriesFinished {
+        if !didAllQueriesFinished {
             return 0
         } else {
             return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
         }
     }
 
-    var lastOperation: BrokerOperationData? {
+    var lastOperation: BrokerJobData? {
         let allOperations = flatMap { $0.operationsData }
         let lastOperation = allOperations.sorted(by: {
             if let date1 = $0.lastRunDate, let date2 = $1.lastRunDate {
@@ -381,7 +378,7 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
         return lastError
     }
 
-    var lastStartedOperation: BrokerOperationData? {
+    var lastStartedOperation: BrokerJobData? {
         let allOperations = flatMap { $0.operationsData }
 
         return allOperations.sorted(by: {
@@ -396,9 +393,9 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
     }
 }
 
-fileprivate extension BrokerOperationData {
+fileprivate extension BrokerJobData {
     var toString: String {
-        if (self as? OptOutOperationData) != nil {
+        if (self as? OptOutJobData) != nil {
             return "optOut"
         } else {
             return "scan"

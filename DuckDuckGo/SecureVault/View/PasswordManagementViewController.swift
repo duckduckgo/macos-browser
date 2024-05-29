@@ -539,6 +539,7 @@ final class PasswordManagementViewController: NSViewController {
                 refetchWithText(searchField.stringValue) { [weak self] in
                     self?.syncModelsOnCredentials(savedCredentials, select: true)
                 }
+                NotificationCenter.default.post(name: .autofillSaveEvent, object: nil, userInfo: nil)
             } else {
                 syncModelsOnCredentials(savedCredentials)
             }

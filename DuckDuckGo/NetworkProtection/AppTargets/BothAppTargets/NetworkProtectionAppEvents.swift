@@ -47,15 +47,15 @@ final class NetworkProtectionAppEvents {
     // MARK: - Feature Visibility
 
     private let featureVisibility: NetworkProtectionFeatureVisibility
-    private let featureDisabler: NetworkProtectionFeatureDisabling
+    private let uninstaller: VPNUninstalling
     private let defaults: UserDefaults
 
-    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
-         featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
+    init(featureVisibility: NetworkProtectionFeatureVisibility,
+         uninstaller: VPNUninstalling = VPNUninstaller(),
          defaults: UserDefaults = .netP) {
 
         self.defaults = defaults
-        self.featureDisabler = featureDisabler
+        self.uninstaller = uninstaller
         self.featureVisibility = featureVisibility
     }
 
@@ -65,14 +65,8 @@ final class NetworkProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
 
         Task { @MainActor in
-            let disabled = await featureVisibility.disableIfUserHasNoAccess()
-
-            guard !disabled else {
-                return
-            }
-
+            await featureVisibility.disableIfUserHasNoAccess()
             restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
-            refreshNetworkProtectionServers()
         }
     }
 
@@ -97,19 +91,4 @@ final class NetworkProtectionAppEvents {
         loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
     }
 
-    /// Fetches a new list of VPN servers, and updates the existing set.
-    ///
-    private func refreshNetworkProtectionServers() {
-        Task {
-            let serverCount: Int
-            do {
-                serverCount = try await NetworkProtectionDeviceManager.create().refreshServerList().count
-            } catch {
-                os_log("Failed to update DuckDuckGo VPN servers", log: .networkProtection, type: .error)
-                return
-            }
-
-            os_log("Successfully updated DuckDuckGo VPN servers; total server count = %{public}d", log: .networkProtection, serverCount)
-        }
-    }
 }

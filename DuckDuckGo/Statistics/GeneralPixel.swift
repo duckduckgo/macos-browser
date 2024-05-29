@@ -26,7 +26,6 @@ import Configuration
 enum GeneralPixel: PixelKitEventV2 {
 
     case crash
-    case brokenSiteReport
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
 
@@ -41,10 +40,32 @@ enum GeneralPixel: PixelKitEventV2 {
     case formAutofilled(kind: FormAutofillKind)
     case autofillItemSaved(kind: FormAutofillKind)
 
+    case autofillLoginsSaveLoginInlineDisplayed
+    case autofillLoginsSaveLoginInlineConfirmed
+    case autofillLoginsSaveLoginInlineDismissed
+
+    case autofillLoginsSavePasswordInlineDisplayed
+    case autofillLoginsSavePasswordInlineConfirmed
+    case autofillLoginsSavePasswordInlineDismissed
+
     case autofillLoginsSaveLoginModalExcludeSiteConfirmed
     case autofillLoginsSettingsResetExcludedDisplayed
     case autofillLoginsSettingsResetExcludedConfirmed
     case autofillLoginsSettingsResetExcludedDismissed
+
+    case autofillLoginsUpdatePasswordInlineDisplayed
+    case autofillLoginsUpdatePasswordInlineConfirmed
+    case autofillLoginsUpdatePasswordInlineDismissed
+
+    case autofillLoginsUpdateUsernameInlineDisplayed
+    case autofillLoginsUpdateUsernameInlineConfirmed
+    case autofillLoginsUpdateUsernameInlineDismissed
+
+    case autofillActiveUser
+    case autofillEnabledUser
+    case autofillOnboardedUser
+    case autofillLoginsStacked
+    case autofillCreditCardsStacked
 
     case bitwardenPasswordAutofilled
     case bitwardenPasswordSaved
@@ -54,12 +75,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case adClickAttributionDetected
     case adClickAttributionActive
     case adClickAttributionPageLoads
-
-    case emailEnabled
-    case emailDisabled
-    case emailUserPressedUseAddress
-    case emailUserPressedUseAlias
-    case emailUserCreatedAlias
 
     case jsPixel(_ pixel: AutofillUserScript.JSPixel)
 
@@ -86,21 +101,30 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerViewFromYoutubeAutomatic
     case duckPlayerViewFromSERP
     case duckPlayerViewFromOther
-    case duckPlayerSettingAlways
-    case duckPlayerSettingNever
+    case duckPlayerOverlayYoutubeImpressions
+    case duckPlayerOverlayYoutubeWatchHere
+    case duckPlayerSettingAlwaysDuckPlayer
+    case duckPlayerSettingAlwaysOverlaySERP
+    case duckPlayerSettingAlwaysOverlayYoutube
+    case duckPlayerSettingAlwaysSettings
+    case duckPlayerSettingNeverOverlaySERP
+    case duckPlayerSettingNeverOverlayYoutube
+    case duckPlayerSettingNeverSettings
     case duckPlayerSettingBackToDefault
+    case duckPlayerWatchOnYoutube
 
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
 
+    // Survey
+    case surveyRemoteMessageDisplayed(messageID: String)
+    case surveyRemoteMessageDismissed(messageID: String)
+    case surveyRemoteMessageOpened(messageID: String)
+
     // VPN
     case vpnBreakageReport(category: String, description: String, metadata: String)
 
-    // VPN
-    case networkProtectionRemoteMessageDisplayed(messageID: String)
-    case networkProtectionRemoteMessageDismissed(messageID: String)
-    case networkProtectionRemoteMessageOpened(messageID: String)
     case networkProtectionEnabledOnSearch
     case networkProtectionGeoswitchingOpened
     case networkProtectionGeoswitchingSetNearest
@@ -129,9 +153,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case dataBrokerProtectionWaitlistCardUITapped
     case dataBrokerProtectionWaitlistTermsAndConditionsDisplayed
     case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
-    case dataBrokerProtectionRemoteMessageDisplayed(messageID: String)
-    case dataBrokerProtectionRemoteMessageDismissed(messageID: String)
-    case dataBrokerProtectionRemoteMessageOpened(messageID: String)
 
     // Login Item events
     case dataBrokerEnableLoginItemDaily
@@ -139,14 +160,21 @@ enum GeneralPixel: PixelKitEventV2 {
     case dataBrokerResetLoginItemDaily
     case dataBrokerDisableAndDeleteDaily
 
-    // DataBrokerProtection Other
-    case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
-
     // Default Browser
     case defaultRequestedFromHomepage
     case defaultRequestedFromHomepageSetupView
     case defaultRequestedFromSettings
     case defaultRequestedFromOnboarding
+
+    // Adding to the Dock
+    case addToDockOnboardingStepPresented
+    case userAddedToDockDuringOnboarding
+    case userSkippedAddingToDockFromOnboarding
+    case startBrowsingOnboardingStepPresented
+    case addToDockNewTabPageCardPresented
+    case userAddedToDockFromNewTabPageCard
+    case userAddedToDockFromSettings
+    case serpAddedToDock
 
     case protectionToggledOffBreakageReport
     case toggleProtectionsDailyCount
@@ -156,6 +184,15 @@ enum GeneralPixel: PixelKitEventV2 {
     // Password Import Keychain Prompt
     case passwordImportKeychainPrompt
     case passwordImportKeychainPromptDenied
+
+    // Autocomplete
+    case autocompleteClickPhrase
+    case autocompleteClickWebsite
+    case autocompleteClickBookmark
+    case autocompleteClickFavorite
+    case autocompleteClickHistory
+    case autocompleteToggledOff
+    case autocompleteToggledOn
 
     // MARK: - Debug
 
@@ -275,10 +312,13 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncMetadataCouldNotLoadDatabase
     case syncBookmarksProviderInitializationFailed
     case syncBookmarksFailed
+    case syncBookmarksPatchCompressionFailed
     case syncCredentialsProviderInitializationFailed
     case syncCredentialsFailed
+    case syncCredentialsPatchCompressionFailed
     case syncSettingsFailed
     case syncSettingsMetadataUpdateFailed
+    case syncSettingsPatchCompressionFailed
     case syncSignupError(error: Error)
     case syncLoginError(error: Error)
     case syncLogoutError(error: Error)
@@ -301,11 +341,8 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case burnerTabMisplaced
 
-    case networkProtectionRemoteMessageFetchingFailed
-    case networkProtectionRemoteMessageStorageFailed
-    case dataBrokerProtectionRemoteMessageFetchingFailed
-    case dataBrokerProtectionRemoteMessageStorageFailed
-
+    case surveyRemoteMessageFetchingFailed
+    case surveyRemoteMessageStorageFailed
     case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
 
     // Tracks installation without tracking retention.
@@ -320,9 +357,6 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .crash:
             return "m_mac_crash"
-
-        case .brokenSiteReport:
-            return "epbf_macos_desktop"
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
@@ -344,6 +378,20 @@ enum GeneralPixel: PixelKitEventV2 {
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
 
+        case .autofillLoginsSaveLoginInlineDisplayed:
+            return "m_mac_autofill_logins_save_login_inline_displayed"
+        case .autofillLoginsSaveLoginInlineConfirmed:
+            return "m_mac_autofill_logins_save_login_inline_confirmed"
+        case .autofillLoginsSaveLoginInlineDismissed:
+            return "m_mac_autofill_logins_save_login_inline_dismissed"
+
+        case .autofillLoginsSavePasswordInlineDisplayed:
+            return "m_mac_autofill_logins_save_password_inline_displayed"
+        case .autofillLoginsSavePasswordInlineConfirmed:
+            return "m_mac_autofill_logins_save_password_inline_confirmed"
+        case .autofillLoginsSavePasswordInlineDismissed:
+            return "m_mac_autofill_logins_save_password_inline_dismissed"
+
         case .autofillLoginsSaveLoginModalExcludeSiteConfirmed:
             return "m_mac_autofill_logins_save_login_exclude_site_confirmed"
         case .autofillLoginsSettingsResetExcludedDisplayed:
@@ -352,6 +400,31 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_autofill_settings_reset_excluded_confirmed"
         case .autofillLoginsSettingsResetExcludedDismissed:
             return "m_mac_autofill_settings_reset_excluded_dismissed"
+
+        case .autofillLoginsUpdatePasswordInlineDisplayed:
+            return "m_mac_autofill_logins_update_password_inline_displayed"
+        case .autofillLoginsUpdatePasswordInlineConfirmed:
+            return "m_mac_autofill_logins_update_password_inline_confirmed"
+        case .autofillLoginsUpdatePasswordInlineDismissed:
+            return "m_mac_autofill_logins_update_password_inline_dismissed"
+
+        case .autofillLoginsUpdateUsernameInlineDisplayed:
+            return "m_mac_autofill_logins_update_username_inline_displayed"
+        case .autofillLoginsUpdateUsernameInlineConfirmed:
+            return "m_mac_autofill_logins_update_username_inline_confirmed"
+        case .autofillLoginsUpdateUsernameInlineDismissed:
+            return "m_mac_autofill_logins_update_username_inline_dismissed"
+
+        case .autofillActiveUser:
+            return "m_mac_autofill_activeuser"
+        case .autofillEnabledUser:
+            return "m_mac_autofill_enableduser"
+        case .autofillOnboardedUser:
+            return "m_mac_autofill_onboardeduser"
+        case .autofillLoginsStacked:
+            return "m_mac_autofill_logins_stacked"
+        case .autofillCreditCardsStacked:
+            return "m_mac_autofill_creditcards_stacked"
 
         case .bitwardenPasswordAutofilled:
             return "m_mac_bitwarden_autofill_password"
@@ -371,13 +444,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .adClickAttributionPageLoads:
             return "m_mac_ad_click_page_loads"
 
-            // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
-        case .emailEnabled: return "email_enabled_macos_desktop"
-        case .emailDisabled: return "email_disabled_macos_desktop"
-        case .emailUserPressedUseAddress: return "email_filled_main_macos_desktop"
-        case .emailUserPressedUseAlias: return "email_filled_random_macos_desktop"
-        case .emailUserCreatedAlias: return "email_generated_button_macos_desktop"
-
         case .jsPixel(let pixel):
             // Email pixels deliberately avoid using the `m_mac_` prefix.
             if pixel.isEmailPixel {
@@ -386,22 +452,22 @@ enum GeneralPixel: PixelKitEventV2 {
                 return "m_mac_\(pixel.pixelName)"
             }
         case .emailEnabledInitial:
-            return "m_mac.enable-email-protection.initial"
+            return "m_mac_enable-email-protection_initial"
 
         case .watchInDuckPlayerInitial:
-            return "m_mac.watch-in-duckplayer.initial"
+            return "m_mac_watch-in-duckplayer_initial"
         case .setAsDefaultInitial:
-            return "m_mac.set-as-default.initial"
+            return "m_mac_set-as-default_initial"
         case .importDataInitial:
-            return "m_mac.import-data.initial"
+            return "m_mac_import-data_initial"
         case .newTabInitial:
-            return "m_mac.new-tab-opened.initial"
+            return "m_mac_new-tab-opened_initial"
         case .favoriteSectionHidden:
-            return "m_mac.favorite-section-hidden"
+            return "m_mac_favorite-section-hidden"
         case .recentActivitySectionHidden:
-            return "m_mac.recent-activity-section-hidden"
+            return "m_mac_recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
-            return "m_mac.continue-setup-section-hidden"
+            return "m_mac_continue-setup-section-hidden"
 
             // Fire Button
         case .fireButtonFirstBurn:
@@ -421,12 +487,28 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_duck-player_view-from_serp"
         case .duckPlayerViewFromOther:
             return "m_mac_duck-player_view-from_other"
-        case .duckPlayerSettingAlways:
-            return "m_mac_duck-player_setting_always"
-        case .duckPlayerSettingNever:
-            return "m_mac_duck-player_setting_never"
+        case .duckPlayerSettingAlwaysSettings:
+            return "m_mac_duck-player_setting_always_settings"
+        case .duckPlayerOverlayYoutubeImpressions:
+            return "m_mac_duck-player_overlay_youtube_impressions"
+        case .duckPlayerOverlayYoutubeWatchHere:
+            return "m_mac_duck-player_overlay_youtube_watch_here"
+        case .duckPlayerSettingAlwaysDuckPlayer:
+            return "m_mac_duck-player_setting_always_duck-player"
+        case .duckPlayerSettingAlwaysOverlaySERP:
+            return "m_mac_duck-player_setting_always_overlay_serp"
+        case .duckPlayerSettingAlwaysOverlayYoutube:
+            return "m_mac_duck-player_setting_always_overlay_youtube"
+        case .duckPlayerSettingNeverOverlaySERP:
+            return "m_mac_duck-player_setting_never_overlay_serp"
+        case .duckPlayerSettingNeverOverlayYoutube:
+            return "m_mac_duck-player_setting_never_overlay_youtube"
+        case .duckPlayerSettingNeverSettings:
+            return "m_mac_duck-player_setting_never_settings"
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
+        case .duckPlayerWatchOnYoutube:
+            return "m_mac_duck-player_watch_on_youtube"
 
         case .dashboardProtectionAllowlistAdd:
             return "m_mac_mp_wla"
@@ -434,21 +516,21 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_mp_wlr"
 
         case .launchInitial:
-            return "m.mac.first-launch"
+            return "m_mac_first-launch"
         case .serpInitial:
-            return "m.mac.navigation.first-search"
+            return "m_mac_navigation_first-search"
         case .serpDay21to27:
-            return "m.mac.search-day-21-27.initial"
+            return "m_mac_search-day-21-27_initial"
 
         case .vpnBreakageReport:
             return "m_mac_vpn_breakage_report"
 
-        case .networkProtectionRemoteMessageDisplayed(let messageID):
-            return "m_mac_netp_remote_message_displayed_\(messageID)"
-        case .networkProtectionRemoteMessageDismissed(let messageID):
-            return "m_mac_netp_remote_message_dismissed_\(messageID)"
-        case .networkProtectionRemoteMessageOpened(let messageID):
-            return "m_mac_netp_remote_message_opened_\(messageID)"
+        case .surveyRemoteMessageDisplayed(let messageID):
+            return "m_mac_survey_remote_message_displayed_\(messageID)"
+        case .surveyRemoteMessageDismissed(let messageID):
+            return "m_mac_survey_remote_message_dismissed_\(messageID)"
+        case .surveyRemoteMessageOpened(let messageID):
+            return "m_mac_survey_remote_message_opened_\(messageID)"
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
 
@@ -488,14 +570,6 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_dbp_imp_terms"
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_dbp_ev_terms_accepted"
-        case .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn:
-            return "m_mac_dbp_error_when_fetching_subscription_auth_token_after_sign_in"
-        case .dataBrokerProtectionRemoteMessageDisplayed(let messageID):
-            return "m_mac_dbp_remote_message_displayed_\(messageID)"
-        case .dataBrokerProtectionRemoteMessageDismissed(let messageID):
-            return "m_mac_dbp_remote_message_dismissed_\(messageID)"
-        case .dataBrokerProtectionRemoteMessageOpened(let messageID):
-            return "m_mac_dbp_remote_message_opened_\(messageID)"
 
         case .dataBrokerEnableLoginItemDaily: return "m_mac_dbp_daily_login-item_enable"
         case .dataBrokerDisableLoginItemDaily: return "m_mac_dbp_daily_login-item_disable"
@@ -516,6 +590,15 @@ enum GeneralPixel: PixelKitEventV2 {
         case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
         case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
 
+        case .addToDockOnboardingStepPresented: return "m_mac_add_to_dock_onboarding_step_presented"
+        case .userAddedToDockDuringOnboarding: return "m_mac_user_added_to_dock_during_onboarding"
+        case .userSkippedAddingToDockFromOnboarding: return "m_mac_user_skipped_adding_to_dock_from_onboarding"
+        case .startBrowsingOnboardingStepPresented: return "m_mac_start_browsing_onboarding_step_presented"
+        case .addToDockNewTabPageCardPresented: return "m_mac_add_to_dock_new_tab_page_card_presented_u"
+        case .userAddedToDockFromNewTabPageCard: return "m_mac_user_added_to_dock_from_new_tab_page_card"
+        case .userAddedToDockFromSettings: return "m_mac_user_added_to_dock_from_settings"
+        case .serpAddedToDock: return "m_mac_serp_added_to_dock"
+
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
         case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"
         case .toggleReportDoNotSend: return "m_mac_toggle-report-do-not-send"
@@ -524,6 +607,15 @@ enum GeneralPixel: PixelKitEventV2 {
             // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
         case .passwordImportKeychainPromptDenied: return "m_mac_password_import_keychain_prompt_denied"
+
+            // Autocomplete
+        case .autocompleteClickPhrase: return "m_mac_autocomplete_click_phrase"
+        case .autocompleteClickWebsite: return "m_mac_autocomplete_click_website"
+        case .autocompleteClickBookmark: return "m_mac_autocomplete_click_bookmark"
+        case .autocompleteClickFavorite: return "m_mac_autocomplete_click_favorite"
+        case .autocompleteClickHistory: return "m_mac_autocomplete_click_history"
+        case .autocompleteToggledOff: return "m_mac_autocomplete_toggled_off"
+        case .autocompleteToggledOn: return "m_mac_autocomplete_toggled_on"
 
             // DEBUG
         case .assertionFailure:
@@ -731,10 +823,13 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
         case .syncBookmarksProviderInitializationFailed: return "sync_bookmarks_provider_initialization_failed"
         case .syncBookmarksFailed: return "sync_bookmarks_failed"
+        case .syncBookmarksPatchCompressionFailed: return "sync_bookmarks_patch_compression_failed"
         case .syncCredentialsProviderInitializationFailed: return "sync_credentials_provider_initialization_failed"
         case .syncCredentialsFailed: return "sync_credentials_failed"
+        case .syncCredentialsPatchCompressionFailed: return "sync_credentials_patch_compression_failed"
         case .syncSettingsFailed: return "sync_settings_failed"
         case .syncSettingsMetadataUpdateFailed: return "sync_settings_metadata_update_failed"
+        case .syncSettingsPatchCompressionFailed: return "sync_settings_patch_compression_failed"
         case .syncSignupError: return "sync_signup_error"
         case .syncLoginError: return "sync_login_error"
         case .syncLogoutError: return "sync_logout_error"
@@ -757,12 +852,8 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .burnerTabMisplaced: return "burner_tab_misplaced"
 
-        case .networkProtectionRemoteMessageFetchingFailed: return "netp_remote_message_fetching_failed"
-        case .networkProtectionRemoteMessageStorageFailed: return "netp_remote_message_storage_failed"
-
-        case .dataBrokerProtectionRemoteMessageFetchingFailed: return "dbp_remote_message_fetching_failed"
-        case .dataBrokerProtectionRemoteMessageStorageFailed: return "dbp_remote_message_storage_failed"
-
+        case .surveyRemoteMessageFetchingFailed: return "survey_remote_message_fetching_failed"
+        case .surveyRemoteMessageStorageFailed: return "survey_remote_message_storage_failed"
         case .loginItemUpdateError: return "login-item_update-error"
 
             // Installation Attribution

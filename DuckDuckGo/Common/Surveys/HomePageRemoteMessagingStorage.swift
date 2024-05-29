@@ -18,26 +18,21 @@
 
 import Foundation
 
-protocol HomePageRemoteMessagingStorage {
+protocol SurveyRemoteMessagingStorage {
 
-    func store<Message: Codable>(messages: [Message]) throws
-    func storedMessages<Message: Codable>() -> [Message]
+    func store(messages: [SurveyRemoteMessage]) throws
+    func storedMessages() -> [SurveyRemoteMessage]
 
     func dismissRemoteMessage(with id: String)
     func dismissedMessageIDs() -> [String]
 
 }
 
-final class DefaultHomePageRemoteMessagingStorage: HomePageRemoteMessagingStorage {
+final class DefaultSurveyRemoteMessagingStorage: SurveyRemoteMessagingStorage {
 
-    enum NetworkProtectionConstants {
-        static let dismissedMessageIdentifiersKey = "home.page.network-protection.dismissed-message-identifiers"
-        static let networkProtectionMessagesFileName = "network-protection-messages.json"
-    }
-
-    enum DataBrokerProtectionConstants {
-        static let dismissedMessageIdentifiersKey = "home.page.dbp.dismissed-message-identifiers"
-        static let networkProtectionMessagesFileName = "dbp-messages.json"
+    enum SurveyConstants {
+        static let dismissedMessageIdentifiersKey = "home.page.survey.dismissed-message-identifiers"
+        static let surveyMessagesFileName = "survey-messages.json"
     }
 
     private let userDefaults: UserDefaults
@@ -48,23 +43,16 @@ final class DefaultHomePageRemoteMessagingStorage: HomePageRemoteMessagingStorag
         URL.sandboxApplicationSupportURL
     }
 
-    static func networkProtection() -> DefaultHomePageRemoteMessagingStorage {
-        return DefaultHomePageRemoteMessagingStorage(
-            messagesFileName: NetworkProtectionConstants.networkProtectionMessagesFileName,
-            dismissedMessageIdentifiersKey: NetworkProtectionConstants.dismissedMessageIdentifiersKey
-        )
-    }
-
-    static func dataBrokerProtection() -> DefaultHomePageRemoteMessagingStorage {
-        return DefaultHomePageRemoteMessagingStorage(
-            messagesFileName: DataBrokerProtectionConstants.networkProtectionMessagesFileName,
-            dismissedMessageIdentifiersKey: DataBrokerProtectionConstants.dismissedMessageIdentifiersKey
+    static func surveys() -> DefaultSurveyRemoteMessagingStorage {
+        return DefaultSurveyRemoteMessagingStorage(
+            messagesFileName: SurveyConstants.surveyMessagesFileName,
+            dismissedMessageIdentifiersKey: SurveyConstants.dismissedMessageIdentifiersKey
         )
     }
 
     init(
         userDefaults: UserDefaults = .standard,
-        messagesDirectoryURL: URL = DefaultHomePageRemoteMessagingStorage.applicationSupportURL,
+        messagesDirectoryURL: URL = DefaultSurveyRemoteMessagingStorage.applicationSupportURL,
         messagesFileName: String,
         dismissedMessageIdentifiersKey: String
     ) {
@@ -73,15 +61,15 @@ final class DefaultHomePageRemoteMessagingStorage: HomePageRemoteMessagingStorag
         self.dismissedMessageIdentifiersKey = dismissedMessageIdentifiersKey
     }
 
-    func store<Message: Codable>(messages: [Message]) throws {
+    func store(messages: [SurveyRemoteMessage]) throws {
         let encoded = try JSONEncoder().encode(messages)
         try encoded.write(to: messagesURL)
     }
 
-    func storedMessages<Message: Codable>() -> [Message] {
+    func storedMessages() -> [SurveyRemoteMessage] {
         do {
             let messagesData = try Data(contentsOf: messagesURL)
-            let messages = try JSONDecoder().decode([Message].self, from: messagesData)
+            let messages = try JSONDecoder().decode([SurveyRemoteMessage].self, from: messagesData)
 
             return messages
         } catch {

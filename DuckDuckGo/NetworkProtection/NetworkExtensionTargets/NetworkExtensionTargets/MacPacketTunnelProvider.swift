@@ -141,8 +141,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #else
         let defaults = UserDefaults.netP
 #endif
-        let settings = VPNSettings(defaults: defaults)
-
         switch event {
         case .userBecameActive:
             PixelKit.fire(
@@ -327,8 +325,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Initialization
 
-    @MainActor
-    @objc public init() {
+    // swiftlint:disable:next function_body_length
+    @MainActor @objc public init() {
         let isSubscriptionEnabled = false
 
 #if NETP_SYSTEM_EXTENSION
@@ -338,25 +336,44 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #endif
 
         NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = AppVersion.shared.versionAndBuildNumber
-
         let settings = VPNSettings(defaults: defaults)
-        let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
+
+        // MARK: - Configure Subscription
+        let subscriptionUserDefaults = UserDefaults(suiteName: MacPacketTunnelProvider.subscriptionsAppGroup)!
+        let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
-        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                                            serviceName: Self.tokenServiceName,
                                                                            errorEvents: debugEvents,
                                                                            isSubscriptionEnabled: isSubscriptionEnabled,
                                                                            accessTokenProvider: { nil }
         )
+        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
+                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
+                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
+        // Align Subscription environment to the VPN environment
+        var subscriptionEnvironment = SubscriptionEnvironment.default
+        switch settings.selectedEnvironment {
+        case .production:
+            subscriptionEnvironment.serviceEnvironment = .production
+        case .staging:
+            subscriptionEnvironment.serviceEnvironment = .staging
+        }
 
-        let accountManager = AccountManager(subscriptionAppGroup: Self.subscriptionsAppGroup, accessTokenStorage: tokenStore)
+        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let accountManager = AccountManager(accessTokenStorage: tokenStore,
+                                            entitlementsCache: entitlementsCache,
+                                            subscriptionService: subscriptionService,
+                                            authService: authService)
 
-        SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
         let entitlementsCheck = {
             await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
+
+        let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
+        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
 
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,

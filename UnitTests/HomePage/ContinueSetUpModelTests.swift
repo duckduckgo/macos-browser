@@ -21,41 +21,21 @@ import BrowserServicesKit
 import Common
 @testable import DuckDuckGo_Privacy_Browser
 
-final class MockNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging {
+final class MockSurveyRemoteMessaging: SurveyRemoteMessaging {
 
-    var messages: [NetworkProtectionRemoteMessage] = []
+    var messages: [SurveyRemoteMessage] = []
 
-    func fetchRemoteMessages(completion fetchCompletion: (() -> Void)? = nil) {
-        fetchCompletion?()
+    func fetchRemoteMessages() async {
+        return
     }
 
-    func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage] {
+    func presentableRemoteMessages() -> [SurveyRemoteMessage] {
         messages
     }
 
-    func dismiss(message: NetworkProtectionRemoteMessage) {}
+    func dismiss(message: SurveyRemoteMessage) {}
 
 }
-
-#if DBP
-
-final class MockDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging {
-
-    var messages: [DataBrokerProtectionRemoteMessage] = []
-
-    func fetchRemoteMessages(completion fetchCompletion: (() -> Void)? = nil) {
-        fetchCompletion?()
-    }
-
-    func presentableRemoteMessages() -> [DataBrokerProtectionRemoteMessage] {
-        messages
-    }
-
-    func dismiss(message: DataBrokerProtectionRemoteMessage) {}
-
-}
-
-#endif
 
 final class ContinueSetUpModelTests: XCTestCase {
 
@@ -69,6 +49,8 @@ final class ContinueSetUpModelTests: XCTestCase {
     var coookiePopupProtectionPreferences: MockCookiePopupProtectionPreferencesPersistor!
     var privacyConfigManager: MockPrivacyConfigurationManager!
     var randomNumberGenerator: MockRandomNumberGenerator!
+    var dockCustomizer: DockCustomization!
+    var mockSurveyMessaging: SurveyRemoteMessaging!
     let userDefaults = UserDefaults(suiteName: "\(Bundle.main.bundleIdentifier!).\(NSApplication.runType)")!
 
     @MainActor override func setUp() {
@@ -86,28 +68,17 @@ final class ContinueSetUpModelTests: XCTestCase {
         let config = MockPrivacyConfiguration()
         privacyConfigManager.privacyConfig = config
         randomNumberGenerator = MockRandomNumberGenerator()
-
-#if DBP
-        let messaging = HomePageRemoteMessaging(
-            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
-            networkProtectionUserDefaults: userDefaults,
-            dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
-            dataBrokerProtectionUserDefaults: userDefaults
-        )
-#else
-        let messaging = HomePageRemoteMessaging(
-            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
-            networkProtectionUserDefaults: userDefaults
-        )
-#endif
+        mockSurveyMessaging = MockSurveyRemoteMessaging()
+        dockCustomizer = DockCustomizerMock()
 
         vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
+            dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences,
-            homePageRemoteMessaging: messaging,
+            surveyRemoteMessaging: mockSurveyMessaging,
             privacyConfigurationManager: privacyConfigManager,
             permanentSurveyManager: MockPermanentSurveyManager()
         )
@@ -146,11 +117,12 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
+            dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences,
-            homePageRemoteMessaging: createMessaging(),
+            surveyRemoteMessaging: createMessaging(),
             permanentSurveyManager: MockPermanentSurveyManager()
         )
 
@@ -226,6 +198,7 @@ final class ContinueSetUpModelTests: XCTestCase {
 
     @MainActor func testWhenAskedToPerformActionForImportPromptThrowsThenItOpensImportWindow() {
         let numberOfFeatures = HomePage.Models.FeatureType.allCases.count - 1
+
         vm.shouldShowAllFeatures = true
         XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures)
 
@@ -353,15 +326,17 @@ final class ContinueSetUpModelTests: XCTestCase {
         emailStorage.isEmailProtectionEnabled = true
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         capturingDataImportProvider.didImport = true
+        dockCustomizer.addToDock()
         userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageShowPermanentSurvey.rawValue)
 
         vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
+            dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences,
-            homePageRemoteMessaging: createMessaging(),
+            surveyRemoteMessaging: createMessaging(),
             permanentSurveyManager: MockPermanentSurveyManager()
         )
 
@@ -384,6 +359,11 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.removeItem(for: .emailProtection)
         XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.emailProtection))
+
+#if !APPSTORE
+        vm.removeItem(for: .dock)
+        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.dock))
+#endif
 
         let vm2 = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults)
         XCTAssertTrue(vm2.visibleFeaturesMatrix.flatMap { $0 }.isEmpty)
@@ -455,17 +435,18 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertFalse(vm2.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
     }
 
-    @MainActor func testWhenAskedToPerformActionForPermanetShowsTheSurveySite() async {
+    @MainActor func testWhenAskedToPerformActionForPermanentShowsTheSurveySite() async {
         let expectedURL = URL(string: "someurl.com")
         let surveyManager = MockPermanentSurveyManager(isSurveyAvailable: true, url: expectedURL)
         userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
         let vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
+            dockCustomizer: dockCustomizer,
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences,
-            homePageRemoteMessaging: createMessaging(),
+            surveyRemoteMessaging: createMessaging(),
             privacyConfigurationManager: privacyConfigManager,
             permanentSurveyManager: surveyManager
         )
@@ -496,20 +477,29 @@ final class ContinueSetUpModelTests: XCTestCase {
         return features.chunked(into: HomePage.featuresPerRow)
     }
 
-    private func createMessaging() -> HomePageRemoteMessaging {
-#if DBP
-        return HomePageRemoteMessaging(
-            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
-            networkProtectionUserDefaults: userDefaults,
-            dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
-            dataBrokerProtectionUserDefaults: userDefaults
-        )
-#else
-        return HomePageRemoteMessaging(
-            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
-            networkProtectionUserDefaults: userDefaults
-        )
+    private func createMessaging() -> SurveyRemoteMessaging {
+        MockSurveyRemoteMessaging()
+    }
+
+    @MainActor func test_WhenUserDoesntHaveApplicationInTheDock_ThenAddToDockCardIsDisplayed() {
+#if !APPSTORE
+        let dockCustomizer = DockCustomizerMock()
+
+        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, dockCustomizer: dockCustomizer)
+        vm.shouldShowAllFeatures = true
+
+        XCTAssert(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.dock))
 #endif
+    }
+
+    @MainActor func test_WhenUserHasApplicationInTheDock_ThenAddToDockCardIsNotDisplayed() {
+        let dockCustomizer = DockCustomizerMock()
+        dockCustomizer.addToDock()
+
+        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, dockCustomizer: dockCustomizer)
+        vm.shouldShowAllFeatures = true
+
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.dock))
     }
 
 }
@@ -523,7 +513,8 @@ extension HomePage.Models.ContinueSetUpModel {
         privacyConfig: MockPrivacyConfiguration = MockPrivacyConfiguration(),
         appGroupUserDefaults: UserDefaults,
         permanentSurveyManager: MockPermanentSurveyManager = MockPermanentSurveyManager(),
-        randomNumberGenerator: RandomNumberGenerating = MockRandomNumberGenerator()
+        randomNumberGenerator: RandomNumberGenerating = MockRandomNumberGenerator(),
+        dockCustomizer: DockCustomization = DockCustomizerMock()
     ) -> HomePage.Models.ContinueSetUpModel {
         privacyConfig.featureSettings = [
             "networkProtection": "disabled"
@@ -531,27 +522,14 @@ extension HomePage.Models.ContinueSetUpModel {
         let manager = MockPrivacyConfigurationManager()
         manager.privacyConfig = privacyConfig
 
-#if DBP
-        let messaging = HomePageRemoteMessaging(
-            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
-            networkProtectionUserDefaults: appGroupUserDefaults,
-            dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
-            dataBrokerProtectionUserDefaults: appGroupUserDefaults
-        )
-#else
-        let messaging = HomePageRemoteMessaging(
-            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
-            networkProtectionUserDefaults: appGroupUserDefaults
-        )
-#endif
-
         return HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: defaultBrowserProvider,
+            dockCustomizer: dockCustomizer,
             dataImportProvider: dataImportProvider,
             tabCollectionViewModel: TabCollectionViewModel(),
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences,
-            homePageRemoteMessaging: messaging,
+            surveyRemoteMessaging: MockSurveyRemoteMessaging(),
             privacyConfigurationManager: manager,
             permanentSurveyManager: permanentSurveyManager)
     }
