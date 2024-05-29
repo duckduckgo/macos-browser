@@ -21,18 +21,18 @@ import SwiftUI
 
 final class DataImportShortcutsViewModel: ObservableObject {
 
-    let prefs: AppearancePreferences
-    let pinningManager: LocalPinningManager
+    private let prefs: AppearancePreferences
+    private let pinningManager: LocalPinningManager
 
-    @Published var showBookmarksBarStatusBool: Bool {
+    @Published var showBookmarksBarStatus: Bool {
         didSet {
-            prefs.showBookmarksBar = showBookmarksBarStatusBool
+            prefs.showBookmarksBar = showBookmarksBarStatus
         }
     }
 
-    @Published var showPasswordsPinnedStatusBool: Bool {
+    @Published var showPasswordsPinnedStatus: Bool {
         didSet {
-            if showPasswordsPinnedStatusBool {
+            if showPasswordsPinnedStatus {
                 pinningManager.pin(.autofill)
                 NotificationCenter.default.post(name: .passwordsAutoPinned, object: nil)
             } else {
@@ -45,7 +45,7 @@ final class DataImportShortcutsViewModel: ObservableObject {
         self.prefs = prefs
         self.pinningManager = pinningManager
 
-        showBookmarksBarStatusBool = prefs.showBookmarksBar
-        showPasswordsPinnedStatusBool = pinningManager.isPinned(.autofill)
+        showBookmarksBarStatus = prefs.showBookmarksBar
+        showPasswordsPinnedStatus = pinningManager.isPinned(.autofill)
     }
 }

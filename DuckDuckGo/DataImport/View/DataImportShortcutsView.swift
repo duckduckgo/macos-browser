@@ -20,7 +20,7 @@ import SwiftUI
 
 struct DataImportShortcutsView: ModalView {
 
-    @ObservedObject var model: DataImportShortcutsViewModel
+    @ObservedObject private var model: DataImportShortcutsViewModel
 
     init(model: DataImportShortcutsViewModel = DataImportShortcutsViewModel()) {
         self.model = model
@@ -41,7 +41,7 @@ struct DataImportShortcutsView: ModalView {
                 .padding(.top, 0)
                 .padding(.bottom, 1)
                 Spacer()
-                Toggle("", isOn: $model.showBookmarksBarStatusBool)
+                Toggle("", isOn: $model.showBookmarksBarStatus)
                     .toggleStyle(.switch)
             }
             .padding()
@@ -62,7 +62,7 @@ struct DataImportShortcutsView: ModalView {
                 .padding(.bottom, 1)
 
                 Spacer()
-                Toggle("", isOn: $model.showPasswordsPinnedStatusBool)
+                Toggle("", isOn: $model.showPasswordsPinnedStatus)
                     .toggleStyle(.switch)
             }
             .padding()
