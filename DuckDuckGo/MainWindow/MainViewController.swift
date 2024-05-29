@@ -72,8 +72,11 @@ final class MainViewController: NSViewController {
 
             let ipcClient = TunnelControllerIPCClient()
             ipcClient.register()
+            let vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
 
-            return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient, networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler())
+            return NetworkProtectionNavBarPopoverManager(
+                ipcClient: ipcClient,
+                vpnUninstaller: vpnUninstaller)
         }()
         let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
             var connectivityIssuesObserver: ConnectivityIssueObserver!
@@ -189,13 +192,8 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
-
-        refreshNetworkProtectionMessages()
-
-#if DBP
+        refreshSurveyMessages()
         DataBrokerProtectionAppEvents().windowDidBecomeMain()
-        refreshDataBrokerProtectionMessages()
-#endif
     }
 
     func windowDidResignKey() {
@@ -217,19 +215,15 @@ final class MainViewController: NSViewController {
         }
     }
 
-    private let networkProtectionMessaging = DefaultNetworkProtectionRemoteMessaging()
+    private lazy var surveyMessaging: DefaultSurveyRemoteMessaging = {
+        return DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager)
+    }()
 
-    func refreshNetworkProtectionMessages() {
-        networkProtectionMessaging.fetchRemoteMessages()
+    func refreshSurveyMessages() {
+        Task {
+            await surveyMessaging.fetchRemoteMessages()
+        }
     }
-
-#if DBP
-    private let dataBrokerProtectionMessaging = DefaultDataBrokerProtectionRemoteMessaging()
-
-    func refreshDataBrokerProtectionMessages() {
-        dataBrokerProtectionMessaging.fetchRemoteMessages()
-    }
-#endif
 
     override func encodeRestorableState(with coder: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")

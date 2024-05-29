@@ -40,7 +40,7 @@ enum SubscriptionError: Error {
 struct SubscriptionErrorReporter {
 
     // swiftlint:disable:next cyclomatic_complexity
-    static func report(subscriptionActivationError: SubscriptionError) {
+    func report(subscriptionActivationError: SubscriptionError) {
 
         os_log(.error, log: .subscription, "Subscription purchase error: %{public}s", subscriptionActivationError.localizedDescription)
 

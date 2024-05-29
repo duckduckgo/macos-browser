@@ -150,10 +150,13 @@ final class HomePageViewController: NSViewController {
     func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
         return HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            dockCustomizer: DockCustomizer(),
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
             tabCollectionViewModel: tabCollectionViewModel,
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(),
-            homePageRemoteMessaging: .defaultMessaging()
+            surveyRemoteMessaging: DefaultSurveyRemoteMessaging(
+                subscriptionManager: Application.appDelegate.subscriptionManager
+            )
         )
     }
 

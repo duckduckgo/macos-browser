@@ -102,7 +102,12 @@ final class FindInPageViewController: NSViewController {
     }
 
     func makeMeFirstResponder() {
-        textField.makeMeFirstResponder()
+        if textField.isFirstResponder {
+            // select all on Cmd+F while editing
+            textField.currentEditor()?.selectAll(nil)
+        } else {
+            textField.makeMeFirstResponder()
+        }
     }
 
     private func subscribeToModelChanges() {

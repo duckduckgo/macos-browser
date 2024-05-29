@@ -39,6 +39,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
     func optionsButtonMenuRequestedPreferences(_ menu: NSMenu)
     func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu)
+    func optionsButtonMenuRequestedAccessibilityPreferences(_ menu: NSMenu)
 #if DBP
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
 #endif
@@ -56,7 +57,7 @@ final class MoreOptionsMenu: NSMenu {
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
-    private lazy var accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+    private let accountManager: AccountManaging
 
     private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
 
@@ -67,15 +68,17 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
-         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility,
          sharingMenu: NSMenu? = nil,
-         internalUserDecider: InternalUserDecider) {
+         internalUserDecider: InternalUserDecider,
+         accountManager: AccountManaging) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
         self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
         self.internalUserDecider = internalUserDecider
+        self.accountManager = accountManager
 
         super.init(title: "")
 
@@ -87,7 +90,7 @@ final class MoreOptionsMenu: NSMenu {
         setupMenuItems()
     }
 
-    let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
+    let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "").withImage(.optionsButtonMenuZoom)
 
     private func setupMenuItems() {
 
@@ -221,6 +224,10 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func openAppearancePreferences(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedAppearancePreferences(self)
+    }
+
+    @objc func openAccessibilityPreferences(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedAccessibilityPreferences(self)
     }
 
     @objc func openSubscriptionPurchasePage(_ sender: NSMenuItem) {
@@ -386,7 +393,9 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
-        let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
+        let subscriptionManager = Application.appDelegate.subscriptionManager
+        let platform = subscriptionManager.currentEnvironment.purchasePlatform
+        let shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
         if shouldHidePrivacyProDueToNoProducts {
             return []
         }
@@ -606,7 +615,7 @@ final class ZoomSubMenu: NSMenu {
 
         addItem(.separator())
 
-        let globalZoomSettingItem = NSMenuItem(title: UserText.defaultZoomPageMoreOptionsItem, action: #selector(MoreOptionsMenu.openAppearancePreferences(_:)), keyEquivalent: "")
+        let globalZoomSettingItem = NSMenuItem(title: UserText.defaultZoomPageMoreOptionsItem, action: #selector(MoreOptionsMenu.openAccessibilityPreferences(_:)), keyEquivalent: "")
             .targetting(target)
         addItem(globalZoomSettingItem)
     }

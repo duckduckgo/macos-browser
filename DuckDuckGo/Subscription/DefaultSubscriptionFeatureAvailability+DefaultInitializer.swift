@@ -17,12 +17,14 @@
 //
 
 import Foundation
+import AppKit
 import Subscription
 import BrowserServicesKit
 
 extension DefaultSubscriptionFeatureAvailability {
+
     convenience init() {
         self.init(privacyConfigurationManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-                  purchasePlatform: SubscriptionPurchaseEnvironment.current)
+                  purchasePlatform: Application.appDelegate.subscriptionManager.currentEnvironment.purchasePlatform)
     }
 }

@@ -94,6 +94,7 @@ public struct UserDefaultsWrapper<T> {
         case switchToNewTabWhenOpened = "preferences.tabs.switch-to-new-tab-when-opened"
         case newTabPosition = "preferences.tabs.new-tab-position"
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
+        case websitePageZoom = "preferences.appearance.website-page-zoom"
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
 
         case homeButtonPosition = "preferences.appeareance.home-button-position"
@@ -116,6 +117,7 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowAllFavorites = "home.page.show.all.favorites"
         case homePageShowAllFeatures = "home.page.show.all.features"
         case homePageShowMakeDefault = "home.page.show.make.default"
+        case homePageShowAddToDock = "home.page.show.add.to.dock"
         case homePageShowImport = "home.page.show.import"
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"

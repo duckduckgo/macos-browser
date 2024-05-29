@@ -27,7 +27,7 @@ protocol DataBrokerProtectionRepository {
 
     func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker]
 
-    func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws
+    func saveOptOutJob(optOut: OptOutJobData, extractedProfile: ExtractedProfile) throws
 
     func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) throws -> BrokerProfileQueryData?
     func fetchAllBrokerProfileQueryData() throws -> [BrokerProfileQueryData]
@@ -133,20 +133,20 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             guard let broker = try vault.fetchBroker(with: brokerId),
                   let profileQuery = try vault.fetchProfileQuery(with: profileQueryId),
-                  let scanOperation = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else {
+                  let scanJob = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else {
                 let error = DataBrokerProtectionError.dataNotInDatabase
                 os_log("Database error: brokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
                 pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.brokerProfileQueryData for brokerId and profileQueryId"))
                 throw error
             }
 
-            let optOutOperations = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
+            let optOutJobs = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
 
             return BrokerProfileQueryData(
                 dataBroker: broker,
                 profileQuery: profileQuery,
-                scanOperationData: scanOperation,
-                optOutOperationsData: optOutOperations
+                scanJobData: scanJob,
+                optOutJobData: optOutJobs
             )
         } catch {
             os_log("Database error: brokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
@@ -258,14 +258,14 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             for broker in brokers {
                 for profileQuery in profileQueries {
                     if let brokerId = broker.id, let profileQueryId = profileQuery.id {
-                        guard let scanOperation = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else { continue }
-                        let optOutOperations = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
+                        guard let scanJob = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else { continue }
+                        let optOutJobs = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
 
                         let brokerProfileQueryData = BrokerProfileQueryData(
                             dataBroker: broker,
                             profileQuery: profileQuery,
-                            scanOperationData: scanOperation,
-                            optOutOperationsData: optOutOperations
+                            scanJobData: scanJob,
+                            optOutJobData: optOutJobs
                         )
 
                         brokerProfileQueryDataList.append(brokerProfileQueryData)
@@ -281,7 +281,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
-    func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws {
+    func saveOptOutJob(optOut: OptOutJobData, extractedProfile: ExtractedProfile) throws {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
 
