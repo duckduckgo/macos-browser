@@ -123,7 +123,7 @@ final class VPNUninstaller: VPNUninstalling {
     private let settings: VPNSettings
     private let userDefaults: UserDefaults
     private let vpnMenuLoginItem: LoginItem
-    private let ipcClient: TunnelControllerIPCClient
+    private let ipcClient: VPNControllerIPCClient
     private let pixelKit: PixelFiring?
 
     @MainActor
@@ -133,7 +133,7 @@ final class VPNUninstaller: VPNUninstalling {
          pinningManager: LocalPinningManager = .shared,
          userDefaults: UserDefaults = .netP,
          settings: VPNSettings = .init(defaults: .netP),
-         ipcClient: TunnelControllerIPCClient = TunnelControllerIPCClient(),
+         ipcClient: VPNControllerIPCClient = VPNControllerUDSClient(),
          vpnMenuLoginItem: LoginItem = .vpnMenu,
          pixelKit: PixelFiring? = PixelKit.shared,
          log: OSLog = .networkProtection) {
@@ -184,7 +184,11 @@ final class VPNUninstaller: VPNUninstalling {
             // Allow some time for the login items to fully launch
 
             do {
-                try await ipcClient.command(.uninstallVPN)
+                if removeSystemExtension {
+                    try await ipcClient.execute(.uninstallVPN)
+                } else {
+                    try await ipcClient.execute(.removeVPNConfiguration)
+                }
             } catch {
                 print("Failed to uninstall VPN, with error: \(error.localizedDescription)")
 
@@ -224,7 +228,7 @@ final class VPNUninstaller: VPNUninstalling {
     func removeSystemExtension() async throws {
 #if NETP_SYSTEM_EXTENSION
         do {
-            try await ipcClient.command(.removeSystemExtension)
+            try await ipcClient.execute(.removeSystemExtension)
         } catch {
             throw UninstallError.systemExtensionError(error)
         }
@@ -238,7 +242,7 @@ final class VPNUninstaller: VPNUninstalling {
     private func removeVPNConfiguration() async throws {
         // Remove the agent VPN configuration
         do {
-            try await ipcClient.command(.removeVPNConfiguration)
+            try await ipcClient.execute(.removeVPNConfiguration)
         } catch {
             throw UninstallError.vpnConfigurationError(error)
         }

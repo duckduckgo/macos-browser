@@ -70,7 +70,7 @@ final class MainViewController: NSViewController {
             }
 #endif
 
-            let ipcClient = TunnelControllerIPCClient()
+            let ipcClient = VPNControllerXPCClient()
             ipcClient.register()
             let vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
 

@@ -1,5 +1,5 @@
 //
-//  TunnelControllerIPCClient.swift
+//  VPNControllerXPCClient.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import XPCHelper
 
 /// This protocol describes the client-side IPC interface for controlling the tunnel
 ///
-public protocol IPCClientInterface: AnyObject {
+public protocol XPCClientInterface: AnyObject {
     func errorChanged(_ error: String?)
     func serverInfoChanged(_ serverInfo: NetworkProtectionStatusServerInfo)
     func statusChanged(_ status: ConnectionStatus)
@@ -31,18 +31,18 @@ public protocol IPCClientInterface: AnyObject {
 
 /// This is the XPC interface with parameters that can be packed properly
 @objc
-protocol XPCClientInterface {
+protocol XPCClientInterfaceObjC {
     func errorChanged(error: String?)
     func serverInfoChanged(payload: Data)
     func statusChanged(payload: Data)
     func dataVolumeUpdated(payload: Data)
 }
 
-public final class TunnelControllerIPCClient {
+public final class VPNControllerXPCClient {
 
     // MARK: - XPC Communication
 
-    let xpc: XPCClient<XPCClientInterface, XPCServerInterface>
+    let xpc: XPCClient<XPCClientInterfaceObjC, XPCServerInterfaceObjC>
 
     // MARK: - Observers offered
 
@@ -53,7 +53,7 @@ public final class TunnelControllerIPCClient {
 
     /// The delegate.
     ///
-    public weak var clientDelegate: IPCClientInterface? {
+    public weak var clientDelegate: XPCClientInterface? {
         didSet {
             xpcDelegate.clientDelegate = self.clientDelegate
         }
@@ -62,8 +62,8 @@ public final class TunnelControllerIPCClient {
     private let xpcDelegate: TunnelControllerXPCClientDelegate
 
     public init(machServiceName: String) {
-        let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
-        let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
+        let clientInterface = NSXPCInterface(with: XPCClientInterfaceObjC.self)
+        let serverInterface = NSXPCInterface(with: XPCServerInterfaceObjC.self)
         self.xpcDelegate = TunnelControllerXPCClientDelegate(
             clientDelegate: self.clientDelegate,
             serverInfoObserver: self.serverInfoObserver,
@@ -95,15 +95,15 @@ public final class TunnelControllerIPCClient {
     }
 }
 
-private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
+private final class TunnelControllerXPCClientDelegate: XPCClientInterfaceObjC {
 
-    weak var clientDelegate: IPCClientInterface?
+    weak var clientDelegate: XPCClientInterface?
     let serverInfoObserver: ConnectionServerInfoObserverThroughIPC
     let connectionErrorObserver: ConnectionErrorObserverThroughIPC
     let connectionStatusObserver: ConnectionStatusObserverThroughIPC
     let dataVolumeObserver: DataVolumeObserverThroughIPC
 
-    init(clientDelegate: IPCClientInterface?,
+    init(clientDelegate: XPCClientInterface?,
          serverInfoObserver: ConnectionServerInfoObserverThroughIPC,
          connectionErrorObserver: ConnectionErrorObserverThroughIPC,
          connectionStatusObserver: ConnectionStatusObserverThroughIPC,
@@ -150,7 +150,7 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
 
 // MARK: - Outgoing communication to the server
 
-extension TunnelControllerIPCClient: IPCServerInterface {
+extension VPNControllerXPCClient: XPCServerInterface {
     public func register() {
         xpc.execute(call: { server in
             server.register()
@@ -197,6 +197,45 @@ extension TunnelControllerIPCClient: IPCServerInterface {
                 // If you add a completion block, please remember to call it here too!
                 continuation.resume(throwing: error)
             })
+        }
+    }
+}
+
+extension VPNControllerXPCClient: VPNControllerIPCClient {
+
+    /// Here we implement support for ``VPNControllerIPCClient``, which is a simplified
+    /// command mechanism.
+    ///
+    public func execute(_ command: VPNIPCServerCommand) async throws {
+        switch command {
+        case .start:
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                self.start { error in
+                    if let error {
+                        continuation.resume(throwing: error)
+                        return
+                    }
+
+                    continuation.resume()
+                }
+            }
+        case .stop:
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                self.stop { error in
+                    if let error {
+                        continuation.resume(throwing: error)
+                        return
+                    }
+
+                    continuation.resume()
+                }
+            }
+        case .removeSystemExtension:
+            try await self.command(.removeSystemExtension)
+        case .removeVPNConfiguration:
+            try await self.command(.removeVPNConfiguration)
+        case .uninstallVPN:
+            try await self.command(.uninstallVPN)
         }
     }
 }

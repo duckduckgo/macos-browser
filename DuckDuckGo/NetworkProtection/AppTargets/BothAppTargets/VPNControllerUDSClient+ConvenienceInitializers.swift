@@ -1,5 +1,5 @@
 //
-//  VPNIPCServerCommand.swift
+//  VPNControllerUDSClient+ConvenienceInitializers.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,11 +17,15 @@
 //
 
 import Foundation
+import NetworkProtectionIPC
+import UDSHelper
 
-public enum VPNIPCServerCommand: Codable {
-    case start
-    case stop
-    case removeSystemExtension
-    case removeVPNConfiguration
-    case uninstallVPN
+extension VPNControllerUDSClient {
+    convenience init(fileManager: FileManager = .default, bundle: Bundle = .main) {
+        let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: bundle.appGroup(bundle: .ipc))!.appendingPathComponent("vpn.ipc")
+
+        let udsClient = UDSClient<VPNIPCClientCommand, VPNIPCServerCommand>(socketFileURL: socketFileURL, log: .networkProtectionIPCLog)
+
+        self.init(udsClient: udsClient)
+    }
 }

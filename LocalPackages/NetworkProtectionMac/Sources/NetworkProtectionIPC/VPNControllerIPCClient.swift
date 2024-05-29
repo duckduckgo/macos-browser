@@ -1,5 +1,5 @@
 //
-//  VPNIPCServerCommand.swift
+//  VPNControllerIPCClient.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
+import NetworkProtection
 
-public enum VPNIPCServerCommand: Codable {
-    case start
-    case stop
-    case removeSystemExtension
-    case removeVPNConfiguration
-    case uninstallVPN
+public protocol VPNControllerIPCClient {
+    func execute(_ command: VPNIPCServerCommand) async throws
 }

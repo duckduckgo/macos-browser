@@ -216,7 +216,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
 
         // Configure Event handlers
-        let ipcClient = TunnelControllerIPCClient()
+        let ipcClient = VPNControllerXPCClient()
         let tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
         let vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
 

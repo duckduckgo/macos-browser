@@ -33,7 +33,7 @@ final class TunnelControllerIPCService {
     private let tunnelController: NetworkProtectionTunnelController
     private let networkExtensionController: NetworkExtensionController
     private let uninstaller: VPNUninstalling
-    private let server: NetworkProtectionIPC.TunnelControllerIPCServer
+    private let server: NetworkProtectionIPC.VPNControllerXPCServer
     private let statusReporter: NetworkProtectionStatusReporter
     private var cancellables = Set<AnyCancellable>()
     private let defaults: UserDefaults
@@ -82,6 +82,18 @@ final class TunnelControllerIPCService {
                     stop { _ in
                         // no-op
                     }
+                case .removeSystemExtension:
+                    Task {
+                        try await self.command(.removeSystemExtension)
+                    }
+                case .removeVPNConfiguration:
+                    Task {
+                        try await self.command(.removeVPNConfiguration)
+                    }
+                case .uninstallVPN:
+                    Task {
+                        try await self.command(.uninstallVPN)
+                    }
                 }
             }
         } catch {
@@ -128,7 +140,7 @@ final class TunnelControllerIPCService {
 
 // MARK: - Requests from the client
 
-extension TunnelControllerIPCService: IPCServerInterface {
+extension TunnelControllerIPCService: XPCServerInterface {
 
     func register() {
         server.serverInfoChanged(statusReporter.serverInfoObserver.recentValue)

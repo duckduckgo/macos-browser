@@ -25,7 +25,7 @@ final class TunnelControllerProvider {
     let tunnelController: NetworkProtectionIPCTunnelController
 
     private init() {
-        let ipcClient = TunnelControllerIPCClient()
+        let ipcClient = VPNControllerXPCClient()
         ipcClient.register()
         tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
     }

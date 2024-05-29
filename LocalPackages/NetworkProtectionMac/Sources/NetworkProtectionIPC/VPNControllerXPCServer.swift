@@ -1,5 +1,5 @@
 //
-//  TunnelControllerIPCServer.swift
+//  VPNControllerXPCServer.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import XPCHelper
 
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
-public protocol IPCServerInterface: AnyObject {
+public protocol XPCServerInterface: AnyObject {
     /// Registers a connection with the server.
     ///
     /// This is the point where the server will start sending status updates to the client.
@@ -60,7 +60,7 @@ public protocol IPCServerInterface: AnyObject {
 /// calls to the IPC interface when appropriate.
 ///
 @objc
-protocol XPCServerInterface {
+protocol XPCServerInterfaceObjC {
     /// Registers a connection with the server.
     ///
     /// This is the point where the server will start sending status updates to the client.
@@ -84,8 +84,8 @@ protocol XPCServerInterface {
     func command(_ payload: Data, completion: @escaping (Error?) -> Void)
 }
 
-public final class TunnelControllerIPCServer {
-    let xpc: XPCServer<XPCClientInterface, XPCServerInterface>
+public final class VPNControllerXPCServer {
+    let xpc: XPCServer<XPCClientInterfaceObjC, XPCServerInterfaceObjC>
 
     enum IPCError: Error {
         case cannotDecodeDebugCommand
@@ -93,11 +93,11 @@ public final class TunnelControllerIPCServer {
 
     /// The delegate.
     ///
-    public weak var serverDelegate: IPCServerInterface?
+    public weak var serverDelegate: XPCServerInterface?
 
     public init(machServiceName: String) {
-        let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
-        let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
+        let clientInterface = NSXPCInterface(with: XPCClientInterfaceObjC.self)
+        let serverInterface = NSXPCInterface(with: XPCServerInterfaceObjC.self)
 
         xpc = XPCServer(
             machServiceName: machServiceName,
@@ -114,7 +114,7 @@ public final class TunnelControllerIPCServer {
 
 // MARK: - Outgoing communication to the clients
 
-extension TunnelControllerIPCServer: IPCClientInterface {
+extension VPNControllerXPCServer: XPCClientInterface {
 
     public func errorChanged(_ error: String?) {
         xpc.forEachClient { client in
@@ -169,7 +169,8 @@ extension TunnelControllerIPCServer: IPCClientInterface {
 
 // MARK: - Incoming communication from a client
 
-extension TunnelControllerIPCServer: XPCServerInterface {
+extension VPNControllerXPCServer: XPCServerInterfaceObjC {
+
     func register() {
         serverDelegate?.register()
     }

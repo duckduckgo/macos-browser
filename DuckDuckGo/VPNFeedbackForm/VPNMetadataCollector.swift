@@ -119,14 +119,14 @@ protocol VPNMetadataCollector {
 final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
     private let statusReporter: NetworkProtectionStatusReporter
-    private let ipcClient: TunnelControllerIPCClient
+    private let ipcClient: VPNControllerXPCClient
     private let defaults: UserDefaults
     private let accountManager: AccountManaging
     private let settings: VPNSettings
 
     init(defaults: UserDefaults = .netP,
          accountManager: AccountManaging) {
-        let ipcClient = TunnelControllerIPCClient()
+        let ipcClient = VPNControllerXPCClient()
         ipcClient.register()
         self.accountManager = accountManager
         self.ipcClient = ipcClient
