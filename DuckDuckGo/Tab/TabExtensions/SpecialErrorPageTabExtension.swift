@@ -129,7 +129,6 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
             return .next
         }
         // Check the URL
-        print("[+] decidePolicy for \(url) in SpecialErrorPage")
         let isMalicious = await phishingDetectionManager.isMalicious(url: url)
         if isMalicious {
             errorPageType = .phishing

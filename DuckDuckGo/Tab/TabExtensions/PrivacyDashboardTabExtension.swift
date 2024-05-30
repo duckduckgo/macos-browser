@@ -189,7 +189,6 @@ extension PrivacyDashboardTabExtension: NavigationResponder {
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         resetConnectionUpgradedTo(navigationAction: navigationAction)
         let url = navigationAction.url
-        print("[+] decidePolicy for \(url) in PrivacyDashboard")
         let malicious = phishingStateManager.tabIsPhishing
         self.phishingStateManager.setIsPhishing(malicious)
         await MainActor.run {
