@@ -21,32 +21,20 @@ import Networking
 
 protocol HomePageRemoteMessagingRequest {
 
-    func fetchHomePageRemoteMessages<T: Decodable>(completion: @escaping (Result<[T], Error>) -> Void)
+    func fetchHomePageRemoteMessages() async -> Result<[SurveyRemoteMessage], Error>
 
 }
 
 final class DefaultHomePageRemoteMessagingRequest: HomePageRemoteMessagingRequest {
 
-    enum NetworkProtectionEndpoint {
+    enum SurveysEndpoint {
         case debug
         case production
 
         var url: URL {
             switch self {
-            case .debug: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/network-protection/messages-v2-debug.json")!
-            case .production: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/network-protection/messages-v2.json")!
-            }
-        }
-    }
-
-    enum DataBrokerProtectionEndpoint {
-        case debug
-        case production
-
-        var url: URL {
-            switch self {
-            case .debug: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/dbp/messages-debug.json")!
-            case .production: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/dbp/messages.json")!
+            case .debug: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/surveys/surveys-debug.json")!
+            case .production: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/surveys/surveys.json")!
             }
         }
     }
@@ -56,19 +44,11 @@ final class DefaultHomePageRemoteMessagingRequest: HomePageRemoteMessagingReques
         case requestCompletedWithoutErrorOrResponse
     }
 
-    static func networkProtectionMessagesRequest() -> HomePageRemoteMessagingRequest {
+    static func surveysRequest() -> HomePageRemoteMessagingRequest {
 #if DEBUG || REVIEW
-        return DefaultHomePageRemoteMessagingRequest(endpointURL: NetworkProtectionEndpoint.debug.url)
+        return DefaultHomePageRemoteMessagingRequest(endpointURL: SurveysEndpoint.debug.url)
 #else
-        return DefaultHomePageRemoteMessagingRequest(endpointURL: NetworkProtectionEndpoint.production.url)
-#endif
-    }
-
-    static func dataBrokerProtectionMessagesRequest() -> HomePageRemoteMessagingRequest {
-#if DEBUG || REVIEW
-        return DefaultHomePageRemoteMessagingRequest(endpointURL: DataBrokerProtectionEndpoint.debug.url)
-#else
-        return DefaultHomePageRemoteMessagingRequest(endpointURL: DataBrokerProtectionEndpoint.production.url)
+        return DefaultHomePageRemoteMessagingRequest(endpointURL: SurveysEndpoint.production.url)
 #endif
     }
 
@@ -78,25 +58,27 @@ final class DefaultHomePageRemoteMessagingRequest: HomePageRemoteMessagingReques
         self.endpointURL = endpointURL
     }
 
-    func fetchHomePageRemoteMessages<T: Decodable>(completion: @escaping (Result<[T], Error>) -> Void) {
+    func fetchHomePageRemoteMessages() async -> Result<[SurveyRemoteMessage], Error> {
         let httpMethod = APIRequest.HTTPMethod.get
         let configuration = APIRequest.Configuration(url: endpointURL, method: httpMethod, body: nil)
         let request = APIRequest(configuration: configuration)
 
-        request.fetch { response, error in
-            if let error {
-                completion(Result.failure(error))
-            } else if let responseData = response?.data {
-                do {
-                    let decoder = JSONDecoder()
-                    let decoded = try decoder.decode([T].self, from: responseData)
-                    completion(Result.success(decoded))
-                } catch {
-                    completion(.failure(HomePageRemoteMessagingRequestError.failedToDecodeMessages))
-                }
-            } else {
-                completion(.failure(HomePageRemoteMessagingRequestError.requestCompletedWithoutErrorOrResponse))
+        do {
+            let response = try await request.fetch()
+
+            guard let data = response.data else {
+                return .failure(HomePageRemoteMessagingRequestError.requestCompletedWithoutErrorOrResponse)
             }
+
+            do {
+                let decoder = JSONDecoder()
+                let decoded = try decoder.decode([SurveyRemoteMessage].self, from: data)
+                return .success(decoded)
+            } catch {
+                return .failure(HomePageRemoteMessagingRequestError.failedToDecodeMessages)
+            }
+        } catch {
+            return .failure(error)
         }
     }
 

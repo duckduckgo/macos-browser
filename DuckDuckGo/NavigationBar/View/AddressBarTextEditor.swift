@@ -292,12 +292,14 @@ final class AddressBarTextEditor: NSTextView {
         guard let index = nextWordSelectionIndex(backwards: false) else { return }
 
         self.selectedRange = NSRange(location: index, length: 0)
+        scrollToCaret()
     }
 
     override func moveWordLeft(_ sender: Any?) {
         guard let index = nextWordSelectionIndex(backwards: true) else { return }
 
         self.selectedRange = NSRange(location: index, length: 0)
+        scrollToCaret()
     }
 
     override func moveWordRightAndModifySelection(_ sender: Any?) {
@@ -311,6 +313,7 @@ final class AddressBarTextEditor: NSTextView {
 
         let range = NSRange(location: selectedRange.location, length: index - selectedRange.location)
         self.setSelectedRange(range, affinity: .downstream, stillSelecting: false)
+        self.scrollToSelectionEnd()
     }
 
     override func moveWordLeftAndModifySelection(_ sender: Any?) {
@@ -324,6 +327,7 @@ final class AddressBarTextEditor: NSTextView {
 
         let range = NSRange(location: index, length: selectedRange.upperBound - index)
         self.setSelectedRange(range, affinity: .upstream, stillSelecting: false)
+        self.scrollToSelectionStart()
     }
 
     override func deleteForward(_ sender: Any?) {
@@ -420,6 +424,22 @@ final class AddressBarTextEditor: NSTextView {
             break
         }
         breakUndoCoalescing()
+    }
+
+    private func scrollToCaret() {
+        guard let layoutManager = layoutManager, let textContainer = textContainer else { return }
+        let caretRect = layoutManager.boundingRect(forGlyphRange: selectedRange(), in: textContainer)
+        scrollToVisible(caretRect)
+    }
+
+    private func scrollToSelectionStart() {
+        let startRange = NSRange(location: selectedRange().location, length: 0)
+        self.scrollRangeToVisible(startRange)
+    }
+
+    private func scrollToSelectionEnd() {
+        let endRange = NSRange(location: selectedRange.location + selectedRange.length, length: 0)
+        self.scrollRangeToVisible(endRange)
     }
 
 }
