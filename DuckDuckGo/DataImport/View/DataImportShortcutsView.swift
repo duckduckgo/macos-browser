@@ -20,9 +20,15 @@ import SwiftUI
 
 struct DataImportShortcutsView: ModalView {
 
+    typealias DataType = DataImport.DataType
+
     @ObservedObject private var model: DataImportShortcutsViewModel
 
-    init(model: DataImportShortcutsViewModel = DataImportShortcutsViewModel()) {
+    init(model: DataImportShortcutsViewModel = DataImportShortcutsViewModel(), dataTypes: Set<DataType>? = nil) {
+        self.init(model: .init(dataTypes: dataTypes))
+    }
+
+    init(model: DataImportShortcutsViewModel) {
         self.model = model
     }
 
@@ -30,57 +36,55 @@ struct DataImportShortcutsView: ModalView {
 
         VStack(alignment: .leading, spacing: 8) {
             VStack(spacing: 0) {
-                HStack {
-                    Image(.bookmarksFavoritesColor24)
-                    VStack(alignment: .leading) {
-                        Text("Show Bookmarks Bar", comment: "Title for the setting to enable the bookmarks bar")
-                                .font(.system(size: 16))
-                        Text("Put your favorite bookmarks in easy reach", comment: "Description for the setting to enable the bookmarks bar")
-                                .font(.system(size: 13))
-                                .foregroundColor(.greyText)
-                    }
-                            .padding(.top, 0)
-                            .padding(.bottom, 1)
-                    Spacer()
-                    Toggle("", isOn: $model.showBookmarksBarStatus)
-                            .toggleStyle(.switch)
-                }
-                        .padding()
+                if let dataTypes = model.dataTypes, dataTypes.contains(.bookmarks) {
+                    importShortcutsRow(image: Image(.bookmarksFavoritesColor24),
+                                       title: UserText.importShortcutsBookmarksTitle,
+                                       subtitle: UserText.importShortcutsBookmarksSubtitle,
+                                       isOn: $model.showBookmarksBarStatus)
+               }
 
-                Divider()
+                if let dataTypes = model.dataTypes, dataTypes.count > 1 {
+                    Divider()
                         .padding(.leading)
-
-                HStack {
-                    Image(.keyColor24)
-                    VStack(alignment: .leading) {
-                        Text("Show Passwords Shortcut", comment: "Title for the setting to enable the passwords shortcut")
-                                .font(.system(size: 16))
-                        Text("Keep passwords nearby in the address bar", comment: "Description for the setting to enable the passwords shortcut")
-                                .font(.system(size: 13))
-                                .foregroundColor(.greyText)
-                    }
-                            .padding(.top, 0)
-                            .padding(.bottom, 1)
-
-                    Spacer()
-                    Toggle("", isOn: $model.showPasswordsPinnedStatus)
-                            .toggleStyle(.switch)
                 }
-                        .padding()
+
+                importShortcutsRow(image: Image(.keyColor24),
+                                   title: UserText.importShortcutsPasswordsTitle,
+                                   subtitle: UserText.importShortcutsPasswordsSubtitle,
+                                   isOn: $model.showPasswordsPinnedStatus)
             }
-                    .roundedBorder()
+            .roundedBorder()
         }
 
         importShortcutsSubtitle()
     }
 }
 
+private func importShortcutsRow(image: Image, title: String, subtitle: String, isOn: Binding<Bool>) -> some View {
+    HStack {
+        image
+        VStack(alignment: .leading) {
+            Text(title)
+            Text(subtitle)
+                .font(.subheadline)
+                .foregroundColor(.greyText)
+        }
+        .padding(.top, 0)
+        .padding(.bottom, 1)
+        Spacer()
+        Toggle("", isOn: isOn)
+            .toggleStyle(.switch)
+    }
+    .padding(.horizontal)
+    .padding(.vertical, 10)
+}
+
 private func importShortcutsSubtitle() -> some View {
     Text(UserText.importDataShortcutsSubtitle)
-            .font(.subheadline)
-            .foregroundColor(Color(.greyText))
-            .padding(.top, 8)
-            .padding(.leading, 8)
+        .font(.subheadline)
+        .foregroundColor(Color(.greyText))
+        .padding(.top, 8)
+        .padding(.leading, 8)
 }
 
 #Preview {

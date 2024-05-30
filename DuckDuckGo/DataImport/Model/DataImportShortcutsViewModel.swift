@@ -20,7 +20,9 @@ import Foundation
 import SwiftUI
 
 final class DataImportShortcutsViewModel: ObservableObject {
+    typealias DataType = DataImport.DataType
 
+    let dataTypes: Set<DataType>?
     private let prefs: AppearancePreferences
     private let pinningManager: LocalPinningManager
 
@@ -41,7 +43,8 @@ final class DataImportShortcutsViewModel: ObservableObject {
         }
     }
 
-    init(prefs: AppearancePreferences = AppearancePreferences.shared, pinningManager: LocalPinningManager = LocalPinningManager.shared) {
+    init(dataTypes: Set<DataType>? = nil, prefs: AppearancePreferences = AppearancePreferences.shared, pinningManager: LocalPinningManager = LocalPinningManager.shared) {
+        self.dataTypes = dataTypes
         self.prefs = prefs
         self.pinningManager = pinningManager
 

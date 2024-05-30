@@ -25744,6 +25744,54 @@
         }
       }
     },
+    "import.shortcuts.bookmarks.subtitle" : {
+      "comment" : "Description for the setting to enable the bookmarks bar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Put your favorite bookmarks in easy reach"
+          }
+        }
+      }
+    },
+    "import.shortcuts.bookmarks.title" : {
+      "comment" : "Title for the setting to enable the bookmarks bar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Bookmarks Bar"
+          }
+        }
+      }
+    },
+    "import.shortcuts.passwords.subtitle" : {
+      "comment" : "Description for the setting to enable the passwords shortcut",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep passwords nearby in the address bar"
+          }
+        }
+      }
+    },
+    "import.shortcuts.passwords.title" : {
+      "comment" : "Title for the setting to enable the passwords shortcut",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Passwords Shortcut"
+          }
+        }
+      }
+    },
     "invite.dialog.get.started.button" : {
       "comment" : "Get Started button on an invite dialog",
       "extractionState" : "extracted_with_value",
