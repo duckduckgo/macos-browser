@@ -29,7 +29,6 @@ final class PrivacyDashboardTabExtension {
 
     private let contentBlocking: any ContentBlockingProtocol
     private let certificateTrustEvaluator: CertificateTrustEvaluating
-    private let phishingDetectionManager: PhishingDetectionManaging
     private var phishingStateManager: PhishingStateManager
 
     @Published private(set) var privacyInfo: PrivacyInfo?
@@ -46,12 +45,10 @@ final class PrivacyDashboardTabExtension {
          didUpgradeToHttpsPublisher: some Publisher<URL, Never>,
          trackersPublisher: some Publisher<DetectedTracker, Never>,
          webViewPublisher: some Publisher<WKWebView, Never>,
-         phishingDetectionManager: some PhishingDetectionManaging,
          phishingStateManager: PhishingStateManager) {
 
         self.contentBlocking = contentBlocking
         self.certificateTrustEvaluator = certificateTrustEvaluator
-        self.phishingDetectionManager = phishingDetectionManager
         self.phishingStateManager = phishingStateManager
 
         autoconsentUserScriptPublisher.sink { [weak self] autoconsentUserScript in
@@ -112,7 +109,10 @@ final class PrivacyDashboardTabExtension {
 
     private func updatePrivacyInfo(with url: URL?) async {
         guard let url = url else { return }
-        let malicious = await phishingDetectionManager.isMalicious(url: url)
+        // Avoid hitting the API if the URL is not valid (i.e. user typing)
+        guard url.isValid else { return }
+        guard !(url.isDuckURLScheme || url.isDuckDuckGo) else { return }
+        let malicious = phishingStateManager.tabIsPhishing
         self.phishingStateManager.setIsPhishing(malicious)
         await MainActor.run {
             self.privacyInfo?.isPhishing = malicious
@@ -188,7 +188,13 @@ extension PrivacyDashboardTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         resetConnectionUpgradedTo(navigationAction: navigationAction)
-
+        let url = navigationAction.url
+        print("[+] decidePolicy for \(url) in PrivacyDashboard")
+        let malicious = phishingStateManager.tabIsPhishing
+        self.phishingStateManager.setIsPhishing(malicious)
+        await MainActor.run {
+            self.privacyInfo?.isPhishing = malicious
+        }
         return .next
     }
 

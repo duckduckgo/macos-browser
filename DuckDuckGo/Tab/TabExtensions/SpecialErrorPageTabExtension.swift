@@ -49,10 +49,11 @@ final class SpecialErrorPageTabExtension {
     private var shouldBypassSSLError = false
     private var urlCredentialCreator: URLCredentialCreating
     private var featureFlagger: FeatureFlagger
+    private var phishingDetectionManager: PhishingDetectionManaging
     private var phishingStateManager: PhishingStateManager
 #if DEBUG
     var errorPageType: ErrorType?
-    var phishingUrlExemptions: [String] = ["about:blank", "https://duckduckgo.com"]
+    var phishingUrlExemptions: Set<String> = ["about:blank", "https://duckduckgo.com"]
 #else
     private var errorPageType: ErrorType?
     private var phishingUrlExemptions: [String] = ["about:blank", "https://duckduckgo.com"]
@@ -65,9 +66,11 @@ final class SpecialErrorPageTabExtension {
         scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
+        phishingDetectionManager: some PhishingDetectionManaging,
         phishingStateManager: PhishingStateManager) {
             self.featureFlagger = featureFlagger
             self.urlCredentialCreator = urlCredentialCreator
+            self.phishingDetectionManager = phishingDetectionManager
             self.phishingStateManager = phishingStateManager
             webViewPublisher.sink { [weak self] webView in
                 self?.webView = webView
@@ -85,7 +88,7 @@ final class SpecialErrorPageTabExtension {
         webView?.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
         loadHTML(html: html, url: url, alternate: alternate)
     }
-    
+
     @MainActor
     private func loadPhishingErrorHTML(url: URL) {
         let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
@@ -121,12 +124,13 @@ final class SpecialErrorPageTabExtension {
 extension SpecialErrorPageTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        let urlString = navigationAction.url.absoluteString
-        if phishingUrlExemptions.contains(urlString) {
-            return .allow
+        let url = navigationAction.url
+        if phishingUrlExemptions.contains(url.absoluteString) {
+            return .next
         }
         // Check the URL
-        let isMalicious = phishingStateManager.tabIsPhishing
+        print("[+] decidePolicy for \(url) in SpecialErrorPage")
+        let isMalicious = await phishingDetectionManager.isMalicious(url: url)
         if isMalicious {
             errorPageType = .phishing
             specialErrorPageUserScript?.failingURL = navigationAction.url
@@ -134,7 +138,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
             return .cancel
         }
         errorPageType = nil
-        return .allow
+        return .next
     }
 
     @MainActor
@@ -185,8 +189,9 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
 
     func visitSite() {
         if errorPageType == .phishing {
-            let urlString = webView?.url?.absoluteString
-            phishingUrlExemptions.append(urlString!)
+            if let urlString = webView?.url?.absoluteString {
+                phishingUrlExemptions.insert(urlString)
+            }
         } else if errorPageType == .ssl {
             shouldBypassSSLError = true
         }

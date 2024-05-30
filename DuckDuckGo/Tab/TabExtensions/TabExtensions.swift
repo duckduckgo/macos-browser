@@ -132,7 +132,6 @@ extension TabExtensionsBuilder {
                                          didUpgradeToHttpsPublisher: httpsUpgrade.didUpgradeToHttpsPublisher,
                                          trackersPublisher: contentBlocking.trackersPublisher,
                                          webViewPublisher: args.webViewFuture,
-                                         phishingDetectionManager: dependencies.phishingDetectionManager,
                                          phishingStateManager: dependencies.phishingStateManager)
         }
 
@@ -204,6 +203,7 @@ extension TabExtensionsBuilder {
         add {
             SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
                                   scriptsPublisher: userScripts.compactMap { $0 },
+                                  phishingDetectionManager: dependencies.phishingDetectionManager,
                                   phishingStateManager: dependencies.phishingStateManager)
         }
 
