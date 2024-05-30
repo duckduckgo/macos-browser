@@ -470,7 +470,7 @@ final class NavigationBarViewController: NSViewController {
 
     @objc private func showPasswordsPinningOption(_ sender: Notification) {
         guard view.window?.isKeyWindow == true else { return }
-        
+
         DispatchQueue.main.async {
             let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerPinnedPromptPopoverText,
                                                               buttonText: UserText.passwordManagerPinnedPromptPopoverButtonText,
@@ -478,12 +478,12 @@ final class NavigationBarViewController: NSViewController {
                                                               onDismiss: {
                 self.passwordManagementButton.isHidden = !LocalPinningManager.shared.isPinned(.autofill)
             })
-            
+
             popoverMessage.viewModel.buttonAction = {
                 LocalPinningManager.shared.pin(.autofill)
                 popoverMessage.dismiss()
             }
-            
+
             self.passwordManagementButton.isHidden = false
             popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
         }
