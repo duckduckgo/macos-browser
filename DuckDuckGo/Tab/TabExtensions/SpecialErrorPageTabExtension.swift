@@ -33,6 +33,14 @@ extension UserScripts: SpecialErrorPageScriptProvider {}
 enum ErrorType {
     case phishing
     case ssl
+    var description: String {
+        switch self {
+        case .phishing:
+            return "Phishing"
+        case .ssl:
+            return "SSL"
+        }
+    }
 }
 
 final class SpecialErrorPageTabExtension {
@@ -41,9 +49,14 @@ final class SpecialErrorPageTabExtension {
     private var shouldBypassSSLError = false
     private var urlCredentialCreator: URLCredentialCreating
     private var featureFlagger: FeatureFlagger
-    private var phishingUrlExemptions: [String] = ["about:blank", "https://duckduckgo.com"]
-    private var errorPageType: ErrorType?
     private var phishingStateManager: PhishingStateManager
+#if DEBUG
+    var errorPageType: ErrorType?
+    var phishingUrlExemptions: [String] = ["about:blank", "https://duckduckgo.com"]
+#else
+    private var errorPageType: ErrorType?
+    private var phishingUrlExemptions: [String] = ["about:blank", "https://duckduckgo.com"]
+#endif
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -120,6 +133,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
             loadPhishingErrorHTML(url: navigationAction.url)
             return .cancel
         }
+        errorPageType = nil
         return .allow
     }
 

@@ -116,7 +116,6 @@ final class PrivacyDashboardTabExtension {
         self.phishingStateManager.setIsPhishing(malicious)
         await MainActor.run {
             self.privacyInfo?.isPhishing = malicious
-            print("self.privacyInfo?.isPhishing: ", self.privacyInfo?.isPhishing ?? "nil")
         }
     }
 

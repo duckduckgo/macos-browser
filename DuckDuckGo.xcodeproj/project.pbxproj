@@ -2526,6 +2526,9 @@
 		CBC83E3629B63D380008E19C /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = CBC83E3529B63D380008E19C /* Configuration */; };
 		CBDD5DE329A67F2700832877 /* MockConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */; };
 		CBDD5DE429A6800300832877 /* MockConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */; };
+		CD236AF82C0892B8005F5425 /* PhishingDetectionIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD236AF62C0892B8005F5425 /* PhishingDetectionIntegrationTests.swift */; };
+		CD236AF92C0893A4005F5425 /* PhishingDetectionIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD236AF62C0892B8005F5425 /* PhishingDetectionIntegrationTests.swift */; };
+		CD236AFB2C0893EC005F5425 /* PreferencesViews in Frameworks */ = {isa = PBXBuildFile; productRef = CD236AFA2C0893EC005F5425 /* PreferencesViews */; };
 		CD2C47DA2BFCEDE500D197A9 /* PhishingDetection in Frameworks */ = {isa = PBXBuildFile; productRef = CD2C47D92BFCEDE500D197A9 /* PhishingDetection */; };
 		CD2C47DC2BFCEDF000D197A9 /* PhishingDetection in Frameworks */ = {isa = PBXBuildFile; productRef = CD2C47DB2BFCEDF000D197A9 /* PhishingDetection */; };
 		CD2C47E32BFCF96900D197A9 /* PhishingErrorPageHTMLTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2C47E22BFCF96900D197A9 /* PhishingErrorPageHTMLTemplate.swift */; };
@@ -4069,6 +4072,7 @@
 		CB24F70B29A3D9CB006DCC58 /* AppConfigurationURLProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigurationURLProvider.swift; sourceTree = "<group>"; };
 		CB6BCDF827C6BEFF00CC76DC /* PrivacyFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyFeatures.swift; sourceTree = "<group>"; };
 		CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationStore.swift; sourceTree = "<group>"; };
+		CD236AF62C0892B8005F5425 /* PhishingDetectionIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhishingDetectionIntegrationTests.swift; sourceTree = "<group>"; };
 		CD2C47E22BFCF96900D197A9 /* PhishingErrorPageHTMLTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhishingErrorPageHTMLTemplate.swift; sourceTree = "<group>"; };
 		CD3F046E2BFCE23B00C66DA0 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		CD3F046F2BFCE23B00C66DA0 /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../../content-scope-scripts"; sourceTree = "<group>"; };
@@ -4196,6 +4200,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD236AFB2C0893EC005F5425 /* PreferencesViews in Frameworks */,
 				F116A7C92BD1929000F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CD2B316DFC00A595BB /* SnapshotTesting in Frameworks */,
 				B6AE39F329374AEC00C37AA4 /* OHHTTPStubs in Frameworks */,
@@ -5008,6 +5013,7 @@
 		4B1AD89E25FC27E200261379 /* IntegrationTests */ = {
 			isa = PBXGroup;
 			children = (
+				CD236AF52C08928D005F5425 /* PhishingDetection */,
 				B603972A29BEDF0F00902A34 /* Common */,
 				B31055CC27A1BA39001AC618 /* Autoconsent */,
 				B6EC37DC29B5D05A001ACE79 /* Downloads */,
@@ -8208,6 +8214,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		CD236AF52C08928D005F5425 /* PhishingDetection */ = {
+			isa = PBXGroup;
+			children = (
+				CD236AF62C0892B8005F5425 /* PhishingDetectionIntegrationTests.swift */,
+			);
+			path = PhishingDetection;
+			sourceTree = "<group>";
+		};
 		CD2C47DF2BFCF05000D197A9 /* PhishingDetection */ = {
 			isa = PBXGroup;
 			children = (
@@ -8442,6 +8456,7 @@
 				B6AE39F429374AEC00C37AA4 /* OHHTTPStubsSwift */,
 				B65CD8CC2B316DFC00A595BB /* SnapshotTesting */,
 				F116A7C82BD1929000F3FCF7 /* PixelKitTestingUtilities */,
+				CD236AFA2C0893EC005F5425 /* PreferencesViews */,
 			);
 			productName = "Integration Tests";
 			productReference = 4B1AD89D25FC27E200261379 /* Integration Tests.xctest */;
@@ -10653,6 +10668,7 @@
 				3706FEA5293F662100E42796 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				B603973D29BF1D7D00902A34 /* AutoconsentIntegrationTests.swift in Sources */,
 				B60C6F8729B1CAB2007BFAA8 /* TestRunHelper.swift in Sources */,
+				CD236AF92C0893A4005F5425 /* PhishingDetectionIntegrationTests.swift in Sources */,
 				B64CE01F2B8622D700126CA5 /* AddressBarTests.swift in Sources */,
 				B603972D29BEDF2100902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				3706FEA6293F662100E42796 /* EncryptionKeyStoreTests.swift in Sources */,
@@ -10695,6 +10711,7 @@
 				B644B43D29D56829003FA9AB /* SearchNonexistentDomainTests.swift in Sources */,
 				B603973C29BF1D7D00902A34 /* AutoconsentIntegrationTests.swift in Sources */,
 				B60C6F8629B1CAB0007BFAA8 /* TestRunHelper.swift in Sources */,
+				CD236AF82C0892B8005F5425 /* PhishingDetectionIntegrationTests.swift in Sources */,
 				B64CE01E2B8622D700126CA5 /* AddressBarTests.swift in Sources */,
 				B603972C29BEDF2100902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				4B1AD8D525FC38DD00261379 /* EncryptionKeyStoreTests.swift in Sources */,
@@ -13536,6 +13553,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Configuration;
+		};
+		CD236AFA2C0893EC005F5425 /* PreferencesViews */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PreferencesViews;
 		};
 		CD2C47D92BFCEDE500D197A9 /* PhishingDetection */ = {
 			isa = XCSwiftPackageProductDependency;

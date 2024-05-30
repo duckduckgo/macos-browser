@@ -22,6 +22,7 @@ import Navigation
 import Common
 import WebKit
 import XCTest
+import PhishingDetection
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -38,9 +39,9 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         scriptPublisher = PassthroughSubject<MockSpecialErrorPageScriptProvider, Never>()
         credentialCreator = MockCredentialCreator()
         let featureFlagger = MockFeatureFlagger()
-        let mockPhishingDetectionManager = MockPhishingDetectionManager()
+        let phishingStateManager = PhishingStateManager()
         errorPageExtension = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger,
-        phishingDetectionManager: mockPhishingDetectionManager)
+                                                          phishingStateManager: phishingStateManager)
     }
 
     override func tearDownWithError() throws {
