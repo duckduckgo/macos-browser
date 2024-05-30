@@ -1,5 +1,5 @@
 //
-//  SSLErrorPageTabExtension.swift
+//  SpecialErrorPageTabExtension.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -56,7 +56,7 @@ final class SpecialErrorPageTabExtension {
     var phishingUrlExemptions: Set<String> = []
 #else
     private var errorPageType: ErrorType?
-    private var phishingUrlExemptions: [String] = []
+    private var phishingUrlExemptions: Set<String> = []
 #endif
 
     private var cancellables = Set<AnyCancellable>()
