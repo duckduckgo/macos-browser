@@ -1046,7 +1046,14 @@ struct UserText {
                                                                       value: "View",
                                                                       comment: "Button to view the recently autosaved password")
 
-    static let passwordManagerAutoPinnedPopoverText = NSLocalizedString("autofill.popover.auto-pinned.text", value: "Shortcut Added!", comment: "Text confirming the password manager has been pinned to the toolbar")
+    static let passwordManagerAutoPinnedPopoverText = NSLocalizedString("autofill.popover.passwords.auto-pinned.text", value: "Shortcut Added!", comment: "Text confirming the password manager has been pinned to the toolbar")
+
+    static let passwordManagerPinnedPromptPopoverText = NSLocalizedString("autofill.popover.passwords.pin-prompt.text", 
+                                                                          value: "Add passwords shortcut?",
+                                                                          comment: "Text prompting user to pin the password manager shortcut to the toolbar")
+    static let passwordManagerPinnedPromptPopoverButtonText = NSLocalizedString("autofill.popover.passwords.pin-prompt.button.text",
+                                                                     value: "Add Shortcut",
+                                                                     comment: "Button to pin the password manager shortcut to the toolbar")
 
     static func openPasswordManagerButton(managerName: String) -> String {
         let localized = NSLocalizedString("autofill.popover.open-password-manager", value: "Open %@", comment: "Open password manager button")

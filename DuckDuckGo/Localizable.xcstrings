@@ -5327,18 +5327,6 @@
         }
       }
     },
-    "autofill.popover.auto-pinned.text" : {
-      "comment" : "Text confirming the password manager has been pinned to the toolbar",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Shortcut Added!"
-          }
-        }
-      }
-    },
     "autofill.popover.autosave.button.text" : {
       "comment" : "Button to view the recently autosaved password",
       "extractionState" : "extracted_with_value",
@@ -5695,6 +5683,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы используете %@ для управления паролями"
+          }
+        }
+      }
+    },
+    "autofill.popover.passwords.auto-pinned.text" : {
+      "comment" : "Text confirming the password manager has been pinned to the toolbar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Shortcut Added!"
+          }
+        }
+      }
+    },
+    "autofill.popover.passwords.pin-prompt.button.text" : {
+      "comment" : "Button to pin the password manager shortcut to the toolbar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Shortcut"
+          }
+        }
+      }
+    },
+    "autofill.popover.passwords.pin-prompt.text" : {
+      "comment" : "Text prompting user to pin the password manager shortcut to the toolbar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add passwords shortcut?"
           }
         }
       }

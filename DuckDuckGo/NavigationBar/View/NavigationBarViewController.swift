@@ -382,6 +382,11 @@ final class NavigationBarViewController: NSViewController {
                                                object: nil)
 
         NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showPasswordsPinningOption(_:)),
+                                               name: .passwordsPinningPrompt,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
                                                selector: #selector(showAutoconsentFeedback(_:)),
                                                name: AutoconsentUserScript.newSitePopupHiddenNotification,
                                                object: nil)
@@ -455,8 +460,31 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @objc private func showPasswordsAutoPinnedFeedback(_ sender: Notification) {
+        guard view.window?.isKeyWindow == true else { return }
+
         DispatchQueue.main.async {
             let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerAutoPinnedPopoverText)
+            popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
+        }
+    }
+
+    @objc private func showPasswordsPinningOption(_ sender: Notification) {
+        guard view.window?.isKeyWindow == true else { return }
+        
+        DispatchQueue.main.async {
+            let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerPinnedPromptPopoverText,
+                                                              buttonText: UserText.passwordManagerPinnedPromptPopoverButtonText,
+                                                              buttonAction: {},
+                                                              onDismiss: {
+                self.passwordManagementButton.isHidden = !LocalPinningManager.shared.isPinned(.autofill)
+            })
+            
+            popoverMessage.viewModel.buttonAction = {
+                LocalPinningManager.shared.pin(.autofill)
+                popoverMessage.dismiss()
+            }
+            
+            self.passwordManagementButton.isHidden = false
             popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
         }
     }
