@@ -29,10 +29,11 @@ extension UserText {
                                                                   value: "If your passwords are saved in another browser, you can import them into DuckDuckGo.",
                                                                   comment: "Label for default empty state description")
 
-    static let pmEmptyStateLoginsTitle = NSLocalizedString("pm.empty.logins.title", value: "No passwords", comment: "Label for logins empty state title")
+    static let pmEmptyStateLoginsTitle = NSLocalizedString("pm.empty.logins.title", value: "No passwords saved yet", comment: "Label for logins empty state title")
     static let pmEmptyStateIdentitiesTitle = NSLocalizedString("pm.empty.identities.title", value: "No Identities", comment: "Label for identities empty state title")
     static let pmEmptyStateCardsTitle = NSLocalizedString("pm.empty.cards.title", value: "No Cards", comment: "Label for cards empty state title")
     static let pmEmptyStateNotesTitle = NSLocalizedString("pm.empty.notes.title", value: "No Notes", comment: "Label for notes empty state title")
+    static let pmEmptyStateLoginsButtonTitle = NSLocalizedString("pm.empty.logins.button.title", value: "Import passwords", comment: "Import passwords button title for logins empty state")
 
     static let pmAddItem = NSLocalizedString("pm.add.new", value: "Add New", comment: "Add New item button")
     static let pmAddCard = NSLocalizedString("pm.add.card", value: "Add Credit Card", comment: "Add New Credit Card button")

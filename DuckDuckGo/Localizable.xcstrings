@@ -39922,61 +39922,73 @@
         }
       }
     },
+    "pm.empty.logins.button.title" : {
+      "comment" : "Import passwords button title for logins empty state",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import passwords"
+          }
+        }
+      }
+    },
     "pm.empty.logins.title" : {
       "comment" : "Label for logins empty state title",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Keine Passwörter"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "No passwords"
+            "value" : "No passwords saved yet"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Sin contraseñas"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Aucun mot de passe"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nessuna password"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Geen wachtwoorden"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Brak haseł"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Sem palavras-passe"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Нет паролей"
           }
         }
