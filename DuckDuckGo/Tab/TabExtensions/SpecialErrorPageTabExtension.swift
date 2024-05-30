@@ -53,10 +53,10 @@ final class SpecialErrorPageTabExtension {
     private var phishingStateManager: PhishingStateManager
 #if DEBUG
     var errorPageType: ErrorType?
-    var phishingUrlExemptions: Set<String> = ["about:blank", "https://duckduckgo.com"]
+    var phishingUrlExemptions: Set<String> = []
 #else
     private var errorPageType: ErrorType?
-    private var phishingUrlExemptions: [String] = ["about:blank", "https://duckduckgo.com"]
+    private var phishingUrlExemptions: [String] = []
 #endif
 
     private var cancellables = Set<AnyCancellable>()
@@ -125,7 +125,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let url = navigationAction.url
-        if phishingUrlExemptions.contains(url.absoluteString) {
+        if phishingUrlExemptions.contains(url.absoluteString) || url.isDuckDuckGo || url.isDuckURLScheme {
             return .next
         }
         // Check the URL
