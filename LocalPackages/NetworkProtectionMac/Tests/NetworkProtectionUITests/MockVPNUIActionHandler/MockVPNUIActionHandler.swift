@@ -1,7 +1,7 @@
 //
-//  MockAppLauncher.swift
+//  MockVPNUIActionHandler.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@
 import Foundation
 import NetworkProtectionUI
 
-public final class MockAppLauncher: AppLaunching {
+public final class MockVPNUIActionHandler: VPNUIActionHandler {
     public init() {
     }
 
-    public var spyLaunchAppCommand: AppLaunchCommand?
-    public func launchApp(withCommand command: AppLaunchCommand) async {
-        spyLaunchAppCommand = command
+    public var spyAction: VPNUIAction?
+    public func handle(action: VPNUIAction) async {
+        spyAction = action
     }
 }

@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppLauncher
 import Cocoa
 import Combine
 import Common

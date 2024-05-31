@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppLauncher
 import Cocoa
 import Combine
 import Common
@@ -313,20 +314,20 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             statusReporter: statusReporter,
             controller: tunnelController,
             iconProvider: iconProvider,
-            appLauncher: appLauncher,
+            uiActionHandler: appLauncher,
             menuItems: {
                 [
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .showSettings)
+                        try? await self?.appLauncher.launchApp(withCommand: .showSettings)
                     }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuFAQ, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .showFAQ)
+                        try? await self?.appLauncher.launchApp(withCommand: .showFAQ)
                     }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .shareFeedback)
+                        try? await self?.appLauncher.launchApp(withCommand: .shareFeedback)
                     }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .justOpen)
+                        try? await self?.appLauncher.launchApp(withCommand: .justOpen)
                     }),
                 ]
             },

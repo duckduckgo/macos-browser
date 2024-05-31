@@ -230,6 +230,7 @@ extension DBPHomeViewController {
 
 // MARK: - System configuration
 
+import AppLauncher
 import ServiceManagement
 
 extension DBPHomeViewController {
@@ -246,7 +247,7 @@ extension DBPHomeViewController {
     func moveToApplicationFolder() {
         pixelHandler.fire(.homeViewCTAMoveApplicationClicked)
         Task { @MainActor in
-            await AppLauncher(appBundleURL: Bundle.main.bundleURL).launchApp(withCommand: .moveAppToApplications)
+            try? await AppLauncher(appBundleURL: Bundle.main.bundleURL).launchApp(withCommand: .moveAppToApplications)
         }
     }
 }
