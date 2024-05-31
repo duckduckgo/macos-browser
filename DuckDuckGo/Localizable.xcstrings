@@ -17882,7 +17882,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Export passwords…"
+            "value" : "Export Passwords…"
           }
         },
         "es" : {
@@ -23153,7 +23153,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Import passwords…"
+            "value" : "Import Passwords…"
           }
         },
         "es" : {
@@ -23243,7 +23243,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Import from"
+            "value" : "Import From"
           }
         }
       }
@@ -42551,7 +42551,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Save Password to DuckDuckGo?"
+            "value" : "Save password in DuckDuckGo?"
           }
         },
         "es" : {
@@ -42604,55 +42604,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Neues Passwort gespeichert"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "New Password Saved"
+            "value" : "New password saved"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nueva contraseña guardada"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nouveau mot de passe enregistré"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nuova password salvata"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nieuw wachtwoord opgeslagen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Zapisano nowe hasło"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nova palavra-passe guardada"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Новый пароль сохранен"
           }
         }
@@ -43145,7 +43145,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Update Password?"
+            "value" : "Update password?"
           }
         }
       }
@@ -48758,6 +48758,7 @@
     },
     "Select data to import:" : {
       "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48808,6 +48809,9 @@
           }
         }
       }
+    },
+    "Select Data to Import:" : {
+      "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks."
     },
     "Select Profile:" : {
       "comment" : "Browser Profile picker title for Data Import",

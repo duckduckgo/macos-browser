@@ -28,7 +28,7 @@ struct DataImportTypePicker: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Select data to import:",
+            Text("Select Data to Import:",
                  comment: "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.")
                 .bold()
 
