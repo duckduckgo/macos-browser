@@ -2515,8 +2515,6 @@
 		EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */; };
 		EA18D1CA272F0DC8006DC101 /* social_images in Resources */ = {isa = PBXBuildFile; fileRef = EA18D1C9272F0DC8006DC101 /* social_images */; };
 		EA8AE76A279FBDB20078943E /* ClickToLoadTDSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8AE769279FBDB20078943E /* ClickToLoadTDSTests.swift */; };
-		EAF52F4F2B93B024003D73EB /* ClickToLoadRulesSplitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF52F4E2B93B024003D73EB /* ClickToLoadRulesSplitter.swift */; };
-		EAF52F502B93B024003D73EB /* ClickToLoadRulesSplitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF52F4E2B93B024003D73EB /* ClickToLoadRulesSplitter.swift */; };
 		EE02D41A2BB4609900DBE6B3 /* UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE02D4192BB4609900DBE6B3 /* UITests.swift */; };
 		EE02D41C2BB460A600DBE6B3 /* BrowsingHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE02D41B2BB460A600DBE6B3 /* BrowsingHistoryTests.swift */; };
 		EE02D4202BB460C000DBE6B3 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = EE02D41F2BB460C000DBE6B3 /* BrowserServicesKit */; };
@@ -4042,7 +4040,6 @@
 		EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadUserScript.swift; sourceTree = "<group>"; };
 		EA18D1C9272F0DC8006DC101 /* social_images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = social_images; sourceTree = "<group>"; };
 		EA8AE769279FBDB20078943E /* ClickToLoadTDSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToLoadTDSTests.swift; sourceTree = "<group>"; };
-		EAF52F4E2B93B024003D73EB /* ClickToLoadRulesSplitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToLoadRulesSplitter.swift; sourceTree = "<group>"; };
 		EE02D4192BB4609900DBE6B3 /* UITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITests.swift; sourceTree = "<group>"; };
 		EE02D41B2BB460A600DBE6B3 /* BrowsingHistoryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowsingHistoryTests.swift; sourceTree = "<group>"; };
 		EE0429DF2BA31D2F009EB20F /* FindInPageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindInPageTests.swift; sourceTree = "<group>"; };
@@ -5225,7 +5222,7 @@
 				B68D21CE2ACBC9E7002DA3C2 /* Mocks */,
 				026ADE1326C3010C002518EE /* macos-config.json */,
 				9833913027AAA4B500DAF119 /* trackerData.json */,
-				EAF52F4D2B93AF71003D73EB /* ClickToLoad */,
+				EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */,
 				85AC3B0425D6B1D800C7D2AA /* ScriptSourceProviding.swift */,
 				9826B09F2747DF3D0092F683 /* ContentBlocking.swift */,
 				9812D894276CEDA5004B6181 /* ContentBlockerRulesLists.swift */,
@@ -8149,15 +8146,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		EAF52F4D2B93AF71003D73EB /* ClickToLoad */ = {
-			isa = PBXGroup;
-			children = (
-				EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */,
-				EAF52F4E2B93B024003D73EB /* ClickToLoadRulesSplitter.swift */,
-			);
-			path = ClickToLoad;
-			sourceTree = "<group>";
-		};
 		EEA3EEAF2B24EB5100E8333A /* VPNLocation */ = {
 			isa = PBXGroup;
 			children = (
@@ -9643,7 +9631,6 @@
 				3706FAFE293F65D500E42796 /* SpacerNode.swift in Sources */,
 				3706FB00293F65D500E42796 /* PasswordManagementCreditCardModel.swift in Sources */,
 				BBDFDC5D2B2B8E2100F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */,
-				EAF52F502B93B024003D73EB /* ClickToLoadRulesSplitter.swift in Sources */,
 				3706FB01293F65D500E42796 /* NSEventExtension.swift in Sources */,
 				3706FB02293F65D500E42796 /* Onboarding.swift in Sources */,
 				4B9DB0482A983B24000927DB /* WaitlistRootView.swift in Sources */,
@@ -11082,7 +11069,6 @@
 				4BE6547E271FCD4D008D1D63 /* PasswordManagementIdentityModel.swift in Sources */,
 				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
 				85625998269C9C5F00EE44BC /* PasswordManagementPopover.swift in Sources */,
-				EAF52F4F2B93B024003D73EB /* ClickToLoadRulesSplitter.swift in Sources */,
 				1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */,
 				9FEE98652B846870002E44E8 /* AddEditBookmarkView.swift in Sources */,
 				85589E9127BFB9810038AD11 /* HomePageRecentlyVisitedModel.swift in Sources */,
