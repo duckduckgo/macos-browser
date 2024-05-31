@@ -83,13 +83,6 @@ final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
 
     @MainActor
     private func handleUnblockClickToLoadContent(params: Any, message: UserScriptMessage) -> Encodable? {
-        struct UnblockMessage: Decodable {
-            let action: String
-            let isLogin: Bool
-            let isSurrogateLogin: Bool
-            let entity: String
-        }
-
         guard let delegate = delegate else { return false }
 
         // only worry about CTL FB for now
@@ -104,8 +97,8 @@ final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
 
     @MainActor
     public func displayClickToLoadPlaceholders() {
-        if let webView = webView {
-            broker?.push(method: "displayClickToLoadPlaceholders", params: ["ruleAction": ["block"]], for: self, into: webView)
-        }
+        guard let webView else { return }
+
+        broker?.push(method: "displayClickToLoadPlaceholders", params: ["ruleAction": ["block"]], for: self, into: webView)
     }
 }

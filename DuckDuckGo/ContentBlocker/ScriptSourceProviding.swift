@@ -146,20 +146,15 @@ struct ScriptSourceProvider: ScriptSourceProviding {
 
         let setsToCombine = [ DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName, DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName ]
 
-        setsToCombine.forEach { setName in
+        for setName in setsToCombine {
             if let ruleSetIndex = contentBlockingManager.currentRules.firstIndex(where: { $0.name == setName }) {
-                rules[ruleSetIndex].trackerData.trackers.forEach { key, value in
-                    combinedTrackers[key] = value
-                }
-                rules[ruleSetIndex].trackerData.entities.forEach { key, value in
-                    combinedEntities[key] = value
-                }
-                rules[ruleSetIndex].trackerData.domains.forEach { key, value in
-                    combinedDomains[key] = value
-                }
+                let ruleSet = rules[ruleSetIndex]
+
+                combinedTrackers = combinedTrackers.merging(ruleSet.trackerData.trackers) { (_, new) in new }
+                combinedEntities = combinedEntities.merging(ruleSet.trackerData.entities) { (_, new) in new }
+                combinedDomains = combinedDomains.merging(ruleSet.trackerData.domains) { (_, new) in new }
                 if setName == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
-                    // just copy the cnames from the main TDS
-                    cnames = rules[ruleSetIndex].trackerData.cnames
+                    cnames = ruleSet.trackerData.cnames
                 }
             }
         }
@@ -170,9 +165,13 @@ struct ScriptSourceProvider: ScriptSourceProviding {
                             cnames: cnames)
 
         let surrogateTDS = ContentBlockerRulesManager.extractSurrogates(from: combinedTrackerData)
-        let encodedData = try? JSONEncoder().encode(surrogateTDS)
-        let encodedTrackerData = String(data: encodedData!, encoding: .utf8)!
+        let encodedTrackerData = encodeTrackerData(surrogateTDS)
 
         return (trackerData: combinedTrackerData, encodedTrackerData: encodedTrackerData)
+    }
+
+    private func encodeTrackerData(_ trackerData: TrackerData) -> String {
+        let encodedData = try? JSONEncoder().encode(trackerData)
+        return String(data: encodedData!, encoding: .utf8)!
     }
 }

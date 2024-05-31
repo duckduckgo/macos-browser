@@ -36,9 +36,8 @@ class ClickToLoadTDSTests: XCTestCase {
         let trackerManager = TrackerDataManager(etag: etag,
                                          data: trackerData,
                                          embeddedDataProvider: AppTrackerDataSetProvider())
-        let mockAdAttributing = MockAttributing()
 
-        let cbrLists = ContentBlockerRulesLists(trackerDataManager: trackerManager, adClickAttribution: mockAdAttributing)
+        let cbrLists = ContentBlockerRulesLists(trackerDataManager: trackerManager, adClickAttribution: MockAttributing())
         let ruleSets = cbrLists.contentBlockerRulesLists
         let tdsName = DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName
 
@@ -79,14 +78,15 @@ class ClickToLoadTDSTests: XCTestCase {
 
     func testClickToLoadTDSSplit() throws {
 
-        let trackerData = AppTrackerDataSetProvider().embeddedData
-        let etag = AppTrackerDataSetProvider().embeddedDataEtag
-        let trackerManager = TrackerDataManager(etag: etag,
-                                         data: trackerData,
-                                         embeddedDataProvider: AppTrackerDataSetProvider())
-        let mockAdAttributing = MockAttributing()
+        let provider = AppTrackerDataSetProvider()
 
-        let cbrLists = ContentBlockerRulesLists(trackerDataManager: trackerManager, adClickAttribution: mockAdAttributing)
+        let trackerManager = TrackerDataManager(
+                                    etag: provider.embeddedDataEtag,
+                                    data: provider.embeddedData,
+                                    embeddedDataProvider: provider
+        )
+
+        let cbrLists = ContentBlockerRulesLists(trackerDataManager: trackerManager, adClickAttribution: MockAttributing())
         let ruleSets = cbrLists.contentBlockerRulesLists
         let ctlTdsName = DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName
         let mainTdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
