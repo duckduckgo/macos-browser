@@ -43,7 +43,7 @@ public final class AppLauncher: AppLaunching {
             }
         }
 
-        public var errorUserInfo: [String : Any] {
+        public var errorUserInfo: [String: Any] {
             switch self {
             case .workspaceOpenError(let error):
                 return [NSUnderlyingErrorKey: error as NSError]
