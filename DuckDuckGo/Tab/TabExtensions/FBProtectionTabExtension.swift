@@ -76,13 +76,13 @@ extension FBProtectionTabExtension {
         }
         if enable {
             do {
-                try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+                try userContentController.enableGlobalContentRuleList(withIdentifier: DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName)
             } catch {
                 return false
             }
         } else {
             do {
-                try userContentController.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+                try userContentController.disableGlobalContentRuleList(withIdentifier: DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName)
             } catch {
                 return false
             }

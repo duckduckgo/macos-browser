@@ -23,10 +23,6 @@ import CryptoKit
 
 final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
 
-    enum Constants {
-        static let clickToLoadRulesListName = "ClickToLoad"
-    }
-
     private let adClickAttribution: AdClickAttributing
 
     init(trackerDataManager: TrackerDataManager, adClickAttribution: AdClickAttributing) {

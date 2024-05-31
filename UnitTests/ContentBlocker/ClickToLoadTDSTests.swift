@@ -40,7 +40,7 @@ class ClickToLoadTDSTests: XCTestCase {
 
         let cbrLists = ContentBlockerRulesLists(trackerDataManager: trackerManager, adClickAttribution: mockAdAttributing)
         let ruleSets = cbrLists.contentBlockerRulesLists
-        let tdsName = ContentBlockerRulesLists.Constants.clickToLoadRulesListName
+        let tdsName = DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName
 
         let ctlRules = ruleSets.first(where: { $0.name == tdsName})
         let ctlTrackerData = ctlRules?.trackerData
@@ -88,7 +88,7 @@ class ClickToLoadTDSTests: XCTestCase {
 
         let cbrLists = ContentBlockerRulesLists(trackerDataManager: trackerManager, adClickAttribution: mockAdAttributing)
         let ruleSets = cbrLists.contentBlockerRulesLists
-        let ctlTdsName = ContentBlockerRulesLists.Constants.clickToLoadRulesListName
+        let ctlTdsName = DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName
         let mainTdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
 
         let mainRules = ruleSets.first(where: { $0.name == mainTdsName})

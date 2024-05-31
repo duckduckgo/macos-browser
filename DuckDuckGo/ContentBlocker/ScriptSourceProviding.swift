@@ -95,7 +95,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         let trackerData = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})?.trackerData
 
         let ctlTrackerData = (contentBlockingManager.currentRules.first(where: {
-            $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
+            $0.name == DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName
         })?.trackerData)
 
         return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
@@ -144,7 +144,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         var combinedDomains: [String: String] = [:]
         var cnames: [TrackerData.CnameDomain: TrackerData.TrackerDomain]? = [:]
 
-        let setsToCombine = [ DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName, ContentBlockerRulesLists.Constants.clickToLoadRulesListName ]
+        let setsToCombine = [ DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName, DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName ]
 
         setsToCombine.forEach { setName in
             if let ruleSetIndex = contentBlockingManager.currentRules.firstIndex(where: { $0.name == setName }) {
