@@ -22,6 +22,7 @@ import UserNotifications
 import NetworkProtection
 import NetworkProtectionUI
 import PixelKit
+import VPNAppLauncher
 
 extension UNNotificationAction {
 
@@ -198,10 +199,10 @@ extension NetworkProtectionUNNotificationsPresenter: UNUserNotificationCenterDel
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         switch UNNotificationAction.Identifier(rawValue: response.actionIdentifier) {
         case .reconnect:
-            try? await appLauncher.launchApp(withCommand: .showStatus)
+            try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showStatus)
 
         case .none:
-            try? await appLauncher.launchApp(withCommand: .showStatus)
+            try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showStatus)
         }
     }
 

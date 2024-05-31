@@ -19,13 +19,7 @@
 import AppLauncher
 import Foundation
 
-extension AppLauncher {
-    func launchApp(withCommand command: VPNAppLaunchCommand) async throws {
-        try await launchApp(withCommand: command as AppLaunchCommand)
-    }
-}
-
-enum VPNAppLaunchCommand: Codable, AppLaunchCommand {
+public enum VPNAppLaunchCommand: Codable, AppLaunchCommand {
     case justOpen
     case shareFeedback
     case showFAQ
@@ -56,7 +50,7 @@ enum VPNAppLaunchCommand: Codable, AppLaunchCommand {
         }
     }
 
-    var allowsRunningApplicationSubstitution: Bool {
+    public var allowsRunningApplicationSubstitution: Bool {
         switch self {
         case .showSettings:
             return true
@@ -65,7 +59,7 @@ enum VPNAppLaunchCommand: Codable, AppLaunchCommand {
         }
     }
 
-    var launchURL: URL? {
+    public var launchURL: URL? {
         guard let commandURL else {
             return nil
         }
@@ -73,7 +67,7 @@ enum VPNAppLaunchCommand: Codable, AppLaunchCommand {
         return URL(string: commandURL)!
     }
 
-    var hideApp: Bool {
+    public var hideApp: Bool {
         switch self {
         default:
             return false

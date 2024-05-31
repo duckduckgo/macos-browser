@@ -21,8 +21,8 @@ import Foundation
 import AppKit
 import PixelKit
 import Subscription
-
 import NetworkProtectionUI
+import VPNAppLauncher
 
 #if DBP
 import DataBrokerProtection

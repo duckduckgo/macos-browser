@@ -20,12 +20,6 @@ import AppKit
 import Foundation
 import Common
 
-public protocol AppLaunchCommand {
-    var allowsRunningApplicationSubstitution: Bool { get }
-    var launchURL: URL? { get }
-    var hideApp: Bool { get }
-}
-
 public protocol AppLaunching {
     func launchApp(withCommand command: AppLaunchCommand) async throws
 }

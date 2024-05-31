@@ -29,6 +29,7 @@ import NetworkProtectionUI
 import ServiceManagement
 import PixelKit
 import Subscription
+import VPNAppLauncher
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
@@ -318,16 +319,16 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             menuItems: {
                 [
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
-                        try? await self?.appLauncher.launchApp(withCommand: .showSettings)
+                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
                     }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuFAQ, action: { [weak self] in
-                        try? await self?.appLauncher.launchApp(withCommand: .showFAQ)
+                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                     }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
-                        try? await self?.appLauncher.launchApp(withCommand: .shareFeedback)
+                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
                     }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
-                        try? await self?.appLauncher.launchApp(withCommand: .justOpen)
+                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.justOpen)
                     }),
                 ]
             },
