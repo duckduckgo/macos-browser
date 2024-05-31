@@ -339,8 +339,23 @@ struct DataImportViewModel {
             // errors occurred during import: show feedback screen
             self.screen = .feedback
         } else {
-            // When we skip a manual import, and there are no next non-imported data types, we dismiss
-            self.dismiss(using: dismiss)
+            // When we skip a manual import, and there are no next non-imported data types,
+            // if some data was successfully imported we present the shortcuts screen, otherwise we dismiss
+            var dataTypes: Set<DataType> = []
+
+            // Filter out only the successful results with a positive count of successful summaries
+            for dataTypeImportResult in summary {
+                guard case .success(let summary) = dataTypeImportResult.result, summary.successful > 0 else {
+                    continue
+                }
+                dataTypes.insert(dataTypeImportResult.dataType)
+            }
+
+            if !dataTypes.isEmpty {
+                self.screen = .shortcuts(dataTypes)
+            } else {
+                self.dismiss(using: dismiss)
+            }
         }
     }
 
