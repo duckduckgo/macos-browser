@@ -206,7 +206,7 @@ final class PasswordManagementViewController: NSViewController {
         autofillTitleLabel.stringValue = UserText.passwordManagementTitle
         emptyStateTitle.stringValue = UserText.pmEmptyStateDefaultTitle
         emptyStateMessage.stringValue = UserText.pmEmptyStateDefaultDescription
-        emptyStateButton.title = UserText.importData
+        emptyStateButton.title = UserText.pmEmptyStateDefaultButtonTitle
     }
 
     private func bindSyncDidFinish() -> AnyCancellable? {
@@ -987,8 +987,8 @@ final class PasswordManagementViewController: NSViewController {
 
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
-        case .allItems: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
-        case .logins: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false, buttonTitle: UserText.pmEmptyStateLoginsButtonTitle)
+        case .allItems: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
+        case .logins: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
         case .identities: showEmptyState(image: .identitiesEmpty, title: UserText.pmEmptyStateIdentitiesTitle)
         case .cards: showEmptyState(image: .creditCardsEmpty, title: UserText.pmEmptyStateCardsTitle)
         }
@@ -998,7 +998,7 @@ final class PasswordManagementViewController: NSViewController {
         emptyState.isHidden = true
     }
 
-    private func showEmptyState(image: NSImage, title: String, message: String? = nil, hideMessage: Bool = true, hideButton: Bool = true, buttonTitle: String = UserText.initiateImport) {
+    private func showEmptyState(image: NSImage, title: String, message: String? = nil, hideMessage: Bool = true, hideButton: Bool = true) {
         emptyState.isHidden = false
         emptyStateImageView.image = image
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
@@ -1007,7 +1007,6 @@ final class PasswordManagementViewController: NSViewController {
         }
         emptyStateMessage.isHidden = hideMessage
         emptyStateButton.isHidden = hideButton
-        emptyStateButton.title = buttonTitle
     }
 
     private func requestSync() {

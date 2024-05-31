@@ -39766,6 +39766,18 @@
         }
       }
     },
+    "pm.empty.default.button.title" : {
+      "comment" : "Import passwords button title for default empty state",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import Passwords"
+          }
+        }
+      }
+    },
     "pm.empty.default.description" : {
       "comment" : "Label for default empty state description",
       "extractionState" : "extracted_with_value",
@@ -39942,18 +39954,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет учетных данных"
-          }
-        }
-      }
-    },
-    "pm.empty.logins.button.title" : {
-      "comment" : "Import passwords button title for logins empty state",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Import passwords"
           }
         }
       }
