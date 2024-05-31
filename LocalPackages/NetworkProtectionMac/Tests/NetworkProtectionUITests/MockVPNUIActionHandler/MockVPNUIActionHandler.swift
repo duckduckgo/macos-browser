@@ -20,11 +20,16 @@ import Foundation
 import NetworkProtectionUI
 
 public final class MockVPNUIActionHandler: VPNUIActionHandler {
-    public init() {
+
+    public func showVPNLocations() async {
+        // placeholder
     }
 
-    public var spyAction: VPNUIAction?
-    public func handle(action: VPNUIAction) async {
-        spyAction = action
+    public func moveAppToApplications() async {
+        // placeholder
+    }
+
+    public func showPrivacyPro() async {
+        // placeholder
     }
 }
