@@ -48,7 +48,6 @@
 	</array>
 	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
 	<array>
-		<string>com.apple.PIPAgent</string>
 		<string>$(DBP_BACKGROUND_AGENT_BUNDLE_ID)</string>
 		<string>$(AGENT_BUNDLE_ID)</string>
 	</array>
