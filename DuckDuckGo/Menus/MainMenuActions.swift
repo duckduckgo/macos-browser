@@ -927,6 +927,11 @@ extension MainViewController {
         setConfigurationUrl(nil)
     }
 
+    @objc func resetSurveyRemoteMessages(_ sender: Any?) {
+        DefaultSurveyRemoteMessagingStorage.surveys().removeStoredAndDismissedMessages()
+        DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager).resetLastRefreshTimestamp()
+    }
+
     // MARK: - Developer Tools
 
     @objc func toggleDeveloperTools(_ sender: Any?) {
