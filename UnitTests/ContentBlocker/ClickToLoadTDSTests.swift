@@ -23,18 +23,7 @@ import BrowserServicesKit
 
 private extension KnownTracker {
 
-    var countCTLActions: Int {
-        var count = 0
-
-        if let rules = rules {
-            for rule in rules {
-                if let action = rule.action, action == .blockCTLFB {
-                    count += 1
-                }
-            }
-        }
-        return count
-    }
+    var countCTLActions: Int { rules?.filter { $0.action == .blockCTLFB }.count ?? 0 }
 
 }
 
