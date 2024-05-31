@@ -37553,7 +37553,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Warnings are shown for websites that have been reported as deceptive."
+            "value" : "Warnings are shown for websites that have been reported to be deceptive. Deceptive websites try to trick you into believing they are legitimate websites you trust. If you understand the risks involved, you can continue anyway.<br><br>See our Phishing and Malware Protection help page for more information."
           }
         }
       }
@@ -37577,7 +37577,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "This website may try to trick you into doing something dangerous, like installing software or disclosing personal or financial information, like passwords, phone numbers or credit cards."
+            "value" : "This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers."
           }
         }
       }
@@ -37589,7 +37589,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Warning: This site may be malicious"
+            "value" : "Warning: This site puts your personal information at risk"
+          }
+        }
+      }
+    },
+    "phishing.error.page.learn.more.url" : {
+      "comment" : "URL of help page with in-depth description of the error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "https://duckduckgo.com/duckduckgo-help-pages/"
           }
         }
       }
@@ -37606,6 +37618,9 @@
         }
       }
     },
+    "phishing.error.page.specific.message.phishing" : {
+      "comment" : "Specific message shown in an error page that warns users of security risks on a website due to Phishing issues."
+    },
     "phishing.error.page.tab.title" : {
       "comment" : "Title shown in an error page tab that warn users of security risks on a website due to Phishing issues",
       "extractionState" : "extracted_with_value",
@@ -37613,7 +37628,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Warning: Site May Be Malicious"
+            "value" : "Warning: This site puts your personal information at risk"
           }
         }
       }

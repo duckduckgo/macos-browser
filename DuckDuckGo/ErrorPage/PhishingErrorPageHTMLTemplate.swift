@@ -40,11 +40,11 @@ struct PhishingErrorPageHTMLTemplate {
             return ""
         }
         let eTldPlus1 = tld.eTLDplus1(domain) ?? domain
-        let loadTimeData = createJSONString(header: phishingError.header, body: phishingError.body(for: domain), advancedButton: phishingError.advancedButton, leaveSiteButton: phishingError.leaveSiteButton, advancedInfoHeader: phishingError.advancedInfoTitle, specificMessage: phishingError.specificMessage(for: domain, eTldPlus1: eTldPlus1), advancedInfoBody: phishingError.advancedInfoBody, visitSiteButton: phishingError.visitSiteButton)
+        let loadTimeData = createJSONString(header: phishingError.header, body: phishingError.body(for: domain), advancedButton: phishingError.advancedButton, leaveSiteButton: phishingError.leaveSiteButton, advancedInfoHeader: phishingError.advancedInfoTitle, specificMessage: phishingError.specificMessage(for: domain, eTldPlus1: eTldPlus1), advancedInfoBody: phishingError.advancedInfoBody, visitSiteButton: phishingError.visitSiteButton, learnMoreText: phishingError.learnMoreText, learnMoreURL: phishingError.learnMoreURL)
         return html.replacingOccurrences(of: "$LOAD_TIME_DATA$", with: loadTimeData, options: .literal)
     }
 
-    private func createJSONString(header: String, body: String, advancedButton: String, leaveSiteButton: String, advancedInfoHeader: String, specificMessage: String, advancedInfoBody: String, visitSiteButton: String) -> String {
+    private func createJSONString(header: String, body: String, advancedButton: String, leaveSiteButton: String, advancedInfoHeader: String, specificMessage: String, advancedInfoBody: String, visitSiteButton: String, learnMoreText: String, learnMoreURL: String) -> String {
         let innerDictionary: [String: Any] = [
             "header": header.escapedUnicodeHtmlString(),
             "body": body.escapedUnicodeHtmlString(),
@@ -53,7 +53,9 @@ struct PhishingErrorPageHTMLTemplate {
             "advancedInfoHeader": advancedInfoHeader.escapedUnicodeHtmlString(),
             "specificMessage": specificMessage.escapedUnicodeHtmlString(),
             "advancedInfoBody": advancedInfoBody.escapedUnicodeHtmlString(),
-            "visitSiteButton": visitSiteButton.escapedUnicodeHtmlString()
+            "visitSiteButton": visitSiteButton.escapedUnicodeHtmlString(),
+            "learnMoreText": learnMoreText.escapedUnicodeHtmlString(),
+            "learnMoreURL": learnMoreURL,
         ]
 
         let outerDictionary: [String: Any] = [
@@ -104,9 +106,20 @@ public struct PhishingError {
         return UserText.phishingErrorAdvancedInfoBodyPhishing
     }
 
+    var learnMoreText: String {
+        return UserText.learnMore
+    }
+
+    var learnMoreURL: String {
+        return UserText.phishingErrorLearnMoreURL
+    }
+
     func specificMessage(for domain: String, eTldPlus1: String) -> String {
-        let boldDomain = "<span style=\"font-weight: 600;\">\(domain)</span>"
-        let boldETldPlus1 = "<span style=\"font-weight: 600;\">\(eTldPlus1)</span>"
-        return UserText.phishingErrorPageBody(boldDomain)
+        return ""
+
+// TODO: Confirm we're not passing a specific message
+//        let boldDomain = "<span style=\"font-weight: 600;\">\(domain)</span>"
+//        let boldETldPlus1 = "<span style=\"font-weight: 600;\">\(eTldPlus1)</span>"
+//        return UserText.phishingErrorPageBody(boldDomain)
     }
 }
