@@ -1,5 +1,5 @@
 //
-//  AppLauncher+DefaultInitializer.swift
+//  VPNAppLauncher+DefaultInitializer.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //

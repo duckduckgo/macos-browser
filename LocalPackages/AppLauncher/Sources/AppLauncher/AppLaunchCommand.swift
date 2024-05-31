@@ -1,5 +1,5 @@
 //
-//  AppLauncher+VPNUIActionHandler.swift
+//  AppLaunchCommand.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,20 +16,10 @@
 //  limitations under the License.
 //
 
-import AppLauncher
 import Foundation
-import NetworkProtectionUI
 
-extension AppLauncher: VPNUIActionHandler {
-    public func showVPNLocations() async {
-        try? await launchApp(withCommand: VPNAppLaunchCommand.showVPNLocations)
-    }
-
-    public func moveAppToApplications() async {
-        try? await launchApp(withCommand: VPNAppLaunchCommand.moveAppToApplications)
-    }
-
-    public func showPrivacyPro() async {
-        try? await launchApp(withCommand: VPNAppLaunchCommand.showPrivacyPro)
-    }
+public protocol AppLaunchCommand {
+    var allowsRunningApplicationSubstitution: Bool { get }
+    var launchURL: URL? { get }
+    var hideApp: Bool { get }
 }

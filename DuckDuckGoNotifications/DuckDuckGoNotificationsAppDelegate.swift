@@ -24,6 +24,7 @@ import Networking
 import PixelKit
 import NetworkExtension
 import NetworkProtection
+import VPNAppLauncher
 
 @objc(Application)
 final class DuckDuckGoNotificationsApplication: NSApplication {

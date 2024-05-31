@@ -25,6 +25,7 @@ import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
 import Subscription
+import VPNAppLauncher
 
 protocol NetworkProtectionIPCClient {
     var ipcStatusObserver: ConnectionStatusObserver { get }
@@ -86,28 +87,28 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                     return [
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
-                                try? await appLauncher.launchApp(withCommand: .showSettings)
+                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
-                                try? await appLauncher.launchApp(withCommand: .showFAQ)
+                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusViewShareFeedback,
                             action: {
-                                try? await appLauncher.launchApp(withCommand: .shareFeedback)
+                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
                             })
                     ]
                 } else {
                     return [
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
-                                try? await appLauncher.launchApp(withCommand: .showFAQ)
+                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusViewShareFeedback,
                             action: {
-                                try? await appLauncher.launchApp(withCommand: .shareFeedback)
+                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
                             })
                     ]
                 }
