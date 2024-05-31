@@ -37,7 +37,7 @@ public final class StatusBarMenu: NSObject {
     private let controller: TunnelController
     private let statusReporter: NetworkProtectionStatusReporter
     private let onboardingStatusPublisher: OnboardingStatusPublisher
-    private let appLauncher: VPNAppLaunching
+    private let uiActionHandler: VPNUIActionHandler
     private let menuItems: () -> [MenuItem]
     private let agentLoginItem: LoginItem?
     private let isMenuBarStatusView: Bool
@@ -64,7 +64,7 @@ public final class StatusBarMenu: NSObject {
                 statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,
                 iconProvider: IconProvider,
-                appLauncher: VPNAppLaunching,
+                uiActionHandler: VPNUIActionHandler,
                 menuItems: @escaping () -> [MenuItem],
                 agentLoginItem: LoginItem?,
                 isMenuBarStatusView: Bool,
@@ -80,7 +80,7 @@ public final class StatusBarMenu: NSObject {
         self.controller = controller
         self.statusReporter = statusReporter
         self.onboardingStatusPublisher = onboardingStatusPublisher
-        self.appLauncher = appLauncher
+        self.uiActionHandler = uiActionHandler
         self.menuItems = menuItems
         self.agentLoginItem = agentLoginItem
         self.isMenuBarStatusView = isMenuBarStatusView
@@ -134,7 +134,7 @@ public final class StatusBarMenu: NSObject {
             popover = NetworkProtectionPopover(controller: controller,
                                                onboardingStatusPublisher: onboardingStatusPublisher,
                                                statusReporter: statusReporter,
-                                               appLauncher: appLauncher,
+                                               uiActionHandler: uiActionHandler,
                                                menuItems: menuItems,
                                                agentLoginItem: agentLoginItem,
                                                isMenuBarStatusView: isMenuBarStatusView,
