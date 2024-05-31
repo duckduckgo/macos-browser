@@ -21,8 +21,8 @@ import Foundation
 import Common
 import NetworkProtectionUI
 
-extension AppLaunchCommand {
-    var rawValue: String {
+extension VPNAppLaunchCommand {
+    public var rawValue: String {
         switch self {
         case .startVPN: return "startVPN"
         case .stopVPN: return "stopVPN"
@@ -39,17 +39,24 @@ extension AppLaunchCommand {
     }
 }
 
+protocol AppLaunchCommand {
+    var allowsRunningApplicationSubstitution: Bool { get }
+    var hideApp: Bool { get }
+    var launchURL: URL? { get }
+    var rawValue: String { get }
+}
+
 /// Launches the main App
 ///
-public final class AppLauncher: AppLaunching {
+final class AppLauncher {
 
     private let mainBundleURL: URL
 
-    public init(appBundleURL: URL) {
+    init(appBundleURL: URL) {
         mainBundleURL = appBundleURL
     }
 
-    public func launchApp(withCommand command: AppLaunchCommand) async {
+    func launchApp(withCommand command: AppLaunchCommand) async {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.allowsRunningApplicationSubstitution = command.allowsRunningApplicationSubstitution
         configuration.arguments = [command.rawValue]
@@ -69,9 +76,6 @@ public final class AppLauncher: AppLaunching {
         do {
             if let launchURL = command.launchURL {
                 try await NSWorkspace.shared.open([launchURL], withApplicationAt: mainBundleURL, configuration: configuration)
-            } else if let helperAppPath = command.helperAppPath {
-                let launchURL = mainBundleURL.appending(helperAppPath)
-                try await NSWorkspace.shared.openApplication(at: launchURL, configuration: configuration)
             }
         } catch {
             os_log("🔵 Open Application failed: %{public}@", type: .error, error.localizedDescription)
@@ -79,7 +83,13 @@ public final class AppLauncher: AppLaunching {
     }
 }
 
-extension AppLaunchCommand {
+extension AppLauncher: VPNAppLaunching {
+    func launchApp(withCommand command: NetworkProtectionUI.VPNAppLaunchCommand) async {
+        await launchApp(withCommand: command as AppLaunchCommand)
+    }
+}
+
+extension VPNAppLaunchCommand: AppLaunchCommand {
     var commandURL: String? {
         switch self {
         case .justOpen:
@@ -109,19 +119,6 @@ extension AppLaunchCommand {
             return true
         default:
             return false
-        }
-    }
-
-    var helperAppPath: String? {
-        switch self {
-        case .startVPN:
-            return "Contents/Resources/startVPN.app"
-        case .stopVPN:
-            return "Contents/Resources/stopVPN.app"
-        case .enableOnDemand:
-            return "Contents/Resources/enableOnDemand.app"
-        default:
-            return nil
         }
     }
 

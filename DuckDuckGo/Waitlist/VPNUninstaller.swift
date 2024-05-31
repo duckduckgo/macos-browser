@@ -218,7 +218,12 @@ final class VPNUninstaller: VPNUninstalling {
     }
 
     private func enableLoginItems() throws {
-        try loginItemsManager.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: log)
+        do {
+            try loginItemsManager.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: log)
+        } catch {
+            // Launch the login item as a regular app
+            //AppLauncher(appBundleURL: )
+        }
     }
 
     func disableLoginItems() {

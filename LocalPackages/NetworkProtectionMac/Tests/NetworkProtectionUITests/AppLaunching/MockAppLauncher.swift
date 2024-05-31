@@ -19,12 +19,12 @@
 import Foundation
 import NetworkProtectionUI
 
-public final class MockAppLauncher: AppLaunching {
+public final class MockAppLauncher: VPNAppLaunching {
     public init() {
     }
 
-    public var spyLaunchAppCommand: AppLaunchCommand?
-    public func launchApp(withCommand command: AppLaunchCommand) async {
+    public var spyLaunchAppCommand: VPNAppLaunchCommand?
+    public func launchApp(withCommand command: VPNAppLaunchCommand) async {
         spyLaunchAppCommand = command
     }
 }

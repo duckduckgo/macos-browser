@@ -53,7 +53,7 @@ public final class NetworkProtectionPopover: NSPopover {
     public required init(controller: TunnelController,
                          onboardingStatusPublisher: OnboardingStatusPublisher,
                          statusReporter: NetworkProtectionStatusReporter,
-                         appLauncher: AppLaunching,
+                         appLauncher: VPNAppLaunching,
                          menuItems: @escaping () -> [MenuItem],
                          agentLoginItem: LoginItem?,
                          isMenuBarStatusView: Bool,

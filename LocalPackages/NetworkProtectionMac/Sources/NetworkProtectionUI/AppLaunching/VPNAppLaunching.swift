@@ -1,5 +1,5 @@
 //
-//  AppLaunching.swift
+//  VPNAppLaunching.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -21,7 +21,7 @@
 
 import Foundation
 
-public enum AppLaunchCommand: Codable {
+public enum VPNAppLaunchCommand: Codable {
     case justOpen
     case shareFeedback
     case showFAQ
@@ -35,6 +35,6 @@ public enum AppLaunchCommand: Codable {
     case showPrivacyPro
 }
 
-public protocol AppLaunching {
-    func launchApp(withCommand command: AppLaunchCommand) async
+public protocol VPNAppLaunching {
+    func launchApp(withCommand command: VPNAppLaunchCommand) async
 }

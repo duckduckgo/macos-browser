@@ -67,7 +67,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         return formatter
     }()
 
-    private let appLauncher: AppLaunching
+    private let appLauncher: VPNAppLaunching
 
     // MARK: - Misc
 
@@ -91,7 +91,7 @@ public final class TunnelControllerViewModel: ObservableObject {
                 runLoopMode: RunLoop.Mode? = nil,
                 vpnSettings: VPNSettings,
                 locationFormatter: VPNLocationFormatting,
-                appLauncher: AppLaunching) {
+                appLauncher: VPNAppLaunching) {
 
         self.tunnelController = controller
         self.onboardingStatusPublisher = onboardingStatusPublisher

@@ -18,6 +18,8 @@
 
 import NetworkProtection
 
+// Base protocol for any IPC client we implement.
+//
 public protocol VPNControllerIPCClient {
     func execute(_ command: VPNIPCServerCommand) async throws
 }
