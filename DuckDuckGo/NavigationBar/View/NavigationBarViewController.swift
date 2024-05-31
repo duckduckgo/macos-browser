@@ -460,8 +460,6 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @objc private func showPasswordsAutoPinnedFeedback(_ sender: Notification) {
-        guard view.window?.isKeyWindow == true else { return }
-
         DispatchQueue.main.async {
             let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerAutoPinnedPopoverText)
             popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
