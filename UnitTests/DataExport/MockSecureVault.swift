@@ -161,6 +161,10 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         return storedCards
     }
 
+    func creditCardsCount() throws -> Int {
+        return storedCards.count
+    }
+
     func creditCardFor(id: Int64) throws -> SecureVaultModels.CreditCard? {
         return storedCards.first { $0.id == id }
     }
@@ -406,6 +410,10 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
 
     func creditCards() throws -> [SecureVaultModels.CreditCard] {
         return Array(_creditCards.values)
+    }
+
+    func creditCardsCount() throws -> Int {
+        return _creditCards.count
     }
 
     func creditCardForCardId(_ cardId: Int64) throws -> SecureVaultModels.CreditCard? {
