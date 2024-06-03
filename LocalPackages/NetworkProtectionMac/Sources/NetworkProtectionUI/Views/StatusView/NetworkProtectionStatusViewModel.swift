@@ -380,25 +380,16 @@ extension NetworkProtectionStatusView {
         func warningMessage(for knownFailure: KnownFailure?) -> String? {
             guard let knownFailure else { return nil }
 
-            switch (knownFailure.domain, knownFailure.code) {
-            case ("SMAppServiceErrorDomain", 1):
+            switch KnownFailure.SilentError(rawValue: knownFailure.error) {
+            case .operationNotPermitted:
                 return UserText.vpnOperationNotPermittedMessage
-            case ("TunnelControllerIPCService.IPCError", 0):
+            case .loginItemVersionMismatched:
                 return UserText.vpnLoginItemVersionMismatchedMessage
-            case ("NetworkProtection.NetworkProtectionClientError", 5):
+            case .registeredServerFetchingFailed:
                 return UserText.vpnRegisteredServerFetchingFailedMessage
             default:
                 return nil
             }
-        }
-    }
-}
-
-extension PacketTunnelProvider.TunnelError: InternalErrorWrapping {
-    public var internalError: Error? {
-        switch self {
-        case .startingTunnelWithoutAuthToken, .simulateTunnelFailureError, .vpnAccessRevoked: return nil
-        case .couldNotGenerateTunnelConfiguration(internalError: let error): return error
         }
     }
 }

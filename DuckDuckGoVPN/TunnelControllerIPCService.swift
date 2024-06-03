@@ -37,8 +37,14 @@ final class TunnelControllerIPCService {
     private var cancellables = Set<AnyCancellable>()
     private let defaults: UserDefaults
 
-    enum IPCError {
+    enum IPCError: SilentErrorConvertible {
         case versionMismatched
+
+        var asSilentError: KnownFailure.SilentError? {
+            switch self {
+            case .versionMismatched: return .loginItemVersionMismatched
+            }
+        }
     }
 
     init(tunnelController: NetworkProtectionTunnelController,
@@ -219,4 +225,8 @@ extension TunnelControllerIPCService.IPCError: LocalizedError, CustomNSError {
         case .versionMismatched: return [:]
         }
     }
+}
+
+extension KnownFailure {
+    static let loginItemVersionMismatched = KnownFailure(TunnelControllerIPCService.IPCError.versionMismatched)
 }
