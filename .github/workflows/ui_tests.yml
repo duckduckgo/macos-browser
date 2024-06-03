@@ -60,6 +60,12 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
+    - name: Launch activity monitor
+      run: open /System/Applications/Utilities/Activity\ Monitor.app
+
+    - name: Start recording
+      run: screencapture -v -V 430 recording.mov &
+
     - name: Build and run UI Testing
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
@@ -91,12 +97,17 @@ jobs:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml
 
+    - name: Sleep for recording to finish
+      if: failure() || cancelled()
+      run: sleep 90
+
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4
       if: failure() || cancelled()
       with:
         name: "BuildLogs ${{ matrix.runner }}"
         path: |
+          recording.mov
           xcodebuild.log
           DerivedData/Logs/Test/*.xcresult
           ~/Library/Logs/DiagnosticReports/*
