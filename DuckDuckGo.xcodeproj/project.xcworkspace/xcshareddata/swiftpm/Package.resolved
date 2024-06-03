@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "anh/netp/remove-token-store",
-        "revision" : "f93619b5d18e98209986605cf1bcb501f6d3ceec"
+        "revision" : "dd74cd699aef3ad2722138a8649540c1205b282a"
       }
     },
     {

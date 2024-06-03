@@ -642,6 +642,10 @@ import SubscriptionUI
                                   currentViewController: { WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController },
                                   subscriptionManager: Application.appDelegate.subscriptionManager)
 
+            NSMenuItem(title: "Privacy Pro Survey") {
+                NSMenuItem(title: "Reset Remote Message Cache", action: #selector(MainViewController.resetSurveyRemoteMessages))
+            }
+
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }
         debugMenu.addItem(internalUserItem)
