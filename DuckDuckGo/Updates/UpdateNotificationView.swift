@@ -22,6 +22,7 @@ struct UpdateNotificationView: View {
     let icon: NSImage
     let text: String
     let onClose: () -> Void
+    let onTap: () -> Void
 
     var body: some View {
         HStack {
@@ -48,11 +49,14 @@ struct UpdateNotificationView: View {
         .cornerRadius(8)
         .shadow(radius: 10)
         .padding()
+        .onTapGesture {
+            onTap()
+        }
     }
 }
 
 struct UpdateNotificationView_Previews: PreviewProvider {
     static var previews: some View {
-        UpdateNotificationView(icon: NSImage(named: NSImage.cautionName)!, text: "Critical update required. Relaunch to update.", onClose: {})
+        UpdateNotificationView(icon: NSImage(named: NSImage.cautionName)!, text: "Critical update required. Relaunch to update.", onClose: {}, onTap: {})
     }
 }

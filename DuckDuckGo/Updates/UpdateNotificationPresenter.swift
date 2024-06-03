@@ -30,15 +30,17 @@ final class UpdateNotificationPresenter {
 
         let notificationSize = NSRect(x: 0, y: 0, width: 300, height: 60)
 
-        let updateNotificationView = UpdateNotificationView(icon: icon, text: text) { [weak self] in
+        let updateNotificationView = UpdateNotificationView(icon: icon, text: text, onClose: { [weak self] in
             self?.closeUpdateNotification()
-        }
+        }, onTap: { [weak self] in
+            self?.openUpdatesPage()
+        })
         let hostingController = NSHostingController(rootView: updateNotificationView)
         let notificationWindow = UpdateNotificationWindow(contentRect: notificationSize, styleMask: .borderless, backing: .buffered, defer: false)
         notificationWindow.contentView = hostingController.view
 
         let screenFrame = NSScreen.main!.frame
-        notificationWindow.setFrameOrigin(NSPoint(x: screenFrame.width - notificationSize.width - 20, y: screenFrame.height - notificationSize.height - 40))
+        notificationWindow.setFrameOrigin(NSPoint(x: screenFrame.width - notificationSize.width, y: screenFrame.height - notificationSize.height - 150))
 
         self.notificationWindow = notificationWindow
 
@@ -61,6 +63,10 @@ final class UpdateNotificationPresenter {
         } completionHandler: { [weak self] in
             self?.closeUpdateNotification()
         }
+    }
+
+    func openUpdatesPage() {
+        //TODO
     }
 
 }
