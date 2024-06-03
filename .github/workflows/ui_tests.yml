@@ -76,7 +76,7 @@ jobs:
         | tee xcodebuild.log \
         | xcbeautify
 
-        cp -R DerivedData/Build/Products/Review/DuckDuckGo\ Review.app /Applications/DuckDuckGo\ Review.app
+        spctl --add --path ./DerivedData/Build/Products/Review/UI\ Tests-Runner.app
 
     - name: Start recording
       run: screencapture -v -V 430 recording.mov &
