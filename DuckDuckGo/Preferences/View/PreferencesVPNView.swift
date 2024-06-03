@@ -24,14 +24,33 @@ extension Preferences {
 
     struct VPNView: View {
         @ObservedObject var model: VPNPreferencesModel
+        let status: PrivacyProtectionStatus
 
         var body: some View {
-            PreferencePane(UserText.vpn) {
+            PreferencePane(UserText.vpn, spacing: 4) {
+
+                if let status = status.status {
+                    PreferencePaneSection {
+                        StatusIndicatorView(status: status, isLarge: true)
+                    }
+                }
+
+                PreferencePaneSection {
+                    Button(UserText.openVPNButtonTitle) {
+                        Task { @MainActor in
+                            NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
+                        }
+                    }
+                }
+                .padding(.bottom, 12)
+
+                // SECTION: Location
 
                 PreferencePaneSection {
                     TextMenuItemHeader(UserText.vpnLocationTitle)
                     VPNLocationPreferenceItem(model: model.locationItem)
                 }
+                .padding(.bottom, 12)
 
                 // SECTION: Manage VPN
 
@@ -76,6 +95,7 @@ extension Preferences {
                         .background(Color(.blackWhite1))
                         .roundedBorder()
                 }
+                .padding(.bottom, 12)
 
                 // SECTION: Shortcuts
 
@@ -88,13 +108,14 @@ extension Preferences {
                         ToggleMenuItem(UserText.vpnShowInBrowserToolbarSettingTitle, isOn: $model.showInBrowserToolbar)
                     }
                 }
+                .padding(.bottom, 12)
 
                 // SECTION: VPN Notifications
 
                 PreferencePaneSection(UserText.vpnNotificationsSettingsTitle) {
-
                     ToggleMenuItem("VPN connection drops or status changes", isOn: $model.notifyStatusChanges)
                 }
+                .padding(.bottom, 12)
 
                 // SECTION: Uninstall
 

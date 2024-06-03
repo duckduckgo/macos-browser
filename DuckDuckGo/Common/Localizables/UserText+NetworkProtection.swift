@@ -175,6 +175,7 @@ extension UserText {
     // "vpn.setting.description.secure.dns" - Secure DNS setting description
     static let vpnSecureDNSSettingDescription = "Our VPN uses Secure DNS to keep your online activity private, so that your Internet provider can't see what websites you visit."
     // "vpn.button.title.uninstall.vpn" - Uninstall VPN button title
+    static let openVPNButtonTitle = "Open VPN"
     static let uninstallVPNButtonTitle = "Uninstall DuckDuckGo VPN..."
 
     // MARK: - VPN Settings Alerts

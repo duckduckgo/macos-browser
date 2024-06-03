@@ -98,7 +98,7 @@ enum Preferences {
                 case .dataClearing:
                     DataClearingView(model: DataClearingPreferences.shared)
                 case .vpn:
-                    VPNView(model: VPNPreferencesModel())
+                    VPNView(model: VPNPreferencesModel(), status: PrivacyProtectionStatus.status(for: .vpn))
                 case .subscription:
                     SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
                 case .autofill:
