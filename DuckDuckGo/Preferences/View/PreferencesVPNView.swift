@@ -24,7 +24,7 @@ extension Preferences {
 
     struct VPNView: View {
         @ObservedObject var model: VPNPreferencesModel
-        let status: PrivacyProtectionStatus
+        @ObservedObject var status: PrivacyProtectionStatus
 
         var body: some View {
             PreferencePane(UserText.vpn, spacing: 4) {
