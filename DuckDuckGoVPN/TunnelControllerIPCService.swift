@@ -224,7 +224,3 @@ extension TunnelControllerIPCService.IPCError: LocalizedError, CustomNSError {
         }
     }
 }
-
-extension KnownFailure {
-    static let loginItemVersionMismatched = KnownFailure(TunnelControllerIPCService.IPCError.versionMismatched)
-}
