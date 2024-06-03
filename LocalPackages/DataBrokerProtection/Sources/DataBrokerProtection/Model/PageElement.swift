@@ -21,6 +21,7 @@ struct PageElement: Codable, Sendable {
     let type: String
     let selector: String
     let parent: ParentElement?
+    let multiple: Bool?
 }
 
 struct ProfileMatch: Codable, Sendable {
