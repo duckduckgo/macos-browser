@@ -91,15 +91,11 @@ public final class TunnelControllerIPCClient {
                 // By calling register we make sure that XPC will connect as soon as it
                 // becomes available again, as requests are queued.  This helps ensure
                 // that the client app will always be connected to XPC.
-                self.register(version: DefaultIPCMetadataCollector.version,
-                              bundlePath: DefaultIPCMetadataCollector.bundlePath,
-                              completion: { _ in })
+                self.register { _ in }
             }
         }
 
-        self.register(version: DefaultIPCMetadataCollector.version,
-                      bundlePath: DefaultIPCMetadataCollector.bundlePath,
-                      completion: { _ in })
+        self.register { _ in }
     }
 }
 
@@ -168,9 +164,7 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
 
 extension TunnelControllerIPCClient: IPCServerInterface {
     public func register(completion: @escaping (Error?) -> Void) {
-        register(version: DefaultIPCMetadataCollector.version,
-                 bundlePath: DefaultIPCMetadataCollector.bundlePath,
-                 completion: self.onComplete(completion))
+        register(version: version, bundlePath: bundlePath, completion: self.onComplete(completion))
     }
 
     public func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void) {

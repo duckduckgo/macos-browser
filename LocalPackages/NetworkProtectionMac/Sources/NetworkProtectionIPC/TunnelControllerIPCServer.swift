@@ -23,6 +23,9 @@ import XPCHelper
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
 public protocol IPCServerInterface: AnyObject {
+    var version: String { get }
+    var bundlePath: String { get }
+
     /// Registers a connection with the server.
     ///
     /// This is the point where the server will start sending status updates to the client.
@@ -54,6 +57,11 @@ public protocol IPCServerInterface: AnyObject {
     /// Commands
     ///
     func command(_ command: VPNCommand) async throws
+}
+
+public extension IPCServerInterface {
+    var version: String { DefaultIPCMetadataCollector.version }
+    var bundlePath: String { DefaultIPCMetadataCollector.bundlePath }
 }
 
 /// This protocol describes the server-side XPC interface.

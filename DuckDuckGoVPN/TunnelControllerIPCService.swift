@@ -124,15 +124,13 @@ final class TunnelControllerIPCService {
 extension TunnelControllerIPCService: IPCServerInterface {
 
     func register(completion: @escaping (Error?) -> Void) {
-        register(version: DefaultIPCMetadataCollector.version,
-                 bundlePath: DefaultIPCMetadataCollector.bundlePath,
-                 completion: completion)
+        register(version: version, bundlePath: bundlePath, completion: completion)
     }
 
     func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void) {
         server.serverInfoChanged(statusReporter.serverInfoObserver.recentValue)
         server.statusChanged(statusReporter.statusObserver.recentValue)
-        if DefaultIPCMetadataCollector.version != version {
+        if self.version != version {
             let error = TunnelControllerIPCService.IPCError.versionMismatched
             NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
             completion(error)
