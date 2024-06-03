@@ -76,9 +76,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
                 NSMenuItem(title: "Remove Network Extension and Login Items", action: #selector(NetworkProtectionDebugMenu.removeSystemExtensionAndAgents))
                     .targetting(self)
-
-                NSMenuItem(title: "Reset Remote Messages", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionRemoteMessages))
-                    .targetting(self)
             }
 
             NSMenuItem.separator()
@@ -481,11 +478,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @objc func resetNetworkProtectionActivationDate(_ sender: Any?) {
         overrideNetworkProtectionActivationDate(to: nil)
-    }
-
-    @objc func resetNetworkProtectionRemoteMessages(_ sender: Any?) {
-        DefaultHomePageRemoteMessagingStorage.networkProtection().removeStoredAndDismissedMessages()
-        DefaultNetworkProtectionRemoteMessaging(minimumRefreshInterval: 0).resetLastRefreshTimestamp()
     }
 
     @objc func overrideNetworkProtectionActivationDateToNow(_ sender: Any?) {

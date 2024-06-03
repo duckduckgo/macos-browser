@@ -743,6 +743,9 @@ extension MainViewController {
             try? vault?.deleteNoteFor(noteId: noteID)
         }
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
+
+        let autofillPixelReporter = AutofillPixelReporter(userDefaults: .standard, eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in }, installDate: nil)
+        autofillPixelReporter.resetStoreDefaults()
     }
 
     @objc func resetBookmarks(_ sender: Any?) {
@@ -922,6 +925,11 @@ extension MainViewController {
 
     @objc func resetConfigurationToDefault(_ sender: Any?) {
         setConfigurationUrl(nil)
+    }
+
+    @objc func resetSurveyRemoteMessages(_ sender: Any?) {
+        DefaultSurveyRemoteMessagingStorage.surveys().removeStoredAndDismissedMessages()
+        DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager).resetLastRefreshTimestamp()
     }
 
     // MARK: - Developer Tools

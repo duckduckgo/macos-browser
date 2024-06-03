@@ -59,8 +59,6 @@ final class NetworkProtectionDebugUtilities {
 
         settings.resetToDefaults()
 
-        DefaultHomePageRemoteMessagingStorage.networkProtection().removeStoredAndDismissedMessages()
-
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
