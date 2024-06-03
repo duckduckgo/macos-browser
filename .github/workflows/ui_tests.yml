@@ -76,7 +76,9 @@ jobs:
         | tee xcodebuild.log \
         | xcbeautify
 
-        spctl --add --path ./DerivedData/Build/Products/Review/UI\ Tests-Runner.app
+    - name: Override Gatekeeper for tests runner
+      run: |
+        sudo spctl --add --path ./DerivedData/Build/Products/Review/UI\ Tests-Runner.app
 
     - name: Start recording
       run: screencapture -v -V 430 recording.mov &
