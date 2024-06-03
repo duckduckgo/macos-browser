@@ -14,7 +14,7 @@ jobs:
       matrix:
         runner: [macos-13-xlarge, macos-14-xlarge]
 
-    timeout-minutes: 120
+    timeout-minutes: 20
 
     steps:
     - name: Check out the code
