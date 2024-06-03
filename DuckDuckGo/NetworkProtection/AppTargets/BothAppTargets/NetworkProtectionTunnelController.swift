@@ -37,6 +37,7 @@ import Subscription
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
+// swiftlint:disable:next type_body_length
 final class NetworkProtectionTunnelController: TunnelController, TunnelSessionProvider {
 
     // MARK: - Settings
@@ -95,6 +96,13 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// For reference read: https://app.asana.com/0/1203137811378537/1206513608690551/f
     ///
     private var internalManager: NETunnelProviderManager?
+
+    /// Simply clears the internal manager so the VPN manager is reloaded next time it's requested.
+    ///
+    @MainActor
+    private func clearInternalManager() {
+        internalManager = nil
+    }
 
     /// The last known VPN status.
     ///
@@ -180,6 +188,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
         subscribeToSettingsChanges()
         subscribeToStatusChanges()
+        subscribeToConfigurationChanges()
     }
 
     // MARK: - Observing Status Changes
@@ -209,6 +218,31 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
 
         }
+    }
+
+    // MARK: - Observing Configuation Changes
+
+    private func subscribeToConfigurationChanges() {
+        notificationCenter.publisher(for: .NEVPNConfigurationChange)
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                Task { @MainActor in
+                    guard let manager = await self.manager else {
+                        return
+                    }
+
+                    do {
+                        try await manager.loadFromPreferences()
+
+                        if manager.connection.status == .invalid {
+                            self.clearInternalManager()
+                        }
+                    } catch {
+                        self.clearInternalManager()
+                    }
+                }
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Subscriptions
@@ -695,6 +729,14 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     @MainActor
     func disableOnDemand(tunnelManager: NETunnelProviderManager) async throws {
         try await tunnelManager.loadFromPreferences()
+
+        guard tunnelManager.connection.status != .invalid else {
+            // An invalid connection status means the VPN isn't really configured
+            // so we don't want to save changed because that would re-create the VPN
+            // configuration.
+            clearInternalManager()
+            return
+        }
 
         tunnelManager.isOnDemandEnabled = false
 
