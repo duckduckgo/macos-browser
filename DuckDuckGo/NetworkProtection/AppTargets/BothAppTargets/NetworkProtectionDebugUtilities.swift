@@ -75,14 +75,6 @@ final class NetworkProtectionDebugUtilities {
         try await ipcClient.command(.sendTestNotification)
     }
 
-    func simulateKnownFailure(domain: String, code: Int) async throws {
-        do {
-            try await ipcClient.command(.simulateKnownFailure(domain, code))
-        } catch {
-            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(NSError(domain: domain, code: code))
-        }
-    }
-
     func expireRegistrationKeyNow() async throws {
         try await ipcClient.command(.expireRegistrationKey)
     }

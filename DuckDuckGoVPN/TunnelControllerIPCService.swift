@@ -192,8 +192,6 @@ extension TunnelControllerIPCService: IPCServerInterface {
         case .sendTestNotification:
             // Intentional no-op: handled by the extension
             break
-        case .simulateKnownFailure(let domain, let code):
-            throw NSError(domain: domain, code: code)
         case .removeVPNConfiguration:
             try await uninstaller.removeVPNConfiguration()
         case .uninstallVPN:

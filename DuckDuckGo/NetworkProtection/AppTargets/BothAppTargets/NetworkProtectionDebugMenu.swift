@@ -92,12 +92,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Send Test Notification", action: #selector(NetworkProtectionDebugMenu.sendTestNotification))
                 .targetting(self)
 
-            NSMenuItem(title: "Simulate Known Failure") {
-                menuItem(title: "Operation Not Permitted", action: #selector(NetworkProtectionDebugMenu.simulateKnownFailure), representedObject: ("SMAppServiceErrorDomain", 1))
-                menuItem(title: "Login Item Version Mismatched", action: #selector(NetworkProtectionDebugMenu.simulateKnownFailure), representedObject: ("TunnelControllerIPCService.IPCError", 0))
-                menuItem(title: "Failed to Fetch Registered Servers", action: #selector(NetworkProtectionDebugMenu.simulateKnownFailure), representedObject: ("NetworkProtection.NetworkProtectionClientError", 5))
-            }
-
             NSMenuItem(title: "Log Feedback Metadata to Console", action: #selector(NetworkProtectionDebugMenu.logFeedbackMetadataToConsole))
                 .targetting(self)
 
@@ -237,14 +231,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 try await debugUtilities.sendTestNotificationRequest()
             } catch {
                 await NSAlert(error: error).runModal()
-            }
-        }
-    }
-
-    @objc func simulateKnownFailure(_ sender: NSMenuItem?) throws {
-        Task { @MainActor in
-            if let error = sender?.representedObject as? (String, Int) {
-                try await debugUtilities.simulateKnownFailure(domain: error.0, code: error.1)
             }
         }
     }
