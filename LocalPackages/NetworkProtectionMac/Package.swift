@@ -72,6 +72,7 @@ let package = Package(
         .target(
             name: "VPNAppLauncher",
             dependencies: [
+                "NetworkProtectionUI",
                 .product(name: "AppLauncher", package: "AppLauncher"),
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "PixelKit", package: "BrowserServicesKit"),

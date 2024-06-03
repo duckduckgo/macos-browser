@@ -18,7 +18,6 @@
 
 import AppKit
 import Foundation
-import Common
 
 public protocol AppLaunching {
     func launchApp(withCommand command: AppLaunchCommand) async throws
