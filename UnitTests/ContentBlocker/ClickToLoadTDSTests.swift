@@ -31,11 +31,12 @@ class ClickToLoadTDSTests: XCTestCase {
 
     func testEnsureClickToLoadTDSCompiles() throws {
 
-        let trackerData = AppTrackerDataSetProvider().embeddedData
-        let etag = AppTrackerDataSetProvider().embeddedDataEtag
+        let provider = AppTrackerDataSetProvider()
+        let trackerData = provider.embeddedData
+        let etag = provider.embeddedDataEtag
         let trackerManager = TrackerDataManager(etag: etag,
                                          data: trackerData,
-                                         embeddedDataProvider: AppTrackerDataSetProvider())
+                                         embeddedDataProvider: provider)
 
         let cbrLists = ContentBlockerRulesLists(trackerDataManager: trackerManager, adClickAttribution: MockAttributing())
         let ruleSets = cbrLists.contentBlockerRulesLists
@@ -91,26 +92,11 @@ class ClickToLoadTDSTests: XCTestCase {
         let ctlTdsName = DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName
         let mainTdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
 
-        let mainRules = ruleSets.first(where: { $0.name == mainTdsName})
-        let ctlRules = ruleSets.first(where: { $0.name == ctlTdsName})
-
-        let mainTrackerData = mainRules?.trackerData
-        let mainTrackers = mainTrackerData?.tds.trackers
-
-        let ctlTrackerData = ctlRules?.trackerData
-        let ctlTrackers = ctlTrackerData?.tds.trackers
-
-        let fbMainTracker = mainTrackers?["facebook.net"]
-        let fbCTLTracker = ctlTrackers?["facebook.net"]
-
-        let fbMainRules = fbMainTracker?.rules
-        let fbCTLRules = fbCTLTracker?.rules
+        let (fbMainRules, mainCTLRuleCount) = trackerRules(for: DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName, ruleSets: ruleSets)
+        let (fbCTLRules, ctlCTLRuleCount) = trackerRules(for: ContentBlockerRulesLists.Constants.clickToLoadRulesListName, ruleSets: ruleSets)
 
         let fbMainRuleCount = fbMainRules!.count
         let fbCTLRuleCount = fbCTLRules!.count
-
-        let mainCTLRuleCount = fbMainTracker!.countCTLActions
-        let ctlCTLRuleCount = fbCTLTracker!.countCTLActions
 
         // ensure both rulesets contains facebook.net rules
         XCTAssert(fbMainRuleCount > 0)
@@ -124,4 +110,9 @@ class ClickToLoadTDSTests: XCTestCase {
         XCTAssert(fbMainRuleCount + ctlCTLRuleCount == fbCTLRuleCount)
 
     }
+}
+
+func trackerRules(for name: String, ruleSets: [ContentBlockerRulesList]) -> (rules: [KnownTracker.Rule]?, countCTLActions: Int) {
+    let tracker = ruleSets.first { $0.name == name }?.trackerData?.tds.trackers["facebook.net"]
+    return (tracker?.rules, tracker?.countCTLActions ?? 0)
 }
