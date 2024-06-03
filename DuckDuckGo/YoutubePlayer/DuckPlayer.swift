@@ -53,6 +53,25 @@ enum DuckPlayerMode: Equatable, Codable {
 }
 
 /// Values that the Frontend can use to determine the current state.
+struct InitialSetupSettings: Codable {
+    struct PlayerSettings: Codable {
+        let pip: PIP
+    }
+
+    struct PIP: Codable {
+        let status: Status
+    }
+
+    enum Status: String, Codable {
+        case enabled
+        case disabled
+    }
+
+    let userValues: UserValues
+    let settings: PlayerSettings
+}
+
+/// Values that the Frontend can use to determine user settings
 public struct UserValues: Codable {
     enum CodingKeys: String, CodingKey {
         case duckPlayerMode = "privatePlayerMode"
@@ -168,11 +187,23 @@ final class DuckPlayer {
         encodeUserValues()
     }
 
+    public func initialSetup(params: Any, message: UserScriptMessage) -> Encodable? {
+        encodedSettings()
+    }
+
     private func encodeUserValues() -> UserValues {
         UserValues(
             duckPlayerMode: self.preferences.duckPlayerMode,
             overlayInteracted: self.preferences.youtubeOverlayInteracted
         )
+    }
+
+    private func encodedSettings() -> InitialSetupSettings {
+        let pip = InitialSetupSettings.PIP(status: shouldEnablePiP ? .enabled : .disabled)
+        let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip)
+        let userValues = encodeUserValues()
+
+        return InitialSetupSettings(userValues: userValues, settings: playerSettings)
     }
 
     // MARK: - Private
@@ -252,6 +283,14 @@ extension DuckPlayer {
             return page.url.youtubeVideoID
         }
         return actualTitle.dropping(prefix: Self.websiteTitlePrefix)
+    }
+
+    var shouldEnablePiP: Bool {
+#if APPSTORE
+        return false
+#else
+        return true
+#endif
     }
 }
 

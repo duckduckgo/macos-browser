@@ -89,6 +89,14 @@ final class DuckPlayerTests: XCTestCase {
         XCTAssertNil(duckPlayer.title(for: feedItem))
     }
 
+    func testEnabledPiPFlag() {
+#if APPSTORE
+        XCTAssertFalse(duckPlayer.shouldEnablePiP)
+#else
+        XCTAssertTrue(duckPlayer.shouldEnablePiP)
+#endif
+    }
+
     func testThatTitleForRecentlyVisitedPageIsNotAdjustedForNonDuckPlayerFeedItems() {
         let feedItem = HomePage.Models.RecentlyVisitedPageModel(
             actualTitle: "Duck Player - A sample video title",
