@@ -63,14 +63,27 @@ jobs:
     - name: Launch activity monitor
       run: open /System/Applications/Utilities/Activity\ Monitor.app
 
-    - name: Start recording
-      run: screencapture -v -V 430 recording.mov &
-
-    - name: Build and run UI Testing
+    - name: Build for testing
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
-        set -o pipefail && xcodebuild test \
+        set -o pipefail && xcodebuild build-for-testing \
+          -scheme "UI Tests" \
+          -configuration Review \
+          -derivedDataPath DerivedData \
+          -skipPackagePluginValidation \
+          -skipMacroValidation \
+        | tee xcodebuild.log \
+        | xcbeautify
+
+        cp -R DerivedData/Build/Products/Review/DuckDuckGo\ Review.app /Applications/DuckDuckGo\ Review.app
+
+    - name: Start recording
+      run: screencapture -v -V 430 recording.mov &
+
+    - name: Run UI Tests
+      run: |
+        set -o pipefail && xcodebuild test-without-building \
           -scheme "UI Tests" \
           -configuration Review \
           -derivedDataPath DerivedData \
@@ -78,7 +91,7 @@ jobs:
           -skipMacroValidation \
           -test-iterations 2 \
           -retry-tests-on-failure \
-        | tee xcodebuild.log \
+        | tee -a xcodebuild.log \
         | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml
 
      #   - name: Create Asana task when workflow failed
