@@ -129,7 +129,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
          accountManager: AccountManaging) {
         let ipcClient = TunnelControllerIPCClient()
         ipcClient.register { _ in }
-		self.accountManager = accountManager
+        self.accountManager = accountManager
         self.ipcClient = ipcClient
         self.defaults = defaults
 

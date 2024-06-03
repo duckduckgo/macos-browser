@@ -52,19 +52,21 @@ final class NetworkProtectionIPCTunnelController {
     private let ipcClient: NetworkProtectionIPCClient
     private let pixelKit: PixelFiring?
     private let errorRecorder: VPNOperationErrorRecorder
-    private let knownFailureStore = NetworkProtectionKnownFailureStore()
+    private let knownFailureStore: NetworkProtectionKnownFailureStore
 
     init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
          loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          ipcClient: NetworkProtectionIPCClient,
          pixelKit: PixelFiring? = PixelKit.shared,
-         errorRecorder: VPNOperationErrorRecorder = VPNOperationErrorRecorder()) {
+         errorRecorder: VPNOperationErrorRecorder = VPNOperationErrorRecorder(),
+         knownFailureStore: NetworkProtectionKnownFailureStore = NetworkProtectionKnownFailureStore()) {
 
         self.featureVisibility = featureVisibility
         self.loginItemsManager = loginItemsManager
         self.ipcClient = ipcClient
         self.pixelKit = pixelKit
         self.errorRecorder = errorRecorder
+        self.knownFailureStore = knownFailureStore
     }
 
     // MARK: - Login Items Manager
@@ -101,11 +103,12 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
         do {
             try await enableLoginItems()
 
-            ipcClient.start { [knownFailureStore, pixelKit] error in
+            knownFailureStore.reset()
+
+            ipcClient.start { [pixelKit] error in
                 if let error {
                     handleFailure(error)
                 } else {
-                    knownFailureStore.lastKnownFailure = nil
                     pixelKit?.fire(StartAttempt.success, frequency: .dailyAndCount)
                 }
             }
