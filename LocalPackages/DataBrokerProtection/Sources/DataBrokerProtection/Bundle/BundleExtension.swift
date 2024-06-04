@@ -18,7 +18,11 @@
 
 import Foundation
 
-extension Bundle {
+protocol GroupNameProviding {
+    var appGroupName: String { get }
+}
+
+extension Bundle: GroupNameProviding {
 
     static let dbpAppGroupName = "DBP_APP_GROUP"
 
