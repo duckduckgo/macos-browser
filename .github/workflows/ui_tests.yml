@@ -95,8 +95,7 @@ jobs:
           -skipMacroValidation \
           -test-iterations 2 \
           -retry-tests-on-failure \
-        | tee -a xcodebuild.log \
-        | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml
+        | tee -a xcodebuild.log
 
     - name: Enable Gatekeeper
       run: |
@@ -111,17 +110,17 @@ jobs:
  #          --header "Content-Type: application/json" \
  #          --data ' { "data": { "name": "GH Workflow Failure - UI Tests", "projects": [ "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}" ], "notes" : "The end to end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" } }'
 
+    - name: Prepare test report
+      if: always()
+      run: |
+        xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml < xcodebuild.log
+
     - name: Publish tests report
       uses: mikepenz/action-junit-report@v4
       if: always() 
       with:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml
-
-    - name: Sleep for recording to finish
-      # if: failure() || cancelled()
-      if: always()
-      run: sleep 90
 
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4
