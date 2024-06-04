@@ -85,18 +85,6 @@ jobs:
     #     rm -rf "$DEST"
     #     cp -R "DerivedData/Build/Products/Review/DuckDuckGo Review.app" "$DEST"
 
-    # - name: Setup tmate session
-    #   uses: mxschmitt/action-tmate@v3
-    #   with:
-    #     limit-access-to-actor: true
-
-    - name: Start recording
-      run: screencapture -v -V 430 recording.mov &
-
-    - name: Launch the app
-      run: |
-        open -b com.duckduckgo.macos.browser.review
-
     - name: Run UI Tests
       run: |
         set -o pipefail && xcodebuild test-without-building \
@@ -107,9 +95,8 @@ jobs:
           -skipMacroValidation \
           -test-iterations 2 \
           -retry-tests-on-failure \
-        | tee -a xcodebuild.log
-        #  \
-        # | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml
+        | tee -a xcodebuild.log \
+        | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml
 
     - name: Enable Gatekeeper
       run: |

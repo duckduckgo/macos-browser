@@ -60,7 +60,7 @@ extension NSApplication {
             return .normal
         }
 #elseif REVIEW
-        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" || ProcessInfo.processInfo.environment["CI"] == "true" {
+        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" || ProcessInfo.processInfo.environment["CI"] != nil {
             return .uiTests
         }
         return .normal
