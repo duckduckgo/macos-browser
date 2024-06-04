@@ -76,12 +76,6 @@ jobs:
         | tee xcodebuild.log \
         | xcbeautify
 
-    # - name: Install the app
-    #   run: |
-    #     DEST="/Applications/DuckDuckGo Review.app"
-    #     rm -rf "$DEST"
-    #     cp -R "DerivedData/Build/Products/Review/DuckDuckGo Review.app" "$DEST"
-
     - name: Run UI Tests
       run: |
         set -o pipefail && xcodebuild test-without-building \
