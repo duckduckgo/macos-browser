@@ -172,8 +172,8 @@ struct DataImportView: ModalView {
 
                 ReportFeedbackView(model: $model.reportModel)
 
-            case .shortcuts:
-                DataImportShortcutsView()
+            case .shortcuts(let dataTypes):
+                DataImportShortcutsView(dataTypes: dataTypes)
             }
         }
     }

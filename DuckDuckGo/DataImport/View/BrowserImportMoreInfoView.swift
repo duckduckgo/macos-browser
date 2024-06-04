@@ -30,7 +30,7 @@ struct BrowserImportMoreInfoView: View {
         switch source {
         case .chrome, .chromium, .coccoc, .edge, .brave, .opera, .operaGX, .vivaldi:
             Text("""
-            If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.
+            After clicking import, your computer may ask you to enter a password. You may need to enter your password two times before importing starts. DuckDuckGo will not see that password.
 
             Imported passwords are stored securely using encryption.
             """, comment: "Warning that Chromium data import would require entering system passwords.")

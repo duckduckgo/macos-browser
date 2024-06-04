@@ -1239,6 +1239,9 @@
         }
       }
     },
+    "After clicking import, your computer may ask you to enter a password. You may need to enter your password two times before importing starts. DuckDuckGo will not see that password.\n\nImported passwords are stored securely using encryption." : {
+      "comment" : "Warning that Chromium data import would require entering system passwords."
+    },
     "after.bitwarden.installation.info" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -4665,7 +4668,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Lock access to passwords and autofill info after computer is idle for"
+            "value" : "Lock autofill after computer is idle for"
           }
         },
         "es" : {
@@ -4965,7 +4968,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "If not locked, anyone with access to your device will be able to use and modify your autofill info. For security purposes, payment method form fill always requires authentication."
+            "value" : "If not locked, anyone with access to your device will be able to use and modify your autofill data. For security purposes, credit card form fill always requires authentication."
           }
         },
         "es" : {
@@ -5320,18 +5323,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Способы оплаты"
-          }
-        }
-      }
-    },
-    "autofill.popover.auto-pinned.text" : {
-      "comment" : "Text confirming the password manager has been pinned to the toolbar",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Shortcut Added!"
           }
         }
       }
@@ -5692,6 +5683,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы используете %@ для управления паролями"
+          }
+        }
+      }
+    },
+    "autofill.popover.passwords.auto-pinned.text" : {
+      "comment" : "Text confirming the password manager has been pinned to the toolbar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Shortcut Added!"
+          }
+        }
+      }
+    },
+    "autofill.popover.passwords.pin-prompt.button.text" : {
+      "comment" : "Button to pin the password manager shortcut to the toolbar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Shortcut"
+          }
+        }
+      }
+    },
+    "autofill.popover.passwords.pin-prompt.text" : {
+      "comment" : "Text prompting user to pin the password manager shortcut to the toolbar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add passwords shortcut?"
           }
         }
       }
@@ -17855,7 +17882,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Export passwords…"
+            "value" : "Export Passwords…"
           }
         },
         "es" : {
@@ -22369,6 +22396,7 @@
     },
     "If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.\n\nImported passwords are stored securely using encryption." : {
       "comment" : "Warning that Chromium data import would require entering system passwords.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -23125,7 +23153,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Import passwords…"
+            "value" : "Import Passwords…"
           }
         },
         "es" : {
@@ -23179,7 +23207,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Customize your experience"
+            "value" : "Almost done!"
+          }
+        }
+      }
+    },
+    "import.browser.data.shortcuts.subtitle" : {
+      "comment" : "Subtitle explaining how users can find toolbar shortcuts.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can always right-click on the browser toolbar to find more shortcuts like these."
           }
         }
       }
@@ -23203,7 +23243,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Import from"
+            "value" : "Import From"
           }
         }
       }
@@ -25724,6 +25764,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пароли импортируются (%d)…"
+          }
+        }
+      }
+    },
+    "import.shortcuts.bookmarks.subtitle" : {
+      "comment" : "Description for the setting to enable the bookmarks bar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Put your favorite bookmarks in easy reach"
+          }
+        }
+      }
+    },
+    "import.shortcuts.bookmarks.title" : {
+      "comment" : "Title for the setting to enable the bookmarks bar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Bookmarks Bar"
+          }
+        }
+      }
+    },
+    "import.shortcuts.passwords.subtitle" : {
+      "comment" : "Description for the setting to enable the passwords shortcut",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep passwords nearby in the address bar"
+          }
+        }
+      }
+    },
+    "import.shortcuts.passwords.title" : {
+      "comment" : "Title for the setting to enable the passwords shortcut",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Passwords Shortcut"
           }
         }
       }
@@ -34727,55 +34815,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Fireproof?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Fireproof?"
+            "value" : "Fireproof this website"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "¿Marcar como Fireproof?"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Mode coupe-feu (Fireproof) ?"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Attivare Fireproof?"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Fireproof?"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ustawić jako Fireproof?"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Utilizar o Fireproof?"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Сделать огнеупорным?"
           }
         }
@@ -34787,55 +34875,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Login bei Bitwarden speichern?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Save Login to Bitwarden?"
+            "value" : "Save password to Bitwarden?"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "¿Guardar inicio de sesión en Bitwarden?"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Enregistrer la connexion à Bitwarden ?"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Salvare l'accesso a Bitwarden?"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Login op Bitwarden opslaan?"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Zapisać dane logowania w aplikacji Bitwarden?"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Guardar início de sessão no Bitwarden?"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Сохранить логин в Bitwarden?"
           }
         }
@@ -39678,6 +39766,18 @@
         }
       }
     },
+    "pm.empty.default.button.title" : {
+      "comment" : "Import passwords button title for default empty state",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import Passwords"
+          }
+        }
+      }
+    },
     "pm.empty.default.description" : {
       "comment" : "Label for default empty state description",
       "extractionState" : "extracted_with_value",
@@ -39864,55 +39964,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Keine Passwörter"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "No passwords"
+            "value" : "No passwords saved yet"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Sin contraseñas"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Aucun mot de passe"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nessuna password"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Geen wachtwoorden"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Brak haseł"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Sem palavras-passe"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Нет паролей"
           }
         }
@@ -42451,7 +42551,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Save Password to DuckDuckGo?"
+            "value" : "Save password in DuckDuckGo?"
           }
         },
         "es" : {
@@ -42504,55 +42604,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Neues Passwort gespeichert"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "New Password Saved"
+            "value" : "New password saved"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nueva contraseña guardada"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nouveau mot de passe enregistré"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nuova password salvata"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nieuw wachtwoord opgeslagen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Zapisano nowe hasło"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nova palavra-passe guardada"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Новый пароль сохранен"
           }
         }
@@ -43045,7 +43145,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Update Password?"
+            "value" : "Update password?"
           }
         }
       }
@@ -48658,6 +48758,7 @@
     },
     "Select data to import:" : {
       "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48708,6 +48809,9 @@
           }
         }
       }
+    },
+    "Select Data to Import:" : {
+      "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks."
     },
     "Select Profile:" : {
       "comment" : "Browser Profile picker title for Data Import",

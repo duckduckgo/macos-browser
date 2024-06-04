@@ -486,4 +486,5 @@ extension NavigationBarPopovers: NSPopoverDelegate {
 extension Notification.Name {
     static let loginAutoSaved = Notification.Name(rawValue: "loginAutoSaved")
     static let passwordsAutoPinned = Notification.Name(rawValue: "passwordsAutoPinned")
+    static let passwordsPinningPrompt = Notification.Name(rawValue: "passwordsPinningPrompt")
 }

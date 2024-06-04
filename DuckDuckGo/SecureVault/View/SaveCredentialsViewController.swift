@@ -82,6 +82,8 @@ final class SaveCredentialsViewController: NSViewController {
 
     private var saveButtonAction: (() -> Void)?
 
+    private var shouldFirePinPromptNotification = false
+
     var passwordData: Data {
         let string = hiddenPasswordField.isHidden ? visiblePasswordField.stringValue : hiddenPasswordField.stringValue
         return string.data(using: .utf8)!
@@ -105,6 +107,9 @@ final class SaveCredentialsViewController: NSViewController {
 
     override func viewWillDisappear() {
         passwordManagerStateCancellable = nil
+        if shouldFirePinPromptNotification {
+            NotificationCenter.default.post(name: .passwordsPinningPrompt, object: nil)
+        }
     }
 
     private func setUpStrings() {
@@ -233,9 +238,14 @@ final class SaveCredentialsViewController: NSViewController {
                     }
                 }
             } else {
-                _ = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared).storeWebsiteCredentials(credentials)
+                let vault = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
+                _ = try vault.storeWebsiteCredentials(credentials)
                 NSApp.delegateTyped.syncService?.scheduler.notifyDataChanged()
                 os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+
+                if existingCredentials?.account.id == nil, !LocalPinningManager.shared.isPinned(.autofill), let count = try? vault.accountsCount(), count == 1 {
+                    shouldFirePinPromptNotification = true
+                }
             }
         } catch {
             os_log("%s:%s: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
