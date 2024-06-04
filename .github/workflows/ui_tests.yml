@@ -85,11 +85,6 @@ jobs:
     #     rm -rf "$DEST"
     #     cp -R "DerivedData/Build/Products/Review/DuckDuckGo Review.app" "$DEST"
 
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-      with:
-        limit-access-to-actor: true
-
     - name: Start recording
       run: screencapture -v -V 430 recording.mov &
 
