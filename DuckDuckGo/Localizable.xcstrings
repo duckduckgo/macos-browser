@@ -34875,55 +34875,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Login bei Bitwarden speichern?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Save Login to Bitwarden?"
+            "value" : "Save password to Bitwarden?"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "¿Guardar inicio de sesión en Bitwarden?"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Enregistrer la connexion à Bitwarden ?"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Salvare l'accesso a Bitwarden?"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Login op Bitwarden opslaan?"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Zapisać dane logowania w aplikacji Bitwarden?"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Guardar início de sessão no Bitwarden?"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Сохранить логин в Bitwarden?"
           }
         }
