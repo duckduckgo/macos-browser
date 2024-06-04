@@ -37,13 +37,15 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let connectivityIssuesObserver: ConnectivityIssueObserver
         let controllerErrorMessageObserver: ControllerErrorMesssageObserver
         let dataVolumeObserver: DataVolumeObserver
+        let knownFailureObserver: KnownFailureObserver
 
         init(status: ConnectionStatus,
              isHavingConnectivityIssues: Bool = false,
              serverInfo: NetworkProtectionStatusServerInfo = MockStatusReporter.defaultServerInfo,
              tunnelErrorMessage: String? = nil,
              controllerErrorMessage: String? = nil,
-             dataVolume: DataVolume = .init()) {
+             dataVolume: DataVolume = .init(),
+             failure: KnownFailure? = nil) {
 
             let mockStatusObserver = MockConnectionStatusObserver()
             mockStatusObserver.subject.send(status)
@@ -68,6 +70,10 @@ final class TunnelControllerViewModelTests: XCTestCase {
             let mockDataVolumeObserver = MockDataVolumeObserver()
             mockDataVolumeObserver.subject.send(dataVolume)
             dataVolumeObserver = mockDataVolumeObserver
+
+            let mockKnownFailureObserver = MockKnownFailureObserver()
+            mockKnownFailureObserver.subject.send(failure)
+            knownFailureObserver = mockKnownFailureObserver
         }
 
         func forceRefresh() {

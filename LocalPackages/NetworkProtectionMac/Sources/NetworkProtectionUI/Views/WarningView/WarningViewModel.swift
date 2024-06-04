@@ -1,5 +1,5 @@
 //
-//  TunnelControllerProvider.swift
+//  WarningViewModel.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,21 +16,20 @@
 //  limitations under the License.
 //
 
-import Foundation
-import NetworkProtection
-import NetworkProtectionIPC
+import SwiftUI
 
-final class TunnelControllerProvider {
-    static let shared = TunnelControllerProvider()
+extension WarningView {
+    final class Model: ObservableObject {
+        var message: String
+        var actionTitle: String?
+        var action: (() -> Void)?
 
-    let tunnelController: NetworkProtectionIPCTunnelController
-
-    private init() {
-        let ipcClient = TunnelControllerIPCClient()
-        ipcClient.register { error in
-            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
+        init(message: String,
+             actionTitle: String? = nil,
+             action: (() -> Void)?) {
+            self.message = message
+            self.actionTitle = actionTitle
+            self.action = action
         }
-        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
     }
-
 }
