@@ -80,6 +80,10 @@ jobs:
         | tee xcodebuild.log \
         | xcbeautify
 
+    - name: Install the app
+      run: |
+        cp -R "DerivedData/Build/Products/Review/DuckDuckGo Review.app" /Applications
+
     - name: Start recording
       run: screencapture -v -V 430 recording.mov &
 
