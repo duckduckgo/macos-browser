@@ -91,7 +91,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         subscriptionManager.accountManager
     }
     public let subscriptionManager: SubscriptionManaging
-    public let vpnTunnelIPCClient = TunnelControllerIPCClient()
     public let vpnSettings = VPNSettings(defaults: .netP)
 
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
