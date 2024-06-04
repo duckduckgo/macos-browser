@@ -75,6 +75,8 @@ public enum DataBrokerProtectionPixels {
     case error(error: DataBrokerProtectionError, dataBroker: String)
     case generalError(error: Error, functionOccurredIn: String)
     case secureVaultInitError(error: Error)
+    case secureVaultKeyStoreReadError(error: Error)
+    case secureVaultKeyStoreUpdateError(error: Error)
     case secureVaultError(error: Error)
     case parentChildMatches(parent: String, child: String, value: Int)
 
@@ -203,6 +205,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .error: return "m_mac_data_broker_error"
         case .generalError: return "m_mac_data_broker_error"
         case .secureVaultInitError: return "m_mac_dbp_secure_vault_init_error"
+        case .secureVaultKeyStoreReadError: return "m_mac_dbp_secure_vault_keystore_read_error"
+        case .secureVaultKeyStoreUpdateError: return "m_mac_dbp_secure_vault_keystore_update_error"
         case .secureVaultError: return "m_mac_dbp_secure_vault_error"
 
         case .backgroundAgentStarted: return "m_mac_dbp_background-agent_started"
@@ -375,6 +379,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .entitlementCheckInvalid,
                 .entitlementCheckError,
                 .secureVaultInitError,
+                .secureVaultKeyStoreReadError,
+                .secureVaultKeyStoreUpdateError,
                 .secureVaultError:
             return [:]
         case .ipcServerProfileSavedCalledByApp,
@@ -432,7 +438,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             case .generalError(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .secureVaultInitError(let error),
-                    .secureVaultError(let error):
+                    .secureVaultError(let error),
+                    .secureVaultKeyStoreReadError(let error),
+                    .secureVaultKeyStoreUpdateError(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerProfileSavedXPCError(error: let error),
                     .ipcServerImmediateScansFinishedWithError(error: let error),

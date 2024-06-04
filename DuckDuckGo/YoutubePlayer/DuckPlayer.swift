@@ -53,6 +53,25 @@ enum DuckPlayerMode: Equatable, Codable {
 }
 
 /// Values that the Frontend can use to determine the current state.
+struct InitialSetupSettings: Codable {
+    struct PlayerSettings: Codable {
+        let pip: PIP
+    }
+
+    struct PIP: Codable {
+        let status: Status
+    }
+
+    enum Status: String, Codable {
+        case enabled
+        case disabled
+    }
+
+    let userValues: UserValues
+    let settings: PlayerSettings
+}
+
+/// Values that the Frontend can use to determine user settings
 public struct UserValues: Codable {
     enum CodingKeys: String, CodingKey {
         case duckPlayerMode = "privatePlayerMode"
@@ -168,11 +187,28 @@ final class DuckPlayer {
         encodeUserValues()
     }
 
+    public func initialSetup(with webView: WKWebView?) -> (_ params: Any, _ message: UserScriptMessage) async -> Encodable? {
+        return { _, _ in
+            return await self.encodedSettings(with: webView)
+        }
+    }
+
     private func encodeUserValues() -> UserValues {
         UserValues(
             duckPlayerMode: self.preferences.duckPlayerMode,
             overlayInteracted: self.preferences.youtubeOverlayInteracted
         )
+    }
+
+    @MainActor
+    private func encodedSettings(with webView: WKWebView?) async -> InitialSetupSettings {
+        let isPiPEnabled = webView?.configuration.allowsPictureInPictureMediaPlayback == true
+        let pip = InitialSetupSettings.PIP(status: isPiPEnabled ? .enabled : .disabled)
+
+        let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip)
+        let userValues = encodeUserValues()
+
+        return InitialSetupSettings(userValues: userValues, settings: playerSettings)
     }
 
     // MARK: - Private
@@ -253,6 +289,7 @@ extension DuckPlayer {
         }
         return actualTitle.dropping(prefix: Self.websiteTitlePrefix)
     }
+
 }
 
 #if DEBUG
