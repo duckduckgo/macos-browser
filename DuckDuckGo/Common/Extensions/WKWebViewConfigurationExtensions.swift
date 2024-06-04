@@ -24,7 +24,12 @@ import WebKit
 extension WKWebViewConfiguration {
 
     var allowsPictureInPictureMediaPlayback: Bool {
-        preferences.value(forKey: "allowsPictureInPictureMediaPlayback") as? Bool ?? false
+        get {
+            return preferences.value(forKey: "allowsPictureInPictureMediaPlayback") as? Bool ?? false
+        }
+        set {
+            preferences.setValue(newValue, forKey: "allowsPictureInPictureMediaPlayback")
+        }
     }
 
     @MainActor
@@ -40,7 +45,7 @@ extension WKWebViewConfiguration {
         }
 
 #if !APPSTORE
-        preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
+        allowsPictureInPictureMediaPlayback = true
 #endif
 
         preferences.setValue(true, forKey: "developerExtrasEnabled")
