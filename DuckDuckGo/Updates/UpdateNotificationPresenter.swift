@@ -33,6 +33,7 @@ final class UpdateNotificationPresenter {
         let updateNotificationView = UpdateNotificationView(icon: icon, text: text, onClose: { [weak self] in
             self?.closeUpdateNotification()
         }, onTap: { [weak self] in
+            self?.closeUpdateNotification()
             self?.openUpdatesPage()
         })
         let hostingController = NSHostingController(rootView: updateNotificationView)

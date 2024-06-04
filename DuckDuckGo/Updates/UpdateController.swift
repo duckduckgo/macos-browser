@@ -76,7 +76,10 @@ final class UpdateController: NSObject {
 //        updater.updater.updateCheckInterval = 0
 //#endif
 
-        updater.checkForUpdates(nil)
+        updater.updater.checkForUpdatesInBackground()
+
+        //TODO: if automatic updates are disabled
+//        updater.updater.automaticallyDownloadsUpdates = false
     }
 
     private func showNotSupportedInfo() {
@@ -133,8 +136,7 @@ extension UpdateController: SPUUpdaterDelegate {
         }
     }
 
-    func updater(_ updater: SPUUpdater, didFinishLoading appcast: SUAppcast) {
-        // Example to show a notification when appcast finishes loading
+    func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
         notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Relaunch to update.")
     }
 
