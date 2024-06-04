@@ -102,8 +102,9 @@ jobs:
           -skipMacroValidation \
           -test-iterations 2 \
           -retry-tests-on-failure \
-        | tee -a xcodebuild.log \
-        | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml
+        | tee -a xcodebuild.log
+        #  \
+        # | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml
 
     - name: Enable Gatekeeper
       run: |
