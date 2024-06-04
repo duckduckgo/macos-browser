@@ -477,9 +477,9 @@ final class NavigationBarViewController: NSViewController {
                 self.passwordManagementButton.isHidden = !LocalPinningManager.shared.isPinned(.autofill)
             })
 
-            popoverMessage.viewModel.buttonAction = {
+            popoverMessage.viewModel.buttonAction = { [weak popoverMessage] in
                 LocalPinningManager.shared.pin(.autofill)
-                popoverMessage.dismiss()
+                popoverMessage?.dismiss()
             }
 
             self.passwordManagementButton.isHidden = false
