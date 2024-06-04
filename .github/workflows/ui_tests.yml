@@ -115,12 +115,10 @@ jobs:
 
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4
-      # if: failure() || cancelled()
-      if: always()
+      if: failure() || cancelled()
       with:
         name: "BuildLogs ${{ matrix.runner }}"
         path: |
-          recording.mov
           xcodebuild.log
           DerivedData/Logs/Test/*.xcresult
           ~/Library/Logs/DiagnosticReports/*
