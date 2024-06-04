@@ -187,8 +187,10 @@ final class DuckPlayer {
         encodeUserValues()
     }
 
-    public func initialSetup(params: Any, message: UserScriptMessage) -> Encodable? {
-        encodedSettings()
+    public func initialSetup(with webView: WKWebView?) -> (_ params: Any, _ message: UserScriptMessage) async -> Encodable? {
+        return { _, _ in
+            return await self.encodedSettings(with: webView)
+        }
     }
 
     private func encodeUserValues() -> UserValues {
@@ -198,8 +200,11 @@ final class DuckPlayer {
         )
     }
 
-    private func encodedSettings() -> InitialSetupSettings {
-        let pip = InitialSetupSettings.PIP(status: shouldEnablePiP ? .enabled : .disabled)
+    @MainActor
+    private func encodedSettings(with webView: WKWebView?) async -> InitialSetupSettings {
+        let isPiPEnabled = webView?.configuration.allowsPictureInPictureMediaPlayback == true
+        let pip = InitialSetupSettings.PIP(status: isPiPEnabled ? .enabled : .disabled)
+
         let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip)
         let userValues = encodeUserValues()
 
@@ -285,13 +290,6 @@ extension DuckPlayer {
         return actualTitle.dropping(prefix: Self.websiteTitlePrefix)
     }
 
-    var shouldEnablePiP: Bool {
-#if APPSTORE
-        return false
-#else
-        return true
-#endif
-    }
 }
 
 #if DEBUG

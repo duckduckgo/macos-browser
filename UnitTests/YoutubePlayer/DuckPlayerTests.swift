@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import XCTest
+import Common
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -89,11 +90,16 @@ final class DuckPlayerTests: XCTestCase {
         XCTAssertNil(duckPlayer.title(for: feedItem))
     }
 
-    func testEnabledPiPFlag() {
+    @MainActor
+    func testEnabledPiPFlag() async {
+        let configuration = WKWebViewConfiguration()
+
+        configuration.applyStandardConfiguration(contentBlocking: ContentBlockingMock(),
+                                                 burnerMode: .regular)
 #if APPSTORE
-        XCTAssertFalse(duckPlayer.shouldEnablePiP)
+        XCTAssertFalse(configuration.allowsPictureInPictureMediaPlayback)
 #else
-        XCTAssertTrue(duckPlayer.shouldEnablePiP)
+        XCTAssertTrue(configuration.allowsPictureInPictureMediaPlayback)
 #endif
     }
 

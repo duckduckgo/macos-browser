@@ -23,6 +23,10 @@ import WebKit
 
 extension WKWebViewConfiguration {
 
+    var allowsPictureInPictureMediaPlayback: Bool {
+        preferences.value(forKey: "allowsPictureInPictureMediaPlayback") as? Bool ?? false
+    }
+
     @MainActor
     func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, burnerMode: BurnerMode) {
         if case .burner(let websiteDataStore) = burnerMode {
@@ -34,7 +38,11 @@ extension WKWebViewConfiguration {
         } else {
             preferences.setValue(true, forKey: "fullScreenEnabled")
         }
+
+#if !APPSTORE
         preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
+#endif
+
         preferences.setValue(true, forKey: "developerExtrasEnabled")
         preferences.setValue(false, forKey: "backspaceKeyNavigationEnabled")
         preferences.javaScriptCanOpenWindowsAutomatically = true
