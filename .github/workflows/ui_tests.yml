@@ -63,6 +63,10 @@ jobs:
     - name: Launch activity monitor
       run: open /System/Applications/Utilities/Activity\ Monitor.app
 
+    - name: Disable Gatekeeper
+      run: |
+        sudo spctl --master-disable
+
     - name: Build for testing
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
@@ -75,10 +79,6 @@ jobs:
           -skipMacroValidation \
         | tee xcodebuild.log \
         | xcbeautify
-
-    - name: Override Gatekeeper for tests runner
-      run: |
-        sudo spctl --add --path ./DerivedData/Build/Products/Review/UI\ Tests-Runner.app
 
     - name: Start recording
       run: screencapture -v -V 430 recording.mov &
@@ -95,6 +95,10 @@ jobs:
           -retry-tests-on-failure \
         | tee -a xcodebuild.log \
         | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml
+
+    - name: Enable Gatekeeper
+      run: |
+        sudo spctl --master-enable
 
      #   - name: Create Asana task when workflow failed
  #     if: ${{ failure() }} && github.ref == 'refs/heads/main'
