@@ -64,8 +64,7 @@ jobs:
       run: open /System/Applications/Utilities/Activity\ Monitor.app
 
     - name: Disable Gatekeeper
-      run: |
-        sudo spctl --master-disable
+      run: sudo spctl --master-disable
 
     - name: Build for testing
       run: |
@@ -80,12 +79,18 @@ jobs:
         | tee xcodebuild.log \
         | xcbeautify
 
-    - name: Install the app
-      run: |
-        cp -R "DerivedData/Build/Products/Review/DuckDuckGo Review.app" /Applications
+    # - name: Install the app
+    #   run: |
+    #     DEST="/Applications/DuckDuckGo Review.app"
+    #     rm -rf "$DEST"
+    #     cp -R "DerivedData/Build/Products/Review/DuckDuckGo Review.app" "$DEST"
 
     - name: Start recording
       run: screencapture -v -V 430 recording.mov &
+
+    - name: Launch the app
+      run: |
+        open -b com.duckduckgo.macos.browser.review
 
     - name: Run UI Tests
       run: |
