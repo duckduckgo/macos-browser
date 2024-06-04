@@ -100,11 +100,14 @@ public struct TransparentActionButtonStyle: ButtonStyle {
 public struct DismissActionButtonStyle: ButtonStyle {
     @Environment(\.colorScheme) var colorScheme
 
-    public init() {}
+    public let textColor: Color
+
+    public init(textColor: Color = .primary) {
+        self.textColor = textColor
+    }
 
     public func makeBody(configuration: Self.Configuration) -> some View {
         let backgroundColor = configuration.isPressed ? Color(.windowBackgroundColor) : Color(.controlColor)
-        let labelColor = Color.primary
         let outerShadowOpacity = colorScheme == .dark ? 0.8 : 0.0
 
         configuration.label
@@ -124,7 +127,7 @@ public struct DismissActionButtonStyle: ButtonStyle {
                 RoundedRectangle(cornerRadius: 5)
                     .stroke(Color.black.opacity(0.1), lineWidth: 1)
             )
-            .foregroundColor(labelColor)
+            .foregroundColor(textColor)
 
     }
 }

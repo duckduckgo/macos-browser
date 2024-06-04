@@ -266,7 +266,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             connectionErrorObserver: errorObserver,
             connectivityIssuesObserver: DisabledConnectivityIssueObserver(),
             controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications(),
-            dataVolumeObserver: dataVolumeObserver
+            dataVolumeObserver: dataVolumeObserver,
+            knownFailureObserver: KnownFailureObserverThroughDistributedNotifications()
         )
     }()
 

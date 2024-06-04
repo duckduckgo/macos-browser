@@ -1,7 +1,7 @@
 //
-//  TunnelControllerProvider.swift
+//  KnownFailureObserverThroughIPC.swift
 //
-//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,20 +17,23 @@
 //
 
 import Foundation
+import Combine
 import NetworkProtection
-import NetworkProtectionIPC
 
-final class TunnelControllerProvider {
-    static let shared = TunnelControllerProvider()
+public final class KnownFailureObserverThroughIPC: KnownFailureObserver {
+    private let subject = CurrentValueSubject<KnownFailure?, Never>(nil)
 
-    let tunnelController: NetworkProtectionIPCTunnelController
+    // MARK: - KnownFailureObserver
 
-    private init() {
-        let ipcClient = TunnelControllerIPCClient()
-        ipcClient.register { error in
-            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
-        }
-        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+    public lazy var publisher = subject.eraseToAnyPublisher()
+
+    public var recentValue: KnownFailure? {
+        subject.value
     }
 
+    // MARK: - Publishing Updates
+
+    func publish(_ error: KnownFailure?) {
+        subject.send(error)
+    }
 }
