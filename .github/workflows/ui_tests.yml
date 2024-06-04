@@ -60,9 +60,6 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
-    - name: Disable Gatekeeper
-      run: sudo spctl --master-disable
-
     - name: Build for testing
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
@@ -75,6 +72,10 @@ jobs:
           -skipMacroValidation \
         | tee xcodebuild.log \
         | xcbeautify
+
+    # Disable Gatekeeper to allow launching unsigned UI Tests Runner
+    - name: Disable Gatekeeper
+      run: sudo spctl --master-disable
 
     - name: Run UI Tests
       run: |
@@ -92,7 +93,7 @@ jobs:
       run: |
         sudo spctl --master-enable
 
-     #   - name: Create Asana task when workflow failed
+ #   - name: Create Asana task when workflow failed
  #     if: ${{ failure() }} && github.ref == 'refs/heads/main'
  #     run: |
  #       curl -s "https://app.asana.com/api/1.0/tasks" \
