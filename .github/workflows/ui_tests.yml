@@ -73,10 +73,6 @@ jobs:
         | tee xcodebuild.log \
         | xcbeautify
 
-    # Disable Gatekeeper to allow launching unsigned UI Tests Runner
-    - name: Disable Gatekeeper
-      run: sudo spctl --master-disable
-
     - name: Run UI Tests
       run: |
         set -o pipefail && xcodebuild test-without-building \
@@ -87,11 +83,8 @@ jobs:
           -skipMacroValidation \
           -test-iterations 2 \
           -retry-tests-on-failure \
-        | tee -a xcodebuild.log
-
-    - name: Enable Gatekeeper
-      run: |
-        sudo spctl --master-enable
+        | tee -a xcodebuild.log \
+        | tee ui-tests.log
 
  #   - name: Create Asana task when workflow failed
  #     if: ${{ failure() }} && github.ref == 'refs/heads/main'
@@ -105,7 +98,7 @@ jobs:
     - name: Prepare test report
       if: always()
       run: |
-        xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml < xcodebuild.log
+        xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml < ui-tests.log
 
     - name: Publish tests report
       uses: mikepenz/action-junit-report@v4
