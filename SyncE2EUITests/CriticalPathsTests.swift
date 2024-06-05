@@ -239,10 +239,10 @@ final class CriticalPathsTests: XCTestCase {
 
         // Temporarily skipping Logins testing in CI until we resolve the problem with encrypted value transformers
         // See makeDatabase() in Database.swift
-//        if !isCI {
+        if !isCI {
             // Add Login
             addLogin()
-//        }
+        }
 
         // Copy code to clipboard
         copyToClipboard(code: code)
@@ -284,10 +284,10 @@ final class CriticalPathsTests: XCTestCase {
 
         // Temporarily skipping Logins testing in CI until we resolve the problem with encrypted value transformers
         // See makeDatabase() in Database.swift
-//        if !isCI {
+        if !isCI {
             // Check Logins
             checkLogins()
-//        }
+        }
     }
 
     private func logIn() {
