@@ -242,7 +242,7 @@ public final class UDSServer {
             }
 
             return true
-        } onError: { [weak self] error in
+        } onError: { [weak self] _ in
             guard let self else { return false }
             self.closeConnection(connection)
             return false

@@ -53,7 +53,6 @@ final class NetworkProtectionIPCTunnelController {
     private let ipcClient: NetworkProtectionIPCClient
     private let pixelKit: PixelFiring?
     private let errorRecorder: VPNOperationErrorRecorder
-    //private let udsClient: UDSClient
 
     init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
          loginItemsManager: LoginItemsManaging = LoginItemsManager(),

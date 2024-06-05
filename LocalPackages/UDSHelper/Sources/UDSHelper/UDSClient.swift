@@ -33,7 +33,6 @@ public actor UDSClient {
     private var internalConnection: NWConnection?
     private let socketFileURL: URL
     private let receiver: UDSReceiver
-    private let urlShortener: UDSURLShortening
     private let queue = DispatchQueue(label: "com.duckduckgo.UDSConnection.queue.\(UUID().uuidString)")
     private let log: OSLog
     private let payloadHandler: PayloadHandler?
@@ -50,7 +49,6 @@ public actor UDSClient {
     /// maximum length of the path.  Use any public factory method provided below instead.
     ///
     public init(socketFileURL: URL,
-                urlShortener: UDSURLShortening = UDSURLShortener(),
                 log: OSLog,
                 payloadHandler: PayloadHandler? = nil) {
 
@@ -58,7 +56,6 @@ public actor UDSClient {
 
         self.receiver = UDSReceiver(log: log)
         self.socketFileURL = socketFileURL
-        self.urlShortener = urlShortener
         self.log = log
         self.payloadHandler = payloadHandler
     }
