@@ -45,8 +45,8 @@ final class Database {
 
             let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
 
-            // Encryption is disabled for UI Tests to make them work in CI
-            if NSApp.runType != .uiTests {
+            // Encryption is disabled for UI Tests in CI until we resolve the issue with Value Transformers intialization
+            if NSApp.runType != .uiTestsInCI {
                 _=mainModel.registerValueTransformers(withAllowedPropertyClasses: [
                     NSImage.self,
                     NSString.self,

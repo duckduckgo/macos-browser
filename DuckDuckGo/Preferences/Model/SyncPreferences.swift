@@ -398,7 +398,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             return
         }
 
-        guard [NSApplication.RunType.normal, .uiTests].contains(NSApp.runType) else {
+        guard [NSApplication.RunType.normal, .uiTests, .uiTestsInCI].contains(NSApp.runType) else {
             return
         }
 

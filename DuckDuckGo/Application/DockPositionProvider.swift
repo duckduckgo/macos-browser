@@ -28,8 +28,8 @@ enum DockApp: String, CaseIterable {
     case safari = "/Applications/Safari.app/"
     case safariLong = "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app/"
 
-    var url: URL {
-        return URL(string: "file://" + self.rawValue)!
+    var url: URL? {
+        return URL(string: "file://" + self.rawValue)
     }
 }
 
@@ -68,7 +68,7 @@ final class DockPositionProvider: DockPositionProviding {
 
         // Place based on the preferred order
         for app in preferredOrder {
-            if let position = currentAppURLs.firstIndex(of: app.url) {
+            if let appUrl = app.url, let position = currentAppURLs.firstIndex(of: appUrl) {
                 return position + 1
             }
         }
