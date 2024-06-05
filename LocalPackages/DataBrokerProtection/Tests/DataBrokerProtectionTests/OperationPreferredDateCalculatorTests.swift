@@ -369,6 +369,41 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
+    func testWhenOptOutFailedThreeTimes_thenWeRetryInSixteenHours() throws {
+        let expectedOptOutDate = Calendar.current.date(byAdding: .hour, value: 16, to: Date())!
+        let historyEvents: [HistoryEvent] = [
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL))
+        ]
+        let calculator = OperationPreferredDateCalculator()
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+                                                                     historyEvents: historyEvents,
+                                                                     extractedProfileID: nil,
+                                                                     schedulingConfig: schedulingConfig)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+
+    func testWhenOptOutFailedThreeTimes_thenWeRetryInThirtyTwoHours() throws {
+        let expectedOptOutDate = Calendar.current.date(byAdding: .hour, value: 32, to: Date())!
+        let historyEvents: [HistoryEvent] = [
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL))
+        ]
+        let calculator = OperationPreferredDateCalculator()
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+                                                                     historyEvents: historyEvents,
+                                                                     extractedProfileID: nil,
+                                                                     schedulingConfig: schedulingConfig)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+
     func testWhenOptOutFailedSixTimes_thenWeRetryInTwoDays() throws {
         let expectedOptOutDate = Calendar.current.date(byAdding: .day, value: 2, to: Date())!
         let historyEvents: [HistoryEvent] = [
