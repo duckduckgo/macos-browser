@@ -32,6 +32,15 @@ final class DataBrokerProtectionSecureVaultErrorReporter: SecureVaultReporting {
 
     func secureVaultError(_ error: SecureStorageError) {
         switch error {
+        case .initFailed(let cause as SecureStorageError):
+            switch cause {
+            case .keystoreReadError:
+                pixelHandler.fire(.secureVaultKeyStoreReadError(error: cause))
+            case .keystoreUpdateError:
+                pixelHandler.fire(.secureVaultKeyStoreUpdateError(error: cause))
+            default:
+                pixelHandler.fire(.secureVaultInitError(error: error))
+            }
         case .initFailed, .failedToOpenDatabase:
             pixelHandler.fire(.secureVaultInitError(error: error))
         default:

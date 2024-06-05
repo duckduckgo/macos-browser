@@ -1,5 +1,5 @@
 //
-//  BundleExtension.swift
+//  KnownFailureObserverThroughIPC.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -17,19 +17,23 @@
 //
 
 import Foundation
+import Combine
+import NetworkProtection
 
-protocol GroupNameProviding {
-    var appGroupName: String { get }
-}
+public final class KnownFailureObserverThroughIPC: KnownFailureObserver {
+    private let subject = CurrentValueSubject<KnownFailure?, Never>(nil)
 
-extension Bundle: GroupNameProviding {
+    // MARK: - KnownFailureObserver
 
-    static let dbpAppGroupName = "DBP_APP_GROUP"
+    public lazy var publisher = subject.eraseToAnyPublisher()
 
-    var appGroupName: String {
-        guard let appGroup = object(forInfoDictionaryKey: Bundle.dbpAppGroupName) as? String else {
-            fatalError("Info.plist is missing \(Bundle.dbpAppGroupName)")
-        }
-        return appGroup
+    public var recentValue: KnownFailure? {
+        subject.value
+    }
+
+    // MARK: - Publishing Updates
+
+    func publish(_ error: KnownFailure?) {
+        subject.send(error)
     }
 }

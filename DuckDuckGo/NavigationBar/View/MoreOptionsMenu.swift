@@ -288,6 +288,7 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(.passwordManagement)
             .withSubmenu(loginsSubMenu)
+            .withAccessibilityIdentifier("MoreOptionsMenu.autofill")
 
         addItem(NSMenuItem.separator())
     }
@@ -740,6 +741,7 @@ final class LoginsSubMenu: NSMenu {
     private func updateMenuItems(with target: AnyObject) {
         addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(MoreOptionsMenu.openAutofillWithAllItems), keyEquivalent: "")
             .targetting(target)
+            .withAccessibilityIdentifier("LoginsSubMenu.allItems")
 
         addItem(NSMenuItem.separator())
 

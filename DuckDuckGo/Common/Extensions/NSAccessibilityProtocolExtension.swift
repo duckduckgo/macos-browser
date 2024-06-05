@@ -1,7 +1,7 @@
 //
-//  BundleExtension.swift
+//  NSAccessibilityProtocolExtension.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,18 +18,16 @@
 
 import Foundation
 
-protocol GroupNameProviding {
-    var appGroupName: String { get }
-}
+extension NSAccessibilityProtocol {
 
-extension Bundle: GroupNameProviding {
+    @discardableResult
+    func withAccessibilityIdentifier(_ accessibilityIdentifier: String) -> Self {
+        self.setAccessibilityIdentifier(accessibilityIdentifier)
+        return self
+    }
 
-    static let dbpAppGroupName = "DBP_APP_GROUP"
-
-    var appGroupName: String {
-        guard let appGroup = object(forInfoDictionaryKey: Bundle.dbpAppGroupName) as? String else {
-            fatalError("Info.plist is missing \(Bundle.dbpAppGroupName)")
-        }
-        return appGroup
+    func withAccessibilityValue(_ accessibilityValue: String) -> Self {
+        self.setAccessibilityValue(accessibilityValue)
+        return self
     }
 }

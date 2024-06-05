@@ -23,11 +23,16 @@ import XPCHelper
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
 public protocol XPCServerInterface: AnyObject {
+    var version: String { get }
+    var bundlePath: String { get }
+
     /// Registers a connection with the server.
     ///
     /// This is the point where the server will start sending status updates to the client.
     ///
-    func register()
+    func register(completion: @escaping (Error?) -> Void)
+
+    func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void)
 
     /// Start the VPN tunnel.
     ///
@@ -58,6 +63,11 @@ public protocol XPCServerInterface: AnyObject {
     func command(_ command: VPNCommand) async throws
 }
 
+public extension XPCServerInterface {
+    var version: String { DefaultIPCMetadataCollector.version }
+    var bundlePath: String { DefaultIPCMetadataCollector.bundlePath }
+}
+
 /// This protocol describes the server-side XPC interface.
 ///
 /// The object that implements this interface takes care of unpacking any encoded data and forwarding
@@ -69,7 +79,9 @@ protocol XPCServerInterfaceObjC {
     ///
     /// This is the point where the server will start sending status updates to the client.
     ///
-    func register()
+    func register(completion: @escaping (Error?) -> Void)
+
+    func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void)
 
     /// Start the VPN tunnel.
     ///
@@ -173,14 +185,24 @@ extension VPNControllerXPCServer: XPCClientInterface {
             client.dataVolumeUpdated(payload: payload)
         }
     }
+
+    public func knownFailureUpdated(_ failure: KnownFailure?) {
+        xpc.forEachClient { client in
+            client.knownFailureUpdated(failure: failure)
+        }
+    }
 }
 
 // MARK: - Incoming communication from a client
 
 extension VPNControllerXPCServer: XPCServerInterfaceObjC {
 
-    func register() {
-        serverDelegate?.register()
+    func register(completion: @escaping (Error?) -> Void) {
+        serverDelegate?.register(completion: completion)
+    }
+
+    func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void) {
+        serverDelegate?.register(version: version, bundlePath: bundlePath, completion: completion)
     }
 
     func start(completion: @escaping (Error?) -> Void) {

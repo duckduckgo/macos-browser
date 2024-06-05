@@ -50,6 +50,11 @@ public struct NetworkProtectionStatusView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
+            if let warning = model.warningViewModel {
+                WarningView(model: warning)
+                    .transition(.slide)
+            }
+
             if model.shouldShowSubscriptionExpired {
                 SubscriptionExpiredView {
                     model.openPrivacyPro()
@@ -62,11 +67,6 @@ public struct NetworkProtectionStatusView: View {
                     .padding(.horizontal, 5)
                     .padding(.top, 5)
                     .transition(.slide)
-            } else {
-                if let healthWarning = model.issueDescription {
-                    connectionHealthWarningView(message: healthWarning)
-                        .transition(.slide)
-                }
             }
 
             Spacer()
@@ -87,28 +87,6 @@ public struct NetworkProtectionStatusView: View {
     }
 
     // MARK: - Composite Views
-
-    private func connectionHealthWarningView(message: String) -> some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .top, spacing: 12) {
-                Image(.warningColored)
-
-                /// Text elements in SwiftUI don't expand horizontally more than needed, so we're adding an "optional" spacer at the end so that
-                /// the alert bubble won't shrink if there's not enough text.
-                HStack(spacing: 0) {
-                    Text(message)
-                        .makeSelectable()
-                        .multilineText()
-                        .foregroundColor(Color(.defaultText))
-
-                    Spacer()
-                }
-            }
-            .padding(16)
-            .background(RoundedRectangle(cornerRadius: 8).fill(Color(.alertBubbleBackground)))
-        }
-        .padding(EdgeInsets(top: 8, leading: 8, bottom: 4, trailing: 8))
-    }
 
     private func bottomMenuView() -> some View {
         VStack(spacing: 0) {

@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import NetworkProtection
 import NetworkProtectionIPC
 
 final class TunnelControllerProvider {
@@ -26,7 +27,10 @@ final class TunnelControllerProvider {
 
     private init() {
         let ipcClient = VPNControllerXPCClient()
-        ipcClient.register()
+        ipcClient.register { error in
+            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
+        }
+
         tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
     }
 

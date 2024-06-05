@@ -21,7 +21,6 @@ import Foundation
 import UserNotifications
 import NetworkProtection
 import NetworkProtectionUI
-import PixelKit
 import VPNAppLauncher
 
 extension UNNotificationAction {
@@ -162,20 +161,6 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
             _=self.registerNotificationCategoriesOnce
             self.userNotificationCenter.removeDeliveredNotifications(withIdentifiers: [identifier.rawValue])
             self.userNotificationCenter.add(request)
-
-            switch identifier {
-            case .disconnected:
-                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDisconnectedNotificationDisplayed, frequency: .dailyAndCount)
-            case .reconnecting:
-                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionReconnectingNotificationDisplayed, frequency: .dailyAndCount)
-            case .connected:
-                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionConnectedNotificationDisplayed, frequency: .dailyAndCount)
-            case .superseded:
-                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionSupersededNotificationDisplayed, frequency: .dailyAndCount)
-            case .expiredEntitlement:
-                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionExpiredEntitlementNotificationDisplayed, frequency: .dailyAndCount)
-            case .test: break
-            }
         }
     }
 

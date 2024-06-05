@@ -53,19 +53,22 @@ final class NetworkProtectionIPCTunnelController {
     private let ipcClient: NetworkProtectionIPCClient
     private let pixelKit: PixelFiring?
     private let errorRecorder: VPNOperationErrorRecorder
+    private let knownFailureStore: NetworkProtectionKnownFailureStore
 
     init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
          loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          ipcClient: NetworkProtectionIPCClient,
          fileManager: FileManager = .default,
          pixelKit: PixelFiring? = PixelKit.shared,
-         errorRecorder: VPNOperationErrorRecorder = VPNOperationErrorRecorder()) {
+         errorRecorder: VPNOperationErrorRecorder = VPNOperationErrorRecorder(),
+         knownFailureStore: NetworkProtectionKnownFailureStore = NetworkProtectionKnownFailureStore()) {
 
         self.featureVisibility = featureVisibility
         self.loginItemsManager = loginItemsManager
         self.ipcClient = ipcClient
         self.pixelKit = pixelKit
         self.errorRecorder = errorRecorder
+        self.knownFailureStore = knownFailureStore
     }
 
     // MARK: - Login Items Manager
@@ -93,6 +96,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
         pixelKit?.fire(StartAttempt.begin)
 
         func handleFailure(_ error: Error) {
+            knownFailureStore.lastKnownFailure = KnownFailure(error)
             errorRecorder.recordIPCStartFailure(error)
             log(error)
             pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndCount)
@@ -100,6 +104,8 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
 
         do {
             try await enableLoginItems()
+
+            knownFailureStore.reset()
 
             ipcClient.start { [pixelKit] error in
                 if let error {

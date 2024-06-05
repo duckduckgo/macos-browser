@@ -19,7 +19,8 @@
 import Foundation
 
 public protocol VPNUIActionHandler {
-    func showVPNLocations() async
     func moveAppToApplications() async
+    func shareFeedback() async
     func showPrivacyPro() async
+    func showVPNLocations() async
 }

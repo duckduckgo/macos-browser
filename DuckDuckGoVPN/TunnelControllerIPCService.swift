@@ -39,6 +39,16 @@ final class TunnelControllerIPCService {
     private let defaults: UserDefaults
     private let udsServer: UDSServer
 
+    enum IPCError: SilentErrorConvertible {
+        case versionMismatched
+
+        var asSilentError: KnownFailure.SilentError? {
+            switch self {
+            case .versionMismatched: return .loginItemVersionMismatched
+            }
+        }
+    }
+
     init(tunnelController: NetworkProtectionTunnelController,
          uninstaller: VPNUninstalling,
          networkExtensionController: NetworkExtensionController,
@@ -60,6 +70,7 @@ final class TunnelControllerIPCService {
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
         subscribeToServerChanges()
+        subscribeToKnownFailureUpdates()
         subscribeToDataVolumeUpdates()
 
         server.serverDelegate = self
@@ -115,6 +126,15 @@ final class TunnelControllerIPCService {
             .store(in: &cancellables)
     }
 
+    private func subscribeToKnownFailureUpdates() {
+        statusReporter.knownFailureObserver.publisher
+            .subscribe(on: DispatchQueue.main)
+            .sink { [weak self] failure in
+                self?.server.knownFailureUpdated(failure)
+            }
+            .store(in: &cancellables)
+    }
+
     private func subscribeToDataVolumeUpdates() {
         statusReporter.dataVolumeObserver.publisher
             .subscribe(on: DispatchQueue.main)
@@ -129,9 +149,20 @@ final class TunnelControllerIPCService {
 
 extension TunnelControllerIPCService: XPCServerInterface {
 
-    func register() {
+    func register(completion: @escaping (Error?) -> Void) {
+        register(version: version, bundlePath: bundlePath, completion: completion)
+    }
+
+    func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void) {
         server.serverInfoChanged(statusReporter.serverInfoObserver.recentValue)
         server.statusChanged(statusReporter.statusObserver.recentValue)
+        if self.version != version {
+            let error = TunnelControllerIPCService.IPCError.versionMismatched
+            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
+            completion(error)
+        } else {
+            completion(nil)
+        }
     }
 
     func start(completion: @escaping (Error?) -> Void) {
@@ -223,6 +254,28 @@ extension TunnelControllerIPCService: XPCServerInterface {
             try await uninstaller.removeVPNConfiguration()
         case .systemExtension:
             try await uninstaller.removeSystemExtension()
+        }
+    }
+}
+
+// MARK: - Error Handling
+
+extension TunnelControllerIPCService.IPCError: LocalizedError, CustomNSError {
+    var errorDescription: String? {
+        switch self {
+        case .versionMismatched: return "Login item version mismatched"
+        }
+    }
+
+    var errorCode: Int {
+        switch self {
+        case .versionMismatched: return 0
+        }
+    }
+
+    var errorUserInfo: [String: Any] {
+        switch self {
+        case .versionMismatched: return [:]
         }
     }
 }

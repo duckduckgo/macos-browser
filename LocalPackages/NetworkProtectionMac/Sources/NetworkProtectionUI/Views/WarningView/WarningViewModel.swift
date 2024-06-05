@@ -1,7 +1,7 @@
 //
-//  BundleExtension.swift
+//  WarningViewModel.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,20 +16,20 @@
 //  limitations under the License.
 //
 
-import Foundation
+import SwiftUI
 
-protocol GroupNameProviding {
-    var appGroupName: String { get }
-}
+extension WarningView {
+    final class Model: ObservableObject {
+        var message: String
+        var actionTitle: String?
+        var action: (() -> Void)?
 
-extension Bundle: GroupNameProviding {
-
-    static let dbpAppGroupName = "DBP_APP_GROUP"
-
-    var appGroupName: String {
-        guard let appGroup = object(forInfoDictionaryKey: Bundle.dbpAppGroupName) as? String else {
-            fatalError("Info.plist is missing \(Bundle.dbpAppGroupName)")
+        init(message: String,
+             actionTitle: String? = nil,
+             action: (() -> Void)?) {
+            self.message = message
+            self.actionTitle = actionTitle
+            self.action = action
         }
-        return appGroup
     }
 }
