@@ -35,6 +35,10 @@ extension XCUIElement {
 
 final class CriticalPathsTests: XCTestCase {
 
+    var isCI: Bool {
+        ProcessInfo.processInfo.environment["CI"] != nil
+    }
+
     var app: XCUIApplication!
     var debugMenuBarItem: XCUIElement!
     var internaluserstateMenuItem: XCUIElement!
@@ -233,8 +237,12 @@ final class CriticalPathsTests: XCTestCase {
         // Add Bookmarks and Favorite
         addBookmarksAndFavorites()
 
-        // Add Login
-//        addLogin()
+        // Temporarily skipping Logins testing in CI until we resolve the problem with encrypted value transformers
+        // See makeDatabase() in Database.swift
+        if !isCI {
+            // Add Login
+            addLogin()
+        }
 
         // Copy code to clipboard
         copyToClipboard(code: code)
@@ -274,8 +282,12 @@ final class CriticalPathsTests: XCTestCase {
         // Check Unified favorites
         checkUnifiedFavorites()
 
-        // Check Logins
-        // checkLogins()
+        // Temporarily skipping Logins testing in CI until we resolve the problem with encrypted value transformers
+        // See makeDatabase() in Database.swift
+        if !isCI {
+            // Check Logins
+            checkLogins()
+        }
     }
 
     private func logIn() {
