@@ -207,7 +207,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
 #if SPARKLE
-        if NSApp.runType != .uiTests {
+        if !NSApp.runType.isUITests {
             updateController = UpdateController(internalUserDecider: internalUserDecider)
             stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
         }
@@ -272,7 +272,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         subscriptionManager.loadInitialData()
 
-        if [.normal, .uiTests].contains(NSApp.runType) {
+        if [.normal, .uiTests, .uiTestsInCI].contains(NSApp.runType) {
             stateRestorationManager.applicationDidFinishLaunching()
         }
 

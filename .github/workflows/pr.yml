@@ -78,7 +78,7 @@ jobs:
       run: bats --formatter junit scripts/tests/* > bats-tests.xml
 
     - name: Publish unit tests report
-      uses: mikepenz/action-junit-report@v3
+      uses: mikepenz/action-junit-report@v4
       if: always() # always run even if the previous step fails
       with:
         check_name: "Test Report: Shell Scripts"
@@ -209,7 +209,7 @@ jobs:
         fi
 
     - name: Publish unit tests report
-      uses: mikepenz/action-junit-report@v3
+      uses: mikepenz/action-junit-report@v4
       if: always() # always run even if the previous step fails
       with:
         check_name: "Test Report: ${{ matrix.flavor }}"
