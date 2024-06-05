@@ -120,6 +120,7 @@ final class VPNUninstaller: VPNUninstalling {
 
     private let log: OSLog
     private let ipcServiceLauncher: IPCServiceLauncher
+    private let loginItemsManager: LoginItemsManaging
     private let pinningManager: LocalPinningManager
     private let settings: VPNSettings
     private let userDefaults: UserDefaults
@@ -131,6 +132,7 @@ final class VPNUninstaller: VPNUninstalling {
     private var isDisabling = false
 
     init(ipcServiceLauncher: IPCServiceLauncher? = nil,
+         loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          pinningManager: LocalPinningManager = .shared,
          userDefaults: UserDefaults = .netP,
          settings: VPNSettings = .init(defaults: .netP),
@@ -139,8 +141,15 @@ final class VPNUninstaller: VPNUninstalling {
          pixelKit: PixelFiring? = PixelKit.shared,
          log: OSLog = .networkProtection) {
 
+        let vpnAgentBundleID = Bundle.main.vpnMenuAgentBundleId
+        let appLauncher = AppLauncher(appBundleURL: Bundle.main.vpnMenuAgentURL)
+        let ipcServiceLaunchMethod = IPCServiceLauncher.LaunchMethod.direct(
+            bundleID: vpnAgentBundleID,
+            appLauncher: appLauncher)
+
         self.log = log
-        self.ipcServiceLauncher = ipcServiceLauncher ?? IPCServiceLauncher(bundleID: Bundle.main.vpnMenuAgentBundleId, ipcClient: ipcClient, loginItemsManager: LoginItemsManager(), log: .disabled)
+        self.ipcServiceLauncher = ipcServiceLauncher ?? IPCServiceLauncher(launchMethod: ipcServiceLaunchMethod)
+        self.loginItemsManager = loginItemsManager
         self.pinningManager = pinningManager
         self.settings = settings
         self.userDefaults = userDefaults
@@ -177,7 +186,7 @@ final class VPNUninstaller: VPNUninstalling {
             }
 
             do {
-                try await ipcServiceLauncher.enable(launchMethod: .direct)
+                try await ipcServiceLauncher.enable()
             } catch {
                 throw UninstallError.runAgentError(error)
             }
@@ -206,7 +215,15 @@ final class VPNUninstaller: VPNUninstalling {
 
             // We want to give some time for the login item to reset state before disabling it
             try? await Task.sleep(interval: 0.5)
+
+            // While it may seem like a duplication of code, it's one thing to disable the IPC service
+            // and it's nother one to "uninstall" our login items.  The uninstaller wants both things
+            // to happen.
+            //
+            // As an example of why this is important, we want all agents to be disabled even if the IPC
+            // service is not based on login items.
             try await ipcServiceLauncher.disable()
+            removeAgents()
 
             notifyVPNUninstalled()
             isDisabling = false
@@ -232,8 +249,8 @@ final class VPNUninstaller: VPNUninstalling {
         loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
     }*/
 
-    func removeAgents() async throws {
-        try await ipcServiceLauncher.disable()
+    func removeAgents() {
+        loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
     }
 
     func removeSystemExtension() async throws {

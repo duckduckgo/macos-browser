@@ -20,7 +20,8 @@ import AppKit
 import Foundation
 
 public protocol AppLaunching {
-    func launchApp(withCommand command: AppLaunchCommand) async throws
+    @discardableResult
+    func launchApp(withCommand command: AppLaunchCommand) async throws -> NSRunningApplication
 }
 
 /// Launches the main App
@@ -50,7 +51,8 @@ public final class AppLauncher: AppLaunching {
         mainBundleURL = appBundleURL
     }
 
-    public func launchApp(withCommand command: AppLaunchCommand) async throws {
+    @discardableResult
+    public func launchApp(withCommand command: AppLaunchCommand) async throws -> NSRunningApplication {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.allowsRunningApplicationSubstitution = command.allowsRunningApplicationSubstitution
 
@@ -68,9 +70,9 @@ public final class AppLauncher: AppLaunching {
 
         do {
             if let launchURL = command.launchURL {
-                try await NSWorkspace.shared.open([launchURL], withApplicationAt: mainBundleURL, configuration: configuration)
+                return try await NSWorkspace.shared.open([launchURL], withApplicationAt: mainBundleURL, configuration: configuration)
             } else {
-                try await NSWorkspace.shared.openApplication(at: mainBundleURL, configuration: configuration)
+                return try await NSWorkspace.shared.openApplication(at: mainBundleURL, configuration: configuration)
             }
         } catch {
             throw AppLaunchError.workspaceOpenError(error)
