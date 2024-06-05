@@ -23,24 +23,24 @@ import os.log
 
 typealias UDSMessageLength = UInt16
 
-struct UDSReceiver<Message: Codable> {
+struct UDSReceiver {
 
     /// The return value allows the callback handler to continue receiving messages (if it returns `true`)
     /// or stop receiving messages (when it returns `false`).
     ///
-    typealias EventHandler = (Event) async -> Bool
+    typealias MessageHandler = (UDSMessage) async throws -> Bool
 
-    private enum ReadError: Error {
+    enum ReadError: Error {
         case notEnoughData(expected: Int, received: Int)
         case connectionError(_ error: Error)
         case connectionClosed
     }
-
+/*
     enum Event {
-        case received(_ message: Message)
+        case received(_ message: UDSMessage<Command>)
         case error(_ error: Error)
     }
-
+*/
     private let log: OSLog
 
     init(log: OSLog) {
@@ -53,19 +53,20 @@ struct UDSReceiver<Message: Codable> {
     ///     - connection: the connection to receive messages for.
     ///     - messageHandler: the callback for important events.
     ///
-    func startReceivingMessages(on connection: NWConnection, eventHandler: @escaping EventHandler) {
+    func startReceivingMessages(on connection: NWConnection, messageHandler: @escaping MessageHandler, onError errorHandler: @escaping (Error) async -> Bool) {
         Task {
-            await runReceiveMessageLoop(on: connection, eventHandler: eventHandler)
+            await runReceiveMessageLoop(on: connection, messageHandler: messageHandler, onError: errorHandler)
         }
     }
 
-    private func runReceiveMessageLoop(on connection: NWConnection, eventHandler: @escaping EventHandler) async {
+    private func runReceiveMessageLoop(on connection: NWConnection, messageHandler: @escaping MessageHandler, onError errorHandler: @escaping (Error) async -> Bool) async {
+
         while true {
             do {
                 let length = try await receiveMessageLength(on: connection)
                 let message = try await receiveEncodedObjectData(ofLength: length, on: connection)
 
-                guard await eventHandler(.received(message)) else {
+                guard try await messageHandler(message) else {
                     return
                 }
             } catch {
@@ -77,8 +78,8 @@ struct UDSReceiver<Message: Codable> {
                            String(describing: expected),
                            String(describing: received))
 
-                    guard await eventHandler(.error(error)) else {
-                        return
+                    guard await errorHandler(error) else {
+                        break
                     }
                 case ReadError.connectionError(let error):
                     os_log("UDSServer - Connection closing due to a connection error: %{public}@",
@@ -86,16 +87,16 @@ struct UDSReceiver<Message: Codable> {
                            type: .error,
                            String(describing: error))
 
-                    guard await eventHandler(.error(error)) else {
-                        return
+                    guard await errorHandler(error) else {
+                        break
                     }
                 case ReadError.connectionClosed:
                     os_log("UDSServer - Connection closing: End of file reached",
                            log: log,
                            type: .info)
 
-                    guard await eventHandler(.error(error)) else {
-                        return
+                    guard await errorHandler(error) else {
+                        break
                     }
                 default:
                     os_log("UDSServer - Connection closing due to error: %{public}@",
@@ -103,8 +104,8 @@ struct UDSReceiver<Message: Codable> {
                            type: .error,
                            String(describing: error))
 
-                    guard await eventHandler(.error(error)) else {
-                        return
+                    guard await errorHandler(error) else {
+                        break
                     }
                 }
             }
@@ -155,7 +156,7 @@ struct UDSReceiver<Message: Codable> {
     ///
     /// - Returns: a message on success.
     ///
-    private func receiveEncodedObjectData(ofLength length: UDSMessageLength, on connection: NWConnection) async throws -> Message {
+    private func receiveEncodedObjectData(ofLength length: UDSMessageLength, on connection: NWConnection) async throws -> UDSMessage {
         try await withCheckedThrowingContinuation { continuation in
             connection.receive(minimumIncompleteLength: Int(length), maximumLength: Int(length)) { (data, _, isComplete, error) in
                 if let data = data {
@@ -185,7 +186,7 @@ struct UDSReceiver<Message: Codable> {
         }
     }
 
-    private func decodeMessage(from data: Data) throws -> Message {
-        try JSONDecoder().decode(Message.self, from: data)
+    private func decodeMessage(from data: Data) throws -> UDSMessage {
+        try JSONDecoder().decode(UDSMessage.self, from: data)
     }
 }

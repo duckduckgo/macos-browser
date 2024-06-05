@@ -63,14 +63,14 @@ private actor ClientConnections {
 
 /// Unix Domain Socket server
 ///
-public final class UDSServer<Message: Codable> {
+public final class UDSServer {
     private let listenerQueue = DispatchQueue(label: "com.duckduckgo.UDSServer.listenerQueue")
     private let connectionQueue = DispatchQueue(label: "com.duckduckgo.UDSServer.connectionQueue")
 
     private var listener: NWListener?
     private var connections = ClientConnections()
 
-    private let receiver: UDSReceiver<Message>
+    private let receiver: UDSReceiver
 
     private let fileManager: FileManager
     private let socketFileURL: URL
@@ -89,7 +89,7 @@ public final class UDSServer<Message: Codable> {
         self.fileManager = fileManager
         self.socketFileURL = socketFileURL
         self.log = log
-        self.receiver = UDSReceiver<Message>(log: log)
+        self.receiver = UDSReceiver(log: log)
 
         do {
             try fileManager.removeItem(at: socketFileURL)
@@ -100,7 +100,7 @@ public final class UDSServer<Message: Codable> {
         os_log("UDSServer - Initialized with path: %{public}@", log: log, type: .info, socketFileURL.path)
     }
 
-    public func start(messageHandler: @escaping (Message) -> Void) throws {
+    public func start(messageHandler: @escaping (Data) async throws -> Data?) throws {
         let listener: NWListener
 
         do {
@@ -167,7 +167,7 @@ public final class UDSServer<Message: Codable> {
         await connections.removeAll()
     }
 
-    private func handleNewConnection(_ connection: NWConnection, messageHandler: @escaping (Message) -> Void) {
+    private func handleNewConnection(_ connection: NWConnection, messageHandler: @escaping (Data) async throws -> Data?) {
         Task {
             os_log("UDSServer - New connection: %{public}@",
                    log: log,
@@ -226,19 +226,47 @@ public final class UDSServer<Message: Codable> {
     /// - Parameters:
     ///     - connection: the connection to receive messages for.
     ///
-    private func startReceivingMessages(on connection: NWConnection, messageHandler: @escaping (Message) -> Void) {
-        receiver.startReceivingMessages(on: connection) { [weak self] event in
+    private func startReceivingMessages(on connection: NWConnection, messageHandler: @escaping (Data) async throws -> Data?) {
+
+        receiver.startReceivingMessages(on: connection) { [weak self] message in
             guard let self else { return false }
 
-            switch event {
-            case .received(let message):
-                messageHandler(message)
-            case .error:
-                self.closeConnection(connection)
-                return false
+            switch message.body {
+            case .request(let data):
+                let responsePayload = try await messageHandler(data)
+                let responseMessage = message.successResponse(withPayload: responsePayload)
+                try await self.send(responseMessage, connection: connection)
+            case .response:
+                // TBD
+                break
             }
 
             return true
+        } onError: { [weak self] error in
+            guard let self else { return false }
+            self.closeConnection(connection)
+            return false
+        }
+    }
+
+    private func send(_ message: UDSMessage, connection: NWConnection) async throws {
+
+        let data = try JSONEncoder().encode(message)
+        let lengthData = withUnsafeBytes(of: UDSMessageLength(data.count)) {
+            Data($0)
+        }
+
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            connection.send(content: lengthData + data, completion: .contentProcessed { error in
+                if let error {
+                    os_log("UDSServer - Send Error %{public}@", log: self.log, String(describing: error))
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                os_log("UDSServer - Send Success", log: self.log)
+                continuation.resume()
+            })
         }
     }
 }

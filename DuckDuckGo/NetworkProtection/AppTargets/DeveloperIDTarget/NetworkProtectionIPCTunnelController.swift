@@ -53,7 +53,7 @@ final class NetworkProtectionIPCTunnelController {
     private let ipcClient: NetworkProtectionIPCClient
     private let pixelKit: PixelFiring?
     private let errorRecorder: VPNOperationErrorRecorder
-    private let udsClient: UDSClient<VPNIPCClientCommand, VPNIPCServerCommand>
+    //private let udsClient: UDSClient
 
     init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
          loginItemsManager: LoginItemsManaging = LoginItemsManager(),
@@ -65,10 +65,6 @@ final class NetworkProtectionIPCTunnelController {
         self.featureVisibility = featureVisibility
         self.loginItemsManager = loginItemsManager
         self.ipcClient = ipcClient
-
-        let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .ipc))!.appendingPathComponent("vpn.ipc")
-
-        self.udsClient = UDSClient(socketFileURL: socketFileURL, log: .networkProtectionIPCLog)
         self.pixelKit = pixelKit
         self.errorRecorder = errorRecorder
     }
@@ -106,15 +102,13 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
         do {
             try await enableLoginItems()
 
-            try await udsClient.send(.start)
-/*
             ipcClient.start { [pixelKit] error in
                 if let error {
                     handleFailure(error)
                 } else {
                     pixelKit?.fire(StartAttempt.success, frequency: .dailyAndCount)
                 }
-            }*/
+            }
         } catch {
             handleFailure(error)
         }
@@ -132,15 +126,13 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
         do {
             try await enableLoginItems()
 
-            try? await udsClient.send(.stop)
-/*
             ipcClient.stop { [pixelKit] error in
                 if let error {
                     handleFailure(error)
                 } else {
                     pixelKit?.fire(StopAttempt.success, frequency: .dailyAndCount)
                 }
-            }*/
+            }
         } catch {
             handleFailure(error)
         }

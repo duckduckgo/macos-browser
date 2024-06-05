@@ -203,39 +203,15 @@ extension VPNControllerXPCClient: XPCServerInterface {
 
 extension VPNControllerXPCClient: VPNControllerIPCClient {
 
-    /// Here we implement support for ``VPNControllerIPCClient``, which is a simplified
-    /// command mechanism.
-    ///
-    public func execute(_ command: VPNIPCServerCommand) async throws {
-        switch command {
-        case .start:
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-                self.start { error in
-                    if let error {
-                        continuation.resume(throwing: error)
-                        return
-                    }
-
-                    continuation.resume()
-                }
-            }
-        case .stop:
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-                self.stop { error in
-                    if let error {
-                        continuation.resume(throwing: error)
-                        return
-                    }
-
-                    continuation.resume()
-                }
-            }
-        case .removeSystemExtension:
-            try await self.command(.removeSystemExtension)
-        case .removeVPNConfiguration:
-            try await self.command(.removeVPNConfiguration)
-        case .uninstallVPN:
+    public func uninstall(_ component: VPNUninstallComponent) async throws {
+        switch component {
+        case .all:
             try await self.command(.uninstallVPN)
+        case .configuration:
+            try await self.command(.removeVPNConfiguration)
+        case .systemExtension:
+            try await self.command(.removeSystemExtension)
         }
+
     }
 }

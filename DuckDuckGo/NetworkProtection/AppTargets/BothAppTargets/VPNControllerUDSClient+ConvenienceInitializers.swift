@@ -21,11 +21,15 @@ import NetworkProtectionIPC
 import UDSHelper
 
 extension VPNControllerUDSClient {
-    convenience init(fileManager: FileManager = .default, bundle: Bundle = .main) {
-        let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: bundle.appGroup(bundle: .ipc))!.appendingPathComponent("vpn.ipc")
-
-        let udsClient = UDSClient<VPNIPCClientCommand, VPNIPCServerCommand>(socketFileURL: socketFileURL, log: .networkProtectionIPCLog)
-
-        self.init(udsClient: udsClient)
+    convenience init() {
+        self.init(udsClient: .sharedVPNUDSClient)
     }
+}
+
+extension UDSClient {
+    static let sharedVPNUDSClient: UDSClient = {
+        let socketFileURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .ipc))!.appendingPathComponent("vpn.ipc")
+
+        return UDSClient(socketFileURL: socketFileURL, log: .networkProtectionIPCLog)
+    }()
 }

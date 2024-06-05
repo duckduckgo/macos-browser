@@ -69,6 +69,8 @@ public final class AppLauncher: AppLaunching {
         do {
             if let launchURL = command.launchURL {
                 try await NSWorkspace.shared.open([launchURL], withApplicationAt: mainBundleURL, configuration: configuration)
+            } else {
+                try await NSWorkspace.shared.openApplication(at: mainBundleURL, configuration: configuration)
             }
         } catch {
             throw AppLaunchError.workspaceOpenError(error)

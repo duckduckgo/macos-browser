@@ -16,28 +16,23 @@
 //  limitations under the License.
 //
 
+import Foundation
 import UDSHelper
 
-public final class VPNControllerUDSClient: VPNControllerIPCClient {
+public final class VPNControllerUDSClient {
 
-    private let udsClient: UDSClient<VPNIPCClientCommand, VPNIPCServerCommand>
+    private let udsClient: UDSClient
+    private let encoder = JSONEncoder()
 
-    public init(udsClient: UDSClient<VPNIPCClientCommand, VPNIPCServerCommand>) {
+    public init(udsClient: UDSClient) {    
         self.udsClient = udsClient
     }
+}
 
-    public func execute(_ command: VPNIPCServerCommand) async throws {
-        switch command {
-        case .start:
-            break
-        case .stop:
-            break
-        case .removeSystemExtension:
-            try await udsClient.send(.start)
-        case .removeVPNConfiguration:
-            break
-        case .uninstallVPN:
-            break
-        }
+extension VPNControllerUDSClient: VPNControllerIPCClient {
+
+    public func uninstall(_ component: VPNUninstallComponent) async throws {
+        let payload = try encoder.encode(VPNIPCServerCommand.uninstall(component))
+        try await udsClient.send(payload)
     }
 }

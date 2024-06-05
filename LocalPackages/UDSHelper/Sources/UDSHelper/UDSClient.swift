@@ -21,7 +21,9 @@ import Network
 // swiftlint:disable:next enforce_os_log_wrapper
 import os.log
 
-public actor UDSClient<Incoming: Codable, Outgoing: Codable> {
+public actor UDSClient {
+
+    public typealias PayloadHandler = (Data) async throws -> Void
 
     enum ConnectionError: Error {
         case cancelled
@@ -30,24 +32,35 @@ public actor UDSClient<Incoming: Codable, Outgoing: Codable> {
 
     private var internalConnection: NWConnection?
     private let socketFileURL: URL
-    private let receiver: UDSReceiver<Incoming>
+    private let receiver: UDSReceiver
     private let urlShortener: UDSURLShortening
     private let queue = DispatchQueue(label: "com.duckduckgo.UDSConnection.queue.\(UUID().uuidString)")
     private let log: OSLog
+    private let payloadHandler: PayloadHandler?
+
+    // MARK: - Message completion callbacks
+
+    typealias Callback = (Data?) async -> Void
+
+    private var responseCallbacks = [UUID: Callback]()
+
+    // MARK: - Initializers
 
     /// This should not be called directly because the socketFileURL needs to comply with some requirements in terms of
     /// maximum length of the path.  Use any public factory method provided below instead.
     ///
     public init(socketFileURL: URL,
                 urlShortener: UDSURLShortening = UDSURLShortener(),
-                log: OSLog) {
+                log: OSLog,
+                payloadHandler: PayloadHandler? = nil) {
 
         os_log("UDSClient - Initialized with path: %{public}@", log: log, type: .info, socketFileURL.path)
 
-        self.receiver = UDSReceiver<Incoming>(log: log)
+        self.receiver = UDSReceiver(log: log)
         self.socketFileURL = socketFileURL
         self.urlShortener = urlShortener
         self.log = log
+        self.payloadHandler = payloadHandler
     }
 
     // MARK: - Connection Management
@@ -71,9 +84,11 @@ public actor UDSClient<Incoming: Codable, Outgoing: Codable> {
 
         connection.stateUpdateHandler = { state in
             Task {
-                try await self.statusUpdateHandler(state)
+                await self.statusUpdateHandler(state)
             }
         }
+
+        startReceivingMessages(on: connection)
 
         internalConnection = connection
         connection.start(queue: queue)
@@ -92,18 +107,16 @@ public actor UDSClient<Incoming: Codable, Outgoing: Codable> {
         return connection
     }
 
-    private func statusUpdateHandler(_ state: NWConnection.State) async throws {
+    private func statusUpdateHandler(_ state: NWConnection.State) {
         switch state {
         case .cancelled:
             os_log("UDSClient - Connection cancelled", log: self.log, type: .info)
 
             self.releaseConnection()
-            throw ConnectionError.cancelled
         case .failed(let error):
             os_log("UDSClient - Connection failed with error: %{public}@", log: self.log, type: .error, String(describing: error))
 
             self.releaseConnection()
-            throw ConnectionError.failure(error)
         case .ready:
             os_log("UDSClient - Connection ready", log: self.log, type: .info)
         case .waiting(let error):
@@ -121,25 +134,60 @@ public actor UDSClient<Incoming: Codable, Outgoing: Codable> {
 
     // MARK: - Sending commands
 
-    public func send(_ command: Outgoing) async throws {
-        let data = try JSONEncoder().encode(command)
-        let lengthData = withUnsafeBytes(of: UDSMessageLength(data.count)) {
-            Data($0)
-        }
+    @discardableResult
+    public func send(_ payload: Data) async throws -> Data? {
+        let uuid = UUID()
+        let message = UDSMessage(uuid: uuid, body: .request(payload))
 
-        let connection = try await connection()
+        return try await send(message)
+    }
 
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            connection.send(content: lengthData + data, completion: .contentProcessed { error in
-                if let error {
-                    os_log("UDSClient - Send Error %{public}@", log: self.log, String(describing: error))
-                    continuation.resume(throwing: error)
-                    return
+    private func send(_ message: UDSMessage) async throws -> Data? {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Data?, Error>) in
+
+            Task {
+                await send(message) { result in
+                    switch result {
+                    case .success(let data):
+                        continuation.resume(returning: data)
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
+                    }
                 }
+            }
+        }
+    }
 
-                os_log("UDSClient - Send Success", log: self.log)
-                continuation.resume()
-            })
+    private func send(_ message: UDSMessage, completion: @escaping (Result<Data?, Error>) async -> Void) async {
+
+        do {
+            let data = try JSONEncoder().encode(message)
+            let lengthData = withUnsafeBytes(of: UDSMessageLength(data.count)) {
+                Data($0)
+            }
+            let payload = lengthData + data
+            let connection = try await connection()
+
+            assert(responseCallbacks[message.uuid] == nil)
+            responseCallbacks[message.uuid] = { (data: Data?) in
+                await completion(.success(data))
+            }
+
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                connection.send(content: payload, completion: .contentProcessed { error in
+                    if let error {
+                        os_log("UDSClient - Send Error %{public}@", log: self.log, String(describing: error))
+                        continuation.resume(throwing: error)
+                        return
+                    }
+
+                    os_log("UDSClient - Send Success", log: self.log)
+                    continuation.resume()
+                })
+            }
+        } catch {
+            responseCallbacks.removeValue(forKey: message.uuid)
+            await completion(.failure(error))
         }
     }
 
@@ -148,21 +196,43 @@ public actor UDSClient<Incoming: Codable, Outgoing: Codable> {
     /// - Parameters:
     ///     - connection: the connection to receive messages for.
     ///
-    private func startReceivingMessages(on connection: NWConnection, messageHandler: @escaping (Incoming) -> Void) {
+    private func startReceivingMessages(on connection: NWConnection) {
 
-        receiver.startReceivingMessages(on: connection) { [weak self] event in
+        receiver.startReceivingMessages(on: connection) { [weak self] message in
             guard let self else { return false }
 
-            switch event {
-            case .received(let message):
-                messageHandler(message)
-            case .error:
-                await self.closeConnection(connection)
-                return false
+            switch message.body {
+            case .request(let payload):
+                try await payloadHandler?(payload)
+            case .response(let response):
+                await handleResponse(uuid: message.uuid, response: response, on: connection)
             }
 
+
             return true
+
+        } onError: { [weak self] error in
+            guard let self else { return false }
+            await self.closeConnection(connection)
+            return false
         }
+    }
+
+    private func handleResponse(uuid: UUID, response: UDSMessageResponse, on connection: NWConnection) async {
+        guard let callback = responseCallbacks[uuid] else {
+            return
+        }
+
+        responseCallbacks.removeValue(forKey: uuid)
+
+        switch response {
+        case .success(let data):
+            await callback(data)
+        case .failure:
+            await callback(nil)
+        }
+
+        return
     }
 
     private func closeConnection(_ connection: NWConnection) {

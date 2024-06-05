@@ -37,7 +37,7 @@ final class TunnelControllerIPCService {
     private let statusReporter: NetworkProtectionStatusReporter
     private var cancellables = Set<AnyCancellable>()
     private let defaults: UserDefaults
-    private let udsServer: UDSServer<VPNIPCServerCommand>
+    private let udsServer: UDSServer
 
     init(tunnelController: NetworkProtectionTunnelController,
          uninstaller: VPNUninstalling,
@@ -55,7 +55,7 @@ final class TunnelControllerIPCService {
 
         let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .ipc))!.appendingPathComponent("vpn.ipc")
 
-        udsServer = UDSServer<VPNIPCServerCommand>(socketFileURL: socketFileURL, log: .networkProtectionIPCLog)
+        udsServer = UDSServer(socketFileURL: socketFileURL, log: .networkProtectionIPCLog)
 
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
@@ -69,11 +69,24 @@ final class TunnelControllerIPCService {
         server.activate()
 
         do {
-            try udsServer.start { [weak self] request in
-                guard let self else { return }
+            try udsServer.start { [weak self] message in
+                guard let self else { return nil }
+
+                let command = try JSONDecoder().decode(VPNIPCServerCommand.self, from: message)
+
+                switch command {
+                case .uninstall(let component):
+                    try await uninstall(component)
+                    return nil
+                default:
+                    return nil
+                }
+
+/*
+                let payload = message.payload
 
                 // no-op
-                switch request {
+                switch message {
                 case .start:
                     start { _ in
                         // no-op
@@ -94,7 +107,8 @@ final class TunnelControllerIPCService {
                     Task {
                         try await self.command(.uninstallVPN)
                     }
-                }
+                }*/
+                return nil
             }
         } catch {
             fatalError(error.localizedDescription)
@@ -191,7 +205,7 @@ extension TunnelControllerIPCService: XPCServerInterface {
 
         switch command {
         case .removeSystemExtension:
-            try await uninstaller.removeSystemExtension()
+            try await uninstall(.systemExtension)
         case .expireRegistrationKey:
             // Intentional no-op: handled by the extension
             break
@@ -199,12 +213,23 @@ extension TunnelControllerIPCService: XPCServerInterface {
             // Intentional no-op: handled by the extension
             break
         case .removeVPNConfiguration:
-            try await uninstaller.removeVPNConfiguration()
+            try await uninstall(.configuration)
         case .uninstallVPN:
-            try await uninstaller.uninstall(includingSystemExtension: true)
+            try await uninstall(.all)
         case .disableConnectOnDemandAndShutDown:
             // Not implemented on macOS yet
             break
+        }
+    }
+
+    private func uninstall(_ component: VPNUninstallComponent) async throws {
+        switch component {
+        case .all:
+            try await uninstaller.uninstall(includingSystemExtension: true)
+        case .configuration:
+            try await uninstaller.removeVPNConfiguration()
+        case .systemExtension:
+            try await uninstaller.removeSystemExtension()
         }
     }
 }

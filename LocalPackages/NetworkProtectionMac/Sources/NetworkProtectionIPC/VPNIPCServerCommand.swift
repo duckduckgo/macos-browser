@@ -18,10 +18,12 @@
 
 import Foundation
 
+public enum VPNUninstallComponent: Codable {
+    case all
+    case configuration
+    case systemExtension
+}
+
 public enum VPNIPCServerCommand: Codable {
-    case start
-    case stop
-    case removeSystemExtension
-    case removeVPNConfiguration
-    case uninstallVPN
+    case uninstall(_ component: VPNUninstallComponent)
 }
