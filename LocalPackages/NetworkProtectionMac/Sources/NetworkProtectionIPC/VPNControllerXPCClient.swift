@@ -206,7 +206,7 @@ extension VPNControllerXPCClient: XPCServerInterface {
 }
 
 extension VPNControllerXPCClient: VPNControllerIPCClient {
-    
+
     public func quitAgent() async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             xpc.execute { server in
@@ -222,7 +222,6 @@ extension VPNControllerXPCClient: VPNControllerIPCClient {
             }
         }
     }
-    
 
     public func uninstall(_ component: VPNUninstallComponent) async throws {
         switch component {

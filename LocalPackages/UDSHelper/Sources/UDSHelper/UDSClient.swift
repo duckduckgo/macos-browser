@@ -120,7 +120,6 @@ public actor UDSClient {
             os_log("UDSClient - Waiting to connect... %{public}@", log: self.log, type: .info, String(describing: error))
         default:
             os_log("UDSClient - Unexpected state", log: self.log, type: .info)
-            break
         }
     }
 
@@ -205,10 +204,8 @@ public actor UDSClient {
                 await handleResponse(uuid: message.uuid, response: response, on: connection)
             }
 
-
             return true
-
-        } onError: { [weak self] error in
+        } onError: { [weak self] _ in
             guard let self else { return false }
             await self.closeConnection(connection)
             return false

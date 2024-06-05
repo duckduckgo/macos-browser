@@ -59,7 +59,7 @@ struct UDSReceiver {
         }
     }
 
-    // switlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity
     private func runReceiveMessageLoop(on connection: NWConnection, messageHandler: @escaping MessageHandler, onError errorHandler: @escaping (Error) async -> Bool) async {
 
         while true {
