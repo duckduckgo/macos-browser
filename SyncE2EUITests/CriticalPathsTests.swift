@@ -239,10 +239,10 @@ final class CriticalPathsTests: XCTestCase {
 
         // Temporarily skipping Logins testing in CI until we resolve the problem with encrypted value transformers
         // See makeDatabase() in Database.swift
-        if !isCI {
+//        if !isCI {
             // Add Login
             addLogin()
-        }
+//        }
 
         // Copy code to clipboard
         copyToClipboard(code: code)
@@ -284,10 +284,10 @@ final class CriticalPathsTests: XCTestCase {
 
         // Temporarily skipping Logins testing in CI until we resolve the problem with encrypted value transformers
         // See makeDatabase() in Database.swift
-        if !isCI {
+//        if !isCI {
             // Check Logins
             checkLogins()
-        }
+//        }
     }
 
     private func logIn() {
@@ -350,7 +350,7 @@ final class CriticalPathsTests: XCTestCase {
     private func addLogin() {
         let bookmarksWindow = app.windows["Bookmarks"]
         bookmarksWindow.buttons["NavigationBarViewController.optionsButton"].click()
-        bookmarksWindow.menuItems["Autofill"].click()
+        bookmarksWindow.menuItems["MoreOptionsMenu.autofill"].click()
         bookmarksWindow.popovers.buttons["add item"].click()
         bookmarksWindow.popovers.menuItems["createNewLogin"].click()
         let usernameTextfieldTextField = bookmarksWindow.popovers.textFields["Username TextField"]
@@ -411,10 +411,10 @@ final class CriticalPathsTests: XCTestCase {
     }
 
     private func checkLogins() {
-        let bookmarksWindow = app.windows["Bookmarks"]
-        bookmarksWindow.buttons["NavigationBarViewController.optionsButton"].click()
-        bookmarksWindow.menuItems["Autofill"].click()
-        let elementsQuery = bookmarksWindow.popovers.scrollViews.otherElements
+        let currentWindow = app.windows.firstMatch
+        app.buttons["NavigationBarViewController.optionsButton"].click()
+        app.menuItems["MoreOptionsMenu.autofill"].click()
+        let elementsQuery = currentWindow.popovers.scrollViews.otherElements
         elementsQuery.buttons["Da, Dax Login, daxthetest"].click()
         elementsQuery.buttons["Gi, Github, githubusername"].click()
         elementsQuery.buttons["My, mywebsite.com, mywebsite"].click()
