@@ -21,11 +21,15 @@ import NetworkProtectionUI
 
 public final class MockVPNUIActionHandler: VPNUIActionHandler {
 
-    public func showVPNLocations() async {
+    public func moveAppToApplications() async {
         // placeholder
     }
 
-    public func moveAppToApplications() async {
+    public func shareFeedback() async {
+        // placeholder
+    }
+
+    public func showVPNLocations() async {
         // placeholder
     }
 
