@@ -29,17 +29,17 @@ struct SystemDate: DateProtocol {
 }
 
 struct OperationPreferredDateCalculator {
-
+    
     func dateForScanOperation(currentPreferredRunDate: Date?,
                               historyEvents: [HistoryEvent],
                               extractedProfileID: Int64?,
                               schedulingConfig: DataBrokerScheduleConfig,
                               isDeprecated: Bool = false) throws -> Date? {
-
+        
         guard let lastEvent = historyEvents.last else {
             throw DataBrokerProtectionError.cantCalculatePreferredRunDate
         }
-
+        
         switch lastEvent.type {
         case .optOutConfirmed:
             if isDeprecated {
@@ -57,17 +57,17 @@ struct OperationPreferredDateCalculator {
             return Date().addingTimeInterval(schedulingConfig.confirmOptOutScan.hoursToSeconds)
         }
     }
-
+    
     func dateForOptOutOperation(currentPreferredRunDate: Date?,
                                 historyEvents: [HistoryEvent],
                                 extractedProfileID: Int64?,
                                 schedulingConfig: DataBrokerScheduleConfig,
                                 date: DateProtocol = SystemDate()) throws -> Date? {
-
+        
         guard let lastEvent = historyEvents.last else {
             throw DataBrokerProtectionError.cantCalculatePreferredRunDate
         }
-
+        
         switch lastEvent.type {
         case .matchesFound, .reAppearence:
             if let extractedProfileID = extractedProfileID, shouldScheduleNewOptOut(events: historyEvents,
@@ -78,14 +78,14 @@ struct OperationPreferredDateCalculator {
                 return currentPreferredRunDate
             }
         case .error:
-            return date.now.addingTimeInterval(calculateNextRunDate(schedulingConfig: schedulingConfig, historyEvents: historyEvents))
+            return date.now.addingTimeInterval(calculateNextRunDateOnError(schedulingConfig: schedulingConfig, historyEvents: historyEvents))
         case .optOutStarted, .scanStarted, .noMatchFound:
             return currentPreferredRunDate
         case .optOutConfirmed, .optOutRequested:
             return nil
         }
     }
-
+    
     // If the time elapsed since the last profile removal exceeds the current date plus maintenance period (expired), we should proceed with scheduling a new opt-out request as the broker has failed to honor the previous one.
     private func shouldScheduleNewOptOut(events: [HistoryEvent],
                                          extractedProfileId: Int64,
@@ -93,13 +93,13 @@ struct OperationPreferredDateCalculator {
         guard let lastRemovalEvent = events.last(where: { $0.type == .optOutRequested && $0.extractedProfileId == extractedProfileId }) else {
             return false
         }
-
+        
         let lastRemovalEventDate = lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
         return lastRemovalEventDate < Date()
     }
-
-    private func calculateNextRunDate(schedulingConfig: DataBrokerScheduleConfig,
-                                      historyEvents: [HistoryEvent]) -> TimeInterval {
+    
+    private func calculateNextRunDateOnError(schedulingConfig: DataBrokerScheduleConfig,
+                                             historyEvents: [HistoryEvent]) -> TimeInterval {
         let pastTries = historyEvents.filter { $0.isError }.count
         return min(Int(pow(2.0, Double(pastTries))), schedulingConfig.retryError).hoursToSeconds
     }
