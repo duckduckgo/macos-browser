@@ -1,5 +1,5 @@
 //
-//  VPNControllerIPCServer.swift
+//  VPNControllerIPCClient.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -23,4 +23,5 @@ import NetworkProtection
 public protocol VPNControllerIPCClient {
 
     func uninstall(_ component: VPNUninstallComponent) async throws
+    func quitAgent() async throws
 }

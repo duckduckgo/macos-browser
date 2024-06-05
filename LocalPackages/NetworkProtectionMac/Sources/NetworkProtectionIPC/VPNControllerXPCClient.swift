@@ -172,6 +172,12 @@ extension VPNControllerXPCClient: XPCServerInterface {
         }, xpcReplyErrorHandler: completion)
     }
 
+    public func quitAgent(completion: @escaping (Error?) -> Void) {
+        xpc.execute(call: { server in
+            server.quitAgent(completion: completion)
+        }, xpcReplyErrorHandler: completion)
+    }
+
     public func fetchLastError(completion: @escaping (Error?) -> Void) {
         xpc.execute(call: { server in
             server.fetchLastError(completion: completion)
@@ -193,8 +199,6 @@ extension VPNControllerXPCClient: XPCServerInterface {
                     }
                 }
             }, xpcReplyErrorHandler: { error in
-                // Intentional no-op as there's no completion block
-                // If you add a completion block, please remember to call it here too!
                 continuation.resume(throwing: error)
             })
         }
@@ -202,6 +206,23 @@ extension VPNControllerXPCClient: XPCServerInterface {
 }
 
 extension VPNControllerXPCClient: VPNControllerIPCClient {
+    
+    public func quitAgent() async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            xpc.execute { server in
+                server.quitAgent { error in
+                    if let error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume()
+                    }
+                }
+            } xpcReplyErrorHandler: { error in
+                continuation.resume(throwing: error)
+            }
+        }
+    }
+    
 
     public func uninstall(_ component: VPNUninstallComponent) async throws {
         switch component {

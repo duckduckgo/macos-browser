@@ -1,5 +1,5 @@
 //
-//  VPNIPCServerCommand.swift
+//  VPNIPCClientCommand2.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,12 +18,6 @@
 
 import Foundation
 
-public enum VPNUninstallComponent: Codable {
-    case all
-    case configuration
-    case systemExtension
-}
-
 public enum VPNIPCServerCommand: Codable {
-    case uninstall(_ component: VPNUninstallComponent)
+    case none
 }

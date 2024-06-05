@@ -130,7 +130,7 @@ final class VPNUninstaller: VPNUninstalling {
     @MainActor
     private var isDisabling = false
 
-    init(ipcServiceLauncher: IPCServiceLauncher = VPNUDSServiceLauncher(bundleID: Bundle.main.vpnMenuAgentBundleId),
+    init(ipcServiceLauncher: IPCServiceLauncher? = nil,
          pinningManager: LocalPinningManager = .shared,
          userDefaults: UserDefaults = .netP,
          settings: VPNSettings = .init(defaults: .netP),
@@ -140,7 +140,7 @@ final class VPNUninstaller: VPNUninstalling {
          log: OSLog = .networkProtection) {
 
         self.log = log
-        self.ipcServiceLauncher = ipcServiceLauncher
+        self.ipcServiceLauncher = ipcServiceLauncher ?? IPCServiceLauncher(bundleID: Bundle.main.vpnMenuAgentBundleId, ipcClient: ipcClient, loginItemsManager: LoginItemsManager(), log: .disabled)
         self.pinningManager = pinningManager
         self.settings = settings
         self.userDefaults = userDefaults
@@ -177,7 +177,7 @@ final class VPNUninstaller: VPNUninstalling {
             }
 
             do {
-                try await ipcServiceLauncher.enable()
+                try await ipcServiceLauncher.enable(launchMethod: .direct)
             } catch {
                 throw UninstallError.runAgentError(error)
             }

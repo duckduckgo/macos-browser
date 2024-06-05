@@ -19,58 +19,67 @@
 import AppLauncher
 import Common
 import Foundation
+import NetworkProtectionIPC
 
-protocol IPCServiceLauncher {
-    func enable() async throws
-    func disable() async throws
-}
+final class IPCServiceLauncher{
 
-final class VPNXPCServiceLauncher: IPCServiceLauncher {
-
-    private let loginItemsManager: LoginItemsManaging
-    private let log: OSLog
-
-    init(loginItemsManager: LoginItemsManaging,
-         log: OSLog) {
-
-        self.log = log
-        self.loginItemsManager = loginItemsManager
+    enum LaunchMethod {
+        case direct
+        case loginItem
     }
-
-    func enable() async throws {
-        try loginItemsManager.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: log)
-    }
-
-    func disable() async throws {
-        loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
-    }
-}
-
-final class VPNUDSServiceLauncher: IPCServiceLauncher {
 
     private let bundleID: String
     private let appLauncher: AppLaunching
+    private let ipcClient: VPNControllerIPCClient
+    private let loginItemsManager: LoginItemsManaging
+    private let log: OSLog
 
-    init(bundleID: String) {
+    init(bundleID: String,
+         ipcClient: VPNControllerIPCClient,
+         loginItemsManager: LoginItemsManager,
+         log: OSLog) {
+
         self.bundleID = bundleID
         self.appLauncher = AppLauncher(appBundleURL: Bundle.main.vpnMenuAgentURL)
+        self.ipcClient = ipcClient
+        self.loginItemsManager = loginItemsManager
+        self.log = log
     }
 
-    func enable() async throws {
-        guard NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).isEmpty else {
-            return
-        }
+    /// Enable the IPC service
+    ///
+    /// When enabling the IPC service it's important to pick the right method, because during uninstallation we don't want the user to be
+    /// told by mistake we're enabling a background agent.
+    ///
+    func enable(launchMethod: LaunchMethod) async throws {
+        switch launchMethod {
+        case .direct:
+            guard NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).isEmpty else {
+                return
+            }
 
-        struct UDSLaunchAppCommand: AppLaunchCommand {
-            var allowsRunningApplicationSubstitution = true
-            var launchURL: URL?
-            var hideApp = true
-        }
+            struct UDSLaunchAppCommand: AppLaunchCommand {
+                var allowsRunningApplicationSubstitution = true
+                var launchURL: URL?
+                var hideApp = true
+            }
 
-        try await appLauncher.launchApp(withCommand: UDSLaunchAppCommand())
+            try await appLauncher.launchApp(withCommand: UDSLaunchAppCommand())
+        case .loginItem:
+            try loginItemsManager.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: log)
+        }
     }
 
+    /// Disables the IPC service.
+    ///
+    /// While ``enable(launchMethod:)`` launches the service according to the selected method, here we need to disable the
+    /// service regardless of what method it was launched with.
+    ///
     func disable() async throws {
-        //appLauncher.stopApp()
+        if loginItemsManager.isAnyEnabled(LoginItemsManager.networkProtectionLoginItems) {
+            loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
+        }
+
+        try await ipcClient.quitAgent()
     }
 }

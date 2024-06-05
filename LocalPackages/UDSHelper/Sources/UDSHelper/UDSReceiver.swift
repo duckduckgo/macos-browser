@@ -80,7 +80,7 @@ struct UDSReceiver {
                            String(describing: received))
 
                     guard await errorHandler(error) else {
-                        break
+                        return
                     }
                 case ReadError.connectionError(let error):
                     os_log("UDSServer - Connection closing due to a connection error: %{public}@",
@@ -89,7 +89,7 @@ struct UDSReceiver {
                            String(describing: error))
 
                     guard await errorHandler(error) else {
-                        break
+                        return
                     }
                 case ReadError.connectionClosed:
                     os_log("UDSServer - Connection closing: End of file reached",
@@ -97,7 +97,7 @@ struct UDSReceiver {
                            type: .info)
 
                     guard await errorHandler(error) else {
-                        break
+                        return
                     }
                 default:
                     os_log("UDSServer - Connection closing due to error: %{public}@",
@@ -106,7 +106,7 @@ struct UDSReceiver {
                            String(describing: error))
 
                     guard await errorHandler(error) else {
-                        break
+                        return
                     }
                 }
             }

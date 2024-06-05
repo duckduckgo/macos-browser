@@ -72,43 +72,16 @@ final class TunnelControllerIPCService {
             try udsServer.start { [weak self] message in
                 guard let self else { return nil }
 
-                let command = try JSONDecoder().decode(VPNIPCServerCommand.self, from: message)
+                let command = try JSONDecoder().decode(VPNIPCClientCommand.self, from: message)
 
                 switch command {
+                case .quitAgent:
+                    try await quitAgent()
+                    return nil
                 case .uninstall(let component):
                     try await uninstall(component)
                     return nil
-                default:
-                    return nil
                 }
-
-/*
-                let payload = message.payload
-
-                // no-op
-                switch message {
-                case .start:
-                    start { _ in
-                        // no-op
-                    }
-                case .stop:
-                    stop { _ in
-                        // no-op
-                    }
-                case .removeSystemExtension:
-                    Task {
-                        try await self.command(.removeSystemExtension)
-                    }
-                case .removeVPNConfiguration:
-                    Task {
-                        try await self.command(.removeVPNConfiguration)
-                    }
-                case .uninstallVPN:
-                    Task {
-                        try await self.command(.uninstallVPN)
-                    }
-                }*/
-                return nil
             }
         } catch {
             fatalError(error.localizedDescription)
@@ -181,6 +154,26 @@ extension TunnelControllerIPCService: XPCServerInterface {
         // that the requested operation was executed fully.  Failure to complete the
         // operation will be handled entirely within the tunnel controller.
         completion(nil)
+    }
+
+    func quitAgent() async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            quitAgent { error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                continuation.resume()
+            }
+        }
+    }
+
+    func quitAgent(completion: @escaping (Error?) -> Void) {
+        Task {
+            completion(nil)
+            exit(EXIT_SUCCESS)
+        }
     }
 
     func fetchLastError(completion: @escaping (Error?) -> Void) {

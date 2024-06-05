@@ -24,7 +24,7 @@ public final class VPNControllerUDSClient {
     private let udsClient: UDSClient
     private let encoder = JSONEncoder()
 
-    public init(udsClient: UDSClient) {    
+    public init(udsClient: UDSClient) {
         self.udsClient = udsClient
     }
 }
@@ -32,7 +32,12 @@ public final class VPNControllerUDSClient {
 extension VPNControllerUDSClient: VPNControllerIPCClient {
 
     public func uninstall(_ component: VPNUninstallComponent) async throws {
-        let payload = try encoder.encode(VPNIPCServerCommand.uninstall(component))
+        let payload = try encoder.encode(VPNIPCClientCommand.uninstall(component))
+        try await udsClient.send(payload)
+    }
+
+    public func quitAgent() async throws {
+        let payload = try encoder.encode(VPNIPCClientCommand.quitAgent)
         try await udsClient.send(payload)
     }
 }
