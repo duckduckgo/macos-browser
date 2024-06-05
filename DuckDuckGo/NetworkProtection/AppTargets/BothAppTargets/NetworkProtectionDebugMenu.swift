@@ -405,6 +405,13 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     }
 
+    func menuItem(title: String, action: Selector, representedObject: Any?) -> NSMenuItem {
+        let menuItem = NSMenuItem(title: title, action: action, keyEquivalent: "")
+        menuItem.target = self
+        menuItem.representedObject = representedObject
+        return menuItem
+    }
+
     // MARK: - Menu State Update
 
     override func update() {

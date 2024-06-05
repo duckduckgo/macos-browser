@@ -1,5 +1,5 @@
 //
-//  TunnelControllerProvider.swift
+//  NSAccessibilityProtocolExtension.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,20 +17,17 @@
 //
 
 import Foundation
-import NetworkProtection
-import NetworkProtectionIPC
 
-final class TunnelControllerProvider {
-    static let shared = TunnelControllerProvider()
+extension NSAccessibilityProtocol {
 
-    let tunnelController: NetworkProtectionIPCTunnelController
-
-    private init() {
-        let ipcClient = TunnelControllerIPCClient()
-        ipcClient.register { error in
-            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
-        }
-        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+    @discardableResult
+    func withAccessibilityIdentifier(_ accessibilityIdentifier: String) -> Self {
+        self.setAccessibilityIdentifier(accessibilityIdentifier)
+        return self
     }
 
+    func withAccessibilityValue(_ accessibilityValue: String) -> Self {
+        self.setAccessibilityValue(accessibilityValue)
+        return self
+    }
 }

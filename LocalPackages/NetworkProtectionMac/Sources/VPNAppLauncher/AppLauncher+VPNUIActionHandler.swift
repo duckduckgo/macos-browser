@@ -21,12 +21,17 @@ import Foundation
 import NetworkProtectionUI
 
 extension AppLauncher: VPNUIActionHandler {
-    public func showVPNLocations() async {
-        try? await launchApp(withCommand: VPNAppLaunchCommand.showVPNLocations)
-    }
 
     public func moveAppToApplications() async {
         try? await launchApp(withCommand: VPNAppLaunchCommand.moveAppToApplications)
+    }
+
+    public func shareFeedback() async {
+        try? await launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
+    }
+
+    public func showVPNLocations() async {
+        try? await launchApp(withCommand: VPNAppLaunchCommand.showVPNLocations)
     }
 
     public func showPrivacyPro() async {
