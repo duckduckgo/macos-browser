@@ -95,7 +95,7 @@ extension NetworkProtectionStatusView {
         ///
         private let runLoopMode: RunLoop.Mode?
 
-        private let appLauncher: AppLaunching
+        private let uiActionHandler: VPNUIActionHandler
 
         private let uninstallHandler: () async -> Void
 
@@ -115,7 +115,7 @@ extension NetworkProtectionStatusView {
                     onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
                     debugInformationPublisher: AnyPublisher<Bool, Never>,
-                    appLauncher: AppLaunching,
+                    uiActionHandler: VPNUIActionHandler,
                     menuItems: @escaping () -> [MenuItem],
                     agentLoginItem: LoginItem?,
                     isMenuBarStatusView: Bool,
@@ -132,7 +132,7 @@ extension NetworkProtectionStatusView {
             self.agentLoginItem = agentLoginItem
             self.isMenuBarStatusView = isMenuBarStatusView
             self.runLoopMode = runLoopMode
-            self.appLauncher = appLauncher
+            self.uiActionHandler = uiActionHandler
             self.uninstallHandler = uninstallHandler
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
@@ -140,7 +140,7 @@ extension NetworkProtectionStatusView {
                                                                   statusReporter: statusReporter,
                                                                   vpnSettings: .init(defaults: userDefaults),
                                                                   locationFormatter: locationFormatter,
-                                                                  appLauncher: appLauncher)
+                                                                  uiActionHandler: uiActionHandler)
 
             connectionStatus = statusReporter.statusObserver.recentValue
             isHavingConnectivityIssues = statusReporter.connectivityIssuesObserver.recentValue
@@ -187,13 +187,13 @@ extension NetworkProtectionStatusView {
 
         func openPrivacyPro() {
             Task {
-                await appLauncher.launchApp(withCommand: .showPrivacyPro)
+                await uiActionHandler.showPrivacyPro()
             }
         }
 
         func openFeedbackForm() {
             Task {
-                await appLauncher.launchApp(withCommand: .shareFeedback)
+                await uiActionHandler.shareFeedback()
             }
         }
 

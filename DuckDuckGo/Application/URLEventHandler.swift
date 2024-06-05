@@ -21,8 +21,8 @@ import Foundation
 import AppKit
 import PixelKit
 import Subscription
-
 import NetworkProtectionUI
+import VPNAppLauncher
 
 #if DBP
 import DataBrokerProtection
@@ -145,25 +145,25 @@ final class URLEventHandler {
     private static func handleNetworkProtectionURL(_ url: URL) {
         DispatchQueue.main.async {
             switch url {
-            case AppLaunchCommand.showStatus.launchURL:
+            case VPNAppLaunchCommand.showStatus.launchURL:
                 Task {
                     await WindowControllersManager.shared.showNetworkProtectionStatus()
                 }
-            case AppLaunchCommand.showSettings.launchURL:
+            case VPNAppLaunchCommand.showSettings.launchURL:
                 WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
-            case AppLaunchCommand.shareFeedback.launchURL:
+            case VPNAppLaunchCommand.shareFeedback.launchURL:
                 WindowControllersManager.shared.showShareFeedbackModal()
-            case AppLaunchCommand.justOpen.launchURL:
+            case VPNAppLaunchCommand.justOpen.launchURL:
                 WindowControllersManager.shared.showMainWindow()
-            case AppLaunchCommand.showVPNLocations.launchURL:
+            case VPNAppLaunchCommand.showVPNLocations.launchURL:
                 WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
                 WindowControllersManager.shared.showLocationPickerSheet()
-            case AppLaunchCommand.showPrivacyPro.launchURL:
+            case VPNAppLaunchCommand.showPrivacyPro.launchURL:
                 let url = Application.appDelegate.subscriptionManager.url(for: .purchase)
                 WindowControllersManager.shared.showTab(with: .subscription(url))
                 PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
 #if !APPSTORE && !DEBUG
-            case AppLaunchCommand.moveAppToApplications.launchURL:
+            case VPNAppLaunchCommand.moveAppToApplications.launchURL:
                 // this should be run after NSApplication.shared is set
                 PFMoveToApplicationsFolderIfNecessary(false)
 #endif

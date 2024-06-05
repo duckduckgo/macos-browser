@@ -16,11 +16,13 @@
 //  limitations under the License.
 //
 
+import AppLauncher
 import Cocoa
 import Combine
 import Common
 import NetworkExtension
 import NetworkProtection
+import VPNAppLauncher
 
 @objc(Application)
 final class DuckDuckGoNotificationsApplication: NSApplication {
