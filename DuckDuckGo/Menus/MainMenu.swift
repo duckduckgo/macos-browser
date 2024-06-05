@@ -606,6 +606,7 @@ import SubscriptionUI
             }
             NSMenuItem(title: "Sync & Backup")
                 .submenu(SyncDebugMenu())
+                .withAccessibilityIdentifier("MainMenu.syncAndBackup")
 
 #if DBP
             NSMenuItem(title: "Personal Information Removal")
