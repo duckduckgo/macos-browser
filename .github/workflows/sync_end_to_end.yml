@@ -1,4 +1,4 @@
-name: Sync-End-to-End tests
+name: Sync End-to-End tests
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   sync-end-to-end-tests:
-    name: Sync End to end Tests
+    name: Sync End-to-End Tests
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -95,15 +95,6 @@ jobs:
         | tee -a xcodebuild.log \
         | tee ui-tests.log
 
-    # - name: Create Asana task when workflow failed
-    #   if: ${{ failure() }}
-    #   run: |
-    #     curl -s "https://app.asana.com/api/1.0/tasks" \
-    #       --header "Accept: application/json" \
-    #       --header "Authorization: Bearer ${{ secrets.ASANA_ACCESS_TOKEN }}" \
-    #       --header "Content-Type: application/json" \
-    #       --data ' { "data": { "name": "GH Workflow Failure - Sync End to end tests", "projects": [ "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}" ], "notes" : "The end to end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" } }'
-    
     - name: Prepare test report
       if: always()
       run: |
@@ -127,3 +118,18 @@ jobs:
           ~/Library/Logs/DiagnosticReports/*
         retention-days: 7
 
+    - name: Create Asana task when workflow failed
+      if: always()
+      run: |
+        curl -fLSs "https://app.asana.com/api/1.0/tasks" \
+          -H "Authorization: Bearer ${{ secrets.ASANA_ACCESS_TOKEN }}" \
+          -H 'content-type: application/json' \
+          -d '{
+            "data": {
+              "name": "GH Workflow Failure - Sync End-to-End Tests",
+              "projects": [
+                "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}"
+              ],
+              "notes" : "The Sync end-to-end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+          }'
