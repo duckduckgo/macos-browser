@@ -77,6 +77,17 @@ final class UpdateController: NSObject {
         return true
     }
 
+    private var isUpdateFound: Bool = false
+    private var isUpdateDownloaded: Bool = false
+
+    private func refreshUpdateObjectIfNeeded(appcastItem: SUAppcastItem) {
+        if isUpdateFound && isUpdateDownloaded {
+            availableUpdate = Update(appcastItem: appcastItem)
+        } else {
+            availableUpdate = nil
+        }
+    }
+
     private func configureUpdater() {
     // The default configuration of Sparkle updates is in Info.plist
     updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
@@ -87,10 +98,8 @@ final class UpdateController: NSObject {
 //        updater.updater.updateCheckInterval = 0
 //#endif
 
+        updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
         updater.updater.checkForUpdatesInBackground()
-
-        //TODO: if automatic updates are disabled
-//        updater.updater.automaticallyDownloadsUpdates = false
     }
 
     private func showNotSupportedInfo() {
@@ -105,11 +114,28 @@ final class UpdateController: NSObject {
     }
 
     @objc func runUpdate() {
-        //TODO: Run update
-        //TODO: Remove this
-        notificationPresenter.openUpdatesPage()
+        restartApp()
     }
 
+    private func restartApp() {
+        guard let executablePath = Bundle.main.executablePath else {
+            print("Unable to find executable path")
+            return
+        }
+
+        let task = Process()
+        task.launchPath = executablePath
+
+        do {
+            try task.run()
+        } catch {
+            print("Unable to launch the app: \(error)")
+            return
+        }
+
+        // Terminate the current app instance
+        exit(0)
+    }
 }
 
 extension UpdateController: SPUStandardUserDriverDelegate {
@@ -162,12 +188,18 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        availableUpdate = Update(appcastItem: item)
+        isUpdateFound = true
+        refreshUpdateObjectIfNeeded(appcastItem: item)
     }
 
-//    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
-//
-//    }
+    func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
+        isUpdateDownloaded = true
+        refreshUpdateObjectIfNeeded(appcastItem: item)
+    }
+
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
+
+    }
 
 }
 
