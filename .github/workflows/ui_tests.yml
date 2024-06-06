@@ -86,15 +86,6 @@ jobs:
         | tee -a xcodebuild.log \
         | tee ui-tests.log
 
- #   - name: Create Asana task when workflow failed
- #     if: ${{ failure() }} && github.ref == 'refs/heads/main'
- #     run: |
- #       curl -s "https://app.asana.com/api/1.0/tasks" \
- #          --header "Accept: application/json" \
- #          --header "Authorization: Bearer ${{ secrets.ASANA_ACCESS_TOKEN }}" \
- #          --header "Content-Type: application/json" \
- #          --data ' { "data": { "name": "GH Workflow Failure - UI Tests", "projects": [ "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}" ], "notes" : "The end to end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" } }'
-
     - name: Prepare test report
       if: always()
       run: |
