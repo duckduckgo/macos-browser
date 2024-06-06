@@ -59,12 +59,23 @@ final class UpdateController: NSObject {
         updater.checkForUpdates(sender)
     }
 
+    var availableUpdate: Update? {
+        didSet {
+            if availableUpdate != nil {
+                notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Relaunch to update.")
+            }
+        }
+    }
+
     // MARK: - Private
 
     private var updater: SPUStandardUpdaterController!
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
-
     private var internalUserDecider: InternalUserDecider
+
+    private var areAutomaticUpdatesEnabled: Bool {
+        return true
+    }
 
     private func configureUpdater() {
     // The default configuration of Sparkle updates is in Info.plist
@@ -89,9 +100,23 @@ final class UpdateController: NSObject {
         }
     }
 
+    @objc func openUpdatesPage() {
+        notificationPresenter.openUpdatesPage()
+    }
+
+    @objc func runUpdate() {
+        //TODO: Run update
+        //TODO: Remove this
+        notificationPresenter.openUpdatesPage()
+    }
+
 }
 
 extension UpdateController: SPUStandardUserDriverDelegate {
+
+    func standardUserDriverShouldHandleShowingScheduledUpdate(_ update: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
+        return !areAutomaticUpdatesEnabled
+    }
 
 }
 
@@ -137,8 +162,12 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Relaunch to update.")
+        availableUpdate = Update(appcastItem: item)
     }
+
+//    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
+//
+//    }
 
 }
 

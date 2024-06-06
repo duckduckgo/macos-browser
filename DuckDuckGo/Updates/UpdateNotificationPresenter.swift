@@ -21,6 +21,8 @@ import SwiftUI
 
 final class UpdateNotificationPresenter {
 
+    static let presentationTimeInterval: TimeInterval = 5
+
     private var notificationWindow: UpdateNotificationWindow?
     private var hideTimer: Timer?
 
@@ -46,7 +48,7 @@ final class UpdateNotificationPresenter {
         self.notificationWindow = notificationWindow
 
         // Set a timer to automatically hide the notification after 10 seconds
-        hideTimer = Timer.scheduledTimer(timeInterval: 10.0, target: self, selector: #selector(fadeOutNotification), userInfo: nil, repeats: false)
+        hideTimer = Timer.scheduledTimer(timeInterval: Self.presentationTimeInterval, target: self, selector: #selector(fadeOutNotification), userInfo: nil, repeats: false)
     }
 
     func closeUpdateNotification() {
@@ -67,7 +69,10 @@ final class UpdateNotificationPresenter {
     }
 
     func openUpdatesPage() {
-        //TODO
+        //TODO: Open Updates page
+        DispatchQueue.main.async {
+            WindowControllersManager.shared.showTab(with: .newtab)
+        }
     }
 
 }

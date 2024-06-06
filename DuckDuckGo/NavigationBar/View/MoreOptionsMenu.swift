@@ -93,6 +93,7 @@ final class MoreOptionsMenu: NSMenu {
     let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "").withImage(.optionsButtonMenuZoom)
 
     private func setupMenuItems() {
+        addUpdateItem()
 
 #if FEEDBACK
         let feedbackString: String = {
@@ -245,6 +246,15 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func doPrint(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedPrint(self)
+    }
+
+    private func addUpdateItem() {
+#if SPARKLE
+        if let update = Application.appDelegate.updateController.availableUpdate {
+            addItem(UpdateMenuItemFactory.menuItem(for: update))
+            addItem(NSMenuItem.separator())
+        }
+#endif
     }
 
     private func addWindowItems() {
