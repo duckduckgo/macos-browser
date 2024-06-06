@@ -113,7 +113,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         didSet {
             syncBookmarksAdapter.isFaviconsFetchingEnabled = isFaviconsFetchingEnabled
             if isFaviconsFetchingEnabled {
-                syncService.scheduler.notifyDataChanged()
+                syncService.scheduler.notifyDataChanged(for: syncBookmarksAdapter.provider?.feature)
             }
         }
     }
@@ -122,7 +122,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         didSet {
             appearancePreferences.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayUnified(native: .desktop) : .displayNative(.desktop)
             if shouldRequestSyncOnFavoritesOptionChange {
-                syncService.scheduler.notifyDataChanged()
+                syncService.scheduler.notifyDataChanged(for: syncSettingsAdapter.provider?.feature)
             } else {
                 shouldRequestSyncOnFavoritesOptionChange = true
             }
@@ -170,6 +170,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         syncService: DDGSyncing,
         syncBookmarksAdapter: SyncBookmarksAdapter,
         syncCredentialsAdapter: SyncCredentialsAdapter,
+        syncSettingsAdapter: SyncSettingsAdapter,
         appearancePreferences: AppearancePreferences = .shared,
         managementDialogModel: ManagementDialogModel = ManagementDialogModel(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
@@ -178,6 +179,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
         self.syncCredentialsAdapter = syncCredentialsAdapter
+        self.syncSettingsAdapter = syncSettingsAdapter
         self.appearancePreferences = appearancePreferences
         self.syncFeatureFlags = syncService.featureFlags
         self.userAuthenticator = userAuthenticator
@@ -431,6 +433,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     private let syncService: DDGSyncing
     private let syncBookmarksAdapter: SyncBookmarksAdapter
     private let syncCredentialsAdapter: SyncCredentialsAdapter
+    private let syncSettingsAdapter: SyncSettingsAdapter
     private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
     private var connector: RemoteConnecting?

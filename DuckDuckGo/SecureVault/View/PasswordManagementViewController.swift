@@ -1014,7 +1014,7 @@ final class PasswordManagementViewController: NSViewController {
             return
         }
         os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
-        syncService.scheduler.requestSyncImmediately()
+        syncService.scheduler.requestSyncImmediately(for: NSApp.delegateTyped.syncDataProviders?.credentialsAdapter.provider?.feature)
     }
 
 }

@@ -36,10 +36,13 @@ struct AutofillDeleteAllPasswordsBuilder: AutofillActionBuilder {
     @MainActor
     func buildExecutor() -> AutofillActionExecutor? {
         guard let secureVault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared),
-        let syncService = NSApp.delegateTyped.syncService else { return nil }
+              let syncService = NSApp.delegateTyped.syncService,
+              let syncDataProviders = NSApp.delegateTyped.syncDataProviders
+        else { return nil }
 
         return AutofillDeleteAllPasswordsExecutor(userAuthenticator: DeviceAuthenticator.shared,
                                                   secureVault: secureVault,
-                                                  syncService: syncService)
+                                                  syncService: syncService,
+                                                  syncCredentialsAdapter: syncDataProviders.credentialsAdapter)
     }
 }

@@ -30,6 +30,7 @@ struct SyncView: View {
                 syncService: syncService,
                 syncBookmarksAdapter: syncDataProviders.bookmarksAdapter,
                 syncCredentialsAdapter: syncDataProviders.credentialsAdapter,
+                syncSettingsAdapter: syncDataProviders.settingsAdapter,
                 syncPausedStateManager: syncDataProviders.syncErrorHandler
             )
             SyncUI.ManagementView(model: syncPreferences)
@@ -43,11 +44,11 @@ struct SyncView: View {
 
     private func requestSync() {
         Task { @MainActor in
-            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+            guard let syncService = NSApp.delegateTyped.syncService else {
                 return
             }
             os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
-            syncService.scheduler.notifyDataChanged()
+            syncService.scheduler.notifyDataChanged(for: NSApp.delegateTyped.syncDataProviders.settingsAdapter.provider?.feature)
         }
     }
 }

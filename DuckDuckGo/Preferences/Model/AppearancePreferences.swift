@@ -234,14 +234,4 @@ final class AppearancePreferences: ObservableObject {
     }
 
     private var persistor: AppearancePreferencesPersistor
-
-    private func requestSync() {
-        Task { @MainActor in
-            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
-                return
-            }
-            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
-            syncService.scheduler.notifyDataChanged()
-        }
-    }
 }

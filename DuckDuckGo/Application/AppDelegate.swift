@@ -562,14 +562,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
-            syncService?.scheduler.notifyDataChanged()
+            syncService?.scheduler.notifyDataChanged(for: syncDataProviders.settingsAdapter.provider?.feature)
         }
     }
 
     private func emailDidSignOutNotification(_ notification: Notification) {
         PixelKit.fire(NonStandardEvent(NonStandardPixel.emailDisabled))
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
-            syncService?.scheduler.notifyDataChanged()
+            syncService?.scheduler.notifyDataChanged(for: syncDataProviders.settingsAdapter.provider?.feature)
         }
     }
 

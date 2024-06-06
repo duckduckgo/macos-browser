@@ -367,11 +367,13 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func requestSync() {
         Task { @MainActor in
-            guard let syncService = NSApp.delegateTyped.syncService else {
+            guard let syncService = NSApp.delegateTyped.syncService,
+                  let bookmarksFeature = NSApp.delegateTyped.syncDataProviders.bookmarksAdapter.provider?.feature
+            else {
                 return
             }
             os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
-            syncService.scheduler.notifyDataChanged()
+            syncService.scheduler.notifyDataChanged(for: bookmarksFeature)
         }
     }
 

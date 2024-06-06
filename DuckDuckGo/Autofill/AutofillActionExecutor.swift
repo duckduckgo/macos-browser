@@ -24,7 +24,12 @@ import PixelKit
 
 /// Conforming types provide an `execute` method which performs some action on autofill types (e.g delete all passwords)
 protocol AutofillActionExecutor {
-    init(userAuthenticator: UserAuthenticating, secureVault: any AutofillSecureVault, syncService: DDGSyncing)
+    init(
+        userAuthenticator: UserAuthenticating,
+        secureVault: any AutofillSecureVault,
+        syncService: DDGSyncing,
+        syncCredentialsAdapter: SyncCredentialsAdapter
+    )
     /// NSAlert to display asking a user to confirm the action
     var confirmationAlert: NSAlert { get }
     /// NSAlert to display when the action is complete
@@ -53,11 +58,13 @@ struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
     private var userAuthenticator: UserAuthenticating
     private var secureVault: any AutofillSecureVault
     private var syncService: DDGSyncing
+    private var syncCredentialsAdapter: SyncCredentialsAdapter
 
-    init(userAuthenticator: UserAuthenticating, secureVault: any AutofillSecureVault, syncService: DDGSyncing) {
+    init(userAuthenticator: UserAuthenticating, secureVault: any AutofillSecureVault, syncService: DDGSyncing, syncCredentialsAdapter: SyncCredentialsAdapter) {
         self.userAuthenticator = userAuthenticator
         self.secureVault = secureVault
         self.syncService = syncService
+        self.syncCredentialsAdapter = syncCredentialsAdapter
     }
 
     func execute(_ onSuccess: (() -> Void)? = nil) {
@@ -66,7 +73,7 @@ struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
 
             do {
                 try secureVault.deleteAllWebsiteCredentials()
-                syncService.scheduler.notifyDataChanged()
+                syncService.scheduler.notifyDataChanged(for: syncCredentialsAdapter.provider?.feature)
                 onSuccess?()
             } catch {
                 PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))

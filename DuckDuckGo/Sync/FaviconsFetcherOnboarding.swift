@@ -57,7 +57,7 @@ final class FaviconsFetcherOnboarding {
             sheetParent.endSheet(window)
             if self?.shouldEnableFaviconsFetcherOnDismiss == true {
                 self?.syncBookmarksAdapter.isFaviconsFetchingEnabled = true
-                self?.syncService.scheduler.notifyDataChanged()
+                self?.syncService.scheduler.notifyDataChanged(for: self?.syncBookmarksAdapter.provider?.feature)
             }
         }
 
