@@ -118,8 +118,14 @@ jobs:
           ~/Library/Logs/DiagnosticReports/*
         retention-days: 7
 
+  notify-failure:
+    name: Notify on failure
+    if: ${{ always() && (needs.ui-tests.result == 'failure' || needs.ui-tests.result == 'cancelled') }}
+    needs: [ui-tests]
+    runs-on: ubuntu-latest
+
+    steps:
     - name: Create Asana task when workflow failed
-      if: always()
       run: |
         curl -fLSs "https://app.asana.com/api/1.0/tasks" \
           -H "Authorization: Bearer ${{ secrets.ASANA_ACCESS_TOKEN }}" \
