@@ -120,8 +120,7 @@ jobs:
 
   notify-failure:
     name: Notify on failure
-    # if: ${{ always() && github.event_name == 'schedule' && (needs.sync-end-to-end-tests.result == 'failure' || needs.sync-end-to-end-tests.result == 'cancelled') }}
-    if: ${{ always() && (needs.sync-end-to-end-tests.result == 'failure' || needs.sync-end-to-end-tests.result == 'cancelled') }}
+    if: ${{ always() && github.event_name == 'schedule' && (needs.sync-end-to-end-tests.result == 'failure' || needs.sync-end-to-end-tests.result == 'cancelled') }}
     needs: [sync-end-to-end-tests]
     runs-on: ubuntu-latest
 

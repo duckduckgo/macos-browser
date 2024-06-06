@@ -111,8 +111,7 @@ jobs:
 
   notify-failure:
     name: Notify on failure
-    # if: ${{ always() && github.event_name == 'schedule' && (needs.ui-tests.result == 'failure' || needs.ui-tests.result == 'cancelled') }}
-    if: ${{ always() && (needs.ui-tests.result == 'failure' || needs.ui-tests.result == 'cancelled') }}
+    if: ${{ always() && github.event_name == 'schedule' && (needs.ui-tests.result == 'failure' || needs.ui-tests.result == 'cancelled') }}
     needs: [ui-tests]
     runs-on: ubuntu-latest
 
