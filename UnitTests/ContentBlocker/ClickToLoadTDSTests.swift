@@ -89,11 +89,12 @@ class ClickToLoadTDSTests: XCTestCase {
 
         let cbrLists = ContentBlockerRulesLists(trackerDataManager: trackerManager, adClickAttribution: MockAttributing())
         let ruleSets = cbrLists.contentBlockerRulesLists
-        let ctlTdsName = DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName
-        let mainTdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
 
-        let (fbMainRules, mainCTLRuleCount) = trackerRules(for: DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName, ruleSets: ruleSets)
-        let (fbCTLRules, ctlCTLRuleCount) = trackerRules(for: ContentBlockerRulesLists.Constants.clickToLoadRulesListName, ruleSets: ruleSets)
+        let mainTdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
+        let ctlTdsName = DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName
+
+        let (fbMainRules, mainCTLRuleCount) = trackerRules(for: mainTdsName, ruleSets: ruleSets)
+        let (fbCTLRules, ctlCTLRuleCount) = trackerRules(for: ctlTdsName, ruleSets: ruleSets)
 
         let fbMainRuleCount = fbMainRules!.count
         let fbCTLRuleCount = fbCTLRules!.count
