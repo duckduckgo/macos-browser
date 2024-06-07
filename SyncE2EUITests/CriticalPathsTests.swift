@@ -237,12 +237,8 @@ final class CriticalPathsTests: XCTestCase {
         // Add Bookmarks and Favorite
         addBookmarksAndFavorites()
 
-        // Temporarily skipping Logins testing in CI until we resolve the problem with encrypted value transformers
-        // See makeDatabase() in Database.swift
-        if !isCI {
-            // Add Login
-            addLogin()
-        }
+        // Add Login
+        addLogin()
 
         // Copy code to clipboard
         copyToClipboard(code: code)
@@ -282,12 +278,8 @@ final class CriticalPathsTests: XCTestCase {
         // Check Unified favorites
         checkUnifiedFavorites()
 
-        // Temporarily skipping Logins testing in CI until we resolve the problem with encrypted value transformers
-        // See makeDatabase() in Database.swift
-        if !isCI {
-            // Check Logins
-            checkLogins()
-        }
+        // Check Logins
+        checkLogins()
     }
 
     private func logIn() {
