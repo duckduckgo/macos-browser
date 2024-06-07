@@ -20,6 +20,7 @@ struct ExtractAction: Action {
     let id: String
     let actionType: ActionType
     let selector: String
+    let noResultsSelector: String?
     let profile: ExtractProfileSelectors
     let dataSource: DataSource?
 }
