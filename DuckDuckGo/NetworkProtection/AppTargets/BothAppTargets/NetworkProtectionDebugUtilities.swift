@@ -18,103 +18,64 @@
 
 import Common
 import Foundation
-
-#if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionUI
 import NetworkExtension
 import SystemExtensions
 import LoginItems
+import NetworkProtectionIPC
 
-/// Utility code to help implement our debug menu options for Network Protection.
+/// Utility code to help implement our debug menu options for the VPN.
 ///
 final class NetworkProtectionDebugUtilities {
 
-    // MARK: - Registration Key Validity
-
-    @UserDefaultsWrapper(key: .networkProtectionRegistrationKeyValidity, defaultValue: nil)
-    var registrationKeyValidity: TimeInterval? {
-        didSet {
-            Task {
-                await sendRegistrationKeyValidityToProvider()
-            }
-        }
-    }
-
-    private let networkProtectionFeatureDisabler = NetworkProtectionFeatureDisabler()
+    private let ipcClient: TunnelControllerIPCClient
+    private let vpnUninstaller: VPNUninstaller
 
     // MARK: - Login Items Management
 
     private let loginItemsManager: LoginItemsManager
 
-    // MARK: - Server Selection
+    // MARK: - Settings
 
-    private let selectedServerStore = NetworkProtectionSelectedServerUserDefaultsStore()
+    private let settings: VPNSettings
 
     // MARK: - Initializers
 
-    init(loginItemsManager: LoginItemsManager = .init()) {
+    init(loginItemsManager: LoginItemsManager = .init(), settings: VPNSettings = .init(defaults: .netP)) {
         self.loginItemsManager = loginItemsManager
+        self.settings = settings
+
+        let ipcClient = TunnelControllerIPCClient()
+
+        self.ipcClient = ipcClient
+        self.vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
     }
 
     // MARK: - Debug commands for the extension
 
     func resetAllState(keepAuthToken: Bool) async throws {
-        networkProtectionFeatureDisabler.disable(keepAuthToken: keepAuthToken, uninstallSystemExtension: true)
+        try await vpnUninstaller.uninstall(removeSystemExtension: true)
 
-        NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
+        settings.resetToDefaults()
+
+        DefaultHomePageRemoteMessagingStorage.networkProtection().removeStoredAndDismissedMessages()
+
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+        UserDefaults.netP.networkProtectionEntitlementsExpired = false
     }
 
     func removeSystemExtensionAndAgents() async throws {
-        networkProtectionFeatureDisabler.disableLoginItems()
-        try await networkProtectionFeatureDisabler.disableSystemExtension()
+        try await vpnUninstaller.removeSystemExtension()
+        vpnUninstaller.disableLoginItems()
     }
 
     func sendTestNotificationRequest() async throws {
-        guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
-            return
-        }
-
-        try? activeSession.sendProviderMessage(.triggerTestNotification)
+        try await ipcClient.command(.sendTestNotification)
     }
 
-    // MARK: - Registation Key
-
-    private func sendRegistrationKeyValidityToProvider() async {
-        guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
-            return
-        }
-
-        try? activeSession.sendProviderMessage(.setKeyValidity(registrationKeyValidity))
-    }
-
-    func expireRegistrationKeyNow() async {
-        guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
-            return
-        }
-
-        try? activeSession.sendProviderMessage(.expireRegistrationKey)
-    }
-
-    // MARK: - Server Selection
-
-    func selectedServerName() -> String? {
-        selectedServerStore.selectedServer.stringValue
-    }
-
-    func setSelectedServer(selectedServer: SelectedNetworkProtectionServer) {
-        selectedServerStore.selectedServer = selectedServer
-
-        Task {
-            guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
-                return
-            }
-
-            try? activeSession.sendProviderMessage(.setSelectedServer(selectedServer.stringValue))
-        }
+    func expireRegistrationKeyNow() async throws {
+        try await ipcClient.command(.expireRegistrationKey)
     }
 }
-
-#endif

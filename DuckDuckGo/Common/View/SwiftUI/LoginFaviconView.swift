@@ -35,13 +35,15 @@ struct LoginFaviconView: View {
                     .cornerRadius(4.0)
                     .padding(.leading, 6)
             } else {
-                LetterIconView(title: generatedIconLetters)
+                LetterIconView(title: generatedIconLetters, font: .system(size: 32, weight: .semibold))
+                    .padding(.leading, 8)
             }
         }
     }
 
+    @MainActor(unsafe)
     var favicon: NSImage? {
-        return faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image ?? NSImage(named: "Login")
+        return faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image ?? .login
     }
 
 }

@@ -33,7 +33,7 @@ extension URL {
     }
 
     static func duckPlayer(_ videoID: String, timestamp: String? = nil) -> URL {
-        let url = "\(DuckPlayer.duckPlayerScheme)://player/\(videoID)".url!
+        let url = "\(NavigationalScheme.duck.rawValue)://player/\(videoID)".url!
         return url.addingTimestamp(timestamp)
     }
 
@@ -47,21 +47,23 @@ extension URL {
         return url.addingTimestamp(timestamp)
     }
 
-    var isDuckPlayerScheme: Bool {
-        scheme == DuckPlayer.duckPlayerScheme
+    var isDuckURLScheme: Bool {
+        navigationalScheme == .duck
     }
 
     /**
      * Returns true if a URL represents a Private Player URL.
      *
-     * When simulated requests are in use (macOS 12 and above), the Private Player Scheme URL is replaced by
-     * `www.youtube-nocookie.com/embed/VIDEOID` URL. Otherwise, checks for `duck://player/` URL.
+     * It primarily checks for `duck://player/` URL, but on macOS 12 and above (when using simulated requests),
+     * the Duck Scheme URL is eventually replaced by `www.youtube-nocookie.com/embed/VIDEOID` URL so this
+     * is checked too and this function returns `true` if any of the two is true on macOS 12.
      */
     var isDuckPlayer: Bool {
+        let isPrivatePlayer = isDuckURLScheme && host == DuckPlayer.duckPlayerHost
         if DuckPlayer.usesSimulatedRequests {
-            return host == DuckPlayer.duckPlayerHost && pathComponents.count == 3 && pathComponents[safe: 1] == "embed"
+            return isPrivatePlayer || isYoutubeNoCookie
         } else {
-            return isDuckPlayerScheme && host == DuckPlayer.duckPlayerHost
+            return isPrivatePlayer
         }
     }
 
@@ -103,7 +105,7 @@ extension URL {
 
     /// Attempts extracting video ID and timestamp from the URL. Works with all types of YouTube URLs.
     var youtubeVideoParams: (videoID: String, timestamp: String?)? {
-        if isDuckPlayerScheme {
+        if isDuckURLScheme {
             guard let components = URLComponents(string: absoluteString) else {
                 return nil
             }
@@ -135,6 +137,10 @@ extension URL {
 
     // MARK: - Private
 
+    private var isYoutubeNoCookie: Bool {
+        host == "www.youtube-nocookie.com" && pathComponents.count == 3 && pathComponents[safe: 1] == "embed"
+    }
+
     private var isYoutubeWatch: Bool {
         guard let host else { return false }
         return host.contains("youtube.com") && path == "/watch"
@@ -142,7 +148,7 @@ extension URL {
 
     private func addingTimestamp(_ timestamp: String?) -> URL {
         guard let timestamp = timestamp,
-              let regex = try? NSRegularExpression.init(pattern: "^(\\d+[smh]?)+$"),
+              let regex = try? NSRegularExpression(pattern: "^(\\d+[smh]?)+$"),
               timestamp.matches(regex)
         else {
             return self

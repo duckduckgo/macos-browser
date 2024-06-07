@@ -20,12 +20,28 @@ import Foundation
 import WebKit
 import Common
 import UserScript
+import PixelKit
 
 protocol YoutubeOverlayUserScriptDelegate: AnyObject {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL, in webView: WKWebView)
 }
 
 final class YoutubeOverlayUserScript: NSObject, Subfeature {
+
+    enum MessageOrigin {
+        case duckPlayer, serpOverlay, youtubeOverlay
+
+        init?(url: URL) {
+            switch url.host {
+            case "duckduckgo.com":
+                self = .serpOverlay
+            case "www.youtube.com":
+                self = .youtubeOverlay
+            default:
+                return nil
+            }
+        }
+    }
 
     let duckPlayerPreferences: DuckPlayerPreferences
     weak var broker: UserScriptMessageBroker?
@@ -59,7 +75,11 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch MessageNames(rawValue: methodName) {
         case .setUserValues:
-            return DuckPlayer.shared.handleSetUserValues
+            guard let url = webView?.url, let origin = MessageOrigin(url: url) else {
+                assertionFailure("YoutubeOverlayUserScript: Unexpected message origin: \(String(describing: webView?.url))")
+                return nil
+            }
+            return DuckPlayer.shared.handleSetUserValuesMessage(from: origin)
         case .getUserValues:
             return DuckPlayer.shared.handleGetUserValues
         case .openDuckPlayer:
@@ -86,7 +106,7 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
         guard let dict = params as? [String: Any],
               let href = dict["href"] as? String,
               let url = href.url,
-              url.isDuckPlayerScheme,
+              url.isDuckURLScheme,
               let webView = message.messageWebView
         else {
             assertionFailure("YoutubeOverlayUserScript: expected duck:// URL")
@@ -110,23 +130,24 @@ extension YoutubeOverlayUserScript {
             return nil
         }
         let pixelName = parameters["pixelName"] as? String
-        if pixelName == "play.use" || pixelName == "play.do_not_use" {
+
+        switch pixelName {
+        case "play.use":
             duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
-            if pixelName == "play.use" {
-                Pixel.fire(.duckPlayerViewFromYoutubeViaMainOverlay)
+            PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaMainOverlay)
+            // Temporary pixel for first time user uses Duck Player
+            if AppDelegate.isNewUser {
+                PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .legacyInitial)
             }
+        case "play.do_not_use":
+            duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
+            PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeWatchHere)
+        case "overlay":
+            PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeImpressions)
+        default:
+            break
         }
 
-        // Temporary pixel for first time user uses Duck Player
-        if !Pixel.isNewUser {
-            return nil
-        }
-        if pixelName == "play.use" {
-            let repetition = Pixel.Event.Repetition(key: Pixel.Event.watchInDuckPlayerInitial.name)
-            if repetition == .initial {
-                Pixel.fire(.watchInDuckPlayerInitial)
-            }
-        }
         return nil
     }
 }

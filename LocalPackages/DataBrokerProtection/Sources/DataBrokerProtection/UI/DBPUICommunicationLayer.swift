@@ -23,46 +23,64 @@ import UserScript
 import Common
 
 protocol DBPUICommunicationDelegate: AnyObject {
-    func setState()
+    func saveProfile() async throws
     func getUserProfile() -> DBPUIUserProfile?
+    func deleteProfileData() throws
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool
-    func removeNameFromUserProfile(_ name: DBPUIUserProfileName) -> Bool
+    func setNameAtIndexInCurrentUserProfile(_ payload: DBPUINameAtIndex) -> Bool
     func removeNameAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
-    func setBirthYearForCurrentUserProfile(_ year: DBPUIBirthYear)
+    func setBirthYearForCurrentUserProfile(_ year: DBPUIBirthYear) -> Bool
     func addAddressToCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool
-    func removeAddressFromCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool
+    func setAddressAtIndexInCurrentUserProfile(_ payload: DBPUIAddressAtIndex) -> Bool
     func removeAddressAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
     func startScanAndOptOut() -> Bool
+    func getInitialScanState() async -> DBPUIInitialScanState
+    func getMaintananceScanState() async -> DBPUIScanAndOptOutMaintenanceState
+    func getDataBrokers() async -> [DBPUIDataBroker]
+    func getBackgroundAgentMetadata() async -> DBPUIDebugMetadata
 }
 
 enum DBPUIReceivedMethodName: String {
     case handshake
-    case setState
+    case saveProfile
     case getCurrentUserProfile
+    case deleteUserProfileData
     case addNameToCurrentUserProfile
-    case removeNameFromCurrentUserProfile
+    case setNameAtIndexInCurrentUserProfile
     case removeNameAtIndexFromCurrentUserProfile
     case setBirthYearForCurrentUserProfile
     case addAddressToCurrentUserProfile
-    case removeAddressFromCurrentUserProfile
+    case setAddressAtIndexInCurrentUserProfile
     case removeAddressAtIndexFromCurrentUserProfile
     case startScanAndOptOut
+    case initialScanStatus
+    case maintenanceScanStatus
+    case getDataBrokers
+    case getBackgroundAgentMetadata
 }
 
 enum DBPUISendableMethodName: String {
     case setState
-    case scanAndOptOutStatusChanged
 }
 
 struct DBPUICommunicationLayer: Subfeature {
-    var messageOriginPolicy: MessageOriginPolicy = .all
+    private let webURLSettings: DataBrokerProtectionWebUIURLSettingsRepresentable
+
+    var messageOriginPolicy: MessageOriginPolicy
     var featureName: String = "dbpuiCommunication"
-    var broker: UserScriptMessageBroker?
+    weak var broker: UserScriptMessageBroker?
 
     weak var delegate: DBPUICommunicationDelegate?
 
     private enum Constants {
-        static let version = 1
+        static let version = 3
+    }
+
+    internal init(webURLSettings: DataBrokerProtectionWebUIURLSettingsRepresentable) {
+        self.webURLSettings = webURLSettings
+        self.messageOriginPolicy = .only(rules: [
+            .exact(hostname: webURLSettings.selectedURLHostname)
+        ])
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -74,16 +92,21 @@ struct DBPUICommunicationLayer: Subfeature {
 
         switch actionResult {
         case .handshake: return handshake
-        case .setState: return setState
+        case .saveProfile: return saveProfile
         case .getCurrentUserProfile: return getCurrentUserProfile
+        case .deleteUserProfileData: return deleteUserProfileData
         case .addNameToCurrentUserProfile: return addNameToCurrentUserProfile
-        case .removeNameFromCurrentUserProfile: return removeNameFromCurrentUserProfile
+        case .setNameAtIndexInCurrentUserProfile: return setNameAtIndexInCurrentUserProfile
         case .removeNameAtIndexFromCurrentUserProfile: return removeNameAtIndexFromCurrentUserProfile
         case .setBirthYearForCurrentUserProfile: return setBirthYearForCurrentUserProfile
         case .addAddressToCurrentUserProfile: return addAddressToCurrentUserProfile
-        case .removeAddressFromCurrentUserProfile: return removeAddressFromCurrentUserProfile
+        case .setAddressAtIndexInCurrentUserProfile: return setAddressAtIndexInCurrentUserProfile
         case .removeAddressAtIndexFromCurrentUserProfile: return removeAddressAtIndexFromCurrentUserProfile
         case .startScanAndOptOut: return startScanAndOptOut
+        case .initialScanStatus: return initialScanStatus
+        case .maintenanceScanStatus: return maintenanceScanStatus
+        case .getDataBrokers: return getDataBrokers
+        case .getBackgroundAgentMetadata: return getBackgroundAgentMetadata
         }
 
     }
@@ -104,18 +127,16 @@ struct DBPUICommunicationLayer: Subfeature {
         return DBPUIStandardResponse(version: Constants.version, success: true)
     }
 
-    func setState(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let data = try? JSONSerialization.data(withJSONObject: params),
-                let result = try? JSONDecoder().decode(DBPUISetState.self, from: data) else {
-            os_log("Failed to parse setState message", log: .dataBrokerProtection)
-            throw DBPUIError.malformedRequest
+    func saveProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        os_log("Web UI requested to save the profile", log: .dataBrokerProtection)
+
+        do {
+            try await delegate?.saveProfile()
+            return DBPUIStandardResponse(version: Constants.version, success: true)
+        } catch {
+            os_log("DBPUICommunicationLayer saveProfile, error: %{public}@", log: .error, error.localizedDescription)
+            return DBPUIStandardResponse(version: Constants.version, success: false)
         }
-
-        os_log("Web UI requested new state: \(result.state.rawValue)", log: .dataBrokerProtection)
-
-        delegate?.setState()
-
-        return nil
     }
 
     func getCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -124,6 +145,16 @@ struct DBPUICommunicationLayer: Subfeature {
         }
 
         return profile
+    }
+
+    func deleteUserProfileData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        do {
+            try delegate?.deleteProfileData()
+            return DBPUIStandardResponse(version: Constants.version, success: true)
+        } catch {
+            os_log("DBPUICommunicationLayer deleteUserProfileData, error: %{public}@", log: .error, error.localizedDescription)
+            return DBPUIStandardResponse(version: Constants.version, success: false)
+        }
     }
 
     func addNameToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -140,14 +171,14 @@ struct DBPUICommunicationLayer: Subfeature {
         return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
-    func removeNameFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    func setNameAtIndexInCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
-                let result = try? JSONDecoder().decode(DBPUIUserProfileName.self, from: data) else {
+                let result = try? JSONDecoder().decode(DBPUINameAtIndex.self, from: data) else {
             os_log("Failed to parse removeNameFromCurrentUserProfile message", log: .dataBrokerProtection)
             throw DBPUIError.malformedRequest
         }
 
-        if delegate?.removeNameFromUserProfile(result) == true {
+        if delegate?.setNameAtIndexInCurrentUserProfile(result) == true {
             return DBPUIStandardResponse(version: Constants.version, success: true)
         }
 
@@ -175,9 +206,11 @@ struct DBPUICommunicationLayer: Subfeature {
             throw DBPUIError.malformedRequest
         }
 
-        delegate?.setBirthYearForCurrentUserProfile(result)
+        if delegate?.setBirthYearForCurrentUserProfile(result) == true {
+            return DBPUIStandardResponse(version: Constants.version, success: true)
+        }
 
-        return nil
+        return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
     func addAddressToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -194,14 +227,14 @@ struct DBPUICommunicationLayer: Subfeature {
         return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
-    func removeAddressFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    func setAddressAtIndexInCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
-                let result = try? JSONDecoder().decode(DBPUIUserProfileAddress.self, from: data) else {
+                let result = try? JSONDecoder().decode(DBPUIAddressAtIndex.self, from: data) else {
             os_log("Failed to parse removeAddressFromCurrentUserProfile message", log: .dataBrokerProtection)
             throw DBPUIError.malformedRequest
         }
 
-        if delegate?.removeAddressFromCurrentUserProfile(result) == true {
+        if delegate?.setAddressAtIndexInCurrentUserProfile(result) == true {
             return DBPUIStandardResponse(version: Constants.version, success: true)
         }
 
@@ -228,6 +261,31 @@ struct DBPUICommunicationLayer: Subfeature {
         }
 
         return DBPUIStandardResponse(version: Constants.version, success: false)
+    }
+
+    func initialScanStatus(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
+        guard let initialScanState = await delegate?.getInitialScanState() else {
+            return DBPUIStandardResponse(version: Constants.version, success: false, id: "NOT_FOUND", message: "No initial scan data found")
+        }
+
+        return initialScanState
+    }
+
+    func maintenanceScanStatus(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
+        guard let maintenanceScanStatus = await delegate?.getMaintananceScanState() else {
+            return DBPUIStandardResponse(version: Constants.version, success: false, id: "NOT_FOUND", message: "No maintenance data found")
+        }
+
+        return maintenanceScanStatus
+    }
+
+    func getDataBrokers(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
+        let dataBrokers = await delegate?.getDataBrokers() ?? [DBPUIDataBroker]()
+        return DBPUIDataBrokerList(dataBrokers: dataBrokers)
+    }
+
+    func getBackgroundAgentMetadata(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
+        return await delegate?.getBackgroundAgentMetadata()
     }
 
     func sendMessageToUI(method: DBPUISendableMethodName, params: DBPUISendableMessage, into webView: WKWebView) {

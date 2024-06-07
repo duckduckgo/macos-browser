@@ -1,0 +1,180 @@
+{
+  "roots" : {
+    "bookmark_bar" : {
+      "children" : [
+        {
+          "name" : "Get Help",
+          "type" : "bookmark",
+          "url" : "https:\/\/support.mozilla.org\/en-US\/products\/firefox"
+        },
+        {
+          "name" : "Customize Firefox",
+          "type" : "bookmark",
+          "url" : "https:\/\/support.mozilla.org\/en-US\/kb\/customize-firefox-controls-buttons-and-toolbars?utm_source=firefox-browser&utm_medium=default-bookmarks&utm_campaign=customize"
+        },
+        {
+          "name" : "Get Involved",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.mozilla.org\/en-US\/contribute\/"
+        },
+        {
+          "name" : "About Us",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.mozilla.org\/en-US\/about\/"
+        }
+      ],
+      "name" : "Mozilla Firefox",
+      "type" : "folder"
+    },
+    "other" : {
+      "children" : [
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "children" : [
+                    {
+                      "name" : "News, sport and opinion from the Guardian's global edition | The Guardian",
+                      "type" : "bookmark",
+                      "url" : "https:\/\/www.theguardian.com\/international"
+                    }
+                  ],
+                  "name" : "FolderA-Level3",
+                  "type" : "folder"
+                },
+                {
+                  "name" : "Digg - What the Internet is talking about right now",
+                  "type" : "bookmark",
+                  "url" : "https:\/\/digg.com\/"
+                }
+              ],
+              "name" : "FolderA-Level2",
+              "type" : "folder"
+            },
+            {
+              "name" : "Wikipedia",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.wikipedia.org\/"
+            }
+          ],
+          "name" : "FolderA-Level1",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "children" : [
+                    {
+                      "name" : "Bloomberg.com",
+                      "type" : "bookmark",
+                      "url" : "https:\/\/www.bloomberg.com\/europe"
+                    }
+                  ],
+                  "name" : "FolderB-Level3-a",
+                  "type" : "folder"
+                },
+                {
+                  "children" : [
+                    {
+                      "name" : "TechCrunch – Startup and Technology News",
+                      "type" : "bookmark",
+                      "url" : "https:\/\/techcrunch.com\/"
+                    }
+                  ],
+                  "name" : "FolderB-Level3-b",
+                  "type" : "folder"
+                },
+                {
+                  "name" : "The Verge",
+                  "type" : "bookmark",
+                  "url" : "https:\/\/www.theverge.com\/"
+                }
+              ],
+              "name" : "FolderB-Level2",
+              "type" : "folder"
+            },
+            {
+              "name" : "Techmeme",
+              "type" : "bookmark",
+              "url" : "https:\/\/techmeme.com\/"
+            }
+          ],
+          "name" : "FolderB-Level1",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+
+          ],
+          "name" : "EmptyFolder",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "name" : "Breaking News | Irish & International Headlines | The Irish Times",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.irishtimes.com\/"
+            }
+          ],
+          "name" : "DuplicateFolderName",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "name" : "The Wall Street Journal - Breaking News, Business, Financial & Economic News, World News and Video",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.wsj.com\/?mod=wsjheader_logo"
+            }
+          ],
+          "name" : "DuplicateFolderName",
+          "type" : "folder"
+        },
+        {
+          "name" : "DuckDuckGo — Privacy, simplified.",
+          "type" : "bookmark",
+          "url" : "https:\/\/duckduckgo.com\/"
+        },
+        {
+          "children" : [
+            {
+              "name" : "MacRumors: Apple News and Rumors",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.macrumors.com\/"
+            }
+          ],
+          "name" : "DupeFolderNameContents",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "name" : "MacRumors: Apple News and Rumors",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.macrumors.com\/"
+            }
+          ],
+          "name" : "DupeFolderNameContents",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "name" : "Getting Started",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.mozilla.org\/en-US\/firefox\/central\/"
+            }
+          ],
+          "name" : "Bookmarks Toolbar",
+          "type" : "folder"
+        }
+      ],
+      "name" : "Other bookmarks",
+      "type" : "folder"
+    }
+  }
+}

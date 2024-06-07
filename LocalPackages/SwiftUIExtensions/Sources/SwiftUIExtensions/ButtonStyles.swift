@@ -25,11 +25,11 @@ public struct StandardButtonStyle: ButtonStyle {
 
     public func makeBody(configuration: Self.Configuration) -> some View {
 
-        let backgroundColor = Color("PWMButtonBackground\(configuration.isPressed ? "-Pressed" : "")")
-        let labelColor = Color("PWMButtonLabel")
+        let backgroundColor = configuration.isPressed ? Color(.pwmButtonBackgroundPressed) : Color(.pwmButtonBackground)
+        let labelColor = Color(.pwmButtonLabel)
 
         configuration.label
-            .font(.custom("SFProText-Regular", size: 13))
+            .font(.system(size: 13))
             .padding(.top, 2.5)
             .padding(.bottom, 3)
             .padding(.horizontal, 7.5)
@@ -55,8 +55,9 @@ public struct DefaultActionButtonStyle: ButtonStyle {
         let labelColor = enabled ? Color.white : Color.primary.opacity(0.3)
 
         configuration.label
-            .lineLimit(1)
-            .font(.custom("SFProText-Regular", size: 13))
+            .font(.system(size: 13))
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
             .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
             .padding(.top, 2.5)
             .padding(.bottom, 3)
@@ -64,6 +65,66 @@ public struct DefaultActionButtonStyle: ButtonStyle {
             .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
             .foregroundColor(labelColor)
             .cornerRadius(5)
+
+    }
+}
+
+public struct TransparentActionButtonStyle: ButtonStyle {
+
+    public let enabled: Bool
+
+    public init(enabled: Bool) {
+        self.enabled = enabled
+    }
+
+    public func makeBody(configuration: Self.Configuration) -> some View {
+
+        let enabledForegroundColor = configuration.isPressed ? Color(NSColor.controlAccentColor).opacity(0.5) : Color(NSColor.controlAccentColor)
+        let disabledForegroundColor = Color.gray.opacity(0.1)
+
+        configuration.label
+            .font(.system(size: 13))
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
+            .padding(.top, 2.5)
+            .padding(.bottom, 3)
+            .padding(.horizontal, 0)
+            .background(Color.clear)
+            .foregroundColor(enabled ? enabledForegroundColor : disabledForegroundColor)
+            .cornerRadius(5)
+
+    }
+}
+
+public struct DismissActionButtonStyle: ButtonStyle {
+    @Environment(\.colorScheme) var colorScheme
+
+    public init() {}
+
+    public func makeBody(configuration: Self.Configuration) -> some View {
+        let backgroundColor = configuration.isPressed ? Color(.windowBackgroundColor) : Color(.controlColor)
+        let labelColor = Color.primary
+        let outerShadowOpacity = colorScheme == .dark ? 0.8 : 0.0
+
+        configuration.label
+            .lineLimit(1)
+            .font(.system(size: 13))
+            .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
+            .padding(.top, 2.5)
+            .padding(.bottom, 3)
+            .padding(.horizontal, 7.5)
+            .background(
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    .fill(backgroundColor)
+                    .shadow(color: .black.opacity(0.1), radius: 0.1, x: 0, y: 1)
+                    .shadow(color: .primary.opacity(outerShadowOpacity), radius: 0.1, x: 0, y: -0.6)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.black.opacity(0.1), lineWidth: 1)
+            )
+            .foregroundColor(labelColor)
 
     }
 }
@@ -77,13 +138,13 @@ public struct DestructiveActionButtonStyle: ButtonStyle {
     }
 
     public func makeBody(configuration: Self.Configuration) -> some View {
-        let enabledBackgroundColor = configuration.isPressed ? Color("PWMButtonBackground-Pressed") : Color.red
+        let enabledBackgroundColor = configuration.isPressed ? Color(.pwmButtonBackgroundPressed) : .red
         let disabledBackgroundColor = Color.gray.opacity(0.1)
         let labelColor = enabled ? Color.white : Color.primary.opacity(0.3)
 
         configuration.label
             .lineLimit(1)
-            .font(.custom("SFProText-Regular", size: 13))
+            .font(.system(size: 13))
             .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
             .padding(.top, 2.5)
             .padding(.bottom, 3)

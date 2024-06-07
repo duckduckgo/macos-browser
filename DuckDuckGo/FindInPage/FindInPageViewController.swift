@@ -43,9 +43,14 @@ final class FindInPageViewController: NSViewController {
 
     private var modelCancellables = Set<AnyCancellable>()
 
+    static func create() -> FindInPageViewController {
+        (NSStoryboard(name: "FindInPage", bundle: nil).instantiateInitialController() as? FindInPageViewController)!
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        focusRingView.strokedBackgroundColor = NSColor.findInPageFocusedBackgroundColor
+        focusRingView.strokedBackgroundColor = .findInPageFocusedBackground
+        textField.placeholderString = UserText.findInPageTextFieldPlaceholder
         textField.delegate = self
         listenForTextFieldResponderNotifications()
         subscribeToModelChanges()
@@ -54,6 +59,14 @@ final class FindInPageViewController: NSViewController {
         closeButton.toolTip = UserText.findInPageCloseTooltip
         nextButton.toolTip = UserText.findInPageNextTooltip
         previousButton.toolTip = UserText.findInPagePreviousTooltip
+
+        nextButton.setAccessibilityIdentifier("FindInPageController.nextButton")
+        closeButton.setAccessibilityIdentifier("FindInPageController.closeButton")
+        previousButton.setAccessibilityIdentifier("FindInPageController.previousButton")
+        textField.setAccessibilityIdentifier("FindInPageController.textField")
+        textField.setAccessibilityRole(.textField)
+        statusField.setAccessibilityIdentifier("FindInPageController.statusField")
+        statusField.setAccessibilityRole(.textField)
     }
 
     @IBAction func findInPageNext(_ sender: Any?) {

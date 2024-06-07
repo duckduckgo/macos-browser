@@ -26,15 +26,11 @@ extension NSSharingService {
 
 final class QRSharingService: NSSharingService {
 
-    private enum Constants {
-        static let menuIcon = NSImage(named: "QR-Icon")!
-    }
-
     fileprivate var qrImage: NSImage?
     fileprivate var imageUrl: URL?
 
     fileprivate init() {
-        super.init(title: UserText.shareViaQRCodeMenuItem, image: Constants.menuIcon, alternateImage: nil) {}
+        super.init(title: UserText.shareViaQRCodeMenuItem, image: .qrIcon, alternateImage: nil) {}
     }
 
     /// Get ASCII `Data` for an array of items to share that can be represented as strings (e.g., URLs or Strings).

@@ -19,6 +19,8 @@
 import Foundation
 import UserNotifications
 import NetworkProtection
+import NetworkProtectionUI
+import PixelKit
 
 extension UNNotificationAction {
 
@@ -46,6 +48,7 @@ extension UNNotificationCategory {
 /// This class takes care of requesting the presentation of notifications using UNNotificationCenter
 ///
 final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtectionNotificationsPresenter {
+
     private static let threadIdentifier = "com.duckduckgo.NetworkProtectionNotificationsManager.threadIdentifier"
 
     private let appLauncher: AppLauncher
@@ -100,40 +103,54 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
 
     // MARK: - Presenting user notifications
 
-    func showReconnectedNotification() {
+    func showConnectedNotification(serverLocation: String?) {
+        // Should include the serverLocation in the subtitle, but due to a bug with the current server in the PacketTunnelProvider
+        // this is not currently working on macOS. Add the necessary copy as on iOS when this is fixed.
+        let subtitle: String
+        if let serverLocation {
+            subtitle = UserText.networkProtectionConnectionSuccessNotificationSubtitle(serverLocation: serverLocation)
+        } else {
+            subtitle = UserText.networkProtectionConnectionSuccessNotificationSubtitle
+        }
         let content = notificationContent(title: UserText.networkProtectionConnectionSuccessNotificationTitle,
-                                          subtitle: UserText.networkProtectionConnectionSuccessNotificationSubtitle)
-        showNotification(content)
+                                          subtitle: subtitle)
+        showNotification(.connected, content)
     }
 
     func showReconnectingNotification() {
         let content = notificationContent(title: UserText.networkProtectionConnectionInterruptedNotificationTitle,
                                           subtitle: UserText.networkProtectionConnectionInterruptedNotificationSubtitle)
-        showNotification(content)
+        showNotification(.reconnecting, content)
     }
 
     func showConnectionFailureNotification() {
         let content = notificationContent(title: UserText.networkProtectionConnectionFailureNotificationTitle,
                                           subtitle: UserText.networkProtectionConnectionFailureNotificationSubtitle)
-        showNotification(content)
+        showNotification(.disconnected, content)
     }
 
     func showSupersededNotification() {
         let content = notificationContent(title: UserText.networkProtectionSupersededNotificationTitle,
                                           subtitle: UserText.networkProtectionSupersededNotificationSubtitle,
                                           category: .superseded)
-        showNotification(content)
+        showNotification(.superseded, content)
+    }
+
+    func showEntitlementNotification() {
+        let content = notificationContent(title: UserText.networkProtectionEntitlementExpiredNotificationTitle,
+                                          subtitle: UserText.networkProtectionEntitlementExpiredNotificationBody)
+        showNotification(.expiredEntitlement, content)
     }
 
     func showTestNotification() {
         // These strings are deliberately hardcoded as we don't want them localized, they're only for debugging:
         let content = notificationContent(title: "Test notification",
                                           subtitle: "Test notification")
-        showNotification(content)
+        showNotification(.test, content)
     }
 
-    private func showNotification(_ content: UNNotificationContent) {
-        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: .none)
+    private func showNotification(_ identifier: NetworkProtectionNotificationIdentifier, _ content: UNNotificationContent) {
+        let request = UNNotificationRequest(identifier: identifier.rawValue, content: content, trigger: .none)
 
         requestAlertAuthorization { authorized in
             guard authorized else {
@@ -141,10 +158,34 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
             }
 
             _=self.registerNotificationCategoriesOnce
+            self.userNotificationCenter.removeDeliveredNotifications(withIdentifiers: [identifier.rawValue])
             self.userNotificationCenter.add(request)
+
+            switch identifier {
+            case .disconnected:
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDisconnectedNotificationDisplayed, frequency: .dailyAndCount)
+            case .reconnecting:
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionReconnectingNotificationDisplayed, frequency: .dailyAndCount)
+            case .connected:
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionConnectedNotificationDisplayed, frequency: .dailyAndCount)
+            case .superseded:
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionSupersededNotificationDisplayed, frequency: .dailyAndCount)
+            case .expiredEntitlement:
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionExpiredEntitlementNotificationDisplayed, frequency: .dailyAndCount)
+            case .test: break
+            }
         }
     }
 
+}
+
+public enum NetworkProtectionNotificationIdentifier: String {
+    case disconnected = "network-protection.notification.disconnected"
+    case reconnecting = "network-protection.notification.reconnecting"
+    case connected = "network-protection.notification.connected"
+    case superseded = "network-protection.notification.superseded"
+    case expiredEntitlement = "network-protection.notification.expired-entitlement"
+    case test = "network-protection.notification.test"
 }
 
 extension NetworkProtectionUNNotificationsPresenter: UNUserNotificationCenterDelegate {

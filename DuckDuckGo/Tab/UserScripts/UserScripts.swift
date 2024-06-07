@@ -19,6 +19,8 @@
 import Foundation
 import BrowserServicesKit
 import UserScript
+import WebKit
+import Subscription
 
 @MainActor
 final class UserScripts: UserScriptsProvider {
@@ -29,6 +31,8 @@ final class UserScripts: UserScriptsProvider {
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
     let debugScript = DebugUserScript()
+    let subscriptionPagesUserScript = SubscriptionPagesUserScript()
+    let identityTheftRestorationPagesUserScript = IdentityTheftRestorationPagesUserScript()
     let clickToLoadScript: ClickToLoadUserScript
 
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
@@ -37,18 +41,19 @@ final class UserScripts: UserScriptsProvider {
     let contentScopeUserScriptIsolated: ContentScopeUserScript
     let autofillScript: WebsiteAutofillUserScript
     let specialPages: SpecialPagesUserScript?
-    let autoconsentUserScript: UserScriptWithAutoconsent?
+    let autoconsentUserScript: UserScriptWithAutoconsent
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
+    let sslErrorPageUserScript: SSLErrorPageUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
-        let privacySettings = PrivacySecurityPreferences.shared
+        let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let privacyConfig = sourceProvider.privacyConfigurationManager.privacyConfig
         let sessionKey = sourceProvider.sessionKey ?? ""
-        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
+        let prefs = ContentScopeProperties(gpcEnabled: isGPCEnabled,
                                                 sessionKey: sessionKey,
                                                 featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig))
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
@@ -56,31 +61,42 @@ final class UserScripts: UserScriptsProvider {
 
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
 
-        autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
-                                                      config: sourceProvider.privacyConfigurationManager.privacyConfig)
+        autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
+
+        sslErrorPageUserScript = SSLErrorPageUserScript()
+
+        specialPages = SpecialPagesUserScript()
 
         if DuckPlayer.shared.isAvailable {
             youtubeOverlayScript = YoutubeOverlayUserScript()
             youtubePlayerUserScript = YoutubePlayerUserScript()
-            specialPages = SpecialPagesUserScript()
         } else {
             youtubeOverlayScript = nil
             youtubePlayerUserScript = nil
-            specialPages = nil
         }
 
-        if let autoconsentUserScript = autoconsentUserScript {
-            userScripts.append(autoconsentUserScript)
-        }
-        if let youtubeOverlayScript = youtubeOverlayScript {
+        userScripts.append(autoconsentUserScript)
+
+        if let youtubeOverlayScript {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
         }
 
-        if let youtubePlayerUserScript = youtubePlayerUserScript {
-            if let specialPages = specialPages {
-                specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
-                userScripts.append(specialPages)
+        if let specialPages = specialPages {
+            if let sslErrorPageUserScript {
+                specialPages.registerSubfeature(delegate: sslErrorPageUserScript)
             }
+            if let youtubePlayerUserScript {
+                specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
+            }
+            userScripts.append(specialPages)
+        }
+
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+            subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
+            userScripts.append(subscriptionPagesUserScript)
+
+            identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())
+            userScripts.append(identityTheftRestorationPagesUserScript)
         }
     }
 

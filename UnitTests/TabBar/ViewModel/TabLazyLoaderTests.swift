@@ -18,6 +18,7 @@
 
 import XCTest
 import Combine
+import Navigation
 @testable import DuckDuckGo_Privacy_Browser
 
 private final class TabMock: LazyLoadable {
@@ -32,7 +33,8 @@ private final class TabMock: LazyLoadable {
     lazy var loadingFinishedPublisher: AnyPublisher<TabMock, Never> = loadingFinishedSubject.eraseToAnyPublisher()
 
     func isNewer(than other: TabMock) -> Bool { isNewerClosure(other) }
-    func reload() { reloadClosure(self) }
+    @discardableResult
+    func reload() -> ExpectedNavigation? { reloadClosure(self); return nil }
 
     var isNewerClosure: (TabMock) -> Bool = { _ in true }
     var reloadClosure: (TabMock) -> Void = { _ in }
@@ -150,8 +152,8 @@ class TabLazyLoaderTests: XCTestCase {
 
         dataSource.tabs = [
             .mockNotUrl,
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation)
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation)
         ]
         dataSource.selectedTab = dataSource.tabs.first
 
@@ -177,8 +179,8 @@ class TabLazyLoaderTests: XCTestCase {
 
         dataSource.tabs = [
             selectedUrlTab,
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation)
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation)
         ]
         dataSource.selectedTab = dataSource.tabs.first
 
@@ -197,28 +199,28 @@ class TabLazyLoaderTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
     }
 
-    func testThatLazyLoadingDoesNotStartIfCurrentUrlTabDoesNotFinishLoading() {
+    func testThatLazyLoadingDoesNotStartIfCurrentUrlTabDoesNotFinishLoading() async throws {
         let reloadExpectation = expectation(description: "TabMock.reload() called")
         reloadExpectation.isInverted = true
 
         dataSource.tabs = [
             .mockUrl,
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation)
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation)
         ]
         dataSource.selectedTab = dataSource.tabs.first
 
         let lazyLoader = TabLazyLoader(dataSource: dataSource)
 
-        var didFinishEvents: [Bool] = []
-        lazyLoader?.lazyLoadingDidFinishPublisher.sink(receiveValue: { didFinishEvents.append($0) }).store(in: &cancellables)
+        lazyLoader?.lazyLoadingDidFinishPublisher.sink { _ in
+            XCTFail("Unexpected didFinish event")
+        }.store(in: &cancellables)
 
         // When
         lazyLoader?.scheduleLazyLoading()
 
         // Then
-        waitForExpectations(timeout: 0.1)
-        XCTAssertEqual(didFinishEvents.count, 0)
+        await fulfillment(of: [reloadExpectation], timeout: 0.1)
     }
 
     func testThatLazyLoadingStopsAfterLoadingMaximumNumberOfTabs() throws {
@@ -228,7 +230,7 @@ class TabLazyLoaderTests: XCTestCase {
 
         dataSource.tabs = [.mockNotUrl]
         for _ in 0..<(2 * maxNumberOfLazyLoadedTabs) {
-            dataSource.tabs.append(TabMock.init(isUrl: true, reloadExpectation: reloadExpectation))
+            dataSource.tabs.append(TabMock(isUrl: true, reloadExpectation: reloadExpectation))
         }
         dataSource.selectedTab = dataSource.tabs.first
 
@@ -254,11 +256,11 @@ class TabLazyLoaderTests: XCTestCase {
 
         dataSource.tabs = [
             selectedUrlTab,
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation)
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation)
         ]
         dataSource.selectedTab = selectedUrlTab
 

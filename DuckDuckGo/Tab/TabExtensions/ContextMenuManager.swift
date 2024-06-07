@@ -24,6 +24,16 @@ import WebKit
 enum NavigationDecision {
     case allow(NewWindowPolicy)
     case cancel
+
+    /**
+     * Replaces `.tab` with `.window` when user prefers windows over tabs.
+     */
+    func preferringTabsToWindows(_ prefersTabsToWindows: Bool) -> NavigationDecision {
+        guard case .allow(let targetKind) = self, !prefersTabsToWindows else {
+            return self
+        }
+        return .allow(targetKind.preferringTabsToWindows(prefersTabsToWindows))
+    }
 }
 
 @MainActor
@@ -34,17 +44,29 @@ final class ContextMenuManager: NSObject {
     private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
     private var linkURL: String?
-    private var isNonSupportedScheme: Bool {
-        guard let linkURL else { return false }
-        if let scheme = URL(string: linkURL)?.scheme {
-            return !WKWebView.handlesURLScheme(scheme)
+
+    private var tabsPreferences: TabsPreferences
+
+    private var isEmailAddress: Bool {
+        guard let linkURL, let url = URL(string: linkURL) else {
+            return false
         }
-        return false
+        return url.navigationalScheme == .mailto
     }
+
+    private var isWebViewSupportedScheme: Bool {
+        guard let linkURL, let scheme = URL(string: linkURL)?.scheme else {
+            return false
+        }
+        return WKWebView.handlesURLScheme(scheme)
+    }
+
     fileprivate weak var webView: WKWebView?
 
     @MainActor
-    init(contextMenuScriptPublisher: some Publisher<ContextMenuUserScript?, Never>) {
+    init(contextMenuScriptPublisher: some Publisher<ContextMenuUserScript?, Never>,
+         tabsPreferences: TabsPreferences = TabsPreferences.shared) {
+        self.tabsPreferences = tabsPreferences
         super.init()
 
         userScriptCancellable = contextMenuScriptPublisher.sink { [weak self] contextMenuScript in
@@ -93,16 +115,16 @@ extension ContextMenuManager {
             return
         }
 
-        if isNonSupportedScheme {
-            // leave "open link" item for non-supported scheme
-        } else {
+        if isEmailAddress {
+            menu.removeItem(at: index)
+        } else if isWebViewSupportedScheme {
             menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem,
                                                                             makeBurner: isCurrentWindowBurner))
         }
     }
 
     private func handleOpenLinkInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isCurrentWindowBurner || isNonSupportedScheme {
+        if isCurrentWindowBurner || !isWebViewSupportedScheme {
             menu.removeItem(at: index)
         } else {
             menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item))
@@ -110,7 +132,7 @@ extension ContextMenuManager {
     }
 
     private func handleOpenFrameInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isCurrentWindowBurner || isNonSupportedScheme {
+        if isCurrentWindowBurner || !isWebViewSupportedScheme {
             menu.removeItem(at: index)
         } else {
             menu.replaceItem(at: index, with: self.openFrameInNewWindowMenuItem(from: item))
@@ -118,10 +140,10 @@ extension ContextMenuManager {
     }
 
     private func handleDownloadLinkedFileItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isNonSupportedScheme {
-            menu.removeItem(at: index)
-        } else {
+        if isWebViewSupportedScheme {
             menu.replaceItem(at: index, with: self.downloadMenuItem(from: item))
+        } else {
+            menu.removeItem(at: index)
         }
     }
 
@@ -130,16 +152,25 @@ extension ContextMenuManager {
             assertionFailure("WKMenuItemIdentifierOpenLinkInNewWindow item not found")
             return
         }
-        // insert Add Link to Bookmarks
-        if !isNonSupportedScheme {
-            menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: index)
-            menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
+
+        var currentIndex = index
+
+        if isWebViewSupportedScheme {
+            // insert Add Link to Bookmarks
+            menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: currentIndex)
+            menu.replaceItem(at: currentIndex + 1, with: self.copyLinkOrEmailAddressMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
+            currentIndex += 2
+        } else if isEmailAddress {
+            let emailAddresses = linkURL.flatMap(URL.init(string:))?.emailAddresses ?? []
+            let title = emailAddresses.count > 1 ? UserText.copyEmailAddresses : UserText.copyEmailAddress
+            menu.replaceItem(at: currentIndex, with: self.copyLinkOrEmailAddressMenuItem(withTitle: title, from: openLinkInNewWindowItem))
+            currentIndex += 1
         }
 
         // insert Separator and Copy (selection) items
         if selectedText?.isEmpty == false {
-            menu.insertItem(.separator(), at: index + 2)
-            menu.insertItem(self.copySelectionMenuItem(), at: index + 3)
+            menu.insertItem(.separator(), at: currentIndex)
+            menu.insertItem(self.copySelectionMenuItem(), at: currentIndex + 1)
         }
     }
 
@@ -217,7 +248,7 @@ private extension ContextMenuManager {
     }
 
     func bookmarkPageMenuItem() -> NSMenuItem {
-        NSMenuItem(title: UserText.bookmarkPage, action: #selector(MainViewController.bookmarkThisPage), target: nil, keyEquivalent: "")
+        NSMenuItem(title: UserText.bookmarkPage, action: #selector(MainViewController.bookmarkThisPage), target: nil, keyEquivalent: "").withAccessibilityIdentifier("ContextMenuManager.bookmarkPageMenuItem")
     }
 
     func openLinkInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
@@ -243,8 +274,8 @@ private extension ContextMenuManager {
                      withIdentifierIn: [.downloadLinkedFile, .downloadMedia])
     }
 
-    func copyLinkMenuItem(withTitle title: String, from openLinkItem: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: title, action: #selector(copyLink), from: openLinkItem, with: .openLinkInNewWindow)
+    func copyLinkOrEmailAddressMenuItem(withTitle title: String, from openLinkItem: NSMenuItem) -> NSMenuItem {
+        makeMenuItem(withTitle: title, action: #selector(copyLinkOrEmailAddress), from: openLinkItem, with: .openLinkInNewWindow)
     }
 
     func copySelectionMenuItem() -> NSMenuItem {
@@ -285,7 +316,7 @@ private extension ContextMenuManager {
         let identifier = item.identifier.flatMap(WKMenuItemIdentifier.init)
         assert(identifier != nil && validIdentifiers.contains(identifier!))
 
-        return NSMenuItem(title: title, action: action, target: self, keyEquivalent: keyEquivalent ?? item.keyEquivalent, representedObject: item)
+        return NSMenuItem(title: title, action: action, target: self, keyEquivalent: [.charCode(keyEquivalent ?? item.keyEquivalent)], representedObject: item)
     }
 
 }
@@ -343,8 +374,8 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in
-            .allow(.tab(selected: false, burner: burner))
+        onNewWindow = { [weak self] _ in
+            .allow(.tab(selected: self?.tabsPreferences.switchToNewTabWhenOpened ?? false, burner: burner, contextMenuInitiated: true))
         }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
@@ -421,7 +452,7 @@ private extension ContextMenuManager {
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
-    func copyLink(_ sender: NSMenuItem) {
+    func copyLinkOrEmailAddress(_ sender: NSMenuItem) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openLinkInNewWindow,
@@ -431,10 +462,19 @@ private extension ContextMenuManager {
             return
         }
 
+        let isEmailAddress = self.isEmailAddress
+
         onNewWindow = { navigationAction in
             guard let url = navigationAction?.request.url else { return .cancel }
 
-            NSPasteboard.general.copy(url)
+            if isEmailAddress {
+                let emailAddresses = url.emailAddresses
+                if !emailAddresses.isEmpty {
+                    NSPasteboard.general.copy(emailAddresses.joined(separator: ", "))
+                }
+            } else {
+                NSPasteboard.general.copy(url)
+            }
 
             return .cancel
         }

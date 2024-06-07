@@ -16,16 +16,25 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import AppKit
+
+typealias MenuBuilder = ArrayBuilder<NSMenuItem>
 
 extension NSMenu {
 
-    convenience init(items: [NSMenuItem]) {
-        self.init()
+    convenience init(title: String = "", items: [NSMenuItem]) {
+        self.init(title: title)
+        self.items = items
+    }
 
-        items.forEach { item in
-            addItem(item)
-        }
+    convenience init(title string: String = "", @MenuBuilder items: () -> [NSMenuItem]) {
+        self.init(title: string, items: items())
+    }
+
+    @discardableResult
+    func buildItems(@MenuBuilder items: () -> [NSMenuItem]) -> NSMenu {
+        self.items = items()
+        return self
     }
 
     func indexOfItem(withIdentifier id: String) -> Int? {
@@ -47,6 +56,16 @@ extension NSMenu {
     func replaceItem(at index: Int, with newItem: NSMenuItem) {
         removeItem(at: index)
         insertItem(newItem, at: index)
+    }
+
+    /// Pops up the menu at the current mouse location.
+    ///
+    /// - Parameter view: The view to display the menu item over.
+    /// - Attention: If the view is not currently installed in a window, this function does not show any pop up menu.
+    func popUpAtMouseLocation(in view: NSView) {
+        guard let cursorLocation = view.window?.mouseLocationOutsideOfEventStream else { return }
+        let convertedLocation = view.convert(cursorLocation, from: nil)
+        popUp(positioning: nil, at: convertedLocation, in: view)
     }
 
 }

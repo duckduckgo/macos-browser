@@ -31,6 +31,14 @@ Fetches and updates certificates and provisioning profiles for App Store distrib
 
 Makes App Store release build and uploads it to TestFlight
 
+### mac release_testflight_review
+
+```sh
+[bundle exec] fastlane mac release_testflight_review
+```
+
+Makes App Store release build and uploads it to TestFlight
+
 ### mac release_appstore
 
 ```sh
@@ -47,10 +55,50 @@ Makes App Store release build and uploads it to App Store Connect
 
 Updates App Store metadata
 
+### mac make_release_branch
+
+```sh
+[bundle exec] fastlane mac make_release_branch
+```
+
+Executes the release preparation work in the repository
+
 ### mac code_freeze
 
 ```sh
 [bundle exec] fastlane mac code_freeze
+```
+
+Executes the release preparation work in the repository
+
+### mac bump_internal_release
+
+```sh
+[bundle exec] fastlane mac bump_internal_release
+```
+
+Prepares new internal release on top of an existing one
+
+### mac prepare_hotfix
+
+```sh
+[bundle exec] fastlane mac prepare_hotfix
+```
+
+Executes the hotfix release preparation work in the repository
+
+### mac update_embedded_files
+
+```sh
+[bundle exec] fastlane mac update_embedded_files
+```
+
+Updates embedded files and pushes to remote.
+
+### mac set_version
+
+```sh
+[bundle exec] fastlane mac set_version
 ```
 
 Executes the release preparation work in the repository

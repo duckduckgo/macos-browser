@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 
@@ -30,9 +31,9 @@ extension Preferences {
         @ObservedObject var model: AboutModel
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.aboutDuckDuckGo)
-                    .font(Const.Fonts.preferencePaneTitle)
+            PreferencePane {
+
+                TextMenuTitle(UserText.aboutDuckDuckGo)
 
                 if !SupportedOSChecker.isCurrentOSReceivingUpdates {
                     UnsupportedDeviceInfoBox(wide: true)
@@ -42,7 +43,7 @@ extension Preferences {
 
                 PreferencePaneSection {
                     HStack {
-                        Image("AboutPageLogo")
+                        Image(.aboutPageLogo)
                         VStack(alignment: .leading, spacing: 8) {
 #if APPSTORE
                             Text(UserText.duckDuckGoForMacAppStore).font(.companyName)
@@ -50,24 +51,25 @@ extension Preferences {
                             Text(UserText.duckDuckGo).font(.companyName)
 #endif
                             Text(UserText.privacySimplified).font(.privacySimplified)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .multilineTextAlignment(.leading)
 
-                            Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber)).onTapGesture(count: 12) {
-#if NETWORK_PROTECTION
-                                model.displayNetPInvite()
-#endif
-                            }
+                            Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                                .contextMenu(ContextMenu(menuItems: {
+                                    Button(UserText.copy, action: {
+                                        model.copy(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                                    })
+                                }))
                         }
                     }
                     .padding(.bottom, 8)
 
                     TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
-                        model.openURL(.aboutDuckDuckGo)
+                        model.openNewTab(with: .aboutDuckDuckGo)
                     }
 
-                    Text("Build variant: \(variant)")
-
                     TextButton(UserText.privacyPolicy) {
-                        model.openURL(.privacyPolicy)
+                        model.openNewTab(with: .privacyPolicy)
                     }
 
                     #if FEEDBACK
@@ -108,10 +110,7 @@ extension Preferences {
         }
 
         var combinedText: String {
-            return UserText.aboutUnsupportedDeviceInfo2Part1 + " " +
-            UserText.aboutUnsupportedDeviceInfo2Part2(version: versionString) + " " +
-            UserText.aboutUnsupportedDeviceInfo2Part3 + " " +
-            UserText.aboutUnsupportedDeviceInfo2Part4
+            return UserText.aboutUnsupportedDeviceInfo2(version: versionString)
         }
 
         var versionString: String {
@@ -119,7 +118,7 @@ extension Preferences {
         }
 
         var body: some View {
-            let image = Image("Alert-Color-16")
+            let image = Image(.alertColor16)
                 .resizable()
                 .frame(width: 16, height: 16)
                 .padding(.trailing, 4)
@@ -129,26 +128,11 @@ extension Preferences {
             let narrowContentView = Text(combinedText)
 
             let wideContentView: some View = VStack(alignment: .leading, spacing: 0) {
-                HStack(alignment: .center, spacing: 0) {
-                    Text(UserText.aboutUnsupportedDeviceInfo2Part1 + " ")
-                    Button(action: {
-                        NSWorkspace.shared.open(Self.softwareUpdateURL)
-                    }) {
-                        Text(UserText.aboutUnsupportedDeviceInfo2Part2(version: versionString) + " ")
-                            .foregroundColor(Color.blue)
-                            .underline()
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .onHover { hovering in
-                        if hovering {
-                            NSCursor.pointingHand.set()
-                        } else {
-                            NSCursor.arrow.set()
-                        }
-                    }
-                    Text(UserText.aboutUnsupportedDeviceInfo2Part3)
+                if #available(macOS 12.0, *) {
+                    Text(aboutUnsupportedDeviceInfo2Attributed)
+                } else {
+                    aboutUnsupportedDeviceInfo2DeprecatedView()
                 }
-                Text(UserText.aboutUnsupportedDeviceInfo2Part4)
             }
 
             return HStack(alignment: .top) {
@@ -163,10 +147,43 @@ extension Preferences {
                 }
             }
             .padding()
-            .background(Color("UnsupportedOSWarningColor"))
+            .background(Color.unsupportedOSWarning)
             .cornerRadius(8)
             .frame(width: width, height: height)
         }
-    }
 
+        @available(macOS 12, *)
+        private var aboutUnsupportedDeviceInfo2Attributed: AttributedString {
+            let baseString = UserText.aboutUnsupportedDeviceInfo2(version: versionString)
+            var instructions = AttributedString(baseString)
+            if let range = instructions.range(of: "macOS \(versionString)") {
+                instructions[range].link = Self.softwareUpdateURL
+            }
+            return instructions
+        }
+
+        @ViewBuilder
+        private func aboutUnsupportedDeviceInfo2DeprecatedView() -> some View {
+            HStack(alignment: .center, spacing: 0) {
+                Text(verbatim: UserText.aboutUnsupportedDeviceInfo2Part1 + " ")
+                Button(action: {
+                    NSWorkspace.shared.open(Self.softwareUpdateURL)
+                }) {
+                    Text(verbatim: UserText.aboutUnsupportedDeviceInfo2Part2(version: versionString) + " ")
+                        .foregroundColor(Color.blue)
+                        .underline()
+                }
+                .buttonStyle(PlainButtonStyle())
+                .onHover { hovering in
+                    if hovering {
+                        NSCursor.pointingHand.set()
+                    } else {
+                        NSCursor.arrow.set()
+                    }
+                }
+                Text(verbatim: UserText.aboutUnsupportedDeviceInfo2Part3)
+            }
+            Text(verbatim: UserText.aboutUnsupportedDeviceInfo2Part4)
+        }
+    }
 }

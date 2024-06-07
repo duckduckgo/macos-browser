@@ -58,7 +58,7 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
         }
         if message.name == "enableFacebook" {
             guard let delegate = delegate else { return }
-            delegate.clickToLoadUserScriptAllowFB(self) { (_) -> Void in
+            delegate.clickToLoadUserScriptAllowFB(self) { _ in
                 guard let isLogin = message.body as? Bool else {
                     replyHandler(nil, nil)
                     return

@@ -28,12 +28,12 @@ struct DefaultBrowserPrompt: View {
             HStack {
                 Spacer()
 
-                Image("DefaultBrowser")
+                Image(.defaultBrowser)
                     .frame(width: 32, height: 32)
 
                 Text(UserText.defaultBrowserPromptMessage)
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(Color("HomeDefaultBrowserPromptTextColor"))
+                    .foregroundColor(Color.homeDefaultBrowserPromptText)
 
                 let button = Button(UserText.defaultBrowserPromptButton) {
                     self.model.requestSetDefault()
@@ -43,13 +43,13 @@ struct DefaultBrowserPrompt: View {
 
                 Spacer()
 
-                HoverButton(imageName: "Close", imageSize: 22, cornerRadius: 4) {
+                HoverButton(image: .close, imageSize: 22, cornerRadius: 4) {
                     self.model.close()
                 }.padding()
 
             }.background(
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color("HomeDefaultBrowserPromptBackgroundColor"))
+                    .fill(Color.homeDefaultBrowserPromptBackground)
             )
             .visibility(model.shouldShow ? .visible : .gone)
             .padding(.top, 24)

@@ -96,7 +96,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
             (
                 mainWindowControllers.count == 1 &&
                 mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.count == 1 &&
-                mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.first?.content == .homePage &&
+                mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.first?.content == .newtab &&
                 pinnedTabsManager.tabCollection.tabs.isEmpty
             )
         }
@@ -119,7 +119,7 @@ extension WindowControllersManager {
     }
 
     func showPreferencesTab(withSelectedPane pane: PreferencePaneIdentifier? = nil) {
-        showTab(with: .preferences(pane: pane))
+        showTab(with: .settings(pane: pane))
     }
 
     /// Opens a bookmark in a tab, respecting the current modifier keys when deciding where to open the bookmark's URL.
@@ -127,41 +127,19 @@ extension WindowControllersManager {
         guard let url = bookmark.urlObject else { return }
 
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            WindowsManager.openNewWindow(with: url, isBurner: false)
+            WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
         } else if mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false {
-            show(url: url, newTab: true)
+            show(url: url, source: .bookmark, newTab: true)
         } else if NSApplication.shared.isCommandPressed && !NSApplication.shared.isOptionPressed {
-            mainWindowController?.mainViewController.tabCollectionViewModel.appendNewTab(with: .url(url), selected: false)
+            mainWindowController?.mainViewController.tabCollectionViewModel.appendNewTab(with: .url(url, source: .bookmark), selected: false)
         } else if selectedTab?.isPinned ?? false { // When selecting a bookmark with a pinned tab active, always open the URL in a new tab
-            show(url: url, newTab: true)
+            show(url: url, source: .bookmark, newTab: true)
         } else {
-            show(url: url)
+            show(url: url, source: .bookmark)
         }
     }
 
-    func show(url: URL?, newTab: Bool = false) {
-
-        func show(url: URL?, in windowController: MainWindowController) {
-            let viewController = windowController.mainViewController
-            windowController.window?.makeKeyAndOrderFront(self)
-
-            let tabCollectionViewModel = viewController.tabCollectionViewModel
-            let tabCollection = tabCollectionViewModel.tabCollection
-
-            if tabCollection.tabs.count == 1,
-               let firstTab = tabCollection.tabs.first,
-               case .homePage = firstTab.content,
-               !newTab {
-                firstTab.setContent(url.map { .url($0) } ?? .homePage)
-            } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-                tab.setContent(url.map { .url($0) } ?? .homePage)
-            } else {
-                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
-                newTab.setContent(url.map { .url($0) } ?? .homePage)
-                tabCollectionViewModel.append(tab: newTab)
-            }
-        }
-
+    func show(url: URL?, source: Tab.TabContent.URLSource, newTab: Bool = false) {
         let nonPopupMainWindowControllers = mainWindowControllers.filter { $0.window?.isPopUpWindow == false }
 
         // If there is a main window, open the URL in it
@@ -173,20 +151,46 @@ extension WindowControllersManager {
             // If there is any non-popup window available, open the URL in it
             ?? nonPopupMainWindowControllers.first {
 
-            show(url: url, in: windowController)
+            show(url: url, in: windowController, source: source, newTab: newTab)
             return
         }
 
         // Open a new window
         if let url = url {
-            WindowsManager.openNewWindow(with: url, isBurner: false)
+            WindowsManager.openNewWindow(with: url, source: source, isBurner: false)
         } else {
             WindowsManager.openNewWindow(burnerMode: .regular)
         }
     }
 
+    private func show(url: URL?, in windowController: MainWindowController, source: Tab.TabContent.URLSource, newTab: Bool) {
+        let viewController = windowController.mainViewController
+        windowController.window?.makeKeyAndOrderFront(self)
+
+        let tabCollectionViewModel = viewController.tabCollectionViewModel
+        let tabCollection = tabCollectionViewModel.tabCollection
+
+        if tabCollection.tabs.count == 1,
+           let firstTab = tabCollection.tabs.first,
+           case .newtab = firstTab.content,
+           !newTab {
+            firstTab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab)
+        } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
+            tab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab)
+        } else {
+            let newTab = Tab(content: url.map { .url($0, source: source) } ?? .newtab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+            newTab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab)
+            tabCollectionViewModel.append(tab: newTab)
+        }
+    }
+
     func showTab(with content: Tab.TabContent) {
-        guard let windowController = self.mainWindowController else { return }
+        guard let windowController = self.mainWindowController else {
+            let tabCollection = TabCollection(tabs: [Tab(content: content)])
+            let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+            WindowsManager.openNewWindow(with: tabCollectionViewModel)
+            return
+        }
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel
@@ -194,9 +198,8 @@ extension WindowControllersManager {
         windowController.window?.orderFront(nil)
     }
 
-    // MARK: - Network Protection
+    // MARK: - VPN
 
-#if NETWORK_PROTECTION
     @MainActor
     func showNetworkProtectionStatus(retry: Bool = false) async {
         guard let windowController = mainWindowControllers.first else {
@@ -214,7 +217,45 @@ extension WindowControllersManager {
 
         windowController.mainViewController.navigationBarViewController.showNetworkProtectionStatus()
     }
-#endif
+
+    func showShareFeedbackModal() {
+        let feedbackFormViewController = VPNFeedbackFormViewController()
+        let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
+
+        guard let feedbackFormWindow = feedbackFormWindowController.window else {
+            assertionFailure("Couldn't get window for feedback form")
+            return
+        }
+
+        if let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController {
+            parentWindowController.window?.beginSheet(feedbackFormWindow)
+        } else {
+            let tabCollection = TabCollection(tabs: [])
+            let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+            let window = WindowsManager.openNewWindow(with: tabCollectionViewModel)
+            window?.beginSheet(feedbackFormWindow)
+        }
+    }
+
+    func showMainWindow() {
+        guard WindowControllersManager.shared.lastKeyMainWindowController == nil else { return }
+        let tabCollection = TabCollection(tabs: [])
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        _ = WindowsManager.openNewWindow(with: tabCollectionViewModel)
+    }
+
+    func showLocationPickerSheet() {
+        let locationsViewController = VPNLocationsHostingViewController()
+        let locationsWindowController = locationsViewController.wrappedInWindowController()
+
+        guard let locationsFormWindow = locationsWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
+            assertionFailure("Failed to present native VPN feedback form")
+            return
+        }
+
+        parentWindowController.window?.beginSheet(locationsFormWindow)
+    }
 
 }
 

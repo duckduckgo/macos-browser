@@ -17,12 +17,13 @@
 //
 
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 final class UserAgentTests: XCTestCase {
 
     func test_default_user_agent_is_safari() {
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "localhost")!))
+        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "http://localhost")!))
         XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "http://example.com")!))
     }
 
@@ -69,6 +70,15 @@ final class UserAgentTests: XCTestCase {
         XCTAssertEqual(UserAgent.for("https://google.com".url, privacyConfig: config), UserAgent.webViewDefault)
         XCTAssertEqual(UserAgent.for("https://docs.google.com".url, privacyConfig: config), UserAgent.webViewDefault)
         XCTAssertNotEqual(UserAgent.for("https://duckduckgo.com".url, privacyConfig: config), UserAgent.webViewDefault)
+    }
+
+    func testWhenDefaultPolicyIsBrandThenBrandedUserAgentIsUsed() {
+        let config = MockPrivacyConfiguration()
+        config.featureSettings = [
+            "defaultPolicy": "brand"
+        ] as! [String: Any]
+
+        XCTAssertEqual(UserAgent.for("http://wikipedia.org".url, privacyConfig: config), UserAgent.brandedDefault)
     }
 
     func testThatRemoteConfigurationTakesPrecedenceOverLocalConfiguration() {

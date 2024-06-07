@@ -17,6 +17,7 @@
 //
 
 import XCTest
+import History
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -113,7 +114,7 @@ final class TabCollectionTests: XCTestCase {
 
         let tab1 = Tab()
         tabCollection.append(tab: tab1)
-        let tab2 = Tab(content: .homePage, extensionsBuilder: extensionBuilder)
+        let tab2 = Tab(content: .newtab, extensionsBuilder: extensionBuilder)
         tabCollection.append(tab: tab2)
 
         let visit = Visit(date: Date())
@@ -181,13 +182,13 @@ final class TabCollectionTests: XCTestCase {
 extension Tab {
     @MainActor
     convenience override init() {
-        self.init(content: .homePage)
+        self.init(content: .newtab)
     }
 }
 
 class HistoryTabExtensionMock: TabExtension, HistoryExtensionProtocol {
 
-    var localHistory: [DuckDuckGo_Privacy_Browser.Visit] = []
+    var localHistory: [Visit] = []
     func getPublicProtocol() -> HistoryExtensionProtocol { self }
 
 }

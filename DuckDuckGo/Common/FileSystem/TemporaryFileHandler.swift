@@ -20,11 +20,6 @@ import Foundation
 
 final class TemporaryFileHandler {
 
-    enum FileHandlerError: Error {
-        case noFileFound
-        case failedToCopyFile
-    }
-
     let fileURL: URL
     let temporaryFileURL: URL
 
@@ -43,24 +38,14 @@ final class TemporaryFileHandler {
         deleteTemporarilyCopiedFile()
     }
 
-    func withTemporaryFile<T>(_ closure: (URL) -> T) throws -> T {
+    func withTemporaryFile<T>(_ closure: (URL) throws -> T) throws -> T {
         let temporaryFileURL = try copyFileToTemporaryDirectory()
         defer { deleteTemporarilyCopiedFile() }
-        return closure(temporaryFileURL)
+        return try closure(temporaryFileURL)
     }
 
     func copyFileToTemporaryDirectory() throws -> URL {
-        let fileManager = FileManager.default
-
-        guard fileManager.fileExists(atPath: fileURL.path) else {
-            throw FileHandlerError.noFileFound
-        }
-
-        do {
-            try fileManager.copyItem(at: fileURL, to: temporaryFileURL)
-        } catch {
-            throw FileHandlerError.failedToCopyFile
-        }
+        try FileManager.default.copyItem(at: fileURL, to: temporaryFileURL)
 
         return temporaryFileURL
     }
@@ -73,7 +58,7 @@ final class TemporaryFileHandler {
 
 extension URL {
 
-    func withTemporaryFile<T>(_ closure: (URL) -> T) throws -> T {
+    func withTemporaryFile<T>(_ closure: (URL) throws -> T) throws -> T {
         let handler = TemporaryFileHandler(fileURL: self)
         return try handler.withTemporaryFile(closure)
     }

@@ -17,54 +17,60 @@
 //
 
 import AppKit
-import Combine
 
 final class BookmarkManagementSplitViewController: NSSplitViewController {
 
-    private enum Constants {
-        static let storyboardName = "Bookmarks"
-        static let identifier = "BookmarkManagementSplitViewController"
-    }
-
-    static func create() -> BookmarkManagementSplitViewController {
-        let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        return storyboard.instantiateController(identifier: Constants.identifier)
-    }
-
-    // swiftlint:disable force_cast
-    var sidebarViewController: BookmarkManagementSidebarViewController {
-        return splitViewItems[0].viewController as! BookmarkManagementSidebarViewController
-    }
-
-    var detailViewController: BookmarkManagementDetailViewController {
-        return splitViewItems[1].viewController as! BookmarkManagementDetailViewController
-    }
-    // swiftlint:enable force_cast
-
+    private let bookmarkManager: BookmarkManager
     weak var delegate: BrowserTabSelectionDelegate?
 
-    private var selectedTabCancellable: AnyCancellable?
+    lazy var sidebarViewController: BookmarkManagementSidebarViewController = BookmarkManagementSidebarViewController(bookmarkManager: bookmarkManager)
+    lazy var detailViewController: BookmarkManagementDetailViewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager)
+
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+        self.bookmarkManager = bookmarkManager
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(type(of: self)): Bad initializer")
+    }
+
+    override func loadView() {
+        title = UserText.bookmarks
+
+        splitView.dividerStyle = .thin
+        splitView.isVertical = true
+        splitView.setValue(NSColor.divider, forKey: #keyPath(NSSplitView.dividerColor))
+
+        let sidebarViewItem = NSSplitViewItem(contentListWithViewController: sidebarViewController)
+        sidebarViewItem.minimumThickness = 256
+        sidebarViewItem.maximumThickness = 256
+
+        addSplitViewItem(sidebarViewItem)
+
+        let detailViewItem = NSSplitViewItem(viewController: detailViewController)
+        addSplitViewItem(detailViewItem)
+
+        view = splitView
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        splitView.setValue(NSColor(named: "DividerColor"), forKey: "dividerColor")
         sidebarViewController.delegate = self
         detailViewController.delegate = self
-        sidebarViewController.tabSwitcherButton.displayBrowserTabButtons(withSelectedTab: .bookmarks)
-
-        selectedTabCancellable = sidebarViewController.tabSwitcherButton.selectionPublisher.dropFirst().sink { [weak self] index in
-            self?.delegate?.selectedTab(at: index)
-        }
     }
 
 }
 
 extension BookmarkManagementSplitViewController: BookmarkManagementSidebarViewControllerDelegate {
 
-    func bookmarkManagementSidebarViewController(_ sidebarViewController: BookmarkManagementSidebarViewController,
-                                                 enteredState state: BookmarkManagementSidebarViewController.SelectionState) {
+    func sidebarSelectionStateDidChange(_ state: BookmarkManagementSidebarViewController.SelectionState) {
         detailViewController.update(selectionState: state)
+    }
+
+    func sidebarSelectedTabContentDidChange(_ content: Tab.TabContent) {
+        delegate?.selectedTabContent(content)
     }
 
 }
@@ -76,3 +82,37 @@ extension BookmarkManagementSplitViewController: BookmarkManagementDetailViewCon
     }
 
 }
+
+#if DEBUG
+private let previewSize = NSSize(width: 700, height: 660)
+@available(macOS 14.0, *)
+#Preview(traits: .fixedLayout(width: previewSize.width, height: previewSize.height)) { {
+
+    let vc = BookmarkManagementSplitViewController(bookmarkManager: {
+        let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
+            BookmarkFolder(id: "1", title: "Folder 1", children: [
+                BookmarkFolder(id: "2", title: "Nested Folder", children: [
+                    Bookmark(id: "b1", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "2")
+                ])
+            ]),
+            BookmarkFolder(id: "3", title: "Another Folder", children: [
+                BookmarkFolder(id: "4", title: "Nested Folder", children: [
+                    BookmarkFolder(id: "5", title: "Another Nested Folder", children: [
+                        Bookmark(id: "b2", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "5")
+                    ])
+                ])
+            ]),
+            Bookmark(id: "b3", url: URL.duckDuckGo.absoluteString, title: "Bookmark 1", isFavorite: false, parentFolderUUID: ""),
+            Bookmark(id: "b4", url: URL.duckDuckGo.absoluteString, title: "Bookmark 2", isFavorite: false, parentFolderUUID: ""),
+            Bookmark(id: "b5", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "")
+        ]))
+        bkman.loadBookmarks()
+        customAssertionFailure = { _, _, _ in }
+
+        return bkman
+    }())
+    vc.preferredContentSize = previewSize
+    return vc
+
+}() }
+#endif

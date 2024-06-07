@@ -61,9 +61,9 @@ final class JSAlertViewModelTests: XCTestCase {
 
     func testTitleText() {
         let params: [JSAlertQuery.TestParameters] = [
-            .init(type: .testAlert(parameters: .testData(domain: "duckduckgo.com")), result: "A message from duckduckgo.com"),
-            .init(type: .testConfirm(parameters: .testData(domain: "wikipedia.com")), result: "A message from wikipedia.com"),
-            .init(type: .testTextInput(parameters: .testData(domain: "example.com")), result: "A message from example.com")
+            .init(type: .testAlert(parameters: .testData(domain: "duckduckgo.com")), result: UserText.alertTitle(from: "duckduckgo.com")),
+            .init(type: .testConfirm(parameters: .testData(domain: "wikipedia.com")), result: UserText.alertTitle(from: "wikipedia.com")),
+            .init(type: .testTextInput(parameters: .testData(domain: "example.com")), result: UserText.alertTitle(from: "example.com"))
         ]
 
         for param in params {

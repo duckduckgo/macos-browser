@@ -18,17 +18,29 @@
 
 import AppKit
 import SwiftUI
+import SwiftUIExtensions
 import Combine
+import DDGSync
+import NetworkProtection
 
 final class PreferencesViewController: NSViewController {
 
     weak var delegate: BrowserTabSelectionDelegate?
 
-    let model = PreferencesSidebarModel(includeDuckPlayer: DuckPlayer.shared.isAvailable)
-    private var selectedTabIndexCancellable: AnyCancellable?
+    let model: PreferencesSidebarModel
+    private var selectedTabContentCancellable: AnyCancellable?
     private var selectedPreferencePaneCancellable: AnyCancellable?
 
     private var bitwardenManager: BWManagement = BWManager.shared
+
+    init(syncService: DDGSyncing, duckPlayer: DuckPlayer = DuckPlayer.shared) {
+        model = PreferencesSidebarModel(syncService: syncService, includeDuckPlayer: duckPlayer.isAvailable)
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func loadView() {
         view = NSView()
@@ -49,10 +61,10 @@ final class PreferencesViewController: NSViewController {
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        selectedTabIndexCancellable = model.$selectedTabIndex
+        selectedTabContentCancellable = model.selectedTabContent
             .dropFirst()
-            .sink { [weak self] index in
-                self?.delegate?.selectedTab(at: index)
+            .sink { [weak self] in
+                self?.delegate?.selectedTabContent($0)
             }
 
         selectedPreferencePaneCancellable = model.$selectedPane
@@ -64,9 +76,7 @@ final class PreferencesViewController: NSViewController {
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
-        selectedTabIndexCancellable?.cancel()
-        selectedTabIndexCancellable = nil
-        selectedPreferencePaneCancellable?.cancel()
+        selectedTabContentCancellable = nil
         selectedPreferencePaneCancellable = nil
     }
 }

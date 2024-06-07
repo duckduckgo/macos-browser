@@ -56,7 +56,6 @@ extension Tab: NSSecureCoding {
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
                   interactionStateData: interactionStateData,
                   shouldLoadInBackground: false,
-                  shouldLoadFromCache: true,
                   lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt))
 
         _=self.awakeAfter(using: decoder)
@@ -89,54 +88,59 @@ private extension Tab.TabContent {
         case url = 0
         case preferences = 1
         case bookmarks = 2
-        case homePage = 3
+        case newtab = 3
         case onboarding = 4
         case duckPlayer = 5
-#if DBP
         case dataBrokerProtection = 6
-#endif
+        case subscription = 7
+        case identityTheftRestoration = 8
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     init?(type: ContentType, url: URL?, videoID: String?, timestamp: String?, preferencePane: PreferencePaneIdentifier?) {
         switch type {
-        case .homePage:
-            self = .homePage
+        case .newtab:
+            self = .newtab
         case .url:
             guard let url = url else { return nil }
-            self = .url(url)
+            self = .url(url, source: .pendingStateRestoration)
         case .bookmarks:
             self = .bookmarks
         case .preferences:
-            self = .preferences(pane: preferencePane)
+            self = .settings(pane: preferencePane)
         case .onboarding:
             self = .onboarding
         case .duckPlayer:
             guard let videoID = videoID else { return nil }
-            self = .url(.duckPlayer(videoID, timestamp: timestamp))
-#if DBP
+            self = .url(.duckPlayer(videoID, timestamp: timestamp), source: .pendingStateRestoration)
         case .dataBrokerProtection:
             self = .dataBrokerProtection
-#endif
+        case .subscription:
+            guard let url = url else { return nil }
+            self = .subscription(url)
+        case .identityTheftRestoration:
+            guard let url = url else { return nil }
+            self = .identityTheftRestoration(url)
         }
     }
 
     var type: ContentType {
         switch self {
         case .url: return .url
-        case .homePage: return .homePage
+        case .newtab: return .newtab
         case .bookmarks: return .bookmarks
-        case .preferences: return .preferences
+        case .settings: return .preferences
         case .onboarding: return .onboarding
-        case .none: return .homePage
-#if DBP
+        case .none: return .newtab
         case .dataBrokerProtection: return .dataBrokerProtection
-#endif
+        case .subscription: return .subscription
+        case .identityTheftRestoration: return .identityTheftRestoration
         }
     }
 
     var preferencePane: PreferencePaneIdentifier? {
         switch self {
-        case let .preferences(pane: pane):
+        case let .settings(pane: pane):
             return pane
         default:
             return nil

@@ -17,8 +17,10 @@
 //
 
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 class RecentlyVisitedSiteModelTests: XCTestCase {
 
     private func RecentlyVisitedSiteModel(originalURL: URL, duckPlayer: DuckPlayerMode = .disabled) -> HomePage.Models.RecentlyVisitedSiteModel? {

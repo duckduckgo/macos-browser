@@ -20,16 +20,26 @@ import Foundation
 import WebKit
 
 enum NewWindowPolicy {
-    case tab(selected: Bool, burner: Bool)
+    case tab(selected: Bool, burner: Bool, contextMenuInitiated: Bool = false)
     case popup(origin: NSPoint?, size: NSSize?)
     case window(active: Bool, burner: Bool)
 
-    init(_ windowFeatures: WKWindowFeatures, shouldSelectNewTab: Bool = false, isBurner: Bool) {
+    init(_ windowFeatures: WKWindowFeatures, shouldSelectNewTab: Bool = false, isBurner: Bool, contextMenuInitiated: Bool = false) {
         if windowFeatures.toolbarsVisibility?.boolValue == true {
             self = .tab(selected: shouldSelectNewTab,
-                        burner: isBurner)
+                        burner: isBurner,
+                        contextMenuInitiated: contextMenuInitiated)
         } else if windowFeatures.width != nil {
             self = .popup(origin: windowFeatures.origin, size: windowFeatures.size)
+
+        } else
+        // This is a temporary fix for macOS 14.1 WKWindowFeatures being empty when opening a new regular tab
+        // Instead of defaulting to window policy, we default to tab policy, and allow popups in some limited scenarios.
+        // See https://app.asana.com/0/1177771139624306/1205690527704551/f.
+        if #available(macOS 14.1, *),
+           windowFeatures.statusBarVisibility == nil && windowFeatures.menuBarVisibility == nil {
+            self = .tab(selected: shouldSelectNewTab, burner: isBurner, contextMenuInitiated: contextMenuInitiated)
+
         } else {
             self = .window(active: true, burner: isBurner)
         }
@@ -40,8 +50,28 @@ enum NewWindowPolicy {
         return false
     }
     var isSelectedTab: Bool {
-        if case .tab(selected: true, burner: _) = self { return true }
+        if case .tab(selected: true, burner: _, contextMenuInitiated: _) = self { return true }
         return false
+    }
+
+    /**
+     * Replaces `.tab` with `.window` when user prefers windows over tabs.
+     */
+    func preferringTabsToWindows(_ prefersTabsToWindows: Bool) -> NewWindowPolicy {
+        guard case .tab(_, let isBurner, contextMenuInitiated: false) = self, !prefersTabsToWindows else {
+            return self
+        }
+        return .window(active: true, burner: isBurner)
+    }
+
+    /**
+     * Forces selecting a tab if `true` is passed as argument.
+     */
+    func preferringSelectedTabs(_ prefersSelectedTabs: Bool) -> NewWindowPolicy {
+        guard case .tab(selected: false, burner: let isBurner, contextMenuInitiated: let contextMenuInitiated) = self, prefersSelectedTabs else {
+            return self
+        }
+        return .tab(selected: true, burner: isBurner, contextMenuInitiated: contextMenuInitiated)
     }
 
 }

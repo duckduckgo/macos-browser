@@ -24,9 +24,47 @@ protocol WebViewContextMenuDelegate: AnyObject {
     func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?)
 }
 
+protocol WebViewInteractionEventsDelegate: AnyObject {
+    func webView(_ webView: WebView, mouseDown event: NSEvent)
+    func webView(_ webView: WebView, keyDown event: NSEvent)
+    func webView(_ webView: WebView, scrollWheel event: NSEvent)
+}
+
+@objc(DuckDuckGo_WebView)
 final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
+    weak var interactionEventsDelegate: WebViewInteractionEventsDelegate?
+
+    private var isLoadingObserver: Any?
+
+    private var shouldShowWebInspector: Bool {
+        // When a new tab is open, we don't want the web inspector to be active on screen and gain focus.
+        // When a new tab is open the other tab views are removed from the window, hence, we should not show the web inspector.
+        isInspectorShown && window != nil
+    }
+
+    override func addTrackingArea(_ trackingArea: NSTrackingArea) {
+        /// disable mouseEntered/mouseMoved/mouseExited events passing to Web View while it‘s loading
+        /// see https://app.asana.com/0/1177771139624306/1206990108527681/f
+        if trackingArea.owner?.className == "WKMouseTrackingObserver" {
+            // suppress Tracking Area events while loading
+            isLoadingObserver = self.observe(\.isLoading, options: [.new]) { [weak self, trackingArea] _, c in
+                if c.newValue /* isLoading */ ?? false {
+                    guard let self, self.trackingAreas.contains(trackingArea) else { return }
+                    removeTrackingArea(trackingArea)
+                } else {
+                    guard let self, !self.trackingAreas.contains(trackingArea) else { return }
+                    superAddTrackingArea(trackingArea)
+                }
+            }
+        }
+        super.addTrackingArea(trackingArea)
+    }
+
+    private func superAddTrackingArea(_ trackingArea: NSTrackingArea) {
+        super.addTrackingArea(trackingArea)
+    }
 
     override var isInFullScreenMode: Bool {
         if #available(macOS 13.0, *) {
@@ -36,8 +74,10 @@ final class WebView: WKWebView {
         }
     }
 
-    func stopAllMediaAndLoading() {
-        stopLoading()
+    func stopAllMedia(shouldStopLoading: Bool) {
+        if shouldStopLoading {
+            stopLoading()
+        }
         stopMediaCapture()
         stopAllMediaPlayback()
         if isInFullScreenMode {
@@ -69,6 +109,10 @@ final class WebView: WKWebView {
         window != nil && zoomLevel != defaultZoomValue && !self.isInFullScreenMode
     }
 
+    var canResetMagnification: Bool {
+        window != nil && magnification != 1
+    }
+
     var canZoomIn: Bool {
         window != nil && zoomLevel.index < DefaultZoomValue.allCases.count - 1 && !self.isInFullScreenMode
     }
@@ -78,6 +122,7 @@ final class WebView: WKWebView {
     }
 
     func resetZoomLevel() {
+        magnification = 1
         zoomLevel = defaultZoomValue
     }
 
@@ -103,12 +148,29 @@ final class WebView: WKWebView {
         contextMenuDelegate?.webView(self, didCloseContextMenu: menu, with: event)
     }
 
+    // MARK: - Events
+
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+        interactionEventsDelegate?.webView(self, mouseDown: event)
+    }
+
+    override func keyDown(with event: NSEvent) {
+        super.keyDown(with: event)
+        interactionEventsDelegate?.webView(self, keyDown: event)
+    }
+
+    override func scrollWheel(with event: NSEvent) {
+        super.scrollWheel(with: event)
+        interactionEventsDelegate?.webView(self, scrollWheel: event)
+    }
+
     // MARK: - Developer Tools
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        if self.isInspectorShown {
-            self.openDeveloperTools()
+        if shouldShowWebInspector {
+            openDeveloperTools()
         }
     }
 
@@ -176,6 +238,9 @@ final class WebView: WKWebView {
     // MARK: - NSDraggingDestination
 
     override func draggingUpdated(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        if draggingInfo.draggingSource is WebView {
+            return super.draggingUpdated(draggingInfo)
+        }
         if NSApp.isCommandPressed || NSApp.isOptionPressed {
             return superview?.draggingUpdated(draggingInfo) ?? .none
         }
@@ -190,6 +255,9 @@ final class WebView: WKWebView {
     }
 
     override func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
+        if draggingInfo.draggingSource is WebView {
+            return super.performDragOperation(draggingInfo)
+        }
         if NSApp.isCommandPressed || NSApp.isOptionPressed || super.draggingUpdated(draggingInfo) == .none {
             return superview?.performDragOperation(draggingInfo) ?? false
         }

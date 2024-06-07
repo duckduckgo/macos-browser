@@ -40,7 +40,7 @@ final class SharingMenu: NSMenu {
         self.items = services.map { service in
             NSMenuItem(service: service, target: self, action: #selector(sharingItemSelected))
         } + [
-            NSMenuItem(title: UserText.moreMenuItem, action: #selector(openSharingPreferences), target: self).withImage(.more)
+            NSMenuItem(title: UserText.moreMenuItem, action: #selector(openSharingPreferences), target: self).withImage(.sharedMoreMenu)
         ]
     }
 
@@ -48,7 +48,8 @@ final class SharingMenu: NSMenu {
     private func sharingData() -> SharingData? {
         guard let tabViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel.selectedTabViewModel,
               tabViewModel.canReload,
-              let url = tabViewModel.tab.content.url else { return nil }
+              !tabViewModel.isShowingErrorPage,
+              let url = tabViewModel.tab.content.userEditableUrl else { return nil }
 
         let sharingData = DuckPlayer.shared.sharingData(for: tabViewModel.title, url: url) ?? (tabViewModel.title, url)
 
@@ -71,13 +72,12 @@ final class SharingMenu: NSMenu {
         let data = try? PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
         let descriptor = NSAppleEventDescriptor(descriptorType: .openSharingSubpane, data: data)
 
-        // if you want to refactor this to remove the warning - stop now
-        // the suggested method with NSWorkspace.OpenConfiguration doesn‘t work for Sharing Preferences
-        NSWorkspace.shared.open([url],
-                                withAppBundleIdentifier: nil,
-                                options: .async,
-                                additionalEventParamDescriptor: descriptor,
-                                launchIdentifiers: nil)
+        // the non-deprecated method with NSWorkspace.OpenConfiguration doesn‘t work for Sharing Preferences
+        (NSWorkspace.shared as Workspace).open([url],
+                                               withAppBundleIdentifier: nil,
+                                               options: [],
+                                               additionalEventParamDescriptor: descriptor,
+                                               launchIdentifiers: nil)
     }
 
     @objc func sharingItemSelected(_ sender: NSMenuItem) {
@@ -173,7 +173,7 @@ private extension NSMenuItem {
 
 private extension NSImage {
 
-    static var more: NSImage? {
+    static var sharedMoreMenu: NSImage? {
         let sharedMoreMenuImageSelector = NSSelectorFromString("sharedMoreMenuImage")
         guard NSSharingServicePicker.responds(to: sharedMoreMenuImageSelector) else { return nil }
         return NSSharingServicePicker.perform(sharedMoreMenuImageSelector)?.takeUnretainedValue() as? NSImage

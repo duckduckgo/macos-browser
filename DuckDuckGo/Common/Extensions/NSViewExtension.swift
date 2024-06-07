@@ -22,17 +22,38 @@ import Common
 
 extension NSView {
 
+    // Since macOS 14 Sonoma view has clipsToBound == false by default
+    func visibleRectClampedToBounds() -> NSRect {
+        var visibleRect = self.visibleRect
+
+        guard !clipsToBounds, let superview else { return visibleRect }
+        let frame = self.frame
+        visibleRect = frame
+
+        if superview.isFlipped != isFlipped {
+            visibleRect.origin.y = superview.bounds.height - visibleRect.origin.y - visibleRect.height
+        }
+
+        visibleRect = visibleRect.intersection(superview.visibleRect)
+        visibleRect.origin.x -= frame.origin.x
+        visibleRect.origin.y -= frame.origin.y
+
+        return visibleRect
+    }
+
     func setCornerRadius(_ radius: CGFloat) {
         wantsLayer = true
         layer?.masksToBounds = true
         layer?.cornerRadius = radius
     }
 
-    func addAndLayout(_ subView: NSView) {
-        subView.frame = bounds
-        subView.autoresizingMask = [.height, .width]
-        subView.translatesAutoresizingMaskIntoConstraints = true
-        addSubview(subView)
+    func addAndLayout(_ subview: NSView) {
+        subview.translatesAutoresizingMaskIntoConstraints = false
+        subview.frame = bounds
+        subview.autoresizingMask = [.height, .width]
+        subview.translatesAutoresizingMaskIntoConstraints = true
+
+        addSubview(subview)
    }
 
     func wrappedInContainer(padding: CGFloat = 0) -> NSView {
@@ -53,11 +74,23 @@ extension NSView {
         return containerView
     }
 
+    func hidden() -> Self {
+        self.isHidden = true
+        return self
+    }
+
+    var isShown: Bool {
+        get { !isHidden }
+        set { isHidden = !newValue }
+    }
+
     func makeMeFirstResponder() {
         guard let window = window else {
             os_log("%s: Window not available", type: .error, className)
             return
         }
+        // prevent all text selection on repeated Address Bar activation
+        guard window.firstResponder !== (self as? NSControl)?.currentEditor() ?? self else { return }
 
         window.makeFirstResponder(self)
     }
@@ -127,7 +160,7 @@ extension NSView {
 
     func mouseLocationInsideBounds(_ point: NSPoint?) -> NSPoint? {
         withMouseLocationInViewCoordinates(point) { locationInView in
-            guard self.visibleRect.contains(locationInView) else { return nil }
+            guard self.visibleRectClampedToBounds().contains(locationInView) else { return nil }
             return locationInView
         }
     }

@@ -16,7 +16,13 @@
 //  limitations under the License.
 //
 
+/*
+ WARNING: This component doesn't work anymore, re-implementation needed
+ https://app.asana.com/0/0/1207002879349166/f
+ */
+
 import Foundation
+import PixelKit
 
 enum PixelExperiment: String, CaseIterable {
 
@@ -26,6 +32,18 @@ enum PixelExperiment: String, CaseIterable {
     ///  allocate and return a cohort.  Subsequently, return the same cohort.
     static var cohort: PixelExperiment? {
         logic.cohort
+    }
+
+    static var isExperimentInstalled: Bool {
+        return logic.isInstalled
+    }
+
+    static var allocatedCohortDoesNotMatchCurrentCohorts: Bool {
+        guard let allocatedCohort = logic.allocatedCohort else { return false }
+        if PixelExperiment(rawValue: allocatedCohort) == nil {
+            return true
+        }
+        return false
     }
 
     /// Enables this experiment for new users when called from the new installation path.
@@ -39,11 +57,10 @@ enum PixelExperiment: String, CaseIterable {
 
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
     //  remember to keep it clear for privacy triage.
-    case control = "a"
-    case onboardingExperiment1 = "b"
+    case control
 }
 
-/// These functions contain the business logic for determining if the pixel should be fired or not.
+// These functions contain the business logic for determining if the pixel should be fired or not.
 extension PixelExperiment {
 
     static func fireEnrollmentPixel() {
@@ -56,10 +73,6 @@ extension PixelExperiment {
 
     static func fireDay21To27SerpPixel() {
         logic.fireDay21To27SerpPixel()
-    }
-
-    static func fireSetAsDefaultInitialPixel() {
-        logic.fireSetAsDefaultInitialPixel()
     }
 
 }
@@ -86,10 +99,10 @@ final internal class PixelExperimentLogic {
     }
 
     @UserDefaultsWrapper(key: .pixelExperimentInstalled, defaultValue: false)
-    private var isInstalled: Bool
+    var isInstalled: Bool
 
     @UserDefaultsWrapper(key: .pixelExperimentCohort, defaultValue: nil)
-    private var allocatedCohort: String?
+    var allocatedCohort: String?
 
     @UserDefaultsWrapper(key: .pixelExperimentEnrollmentDate, defaultValue: nil)
     private var enrollmentDate: Date?
@@ -121,29 +134,27 @@ final internal class PixelExperimentLogic {
         isInstalled = true
     }
 
-    // You'll need additional pixels for your experiment.  Pass the cohort as a paramter.
+    // You'll need additional pixels for your experiment.  Pass the cohort as a parameter.
     func fireEnrollmentPixel() {
         // You'll probably need this at least.
-        guard allocatedCohort != nil, let cohort else { return }
-        Pixel.fire(.launchInitial(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
     }
 
+    // Often used
     func fireFirstSerpPixel() {
         guard allocatedCohort != nil, let cohort else { return }
-        Pixel.fire(.serpInitial(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
+        PixelKit.fire(GeneralPixel.serpInitial(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
     }
 
+    // Often used for retention experiments
     func fireDay21To27SerpPixel() {
         guard allocatedCohort != nil, let cohort else { return }
 
-        if now() >= Pixel.firstLaunchDate.adding(.days(21)) && now() <= Pixel.firstLaunchDate.adding(.days(27)) {
-            Pixel.fire(.serpDay21to27(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
+        DispatchQueue.main.async {
+            let now = self.now()
+            if now >= AppDelegate.firstLaunchDate.adding(.days(21)) && now <= AppDelegate.firstLaunchDate.adding(.days(27)) {
+                PixelKit.fire(GeneralPixel.serpDay21to27(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+            }
         }
-    }
-
-    func fireSetAsDefaultInitialPixel() {
-        guard allocatedCohort != nil, let cohort else { return }
-        Pixel.fire(.setAsDefaultInitial(cohort: cohort.rawValue), limitTo: .initial)
     }
 
     func cleanup() {

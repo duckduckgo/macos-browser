@@ -1,5 +1,5 @@
 //
-//  BookmarkStore.swift
+//  LegacyBookmarkStore.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,6 +19,7 @@
 import Foundation
 import CoreData
 import Cocoa
+import PixelKit
 
 fileprivate extension UUID {
 
@@ -171,7 +172,7 @@ extension LegacyBookmarkStore {
 
             try context.save()
         } catch {
-            Pixel.fire(.debug(event: .bookmarksStoreRootFolderMigrationFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.bookmarksStoreRootFolderMigrationFailed, error: error))
         }
     }
 
@@ -211,7 +212,7 @@ extension LegacyBookmarkStore {
             // 4. Save the migration:
             try context.save()
         } catch {
-            Pixel.fire(.debug(event: .bookmarksStoreRootFolderMigrationFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.bookmarksStoreRootFolderMigrationFailed, error: error))
         }
     }
 }

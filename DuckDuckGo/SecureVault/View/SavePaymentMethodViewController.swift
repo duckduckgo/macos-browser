@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Combine
 import Common
+import PixelKit
 
 protocol SavePaymentMethodDelegate: AnyObject {
 
@@ -42,14 +43,22 @@ final class SavePaymentMethodViewController: NSViewController {
         return controller
     }
 
-    @IBOutlet var cardDetailsLabel: NSTextField!
-    @IBOutlet var cardExpirationLabel: NSTextField!
+    @IBOutlet weak var cardDetailsLabel: NSTextField!
+    @IBOutlet weak var cardExpirationLabel: NSTextField!
+    @IBOutlet weak var titleLabel: NSTextField!
+    @IBOutlet weak var saveButton: NSButton!
+    @IBOutlet weak var notNowButton: NSButton!
 
     weak var delegate: SavePaymentMethodDelegate?
 
     private var paymentMethod: SecureVaultModels.CreditCard?
 
     // MARK: - Public
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setUpStrings()
+    }
 
     func savePaymentMethod(_ paymentMethod: SecureVaultModels.CreditCard) {
         self.paymentMethod = paymentMethod
@@ -83,10 +92,10 @@ final class SavePaymentMethodViewController: NSViewController {
         paymentMethod.title = CreditCardValidation.type(for: paymentMethod.cardNumber).displayName
 
         do {
-            try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeCreditCard(paymentMethod)
+            try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared).storeCreditCard(paymentMethod)
         } catch {
             os_log("%s:%s: failed to store payment method %s", type: .error, className, #function, error.localizedDescription)
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
     }
 
@@ -95,4 +104,9 @@ final class SavePaymentMethodViewController: NSViewController {
         self.delegate?.shouldCloseSavePaymentMethodViewController(self)
     }
 
+    private func setUpStrings() {
+        titleLabel.stringValue = UserText.passwordManagementSavePayment
+        notNowButton.title = UserText.notNow
+        saveButton.title = UserText.save
+    }
 }

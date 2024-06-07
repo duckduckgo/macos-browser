@@ -16,44 +16,99 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 
-struct WaitlistActivationDateStore {
+enum WaitlistActivationDateStoreSource {
+    case netP
+    case dbp
 
-    private enum Constants {
-        static let networkProtectionActivationDateKey = "com.duckduckgo.network-protection.activation-date"
+    var activationDateKey: String {
+        switch self {
+        case .netP: return "com.duckduckgo.network-protection.activation-date"
+        case .dbp: return "com.duckduckgo.dbp.activation-date"
+        }
     }
 
+    var lastActiveDateKey: String {
+        switch self {
+        case .netP: return "com.duckduckgo.network-protection.last-active-date"
+        case .dbp: return "com.duckduckgo.dbp.last-active-date"
+        }
+    }
+}
+
+protocol WaitlistActivationDateStore {
+
+    func daysSinceActivation() -> Int?
+    func daysSinceLastActive() -> Int?
+
+}
+
+struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
+
+    private let source: WaitlistActivationDateStoreSource
     private let userDefaults: UserDefaults
 
-    init(userDefaults: UserDefaults = .shared) {
-        self.userDefaults = userDefaults
+    init(source: WaitlistActivationDateStoreSource) {
+        self.source = source
+        switch source {
+        case.netP:
+            self.userDefaults = .netP
+        case .dbp:
+            self.userDefaults = .dbp
+        }
     }
 
     func setActivationDateIfNecessary() {
-        if userDefaults.double(forKey: Constants.networkProtectionActivationDateKey) != 0 {
+        if userDefaults.double(forKey: source.activationDateKey) != 0 {
             return
         }
 
-        userDefaults.set(Date().timeIntervalSinceReferenceDate, forKey: Constants.networkProtectionActivationDateKey)
+        updateActivationDate(Date())
     }
 
     func daysSinceActivation() -> Int? {
-        let timestamp = userDefaults.double(forKey: Constants.networkProtectionActivationDateKey)
+        let timestamp = userDefaults.double(forKey: source.activationDateKey)
 
         if timestamp == 0 {
             return nil
         }
 
         let activationDate = Date(timeIntervalSinceReferenceDate: timestamp)
-        let currentDate = Date()
+        return daysSince(date: activationDate)
+    }
 
-        let numberOfDays = Calendar.current.dateComponents([.day], from: activationDate, to: currentDate)
+    func updateLastActiveDate() {
+        userDefaults.set(Date(), forKey: source.lastActiveDateKey)
+    }
+
+    func daysSinceLastActive() -> Int? {
+        let timestamp = userDefaults.double(forKey: source.lastActiveDateKey)
+
+        if timestamp == 0 {
+            return nil
+        }
+
+        let activationDate = Date(timeIntervalSinceReferenceDate: timestamp)
+        return daysSince(date: activationDate)
+    }
+
+    // MARK: - Resetting
+
+    func removeDates() {
+        userDefaults.removeObject(forKey: source.activationDateKey)
+        userDefaults.removeObject(forKey: source.lastActiveDateKey)
+    }
+
+    // MARK: - Updating
+
+    func updateActivationDate(_ date: Date) {
+        userDefaults.set(date.timeIntervalSinceReferenceDate, forKey: source.activationDateKey)
+    }
+
+    private func daysSince(date storedDate: Date) -> Int? {
+        let numberOfDays = Calendar.current.dateComponents([.day], from: storedDate, to: Date())
         return numberOfDays.day
     }
 
 }
-
-#endif

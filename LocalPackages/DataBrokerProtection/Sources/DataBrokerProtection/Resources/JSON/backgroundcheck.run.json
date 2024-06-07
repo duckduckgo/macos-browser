@@ -1,0 +1,61 @@
+{
+  "name": "backgroundcheck.run",
+  "url": "backgroundcheck.run",
+  "version": "0.1.5",
+  "parent": "verecor.com",
+  "addedDatetime": 1677736800000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "64967cc5-ebf6-4c27-b12c-8f15dceb2678",
+          "url": "https://backgroundcheck.run/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}"
+        },
+        {
+          "actionType": "extract",
+          "id": "57dfbc89-94c8-49f0-9952-c58c92883ffd",
+          "selector": ".b-pfl-list",
+          "profile": {
+            "name": {
+              "selector": ".name"
+            },
+            "alternativeNamesList": {
+              "selector": ".//span[contains(., 'Known as')]/following-sibling::span[@class='medium-20 col']/span[@class='info']/span[@class='nowrap']",
+              "findElements": true
+            },
+            "age": {
+              "beforeText": "age:",
+              "selector": ".age"
+            },
+            "addressCityStateList": {
+              "selector": ".//span[@itemprop='address']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//span[@itemprop='relatedTo']",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://backgroundcheck.run/person/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

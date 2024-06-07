@@ -31,17 +31,34 @@ class FirefoxBookmarksReaderTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(bookmarks.topLevelFolders.bookmarkBar.type, "folder")
-        XCTAssertEqual(bookmarks.topLevelFolders.otherBookmarks.type, "folder")
+        XCTAssertEqual(bookmarks.topLevelFolders.bookmarkBar?.type, .folder)
+        XCTAssertEqual(bookmarks.topLevelFolders.otherBookmarks?.type, .folder)
 
-        XCTAssertTrue(bookmarks.topLevelFolders.bookmarkBar.children!.contains(where: { bookmark in
+        XCTAssertEqual(bookmarks.topLevelFolders.bookmarkBar?.children?.contains(where: { bookmark in
             bookmark.url?.absoluteString == "https://duckduckgo.com/"
-        }))
+        }), true)
+    }
+
+    func testFileNotFoundReturnsFailureWithDbOpenError() {
+        // Given
+        let bookmarksReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: invalidResourceURL())
+        let expected: DataImportResult<ImportedBookmarks> = .failure(FirefoxBookmarksReader.ImportError(type: .couldNotFindBookmarksFile, underlyingError: nil))
+
+        // When
+        let result = bookmarksReader.readBookmarks()
+
+        // Then
+        XCTAssertEqual(expected, result)
     }
 
     private func resourceURL() -> URL {
         let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
         return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData")
+    }
+
+    private func invalidResourceURL() -> URL {
+        let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
+        return bundle.resourceURL!.appendingPathComponent("Nothing/Here")
     }
 
 }

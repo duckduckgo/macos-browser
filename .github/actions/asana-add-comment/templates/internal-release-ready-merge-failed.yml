@@ -1,0 +1,17 @@
+data:
+  # yq -o=j | sed -E 's/\\n( *)([^\\n])/\2/g'
+  html_text: |
+    <body>
+      <h2>[ACTION NEEDED] Internal release build ${TAG} ready</h2>
+      <ul>
+        <li>📥 DMG is available from <a href='${DMG_URL}'>${DMG_URL}</a>.</li>
+        <li>🏷️ Repository is tagged with <code>${TAG}</code> tag.</li>
+        <li>🚢 GitHub <a href='${RELEASE_URL}'>${TAG} pre-release</a> is created.</li>
+        <li><b>❗️ Merging <code>${BRANCH}</code> to <code>${BASE_BRANCH}</code> failed.</b>
+          <ul>
+            <li><a data-asana-gid='${ASSIGNEE_ID}'/>, please proceed with manual merging <a data-asana-gid='${TASK_ID}' data-asana-dynamic='false'>according to instructions</a>.</li>
+          </ul></li>
+      </ul>
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>

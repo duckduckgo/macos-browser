@@ -19,11 +19,13 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-struct DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
+class DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
+
     var selectedDownloadLocation: String?
     var alwaysRequestDownloadLocation: Bool
     var defaultDownloadLocation: URL?
     var lastUsedCustomDownloadLocation: String?
+    var shouldOpenPopupOnCompletion: Bool
 
     var _isDownloadLocationValid: (URL) -> Bool
 
@@ -34,15 +36,43 @@ struct DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
     init(
         selectedDownloadLocation: String? = nil,
         alwaysRequestDownloadLocation: Bool = false,
+        shouldOpenPopupOnCompletion: Bool = true,
         defaultDownloadLocation: URL? = FileManager.default.temporaryDirectory,
         lastUsedCustomDownloadLocation: String? = nil,
         isDownloadLocationValid: @escaping (URL) -> Bool = { _ in true }
     ) {
         self.selectedDownloadLocation = selectedDownloadLocation
         self.alwaysRequestDownloadLocation = alwaysRequestDownloadLocation
+        self.shouldOpenPopupOnCompletion = shouldOpenPopupOnCompletion
         self.defaultDownloadLocation = defaultDownloadLocation
         self.lastUsedCustomDownloadLocation = lastUsedCustomDownloadLocation
         self._isDownloadLocationValid = isDownloadLocationValid
+    }
+
+    func values() -> [String: any Equatable] {
+        var result = [String: any Equatable]()
+        for (label, value) in Mirror(reflecting: self).children {
+            guard let label, let value = value as? any Equatable else { continue }
+            result[label] = value
+        }
+        return result
+    }
+}
+extension [String: any Equatable] {
+    func difference(from other: Self) -> Set<String> {
+        func areEqual<T: Equatable>(_ lhs: T, with rhs: any Equatable) -> Bool {
+            guard let rhs = rhs as? T else { return false }
+            return lhs == rhs
+        }
+
+        var result = Set(self.keys).symmetricDifference(other.keys)
+        for (key, lhs) in self {
+            guard let rhs = other[key] else { continue }
+            if !areEqual(lhs, with: rhs) {
+                result.insert(key)
+            }
+        }
+        return result
     }
 }
 
@@ -112,7 +142,7 @@ class DownloadsPreferencesTests: XCTestCase {
 
         preferences.selectedDownloadLocation = invalidDownloadLocationURL
 
-        XCTAssertEqual(preferences.effectiveDownloadLocation, testDirectory)
+        XCTAssertEqual(preferences.effectiveDownloadLocation, DownloadsPreferences.defaultDownloadLocation())
     }
 
     func testWhenGettingSelectedDownloadLocationAndSelectedLocationIsInaccessibleThenDefaultDownloadLocationIsReturned() {
@@ -125,7 +155,95 @@ class DownloadsPreferencesTests: XCTestCase {
         XCTAssertEqual(preferences.effectiveDownloadLocation, DownloadsPreferences.defaultDownloadLocation())
     }
 
-    private func createTemporaryTestDirectory(named name: String = DownloadsPreferencesTests.defaultTestDirectoryName) -> URL {
+    func testShouldOpenPopupOnCompletionSetting() {
+        let persistor1 = DownloadsPreferencesPersistorMock(shouldOpenPopupOnCompletion: true)
+        var preferences = DownloadsPreferences(persistor: persistor1)
+        XCTAssertTrue(preferences.shouldOpenPopupOnCompletion)
+
+        let persistor2 = DownloadsPreferencesPersistorMock(shouldOpenPopupOnCompletion: false)
+        preferences = DownloadsPreferences(persistor: persistor2)
+        XCTAssertFalse(preferences.shouldOpenPopupOnCompletion)
+
+        var eObjectWillChangeCalled = expectation(description: "object will change called 1")
+        let c = preferences.objectWillChange.sink {
+            eObjectWillChangeCalled.fulfill()
+        }
+
+        let valuesWithTrue = persistor1.values()
+        let valuesWithFalse = persistor2.values()
+        XCTAssertEqual(valuesWithTrue.difference(from: valuesWithFalse), ["\(\DownloadsPreferencesPersistorMock.shouldOpenPopupOnCompletion)".pathExtension])
+
+        preferences.shouldOpenPopupOnCompletion = true
+        waitForExpectations(timeout: 0)
+        XCTAssertTrue(preferences.shouldOpenPopupOnCompletion)
+        XCTAssertEqual(persistor2.values().difference(from: valuesWithTrue), [])
+
+        eObjectWillChangeCalled = expectation(description: "object will change called 2")
+        preferences.shouldOpenPopupOnCompletion = false
+        waitForExpectations(timeout: 0)
+        XCTAssertFalse(preferences.shouldOpenPopupOnCompletion)
+        XCTAssertEqual(persistor2.values().difference(from: valuesWithFalse), [])
+        withExtendedLifetime(c) {}
+    }
+
+    func testWhenLastUsedCustomDownloadLocationIsSet_lastDownloadLocationIsReturned() {
+        let testDirectory = createTemporaryTestDirectory()
+        let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil)
+        let preferences = DownloadsPreferences(persistor: persistor)
+
+        let valuesBeforeChange = persistor.values()
+        preferences.lastUsedCustomDownloadLocation = testDirectory
+
+        let valuesAfterChange = persistor.values()
+        XCTAssertEqual(valuesBeforeChange.difference(from: valuesAfterChange), ["\(\DownloadsPreferencesPersistorMock.lastUsedCustomDownloadLocation)".pathExtension])
+        XCTAssertEqual(preferences.lastUsedCustomDownloadLocation, testDirectory)
+    }
+
+    func testWhenLastUsedCustomDownloadLocationIsRemoved_nilIsReturned() {
+        let testDirectory = createTemporaryTestDirectory()
+        let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil)
+        let preferences = DownloadsPreferences(persistor: persistor)
+
+        let valuesBeforeChange = persistor.values()
+        preferences.lastUsedCustomDownloadLocation = testDirectory
+        deleteTemporaryTestDirectory()
+
+        let valuesAfterChange = persistor.values()
+        XCTAssertEqual(valuesBeforeChange.difference(from: valuesAfterChange), ["\(\DownloadsPreferencesPersistorMock.lastUsedCustomDownloadLocation)".pathExtension])
+        XCTAssertNil(preferences.lastUsedCustomDownloadLocation)
+    }
+
+    func testWhenInvalidLastUsedCustomDownloadLocationIsSet_lastUsedCustomLocationIsNil() {
+        let testDirectory = createTemporaryTestDirectory()
+        let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil)
+        let preferences = DownloadsPreferences(persistor: persistor)
+
+        preferences.lastUsedCustomDownloadLocation = testDirectory
+        preferences.lastUsedCustomDownloadLocation = testDirectory.appendingPathComponent("non-existent-dir")
+
+        XCTAssertNil(preferences.lastUsedCustomDownloadLocation)
+    }
+
+    func testWhenLastUsedCustomDownloadLocationIsReset_nilIsReturned() {
+        let testDirectory = createTemporaryTestDirectory()
+        let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil)
+        let preferences = DownloadsPreferences(persistor: persistor)
+
+        let valuesBeforeChange = persistor.values()
+        preferences.lastUsedCustomDownloadLocation = testDirectory
+        preferences.lastUsedCustomDownloadLocation = testDirectory.appendingPathComponent("non-existent-dir")
+        deleteTemporaryTestDirectory()
+
+        let valuesAfterChange = persistor.values()
+        XCTAssertEqual(valuesBeforeChange.difference(from: valuesAfterChange), ["\(\DownloadsPreferencesPersistorMock.lastUsedCustomDownloadLocation)".pathExtension])
+        XCTAssertNil(preferences.lastUsedCustomDownloadLocation)
+    }
+
+}
+
+private extension DownloadsPreferencesTests {
+
+    func createTemporaryTestDirectory(named name: String = DownloadsPreferencesTests.defaultTestDirectoryName) -> URL {
         let baseTemporaryDirectoryURL = FileManager.default.temporaryDirectory
         let testTemporaryDirectoryURL = baseTemporaryDirectoryURL.appendingPathComponent(name)
 
@@ -138,7 +256,7 @@ class DownloadsPreferencesTests: XCTestCase {
         return testTemporaryDirectoryURL
     }
 
-    private func deleteTemporaryTestDirectory(named name: String = DownloadsPreferencesTests.defaultTestDirectoryName) {
+    func deleteTemporaryTestDirectory(named name: String = DownloadsPreferencesTests.defaultTestDirectoryName) {
         let baseTemporaryDirectoryURL = FileManager.default.temporaryDirectory
 
         try? FileManager.default.removeItem(at: baseTemporaryDirectoryURL.appendingPathComponent(name))

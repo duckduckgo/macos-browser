@@ -63,12 +63,4 @@ final class OnboardingViewController: NSViewController {
         }
     }
 
-    override func viewWillDisappear() {
-        NotificationCenter.default.post(name: .onboardingPageLeft, object: self, userInfo: nil)
-    }
-
 }
-
-extension Notification.Name {
-     static let onboardingPageLeft = Notification.Name("onboardingPageLeft")
- }

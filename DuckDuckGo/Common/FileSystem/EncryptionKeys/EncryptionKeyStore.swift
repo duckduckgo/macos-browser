@@ -18,8 +18,9 @@
 
 import Foundation
 import CryptoKit
+import PixelKit
 
-enum EncryptionKeyStoreError: Error, ErrorWithParameters {
+enum EncryptionKeyStoreError: Error, ErrorWithPixelParameters {
     case storageFailed(OSStatus)
     case readFailed(OSStatus)
     case deletionFailed(OSStatus)
@@ -29,15 +30,15 @@ enum EncryptionKeyStoreError: Error, ErrorWithParameters {
     var errorParameters: [String: String] {
         switch self {
         case .storageFailed(let status):
-            return [Pixel.Parameters.keychainErrorCode: "\(status)"]
+            return [PixelKit.Parameters.keychainErrorCode: "\(status)"]
         case .readFailed(let status):
-            return [Pixel.Parameters.keychainErrorCode: "\(status)"]
+            return [PixelKit.Parameters.keychainErrorCode: "\(status)"]
         case .deletionFailed(let status):
-            return [Pixel.Parameters.keychainErrorCode: "\(status)"]
+            return [PixelKit.Parameters.keychainErrorCode: "\(status)"]
         case .cannotTransformDataToString(let status):
-            return [Pixel.Parameters.keychainErrorCode: "\(status)"]
+            return [PixelKit.Parameters.keychainErrorCode: "\(status)"]
         case .cannotTransfrotmStringToBase64Data(let status):
-            return [Pixel.Parameters.keychainErrorCode: "\(status)"]
+            return [PixelKit.Parameters.keychainErrorCode: "\(status)"]
         }
     }
 }

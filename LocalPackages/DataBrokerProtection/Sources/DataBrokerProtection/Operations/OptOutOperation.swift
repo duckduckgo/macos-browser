@@ -31,20 +31,37 @@ final class OptOutOperation: DataBrokerOperation {
     let query: BrokerProfileQueryData
     let emailService: EmailServiceProtocol
     let captchaService: CaptchaServiceProtocol
+    let cookieHandler: CookieHandler
+    let stageCalculator: StageDurationCalculator
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<Void, Error>?
     var extractedProfile: ExtractedProfile?
-    var stageCalculator: DataBrokerProtectionStageDurationCalculator?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
+    let clickAwaitTime: TimeInterval
+    let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    var postLoadingSiteStartTime: Date?
+    let sleepObserver: SleepObserver
+
+    // Captcha is a third-party resource that sometimes takes more time to load
+    // if we are not able to get the captcha information. We will try to run the action again
+    // instead of failing the whole thing.
+    //
+    // https://app.asana.com/0/1203581873609357/1205476538384291/f
+    var retriesCountOnError: Int = 3
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
+         cookieHandler: CookieHandler = BrokerCookieHandler(),
          operationAwaitTime: TimeInterval = 3,
+         clickAwaitTime: TimeInterval = 40,
+         stageCalculator: StageDurationCalculator,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         sleepObserver: SleepObserver,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -53,17 +70,20 @@ final class OptOutOperation: DataBrokerOperation {
         self.emailService = emailService
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
+        self.stageCalculator = stageCalculator
         self.shouldRunNextStep = shouldRunNextStep
+        self.clickAwaitTime = clickAwaitTime
+        self.cookieHandler = cookieHandler
+        self.pixelHandler = pixelHandler
+        self.sleepObserver = sleepObserver
     }
 
     func run(inputValue: ExtractedProfile,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
-             stageCalculator: DataBrokerProtectionStageDurationCalculator,
              showWebView: Bool = false) async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.extractedProfile = inputValue.merge(with: query.profileQuery)
-            self.stageCalculator = stageCalculator
             self.continuation = continuation
 
             Task {
@@ -71,44 +91,41 @@ final class OptOutOperation: DataBrokerOperation {
                                  isFakeBroker: query.dataBroker.isFakeBroker,
                                  showWebView: showWebView)
 
-                do {
-                    if let optOutStep = try query.dataBroker.optOutStep() {
-                        if let actionsHandler = actionsHandler {
-                            self.actionsHandler = actionsHandler
-                        } else {
-                            self.actionsHandler = ActionsHandler(step: optOutStep)
-                        }
-
-                        if self.shouldRunNextStep() {
-                            await executeNextStep()
-                        } else {
-                            failed(with: DataBrokerProtectionError.cancelled)
-                        }
-
+                if let optOutStep = query.dataBroker.optOutStep() {
+                    if let actionsHandler = actionsHandler {
+                        self.actionsHandler = actionsHandler
                     } else {
-                        // If we try to run an optout on a broker without an optout step, we throw.
-                        failed(with: .noOptOutStep)
+                        self.actionsHandler = ActionsHandler(step: optOutStep)
                     }
-                } catch {
-                    failed(with: DataBrokerProtectionError.unknown(error.localizedDescription))
+
+                    if self.shouldRunNextStep() {
+                        await executeNextStep()
+                    } else {
+                        failed(with: DataBrokerProtectionError.cancelled)
+                    }
+
+                } else {
+                    // If we try to run an optout on a broker without an optout step, we throw.
+                    failed(with: DataBrokerProtectionError.noOptOutStep)
                 }
             }
         }
     }
 
-    func extractedProfiles(profiles: [ExtractedProfile]) async {
+    func extractedProfiles(profiles: [ExtractedProfile], meta: [String: Any]?) async {
         // No - op
     }
 
     func executeNextStep() async {
+        retriesCountOnError = 0 // We reset the retries on error when it is successful
         os_log("OPTOUT Waiting %{public}f seconds...", log: .action, operationAwaitTime)
         try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
 
         if let action = actionsHandler?.nextAction(), self.shouldRunNextStep() {
+            stageCalculator.setLastActionId(action.id)
             await runNextAction(action)
         } else {
             await webViewHandler?.finish() // If we executed all steps we release the web view
-            stageCalculator?.fireOptOutValidate()
             complete(())
         }
     }

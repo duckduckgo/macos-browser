@@ -22,14 +22,8 @@ import SecureStorage
 
 final class SecureVaultLoginImporter: LoginImporter {
 
-    private let secureVault: any AutofillSecureVault
-
-    init(secureVault: any AutofillSecureVault) {
-        self.secureVault = secureVault
-    }
-
-    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.CompletedLoginsResult {
-        let vault = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+    func importLogins(_ logins: [ImportedLoginCredential], progressCallback: @escaping (Int) throws -> Void) throws -> DataImport.DataTypeSummary {
+        let vault = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
 
         var successful: [String] = []
         var duplicates: [String] = []
@@ -39,9 +33,9 @@ final class SecureVaultLoginImporter: LoginImporter {
         let hashingSalt = try vault.getHashingSalt()
 
         try vault.inDatabaseTransaction { database in
-            for login in logins {
+            for (idx, login) in logins.enumerated() {
                 let title = login.title
-                let account = SecureVaultModels.WebsiteAccount(title: title, username: login.username, domain: login.url)
+                let account = SecureVaultModels.WebsiteAccount(title: title, username: login.username, domain: login.url, notes: login.notes)
                 let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: login.password.data(using: .utf8)!)
                 let importSummaryValue: String
 
@@ -61,10 +55,12 @@ final class SecureVaultLoginImporter: LoginImporter {
                         failed.append(importSummaryValue)
                     }
                 }
+
+                try progressCallback(idx + 1)
             }
         }
 
-        return .init(successfulImports: successful, duplicateImports: duplicates, failedImports: failed)
+        return .init(successful: successful.count, duplicate: duplicates.count, failed: failed.count)
     }
 
 }

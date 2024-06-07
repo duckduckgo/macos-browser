@@ -16,81 +16,169 @@
 //  limitations under the License.
 //
 
+import Common
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 import SyncUI
+import BrowserServicesKit
+import PixelKit
+import Subscription
+import SubscriptionUI
 
-fileprivate extension Preferences.Const {
-    static let sidebarWidth: CGFloat = 256
-    static let paneContentWidth: CGFloat = 524
-    static let panePaddingHorizontal: CGFloat = 48
-    static let panePaddingVertical: CGFloat = 40
-}
+enum Preferences {
 
-extension Preferences {
+    enum Const {
+        static var sidebarWidth: CGFloat {
+            switch Locale.current.languageCode {
+            case "en":
+                return 310
+            default:
+                return 355
+            }
+        }
+        static let paneContentWidth: CGFloat = 524
+        static let panePaddingHorizontal: CGFloat = 40
+        static let panePaddingVertical: CGFloat = 40
+    }
 
     struct RootView: View {
 
         @ObservedObject var model: PreferencesSidebarModel
 
+        var subscriptionModel: PreferencesSubscriptionModel?
+
+        init(model: PreferencesSidebarModel) {
+            self.model = model
+            self.subscriptionModel = makeSubscriptionViewModel()
+        }
+
         var body: some View {
             HStack(spacing: 0) {
                 Sidebar().environmentObject(model).frame(width: Const.sidebarWidth)
-
                 Color(NSColor.separatorColor).frame(width: 1)
-
                 ScrollView(.vertical) {
                     HStack(spacing: 0) {
-                        VStack(alignment: .leading) {
-
-                            switch model.selectedPane {
-                            case .general:
-                                GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences.shared)
-                            case .sync:
-                                SyncView()
-                            case .appearance:
-                                AppearanceView(model: .shared)
-                            case .privacy:
-                                PrivacyView(model: PrivacyPreferencesModel())
-                            case .autofill:
-                                AutofillView(model: AutofillPreferencesModel())
-                            case .downloads:
-                                DownloadsView(model: DownloadsPreferences())
-                            case .duckPlayer:
-                                DuckPlayerView(model: .shared)
-                            case .about:
-#if NETWORK_PROTECTION
-                                let netPInvitePresenter = NetworkProtectionInvitePresenter()
-                                AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
-#else
-                                AboutView(model: AboutModel())
-#endif
-                            }
-                        }
-                        .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
-                        .padding(.vertical, Const.panePaddingVertical)
-                        .padding(.horizontal, Const.panePaddingHorizontal)
-
+                        contentView
                         Spacer()
                     }
                 }
                 .frame(maxWidth: .infinity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color("InterfaceBackgroundColor"))
+            .background(Color.preferencesBackground)
+        }
+
+        @ViewBuilder
+        var contentView: some View {
+            VStack(alignment: .leading) {
+                switch model.selectedPane {
+                case .defaultBrowser:
+                    DefaultBrowserView(defaultBrowserModel: DefaultBrowserPreferences.shared,
+                                       status: PrivacyProtectionStatus.status(for: .defaultBrowser))
+                case .privateSearch:
+                    PrivateSearchView(model: SearchPreferences.shared)
+                case .webTrackingProtection:
+                    WebTrackingProtectionView(model: WebTrackingProtectionPreferences.shared)
+                case .cookiePopupProtection:
+                    CookiePopupProtectionView(model: CookiePopupProtectionPreferences.shared)
+                case .emailProtection:
+                    EmailProtectionView(emailManager: EmailManager())
+                case .general:
+                    GeneralView(startupModel: StartupPreferences.shared,
+                                downloadsModel: DownloadsPreferences.shared,
+                                searchModel: SearchPreferences.shared,
+                                tabsModel: TabsPreferences.shared,
+                                dataClearingModel: DataClearingPreferences.shared)
+                case .sync:
+                    SyncView()
+                case .appearance:
+                    AppearanceView(model: .shared)
+                case .dataClearing:
+                    DataClearingView(model: DataClearingPreferences.shared)
+                case .vpn:
+                    VPNView(model: VPNPreferencesModel())
+                case .subscription:
+                    SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
+                case .autofill:
+                    AutofillView(model: AutofillPreferencesModel())
+                case .accessibility:
+                    AccessibilityView(model: AccessibilityPreferences.shared)
+                case .duckPlayer:
+                    DuckPlayerView(model: .shared)
+                case .otherPlatforms:
+                    // Opens a new tab
+                    Spacer()
+                case .about:
+                    AboutView(model: AboutModel())
+                }
+            }
+            .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
+            .padding(.vertical, Const.panePaddingVertical)
+            .padding(.horizontal, Const.panePaddingHorizontal)
+        }
+
+        // swiftlint:disable:next cyclomatic_complexity function_body_length
+        private func makeSubscriptionViewModel() -> PreferencesSubscriptionModel {
+            let openURL: (URL) -> Void = { url in
+                DispatchQueue.main.async {
+                    WindowControllersManager.shared.showTab(with: .subscription(url))
+                }
+            }
+
+            let handleUIEvent: (PreferencesSubscriptionModel.UserEvent) -> Void = { event in
+                DispatchQueue.main.async {
+                    switch event {
+                    case .openVPN:
+                        PixelKit.fire(PrivacyProPixel.privacyProVPNSettings)
+                        NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
+                    case .openDB:
+                        PixelKit.fire(PrivacyProPixel.privacyProPersonalInformationRemovalSettings)
+                        WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+                    case .openITR:
+                        PixelKit.fire(PrivacyProPixel.privacyProIdentityRestorationSettings)
+                        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+                    case .iHaveASubscriptionClick:
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseClick)
+                    case .activateAddEmailClick:
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+                    case .postSubscriptionAddEmailClick:
+                        PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .unique)
+                    case .restorePurchaseStoreClick:
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
+                    case .addToAnotherDeviceClick:
+                        PixelKit.fire(PrivacyProPixel.privacyProSettingsAddDevice)
+                    case .addDeviceEnterEmail:
+                        PixelKit.fire(PrivacyProPixel.privacyProAddDeviceEnterEmail)
+                    case .activeSubscriptionSettingsClick:
+                        PixelKit.fire(PrivacyProPixel.privacyProSubscriptionSettings)
+                    case .changePlanOrBillingClick:
+                        PixelKit.fire(PrivacyProPixel.privacyProSubscriptionManagementPlanBilling)
+                    case .removeSubscriptionClick:
+                        PixelKit.fire(PrivacyProPixel.privacyProSubscriptionManagementRemoval)
+                    }
+                }
+            }
+
+            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
+                if #available(macOS 12.0, *) {
+                    Task {
+                        guard let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
+                              let windowControllerManager = WindowControllersManager.shared.lastKeyMainWindowController else {
+                            return
+                        }
+
+                        await SubscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
+                    }
+                }
+            },
+                                                                      openURLHandler: openURL,
+                                                                      uiActionHandler: handleUIEvent)
+
+            return PreferencesSubscriptionModel(openURLHandler: openURL,
+                                                userEventHandler: handleUIEvent,
+                                                sheetActionHandler: sheetActionHandler,
+                                                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         }
     }
-
-}
-
-struct SyncView: View {
-
-    var body: some View {
-        if let syncService = (NSApp.delegate as? AppDelegate)?.syncService {
-            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
-        } else {
-            FailedAssertionView("Failed to initialize Sync Management View")
-        }
-    }
-
 }

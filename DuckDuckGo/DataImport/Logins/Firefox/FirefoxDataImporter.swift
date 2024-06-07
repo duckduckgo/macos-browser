@@ -17,157 +17,147 @@
 //
 
 import Foundation
+import SecureStorage
+import PixelKit
 
-final class FirefoxDataImporter: DataImporter {
-
-    var primaryPassword: String?
+internal class FirefoxDataImporter: DataImporter {
 
     private let loginImporter: LoginImporter
     private let bookmarkImporter: BookmarkImporter
     private let faviconManager: FaviconManagement
+    private let profile: DataImport.BrowserProfile
+    private var source: DataImport.Source {
+        profile.browser.importSource
+    }
 
-    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+    private let primaryPassword: String?
+
+    init(profile: DataImport.BrowserProfile, primaryPassword: String?, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+        self.profile = profile
+        self.primaryPassword = primaryPassword
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
         self.faviconManager = faviconManager
     }
 
-    func importableTypes() -> [DataImport.DataType] {
-        return [.logins, .bookmarks]
+    var importableTypes: [DataImport.DataType] {
+        return [.passwords, .bookmarks]
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
-    func importData(types: [DataImport.DataType],
-                    from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
-        guard let firefoxProfileURL = profile?.profileURL ?? Self.defaultFirefoxProfilePath() else {
-            completion(.failure(.generic(.cannotReadFile)))
-            return
+    func importData(types: Set<DataImport.DataType>) -> DataImportTask {
+        .detachedWithProgress { updateProgress in
+            do {
+                let result = try await self.importDataSync(types: types, updateProgress: updateProgress)
+                return result
+            } catch is CancellationError {
+            } catch {
+                assertionFailure("Only CancellationError should be thrown here")
+            }
+            return [:]
         }
+    }
 
-        var summary = DataImport.Summary()
+    private func importDataSync(types: Set<DataImport.DataType>, updateProgress: @escaping DataImportProgressCallback) async throws -> DataImportSummary {
+        var summary = DataImportSummary()
 
-        if types.contains(.logins) {
-            let loginReader = FirefoxLoginReader(firefoxProfileURL: firefoxProfileURL, primaryPassword: self.primaryPassword)
+        let dataTypeFraction = 1.0 / Double(types.count)
+
+        if types.contains(.passwords) {
+            try updateProgress(.importingPasswords(numberOfPasswords: nil, fraction: 0.0))
+
+            let loginReader = FirefoxLoginReader(firefoxProfileURL: profile.profileURL, primaryPassword: self.primaryPassword)
             let loginResult = loginReader.readLogins(dataFormat: nil)
 
-            switch loginResult {
-            case .success(let logins):
-                do {
-                    summary.loginsResult = .completed(try loginImporter.importLogins(logins))
-                } catch {
-                    completion(.failure(.logins(.cannotAccessSecureVault)))
-                }
-            case .failure(let error):
-                switch error {
-                case .requiresPrimaryPassword: completion(.failure(.logins(.needsLoginPrimaryPassword)))
-                case .databaseAccessFailed: completion(.failure(.logins(DataImportError.ImportErrorType.databaseAccessFailed)))
-                case .couldNotFindProfile: completion(.failure(.logins(.couldNotFindProfile)))
-                case .couldNotGetDecryptionKey: completion(.failure(.logins(.couldNotGetDecryptionKey)))
-                case .couldNotFindLoginsFile: completion(.failure(.logins(.cannotFindFile)))
-                case .couldNotReadLoginsFile: completion(.failure(.logins(.cannotReadFile)))
-                case .decryptionFailed: completion(.failure(.logins(.cannotDecryptFile)))
-                case .failedToTemporarilyCopyFile: completion(.failure(.logins(.failedToTemporarilyCopyFile)))
-                }
+            try updateProgress(.importingPasswords(numberOfPasswords: try? loginResult.get().count, fraction: dataTypeFraction * 0.5))
 
-                return
+            let loginsSummary = try loginResult.flatMap { logins in
+                do {
+                    return try .success(loginImporter.importLogins(logins) { count in
+                        try updateProgress(.importingPasswords(numberOfPasswords: count,
+                                                               fraction: dataTypeFraction * (0.5 + 0.5 * Double(count) / Double(logins.count))))
+                    })
+                } catch is CancellationError {
+                    throw CancellationError()
+                } catch {
+                    return .failure(LoginImporterError(error: error))
+                }
             }
+
+            summary[.passwords] = loginsSummary
+
+            try updateProgress(.importingPasswords(numberOfPasswords: try? loginResult.get().count, fraction: dataTypeFraction * 1.0))
         }
 
-        if types.contains(.bookmarks) {
-            let bookmarkReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: firefoxProfileURL)
+        let passwordsFraction: Double = types.contains(.passwords) ? 0.5 : 0.0
+        if types.contains(.bookmarks)
+            // don‘t proceed with bookmarks import on invalid Primary Password
+            && (summary[.passwords]?.error as? FirefoxLoginReader.ImportError)?.type != .requiresPrimaryPassword {
+
+            try updateProgress(.importingBookmarks(numberOfBookmarks: nil, fraction: passwordsFraction + 0.0))
+
+            let bookmarkReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: profile.profileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
-            importFavicons(from: firefoxProfileURL)
+            try updateProgress(.importingBookmarks(numberOfBookmarks: try? bookmarkResult.get().numberOfBookmarks,
+                                                   fraction: passwordsFraction + dataTypeFraction * 0.5))
 
-            switch bookmarkResult {
-            case .success(let bookmarks):
-                do {
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(.firefox))
-                } catch {
-                    guard let error = error as? FirefoxBookmarksReader.ImportError else {
-                        completion(.failure(.bookmarks(.unexpectedBookmarksDatabaseFormat)))
-                        return
-                    }
-
-                    completion(.failure(.bookmarks(error)))
-                    return
-                }
-            case .failure(let error):
-                completion(.failure(.bookmarks(error)))
-                return
+            let bookmarksSummary = bookmarkResult.map { bookmarks in
+                bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
             }
-        }
 
-        completion(.success(summary))
+            if case .success = bookmarksSummary {
+                await importFavicons()
+            }
+
+            summary[.bookmarks] = bookmarksSummary.map { .init($0) }
+
+            try updateProgress(.importingBookmarks(numberOfBookmarks: try? bookmarkResult.get().numberOfBookmarks,
+                                                   fraction: passwordsFraction + dataTypeFraction * 1.0))
+        }
+        try updateProgress(.done)
+
+        return summary
     }
 
-    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) async -> Result<DataImport.Summary, DataImportError> {
-        return await withCheckedContinuation { continuation in
-            importData(types: types, from: profile) { result in
-                continuation.resume(returning: result)
-            }
-        }
-    }
-
-    private func importFavicons(from firefoxProfileURL: URL) {
-        let faviconsReader = FirefoxFaviconsReader(firefoxDataDirectoryURL: firefoxProfileURL)
+    private func importFavicons() async {
+        let faviconsReader = FirefoxFaviconsReader(firefoxDataDirectoryURL: profile.profileURL)
         let faviconsResult = faviconsReader.readFavicons()
 
         switch faviconsResult {
         case .success(let faviconsByURL):
-            for (pageURLString, fetchedFavicons) in faviconsByURL {
-                if let pageURL = URL(string: pageURLString) {
-                    let favicons = fetchedFavicons.map {
-                        Favicon(identifier: UUID(),
-                                url: pageURL,
-                                image: $0.image,
-                                relation: .icon,
-                                documentUrl: pageURL,
-                                dateCreated: Date())
-                    }
-
-                    faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+            let faviconsByDocument = faviconsByURL.reduce(into: [URL: [Favicon]]()) { result, pair in
+                guard let pageURL = URL(string: pair.key) else { return }
+                let favicons = pair.value.map {
+                    Favicon(identifier: UUID(),
+                            url: pageURL,
+                            image: $0.image,
+                            relation: .icon,
+                            documentUrl: pageURL,
+                            dateCreated: Date())
                 }
+                result[pageURL] = favicons
             }
+            await faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
-        case .failure:
-            Pixel.fire(.faviconImportFailed(source: .firefox))
+        case .failure(let error):
+            PixelKit.fire(GeneralPixel.dataImportFailed(source: source, sourceVersion: profile.installedAppsMajorVersionDescription(), error: error))
         }
     }
 
-    static func loginDatabaseRequiresPrimaryPassword(profileURL: URL?) -> Bool {
-        guard let firefoxProfileURL = profileURL ?? defaultFirefoxProfilePath() else {
-            return false
-        }
+    /// requires primary password?
+    func validateAccess(for selectedDataTypes: Set<DataImport.DataType>) -> [DataImport.DataType: any DataImportError]? {
+        guard selectedDataTypes.contains(.passwords) else { return nil }
 
-        let loginReader = FirefoxLoginReader(firefoxProfileURL: firefoxProfileURL, primaryPassword: nil)
-        let loginResult = loginReader.readLogins(dataFormat: nil)
+        let loginReader = FirefoxLoginReader(firefoxProfileURL: profile.profileURL, primaryPassword: primaryPassword)
+        do {
+            _=try loginReader.getEncryptionKey()
+            return nil
 
-        switch loginResult {
-        case .success: return false
-        case .failure(let failure): return failure == .requiresPrimaryPassword
-        }
-    }
-
-    static func defaultFirefoxProfilePath() -> URL? {
-        guard let potentialProfiles = try? FileManager.default.contentsOfDirectory(atPath: profilesDirectoryURL().path) else {
+        } catch let error as FirefoxLoginReader.ImportError where error.type == .requiresPrimaryPassword {
+            return [.passwords: error]
+        } catch {
             return nil
         }
-
-        // This is the value used by Firefox in production releases. Use it by default, if no profile is selected.
-        let profiles = potentialProfiles.filter { $0.hasSuffix(".default-release") }
-
-        guard let selectedProfile = profiles.first else {
-            return nil
-        }
-
-        return profilesDirectoryURL().appendingPathComponent(selectedProfile)
-    }
-
-    static func profilesDirectoryURL() -> URL {
-        let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        return applicationSupportURL.appendingPathComponent("Firefox/Profiles")
     }
 
 }

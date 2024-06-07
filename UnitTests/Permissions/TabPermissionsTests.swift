@@ -69,7 +69,7 @@ final class TabPermissionsTests: XCTestCase {
 
     @MainActor
     func testWhenExternalAppPermissionRequestedAndGranted_AppIsOpened() async throws {
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self])
         let workspace = WorkspaceMock()
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
 
@@ -77,7 +77,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(urls.url, source: .link)?.result
 
         workspace.appUrl = Bundle.main.bundleURL
 
@@ -105,7 +105,7 @@ final class TabPermissionsTests: XCTestCase {
             }
         }.timeout(1).first().promise()
 
-        tab.setUrl(externalUrl, userEntered: nil)
+        tab.setUrl(externalUrl, source: .link)
 
         let queried = try await authQueryPromise.value
         let resultUrl = try await workspaceOpenCalledPromise.value
@@ -137,7 +137,7 @@ final class TabPermissionsTests: XCTestCase {
             }
         }.timeout(1).first().promise()
 
-        tab.setUrl(externalUrl, userEntered: nil)
+        tab.setUrl(externalUrl, source: .link)
 
         let queried2 = try await authQueryPromise2.value
         let resultUrl2 = try await workspaceOpenCalledPromise2.value
@@ -150,7 +150,7 @@ final class TabPermissionsTests: XCTestCase {
 
     @MainActor
     func testWhenExternalAppPermissionRequestedAndGrantedAndPersisted_AppIsOpened() async throws {
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self])
         let workspace = WorkspaceMock()
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, permissionManager: PermissionManagerMock(), extensionsBuilder: extensionsBuilder)
 
@@ -158,7 +158,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(urls.url, source: .link)?.result
 
         workspace.appUrl = Bundle.main.bundleURL
 
@@ -186,7 +186,7 @@ final class TabPermissionsTests: XCTestCase {
             }
         }.timeout(1).first().promise()
 
-        tab.setUrl(externalUrl, userEntered: nil)
+        tab.setUrl(externalUrl, source: .link)
 
         let queried = try await authQueryPromise.value
         let resultUrl = try await workspaceOpenCalledPromise.value
@@ -212,7 +212,7 @@ final class TabPermissionsTests: XCTestCase {
         }
 
         let externalUrl2 = URL(string: "testextapp://openapp2?arg=2")!
-        tab.setUrl(externalUrl2, userEntered: nil)
+        tab.setUrl(externalUrl2, source: .link)
 
         let resultUrl2 = try await workspaceOpenCalledPromise2.value
         XCTAssertEqual(resultUrl2, externalUrl2)
@@ -222,7 +222,7 @@ final class TabPermissionsTests: XCTestCase {
 
     @MainActor
     func testWhenExternalAppPermissionEnteredByUser_permissionIsQueriedAndAppIsOpened() async throws {
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self])
         let workspace = WorkspaceMock()
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
 
@@ -256,7 +256,7 @@ final class TabPermissionsTests: XCTestCase {
             }
         }.timeout(1).first().promise()
 
-        tab.setUrl(externalUrl, userEntered: externalUrl.absoluteString)
+        tab.setUrl(externalUrl, source: .userEntered(externalUrl.absoluteString))
 
         let queried = try await authQueryPromise.value
         let resultUrl = try await workspaceOpenCalledPromise.value
@@ -269,7 +269,7 @@ final class TabPermissionsTests: XCTestCase {
 
     @MainActor
     func testWhenExternalAppPermissionRejected_AppIsNotOpened() async throws {
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self])
         let workspace = WorkspaceMock()
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
 
@@ -277,7 +277,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(urls.url, source: .link)?.result
 
         workspace.appUrl = Bundle.main.bundleURL
 
@@ -301,7 +301,7 @@ final class TabPermissionsTests: XCTestCase {
             }
         }.timeout(1).first().promise()
 
-        tab.setUrl(externalUrl, userEntered: nil)
+        tab.setUrl(externalUrl, source: .link)
 
         let queried = try await authQueryPromise.value
 
@@ -313,7 +313,7 @@ final class TabPermissionsTests: XCTestCase {
 
     @MainActor
     func testWhenExternalAppNotFound_AppIsNotOpened() async throws {
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self])
         let workspace = WorkspaceMock()
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
 
@@ -321,7 +321,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(urls.url, source: .link)?.result
 
         workspace.appUrl = nil
 
@@ -337,7 +337,7 @@ final class TabPermissionsTests: XCTestCase {
             XCTFail("Unexpected permissions query \(query)")
         }
 
-        let result = await tab.setUrl(externalUrl, userEntered: nil)?.value?.result
+        let result = await tab.setUrl(externalUrl, source: .link)?.result
 
         guard case .failure(let error) = result else {
             XCTFail("unexpected result \(String(describing: result))")
@@ -351,7 +351,7 @@ final class TabPermissionsTests: XCTestCase {
 
     @MainActor
     func testWhenExternalAppNotFoundForUserEnteredUrl_SearchIsDone() async throws {
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self])
         let workspace = WorkspaceMock()
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
 
@@ -359,7 +359,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(urls.url, source: .link)?.result
 
         workspace.appUrl = nil
 
@@ -375,7 +375,7 @@ final class TabPermissionsTests: XCTestCase {
             XCTFail("Unexpected permissions query \(query)")
         }
 
-        let result = await tab.setUrl(externalUrl, userEntered: externalUrl.absoluteString)?.value?.result
+        let result = await tab.setUrl(externalUrl, source: .userEntered(externalUrl.absoluteString))?.result
 
         guard case .failure(let error) = result,
               let error = error as? DidCancelError,
@@ -385,7 +385,7 @@ final class TabPermissionsTests: XCTestCase {
         }
 
         _=await navigation.result
-        XCTAssertEqual(tab.content, .contentFromURL(URL.makeSearchUrl(from: externalUrl.absoluteString), userEntered: nil))
+        XCTAssertEqual(tab.content, .contentFromURL(URL.makeSearchUrl(from: externalUrl.absoluteString), source: .webViewUpdated))
 
         withExtendedLifetime(c) {}
     }
@@ -393,7 +393,7 @@ final class TabPermissionsTests: XCTestCase {
     @MainActor
     func testWhenSessionIsRestored_externalAppIsNotOpened() {
         var eDidCancel: XCTestExpectation!
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self]) { builder in { _, _ in
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self]) { builder in { _, _ in
             builder.add {
                 TestsClosureNavigationResponderTabExtension(.init { _, _ in
                     .next
@@ -414,7 +414,7 @@ final class TabPermissionsTests: XCTestCase {
         eDidCancel = expectation(description: "didCancel external app should be called")
 
         // shouldn‘t open external app when restoring session from interaction state
-        let tab = Tab(content: .url(externalUrl), webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true, shouldLoadFromCache: true)
+        let tab = Tab(content: .url(externalUrl, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         var c = tab.permissions.$authorizationQuery.sink { query in
             guard let query else { return }
@@ -432,10 +432,10 @@ final class TabPermissionsTests: XCTestCase {
             }
             permissionRequest.fulfill()
         }
-        eDidCancel = expectation(description: "didCancel external app should be called")
+        eDidCancel = expectation(description: "external app permission requested")
 
         // but should open auth query on reload
-        tab.reload()
+        tab.setContent(.url(externalUrl, source: .reload))
 
         waitForExpectations(timeout: 2)
 
@@ -454,6 +454,11 @@ final class WorkspaceMock: Workspace {
     var onOpen: ((URL) -> Bool)?
     func open(_ url: URL) -> Bool {
         return onOpen?(url) ?? false
+    }
+
+    var onOpenURLs: (([URL], String?, NSWorkspace.LaunchOptions, NSAppleEventDescriptor?, AutoreleasingUnsafeMutablePointer<NSArray?>?) -> Bool)?
+    func open(_ urls: [URL], withAppBundleIdentifier bundleIdentifier: String?, options: NSWorkspace.LaunchOptions, additionalEventParamDescriptor descriptor: NSAppleEventDescriptor?, launchIdentifiers identifiers: AutoreleasingUnsafeMutablePointer<NSArray?>?) -> Bool {
+        return onOpenURLs?(urls, bundleIdentifier, options, descriptor, identifiers) ?? false
     }
 
 }

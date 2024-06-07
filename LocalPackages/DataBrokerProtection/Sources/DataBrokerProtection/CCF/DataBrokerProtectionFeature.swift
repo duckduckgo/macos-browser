@@ -24,11 +24,11 @@ import Common
 
 protocol CCFCommunicationDelegate: AnyObject {
     func loadURL(url: URL) async
-    func extractedProfiles(profiles: [ExtractedProfile]) async
+    func extractedProfiles(profiles: [ExtractedProfile], meta: [String: Any]?) async
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse) async
     func solveCaptcha(with response: SolveCaptchaResponse) async
     func success(actionId: String, actionType: ActionType) async
-    func onError(error: DataBrokerProtectionError) async
+    func onError(error: Error) async
 }
 
 enum CCFSubscribeActionName: String {
@@ -43,7 +43,7 @@ enum CCFReceivedMethodName: String {
 struct DataBrokerProtectionFeature: Subfeature {
     var messageOriginPolicy: MessageOriginPolicy = .all
     var featureName: String = "brokerProtection"
-    var broker: UserScriptMessageBroker? // This broker is not related to DBP brokers. It's just a name we inherit from Subfeature
+    weak var broker: UserScriptMessageBroker? // This broker is not related to DBP brokers. It's just a name we inherit from Subfeature
 
     weak var delegate: CCFCommunicationDelegate?
 
@@ -77,7 +77,7 @@ struct DataBrokerProtectionFeature: Subfeature {
 
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(CCFResult.self, from: data) else {
-            await delegate?.onError(error: .parsingErrorObjectFailed)
+            await delegate?.onError(error: DataBrokerProtectionError.parsingErrorObjectFailed)
             return
         }
 
@@ -98,10 +98,10 @@ struct DataBrokerProtectionFeature: Subfeature {
             if let url = URL(string: navigate.url) {
                 await delegate?.loadURL(url: url)
             } else {
-                await delegate?.onError(error: .malformedURL)
+                await delegate?.onError(error: DataBrokerProtectionError.malformedURL)
             }
         case .extract(let profiles):
-            await delegate?.extractedProfiles(profiles: profiles)
+            await delegate?.extractedProfiles(profiles: profiles, meta: success.meta)
         case .getCaptchaInfo(let captchaInfo):
             await delegate?.captchaInformation(captchaInfo: captchaInfo)
         case .solveCaptcha(let response):

@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import History
 
 final class VisitViewModel {
 
@@ -42,6 +43,7 @@ final class VisitViewModel {
         title.truncated(length: MainMenu.Constants.maxTitleLength)
     }
 
+    @MainActor(unsafe)
     var smallFaviconImage: NSImage? {
         guard let historyEntry = visit.historyEntry else {
             assertionFailure("History entry already deallocated")

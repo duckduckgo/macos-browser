@@ -79,9 +79,11 @@ extension NSViewController {
         }
     }
 
-    func addAndLayoutChild(_ vc: NSViewController) {
+    func addAndLayoutChild(_ vc: NSViewController, into containerView: NSView? = nil) {
+        assert(containerView == nil || sequence(first: containerView!, next: { $0.superview }).contains(self.view),
+               "\(containerView!) is not a part of \(self) view hierarchy")
         self.addChild(vc)
-        view.addAndLayout(vc.view)
+        (containerView ?? self.view).addAndLayout(vc.view)
     }
 
     func removeCompletely() {

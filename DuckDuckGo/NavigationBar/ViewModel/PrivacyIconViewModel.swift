@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 import PrivacyDashboard
 
@@ -26,7 +27,7 @@ struct PrivacyIconViewModel {
     static func trackerImages(from trackerInfo: TrackerInfo) -> [CGImage] {
         let sortedEntities = sortedEntities(from: trackerInfo).prefix(maxNumberOfIcons)
         var images: [CGImage] = sortedEntities.map {
-            if let logo = logos[$0] {
+            if let logo = logo(for: $0) {
                 return logo
             } else if let letter = letters[$0[$0.startIndex]] {
                 return letter
@@ -74,194 +75,166 @@ struct PrivacyIconViewModel {
 
     // MARK: - Images
 
-    static var shadowTrackerImage: CGImage {
-        if NSApp.effectiveAppearance.name == NSAppearance.Name.aqua {
-            return shadowTrackerImageAqua
-        } else {
-            return shadowTrackerImageDark
-        }
+    static var shadowTrackerImage: CGImage! {
+        {
+            if NSApp.effectiveAppearance.name == .aqua {
+                NSImage.shadowtracker
+            } else {
+                NSImage.shadowtrackerDark
+            }
+        }().cgImage(forProposedRect: nil, context: .current, hints: nil)
     }
 
-    static let shadowTrackerImageAqua = NSImage(named: "shadowtracker")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
-    static let shadowTrackerImageDark = NSImage(named: "shadowtracker_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
-
-    static var blankTrackerImage: CGImage {
-        if NSApp.effectiveAppearance.name == NSAppearance.Name.aqua {
-            return blankTrackerImageAqua
-        } else {
-            return blankTrackerImageDark
-        }
+    static var blankTrackerImage: CGImage! {
+        {
+            if NSApp.effectiveAppearance.name == .aqua {
+                NSImage.blanktracker
+            } else {
+                NSImage.blanktrackerDark
+            }
+        }().cgImage(forProposedRect: nil, context: .current, hints: nil)
     }
-
-    static let blankTrackerImageAqua = NSImage(named: "blanktracker")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
-    static let blankTrackerImageDark = NSImage(named: "blanktracker_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
 
     static var letters: [Character: CGImage] {
-        if NSApp.effectiveAppearance.name == NSAppearance.Name.aqua {
+        if NSApp.effectiveAppearance.name == .aqua {
             return lettersAqua
         } else {
             return lettersDark
         }
     }
 
-    static let lettersAqua: [Character: CGImage] = {
-        return [
-            "a": NSImage(named: "a")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "b": NSImage(named: "b")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "c": NSImage(named: "c")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "d": NSImage(named: "d")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "e": NSImage(named: "e")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "f": NSImage(named: "f")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "g": NSImage(named: "g")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "h": NSImage(named: "h")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "i": NSImage(named: "i")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "j": NSImage(named: "j")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "k": NSImage(named: "k")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "l": NSImage(named: "l")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "m": NSImage(named: "m")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "n": NSImage(named: "n")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "o": NSImage(named: "o")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "p": NSImage(named: "p")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "q": NSImage(named: "q")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "r": NSImage(named: "r")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "s": NSImage(named: "s")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "t": NSImage(named: "t")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "u": NSImage(named: "u")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "v": NSImage(named: "v")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "w": NSImage(named: "w")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "x": NSImage(named: "x")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "y": NSImage(named: "y")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "z": NSImage(named: "z")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
-        ]
+    private static let lettersAqua: [Character: CGImage] = {
+        Character.reduceCharacters(from: "a", to: "z", into: [:]) {
+            $0[$1] = NSImage(named: "\($1)")!.cgImage(forProposedRect: nil, context: .current, hints: nil)
+        }
     }()
 
-    static let lettersDark: [Character: CGImage] = {
-        return [
-            "a": NSImage(named: "a_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "b": NSImage(named: "b_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "c": NSImage(named: "c_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "d": NSImage(named: "d_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "e": NSImage(named: "e_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "f": NSImage(named: "f_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "g": NSImage(named: "g_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "h": NSImage(named: "h_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "i": NSImage(named: "i_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "j": NSImage(named: "j_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "k": NSImage(named: "k_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "l": NSImage(named: "l_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "m": NSImage(named: "m_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "n": NSImage(named: "n_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "o": NSImage(named: "o_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "p": NSImage(named: "p_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "q": NSImage(named: "q_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "r": NSImage(named: "r_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "s": NSImage(named: "s_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "t": NSImage(named: "t_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "u": NSImage(named: "u_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "v": NSImage(named: "v_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "w": NSImage(named: "w_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "x": NSImage(named: "x_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "y": NSImage(named: "y_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "z": NSImage(named: "z_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
-        ]
+    private static let lettersDark: [Character: CGImage] = {
+        Character.reduceCharacters(from: "a", to: "z", into: [:]) {
+            $0[$1] = NSImage(named: "\($1)_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)
+        }
     }()
 
-    static var logos: [String: CGImage] {
-        if NSApp.effectiveAppearance.name == NSAppearance.Name.aqua {
-            return logosAqua
-        } else {
-            return logosDark
+    static func logo(for trackerNetworkName: String) -> CGImage? {
+        guard let trackerNetwork = TrackerNetwork(trackerNetworkName: trackerNetworkName) else { return nil }
+        return {
+            if NSApp.effectiveAppearance.name == .aqua {
+                aquaLogo(for: trackerNetwork)
+            } else {
+                darkLogo(for: trackerNetwork)
+            }
+        }()?.cgImage(forProposedRect: nil, context: .current, hints: nil)
+    }
+
+    // swiftlint:disable cyclomatic_complexity
+    private static func aquaLogo(for trackerNetwork: TrackerNetwork) -> NSImage? {
+        switch trackerNetwork {
+        case .adform:            .adform
+        case .adobe:             .adobe
+        case .amazon:            .amazon
+        case .amobee:            .amobee
+        case .appnexus:          .appnexus
+        case .centro:            .centro
+        case .cloudflare:        .cloudflare
+        case .comscore:          .comscore
+        case .conversant:        .conversant
+        case .criteo:            .criteo
+        case .dataxu:            .dataxu
+        case .facebook:          .facebook
+        case .google:            .google
+        case .hotjar:            .hotjar
+        case .indexexchange:     .indexexchange
+        case .iponweb:           .iponweb
+        case .linkedin:          .linkedin
+        case .lotame:            .lotame
+        case .mediamath:         .mediamath
+        case .microsoft:         .microsoft
+        case .neustar:           .neustar
+        case .newrelic:          .newrelic
+        case .nielsen:           .nielsen
+        case .openx:             .openx
+        case .oracle:            .oracle
+        case .pubmatic:          .pubmatic
+        case .qwantcast:         .qwantcast
+        case .rubicon:           .rubicon
+        case .salesforce:        .salesforce
+        case .smartadserver:     .smartadserver
+        case .spotx:             .spotx
+        case .stackpath:         .stackpath
+        case .taboola:           .taboola
+        case .tapad:             .tapad
+        case .theTradeDesk:      .thetradedesk
+        case .towerdata:         .towerdata
+        case .twitter:           .twitter
+        case .verizonMedia:      .verizonmedia
+        case .windows:           .windows
+        case .xaxis:             .xaxis
         }
     }
 
-    static let logosAqua: [String: CGImage] = {
-        return [
-            "adform": NSImage(named: "adform")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "adobe": NSImage(named: "adobe")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "amazon": NSImage(named: "amazon")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "amobee": NSImage(named: "amobee")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "appnexus": NSImage(named: "appnexus")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "centro": NSImage(named: "centro")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "cloudflare": NSImage(named: "cloudflare")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "comscore": NSImage(named: "comscore")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "conversant": NSImage(named: "conversant")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "criteo": NSImage(named: "criteo")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "dataxu": NSImage(named: "dataxu")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "facebook": NSImage(named: "facebook")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "google": NSImage(named: "google")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "hotjar": NSImage(named: "hotjar")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "indexexchange": NSImage(named: "indexexchange")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "iponweb": NSImage(named: "iponweb")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "linkedin": NSImage(named: "linkedin")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "lotame": NSImage(named: "lotame")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "mediamath": NSImage(named: "mediamath")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "microsoft": NSImage(named: "microsoft")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "neustar": NSImage(named: "neustar")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "newrelic": NSImage(named: "newrelic")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "nielsen": NSImage(named: "nielsen")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "openx": NSImage(named: "openx")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "oracle": NSImage(named: "oracle")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "pubmatic": NSImage(named: "pubmatic")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "qwantcast": NSImage(named: "qwantcast")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "rubicon": NSImage(named: "rubicon")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "salesforce": NSImage(named: "salesforce")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "smartadserver": NSImage(named: "smartadserver")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "spotx": NSImage(named: "spotx")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "stackpath": NSImage(named: "stackpath")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "taboola": NSImage(named: "taboola")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "tapad": NSImage(named: "tapad")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "the trade desk": NSImage(named: "thetradedesk")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "towerdata": NSImage(named: "towerdata")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "twitter": NSImage(named: "twitter")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "verizon media": NSImage(named: "verizonmedia")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "windows": NSImage(named: "windows")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "xaxis": NSImage(named: "xaxis")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
-        ]
-    }()
+    private static func darkLogo(for trackerNetwork: TrackerNetwork) -> NSImage? {
+        switch trackerNetwork {
+        case .adform:            .adformDark
+        case .adobe:             .adobeDark
+        case .amazon:            .amazonDark
+        case .amobee:            .amobeeDark
+        case .appnexus:          .appnexusDark
+        case .centro:            .centroDark
+        case .cloudflare:        .cloudflareDark
+        case .comscore:          .comscoreDark
+        case .conversant:        .conversantDark
+        case .criteo:            .criteoDark
+        case .dataxu:            .dataxuDark
+        case .facebook:          .facebookDark
+        case .google:            .googleDark
+        case .hotjar:            .hotjarDark
+        case .indexexchange:     .indexexchangeDark
+        case .iponweb:           .iponwebDark
+        case .linkedin:          .linkedinDark
+        case .lotame:            .lotameDark
+        case .mediamath:         .mediamathDark
+        case .microsoft:         .microsoftDark
+        case .neustar:           .neustarDark
+        case .newrelic:          .newrelicDark
+        case .nielsen:           .nielsenDark
+        case .openx:             .openxDark
+        case .oracle:            .oracleDark
+        case .pubmatic:          .pubmaticDark
+        case .qwantcast:         .qwantcastDark
+        case .rubicon:           .rubiconDark
+        case .salesforce:        .salesforceDark
+        case .smartadserver:     .smartadserverDark
+        case .spotx:             .spotxDark
+        case .stackpath:         .stackpathDark
+        case .taboola:           .taboolaDark
+        case .tapad:             .tapadDark
+        case .theTradeDesk:      .thetradedeskDark
+        case .towerdata:         .towerdataDark
+        case .twitter:           .twitterDark
+        case .verizonMedia:      .verizonmediaDark
+        case .windows:           .windowsDark
+        case .xaxis:             .xaxisDark
+        }
+    }
+    // swiftlint:enable cyclomatic_complexity
 
-    static let logosDark: [String: CGImage] = {
-        return [
-            "adform": NSImage(named: "adform_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "adobe": NSImage(named: "adobe_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "amazon": NSImage(named: "amazon_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "amobee": NSImage(named: "amobee_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "appnexus": NSImage(named: "appnexus_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "centro": NSImage(named: "centro_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "cloudflare": NSImage(named: "cloudflare_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "comscore": NSImage(named: "comscore_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "conversant": NSImage(named: "conversant_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "criteo": NSImage(named: "criteo_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "dataxu": NSImage(named: "dataxu_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "facebook": NSImage(named: "facebook_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "google": NSImage(named: "google_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "hotjar": NSImage(named: "hotjar_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "indexexchange": NSImage(named: "indexexchange_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "lponweb": NSImage(named: "iponweb_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "linkedin": NSImage(named: "linkedin_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "lotame": NSImage(named: "lotame_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "mediamath": NSImage(named: "mediamath_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "microsoft": NSImage(named: "microsoft_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "neustar": NSImage(named: "neustar_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "newrelic": NSImage(named: "newrelic_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "nielsen": NSImage(named: "nielsen_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "openx": NSImage(named: "openx_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "oracle": NSImage(named: "oracle_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "pubmatic": NSImage(named: "pubmatic_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "qwantcast": NSImage(named: "qwantcast_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "rubicon": NSImage(named: "rubicon_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "salesforce": NSImage(named: "salesforce_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "smartadserver": NSImage(named: "smartadserver_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "spotx": NSImage(named: "spotx_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "stackpath": NSImage(named: "stackpath_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "taboola": NSImage(named: "taboola_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "tapad": NSImage(named: "tapad_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "the trade desk": NSImage(named: "thetradedesk_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "towerdata": NSImage(named: "towerdata_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "twitter": NSImage(named: "twitter_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "verizon media": NSImage(named: "verizonmedia_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "windows": NSImage(named: "windows_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!,
-            "xaxis": NSImage(named: "xaxis_dark")!.cgImage(forProposedRect: nil, context: .current, hints: nil)!
-        ]
-    }()
+}
+
+extension Character {
+
+    @inlinable static func reduceCharacters<Result>(from startCharacter: Character, to endCharacter: Character, into initialResult: Result, _ updateAccumulatingResult: (_ partialResult: inout Result, Character) throws -> Void) rethrows -> Result {
+        assert(startCharacter.unicodeScalars.count == 1)
+        assert(endCharacter.unicodeScalars.count == 1)
+        guard let start = startCharacter.unicodeScalars.first?.value,
+              let end = endCharacter.unicodeScalars.first?.value,
+              start <= end else {
+            assertionFailure("Characters \(startCharacter) and \(endCharacter) do not form sequence")
+            return initialResult
+        }
+
+        return try (start...end).reduce(into: initialResult) { result, char in
+            try updateAccumulatingResult(&result, Character(UnicodeScalar(char)!))
+        }
+    }
 
 }

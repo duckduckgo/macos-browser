@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import XCTest
-import Combine
+
 @testable import DuckDuckGo_Privacy_Browser
 
 final class URLSuggestedFilenameTests: XCTestCase {

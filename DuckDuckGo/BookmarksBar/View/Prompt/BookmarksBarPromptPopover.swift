@@ -57,10 +57,6 @@ extension BookmarksBarPromptPopover: NSPopoverDelegate {
 
 final class BookmarksBarPromptViewController: NSHostingController<BookmarksBarPromptView> {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-
     static func create() -> BookmarksBarPromptViewController {
         let controller = BookmarksBarPromptViewController(rootView: BookmarksBarPromptView())
         controller.rootView.model.delegate = controller
@@ -79,18 +75,17 @@ struct BookmarksBarPromptView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Image("BookmarksBarIllustration")
+            Image(.bookmarksBarIllustration)
                 .resizable()
                 .frame(width: 256, height: 96)
                 .padding(.bottom, 16)
 
             Text(UserText.bookmarksBarPromptTitle)
-                .font(Font.custom("SF Pro Text", size: 15)
-                    .weight(.semibold))
+                .font(.system(size: 15).weight(.semibold))
                 .padding(.bottom, 16)
 
             Text(UserText.bookmarksBarPromptMessage)
-                .font(Font.custom("SF Pro Text", size: 13))
+                .font(.system(size: 13))
                 .padding(.bottom, 20)
 
             HStack {
@@ -98,7 +93,7 @@ struct BookmarksBarPromptView: View {
                     model.rejectBookmarksBar()
                 } label: {
                     Text(UserText.bookmarksBarPromptDismiss)
-                        .font(Font.custom("SF Pro Text", size: 13))
+                        .font(.system(size: 13))
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
                         .frame(height: 28)
@@ -110,7 +105,7 @@ struct BookmarksBarPromptView: View {
                     model.acceptBookmarksBar()
                 } label: {
                     Text(UserText.bookmarksBarPromptAccept)
-                        .font(Font.custom("SF Pro Text", size: 13))
+                        .font(.system(size: 13))
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
                         .frame(height: 28)
@@ -126,7 +121,7 @@ struct BookmarksBarPromptView: View {
         .padding(.top, 20)
         .padding(.bottom, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color("InterfaceBackgroundColor"))
+        .background(Color(.interfaceBackground))
     }
 
 }

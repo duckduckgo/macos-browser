@@ -16,9 +16,11 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import BrowserServicesKit
 import Combine
+import DDGSync
+import SwiftUI
+import Subscription
 
 final class PreferencesSidebarModel: ObservableObject {
 
@@ -26,40 +28,90 @@ final class PreferencesSidebarModel: ObservableObject {
 
     @Published private(set) var sections: [PreferencesSection] = []
     @Published var selectedTabIndex: Int = 0
-    @Published private(set) var selectedPane: PreferencePaneIdentifier = .general
+    @Published private(set) var selectedPane: PreferencePaneIdentifier = .defaultBrowser
+    private let vpnVisibility: NetworkProtectionFeatureVisibility
+
+    var selectedTabContent: AnyPublisher<Tab.TabContent, Never> {
+        $selectedTabIndex.map { [tabSwitcherTabs] in tabSwitcherTabs[$0] }.eraseToAnyPublisher()
+    }
+
+    // MARK: - Initializers
 
     init(
         loadSections: @escaping () -> [PreferencesSection],
         tabSwitcherTabs: [Tab.TabContent],
-        privacyConfigurationManager: PrivacyConfigurationManaging
+        privacyConfigurationManager: PrivacyConfigurationManaging,
+        syncService: DDGSyncing,
+        vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility()
     ) {
         self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs
+        self.vpnVisibility = vpnVisibility
+
         resetTabSelectionIfNeeded()
         refreshSections()
 
-        privacyConfigCancellable = privacyConfigurationManager.updatesPublisher
+        let duckPlayerFeatureFlagDidChange = privacyConfigurationManager.updatesPublisher
             .map { [weak privacyConfigurationManager] in
                 privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .duckPlayer) == true
             }
             .removeDuplicates()
             .asVoid()
+
+        let syncFeatureFlagsDidChange = syncService.featureFlagsPublisher.map { $0.contains(.userInterface) }
+            .removeDuplicates()
+            .asVoid()
+
+        Publishers.Merge(duckPlayerFeatureFlagDidChange, syncFeatureFlagsDidChange)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.refreshSections()
             }
+            .store(in: &cancellables)
+
+        setupVPNPaneVisibility()
     }
 
     @MainActor
     convenience init(
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
-        includeDuckPlayer: Bool
+        syncService: DDGSyncing,
+        vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+        includeDuckPlayer: Bool,
+        userDefaults: UserDefaults = .netP
     ) {
-        self.init(loadSections: { PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer) },
+        let loadSections = {
+            let includingVPN = vpnVisibility.isInstalled
+
+            return PreferencesSection.defaultSections(
+                includingDuckPlayer: includeDuckPlayer,
+                includingSync: syncService.featureFlags.contains(.userInterface),
+                includingVPN: includingVPN
+            )
+        }
+
+        self.init(loadSections: loadSections,
                   tabSwitcherTabs: tabSwitcherTabs,
-                  privacyConfigurationManager: privacyConfigurationManager)
+                  privacyConfigurationManager: privacyConfigurationManager,
+                  syncService: syncService,
+                  vpnVisibility: vpnVisibility)
     }
+
+    // MARK: - Setup
+
+    private func setupVPNPaneVisibility() {
+        vpnVisibility.onboardStatusPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+
+                self.refreshSections()
+            }
+            .store(in: &cancellables)
+    }
+
+    // MARK: - Refreshing logic
 
     func refreshSections() {
         sections = loadSections()
@@ -68,14 +120,23 @@ final class PreferencesSidebarModel: ObservableObject {
         }
     }
 
+    @MainActor
     func selectPane(_ identifier: PreferencePaneIdentifier) {
+        // Open a new tab in case of special panes
+        if identifier.rawValue.hasPrefix(URL.NavigationalScheme.https.rawValue),
+            let url = URL(string: identifier.rawValue) {
+            WindowControllersManager.shared.show(url: url,
+                                                 source: .ui,
+                                                 newTab: true)
+        }
+
         if sections.flatMap(\.panes).contains(identifier), identifier != selectedPane {
             selectedPane = identifier
         }
     }
 
     func resetTabSelectionIfNeeded() {
-        if let preferencesTabIndex = tabSwitcherTabs.firstIndex(of: .anyPreferencePane) {
+        if let preferencesTabIndex = tabSwitcherTabs.firstIndex(of: .anySettingsPane) {
             if preferencesTabIndex != selectedTabIndex {
                 selectedTabIndex = preferencesTabIndex
             }
@@ -83,5 +144,5 @@ final class PreferencesSidebarModel: ObservableObject {
     }
 
     private let loadSections: () -> [PreferencesSection]
-    private var privacyConfigCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 }

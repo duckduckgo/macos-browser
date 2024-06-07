@@ -26,6 +26,8 @@ extension Bundle {
         static let buildNumber = kCFBundleVersionKey as String
         static let versionNumber = "CFBundleShortVersionString"
         static let displayName = "CFBundleDisplayName"
+        static let documentTypes = "CFBundleDocumentTypes"
+        static let typeExtensions = "CFBundleTypeExtensions"
         static let vpnMenuAgentBundleId = "AGENT_BUNDLE_ID"
         static let vpnMenuAgentProductName = "AGENT_PRODUCT_NAME"
 
@@ -33,12 +35,11 @@ extension Bundle {
         static let notificationsAgentBundleId = "NOTIFICATIONS_AGENT_BUNDLE_ID"
         static let notificationsAgentProductName = "NOTIFICATIONS_AGENT_PRODUCT_NAME"
 #endif
-        static let appGroup = "NETP_APP_GROUP"
-    }
 
-    var displayName: String? {
-        object(forInfoDictionaryKey: Keys.displayName) as? String ??
-            object(forInfoDictionaryKey: Keys.name) as? String
+#if DBP
+        static let dbpBackgroundAgentBundleId = "DBP_BACKGROUND_AGENT_BUNDLE_ID"
+        static let dbpBackgroundAgentProductName = "DBP_BACKGROUND_AGENT_PRODUCT_NAME"
+#endif
     }
 
     var versionNumber: String? {
@@ -79,11 +80,66 @@ extension Bundle {
     }
 #endif
 
-    var appGroupName: String {
-        guard let appGroup = object(forInfoDictionaryKey: Keys.appGroup) as? String else {
-            fatalError("Info.plist is missing \(Keys.appGroup)")
+#if DBP
+    var dbpBackgroundAgentBundleId: String {
+        guard let bundleID = object(forInfoDictionaryKey: Keys.dbpBackgroundAgentBundleId) as? String else {
+            fatalError("Info.plist is missing \(Keys.dbpBackgroundAgentBundleId)")
+        }
+        return bundleID
+    }
+
+    var dbpBackgroundAgentURL: URL {
+        guard let productName = object(forInfoDictionaryKey: Keys.dbpBackgroundAgentProductName) as? String else {
+            fatalError("Info.plist is missing \(Keys.dbpBackgroundAgentProductName)")
+        }
+        return loginItemsURL.appendingPathComponent(productName + ".app")
+    }
+#endif
+
+    func appGroup(bundle: BundleGroup) -> String {
+        let appGroupName = bundle.appGroupKey
+        guard let appGroup = object(forInfoDictionaryKey: appGroupName) as? String else {
+            fatalError("Info.plist is missing \(appGroupName)")
         }
         return appGroup
     }
 
+    var isInApplicationsDirectory: Bool {
+        let directoryPaths = NSSearchPathForDirectoriesInDomains(.applicationDirectory, .localDomainMask, true)
+
+        guard let applicationsPath = directoryPaths.first else {
+            // Default to true to be safe. In theory this should always return a valid path and the else branch will never be run, but some app logic
+            // depends on this check in order to allow users to proceed, so we should avoid blocking them in case this assumption is ever wrong.
+            return true
+        }
+
+        let path = self.bundlePath
+        return path.hasPrefix(applicationsPath)
+    }
+
+    var documentTypes: [[String: Any]] {
+        infoDictionary?[Keys.documentTypes] as? [[String: Any]] ?? []
+    }
+
+    var fileTypeExtensions: Set<String> {
+        documentTypes.reduce(into: []) { $0.formUnion($1[Keys.typeExtensions] as? [String] ?? []) }
+    }
+
+}
+
+enum BundleGroup {
+    case netP
+    case dbp
+    case subs
+
+    var appGroupKey: String {
+        switch self {
+        case .dbp:
+            return "DBP_APP_GROUP"
+        case .netP:
+            return "NETP_APP_GROUP"
+        case .subs:
+            return "SUBSCRIPTION_APP_GROUP"
+        }
+    }
 }

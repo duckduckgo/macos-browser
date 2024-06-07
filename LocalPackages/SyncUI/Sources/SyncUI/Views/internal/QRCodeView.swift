@@ -20,8 +20,6 @@ import SwiftUI
 import CoreImage
 
 struct QRCode: View {
-    @Environment(\.colorScheme) var colorScheme
-
     let string: String
     let size: CGSize
 
@@ -40,7 +38,7 @@ struct QRCode: View {
             return NSImage(systemSymbolName: "xmark.circle", accessibilityDescription: nil) ?? NSImage()
         }()
         let data = Data(text.utf8)
-        let qrCodeFilter: CIFilter = CIFilter.init(name: "CIQRCodeGenerator")!
+        let qrCodeFilter: CIFilter = CIFilter(name: "CIQRCodeGenerator")!
         qrCodeFilter.setValue(data, forKey: "inputMessage")
         qrCodeFilter.setValue("H", forKey: "inputCorrectionLevel")
 
@@ -58,8 +56,8 @@ struct QRCode: View {
         }
 
         let colorParameters: [String: Any] = [
-            "inputColor0": CIColor(color: colorScheme == .light ? NSColor.black : NSColor.white)!,
-            "inputColor1": CIColor(color: NSColor.clear)!
+            "inputColor0": CIColor(color: NSColor.black)!,
+            "inputColor1": CIColor(color: NSColor.white)!
         ]
         let coloredImage = outputImage.applyingFilter("CIFalseColor", parameters: colorParameters)
 

@@ -20,13 +20,18 @@ import Foundation
 import BrowserServicesKit
 import Common
 
-enum UserAgent {
+extension UserAgent {
 
     // MARK: - Fallback versions
 
     static let fallbackSafariVersion = "14.1.2"
     static let fallbackWebKitVersion = "605.1.15"
     static let fallbackWebViewDefault = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+
+    static let defaultPolicyConfigKey = "defaultPolicy"
+    static let defaultSitesConfigKey = "defaultSites"
+
+    static let brandPolicy = "brand"
 
     // MARK: - Loaded versions
 
@@ -46,6 +51,8 @@ enum UserAgent {
         return version
     }()
 
+    static let ddgVersion: String = "Ddg/\(safariVersion)"
+
     // MARK: - User Agents
 
     static let safari = "Mozilla/5.0 " +
@@ -59,6 +66,7 @@ enum UserAgent {
         "Safari/537.36"
     static let `default` = UserAgent.safari
     static let webViewDefault = ""
+    static let brandedDefault = "\(Self.default) \(ddgVersion)"
 
     static let localUserAgentConfiguration: KeyValuePairs<RegEx, String> = [
         // use safari when serving up PDFs from duckduckgo directly
@@ -68,30 +76,29 @@ enum UserAgent {
         regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
     ]
 
-    static func duckDuckGoUserAgent(appVersion: String = AppVersion.shared.versionNumber,
-                                    appID: String = AppVersion.shared.identifier,
-                                    systemVersion: String = ProcessInfo.processInfo.operatingSystemVersionString) -> String {
-        return "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))"
-    }
-
     static func `for`(_ url: URL?,
                       privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> String {
         guard let absoluteString = url?.absoluteString else {
             return Self.default
         }
 
-        // 1) Apply remote user agent configuration
-        if privacyConfig.isEnabled(featureKey: .customUserAgent) &&
-            isURLPartOfWebviewDefaultList(url: url, privacyConfig: privacyConfig) {
-            return UserAgent.webViewDefault
-        }
-
-        // 2) Apply local user agent configuration
         if let userAgent = localUserAgentConfiguration.first(where: { (regex, _) in absoluteString.matches(regex) })?.value {
             return userAgent
         }
 
-        return Self.default
+        guard privacyConfig.isEnabled(featureKey: .customUserAgent) else { return Self.default }
+
+        if isURLPartOfWebviewDefaultList(url: url, privacyConfig: privacyConfig) {
+            return UserAgent.webViewDefault
+        } else if isURLPartOfDefaultSitesList(url: url) {
+            return Self.default
+        }
+
+        if isBrandPolicy(forConfig: privacyConfig) {
+            return Self.brandedDefault
+        } else {
+            return Self.default
+        }
     }
 
     // MARK: - Remote user agent configuration
@@ -99,8 +106,8 @@ enum UserAgent {
     static let webviewDefaultKey = "webViewDefault"
     static let domainKey = "domain"
 
-    static func isURLPartOfWebviewDefaultList(url: URL?,
-                                              privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
+    private static func isURLPartOfWebviewDefaultList(url: URL?,
+                                                      privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
         let settings = privacyConfig.settings(for: .customUserAgent)
         let webViewDefaultList = settings[webviewDefaultKey] as? [[String: String]] ?? []
         let domains = webViewDefaultList.map { $0[domainKey] ?? "" }
@@ -108,6 +115,23 @@ enum UserAgent {
         return domains.contains(where: { domain in
             url?.isPart(ofDomain: domain) ?? false
         })
+    }
+
+    private static func isURLPartOfDefaultSitesList(url: URL?, privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
+
+        let uaSettings = privacyConfig.settings(for: .customUserAgent)
+        let defaultSitesObjs = uaSettings[defaultSitesConfigKey] as? [[String: String]] ?? []
+        let domains = defaultSitesObjs.map { $0[domainKey] ?? "" }
+
+        return domains.contains(where: { domain in
+            url?.isPart(ofDomain: domain) ?? false
+        })
+    }
+
+    private static func isBrandPolicy(forConfig config: PrivacyConfiguration) -> Bool {
+        let uaSettings = config.settings(for: .customUserAgent)
+        guard let policy = uaSettings[defaultPolicyConfigKey] as? String else { return false }
+        return policy == brandPolicy
     }
 
 }

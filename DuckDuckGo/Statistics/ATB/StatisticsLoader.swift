@@ -20,6 +20,7 @@ import Common
 import Foundation
 import BrowserServicesKit
 import Networking
+import PixelKit
 
 final class StatisticsLoader {
 
@@ -29,12 +30,18 @@ final class StatisticsLoader {
 
     private let statisticsStore: StatisticsStore
     private let emailManager: EmailManager
+    private let attributionPixelHandler: InstallationAttributionsPixelHandler
     private let parser = AtbParser()
     private var isAppRetentionRequestInProgress = false
 
-    init(statisticsStore: StatisticsStore = LocalStatisticsStore(), emailManager: EmailManager = EmailManager()) {
+    init(
+        statisticsStore: StatisticsStore = LocalStatisticsStore(),
+        emailManager: EmailManager = EmailManager(),
+        attributionPixelHandler: InstallationAttributionsPixelHandler = AppInstallationAttributionPixelHandler()
+    ) {
         self.statisticsStore = statisticsStore
         self.emailManager = emailManager
+        self.attributionPixelHandler = attributionPixelHandler
     }
 
     func refreshRetentionAtb(isSearch: Bool, completion: @escaping Completion = {}) {
@@ -53,12 +60,8 @@ final class StatisticsLoader {
                         completion()
                     }
                 }
-                PixelExperiment.fireDay21To27SerpPixel()
-                PixelExperiment.fireFirstSerpPixel()
-                Pixel.fire(.serp)
-                Task {
-                    await WindowControllersManager.shared.pinnedTabsManager.reportUsage()
-                }
+                PixelKit.fire(GeneralPixel.serp)
+                self.fireDailyOsVersionCounterPixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)
             } else {
@@ -98,6 +101,7 @@ final class StatisticsLoader {
 
             if let data = response?.data, let atb = try? self.parser.convert(fromJsonData: data) {
                 self.requestExti(atb: atb, completion: completion)
+                self.attributionPixelHandler.fireInstallationAttributionPixel()
             } else {
                 completion()
             }
@@ -212,6 +216,18 @@ final class StatisticsLoader {
 
         if let updateVersion = atb.updateVersion {
             statisticsStore.atb = updateVersion
+            statisticsStore.variant = nil
+        }
+    }
+
+    private func fireDailyOsVersionCounterPixel() {
+        // To avoid temporal correlation attacks, add a randomized delay of 0.5-5 seconds
+        let randomDelay = Double.random(in: 0.5...5)
+
+        DispatchQueue.global().asyncAfter(deadline: .now() + randomDelay) {
+            PixelKit.fire(GeneralPixel.dailyOsVersionCounter,
+                          frequency: .legacyDaily,
+                          includeAppVersionParameter: false)
         }
     }
 

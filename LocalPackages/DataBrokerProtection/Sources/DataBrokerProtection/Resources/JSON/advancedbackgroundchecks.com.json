@@ -1,8 +1,9 @@
 {
-  "name": "advancedbackgroundchecks.com",
-  "version": "0.1.0",
+  "name": "AdvancedBackgroundChecks",
+  "url": "advancedbackgroundchecks.com",
+  "version": "0.1.7",
   "parent": "peoplefinders.com",
-  "addedDatetime": 1678078800000,
+  "addedDatetime": 1678060800000,
   "steps": [
     {
       "stepType": "scan",
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "ef8031e6-5e61-4183-b57e-7df156c7129a",
+          "id": "070b6417-8ccd-4111-b5ae-7ae470b0399a",
           "url": "https://www.advancedbackgroundchecks.com/names/${firstName}-${lastName}_${city}-${state}_age_${age}"
         },
         {
           "actionType": "extract",
-          "id": "f3ed744c-6cfc-4a99-b46e-6095587eadfc",
+          "id": "d760163d-4a1f-476a-bc3e-4f3ccedc29f1",
           "selector": ".card-block",
           "profile": {
             "name": {
@@ -23,8 +24,9 @@
               "beforeText": "Age"
             },
             "alternativeNamesList": {
-              "selector": "(.//p[@class='card-text max-lines-1'])[1]",
-              "afterText": "AKA:"
+              "selector": ".//p[contains(@class, 'card-text') and strong[contains(text(), 'AKA')]]",
+              "afterText": "AKA:",
+              "separator": ","
             },
             "age": {
               "selector": ".card-title",
@@ -38,11 +40,14 @@
               "selector": "(.//p[@class='card-text'])[1]"
             },
             "relativesList": {
-              "selector": "(.//p[@class='card-text max-lines-1'])[2]",
-              "afterText": "Related to:"
+              "selector": ".//p[contains(@class, 'card-text') and strong[contains(text(), 'Related to')]]",
+              "afterText": "Related to:",
+              "separator": ","
             },
             "profileUrl": {
-              "selector": ".link-to-details"
+              "selector": ".link-to-details",
+              "identifierType": "path",
+              "identifier": "https://www.advancedbackgroundchecks.com/${id}"
             }
           }
         }

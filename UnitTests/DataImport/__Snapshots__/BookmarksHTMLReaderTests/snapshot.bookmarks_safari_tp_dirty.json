@@ -1,0 +1,105 @@
+{
+  "roots" : {
+    "bookmark_bar" : {
+      "children" : [
+        {
+          "name" : "Apple",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.apple.com\/"
+        },
+        {
+          "name" : "Yahoo",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.icloud.com\/'%3EiCloud%3C\/A%3E%3CD%3E%3CA%20HREF="
+        },
+        {
+          "name" : "Google",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.bing.com\/'%3EBing%3C\/A%3E%3CDT%3E%3CA%20HREF="
+        },
+        {
+          "name" : "Wikipedia",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.wikipedia.org\/"
+        },
+        {
+          "name" : "Facebook",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.facebook.com\/"
+        },
+        {
+          "name" : "Twitter",
+          "type" : "bookmark",
+          "url" : "https:\/\/twitter.com\/"
+        },
+        {
+          "name" : "LinkedIn",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.linkedin.com\/"
+        },
+        {
+          "name" : "The Weather Channel",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.weather.com\/"
+        },
+        {
+          "name" : "Yelp",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.yelp.com\/"
+        },
+        {
+          "name" : "",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.tripadvisor.com\/"
+        },
+        {
+          "name" : "catz - Google Search",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.google.com\/search?q=catz&client=safari&sca_esv=570874343&rls=en&tbm=isch&source=1nms&sa=X&ved=2ahUKEwiQ60DeoN6BAxXJOhAIHbYCD2gQ_AUoAXoECAEQAw&biw=1324&bih=888"
+        },
+        {
+          "name" : "dogz - Google Search",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.google.com\/search?client=safari&rls=en&q=dogz&ie=UTF-8&oe=UTF-8"
+        },
+        {
+          "name" : "ab yrvalg - Google Search",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.google.com\/search?client=safari&rls=en&q=abyrvalg&ie=UTF-8&oe=UTF-8"
+        }
+      ],
+      "name" : "Favorites",
+      "type" : "folder"
+    },
+    "other" : {
+      "children" : [
+        {
+          "children" : [
+
+          ],
+          "name" : "Bookmarks Menu",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "name" : "abyrvalg - Google Search",
+                  "type" : "bookmark",
+                  "url" : "https:\/\/www.google.com\/search?client=safari&rls=en&q=abyrvalg&ie=UTF-8&oe=UTF-8"
+                }
+              ],
+              "name" : "Tab Group Favorites",
+              "type" : "folder"
+            }
+          ],
+          "name" : "Tab Group Favorites",
+          "type" : "folder"
+        }
+      ],
+      "name" : "Other bookmarks",
+      "type" : "folder"
+    }
+  }
+}

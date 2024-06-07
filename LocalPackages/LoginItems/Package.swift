@@ -5,16 +5,23 @@ import PackageDescription
 
 let package = Package(
     name: "LoginItems",
-    platforms: [ .macOS(.v10_15) ],
+    platforms: [ .macOS("11.4") ],
     products: [
         .library(
             name: "LoginItems",
-            targets: ["LoginItems"]),
+            targets: ["LoginItems"]
+        ),
     ],
-    dependencies: [],
+    dependencies: [
+    ],
     targets: [
         .target(
             name: "LoginItems",
-            dependencies: []),
+            dependencies: [
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ]
+        ),
     ]
 )

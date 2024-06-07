@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Common
 import Foundation
 import Persistence
+import PixelKit
 
 protocol PrivacyFeaturesProtocol {
     var contentBlocking: AnyContentBlocking { get }
@@ -42,15 +43,32 @@ final class AppPrivacyFeatures: PrivacyFeaturesProtocol {
     let httpsUpgrade: HTTPSUpgrade
 
     private static let httpsUpgradeDebugEvents = EventMapping<AppHTTPSUpgradeStore.ErrorEvents> { event, error, parameters, onComplete in
-        let domainEvent: Pixel.Event.Debug
+        let domainEvent: GeneralPixel
+        let dailyAndCount: Bool
+
         switch event {
         case .dbSaveBloomFilterError:
-            domainEvent = .dbSaveBloomFilterError
+            domainEvent = GeneralPixel.dbSaveBloomFilterError(error: error)
+            dailyAndCount = true
         case .dbSaveExcludedHTTPSDomainsError:
-            domainEvent = .dbSaveExcludedHTTPSDomainsError
+            domainEvent = GeneralPixel.dbSaveExcludedHTTPSDomainsError(error: error)
+            dailyAndCount = false
         }
 
-        Pixel.fire(.debug(event: domainEvent, error: error), withAdditionalParameters: parameters, onComplete: onComplete)
+        if dailyAndCount {
+            PixelKit.fire(DebugEvent(domainEvent, error: error),
+                          frequency: .dailyAndCount,
+                          withAdditionalParameters: parameters ?? [:],
+                          includeAppVersionParameter: true) { _, error in
+                onComplete(error)
+            }
+        } else {
+            PixelKit.fire(DebugEvent(domainEvent, error: error),
+                          frequency: .dailyAndCount,
+                          withAdditionalParameters: parameters ?? [:]) { _, error in
+                onComplete(error)
+            }
+        }
     }
     private static var embeddedBloomFilterResources: EmbeddedBloomFilterResources {
         EmbeddedBloomFilterResources(bloomSpecification: Bundle.main.url(forResource: "httpsMobileV2BloomSpec", withExtension: "json")!,

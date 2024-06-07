@@ -20,16 +20,19 @@ import Foundation
 import Combine
 
 public protocol ManagementDialogModelDelegate: AnyObject {
-    func turnOnSync()
-    func dontSyncAnotherDeviceNow()
-    func recoverDevice(using recoveryCode: String)
-    func presentSyncAnotherDeviceDialog()
-    func confirmSetupComplete()
-    func saveRecoveryPDF()
+    func recoverDevice(recoveryCode: String, fromRecoveryScreen: Bool)
     func turnOffSync()
     func updateDeviceName(_ name: String)
     func removeDevice(_ device: SyncDevice)
     func deleteAccount()
+    func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool)
+    func saveRecoveryPDF()
+    func recoveryCodeNextPressed()
+    func turnOnSync()
+    func recoveryCodePasted(_ code: String)
+    func enterRecoveryCodePressed()
+    func copyCode()
+    func openSystemPasswordSettings()
 }
 
 public final class ManagementDialogModel: ObservableObject {
@@ -38,12 +41,12 @@ public final class ManagementDialogModel: ObservableObject {
     public var codeToDisplay: String?
 
     @Published public var shouldShowErrorMessage: Bool = false
-    @Published public var errorMessage: String?
+    @Published public var syncErrorMessage: SyncErrorMessage?
 
     public weak var delegate: ManagementDialogModelDelegate?
 
     public init() {
-        shouldShowErrorMessageCancellable = $errorMessage
+        shouldShowErrorMessageCancellable = $syncErrorMessage
             .map { $0 != nil }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] hasError in
@@ -52,6 +55,8 @@ public final class ManagementDialogModel: ObservableObject {
     }
 
     public func endFlow() {
+        syncErrorMessage?.type.onButtonPressed(delegate: delegate)
+        syncErrorMessage = nil
         currentDialog = nil
     }
 

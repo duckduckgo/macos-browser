@@ -1,5 +1,5 @@
 //
-//  DataImportProvider.swift
+//  DataImportStatusProviding.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,6 +19,7 @@
 import Foundation
 import Bookmarks
 import BrowserServicesKit
+import PixelKit
 
 protocol DataImportStatusProviding {
     var didImport: Bool { get }
@@ -30,7 +31,7 @@ final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding
     let secureVault: (any AutofillSecureVault)?
     let bookmarkManager: BookmarkManager
 
-    init(secureVault: (any AutofillSecureVault)? = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared),
+    init(secureVault: (any AutofillSecureVault)? = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared),
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.secureVault = secureVault
         self.bookmarkManager = bookmarkManager
@@ -47,8 +48,10 @@ final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding
         }
         return successfulImportHappened!
     }
+
+    @MainActor
     func showImportWindow(completion: (() -> Void)?) {
-        DataImportViewController.show(completion: completion)
+        DataImportView().show(completion: completion)
     }
 
     // It only cover the case in which the user has imported bookmar AFTER already having some bookmarks
@@ -78,7 +81,7 @@ final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding
             let identitiesDates = try secureVault.identities().map(\.created)
             dates.append(contentsOf: identitiesDates)
         } catch {
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
         guard dates.count >= 2 else {
             return false

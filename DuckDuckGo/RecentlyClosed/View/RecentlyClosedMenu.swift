@@ -64,24 +64,22 @@ private extension NSMenuItem {
         self.init()
 
         switch recentlyClosedTab.tabContent {
-#if DBP
         case .dataBrokerProtection:
             image = TabViewModel.Favicon.dataBrokerProtection
             title = UserText.tabDataBrokerProtectionTitle
-#endif
-        case .homePage:
+        case .newtab:
             image = TabViewModel.Favicon.home
             title = UserText.tabHomeTitle
-        case .preferences:
-            image = TabViewModel.Favicon.preferences
+        case .settings:
+            image = TabViewModel.Favicon.settings
             title = UserText.tabPreferencesTitle
         case .bookmarks:
-            image = TabViewModel.Favicon.preferences
+            image = TabViewModel.Favicon.bookmarks
             title = UserText.tabPreferencesTitle
-        case .url:
+        case .url, .subscription, .identityTheftRestoration:
             image = recentlyClosedTab.favicon
             image?.size = NSSize.faviconSize
-            title = recentlyClosedTab.title ?? recentlyClosedTab.tabContent.url?.absoluteString ?? ""
+            title = recentlyClosedTab.title ?? recentlyClosedTab.tabContent.userEditableUrl?.absoluteString ?? ""
 
             if title.count > MainMenu.Constants.maxTitleLength {
                 title = String(title.truncated(length: MainMenu.Constants.maxTitleLength))
@@ -102,18 +100,7 @@ private extension NSMenuItem {
                 return nil
             }
 
-            if recentlyClosedWindow.tabs.count > 1 {
-                let moreCount = recentlyClosedWindow.tabs.count - 1
-                let titleSuffix: String
-                if moreCount == 1 {
-                    titleSuffix = UserText.recentlyClosedMenuItemSuffixOne
-                } else {
-                    titleSuffix = String(format: UserText.recentlyClosedMenuItemSuffixMultiple, moreCount)
-                }
-
-                item.title = item.title.truncated(length: MainMenu.Constants.maxTitleLength - titleSuffix.count)
-                item.title += titleSuffix
-            }
+            item.title = String(format: UserText.recentlyClosedWindowMenuItem, recentlyClosedWindow.tabs.count)
             item.representedObject = recentlyClosedWindow
             return item
         }

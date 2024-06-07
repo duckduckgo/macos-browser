@@ -20,6 +20,7 @@ import Combine
 import Common
 import PrivacyDashboard
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -38,16 +39,17 @@ class AutoconsentIntegrationTests: XCTestCase {
     @MainActor
     override func setUp() {
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
-        window = WindowsManager.openNewWindow(with: .none)!
+        window = WindowsManager.openNewWindow(with: Tab(content: .none))
     }
 
-    override func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window.close()
         window = nil
 
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests
@@ -55,9 +57,8 @@ class AutoconsentIntegrationTests: XCTestCase {
     @MainActor
     func testWhenAutoconsentEnabled_cookieConsentManaged() async throws {
         // enable the feature
-        PrivacySecurityPreferences.shared.autoconsentEnabled = true
-        let url = URL(string: "http://privacy-test-pages.glitch.me/features/autoconsent/")!
-
+        CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
+        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/")!
         let tab = self.tabViewModel.tab
 
         // expect cookieConsentManaged to be published
@@ -73,48 +74,17 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, source: .link)?.result
 
         let cookieConsentManaged = try await cookieConsentManagedPromise.value
         XCTAssertTrue(cookieConsentManaged)
     }
 
     @MainActor
-    func testWhenAutoconsentDisabled_promptIsDisplayed() async throws {
-        // reset the feature setting
-        PrivacySecurityPreferences.shared.autoconsentEnabled = nil
-        let url = URL(string: "http://privacy-test-pages.glitch.me/features/autoconsent/")!
-
-        let tab = self.tabViewModel.tab
-
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
-
-        // expect cookieConsent request to be published
-        let cookieConsentPromptRequestPromise = tab.cookieConsentPromptRequestPublisher
-            .compactMap { $0 != nil ? true : nil }
-            .timeout(5)
-            .first()
-            .promise()
-
-        let cookieConsentPromptRequestPublished = try await cookieConsentPromptRequestPromise.value
-        XCTAssertTrue(cookieConsentPromptRequestPublished)
-        XCTAssertTrue(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
-
-        // expect cookieConsent popover to be hidden when opening a new tab
-        mainViewController.browserTabViewController.openNewTab(with: .none)
-        XCTAssertFalse(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
-
-        // switch back: popover should be reopen
-        mainViewController.tabCollectionViewModel.select(at: .unpinned(0))
-        XCTAssertTrue(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
-    }
-
-    @MainActor
     func testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden() async throws {
         // enable the feature
-        PrivacySecurityPreferences.shared.autoconsentEnabled = true
-        let url = URL(string: "http://privacy-test-pages.glitch.me/features/autoconsent/banner.html")!
-
+        CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
+        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/banner.html")!
         let tab = self.tabViewModel.tab
         // expect `cosmetic` to be published
         let cookieConsentManagedPromise = tab.privacyInfoPublisher
@@ -130,7 +100,7 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, source: .link)?.result
 
         do {
             let cookieConsentManaged = try await cookieConsentManagedPromise.value
@@ -163,9 +133,8 @@ class AutoconsentIntegrationTests: XCTestCase {
     @MainActor
     func testCosmeticRule_whenFakeCookieBannerIsDisplayedAndScriptsAreReloaded_bannerIsHidden() async throws {
         // enable the feature
-        PrivacySecurityPreferences.shared.autoconsentEnabled = true
-        let url = URL(string: "http://privacy-test-pages.glitch.me/features/autoconsent/banner.html")!
-
+        CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
+        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/banner.html")!
         let tab = self.tabViewModel.tab
         // expect `cosmetic` to be published
         let cookieConsentManagedPromise = tab.privacyInfoPublisher
@@ -181,15 +150,15 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        os_log("starting navigation to http://privacy-test-pages.glitch.me/features/autoconsent/banner.html")
-        let navigation = await tab.setUrl(url, userEntered: nil)?.value
+        os_log("starting navigation to http://privacy-test-pages.site/features/autoconsent/banner.html")
+        let navigation = tab.setUrl(url, source: .link)
 
         navigation?.appendResponder(navigationResponse: { response in
             os_log("navigationResponse: %s", "\(String(describing: response))")
 
             // cause UserScripts reload (ContentBlockingUpdating)
-            PrivacySecurityPreferences.shared.gpcEnabled = true
-            PrivacySecurityPreferences.shared.gpcEnabled = false
+            WebTrackingProtectionPreferences.shared.isGPCEnabled = true
+            WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
             return .allow
         })

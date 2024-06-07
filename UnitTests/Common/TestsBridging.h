@@ -19,3 +19,4 @@
 #import "Bridging.h"
 
 #import "DownloadsWebViewMock.h"
+#import "WKURLSchemeTask+Private.h"

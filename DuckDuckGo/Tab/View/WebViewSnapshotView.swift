@@ -57,18 +57,13 @@ final class WebViewSnapshotView: NSView {
         }
     }
 
-    override func viewWillMove(toSuperview newSuperview: NSView?) {
-        super.viewWillMove(toSuperview: newSuperview)
-
-    }
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     private func updateDimColor() {
         NSAppearance.withAppAppearance {
-            dimmingView.layer?.backgroundColor = NSColor(named: "WindowBackgroundColor")?.withAlphaComponent(1.0).cgColor
+            dimmingView.layer?.backgroundColor = NSColor.windowBackground.withAlphaComponent(1.0).cgColor
         }
     }
 }

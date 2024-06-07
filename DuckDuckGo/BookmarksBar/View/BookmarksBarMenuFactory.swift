@@ -20,16 +20,10 @@ import Foundation
 
 struct BookmarksBarMenuFactory {
 
-    static func replace(_ menuItem: NSMenuItem?, _ prefs: AppearancePreferences = .shared) -> NSMenuItem? {
-        assert(menuItem != nil)
-        guard let menuItem, let menu = menuItem.menu else {
-            return nil
-        }
-
+    static func replace(_ menuItem: NSMenuItem, _ prefs: AppearancePreferences = .shared) -> NSMenuItem? {
+        guard let menu = menuItem.menu else { return nil }
         let index = menu.index(of: menuItem)
-        guard index >= 0 else {
-            return nil
-        }
+        guard index >= 0 else { return nil }
 
         let item = makeMenuItem(prefs)
         menu.replaceItem(at: index, with: item)
@@ -40,18 +34,25 @@ struct BookmarksBarMenuFactory {
         menu.addItem(makeMenuItem(prefs))
     }
 
+    static func addToMenuWithManageBookmarksSection(_ menu: NSMenu, target: AnyObject, addFolderSelector: Selector, manageBookmarksSelector: Selector, prefs: AppearancePreferences = .shared) {
+        addToMenu(menu, prefs)
+        menu.addItem(.separator())
+        menu.addItem(NSMenuItem(title: UserText.addFolder, action: addFolderSelector, target: target))
+        menu.addItem(NSMenuItem(title: UserText.bookmarksManageBookmarks, action: manageBookmarksSelector, target: target))
+    }
+
     private static func makeMenuItem( _ prefs: AppearancePreferences) -> NSMenuItem {
         let item = NSMenuItem(title: UserText.showBookmarksBar, action: nil, keyEquivalent: "B")
         item.submenu = NSMenu(items: [
-            BlockMenuItem(title: UserText.showBookmarksBarAlways, isChecked: prefs.showBookmarksBar && prefs.bookmarksBarAppearance == .alwaysOn) {
+            BlockMenuItem(title: UserText.mainMenuBookmarksShowBookmarksBarAlways, isChecked: prefs.showBookmarksBar && prefs.bookmarksBarAppearance == .alwaysOn) {
                 prefs.bookmarksBarAppearance = .alwaysOn
                 prefs.showBookmarksBar = true
             },
-            BlockMenuItem(title: UserText.showBookmarksBarNewTabOnly, isChecked: prefs.showBookmarksBar && prefs.bookmarksBarAppearance == .newTabOnly) {
+            BlockMenuItem(title: UserText.mainMenuBookmarksShowBookmarksBarNewTabOnly, isChecked: prefs.showBookmarksBar && prefs.bookmarksBarAppearance == .newTabOnly) {
                 prefs.bookmarksBarAppearance = .newTabOnly
                 prefs.showBookmarksBar = true
             },
-            BlockMenuItem(title: UserText.showBookmarksBarNever, isChecked: !prefs.showBookmarksBar) {
+            BlockMenuItem(title: UserText.mainMenuBookmarksShowBookmarksBarNever, isChecked: !prefs.showBookmarksBar) {
                 prefs.showBookmarksBar = false
             }
         ])

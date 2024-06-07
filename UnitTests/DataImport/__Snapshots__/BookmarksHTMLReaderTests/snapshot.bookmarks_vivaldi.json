@@ -1,0 +1,136 @@
+{
+  "roots" : {
+    "bookmark_bar" : {
+      "children" : [
+        {
+          "children" : [
+            {
+              "name" : "Vivaldi Social",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/sd-social"
+            },
+            {
+              "name" : "Vivaldi Community",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/sd-community"
+            },
+            {
+              "name" : "Booking.com",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/bookingcom-en-us"
+            },
+            {
+              "name" : "Amazon",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/amazon"
+            },
+            {
+              "name" : "eBay",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/ebay-en-us"
+            },
+            {
+              "name" : "AliExpress",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/aliexpresscom-us"
+            },
+            {
+              "name" : "Eneba",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/eneba-en"
+            },
+            {
+              "name" : "AccuWeather",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/sd-accuweather"
+            },
+            {
+              "name" : "Vivaldia Games",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/vivaldia-game"
+            }
+          ],
+          "name" : "Speed Dial",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "name" : "Vivaldi Features",
+                  "type" : "bookmark",
+                  "url" : "https:\/\/vivaldi.com\/bk\/sd-browser-features"
+                },
+                {
+                  "name" : "Vivaldi Webmail",
+                  "type" : "bookmark",
+                  "url" : "https:\/\/vivaldi.com\/bk\/sd-webmail"
+                },
+                {
+                  "name" : "Vivaldi Help",
+                  "type" : "bookmark",
+                  "url" : "https:\/\/vivaldi.com\/bk\/sd-vivaldi-help-en"
+                }
+              ],
+              "name" : "Vivaldi",
+              "type" : "folder"
+            },
+            {
+              "name" : "Booking.com",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/booking-us-bk"
+            },
+            {
+              "name" : "Kayak",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/kayak-en-us"
+            },
+            {
+              "name" : "AliExpress",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/ali-us-bk"
+            },
+            {
+              "name" : "Amazon",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/amazon-us-bk"
+            },
+            {
+              "name" : "eBay",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/ebay-us-bk"
+            },
+            {
+              "name" : "Expedia",
+              "type" : "bookmark",
+              "url" : "https:\/\/vivaldi.com\/bk\/expedia-eu"
+            }
+          ],
+          "name" : "Bookmarks",
+          "type" : "folder"
+        },
+        {
+          "name" : "Get Firefox for desktop — Mozilla (US)",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.mozilla.org\/en-US\/firefox\/new\/?redirect_source=firefox-com"
+        }
+      ],
+      "name" : "Bookmarks",
+      "type" : "folder"
+    },
+    "other" : {
+      "children" : [
+        {
+          "children" : [
+
+          ],
+          "name" : "Trash",
+          "type" : "folder"
+        }
+      ],
+      "name" : "Other bookmarks",
+      "type" : "folder"
+    }
+  }
+}

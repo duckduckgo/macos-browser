@@ -1,5 +1,5 @@
 //
-//  TabUIDelegate.swift
+//  Tab+UIDelegate.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -17,10 +17,12 @@
 //
 
 import Combine
+import Common
 import Foundation
 import Navigation
 import UniformTypeIdentifiers
 import WebKit
+import PDFKit
 
 extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
@@ -34,22 +36,27 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         self.value(forKey: Tab.objcNewWindowPolicyDecisionMakersKeyPath) as? [NewWindowPolicyDecisionMaker]
     }
 
+    @MainActor private static var expectedSaveDataToFileCallback: (@MainActor (URL?) -> Void)?
+    @MainActor
+    private static func consumeExpectedSaveDataToFileCallback() -> (@MainActor (URL?) -> Void)? {
+        defer {
+            expectedSaveDataToFileCallback = nil
+        }
+        return expectedSaveDataToFileCallback
+    }
+
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
     func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
-        let prefs = DownloadsPreferences()
-        if !prefs.alwaysRequestDownloadLocation,
-           let location = prefs.effectiveDownloadLocation {
-            let url = location.appendingPathComponent(suggestedFilename)
-            try? data.writeFileWithProgress(to: url)
-            return
+        Task {
+            var result: URL?
+            do {
+                result = try await saveDownloadedData(data, suggestedFilename: suggestedFilename, mimeType: mimeType, originatingURL: originatingURL)
+            } catch {
+                assertionFailure("Save web content failed with \(error)")
+            }
+            // when print function saves a PDF setting the callback, return the saved temporary file to it
+            await Self.consumeExpectedSaveDataToFileCallback()?(result)
         }
-
-        let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
-        let dialog = UserDialogType.savePanel(.init(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { result in
-            guard let url = (try? result.get())?.url else { return }
-            try? data.writeFileWithProgress(to: url)
-        })
-        userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
     }
 
     @MainActor
@@ -78,11 +85,12 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                                             windowFeatures: WKWindowFeatures,
                                             completionHandler: @escaping (WKWebView?) -> Void) {
 
-        switch newWindowPolicy(for: navigationAction) {
+        switch newWindowPolicy(for: navigationAction)?.preferringTabsToWindows(tabsPreferences.preferNewTabsToWindows) {
         // popup kind is known, action doesn‘t require Popup Permission
         case .allow(let targetKind):
             // proceed to web view creation
-            completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
+            completionHandler(self.createWebView(from: webView, with: configuration,
+                                                 for: navigationAction, of: targetKind.preferringSelectedTabs(tabsPreferences.switchToNewTabWhenOpened)))
             return
         case .cancel:
             // navigation action was handled before and cancelled
@@ -92,9 +100,10 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             break
         }
 
-        let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
+        let shouldSelectNewTab = !NSApp.isCommandPressed || tabsPreferences.switchToNewTabWhenOpened // this is actually not correct, to be fixed later
         // try to guess popup kind from provided windowFeatures
         let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isBurner: burnerMode.isBurner)
+            .preferringTabsToWindows(tabsPreferences.preferNewTabsToWindows)
 
         // action doesn‘t require Popup Permission as it‘s user-initiated
         // TO BE FIXED: this also opens a new window when a popup ad is shown on click simultaneously with the main frame navigation:
@@ -147,10 +156,13 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     @MainActor
     private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
         guard let delegate else { return nil }
+        // disable opening 'javascript:' links in new tab
+        guard navigationAction.request.url?.navigationalScheme != .javascript else { return nil }
 
         let tab = Tab(content: .none,
                       webViewConfiguration: configuration,
                       parentTab: self,
+                      securityOrigin: navigationAction.safeSourceFrame.map { SecurityOrigin($0.securityOrigin) },
                       burnerMode: burnerMode,
                       canBeClosedWithBack: kind.isSelectedTab,
                       webViewSize: webView.superview?.bounds.size ?? .zero)
@@ -311,6 +323,10 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             printOperation.view?.frame = webView.bounds
         }
 
+        runPrintOperation(printOperation, completionHandler: completionHandler)
+    }
+
+    func runPrintOperation(_ printOperation: NSPrintOperation, completionHandler: ((Bool) -> Void)? = nil) {
         let dialog = UserDialogType.print(.init(printOperation) { result in
             completionHandler?((try? result.get()) ?? false)
         })
@@ -327,7 +343,29 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         self.runPrintOperation(for: frameHandle, in: webView) { _ in completionHandler() }
     }
 
-    func print() {
+    @MainActor(unsafe)
+    func print(pdfHUD: WKPDFHUDViewWrapper? = nil) {
+        if let pdfHUD {
+            Self.expectedSaveDataToFileCallback = { [weak self] url in
+                guard let self, let url,
+                      let pdfDocument = PDFDocument(url: url) else {
+                    assertionFailure("Could not load PDF document from \(url?.path ?? "<nil>")")
+                    return
+                }
+                // Set up NSPrintOperation
+                guard let printOperation = pdfDocument.printOperation(for: .shared, scalingMode: .pageScaleNone, autoRotate: false) else {
+                    assertionFailure("Could not print PDF document")
+                    return
+                }
+
+                self.runPrintOperation(printOperation) { _ in
+                    try? FileManager.default.removeItem(at: url)
+                }
+            }
+            saveWebContent(pdfHUD: pdfHUD, location: .temporary)
+            return
+        }
+
         self.runPrintOperation(for: nil, in: self.webView)
     }
 

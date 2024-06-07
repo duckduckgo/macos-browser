@@ -20,6 +20,7 @@ import AppKit
 import BrowserServicesKit
 import Combine
 import Common
+import PixelKit
 
 protocol SaveCredentialsDelegate: AnyObject {
 
@@ -41,14 +42,17 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var titleLabel: NSTextField!
     @IBOutlet var passwordManagerTitle: NSView!
     @IBOutlet var passwordManagerAccountLabel: NSTextField!
+    @IBOutlet weak var passwordManagerTitleLabel: NSTextField!
     @IBOutlet var unlockPasswordManagerTitle: NSView!
     @IBOutlet var faviconImage: NSImageView!
     @IBOutlet var domainLabel: NSTextField!
     @IBOutlet var usernameField: NSTextField!
     @IBOutlet var hiddenPasswordField: NSSecureTextField!
     @IBOutlet var visiblePasswordField: NSTextField!
-
-    @IBOutlet var notNowButton: NSButton!
+    @IBOutlet weak var unlockPasswordManagerTitleLabel: NSTextField!
+    @IBOutlet weak var usernameFieldTitleLabel: NSTextField!
+    @IBOutlet weak var passwordFieldTitleLabel: NSTextField!
+    @IBOutlet var notNowSegmentedControl: NSSegmentedControl!
     @IBOutlet var saveButton: NSButton!
     @IBOutlet var updateButton: NSButton!
     @IBOutlet var dontUpdateButton: NSButton!
@@ -56,8 +60,8 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var editButton: NSButton!
     @IBOutlet var openPasswordManagerButton: NSButton!
     @IBOutlet weak var passwordManagerNotNowButton: NSButton!
-
     @IBOutlet var fireproofCheck: NSButton!
+    @IBOutlet weak var fireproofCheckDescription: NSTextFieldCell!
 
     weak var delegate: SaveCredentialsDelegate?
 
@@ -81,6 +85,8 @@ final class SaveCredentialsViewController: NSViewController {
 
         visiblePasswordField.isHidden = true
         saveButton.becomeFirstResponder()
+        updateSaveSegmentedControl()
+        setUpStrings()
     }
 
     override func viewWillAppear() {
@@ -92,6 +98,27 @@ final class SaveCredentialsViewController: NSViewController {
 
     override func viewWillDisappear() {
         passwordManagerStateCancellable = nil
+    }
+
+    private func setUpStrings() {
+        passwordManagerTitleLabel.stringValue = UserText.passwordManagementSaveCredentialsPasswordManagerTitle
+        unlockPasswordManagerTitleLabel.stringValue = UserText.passwordManagementSaveCredentialsUnlockPasswordManager
+        usernameFieldTitleLabel.stringValue = UserText.authAlertUsernamePlaceholder
+        passwordFieldTitleLabel.stringValue = UserText.authAlertPasswordPlaceholder
+        fireproofCheck.title = UserText.passwordManagementSaveCredentialsFireproofCheckboxTitle
+        fireproofCheckDescription.title = UserText.passwordManagementSaveCredentialsFireproofCheckboxDescription
+        saveButton.title = UserText.save
+        notNowSegmentedControl.setLabel(UserText.dontSave, forSegment: 0)
+        let fontAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: NSFont.systemFontSize)]
+          let titleSize = (UserText.dontSave as NSString).size(withAttributes: fontAttributes)
+        notNowSegmentedControl.setWidth(titleSize.width + 16, forSegment: 0)
+        notNowSegmentedControl.setLabel(UserText.dontSave, forSegment: 0)
+        updateButton.title = UserText.update
+        openPasswordManagerButton.title = UserText.bitwardenPreferencesOpenBitwarden
+        dontUpdateButton.title = UserText.dontUpdate
+        doneButton.title = UserText.done
+        editButton.title = UserText.edit
+        passwordManagerNotNowButton.title = UserText.notNow
     }
 
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
@@ -120,7 +147,7 @@ final class SaveCredentialsViewController: NSViewController {
         visiblePasswordField.setEditable(editable)
 
         if editable || passwordManagerCoordinator.isEnabled {
-            notNowButton.isHidden = passwordManagerCoordinator.isEnabled || credentials?.account.id != nil
+            notNowSegmentedControl.isHidden = passwordManagerCoordinator.isEnabled || credentials?.account.id != nil
             passwordManagerNotNowButton.isHidden = !passwordManagerCoordinator.isEnabled || credentials?.account.id != nil
             saveButton.isHidden = credentials?.account.id != nil || passwordManagerCoordinator.isLocked
             updateButton.isHidden = credentials?.account.id == nil || passwordManagerCoordinator.isLocked
@@ -132,12 +159,12 @@ final class SaveCredentialsViewController: NSViewController {
 
             titleLabel.isHidden = passwordManagerCoordinator.isEnabled
             passwordManagerTitle.isHidden = !passwordManagerCoordinator.isEnabled || passwordManagerCoordinator.isLocked
-            passwordManagerAccountLabel.stringValue = "Connected to \(passwordManagerCoordinator.activeVaultEmail ?? "")"
+            passwordManagerAccountLabel.stringValue = UserText.passwordManagementSaveCredentialsAccountLabel(activeVault: passwordManagerCoordinator.activeVaultEmail ?? "")
             unlockPasswordManagerTitle.isHidden = !passwordManagerCoordinator.isEnabled || !passwordManagerCoordinator.isLocked
             titleLabel.stringValue = UserText.pmSaveCredentialsEditableTitle
             usernameField.makeMeFirstResponder()
         } else {
-            notNowButton.isHidden = true
+            notNowSegmentedControl.isHidden = true
             saveButton.isHidden = true
             updateButton.isHidden = true
             dontUpdateButton.isHidden = true
@@ -148,6 +175,28 @@ final class SaveCredentialsViewController: NSViewController {
             titleLabel.stringValue = UserText.pmSaveCredentialsNonEditableTitle
             view.window?.makeFirstResponder(nil)
         }
+        let notNowTrailingToOpenPasswordConstraint = passwordManagerNotNowButton.trailingAnchor.constraint(equalTo: openPasswordManagerButton.leadingAnchor, constant: -12)
+        let notNowTrailingToSaveButtonConstraint = passwordManagerNotNowButton.trailingAnchor.constraint(equalTo: saveButton.leadingAnchor, constant: -12)
+        let dontUpdateRrailingToOpenPasswordConstraint = dontUpdateButton.trailingAnchor.constraint(equalTo: openPasswordManagerButton.leadingAnchor, constant: -12)
+        let dontUpdateTrailingToUpdateButtonConstraint = dontUpdateButton.trailingAnchor.constraint(equalTo: updateButton.leadingAnchor, constant: -12)
+        if openPasswordManagerButton.isHidden {
+            notNowTrailingToOpenPasswordConstraint.isActive = false
+            dontUpdateRrailingToOpenPasswordConstraint.isActive = false
+            notNowTrailingToSaveButtonConstraint.isActive = true
+            dontUpdateTrailingToUpdateButtonConstraint.isActive = true
+        } else {
+            notNowTrailingToSaveButtonConstraint.isActive = false
+            dontUpdateTrailingToUpdateButtonConstraint.isActive = false
+            notNowTrailingToOpenPasswordConstraint.isActive = true
+            dontUpdateRrailingToOpenPasswordConstraint.isActive = true
+        }
+    }
+
+    private func updateSaveSegmentedControl() {
+        if notNowSegmentedControl.segmentCount > 1 {
+            notNowSegmentedControl.setShowsMenuIndicator(true, forSegment: 1)
+        }
+        notNowSegmentedControl.selectedSegment = -1
     }
 
     @IBAction func onSaveClicked(sender: Any?) {
@@ -173,16 +222,16 @@ final class SaveCredentialsViewController: NSViewController {
                     }
                 }
             } else {
-                _ = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeWebsiteCredentials(credentials)
-                (NSApp.delegate as? AppDelegate)?.syncService?.scheduler.notifyDataChanged()
+                _ = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared).storeWebsiteCredentials(credentials)
+                NSApp.delegateTyped.syncService?.scheduler.notifyDataChanged()
                 os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
             }
         } catch {
             os_log("%s:%s: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
 
-        Pixel.fire(.autofillItemSaved(kind: .password))
+        PixelKit.fire(GeneralPixel.autofillItemSaved(kind: .password))
 
         if passwordManagerCoordinator.isEnabled {
             passwordManagerCoordinator.reportPasswordSave()
@@ -203,12 +252,35 @@ final class SaveCredentialsViewController: NSViewController {
         delegate?.shouldCloseSaveCredentialsViewController(self)
     }
 
+    @IBAction func onNotNowSegmentedControlClicked(_ sender: Any) {
+        if notNowSegmentedControl.selectedSegment == 0 {
+            onNotNowClicked(sender: sender)
+        } else {
+            displayMenuForSecondSegment()
+        }
+    }
+
+    func displayMenuForSecondSegment() {
+        let item = NSMenuItem(title: UserText.neverForThisSite, action: #selector(onNeverPromptClicked), target: self, keyEquivalent: "")
+        let menu = NSMenu(title: "", items: [item])
+
+        let segmentWidth = notNowSegmentedControl.bounds.width - 64.0
+        let segmentFrame = CGRect(x: segmentWidth, y: 0, width: segmentWidth, height: notNowSegmentedControl.bounds.height)
+
+        if let contentView = notNowSegmentedControl.window?.contentView {
+            let menuOrigin = notNowSegmentedControl.convert(segmentFrame.origin, to: contentView)
+            let finalMenuOrigin = CGPoint(x: menuOrigin.x, y: menuOrigin.y - segmentFrame.height - 5.0)
+            menu.popUp(positioning: nil, at: finalMenuOrigin, in: contentView)
+        }
+
+    }
+
     @IBAction func onNotNowClicked(sender: Any?) {
         func notifyDelegate() {
             delegate?.shouldCloseSaveCredentialsViewController(self)
         }
 
-        guard PrivacySecurityPreferences.shared.loginDetectionEnabled else {
+        guard DataClearingPreferences.shared.isLoginDetectionEnabled else {
             notifyDelegate()
             return
         }
@@ -236,6 +308,17 @@ final class SaveCredentialsViewController: NSViewController {
 
     }
 
+    @objc func onNeverPromptClicked() {
+        do {
+            _ = try AutofillNeverPromptWebsitesManager.shared.saveNeverPromptWebsite(domainLabel.stringValue)
+        } catch {
+            os_log("%: failed to save never prompt for website %s", type: .error, #function, error.localizedDescription)
+        }
+        PixelKit.fire(GeneralPixel.autofillLoginsSaveLoginModalExcludeSiteConfirmed)
+
+        onNotNowClicked(sender: nil)
+    }
+
     @IBAction func onOpenPasswordManagerClicked(sender: Any?) {
         passwordManagerCoordinator.openPasswordManager()
     }
@@ -254,11 +337,10 @@ final class SaveCredentialsViewController: NSViewController {
 
     func loadFaviconForDomain(_ domain: String?) {
         guard let domain else {
-            faviconImage.image = NSImage(named: NSImage.Name("Web"))
+            faviconImage.image = .web
             return
         }
-        faviconImage.image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
-            ?? NSImage(named: NSImage.Name("Web"))
+        faviconImage.image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image ?? .web
     }
 
     private func updatePasswordFieldVisibility(visible: Bool) {

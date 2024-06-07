@@ -21,4 +21,5 @@ struct ExtractAction: Action {
     let actionType: ActionType
     let selector: String
     let profile: ExtractProfileSelectors
+    let dataSource: DataSource?
 }

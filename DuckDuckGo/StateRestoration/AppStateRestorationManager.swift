@@ -19,12 +19,14 @@
 import Foundation
 import Combine
 import Common
+import PixelKit
 
 @MainActor
 final class AppStateRestorationManager: NSObject {
     static let fileName = "persistentState"
 
     private let service: StatePersistenceService
+    private let tabSnapshotCleanupService: TabSnapshotCleanupService
     private var appWillRelaunchCancellable: AnyCancellable?
     private var stateChangedCancellable: AnyCancellable?
 
@@ -34,14 +36,16 @@ final class AppStateRestorationManager: NSObject {
 
     convenience init(fileStore: FileStore) {
         let service = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
-        self.init(service: service)
+        self.init(fileStore: fileStore, service: service)
     }
 
     init(
+        fileStore: FileStore,
         service: StatePersistenceService,
         shouldRestorePreviousSession: Bool = StartupPreferences().restorePreviousSession
     ) {
         self.service = service
+        self.tabSnapshotCleanupService = TabSnapshotCleanupService(fileStore: fileStore)
         self.shouldRestorePreviousSession = shouldRestorePreviousSession
     }
 
@@ -55,26 +59,38 @@ final class AppStateRestorationManager: NSObject {
         service.canRestoreLastSessionState
     }
 
-    func restoreLastSessionState(interactive: Bool) {
+    @discardableResult
+    func restoreLastSessionState(interactive: Bool) -> WindowManagerStateRestoration? {
+        var state: WindowManagerStateRestoration?
         do {
             let isCalledAtStartup = !interactive
             try service.restoreState(using: { coder in
-                try WindowsManager.restoreState(from: coder, includePinnedTabs: isCalledAtStartup)
+                state = try WindowsManager.restoreState(from: coder, includePinnedTabs: isCalledAtStartup)
             })
             clearLastSessionState()
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {
             os_log("App state could not be decoded: %s", "\(error)")
-            Pixel.fire(
-                .debug(event: .appStateRestorationFailed, error: error),
-                withAdditionalParameters: ["interactive": String(interactive)]
-            )
+            PixelKit.fire(DebugEvent(GeneralPixel.appStateRestorationFailed, error: error),
+                          withAdditionalParameters: ["interactive": String(interactive)])
         }
+
+        return state
     }
 
     func clearLastSessionState() {
         service.removeLastSessionState()
+    }
+
+    // Cleans all stored snapshots except snapshots listed in the state
+    func cleanTabSnapshots(state: WindowManagerStateRestoration? = nil) {
+        let tabs = state?.windows.flatMap { $0.model.tabCollection.tabs } ?? []
+        let pinnedTabs = state?.pinnedTabs?.tabs ?? []
+        let stateSnapshotIds = (tabs + pinnedTabs).compactMap { $0.tabSnapshotIdentifier }
+        Task {
+            await tabSnapshotCleanupService.cleanStoredSnapshots(except: Set(stateSnapshotIds))
+        }
     }
 
     func applicationDidFinishLaunching() {
@@ -104,9 +120,11 @@ final class AppStateRestorationManager: NSObject {
     private func readLastSessionState(restoreWindows: Bool) {
         service.loadLastSessionState()
         if restoreWindows {
-            restoreLastSessionState(interactive: false)
+            let state = restoreLastSessionState(interactive: false)
+            cleanTabSnapshots(state: state)
         } else {
             restorePinnedTabs()
+            cleanTabSnapshots()
         }
         WindowControllersManager.shared.updateIsInInitialState()
     }
@@ -121,7 +139,7 @@ final class AppStateRestorationManager: NSObject {
             // ignore
         } catch {
             os_log("Pinned tabs state could not be decoded: %s", "\(error)")
-            Pixel.fire(.debug(event: .appStateRestorationFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.appStateRestorationFailed, error: error))
         }
     }
 

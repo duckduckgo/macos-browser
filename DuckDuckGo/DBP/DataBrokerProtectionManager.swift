@@ -16,47 +16,43 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import BrowserServicesKit
 import DataBrokerProtection
+import LoginItems
+import Common
 
 public final class DataBrokerProtectionManager {
 
     static let shared = DataBrokerProtectionManager()
 
-    private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
+    private let authenticationRepository: AuthenticationRepository = KeychainAuthenticationData()
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
+    private let dataBrokerProtectionWaitlistDataSource: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
-        DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
+        let dataManager = DataBrokerProtectionDataManager(pixelHandler: pixelHandler, fakeBrokerFlag: fakeBrokerFlag)
+        dataManager.delegate = self
+        return dataManager
     }()
 
-    lazy var scheduler: DataBrokerProtectionScheduler = {
-        let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
-        let features = ContentScopeFeatureToggles(emailProtection: false,
-                                                  emailProtectionIncontextSignup: false,
-                                                  credentialsAutofill: false,
-                                                  identitiesAutofill: false,
-                                                  creditCardsAutofill: false,
-                                                  credentialsSaving: false,
-                                                  passwordGeneration: false,
-                                                  inlineIconCredentials: false,
-                                                  thirdPartyCredentialsProvider: false)
+    private lazy var ipcClient: DataBrokerProtectionIPCClient = {
+        let loginItemStatusChecker = LoginItem.dbpBackgroundAgent
+        return DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId,
+                                             pixelHandler: pixelHandler,
+                                             loginItemStatusChecker: loginItemStatusChecker)
+    }()
 
-        let privacySettings = PrivacySecurityPreferences.shared
-        let sessionKey = UUID().uuidString
-        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
-                                                sessionKey: sessionKey,
-                                                featureToggles: features)
+    lazy var scheduler: DataBrokerProtectionLoginItemScheduler = {
 
-        return DefaultDataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
-                                                  contentScopeProperties: prefs,
-                                                  dataManager: dataManager,
-                                                  notificationCenter: NotificationCenter.default,
-                                                  pixelHandler: DataBrokerProtectionPixelsHandler(),
-                                                  redeemUseCase: redeemUseCase)
+        let ipcScheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
+
+        return DataBrokerProtectionLoginItemScheduler(ipcScheduler: ipcScheduler)
     }()
 
     private init() {
@@ -69,14 +65,24 @@ public final class DataBrokerProtectionManager {
         redeemUseCase.shouldAskForInviteCode()
     }
 
-    public func runOperationsAndStartSchedulerIfPossible() {
-        guard !redeemUseCase.shouldAskForInviteCode() && !DataBrokerDebugFlagBlockScheduler().isFlagOn() else { return }
+    // MARK: - Debugging Features
 
-        // If there's no saved profile we don't need to start the scheduler
-        if dataManager.fetchProfile() != nil {
-            scheduler.runQueuedOperations(showWebView: false) { [weak self] in
-                self?.scheduler.startScheduler()
-            }
-        }
+    public func showAgentIPAddress() {
+        ipcClient.openBrowser(domain: "https://www.whatismyip.com")
     }
 }
+
+extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
+    public func dataBrokerProtectionDataManagerDidUpdateData() {
+        scheduler.startScheduler()
+
+        let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
+        dbpDateStore.setActivationDateIfNecessary()
+    }
+
+    public func dataBrokerProtectionDataManagerDidDeleteData() {
+        scheduler.stopScheduler()
+    }
+}
+
+#endif

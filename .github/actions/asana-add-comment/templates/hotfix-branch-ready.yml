@@ -1,0 +1,13 @@
+data:
+  # yq -o=j | sed -E 's/\\n( *)([^\\n])/\2/g'
+  html_text: |
+    <body>
+      <h2>Hotfix branch ${BRANCH} ready ⚙️</h2>
+      <ul>
+        <li>🔱 <code>${BRANCH}</code> branch has been created off <code>${RELEASE_TAG}</code> tag.</li>
+        <li>Point any pull requests with changes required for the hotfix release to that branch.</li>
+
+      </ul>
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>

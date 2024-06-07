@@ -20,7 +20,7 @@ import Foundation
 
 protocol BrowserTabSelectionDelegate: AnyObject {
 
-    func selectedTab(at index: Int)
+    func selectedTabContent(_ content: Tab.TabContent)
 
     func selectedPreferencePane(_ identifier: PreferencePaneIdentifier)
 

@@ -42,7 +42,7 @@ struct PasswordManagementLoginItemView: View {
                 if editMode {
 
                     RoundedRectangle(cornerRadius: 8)
-                        .foregroundColor(Color(NSColor.editingPanelColor))
+                        .foregroundColor(Color(.editingPanel))
                         .shadow(radius: 6)
 
                 }
@@ -83,7 +83,9 @@ struct PasswordManagementLoginItemView: View {
                     }
 
                     Buttons()
-                        .padding()
+                        .padding(.top, editMode ? 12 : 10)
+                        .padding(.bottom, editMode ? 12 : 3)
+                        .padding(.horizontal)
 
                 }
             }
@@ -102,6 +104,7 @@ struct PasswordManagementLoginItemView: View {
                     secondaryButton: cancelButton
                 )
             }
+            .accessibility(identifier: "Login item View")
         }
     }
 
@@ -175,6 +178,7 @@ private struct UsernameView: View {
                 TextField("", text: $model.username)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.bottom, interItemSpacing)
+                    .accessibility(identifier: "Username TextField")
 
             } else {
 
@@ -217,7 +221,7 @@ private struct UsernameLabel: View {
                     Button {
                         model.copy(model.username)
                     } label: {
-                        Image("Copy")
+                        Image(.copy)
                     }
                     .buttonStyle(PlainButtonStyle())
                     .tooltip(UserText.copyUsernameTooltip)
@@ -283,7 +287,7 @@ private struct PrivateEmailMessage: View {
         let text = String(format: UserText.pmSignInToManageEmail, UserText.pmEnableEmailProtection)
         var attributedString = AttributedString(text)
         if let range = attributedString.range(of: UserText.pmEnableEmailProtection) {
-            attributedString[range].foregroundColor = Color("LinkBlueColor")
+            attributedString[range].foregroundColor = Color(.linkBlue)
         }
         return attributedString
     }
@@ -356,25 +360,9 @@ private struct PasswordView: View {
 
                 HStack {
 
-                    if isPasswordVisible {
+                    SecureTextField(textValue: $model.password, isVisible: isPasswordVisible)
 
-                        TextField("", text: $model.password)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                    } else {
-
-                        SecureField("", text: $model.password)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                    }
-
-                    Button {
-                        isPasswordVisible = !isPasswordVisible
-                    } label: {
-                        Image("SecureEyeToggle")
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .tooltip(isPasswordVisible ? UserText.hidePasswordTooltip : UserText.showPasswordTooltip)
+                    SecureTextFieldButton(isVisible: $isPasswordVisible, toolTipHideText: UserText.hidePasswordTooltip, toolTipShowText: UserText.showPasswordTooltip)
                     .padding(.trailing, 10)
 
                 }
@@ -384,29 +372,16 @@ private struct PasswordView: View {
 
                 HStack(alignment: .center, spacing: 6) {
 
-                    if isPasswordVisible {
-                        Text(model.password)
-                    } else {
-                        Text(model.password.isEmpty ? "" : "••••••••••••")
-                    }
+                    HiddenText(isVisible: isPasswordVisible, text: model.password, hiddenTextLength: 12)
 
                     if (isHovering || isPasswordVisible) && model.password != "" {
-                        Button {
-                            isPasswordVisible = !isPasswordVisible
-                        } label: {
-                            Image("SecureEyeToggle")
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .tooltip(isPasswordVisible ? UserText.hidePasswordTooltip : UserText.showPasswordTooltip)
+                        SecureTextFieldButton(isVisible: $isPasswordVisible, toolTipHideText: UserText.hidePasswordTooltip, toolTipShowText: UserText.showPasswordTooltip)
                     }
 
                     if isHovering && model.password != "" {
-                        Button {
+                        CopyButton {
                             model.copy(model.password)
-                        } label: {
-                            Image("Copy")
                         }
-                        .buttonStyle(PlainButtonStyle())
                         .tooltip(UserText.copyPasswordTooltip)
                     }
 
@@ -439,6 +414,7 @@ private struct WebsiteView: View {
             TextField("", text: $model.domain)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.bottom, interItemSpacing)
+                .accessibility(identifier: "Website TextField")
 
         } else {
             if let domainURL = model.domain.url {
@@ -470,10 +446,10 @@ private struct NotesView: View {
 
         if model.isEditing || model.isNew {
 #if APPSTORE
-            FocusableTextEditor()
+            FocusableTextEditor(text: $model.notes)
 #else
             if #available(macOS 12, *) {
-                FocusableTextEditor()
+                FocusableTextEditor(text: $model.notes)
             } else {
                 TextEditor(text: $model.notes)
                     .frame(height: 197.0)
@@ -488,9 +464,9 @@ private struct NotesView: View {
                     .background(
                         ZStack {
                             RoundedRectangle(cornerRadius: cornerRadius)
-                                .stroke(Color(NSColor.textEditorBorderColor), lineWidth: borderWidth)
+                                .stroke(Color(.textEditorBorder), lineWidth: borderWidth)
                             RoundedRectangle(cornerRadius: cornerRadius)
-                                .fill(Color(NSColor.textEditorBackgroundColor))
+                                .fill(Color(.textEditorBackground))
                         }
                     )
             }
@@ -504,44 +480,23 @@ private struct NotesView: View {
                         model.copy(model.notes)
                     })
                 }))
+                .modifier(TextSelectionModifier())
         }
     }
 
 }
 
-@available(macOS 12, *)
-struct FocusableTextEditor: View {
+private struct TextSelectionModifier: ViewModifier {
 
-    @EnvironmentObject var model: PasswordManagementLoginModel
-    @FocusState var isFocused: Bool
-
-    let cornerRadius: CGFloat = 8.0
-    let borderWidth: CGFloat = 0.4
-    let characterLimit: Int = 10000
-
-    var body: some View {
-        TextEditor(text: $model.notes)
-            .frame(height: 197.0)
-            .font(.body)
-            .foregroundColor(.primary)
-            .focused($isFocused)
-            .padding(EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 0.0))
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius,
-                                        style: .continuous))
-            .onChange(of: model.notes) {
-                model.notes = String($0.prefix(characterLimit))
-            }
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: cornerRadius).stroke(Color.accentColor.opacity(0.5), lineWidth: 4).opacity(isFocused ? 1 : 0).scaleEffect(isFocused ? 1 : 1.04)
-                        .animation(isFocused ? .easeIn(duration: 0.2) : .easeOut(duration: 0.0), value: isFocused)
-                    RoundedRectangle(cornerRadius: cornerRadius)
-                        .stroke(Color(NSColor.textEditorBorderColor), lineWidth: borderWidth)
-                    RoundedRectangle(cornerRadius: cornerRadius)
-                        .fill(Color(NSColor.textEditorBackgroundColor))
-                }
-            )
+    func body(content: Content) -> some View {
+        if #available(macOS 12, *) {
+            content
+                .textSelection(.enabled)
+        } else {
+            content
+        }
     }
+
 }
 
 private struct DatesView: View {

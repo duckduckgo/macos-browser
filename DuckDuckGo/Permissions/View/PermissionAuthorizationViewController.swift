@@ -59,7 +59,12 @@ final class PermissionAuthorizationViewController: NSViewController {
     @IBOutlet var domainNameLabel: NSTextField!
     @IBOutlet var alwaysAllowCheckbox: NSButton!
     @IBOutlet var alwaysAllowStackView: NSStackView!
+    @IBOutlet var learnMoreStackView: NSStackView!
     @IBOutlet var denyButton: NSButton!
+    @IBOutlet var buttonsBottomConstraint: NSLayoutConstraint!
+    @IBOutlet var learnMoreBottomConstraint: NSLayoutConstraint!
+    @IBOutlet weak var linkButton: LinkButton!
+    @IBOutlet weak var allowButton: NSButton!
 
     weak var query: PermissionAuthorizationQuery? {
         didSet {
@@ -78,6 +83,7 @@ final class PermissionAuthorizationViewController: NSViewController {
         } else {
             denyButton.title = UserText.permissionPopoverDenyButton
         }
+        denyButton.setAccessibilityIdentifier("PermissionAuthorizationViewController.denyButton")
     }
 
     private func updateText() {
@@ -88,24 +94,30 @@ final class PermissionAuthorizationViewController: NSViewController {
 
         switch query.permissions[0] {
         case .camera, .microphone, .geolocation:
-            self.descriptionLabel.stringValue = String(format: UserText.devicePermissionAuthorizationFormat,
-                                                       query.domain,
-                                                       query.permissions.localizedDescription.lowercased())
+            descriptionLabel.stringValue = String(format: UserText.devicePermissionAuthorizationFormat,
+                                                  query.domain,
+                                                  query.permissions.localizedDescription.lowercased())
         case .popups:
-            self.descriptionLabel.stringValue = String(format: UserText.popupWindowsPermissionAuthorizationFormat,
-                                                       query.domain,
-                                                       query.permissions.localizedDescription.lowercased())
+            descriptionLabel.stringValue = String(format: UserText.popupWindowsPermissionAuthorizationFormat,
+                                                  query.domain,
+                                                  query.permissions.localizedDescription.lowercased())
         case .externalScheme where query.domain.isEmpty:
-            self.descriptionLabel.stringValue = String(format: UserText.externalSchemePermissionAuthorizationNoDomainFormat,
-                                                       query.permissions.localizedDescription)
+            descriptionLabel.stringValue = String(format: UserText.externalSchemePermissionAuthorizationNoDomainFormat,
+                                                  query.permissions.localizedDescription)
         case .externalScheme:
-            self.descriptionLabel.stringValue = String(format: UserText.externalSchemePermissionAuthorizationFormat,
-                                                       query.domain,
-                                                       query.permissions.localizedDescription)
+            descriptionLabel.stringValue = String(format: UserText.externalSchemePermissionAuthorizationFormat,
+                                                  query.domain,
+                                                  query.permissions.localizedDescription)
         }
-        self.alwaysAllowCheckbox.stringValue = UserText.permissionAlwaysAllowOnDomainCheckbox
-        self.domainNameLabel.stringValue = query.domain.isEmpty ? "" : "“" + query.domain + "”"
-        self.alwaysAllowStackView.isHidden = !query.shouldShowAlwaysAllowCheckbox
+        alwaysAllowCheckbox.title = UserText.permissionAlwaysAllowOnDomainCheckbox
+        domainNameLabel.stringValue = query.domain.isEmpty ? "" : "“" + query.domain + "”"
+        alwaysAllowStackView.isHidden = !query.shouldShowAlwaysAllowCheckbox
+        learnMoreStackView.isHidden = !query.permissions.contains(.geolocation)
+        learnMoreBottomConstraint.isActive = !learnMoreStackView.isHidden
+        buttonsBottomConstraint.isActive = !learnMoreBottomConstraint.isActive
+        linkButton.title = UserText.permissionPopupLearnMoreLink
+        allowButton.title = UserText.permissionPopupAllowButton
+        allowButton.setAccessibilityIdentifier("PermissionAuthorizationViewController.allowButton")
     }
 
     @IBAction func alwaysAllowLabelClick(_ sender: Any) {
@@ -126,4 +138,7 @@ final class PermissionAuthorizationViewController: NSViewController {
         query.handleDecision(grant: false)
     }
 
+    @IBAction func learnMoreAction(_ sender: NSButton) {
+        WindowControllersManager.shared.show(url: "https://help.duckduckgo.com/privacy/device-location-services".url, source: .ui, newTab: true)
+    }
 }

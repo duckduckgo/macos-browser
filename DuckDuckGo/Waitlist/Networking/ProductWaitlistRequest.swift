@@ -130,7 +130,11 @@ final class ProductWaitlistRequest: WaitlistRequest {
     private let makeHTTPRequest: ProductWaitlistMakeHTTPRequest
 
     private var endpoint: URL {
-        return URL(string: "https://quack.duckduckgo.com/api/auth/waitlist/")!
+#if DEBUG
+        URL(string: "https://quackdev.duckduckgo.com/api/auth/waitlist/")!
+#else
+        URL(string: "https://quack.duckduckgo.com/api/auth/waitlist/")!
+#endif
     }
 
 }

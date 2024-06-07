@@ -16,22 +16,40 @@
 //  limitations under the License.
 //
 
+import Navigation
 import WebKit
 
-enum BackForwardListItem: Equatable {
-    case backForwardListItem(WKBackForwardListItem)
-    case goBackToCloseItem(parentTab: Tab)
-    case error
+struct BackForwardListItem: Hashable {
+
+    enum Kind: Hashable {
+        case url(URL)
+        case goBackToClose(URL?)
+    }
+    let kind: Kind
+    let title: String?
+    let identity: HistoryItemIdentity?
 
     var url: URL? {
-        switch self {
-        case .backForwardListItem(let item):
-            return item.url
-        case .goBackToCloseItem(parentTab: let tab):
-            return tab.content.url
-        case .error:
-            return nil
+        switch kind {
+        case .url(let url): return url
+        case .goBackToClose(let url): return url
         }
     }
 
+    init(kind: Kind, title: String?, identity: HistoryItemIdentity?) {
+        self.kind = kind
+        self.title = title
+        self.identity = identity
+    }
+
+    init(_ wkItem: WKBackForwardListItem) {
+        self.init(kind: .url(wkItem.url), title: wkItem.tabTitle ?? wkItem.title, identity: wkItem.identity)
+    }
+
+}
+
+extension [BackForwardListItem] {
+    init(_ items: [WKBackForwardListItem]) {
+        self = items.map(BackForwardListItem.init)
+    }
 }

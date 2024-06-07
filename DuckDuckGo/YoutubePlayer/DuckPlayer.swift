@@ -23,10 +23,7 @@ import Foundation
 import Navigation
 import WebKit
 import UserScript
-
-extension NSImage {
-    static let duckPlayer: NSImage = #imageLiteral(resourceName: "DuckPlayer")
-}
+import PixelKit
 
 enum DuckPlayerMode: Equatable, Codable {
     case enabled, alwaysAsk, disabled
@@ -74,14 +71,7 @@ final class DuckPlayer {
         }
     }()
 
-    static let duckPlayerHost: String = {
-        if usesSimulatedRequests {
-            return "www.youtube-nocookie.com"
-        } else {
-            return "player"
-        }
-    }()
-    static let duckPlayerScheme = "duck"
+    static let duckPlayerHost: String = "player"
     static let commonName = UserText.duckPlayer
 
     static let shared = DuckPlayer()
@@ -119,16 +109,59 @@ final class DuckPlayer {
 
     // MARK: - Common Message Handlers
 
-    public func handleSetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
-        guard let userValues: UserValues = DecodableHelper.decode(from: params) else {
-            assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
-            return nil
+    // swiftlint:disable:next cyclomatic_complexity
+    public func handleSetUserValuesMessage(
+        from origin: YoutubeOverlayUserScript.MessageOrigin
+    ) -> (_ params: Any, _ message: UserScriptMessage) -> Encodable? {
+
+        return { [weak self] params, _ -> Encodable? in
+            guard let self else {
+                return nil
+            }
+            guard let userValues: UserValues = DecodableHelper.decode(from: params) else {
+                assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
+                return nil
+            }
+
+            let modeDidChange = self.preferences.duckPlayerMode != userValues.duckPlayerMode
+            let overlayDidInteract = !self.preferences.youtubeOverlayInteracted && userValues.overlayInteracted
+
+            if modeDidChange {
+                self.preferences.duckPlayerMode = userValues.duckPlayerMode
+                if case .enabled = userValues.duckPlayerMode {
+                    switch origin {
+                    case .duckPlayer:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysDuckPlayer)
+                    case .serpOverlay:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysOverlaySERP)
+                    case .youtubeOverlay:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysOverlayYoutube)
+                    }
+                }
+            }
+
+            if overlayDidInteract {
+                self.preferences.youtubeOverlayInteracted = userValues.overlayInteracted
+
+                // If user checks "Remember my choice" and clicks "Watch here", we won't show
+                // the overlay anymore, but will keep presenting Dax logos (the mode stays at
+                // "alwaysAsk" which may be a bit counterintuitive, but it's the overlayInteracted
+                // flag that plays a role here). We want to track users opting in to not showing overlays,
+                // hence firing the pixel here.
+                if userValues.duckPlayerMode == .alwaysAsk {
+                    switch origin {
+                    case .serpOverlay:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingNeverOverlaySERP)
+                    case .youtubeOverlay:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingNeverOverlayYoutube)
+                    default:
+                        break
+                    }
+                }
+            }
+
+            return self.encodeUserValues()
         }
-
-        self.preferences.youtubeOverlayInteracted = userValues.overlayInteracted
-        self.preferences.duckPlayerMode = userValues.duckPlayerMode
-
-        return encodeUserValues()
     }
 
     public func handleGetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
@@ -160,16 +193,6 @@ final class DuckPlayer {
             modeCancellable = preferences.$duckPlayerMode
                 .removeDuplicates()
                 .dropFirst(1)
-                .handleEvents(receiveOutput: { mode in
-                    switch mode {
-                    case .enabled:
-                        Pixel.fire(.duckPlayerSettingAlways)
-                    case .alwaysAsk:
-                        Pixel.fire(.duckPlayerSettingBackToDefault)
-                    case .disabled:
-                        Pixel.fire(.duckPlayerSettingNever)
-                    }
-                })
                 .prepend(preferences.duckPlayerMode)
                 .assign(to: \.mode, onWeaklyHeld: self)
         } else {
@@ -192,7 +215,7 @@ extension DuckPlayer {
     func image(for bookmark: Bookmark) -> NSImage? {
         // Bookmarks to Duck Player pages retain duck:// URL even when Duck Player is disabled,
         // so we keep the Duck Player favicon even if Duck Player is currently disabled
-        return (bookmark.urlObject?.isDuckPlayerScheme ?? false) ? .duckPlayer : nil
+        return (bookmark.urlObject?.isDuckPlayer ?? false) ? .duckPlayer : nil
     }
 
     func domainForRecentlyVisitedSite(with url: URL) -> String? {
@@ -204,7 +227,7 @@ extension DuckPlayer {
     }
 
     func sharingData(for title: String, url: URL) -> (title: String, url: URL)? {
-        guard isAvailable, mode != .disabled, url.isDuckPlayerScheme, let (videoID, timestamp) = url.youtubeVideoParams else {
+        guard isAvailable, mode != .disabled, url.isDuckURLScheme, let (videoID, timestamp) = url.youtubeVideoParams else {
             return nil
         }
 
@@ -219,7 +242,7 @@ extension DuckPlayer {
             return nil
         }
 
-        guard page.url.isDuckPlayer || page.url.isDuckPlayerScheme else {
+        guard page.url.isDuckPlayer else {
             return nil
         }
 
@@ -253,7 +276,7 @@ extension DuckPlayer {
         let preferencesPersistor = DuckPlayerPreferencesPersistorMock(duckPlayerMode: mode, youtubeOverlayInteracted: true)
         let preferences = DuckPlayerPreferences(persistor: preferencesPersistor)
         // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
-        let privacyConfigurationManager = ((NSClassFromString("MockPrivacyConfigurationManager") as? NSObject.Type)!.init() as? PrivacyConfigurationManaging)!
+        let privacyConfigurationManager = MockPrivacyConfigurationManager()
         return DuckPlayer(preferences: preferences, privacyConfigurationManager: privacyConfigurationManager)
     }
 

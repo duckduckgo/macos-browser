@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import PixelKit
 
 enum ChromiumKeychainPromptResult {
     case password(String)
@@ -43,6 +44,10 @@ final class ChromiumKeychainPrompt: ChromiumKeychainPrompting {
             kSecMatchLimit as String: kSecMatchLimitOne] as [String: Any]
 
         var dataFromKeychain: AnyObject?
+
+        // Fire Pixel to help measure rate of password prompt denied actions
+        PixelKit.fire(GeneralPixel.passwordImportKeychainPrompt)
+
         let status: OSStatus = SecItemCopyMatching(query as CFDictionary, &dataFromKeychain)
 
         if status == noErr, let passwordData = dataFromKeychain as? Data {

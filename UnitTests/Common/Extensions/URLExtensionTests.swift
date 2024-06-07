@@ -56,7 +56,8 @@ final class URLExtensionTests: XCTestCase {
             ("test string with spaces", "https://duckduckgo.com/?q=test%20string%20with%20spaces"),
             ("http://💩.la:8080 ", "http://xn--ls8h.la:8080"),
             ("http:// 💩.la:8080 ", "https://duckduckgo.com/?q=http%3A%2F%2F%20%F0%9F%92%A9.la%3A8080"),
-            ("https://xn--ls8h.la/path/to/resource", "https://xn--ls8h.la/path/to/resource")
+            ("https://xn--ls8h.la/path/to/resource", "https://xn--ls8h.la/path/to/resource"),
+            ("1.4/3.4", "https://duckduckgo.com/?q=1.4%2F3.4")
         ]
 
         for (string, expected) in data {
@@ -116,4 +117,118 @@ final class URLExtensionTests: XCTestCase {
         XCTAssertNil(notURL)
     }
 
+    func testThatEmailAddressesExtractsCommaSeparatedAddressesFromMailtoURL() throws {
+        let url1 = try XCTUnwrap(URL(string: "mailto:dax@duck.com,donald@duck.com,example@duck.com"))
+        XCTAssertEqual(url1.emailAddresses, ["dax@duck.com", "donald@duck.com", "example@duck.com"])
+
+        if let url2 = URL(string: "mailto:  dax@duck.com,    donald@duck.com,  example@duck.com ") {
+            XCTAssertEqual(url2.emailAddresses, ["dax@duck.com", "donald@duck.com", "example@duck.com"])
+        }
+    }
+
+    func testThatEmailAddressesExtractsInvalidEmailAddresses() throws {
+        // parity with Safari which also doesn't validate email addresses
+        let url1 = try XCTUnwrap(URL(string: "mailto:dax@duck.com,donald,example"))
+        XCTAssertEqual(url1.emailAddresses, ["dax@duck.com", "donald", "example"])
+
+        if let url2 = URL(string: "mailto:dax@duck.com, ,,, ,, donald") {
+            XCTAssertEqual(url2.emailAddresses, ["dax@duck.com", "donald"])
+        }
+    }
+
+    func testWhenGetHostAndPort_WithPort_ThenHostAndPortIsReturned() throws {
+        // Given
+        let expected = "duckduckgo.com:1234"
+        let sut = URL(string: "https://duckduckgo.com:1234")
+
+        // When
+        let result = sut?.hostAndPort()
+
+        // Then
+        XCTAssertEqual(expected, result)
+    }
+
+    func testWhenGetHostAndPort_WithoutPort_ThenHostReturned() throws {
+        // Given
+        let expected = "duckduckgo.com"
+        let sut = URL(string: "https://duckduckgo.com")
+
+        // When
+        let result = sut?.hostAndPort()
+
+        // Then
+        XCTAssertEqual(expected, result)
+    }
+
+    func testIsChildWhenURLsSame() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenTestedURLHasSubpath() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://dax.duckduckgo.com/subscriptions/test")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenTestedURLHasSubdomain() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://dax.duckduckgo.com/subscriptions")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenTestedURLHasSubdomainAndSubpath() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://dax.duckduckgo.com/subscriptions/test")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenTestedURLHasWWW() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://www.duckduckgo.com/subscriptions/test/t")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenParentHasParamThatShouldBeIgnored() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions?environment=staging")!
+        let testedURL = URL(string: "https://www.duckduckgo.com/subscriptions/test/t")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenChildHasParamThatShouldBeIgnored() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://duckduckgo.com/subscriptions?environment=staging")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenChildHasPathAndParamThatShouldBeIgnored() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://www.duckduckgo.com/subscriptions/test/t?environment=staging")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenBothHaveParamThatShouldBeIgnored() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions?environment=production")!
+        let testedURL = URL(string: "https://www.duckduckgo.com/subscriptions/test/t?environment=staging")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildFailsWhenPathIsShorterSubstring() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://duckduckgo.com/subscription")!
+        XCTAssertFalse(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildFailsWhenPathIsLonger() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://duckduckgo.com/subscriptionszzz")!
+        XCTAssertFalse(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildFailsWhenPathIsNotComplete() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions/welcome")!
+        let testedURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        XCTAssertFalse(testedURL.isChild(of: parentURL))
+    }
 }

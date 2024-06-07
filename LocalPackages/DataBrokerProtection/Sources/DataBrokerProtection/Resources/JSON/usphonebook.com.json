@@ -1,8 +1,9 @@
 {
-  "name": "usphonebook.com",
-  "version": "0.1.0",
+  "name": "USPhoneBook",
+  "url": "usphonebook.com",
+  "version": "0.1.5",
   "parent": "peoplefinders.com",
-  "addedDatetime": 1678078800000,
+  "addedDatetime": 1678082400000,
   "steps": [
     {
       "stepType": "scan",
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "99ede9cb-96a1-42ed-b721-53432fe4c14f",
-          "url": "https://www.usphonebook.com/${firstName}-${lastName}/${stateFull}/${city}"
+          "id": "98a804b2-115c-4c2c-8e97-3f3679cd3fbb",
+          "url": "https://www.usphonebook.com/${firstName}-${lastName}/${state|stateFull}/${city}"
         },
         {
           "actionType": "extract",
-          "id": "1a35ecd2-883a-45fa-b6b9-04dab35a3249",
+          "id": "fd2f1b35-bf37-426f-b39b-f4b280513e53",
           "selector": ".ls_contacts-people-finder-wrapper",
           "profile": {
             "name": {
@@ -39,7 +40,9 @@
               "separator": ","
             },
             "profileUrl": {
-              "selector": ".ls_success-extra-margin"
+              "selector": ".ls_success-extra-margin",
+              "identifierType": "path",
+              "identifier": "https://www.usphonebook.com/${firstName}-${lastName}/${id}"
             }
           }
         }

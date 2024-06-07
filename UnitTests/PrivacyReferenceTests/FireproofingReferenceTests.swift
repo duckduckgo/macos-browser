@@ -46,25 +46,19 @@ final class FireproofingReferenceTests: XCTestCase {
     }
 
     /// Test disabled until Privacy Reference Tests contain the new Fire Button and Fireproofing logic
-    func testFireproofing() throws {
+    @MainActor
+    func testFireproofing() async throws {
         referenceTests = testData.fireButtonFireproofing.tests.filter {
             $0.exceptPlatforms.contains("macos-browser") == false
         }
 
-        let testsExecuted = expectation(description: "tests executed")
-        testsExecuted.expectedFulfillmentCount = referenceTests.count
-
-        runReferenceTests(onTestExecuted: testsExecuted)
-
-        waitForExpectations(timeout: 30, handler: nil)
+        for test in referenceTests {
+            await runReferenceTest(test)
+        }
     }
 
-    private func runReferenceTests(onTestExecuted: XCTestExpectation) {
-
-        guard let test = referenceTests.popLast() else {
-            return
-        }
-
+    @MainActor
+    private func runReferenceTest(_ test: Test) async {
         os_log("Testing %s", test.name)
 
         let loginDomains = testData.fireButtonFireproofing.fireproofedSites.map { sanitizedSite($0) }
@@ -77,33 +71,20 @@ final class FireproofingReferenceTests: XCTestCase {
             return
         }
 
-        Task { @MainActor () -> Void in
-            await dataStore.cookieStore?.setCookie(cookie)
-            await webCacheManager.clear()
+        await dataStore.cookieStore?.setCookie(cookie)
+        await webCacheManager.clear()
 
-            let hotCookies = await dataStore.cookieStore?.allCookies()
-            let testCookie = hotCookies?.filter { $0.name == test.cookieName }.first
+        let hotCookies = await dataStore.cookieStore?.allCookies()
+        let testCookie = hotCookies?.filter { $0.name == test.cookieName }.first
 
-            if test.expectCookieRemoved {
-                XCTAssertNil(testCookie, "Cookie should not exist for test: \(test.name)")
-            } else {
-                XCTAssertNotNil(testCookie, "Cookie should exist for test: \(test.name)")
-            }
+        if test.expectCookieRemoved {
+            XCTAssertNil(testCookie, "Cookie should not exist for test: \(test.name)")
+        } else {
+            XCTAssertNotNil(testCookie, "Cookie should exist for test: \(test.name)")
+        }
 
-            if let cookie = testCookie {
-                await dataStore.cookieStore?.deleteCookie(cookie)
-            }
-
-            DispatchQueue.main.async { [weak self] in
-                onTestExecuted.fulfill()
-
-                guard let self = self else {
-                    XCTFail("\(#function): Failed to unwrap self")
-                    return
-                }
-
-                self.runReferenceTests(onTestExecuted: onTestExecuted)
-            }
+        if let cookie = testCookie {
+            await dataStore.cookieStore?.deleteCookie(cookie)
         }
     }
 

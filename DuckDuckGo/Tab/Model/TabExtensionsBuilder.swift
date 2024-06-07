@@ -34,7 +34,7 @@ struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
 
     static var `default`: TabExtensionsBuilderProtocol {
 #if DEBUG
-        return NSApp.isRunningUnitTests ? TestTabExtensionsBuilder.shared : TabExtensionsBuilder()
+        return NSApp.runType.requiresEnvironment ? TabExtensionsBuilder() : TestTabExtensionsBuilder.shared
 #else
         return TabExtensionsBuilder()
 #endif
@@ -117,7 +117,7 @@ final class TestTabExtensionsBuilder: TabExtensionsBuilderProtocol {
         else {
             fatalError("\(type(of: components[idx].buildingBlock)) has been already initialized at the moment of the `override` call")
         }
-        loader.state = TabExtensionLazyLoader<Extension.PublicProtocol>.State.none { makeTabExtension().getPublicProtocol () }
+        loader.state = TabExtensionLazyLoader<Extension.PublicProtocol>.State.none { makeTabExtension().getPublicProtocol() }
 
         return builderBlock
     }
@@ -159,10 +159,10 @@ struct TabExtensionBuildingBlock<T> {
     }
 
     init<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) where Extension.PublicProtocol == T {
-        if NSApp.isRunningUnitTests {
-            state = .lazy(.init(makeTabExtension))
-        } else {
+        if NSApp.runType.requiresEnvironment {
             state = .loaded(makeTabExtension().getPublicProtocol())
+        } else {
+            state = .lazy(.init(makeTabExtension))
         }
     }
 
@@ -235,7 +235,7 @@ struct TabExtensions {
         let tabExtension = extensions[ObjectIdentifier(T.PublicProtocol.self)]?.getPublicProtocol() as? T.PublicProtocol
         guard isNullable != .nullable else { return tabExtension}
 #if DEBUG
-        assert(NSApp.isRunningUnitTests || tabExtension != nil)
+        assert(!NSApp.runType.requiresEnvironment || tabExtension != nil)
 #else
         os_log("%s Tab Extension not initialised for Unit Tests, activate it in TabExtensions.swift", log: .autoconsent, type: .debug, "\(T.self)")
 #endif

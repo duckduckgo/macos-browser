@@ -21,12 +21,17 @@ import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import Foundation
 import ServiceManagement
 
+public enum SMLoginItemSetEnabledError: Error {
+    case failed
+}
+
 /// Takes care of enabling and disabling a login item.
 ///
 public struct LoginItem: Equatable, Hashable {
 
-    let agentBundleID: String
-    let url: URL
+    public let agentBundleID: String
+    private let launchInformation: LoginItemLaunchInformation
+    private let defaults: UserDefaults
     private let log: OSLog
 
     public var isRunning: Bool {
@@ -45,6 +50,10 @@ public struct LoginItem: Equatable, Hashable {
 
         public var isEnabled: Bool {
             self == .enabled
+        }
+
+        public var isInstalled: Bool {
+            self == .enabled || self == .requiresApproval
         }
 
         @available(macOS 13.0, *)
@@ -71,9 +80,10 @@ public struct LoginItem: Equatable, Hashable {
         return Status(SMAppService.loginItem(identifier: agentBundleID).status)
     }
 
-    public init(bundleId: String, url: URL, log: OSLog) {
+    public init(bundleId: String, defaults: UserDefaults, log: OSLog = .disabled) {
         self.agentBundleID = bundleId
-        self.url = url
+        self.defaults = defaults
+        self.launchInformation = LoginItemLaunchInformation(agentBundleID: bundleId, defaults: defaults)
         self.log = log
     }
 
@@ -83,8 +93,13 @@ public struct LoginItem: Equatable, Hashable {
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).register()
         } else {
-            SMLoginItemSetEnabled(agentBundleID as CFString, true)
+            let success = SMLoginItemSetEnabled(agentBundleID as CFString, true)
+            if !success {
+                throw SMLoginItemSetEnabledError.failed
+            }
         }
+
+        launchInformation.updateLastEnabledTimestamp()
     }
 
     public func disable() throws {
@@ -93,9 +108,11 @@ public struct LoginItem: Equatable, Hashable {
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).unregister()
         } else {
-            SMLoginItemSetEnabled(agentBundleID as CFString, false)
+            let success = SMLoginItemSetEnabled(agentBundleID as CFString, false)
+            if !success {
+                throw SMLoginItemSetEnabledError.failed
+            }
         }
-        stop()
     }
 
     /// Restarts a login item.
@@ -103,7 +120,7 @@ public struct LoginItem: Equatable, Hashable {
     /// This call will only enable the login item if it was enabled to begin with.
     ///
     public func restart() throws {
-        guard [.enabled, .requiresApproval].contains(status) else {
+        guard [.enabled].contains(status) else {
             os_log("🟢 restart not needed for login item %{public}@", log: log, self.debugDescription)
             return
         }
@@ -111,17 +128,11 @@ public struct LoginItem: Equatable, Hashable {
         try enable()
     }
 
-    public func launch() async throws {
-        os_log("🟢 launching login item %{public}@", log: log, self.debugDescription)
-        _ = try await NSWorkspace.shared.openApplication(at: url, configuration: .init())
-    }
-
-    private func stop() {
+    public func forceStop() {
         let runningApplications = runningApplications
         os_log("🟢 stopping %{public}@", log: log, runningApplications.map { $0.processIdentifier }.description)
         runningApplications.forEach { $0.terminate() }
     }
-
 }
 
 extension LoginItem: CustomDebugStringConvertible {

@@ -1,5 +1,5 @@
 //
-//  LoginItem.swift
+//  LoginItem+NetworkProtection.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,15 +16,13 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
+import Foundation
 import LoginItems
 
 extension LoginItem {
-
-    static let vpnMenu = LoginItem(bundleId: Bundle.main.vpnMenuAgentBundleId, url: Bundle.main.vpnMenuAgentURL, log: .networkProtection)
+    static let vpnMenu = LoginItem(bundleId: Bundle.main.vpnMenuAgentBundleId, defaults: .netP, log: .networkProtection)
 #if NETP_SYSTEM_EXTENSION
-    static let notificationsAgent = LoginItem(bundleId: Bundle.main.notificationsAgentBundleId, url: Bundle.main.notificationsAgentURL, log: .networkProtection)
+    static let notificationsAgent = LoginItem(bundleId: Bundle.main.notificationsAgentBundleId, defaults: .netP, log: .networkProtection)
 #endif
 
 }
@@ -38,5 +36,3 @@ extension LoginItemsManager {
         return items
     }
 }
-
-#endif

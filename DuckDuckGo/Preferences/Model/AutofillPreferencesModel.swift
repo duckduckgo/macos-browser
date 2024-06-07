@@ -17,6 +17,8 @@
 //
 
 import Foundation
+import BrowserServicesKit
+import Common
 
 final class AutofillPreferencesModel: ObservableObject {
 
@@ -59,6 +61,12 @@ final class AutofillPreferencesModel: ObservableObject {
         }
     }
 
+    @Published private(set) var autofillSurveyEnabled: Bool {
+        didSet {
+            persistor.autofillSurveyEnabled = autofillSurveyEnabled && Bundle.main.preferredLocalizations.first == "en"
+        }
+    }
+
     @MainActor
     @Published private(set) var passwordManager: PasswordManager {
         didSet {
@@ -73,6 +81,8 @@ final class AutofillPreferencesModel: ObservableObject {
     }
 
     @Published private(set) var isBitwardenSetupFlowPresented = false
+
+    @Published private(set) var hasNeverPromptWebsites: Bool = false
 
     func authorizeAutoLockSettingsChange(
         isEnabled isAutoLockEnabledNewValue: Bool? = nil,
@@ -121,19 +131,26 @@ final class AutofillPreferencesModel: ObservableObject {
     @MainActor
     func showAutofillPopover(_ selectedCategory: SecureVaultSorting.Category = .allItems) {
         guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
-        guard let navigationViewController = parentWindowController.mainViewController.navigationBarViewController else { return }
+        let navigationViewController = parentWindowController.mainViewController.navigationBarViewController
         navigationViewController.showPasswordManagerPopover(selectedCategory: selectedCategory)
+    }
+
+    func resetNeverPromptWebsites() {
+        _ = neverPromptWebsitesManager.deleteAllNeverPromptWebsites()
+        hasNeverPromptWebsites = !neverPromptWebsitesManager.neverPromptWebsites.isEmpty
     }
 
     @MainActor
     init(
         persistor: AutofillPreferencesPersistor = AutofillPreferences(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
-        bitwardenInstallationService: BWInstallationService = LocalBitwardenInstallationService()
+        bitwardenInstallationService: BWInstallationService = LocalBitwardenInstallationService(),
+        neverPromptWebsitesManager: AutofillNeverPromptWebsitesManager = AutofillNeverPromptWebsitesManager.shared
     ) {
         self.persistor = persistor
         self.userAuthenticator = userAuthenticator
         self.bitwardenInstallationService = bitwardenInstallationService
+        self.neverPromptWebsitesManager = neverPromptWebsitesManager
 
         isAutoLockEnabled = persistor.isAutoLockEnabled
         autoLockThreshold = persistor.autoLockThreshold
@@ -143,11 +160,14 @@ final class AutofillPreferencesModel: ObservableObject {
         askToSavePaymentMethods = persistor.askToSavePaymentMethods
         autolockLocksFormFilling = persistor.autolockLocksFormFilling
         passwordManager = persistor.passwordManager
+        hasNeverPromptWebsites = !neverPromptWebsitesManager.neverPromptWebsites.isEmpty
+        autofillSurveyEnabled = persistor.autofillSurveyEnabled
     }
 
     private var persistor: AutofillPreferencesPersistor
     private var userAuthenticator: UserAuthenticating
     private let bitwardenInstallationService: BWInstallationService
+    private let neverPromptWebsitesManager: AutofillNeverPromptWebsitesManager
 
     // MARK: - Password Manager
 
@@ -178,11 +198,36 @@ final class AutofillPreferencesModel: ObservableObject {
     }
 
     func openSettings() {
-        guard let link = URL.fullDiskAccess else {
-            assertionFailure("Can't initialize link to Settings")
-            return
-        }
-        NSWorkspace.shared.open(link)
+        NSWorkspace.shared.open(.fullDiskAccess)
     }
 
+    func launchSurvey(statisticsStore: StatisticsStore = LocalStatisticsStore(),
+                      activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
+                      operatingSystemVersion: String = ProcessInfo.processInfo.operatingSystemVersion.description,
+                      appVersion: String = AppVersion.shared.versionNumber,
+                      hardwareModel: String? = HardwareModel.model) {
+
+        let surveyURLBuilder = SurveyURLBuilder(
+            statisticsStore: statisticsStore,
+            operatingSystemVersion: operatingSystemVersion,
+            appVersion: appVersion,
+            hardwareModel: hardwareModel,
+            daysSinceActivation: activationDateStore.daysSinceActivation(),
+            daysSinceLastActive: activationDateStore.daysSinceLastActive()
+        )
+
+        guard let surveyUrl = surveyURLBuilder.buildSurveyURLWithPasswordsCountSurveyParameter(from: "https://selfserve.decipherinc.com/survey/selfserve/32ab/240307") else {
+            return
+        }
+
+        DispatchQueue.main.async {
+            WindowControllersManager.shared.showTab(with: .url(surveyUrl, credential: nil, source: .appOpenUrl))
+        }
+
+        disableAutofillSurvey()
+    }
+
+    func disableAutofillSurvey() {
+        autofillSurveyEnabled = false
+    }
 }

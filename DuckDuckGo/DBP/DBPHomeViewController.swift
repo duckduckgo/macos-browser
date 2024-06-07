@@ -16,11 +16,15 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import DataBrokerProtection
 import AppKit
 import Common
 import SwiftUI
+import BrowserServicesKit
+import PixelKit
 
 public extension Notification.Name {
     static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
@@ -29,15 +33,47 @@ public extension Notification.Name {
 final class DBPHomeViewController: NSViewController {
     private var presentedWindowController: NSWindowController?
     private let dataBrokerProtectionManager: DataBrokerProtectionManager
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
+    private var currentChildViewController: NSViewController?
+    private var observer: NSObjectProtocol?
 
-    lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
-        DataBrokerProtectionViewController(scheduler: dataBrokerProtectionManager.scheduler,
-                                           dataManager: dataBrokerProtectionManager.dataManager,
-                                           notificationCenter: NotificationCenter.default)
+    private let prerequisiteVerifier: DataBrokerPrerequisitesStatusVerifier
+    private lazy var errorViewController: DataBrokerProtectionErrorViewController = {
+        DataBrokerProtectionErrorViewController()
     }()
 
-    init(dataBrokerProtectionManager: DataBrokerProtectionManager) {
+    private lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
+        let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
+        let features = ContentScopeFeatureToggles(emailProtection: false,
+                                                  emailProtectionIncontextSignup: false,
+                                                  credentialsAutofill: false,
+                                                  identitiesAutofill: false,
+                                                  creditCardsAutofill: false,
+                                                  credentialsSaving: false,
+                                                  passwordGeneration: false,
+                                                  inlineIconCredentials: false,
+                                                  thirdPartyCredentialsProvider: false)
+
+        let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
+        let sessionKey = UUID().uuidString
+        let prefs = ContentScopeProperties(gpcEnabled: isGPCEnabled,
+                                           sessionKey: sessionKey,
+                                           featureToggles: features)
+
+        return DataBrokerProtectionViewController(
+            scheduler: dataBrokerProtectionManager.scheduler,
+            dataManager: dataBrokerProtectionManager.dataManager,
+            privacyConfig: privacyConfigurationManager,
+            prefs: prefs,
+            webUISettings: DataBrokerProtectionWebUIURLSettings(.dbp),
+            openURLHandler: { url in
+                WindowControllersManager.shared.show(url: url, source: .link, newTab: true)
+            })
+    }()
+
+    init(dataBrokerProtectionManager: DataBrokerProtectionManager, prerequisiteVerifier: DataBrokerPrerequisitesStatusVerifier = DefaultDataBrokerPrerequisitesStatusVerifier()) {
         self.dataBrokerProtectionManager = dataBrokerProtectionManager
+        self.prerequisiteVerifier = prerequisiteVerifier
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -52,27 +88,45 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if !dataBrokerProtectionManager.shouldAskForInviteCode() {
-            attachDataBrokerContainerView()
-        }
-    }
+        setupUI()
+        setupObserver()
 
-    private func attachDataBrokerContainerView() {
-        addChild(dataBrokerProtectionViewController)
-        view.addSubview(dataBrokerProtectionViewController.view)
+        do {
+            if try dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
+                let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
+                dbpDateStore.updateLastActiveDate()
+            }
+        } catch {
+            os_log("DBPHomeViewController error: viewDidLoad, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPHomeViewController.viewDidLoad"))
+        }
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
 
-        if dataBrokerProtectionManager.shouldAskForInviteCode() {
+        if shouldAskForInviteCode() {
             presentInviteCodeFlow()
         }
     }
 
     override func viewDidLayout() {
         super.viewDidLayout()
-        dataBrokerProtectionViewController.view.frame = view.bounds
+        if let currentChildViewController = currentChildViewController {
+            currentChildViewController.view.frame = view.bounds
+        }
+    }
+
+    private func setupUI() {
+        if !shouldAskForInviteCode() {
+            setupUIWithCurrentStatus()
+        }
+    }
+
+    private func setupObserver() {
+        observer = NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: nil) { [weak self] _ in
+            self?.setupUI()
+        }
     }
 
     private func presentInviteCodeFlow() {
@@ -90,13 +144,54 @@ final class DBPHomeViewController: NSViewController {
         }
         parentWindowController.window?.beginSheet(newWindow)
     }
+
+    private func setupUIWithCurrentStatus() {
+        setupUIWithStatus(prerequisiteVerifier.checkStatus())
+    }
+
+    private func setupUIWithStatus(_ status: DataBrokerPrerequisitesStatus) {
+        switch status {
+        case .invalidDirectory:
+            displayWrongDirectoryErrorUI()
+            pixelHandler.fire(.homeViewShowBadPathError)
+        case .invalidSystemPermission:
+            displayWrongPermissionsErrorUI()
+            pixelHandler.fire(.homeViewShowNoPermissionError)
+        case .valid:
+            displayDBPUI()
+            pixelHandler.fire(.homeViewShowWebUI)
+        }
+    }
+
+    private func shouldAskForInviteCode() -> Bool {
+        prerequisiteVerifier.checkStatus() == .valid && dataBrokerProtectionManager.shouldAskForInviteCode()
+    }
+
+    private func displayDBPUI() {
+        replaceChildController(dataBrokerProtectionViewController)
+    }
+
+    private func replaceChildController(_ childViewController: NSViewController) {
+        if let child = currentChildViewController {
+            child.removeCompletely()
+        }
+
+        addAndLayoutChild(childViewController)
+        self.currentChildViewController = childViewController
+    }
+
+    deinit {
+        if let observer = observer {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
 }
 
 extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDelegate {
     func dataBrokerProtectionInviteDialogsViewModelDidReedemSuccessfully(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
         presentedWindowController?.window?.close()
         presentedWindowController = nil
-        attachDataBrokerContainerView()
+        setupUIWithCurrentStatus()
     }
 
     func dataBrokerProtectionInviteDialogsViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
@@ -106,43 +201,55 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
     }
 }
 
-public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
+// MARK: - Error UI
 
-    // swiftlint:disable:next cyclomatic_complexity
-    public init() {
-        super.init { event, _, _, _ in
-            switch event {
-            case .error(let error, _):
-                Pixel.fire(.debug(event: .dataBrokerProtectionError, error: error), withAdditionalParameters: event.params)
-            case .optOutStart:
-                Pixel.fire(.debug(event: .optOutStart), withAdditionalParameters: event.params)
-            case .optOutEmailGenerate:
-                Pixel.fire(.debug(event: .optOutEmailGenerate), withAdditionalParameters: event.params)
-            case .optOutCaptchaParse:
-                Pixel.fire(.debug(event: .optOutCaptchaParse), withAdditionalParameters: event.params)
-            case .optOutCaptchaSend:
-                Pixel.fire(.debug(event: .optOutCaptchaSend), withAdditionalParameters: event.params)
-            case .optOutCaptchaSolve:
-                Pixel.fire(.debug(event: .optOutCaptchaSolve), withAdditionalParameters: event.params)
-            case .optOutSubmit:
-                Pixel.fire(.debug(event: .optOutSubmit), withAdditionalParameters: event.params)
-            case .optOutEmailReceive:
-                Pixel.fire(.debug(event: .optOutEmailReceive), withAdditionalParameters: event.params)
-            case .optOutEmailConfirm:
-                Pixel.fire(.debug(event: .optOutEmailConfirm), withAdditionalParameters: event.params)
-            case .optOutValidate:
-                Pixel.fire(.debug(event: .optOutValidate), withAdditionalParameters: event.params)
-            case .optOutFinish:
-                Pixel.fire(.debug(event: .optOutFinish), withAdditionalParameters: event.params)
-            case .optOutSuccess:
-                Pixel.fire(.debug(event: .optOutSuccess), withAdditionalParameters: event.params)
-            case .optOutFailure:
-                Pixel.fire(.debug(event: .optOutFailure), withAdditionalParameters: event.params)
-            }
+extension DBPHomeViewController {
+    private func displayWrongDirectoryErrorUI() {
+        let errorViewModel = DataBrokerProtectionErrorViewModel(title: UserText.dbpErrorPageBadPathTitle,
+                                                                message: UserText.dbpErrorPageBadPathMessage,
+                                                                ctaText: UserText.dbpErrorPageBadPathCTA,
+                                                                ctaAction: { [weak self] in
+            self?.moveToApplicationFolder()
+        })
+
+        errorViewController.errorViewModel = errorViewModel
+        replaceChildController(errorViewController)
+    }
+
+    private func displayWrongPermissionsErrorUI() {
+        let errorViewModel = DataBrokerProtectionErrorViewModel(title: UserText.dbpErrorPageNoPermissionTitle,
+                                                                message: UserText.dbpErrorPageNoPermissionMessage,
+                                                                ctaText: UserText.dbpErrorPageNoPermissionCTA,
+                                                                ctaAction: { [weak self] in
+            self?.openLoginItemSettings()
+        })
+
+        errorViewController.errorViewModel = errorViewModel
+        replaceChildController(errorViewController)
+    }
+}
+
+// MARK: - System configuration
+
+import ServiceManagement
+
+extension DBPHomeViewController {
+    func openLoginItemSettings() {
+        pixelHandler.fire(.homeViewCTAGrantPermissionClicked)
+        if #available(macOS 13.0, *) {
+            SMAppService.openSystemSettingsLoginItems()
+        } else {
+            let loginItemsURL = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension")!
+            NSWorkspace.shared.open(loginItemsURL)
         }
     }
 
-    override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
-        fatalError("Use init()")
+    func moveToApplicationFolder() {
+        pixelHandler.fire(.homeViewCTAMoveApplicationClicked)
+        Task { @MainActor in
+            await AppLauncher(appBundleURL: Bundle.main.bundleURL).launchApp(withCommand: .moveAppToApplications)
+        }
     }
 }
+
+#endif

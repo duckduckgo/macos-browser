@@ -19,36 +19,38 @@
 import Combine
 import Common
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
 class PrivacyDashboardIntegrationTests: XCTestCase {
 
-    static var window: NSWindow!
+    var window: NSWindow!
     var tabViewModel: TabViewModel {
-        (Self.window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
+        (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
     }
 
     @MainActor
-    override class func setUp() {
+    override func setUp() {
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         window = WindowsManager.openNewWindow(with: .none)!
     }
 
-    override class func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window.close()
         window = nil
 
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests
 
     @MainActor
     func testWhenTrackerDetected_trackerInfoUpdated() async throws {
-        var persistor = DownloadsPreferencesUserDefaultsPersistor()
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
         let tabViewModel = self.tabViewModel
@@ -64,8 +66,8 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
             .promise()
 
         // load the test page
-        let url = URL(string: "http://privacy-test-pages.glitch.me/tracker-reporting/1major-via-script.html")!
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-via-script.html")!
+        _=await tab.setUrl(url, source: .link)?.result
 
         let trackersCount = try await trackersCountPromise.value
         XCTAssertEqual(trackersCount, 1)
@@ -78,7 +80,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
             .timeout(10)
             .first()
             .promise()
-        _=await tab.setUrl(URL.testsServer, userEntered: nil)?.value?.result
+        _=await tab.setUrl(URL.testsServer, source: .link)?.result
 
         let trackersCount2 = try await trackersCountPromise2.value
         XCTAssertEqual(trackersCount2, 0)

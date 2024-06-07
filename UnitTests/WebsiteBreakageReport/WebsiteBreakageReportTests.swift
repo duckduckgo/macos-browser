@@ -16,18 +16,30 @@
 //  limitations under the License.
 //
 
+import PrivacyDashboard
 import XCTest
-@testable import Networking
+import PixelKit
+import PixelKitTestingUtilities
 @testable import DuckDuckGo_Privacy_Browser
+@testable import Networking
 
 class WebsiteBreakageReportTests: XCTestCase {
 
+    func testReportBrokenSitePixel() {
+        fire(NonStandardEvent(NonStandardPixel.brokenSiteReport),
+             frequency: .standard,
+             and: .expect(pixelName: "epbf_macos_desktop"),
+             file: #filePath,
+             line: #line)
+    }
+
     func testCommonSetOfFields() throws {
-        let breakage = WebsiteBreakage(
-            category: .contentIsMissing,
+        let breakage = BrokenSiteReport(
+            siteUrl: URL(string: "https://example.test/")!,
+            category: "contentIsMissing",
             description: nil,
-            siteUrlString: "https://example.test/",
             osVersion: "12.3.0",
+            manufacturer: "Apple",
             upgradedHttps: true,
             tdsETag: "abc123",
             blockedTrackerDomains: [
@@ -39,7 +51,17 @@ class WebsiteBreakageReportTests: XCTestCase {
             ],
             isGPCEnabled: true,
             ampURL: "https://example.test",
-            urlParametersRemoved: false
+            urlParametersRemoved: false,
+            protectionsState: true,
+            reportFlow: .appMenu,
+            errors: nil,
+            httpStatusCodes: nil,
+            openerContext: nil,
+            vpnOn: false,
+            jsPerformance: nil,
+            userRefreshCount: 0,
+            didOpenReportInfo: false,
+            toggleReportCounter: nil
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
@@ -51,20 +73,22 @@ class WebsiteBreakageReportTests: XCTestCase {
         XCTAssertEqual(url.host, "improving.duckduckgo.com")
         XCTAssertEqual(url.path, "/t/epbf_macos_desktop")
 
-        XCTAssertEqual(queryItems[valueFor: "category"], "content")
+        XCTAssertEqual(queryItems[valueFor: "category"], "contentIsMissing")
         XCTAssertEqual(queryItems[valueFor: "siteUrl"], "https%3A%2F%2Fexample.test%2F")
         XCTAssertEqual(queryItems[valueFor: "upgradedHttps"], "true")
         XCTAssertEqual(queryItems[valueFor: "tds"], "abc123")
         XCTAssertEqual(queryItems[valueFor: "blockedTrackers"], "bad.tracker.test,tracking.test")
         XCTAssertEqual(queryItems[valueFor: "surrogates"], "surrogate.domain.test")
+        XCTAssertEqual(queryItems[valueFor: "protectionsState"], "true")
     }
 
     func testThatNativeAppSpecificFieldsAreReported() throws {
-        let breakage = WebsiteBreakage(
-            category: .videoOrImagesDidntLoad,
+        let breakage = BrokenSiteReport(
+            siteUrl: URL(string: "http://unsafe.example.test/path/to/thing.html")!,
+            category: "videoOrImagesDidntLoad",
             description: nil,
-            siteUrlString: "http://unsafe.example.test/path/to/thing.html",
             osVersion: "12",
+            manufacturer: "Apple",
             upgradedHttps: false,
             tdsETag: "abc123",
             blockedTrackerDomains: [
@@ -77,7 +101,16 @@ class WebsiteBreakageReportTests: XCTestCase {
             isGPCEnabled: true,
             ampURL: "https://example.test",
             urlParametersRemoved: false,
-            manufacturer: "IBM"
+            protectionsState: true,
+            reportFlow: .appMenu,
+            errors: nil,
+            httpStatusCodes: nil,
+            openerContext: nil,
+            vpnOn: false,
+            jsPerformance: nil,
+            userRefreshCount: 0,
+            didOpenReportInfo: false,
+            toggleReportCounter: nil
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
@@ -89,22 +122,25 @@ class WebsiteBreakageReportTests: XCTestCase {
         XCTAssertEqual(url.host, "improving.duckduckgo.com")
         XCTAssertEqual(url.path, "/t/epbf_macos_desktop")
 
-        XCTAssertEqual(queryItems[valueFor: "category"], "images")
+        XCTAssertEqual(queryItems[valueFor: "category"], "videoOrImagesDidntLoad")
         XCTAssertEqual(queryItems[valueFor: "siteUrl"], "http%3A%2F%2Funsafe.example.test%2Fpath%2Fto%2Fthing.html")
         XCTAssertEqual(queryItems[valueFor: "upgradedHttps"], "false")
         XCTAssertEqual(queryItems[valueFor: "tds"], "abc123")
         XCTAssertEqual(queryItems[valueFor: "blockedTrackers"], "bad.tracker.test,tracking.test")
         XCTAssertEqual(queryItems[valueFor: "surrogates"], "surrogate.domain.test")
-        XCTAssertEqual(queryItems[valueFor: "manufacturer"], "IBM")
+        XCTAssertEqual(queryItems[valueFor: "protectionsState"], "true")
+        XCTAssertEqual(queryItems[valueFor: "manufacturer"], "Apple")
         XCTAssertEqual(queryItems[valueFor: "os"], "12")
         XCTAssertEqual(queryItems[valueFor: "gpc"], "true")
     }
 
     func makeURLRequest(with parameters: [String: String]) -> URLRequest {
         APIRequest.Headers.setUserAgent("")
-        let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
-                                                     queryParameters: parameters,
-                                                     allowedQueryReservedCharacters: WebsiteBreakageSender.allowedQueryReservedCharacters)
+        var params = parameters
+        params["test"] = "1"
+        let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: NonStandardPixel.brokenSiteReport.name),
+                                                     queryParameters: params,
+                                                     allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters)
         return configuration.request
     }
 }

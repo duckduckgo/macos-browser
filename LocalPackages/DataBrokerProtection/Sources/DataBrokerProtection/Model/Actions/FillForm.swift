@@ -18,16 +18,12 @@
 
 import Foundation
 
-struct PageElement: Codable, Sendable {
-    let type: String
-    let selector: String
-}
-
 struct FillFormAction: Action {
     let id: String
     let actionType: ActionType
     let selector: String
     let elements: [PageElement]
+    let dataSource: DataSource?
 
     var needsEmail: Bool {
         elements.contains { $0.type == "email" }

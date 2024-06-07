@@ -17,6 +17,7 @@
 //
 
 import BrowserServicesKit
+import PixelKit
 
 extension EmailManagerRequestDelegate {
 
@@ -46,7 +47,7 @@ extension EmailManagerRequestDelegate {
     }
     // swiftlint:enable function_parameter_count
 
-    public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
+    public func emailManagerKeychainAccessFailed(_ emailManager: EmailManager, accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [
             "access_type": accessType.rawValue,
             "error": error.errorDescription
@@ -67,7 +68,7 @@ extension EmailManagerRequestDelegate {
             parameters["keychain_operation"] = "save"
         }
 
-        Pixel.fire(.debug(event: .emailAutofillKeychainError), withAdditionalParameters: parameters)
+        PixelKit.fire(DebugEvent(GeneralPixel.emailAutofillKeychainError), withAdditionalParameters: parameters)
     }
 
 }

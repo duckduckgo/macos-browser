@@ -22,4 +22,5 @@ struct GetCaptchaInfoAction: Action {
     let id: String
     let actionType: ActionType
     let selector: String
+    let dataSource: DataSource?
 }

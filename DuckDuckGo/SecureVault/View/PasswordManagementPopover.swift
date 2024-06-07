@@ -18,6 +18,7 @@
 
 import AppKit
 import BrowserServicesKit
+import Combine
 import SwiftUI
 
 final class PasswordManagementPopover: NSPopover {
@@ -41,8 +42,6 @@ final class PasswordManagementPopover: NSPopover {
     var viewController: PasswordManagementViewController { contentViewController as! PasswordManagementViewController }
     // swiftlint:enable force_cast
 
-    private var parentWindowDidResignKeyObserver: Any?
-
     func select(category: SecureVaultSorting.Category?) {
         viewController.select(category: category)
     }
@@ -60,22 +59,6 @@ final class PasswordManagementPopover: NSPopover {
 
 extension PasswordManagementPopover: NSPopoverDelegate {
 
-    func popoverDidShow(_ notification: Notification) {
-        parentWindowDidResignKeyObserver = NotificationCenter.default.addObserver(forName: NSWindow.didResignMainNotification,
-                                                                                  object: nil,
-                                                                                  queue: OperationQueue.main) { [weak self] _ in
-            guard let self = self, self.isShown else { return }
-
-            if !DeviceAuthenticator.shared.isAuthenticating {
-                self.close()
-            }
-        }
-    }
-
-    func popoverShouldClose(_ popover: NSPopover) -> Bool {
-        return !DeviceAuthenticator.shared.isAuthenticating
-    }
-
     func popoverDidClose(_ notification: Notification) {
         if let window = viewController.view.window {
             for sheet in window.sheets {
@@ -86,7 +69,6 @@ extension PasswordManagementPopover: NSPopoverDelegate {
         if !viewController.isDirty {
             viewController.clear()
         }
-        parentWindowDidResignKeyObserver = nil
     }
 
 }

@@ -27,7 +27,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
 
     func testWhenAccountIsSelectedThenModelReflectsThat() {
         let accounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: accounts)
         model.select(item: accounts[0])
@@ -47,26 +47,26 @@ final class PasswordManagementItemListModelTests: XCTestCase {
     func testWhenFilterAppliedThenDisplayedAccountsOnlyContainFilteredMatches() {
 
         let createdAccounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: createdAccounts)
         model.filter = "domain5"
 
-        XCTAssertEqual(model.displayedItems.count, 1)
+        XCTAssertEqual(model.displayedSections.count, 1)
 
-        let filteredAccounts = accounts(from: model.displayedItems)
+        let filteredAccounts = accounts(from: model.displayedSections)
         XCTAssertEqual(filteredAccounts[0].domain, "domain5")
 
         model.filter = ""
 
-        let unfilteredAccounts = accounts(from: model.displayedItems)
+        let unfilteredAccounts = accounts(from: model.displayedSections)
         XCTAssertEqual(unfilteredAccounts.count, 10)
         XCTAssertEqual(unfilteredAccounts[0].domain, "domain0")
         XCTAssertEqual(unfilteredAccounts[9].domain, "domain9")
     }
 
     func testWhenAccountIsSelectedThenCallbackReceivesOldAndNewVersion() {
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
         let account = makeAccount(id: 1)
 
         model.update(items: [account])
@@ -77,12 +77,12 @@ final class PasswordManagementItemListModelTests: XCTestCase {
     }
 
     func testWhenGettingEmptyState_AndViewModelIsNewlyCreated_ThenEmptyStateIsNone() {
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
         XCTAssertEqual(model.emptyState, .none)
     }
 
     func testWhenGettingEmptyState_AndViewModelGetsGivenEmptyDataSet_ThenEmptyStateIsNoData() {
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
         model.update(items: [])
 
         XCTAssertEqual(model.emptyState, .noData)
@@ -90,7 +90,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
 
     func testWhenGettingEmptyState_AndViewModelHasData_AndCategoryIsAllItems_AndViewModelIsFiltered_ThenEmptyStateIsNone() {
         let accounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: accounts)
         XCTAssertEqual(model.emptyState, .none)
@@ -104,7 +104,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
 
     func testWhenGettingEmptyState_AndViewModelHasData_AndCategoryIsLogins_AndViewModelIsFiltered_ThenEmptyStateIsLogins() {
         let accounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: accounts)
         model.sortDescriptor.category = .logins
@@ -115,6 +115,56 @@ final class PasswordManagementItemListModelTests: XCTestCase {
 
         model.filter = "filter that won't match"
         XCTAssertEqual(model.emptyState, .logins)
+    }
+
+    func testWhenGettingSelectedItem_AndViewModelHasNoMatchingDomains_ThenFirstItemSelected() {
+        let account1 = makeAccount(id: 1, domain: "adomain.com")
+        let account2 = makeAccount(id: 2, domain: "anotherdomain.com")
+        let account3 = makeAccount(id: 3, domain: "otherdomain.com")
+        let accounts = [account1, account2, account3]
+
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
+
+        model.update(items: accounts)
+        model.selectLoginWithDomainOrFirst(domain: "dummy.com")
+
+        XCTAssertNotNil(model.selected)
+        XCTAssertEqual(model.selected?.id, String(describing: accounts[0]))
+    }
+
+    func testWhenGettingSelectedItem_AndViewModelHasMatchingDomain_ThenMatchingDomainSelected() {
+        let account1 = makeAccount(id: 1, domain: "adomain.com")
+        let account2 = makeAccount(id: 2, domain: "example.com")
+        let account3 = makeAccount(id: 3, domain: "otherdomain.com")
+        let accounts = [account1, account2, account3]
+
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
+
+        model.update(items: accounts)
+        model.selectLoginWithDomainOrFirst(domain: "example.com")
+
+        XCTAssertNotNil(model.selected)
+        XCTAssertEqual(model.selected?.id, String(describing: accounts[1]))
+    }
+
+    func testWhenGettingSelectedItem_AndViewModelHasMatchingSubdomains_ThenMatchingSubdomainSelected() {
+        let account1 = makeAccount(id: 1, domain: "example.com")
+        let account2 = makeAccount(id: 2, domain: "sub.example.com")
+        let account3 = makeAccount(id: 3, domain: "www.example.com")
+        let accounts = [account1, account2, account3]
+
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
+
+        model.update(items: accounts)
+        model.selectLoginWithDomainOrFirst(domain: "sub.example.com")
+
+        XCTAssertNotNil(model.selected)
+        XCTAssertEqual(model.selected?.id, String(describing: accounts[1]))
+
+        model.selectLoginWithDomainOrFirst(domain: "example.com")
+
+        XCTAssertNotNil(model.selected)
+        XCTAssertEqual(model.selected?.id, String(describing: accounts[0]))
     }
 
     func makeAccount(id: Int64, title: String? = nil, username: String = "username", domain: String = "domain") -> SecureVaultItem {
@@ -129,6 +179,8 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         oldSelection = old
         newSelection = new
     }
+
+    func onAddItemSelected(category: SecureVaultSorting.Category) {}
 
     private func accounts(from sections: [PasswordManagementListSection]) -> [SecureVaultModels.WebsiteAccount] {
         var accounts = [SecureVaultModels.WebsiteAccount]()
@@ -151,9 +203,11 @@ final class PasswordManagementItemListModelTests: XCTestCase {
 
 extension PasswordManagementItemListModel {
 
-    convenience init(onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
+    convenience init(onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void,
+                     onAddItemSelected: @escaping (_ category: SecureVaultSorting.Category) -> Void) {
         self.init(passwordManagerCoordinator: PasswordManagerCoordinatingMock(),
-                  onItemSelected: onItemSelected)
+                  onItemSelected: onItemSelected,
+                  onAddItemSelected: onAddItemSelected)
     }
 
 }

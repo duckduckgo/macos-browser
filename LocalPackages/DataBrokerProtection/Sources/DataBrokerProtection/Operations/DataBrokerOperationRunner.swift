@@ -1,5 +1,5 @@
 //
-//  WebOperationRunner.swift
+//  DataBrokerOperationRunner.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -23,13 +23,15 @@ import Common
 protocol WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
-              stageCalculator: DataBrokerProtectionStageDurationCalculator,
+              stageCalculator: StageDurationCalculator,
+              pixelHandler: EventMapping<DataBrokerProtectionPixels>,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile]
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
-                stageCalculator: DataBrokerProtectionStageDurationCalculator,
+                stageCalculator: StageDurationCalculator,
+                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws
 }
@@ -37,23 +39,27 @@ protocol WebOperationRunner {
 extension WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
-              stageCalculator: DataBrokerProtectionStageDurationCalculator,
+              stageCalculator: StageDurationCalculator,
+              pixelHandler: EventMapping<DataBrokerProtectionPixels>,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
 
         try await scan(profileQuery,
                        stageCalculator: stageCalculator,
+                       pixelHandler: pixelHandler,
                        showWebView: false,
                        shouldRunNextStep: shouldRunNextStep)
     }
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
-                stageCalculator: DataBrokerProtectionStageDurationCalculator,
+                stageCalculator: StageDurationCalculator,
+                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
 
         try await optOut(profileQuery: profileQuery,
                          extractedProfile: extractedProfile,
                          stageCalculator: stageCalculator,
+                         pixelHandler: pixelHandler,
                          showWebView: false,
                          shouldRunNextStep: shouldRunNextStep)
     }
@@ -77,34 +83,44 @@ final class DataBrokerOperationRunner: WebOperationRunner {
     }
 
     func scan(_ profileQuery: BrokerProfileQueryData,
-              stageCalculator: DataBrokerProtectionStageDurationCalculator,
+              stageCalculator: StageDurationCalculator,
+              pixelHandler: EventMapping<DataBrokerProtectionPixels>,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
+        let sleepObserver = DataBrokerProtectionSleepObserver(brokerProfileQueryData: profileQuery)
         let scan = ScanOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
             query: profileQuery,
             emailService: emailService,
             captchaService: captchaService,
+            stageDurationCalculator: stageCalculator,
+            pixelHandler: pixelHandler,
+            sleepObserver: sleepObserver,
             shouldRunNextStep: shouldRunNextStep
         )
-        return try await scan.run(inputValue: (), stageCalculator: stageCalculator, showWebView: showWebView)
+        return try await scan.run(inputValue: (), showWebView: showWebView)
     }
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
-                stageCalculator: DataBrokerProtectionStageDurationCalculator,
+                stageCalculator: StageDurationCalculator,
+                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
+        let sleepObserver = DataBrokerProtectionSleepObserver(brokerProfileQueryData: profileQuery)
         let optOut = OptOutOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
             query: profileQuery,
             emailService: emailService,
             captchaService: captchaService,
+            stageCalculator: stageCalculator,
+            pixelHandler: pixelHandler,
+            sleepObserver: sleepObserver,
             shouldRunNextStep: shouldRunNextStep
         )
-        try await optOut.run(inputValue: extractedProfile, stageCalculator: stageCalculator, showWebView: showWebView)
+        try await optOut.run(inputValue: extractedProfile, showWebView: showWebView)
     }
 
     deinit {

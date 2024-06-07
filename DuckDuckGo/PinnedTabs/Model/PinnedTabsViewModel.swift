@@ -46,6 +46,7 @@ final class PinnedTabsViewModel: ObservableObject {
         didSet {
             if let selectedItem = selectedItem {
                 selectedItemIndex = items.firstIndex(of: selectedItem)
+                updateTabAudioState(tab: selectedItem)
             } else {
                 selectedItemIndex = nil
             }
@@ -57,6 +58,7 @@ final class PinnedTabsViewModel: ObservableObject {
         didSet {
             if let hoveredItem = hoveredItem {
                 hoveredItemIndex = items.firstIndex(of: hoveredItem)
+                updateTabAudioState(tab: hoveredItem)
             } else {
                 hoveredItemIndex = nil
             }
@@ -72,6 +74,7 @@ final class PinnedTabsViewModel: ObservableObject {
     @Published private(set) var selectedItemIndex: Int?
     @Published private(set) var hoveredItemIndex: Int?
     @Published private(set) var dragMovesWindow: Bool = true
+    @Published private(set) var audioStateView: AudioStateView = .notSupported
 
     @Published private(set) var itemsWithoutSeparator: Set<Tab> = []
 
@@ -80,10 +83,15 @@ final class PinnedTabsViewModel: ObservableObject {
 
     // MARK: -
 
-    init(collection: TabCollection, fireproofDomains: FireproofDomains = .shared) {
+    init(
+        collection: TabCollection,
+        fireproofDomains: FireproofDomains = .shared,
+        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
+    ) {
         tabsDidReorderPublisher = tabsDidReorderSubject.eraseToAnyPublisher()
         contextMenuActionPublisher = contextMenuActionSubject.eraseToAnyPublisher()
         self.fireproofDomains = fireproofDomains
+        self.bookmarkManager = bookmarkManager
         tabsCancellable = collection.$tabs.assign(to: \.items, onWeaklyHeld: self)
 
         dragMovesWindowCancellable = $items
@@ -97,6 +105,7 @@ final class PinnedTabsViewModel: ObservableObject {
     private var tabsCancellable: AnyCancellable?
     private var dragMovesWindowCancellable: AnyCancellable?
     private var fireproofDomains: FireproofDomains
+    private var bookmarkManager: BookmarkManager
 
     private func updateItemsWithoutSeparator() {
         var items = Set<Tab>()
@@ -111,6 +120,18 @@ final class PinnedTabsViewModel: ObservableObject {
         }
         itemsWithoutSeparator = items
     }
+
+    private func updateTabAudioState(tab: Tab) {
+        let audioState = tab.audioState
+        switch audioState {
+        case .muted:
+            audioStateView = .muted
+        case .unmuted:
+            audioStateView = .unmuted
+        case .none:
+            audioStateView = .notSupported
+        }
+    }
 }
 
 // MARK: - Context Menu
@@ -121,9 +142,17 @@ extension PinnedTabsViewModel {
         case unpin(Int)
         case duplicate(Int)
         case bookmark(Tab)
+        case removeBookmark(Tab)
         case fireproof(Tab)
         case removeFireproofing(Tab)
         case close(Int)
+        case muteOrUnmute(Tab)
+    }
+
+    enum AudioStateView {
+        case muted
+        case unmuted
+        case notSupported
     }
 
     func isFireproof(_ tab: Tab) -> Bool {
@@ -157,8 +186,17 @@ extension PinnedTabsViewModel {
         contextMenuActionSubject.send(.close(index))
     }
 
+    func isPinnedTabBookmarked(_ tab: Tab) -> Bool {
+        guard let url = tab.url else { return false }
+        return bookmarkManager.isUrlBookmarked(url: url)
+    }
+
     func bookmark(_ tab: Tab) {
         contextMenuActionSubject.send(.bookmark(tab))
+    }
+
+    func removeBookmark(_ tab: Tab) {
+        contextMenuActionSubject.send(.removeBookmark(tab))
     }
 
     func fireproof(_ tab: Tab) {
@@ -167,5 +205,10 @@ extension PinnedTabsViewModel {
 
     func removeFireproofing(_ tab: Tab) {
         contextMenuActionSubject.send(.removeFireproofing(tab))
+    }
+
+    func muteOrUmute(_ tab: Tab) {
+        contextMenuActionSubject.send(.muteOrUnmute(tab))
+        updateTabAudioState(tab: tab)
     }
 }

@@ -60,9 +60,9 @@ struct RecentlyVisited: View {
 
 struct RecentlyVisitedSiteEmptyState: View {
 
-    let textColor = Color("HomeFeedEmptyStateTextColor")
-    let iconColor = Color("HomeFeedEmptyStateIconColor")
-    let connectorColor = Color("HomeFavoritesBackgroundColor")
+    let textColor = Color.homeFeedEmptyStateText
+    let iconColor = Color.homeFeedEmptyStateIcon
+    let connectorColor = Color.homeFavoritesBackground
 
     var body: some View {
 
@@ -70,7 +70,7 @@ struct RecentlyVisitedSiteEmptyState: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 6)
                     .fill(connectorColor)
-                Image("Web")
+                Image(.web)
                     .resizable()
                     .frame(width: 16, height: 16)
                     .foregroundColor(iconColor)
@@ -109,9 +109,9 @@ struct RecentlyVisitedSite: View {
         ZStack(alignment: .top) {
 
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color("HomeFeedItemHoverBackgroundColor"))
-                .shadow(color: Color("HomeFeedItemHoverShadow1Color"), radius: 4, x: 0, y: 4)
-                .shadow(color: Color("HomeFeedItemHoverShadow2Color"), radius: 2, x: 0, y: 1)
+                .fill(Color(.homeFeedItemHoverBackground))
+                .shadow(color: .homeFeedItemHoverShadow1, radius: 4, x: 0, y: 4)
+                .shadow(color: .homeFeedItemHoverShadow2, radius: 2, x: 0, y: 1)
                 .visibility(isHovering && model.showPagesOnHover ? .visible : .gone)
 
             HStack(alignment: .top, spacing: 12) {
@@ -121,13 +121,13 @@ struct RecentlyVisitedSite: View {
                 VStack(alignment: .leading, spacing: 6) {
 
                     if site.isRealDomain {
-                        HyperLink(site.domainToDisplay, textColor: Color("HomeFeedItemTitleColor")) {
+                        HyperLink(site.domainToDisplay, textColor: .homeFeedItemTitle) {
                             model.open(site)
                         }
                         .font(.system(size: 15, weight: .semibold, design: .default))
                     } else {
                         Text(site.domainToDisplay)
-                            .foregroundColor(Color("HomeFeedItemTitleColor"))
+                            .foregroundColor(Color(.homeFeedItemTitle))
                             .font(.system(size: 15, weight: .semibold, design: .default))
                     }
 
@@ -151,13 +151,13 @@ struct RecentlyVisitedSite: View {
 
                 Spacer()
 
-                HoverButton(size: 24, imageName: site.isFavorite ? "FavoriteFilled" : "Favorite", imageSize: 16, cornerRadius: 4) {
+                HoverButton(size: 24, image: site.isFavorite ? .favoriteFilled : .favorite, imageSize: 16, cornerRadius: 4) {
                     model.toggleFavoriteSite(site)
                 }
-                .foregroundColor(Color("HomeFeedItemButtonTintColor"))
+                .foregroundColor(Color.homeFeedItemButtonTint)
                 .tooltip(UserText.tooltipAddToFavorites)
 
-                HoverButton(size: 24, imageName: "Burn", imageSize: 16, cornerRadius: 4) {
+                HoverButton(size: 24, image: .burn, imageSize: 16, cornerRadius: 4) {
                     isHovering = false
                     if site.isFireproof {
                         showsAlert = true
@@ -170,7 +170,7 @@ struct RecentlyVisitedSite: View {
                           primaryButton: .destructive(Text(UserText.homePageClearHistory), action: burn),
                           secondaryButton: .cancel(Text(UserText.cancel)))
                 }
-                .foregroundColor(Color("HomeFeedItemButtonTintColor"))
+                .foregroundColor(Color(.homeFeedItemButtonTint))
                 .tooltip(fireButtonTooltip)
 
             }
@@ -247,9 +247,9 @@ struct RecentlyVisitedPage: View {
 
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
 
-    let linkColor = Color("LinkBlueColor")
-    let pageTextColor = Color("HomeFeedItemPageTextColor")
-    let timeTextColor = Color("HomeFeedItemTimeTextColor")
+    let linkColor = Color.linkBlue
+    let pageTextColor = Color.homeFeedItemPageText
+    let timeTextColor = Color.homeFeedItemTimeText
 
     let page: HomePage.Models.RecentlyVisitedPageModel
     let showExpandButton: Bool
@@ -285,7 +285,7 @@ struct RecentlyVisitedPage: View {
                 model.open(page.url)
             }
 
-            HoverButton(size: 16, imageName: "HomeArrowDown", imageSize: 8, cornerRadius: 4) {
+            HoverButton(size: 16, image: .homeArrowDown, imageSize: 8, cornerRadius: 4) {
                 withAnimation {
                     isExpanded.toggle()
                 }
@@ -310,22 +310,23 @@ struct RecentlyVisitedTitle: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            Image("HomeShield")
+            Image(.homeShield)
                 .resizable()
                 .frame(width: 22, height: 22)
                 .onTapGesture(count: 2) {
                     model.showPagesOnHover.toggle()
                 }
                 .padding(.leading, isExpanded ? 5 : 0)
+                .padding(.top, 4)
 
             VStack(alignment: isExpanded ? .leading : .center, spacing: 6) {
                 Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
                     .font(.system(size: 17, weight: .bold, design: .default))
-                    .foregroundColor(Color("HomeFeedTitleColor"))
+                    .foregroundColor(Color(.homeFeedTitle))
 
                 Text(UserText.homePageProtectionDurationInfo)
                     .font(.system(size: 13, weight: .medium, design: .default))
-                    .foregroundColor(Color("HomeFeedItemTimeTextColor"))
+                    .foregroundColor(Color(.homeFeedItemTimeText))
             }
             .visibility(model.recentSites.count > 0 ? .visible : .gone)
             .padding(.leading, 4)
@@ -333,13 +334,13 @@ struct RecentlyVisitedTitle: View {
 
             Text(UserText.homePageProtectionSummaryInfo)
                 .font(.system(size: 17, weight: .bold, design: .default))
-                .foregroundColor(Color("HomeFeedTitleColor"))
+                .foregroundColor(Color(.homeFeedTitle))
                 .visibility(model.recentSites.count > 0 ? .gone : .visible)
 
             Spacer()
                 .visibility(isExpanded ? .visible : .gone)
 
-            HoverButton(size: 24, imageName: "HomeArrowUp", imageSize: 16, cornerRadius: 4) {
+            HoverButton(size: 24, image: .homeArrowUp, imageSize: 16, cornerRadius: 4) {
                 withAnimation {
                     isExpanded.toggle()
                 }
@@ -353,13 +354,17 @@ struct RecentlyVisitedTitle: View {
 
 struct SiteIconAndConnector: View {
 
-    let backgroundColor = Color("HomeFavoritesBackgroundColor")
-    let mouseOverColor: Color = Color("HomeFavoritesHoverColor")
+    let backgroundColor = Color.homeFavoritesBackground
+    let mouseOverColor = Color.homeFavoritesHover
 
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
     @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
 
     @State var isHovering = false
+
+    private var favicon: FaviconView {
+        FaviconView(url: site.url, size: 22, letterPaddingModifier: 0.22)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -382,7 +387,7 @@ struct SiteIconAndConnector: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(isHovering ? mouseOverColor : backgroundColor)
 
-            FaviconView(url: site.url, size: 22)
+            favicon
         }
         .link {
             self.isHovering = $0
@@ -404,7 +409,7 @@ struct SiteIconAndConnector: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(backgroundColor)
 
-            FaviconView(url: site.url, size: 22)
+            favicon
         }
         .frame(width: 32, height: 32)
     }
@@ -423,7 +428,7 @@ struct SiteTrackerSummary: View {
             // Top 3 entities
             HStack(spacing: 2) {
                 ForEach(site.blockedEntities.prefix(trackerIconCount), id: \.self) {
-                    EntityIcon(imageName: site.entityImageName($0), displayName: site.entityDisplayName($0))
+                    EntityIcon(image: site.entityImage($0), displayName: site.entityDisplayName($0))
                 }
 
                 // Count of other entities, if any
@@ -439,9 +444,9 @@ struct SiteTrackerSummary: View {
             Group {
                 Group {
                     if #available(macOS 12, *) {
-                        Text("**\(site.numberOfTrackersBlocked)** tracking attempts blocked")
+                        Text("**\(site.numberOfTrackersBlocked)** tracking attempts blocked", comment: "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@")
                     } else {
-                        Text("\(site.numberOfTrackersBlocked) tracking attempts blocked")
+                        Text("\(site.numberOfTrackersBlocked) tracking attempts blocked", comment: "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@")
                     }
                 }
                 .visibility(site.blockedEntities.isEmpty ? .gone : .visible)
@@ -465,24 +470,22 @@ struct EntityIcon: View {
 
     let size: CGFloat = 18
 
-    var imageName: String
+    var image: NSImage?
     var displayName: String
 
     var body: some View {
 
         Group {
 
-            if let image = NSImage(named: "feed-" + imageName) {
+            if let image {
                 Image(nsImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .tooltip(displayName)
 
             } else {
-
                 SmallCircleText(text: String(displayName.first ?? "?"))
                     .tooltip(displayName)
-
             }
 
         }.frame(width: size, height: size, alignment: .center)
@@ -497,7 +500,7 @@ struct SmallCircleText: View {
     let backgroundColor: Color
     let textColor: Color
 
-    init(text: String, backgroundColor: Color = Color("HomeEntityIconBackgroundColor"), textColor: Color = Color("HomeEntityIconTextColor")) {
+    init(text: String, backgroundColor: Color = .homeEntityIconBackground, textColor: Color = .homeEntityIconText) {
         self.text = text
         self.backgroundColor = backgroundColor
         self.textColor = textColor

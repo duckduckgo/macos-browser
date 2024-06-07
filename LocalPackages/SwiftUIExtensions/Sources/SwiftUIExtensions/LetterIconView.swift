@@ -1,5 +1,5 @@
 //
-//  FaviconLetterView.swift
+//  LetterIconView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -24,7 +24,8 @@ public struct LetterIconView: View {
     public var size: CGFloat
     public var prefferedFirstCharacters: String?
     public var characterCount: Int
-    private var padding: CGFloat = 0.33
+    private var paddingModifier: CGFloat
+    private var font: Font
     private static let wwwPreffix = "www."
 
     private var characters: String {
@@ -35,11 +36,20 @@ public struct LetterIconView: View {
         return String(title.replacingOccurrences(of: Self.wwwPreffix, with: "").prefix(characterCount))
     }
 
-    public init(title: String, size: CGFloat = 32, prefferedFirstCharacters: String? = nil, characterCount: Int = 2) {
+    /// Initializes a `LetterIconView`
+    /// Note: The `paddingModifier`parameter is used to calculate the inner frame width/height using `size - (size * paddingModifier)`
+    public init(title: String,
+                size: CGFloat = 32,
+                prefferedFirstCharacters: String? = nil,
+                characterCount: Int = 2,
+                font: Font = .title,
+                paddingModifier: CGFloat = 0.33) {
         self.title = title
         self.size = size
         self.prefferedFirstCharacters = prefferedFirstCharacters
         self.characterCount = characterCount
+        self.font = font
+        self.paddingModifier = paddingModifier
     }
 
     public var body: some View {
@@ -47,13 +57,11 @@ public struct LetterIconView: View {
             RoundedRectangle(cornerRadius: size * 0.125)
                 .foregroundColor(Color.forString(title))
                 .frame(width: size, height: size)
-
             Text(characters.capitalized(with: .current))
-                .frame(width: size - (size * padding), height: size - (size * padding))
+                .frame(width: size - (size * paddingModifier), height: size - (size * paddingModifier))
                 .foregroundColor(.white)
                 .minimumScaleFactor(0.01)
-                .font(.system(size: size, weight: .semibold))
+                .font(font)
         }
-        .padding(.leading, 8)
     }
 }

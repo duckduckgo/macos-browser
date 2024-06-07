@@ -1,0 +1,78 @@
+name: Add a Comment to Asana Task
+description: Adds a comment to the Asana task.
+inputs:
+  access-token:
+    description: "Asana access token"
+    required: true
+    type: string
+  task-url:
+    description: "Task URL"
+    required: false
+    type: string
+  task-id:
+    description: "Task ID"
+    required: false
+    type: string
+  comment:
+    description: "Comment to add to the Asana task"
+    required: false
+    type: string
+  template-name:
+    description: |
+      Name of a template file (without extension) for the comment, relative to 'templates' subdirectory of the action.
+      The file is processed by envsubst before being sent to Asana.
+    required: false
+    type: string
+runs:
+  using: "composite"
+  steps:
+    - id: extract-task-id
+      if: ${{ inputs.task-url }}
+      uses: ./.github/actions/asana-extract-task-id
+      with:
+        task-url: ${{ inputs.task-url }}
+        access-token: ${{ inputs.access-token }}
+
+    - id: process-template-payload
+      if: ${{ inputs.template-name }}
+      shell: bash
+      env:
+        TEMPLATE_PATH: ${{ github.action_path }}/templates/${{ inputs.template-name }}.yml
+      run: |
+        if [ ! -f $TEMPLATE_PATH ]; then
+          echo "::error::Template file not found at $TEMPLATE_PATH"
+          exit 1
+        fi
+
+        # Process the template file with envsubst, turn into JSON, remove leading spaces and newlines on non-empty lines, and compact the JSON
+        payload="$(envsubst < $TEMPLATE_PATH | yq -o=j | sed -E 's/\\n( *)([^\\n])/\2/g' | jq -c)"
+        echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
+
+    - id: process-comment-payload
+      if: ${{ inputs.comment }}
+      shell: bash
+      env:
+        COMMENT: ${{ inputs.comment }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        payload="{ \"data\": { \"text\": \"${COMMENT}\n\nWorkflow URL: ${WORKFLOW_URL}\" } }"
+        echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
+
+    - id: add-comment
+      shell: bash
+      env:
+        ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
+        TASK_ID: ${{ inputs.task-id || steps.extract-task-id.outputs.task-id }}
+        PAYLOAD_BASE64: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-comment-payload.outputs.payload-base64 }}
+      run: |
+        return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/stories" \
+          -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+          -H 'content-type: application/json' \
+          --write-out '%{http_code}' \
+          --output /dev/null \
+          -d "$(base64 -d <<< $PAYLOAD_BASE64)")
+
+        if [ $return_code -ne 201 ]; then
+          echo "::error::Failed to add a comment to the Asana task"
+          exit 1
+        fi

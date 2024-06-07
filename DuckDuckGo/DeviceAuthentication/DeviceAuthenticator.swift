@@ -28,28 +28,36 @@ extension NSNotification.Name {
 
 protocol UserAuthenticating {
     func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void)
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult
 }
 
 final class DeviceAuthenticator: UserAuthenticating {
 
     enum AuthenticationReason {
         case autofill
+        case autofillCreditCards
         case changeLoginsSettings
         case unlockLogins
         case exportLogins
+        case syncSettings
+        case deleteAllPasswords
 
         var localizedDescription: String {
             switch self {
-            case .autofill: return UserText.pmAutoLockPromptAutofill
+            case .autofill, .autofillCreditCards: return UserText.pmAutoLockPromptAutofill
             case .changeLoginsSettings: return UserText.pmAutoLockPromptChangeLoginsSettings
             case .unlockLogins: return UserText.pmAutoLockPromptUnlockLogins
             case .exportLogins: return UserText.pmAutoLockPromptExportLogins
+            case .syncSettings: return UserText.syncAutoLockPrompt
+            case .deleteAllPasswords: return UserText.deleteAllPasswordsPermissionText
             }
         }
     }
 
     internal enum Constants {
         static var intervalBetweenIdleChecks: TimeInterval = 1
+        static var intervalBetweenCreditCardAutofillChecks: TimeInterval = 10
+        static var intervalBetweenSyncSettingsChecks: TimeInterval = 15
     }
 
     static var deviceSupportsBiometrics: Bool {
@@ -91,6 +99,8 @@ final class DeviceAuthenticator: UserAuthenticating {
     private let queue = DispatchQueue(label: "Device Authenticator Queue")
 
     private var timer: Timer?
+    private var timerCreditCard: Timer?
+    private var timerSyncSettings: Timer?
 
     private var _isAuthenticating: Bool = false
     private var _deviceIsLocked: Bool = false
@@ -144,7 +154,15 @@ final class DeviceAuthenticator: UserAuthenticating {
     }
 
     func authenticateUser(reason: AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
-        guard requiresAuthentication else {
+        guard NSApp.runType != .uiTests else {
+            result(.success)
+            return
+        }
+
+        let needsAuthenticationForCreditCardsAutofill = reason == .autofillCreditCards && isCreditCardTimeIntervalExpired()
+        let needsAuthenticationForSyncSettings = reason == .syncSettings && isSyncSettingsTimeIntervalExpired()
+        let needsAuthenticationForDeleteAllPasswords = reason == .deleteAllPasswords
+        guard needsAuthenticationForCreditCardsAutofill || needsAuthenticationForSyncSettings || needsAuthenticationForDeleteAllPasswords || requiresAuthentication else {
             result(.success)
             return
         }
@@ -162,13 +180,15 @@ final class DeviceAuthenticator: UserAuthenticating {
             if authenticationResult.authenticated {
                 // Now that the user has unlocked the device, begin the idle timer again.
                 self.beginIdleCheckTimer()
+                self.beginCreditCardAutofillTimer()
+                self.beginSyncSettingsTimer()
             }
 
             result(authenticationResult)
         }
     }
 
-    func authenticateUser(reason: AuthenticationReason) async -> DeviceAuthenticationResult {
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult {
         await withCheckedContinuation { continuation in
             authenticateUser(reason: reason) { result in
                 continuation.resume(returning: result)
@@ -231,6 +251,70 @@ final class DeviceAuthenticator: UserAuthenticating {
         if interval >= autofillPreferences.autoLockThreshold.seconds {
             self.lock()
         }
+    }
+
+    // MARK: - Credit Card Autofill Timer
+
+    private func beginCreditCardAutofillTimer() {
+        os_log("Beginning credit card autofill timer", log: .autoLock)
+
+        self.timerCreditCard?.invalidate()
+        self.timerCreditCard = nil
+
+        let timer = Timer(timeInterval: Constants.intervalBetweenCreditCardAutofillChecks, repeats: false) { [weak self] _ in
+            guard let self = self else {
+                return
+            }
+            self.cancelCreditCardAutofillTimer()
+        }
+
+        self.timerCreditCard = timer
+        RunLoop.current.add(timer, forMode: .common)
+    }
+
+    private func cancelCreditCardAutofillTimer() {
+        os_log("Cancelling credit card autofill timer", log: .autoLock)
+        self.timerCreditCard?.invalidate()
+        self.timerCreditCard = nil
+    }
+
+    private func isCreditCardTimeIntervalExpired() -> Bool {
+        guard let timer = timerCreditCard else {
+            return true
+        }
+        return timer.timeInterval >= Constants.intervalBetweenCreditCardAutofillChecks
+    }
+
+    // MARK: - Sync Timer
+
+    private func beginSyncSettingsTimer() {
+        os_log("Beginning Sync Settings timer", log: .autoLock)
+
+        self.timerSyncSettings?.invalidate()
+        self.timerSyncSettings = nil
+
+        let timer = Timer(timeInterval: Constants.intervalBetweenSyncSettingsChecks, repeats: false) { [weak self] _ in
+            guard let self = self else {
+                return
+            }
+            self.cancelSyncSettingsTimer()
+        }
+
+        self.timerSyncSettings = timer
+        RunLoop.current.add(timer, forMode: .common)
+    }
+
+    private func cancelSyncSettingsTimer() {
+        os_log("Cancelling Sync Settings timer", log: .autoLock)
+        self.timerSyncSettings?.invalidate()
+        self.timerSyncSettings = nil
+    }
+
+    private func isSyncSettingsTimeIntervalExpired() -> Bool {
+        guard let timer = timerSyncSettings else {
+            return true
+        }
+        return timer.timeInterval >= Constants.intervalBetweenSyncSettingsChecks
     }
 
 }

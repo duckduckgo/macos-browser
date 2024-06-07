@@ -22,18 +22,22 @@ import Common
 import DDGSync
 import Persistence
 import SyncDataProviders
+import PixelKit
 
 final class SyncCredentialsAdapter {
 
     private(set) var provider: CredentialsProvider?
     let databaseCleaner: CredentialsDatabaseCleaner
+    let syncErrorHandler: SyncErrorHandling
     let syncDidCompletePublisher: AnyPublisher<Void, Never>
 
-    init(secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
+    init(secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory,
+         syncErrorHandler: SyncErrorHandling) {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
+        self.syncErrorHandler =  syncErrorHandler
         databaseCleaner = CredentialsDatabaseCleaner(
             secureVaultFactory: secureVaultFactory,
-            secureVaultErrorReporter: SecureVaultErrorReporter.shared,
+            secureVaultErrorReporter: SecureVaultReporter.shared,
             errorEvents: CredentialsCleanupErrorHandling(),
             log: .passwordManager
         )
@@ -48,7 +52,11 @@ final class SyncCredentialsAdapter {
         }
     }
 
-    func setUpProviderIfNeeded(secureVaultFactory: AutofillVaultFactory, metadataStore: SyncMetadataStore) {
+    func setUpProviderIfNeeded(
+        secureVaultFactory: AutofillVaultFactory,
+        metadataStore: SyncMetadataStore,
+        metricsEventsHandler: EventMapping<MetricsEvent>? = nil
+    ) {
         guard provider == nil else {
             return
         }
@@ -56,27 +64,19 @@ final class SyncCredentialsAdapter {
         do {
             let provider = try CredentialsProvider(
                 secureVaultFactory: secureVaultFactory,
-                secureVaultErrorReporter: SecureVaultErrorReporter.shared,
+                secureVaultErrorReporter: SecureVaultReporter.shared,
                 metadataStore: metadataStore,
+                metricsEvents: metricsEventsHandler,
+                log: OSLog.sync,
                 syncDidUpdateData: { [weak self] in
                     self?.syncDidCompleteSubject.send()
+                    self?.syncErrorHandler.syncCredentialsSucceded()
                 }
             )
 
             syncErrorCancellable = provider.syncErrorPublisher
-                .sink { error in
-                    switch error {
-                    case let syncError as SyncError:
-                        Pixel.fire(.debug(event: .syncCredentialsFailed, error: syncError))
-                    default:
-                        let nsError = error as NSError
-                        if nsError.domain != NSURLErrorDomain {
-                            let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
-                            let params = processedErrors.errorPixelParameters
-                            Pixel.fire(.debug(event: .syncCredentialsFailed, error: error), withAdditionalParameters: params)
-                        }
-                    }
-                    os_log(.error, log: OSLog.sync, "Credentials Sync error: %{public}s", String(reflecting: error))
+                .sink { [weak self] error in
+                    self?.syncErrorHandler.handleCredentialError(error)
                 }
 
             self.provider = provider
@@ -84,7 +84,7 @@ final class SyncCredentialsAdapter {
         } catch let error as NSError {
             let processedErrors = CoreDataErrorsParser.parse(error: error)
             let params = processedErrors.errorPixelParameters
-            Pixel.fire(.debug(event: .syncCredentialsProviderInitializationFailed, error: error), withAdditionalParameters: params)
+            PixelKit.fire(DebugEvent(GeneralPixel.syncCredentialsProviderInitializationFailed, error: error), withAdditionalParameters: params)
         }
     }
 

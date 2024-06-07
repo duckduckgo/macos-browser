@@ -21,17 +21,19 @@ import Foundation
 enum ItemType: String, Codable, Sendable {
     case text
     case url
-    case element = "elementExpectation"
+    case element
 }
 
 struct Item: Codable, Sendable {
     let type: ItemType
     let expect: String?
     let selector: String?
+    let parent: String?
 }
 
 internal struct ExpectationAction: Action {
     let id: String
     let actionType: ActionType
     let expectations: [Item]
+    let dataSource: DataSource?
 }

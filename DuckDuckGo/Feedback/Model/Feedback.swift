@@ -22,9 +22,13 @@ import QuartzCore
 struct Feedback {
 
     enum Category {
+        case generalFeedback
+        case designFeedback
         case bug
         case featureRequest
         case other
+        case usability
+        case dataImport
     }
 
     let category: Category

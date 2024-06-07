@@ -26,7 +26,7 @@ typealias DataBrokerProtectionVaultFactory = SecureVaultFactory<DefaultDataBroke
 let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = SecureVaultFactory<DefaultDataBrokerProtectionSecureVault>(
     makeCryptoProvider: {
         return DataBrokerProtectionCryptoProvider()
-    }, makeKeyStoreProvider: {
+    }, makeKeyStoreProvider: { _ in
         return DataBrokerProtectionKeyStoreProvider()
     }, makeDatabaseProvider: { key in
         return try DefaultDataBrokerProtectionDatabaseProvider(key: key)
@@ -36,15 +36,20 @@ let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = S
 
 protocol DataBrokerProtectionSecureVault: SecureVault {
     func save(profile: DataBrokerProtectionProfile) throws -> Int64
+    func update(profile: DataBrokerProtectionProfile) throws -> Int64
     func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile?
+    func deleteProfileData() throws
 
     func save(broker: DataBroker) throws -> Int64
     func update(_ broker: DataBroker, with id: Int64) throws
     func fetchBroker(with id: Int64) throws -> DataBroker?
     func fetchBroker(with name: String) throws -> DataBroker?
     func fetchAllBrokers() throws -> [DataBroker]
+    func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker]
 
     func save(profileQuery: ProfileQuery, profileId: Int64) throws -> Int64
+    func delete(profileQuery: ProfileQuery, profileId: Int64) throws
+    func update(_ profileQuery: ProfileQuery, brokerIDs: [Int64], profileId: Int64) throws -> Int64
     func fetchProfileQuery(with id: Int64) throws -> ProfileQuery?
     func fetchAllProfileQueries(for profileId: Int64) throws -> [ProfileQuery]
 
@@ -91,6 +96,10 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         return try self.providers.database.saveProfile(profile: profile, mapperToDB: MapperToDB(mechanism: l2Encrypt(data:)))
     }
 
+    func update(profile: DataBrokerProtectionProfile) throws -> Int64 {
+        return try self.providers.database.updateProfile(profile: profile, mapperToDB: MapperToDB(mechanism: l2Encrypt(data:)))
+    }
+
     func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile? {
         let profile = try self.providers.database.fetchProfile(with: id)
 
@@ -100,6 +109,10 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         } else {
             return nil // Profile not found
         }
+    }
+
+    func deleteProfileData() throws {
+        try self.providers.database.deleteProfileData()
     }
 
     func save(broker: DataBroker) throws -> Int64 {
@@ -136,9 +149,28 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         return try self.providers.database.fetchAllBrokers().map(mapper.mapToModel(_:))
     }
 
+    func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker] {
+        let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+        let brokers = try self.providers.database.fetchAllBrokers().map(mapper.mapToModel(_:))
+
+        return brokers.filter { $0.parent == parentBroker }
+    }
+
     func save(profileQuery: ProfileQuery, profileId: Int64) throws -> Int64 {
         let mapper = MapperToDB(mechanism: l2Encrypt(data:))
         return try self.providers.database.save(mapper.mapToDB(profileQuery, relatedTo: profileId))
+    }
+
+    func delete(profileQuery: ProfileQuery, profileId: Int64) throws {
+        let mapper = MapperToDB(mechanism: l2Encrypt(data:))
+        return try self.providers.database.delete(mapper.mapToDB(profileQuery, relatedTo: profileId))
+    }
+
+    func update(_ profileQuery: ProfileQuery, brokerIDs: [Int64], profileId: Int64) throws -> Int64 {
+        let mapper = MapperToDB(mechanism: l2Encrypt(data:))
+        let profileQueryDB = try mapper.mapToDB(profileQuery, relatedTo: profileId)
+
+        return try self.providers.database.update(profileQueryDB)
     }
 
     func fetchProfileQuery(with id: Int64) throws -> ProfileQuery? {

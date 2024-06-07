@@ -91,7 +91,7 @@ SWIFT_COMPILATION_MODE = wholemodule
 SWIFT_COMPILATION_MODE[config=CI][arch=*][sdk=*] =
 SWIFT_COMPILATION_MODE[config=Debug][arch=*][sdk=*] =
 
-// This is temporarily set back to its default value, as a part of merging Network Protection. There are a small number of warnings introduced in
+// This is temporarily set back to its default value, as a part of merging the VPN. There are a small number of warnings introduced in
 // that feature, and more time is needed to address them. To avoid bothering other developers, this is being disabled and a task to fix it will be
 // prioritized.
 SWIFT_STRICT_CONCURRENCY = minimal;
@@ -101,3 +101,10 @@ DDG_SLOW_COMPILE_CHECK_THRESHOLD[config=CI] = 250
 DDG_SLOW_COMPILE_CHECK = -Xfrontend -warn-long-expression-type-checking=$(DDG_SLOW_COMPILE_CHECK_THRESHOLD) -Xfrontend -warn-long-function-bodies=$(DDG_SLOW_COMPILE_CHECK_THRESHOLD)
 OTHER_SWIFT_FLAGS[config=Debug][arch=*][sdk=*] = $(inherited) $(DDG_SLOW_COMPILE_CHECK)
 OTHER_SWIFT_FLAGS[config=CI][arch=*][sdk=*] = $(inherited) $(DDG_SLOW_COMPILE_CHECK)
+
+// Automatically generate Color and Image asset accessor extensions
+ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES
+
+// Automatically generate localization string catalogs
+LOCALIZATION_PREFERS_STRING_CATALOGS = YES
+SWIFT_EMIT_LOC_STRINGS = YES

@@ -60,32 +60,20 @@ struct DBPUIStandardResponse: Codable {
     }
 }
 
-/// Message to set the UI state. Sent from the UI to the host
-struct DBPUISetState: Codable {
-    let state: DBPUIState
-}
-
-/// Enum representing possible scan and opt out states
-enum DBPUIScanAndOptOutStatus: String, Codable {
-    case notRunning
-    case quickScan
-    case noProfileMatch
-    case removingProfile
-    case complete
-}
-
 /// Message Object representing a user profile name
 struct DBPUIUserProfileName: Codable {
     let first: String
-    let middle: String
+    let middle: String?
     let last: String
+    let suffix: String?
 }
 
 /// Message Object representing a user profile address
 struct DBPUIUserProfileAddress: Codable {
-    let street: String
+    let street: String?
     let city: String
     let state: String
+    let zipCode: String?
 }
 
 /// Message Object representing a user profile containing one or more names and addresses
@@ -102,9 +90,35 @@ struct DBPUIIndex: Codable {
     let index: Int
 }
 
+struct DBPUINameAtIndex: Codable {
+    let index: Int
+    let name: DBPUIUserProfileName
+}
+
+struct DBPUIAddressAtIndex: Codable {
+    let index: Int
+    let address: DBPUIUserProfileAddress
+}
+
 /// Message Object representing a data broker
-struct DBPUIDataBroker: Codable {
+struct DBPUIDataBroker: Codable, Hashable {
     let name: String
+    let url: String
+    let date: Double?
+
+    init(name: String, url: String, date: Double? = nil) {
+        self.name = name
+        self.url = url
+        self.date = date
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
+}
+
+struct DBPUIDataBrokerList: DBPUISendableMessage {
+    let dataBrokers: [DBPUIDataBroker]
 }
 
 /// Message Object representing a requested change to the user profile's brith year
@@ -117,21 +131,107 @@ struct DBPUIBirthYear: Codable {
 /// and addresses that were matched
 struct DBPUIDataBrokerProfileMatch: Codable {
     let dataBroker: DBPUIDataBroker
-    let names: [DBPUIUserProfileName]
+    let name: String
     let addresses: [DBPUIUserProfileAddress]
+    let alternativeNames: [String]
+    let relatives: [String]
+    let date: Double? // Used in some methods to set the removedDate or found date
 }
 
 /// Protocol to represent a message that can be passed from the host to the UI
 protocol DBPUISendableMessage: Codable {}
 
-/// Message to set the UI state. Sent from the host to the UI
-struct DBPUIWebSetState: DBPUISendableMessage {
-    let state: DBPUIState
+/// Message representing the state of any scans and opt outs without state and grouping removed profiles by broker
+struct DBPUIScanAndOptOutMaintenanceState: DBPUISendableMessage {
+    let inProgressOptOuts: [DBPUIDataBrokerProfileMatch]
+    let completedOptOuts: [DBPUIOptOutMatch]
+    let scanSchedule: DBPUIScanSchedule
+    let scanHistory: DBPUIScanHistory
 }
 
-/// Message representing the state of any scans and opt outs
-struct ScanAndOptOutState: DBPUISendableMessage {
-    let status: DBPUIScanAndOptOutStatus
-    let inProgressOptOuts: [DBPUIDataBrokerProfileMatch]
-    let completedOptOuts: [DBPUIDataBrokerProfileMatch]
+struct DBPUIOptOutMatch: DBPUISendableMessage {
+    let dataBroker: DBPUIDataBroker
+    let matches: Int
+    let name: String
+    let alternativeNames: [String]
+    let addresses: [DBPUIUserProfileAddress]
+    let date: Double
+}
+
+/// Data representing the initial scan progress
+struct DBPUIScanProgress: DBPUISendableMessage {
+    let currentScans: Int
+    let totalScans: Int
+}
+
+/// Data to represent the intial scan state
+/// It will show the current scans + total, and the results found
+struct DBPUIInitialScanState: DBPUISendableMessage {
+    let resultsFound: [DBPUIDataBrokerProfileMatch]
+    let scanProgress: DBPUIScanProgress
+}
+
+struct DBPUIScanDate: DBPUISendableMessage {
+    let date: Double
+    let dataBrokers: [DBPUIDataBroker]
+}
+
+struct DBPUIScanSchedule: DBPUISendableMessage {
+    let lastScan: DBPUIScanDate
+    let nextScan: DBPUIScanDate
+}
+
+struct DBPUIScanHistory: DBPUISendableMessage {
+    let sitesScanned: Int
+}
+
+struct DBPUIDebugMetadata: DBPUISendableMessage {
+    let lastRunAppVersion: String
+    let lastRunAgentVersion: String?
+    let isAgentRunning: Bool
+    let lastSchedulerOperationType: String? // scan or optOut
+    let lastSchedulerOperationTimestamp: Double?
+    let lastSchedulerOperationBrokerUrl: String?
+    let lastSchedulerErrorMessage: String?
+    let lastSchedulerErrorTimestamp: Double?
+    let lastSchedulerSessionStartTimestamp: Double?
+    let agentSchedulerState: String? // stopped, running or idle
+    let lastStartedSchedulerOperationType: String?
+    let lastStartedSchedulerOperationTimestamp: Double?
+    let lastStartedSchedulerOperationBrokerUrl: String?
+
+    init(lastRunAppVersion: String,
+         lastRunAgentVersion: String? = nil,
+         isAgentRunning: Bool = false,
+         lastSchedulerOperationType: String? = nil,
+         lastSchedulerOperationTimestamp: Double? = nil,
+         lastSchedulerOperationBrokerUrl: String? = nil,
+         lastSchedulerErrorMessage: String? = nil,
+         lastSchedulerErrorTimestamp: Double? = nil,
+         lastSchedulerSessionStartTimestamp: Double? = nil,
+         agentSchedulerState: String? = nil,
+         lastStartedSchedulerOperationType: String? = nil,
+         lastStartedSchedulerOperationTimestamp: Double? = nil,
+         lastStartedSchedulerOperationBrokerUrl: String? = nil) {
+        self.lastRunAppVersion = lastRunAppVersion
+        self.lastRunAgentVersion = lastRunAgentVersion
+        self.isAgentRunning = isAgentRunning
+        self.lastSchedulerOperationType = lastSchedulerOperationType
+        self.lastSchedulerOperationTimestamp = lastSchedulerOperationTimestamp
+        self.lastSchedulerOperationBrokerUrl = lastSchedulerOperationBrokerUrl
+        self.lastSchedulerErrorMessage = lastSchedulerErrorMessage
+        self.lastSchedulerErrorTimestamp = lastSchedulerErrorTimestamp
+        self.lastSchedulerSessionStartTimestamp = lastSchedulerSessionStartTimestamp
+        self.agentSchedulerState = agentSchedulerState
+        self.lastStartedSchedulerOperationType = lastStartedSchedulerOperationType
+        self.lastStartedSchedulerOperationTimestamp = lastStartedSchedulerOperationTimestamp
+        self.lastStartedSchedulerOperationBrokerUrl = lastStartedSchedulerOperationBrokerUrl
+    }
+}
+
+extension DBPUIInitialScanState {
+    static var empty: DBPUIInitialScanState {
+        .init(resultsFound: [DBPUIDataBrokerProfileMatch](),
+              scanProgress: DBPUIScanProgress(currentScans: 0, totalScans: 0))
+    }
 }

@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Common
 import Navigation
 import WebKit
 
@@ -26,6 +27,22 @@ extension WKWebView {
             return true
         }
         return false
+    }
+
+    enum AudioState {
+        case muted
+        case unmuted
+
+        init(wkMediaMutedState: _WKMediaMutedState) {
+            self = wkMediaMutedState.contains(.audioMuted) ? .muted : .unmuted
+        }
+
+        mutating func toggle() {
+            self = switch self {
+            case .muted: .unmuted
+            case .unmuted: .muted
+            }
+        }
     }
 
     enum CaptureState {
@@ -107,54 +124,84 @@ extension WKWebView {
         return .active
     }
 
-#if !APPSTORE
-    private func setMediaCaptureMuted(_ muted: Bool) {
-        guard self.responds(to: #selector(WKWebView._setPageMuted(_:))) else {
-            assertionFailure("WKWebView does not respond to selector _stopMediaCapture")
-            return
+    @objc dynamic var mediaMutedState: _WKMediaMutedState {
+        get {
+            // swizzle the method to call `_mediaMutedState` without performSelector: usage
+            guard Self.swizzleMediaMutedStateOnce else { return [] }
+            return self.mediaMutedState // call the original
         }
-        let mutedState: _WKMediaMutedState = {
-            guard self.responds(to: #selector(WKWebView._mediaMutedState)) else { return [] }
-            return self._mediaMutedState()
-        }()
-        var newState = mutedState
-        if muted {
-            newState.insert(.captureDevicesMuted)
-        } else {
-            newState.remove(.captureDevicesMuted)
+        set {
+            // swizzle the method to call `_setPageMuted:` without performSelector: usage (as there‘s a non-object argument to pass)
+            guard Self.swizzleSetPageMutedOnce else { return }
+            self.mediaMutedState = newValue // call the original
         }
-        guard newState != mutedState else { return }
-        self._setPageMuted(newState)
     }
-#endif
+
+    static private let swizzleMediaMutedStateOnce: Bool = {
+        guard let originalMethod = class_getInstanceMethod(WKWebView.self, Selector.mediaMutedState),
+              let swizzledMethod = class_getInstanceMethod(WKWebView.self, #selector(getter: mediaMutedState)) else {
+            assertionFailure("WKWebView does not respond to selector _mediaMutedState")
+            return false
+        }
+        method_exchangeImplementations(originalMethod, swizzledMethod)
+        return true
+    }()
+
+    static private let swizzleSetPageMutedOnce: Bool = {
+        guard let originalMethod = class_getInstanceMethod(WKWebView.self, Selector.setPageMuted),
+              let swizzledMethod = class_getInstanceMethod(WKWebView.self, #selector(setter: mediaMutedState)) else {
+            assertionFailure("WKWebView does not respond to selector _setPageMuted:")
+            return false
+        }
+        method_exchangeImplementations(originalMethod, swizzledMethod)
+        return true
+    }()
+
+    /// Returns the audio state of the WKWebView.
+    ///
+    /// - Returns: `muted` if the web view is muted
+    ///            `unmuted` if the web view is unmuted
+    var audioState: AudioState {
+        get {
+            AudioState(wkMediaMutedState: mediaMutedState)
+        }
+        set {
+            switch newValue {
+            case .muted:
+                self.mediaMutedState.insert(.audioMuted)
+            case .unmuted:
+                self.mediaMutedState.remove(.audioMuted)
+            }
+        }
+    }
 
     func stopMediaCapture() {
-        guard #available(macOS 12.0, *) else {
 #if !APPSTORE
+        guard #available(macOS 12.0, *) else {
             guard self.responds(to: #selector(_stopMediaCapture)) else {
                 assertionFailure("WKWebView does not respond to _stopMediaCapture")
                 return
             }
             self._stopMediaCapture()
-#endif
             return
         }
+#endif
 
         setCameraCaptureState(.none)
         setMicrophoneCaptureState(.none)
     }
 
     func stopAllMediaPlayback() {
-        guard #available(macOS 12.0, *) else {
 #if !APPSTORE
+        guard #available(macOS 12.0, *) else {
             guard self.responds(to: #selector(_stopAllMediaPlayback)) else {
                 assertionFailure("WKWebView does not respond to _stopAllMediaPlayback")
                 return
             }
             self._stopAllMediaPlayback()
             return
-#endif
         }
+#endif
         pauseAllMediaPlayback()
     }
 
@@ -163,20 +210,26 @@ extension WKWebView {
             switch permission {
             case .camera:
                 guard #available(macOS 12.0, *) else {
-#if !APPSTORE
-                    self.setMediaCaptureMuted(muted)
-#endif
+                    if muted {
+                        self.mediaMutedState.insert(.captureDevicesMuted)
+                    } else {
+                        self.mediaMutedState.remove(.captureDevicesMuted)
+                    }
                     return
                 }
+
                 self.setCameraCaptureState(muted ? .muted : .active, completionHandler: {})
 
             case .microphone:
                 guard #available(macOS 12.0, *) else {
-#if !APPSTORE
-                    self.setMediaCaptureMuted(muted)
-#endif
+                    if muted {
+                        self.mediaMutedState.insert(.captureDevicesMuted)
+                    } else {
+                        self.mediaMutedState.remove(.captureDevicesMuted)
+                    }
                     return
                 }
+
                 self.setMicrophoneCaptureState(muted ? .muted : .active, completionHandler: {})
             case .geolocation:
                 self.configuration.processPool.geolocationProvider?.isPaused = muted
@@ -231,6 +284,21 @@ extension WKWebView {
         self.evaluateJavaScript("window.open(\(urlEnc), '_blank', 'noopener, noreferrer')")
     }
 
+    func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL) {
+        guard responds(to: Selector.loadAlternateHTMLString) else {
+            if #available(macOS 12.0, *) {
+                os_log(.error, log: .navigation, "WKWebView._loadAlternateHTMLString not available")
+                loadSimulatedRequest(URLRequest(url: failingURL), responseHTML: html)
+            }
+            return
+        }
+        self.perform(Selector.loadAlternateHTMLString, withArguments: [html, baseURL, failingURL])
+    }
+
+    func setDocumentHtml(_ html: String) {
+        self.evaluateJavaScript("document.open(); document.write('\(html.escapedJavaScriptString())'); document.close()", in: nil, in: .defaultClient)
+    }
+
     @MainActor
     var mimeType: String? {
         get async {
@@ -261,6 +329,16 @@ extension WKWebView {
         return self.printOperation(with: printInfo)
     }
 
+    func hudView(at point: NSPoint? = nil) -> WKPDFHUDViewWrapper? {
+        WKPDFHUDViewWrapper.getPdfHudView(in: self, at: point)
+    }
+
+    func savePDF(_ pdfHUD: WKPDFHUDViewWrapper? = nil) -> Bool {
+        guard let hudView = pdfHUD ?? hudView() else { return false }
+        hudView.savePDF()
+        return true
+    }
+
     var fullScreenPlaceholderView: NSView? {
         guard self.responds(to: Selector.fullScreenPlaceholderView) else { return nil }
         return self.value(forKey: NSStringFromSelector(Selector.fullScreenPlaceholderView)) as? NSView
@@ -285,6 +363,9 @@ extension WKWebView {
     enum Selector {
         static let fullScreenPlaceholderView = NSSelectorFromString("_fullScreenPlaceholderView")
         static let printOperationWithPrintInfoForFrame = NSSelectorFromString("_printOperationWithPrintInfo:forFrame:")
+        static let loadAlternateHTMLString = NSSelectorFromString("_loadAlternateHTMLString:baseURL:forUnreachableURL:")
+        static let mediaMutedState = NSSelectorFromString("_mediaMutedState")
+        static let setPageMuted = NSSelectorFromString("_setPageMuted:")
     }
 
 }

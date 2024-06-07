@@ -19,6 +19,7 @@
 import Combine
 import Common
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -37,29 +38,30 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
     @MainActor
     override func setUp() async throws {
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         window = WindowsManager.openNewWindow(with: .none)!
 
-        XCTAssertTrue(AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig.isFeature(.httpsUpgrade, enabledForDomain: "privacy-test-pages.glitch.me"))
+        XCTAssertTrue(AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig.isFeature(.httpsUpgrade, enabledForDomain: "privacy-test-pages.site"))
         await ConfigurationManager.shared.refreshIfNeeded()?.value
     }
 
-    override func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window.close()
         window = nil
 
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests
 
     @MainActor
     func testHttpsUpgrade() async throws {
-        var persistor = DownloadsPreferencesUserDefaultsPersistor()
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
-        let url = URL(string: "http://privacy-test-pages.glitch.me/privacy-protections/https-upgrades/")!
+        let url = URL(string: "http://privacy-test-pages.site/privacy-protections/https-upgrades/")!
         let upgradableUrl = URL(string: "http://good.third-party.site/privacy-protections/https-upgrades/frame.html")!
         let upgradedUrl = try? await AppPrivacyFeatures.shared.httpsUpgrade.upgrade(url: upgradableUrl).get()
         XCTAssertEqual(upgradedUrl, upgradableUrl.toHttps()!, "URL not upgraded")
@@ -67,7 +69,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let tabViewModel = self.tabViewModel
         let tab = tabViewModel.tab
 
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, source: .link)?.result
 
         // expect popup to open and then close
         var oldValue: TabViewModel! = self.tabViewModel
@@ -98,7 +100,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
 
         let fileUrl = try await downloadTaskFuture.value.output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
 
         struct Results: Decodable {
             struct Result: Decodable {
@@ -116,15 +118,15 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
 
     @MainActor
     func testHttpsLoopProtection() async throws {
-        var persistor = DownloadsPreferencesUserDefaultsPersistor()
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
-        let url = URL(string: "http://privacy-test-pages.glitch.me/privacy-protections/https-loop-protection/")!
+        let url = URL(string: "http://privacy-test-pages.site/privacy-protections/https-loop-protection/")!
 
         let tabViewModel = self.tabViewModel
         let tab = tabViewModel.tab
 
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, source: .link)?.result
 
         // expect popup to open and then close
         var oldValue: TabViewModel! = self.tabViewModel
@@ -176,7 +178,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
 
         let fileUrl = try await downloadTaskFuture.value.output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
 
         struct Results: Decodable {
             struct Result: Decodable {

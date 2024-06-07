@@ -16,14 +16,23 @@
 //  limitations under the License.
 //
 
+import AppKit
+import BrowserServicesKit
 import Common
 import Foundation
-import BrowserServicesKit
 
 extension URL.NavigationalScheme {
 
+    static let duck = URL.NavigationalScheme(rawValue: "duck")
+    static let javascript = URL.NavigationalScheme(rawValue: "javascript")
+
     static var validSchemes: [URL.NavigationalScheme] {
         return [.http, .https, .file]
+    }
+
+    /// HTTP or HTTPS
+    var isHypertextScheme: Bool {
+        Self.hypertextSchemes.contains(self)
     }
 
 }
@@ -36,10 +45,18 @@ extension URL {
      * Returns a URL pointing to `${HOME}/Library`, regardless of whether the app is sandboxed or not.
      */
     static var nonSandboxLibraryDirectoryURL: URL {
-        guard NSApp.isSandboxed else {
-            return FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        if NSApp.isSandboxed {
+            return FileManager.default.homeDirectoryForCurrentUser.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         }
-        return FileManager.default.homeDirectoryForCurrentUser.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        return FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+    }
+
+    static var nonSandboxHomeDirectory: URL {
+        if NSApp.isSandboxed {
+            return FileManager.default.homeDirectoryForCurrentUser
+                .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        }
+        return FileManager.default.homeDirectoryForCurrentUser
     }
 
     /**
@@ -68,6 +85,7 @@ extension URL {
 
     // MARK: - Factory
 
+#if !SANDBOX_TEST_TOOL
     static func makeSearchUrl(from searchQuery: String) -> URL? {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -75,7 +93,16 @@ extension URL {
             return nil
         }
 
-        return Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+        var url = Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+
+        // Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
+        // https://app.asana.com/0/1199230911884351/1205979030848528/f
+        if case .normal = NSApp.runType,
+           NSApp.delegateTyped.featureFlagger.isFeatureOn(.appendAtbToSerpQueries),
+           let atbWithVariant = LocalStatisticsStore().atbWithVariant {
+            url = url.appendingParameter(name: URL.DuckDuckGoParameters.ATB.atb, value: atbWithVariant + "-wb")
+        }
+        return url
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
@@ -104,31 +131,44 @@ extension URL {
 
         return url
     }
+#endif
 
-    static var blankPage: URL {
-        return URL(string: "about:blank")!
+    static let blankPage = URL(string: "about:blank")!
+
+    static let newtab = URL(string: "duck://newtab")!
+    static let welcome = URL(string: "duck://welcome")!
+    static let settings = URL(string: "duck://settings")!
+    static let bookmarks = URL(string: "duck://bookmarks")!
+    // base url for Error Page Alternate HTML loaded into Web View
+    static let error = URL(string: "duck://error")!
+
+    static let dataBrokerProtection = URL(string: "duck://personal-information-removal")!
+
+#if !SANDBOX_TEST_TOOL
+    static func settingsPane(_ pane: PreferencePaneIdentifier) -> URL {
+        return settings.appendingPathComponent(pane.rawValue)
     }
 
-    static var homePage: URL {
-        return URL(string: "about:home")!
-    }
-
-    static var welcome: URL {
-        return URL(string: "about:welcome")!
-    }
-
-    static var preferences: URL {
-        return URL(string: "about:preferences")!
-    }
-
-#if DBP
-    static var dataBrokerProtection: URL {
-        return URL(string: "about:dbp")!
+    var isSettingsURL: Bool {
+        isChild(of: .settings) && (pathComponents.isEmpty || PreferencePaneIdentifier(url: self) != nil)
     }
 #endif
 
-    static func preferencePane(_ pane: PreferencePaneIdentifier) -> URL {
-        return Self.preferences.appendingPathComponent(pane.rawValue)
+    enum Invalid {
+        static let aboutNewtab = URL(string: "about:newtab")!
+        static let duckHome = URL(string: "duck://home")!
+
+        static let aboutWelcome = URL(string: "about:welcome")!
+
+        static let aboutHome = URL(string: "about:home")!
+
+        static let aboutSettings = URL(string: "about:settings")!
+        static let aboutPreferences = URL(string: "about:preferences")!
+        static let duckPreferences = URL(string: "duck://preferences")!
+        static let aboutConfig = URL(string: "about:config")!
+        static let duckConfig = URL(string: "duck://config")!
+
+        static let aboutBookmarks = URL(string: "about:bookmarks")!
     }
 
     var isHypertextURL: Bool {
@@ -136,26 +176,14 @@ extension URL {
         return NavigationalScheme.validSchemes.contains(scheme)
     }
 
-    // MARK: Pixel
-
-    static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
-
-    static func pixelUrl(forPixelNamed pixelName: String) -> URL {
-        let urlString = "\(Self.pixelBase)/t/\(pixelName)"
-        let url = URL(string: urlString)!
-        // url = url.addParameter(name: \"atb\", value: statisticsStore.atbWithVariant ?? \"\")")
-        // https://app.asana.com/0/1177771139624306/1199951074455863/f
-        return url
-    }
-
     // MARK: ATB
 
     static var devMode: String {
-        #if DEBUG
+#if DEBUG
         return "?test=1"
-        #else
+#else
         return ""
-        #endif
+#endif
     }
 
     static let atb = "\(Self.duckDuckGo)atb.js\(devMode)"
@@ -212,10 +240,10 @@ extension URL {
         toString(decodePunycode: decodePunycode, dropScheme: dropScheme, needsWWW: nil, dropTrailingSlash: dropTrailingSlash)
     }
 
-    private func toString(decodePunycode: Bool,
-                          dropScheme: Bool,
-                          needsWWW: Bool? = nil,
-                          dropTrailingSlash: Bool) -> String {
+    func toString(decodePunycode: Bool,
+                  dropScheme: Bool,
+                  needsWWW: Bool? = nil,
+                  dropTrailingSlash: Bool) -> String {
         guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
               var string = components.string
         else {
@@ -260,6 +288,15 @@ extension URL {
         return string
     }
 
+    func hostAndPort() -> String? {
+        guard let host else { return nil }
+
+        guard let port = port else { return host }
+
+        return "\(host):\(port)"
+    }
+
+#if !SANDBOX_TEST_TOOL
     func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
         let hasInputScheme = input.hasOrIsPrefix(of: self.separatedScheme ?? "")
         let hasInputWww = input.dropping(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue)
@@ -267,10 +304,10 @@ extension URL {
 
         return self.toString(decodePunycode: decodePunycode,
                              dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
-                             needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty
-                                && hasInputWww,
+                             needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty && hasInputWww,
                              dropTrailingSlash: !input.hasSuffix("/"))
     }
+#endif
 
     /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
     var suggestedFilename: String? {
@@ -289,6 +326,14 @@ extension URL {
         return filename
     }
 
+    var emailAddresses: [String] {
+        guard navigationalScheme == .mailto, let path = URLComponents(url: self, resolvingAgainstBaseURL: false)?.path else {
+            return []
+        }
+
+        return path.components(separatedBy: .init(charactersIn: ", ")).filter { !$0.isEmpty }
+    }
+
     // MARK: - Validity
 
     var isDataURL: Bool {
@@ -296,7 +341,7 @@ extension URL {
     }
 
     var isExternalSchemeLink: Bool {
-        return !["https", "http", "about", "file", "blob", "data", "ftp"].contains(scheme)
+        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript].contains(navigationalScheme)
     }
 
     // MARK: - DuckDuckGo
@@ -319,11 +364,19 @@ extension URL {
     }
 
     static var cookieConsentPopUpManagement: URL {
-        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-consent-pop-up-management")!
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-pop-up-management")!
     }
 
     static var gpcLearnMore: URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
+    }
+
+    static var privateSearchLearnMore: URL {
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/search-privacy/")!
+    }
+
+    static var searchSettings: URL {
+        return URL(string: "https://duckduckgo.com/settings/")!
     }
 
     static var ddgLearnMore: URL {
@@ -338,9 +391,14 @@ extension URL {
         return URL(string: "https://duckduckgo.com/privacy")!
     }
 
+    static var privacyPro: URL {
+        return URL(string: "https://duckduckgo.com/pro")!
+    }
+
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
     static var duckDuckGoEmailLogin = URL(string: "https://duckduckgo.com/email")!
 
+    static var duckDuckGoEmailInfo = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/email-protection/what-is-duckduckgo-email-protection/")!
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
     var isDuckDuckGo: Bool {
@@ -353,6 +411,10 @@ extension URL {
         }
 
         return false
+    }
+
+    var isEmailProtection: Bool {
+        self.isChild(of: .duckDuckGoEmailLogin) || self == .duckDuckGoEmail
     }
 
     enum DuckDuckGoParameters: String {
@@ -392,7 +454,7 @@ extension URL {
     func sanitizedForQuarantine() -> URL? {
         guard !self.isFileURL,
               !["data", "blob"].contains(self.scheme),
-              var components = URLComponents.init(url: self, resolvingAgainstBaseURL: false)
+              var components = URLComponents(url: self, resolvingAgainstBaseURL: false)
         else {
             return nil
         }
@@ -420,18 +482,104 @@ extension URL {
             quarantineProperties[kLSQuarantineDataURLKey as String] = sourceURL
             quarantineProperties[kLSQuarantineOriginURLKey as String] = referrerURL
 
-            if quarantineProperties[kLSQuarantineTypeKey as String] == nil {
-                quarantineProperties[kLSQuarantineTypeKey as String] = ["http", "https"].contains(sourceURL?.scheme)
-                    ? kLSQuarantineTypeWebDownload
-                    : kLSQuarantineTypeOtherDownload
-            }
+            quarantineProperties[kLSQuarantineTypeKey as String] = ["http", "https"].contains(sourceURL?.scheme)
+                ? kLSQuarantineTypeWebDownload
+                : kLSQuarantineTypeOtherDownload
 
             try (self as NSURL).setResourceValue(quarantineProperties, forKey: .quarantinePropertiesKey)
         }
 
     }
 
+    var isFileHidden: Bool {
+        get throws {
+            try self.resourceValues(forKeys: [.isHiddenKey]).isHidden ?? false
+        }
+    }
+
+    var isDirectory: Bool {
+        var isDirectory: ObjCBool = false
+        guard isFileURL,
+              FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) else { return false }
+        return isDirectory.boolValue
+    }
+
+    mutating func setFileHidden(_ hidden: Bool) throws {
+        var resourceValues = URLResourceValues()
+        resourceValues.isHidden = true
+        try setResourceValues(resourceValues)
+    }
+
+    /// Check if location pointed by the URL is writable
+    /// - Note: if there‘s no file at the URL, it will try to create a file and then remove it
+    func isWritableLocation() -> Bool {
+        do {
+            try FileManager.default.checkWritability(self)
+            return true
+        } catch {
+            return false
+        }
+    }
+
+#if DEBUG && APPSTORE
+    /// sandbox extension URL access should be stopped after SecurityScopedFileURLController is deallocated - this function validates it and breaks if the file is still writable
+    func ensureUrlIsNotWritable(or handler: () -> Void) {
+        let fm = FileManager.default
+        // is the URL ~/Downloads?
+        if self.resolvingSymlinksInPath() == fm.urls(for: .downloadsDirectory, in: .userDomainMask).first!.resolvingSymlinksInPath() {
+            assert(isWritableLocation())
+            return
+        }
+        // is parent directory writable (e.g. ~/Downloads)?
+        if fm.isWritableFile(atPath: self.deletingLastPathComponent().path)
+            // trashed files are still accessible for some reason even after stopping access
+            || fm.isInTrash(self)
+            // other file is being saved at the same URL
+            || NSURL.activeSecurityScopedUrlUsages.contains(where: { $0.url !== self as NSURL && $0.url == self as NSURL })
+            || !isWritableLocation() { return }
+
+        handler()
+    }
+#endif
+
     // MARK: - System Settings
 
-    static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+    static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!
+
+    static var touchIDAndPassword = URL(string: "x-apple.systempreferences:com.apple.preferences.password")!
+
+    // MARK: - Blob URLs
+
+    var isBlobURL: Bool {
+        guard let scheme = self.scheme?.lowercased() else { return false }
+
+        if scheme == "blob" || scheme.hasPrefix("blob:") {
+            return true
+        }
+
+        return false
+    }
+
+    func strippingUnsupportedCredentials() -> String {
+        if self.absoluteString.firstIndex(of: "@") != nil {
+            let authPattern = "([^:]+):\\/\\/[^\\/]*@"
+            let strippedURL = self.absoluteString.replacingOccurrences(of: authPattern, with: "$1://", options: .regularExpression)
+            let uuid = UUID().uuidString.lowercased()
+            return "\(strippedURL)\(uuid)"
+        }
+        return self.absoluteString
+    }
+
+    public func isChild(of parentURL: URL) -> Bool {
+        if scheme == parentURL.scheme,
+           port == parentURL.port,
+           let parentURLHost = parentURL.host,
+           self.isPart(ofDomain: parentURLHost),
+           pathComponents.starts(with: parentURL.pathComponents) {
+            return true
+        } else {
+            return false
+        }
+    }
+
 }

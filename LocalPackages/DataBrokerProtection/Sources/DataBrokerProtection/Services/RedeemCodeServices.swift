@@ -1,5 +1,5 @@
 //
-//  ReedemCodeServices.swift
+//  RedeemCodeServices.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -34,18 +34,18 @@ public protocol DataBrokerProtectionRedeemUseCase {
 
     /// Returns the auth header needed for the authenticated endpoints.
     ///
-    /// In case there is no auth header present, tries to fetch a new access token with the saved invite code.
-    ///
-    /// - Returns: `String` a string that contains the bearer access token
-    func getAuthHeader() async throws -> String
+    /// - Returns: `String` a string that contains the bearer access token or nil
+    func getAuthHeader() -> String?
 }
 
 public protocol AuthenticationRepository {
     func getInviteCode() -> String?
     func getAccessToken() -> String?
+    func getWaitlistTimestamp() -> Int?
 
     func save(accessToken: String)
     func save(inviteCode: String)
+    func reset()
 }
 
 public protocol DataBrokerProtectionAuthenticationService {
@@ -62,7 +62,7 @@ public final class RedeemUseCase: DataBrokerProtectionRedeemUseCase {
     private let authenticationRepository: AuthenticationRepository
 
     public init(authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService(),
-                authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()) {
+                authenticationRepository: AuthenticationRepository = KeychainAuthenticationData()) {
         self.authenticationService = authenticationService
         self.authenticationRepository = authenticationRepository
     }
@@ -76,29 +76,27 @@ public final class RedeemUseCase: DataBrokerProtectionRedeemUseCase {
         authenticationRepository.save(accessToken: accessToken)
     }
 
-    public func getAuthHeader() async throws -> String {
-        var accessToken = authenticationRepository.getAccessToken() ?? ""
-
-        if accessToken.isEmpty {
-            guard let inviteCode = authenticationRepository.getInviteCode() else {
-                throw AuthenticationError.noInviteCode
-            }
-
-            accessToken = try await authenticationService.redeem(inviteCode: inviteCode)
-            authenticationRepository.save(accessToken: accessToken)
+    public func getAuthHeader() -> String? {
+        guard let token = authenticationRepository.getAccessToken() else {
+            return nil
         }
-
-        return "bearer \(accessToken)"
+        return "bearer \(token)"
     }
 }
 
-// ⚠️ NOTE: This is just a temporary solution. We should not store the access token on User Defaults.
-// The access token will be saved in the secure database once we have that in place.
-public final class UserDefaultsAuthenticationData: AuthenticationRepository {
-    struct Keys {
-        static let accessTokenKey = "dbp:accessTokenKey"
-        static let inviteCodeKey = "dbp:inviteCodeKey"
+public final class KeychainAuthenticationData: AuthenticationRepository {
+    enum DBPWaitlistKeys: String {
+        case accessTokenKey = "dbp:accessTokenKey"
+        case inviteCodeKey = "dbp:inviteCodeKey"
+        case waitlistTimestamp = "databrokerprotection.timestamp"
     }
+
+    /// Hack to stop the bleeding on https://app.asana.com/0/1203581873609357/1206097441142301/f
+    lazy var keychainPrefix: String = {
+        let originalString = Bundle.main.bundleIdentifier ?? "com.duckduckgo"
+        let replacedString = originalString.replacingOccurrences(of: "DBP.backgroundAgent", with: "browser")
+        return replacedString
+    }()
 
     // Initialize this constant with the DBP API Dev Access Token on Bitwarden if you do not want to use the redeem endpoint.
     private let developmentToken: String? = nil
@@ -106,31 +104,105 @@ public final class UserDefaultsAuthenticationData: AuthenticationRepository {
     public init() {}
 
     public func getInviteCode() -> String? {
-        UserDefaults.standard.string(forKey: Keys.inviteCodeKey)
+        return getString(forField: .inviteCodeKey)
     }
 
     public func getAccessToken() -> String? {
-        UserDefaults.standard.string(forKey: Keys.accessTokenKey) ?? developmentToken
+        getString(forField: .accessTokenKey)
     }
 
     public func save(accessToken: String) {
-        UserDefaults.standard.set(accessToken, forKey: Keys.accessTokenKey)
+        add(string: accessToken, forField: .accessTokenKey)
     }
 
     public func save(inviteCode: String) {
-        UserDefaults.standard.set(inviteCode, forKey: Keys.inviteCodeKey)
+        add(string: inviteCode, forField: .inviteCodeKey)
+    }
+
+    public func getWaitlistTimestamp() -> Int? {
+        guard let timestampString = getString(forField: .waitlistTimestamp) else { return nil }
+        return Int(timestampString)
+    }
+
+    public func reset() {
+        deleteItem(forField: .inviteCodeKey)
+        deleteItem(forField: .accessTokenKey)
+    }
+
+    // MARK: - Keychain Read
+
+    private func getString(forField field: DBPWaitlistKeys) -> String? {
+        guard let data = retrieveData(forField: field),
+              let string = String(data: data, encoding: String.Encoding.utf8) else {
+            return nil
+        }
+        return string
+    }
+
+    private func retrieveData(forField field: DBPWaitlistKeys) -> Data? {
+        var query = defaultAttributes(serviceName: keychainServiceName(for: field))
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
+        query[kSecReturnData as String] = true
+
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        guard status == errSecSuccess, let existingItem = item as? Data else {
+            return nil
+        }
+
+        return existingItem
+    }
+
+    // MARK: - Keychain Write
+
+    private func add(string: String, forField field: DBPWaitlistKeys) {
+        guard let stringData = string.data(using: .utf8) else {
+            return
+        }
+
+        deleteItem(forField: field)
+        add(data: stringData, forField: field)
+    }
+
+    private func add(data: Data, forField field: DBPWaitlistKeys) {
+        var query = defaultAttributes(serviceName: keychainServiceName(for: field))
+        query[kSecValueData as String] = data
+        SecItemAdd(query as CFDictionary, nil)
+    }
+
+    private func deleteItem(forField field: DBPWaitlistKeys) {
+        let query = defaultAttributes(serviceName: keychainServiceName(for: field))
+        SecItemDelete(query as CFDictionary)
+    }
+
+    // MARK: -
+
+    private func defaultAttributes(serviceName: String) -> [String: Any] {
+        return [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrSynchronizable as String: false,
+            kSecUseDataProtectionKeychain as String: true,
+            kSecAttrAccessGroup as String: Bundle.main.appGroupName,
+            kSecAttrService as String: serviceName,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
+        ]
+    }
+
+    func keychainServiceName(for field: DBPWaitlistKeys) -> String {
+        [keychainPrefix, "waitlist", field.rawValue].joined(separator: ".")
     }
 }
 
 public enum AuthenticationError: Error, Equatable {
     case noInviteCode
     case cantGenerateURL
+    case noAuthToken
     case issueRedeemingInviteCode(error: String)
 }
 
 struct RedeemResponse: Codable {
     enum CodingKeys: String, CodingKey {
-        case accessToken = "access_token"
+        case accessToken
         case message
     }
 
@@ -139,21 +211,20 @@ struct RedeemResponse: Codable {
 }
 
 public struct AuthenticationService: DataBrokerProtectionAuthenticationService {
-    private struct Constants {
-        static let redeemURL = "https://dbp.duckduckgo.com/dbp/redeem?"
-    }
-
     private let urlSession: URLSession
+    private let settings: DataBrokerProtectionSettings
 
-    public init(urlSession: URLSession = URLSession.shared) {
+    public init(urlSession: URLSession = URLSession.shared, settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings()) {
         self.urlSession = urlSession
+        self.settings = settings
     }
 
     public func redeem(inviteCode: String) async throws -> String {
-        guard let url = URL(string: Constants.redeemURL + "code=\(inviteCode)") else {
+        let redeemURL = settings.selectedEnvironment.endpointURL.appendingPathComponent("dbp/redeem")
+
+        guard let url = URL(string: "\(redeemURL.absoluteString)?code=\(inviteCode)") else {
             throw AuthenticationError.cantGenerateURL
         }
-
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         let (data, _) = try await urlSession.data(for: request)

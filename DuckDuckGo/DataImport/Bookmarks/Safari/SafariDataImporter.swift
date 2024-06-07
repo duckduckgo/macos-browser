@@ -16,17 +16,16 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
+import PixelKit
 
-internal class SafariDataImporter: DataImporter {
+final class SafariDataImporter: DataImporter {
 
-    static func canReadBookmarksFile() -> Bool {
-        return FileManager.default.isReadableFile(atPath: safariDataDirectoryURL.path)
-    }
-
-    static func requestSafariDataDirectoryPermission() -> URL? {
+    @MainActor
+    static func requestDataDirectoryPermission(for fileUrl: URL) -> URL? {
         let openPanel = NSOpenPanel()
-        openPanel.directoryURL = safariDataDirectoryURL
+        // if file does not exist, grant permission to its parent folder
+        openPanel.directoryURL = fileUrl.deletingLastPathComponent()
         openPanel.message = UserText.bookmarkImportSafariRequestPermissionButtonTitle
         openPanel.allowsOtherFileTypes = false
         openPanel.canChooseFiles = false
@@ -36,78 +35,87 @@ internal class SafariDataImporter: DataImporter {
         return openPanel.urls.first
     }
 
-    static private var safariDataDirectoryURL: URL {
-        return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
-    }
-
-    static private var bookmarksFileURL: URL {
-        return safariDataDirectoryURL.appendingPathComponent("Bookmarks.plist")
-    }
-
     private let bookmarkImporter: BookmarkImporter
     private let faviconManager: FaviconManagement
+    private let profile: DataImport.BrowserProfile
+    private var source: DataImport.Source {
+        profile.browser.importSource
+    }
 
-    init(bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+    init(profile: DataImport.BrowserProfile, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement = FaviconManager.shared) {
+        self.profile = profile
         self.bookmarkImporter = bookmarkImporter
         self.faviconManager = faviconManager
     }
 
-    func importableTypes() -> [DataImport.DataType] {
+    var importableTypes: [DataImport.DataType] {
         return [.bookmarks]
     }
 
-    func importData(types: [DataImport.DataType],
-                    from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
-        var summary = DataImport.Summary()
+    func importData(types: Set<DataImport.DataType>) -> DataImportTask {
+        .detachedWithProgress { updateProgress in
+            let result = await self.importDataSync(types: types, updateProgress: updateProgress)
+            return result
+        }
+    }
 
-        if types.contains(.bookmarks) {
-            let bookmarkReader = SafariBookmarksReader(safariBookmarksFileURL: Self.bookmarksFileURL)
-            let bookmarkResult = bookmarkReader.readBookmarks()
+    static let bookmarksFileName = "Bookmarks.plist"
 
-            let faviconsReader = SafariFaviconsReader(safariDataDirectoryURL: Self.safariDataDirectoryURL)
-            let faviconsResult = faviconsReader.readFavicons()
+    private var fileUrl: URL {
+        profile.profileURL.appendingPathComponent(Self.bookmarksFileName)
+    }
 
-            switch faviconsResult {
-            case .success(let faviconsByURL):
-                for (pageURLString, fetchedFavicons) in faviconsByURL {
-                    if let pageURL = URL(string: pageURLString) {
-                        let favicons = fetchedFavicons.map {
-                            Favicon(identifier: UUID(),
-                                    url: pageURL,
-                                    image: $0.image,
-                                    relation: .icon,
-                                    documentUrl: pageURL,
-                                    dateCreated: Date())
-                        }
+    func validateAccess(for types: Set<DataImport.DataType>) -> [DataImport.DataType: any DataImportError]? {
+        guard types.contains(.bookmarks) else { return nil }
 
-                        faviconManager.handleFavicons(favicons, documentUrl: pageURL)
-                    }
-                }
+        if case .failure(let error) = SafariBookmarksReader(safariBookmarksFileURL: fileUrl).validateFileReadAccess() {
+            return [.bookmarks: error]
+        }
+        return nil
+    }
 
-            case .failure:
-                Pixel.fire(.faviconImportFailed(source: .safari))
-            }
+    @MainActor
+    private func importDataSync(types: Set<DataImport.DataType>, updateProgress: DataImportProgressCallback) async -> DataImportSummary {
+        // logins will be imported from CSV
+        guard types.contains(.bookmarks) else { return [:] }
 
-            switch bookmarkResult {
-            case .success(let bookmarks):
-                do {
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(.safari))
-                } catch {
-                    completion(.failure(.bookmarks(.cannotAccessCoreData)))
-                    return
-                }
-            case .failure(let error):
-                completion(.failure(.bookmarks(error)))
-                return
-            }
+        let bookmarkReader = SafariBookmarksReader(safariBookmarksFileURL: fileUrl)
+        let bookmarkResult = bookmarkReader.readBookmarks()
+
+        let summary = bookmarkResult.map { bookmarks in
+            bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
         }
 
-        if types.contains(.logins) {
-            summary.loginsResult = .awaited
+        if case .success = summary {
+            await importFavicons(from: profile.profileURL)
         }
 
-        completion(.success(summary))
+        return [.bookmarks: summary.map { .init($0) }]
+    }
+
+    private func importFavicons(from dataDirectoryURL: URL) async {
+        let faviconsReader = SafariFaviconsReader(safariDataDirectoryURL: dataDirectoryURL)
+        let faviconsResult = faviconsReader.readFavicons()
+
+        switch faviconsResult {
+        case .success(let faviconsByURL):
+            let faviconsByDocument = faviconsByURL.reduce(into: [URL: [Favicon]]()) { result, pair in
+                guard let pageURL = URL(string: pair.key) else { return }
+                let favicons = pair.value.map {
+                    Favicon(identifier: UUID(),
+                            url: pageURL,
+                            image: $0.image,
+                            relation: .icon,
+                            documentUrl: pageURL,
+                            dateCreated: Date())
+                }
+                result[pageURL] = favicons
+            }
+            await faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
+
+        case .failure(let error):
+            PixelKit.fire(GeneralPixel.dataImportFailed(source: source, sourceVersion: profile.installedAppsMajorVersionDescription(), error: error))
+        }
     }
 
 }

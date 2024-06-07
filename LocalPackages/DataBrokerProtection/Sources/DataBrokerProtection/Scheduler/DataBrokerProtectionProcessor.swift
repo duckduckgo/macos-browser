@@ -26,17 +26,21 @@ protocol OperationRunnerProvider {
 
 final class DataBrokerProtectionProcessor {
     private let database: DataBrokerProtectionRepository
-    private let config: SchedulerConfig
+    private let config: DataBrokerProtectionProcessorConfiguration
     private let operationRunnerProvider: OperationRunnerProvider
     private let notificationCenter: NotificationCenter
     private let operationQueue: OperationQueue
     private var pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private let userNotificationService: DataBrokerProtectionUserNotificationService
+    private let engagementPixels: DataBrokerProtectionEngagementPixels
+    private let eventPixels: DataBrokerProtectionEventPixels
 
     init(database: DataBrokerProtectionRepository,
-         config: SchedulerConfig,
+         config: DataBrokerProtectionProcessorConfiguration = DataBrokerProtectionProcessorConfiguration(),
          operationRunnerProvider: OperationRunnerProvider,
          notificationCenter: NotificationCenter = NotificationCenter.default,
-         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         userNotificationService: DataBrokerProtectionUserNotificationService) {
 
         self.database = database
         self.config = config
@@ -44,45 +48,58 @@ final class DataBrokerProtectionProcessor {
         self.notificationCenter = notificationCenter
         self.operationQueue = OperationQueue()
         self.pixelHandler = pixelHandler
-        self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsDifferentBrokers
+        self.userNotificationService = userNotificationService
+        self.engagementPixels = DataBrokerProtectionEngagementPixels(database: database, handler: pixelHandler)
+        self.eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
     }
 
     // MARK: - Public functions
-    func runAllScanOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {
+    func startManualScans(showWebView: Bool = false,
+                          completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+
         operationQueue.cancelAllOperations()
-        runOperations(operationType: .scan,
+        runOperations(operationType: .manualScan,
                       priorityDate: nil,
-                      showWebView: showWebView) {
+                      showWebView: showWebView) { errors in
             os_log("Scans done", log: .dataBrokerProtection)
-            completion?()
+            completion?(errors)
+            self.calculateMisMatches()
         }
     }
 
-    func runAllOptOutOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {
+    private func calculateMisMatches() {
+        let mismatchUseCase = MismatchCalculatorUseCase(database: database, pixelHandler: pixelHandler)
+        mismatchUseCase.calculateMismatches()
+    }
+
+    func runAllOptOutOperations(showWebView: Bool = false,
+                                completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
         operationQueue.cancelAllOperations()
         runOperations(operationType: .optOut,
                       priorityDate: nil,
-                      showWebView: showWebView) {
-            os_log("Scans done", log: .dataBrokerProtection)
-            completion?()
+                      showWebView: showWebView) { errors in
+            os_log("Optouts done", log: .dataBrokerProtection)
+            completion?(errors)
         }
     }
 
-    func runQueuedOperations(showWebView: Bool = false, completion: (() -> Void)? = nil ) {
+    func runQueuedOperations(showWebView: Bool = false,
+                             completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil ) {
         runOperations(operationType: .all,
                       priorityDate: Date(),
-                      showWebView: showWebView) {
+                      showWebView: showWebView) { errors in
             os_log("Queued operations done", log: .dataBrokerProtection)
-            completion?()
+            completion?(errors)
         }
     }
 
-    func runAllOperations(showWebView: Bool = false, completion: (() -> Void)? = nil ) {
+    func runAllOperations(showWebView: Bool = false,
+                          completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil ) {
         runOperations(operationType: .all,
                       priorityDate: nil,
-                      showWebView: showWebView) {
+                      showWebView: showWebView) { errors in
             os_log("Queued operations done", log: .dataBrokerProtection)
-            completion?()
+            completion?(errors)
         }
     }
 
@@ -91,36 +108,52 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Private functions
-    private func runOperations(operationType: DataBrokerOperationsCollection.OperationType,
+    private func runOperations(operationType: OperationType,
                                priorityDate: Date?,
                                showWebView: Bool,
-                               completion: @escaping () -> Void) {
+                               completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
 
+        self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsFor(operationType)
         // Before running new operations we check if there is any updates to the broker files.
-        // This runs only once per 24 hours.
-        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil) {
-            let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault)
+        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: DataBrokerProtectionSecureVaultErrorReporter.shared) {
+            let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
             brokerUpdater.checkForUpdatesInBrokerJSONFiles()
         }
 
-        let profileId: Int64 = 1 // We assume one profile for now
-        let brokersProfileData = database.fetchAllBrokerProfileQueryData(for: profileId)
-        let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
-                                                                                  operationType: operationType,
-                                                                                  priorityDate: priorityDate,
-                                                                                  showWebView: showWebView)
+        // This will fire the DAU/WAU/MAU pixels,
+        engagementPixels.fireEngagementPixel()
+        // This will try to fire the event weekly report pixels
+        eventPixels.tryToFireWeeklyPixels()
 
-        for collection in dataBrokerOperationCollections {
-            operationQueue.addOperation(collection)
+        let dataBrokerOperationCollections: [DataBrokerOperationsCollection]
+
+        do {
+            let brokersProfileData = try database.fetchAllBrokerProfileQueryData()
+            dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
+                                                                                      operationType: operationType,
+                                                                                      priorityDate: priorityDate,
+                                                                                      showWebView: showWebView)
+
+            for collection in dataBrokerOperationCollections {
+                operationQueue.addOperation(collection)
+            }
+        } catch {
+            os_log("DataBrokerProtectionProcessor error: runOperations, error: %{public}@", log: .error, error.localizedDescription)
+            operationQueue.addBarrierBlock {
+                completion(DataBrokerProtectionSchedulerErrorCollection(oneTimeError: error))
+            }
+            return
         }
 
         operationQueue.addBarrierBlock {
-            completion()
+            let operationErrors = dataBrokerOperationCollections.compactMap { $0.error }
+            let errorCollection = operationErrors.count != 0 ? DataBrokerProtectionSchedulerErrorCollection(operationErrors: operationErrors) : nil
+            completion(errorCollection)
         }
     }
 
     private func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData],
-                                                      operationType: DataBrokerOperationsCollection.OperationType,
+                                                      operationType: OperationType,
                                                       priorityDate: Date?,
                                                       showWebView: Bool) -> [DataBrokerOperationsCollection] {
 
@@ -131,8 +164,7 @@ final class DataBrokerProtectionProcessor {
             guard let dataBrokerID = queryData.dataBroker.id else { continue }
 
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
-                let matchingQueriesData = brokerProfileQueriesData.filter { $0.dataBroker.id == dataBrokerID }
-                let collection = DataBrokerOperationsCollection(brokerProfileQueriesData: matchingQueriesData,
+                let collection = DataBrokerOperationsCollection(dataBrokerID: dataBrokerID,
                                                                 database: database,
                                                                 operationType: operationType,
                                                                 intervalBetweenOperations: config.intervalBetweenSameBrokerOperations,
@@ -140,7 +172,9 @@ final class DataBrokerProtectionProcessor {
                                                                 notificationCenter: notificationCenter,
                                                                 runner: operationRunnerProvider.getOperationRunner(),
                                                                 pixelHandler: pixelHandler,
+                                                                userNotificationService: userNotificationService,
                                                                 showWebView: showWebView)
+                collection.errorDelegate = self
                 collections.append(collection)
 
                 visitedDataBrokerIDs.insert(dataBrokerID)
@@ -148,5 +182,28 @@ final class DataBrokerProtectionProcessor {
         }
 
         return collections
+    }
+
+    deinit {
+        os_log("Deinit DataBrokerProtectionProcessor", log: .dataBrokerProtection)
+    }
+}
+
+extension DataBrokerProtectionProcessor: DataBrokerOperationsCollectionErrorDelegate {
+
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection, didErrorBeforeStartingBrokerOperations error: Error) {
+
+    }
+
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
+                                        didError error: Error,
+                                        whileRunningBrokerOperationData: BrokerOperationData,
+                                        withDataBrokerName dataBrokerName: String?) {
+        if let error = error as? DataBrokerProtectionError,
+           let dataBrokerName = dataBrokerName {
+            pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
+        } else {
+            os_log("Cant handle error", log: .dataBrokerProtection)
+        }
     }
 }

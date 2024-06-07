@@ -23,7 +23,7 @@ class HTTPCookieTests: XCTestCase {
 
     func testCookieBelongsToETLDPlus1Domain() {
         // Case 1: Cookie domain and eTLD+1 domain are the same
-        var cookieProperties: [HTTPCookiePropertyKey : Any] = [
+        var cookieProperties: [HTTPCookiePropertyKey: Any] = [
             .domain: "example.com",
             .path: "/",
             .name: "TestCookie",

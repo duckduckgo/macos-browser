@@ -87,10 +87,11 @@ class FirefoxLoginReaderTests: XCTestCase {
         let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: profileDirectoryURL)
         let result = firefoxLoginReader.readLogins(dataFormat: nil)
 
-        if case let .failure(error) = result {
-            XCTAssertEqual(error, .requiresPrimaryPassword)
-        } else {
-            XCTFail("Expected to fail when decrypting a database that is protected with a Primary Password")
+        switch result {
+        case .failure(let error as FirefoxLoginReader.ImportError):
+            XCTAssertEqual(error.type, .requiresPrimaryPassword)
+        default:
+            XCTFail("Received unexpected \(result)")
         }
 
         try structure.removeCreatedFileSystemStructure()
@@ -129,10 +130,11 @@ class FirefoxLoginReaderTests: XCTestCase {
         let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: profileDirectoryURL)
         let result = firefoxLoginReader.readLogins(dataFormat: nil)
 
-        if case let .failure(error) = result {
-            XCTAssertEqual(error, .couldNotFindLoginsFile)
-        } else {
-            XCTFail("Expected to fail when decrypting a database that is protected with a Primary Password")
+        switch result {
+        case .failure(let error as FirefoxLoginReader.ImportError):
+            XCTAssertEqual(error.type, .couldNotFindKeyDB)
+        default:
+            XCTFail("Received unexpected \(result)")
         }
 
         try structure.removeCreatedFileSystemStructure()
@@ -197,10 +199,11 @@ class FirefoxLoginReaderTests: XCTestCase {
         let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: profileDirectoryURL, primaryPassword: "")
         let result = firefoxLoginReader.readLogins(dataFormat: nil)
 
-        if case let .failure(error) = result {
-            XCTAssertEqual(error, .requiresPrimaryPassword)
-        } else {
-            XCTFail("Did not expect decryption success")
+        switch result {
+        case .failure(let error as FirefoxLoginReader.ImportError):
+            XCTAssertEqual(error.type, .requiresPrimaryPassword)
+        default:
+            XCTFail("Received unexpected \(result)")
         }
     }
 
@@ -263,11 +266,32 @@ class FirefoxLoginReaderTests: XCTestCase {
         let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: profileDirectoryURL, primaryPassword: "")
         let result = firefoxLoginReader.readLogins(dataFormat: nil)
 
-        if case let .failure(error) = result {
-            XCTAssertEqual(error, .requiresPrimaryPassword)
-        } else {
-            XCTFail("Did not expect decryption success")
+        switch result {
+        case .failure(let error as FirefoxLoginReader.ImportError):
+            XCTAssertEqual(error.type, .requiresPrimaryPassword)
+        default:
+            XCTFail("Received unexpected \(result)")
         }
+    }
+
+    func testWhenImportingLogins_AndNoKeysDBExists_ThenImportFailsWithNoDBError() throws {
+        // Given
+        let logins = resourcesURLWithoutPassword().appendingPathComponent("logins.json")
+
+        let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
+            File("logins.json", contents: .copy(logins))
+        }
+
+        try structure.writeToTemporaryDirectory()
+        let profileDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(rootDirectoryName)
+
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: profileDirectoryURL)
+
+        // When
+        let result = firefoxLoginReader.readLogins(dataFormat: nil)
+
+        // Then
+        XCTAssertEqual(result, .failure(FirefoxLoginReader.ImportError(type: .couldNotFindKeyDB, underlyingError: nil)))
     }
 
     private func resourcesURLWithPassword() -> URL {

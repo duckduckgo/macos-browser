@@ -21,17 +21,20 @@ import SwiftUI
 public struct TextButton: View {
 
     public let title: String
+    public let fontWeight: Font.Weight
     public let action: () -> Void
 
-    public init(_ title: String, action: @escaping () -> Void) {
+    public init(_ title: String, weight: Font.Weight = .regular, action: @escaping () -> Void) {
         self.title = title
+        self.fontWeight = weight
         self.action = action
     }
 
     public var body: some View {
         Button(action: action) {
             Text(title)
-                .foregroundColor(Color("LinkBlueColor"))
+                .fontWeight(fontWeight)
+                .foregroundColor(Color(.linkBlue))
         }
         .buttonStyle(.plain)
         .cursor(.pointingHand)

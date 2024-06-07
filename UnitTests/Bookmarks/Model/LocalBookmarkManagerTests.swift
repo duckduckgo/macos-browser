@@ -16,11 +16,13 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class LocalBookmarkManagerTests: XCTestCase {
 
     enum BookmarkManagerError: Error {
@@ -156,10 +158,112 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssert(bookmarkStoreMock.updateBookmarkCalled)
     }
 
+    func testWhenBookmarkFolderIsUpdatedAndMoved_ThenManagerUpdatesItAlsoInStore() throws {
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let parent = BookmarkFolder(id: "1", title: "Parent")
+        let folder = BookmarkFolder(id: "2", title: "Child")
+        var bookmarkList: BookmarkList?
+        let cancellable = bookmarkManager.listPublisher
+            .dropFirst()
+            .sink { list in
+            bookmarkList = list
+        }
+
+        bookmarkManager.update(folder: folder, andMoveToParent: .parent(uuid: parent.id))
+
+        withExtendedLifetime(cancellable) {}
+        XCTAssertTrue(bookmarkStoreMock.updateFolderAndMoveToParentCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedFolder, folder)
+        XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .parent(uuid: parent.id))
+        XCTAssertNotNil(bookmarkList)
+    }
+
+    func testWhenGetBookmarkFolderIsCalledThenAskBookmarkStoreToRetrieveFolder() throws {
+        // GIVEN
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        XCTAssertFalse(bookmarkStoreMock.bookmarkFolderWithIdCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedFolderId)
+
+        // WHEN
+        _ = bookmarkManager.getBookmarkFolder(withId: #function)
+
+        // THEN
+        XCTAssertTrue(bookmarkStoreMock.bookmarkFolderWithIdCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedFolderId, #function)
+    }
+
+    func testWhenGetBookmarkFolderIsCalledAndFolderExistsInStoreThenBookmarkStoreReturnsFolder() throws {
+        // GIVEN
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let folder = BookmarkFolder(id: "1", title: "Test")
+        bookmarkStoreMock.bookmarkFolder = folder
+
+        // WHEN
+        let result = bookmarkManager.getBookmarkFolder(withId: #function)
+
+        // THEN
+        XCTAssertEqual(result, folder)
+    }
+
+    func testWhenGetBookmarkFolderIsCalledAndFolderDoesNotExistInStoreThenBookmarkStoreReturnsNil() throws {
+        // GIVEN
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        bookmarkStoreMock.bookmarkFolder = nil
+
+        // WHEN
+        let result = bookmarkManager.getBookmarkFolder(withId: #function)
+
+        // THEN
+        XCTAssertNil(result)
+    }
+
+    // MARK: - Save Multiple Bookmarks at once
+
+    func testWhenMakeBookmarksForWebsitesInfoIsCalledThenBookmarkStoreIsAskedToCreateMultipleBookmarks() {
+        // GIVEN
+        let (sut, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let newFolderName = #function
+        let websitesInfo = [
+            WebsiteInfo(url: URL.duckDuckGo, title: "Website 1"),
+            WebsiteInfo(url: URL.duckDuckGo, title: "Website 2"),
+            WebsiteInfo(url: URL.duckDuckGo, title: "Website 3"),
+            WebsiteInfo(url: URL.duckDuckGo, title: "Website 4"),
+        ].compactMap { $0 }
+        XCTAssertFalse(bookmarkStoreMock.saveBookmarksInNewFolderNamedCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedWebsitesInfo)
+        XCTAssertNil(bookmarkStoreMock.capturedNewFolderName)
+        XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
+
+        // WHEN
+        sut.makeBookmarks(for: websitesInfo, inNewFolderNamed: newFolderName, withinParentFolder: .root)
+
+        // THEN
+        XCTAssertTrue(bookmarkStoreMock.saveBookmarksInNewFolderNamedCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedWebsitesInfo?.count, 4)
+        XCTAssertEqual(bookmarkStoreMock.capturedWebsitesInfo, websitesInfo)
+        XCTAssertEqual(bookmarkStoreMock.capturedNewFolderName, newFolderName)
+        XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .root)
+    }
+
+    func testWhenMakeBookmarksForWebsiteInfoIsCalledThenReloadAllBookmarks() {
+        // GIVEN
+        let (sut, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        bookmarkStoreMock.loadAllCalled = false // Reset after load all bookmarks the first time
+        XCTAssertFalse(bookmarkStoreMock.loadAllCalled)
+        let websitesInfo = [WebsiteInfo(url: URL.duckDuckGo, title: "Website 1")].compactMap { $0 }
+
+        // WHEN
+        sut.makeBookmarks(for: websitesInfo, inNewFolderNamed: "Test", withinParentFolder: .root)
+
+        // THEN
+        XCTAssertTrue(bookmarkStoreMock.loadAllCalled)
+    }
+
 }
 
 fileprivate extension LocalBookmarkManager {
 
+    @MainActor(unsafe)
     static var aManager: (LocalBookmarkManager, BookmarkStoreMock) {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
@@ -179,5 +283,16 @@ fileprivate extension Bookmark {
                                               url: URL.duckDuckGo.absoluteString,
                                               title: "Title",
                                               isFavorite: false)
+
+}
+
+private extension WebsiteInfo {
+
+    @MainActor
+    init?(url: URL, title: String) {
+        let tab = Tab(content: .url(url, credential: nil, source: .ui))
+        tab.title = title
+        self.init(tab)
+    }
 
 }

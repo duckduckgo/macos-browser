@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionIPCNotificationsPresenter.swift
+//  NetworkProtectionAgentNotificationsPresenter.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -32,8 +32,8 @@ final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotif
 
     // MARK: - Presenting user notifications
 
-    func showReconnectedNotification() {
-        notificationCenter.post(.showIssuesResolvedNotification)
+    func showConnectedNotification(serverLocation: String?) {
+        notificationCenter.post(.showConnectedNotification, object: serverLocation)
     }
 
     func showReconnectingNotification() {
@@ -46,6 +46,10 @@ final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotif
 
     func showSupersededNotification() {
         notificationCenter.post(.showVPNSupersededNotification)
+    }
+
+    func showEntitlementNotification() {
+        notificationCenter.post(.showExpiredEntitlementNotification)
     }
 
     func showTestNotification() {

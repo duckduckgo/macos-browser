@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+import Bookmarks
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 
@@ -45,7 +47,7 @@ extension Preferences {
         private var selectionBackground: some View {
             if isSelected {
                 RoundedRectangle(cornerRadius: 6)
-                    .stroke(Color("LinkBlueColor"), lineWidth: 2)
+                    .stroke(Color(.linkBlue), lineWidth: 2)
             }
         }
 
@@ -84,72 +86,52 @@ extension Preferences {
         @ObservedObject var model: AppearancePreferences
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-
-                // TITLE
-                TextMenuTitle(text: UserText.appearance)
+            PreferencePane(UserText.appearance) {
 
                 // SECTION 1: Theme
-                PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.theme)
+                PreferencePaneSection(UserText.theme) {
+
                     ThemePicker()
                         .environmentObject(model)
                 }
 
                 // SECTION 2: Address Bar
-                PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.addressBar)
-                    ToggleMenuItem(title: UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
-                    ToggleMenuItem(title: UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
+                PreferencePaneSection(UserText.addressBar) {
+                    ToggleMenuItem(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
                 }
 
                 // SECTION 3: New Tab Page
-                PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.newTabBottomPopoverTitle)
+                PreferencePaneSection(UserText.newTabBottomPopoverTitle) {
+
                     if model.isContinueSetUpAvailable {
-                        ToggleMenuItem(title: UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
+                        ToggleMenuItem(UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
                     }
-                    ToggleMenuItem(title: UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible)
-                    ToggleMenuItem(title: UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
+                    ToggleMenuItem(UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible).accessibilityIdentifier("Preferences.AppearanceView.showFavoritesToggle")
+                    ToggleMenuItem(UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
                 }
 
                 // SECTION 4: Bookmarks Bar
-                PreferencePaneSection {
-                    TextMenuItemHeader(text: "Bookmarks Bar")
+                PreferencePaneSection(UserText.showBookmarksBar) {
+
                     HStack {
-                        ToggleMenuItem(title: UserText.showBookmarksBarPreference, isOn: $model.showBookmarksBar)
+                        ToggleMenuItem(UserText.showBookmarksBarPreference, isOn: $model.showBookmarksBar)
+                            .accessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarPreferenceToggle")
                         NSPopUpButtonView(selection: $model.bookmarksBarAppearance) {
                             let button = NSPopUpButton()
                             button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+                            button.setAccessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarPopUp")
 
                             let alwaysOn = button.menu?.addItem(withTitle: UserText.showBookmarksBarAlways, action: nil, keyEquivalent: "")
                             alwaysOn?.representedObject = BookmarksBarAppearance.alwaysOn
+                            alwaysOn?.setAccessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarAlways")
 
                             let newTabOnly = button.menu?.addItem(withTitle: UserText.showBookmarksBarNewTabOnly, action: nil, keyEquivalent: "")
                             newTabOnly?.representedObject = BookmarksBarAppearance.newTabOnly
+                            newTabOnly?.setAccessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarNewTabOnly")
 
                             return button
                         }
                         .disabled(!model.showBookmarksBar)
-                    }
-                }
-
-                // SECTION 5: Zoom Setting
-                PreferencePaneSection {
-                    Text(UserText.zoomSettingTitle)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
-                    HStack {
-                        Text(UserText.zoomPickerTitle)
-                        NSPopUpButtonView(selection: $model.defaultPageZoom) {
-                            let button = NSPopUpButton()
-                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-
-                            for value in DefaultZoomValue.allCases {
-                                let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
-                                item?.representedObject = value
-                            }
-                            return button
-                        }
                     }
                 }
             }

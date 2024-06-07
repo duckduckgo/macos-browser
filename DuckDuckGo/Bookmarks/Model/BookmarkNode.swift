@@ -31,17 +31,6 @@ final class BookmarkNode: Hashable {
         return node
     }
 
-    class func bookmarkNodesSortedAlphabetically(_ nodes: [BookmarkNode]) -> [BookmarkNode] {
-        return nodes.sorted { (firstNode, secondNode) -> Bool in
-            guard let firstBookmark = firstNode.representedObject as? BaseBookmarkEntity,
-                  let secondBookmark = secondNode.representedObject as? BaseBookmarkEntity else {
-                return false
-            }
-
-            return firstBookmark.title.localizedStandardCompare(secondBookmark.title) == .orderedAscending
-        }
-    }
-
     weak var parent: BookmarkNode?
 
     let uniqueID: Int
@@ -78,11 +67,24 @@ final class BookmarkNode: Hashable {
         return 0
     }
 
-    init(representedObject: AnyObject, parent: BookmarkNode?) {
+    /// Creates an instance of a bookmark node.
+    /// - Parameters:
+    ///   - representedObject: The represented object contained in the node.
+    ///   - parent: An optional parent node.
+    ///   - uniqueId: A unique identifier for the node. This should be used only in unit tests.
+    /// - Attention: Use this initializer only in tests. 
+    init(representedObject: AnyObject, parent: BookmarkNode?, uniqueId: Int) {
         self.representedObject = representedObject
         self.parent = parent
-        self.uniqueID = BookmarkNode.incrementingID
+        self.uniqueID = uniqueId
+    }
 
+    /// Creates an instance of a bookmark node.
+    /// - Parameters:
+    ///   - representedObject: The represented object contained in the node.
+    ///   - parent: An optional parent node.
+    convenience init(representedObject: AnyObject, parent: BookmarkNode?) {
+        self.init(representedObject: representedObject, parent: parent, uniqueId: BookmarkNode.incrementingID)
         BookmarkNode.incrementingID += 1
     }
 
@@ -176,7 +178,7 @@ final class BookmarkNode: Hashable {
         // The Node class will most frequently represent Bookmark entities and PseudoFolders. Because of this, their unique properties are
         // used to derive the hash for the node so that equality can be handled based on the represented object.
         if let entity = self.representedObject as? BaseBookmarkEntity {
-            hasher.combine(entity.id)
+            hasher.combine(entity.hashValue)
         } else if let folder = self.representedObject as? PseudoFolder {
             hasher.combine(folder.name)
         } else {
@@ -187,7 +189,7 @@ final class BookmarkNode: Hashable {
     // MARK: - Equatable
 
     class func == (lhs: BookmarkNode, rhs: BookmarkNode) -> Bool {
-        return lhs === rhs
+        return lhs.uniqueID == rhs.uniqueID && lhs.representedObjectEquals(rhs.representedObject)
     }
 
 }
@@ -230,10 +232,6 @@ extension Array where Element == BookmarkNode {
 
     func representedObjects() -> [AnyObject] {
         return self.map { $0.representedObject }
-    }
-
-    func bookmarksSortedAlphabetically() -> [BookmarkNode] {
-        return BookmarkNode.bookmarkNodesSortedAlphabetically(self)
     }
 
 }

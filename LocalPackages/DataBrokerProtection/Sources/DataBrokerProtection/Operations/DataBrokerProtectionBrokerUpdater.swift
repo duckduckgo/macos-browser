@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionUpdater.swift
+//  DataBrokerProtectionBrokerUpdater.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,12 +18,17 @@
 
 import Foundation
 import Common
+import SecureStorage
 
 protocol ResourcesRepository {
-    func fetchBrokerFromResourceFiles() -> [DataBroker]?
+    func fetchBrokerFromResourceFiles() throws -> [DataBroker]?
 }
 
 final class FileResources: ResourcesRepository {
+
+    enum FileResourcesError: Error {
+        case bundleResourceURLNil
+    }
 
     private let fileManager: FileManager
 
@@ -31,9 +36,11 @@ final class FileResources: ResourcesRepository {
         self.fileManager = fileManager
     }
 
-    func fetchBrokerFromResourceFiles() -> [DataBroker]? {
+    func fetchBrokerFromResourceFiles() throws -> [DataBroker]? {
         guard let resourceURL = Bundle.module.resourceURL else {
-            return nil
+            assertionFailure()
+            os_log("DataBrokerProtectionUpdater: error FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil", log: .error)
+            throw FileResourcesError.bundleResourceURLNil
         }
 
         do {
@@ -47,24 +54,24 @@ final class FileResources: ResourcesRepository {
                 $0.isJSON && !$0.hasFakePrefix
             }
 
-            return brokerJSONFiles.map(DataBroker.initFromResource(_:))
+            return try brokerJSONFiles.map(DataBroker.initFromResource(_:))
         } catch {
-            os_log("Error fetching brokers JSON files from resources", log: .dataBrokerProtection)
-            return nil
+            os_log("DataBrokerProtectionUpdater: error FileResources error: fetchBrokerFromResourceFiles, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
         }
     }
 }
 
 protocol BrokerUpdaterRepository {
 
-    func saveLastRunDate(date: Date)
-    func getLastRunDate() -> Date?
+    func saveLatestAppVersionCheck(version: String)
+    func getLastCheckedVersion() -> String?
 }
 
 final class BrokerUpdaterUserDefaults: BrokerUpdaterRepository {
 
     struct Consts {
-        static let shouldCheckForUpdatesKey = "macos.browser.data-broker-protection.ShouldCheckForNewBrokers"
+        static let shouldCheckForUpdatesKey = "macos.browser.data-broker-protection.LastLocalVersionChecked"
     }
 
     private let userDefaults: UserDefaults
@@ -73,57 +80,89 @@ final class BrokerUpdaterUserDefaults: BrokerUpdaterRepository {
         self.userDefaults = userDefaults
     }
 
-    func saveLastRunDate(date: Date) {
-        UserDefaults.standard.set(date, forKey: Consts.shouldCheckForUpdatesKey)
+    func saveLatestAppVersionCheck(version: String) {
+        UserDefaults.standard.set(version, forKey: Consts.shouldCheckForUpdatesKey)
     }
 
-    func getLastRunDate() -> Date? {
-        guard let lastRunDateData = UserDefaults.standard.object(forKey: Consts.shouldCheckForUpdatesKey) as? Date else { return nil }
-
-        return lastRunDateData
+    func getLastCheckedVersion() -> String? {
+        UserDefaults.standard.string(forKey: Consts.shouldCheckForUpdatesKey)
     }
 }
 
-struct DataBrokerProtectionBrokerUpdater {
+protocol AppVersionNumberProvider {
+    var versionNumber: String { get }
+}
 
-    struct Consts {
-        static let updateWindow: Double = 24
-    }
+final class AppVersionNumber: AppVersionNumberProvider {
+
+    var versionNumber: String = AppVersion.shared.versionNumber
+}
+
+public struct DataBrokerProtectionBrokerUpdater {
 
     private let repository: BrokerUpdaterRepository
     private let resources: ResourcesRepository
     private let vault: any DataBrokerProtectionSecureVault
+    private let appVersion: AppVersionNumberProvider
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     init(repository: BrokerUpdaterRepository = BrokerUpdaterUserDefaults(),
          resources: ResourcesRepository = FileResources(),
-         vault: any DataBrokerProtectionSecureVault) {
+         vault: any DataBrokerProtectionSecureVault,
+         appVersion: AppVersionNumberProvider = AppVersionNumber(),
+         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()) {
         self.repository = repository
         self.resources = resources
         self.vault = vault
+        self.appVersion = appVersion
+        self.pixelHandler = pixelHandler
     }
 
-    func checkForUpdatesInBrokerJSONFiles() {
-        if let lastRunDate = repository.getLastRunDate() {
-            if hasHoursPassed(hours: Consts.updateWindow, from: lastRunDate, to: Date()) {
-                updateBrokers()
-            }
-        } else {
-            // Last run date is nil. Probably it was not set yet, so we need to check for updates.
-            updateBrokers()
+    public static func provide() -> DataBrokerProtectionBrokerUpdater? {
+        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: DataBrokerProtectionSecureVaultErrorReporter.shared) {
+            return DataBrokerProtectionBrokerUpdater(vault: vault)
         }
+
+        os_log("Error when trying to create vault for data broker protection updater debug menu item", log: .dataBrokerProtection)
+        return nil
     }
 
-    private func updateBrokers() {
-        repository.saveLastRunDate(date: Date())
-        guard let brokers = resources.fetchBrokerFromResourceFiles() else { return }
+    public func updateBrokers() {
+        let brokers: [DataBroker]?
+        do {
+            brokers = try resources.fetchBrokerFromResourceFiles()
+        } catch {
+            os_log("DataBrokerProtectionBrokerUpdater updateBrokers, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
+            return
+        }
+        guard let brokers = brokers else { return }
 
         for broker in brokers {
             do {
                 try update(broker)
             } catch {
                 os_log("Error updating broker: %{public}@, with version: %{public}@", log: .dataBrokerProtection, broker.name, broker.version)
+                pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             }
         }
+    }
+
+    func checkForUpdatesInBrokerJSONFiles() {
+        if let lastCheckedVersion = repository.getLastCheckedVersion() {
+            if shouldUpdate(incoming: appVersion.versionNumber, storedVersion: lastCheckedVersion) {
+                updateBrokersAndSaveLatestVersion()
+            }
+        } else {
+            // There was not a last checked version. Probably new builds or ones without this new implementation
+            // or user deleted user defaults.
+            updateBrokersAndSaveLatestVersion()
+        }
+    }
+
+    private func updateBrokersAndSaveLatestVersion() {
+        repository.saveLatestAppVersionCheck(version: appVersion.versionNumber)
+        updateBrokers()
     }
 
     // Here we check if we need to update broker files
@@ -132,13 +171,13 @@ struct DataBrokerProtectionBrokerUpdater {
     // 2. If does exist, we check the number version, if the version number is new, we update it
     // 3. If it does not exist, we add it, and we create the scan operations related to it
     private func update(_ broker: DataBroker) throws {
-        guard let savedBroker = try vault.fetchBroker(with: broker.name) else {
+        guard let savedBroker = try vault.fetchBroker(with: broker.url) else {
             // The broker does not exist in the current storage. We need to add it.
             try add(broker)
             return
         }
 
-        if shouldUpdate(incomingBrokerVersion: broker.version, storedVersion: savedBroker.version) {
+        if shouldUpdate(incoming: broker.version, storedVersion: savedBroker.version) {
             guard let savedBrokerId = savedBroker.id else { return }
 
             try vault.update(broker, with: savedBrokerId)
@@ -154,21 +193,14 @@ struct DataBrokerProtectionBrokerUpdater {
         let profileQueryIDs = profileQueries.compactMap({ $0.id })
 
         for profileQueryId in profileQueryIDs {
-            try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: nil)
+            try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: Date())
         }
     }
 
-    private func shouldUpdate(incomingBrokerVersion: String, storedVersion: String) -> Bool {
-        let result = incomingBrokerVersion.compare(storedVersion, options: .numeric)
+    private func shouldUpdate(incoming: String, storedVersion: String) -> Bool {
+        let result = incoming.compare(storedVersion, options: .numeric)
 
         return result == .orderedDescending
-    }
-
-    private func hasHoursPassed(hours: Double, from startDate: Date, to endDate: Date) -> Bool {
-        let timeInterval = endDate.timeIntervalSince(startDate)
-        let hoursPassed = timeInterval / 3600  // 3600 seconds in an hour
-
-        return hoursPassed >= hours
     }
 }
 

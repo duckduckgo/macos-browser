@@ -24,14 +24,16 @@ import Navigation
 final class SearchNonexistentDomainNavigationResponder {
 
     private let tld: TLD
+    private let setContent: (Tab.TabContent) -> Void
     private var lastUserEnteredValue: String?
     private var cancellable: AnyCancellable?
 
-    init(tld: TLD, contentPublisher: some Publisher<Tab.TabContent, Never>) {
+    init(tld: TLD, contentPublisher: some Publisher<Tab.TabContent, Never>, setContent: @escaping (Tab.TabContent) -> Void) {
         self.tld = tld
+        self.setContent = setContent
 
         cancellable = contentPublisher.sink { [weak self] tabContent in
-            if case .url(_, credential: .none, userEntered: .some(let userEnteredValue)) = tabContent {
+            if case .url(_, credential: .none, source: .userEntered(let userEnteredValue, _)) = tabContent {
                 self?.lastUserEnteredValue = userEnteredValue
             }
         }
@@ -65,7 +67,7 @@ extension SearchNonexistentDomainNavigationResponder: NavigationResponder {
         // redirect to SERP for non-valid domains entered by user
         // https://app.asana.com/0/1177771139624306/1204041033469842/f
 
-        navigation.navigationAction.targetFrame?.webView?.load(URLRequest(url: url))
+        setContent(.url(url, source: .userEntered(lastUserEnteredValue)))
     }
 
 }

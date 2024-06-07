@@ -22,15 +22,18 @@ struct SyncStatusView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
-        SyncPreferencesRow {
-            Image("SolidCheckmark")
-        } centerContent: {
-            Text(UserText.syncConnected)
-        } rightContent: {
-            Button(UserText.turnOffSync) {
-                model.presentTurnOffSyncConfirmDialog()
+        VStack(alignment: .leading, spacing: 8) {
+            SyncPreferencesRow {
+                Image(.solidCheckmark)
+            } centerContent: {
+                Text(UserText.syncConnected)
+                    .foregroundColor(Color(.blackWhite60))
+            } rightContent: {
+                Button(UserText.turnOffSync) {
+                    model.turnOffSyncPressed()
+                }
             }
+            .roundedBorder()
         }
-        .roundedBorder()
     }
 }

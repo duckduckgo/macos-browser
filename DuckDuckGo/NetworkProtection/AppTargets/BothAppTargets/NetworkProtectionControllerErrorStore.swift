@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionControllerIssuesStore.swift
+//  NetworkProtectionControllerErrorStore.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -15,8 +15,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-
-#if NETWORK_PROTECTION
 
 import Foundation
 import NetworkProtection
@@ -54,5 +52,3 @@ final class NetworkProtectionControllerErrorStore {
         distributedNotificationCenter.post(.controllerErrorChanged, object: errorMessage)
     }
 }
-
-#endif

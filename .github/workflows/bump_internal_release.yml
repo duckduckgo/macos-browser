@@ -1,0 +1,250 @@
+name: Bump Internal Release
+
+on:
+  schedule:
+    - cron: '0 5 * * 2-5' # Run at 05:00 UTC, Tuesday through Friday
+  workflow_dispatch:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: false
+        type: string
+      base-branch:
+        description: "Base branch (defaults to main, only override for testing)"
+        required: false
+        type: string
+      skip-appstore:
+        description: "Skip App Store release and only make a DMG build"
+        default: false
+        type: boolean
+
+jobs:
+
+  validate_input_conditions:
+
+    name: Validate Input Conditions
+
+    # This doesn't need Xcode, so could technically run on Ubuntu, but find_asana_release_task.sh
+    # uses BSD-specific `date` syntax, that doesn't work with GNU `date` (available on Linux).
+    runs-on: macos-13
+    timeout-minutes: 10
+
+    outputs:
+      skip-release: ${{ steps.check-for-changes.outputs.skip-release }}
+      asana-task-url: ${{ steps.set-parameters.outputs.asana-task-url }}
+      release-branch: ${{ steps.set-parameters.outputs.release-branch }}
+      skip-appstore: ${{ steps.set-parameters.outputs.skip-appstore }}
+
+    steps:
+
+      - name: Assert release branch
+        run: |
+          case "${{ github.ref_name }}" in
+            release/*) ;;
+            main) ;;
+            *) echo "👎 Not a release or main branch"; exit 1 ;;
+          esac
+
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
+
+      # When running on schedule there are no inputs, so the workflow has to find the Asana task
+      - name: Find Asana release task
+        id: find-asana-task
+        if: github.event.inputs.asana-task-url == null
+        uses: ./.github/actions/asana-find-release-task
+        with:
+          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+
+      # When running on schedule, only proceed if there are changes to the release branch (i.e. HEAD is not tagged)
+      - name: Check if there are changes to the release branch
+        id: check-for-changes
+        env:
+          release_branch: ${{ steps.find-asana-task.outputs.release-branch || github.ref_name }}
+        run: |
+          if [[ "${{ github.event_name }}" != "schedule" ]]; then
+            echo "skip-release=false" >> $GITHUB_OUTPUT
+          else
+            latest_tag="$(git describe --tags --abbrev=0)"
+            latest_tag_sha="$(git rev-parse "$latest_tag")"
+            release_branch_sha="$(git rev-parse "origin/${release_branch}")"
+
+            if [[ "${latest_tag_sha}" == "${release_branch_sha}" ]]; then
+              echo "::warning::Release branch's HEAD is already tagged. Skipping automatic release."
+              echo "skip-release=true" >> $GITHUB_OUTPUT
+            else
+              changed_files="$(git diff --name-only "$latest_tag".."origin/${release_branch}")"
+              if grep -q -v -e '.github' -e 'scripts' <<< "$changed_files"; then
+                echo "::warning::New code changes found in the release branch since the last release. Will bump internal release now."
+                echo "skip-release=false" >> $GITHUB_OUTPUT
+              else
+                echo "::warning::No changes to the release branch (or only changes to scripts and workflows). Skipping automatic release."
+                echo "skip-release=true" >> $GITHUB_OUTPUT
+              fi
+            fi
+          fi
+
+      - name: Extract Asana Task ID
+        id: task-id
+        if: github.event.inputs.asana-task-url
+        uses: ./.github/actions/asana-extract-task-id
+        with:
+          task-url: ${{ github.event.inputs.asana-task-url }}
+
+      - name: Set parameters
+        id: set-parameters
+        env:
+          ASANA_TASK_URL: ${{ steps.find-asana-task.outputs.task-url || github.event.inputs.asana-task-url }}
+          RELEASE_BRANCH: ${{ steps.find-asana-task.outputs.release-branch || github.ref_name }}
+          TASK_ID: ${{ steps.find-asana-task.outputs.task-id || steps.task-id.outputs.task-id }}
+          SKIP_APPSTORE: ${{ github.event.inputs.skip-appstore || false }} # make sure this is set to false on scheduled runs
+        run: |
+          if [[ "${RELEASE_BRANCH}" == "main" ]]; then
+            echo "::error::Workflow run from main branch and release branch wasn't found. Please re-run the workflow and specify a release branch."
+            exit 1
+          fi
+          echo "release-branch=${RELEASE_BRANCH}" >> $GITHUB_OUTPUT
+          echo "task-id=${TASK_ID}" >> $GITHUB_OUTPUT
+          echo "asana-task-url=${ASANA_TASK_URL}" >> $GITHUB_OUTPUT
+          echo "skip-appstore=${SKIP_APPSTORE}" >> $GITHUB_OUTPUT
+
+      - name: Validate release notes
+        env:
+          TASK_ID: ${{ steps.set-parameters.outputs.task-id }}
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}?opt_fields=notes" \
+            -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+            | jq -r .data.notes \
+            | ./scripts/extract_release_notes.sh -r > raw_release_notes.txt
+          raw_release_notes="$(<raw_release_notes.txt)"
+          if [[ ${#raw_release_notes} == 0 || "$raw_release_notes" == *"<-- Add release notes here -->"* ]]; then
+            echo "::error::Release notes are empty or contain a placeholder. Please add release notes to the Asana task and restart the workflow."
+            exit 1
+          fi
+
+  run_tests:
+
+    name: Run Tests
+
+    needs: validate_input_conditions
+
+    if: needs.validate_input_conditions.outputs.skip-release == 'false'
+    uses: ./.github/workflows/pr.yml
+    with:
+      branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
+    secrets:
+      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+
+  increment_build_number:
+
+    name: Increment Build Number
+
+    needs: [ validate_input_conditions, run_tests ]
+    runs-on: macos-13-xlarge
+    timeout-minutes: 10
+
+    steps:
+
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
+          ref: ${{ needs.validate_input_conditions.outputs.release-branch }}
+          submodules: recursive
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+
+      - name: Prepare fastlane
+        run: bundle install
+
+      - name: Increment build number
+        env:
+          APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+        run: |
+          git config --global user.name "Dax the Duck"
+          git config --global user.email "dax@duckduckgo.com"
+          bundle exec fastlane bump_internal_release update_embedded_files:false
+
+      - name: Extract Asana Task ID
+        id: task-id
+        uses: ./.github/actions/asana-extract-task-id
+        with:
+          task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
+
+      - name: Update Asana tasks for the release
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ needs.validate_input_conditions.outputs.release-branch }}
+        run: |
+          version="$(cut -d '/' -f 2 <<< "$BRANCH")"
+          ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.task-id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
+
+  prepare_release:
+    name: Prepare Release
+    needs: [ validate_input_conditions, increment_build_number ]
+    uses: ./.github/workflows/release.yml
+    with:
+      asana-task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
+      branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
+      skip-appstore: ${{ needs.validate_input_conditions.outputs.skip-appstore == 'true' }}
+    secrets:
+      BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+      P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+      KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.REVIEW_PROVISION_PROFILE_BASE64 }}
+      RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.RELEASE_PROVISION_PROFILE_BASE64 }}
+      DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}
+      DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}
+      NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2: ${{ secrets.NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2 }}
+      NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2: ${{ secrets.NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2 }}
+      NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2: ${{ secrets.NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2 }}
+      NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64_V2: ${{ secrets.NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64_V2 }}
+      NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}
+      NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}
+      APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+      APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+      APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      MM_HANDLES_BASE64: ${{ secrets.MM_HANDLES_BASE64 }}
+      MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+
+  tag_and_merge:
+    name: Tag and Merge Branch
+    needs: [ validate_input_conditions, prepare_release ]
+    uses: ./.github/workflows/tag_release.yml
+    with:
+      asana-task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
+      branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
+      base-branch: ${{ github.event.inputs.base-branch || 'main' }}
+      prerelease: true
+      internal-release-bump: true
+    secrets:
+      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+
+  publish_release:
+    name: Publish DMG Release
+    needs: [ validate_input_conditions, tag_and_merge ]
+    uses: ./.github/workflows/publish_dmg_release.yml
+    with:
+      asana-task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
+      branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
+    secrets:
+      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+      GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+      SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}

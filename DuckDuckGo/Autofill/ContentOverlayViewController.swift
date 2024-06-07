@@ -22,6 +22,7 @@ import Combine
 import BrowserServicesKit
 import SecureStorage
 import Autofill
+import PixelKit
 
 @MainActor
 public final class ContentOverlayViewController: NSViewController, EmailManagerRequestDelegate {
@@ -52,6 +53,8 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }()
 
     lazy var passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
+
+    lazy var privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
 
     public override func viewDidLoad() {
         initWebView()
@@ -104,7 +107,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     public override func viewWillDisappear() {
         // We should never see this but it's better than a flash of old content
-        webView.load(URLRequest(url: URL(string: "about:blank")!))
+        webView.load(URLRequest(url: .blankPage))
     }
 
     public func messageMouseMove(x: CGFloat, y: CGFloat) {
@@ -168,7 +171,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }
 
     nonisolated
-    public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
+    public func emailManagerKeychainAccessFailed(_ emailManager: EmailManager, accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [
             "access_type": accessType.rawValue,
             "error": error.errorDescription
@@ -189,7 +192,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
             parameters["keychain_operation"] = "save"
         }
 
-        Pixel.fire(.debug(event: .emailAutofillKeychainError), withAdditionalParameters: parameters)
+        PixelKit.fire(DebugEvent(GeneralPixel.emailAutofillKeychainError), withAdditionalParameters: parameters)
     }
 
     private enum Constants {
@@ -208,6 +211,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }
         self.preferredContentSize = CGSize(width: widthOut, height: heightOut)
     }
+
 }
 
 extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDelegate {
@@ -250,6 +254,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
                                    promptUserToAutofillCredentialsForDomain domain: String,
                                    withAccounts accounts: [SecureVaultModels.WebsiteAccount],
                                    withTrigger trigger: AutofillUserScript.GetTriggerType,
+                                   onAccountSelected account: @escaping (SecureVaultModels.WebsiteAccount?) -> Void,
                                    completionHandler: @escaping (SecureVaultModels.WebsiteAccount?) -> Void) {
         // no-op on macOS
     }
@@ -290,7 +295,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     }
 
     public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
-        Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
+        PixelKit.fire(GeneralPixel.formAutofilled(kind: type.formAutofillKind))
 
         if type.formAutofillKind == .password &&
             passwordManagerCoordinator.isEnabled {
@@ -299,13 +304,17 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
-        DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
+        DeviceAuthenticator.shared.authenticateUser(reason: .autofillCreditCards) { authenticationResult in
             handler(authenticationResult.authenticated)
         }
     }
 
-    public func secureVaultInitFailed(_ error: SecureStorageError) {
-        SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
+    public func secureVaultError(_ error: SecureStorageError) {
+        SecureVaultReporter.shared.secureVaultError(error)
+    }
+
+    public func secureVaultKeyStoreEvent(_ event: SecureStorageKeyStoreEvent) {
+        SecureVaultReporter.shared.secureVaultKeyStoreEvent(event)
     }
 
     public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
@@ -316,9 +325,9 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
             self.emailManager.updateLastUseDate()
 
-            Pixel.fire(.jsPixel(pixel), withAdditionalParameters: pixelParameters)
+            PixelKit.fire(GeneralPixel.jsPixel(pixel), withAdditionalParameters: pixelParameters)
         } else {
-            Pixel.fire(.jsPixel(pixel), withAdditionalParameters: pixel.pixelParameters)
+            PixelKit.fire(GeneralPixel.jsPixel(pixel), withAdditionalParameters: pixel.pixelParameters)
         }
     }
 
@@ -337,5 +346,19 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         } else {
             autofillPreferencesModel.showAutofillPopover(.logins)
         }
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestRuntimeConfigurationForDomain domain: String, completionHandler: @escaping (String?) -> Void) {
+        let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
+        let properties = ContentScopeProperties(gpcEnabled: isGPCEnabled,
+                                                sessionKey: topAutofillUserScript?.sessionKey ?? "",
+                                                featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfigurationManager.privacyConfig))
+
+        let runtimeConfiguration = DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
+                                                                         properties: properties)
+            .build()
+            .buildRuntimeConfigResponse()
+
+        completionHandler(runtimeConfiguration)
     }
 }

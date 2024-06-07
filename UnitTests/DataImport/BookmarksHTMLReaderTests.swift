@@ -16,85 +16,39 @@
 //  limitations under the License.
 //
 
+import SnapshotTesting
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class BookmarksHTMLReaderTests: XCTestCase {
+final class BookmarksHTMLReaderTests: XCTestCase {
 
-    var reader: BookmarkHTMLReader!
+    let bookmarksHTMLReaderTestFilesURL = Bundle(for: BookmarksHTMLReaderTests.self)
+        .resourceURL!
+        .appendingPathComponent("DataImportResources/TestBookmarksData")
 
-    func bookmarksFileURL(_ name: String) -> URL {
-        let bundle = Bundle(for: ChromiumLoginReaderTests.self)
-        return bundle.resourceURL!
-            .appendingPathComponent("DataImportResources/TestBookmarksData")
-            .appendingPathComponent(name)
-    }
+    @MainActor
+    func testBookmarksHTMLReaderSnapshot() throws {
+        let expectedToThrow: Set<String> = [
+            "bookmarks_invalid.html"
+        ]
 
-    func test_WhenParseChromeHtml_ThenImportSuccess() throws {
-        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_chrome.html"))
-        let result = reader.readBookmarks()
+        for fileName in try FileManager.default.contentsOfDirectory(atPath: bookmarksHTMLReaderTestFilesURL.path) {
+            let fileNameWithoutExtension = fileName.dropping(suffix: "html")
+            let fileURL = bookmarksHTMLReaderTestFilesURL.appendingPathComponent(fileName)
+            let reader = BookmarkHTMLReader(bookmarksFileURL: fileURL, otherBookmarksFolderTitle: "Other bookmarks")
+            let result = reader.readBookmarks()
 
-        let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 12)
-    }
-
-    func test_WhenParseSafariHtml_ThenImportSuccess() throws {
-        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_safari.html"))
-        let result = reader.readBookmarks()
-
-        let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 14)
-    }
-
-    func test_WhenParseFirefoxHtml_ThenImportSuccess() throws {
-        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_firefox.html"))
-        let result = reader.readBookmarks()
-
-        let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 17)
-    }
-
-    func test_WhenParseBraveHtml_ThenImportSuccess() throws {
-        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_brave.html"))
-        let result = reader.readBookmarks()
-
-        let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 12)
-    }
-
-    func test_WhenParseDDGAndroidHtml_ThenImportSuccess() throws {
-        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_ddg_android.html"))
-        let result = reader.readBookmarks()
-
-        let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 13)
-    }
-
-    func test_WhenParseDDGiOSHtml_ThenImportSuccess() throws {
-        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_ddg_ios.html"))
-        let result = reader.readBookmarks()
-
-        let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 8)
-    }
-
-    func test_WhenParseDDGMacOSHtml_ThenImportSuccess() throws {
-        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_ddg_macos.html"))
-        let result = reader.readBookmarks()
-
-        let importedBookmarks = try XCTUnwrap(try? result.get())
-        XCTAssertEqual(importedBookmarks.bookmarks.numberOfBookmarks, 13)
-    }
-
-    func test_WhenParseInvalidHtml_ThenImportFail() throws {
-        reader = BookmarkHTMLReader(bookmarksFileURL: bookmarksFileURL("bookmarks_invalid.html"))
-        let result = reader.readBookmarks()
-
-        XCTAssertThrowsError(try result.get(), "", { error in
-            guard case BookmarkHTMLReader.ImportError.unexpectedBookmarksFileFormat = error else {
-                XCTFail("Unexpected error type: \(String(reflecting: error))")
-                return
+            if expectedToThrow.contains(fileName) {
+                XCTAssertThrowsError(try result.get(), fileNameWithoutExtension)
+                continue
             }
-        })
+            guard case .success(let importResult) = result else {
+                XCTFail("unexpected failure in \(fileNameWithoutExtension): \(result)")
+                continue
+            }
+
+            assertSnapshot(of: importResult.bookmarks, as: .json, named: fileNameWithoutExtension, testName: "snapshot")
+        }
     }
+
 }

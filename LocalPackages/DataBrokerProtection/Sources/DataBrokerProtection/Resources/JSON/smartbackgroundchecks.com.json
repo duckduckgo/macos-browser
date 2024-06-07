@@ -1,8 +1,9 @@
 {
-  "name": "smartbackgroundchecks.com",
-  "version": "0.1.0",
+  "name": "SmartBackgroundChecks",
+  "url": "smartbackgroundchecks.com",
+  "version": "0.1.5",
   "parent": "peoplefinders.com",
-  "addedDatetime": 1678078800000,
+  "addedDatetime": 1678082400000,
   "steps": [
     {
       "stepType": "scan",
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "768ee7a9-b743-413f-88c8-69fc7dd39d21",
+          "id": "290d3add-c786-4ecf-a528-50b2a240f791",
           "url": "https://www.smartbackgroundchecks.com/people/${firstName}-${lastName}/${city}/${state}"
         },
         {
           "actionType": "extract",
-          "id": "def6f046-efe7-4fbb-9453-da7d3b0f9d59",
+          "id": "2e04c4da-5f4b-4ab3-bd9e-4d4300d51f63",
           "selector": ".card-block",
           "profile": {
             "name": {
@@ -36,8 +37,14 @@
               "afterText": "Used to live in:",
               "beforeText": "Relatives and Associates"
             },
+            "relativesList": {
+              "selector": ".//div[contains(text(), 'Relatives')]/following-sibling::h3//a",
+              "findElements": true
+            },
             "profileUrl": {
-              "selector": ".//h2//a"
+              "selector": ".//h2//a",
+              "identifierType": "path",
+              "identifier": "https://www.smartbackgroundchecks.com/people/${firstName}-${lastName}/${id}"
             }
           }
         }

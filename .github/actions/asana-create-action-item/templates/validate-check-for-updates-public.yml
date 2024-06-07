@@ -1,0 +1,41 @@
+data:
+  name: Validate that 'Check For Updates' upgrades to ${TAG}
+  assignee: "${ASSIGNEE_ID}"
+  html_notes: |
+    <body>
+      <h1>Build ${TAG} has been released publicly via Sparkle 🎉</h1>
+      Please verify that "Check for Updates" works correctly:
+      <ol>
+        <li>Launch a debug version of the app with an old version number.</li>
+        <li>Make sure you're not identified as an internal user in the app.</li>
+        <li>Go to Main Menu → DuckDuckGo → Check for Updates...</li>
+        <li>Verify that you're being offered to update to ${TAG}.</li>
+        <li>Verify that the update works.</li>
+      </ol>
+      <h1>🚨In case "Check for Updates" is broken</h1>
+      You can restore previous version of the appcast2.xml:
+      <ol>
+        <li>Download the ${OLD_APPCAST_NAME} file attached to this task.</li>
+        <li>Log in to AWS session:
+          <ul>
+            <li><code>aws --profile ddg-macos sso login</code></li>
+          </ul></li>
+        <li>Overwrite appcast2.xml with the old version:
+          <ul>
+            <li><code>aws --profile ddg-macos s3 cp ${OLD_APPCAST_NAME} s3://${RELEASE_BUCKET_NAME}/${RELEASE_BUCKET_PREFIX}/appcast2.xml --acl public-read</code></li>
+          </ul></li>
+      </ol>
+
+      <hr>
+      <h1>Summary of automated changes</h1>
+      <h2>Changes to appcast2.xml</h2>
+      See the attached <em>${APPCAST_PATCH_NAME}</em> file.
+      <h2>Release notes</h2>
+      See the attached <em>${RELEASE_NOTES_FILE}</em> file for release notes extracted automatically from <a data-asana-gid='${RELEASE_TASK_ID}' data-asana-dynamic='false'>the release task</a> description.
+      <h2>List of files uploaded to S3</h2>
+      <ol>
+        ${FILES_UPLOADED}
+      </ol>
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>

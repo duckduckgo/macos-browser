@@ -25,6 +25,8 @@ struct FaviconView: View {
 
     let url: URL?
     let size: CGFloat
+    let onFaviconMissing: (() -> Void)?
+    private var letterPaddingModifier: CGFloat
 
     var domain: String {
         url?.host ?? ""
@@ -33,23 +35,29 @@ struct FaviconView: View {
     @State var image: NSImage?
     @State private var timer = Timer.publish(every: 0.1, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
-    init(url: URL?, size: CGFloat = 32) {
+    /// Initializes a `FaviconView`
+    /// Note: The `letterPaddingModifier` parameter is only used when a `LetterIconView` is displayed instead of a Favicon image
+    init(url: URL?, size: CGFloat = 32, letterPaddingModifier: CGFloat = 0.33, onFaviconMissing: (() -> Void)? = nil) {
         self.url = url
         self.size = size
+        self.letterPaddingModifier = letterPaddingModifier
+        self.onFaviconMissing = onFaviconMissing
     }
 
+    @MainActor(unsafe)
     func refreshImage() {
         if let duckPlayerImage = DuckPlayer.shared.image(for: self) {
             image = duckPlayerImage
             return
         }
 
-        if let url = url {
+        if faviconManagement.areFaviconsLoaded, let url = url {
             let image = faviconManagement.getCachedFavicon(for: url, sizeCategory: .medium)?.image
             if image?.size.isSmaller(than: CGSize(width: 16, height: 16)) == false {
                 self.image = image
                 return
             }
+            onFaviconMissing?()
         }
 
         image = nil
@@ -69,18 +77,7 @@ struct FaviconView: View {
                         timer.upstream.connect().cancel()
                     }
             } else {
-
-                ZStack {
-                    let eTLDplus1 = ContentBlocking.shared.tld.eTLDplus1(domain) ?? domain
-                    Rectangle()
-                        .foregroundColor(Color.forString(eTLDplus1))
-                    Text(String(eTLDplus1.capitalized.first ?? "?"))
-                        .font(.title)
-                        .foregroundColor(Color.white)
-                }
-                .frame(width: size, height: size)
-                .cornerRadius(4.0)
-
+                LetterIconView(title: ContentBlocking.shared.tld.eTLDplus1(domain) ?? domain, size: size, paddingModifier: letterPaddingModifier)
             }
         }.onAppear {
             refreshImage()

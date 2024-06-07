@@ -27,10 +27,10 @@ struct PinnedTabsView: View {
             ForEach(model.items) { item in
                 PinnedTabView(model: item, showsHover: draggedTab == nil)
                     .environmentObject(model)
-                    .frame(maxHeight: PinnedTabView.Const.dimension)
+                    .frame(maxWidth: PinnedTabView.Const.dimension, maxHeight: PinnedTabView.Const.dimension)
             }
         }
-        .frame(minHeight: PinnedTabView.Const.dimension + 2)
+        .frame(minHeight: PinnedTabView.Const.dimension)
         .simultaneousGesture(dragGesture)
     }
 

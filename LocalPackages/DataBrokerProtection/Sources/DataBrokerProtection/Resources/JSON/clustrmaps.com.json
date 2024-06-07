@@ -1,8 +1,9 @@
 {
-  "name": "clustrmaps.com",
-  "version": "0.1.0",
+  "name": "ClustrMaps",
+  "url": "clustrmaps.com",
+  "version": "0.1.5",
   "parent": "neighbor.report",
-  "addedDatetime": 1692590400000,
+  "addedDatetime": 1692594000000,
   "steps": [
     {
       "stepType": "scan",
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "1605ede5-2592-4733-a4a3-9a90062eabf4",
-          "url": "https://clustrmaps.com/persons/${firstName}-${lastName}/${stateFullCapitalize}/${cityHyphenated}"
+          "id": "c4d4ce8d-0b33-46cb-8e73-a544b362460d",
+          "url": "https://clustrmaps.com/persons/${firstName}-${lastName}/${state|stateFull|capitalize}/${city|hyphenated}"
         },
         {
           "actionType": "extract",
-          "id": "82155f29-6d66-496f-b2e0-d6f8169349bf",
+          "id": "f0e4f08c-c999-451c-b195-93f481c0a4de",
           "selector": ".//div[@itemprop='Person']",
           "profile": {
             "name": {
@@ -38,7 +39,9 @@
               "afterText": "Associated persons:"
             },
             "profileUrl": {
-              "selector": ".persons"
+              "selector": ".persons",
+              "identifierType": "path",
+              "identifier": "https://clustrmaps.com/person/${id}"
             }
           }
         }

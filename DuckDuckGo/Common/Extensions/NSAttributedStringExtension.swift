@@ -18,6 +18,7 @@
 
 import AppKit
 
+typealias NSAttributedStringBuilder = ArrayBuilder<NSAttributedString>
 extension NSAttributedString {
 
     /// These values come from Figma.  Click on the text in Figma and choose Code > iOS to see the values.
@@ -29,6 +30,31 @@ extension NSAttributedString {
         return NSMutableAttributedString(string: string, attributes: [
             NSAttributedString.Key.kern: kern, NSAttributedString.Key.paragraphStyle: paragraphStyle
         ])
+    }
+
+    convenience init(image: NSImage, rect: CGRect) {
+        let attachment = NSTextAttachment()
+        attachment.image = image
+        attachment.bounds = rect
+        self.init(attachment: attachment)
+    }
+
+    convenience init(@NSAttributedStringBuilder components: () -> [NSAttributedString]) {
+        let components = components()
+        guard !components.isEmpty else {
+            self.init()
+            return
+        }
+        guard components.count > 1 else {
+            self.init(attributedString: components[0])
+            return
+        }
+        let result = NSMutableAttributedString(attributedString: components[0])
+        for component in components[1...] {
+            result.append(component)
+        }
+
+        self.init(attributedString: result)
     }
 
 }

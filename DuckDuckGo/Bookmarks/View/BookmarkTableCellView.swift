@@ -16,92 +16,32 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 
 @objc protocol BookmarkTableCellViewDelegate: AnyObject {
 
     func bookmarkTableCellViewRequestedMenu(_ sender: NSButton, cell: BookmarkTableCellView)
-    func bookmarkTableCellViewToggledFavorite(cell: BookmarkTableCellView)
-    func bookmarkTableCellView(_ cellView: BookmarkTableCellView, updatedBookmarkWithUUID uuid: String, newTitle: String, newUrl: String)
 
 }
 
-final class BookmarkTableCellView: NSTableCellView, NibLoadable {
+final class BookmarkTableCellView: NSTableCellView {
 
-    static private var defaultBookmarkFavicon = NSImage(named: "Web")
-    static private var folderAccessoryViewImage = NSImage(named: "Chevron-Next-16")
-    static private var favoriteAccessoryViewImage = NSImage(named: "Favorite")
-    static private var favoriteFilledAccessoryViewImage = NSImage(named: "FavoriteFilledBorder")
-    static private var ellipsisAccessoryViewImage = NSImage(named: "Settings")
+    private lazy var faviconImageView = NSImageView(image: .bookmark)
 
-    @IBOutlet var faviconImageView: NSImageView! {
-        didSet {
-            faviconImageView.wantsLayer = true
-            faviconImageView.layer?.cornerRadius = 2.0
-        }
-    }
+    private lazy var titleLabel = NSTextField(string: "Bookmark")
+    private lazy var bookmarkURLLabel = NSTextField(string: "URL")
+    private lazy var accessoryImageView = NSImageView(image: .forward)
 
-    @IBOutlet var titleLabel: NSTextField!
-    @IBOutlet var bookmarkURLLabel: NSTextField!
-    @IBOutlet var favoriteButton: NSButton!
-    @IBOutlet var accessoryImageView: NSImageView!
-    @IBOutlet var shadowView: NSView! {
-        didSet {
-            shadowView.isHidden = true
-            shadowView.wantsLayer = true
-            shadowView.layer?.backgroundColor = NSColor.tableCellEditingColor.cgColor
-            shadowView.layer?.cornerRadius = 6
+    private lazy var containerView = NSView()
 
-            let shadow = NSShadow()
-            shadow.shadowOffset = NSSize(width: 0, height: -1)
-            shadow.shadowColor = NSColor.black.withAlphaComponent(0.2)
-            shadow.shadowBlurRadius = 2.0
+    private lazy var menuButton = NSButton(title: "", image: .settings, target: self, action: #selector(cellMenuButtonClicked))
 
-            shadowView.shadow = shadow
-        }
-    }
-
-    @IBOutlet var menuButton: NSButton! {
-        didSet {
-            menuButton.isHidden = true
-        }
-    }
-
-    // Shadow view constraints:
-
-    @IBOutlet var shadowViewTopConstraint: NSLayoutConstraint!
-    @IBOutlet var shadowViewBottomConstraint: NSLayoutConstraint!
-
-    // Container view constraints:
-
-    @IBOutlet var titleLabelTopConstraint: NSLayoutConstraint!
-    @IBOutlet var titleLabelBottomConstraint: NSLayoutConstraint!
-
-    @IBAction func cellMenuButtonClicked(_ sender: NSButton) {
+    @objc func cellMenuButtonClicked(_ sender: NSButton) {
         delegate?.bookmarkTableCellViewRequestedMenu(sender, cell: self)
     }
 
-    @IBAction func favoriteButtonClicked(_ sender: NSButton) {
-        guard entity is Bookmark else {
-            assertionFailure("\(#file): Tried to favorite non-Bookmark object")
-            return
-        }
-
-        delegate?.bookmarkTableCellViewToggledFavorite(cell: self)
-    }
-
-    @IBOutlet weak var delegate: BookmarkTableCellViewDelegate?
-
-    var editing: Bool = false {
-        didSet {
-            if editing {
-                enterEditingMode()
-            } else {
-                exitEditingMode()
-            }
-            updateColors()
-        }
-    }
+    weak var delegate: BookmarkTableCellViewDelegate?
 
     var isSelected = false {
         didSet {
@@ -119,17 +59,109 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
                 return
             }
 
-            accessoryImageView.isHidden = mouseInside || editing
-            menuButton.isHidden = !mouseInside || editing
+            accessoryImageView.isHidden = mouseInside
+            menuButton.isHidden = !mouseInside
 
-            if !mouseInside && !editing {
+            if !mouseInside {
                 resetAppearanceFromBookmark()
             }
 
-            if !editing {
-                updateTitleLabelValue()
-            }
+            updateTitleLabelValue()
         }
+    }
+
+    init(identifier: NSUserInterfaceItemIdentifier, entity: BaseBookmarkEntity? = nil) {
+        super.init(frame: NSRect(x: 0, y: 0, width: 462, height: 84))
+        self.identifier = identifier
+
+        setupUI()
+        setupLayout()
+        resetCellState()
+
+        if let bookmark = entity as? Bookmark {
+            update(from: bookmark)
+        } else if let folder = entity as? BookmarkFolder {
+            update(from: folder)
+        } else if entity != nil {
+            assertionFailure("Unsupported Bookmark Entity: \(entity!)")
+        }
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(type(of: self)): Bad initializer")
+    }
+
+    private func setupUI() {
+        autoresizingMask = [.width, .height]
+
+        addSubview(containerView)
+
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addSubview(faviconImageView)
+        containerView.addSubview(titleLabel)
+        containerView.addSubview(menuButton)
+        containerView.addSubview(accessoryImageView)
+
+        faviconImageView.contentTintColor = .suggestionIcon
+        faviconImageView.wantsLayer = true
+        faviconImageView.layer?.cornerRadius = 2.0
+        faviconImageView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        faviconImageView.setContentHuggingPriority(.init(rawValue: 251), for: .vertical)
+        faviconImageView.translatesAutoresizingMaskIntoConstraints = false
+
+        titleLabel.focusRingType = .none
+        titleLabel.isEditable = false
+        titleLabel.isBordered = false
+        titleLabel.isSelectable = false
+        titleLabel.drawsBackground = false
+        titleLabel.font = .systemFont(ofSize: 13)
+        titleLabel.textColor = .labelColor
+        titleLabel.lineBreakMode = .byTruncatingTail
+        titleLabel.cell?.usesSingleLineMode = true
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        titleLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        titleLabel.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+
+        accessoryImageView.translatesAutoresizingMaskIntoConstraints = false
+
+        menuButton.contentTintColor = .button
+        menuButton.translatesAutoresizingMaskIntoConstraints = false
+        menuButton.isBordered = false
+        menuButton.isHidden = true
+        menuButton.setAccessibilityIdentifier("BookmarkTableCellView.menuButton")
+    }
+
+    private func setupLayout() {
+        NSLayoutConstraint.activate([
+        trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: 3),
+        containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 3),
+        bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: 3),
+        containerView.topAnchor.constraint(equalTo: topAnchor, constant: 3),
+
+        menuButton.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 8),
+        faviconImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 6),
+
+        accessoryImageView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
+        titleLabel.leadingAnchor.constraint(equalTo: faviconImageView.trailingAnchor, constant: 8),
+        trailingAnchor.constraint(equalTo: accessoryImageView.trailingAnchor, constant: 3),
+        faviconImageView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
+        trailingAnchor.constraint(equalTo: menuButton.trailingAnchor, constant: 2),
+
+        menuButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
+
+        menuButton.heightAnchor.constraint(equalToConstant: 32),
+        menuButton.widthAnchor.constraint(equalToConstant: 28),
+
+        faviconImageView.heightAnchor.constraint(equalToConstant: 16),
+        faviconImageView.widthAnchor.constraint(equalToConstant: 16),
+
+        bottomAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+        titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 5),
+
+        accessoryImageView.widthAnchor.constraint(equalToConstant: 22),
+        accessoryImageView.heightAnchor.constraint(equalToConstant: 32),
+        ])
     }
 
     override var backgroundStyle: NSView.BackgroundStyle {
@@ -173,97 +205,43 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         resetCellState()
     }
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        resetCellState()
-    }
-
     func update(from bookmark: Bookmark) {
         self.entity = bookmark
 
-        faviconImageView.image = bookmark.favicon(.small) ?? NSImage(named: "BookmarkDefaultFavicon")
+        faviconImageView.image = bookmark.favicon(.small) ?? .bookmarkDefaultFavicon
 
+        faviconImageView.setAccessibilityIdentifier("BookmarkTableCellView.favIconImageView")
         if bookmark.isFavorite {
             accessoryImageView.isHidden = false
         }
 
-        accessoryImageView.image = bookmark.isFavorite ? Self.favoriteAccessoryViewImage : nil
-        favoriteButton.image = bookmark.isFavorite ? Self.favoriteFilledAccessoryViewImage : Self.favoriteAccessoryViewImage
+        accessoryImageView.image = bookmark.isFavorite ? .favoriteFilledBorder : nil
+        accessoryImageView.setAccessibilityIdentifier("BookmarkTableCellView.accessoryImageView")
+        accessoryImageView.setAccessibilityValue(bookmark.isFavorite ? "Favorited" : "Unfavorited")
+        titleLabel.stringValue = bookmark.title
         primaryTitleLabelValue = bookmark.title
         tertiaryTitleLabelValue = bookmark.url
-        bookmarkURLLabel.stringValue = bookmark.url
     }
 
     func update(from folder: BookmarkFolder) {
         self.entity = folder
 
-        faviconImageView.image = NSImage(named: "Folder")
-        accessoryImageView.image = Self.folderAccessoryViewImage
+        faviconImageView.image = .folder
+        accessoryImageView.image = .chevronMediumRight16
         primaryTitleLabelValue = folder.title
         tertiaryTitleLabelValue = nil
     }
 
     private func resetCellState() {
         self.entity = nil
-        editing = false
         mouseInside = false
-        bookmarkURLLabel.isHidden = true
-        favoriteButton.isHidden = true
-        titleLabelBottomConstraint.priority = .required
-    }
-
-    private func enterEditingMode() {
-        titleLabel.isEditable = true
-        bookmarkURLLabel.isEditable = true
-
-        shadowViewTopConstraint.constant = 10
-        shadowViewBottomConstraint.constant = 10
-        titleLabelTopConstraint.constant = 12
-        shadowView.isHidden = false
-        faviconImageView.isHidden = true
-
-        bookmarkURLLabel.isHidden = false
-        favoriteButton.isHidden = false
-        titleLabelBottomConstraint.priority = .defaultLow
-
-        hideTertiaryValueInTitleLabel()
-
-        // Reluctantly use GCD as a workaround for a rare label layout issue, in which the text field shows no text upon becoming first responder.
-        DispatchQueue.main.async {
-            self.titleLabel.becomeFirstResponder()
-        }
-    }
-
-    private func exitEditingMode() {
-        window?.makeFirstResponder(nil)
-
-        titleLabel.isEditable = false
-        bookmarkURLLabel.isEditable = false
-
-        titleLabelTopConstraint.constant = 6
-        shadowViewTopConstraint.constant = 3
-        shadowViewBottomConstraint.constant = 3
-        shadowView.isHidden = true
-        faviconImageView.isHidden = false
-
-        bookmarkURLLabel.isHidden = true
-        favoriteButton.isHidden = true
-        titleLabelBottomConstraint.priority = .required
-
-        if let editedBookmark = self.entity as? Bookmark,
-           titleLabel.stringValue != editedBookmark.title || bookmarkURLLabel.stringValue != editedBookmark.url {
-            delegate?.bookmarkTableCellView(self,
-                                            updatedBookmarkWithUUID: editedBookmark.id,
-                                            newTitle: titleLabel.stringValue,
-                                            newUrl: bookmarkURLLabel.stringValue)
-        }
     }
 
     private func updateColors() {
-        titleLabel.textColor = isSelected && !editing ? .white : .controlTextColor
-        menuButton.contentTintColor = isSelected ? .white : .buttonColor
-        faviconImageView.contentTintColor = isSelected ? .white : .suggestionIconColor
-        accessoryImageView.contentTintColor = isSelected ? .white : .suggestionIconColor
+        titleLabel.textColor = isSelected ? .white : .controlTextColor
+        menuButton.contentTintColor = isSelected ? .white : .button
+        faviconImageView.contentTintColor = isSelected ? .white : .suggestionIcon
+        accessoryImageView.contentTintColor = isSelected ? .white : .suggestionIcon
     }
 
     private func ensureTrackingArea() {
@@ -297,11 +275,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
     private func updateTitleLabelValue() {
-        guard !editing else {
-            return
-        }
-
-        if let tertiaryValue = tertiaryTitleLabelValue, mouseInside, !editing {
+        if let tertiaryValue = tertiaryTitleLabelValue, mouseInside {
             showTertiaryValueInTitleLabel(tertiaryValue)
         } else {
             hideTertiaryValueInTitleLabel()
@@ -335,3 +309,42 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     }
 
 }
+
+#if DEBUG
+@available(macOS 14.0, *)
+#Preview {
+    BookmarkTableCellView.PreviewView(cell: BookmarkTableCellView(identifier: .init("id"), entity: Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false)))
+}
+
+extension BookmarkTableCellView {
+    final class PreviewView: NSView, BookmarkTableCellViewDelegate {
+
+        let cell: BookmarkTableCellView
+
+        init(cell: BookmarkTableCellView) {
+            self.cell = cell
+            super.init(frame: .zero)
+            wantsLayer = true
+            layer!.backgroundColor = NSColor.white.cgColor
+
+            translatesAutoresizingMaskIntoConstraints = true
+            widthAnchor.constraint(equalToConstant: 512).isActive = true
+
+            cell.frame = bounds
+            self.addSubview(cell)
+
+            cell.delegate = self
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        func bookmarkTableCellViewRequestedMenu(_ sender: NSButton, cell: BookmarkTableCellView) {}
+
+        func bookmarkTableCellViewToggledFavorite(cell: BookmarkTableCellView) {
+            (cell.entity as? Bookmark)?.isFavorite.toggle()
+        }
+    }
+}
+#endif

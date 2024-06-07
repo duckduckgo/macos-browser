@@ -1,0 +1,41 @@
+name: Get Release Automation subtask ID
+description: Finds 'Automation' subtask in the release task and returns its ID
+inputs:
+  access-token:
+    description: "Asana access token"
+    required: true
+    type: string
+  task-url:
+    description: "Asana release task URL"
+    required: true
+    type: string
+outputs:
+  automation-task-id:
+    description: "Automation task ID"
+    value: ${{ steps.extract-automation-task-id.outputs.automation-task-id }}
+  assignee-id:
+    description: "Release task assignee ID"
+    value: ${{ steps.extract-assignee-id.outputs.assignee-id }}
+runs:
+  using: "composite"
+  steps:
+    - id: extract-task-id
+      uses: ./.github/actions/asana-extract-task-id
+      with:
+        task-url: ${{ inputs.task-url }}
+        access-token: ${{ inputs.access-token }}
+
+    - id: extract-assignee-id
+      uses: ./.github/actions/asana-extract-task-assignee
+      with:
+        task-id: ${{ steps.extract-task-id.outputs.task-id }}
+        access-token: ${{ inputs.access-token }}
+
+    - id: extract-automation-task-id
+      run: |
+        task_id="${{ steps.extract-task-id.outputs.task-id }}"
+        automation_task_id=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${task_id}/subtasks?opt_fields=name" \
+          -H "Authorization: Bearer ${{ inputs.access-token }}" \
+          | jq -r '.data[] | select(.name=="Automation").gid')
+        echo "automation-task-id=${automation_task_id}" >> $GITHUB_OUTPUT
+      shell: bash

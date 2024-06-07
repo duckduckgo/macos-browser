@@ -22,46 +22,71 @@ import XCTest
 
 final class CSVParserTests: XCTestCase {
 
-    func testWhenParsingMultipleRowsThenMultipleArraysAreReturned() {
-        let string = "line 1\nline 2"
-        let parsed = CSVParser.parse(string: string)
+    func testWhenParsingMultipleRowsThenMultipleArraysAreReturned() throws {
+        let string = """
+          line 1
+        line 2
+        """
+        let parsed = try CSVParser().parse(string: string)
 
         XCTAssertEqual(parsed, [["line 1"], ["line 2"]])
     }
 
-    func testWhenParsingRowsWithVariableNumbersOfEntriesThenParsingSucceeds() {
-        let string = "one\ntwo,three\nfour,five,six"
-        let parsed = CSVParser.parse(string: string)
+    func testControlCharactersAreIgnored() throws {
+        let string = """
+        \u{FEFF}line\u{10} 1\u{10}
+        line 2\u{FEFF}
+        """
+        let parsed = try CSVParser().parse(string: string)
 
-        XCTAssertEqual(parsed, [["one"], ["two", "three"], ["four", "five", "six"]])
+        XCTAssertEqual(parsed, [["line 1"], ["line 2"]])
     }
 
-    func testWhenParsingRowsSurroundedByQuotesThenQuotesAreRemoved() {
+    func testWhenParsingRowsWithVariableNumbersOfEntriesThenParsingSucceeds() throws {
         let string = """
-        "url","username","password"
+        one
+        two;three;
+        four;five;six
         """
+        let parsed = try CSVParser().parse(string: string)
 
-        let parsed = CSVParser.parse(string: string)
+        XCTAssertEqual(parsed, [["one"], ["two", "three", ""], ["four", "five", "six"]])
+    }
+
+    func testWhenParsingRowsSurroundedByQuotesThenQuotesAreRemoved() throws {
+        let string = """
+          "url","username", "password"
+        """ + "  "
+
+        let parsed = try CSVParser().parse(string: string)
 
         XCTAssertEqual(parsed, [["url", "username", "password"]])
     }
 
-    func testWhenParsingRowsWithAnEscapedQuoteThenQuoteIsUnescaped() {
+    func testWhenParsingMalformedCSV_ParserThrows() {
         let string = """
-        "url","username","password\\\"with\\\"quotes"
+        "url","user"name","password"
         """
 
-        let parsed = CSVParser.parse(string: string)
-
-        XCTAssertEqual(parsed, [["url", "username", "password\"with\"quotes"]])
+        XCTAssertThrowsError(try CSVParser().parse(string: string))
     }
 
-    func testWhenParsingQuotedRowsContainingCommasThenTheyAreTreatedAsOneColumnEntry() {
+    func testWhenParsingRowsWithAnEscapedQuoteThenQuoteIsUnescaped() throws {
+        let string = """
+        "url","username","password\\""with""quotes"
+        """
+
+        let parsed = try CSVParser().parse(string: string)
+
+        XCTAssertEqual(parsed, [["url", "username", "password\\\"with\"quotes"]])
+    }
+
+    func testWhenParsingQuotedRowsContainingCommasThenTheyAreTreatedAsOneColumnEntry() throws {
         let string = """
         "url","username","password,with,commas"
         """
 
-        let parsed = CSVParser.parse(string: string)
+        let parsed = try CSVParser().parse(string: string)
 
         XCTAssertEqual(parsed, [["url", "username", "password,with,commas"]])
     }

@@ -1,5 +1,5 @@
 //
-//  ConfigurationStoring.swift
+//  ConfigurationStore.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import Configuration
+import PixelKit
 
 final class ConfigurationStore: ConfigurationStoring {
 
@@ -94,12 +95,12 @@ final class ConfigurationStore: ConfigurationStoring {
         do {
             return try Data(contentsOf: file)
         } catch {
-            guard !NSApp.isRunningUnitTests else { return nil }
+            guard NSApp.runType.requiresEnvironment else { return nil }
 
             let nserror = error as NSError
 
             if nserror.domain != NSCocoaErrorDomain || nserror.code != NSFileReadNoSuchFileError {
-                Pixel.fire(.debug(event: .trackerDataCouldNotBeLoaded, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.trackerDataCouldNotBeLoaded, error: error))
             }
 
             return nil

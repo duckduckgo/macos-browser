@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Combine
 import Foundation
 import SecureStorage
+import PixelKit
 
 final class AutofillTabExtension: TabExtension {
 
@@ -51,9 +52,11 @@ final class AutofillTabExtension: TabExtension {
             autofillScript?.currentOverlayTab = self.delegate
         }
     }
+
     private var emailManager: AutofillEmailDelegate?
     private var vaultManager: AutofillSecureVaultDelegate?
     private var passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
+    private let privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
     private let isBurner: Bool
 
     @Published var autofillDataToSave: AutofillData?
@@ -107,6 +110,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
                             promptUserToAutofillCredentialsForDomain domain: String,
                             withAccounts accounts: [SecureVaultModels.WebsiteAccount],
                             withTrigger trigger: AutofillUserScript.GetTriggerType,
+                            onAccountSelected account: @escaping (SecureVaultModels.WebsiteAccount?) -> Void,
                             completionHandler: @escaping (SecureVaultModels.WebsiteAccount?) -> Void) {
         // no-op on macOS
     }
@@ -145,7 +149,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
     }
 
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
-        Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
+        PixelKit.fire(GeneralPixel.formAutofilled(kind: type.formAutofillKind))
 
         if type.formAutofillKind == .password &&
             passwordManagerCoordinator.isEnabled {
@@ -159,12 +163,16 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         }
     }
 
-    func secureVaultInitFailed(_ error: SecureStorageError) {
-        SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
+    func secureVaultError(_ error: SecureStorageError) {
+        SecureVaultReporter.shared.secureVaultError(error)
+    }
+
+    func secureVaultKeyStoreEvent(_ event: SecureStorageKeyStoreEvent) {
+        SecureVaultReporter.shared.secureVaultKeyStoreEvent(event)
     }
 
     public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
-        Pixel.fire(.jsPixel(pixel))
+        PixelKit.fire(GeneralPixel.jsPixel(pixel))
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
@@ -178,10 +186,32 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
     func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
         // no-op
     }
+
+    func secureVaultManager(_: SecureVaultManager, didRequestRuntimeConfigurationForDomain domain: String, completionHandler: @escaping (String?) -> Void) {
+        let runtimeConfiguration = DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
+                                                                         properties: buildContentScopePropertiesForDomain(domain))
+            .build()
+            .buildRuntimeConfigResponse()
+
+        completionHandler(runtimeConfiguration)
+    }
+
+    private func buildContentScopePropertiesForDomain(_ domain: String) -> ContentScopeProperties {
+        var supportedFeatures = ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfigurationManager.privacyConfig)
+
+        if !passwordManagerCoordinator.isEnabled,
+           AutofillNeverPromptWebsitesManager.shared.hasNeverPromptWebsitesFor(domain: domain) {
+            supportedFeatures.passwordGeneration = false
+        }
+
+        return ContentScopeProperties(gpcEnabled: WebTrackingProtectionPreferences.shared.isGPCEnabled,
+                                      sessionKey: autofillScript?.sessionKey ?? "",
+                                      featureToggles: supportedFeatures)
+    }
 }
 
 extension AutofillType {
-    var formAutofillKind: Pixel.Event.FormAutofillKind {
+    var formAutofillKind: GeneralPixel.FormAutofillKind {
         switch self {
         case .password: return .password
         case .card: return .card

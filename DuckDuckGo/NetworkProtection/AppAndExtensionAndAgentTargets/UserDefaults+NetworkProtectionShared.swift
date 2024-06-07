@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETP_SYSTEM_EXTENSION
-
 import Combine
 import Foundation
 import NetworkProtectionUI
@@ -42,7 +40,19 @@ extension UserDefaults {
         }
     }
 
+    var networkProtectionOnboardingStatus: OnboardingStatus {
+        get {
+            OnboardingStatus(rawValue: networkProtectionOnboardingStatusRawValue) ?? .default
+        }
+
+        set {
+            networkProtectionOnboardingStatusRawValue = newValue.rawValue
+        }
+    }
+
     var networkProtectionOnboardingStatusPublisher: AnyPublisher<OnboardingStatus, Never> {
+        // It's important to subscribe to the publisher for the raw value, since this
+        // is the way to get KVO when the UserDefaults are modified by another process.
         publisher(for: \.networkProtectionOnboardingStatusRawValue).map { value in
             OnboardingStatus(rawValue: value) ?? .default
         }.eraseToAnyPublisher()
@@ -65,5 +75,3 @@ extension NetworkProtectionUI.OnboardingStatus {
 #endif
     }()
 }
-
-#endif

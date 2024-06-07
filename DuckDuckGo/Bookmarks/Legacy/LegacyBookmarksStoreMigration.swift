@@ -20,6 +20,7 @@ import Foundation
 import CoreData
 import Bookmarks
 import Persistence
+import PixelKit
 
 public class LegacyBookmarksStoreMigration {
 
@@ -55,7 +56,7 @@ public class LegacyBookmarksStoreMigration {
         guard BookmarkUtils.fetchRootFolder(destination) == nil else {
             // There should be no data left as migration has been done already
             if !bookmarkRoots.isEmpty {
-                Pixel.fire(.debug(event: .bookmarksMigrationAlreadyPerformed))
+                PixelKit.fire(DebugEvent(GeneralPixel.bookmarksMigrationAlreadyPerformed))
 
                 cleanupOldData(in: source)
             }
@@ -66,15 +67,15 @@ public class LegacyBookmarksStoreMigration {
         _ = LegacyBookmarkStore(context: source)
 
         // Prepare destination
-        BookmarkUtils.prepareFoldersStructure(in: destination)
+        BookmarkUtils.prepareLegacyFoldersStructure(in: destination)
 
         guard let newRoot = BookmarkUtils.fetchRootFolder(destination),
-              let newFavoritesRoot = BookmarkUtils.fetchFavoritesFolder(destination) else {
+              let newFavoritesRoot = BookmarkUtils.fetchLegacyFavoritesFolder(destination) else {
 
             if bookmarkRoots.isEmpty {
-                Pixel.fire(.debug(event: .bookmarksCouldNotPrepareDatabase))
+                PixelKit.fire(DebugEvent(GeneralPixel.bookmarksCouldNotPrepareDatabase))
             } else {
-                Pixel.fire(.debug(event: .bookmarksMigrationCouldNotPrepareDatabase))
+                PixelKit.fire(DebugEvent(GeneralPixel.bookmarksMigrationCouldNotPrepareDatabase))
             }
 
             Thread.sleep(forTimeInterval: 2)
@@ -157,15 +158,15 @@ public class LegacyBookmarksStoreMigration {
         }
 
         do {
-            try destination.save(onErrorFire: .bookmarksMigrationFailed)
+            try destination.save(onErrorFire: GeneralPixel.bookmarksMigrationFailed)
 
             cleanupOldData(in: source)
         } catch {
             destination.reset()
 
-            BookmarkUtils.prepareFoldersStructure(in: destination)
+            BookmarkUtils.prepareLegacyFoldersStructure(in: destination)
             do {
-                try destination.save(onErrorFire: .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration)
+                try destination.save(onErrorFire: GeneralPixel.bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration)
             } catch {
                 Thread.sleep(forTimeInterval: 2)
                 fatalError("Could not write to Bookmarks DB")
@@ -181,7 +182,7 @@ public class LegacyBookmarksStoreMigration {
         allObjects.forEach { context.delete($0) }
 
         if context.hasChanges {
-            try? context.save(onErrorFire: .bookmarksMigrationCouldNotRemoveOldStore)
+            try? context.save(onErrorFire: GeneralPixel.bookmarksMigrationCouldNotRemoveOldStore)
         }
     }
 

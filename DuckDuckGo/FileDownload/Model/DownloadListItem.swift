@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 import UniformTypeIdentifiers
 
@@ -25,20 +26,25 @@ struct DownloadListItem: Equatable {
     let added: Date
     var modified: Date
 
-    let url: URL
+    let downloadURL: URL
     let websiteURL: URL?
-
-    var progress: Progress?
-
-    let isBurner: Bool
-
-    var fileType: UTType? {
+    var fileName: String {
         didSet {
-            guard fileType != oldValue else { return }
+            guard fileName != oldValue else { return }
             modified = Date()
         }
     }
 
+    var progress: Progress? {
+        didSet {
+            guard progress !== oldValue else { return }
+            modified = Date()
+        }
+    }
+
+    let isBurner: Bool
+
+    /// final download destination url, will match actual file url when download is finished
     var destinationURL: URL? {
         didSet {
             guard destinationURL != oldValue else { return }
@@ -46,9 +52,24 @@ struct DownloadListItem: Equatable {
         }
     }
 
+    var destinationFileBookmarkData: Data? {
+        didSet {
+            guard destinationFileBookmarkData != oldValue else { return }
+            modified = Date()
+        }
+    }
+
+    /// temp download file URL (`.duckload`)
     var tempURL: URL? {
         didSet {
             guard tempURL != oldValue else { return }
+            modified = Date()
+        }
+    }
+
+    var tempFileBookmarkData: Data? {
+        didSet {
+            guard tempFileBookmarkData != oldValue else { return }
             modified = Date()
         }
     }

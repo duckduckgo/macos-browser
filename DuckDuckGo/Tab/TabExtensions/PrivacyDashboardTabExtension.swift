@@ -24,33 +24,28 @@ import Foundation
 import Navigation
 import PrivacyDashboard
 
-typealias CookieConsentPromptRequest = UserDialogRequest<Void, Bool>
-
 final class PrivacyDashboardTabExtension {
 
     private let contentBlocking: any ContentBlockingProtocol
+    private let certificateTrustEvaluator: CertificateTrustEvaluating
 
     @Published private(set) var privacyInfo: PrivacyInfo?
-    @Published private(set) var cookieConsentPromptRequest: CookieConsentPromptRequest? {
-        didSet {
-            guard let request = cookieConsentPromptRequest else { return }
-            request.addCompletionHandler { [weak self, weak request] _ in
-                if let self, let request, self.cookieConsentPromptRequest === request {
-                    self.cookieConsentPromptRequest = nil
-                }
-            }
-        }
-    }
+
+    private(set) var isCertificateValid: Bool?
 
     private var previousPrivacyInfosByURL: [String: PrivacyInfo] = [:]
 
     private var cancellables = Set<AnyCancellable>()
 
     init(contentBlocking: some ContentBlockingProtocol,
+         certificateTrustEvaluator: CertificateTrustEvaluating,
          autoconsentUserScriptPublisher: some Publisher<UserScriptWithAutoconsent?, Never>,
          didUpgradeToHttpsPublisher: some Publisher<URL, Never>,
-         trackersPublisher: some Publisher<DetectedTracker, Never>) {
+         trackersPublisher: some Publisher<DetectedTracker, Never>,
+         webViewPublisher: some Publisher<WKWebView, Never>) {
+
         self.contentBlocking = contentBlocking
+        self.certificateTrustEvaluator = certificateTrustEvaluator
 
         autoconsentUserScriptPublisher.sink { [weak self] autoconsentUserScript in
             autoconsentUserScript?.delegate = self
@@ -73,6 +68,30 @@ final class PrivacyDashboardTabExtension {
                 self.privacyInfo?.trackerInfo.addDetectedTracker(tracker.request, onPageWithURL: url)
             }
         }.store(in: &cancellables)
+
+        webViewPublisher.map {
+            $0.publisher(for: \.serverTrust)
+        }
+        .switchToLatest()
+        .sink { [weak self] serverTrust in
+            Task { [weak self] in
+                await self?.updatePrivacyInfo(with: serverTrust)
+            }
+        }
+        .store(in: &cancellables)
+
+    }
+
+    private func updatePrivacyInfo(with trust: SecTrust?) async {
+        let isValid = await self.certificateTrustEvaluator.evaluateCertificateTrust(trust: trust)
+        await MainActor.run {
+            self.isCertificateValid = isValid
+            if isValid ?? false {
+                self.privacyInfo?.serverTrust = trust
+            } else {
+                self.privacyInfo?.serverTrust = nil
+            }
+        }
     }
 
 }
@@ -148,13 +167,14 @@ extension PrivacyDashboardTabExtension: NavigationResponder {
     }
 
     @MainActor
-    func didReceiveRedirect(_ navigationAction: NavigationAction, for navigation: Navigation) {
-        resetDashboardInfo(for: navigationAction.url, didGoBackForward: false)
+    func didCommit(_ navigation: Navigation) {
+        resetDashboardInfo(for: navigation.url, didGoBackForward: navigation.navigationAction.navigationType.isBackForward)
     }
 
-    @MainActor
-    func didStart(_ navigation: Navigation) {
-        resetDashboardInfo(for: navigation.url, didGoBackForward: navigation.navigationAction.navigationType.isBackForward)
+    func navigationDidFinish(_ navigation: Navigation) {
+        if privacyInfo?.url != navigation.url {
+            resetDashboardInfo(for: navigation.url, didGoBackForward: navigation.navigationAction.navigationType.isBackForward)
+        }
     }
 
 }
@@ -165,18 +185,12 @@ extension PrivacyDashboardTabExtension: AutoconsentUserScriptDelegate {
         self.privacyInfo?.cookieConsentManaged = consentStatus
     }
 
-    func autoconsentUserScriptPromptUserForConsent(_ callback: @escaping (Bool) -> Void) {
-        cookieConsentPromptRequest = .init { result in
-            callback((try? result.get()) ?? false)
-        }
-    }
-
 }
 
 protocol PrivacyDashboardProtocol: AnyObject, NavigationResponder {
     var privacyInfo: PrivacyInfo? { get }
     var privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never> { get }
-    var cookieConsentPromptRequestPublisher: AnyPublisher<CookieConsentPromptRequest?, Never> { get }
+    var isCertificateValid: Bool? { get }
 
     func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?)
 }
@@ -186,10 +200,6 @@ extension PrivacyDashboardTabExtension: PrivacyDashboardProtocol, TabExtension {
 
     var privacyInfoPublisher: AnyPublisher<PrivacyDashboard.PrivacyInfo?, Never> {
         self.$privacyInfo.eraseToAnyPublisher()
-    }
-
-    var cookieConsentPromptRequestPublisher: AnyPublisher<CookieConsentPromptRequest?, Never> {
-        self.$cookieConsentPromptRequest.eraseToAnyPublisher()
     }
 
 }
@@ -204,12 +214,12 @@ extension Tab {
         self.privacyDashboard?.privacyInfoPublisher ?? Just(nil).eraseToAnyPublisher()
     }
 
-    var cookieConsentPromptRequestPublisher: AnyPublisher<CookieConsentPromptRequest?, Never> {
-        self.privacyDashboard?.cookieConsentPromptRequestPublisher ?? Just(nil).eraseToAnyPublisher()
-    }
-
     func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?) {
         self.privacyDashboard?.setMainFrameConnectionUpgradedTo(upgradedUrl)
+    }
+
+    var isCertificateValid: Bool? {
+        self.privacyDashboard?.isCertificateValid
     }
 
 }

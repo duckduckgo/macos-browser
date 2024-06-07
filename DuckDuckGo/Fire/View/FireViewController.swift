@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-@preconcurrency import Lottie
+import Lottie
 import Combine
 
 @MainActor
@@ -27,7 +27,7 @@ final class FireViewController: NSViewController {
         static let animationName = "01_Fire_really_small"
     }
 
-    private var fireViewModel: FireViewModel
+    private(set) var fireViewModel: FireViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
     private var cancellables = Set<AnyCancellable>()
 
@@ -36,20 +36,25 @@ final class FireViewController: NSViewController {
         return storyboard.instantiateController(identifier: "FirePopoverViewController")
     }()
 
+    @IBOutlet weak var deletingDataLabel: NSTextField!
     @IBOutlet weak var fakeFireButton: NSButton!
     @IBOutlet weak var progressIndicatorWrapper: NSView!
     @IBOutlet weak var progressIndicator: NSProgressIndicator!
     @IBOutlet weak var progressIndicatorWrapperBG: NSView!
-    private var fireAnimationView: AnimationView?
+    private var fireAnimationView: LottieAnimationView?
     private var fireAnimationViewLoadingTask: Task<(), Never>?
+
+    static func create(tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel? = nil) -> FireViewController {
+        NSStoryboard(name: "Fire", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, fireViewModel: fireViewModel)
+        }!
+    }
 
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel,
-          fireViewModel: FireViewModel? = nil) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel? = nil) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
 
@@ -62,22 +67,17 @@ final class FireViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-#if DEBUG
-        let isRunningTests = NSApp.isRunningUnitTests
-#else
-        let isRunningTests = false
-#endif
-
-        fireAnimationViewLoadingTask = isRunningTests ? nil : Task.detached(priority: .userInitiated) {
-            await self.setupFireAnimationView()
+        deletingDataLabel.stringValue = UserText.fireDialogDelitingData
+        if case .normal = NSApp.runType {
+            fireAnimationViewLoadingTask = Task.detached(priority: .userInitiated) {
+                await self.setupFireAnimationView()
+            }
         }
     }
 
     override func viewWillAppear() {
         super.viewWillAppear()
 
-//        self.view.superview?.isHidden = true
         subscribeToFireAnimationEvents()
         progressIndicator.startAnimation(self)
     }
@@ -117,8 +117,9 @@ final class FireViewController: NSViewController {
         animationView.animationSpeed = fireAnimationSpeed
 
         fakeFireButton.wantsLayer = true
-        fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDownColor.cgColor
+        fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDown.cgColor
 
+        fakeFireButton.setAccessibilityIdentifier("FireViewController.fakeFireButton")
         subscribeToIsBurning()
     }
 
@@ -225,11 +226,11 @@ private actor FireAnimationViewLoader {
     static let shared: FireAnimationViewLoader = .init(animationName: FireViewController.Const.animationName)
 
     @MainActor
-    func createAnimationView() async -> AnimationView? {
+    func createAnimationView() async -> LottieAnimationView? {
         guard let animation = await animation else {
             return nil
         }
-        let view = AnimationView(animation: animation)
+        let view = LottieAnimationView(animation: animation)
         view.identifier = .init(rawValue: animationName)
         return view
     }
@@ -240,7 +241,7 @@ private actor FireAnimationViewLoader {
 
     private let animationName: String
 
-    private var animation: Animation? {
-        Animation.named(animationName, animationCache: LottieAnimationCache.shared)
+    private var animation: LottieAnimation? {
+        LottieAnimation.named(animationName, animationCache: LottieAnimationCache.shared)
     }
 }

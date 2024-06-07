@@ -23,22 +23,30 @@ enum StepType: String, Codable, Sendable {
     case optOut
 }
 
+enum OptOutType: String, Codable, Sendable {
+    case formOptOut
+    case parentSiteOptOut
+}
+
 struct Step: Codable, Sendable {
     let type: StepType
+    let optOutType: OptOutType?
     let actions: [Action]
 
     enum CodingKeys: String, CodingKey {
-        case actions, stepType
+        case actions, stepType, optOutType
     }
 
-    init(type: StepType, actions: [Action]) {
+    init(type: StepType, actions: [Action], optOutType: OptOutType? = nil) {
         self.type = type
         self.actions = actions
+        self.optOutType = optOutType
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         type = try container.decode(StepType.self, forKey: .stepType)
+        optOutType = try? container.decode(OptOutType.self, forKey: .optOutType)
 
         let actionsList = try container.decode([[String: Any]].self, forKey: .actions)
         actions = try Step.parse(actionsList)
@@ -47,6 +55,8 @@ struct Step: Codable, Sendable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .stepType)
+        try container.encode(optOutType, forKey: .optOutType)
+
         var actionsContainer = container.nestedUnkeyedContainer(forKey: .actions)
         for action in actions {
             if let navigateAction = action as? NavigateAction {

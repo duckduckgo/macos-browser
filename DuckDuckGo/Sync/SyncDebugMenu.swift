@@ -18,14 +18,28 @@
 
 import Foundation
 import DDGSync
+import Bookmarks
 
-@objc @MainActor
+@MainActor
 final class SyncDebugMenu: NSMenu {
 
-    @IBOutlet private weak var environmentMenu: NSMenu! {
-        didSet {
-            populateEnvironmentMenu()
+    private let environmentMenu = NSMenu()
+
+    init() {
+        super.init(title: "")
+
+        buildItems {
+            NSMenuItem(title: "Environment")
+                .submenu(environmentMenu)
+            NSMenuItem(title: "Reset Favicons Fetcher Onboarding Dialog", action: #selector(resetFaviconsFetcherOnboardingDialog))
+                .targetting(self)
+            NSMenuItem(title: "Populate Stub objects", action: #selector(createStubsForDebug))
+                .targetting(self)
         }
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func update() {
@@ -35,7 +49,7 @@ final class SyncDebugMenu: NSMenu {
     private func populateEnvironmentMenu() {
         environmentMenu.removeAllItems()
 
-        guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+        guard let syncService = NSApp.delegateTyped.syncService else {
             return
         }
 
@@ -56,7 +70,7 @@ final class SyncDebugMenu: NSMenu {
 
     @objc func switchSyncEnvironment(_ sender: NSMenuItem) {
 #if DEBUG || REVIEW
-        guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService,
+        guard let syncService = NSApp.delegateTyped.syncService,
               let environment = sender.representedObject as? ServerEnvironment
         else {
             return
@@ -65,5 +79,51 @@ final class SyncDebugMenu: NSMenu {
         syncService.updateServerEnvironment(environment)
         UserDefaults.standard.set(environment.description, forKey: UserDefaultsWrapper<String>.Key.syncEnvironment.rawValue)
 #endif
+    }
+
+    @objc func createStubsForDebug() {
+#if DEBUG || REVIEW
+        let db = BookmarkDatabase.shared
+
+        let context = db.db.makeContext(concurrencyType: .privateQueueConcurrencyType)
+
+        context.performAndWait {
+            let root = BookmarkUtils.fetchRootFolder(context)!
+            let favorites = BookmarkUtils.fetchFavoritesFolders(for: .displayNative(.desktop), in: context)
+
+            let nonStub1 = BookmarkEntity.makeBookmark(title: "Non stub", url: "url", parent: root, context: context)
+            nonStub1.addToFavorites(folders: favorites)
+
+            let stub1 = BookmarkEntity.makeBookmark(title: "Stub", url: "", parent: root, context: context)
+            stub1.isStub = true
+            stub1.addToFavorites(folders: favorites)
+
+            let emptyStub = BookmarkEntity.makeBookmark(title: "", url: "", parent: root, context: context)
+            emptyStub.isStub = true
+            emptyStub.title = nil
+            emptyStub.url = nil
+            emptyStub.addToFavorites(folders: favorites)
+
+            let nonStub2 = BookmarkEntity.makeBookmark(title: "Non stub 2", url: "url", parent: root, context: context)
+            nonStub2.addToFavorites(folders: favorites)
+
+            let stub2 = BookmarkEntity.makeBookmark(title: "Stub", url: "", parent: root, context: context)
+            stub2.isStub = true
+            stub2.addToFavorites(folders: favorites)
+
+            let stub3 = BookmarkEntity.makeBookmark(title: "Stub", url: "", parent: root, context: context)
+            stub3.isStub = true
+            stub3.addToFavorites(folders: favorites)
+
+            let nonStub3 = BookmarkEntity.makeBookmark(title: "Non stub 3", url: "url", parent: root, context: context)
+            nonStub3.addToFavorites(folders: favorites)
+
+            try? context.save()
+        }
+#endif
+    }
+
+    @objc func resetFaviconsFetcherOnboardingDialog(_ sender: NSMenuItem) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<String>.Key.syncDidPresentFaviconsFetcherOnboarding.rawValue)
     }
 }

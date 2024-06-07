@@ -21,11 +21,10 @@ import UniformTypeIdentifiers
 
 extension NSOpenPanel {
 
-    static func downloadDirectoryPanel() -> NSOpenPanel {
-        let downloadPreferences = DownloadsPreferences()
+    static func downloadDirectoryPanel(downloadsPreferences: DownloadsPreferences = .shared) -> NSOpenPanel {
         let panel = NSOpenPanel()
 
-        panel.directoryURL = downloadPreferences.effectiveDownloadLocation
+        panel.directoryURL = downloadsPreferences.effectiveDownloadLocation
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.canCreateDirectories = true
@@ -33,14 +32,13 @@ extension NSOpenPanel {
         return panel
     }
 
-    static func filePanel(allowedExtension: String) -> NSOpenPanel {
-        let panel = NSOpenPanel()
+    convenience init(allowedFileTypes: [UTType], directoryURL: URL? = nil) {
+        self.init()
 
-        panel.directoryURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
-        panel.canChooseFiles = true
-        panel.allowedContentTypes = UTType(filenameExtension: allowedExtension).map { [$0] } ?? []
-        panel.canChooseDirectories = false
-
-        return panel
+        self.directoryURL = directoryURL
+        canChooseFiles = true
+        allowedContentTypes = allowedFileTypes
+        canChooseDirectories = false
     }
+
 }

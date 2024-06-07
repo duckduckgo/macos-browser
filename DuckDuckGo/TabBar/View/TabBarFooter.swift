@@ -22,6 +22,6 @@ final class TabBarFooter: NSView {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "TabBarFooter")
 
-    @IBOutlet weak var addButton: LongPressButton!
+    @IBOutlet weak var addButton: MouseOverButton!
 
 }

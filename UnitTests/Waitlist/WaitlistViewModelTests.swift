@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -28,10 +26,13 @@ final class WaitlistViewModelTests: XCTestCase {
     @MainActor
     func testWhenTimestampIsNotPresent_ThenStateIsNotJoinedQueue() async {
         let request = MockWaitlistRequest.failure()
-        let storage = MockWaitlistStorage.init()
+        let storage = MockWaitlistStorage()
         let viewModel = WaitlistViewModel(waitlistRequest: request,
-                                          waitlistStorage: storage,
-                                          notificationService: MockNotificationService())
+                                                           waitlistStorage: storage,
+                                                           notificationService: MockNotificationService(),
+                                                           showNotificationSuccessState: true,
+                                                           termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
+                                                           featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
         await viewModel.updateViewState()
 
@@ -41,13 +42,16 @@ final class WaitlistViewModelTests: XCTestCase {
     @MainActor
     func testWhenTimestampIsPresentAndInviteCodeIsNil_ThenStateIsJoinedQueue() async {
         let request = MockWaitlistRequest.failure()
-        let storage = MockWaitlistStorage.init()
+        let storage = MockWaitlistStorage()
         storage.store(waitlistTimestamp: 12345)
         let notificationService = MockNotificationService(authorizationStatus: .authorized)
 
         let viewModel = WaitlistViewModel(waitlistRequest: request,
-                                          waitlistStorage: storage,
-                                          notificationService: notificationService)
+                                                           waitlistStorage: storage,
+                                                           notificationService: notificationService,
+                                                           showNotificationSuccessState: true,
+                                                           termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
+                                                           featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
         await viewModel.updateViewState()
 
@@ -57,15 +61,18 @@ final class WaitlistViewModelTests: XCTestCase {
     @MainActor
     func testWhenTimestampIsPresentAndInviteCodeIsPresent_ThenStateIsInvited() async {
         let request = MockWaitlistRequest.failure()
-        let storage = MockWaitlistStorage.init()
+        let storage = MockWaitlistStorage()
         storage.store(waitlistTimestamp: 12345)
         storage.store(waitlistToken: "token")
         storage.store(inviteCode: "ABCD1234")
         let notificationService = MockNotificationService(authorizationStatus: .authorized)
 
         let viewModel = WaitlistViewModel(waitlistRequest: request,
-                                          waitlistStorage: storage,
-                                          notificationService: notificationService)
+                                                           waitlistStorage: storage,
+                                                           notificationService: notificationService,
+                                                           showNotificationSuccessState: true,
+                                                           termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
+                                                           featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
         await viewModel.updateViewState()
 
@@ -81,8 +88,11 @@ final class WaitlistViewModelTests: XCTestCase {
         var notificationService = MockNotificationService()
         notificationService.authorizationStatus = .notDetermined
         let viewModel = WaitlistViewModel(waitlistRequest: request,
-                                          waitlistStorage: storage,
-                                          notificationService: notificationService)
+                                                           waitlistStorage: storage,
+                                                           notificationService: notificationService,
+                                                           showNotificationSuccessState: true,
+                                                           termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
+                                                           featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
         var stateUpdates: [WaitlistViewModel.ViewState] = []
         let cancellable = viewModel.$viewState.sink { stateUpdates.append($0) }
@@ -96,15 +106,18 @@ final class WaitlistViewModelTests: XCTestCase {
     @MainActor
     func testWhenAcceptingTermsAndConditions_ThenAuthTokenIsFetched_AndTermsAndConditionsAreMarkedAsAccepted() async {
         let request = MockWaitlistRequest.failure()
-        let storage = MockWaitlistStorage.init()
+        let storage = MockWaitlistStorage()
         storage.store(waitlistTimestamp: 12345)
         storage.store(waitlistToken: "token")
         storage.store(inviteCode: "ABCD1234")
         let notificationService = MockNotificationService(authorizationStatus: .authorized)
 
         let viewModel = WaitlistViewModel(waitlistRequest: request,
-                                          waitlistStorage: storage,
-                                          notificationService: notificationService)
+                                                           waitlistStorage: storage,
+                                                           notificationService: notificationService,
+                                                           showNotificationSuccessState: true,
+                                                           termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
+                                                           featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
         await viewModel.updateViewState()
         XCTAssertEqual(viewModel.viewState, .invited)
@@ -114,5 +127,3 @@ final class WaitlistViewModelTests: XCTestCase {
     }
 
 }
-
-#endif

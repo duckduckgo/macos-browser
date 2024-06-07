@@ -34,6 +34,7 @@ struct ProfileQueryDB: Codable {
     let zipCode: Data?
     let phone: Data?
     let birthYear: Data
+    let deprecated: Bool
 }
 
 extension ProfileQueryDB: PersistableRecord, FetchableRecord {
@@ -52,6 +53,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
         case zipCode
         case phone
         case birthYear
+        case deprecated
     }
 
     init(row: Row) throws {
@@ -67,6 +69,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
         zipCode = row[Columns.zipCode]
         phone = row[Columns.phone]
         birthYear = row[Columns.birthYear]
+        deprecated = row[Columns.deprecated]
     }
 
     func encode(to container: inout PersistenceContainer) throws {
@@ -82,6 +85,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
         container[Columns.zipCode] = zipCode
         container[Columns.phone] = phone
         container[Columns.birthYear] = birthYear
+        container[Columns.deprecated] = deprecated
     }
 }
 
@@ -90,6 +94,7 @@ struct BrokerDB: Codable {
     let name: String
     let json: Data
     let version: String
+    let url: String
 }
 
 extension BrokerDB: PersistableRecord, FetchableRecord {
@@ -100,6 +105,7 @@ extension BrokerDB: PersistableRecord, FetchableRecord {
         case name
         case json
         case version
+        case url
     }
 
     init(row: Row) throws {
@@ -107,6 +113,7 @@ extension BrokerDB: PersistableRecord, FetchableRecord {
         name = row[Columns.name]
         json = row[Columns.json]
         version = row[Columns.version]
+        url = row[Columns.url]
     }
 
     func encode(to container: inout PersistenceContainer) throws {
@@ -114,6 +121,7 @@ extension BrokerDB: PersistableRecord, FetchableRecord {
         container[Columns.name] = name
         container[Columns.json] = json
         container[Columns.version] = version
+        container[Columns.url] = url
     }
 }
 

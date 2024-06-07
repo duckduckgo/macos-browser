@@ -31,18 +31,23 @@ final class PreferencesSidebarModelTests: XCTestCase {
     }
 
     private func PreferencesSidebarModel(loadSections: [PreferencesSection]? = nil, tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes) -> DuckDuckGo_Privacy_Browser.PreferencesSidebarModel {
-        return DuckDuckGo_Privacy_Browser.PreferencesSidebarModel(loadSections: { loadSections ?? PreferencesSection.defaultSections(includingDuckPlayer: false) }, tabSwitcherTabs: tabSwitcherTabs, privacyConfigurationManager: MockPrivacyConfigurationManager())
+        return DuckDuckGo_Privacy_Browser.PreferencesSidebarModel(
+            loadSections: { loadSections ?? PreferencesSection.defaultSections(includingDuckPlayer: false, includingSync: false, includingVPN: false) },
+            tabSwitcherTabs: tabSwitcherTabs,
+            privacyConfigurationManager: MockPrivacyConfigurationManager(),
+            syncService: MockDDGSyncing(authState: .inactive, isSyncInProgress: false)
+        )
     }
 
     func testWhenInitializedThenFirstPaneInFirstSectionIsSelected() throws {
-        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .downloads, .autofill])]
+        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .autofill])]
         let model = PreferencesSidebarModel(loadSections: sections)
 
         XCTAssertEqual(model.selectedPane, .appearance)
     }
 
     func testWhenResetTabSelectionIfNeededCalledThenPreferencesTabIsSelected() throws {
-        let tabs: [Tab.TabContent] = [.anyPreferencePane, .bookmarks]
+        let tabs: [Tab.TabContent] = [.anySettingsPane, .bookmarks]
         let model = PreferencesSidebarModel(tabSwitcherTabs: tabs)
         model.selectedTabIndex = 1
 
@@ -67,7 +72,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
     }
 
     func testWhenSelectPaneIsCalledWithNonexistentPaneThenItHasNoEffect() throws {
-        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .downloads])]
+        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .autofill])]
         let model = PreferencesSidebarModel(loadSections: sections)
 
         model.selectPane(.general)
@@ -75,8 +80,8 @@ final class PreferencesSidebarModelTests: XCTestCase {
     }
 
     func testWhenSelectedTabIndexIsChangedThenSelectedPaneIsNotAffected() throws {
-        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.general, .appearance, .downloads, .autofill])]
-        let tabs: [Tab.TabContent] = [.anyPreferencePane, .bookmarks]
+        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.general, .appearance, .autofill])]
+        let tabs: [Tab.TabContent] = [.anySettingsPane, .bookmarks]
         let model = PreferencesSidebarModel(loadSections: sections, tabSwitcherTabs: tabs)
 
         var selectedPaneUpdates = [PreferencePaneIdentifier]()

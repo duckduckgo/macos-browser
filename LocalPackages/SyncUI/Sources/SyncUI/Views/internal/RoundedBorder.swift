@@ -22,9 +22,9 @@ public extension View {
     func roundedBorder() -> some View {
         background(ZStack {
             RoundedRectangle(cornerRadius: 8)
-                .stroke(Color("BlackWhite10"), lineWidth: 1)
+                .stroke(Color(.blackWhite10), lineWidth: 1)
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color("BlackWhite1"))
+                .fill(Color(.blackWhite1))
         })
     }
 }

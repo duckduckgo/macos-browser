@@ -37,45 +37,71 @@ final class DataBrokerProtectionUpdaterTests: XCTestCase {
         vault?.reset()
     }
 
-    func testWhen24HoursDidntPassSinceLastRunDate_thenCheckingUpdatesIsSkipped() {
+    func testWhenNoVersionIsStored_thenWeTryToUpdateBrokers() {
         if let vault = self.vault {
             let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
-            repository.lastRunDate = substract(hours: 10, to: Date())
+            repository.lastCheckedVersion = nil
 
             sut.checkForUpdatesInBrokerJSONFiles()
 
-            XCTAssertFalse(repository.wasSaveLastRunDateCalled)
+            XCTAssertTrue(repository.wasSaveLatestAppVersionCheckCalled)
+            XCTAssertTrue(resources.wasFetchBrokerFromResourcesFilesCalled)
+        } else {
+            XCTFail("Mock vault issue")
+        }
+    }
+
+    func testWhenVersionIsStoredAndPatchIsLessThanCurrentOne_thenWeTryToUpdateBrokers() {
+        if let vault = self.vault {
+            let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault, appVersion: MockAppVersion(versionNumber: "1.74.1"))
+            repository.lastCheckedVersion = "1.74.0"
+
+            sut.checkForUpdatesInBrokerJSONFiles()
+
+            XCTAssertTrue(repository.wasSaveLatestAppVersionCheckCalled)
+            XCTAssertTrue(resources.wasFetchBrokerFromResourcesFilesCalled)
+        } else {
+            XCTFail("Mock vault issue")
+        }
+    }
+
+    func testWhenVersionIsStoredAndMinorIsLessThanCurrentOne_thenWeTryToUpdateBrokers() {
+        if let vault = self.vault {
+            let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault, appVersion: MockAppVersion(versionNumber: "1.74.0"))
+            repository.lastCheckedVersion = "1.73.0"
+
+            sut.checkForUpdatesInBrokerJSONFiles()
+
+            XCTAssertTrue(repository.wasSaveLatestAppVersionCheckCalled)
+            XCTAssertTrue(resources.wasFetchBrokerFromResourcesFilesCalled)
+        } else {
+            XCTFail("Mock vault issue")
+        }
+    }
+
+    func testWhenVersionIsStoredAndMajorIsLessThanCurrentOne_thenWeTryToUpdateBrokers() {
+        if let vault = self.vault {
+            let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault, appVersion: MockAppVersion(versionNumber: "1.74.0"))
+            repository.lastCheckedVersion = "0.74.0"
+
+            sut.checkForUpdatesInBrokerJSONFiles()
+
+            XCTAssertTrue(repository.wasSaveLatestAppVersionCheckCalled)
+            XCTAssertTrue(resources.wasFetchBrokerFromResourcesFilesCalled)
+        } else {
+            XCTFail("Mock vault issue")
+        }
+    }
+
+    func testWhenVersionIsStoredAndIsEqualOrGreaterThanCurrentOne_thenCheckingUpdatesIsSkipped() {
+        if let vault = self.vault {
+            let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault, appVersion: MockAppVersion(versionNumber: "1.74.0"))
+            repository.lastCheckedVersion = "1.74.0"
+
+            sut.checkForUpdatesInBrokerJSONFiles()
+
+            XCTAssertFalse(repository.wasSaveLatestAppVersionCheckCalled)
             XCTAssertFalse(resources.wasFetchBrokerFromResourcesFilesCalled)
-        } else {
-            XCTFail("Mock vault issue")
-        }
-    }
-
-    func testWhen24PassedSinceLastRunDate_thenWeTryToUpdateBrokers() {
-        if let vault = self.vault {
-            let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
-            repository.lastRunDate = substract(hours: 25, to: Date())
-            resources.brokersList = [.init(id: 1, name: "Broker", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)]
-
-            sut.checkForUpdatesInBrokerJSONFiles()
-
-            XCTAssertTrue(repository.wasSaveLastRunDateCalled)
-            XCTAssertTrue(resources.wasFetchBrokerFromResourcesFilesCalled)
-        } else {
-            XCTFail("Mock vault issue")
-        }
-    }
-
-    func testWhenLastRunDateIsNil_thenWeTryToUpdateBrokers() {
-        if let vault = self.vault {
-            let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
-            repository.lastRunDate = nil
-            resources.brokersList = [.init(id: 1, name: "Broker", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)]
-
-            sut.checkForUpdatesInBrokerJSONFiles()
-
-            XCTAssertTrue(repository.wasSaveLastRunDateCalled)
-            XCTAssertTrue(resources.wasFetchBrokerFromResourcesFilesCalled)
         } else {
             XCTFail("Mock vault issue")
         }
@@ -84,13 +110,13 @@ final class DataBrokerProtectionUpdaterTests: XCTestCase {
     func testWhenSavedBrokerIsOnAnOldVersion_thenWeUpdateIt() {
         if let vault = self.vault {
             let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
-            repository.lastRunDate = nil
-            resources.brokersList = [.init(id: 1, name: "Broker", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)]
+            repository.lastCheckedVersion = nil
+            resources.brokersList = [.init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)]
             vault.shouldReturnOldVersionBroker = true
 
             sut.checkForUpdatesInBrokerJSONFiles()
 
-            XCTAssertTrue(repository.wasSaveLastRunDateCalled)
+            XCTAssertTrue(repository.wasSaveLatestAppVersionCheckCalled)
             XCTAssertTrue(resources.wasFetchBrokerFromResourcesFilesCalled)
             XCTAssertTrue(vault.wasBrokerUpdateCalled)
             XCTAssertFalse(vault.wasBrokerSavedCalled)
@@ -102,13 +128,13 @@ final class DataBrokerProtectionUpdaterTests: XCTestCase {
     func testWhenSavedBrokerIsOnTheCurrentVersion_thenWeDoNotUpdateIt() {
         if let vault = self.vault {
             let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
-            repository.lastRunDate = nil
-            resources.brokersList = [.init(id: 1, name: "Broker", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)]
+            repository.lastCheckedVersion = nil
+            resources.brokersList = [.init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)]
             vault.shouldReturnNewVersionBroker = true
 
             sut.checkForUpdatesInBrokerJSONFiles()
 
-            XCTAssertTrue(repository.wasSaveLastRunDateCalled)
+            XCTAssertTrue(repository.wasSaveLatestAppVersionCheckCalled)
             XCTAssertTrue(resources.wasFetchBrokerFromResourcesFilesCalled)
             XCTAssertFalse(vault.wasBrokerUpdateCalled)
         } else {
@@ -119,29 +145,22 @@ final class DataBrokerProtectionUpdaterTests: XCTestCase {
     func testWhenFileBrokerIsNotStored_thenWeAddTheBrokerAndScanOperations() {
         if let vault = self.vault {
             let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
-            repository.lastRunDate = nil
-            resources.brokersList = [.init(id: 1, name: "Broker", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)]
+            repository.lastCheckedVersion = nil
+            resources.brokersList = [.init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)]
+            vault.profileQueries = [.mock]
 
             sut.checkForUpdatesInBrokerJSONFiles()
 
-            XCTAssertTrue(repository.wasSaveLastRunDateCalled)
+            XCTAssertTrue(repository.wasSaveLatestAppVersionCheckCalled)
             XCTAssertTrue(resources.wasFetchBrokerFromResourcesFilesCalled)
             XCTAssertFalse(vault.wasBrokerUpdateCalled)
             XCTAssertTrue(vault.wasBrokerSavedCalled)
+            XCTAssertTrue(areDatesEqualIgnoringSeconds(
+                date1: Date(),
+                date2: vault.lastPreferredRunDateOnScan)
+            )
         } else {
             XCTFail("Mock vault issue")
-        }
-    }
-
-    private func substract(hours: Int, to date: Date) -> Date {
-        let calendar = Calendar.current
-        var dateComponents = DateComponents()
-        dateComponents.hour = -hours
-
-        if let modifiedDate = calendar.date(byAdding: dateComponents, to: date) {
-            return modifiedDate
-        } else {
-            fatalError("There was an issue changing the date hours.")
         }
     }
 

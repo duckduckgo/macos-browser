@@ -18,6 +18,7 @@
 
 import Foundation
 import SwiftUI
+import History
 
 extension HomePage.Models {
 
@@ -27,7 +28,7 @@ final class RecentlyVisitedModel: ObservableObject {
         let f = RelativeDateTimeFormatter()
         f.unitsStyle = .abbreviated
         return f
-    } ()
+    }()
 
     private let fire: Fire
 
@@ -278,8 +279,55 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         })
     }
 
-    func entityImageName(_ entityName: String) -> String {
-        return entityDisplayName(entityName).slugfiscated()
+    func entityImage(_ entityName: String) -> NSImage? {
+        guard let trackerNetwork = TrackerNetwork(rawValue: entityDisplayName(entityName).slugfiscated()) else { return nil }
+        return Self.feedImage(for: trackerNetwork)
+    }
+
+    // swiftlint:disable:next cyclomatic_complexity
+    static func feedImage(for trackerNetwork: TrackerNetwork) -> NSImage? {
+        switch trackerNetwork {
+        case .adform:            .feedAdform
+        case .adobe:             .feedAdobe
+        case .amazon:            .feedAmazon
+        case .amobee:            .feedAmobee
+        case .appnexus:          .feedAppnexus
+        case .centro:            .feedCentro
+        case .cloudflare:        .feedCloudflare
+        case .comscore:          .feedComscore
+        case .conversant:        .feedConversant
+        case .criteo:            .feedCriteo
+        case .dataxu:            .feedDataxu
+        case .facebook:          .feedFacebook
+        case .google:            .feedGoogle
+        case .hotjar:            .feedHotjar
+        case .indexexchange:     .feedIndexexchange
+        case .iponweb:           .feedIponweb
+        case .linkedin:          .feedLinkedin
+        case .lotame:            .feedLotamesolutions
+        case .mediamath:         .feedMediamath
+        case .microsoft:         .feedMicrosoft
+        case .neustar:           .feedNeustar
+        case .newrelic:          .feedNewrelic
+        case .nielsen:           .feedThenielsencompany
+        case .openx:             .feedOpenx
+        case .oracle:            .feedOracle
+        case .pubmatic:          .feedPubmatic
+        case .qwantcast:         .feedQuantcast
+        case .rubicon:           .feedRubicon
+        case .salesforce:        .feedSalesforce
+        case .smartadserver:     .feedSmartadserver
+        case .spotx:             .feedSpotx
+        case .stackpath:         .feedStackpath
+        case .taboola:           .feedTaboola
+        case .tapad:             .feedTapad
+        case .theTradeDesk:      .feedThetradedesk
+        case .towerdata:         .feedTowerdata
+        case .twitter:           .feedTwitter
+        case .verizonMedia:      .feedVerizonmedia
+        case .xaxis:             .feedXaxis
+        case .windows:           nil
+        }
     }
 
     func entityDisplayName(_ entityName: String, _ contentBlocking: AnyContentBlocking = ContentBlocking.shared) -> String {

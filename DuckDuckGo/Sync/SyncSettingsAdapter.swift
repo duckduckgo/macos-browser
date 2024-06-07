@@ -16,12 +16,18 @@
 //  limitations under the License.
 //
 
+import Bookmarks
 import BrowserServicesKit
 import Combine
 import Common
 import DDGSync
 import Persistence
 import SyncDataProviders
+import PixelKit
+
+extension SettingsProvider.Setting {
+    static let favoritesDisplayMode = SettingsProvider.Setting(key: "favorites_display_mode")
+}
 
 final class SyncSettingsAdapter {
 
@@ -33,7 +39,11 @@ final class SyncSettingsAdapter {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
     }
 
-    func setUpProviderIfNeeded(metadataDatabase: CoreDataDatabase, metadataStore: SyncMetadataStore) {
+    func setUpProviderIfNeeded(
+        metadataDatabase: CoreDataDatabase,
+        metadataStore: SyncMetadataStore,
+        metricsEventsHandler: EventMapping<MetricsEvent>? = nil
+    ) {
         guard provider == nil else {
             return
         }
@@ -42,7 +52,9 @@ final class SyncSettingsAdapter {
         let provider = SettingsProvider(
             metadataDatabase: metadataDatabase,
             metadataStore: metadataStore,
-            emailManager: emailManager,
+            settingsHandlers: [FavoritesDisplayModeSyncHandler(), EmailProtectionSyncHandler(emailManager: emailManager)],
+            metricsEvents: metricsEventsHandler,
+            log: OSLog.sync,
             syncDidUpdateData: { [weak self] in
                 self?.syncDidCompleteSubject.send()
             }
@@ -51,19 +63,24 @@ final class SyncSettingsAdapter {
         syncErrorCancellable = provider.syncErrorPublisher
             .sink { error in
                 switch error {
+                case SyncError.patchPayloadCompressionFailed(let errorCode):
+                    PixelKit.fire(
+                        DebugEvent(GeneralPixel.syncSettingsPatchCompressionFailed),
+                        withAdditionalParameters: ["error": "\(errorCode)"]
+                    )
                 case let syncError as SyncError:
-                    Pixel.fire(.debug(event: .syncSettingsFailed, error: syncError))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncSettingsFailed, error: syncError))
                 case let settingsMetadataError as SettingsSyncMetadataSaveError:
                     let underlyingError = settingsMetadataError.underlyingError
                     let processedErrors = CoreDataErrorsParser.parse(error: underlyingError as NSError)
                     let params = processedErrors.errorPixelParameters
-                    Pixel.fire(.debug(event: .syncSettingsMetadataUpdateFailed, error: underlyingError), withAdditionalParameters: params)
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncSettingsMetadataUpdateFailed, error: underlyingError), withAdditionalParameters: params)
                 default:
                     let nsError = error as NSError
                     if nsError.domain != NSURLErrorDomain {
                         let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
                         let params = processedErrors.errorPixelParameters
-                        Pixel.fire(.debug(event: .syncSettingsFailed, error: error), withAdditionalParameters: params)
+                        PixelKit.fire(DebugEvent(GeneralPixel.syncSettingsFailed, error: error), withAdditionalParameters: params)
                     }
                 }
                 os_log(.error, log: OSLog.sync, "Settings Sync error: %{public}s", String(reflecting: error))

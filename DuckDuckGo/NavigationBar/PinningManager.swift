@@ -17,17 +17,14 @@
 //
 
 import Foundation
-
-#if NETWORK_PROTECTION
 import NetworkProtection
-#endif
 
 enum PinnableView: String {
     case autofill
     case bookmarks
     case downloads
-    case networkProtection
     case homeButton
+    case networkProtection
 }
 
 protocol PinningManager {
@@ -37,15 +34,12 @@ protocol PinningManager {
     func wasManuallyToggled(_ view: PinnableView) -> Bool
     func pin(_ view: PinnableView)
     func unpin(_ view: PinnableView)
+    func shortcutTitle(for view: PinnableView) -> String
 }
 
 final class LocalPinningManager: PinningManager {
 
-#if NETWORK_PROTECTION
     static let shared = LocalPinningManager(networkProtectionFeatureActivation: NetworkProtectionKeychainTokenStore())
-#else
-    static let shared = LocalPinningManager()
-#endif
 
     static let pinnedViewChangedNotificationViewTypeKey = "pinning.pinnedViewChanged.viewType"
 
@@ -55,13 +49,11 @@ final class LocalPinningManager: PinningManager {
     @UserDefaultsWrapper(key: .manuallyToggledPinnedViews, defaultValue: [])
     private var manuallyToggledPinnedViewsStrings: [String]
 
-#if NETWORK_PROTECTION
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
 
     init(networkProtectionFeatureActivation: NetworkProtectionFeatureActivation) {
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
     }
-#endif
 
     func togglePinning(for view: PinnableView) {
         flagAsManuallyToggled(view)
@@ -100,6 +92,7 @@ final class LocalPinningManager: PinningManager {
             return
         }
 
+        manuallyToggledPinnedViewsStrings.removeAll(where: { $0 == view.rawValue })
         pinnedViewStrings.removeAll(where: { $0 == view.rawValue })
 
         NotificationCenter.default.post(name: .PinnedViewsChanged, object: nil, userInfo: [
@@ -111,22 +104,14 @@ final class LocalPinningManager: PinningManager {
         return pinnedViewStrings.contains(view.rawValue)
     }
 
-    func toggleShortcutInterfaceTitle(for view: PinnableView) -> String {
+    func shortcutTitle(for view: PinnableView) -> String {
         switch view {
         case .autofill: return isPinned(.autofill) ? UserText.hideAutofillShortcut : UserText.showAutofillShortcut
         case .bookmarks: return isPinned(.bookmarks) ? UserText.hideBookmarksShortcut : UserText.showBookmarksShortcut
         case .downloads: return isPinned(.downloads) ? UserText.hideDownloadsShortcut : UserText.showDownloadsShortcut
-        case .homeButton: return isPinned(.homeButton) ? UserText.hideHomeShortcut : UserText.showHomeShortcut
+        case .homeButton: return ""
         case .networkProtection:
-#if NETWORK_PROTECTION
-            if !networkProtectionFeatureActivation.isFeatureActivated {
-                assertionFailure("Tried to toggle Network Protection when it was not activated")
-            }
-
             return isPinned(.networkProtection) ? UserText.hideNetworkProtectionShortcut : UserText.showNetworkProtectionShortcut
-#else
-            fatalError("Tried to get Network Protection interface title when NetP was disabled")
-#endif
         }
     }
 
@@ -135,7 +120,7 @@ final class LocalPinningManager: PinningManager {
     /// This method is useful for knowing if the view was manually toggled.
     /// It's particularly useful for initializing a pin to a certain value at a certain point during the execution of code,
     /// only if the user hasn't explicitly specified a desired state.
-    /// As an example: this is used in Network Protection for pinning the icon to the navigation bar the first time the
+    /// As an example: this is used in the VPN for pinning the icon to the navigation bar the first time the
     /// feature is enabled.
     ///
     func wasManuallyToggled(_ view: PinnableView) -> Bool {

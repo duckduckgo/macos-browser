@@ -32,39 +32,29 @@ final class BookmarkHTMLImporter: DataImporter {
         (try? bookmarkReaderResult.get().bookmarks.numberOfBookmarks) ?? 0
     }
 
-    func importableTypes() -> [DataImport.DataType] {
-        [.bookmarks]
+    var importableTypes: [DataImport.DataType] {
+        return [.bookmarks]
     }
 
-    func importData(
-        types: [DataImport.DataType],
-        from profile: DataImport.BrowserProfile?,
-        completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void
-    ) {
-        DispatchQueue.global(qos: .userInitiated).async {
+    func importData(types: Set<DataImport.DataType>) -> DataImportTask {
+        assert(types.contains(.bookmarks))
+        return .detachedWithProgress { updateProgress in
+            [.bookmarks: self.importDataSync(types: types, updateProgress: updateProgress)]
+        }
+    }
+    private func importDataSync(types: Set<DataImport.DataType>, updateProgress: DataImportProgressCallback) -> DataImportResult<DataImport.DataTypeSummary> {
+        switch self.bookmarkReaderResult {
+        case let .success(importedData):
+            let source: BookmarkImportSource = importedData.source ?? .thirdPartyBrowser(.bookmarksHTML)
+            let bookmarksResult = self.bookmarkImporter.importBookmarks(importedData.bookmarks, source: source)
+            return .success(.init(bookmarksResult))
 
-            switch self.bookmarkReaderResult {
-            case let .success(importedData):
-                do {
-                    let source: BookmarkImportSource = importedData.source ?? .thirdPartyBrowser(.bookmarksHTML)
-                    let bookmarksResult = try self.bookmarkImporter.importBookmarks(importedData.bookmarks, source: source)
-                    DispatchQueue.main.async {
-                        completion(.success(.init(bookmarksResult: bookmarksResult)))
-                    }
-                } catch {
-                    DispatchQueue.main.async {
-                        completion(.failure(.bookmarks(.cannotAccessCoreData)))
-                    }
-                }
-            case let .failure(error):
-                DispatchQueue.main.async {
-                    completion(.failure(.bookmarks(error)))
-                }
-            }
+        case let .failure(error):
+            return .failure(error)
         }
     }
 
-    private lazy var bookmarkReaderResult: Result<HTMLImportedBookmarks, BookmarkHTMLReader.ImportError> = {
+    private lazy var bookmarkReaderResult: DataImportResult<HTMLImportedBookmarks> = {
         let bookmarkReader = BookmarkHTMLReader(bookmarksFileURL: self.fileURL)
         return bookmarkReader.readBookmarks()
     }()

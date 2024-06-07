@@ -19,34 +19,60 @@
 import Common
 import Foundation
 import LoginItems
+import PixelKit
 
-/// Class to manage the login items for Network Protection and DBP
-/// 
-final class LoginItemsManager {
+protocol LoginItemsManaging {
+    func enableLoginItems(_ items: Set<LoginItem>, log: OSLog)
+    func throwingEnableLoginItems(_ items: Set<LoginItem>, log: OSLog) throws
+    func disableLoginItems(_ items: Set<LoginItem>)
+    func restartLoginItems(_ items: Set<LoginItem>, log: OSLog)
+}
 
-    /// Save agent last launch time to distinguish between system launch at Log In and Main App launch
-    /// Used for the Connect On Log In feature to prevent connection when started by the Main App
-    /// Ideally we should remove this to make this class completely generic
-    @UserDefaultsWrapper(key: .netpMenuAgentLaunchTime, defaults: .shared)
-    private var netpMenuAgentLaunchTime: Date?
+/// Class to manage the login items for the VPN and DBP
+///
+final class LoginItemsManager: LoginItemsManaging {
+    private enum Action: String {
+        case enable
+        case disable
+        case restart
+    }
 
     // MARK: - Main Interactions
 
     func enableLoginItems(_ items: Set<LoginItem>, log: OSLog) {
-
-#if NETWORK_PROTECTION
-        if items.contains(.vpnMenu) {
-            netpMenuAgentLaunchTime = Date()
+        for item in items {
+            do {
+                try item.enable()
+                os_log("🟢 Enabled successfully %{public}@", log: log, String(describing: item))
+            } catch let error as NSError {
+                handleError(for: item, action: .enable, error: error)
+            }
         }
-#endif
+    }
 
-        updateLoginItems(items, whatAreWeDoing: "enable", using: LoginItem.enable)
-        ensureLoginItemsAreRunning(items, log: log)
+    /// Throwing version of enableLoginItems
+    ///
+    func throwingEnableLoginItems(_ items: Set<LoginItem>, log: OSLog) throws {
+        for item in items {
+            do {
+                try item.enable()
+                os_log("🟢 Enabled successfully %{public}@", log: log, String(describing: item))
+            } catch let error as NSError {
+                handleError(for: item, action: .enable, error: error)
+                throw error
+            }
+        }
     }
 
     func restartLoginItems(_ items: Set<LoginItem>, log: OSLog) {
-        updateLoginItems(items, whatAreWeDoing: "restart", using: LoginItem.restart)
-        ensureLoginItemsAreRunning(items, log: log, condition: .ifLoginItemsAreEnabled)
+        for item in items {
+            do {
+                try item.restart()
+                os_log("🟢 Restarted successfully %{public}@", log: log, String(describing: item))
+            } catch let error as NSError {
+                handleError(for: item, action: .restart, error: error)
+            }
+        }
     }
 
     func disableLoginItems(_ items: Set<LoginItem>) {
@@ -55,23 +81,26 @@ final class LoginItemsManager {
         }
     }
 
+    func isAnyEnabled(_ items: Set<LoginItem>) -> Bool {
+        return items.contains(where: { item in
+            item.status == .enabled
+        })
+    }
+
+    private func handleError(for item: LoginItem, action: Action, error: NSError) {
+        let event = GeneralPixel.loginItemUpdateError(loginItemBundleID: item.agentBundleID,
+                                                      action: "enable",
+                                                      buildType: AppVersion.shared.buildType,
+                                                      osVersion: AppVersion.shared.osVersion)
+        PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
+        os_log("🔴 Could not enable %{public}@: %{public}@", item.debugDescription, error.debugDescription)
+    }
+
     // MARK: - Debug Interactions
 
     func resetLoginItems(_ items: Set<LoginItem>) async throws {
         for item in items {
             try? item.disable()
-        }
-    }
-
-    // MARK: - Misc Utility
-
-    private func updateLoginItems(_ items: Set<LoginItem>, whatAreWeDoing: String, using action: (LoginItem) -> () throws -> Void) {
-        for item in items {
-            do {
-                try action(item)()
-            } catch let error as NSError {
-                logOrAssertionFailure("🔴 Could not \(whatAreWeDoing) \(item): \(error.debugDescription)")
-            }
         }
     }
 
@@ -83,38 +112,6 @@ final class LoginItemsManager {
 
         var shouldIgnoreItemStatus: Bool {
             self == .none
-        }
-    }
-
-    /// Ensures that the login items are running.  If an item that's supposed to be running is not, this method launches it manually.
-    ///
-    func ensureLoginItemsAreRunning(_ items: Set<LoginItem>, log: OSLog, condition: LoginItemCheckCondition = .none, after interval: TimeInterval = .seconds(5)) {
-
-        Task {
-            try await Task.sleep(interval: interval)
-
-            os_log(.info, log: log, "Checking whether login agents are enabled and running")
-
-            for item in items {
-                guard !item.isRunning && (condition.shouldIgnoreItemStatus || item.status.isEnabled) else {
-                    os_log(.info, log: log, "Login item with ID '%{public}s': ok", item.debugDescription)
-                    continue
-                }
-
-                os_log(.error, log: log, "%{public}s is not running, launching manually", item.debugDescription)
-
-                do {
-#if NETWORK_PROTECTION
-                    if item == .vpnMenu {
-                        netpMenuAgentLaunchTime = Date()
-                    }
-#endif
-                    try await item.launch()
-                    os_log(.info, log: log, "Launched login item with ID '%{public}s'", item.debugDescription)
-                } catch {
-                    os_log(.error, log: log, "Login item with ID '%{public}s' could not be launched. Error: %{public}s", item.debugDescription, "\(error)")
-                }
-            }
         }
     }
 }

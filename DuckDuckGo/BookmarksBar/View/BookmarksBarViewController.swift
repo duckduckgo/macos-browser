@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
 import AppKit
 import Combine
+import Common
+import Foundation
 
 final class BookmarksBarViewController: NSViewController {
 
@@ -40,15 +41,21 @@ final class BookmarksBarViewController: NSViewController {
     @UserDefaultsWrapper(key: .bookmarksBarPromptShown, defaultValue: false)
     var bookmarksBarPromptShown: Bool
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    static func create(tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) -> BookmarksBarViewController {
+        NSStoryboard(name: "BookmarksBar", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
+        }!
+    }
+
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.viewModel = BookmarksBarViewModel(bookmarkManager: LocalBookmarkManager.shared, tabCollectionViewModel: tabCollectionViewModel)
+        self.viewModel = BookmarksBarViewModel(bookmarkManager: bookmarkManager, tabCollectionViewModel: tabCollectionViewModel)
 
         super.init(coder: coder)
     }
 
     required init?(coder: NSCoder) {
-        fatalError("TabBarViewController: Bad initializer")
+        fatalError("BookmarksBarViewController: Bad initializer")
     }
 
     // MARK: - View Lifecycle
@@ -75,6 +82,7 @@ final class BookmarksBarViewController: NSViewController {
         bookmarksBarCollectionView.collectionViewLayout = createCenteredCollectionViewLayout()
 
         view.postsFrameChangedNotifications = true
+        bookmarksBarCollectionView.setAccessibilityIdentifier("BookmarksBarViewController.bookmarksBarCollectionView")
     }
 
     private func addContextMenu() {
@@ -158,6 +166,7 @@ final class BookmarksBarViewController: NSViewController {
     }
 
     private func refreshFavicons() {
+        dispatchPrecondition(condition: .onQueue(.main))
         bookmarksBarCollectionView.reloadData()
     }
 
@@ -167,6 +176,20 @@ final class BookmarksBarViewController: NSViewController {
         let location = NSPoint(x: 0, y: sender.frame.height + 5)
 
         menu.popUp(positioning: nil, at: location, in: sender)
+    }
+
+    @IBAction func mouseClickViewMouseUp(_ sender: MouseClickView) {
+        // when collection view reloaded we may receive mouseUp event from a wrong bookmarks bar item
+        // get actual item based on the event coordinates
+        guard let indexPath = bookmarksBarCollectionView.withMouseLocationInViewCoordinates(convert: { point in
+            self.bookmarksBarCollectionView.indexPathForItem(at: point)
+        }),
+              let item = bookmarksBarCollectionView.item(at: indexPath.item) as? BookmarksBarCollectionViewItem else {
+            os_log("Item at mouseUp point not found.", type: .error)
+            return
+        }
+
+        viewModel.bookmarksBarCollectionViewItemClicked(item)
     }
 
 }
@@ -201,60 +224,111 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         bookmarksBarCollectionView.reloadData()
     }
 
-    private func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for bookmark: Bookmark) {
+}
+
+// MARK: - Private
+
+private extension BookmarksBarViewController {
+
+    func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for bookmark: Bookmark) {
         switch action {
         case .openInNewTab:
-            guard let url = bookmark.urlObject else { return }
-            tabCollectionViewModel.appendNewTab(with: .url(url), selected: true)
+            openInNewTab(bookmark: bookmark)
         case .openInNewWindow:
-            guard let url = bookmark.urlObject else { return }
-            WindowsManager.openNewWindow(with: url, isBurner: false)
+            openInNewWindow(bookmark: bookmark)
         case .clickItem:
             WindowControllersManager.shared.open(bookmark: bookmark)
-        case .addToFavorites:
-            bookmark.isFavorite = true
+        case .toggleFavorites:
+            bookmark.isFavorite.toggle()
             bookmarkManager.update(bookmark: bookmark)
         case .edit:
-            let addBookmarkViewController = AddBookmarkModalViewController.create()
-            addBookmarkViewController.delegate = self
-            addBookmarkViewController.edit(bookmark: bookmark)
-            beginSheet(addBookmarkViewController)
+            showDialog(view: BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark))
         case .moveToEnd:
             bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .copyURL:
             bookmark.copyUrlToPasteboard()
         case .deleteEntity:
             bookmarkManager.remove(bookmark: bookmark)
+        case .addFolder:
+            addFolder(inParent: nil)
+        case .manageBookmarks:
+            manageBookmarks()
         }
     }
 
-    private func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for folder: BookmarkFolder, item: BookmarksBarCollectionViewItem) {
+    func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for folder: BookmarkFolder, item: BookmarksBarCollectionViewItem) {
         switch action {
         case .clickItem:
-            let childEntities = folder.children
-            let viewModels = childEntities.map { BookmarkViewModel(entity: $0) }
-            let menuItems = viewModel.bookmarksTreeMenuItems(from: viewModels, topLevel: true)
-            let menu = bookmarkFolderMenu(items: menuItems)
-
-            menu.popUp(positioning: nil, at: CGPoint(x: 0, y: item.view.frame.minY - 7), in: item.view)
+            showSubmenuFor(folder: folder, fromView: item.view)
         case .edit:
-            let addFolderViewController = AddFolderModalViewController.create()
-            addFolderViewController.delegate = self
-            addFolderViewController.edit(folder: folder)
-            beginSheet(addFolderViewController)
+            showDialog(view: BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: nil))
         case .moveToEnd:
             bookmarkManager.move(objectUUIDs: [folder.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .deleteEntity:
             bookmarkManager.remove(folder: folder)
+        case .addFolder:
+            addFolder(inParent: folder)
+        case .openInNewTab:
+            openAllInNewTabs(folder: folder)
+        case .openInNewWindow:
+            openAllInNewWindow(folder: folder)
+        case .manageBookmarks:
+            manageBookmarks()
         default:
             assertionFailure("Received unexpected action for bookmark folder")
         }
     }
 
-    private func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
+    func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
         let menu = NSMenu()
         menu.items = items.isEmpty ? [NSMenuItem.empty] : items
+        menu.autoenablesItems = false
         return menu
+    }
+
+    func openInNewTab(bookmark: Bookmark) {
+        guard let url = bookmark.urlObject else { return }
+        tabCollectionViewModel.appendNewTab(with: .url(url, source: .bookmark), selected: true)
+    }
+
+    func openInNewWindow(bookmark: Bookmark) {
+        guard let url = bookmark.urlObject else { return }
+        WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
+    }
+
+    func openAllInNewTabs(folder: BookmarkFolder) {
+        let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollectionViewModel.burnerMode)
+        tabCollectionViewModel.append(tabs: tabs)
+    }
+
+    func openAllInNewWindow(folder: BookmarkFolder) {
+        let tabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollectionViewModel.burnerMode)
+        WindowsManager.openNewWindow(with: tabCollection, isBurner: tabCollectionViewModel.isBurner)
+    }
+
+    func showSubmenuFor(folder: BookmarkFolder, fromView view: NSView) {
+        let childEntities = folder.children
+        let viewModels = childEntities.map { BookmarkViewModel(entity: $0) }
+        let menuItems = viewModel.bookmarksTreeMenuItems(from: viewModels, topLevel: true)
+        let menu = bookmarkFolderMenu(items: menuItems)
+
+        menu.popUp(positioning: nil, at: CGPoint(x: 0, y: view.frame.minY - 7), in: view)
+    }
+
+    func addFolder(inParent parent: BookmarkFolder?) {
+        showDialog(view: BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: parent))
+    }
+
+    func showDialog(view: any ModalView) {
+        view.show(in: self.view.window)
+    }
+
+    @objc func manageBookmarks() {
+        WindowControllersManager.shared.showBookmarksTab()
+    }
+
+    @objc func addFolder(sender: NSMenuItem) {
+        addFolder(inParent: nil)
     }
 
 }
@@ -265,30 +339,12 @@ extension BookmarksBarViewController: NSMenuDelegate {
 
     public func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
-        BookmarksBarMenuFactory.addToMenu(menu)
-    }
-
-}
-
-// MARK: - Editing
-
-extension BookmarksBarViewController: AddBookmarkModalViewControllerDelegate, AddFolderModalViewControllerDelegate {
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        assertionFailure("Cannot add new folders to the bookmarks bar via the modal")
-    }
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
-        bookmarkManager.update(folder: folder)
-    }
-
-    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL) {
-        assertionFailure("Cannot add new bookmarks to the bookmarks bar via the modal")
-    }
-
-    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL) {
-        bookmarkManager.update(bookmark: bookmark)
-        _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
+        BookmarksBarMenuFactory.addToMenuWithManageBookmarksSection(
+            menu,
+            target: self,
+            addFolderSelector: #selector(addFolder(sender:)),
+            manageBookmarksSelector: #selector(manageBookmarks)
+        )
     }
 
 }

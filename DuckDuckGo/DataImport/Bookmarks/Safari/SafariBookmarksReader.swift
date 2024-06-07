@@ -21,10 +21,6 @@ import Foundation
 
 final class SafariBookmarksReader {
 
-    enum ImportError: Error {
-        case unexpectedBookmarksFileFormat
-    }
-
     private enum Constants {
         static let bookmarkChildrenKey = "Children"
         static let bookmarksBar = "BookmarksBar"
@@ -40,26 +36,75 @@ final class SafariBookmarksReader {
         static let leafType = "WebBookmarkTypeLeaf"
     }
 
-    private let safariBookmarksFileURL: URL
+    struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case readPlist
 
-    init(safariBookmarksFileURL: URL) {
-        self.safariBookmarksFileURL = safariBookmarksFileURL
+            case getTopLevelEntries
+            case getChildren
+            case entryNotDict
+        }
+
+        var action: DataImportAction { .bookmarks }
+        let type: OperationType
+        let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType {
+            switch underlyingError {
+            case let error as CocoaError where error.code == .fileReadNoSuchFile: .noData
+            default: .dataCorrupted
+            }
+        }
     }
 
-    func readBookmarks() -> Result<ImportedBookmarks, SafariBookmarksReader.ImportError> {
-        guard let plistData = readPropertyList() else {
-            return .failure(.unexpectedBookmarksFileFormat)
-        }
+    private let safariBookmarksFileURL: URL
+    private var currentOperationType: ImportError.OperationType = .readPlist
+    private let otherBookmarksFolderTitle: String
 
-        guard let topLevelEntries = plistData[Constants.bookmarkChildrenKey] as? [[String: AnyObject]] else {
-            return .failure(.unexpectedBookmarksFileFormat)
+    init(safariBookmarksFileURL: URL, otherBookmarksFolderTitle: String = UserText.otherBookmarksImportedFolderTitle) {
+        self.safariBookmarksFileURL = safariBookmarksFileURL
+        self.otherBookmarksFolderTitle = otherBookmarksFolderTitle
+    }
+
+    func readBookmarks() -> DataImportResult<ImportedBookmarks> {
+        do {
+            let bookmarks = try reallyReadBookmarks()
+            return .success(bookmarks)
+        } catch {
+            os_log("Failed to read Safari Bookmarks Plist at \"%s\": %s", log: .dataImportExport, type: .error, safariBookmarksFileURL.path, error.localizedDescription)
+            switch error {
+            case let error as ImportError:
+                return .failure(error)
+            default:
+                return .failure(ImportError(type: currentOperationType, underlyingError: error))
+            }
         }
+    }
+
+    func validateFileReadAccess() -> DataImportResult<Void> {
+        if !FileManager.default.isReadableFile(atPath: safariBookmarksFileURL.path) {
+            do {
+                try _=Data(contentsOf: safariBookmarksFileURL)
+            } catch {
+                return .failure(ImportError(type: .readPlist, underlyingError: error))
+            }
+        }
+        return .success( () )
+    }
+
+    private func reallyReadBookmarks() throws -> ImportedBookmarks {
+        currentOperationType = .readPlist
+        let plistData = try readPropertyList()
+
+        guard let children = plistData[Constants.bookmarkChildrenKey] else { throw ImportError(type: .getChildren, underlyingError: nil) }
+        guard let topLevelEntries = children as? [Any] else { throw ImportError(type: .getTopLevelEntries, underlyingError: nil) }
 
         var bookmarksBar: ImportedBookmarks.BookmarkOrFolder?
         var otherBookmarks: [ImportedBookmarks.BookmarkOrFolder] = []
 
-        for entry in topLevelEntries
-            where ((entry[Constants.typeKey] as? String) == Constants.listType) || ((entry[Constants.typeKey] as? String) == Constants.leafType) {
+        for entry in topLevelEntries {
+            guard let entry = entry as? [String: AnyObject] else { throw ImportError(type: .entryNotDict, underlyingError: nil) }
+            guard (entry[Constants.typeKey] as? String) == Constants.listType || (entry[Constants.typeKey] as? String) == Constants.leafType else { continue }
 
             if let title = entry[Constants.titleKey] as? String, title == Constants.readingListKey {
                 continue
@@ -75,13 +120,13 @@ final class SafariBookmarksReader {
 
         }
 
-        let otherBookmarksFolder = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: otherBookmarks)
-        let emptyFolder = ImportedBookmarks.BookmarkOrFolder(name: "bar", type: "folder", urlString: nil, children: [])
+        let otherBookmarksFolder = ImportedBookmarks.BookmarkOrFolder(name: self.otherBookmarksFolderTitle, type: .folder, urlString: nil, children: otherBookmarks)
+        let emptyFolder = ImportedBookmarks.BookmarkOrFolder(name: "bar", type: .folder, urlString: nil, children: [])
 
-        let topLevelFolder = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarksBar ?? emptyFolder, otherBookmarks: otherBookmarksFolder)
+        let topLevelFolder = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarksBar ?? emptyFolder, otherBookmarks: otherBookmarksFolder, syncedBookmarks: nil)
         let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolder)
 
-        return .success(importedBookmarks)
+        return importedBookmarks
     }
 
     private func bookmarkOrFolder(from entry: [String: AnyObject]) -> ImportedBookmarks.BookmarkOrFolder? {
@@ -97,29 +142,24 @@ final class SafariBookmarksReader {
             assert(entry[Constants.typeKey] as? String == Constants.listType)
 
             let children = children.compactMap { bookmarkOrFolder(from: $0) }
-            return ImportedBookmarks.BookmarkOrFolder(name: title, type: "folder", urlString: nil, children: children)
+            return ImportedBookmarks.BookmarkOrFolder(name: title, type: .folder, urlString: nil, children: children)
         } else if let url = entry[Constants.urlStringKey] as? String {
             assert(entry[Constants.typeKey] as? String == Constants.leafType)
 
-            return ImportedBookmarks.BookmarkOrFolder(name: title, type: "bookmark", urlString: url, children: nil)
+            return ImportedBookmarks.BookmarkOrFolder(name: title, type: .bookmark, urlString: url, children: nil)
         }
 
         return nil
     }
 
-    private func readPropertyList() -> [String: AnyObject]? {
+    private func readPropertyList() throws -> [String: AnyObject] {
         var propertyListFormat = PropertyListSerialization.PropertyListFormat.xml
         var plistData: [String: AnyObject] = [:]
 
-        do {
-            let serializedData = try Data(contentsOf: safariBookmarksFileURL)
-            plistData = try PropertyListSerialization.propertyList(from: serializedData,
-                                                                   options: [],
-                                                                   format: &propertyListFormat) as? [String: AnyObject] ?? [:]
-        } catch {
-            os_log("Failed to read Safari Bookmarks Plist at \"%s\": %s", log: .dataImportExport, type: .error, safariBookmarksFileURL.path, error.localizedDescription)
-            return nil
-        }
+        let serializedData = try Data(contentsOf: safariBookmarksFileURL)
+        plistData = try PropertyListSerialization.propertyList(from: serializedData,
+                                                               options: [],
+                                                               format: &propertyListFormat) as? [String: AnyObject] ?? [:]
 
         return plistData
     }

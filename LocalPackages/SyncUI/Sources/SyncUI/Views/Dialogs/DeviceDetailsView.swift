@@ -26,6 +26,7 @@ struct DeviceDetailsView: View {
     let device: SyncDevice
 
     @State var deviceName = ""
+    @State private var isLoading = false
 
     var canSave: Bool {
         !deviceName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
@@ -35,40 +36,42 @@ struct DeviceDetailsView: View {
     func submit() {
         guard canSave else { return }
         model.delegate?.updateDeviceName(deviceName)
-        model.endFlow()
     }
 
     var body: some View {
-        SyncDialog {
-            VStack(spacing: 20) {
-                Text(UserText.deviceDetailsTitle)
-                    .font(.system(size: 17, weight: .bold))
-
-                HStack {
-                    Text(UserText.deviceDetailsLabel)
-                        .font(.system(size: 13, weight: .semibold))
-                    TextField(UserText.deviceDetailsPrompt, text: $deviceName, onCommit: submit)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+        if isLoading {
+            ProgressView()
+                .padding()
+        } else {
+            SyncDialog {
+                VStack(spacing: 20) {
+                    SyncUIViews.TextHeader(text: UserText.deviceDetailsTitle)
+                    HStack {
+                        Text(UserText.deviceDetailsLabel)
+                            .font(.system(size: 13, weight: .semibold))
+                        TextField(UserText.deviceDetailsPrompt, text: $deviceName, onCommit: submit)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 14.5)
+                    .roundedBorder()
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 14.5)
-                .roundedBorder()
+            } buttons: {
+                Button(UserText.cancel) {
+                    model.endFlow()
+                }
+                .buttonStyle(DismissActionButtonStyle())
+                Button(UserText.ok) {
+                    submit()
+                    isLoading = true
+                }
+                .disabled(!canSave)
+                .buttonStyle(DefaultActionButtonStyle(enabled: canSave))
             }
-        } buttons: {
-            Button(UserText.cancel) {
-                model.endFlow()
+            .frame(width: 360, height: 178)
+            .onAppear {
+                deviceName = device.name
             }
-
-            Button(UserText.ok) {
-                submit()
-            }
-            .disabled(!canSave)
-            .buttonStyle(DefaultActionButtonStyle(enabled: canSave))
-
-        }
-        .frame(width: 360, height: 178)
-        .onAppear {
-            deviceName = device.name
         }
     }
 }

@@ -219,9 +219,9 @@ fileprivate struct FavoritesGridAddButton: View {
     var body: some View {
 
         ZStack(alignment: .top) {
-            FavoriteTemplate(title: UserText.addFavorite, url: nil)
+            FavoriteTemplate(title: UserText.addFavorite, url: nil, onFaviconMissing: model.onFaviconMissing)
             ZStack {
-                Image("Add")
+                Image(.add)
                     .resizable()
                     .frame(width: 22, height: 22)
             }.frame(width: FavoritesGrid.GridDimensions.itemWidth, height: FavoritesGrid.GridDimensions.itemWidth)
@@ -240,7 +240,7 @@ fileprivate struct FavoritesGridGhostButton: View {
 
         VStack {
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
+                .stroke(Color(.homeFavoritesGhost), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
                 .frame(width: FavoritesGrid.GridDimensions.itemWidth, height: FavoritesGrid.GridDimensions.itemWidth)
             Spacer()
         }
@@ -254,6 +254,7 @@ struct FavoriteTemplate: View {
 
     let title: String
     let url: URL?
+    let onFaviconMissing: (() -> Void)?
 
     @State var isHovering = false
 
@@ -263,10 +264,10 @@ struct FavoriteTemplate: View {
             ZStack(alignment: .center) {
 
                 RoundedRectangle(cornerRadius: 12)
-                    .foregroundColor(isHovering ? Color("HomeFavoritesHoverColor") : Color("HomeFavoritesBackgroundColor"))
+                    .foregroundColor(isHovering ? .homeFavoritesHover : .homeFavoritesBackground)
 
                 if let url = url {
-                    FaviconView(url: url)
+                    FaviconView(url: url, onFaviconMissing: onFaviconMissing)
                         .frame(width: 32, height: 32)
                         .padding(9)
                 }
@@ -304,28 +305,31 @@ struct Favorite: View {
     let bookmark: Bookmark
 
     // Maintain separate copies of bookmark metadata required by the view, in order to ensure that SwiftUI re-renders correctly.
+    // Do not remove these properties even if some are not used in the `FavoriteTemplate` view as the view will not re-render correctly.
     private let bookmarkTitle: String
     private let bookmarkURL: URL
+    private let bookmarkParentFolder: String?
 
     init?(bookmark: Bookmark) {
         guard let urlObject = bookmark.urlObject else { return nil }
         self.bookmark = bookmark
         self.bookmarkTitle = bookmark.title
         self.bookmarkURL = urlObject
+        self.bookmarkParentFolder = bookmark.parentFolderUUID
     }
 
     var body: some View {
 
-        FavoriteTemplate(title: bookmarkTitle, url: bookmark.urlObject)
+        FavoriteTemplate(title: bookmarkTitle, url: bookmark.urlObject, onFaviconMissing: model.onFaviconMissing)
             .link {
                 model.open(bookmark)
             }.contextMenu(ContextMenu(menuItems: {
-                Button(UserText.openInNewTab, action: { model.openInNewTab(bookmark) })
-                Button(UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) })
+                Button(UserText.openInNewTab, action: { model.openInNewTab(bookmark) }).accessibilityIdentifier("HomePage.Views.openInNewTab")
+                Button(UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) }).accessibilityIdentifier("HomePage.Views.openInNewWindow")
                 Divider()
-                Button(UserText.edit, action: { model.edit(bookmark) })
-                Button(UserText.removeFavorite, action: { model.removeFavorite(bookmark) })
-                Button(UserText.deleteBookmark, action: { model.deleteBookmark(bookmark) })
+                Button(UserText.edit, action: { model.edit(bookmark) }).accessibilityIdentifier("HomePage.Views.editBookmark")
+                Button(UserText.removeFavorite, action: { model.removeFavorite(bookmark) }).accessibilityIdentifier("HomePage.Views.removeFavorite")
+                Button(UserText.deleteBookmark, action: { model.deleteBookmark(bookmark) }).accessibilityIdentifier("HomePage.Views.deleteBookmark")
             }))
 
     }
@@ -340,13 +344,13 @@ extension HomePage.Models.FavoriteModel {
     var favoriteView: some View {
         switch favoriteType {
         case .bookmark(let bookmark):
-            HomePage.Views.Favorite(bookmark: bookmark)
+            HomePage.Views.Favorite(bookmark: bookmark)?.accessibilityIdentifier("HomePage.Models.FavoriteModel.\(bookmark.title)")
 
         case .addButton:
-            HomePage.Views.FavoritesGridAddButton()
+            HomePage.Views.FavoritesGridAddButton().accessibilityIdentifier("HomePage.Models.FavoriteModel.addButton")
 
         case .ghostButton:
-            HomePage.Views.FavoritesGridGhostButton()
+            HomePage.Views.FavoritesGridGhostButton().accessibilityIdentifier("HomePage.Models.FavoriteModel.ghostButton")
         }
     }
 }

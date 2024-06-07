@@ -42,19 +42,22 @@ extension NSSavePanel {
 
             popup.target = savePanel
             popup.action = #selector(NSSavePanel.fileTypePopUpSelectionDidChange(_:))
-            for fileType in fileTypes {
-                let title: String
-                switch (fileType.localizedDescription, fileType.preferredFilenameExtension) {
-                case let (.some(description), .some(fileExtension)):
-                    title = "\(description) (.\(fileExtension))"
-                case let (.some(description), .none):
-                    title = description
-                case let (.none, .some(fileExtension)):
-                    title = "." + fileExtension
-                case (.none, .none):
-                    continue
+            popup.menu = NSMenu {
+                for fileType in fileTypes {
+                    let title: String? = switch (fileType.localizedDescription, fileType.preferredFilenameExtension) {
+                    case let (.some(description), .some(fileExtension)):
+                        "\(description) (.\(fileExtension))"
+                    case let (.some(description), .none):
+                        description
+                    case let (.none, .some(fileExtension)):
+                        "." + fileExtension
+                    case (.none, .none):
+                        nil
+                    }
+                    if let title {
+                        NSMenuItem(title: title, representedObject: fileType)
+                    }
                 }
-                popup.addItem(withTitle: title, representedObject: fileType)
             }
         }
 

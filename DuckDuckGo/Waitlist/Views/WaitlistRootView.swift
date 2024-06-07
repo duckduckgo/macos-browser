@@ -16,30 +16,37 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
+import SwiftUI
+
+#if DBP
 
 import SwiftUI
 
-struct WaitlistRootView: View {
+struct DataBrokerProtectionWaitlistRootView: View {
     @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
         Group {
             switch model.viewState {
             case .notOnWaitlist, .joiningWaitlist:
-                JoinWaitlistView()
+                JoinWaitlistView(viewData: DataBrokerProtectionJoinWaitlistViewData())
             case .joinedWaitlist(let state):
-                if state == .notificationAllowed {
-                    JoinedWaitlistView(notificationsAllowed: true)
-                } else {
-                    JoinedWaitlistView(notificationsAllowed: false)
-                }
+                JoinedWaitlistView(viewData: DataBrokerProtectionJoinedWaitlistViewData(),
+                                   notificationsAllowed: state == .notificationAllowed)
             case .invited:
-                InvitedToWaitlistView()
+                InvitedToWaitlistView(viewData: DataBrokerProtectionInvitedToWaitlistViewData())
             case .termsAndConditions:
-                NetworkProtectionTermsAndConditionsView()
+                WaitlistTermsAndConditionsView(viewData: DataBrokerProtectionWaitlistTermsAndConditionsViewData()) {
+                    DataBrokerProtectionTermsAndConditionsContentView()
+                }
             case .readyToEnable:
-                EnableNetworkProtectionView()
+                // Hack to skip the readyToEnable step and close the modal
+                Text("")
+                    .onAppear {
+                        Task {
+                            await model.perform(action: .closeAndConfirmFeature)
+                        }
+                    }
             }
         }
         .environmentObject(model)

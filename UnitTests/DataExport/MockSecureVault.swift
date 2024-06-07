@@ -16,17 +16,17 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
-import SecureStorage
+import Foundation
 import GRDB
+import SecureStorage
 
 typealias MockVaultFactory = SecureVaultFactory<MockSecureVault<MockDatabaseProvider>>
 
 let MockSecureVaultFactory = SecureVaultFactory<MockSecureVault>(
     makeCryptoProvider: {
         return MockCryptoProvider()
-    }, makeKeyStoreProvider: {
+    }, makeKeyStoreProvider: { _ in
         let provider = MockKeyStoreProvider()
         provider._l1Key = "key".data(using: .utf8)
         return provider
@@ -41,6 +41,7 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
     var storedAccounts: [SecureVaultModels.WebsiteAccount] = []
     var storedCredentials: [Int64: SecureVaultModels.WebsiteCredentials] = [:]
+    var storedNeverPromptWebsites = [SecureVaultModels.NeverPromptWebsites]()
     var storedNotes: [SecureVaultModels.Note] = []
     var storedIdentities: [SecureVaultModels.Identity] = []
     var storedCards: [SecureVaultModels.CreditCard] = []
@@ -55,6 +56,14 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
     func accounts() throws -> [SecureVaultModels.WebsiteAccount] {
         return storedAccounts
+    }
+
+    func accountsCount() throws -> Int {
+        return storedAccounts.count
+    }
+
+    func accountsCountBucket() throws -> String {
+        return ""
     }
 
     func accountsFor(domain: String) throws -> [SecureVaultModels.WebsiteAccount] {
@@ -76,8 +85,42 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         return accountID
     }
 
+    func updateLastUsedFor(accountId: Int64) throws {
+        if var account = storedAccounts.first(where: { $0.id == String(accountId) }) {
+            account.lastUsed = Date()
+        }
+    }
+
     func deleteWebsiteCredentialsFor(accountId: Int64) throws {
         storedCredentials[accountId] = nil
+    }
+
+    func deleteAllWebsiteCredentials() throws {
+        storedAccounts.removeAll()
+        storedCredentials.removeAll()
+    }
+
+    func neverPromptWebsites() throws -> [SecureVaultModels.NeverPromptWebsites] {
+        return storedNeverPromptWebsites
+    }
+
+    func hasNeverPromptWebsitesFor(domain: String) throws -> Bool {
+        return !storedNeverPromptWebsites.filter { $0.domain == domain }.isEmpty
+    }
+
+    func storeNeverPromptWebsites(_ neverPromptWebsite: SecureVaultModels.NeverPromptWebsites) throws -> Int64 {
+        if let neverPromptWebsiteId = neverPromptWebsite.id {
+            storedNeverPromptWebsites.append(neverPromptWebsite)
+            return neverPromptWebsiteId
+        } else {
+            storedNeverPromptWebsites.append(neverPromptWebsite)
+            return -1
+        }
+
+    }
+
+    func deleteAllNeverPromptWebsites() throws {
+        storedNeverPromptWebsites = []
     }
 
     func notes() throws -> [SecureVaultModels.Note] {
@@ -145,6 +188,10 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         []
     }
 
+    func accountTitlesForSyncableCredentials(modifiedBefore date: Date) throws -> [String] {
+        []
+    }
+
     func deleteSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database) throws {
         if let accountId = syncableCredentials.metadata.objectId {
             try deleteWebsiteCredentialsFor(accountId: accountId)
@@ -198,7 +245,29 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
 }
 
+extension MockSecureVault {
+    func addWebsiteCredentials(identifiers: [Int64]) {
+        var credentials = [Int64: SecureVaultModels.WebsiteCredentials]()
+
+        for identifier in identifiers {
+            let account = SecureVaultModels.WebsiteAccount(id: String(identifier),
+                                                           title: "title-\(identifier)",
+                                                           username: "user-\(identifier)",
+                                                           domain: "domain-\(identifier)")
+            let credential = SecureVaultModels.WebsiteCredentials(account: account, password: "password\"containing\"quotes".data(using: .utf8)!)
+            credentials[identifier] = credential
+        }
+
+        self.storedAccounts = credentials.map(\.value.account)
+        self.storedCredentials = credentials
+    }
+}
+
 // MARK: - Mock Providers
+
+private extension URL {
+    static let duckduckgo = URL(string: "https://duckduckgo.com/")!
+}
 
 class MockDatabaseProvider: AutofillDatabaseProvider {
 
@@ -210,10 +279,12 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
     var _forDomain = [String]()
     var _credentialsDict = [Int64: SecureVaultModels.WebsiteCredentials]()
     var _note: SecureVaultModels.Note?
+    var _neverPromptWebsites = [SecureVaultModels.NeverPromptWebsites]()
+
     var db: GRDB.DatabaseWriter
     // swiftlint:enable identifier_name
 
-    required init(file: URL = URL(string: "https://duckduckgo.com/")!, key: Data = Data()) throws {
+    required init(file: URL = .duckduckgo, key: Data = Data()) throws {
         db = try! DatabaseQueue(named: "TestQueue")
     }
 
@@ -245,12 +316,54 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
         return _accounts
     }
 
+    func updateLastUsedForAccountId(_ accountId: Int64) throws {
+        if var account = _accounts.first(where: { $0.id == String(accountId) }) {
+            account.lastUsed = Date()
+        }
+    }
+
     func deleteWebsiteCredentialsForAccountId(_ accountId: Int64) throws {
         self._accounts = self._accounts.filter { $0.id != String(accountId) }
     }
 
+    func deleteAllWebsiteCredentials() throws {
+        self._accounts.removeAll()
+        self._credentialsDict.removeAll()
+    }
+
     func accounts() throws -> [SecureVaultModels.WebsiteAccount] {
         return _accounts
+    }
+
+    func accountsCount() throws -> Int {
+        return _accounts.count
+    }
+
+    func neverPromptWebsites() throws -> [SecureVaultModels.NeverPromptWebsites] {
+        return _neverPromptWebsites
+    }
+
+    func hasNeverPromptWebsitesFor(domain: String) throws -> Bool {
+        return false
+    }
+
+    func storeNeverPromptWebsite(_ neverPromptWebsite: SecureVaultModels.NeverPromptWebsites) throws -> Int64 {
+        if let neverPromptWebsiteId = neverPromptWebsite.id {
+            _neverPromptWebsites.append(neverPromptWebsite)
+            return neverPromptWebsiteId
+        } else {
+            return -1
+        }
+    }
+
+    func deleteAllNeverPromptWebsites() throws {
+        _neverPromptWebsites.removeAll()
+    }
+
+    func updateNeverPromptWebsite(_ neverPromptWebsite: SecureVaultModels.NeverPromptWebsites) throws {
+    }
+
+    func insertNeverPromptWebsite(_ neverPromptWebsite: SecureVaultModels.NeverPromptWebsites) throws {
     }
 
     func notes() throws -> [SecureVaultModels.Note] {
@@ -325,6 +438,10 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
     }
 
     func modifiedSyncableCredentials() throws -> [SecureVaultModels.SyncableCredentials] {
+        []
+    }
+
+    func modifiedSyncableCredentials(before date: Date) throws -> [SecureVaultModels.SyncableCredentials] {
         []
     }
 

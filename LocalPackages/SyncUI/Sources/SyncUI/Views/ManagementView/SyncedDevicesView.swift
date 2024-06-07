@@ -27,19 +27,30 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
     let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        SyncedDevicesList(devices: model.devices,
-                          presentDeviceDetails: model.presentDeviceDetails,
-                          presentRemoveDevice: model.presentRemoveDevice)
-        .onReceive(timer) { _ in
-            guard isVisible else { return }
-            model.refreshDevices()
+        VStack(alignment: .leading) {
+            SyncedDevicesList(devices: model.devices,
+                              presentDeviceDetails: model.presentDeviceDetails,
+                              presentRemoveDevice: model.presentRemoveDevice)
+            .onReceive(timer) { _ in
+                guard isVisible else { return }
+                model.refreshDevices()
+            }
+            .onAppear {
+                isVisible = true
+            }
+            .onDisappear {
+                isVisible = false
+            }
+            Button(UserText.beginSyncButton) {
+                Task {
+                    await model.syncWithAnotherDevicePressed()
+                }
+            }
+            .disabled(!model.isConnectingDevicesAvailable)
+            .padding(.horizontal, 10)
+            .padding(.bottom, 8)
         }
-        .onAppear {
-            isVisible = true
-        }
-        .onDisappear {
-            isVisible = false
-        }
+        .roundedBorder()
     }
 }
 
@@ -56,9 +67,17 @@ struct SyncedDeviceIcon: View {
     }
 
     var body: some View {
+        IconOnBackground(image: image)
+    }
+}
+
+struct IconOnBackground: View {
+    var image: NSImage
+
+    var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color("BlackWhite100").opacity(0.06))
+                .fill(Color(.blackWhite100).opacity(0.06))
                 .frame(width: 24, height: 24)
 
             Image(nsImage: image)
@@ -86,7 +105,7 @@ struct SyncedDevicesList: View {
             ForEach(devices) { device in
                 if !device.isCurrent {
                     Rectangle()
-                        .fill(Color("BlackWhite10"))
+                        .fill(Color(.blackWhite10))
                         .frame(height: 1)
                         .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
                 }
@@ -125,8 +144,11 @@ struct SyncedDevicesList: View {
                     }
                 }
             }
+            Rectangle()
+                .fill(Color(.blackWhite10))
+                .frame(height: 1)
+                .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
         }
-        .roundedBorder()
     }
 
 }

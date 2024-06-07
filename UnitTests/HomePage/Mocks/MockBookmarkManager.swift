@@ -25,12 +25,13 @@ class MockBookmarkManager: BookmarkManager {
         return false
     }
 
+    var isUrlBookmarked = false
     func isUrlBookmarked(url: URL) -> Bool {
-        return false
+        return isUrlBookmarked
     }
 
-    func isHostInBookmarks(host: String) -> Bool {
-        return false
+    func allHosts() -> Set<String> {
+        return []
     }
 
     func getBookmark(for url: URL) -> DuckDuckGo_Privacy_Browser.Bookmark? {
@@ -38,6 +39,10 @@ class MockBookmarkManager: BookmarkManager {
     }
 
     func getBookmark(forUrl url: String) -> DuckDuckGo_Privacy_Browser.Bookmark? {
+        return nil
+    }
+
+    func getBookmarkFolder(withId id: String) -> DuckDuckGo_Privacy_Browser.BookmarkFolder? {
         return nil
     }
 
@@ -49,9 +54,9 @@ class MockBookmarkManager: BookmarkManager {
         return nil
     }
 
-    func makeFolder(for title: String, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?) -> DuckDuckGo_Privacy_Browser.BookmarkFolder {
-        return BookmarkFolder(id: "", title: "")
-    }
+    func makeBookmarks(for websitesInfo: [DuckDuckGo_Privacy_Browser.WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: DuckDuckGo_Privacy_Browser.ParentFolderType) {}
+
+    func makeFolder(for title: String, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?, completion: (DuckDuckGo_Privacy_Browser.BookmarkFolder) -> Void) {}
 
     func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {}
 
@@ -61,7 +66,11 @@ class MockBookmarkManager: BookmarkManager {
 
     func update(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {}
 
+    func update(bookmark: DuckDuckGo_Privacy_Browser.Bookmark, withURL url: URL, title: String, isFavorite: Bool) {}
+
     func update(folder: DuckDuckGo_Privacy_Browser.BookmarkFolder) {}
+
+    func update(folder: DuckDuckGo_Privacy_Browser.BookmarkFolder, andMoveToParent parent: DuckDuckGo_Privacy_Browser.ParentFolderType) {}
 
     func updateUrl(of bookmark: DuckDuckGo_Privacy_Browser.Bookmark, to newUrl: URL) -> DuckDuckGo_Privacy_Browser.Bookmark? {
         return nil
@@ -81,11 +90,17 @@ class MockBookmarkManager: BookmarkManager {
 
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void) {}
 
-    func importBookmarks(_ bookmarks: DuckDuckGo_Privacy_Browser.ImportedBookmarks, source: DuckDuckGo_Privacy_Browser.BookmarkImportSource) -> DuckDuckGo_Privacy_Browser.BookmarkImportResult {
-        BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
+    func importBookmarks(_ bookmarks: DuckDuckGo_Privacy_Browser.ImportedBookmarks, source: DuckDuckGo_Privacy_Browser.BookmarkImportSource) -> DuckDuckGo_Privacy_Browser.BookmarksImportSummary {
+        BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
     }
+
+    func handleFavoritesAfterDisablingSync() {}
 
     @Published var list: BookmarkList?
 
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
+
+    func requestSync() {
+    }
+
 }

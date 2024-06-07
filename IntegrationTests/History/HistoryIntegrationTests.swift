@@ -18,8 +18,10 @@
 
 import Combine
 import Common
+import History
 import Navigation
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -35,8 +37,21 @@ class HistoryIntegrationTests: XCTestCase {
         mainViewController.browserTabViewController.tabViewModel!
     }
 
+    var contentBlockingMock: ContentBlockingMock!
+    var privacyFeaturesMock: AnyPrivacyFeatures!
+    var privacyConfiguration: MockPrivacyConfiguration {
+        contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
+    }
+
     @MainActor
     override func setUp() async throws {
+        contentBlockingMock = ContentBlockingMock()
+        privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
+        // disable waiting for CBR compilation on navigation
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
+            return false
+        }
+
         await withCheckedContinuation { continuation in
             HistoryCoordinator.shared.burnAll {
                 continuation.resume(returning: ())
@@ -44,17 +59,18 @@ class HistoryIntegrationTests: XCTestCase {
         }
     }
 
-    override func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window?.close()
         window = nil
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests
 
     @MainActor
     func testWhenPageTitleIsUpdated_historyEntryTitleUpdated() async throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let html = """
@@ -65,7 +81,6 @@ class HistoryIntegrationTests: XCTestCase {
         """
 
         let url = URL.testsServer.appendingTestParameters(data: html.utf8data)
-
         let titleChangedPromise1 = tab.$title
             .filter { $0 == "Title 1" }
             .receive(on: DispatchQueue.main)
@@ -73,7 +88,7 @@ class HistoryIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(url, source: .link)?.result.get()
         _=try await titleChangedPromise1.value
 
         XCTAssertEqual(HistoryCoordinator.shared.history?.count, 1)
@@ -99,7 +114,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenSameDocumentNavigation_historyEntryTitleUpdated() async throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let html = """
@@ -119,7 +134,7 @@ class HistoryIntegrationTests: XCTestCase {
             URL(string: URL.testsServer.appendingTestParameters(data: html.utf8data).absoluteString + "#1")!,
         ]
 
-        _=try await tab.setUrl(urls[0], userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(urls[0], source: .link)?.result.get()
 
         let titleChangedPromise = tab.$title
             .filter { $0 == "Title 2" }
@@ -143,16 +158,16 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigatingToSamePage_visitIsAdded() async throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let urls = [
             URL.testsServer,
             URL.testsServer.appendingPathComponent("page1").appendingTestParameters(data: "".utf8data),
         ]
-        _=try await tab.setUrl(urls[0], userEntered: nil)?.value?.result.get()
-        _=try await tab.setUrl(urls[1], userEntered: nil)?.value?.result.get()
-        _=try await tab.setUrl(urls[0], userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(urls[0], source: .link)?.result.get()
+        _=try await tab.setUrl(urls[1], source: .link)?.result.get()
+        _=try await tab.setUrl(urls[0], source: .link)?.result.get()
 
         let first = HistoryCoordinator.shared.history?.first(where: { $0.url == urls[0] })
         XCTAssertEqual(first?.numberOfVisits, 2)
@@ -163,15 +178,15 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigatingBack_visitIsNotAdded() async throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let urls = [
             URL.testsServer,
             URL.testsServer.appendingPathComponent("page1").appendingTestParameters(data: "".utf8data),
         ]
-        _=try await tab.setUrl(urls[0], userEntered: nil)?.value?.result.get()
-        _=try await tab.setUrl(urls[1], userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(urls[0], source: .link)?.result.get()
+        _=try await tab.setUrl(urls[1], source: .link)?.result.get()
         _=try await tab.goBack()?.result.get()
         _=try await tab.goForward()?.result.get()
 
@@ -184,12 +199,12 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenScriptTrackerLoaded_trackerAddedToHistory() async throws {
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        let url = URL(string: "http://privacy-test-pages.glitch.me/tracker-reporting/1major-via-script.html")!
+        let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-via-script.html")!
 
         // navigate to a regular page, tracker count should be reset to 0
         let trackerPromise = tab.privacyInfoPublisher.compactMap { $0?.$trackerInfo }
@@ -200,7 +215,7 @@ class HistoryIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(url, source: .link)?.result.get()
         _=try await trackerPromise.value
 
         let first = HistoryCoordinator.shared.history?.first
@@ -212,12 +227,12 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenSurrogateTrackerLoaded_trackerAddedToHistory() async throws {
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        let url = URL(string: "http://privacy-test-pages.glitch.me/tracker-reporting/1major-with-surrogate.html")!
+        let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-with-surrogate.html")!
 
         // navigate to a regular page, tracker count should be reset to 0
         let trackerPromise = tab.privacyInfoPublisher.compactMap { $0?.$trackerInfo }
@@ -228,7 +243,7 @@ class HistoryIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(url, source: .link)?.result.get()
         _=try await trackerPromise.value
 
         let first = HistoryCoordinator.shared.history?.first

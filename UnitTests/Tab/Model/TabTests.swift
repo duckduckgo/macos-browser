@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Navigation
 import XCTest
 
@@ -42,6 +43,7 @@ final class TabTests: XCTestCase {
 
     var webViewConfiguration: WKWebViewConfiguration!
     var schemeHandler: TestSchemeHandler!
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         contentBlockingMock = ContentBlockingMock()
@@ -57,6 +59,7 @@ final class TabTests: XCTestCase {
         webViewConfiguration = WKWebViewConfiguration()
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.http.rawValue)
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.https.rawValue)
+        cancellables = []
     }
 
     override func tearDown() {
@@ -66,16 +69,17 @@ final class TabTests: XCTestCase {
         webViewConfiguration = nil
         schemeHandler = nil
         WKWebView.customHandlerSchemes = []
+        cancellables = nil
     }
 
     // MARK: - Tab Content
 
     func testWhenSettingURLThenTabTypeChangesToStandard() {
-        let tab = Tab(content: .preferences(pane: .autofill))
-        XCTAssertEqual(tab.content, .preferences(pane: .autofill))
+        let tab = Tab(content: .settings(pane: .autofill))
+        XCTAssertEqual(tab.content, .settings(pane: .autofill))
 
         tab.url = URL.duckDuckGo
-        XCTAssertEqual(tab.content, .url(.duckDuckGo))
+        XCTAssertEqual(tab.content, .url(.duckDuckGo, source: .link))
     }
 
     // MARK: - Equality
@@ -110,13 +114,26 @@ final class TabTests: XCTestCase {
     }
 
     func testWhenDownloadDialogIsShowingChangingURLDoesNOTClearDialog() {
-        let tab = Tab()
+        // GIVEN
+        let tab = Tab(content: .none, extensionsBuilder: TestTabExtensionsBuilder(load: [DownloadsTabExtension.self]))
         tab.url = .duckDuckGo
-        DownloadsPreferences().alwaysRequestDownloadLocation = true
+        DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor()).alwaysRequestDownloadLocation = true
         tab.webView(WebViewMock(), saveDataToFile: Data(), suggestedFilename: "anything", mimeType: "application/pdf", originatingURL: .duckDuckGo)
-        XCTAssertNotNil(tab.userInteractionDialog)
+        var expectedDialog: Tab.UserDialog?
+        let expectation = expectation(description: "savePanelDialog published")
+        tab.downloads?.savePanelDialogPublisher.sink(receiveValue: { userDialog in
+            if let userDialog {
+                expectation.fulfill()
+                expectedDialog = userDialog
+            }
+        }).store(in: &cancellables)
+
+        waitForExpectations(timeout: 1)
+        // WHEN
         tab.url = .duckDuckGoMorePrivacyInfo
-        XCTAssertNotNil(tab.userInteractionDialog)
+
+        // THEN
+        XCTAssertNotNil(expectedDialog)
     }
 
     // MARK: - Back/Forward navigation
@@ -159,13 +176,13 @@ final class TabTests: XCTestCase {
 
         // after first navigation: false
         eDidFinishLoading = expectation(description: "didFinish 1")
-        tab.setContent(.url(urls.url))
+        tab.setContent(.url(urls.url, source: .link))
         waitForExpectations(timeout: 5)
 
         // after second navigation: true
         eCanGoBack = expectation(description: "canGoBack: true")
         eDidFinishLoading = expectation(description: "gb_didFinish 2")
-        tab.setContent(.url(urls.url1))
+        tab.setContent(.url(urls.url1, source: .link))
         waitForExpectations(timeout: 5)
 
         // after go back: false
@@ -222,7 +239,7 @@ final class TabTests: XCTestCase {
 
         // initial page
         didFinishExpectations[urls.url.absoluteString] = expectation(description: "didFinish \(urls.url.absoluteString)")
-        tab.setContent(.url(urls.url))
+        tab.setContent(.url(urls.url, source: .link))
         waitForExpectations(timeout: 5)
 
         // load urls.url1 which will be js-redirected to urls.url2
@@ -248,7 +265,7 @@ final class TabTests: XCTestCase {
 
         eDidRedirect = expectation(description: "did redirect")
 
-        tab.setContent(.url(urls.url1))
+        tab.setContent(.url(urls.url1, source: .link))
         waitForExpectations(timeout: 5)
         // "didFinish \(urls.url3.absoluteString)" expectation is set in redirect handler above
         waitForExpectations(timeout: 5)
@@ -256,8 +273,8 @@ final class TabTests: XCTestCase {
         XCTAssertTrue(tab.canGoBack)
         XCTAssertFalse(tab.canGoForward)
         XCTAssertEqual(tab.webView.url, urls.url3)
-        XCTAssertEqual(tab.webView.backForwardList.backList.map(\.url), [urls.url])
-        XCTAssertEqual(tab.webView.backForwardList.forwardList, [])
+        XCTAssertEqual(tab.backHistoryItems.map(\.url), [urls.url])
+        XCTAssertEqual(tab.forwardHistoryItems, [])
 
         withExtendedLifetime((c1, c2)) {}
     }
@@ -298,12 +315,12 @@ final class TabTests: XCTestCase {
 
         // initial page
         eDidFinish = expectation(description: "didFinish 1")
-        tab.setContent(.url(urls.url))
+        tab.setContent(.url(urls.url, source: .link))
         waitForExpectations(timeout: 5)
 
         // page 2 to make canGoBack == true
         eDidFinish = expectation(description: "didFinish 1")
-        tab.setContent(.url(urls.url3))
+        tab.setContent(.url(urls.url3, source: .link))
         waitForExpectations(timeout: 5)
 
         // load urls.url1 which will be js-redirected to urls.url2
@@ -324,25 +341,25 @@ final class TabTests: XCTestCase {
 
         eDidRedirect = expectation(description: "did redirect")
 
-        tab.setContent(.url(urls.url1))
+        tab.setContent(.url(urls.url1, source: .link))
         waitForExpectations(timeout: 5)
         eDidFinish = nil
 
         XCTAssertTrue(tab.canGoBack)
         XCTAssertFalse(tab.canGoForward)
         XCTAssertEqual(tab.webView.url, urls.url3)
-        XCTAssertEqual(tab.webView.backForwardList.backList.map(\.url), [urls.url, urls.url3])
-        XCTAssertEqual(tab.webView.backForwardList.forwardList, [])
+        XCTAssertEqual(tab.backHistoryItems.map(\.url), [urls.url, urls.url3])
+        XCTAssertEqual(tab.forwardHistoryItems, [])
 
         withExtendedLifetime((c1, c2)) {}
     }
 
     @MainActor
     func testIfTabIsBurner_ThenFaviconManagerIsInMemory() throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         XCTAssertTrue(tab.faviconManagement === FaviconManager.shared)
 
-        let burnerTab = Tab(content: .homePage, burnerMode: BurnerMode(isBurner: true))
+        let burnerTab = Tab(content: .newtab, burnerMode: BurnerMode(isBurner: true))
         XCTAssertTrue(burnerTab.faviconManagement !== FaviconManager.shared)
     }
 
@@ -351,10 +368,10 @@ final class TabTests: XCTestCase {
 extension Tab {
     var url: URL? {
         get {
-            content.url
+            content.userEditableUrl
         }
         set {
-            setContent(newValue.map { TabContent.url($0) } ?? .homePage)
+            setContent(newValue.map { TabContent.url($0, source: .link) } ?? .newtab)
         }
     }
 }

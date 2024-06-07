@@ -22,7 +22,9 @@ import XCTest
 
 private struct ChromiumLoginStore {
     static let legacy: Self = .init(directory: "Legacy", decryptionKey: "0geUdf5dTuZmIrtd8Omf/Q==")
+    static let legacyExcluded: Self = .init(directory: "Legacy Excluded", decryptionKey: "0geUdf5dTuZmIrtd8Omf/Q==")
     static let v32: Self = .init(directory: "v32", decryptionKey: "IcBAbGhvYp70AP+5W5ojcw==")
+    static let v32Excluded: Self = .init(directory: "v32 Excluded", decryptionKey: "IcBAbGhvYp70AP+5W5ojcw==")
 
     let directory: String
     let decryptionKey: String
@@ -40,7 +42,7 @@ class ChromiumLoginReaderTests: XCTestCase {
     func testImportFromVersion32() throws {
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryURL: ChromiumLoginStore.v32.databaseDirectoryURL,
-            processName: "Chrome",
+            source: .chrome,
             decryptionKey: ChromiumLoginStore.v32.decryptionKey
         )
 
@@ -64,11 +66,27 @@ class ChromiumLoginReaderTests: XCTestCase {
         XCTAssertEqual(logins[2].password, "password")
     }
 
+    func testImportFromVersion32_WithOnlyExcludedSites_IgnoresExcludedCredentials() throws {
+        // Given
+        let expectedResult: DataImportResult<[ImportedLoginCredential]> = .success([])
+        let reader = ChromiumLoginReader(
+            chromiumDataDirectoryURL: ChromiumLoginStore.v32Excluded.databaseDirectoryURL,
+            source: .chrome,
+            decryptionKey: ChromiumLoginStore.v32Excluded.decryptionKey
+        )
+
+        // When
+        let actualResult = reader.readLogins()
+
+        // Then
+        XCTAssertEqual(expectedResult, actualResult)
+    }
+
     func testImportFromLegacyVersion() throws {
 
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryURL: ChromiumLoginStore.legacy.databaseDirectoryURL,
-            processName: "Chrome",
+            source: .chrome,
             decryptionKey: ChromiumLoginStore.legacy.decryptionKey
         )
 
@@ -83,20 +101,37 @@ class ChromiumLoginReaderTests: XCTestCase {
         XCTAssertEqual(logins[0].password, "password")
     }
 
+    func testImportFromLegacyVersion_WithOnlyExcludedSites_IgnoresExcludedCredentials() {
+        // Given
+        let expectedResult: DataImportResult<[ImportedLoginCredential]> = .success([])
+        let reader = ChromiumLoginReader(
+            chromiumDataDirectoryURL: ChromiumLoginStore.legacyExcluded.databaseDirectoryURL,
+            source: .chrome,
+            decryptionKey: ChromiumLoginStore.legacyExcluded.decryptionKey
+        )
+
+        // When
+        let actualResult = reader.readLogins()
+
+        // Then
+        XCTAssertEqual(expectedResult, actualResult)
+    }
+
     func testWhenImportingChromiumData_AndTheUserCancelsTheKeychainPrompt_ThenAnErrorIsReturned() {
         let mockPrompt = MockChromiumPrompt(returnValue: .userDeniedKeychainPrompt)
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryURL: ChromiumLoginStore.legacy.databaseDirectoryURL,
-            processName: "Chrome",
+            source: .chrome,
             decryptionKeyPrompt: mockPrompt
         )
 
         let result = reader.readLogins()
 
-        if case let .failure(type) = result {
-            XCTAssertEqual(type, .userDeniedKeychainPrompt)
-        } else {
-            XCTFail("Received unexpected success")
+        switch result {
+        case .failure(let error as ChromiumLoginReader.ImportError):
+            XCTAssertEqual(error.type, .userDeniedKeychainPrompt)
+        default:
+            XCTFail("Received unexpected \(result)")
         }
     }
 
@@ -104,16 +139,18 @@ class ChromiumLoginReaderTests: XCTestCase {
         let mockPrompt = MockChromiumPrompt(returnValue: .keychainError(123))
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryURL: ChromiumLoginStore.legacy.databaseDirectoryURL,
-            processName: "Chrome",
+            source: .chrome,
             decryptionKeyPrompt: mockPrompt
         )
 
         let result = reader.readLogins()
 
-        if case let .failure(type) = result {
-            XCTAssertEqual(type, .decryptionKeyAccessFailed(123))
-        } else {
-            XCTFail("Received unexpected success")
+        switch result {
+        case .failure(let error as ChromiumLoginReader.ImportError):
+            XCTAssertEqual(error.type, .decryptionKeyAccessFailed)
+            XCTAssertEqual((error.underlyingError as NSError?)?.code, 123)
+        default:
+            XCTFail("Received unexpected \(result)")
         }
     }
 

@@ -25,10 +25,13 @@ import Common
 protocol WebViewHandler: NSObject {
     func initializeWebView(showWebView: Bool) async
     func load(url: URL) async throws
-    func waitForWebViewLoad(timeoutInSeconds: Int) async throws
+    func takeSnaphost(path: String, fileName: String) async throws
+    func saveHTML(path: String, fileName: String) async throws
+    func waitForWebViewLoad() async throws
     func finish() async
     func execute(action: Action, data: CCFRequestData) async
     func evaluateJavaScript(_ javaScript: String) async throws
+    func setCookies(_ cookies: [HTTPCookie]) async
 }
 
 @MainActor
@@ -36,16 +39,17 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     private var activeContinuation: CheckedContinuation<Void, Error>?
 
     private let isFakeBroker: Bool
-    private let webViewConfiguration: WKWebViewConfiguration
-    private let userContentController: DataBrokerUserContentController?
+    private var webViewConfiguration: WKWebViewConfiguration?
+    private var userContentController: DataBrokerUserContentController?
 
-    private var webView: WKWebView?
+    private var webView: WebView?
     private var window: NSWindow?
 
     init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate, isFakeBroker: Bool = false) {
         let configuration = WKWebViewConfiguration()
         configuration.applyDataBrokerConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: delegate)
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+        configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
 
         self.webViewConfiguration = configuration
         self.isFakeBroker = isFakeBroker
@@ -56,7 +60,11 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     }
 
     func initializeWebView(showWebView: Bool) async {
-        webView = WKWebView(frame: CGRect(origin: .zero, size: CGSize(width: 1024, height: 1024)), configuration: webViewConfiguration)
+        guard let configuration = self.webViewConfiguration else {
+            return
+        }
+
+        webView = WebView(frame: CGRect(origin: .zero, size: CGSize(width: 1024, height: 1024)), configuration: configuration)
         webView?.navigationDelegate = self
 
         if showWebView {
@@ -75,35 +83,43 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     func load(url: URL) async throws {
         webView?.load(url)
         os_log("Loading URL: %@", log: .action, String(describing: url.absoluteString))
-        try await waitForWebViewLoad(timeoutInSeconds: 60)
+        try await waitForWebViewLoad()
+    }
+
+    func setCookies(_ cookies: [HTTPCookie]) async {
+        for cookie in cookies {
+            await webView?.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+        }
     }
 
     func finish() {
         os_log("WebViewHandler finished", log: .action)
         webView?.stopLoading()
+        userContentController?.cleanUpBeforeClosing()
+        WKWebsiteDataStore.default().removeData(ofTypes: [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache], modifiedSince: Date(timeIntervalSince1970: 0)) {
+            os_log("WKWebView data store deleted correctly", log: .action)
+        }
+
+        webViewConfiguration = nil
+        userContentController = nil
+        webView?.navigationDelegate = nil
         webView = nil
     }
 
-    func waitForWebViewLoad(timeoutInSeconds: Int = 0) async throws {
+    deinit {
+        os_log("WebViewHandler Deinit", log: .action)
+    }
+
+    func waitForWebViewLoad() async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.activeContinuation = continuation
-
-            if timeoutInSeconds > 0 {
-                Task {
-                    try await Task.sleep(nanoseconds: UInt64(timeoutInSeconds) * NSEC_PER_SEC)
-                    if self.activeContinuation != nil {
-                        self.activeContinuation?.resume()
-                        self.activeContinuation = nil
-                    }
-                }
-            }
         }
     }
 
     func execute(action: Action, data: CCFRequestData) {
         os_log("Executing action: %{public}@", log: .action, String(describing: action.actionType.rawValue))
 
-        userContentController?.dataBrokerUserScripts.dataBrokerFeature.pushAction(
+        userContentController?.dataBrokerUserScripts?.dataBrokerFeature.pushAction(
             method: .onActionReceived,
             webView: self.webView!,
             params: Params(state: ActionRequest(action: action, data: data))
@@ -112,6 +128,75 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
 
     func evaluateJavaScript(_ javaScript: String) async throws {
         _ = webView?.evaluateJavaScript(javaScript, in: nil, in: WKContentWorld.page)
+    }
+
+    func takeSnaphost(path: String, fileName: String) async throws {
+        let script = "document.body.scrollHeight"
+
+        let result = try await webView?.evaluateJavaScript(script)
+
+        if let height = result as? CGFloat {
+            webView?.frame = CGRect(origin: .zero, size: CGSize(width: 1024, height: height))
+            let configuration = WKSnapshotConfiguration()
+            configuration.rect = CGRect(x: 0, y: 0, width: webView?.frame.size.width ?? 0.0, height: height)
+            if let image = try await webView?.takeSnapshot(configuration: configuration) {
+                saveToDisk(image: image, path: path, fileName: fileName)
+            }
+        }
+    }
+
+    func saveHTML(path: String, fileName: String) async throws {
+        let result = try await webView?.evaluateJavaScript("document.documentElement.outerHTML")
+        let fileManager = FileManager.default
+
+        if let htmlString = result as? String {
+            do {
+                if !fileManager.fileExists(atPath: path) {
+                    try fileManager.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+                }
+
+                let fileURL = URL(fileURLWithPath: "\(path)/\(fileName)")
+                try htmlString.write(to: fileURL, atomically: true, encoding: .utf8)
+                print("HTML content saved to file: \(fileURL)")
+            } catch {
+                print("Error writing HTML content to file: \(error)")
+            }
+        }
+    }
+
+    private func saveToDisk(image: NSImage, path: String, fileName: String) {
+        guard let tiffData = image.tiffRepresentation else {
+            // Handle the case where tiff representation is not available
+            return
+        }
+
+        // Create a bitmap representation from the tiff data
+        guard let bitmapImageRep = NSBitmapImageRep(data: tiffData) else {
+            // Handle the case where bitmap representation cannot be created
+            return
+        }
+
+        let fileManager = FileManager.default
+
+        if !fileManager.fileExists(atPath: path) {
+            do {
+                try fileManager.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print("Error creating folder: \(error)")
+            }
+        }
+
+        if let pngData = bitmapImageRep.representation(using: .png, properties: [:]) {
+            // Save the PNG data to a file
+            do {
+                let fileURL = URL(fileURLWithPath: "\(path)/\(fileName)")
+                try pngData.write(to: fileURL)
+            } catch {
+                print("Error writing PNG: \(error)")
+            }
+        } else {
+            print("Error png data was not respresented")
+        }
     }
 }
 
@@ -131,6 +216,27 @@ extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
         os_log("WebViewHandler didFail: %{public}@", log: .action, String(describing: error.localizedDescription))
         self.activeContinuation?.resume(throwing: error)
         self.activeContinuation = nil
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        os_log("WebViewHandler didFailProvisionalNavigation: %{public}@", log: .action, String(describing: error.localizedDescription))
+        self.activeContinuation?.resume(throwing: error)
+        self.activeContinuation = nil
+    }
+
+    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+        guard let statusCode = (navigationResponse.response as? HTTPURLResponse)?.statusCode else {
+            // if there's no http status code to act on, exit and allow navigation
+            return .allow
+        }
+
+        if statusCode >= 400 {
+            os_log("WebViewHandler failed with status code: %{public}@", log: .action, String(describing: statusCode))
+            self.activeContinuation?.resume(throwing: DataBrokerProtectionError.httpError(code: statusCode))
+            self.activeContinuation = nil
+        }
+
+        return .allow
     }
 
     func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge,
@@ -157,5 +263,13 @@ extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
         } else {
             completionHandler(.cancelAuthenticationChallenge, nil)
         }
+    }
+}
+
+private class WebView: WKWebView {
+
+    deinit {
+        configuration.userContentController.removeAllUserScripts()
+        os_log("DBP WebView Deinit", log: .action)
     }
 }

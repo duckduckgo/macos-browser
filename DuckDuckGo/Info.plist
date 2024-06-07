@@ -2,35 +2,451 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSPrincipalClass</key>
-	<string>$(INFOPLIST_KEY_NSPrincipalClass)</string>
+	<key>AGENT_BUNDLE_ID</key>
+	<string>$(AGENT_BUNDLE_ID)</string>
+	<key>AGENT_PRODUCT_NAME</key>
+	<string>$(AGENT_PRODUCT_NAME)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>html</string>
-				<string>htm</string>
-				<string>shtml</string>
-				<string>xht</string>
-				<string>xhtml</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>document.icns</string>
-			<key>CFBundleTypeName</key>
-			<string>HTML Document</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>HTML</string>
-			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-			<key>LSHandlerRank</key>
-			<string>Default</string>
-		</dict>
-	</array>
+    <array>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>html</string>
+                <string>htm</string>
+                <string>shtml</string>
+                <string>xht</string>
+                <string>xhtml</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>HTML Document</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+                <string>HTML</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Default</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>txt</string>
+                <string>text</string>
+                <string>log</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>text/plain</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.text</string>
+            </array>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+                <string>TEXT</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>Text document</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>webarchive</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>application/x-webarchive</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>Web archive</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Default</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>duckload</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Incomplete download</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>NSIsRelatedItemType</key>
+            <true/>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>pdf</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>PDF Document</string>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>application/pdf</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>png</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>image/png</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.png</string>
+            </array>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+                <string>PNGf</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>PNG image</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>jpg</string>
+                <string>jpeg</string>
+                <string>jp2</string>
+                <string>jpeg2</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>image/jpeg</string>
+                <string>image/jp2</string>
+                <string>image/jpeg2000</string>
+            </array>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+                <string>JPEG</string>
+                <string>jp2 </string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.jpeg</string>
+                <string>public.jpeg-2000</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>JPEG image</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>gif</string>
+                <string>giff</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>image/gif</string>
+            </array>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+                <string>GIFf</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>com.compuserve.gif</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>GIF image</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>svg</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>image/svg+xml</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.svg-image</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>SVG image</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>tiff</string>
+                <string>tif</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>image/tiff</string>
+            </array>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+                <string>TIFF</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>TIFF image</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>ico</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>image/x-icon</string>
+                <string>image/icon</string>
+                <string>image/ico</string>
+            </array>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+                <string>ICO </string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>Windows icon</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>bmp</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>image/bmp</string>
+                <string>image/x-bitmap</string>
+                <string>image/x-bmp</string>
+                <string>image/x-ms-bitmap</string>
+                <string>image/x-ms-bmp</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>com.microsoft.bmp</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>BMP Image</string>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>LSRoleHandlerScheme</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>xml</string>
+                <string>rss</string>
+                <string>atom</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>text/xml</string>
+                <string>application/xml</string>
+                <string>application/rss+xml</string>
+                <string>application/atom+xml</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>XML document</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Default</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>json</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>text/json</string>
+                <string>application/json</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.json</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>JSON document</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Default</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>flac</string>
+                <string>m4a</string>
+                <string>mp3</string>
+                <string>mpg</string>
+                <string>wav</string>
+                <string>aac</string>
+                <string>amr</string>
+                <string>mp4</string>
+                <string>mpeg</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>audio/flac</string>
+                <string>audio/x-flac</string>
+                <string>audio/m4a</string>
+                <string>audio/mp4</string>
+                <string>audio/mp3</string>
+                <string>audio/mpeg</string>
+                <string>audio/mpeg3</string>
+                <string>audio/qcp</string>
+                <string>audio/qcelp</string>
+                <string>audio/vnd.qcelp</string>
+                <string>audio/vnd.qcp</string>
+                <string>audio/vnd.wave</string>
+                <string>audio/x-wav</string>
+                <string>audio/x-aac</string>
+                <string>audio/aac</string>
+                <string>audio/x-amr</string>
+                <string>audio/amr</string>
+                <string>audio/x-m4a</string>
+                <string>audio/x-mp3</string>
+                <string>audio/x-mp4</string>
+                <string>audio/x-mpeg</string>
+                <string>audio/x-mpeg3</string>
+                <string>audio/x-mpg</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>Audio File</string>
+            <key>LSRoleHandlerScheme</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>3gp</string>
+                <string>avi</string>
+                <string>m4v</string>
+                <string>mov</string>
+                <string>mp4</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>video/3gp</string>
+                <string>video/3gpp</string>
+                <string>video/avi</string>
+                <string>video/x-msvideo</string>
+                <string>video/x-m4v</string>
+                <string>video/mp4</string>
+                <string>video/x-quicktime</string>
+                <string>video/quicktime</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.movie</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>document.icns</string>
+            <key>CFBundleTypeIconSystemGenerated</key>
+            <string>YES</string>
+            <key>CFBundleTypeName</key>
+            <string>Video File</string>
+            <key>LSRoleHandlerScheme</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+    </array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -58,19 +474,47 @@
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>CFBundleURLName</key>
-			<string>Network Protection URLs</string>
+			<string>VPN URLs</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>networkprotection</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>DataBroker Protection URLs</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>databrokerprotection</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>DBP_APP_GROUP</key>
+	<string>$(DBP_APP_GROUP)</string>
+	<key>DBP_BACKGROUND_AGENT_BUNDLE_ID</key>
+	<string>$(DBP_BACKGROUND_AGENT_BUNDLE_ID)</string>
+	<key>DBP_BACKGROUND_AGENT_PRODUCT_NAME</key>
+	<string>$(DBP_BACKGROUND_AGENT_PRODUCT_NAME)</string>
+	<key>DISTRIBUTED_NOTIFICATIONS_PREFIX</key>
+	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>NETP_APP_GROUP</key>
+	<string>$(NETP_APP_GROUP)</string>
+	<key>NOTIFICATIONS_AGENT_BUNDLE_ID</key>
+	<string>$(NOTIFICATIONS_AGENT_BUNDLE_ID)</string>
+	<key>NOTIFICATIONS_AGENT_PRODUCT_NAME</key>
+	<string>$(NOTIFICATIONS_AGENT_PRODUCT_NAME)</string>
+	<key>NSAppDataUsageDescription</key>
+	<string>DuckDuckGo will securely access your Bitwarden vault to autofill your passwords. To prevent this dialog in the future, go to Mac System Settings &gt; Privacy &amp; Security &gt; Full Disk Access and toggle DuckDuckGo on, or switch back to the built-in password manager.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
@@ -79,46 +523,32 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Allows you to upload photographs and videos</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2023 DuckDuckGo. All rights reserved.</string>
+	<string>Copyright © 2024 DuckDuckGo. All rights reserved.</string>
 	<key>NSLocationUsageDescription</key>
 	<string>Allows you to share your geolocation</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Allows you to share your location</string>
-	<key>NSMainStoryboardFile</key>
-	<string>MainMenu</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allows you to share recordings</string>
-	<key>NSAppDataUsageDescription</key>
-	<string>DuckDuckGo will securely access your Bitwarden vault to autofill your passwords. To prevent this dialog in the future, go to Mac System Settings &gt; Privacy &amp; Security &gt; Full Disk Access and toggle DuckDuckGo on, or switch back to the built-in password manager.</string>
+	<key>NSPrincipalClass</key>
+	<string>$(INFOPLIST_KEY_NSPrincipalClass)</string>
 	<key>NSSupportsAutomaticTermination</key>
 	<false/>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
+	<key>SUBSCRIPTION_APP_GROUP</key>
+	<string>$(SUBSCRIPTION_APP_GROUP)</string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUFeedURL</key>
 	<string>https://staticcdn.duckduckgo.com/macos-desktop-browser/appcast2.xml</string>
-	<key>SUScheduledCheckInterval</key>
-	<integer>10800</integer>
 	<key>SUPublicEDKey</key>
 	<string>ZaO/DNMzMPBldh40b5xVrpNBmqRkuGY0BNRCUng2qRo=</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>10800</integer>
 	<key>ViewBridgeService</key>
 	<false/>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>NOTIFICATIONS_AGENT_BUNDLE_ID</key>
-	<string>$(NOTIFICATIONS_AGENT_BUNDLE_ID)</string>
-	<key>NOTIFICATIONS_AGENT_PRODUCT_NAME</key>
-	<string>$(NOTIFICATIONS_AGENT_PRODUCT_NAME)</string>
-	<key>AGENT_BUNDLE_ID</key>
-	<string>$(AGENT_BUNDLE_ID)</string>
-	<key>AGENT_PRODUCT_NAME</key>
-	<string>$(AGENT_PRODUCT_NAME)</string>
-	<key>NETP_APP_GROUP</key>
-	<string>$(NETP_APP_GROUP)</string>
-	<key>DISTRIBUTED_NOTIFICATIONS_PREFIX</key>
-	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
 </dict>
 </plist>

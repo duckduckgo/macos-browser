@@ -20,7 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class BrowserProfileListTests: XCTestCase {
+class BrowserProfileTests: XCTestCase {
 
     let mockURL = URL(string: "/Users/Dax/Library/ApplicationSupport/BrowserCompany/Browser/")!
 
@@ -29,7 +29,7 @@ class BrowserProfileListTests: XCTestCase {
         let fileStore = FileStoreMock()
         let profile = DataImport.BrowserProfile(browser: .firefox, profileURL: profileURL, fileStore: fileStore)
 
-        XCTAssertFalse(profile.hasBrowserData)
+        XCTAssertTrue(profile.validateProfileData()?.containsValidData == false)
     }
 
     func testWhenBrowserProfileHasURLWithChromiumLoginData_ThenHasLoginDataIsTrue() {
@@ -39,7 +39,7 @@ class BrowserProfileListTests: XCTestCase {
 
         fileStore.directoryStorage[profileURL.absoluteString] = ["Login Data"]
 
-        XCTAssertTrue(profile.hasBrowserData)
+        XCTAssertTrue(profile.validateProfileData()?.containsValidData == true)
     }
 
     func testWhenBrowserProfileHasURLWithFirefoxLoginData_ThenHasLoginDataIsTrue() {
@@ -48,13 +48,13 @@ class BrowserProfileListTests: XCTestCase {
         let profile = DataImport.BrowserProfile(browser: .firefox, profileURL: profileURL, fileStore: fileStore)
 
         fileStore.directoryStorage[profileURL.absoluteString] = ["key4.db"]
-        XCTAssertFalse(profile.hasBrowserData)
+        XCTAssertTrue(profile.validateProfileData()?.containsValidData == false)
 
         fileStore.directoryStorage[profileURL.absoluteString] = ["logins.json"]
-        XCTAssertFalse(profile.hasBrowserData)
+        XCTAssertTrue(profile.validateProfileData()?.containsValidData == false)
 
         fileStore.directoryStorage[profileURL.absoluteString] = ["logins.json", "key4.db"]
-        XCTAssertTrue(profile.hasBrowserData)
+        XCTAssertTrue(profile.validateProfileData()?.containsValidData == true)
     }
 
     func testWhenGettingProfileName_AndProfileHasNoDetectedName_ThenTheDirectoryNameIsUsed() {
@@ -65,46 +65,188 @@ class BrowserProfileListTests: XCTestCase {
         XCTAssertEqual(profile.profileName, "Profile")
     }
 
+    func testWhenGettingProfileName_AndProfileHasAccountName_AccountNameIsUsed() {
+        let profileURL = profile(named: "Default")
+        let fileStore = FileStoreMock()
+
+        let json = """
+        {
+            "account_info": [
+            {
+                "email": "profile@duck.com",
+                "full_name": "User Name",
+            }
+            ],
+            "profile": {
+                "name": "Profile 1"
+            }
+        }
+        """
+
+        fileStore.storage["Preferences"] = json.utf8data
+        fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
+
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
+
+        XCTAssertEqual(profile.profileName, "User Name (profile@duck.com)")
+        XCTAssertNotNil(profile.profilePreferences?.profileName)
+    }
+
     func testWhenGettingProfileName_AndProfileHasNoDetectedChromiumName_ThenDetectedNameIsUsed() {
         let profileURL = profile(named: "DirectoryName")
         let fileStore = FileStoreMock()
 
-        let chromiumPreferences = ChromePreferences(profile: .init(name: "ChromeProfile"))
-        guard let chromiumPreferencesData = try? JSONEncoder().encode(chromiumPreferences) else {
-            XCTFail("Failed to encode Chromium preferences object")
-            return
+        let json = """
+        {
+            "account_info": [],
+            "profile": {
+                "name": "ChromeProfile"
+            }
         }
+        """
 
-        fileStore.storage["Preferences"] = chromiumPreferencesData
+        fileStore.storage["Preferences"] = json.utf8data
         fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
 
         let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
 
         XCTAssertEqual(profile.profileName, "ChromeProfile")
-        XCTAssertTrue(profile.hasNonDefaultProfileName)
+        XCTAssertNotNil(profile.profilePreferences?.profileName)
     }
 
     func testWhenGettingProfileName_AndChromiumPreferencesAreDetected_AndProfileNameIsSystemProfile_ThenProfileHasDefaultProfileName() {
         let profileURL = profile(named: "System Profile")
         let fileStore = FileStoreMock()
 
-        let chromiumPreferences = ChromePreferences(profile: .init(name: "ChromeProfile"))
-        guard let chromiumPreferencesData = try? JSONEncoder().encode(chromiumPreferences) else {
-            XCTFail("Failed to encode Chromium preferences object")
-            return
+        let json = """
+        {
+            "profile": {
+                "name": "ChromeProfile"
+            }
         }
+        """
 
-        fileStore.storage["Preferences"] = chromiumPreferencesData
+        fileStore.storage["Preferences"] = json.utf8data
         fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
 
         let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
 
         XCTAssertEqual(profile.profileName, "System Profile")
-        XCTAssertFalse(profile.hasNonDefaultProfileName)
+        XCTAssertEqual(profile.profilePreferences?.profileName, "ChromeProfile")
     }
 
     private func profile(named name: String) -> URL {
         return mockURL.appendingPathComponent(name)
+    }
+
+    func testWhenLastChromiumVersionIsPresentInProfile_InstalledAppsReturnsMajorVersion() {
+        let profileURL = profile(named: "System Profile")
+        let fileStore = FileStoreMock()
+
+        let json = """
+        {
+            "profile": {
+                "created_by_version": "118.0.5993.54"
+            },
+            "extensions": {
+                "last_chrome_version": "120.0.1111.42"
+            }
+        }
+        """
+
+        fileStore.storage["Preferences"] = json.utf8data
+        fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
+
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
+
+        XCTAssertEqual(profile.appVersion, "118.0.5993.54")
+        XCTAssertEqual(profile.installedAppsMajorVersionDescription(), "118")
+        XCTAssertEqual(DataImport.Source.chrome.installedAppsMajorVersionDescription(selectedProfile: profile), "118")
+    }
+
+    func testWhenLastOperaVersionIsPresent_InstalledAppsReturnsMajorVersion() {
+        let profileURL = profile(named: "System Profile")
+        let fileStore = FileStoreMock()
+
+        let json = """
+        {
+            "profile": {
+            },
+            "extensions": {
+                "last_opera_version": "117.0.5938.13"
+            }
+        }
+        """
+
+        fileStore.storage["Preferences"] = json.utf8data
+        fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
+
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
+
+        XCTAssertEqual(profile.appVersion, "117.0.5938.13")
+        XCTAssertEqual(profile.installedAppsMajorVersionDescription(), "117")
+        XCTAssertEqual(DataImport.Source.chrome.installedAppsMajorVersionDescription(selectedProfile: profile), "117")
+    }
+
+    func testWhenLastChromiumVersionIsNotPresentInProfile_CreatedByVersionIsReturned() {
+        let profileURL = profile(named: "System Profile")
+        let fileStore = FileStoreMock()
+
+        let json = """
+        {
+            "profile": {
+                "created_by_version": "118.0.5993.54"
+            }
+        }
+        """
+
+        fileStore.storage["Preferences"] = json.utf8data
+        fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
+
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
+
+        XCTAssertEqual(profile.appVersion, "118.0.5993.54")
+        XCTAssertEqual(profile.installedAppsMajorVersionDescription(), "118")
+        XCTAssertEqual(DataImport.Source.chrome.installedAppsMajorVersionDescription(selectedProfile: profile), "118")
+    }
+
+    func testWhenFirefoxLastVersionIsPresentInProfile_LastVersionIsReturned() {
+        let profileURL = profile(named: "Firefox.default")
+        let fileStore = FileStoreMock()
+
+        let conf = """
+        [Compatibility]
+          LastVersion = 118.0.1_20230927232528/20230927232528
+        LastOSABI=Darwin_aarch64-gcc3
+            LastPlatformDir=/Applications/Firefox.app/Contents/Resources
+        LastAppDir=/Applications/Firefox.app/Contents/Resources/browser
+        """
+
+        fileStore.storage["compatibility.ini"] = conf.utf8data
+        fileStore.directoryStorage[profileURL.absoluteString] = ["compatibility.ini"]
+
+        let profile = DataImport.BrowserProfile(browser: .firefox, profileURL: profileURL, fileStore: fileStore)
+
+        XCTAssertEqual(profile.appVersion, "118.0.1_20230927232528/20230927232528")
+        XCTAssertEqual(profile.installedAppsMajorVersionDescription(), "118")
+        XCTAssertEqual(DataImport.Source.chrome.installedAppsMajorVersionDescription(selectedProfile: profile), "118")
+    }
+
+    func testWhenNoVersionInProfile_InstalledAppsVersionsReturned() {
+        let profileURL = profile(named: "System Profile")
+        let fileStore = FileStoreMock()
+
+        let json = """
+        { "profile": {} }
+        """
+
+        fileStore.storage["Preferences"] = json.utf8data
+        fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
+
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
+
+        XCTAssertNil(profile.appVersion)
+        XCTAssertEqual(profile.installedAppsMajorVersionDescription()?.sorted(), DataImport.Source.chrome.installedAppsMajorVersionDescription(selectedProfile: profile)?.sorted())
     }
 
 }

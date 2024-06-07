@@ -16,7 +16,9 @@
 //  limitations under the License.
 //
 
+import History
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -31,7 +33,7 @@ class HistoryCoordinatorTests: XCTestCase {
     func testWhenAddVisitIsCalledBeforeHistoryIsLoadedFromStorage_ThenVisitIsIgnored() {
         let historyStoringMock = HistoryStoringMock()
         historyStoringMock.cleanOldResult = nil
-        let historyCoordinator = HistoryCoordinator()
+        let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
 
         let url = URL.duckDuckGo
         historyCoordinator.addVisit(of: url)
@@ -102,8 +104,8 @@ class HistoryCoordinatorTests: XCTestCase {
     func testWhenTabChangesContent_commitHistoryIsCalled() {
         let historyCoordinatorMock = HistoryCoordinatingMock()
         let extensionBuilder = TestTabExtensionsBuilder(load: [HistoryTabExtensionMock.self])
-        let tab = Tab(content: .url(.duckDuckGo), historyCoordinating: historyCoordinatorMock, extensionsBuilder: extensionBuilder, shouldLoadInBackground: false)
-        tab.setContent(.url(.aboutDuckDuckGo))
+        let tab = Tab(content: .url(.duckDuckGo, source: .link), historyCoordinating: historyCoordinatorMock, extensionsBuilder: extensionBuilder, shouldLoadInBackground: false)
+        tab.setContent(.url(.aboutDuckDuckGo, source: .link))
 
         XCTAssert(historyCoordinatorMock.commitChangesCalled)
     }
@@ -177,8 +179,9 @@ class HistoryCoordinatorTests: XCTestCase {
     func testWhenBurningVisits_DoesntDeleteHistoryBeforeVisits() {
         // Needs real store to catch assertion which can be raised by improper call ordering in the coordinator
         let context = CoreData.historyStoreContainer().newBackgroundContext()
-        let historyStore = HistoryStore(context: context)
+        let historyStore = EncryptedHistoryStore(context: context)
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStore)
+        historyCoordinator.loadHistory { }
 
         let url1 = URL(string: "https://duckduckgo.com")!
         historyCoordinator.addVisit(of: url1)
@@ -258,10 +261,10 @@ fileprivate extension HistoryCoordinator {
 
     static var aHistoryCoordinator: (HistoryStoringMock, HistoryCoordinator) {
         let historyStoringMock = HistoryStoringMock()
-        historyStoringMock.cleanOldResult = .success(History())
+        historyStoringMock.cleanOldResult = .success(BrowsingHistory())
         historyStoringMock.removeEntriesResult = .success(())
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
-        historyCoordinator.loadHistory()
+        historyCoordinator.loadHistory { }
 
         return (historyStoringMock, historyCoordinator)
     }

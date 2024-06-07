@@ -16,136 +16,239 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 
 final class CSVImporter: DataImporter {
 
     struct ColumnPositions {
 
+        private enum Regex {
+            // should end with "login" or "username"
+            static let username = regex("(?:^|\\b|\\s|_)(?:login|username)$", .caseInsensitive)
+            // should end with "password" or "pwd"
+            static let password = regex("(?:^|\\b|\\s|_)(?:password|pwd)$", .caseInsensitive)
+            // should end with "name" or "title"
+            static let title = regex("(?:^|\\b|\\s|_)(?:name|title)$", .caseInsensitive)
+            // should end with "url", "uri"
+            static let url = regex("(?:^|\\b|\\s|_)(?:url|uri)$", .caseInsensitive)
+            // should end with "notes" or "note"
+            static let notes = regex("(?:^|\\b|\\s|_)(?:notes|note)$", .caseInsensitive)
+        }
+
+        static let rowFormatWithTitle = ColumnPositions(titleIndex: 0, urlIndex: 1, usernameIndex: 2, passwordIndex: 3)
+        static let rowFormatWithoutTitle = ColumnPositions(titleIndex: nil, urlIndex: 0, usernameIndex: 1, passwordIndex: 2)
+
         let maximumIndex: Int
 
         let titleIndex: Int?
-        let urlIndex: Int
+        let urlIndex: Int?
+
         let usernameIndex: Int
         let passwordIndex: Int
 
-        init(titleIndex: Int?, urlIndex: Int, usernameIndex: Int, passwordIndex: Int, maximumIndex: Int) {
+        let notesIndex: Int?
+
+        let isZohoVault: Bool
+
+        init(titleIndex: Int?, urlIndex: Int?, usernameIndex: Int, passwordIndex: Int, notesIndex: Int? = nil, isZohoVault: Bool = false) {
             self.titleIndex = titleIndex
             self.urlIndex = urlIndex
             self.usernameIndex = usernameIndex
             self.passwordIndex = passwordIndex
-            self.maximumIndex = maximumIndex
+            self.notesIndex = notesIndex
+            self.maximumIndex = max(titleIndex ?? -1, urlIndex ?? -1, usernameIndex, passwordIndex, notesIndex ?? -1)
+            self.isZohoVault = isZohoVault
         }
 
-        init?(csvValues: [String]) {
-            guard csvValues.count >= 3 else { return nil }
+        private enum Format {
+            case general
+            case zohoGeneral
+            case zohoVault
+        }
 
-            var titlePosition: Int?
-            var urlPosition: Int?
-            var usernamePosition: Int?
-            var passwordPosition: Int?
+        init?(csv: [[String]]) {
+            guard csv.count > 1,
+                  csv[1].count >= 3 else { return nil }
+            var headerRow = csv[0]
 
-            for (index, value) in csvValues.enumerated() {
-                switch value.lowercased() {
-                case "url", "login_uri": urlPosition = index
-                case "username", "login_username": usernamePosition = index
-                case "password", "login_password": passwordPosition = index
-                case "title", "name": titlePosition = index
-                default: break
+            var format = Format.general
+
+            let usernameIndex: Int
+            if let idx = headerRow.firstIndex(where: { value in
+                Regex.username.matches(in: value, range: value.fullRange).isEmpty == false
+            }) {
+                usernameIndex = idx
+                headerRow[usernameIndex] = ""
+
+            // Zoho
+            } else if headerRow.first == "Password Name" {
+                if let idx = csv[1].firstIndex(of: "SecretData") {
+                    format = .zohoVault
+                    usernameIndex = idx
+                } else if csv[1].count == 7 {
+                    format = .zohoGeneral
+                    usernameIndex = 5
+                } else {
+                    return nil
                 }
-            }
-
-            if let url = urlPosition, let  username = usernamePosition, let password = passwordPosition {
-                self.init(titleIndex: titlePosition,
-                          urlIndex: url,
-                          usernameIndex: username,
-                          passwordIndex: password,
-                          maximumIndex: csvValues.count - 1)
             } else {
                 return nil
             }
+
+            let passwordIndex: Int
+            switch format {
+            case .general:
+                guard let idx = headerRow
+                    .firstIndex(where: { !Regex.password.matches(in: $0, range: $0.fullRange).isEmpty }) else { return nil }
+                passwordIndex = idx
+                headerRow[passwordIndex] = ""
+
+            case .zohoGeneral:
+                passwordIndex = usernameIndex + 1
+            case .zohoVault:
+                passwordIndex = usernameIndex
+            }
+
+            let titleIndex = headerRow.firstIndex(where: { !Regex.title.matches(in: $0, range: $0.fullRange).isEmpty })
+            titleIndex.map { headerRow[$0] = "" }
+
+            let urlIndex = headerRow.firstIndex(where: { !Regex.url.matches(in: $0, range: $0.fullRange).isEmpty })
+            urlIndex.map { headerRow[$0] = "" }
+
+            let notesIndex = headerRow.firstIndex(where: { !Regex.notes.matches(in: $0, range: $0.fullRange).isEmpty })
+
+            self.init(titleIndex: titleIndex,
+                      urlIndex: urlIndex,
+                      usernameIndex: usernameIndex,
+                      passwordIndex: passwordIndex,
+                      notesIndex: notesIndex,
+                      isZohoVault: format == .zohoVault)
         }
 
         init?(source: DataImport.Source) {
             switch source {
             case .onePassword7, .onePassword8:
-                self.init(titleIndex: 3, urlIndex: 5, usernameIndex: 6, passwordIndex: 2, maximumIndex: 7)
-            case .lastPass, .firefox, .edge, .chrome, .brave, .safari, .csv, .bookmarksHTML:
+                self.init(titleIndex: 3, urlIndex: 5, usernameIndex: 6, passwordIndex: 2)
+            case .lastPass, .firefox, .edge, .chrome, .chromium, .coccoc, .brave, .opera, .operaGX,
+                 .safari, .safariTechnologyPreview, .tor, .vivaldi, .yandex, .csv, .bookmarksHTML, .bitwarden:
                 return nil
             }
         }
 
     }
 
+    struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case cannotReadFile
+        }
+
+        var action: DataImportAction { .passwords }
+        let type: OperationType
+        let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType {
+            .dataCorrupted
+        }
+    }
+
     private let fileURL: URL
-    private let loginImporter: LoginImporter?
+    private let loginImporter: LoginImporter
     private let defaultColumnPositions: ColumnPositions?
 
-    init(fileURL: URL, loginImporter: LoginImporter?, defaultColumnPositions: ColumnPositions? = nil) {
+    init(fileURL: URL, loginImporter: LoginImporter, defaultColumnPositions: ColumnPositions?) {
         self.fileURL = fileURL
         self.loginImporter = loginImporter
         self.defaultColumnPositions = defaultColumnPositions
     }
 
-    func totalValidLogins() -> Int {
-        guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
-            return 0
-        }
+    static func totalValidLogins(in fileURL: URL, defaultColumnPositions: ColumnPositions?) -> Int {
+        guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else { return 0 }
 
-        var seen: [String: Bool] = [:]
+        let logins = extractLogins(from: fileContents, defaultColumnPositions: defaultColumnPositions) ?? []
 
-        let logins = Self.extractLogins(from: fileContents, defaultColumnPositions: self.defaultColumnPositions)
-        let uniqueLogins = logins.filter { seen.updateValue(true, forKey: "\($0.url)-\($0.username)") == nil }
-
-        return uniqueLogins.count
+        return logins.count
     }
 
     static func extractLogins(from fileContents: String,
-                              defaultColumnPositions: ColumnPositions? = nil) -> [ImportedLoginCredential] {
-        let parsed = CSVParser.parse(string: fileContents)
+                              defaultColumnPositions: ColumnPositions? = nil) -> [ImportedLoginCredential]? {
+        guard let parsed = try? CSVParser().parse(string: fileContents) else { return nil }
 
-        if let possibleHeaderRow = parsed.first, let inferredColumnPositions = ColumnPositions(csvValues: possibleHeaderRow) {
-            return parsed.dropFirst().compactMap {
-                ImportedLoginCredential(row: $0, inferredColumnPositions: inferredColumnPositions)
-            }
+        let columnPositions: ColumnPositions?
+        var startRow = 0
+        if let autodetected = ColumnPositions(csv: parsed) {
+            columnPositions = autodetected
+            startRow = 1
         } else {
-            return parsed.compactMap {
-                ImportedLoginCredential(row: $0, inferredColumnPositions: defaultColumnPositions)
+            columnPositions = defaultColumnPositions
+        }
+
+        guard parsed.indices.contains(startRow) else { return [] } // no data
+
+        let result = parsed[startRow...].compactMap(columnPositions.read)
+
+        guard !result.isEmpty else {
+            if parsed.filter({ !$0.isEmpty }).isEmpty {
+                return [] // no data
+            } else {
+                return nil // error: could not parse data
             }
         }
+
+        return result
     }
 
-    func importableTypes() -> [DataImport.DataType] {
-        if fileURL.pathExtension == "csv" {
-            return [.logins]
-        } else {
-            return []
-        }
+    var importableTypes: [DataImport.DataType] {
+        return [.passwords]
     }
 
-    // This will change to return an array of DataImport.Summary objects, indicating the status of each import type that was requested.
-    func importData(types: [DataImport.DataType],
-                    from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
-        guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
-            completion(.failure(.logins(.cannotReadFile)))
-            return
-        }
-        guard let loginImporter = self.loginImporter else {
-            completion(.failure(.logins(.cannotAccessSecureVault)))
-            return
-        }
-
-        DispatchQueue.global(qos: .userInitiated).async {
-            let loginCredentials = Self.extractLogins(from: fileContents, defaultColumnPositions: self.defaultColumnPositions)
-
+    func importData(types: Set<DataImport.DataType>) -> DataImportTask {
+        .detachedWithProgress { updateProgress in
             do {
-                let result = try loginImporter.importLogins(loginCredentials)
-                DispatchQueue.main.async { completion(.success(.init(bookmarksResult: nil,
-                                                                     loginsResult: .completed(result)))) }
+                let result = try await self.importLoginsSync(updateProgress: updateProgress)
+                return [.passwords: result]
+            } catch is CancellationError {
             } catch {
-                DispatchQueue.main.async { completion(.failure(.bookmarks(.cannotAccessSecureVault))) }
+                assertionFailure("Only CancellationError should be thrown here")
             }
+            return [:]
+        }
+    }
+
+    private func importLoginsSync(updateProgress: @escaping DataImportProgressCallback) async throws -> DataImportResult<DataImport.DataTypeSummary> {
+
+        try updateProgress(.importingPasswords(numberOfPasswords: nil, fraction: 0.0))
+
+        let fileContents: String
+        do {
+            fileContents = try String(contentsOf: fileURL, encoding: .utf8)
+        } catch {
+            return .failure(ImportError(type: .cannotReadFile, underlyingError: error))
+        }
+
+        do {
+            try updateProgress(.importingPasswords(numberOfPasswords: nil, fraction: 0.2))
+
+            let loginCredentials = try Self.extractLogins(from: fileContents, defaultColumnPositions: defaultColumnPositions) ?? {
+                try Task.checkCancellation()
+                throw LoginImporterError(error: nil, type: .malformedCSV)
+            }()
+
+            try updateProgress(.importingPasswords(numberOfPasswords: loginCredentials.count, fraction: 0.5))
+
+            let summary = try loginImporter.importLogins(loginCredentials) { count in
+                try updateProgress(.importingPasswords(numberOfPasswords: count, fraction: 0.5 + 0.5 * (Double(count) / Double(loginCredentials.count))))
+            }
+
+            try updateProgress(.importingPasswords(numberOfPasswords: loginCredentials.count, fraction: 1.0))
+
+            return .success(summary)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch let error as DataImportError {
+            return .failure(error)
+        } catch {
+            return .failure(LoginImporterError(error: error))
         }
     }
 
@@ -158,17 +261,65 @@ extension ImportedLoginCredential {
     fileprivate var isHeaderRow: Bool {
         let types: NSTextCheckingResult.CheckingType = [.link]
 
-        guard let detector = try? NSDataDetector(types: types.rawValue), self.url.count > 0 else {
-            return false
-        }
+        guard let detector = try? NSDataDetector(types: types.rawValue),
+              let url, !url.isEmpty else { return false }
 
-        if detector.numberOfMatches(in: self.url,
-                                    options: NSRegularExpression.MatchingOptions(rawValue: 0),
-                                    range: NSRange(location: 0, length: self.url.count)) > 0 {
+        if detector.numberOfMatches(in: url, options: [], range: url.fullRange) > 0 {
             return false
         }
 
         return true
+    }
+
+}
+
+extension CSVImporter.ColumnPositions {
+
+    func read(_ row: [String]) -> ImportedLoginCredential? {
+        let username: String
+        let password: String
+
+        if isZohoVault {
+            // cell contents:
+            // SecretType:Web Account
+            // User Name:username
+            // Password:password
+            guard let lines = row[safe: usernameIndex]?.components(separatedBy: "\n"),
+                  let usernameLine = lines.first(where: { $0.hasPrefix("User Name:") }),
+                  let passwordLine = lines.first(where: { $0.hasPrefix("Password:") }) else { return nil }
+
+            username = usernameLine.dropping(prefix: "User Name:")
+            password = passwordLine.dropping(prefix: "Password:")
+
+        } else if let user = row[safe: usernameIndex],
+                  let pass = row[safe: passwordIndex] {
+
+            username = user
+            password = pass
+        } else {
+            return nil
+        }
+
+        return ImportedLoginCredential(title: row[safe: titleIndex ?? -1],
+                                       url: row[safe: urlIndex ?? -1],
+                                       username: username,
+                                       password: password,
+                                       notes: row[safe: notesIndex ?? -1])
+    }
+
+}
+
+extension CSVImporter.ColumnPositions? {
+
+    func read(_ row: [String]) -> ImportedLoginCredential? {
+        let columnPositions = self ?? [
+            .rowFormatWithTitle,
+            .rowFormatWithoutTitle
+        ].first(where: {
+            row.count > $0.maximumIndex
+        })
+
+        return columnPositions?.read(row)
     }
 
 }

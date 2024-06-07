@@ -27,41 +27,33 @@ final class PrivacyDashboardPopover: NSPopover {
         guard let addressBar,
               let window = addressBar.window else { return .infinite }
         var frame = window.convertToScreen(addressBar.convert(addressBar.bounds, to: nil))
-
         frame = frame.insetBy(dx: -36, dy: -window.frame.size.height)
-
         return frame
+    }
+
+    var viewController: PrivacyDashboardViewController {
+        (contentViewController as? PrivacyDashboardViewController)!
     }
 
     override init() {
         super.init()
-
-        self.animates = false
 #if DEBUG
         self.behavior = .semitransient
 #else
         self.behavior = .transient
 #endif
-
         setupContentController()
     }
 
     required init?(coder: NSCoder) {
-        fatalError("PrivacyDashboardPopover: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
-    // swiftlint:disable force_cast
-    var viewController: PrivacyDashboardViewController { contentViewController as! PrivacyDashboardViewController }
-    // swiftlint:enable force_cast
-
-    // swiftlint:disable force_cast
     private func setupContentController() {
-        let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
-        let controller = storyboard
-            .instantiateController(withIdentifier: "PrivacyDashboardViewController") as! PrivacyDashboardViewController
+        let controller = PrivacyDashboardViewController()
+        controller.sizeDelegate = self
         contentViewController = controller
     }
-    // swiftlint:enable force_cast
 
     func setPreferredMaxHeight(_ height: CGFloat) {
         viewController.setPreferredMaxHeight(height - 40) // Account for popover arrow height
@@ -71,5 +63,11 @@ final class PrivacyDashboardPopover: NSPopover {
         self.addressBar = positioningView.superview
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
     }
+}
 
+extension PrivacyDashboardPopover: PrivacyDashboardViewControllerSizeDelegate {
+
+    func privacyDashboardViewControllerDidChange(size: NSSize) {
+        self.contentSize = size
+    }
 }

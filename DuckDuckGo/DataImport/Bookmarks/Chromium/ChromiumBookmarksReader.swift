@@ -20,13 +20,26 @@ import Foundation
 
 final class ChromiumBookmarksReader {
 
-    enum ImportError: Error {
-        case noBookmarksFileFound
-        case bookmarksFileDecodingFailed
-    }
-
     enum Constants {
         static let defaultBookmarksFileName = "Bookmarks"
+    }
+
+    struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case fileRead
+            case decodeJson
+        }
+
+        var action: DataImportAction { .bookmarks }
+        let type: OperationType
+        let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType {
+            switch type {
+            case .fileRead: .noData
+            case .decodeJson: .dataCorrupted
+            }
+        }
     }
 
     private let chromiumBookmarksFileURL: URL
@@ -35,16 +48,15 @@ final class ChromiumBookmarksReader {
         self.chromiumBookmarksFileURL = chromiumDataDirectoryURL.appendingPathComponent(bookmarksFileName)
     }
 
-    func readBookmarks() -> Result<ImportedBookmarks, ChromiumBookmarksReader.ImportError> {
-        guard let bookmarksFileData = try? Data(contentsOf: chromiumBookmarksFileURL) else {
-            return .failure(.noBookmarksFileFound)
-        }
-
+    func readBookmarks() -> DataImportResult<ImportedBookmarks> {
+        var currentOperationType: ImportError.OperationType = .fileRead
         do {
+            let bookmarksFileData = try Data(contentsOf: chromiumBookmarksFileURL)
+            currentOperationType = .decodeJson
             let decodedBookmarks = try JSONDecoder().decode(ImportedBookmarks.self, from: bookmarksFileData)
             return .success(decodedBookmarks)
         } catch {
-            return .failure(.bookmarksFileDecodingFailed)
+            return .failure(ImportError(type: currentOperationType, underlyingError: error))
         }
     }
 

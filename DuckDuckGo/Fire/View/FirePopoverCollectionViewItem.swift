@@ -27,7 +27,6 @@ protocol FirePopoverCollectionViewItemDelegate: AnyObject {
 final class FirePopoverCollectionViewItem: NSCollectionViewItem {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "FirePopoverCollectionViewItem")
-    static let defaultFavicon = NSImage(named: "Web")
 
     weak var delegate: FirePopoverCollectionViewItemDelegate?
 
@@ -41,7 +40,7 @@ final class FirePopoverCollectionViewItem: NSCollectionViewItem {
 
     func setItem(_ item: FirePopoverViewModel.Item, isFireproofed: Bool) {
         domainTextField.stringValue = item.domain
-        faviconImageView.image = item.favicon ?? Self.defaultFavicon
+        faviconImageView.image = item.favicon ?? .web
         checkButton.isHidden = isFireproofed
     }
 

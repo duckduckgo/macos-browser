@@ -1,5 +1,5 @@
 //
-//  NavigateAction.swift
+//  Navigate.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -21,4 +21,5 @@ struct NavigateAction: Action {
     let actionType: ActionType
     let url: String
     let ageRange: [String]?
+    let dataSource: DataSource?
 }

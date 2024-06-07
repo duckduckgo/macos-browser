@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
+import Navigation
 
 protocol LazyLoadable: AnyObject, Identifiable {
 
@@ -28,19 +29,21 @@ protocol LazyLoadable: AnyObject, Identifiable {
     var isLazyLoadingInProgress: Bool { get set }
     var loadingFinishedPublisher: AnyPublisher<Self, Never> { get }
 
-    func reload()
+    @discardableResult
+    func reload() -> ExpectedNavigation?
     func isNewer(than other: Self) -> Bool
 }
 
 extension Tab: LazyLoadable {
     var isUrl: Bool { content.isUrl }
 
-    var url: URL? { content.url }
+    var url: URL? { content.urlForWebView }
 
     var loadingFinishedPublisher: AnyPublisher<Tab, Never> {
-        Publishers.Merge(webViewDidFinishNavigationPublisher, webViewDidFailNavigationPublisher)
+        navigationStatePublisher.compactMap { $0 }
+            .filter { $0.isCompleted }
             .prefix(1)
-            .map { self }
+            .map { _ in self }
             .eraseToAnyPublisher()
     }
 

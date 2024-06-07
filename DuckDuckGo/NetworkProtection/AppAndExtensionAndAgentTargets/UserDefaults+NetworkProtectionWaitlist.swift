@@ -1,5 +1,5 @@
 //
-//  PrivacyFeatureOverrideStore.swift
+//  UserDefaults+NetworkProtectionWaitlist.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -32,7 +32,7 @@ protocol WaitlistBetaOverriding {
 }
 
 final class DefaultWaitlistBetaOverrides: WaitlistBetaOverriding {
-    private let userDefaults: UserDefaults = .shared
+    private let userDefaults: UserDefaults = .netP
 
     var waitlistActive: WaitlistOverride {
         .init(rawValue: userDefaults.networkProtectionWaitlistBetaActiveOverrideRawValue) ?? .default

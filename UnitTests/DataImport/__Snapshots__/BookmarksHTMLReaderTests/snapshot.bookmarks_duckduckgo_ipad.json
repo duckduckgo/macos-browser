@@ -1,0 +1,318 @@
+{
+  "roots" : {
+    "bookmark_bar" : {
+      "children" : [
+
+      ],
+      "name" : "",
+      "type" : "folder"
+    },
+    "other" : {
+      "children" : [
+        {
+          "children" : [
+            {
+              "name" : "Firefox help",
+              "type" : "bookmark",
+              "url" : "https:\/\/support.mozilla.org\/products\/firefox"
+            },
+            {
+              "name" : "Setup Firefox",
+              "type" : "bookmark",
+              "url" : "https:\/\/support.mozilla.org\/kb\/customize-firefox-controls-buttons-and-toolbars?utm_source=firefox-browser&utm_medium=default-bookmarks&utm_campaign=customize"
+            },
+            {
+              "name" : "Contribute",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.mozilla.org\/contribute\/"
+            },
+            {
+              "name" : "About",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.mozilla.org\/about\/"
+            }
+          ],
+          "name" : "Mozilla Firefox",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "name" : "Apple",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.apple.com\/"
+            },
+            {
+              "name" : "Yahoo",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.icloud.com\/'%3EiCloud%3C\/A%3E%3CD%3E%3CA%20HREF="
+            },
+            {
+              "name" : "Google",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.bing.com\/'%3EBing%3C\/A%3E%3CDT%3E%3CA%20HREF="
+            },
+            {
+              "name" : "Wikipedia",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.wikipedia.org\/"
+            },
+            {
+              "name" : "Facebook",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.facebook.com\/"
+            },
+            {
+              "name" : "Twitter",
+              "type" : "bookmark",
+              "url" : "https:\/\/twitter.com\/"
+            },
+            {
+              "name" : "LinkedIn",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.linkedin.com\/"
+            },
+            {
+              "name" : "The Weather Channel",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.weather.com\/"
+            },
+            {
+              "name" : "Yelp",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.yelp.com\/"
+            },
+            {
+              "name" : "catz - Google Search",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.google.com\/search?q=catz&client=safari&sca_esv=570874343&rls=en&tbm=isch&source=1nms&sa=X&ved=2ahUKEwiQ60DeoN6BAxXJOhAIHbYCD2gQ_AUoAXoECAEQAw&biw=1324&bih=888"
+            },
+            {
+              "name" : "dogz - Google Search",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.google.com\/search?client=safari&rls=en&q=dogz&ie=UTF-8&oe=UTF-8"
+            },
+            {
+              "name" : "ab yrvalg - Google Search",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.google.com\/search?client=safari&rls=en&q=abyrvalg&ie=UTF-8&oe=UTF-8"
+            }
+          ],
+          "name" : "Favorites",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+
+          ],
+          "name" : "Bookmarks Menu",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "name" : "abyrvalg - Google Search",
+                  "type" : "bookmark",
+                  "url" : "https:\/\/www.google.com\/search?client=safari&rls=en&q=abyrvalg&ie=UTF-8&oe=UTF-8"
+                }
+              ],
+              "name" : "Tab Group Favorites",
+              "type" : "folder"
+            }
+          ],
+          "name" : "Tab Group Favorites",
+          "type" : "folder"
+        },
+        {
+          "name" : "Faceter.cam Web Client",
+          "type" : "bookmark",
+          "url" : "https:\/\/cloud.faceter.cam\/public\/camera\/"
+        },
+        {
+          "name" : "GMail",
+          "type" : "bookmark",
+          "url" : "https:\/\/gmail.com\/"
+        },
+        {
+          "name" : "Thingiverse - Digital Designs for Physical Objects",
+          "type" : "bookmark",
+          "url" : "http:\/\/www.thingiverse.com\/"
+        },
+        {
+          "name" : "(25) YouTube",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.youtube.com\/"
+        },
+        {
+          "name" : "(161) Twitter",
+          "type" : "bookmark",
+          "url" : "https:\/\/twitter.com\/"
+        },
+        {
+          "children" : [
+            {
+              "name" : "BMW 5 Series Owners Board",
+              "type" : "bookmark",
+              "url" : "http:\/\/forum.bmw5.co.uk\/"
+            }
+          ],
+          "name" : "Авто",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "name" : "Caffeinated Bitstream",
+              "type" : "bookmark",
+              "url" : "http:\/\/cafbit.com\/"
+            },
+            {
+              "name" : "svg to svg - CloudConvert",
+              "type" : "bookmark",
+              "url" : "https:\/\/cloudconvert.com\/svg-to-svg"
+            },
+            {
+              "name" : "SVG viewer & editor online",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.rapidtables.com\/web\/tools\/svg-viewer-editor.html"
+            }
+          ],
+          "name" : "Bookmarks",
+          "type" : "folder"
+        },
+        {
+          "name" : "Asana",
+          "type" : "bookmark",
+          "url" : "https:\/\/asana.com\/"
+        },
+        {
+          "children" : [
+            {
+              "name" : "Online Image to Icon Converter",
+              "type" : "bookmark",
+              "url" : "http:\/\/www.rw-designer.com\/image-to-icon"
+            }
+          ],
+          "name" : "Other Bookmarks",
+          "type" : "folder"
+        },
+        {
+          "name" : "Gmail",
+          "type" : "bookmark",
+          "url" : "https:\/\/mail.google.com\/"
+        },
+        {
+          "children" : [
+
+          ],
+          "name" : "Imported Favorites",
+          "type" : "folder"
+        },
+        {
+          "name" : "Emby Community",
+          "type" : "bookmark",
+          "url" : "https:\/\/emby.media\/community\/index.php"
+        },
+        {
+          "children" : [
+            {
+              "name" : "Google Music",
+              "type" : "bookmark",
+              "url" : "https:\/\/music.google.com\/"
+            }
+          ],
+          "name" : "Music",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "name" : "Amazon",
+              "type" : "bookmark",
+              "url" : "https:\/\/amazon.com"
+            }
+          ],
+          "name" : "Books",
+          "type" : "folder"
+        },
+        {
+          "name" : "Blog - Big Nerd Ranch",
+          "type" : "bookmark",
+          "url" : "https:\/\/bignerdranch.com\/resources\/blog\/"
+        },
+        {
+          "name" : "Online FlowChart & Diagrams Editor - Mermaid Live Editor",
+          "type" : "bookmark",
+          "url" : "https:\/\/mermaid.live\/edit"
+        },
+        {
+          "children" : [
+            {
+              "name" : "Firefox Nightly blog",
+              "type" : "bookmark",
+              "url" : "https:\/\/blog.nightly.mozilla.org\/"
+            },
+            {
+              "name" : "Mozilla Bug Tracker",
+              "type" : "bookmark",
+              "url" : "https:\/\/bugzilla.mozilla.org\/"
+            },
+            {
+              "name" : "Mozilla Developer Network",
+              "type" : "bookmark",
+              "url" : "https:\/\/developer.mozilla.org\/"
+            },
+            {
+              "name" : "Nightly Tester Tools",
+              "type" : "bookmark",
+              "url" : "https:\/\/addons.mozilla.org\/firefox\/addon\/nightly-tester-tools\/"
+            },
+            {
+              "name" : "All your crashes",
+              "type" : "bookmark",
+              "url" : "about:crashes"
+            },
+            {
+              "name" : "Planet Mozilla",
+              "type" : "bookmark",
+              "url" : "https:\/\/planet.mozilla.org\/"
+            }
+          ],
+          "name" : "Firefox Nightly Resources",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "name" : "#0 Added bookmark title with a long bookmark title",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.mozilla0.org\/contribute\/?utm_medium=firefox-desktop&utm_source=bookmarks-toolbar&utm_campaign=new-users-nightly&utm_content=-global"
+            },
+            {
+              "name" : "#1 Added bookmark title with a long bookmark title",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.mozilla1.org\/contribute\/?utm_medium=firefox-desktop&utm_source=bookmarks-toolbar&utm_campaign=new-users-nightly&utm_content=-global"
+            }
+          ],
+          "name" : "Bookmarks Toolbar",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "name" : "Home",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.mozilla.org\/firefox\/?utm_medium=firefox-desktop&utm_source=bookmarks-toolbar&utm_campaign=new-users&utm_content=-global"
+            }
+          ],
+          "name" : "Bookmarks Bar",
+          "type" : "folder"
+        }
+      ],
+      "name" : "Other bookmarks",
+      "type" : "folder"
+    }
+  }
+}

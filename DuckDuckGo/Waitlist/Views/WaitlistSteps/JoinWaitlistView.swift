@@ -16,46 +16,73 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import SwiftUI
 import SwiftUIExtensions
 
+protocol JoinWaitlistViewViewData {
+    var headerImageName: String { get }
+    var title: String { get }
+    var subtitle1: String { get }
+    var subtitle2: String { get }
+    var availabilityDisclaimer: String { get }
+    var buttonCloseLabel: String { get }
+    var buttonJoinWaitlistLabel: String { get }
+}
+
 struct JoinWaitlistView: View {
+    let viewData: JoinWaitlistViewViewData
     @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
         WaitlistDialogView {
             VStack(spacing: 16.0) {
-                Image("JoinWaitlistHeader")
+                Image(viewData.headerImageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 96)
 
-                Text(UserText.networkProtectionWaitlistJoinTitle)
+                Text(viewData.title)
                     .font(.system(size: 17, weight: .bold))
 
-                Text(UserText.networkProtectionWaitlistJoinSubtitle1)
+                Text(viewData.subtitle1)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(Color("BlackWhite80"))
+                    .foregroundColor(Color(.blackWhite80))
 
-                Text(UserText.networkProtectionWaitlistJoinSubtitle2)
+                if !viewData.subtitle2.isEmpty {
+                    Text(viewData.subtitle2)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(Color(.blackWhite80))
+                }
+
+                Text(viewData.availabilityDisclaimer)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(Color("BlackWhite80"))
-
-                Text(UserText.networkProtectionWaitlistAvailabilityDisclaimer)
                     .font(.system(size: 12))
-                    .foregroundColor(Color("BlackWhite60"))
+                    .foregroundColor(Color(.blackWhite60))
             }
         } buttons: {
-            Button(UserText.networkProtectionWaitlistButtonClose) {
+            Button(viewData.buttonCloseLabel) {
                 Task { await model.perform(action: .close) }
             }
 
-            Button(UserText.networkProtectionWaitlistButtonJoinWaitlist) {
+            Button(viewData.buttonJoinWaitlistLabel) {
                 Task { await model.perform(action: .joinQueue) }
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: model.viewState == .notOnWaitlist))
         }
         .environmentObject(model)
     }
+}
+
+#if DBP
+
+struct DataBrokerProtectionJoinWaitlistViewData: JoinWaitlistViewViewData {
+    let headerImageName = "DBP-Information-Remover"
+    let title = UserText.dataBrokerProtectionWaitlistJoinTitle
+    let subtitle1 = UserText.dataBrokerProtectionWaitlistInvitedSubtitle
+    let subtitle2 = ""
+    let availabilityDisclaimer = UserText.dataBrokerProtectionWaitlistAvailabilityDisclaimer
+    let buttonCloseLabel = UserText.dataBrokerProtectionWaitlistButtonClose
+    let buttonJoinWaitlistLabel = UserText.dataBrokerProtectionWaitlistButtonJoinWaitlist
 }
 
 #endif

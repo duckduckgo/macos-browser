@@ -1,5 +1,5 @@
 //
-//  RecentlyClosedTabsCacheItem.swift
+//  RecentlyClosedCacheItem.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -35,7 +35,7 @@ extension RecentlyClosedTab: RecentlyClosedCacheItemBurning {
     }
 
     private func contentContainsDomains(_ baseDomains: Set<String>, tld: TLD) -> Bool {
-        if let host = tabContent.url?.host, let baseDomain = tld.eTLDplus1(host), baseDomains.contains(baseDomain) {
+        if let host = tabContent.urlForWebView?.host, let baseDomain = tld.eTLDplus1(host), baseDomains.contains(baseDomain) {
             return true
         } else {
             return false

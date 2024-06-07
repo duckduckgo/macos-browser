@@ -28,12 +28,12 @@ CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES
 CODE_SIGN_STYLE[sdk=*] = Manual
 CODE_SIGN_STYLE[config=Debug][sdk=*] = Automatic
 
-CURRENT_PROJECT_VERSION = $(MARKETING_VERSION)
+DEFAULT_PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser
 
 ENABLE_HARDENED_RUNTIME = YES
 
 INFOPLIST_FILE = DuckDuckGo/Info.plist
-INFOPLIST_KEY_NSPrincipalClass = NSApplication
+INFOPLIST_KEY_NSPrincipalClass = Application
 
 LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks
 

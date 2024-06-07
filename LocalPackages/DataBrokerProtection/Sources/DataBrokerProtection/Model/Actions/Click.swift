@@ -22,4 +22,5 @@ struct ClickAction: Action {
     let id: String
     let actionType: ActionType
     let elements: [PageElement]
+    let dataSource: DataSource?
 }

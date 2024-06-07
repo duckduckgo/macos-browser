@@ -2,13 +2,21 @@
 
 # Constants
 S3_PATH="s3://ddg-staticcdn/macos-desktop-browser/"
+CDN_PATH="https://staticcdn.duckduckgo.com/macos-desktop-browser/"
 
 # Defaults
-DIRECTORY="$HOME/Developer/sparkle-updates"
-PROFILE="ddg-macos"
+if [[ -n "$CI" ]]; then
+    AWS="aws"
+    DIRECTORY="sparkle-updates"
+else
+    AWS="aws --profile ddg-macos"
+    DIRECTORY="$HOME/Developer/sparkle-updates"
+fi
+
 DEBUG=0
 OVERWRITE_DMG_VERSION=""
 RUN_COMMAND=0
+FORCE=0
 
 # Print the usage
 function print_usage() {
@@ -17,7 +25,7 @@ NAME
     upload_to_s3.sh – automation tool for uploading files to AWS S3 for macOS Desktop Browser
 
 SYNOPSIS
-    $0 --run [--directory directory_path] [--overwrite-duckduckgo-dmg version] [--debug]
+    $0 --run [--directory directory_path] [--overwrite-duckduckgo-dmg version] [--debug] [--force]
     $0 --help
 
 DESCRIPTION
@@ -34,6 +42,9 @@ DESCRIPTION
 
     --debug
         In debug mode, no 'aws cp' commands will be executed; they will only be printed to stdout.
+
+    --force
+        Forces the upload process to continue without asking for confirmation.
 
     --help
         Displays this help message.
@@ -62,13 +73,11 @@ function check_aws_installed() {
 
 # Check if there‘s a valid token
 function check_and_login_aws_sso() {
-    SSO_ACCOUNT_PROFILE=$(aws sts get-caller-identity --query "Account" --profile $PROFILE)
-
-    if [ ${#SSO_ACCOUNT_PROFILE} -eq 14 ]; then
+    if $AWS sts get-caller-identity --query "Account" >/dev/null 2>&1; then
         echo "Session is still valid"
     else
         echo "Session has expired"
-        aws sso login --profile $PROFILE
+        $AWS sso login
     fi
 }
 
@@ -105,6 +114,7 @@ while [[ "$#" -gt 0 ]]; do
         --debug) DEBUG=1 ;;
         --help) print_usage; exit 0 ;; # Display the help and exit immediately.
         --run) RUN_COMMAND=1 ;;
+        --force) FORCE=1 ;;
         *) echo "Unknown parameter passed: $1"; print_usage; exit 1 ;; # Display the help and exit with error.
     esac
     shift
@@ -115,8 +125,10 @@ if [[ $RUN_COMMAND -eq 0 ]]; then
     exit 0
 fi
 
-# Perform AWS login if needed
-check_and_login_aws_sso
+if [[ -z "$CI" ]]; then
+    # When not in CI, perform AWS login if needed
+    check_and_login_aws_sso
+fi
 
 # Ensure appcast2.xml exists
 if [[ ! -f "$DIRECTORY/appcast2.xml" ]]; then
@@ -138,18 +150,23 @@ for FILENAME in $FILES_TO_UPLOAD; do
     fi
 
     # Check if the file exists on S3
-    AWS_CMD="aws --profile $PROFILE s3 ls ${S3_PATH}${FILENAME}"
-    echo "Checking S3 for ${S3_PATH}${FILENAME}..."
-    if ! aws --profile "$PROFILE" s3 ls "${S3_PATH}${FILENAME}" > /dev/null 2>&1; then
-        echo "$FILENAME not found on S3. Marking for upload."
-        MISSING_FILES+=("$FILENAME")
+    printf '%s' "Checking CDN for ${CDN_PATH}${FILENAME} ... "
+    if curl -fLSsI "${CDN_PATH}${FILENAME}" >/dev/null 2>&1; then
+        echo "✅"
     else
-        echo "$FILENAME exists on S3. Skipping."
+        echo "❌"
+        echo "🚢 Marking $FILENAME for upload."
+        MISSING_FILES+=("$FILENAME")
     fi
 done
 
-# Add appcast2.xml for upload last
-MISSING_FILES+=("appcast2.xml")
+# Create a copy of appcast2.xml called testing-appcast2.xml
+# https://app.asana.com/0/0/1206349575147845/f
+cp "$DIRECTORY/appcast2.xml" "$DIRECTORY/testing-appcast2.xml"
+echo "Created a copy of appcast2.xml as testing-appcast2.xml"
+
+# Add appcast files for upload
+MISSING_FILES+=("appcast2.xml" "testing-appcast2.xml")
 
 # Notify the user about files to be uploaded
 if [[ ${#MISSING_FILES[@]} -gt 0 ]] || [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
@@ -164,23 +181,41 @@ if [[ ${#MISSING_FILES[@]} -gt 0 ]] || [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
         echo "The file duckduckgo-$OVERWRITE_DMG_VERSION.dmg will be used to overwrite duckduckgo.dmg on S3."
     fi
 
-    read -p "Do you wish to continue? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
+    if [[ $FORCE -eq 0 ]]; then
+        read -p "Do you wish to continue? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
     fi
 fi
 
 # Upload each missing file
 for FILE in "${MISSING_FILES[@]}"; do
-    AWS_CMD="aws --profile $PROFILE s3 cp \"${DIRECTORY}/${FILE}\" ${S3_PATH}${FILE} --acl public-read"
+    AWS_CMD="$AWS s3 cp \"${DIRECTORY}/${FILE}\" ${S3_PATH}${FILE} --acl public-read"
     execute_aws "$AWS_CMD" || exit 1
 done
 
 # If the overwrite flag was set, overwrite the primary dmg
 if [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
-    AWS_CMD="aws --profile $PROFILE s3 cp \"${DIRECTORY}/duckduckgo-$OVERWRITE_DMG_VERSION.dmg\" ${S3_PATH}duckduckgo.dmg --acl public-read"
+    AWS_CMD="$AWS s3 cp \"${DIRECTORY}/duckduckgo-$OVERWRITE_DMG_VERSION.dmg\" ${S3_PATH}duckduckgo.dmg --acl public-read"
     execute_aws "$AWS_CMD" || exit 1
+fi
+
+if [[ -n "$CI" ]]; then
+    # Store the list of uploaded files in a file
+    TMP_FILE="$(mktemp)"
+    for FILE in "${MISSING_FILES[@]}"; do
+        echo "$FILE" >> "$TMP_FILE"
+    done
+    if [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
+        echo "duckduckgo.dmg" >> "$TMP_FILE"
+    fi
+
+    FILES_LIST_FILE="${DIRECTORY}/uploaded_files_list.txt"
+    rm -f "$FILES_LIST_FILE"
+    sort -f < "$TMP_FILE" > "$FILES_LIST_FILE"
+    rm -f "$TMP_FILE"
 fi
 
 echo "Upload complete!"

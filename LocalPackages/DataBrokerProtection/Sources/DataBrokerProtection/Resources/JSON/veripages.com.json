@@ -1,8 +1,9 @@
 {
-  "name": "veripages.com",
-  "version": "0.1.0",
-  "parent": "peoplefinders.com",
-  "addedDatetime": 1691985600000,
+  "name": "Veripages",
+  "url": "veripages.com",
+  "version": "0.1.5",
+  "parent": "verecor.com",
+  "addedDatetime": 1691989200000,
   "steps": [
     {
       "stepType": "scan",
@@ -10,12 +11,21 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "e66c5522-d532-4db0-9b56-0565b2753f6c",
-          "url": "https://veripages.com/inner/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}"
+          "id": "658fce8a-8bc7-4fb7-9f52-4cdbf2e90054",
+          "url": "https://veripages.com/inner/profile/search?fname=${firstName}&lname=${lastName}&fage=${age|ageRange}&state=${state}&city=${city}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
         },
         {
           "actionType": "extract",
-          "id": "f8f302aa-c881-422b-8d2f-98aa115b4378",
+          "id": "4bb4d602-8697-4ad0-ab7e-fef2b5b8406c",
           "selector": ".search-item",
           "profile": {
             "name": {
@@ -31,7 +41,7 @@
               "afterText": ", "
             },
             "addressCityStateList": {
-              "selector": ".//span[@itemprop='address']",
+              "selector": ".//div[contains(@class, 'search-item')]//dt[text() = 'Has lived in']/following-sibling::dd/ul/li",
               "findElements": true
             },
             "relativesList": {
@@ -40,7 +50,9 @@
               "beforeText": ","
             },
             "profileUrl": {
-              "selector": ".//div[@class='search-item-title']//a"
+              "selector": ".//div[@class='search-item-title']//a",
+              "identifierType": "path",
+              "identifier": "https://veripages.com/profile/${firstName}-${lastName}/${id}"
             }
           }
         }

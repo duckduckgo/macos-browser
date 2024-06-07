@@ -22,6 +22,7 @@ import BrowserServicesKit
 import Configuration
 import Common
 import Networking
+import PixelKit
 
 @MainActor
 final class ConfigurationManager {
@@ -59,7 +60,10 @@ final class ConfigurationManager {
     static let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
 
     @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
-    private var lastUpdateTime: Date
+    private(set) var lastUpdateTime: Date
+
+    @UserDefaultsWrapper(key: .configLastInstalled, defaultValue: nil)
+    private(set) var lastConfigurationInstallDate: Date?
 
     private var timerCancellable: AnyCancellable?
     private var lastRefreshCheckTime: Date = Date()
@@ -69,13 +73,13 @@ final class ConfigurationManager {
                                                     eventMapping: Self.configurationDebugEvents)
 
     private static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
-        let domainEvent: Pixel.Event.Debug
+        let domainEvent: GeneralPixel
         switch event {
         case .invalidPayload(let configuration):
             domainEvent = .invalidPayload(configuration)
         }
 
-        Pixel.fire(.debug(event: domainEvent, error: error))
+        PixelKit.fire(DebugEvent(domainEvent, error: error))
     }
 
     func start() {
@@ -97,9 +101,9 @@ final class ConfigurationManager {
         os_log("last refresh check %{public}s", log: .config, type: .default, String(describing: lastRefreshCheckTime))
     }
 
-    private func refreshNow() async {
+    private func refreshNow(isDebug: Bool = false) async {
         let updateTrackerBlockingDependenciesTask = Task {
-            let didFetchAnyTrackerBlockingDependencies = await fetchTrackerBlockingDependencies()
+            let didFetchAnyTrackerBlockingDependencies = await fetchTrackerBlockingDependencies(isDebug: isDebug)
             if didFetchAnyTrackerBlockingDependencies {
                 updateTrackerBlockingDependencies()
                 tryAgainLater()
@@ -134,13 +138,13 @@ final class ConfigurationManager {
         log()
     }
 
-    private func fetchTrackerBlockingDependencies() async -> Bool {
+    private func fetchTrackerBlockingDependencies(isDebug: Bool) async -> Bool {
         var didFetchAnyTrackerBlockingDependencies = false
 
         var tasks = [Configuration: Task<(), Swift.Error>]()
         tasks[.trackerDataSet] = Task { try await fetcher.fetch(.trackerDataSet) }
         tasks[.surrogates] = Task { try await fetcher.fetch(.surrogates) }
-        tasks[.privacyConfiguration] = Task { try await fetcher.fetch(.privacyConfiguration) }
+        tasks[.privacyConfiguration] = Task { try await fetcher.fetch(.privacyConfiguration, isDebug: isDebug) }
 
         for (configuration, task) in tasks {
             do {
@@ -167,7 +171,7 @@ final class ConfigurationManager {
         }
 
         os_log("Failed to complete configuration update %@", log: .config, type: .error, error.localizedDescription)
-        Pixel.fire(.debug(event: .configurationFetchError, error: error))
+        PixelKit.fire(DebugEvent(GeneralPixel.configurationFetchError(error: error)))
         tryAgainSoon()
     }
 
@@ -184,9 +188,9 @@ final class ConfigurationManager {
 
     private var isReadyToRefresh: Bool { Date().timeIntervalSince(lastUpdateTime) > Constants.refreshPeriodSeconds }
 
-    public func forceRefresh() {
+    public func forceRefresh(isDebug: Bool = false) {
         Task {
-            await refreshNow()
+            await refreshNow(isDebug: isDebug)
         }
     }
 
@@ -200,6 +204,7 @@ final class ConfigurationManager {
     }
 
     private func updateTrackerBlockingDependencies() {
+        lastConfigurationInstallDate = Date()
         ContentBlocking.shared.trackerDataManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
                                                          data: ConfigurationStore.shared.loadData(for: .trackerDataSet))
         ContentBlocking.shared.privacyConfigurationManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .privacyConfiguration),

@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+import PreferencesViews
+import PixelKit
 import SwiftUI
 import SwiftUIExtensions
 
@@ -29,14 +31,22 @@ extension Preferences {
                 model.duckPlayerMode
             } set: { newValue in
                 model.duckPlayerMode = newValue
+                switch model.duckPlayerMode {
+                case .enabled:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysSettings)
+                case .alwaysAsk:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
+                case .disabled:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingNeverSettings)
+                }
             }
         }
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
+            PreferencePane {
 
                 // TITLE
-                TextMenuTitle(text: UserText.duckPlayer)
+                TextMenuTitle(UserText.duckPlayer)
 
                 PreferencePaneSection {
                     Picker(selection: duckPlayerModeBinding, content: {
@@ -54,9 +64,9 @@ extension Preferences {
 
                     }, label: {})
                     .pickerStyle(.radioGroup)
-                    .offset(x: Const.pickerHorizontalOffset)
+                    .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
 
-                    TextMenuItemCaption(text: UserText.duckPlayerExplanation)
+                    TextMenuItemCaption(UserText.duckPlayerExplanation)
                 }
             }
         }

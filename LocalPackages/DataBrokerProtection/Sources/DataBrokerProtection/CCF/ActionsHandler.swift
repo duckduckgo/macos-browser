@@ -27,6 +27,16 @@ final class ActionsHandler {
         self.step = step
     }
 
+    func currentAction() -> Action? {
+        guard let lastExecutedActionIndex = self.lastExecutedActionIndex else { return nil }
+
+        if lastExecutedActionIndex < step.actions.count {
+            return step.actions[lastExecutedActionIndex]
+        } else {
+            return nil
+        }
+    }
+
     func nextAction() -> Action? {
         guard let lastExecutedActionIndex = self.lastExecutedActionIndex else {
             // If last executed action index is nil. Means we didn't execute any action, so we return the first action.

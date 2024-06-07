@@ -34,6 +34,7 @@ final class AddressBarTextEditor: NSTextView {
 
     @available(macOS 12.0, *)
     override var textLayoutManager: NSTextLayoutManager? {
+        // uses NSTextLayoutManager by default in macOS 13, ignored in macOS 12
         if let textLayoutManager = super.textLayoutManager,
            !(textLayoutManager.textSelectionNavigation is AddressBarTextSelectionNavigation) {
             textLayoutManager.textSelectionNavigation = AddressBarTextSelectionNavigation(dataSource: textLayoutManager)
@@ -207,9 +208,13 @@ final class AddressBarTextEditor: NSTextView {
 
     // MARK: - Moving selection by word
 
-    @available(macOS, deprecated: 12.0, message: "Move this logic to AddressBarTextSelectionNavigation")
+    @available(macOS, deprecated: 13.0, message: "Move this logic to AddressBarTextSelectionNavigation")
     override func selectionRange(forProposedRange proposedCharRange: NSRange, granularity: NSSelectionGranularity) -> NSRange {
         let string = self.string
+        var proposedCharRange = proposedCharRange
+        if proposedCharRange.length < 0 {
+            proposedCharRange = NSRange(location: string.length(), length: 0)
+        }
         guard let selectableRange = addressBar?.stringValueWithoutSuffixRange,
               var clampedRange = Range(proposedCharRange, in: string)?.clamped(to: selectableRange) else { return proposedCharRange }
         guard !selectableRange.isEmpty else { return NSRange(selectableRange, in: string) }

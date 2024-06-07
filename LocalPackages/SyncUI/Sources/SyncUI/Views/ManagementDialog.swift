@@ -19,21 +19,40 @@
 import SwiftUI
 
 public enum ManagementDialogKind: Equatable {
-    case enableSync
-    case recoverAccount
     case deleteAccount(_ devices: [SyncDevice])
-    case askToSyncAnotherDevice
-    case syncAnotherDevice
-    case deviceSynced(_ devices: [SyncDevice])
-    case saveRecoveryPDF
     case turnOffSync
     case deviceDetails(_ device: SyncDevice)
     case removeDevice(_ device: SyncDevice)
+    case syncWithAnotherDevice(code: String)
+    case prepareToSync
+    case saveRecoveryCode(_ code: String)
+    case nowSyncing
+    case syncWithServer
+    case enterRecoveryCode(code: String)
+    case recoverSyncedData
+    case empty
 }
 
 public struct ManagementDialog: View {
     @ObservedObject public var model: ManagementDialogModel
     @ObservedObject public var recoveryCodeModel: RecoveryCodeViewModel
+
+    var errorTitle: String {
+        return model.syncErrorMessage?.type.title ?? "Sync Error"
+    }
+
+    var errorDescription: String {
+        guard let typeDescription = model.syncErrorMessage?.type.description,
+              let errorDescription = model.syncErrorMessage?.errorDescription
+        else {
+            return ""
+        }
+        return typeDescription + "\n" + errorDescription
+    }
+
+    var buttonTitle: String {
+        return model.syncErrorMessage?.type.buttonTitle ?? UserText.ok
+    }
 
     public init(model: ManagementDialogModel, recoveryCodeModel: RecoveryCodeViewModel = .init()) {
         self.model = model
@@ -44,9 +63,11 @@ public struct ManagementDialog: View {
         content
             .alert(isPresented: $model.shouldShowErrorMessage) {
                 Alert(
-                    title: Text("Unable to turn on Sync"),
-                    message: Text(model.errorMessage ?? "An error occurred"),
-                    dismissButton: .default(Text(UserText.ok))
+                    title: Text(errorTitle),
+                    message: Text(errorDescription),
+                    dismissButton: .default(Text(buttonTitle)) {
+                        model.endFlow()
+                    }
                 )
             }
     }
@@ -54,18 +75,6 @@ public struct ManagementDialog: View {
     @ViewBuilder var content: some View {
         Group {
             switch model.currentDialog {
-            case .enableSync:
-                EnableSyncView()
-            case .askToSyncAnotherDevice:
-                AskToSyncAnotherDeviceView()
-            case .recoverAccount:
-                RecoverAccountView()
-            case .syncAnotherDevice:
-                SyncAnotherDeviceView()
-            case .deviceSynced(let devices):
-                SyncSetupCompleteView(devices: devices)
-            case .saveRecoveryPDF:
-                SaveRecoveryPDFView()
             case .turnOffSync:
                 TurnOffSyncView()
             case .deviceDetails(let device):
@@ -74,7 +83,20 @@ public struct ManagementDialog: View {
                 RemoveDeviceView(device: device)
             case .deleteAccount(let devices):
                 DeleteAccountView(devices: devices)
-
+            case .syncWithAnotherDevice(let code):
+                SyncWithAnotherDeviceView(code: code)
+            case .prepareToSync:
+                PreparingToSyncView()
+            case .saveRecoveryCode(let code):
+                SaveRecoveryPDFView(code: code)
+            case .nowSyncing:
+                DeviceSyncedView()
+            case .syncWithServer:
+                SyncWithServerView()
+            case .enterRecoveryCode(let code):
+                EnterRecoveryCodeView(code: code)
+            case .recoverSyncedData:
+                RecoverSyncedDataView()
             default:
                 EmptyView()
             }

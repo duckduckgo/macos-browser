@@ -46,7 +46,7 @@ final class CLLocationManagerMock: CLLocationManager {
     override init() {
         super.init()
 
-        selfRef = NSValue.init(nonretainedObject: self)
+        selfRef = NSValue(nonretainedObject: self)
         Self.instances.append(selfRef)
     }
 
@@ -101,6 +101,23 @@ final class CLLocationManagerMock: CLLocationManager {
     override func startUpdatingHeading() {
         assert(!isUpdatingHeading)
         isUpdatingHeading = true
+    }
+
+    override func requestLocation() {
+        fatalError("Unexpected call")
+    }
+
+    var whenInUseAuthorizationRequested: (() -> Void)!
+    override func requestWhenInUseAuthorization() {
+        whenInUseAuthorizationRequested!()
+    }
+
+    override func requestAlwaysAuthorization() {
+        fatalError("Unexpected call")
+    }
+
+    override func requestTemporaryFullAccuracyAuthorization(withPurposeKey purposeKey: String, completion: (((any Error)?) -> Void)? = nil) {
+        fatalError("Unexpected call")
     }
 
 }

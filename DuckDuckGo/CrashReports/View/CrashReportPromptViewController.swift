@@ -18,22 +18,28 @@
 
 import Cocoa
 
-protocol CrashReportPromptViewControllerDelegate: AnyObject {
-
-    func crashReportPromptViewController(_ crashReportPromptViewController: CrashReportPromptViewController,
-                                         userDidAllowToReport: Bool)
-
-}
-
 final class CrashReportPromptViewController: NSViewController {
-
+    @IBOutlet weak var titleLabel: NSTextField!
+    @IBOutlet weak var dontSendButton: NSButton!
+    @IBOutlet weak var sendButton: NSButton!
+    @IBOutlet weak var textFieldTitle: NSTextField!
+    @IBOutlet weak var descriptionLabel: NSTextField!
     @IBOutlet var textView: NSTextView!
 
-    weak var delegate: CrashReportPromptViewControllerDelegate?
-    var crashReport: CrashReport? {
+    var userDidAllowToReport: () -> Void = {}
+
+    var crashReport: CrashReportPresenting? {
         didSet {
             updateView()
         }
+    }
+
+    override func viewDidLoad() {
+        titleLabel.stringValue = UserText.crashReportTitle
+        descriptionLabel.stringValue = UserText.crashReportDescription
+        sendButton.title = UserText.crashReportSendButton
+        dontSendButton.title = UserText.crashReportDontSendButton
+        textFieldTitle.stringValue = UserText.crashReportTextFieldTitle
     }
 
     private func updateView() {
@@ -46,12 +52,11 @@ final class CrashReportPromptViewController: NSViewController {
     }
 
     @IBAction func sendAction(_ sender: Any) {
-        delegate?.crashReportPromptViewController(self, userDidAllowToReport: true)
+        userDidAllowToReport()
         view.window?.close()
     }
 
     @IBAction func dontSendAction(_ sender: Any) {
-        delegate?.crashReportPromptViewController(self, userDidAllowToReport: false)
         view.window?.close()
     }
 

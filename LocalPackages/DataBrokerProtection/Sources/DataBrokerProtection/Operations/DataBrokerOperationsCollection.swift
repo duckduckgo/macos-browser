@@ -19,15 +19,26 @@
 import Foundation
 import Common
 
+protocol DataBrokerOperationsCollectionErrorDelegate: AnyObject {
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
+                                        didError error: Error,
+                                        whileRunningBrokerOperationData: BrokerOperationData,
+                                        withDataBrokerName dataBrokerName: String?)
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
+                                        didErrorBeforeStartingBrokerOperations error: Error)
+}
+
+enum OperationType {
+    case manualScan
+    case optOut
+    case all
+}
+
 final class DataBrokerOperationsCollection: Operation {
+    public var error: Error?
+    public weak var errorDelegate: DataBrokerOperationsCollectionErrorDelegate?
 
-    enum OperationType {
-        case scan
-        case optOut
-        case all
-    }
-
-    private let brokerProfileQueriesData: [BrokerProfileQueryData]
+    private let dataBrokerID: Int64
     private let database: DataBrokerProtectionRepository
     private let id = UUID()
     private var _isExecuting = false
@@ -39,12 +50,13 @@ final class DataBrokerOperationsCollection: Operation {
     private let runner: WebOperationRunner
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let showWebView: Bool
+    private let userNotificationService: DataBrokerProtectionUserNotificationService
 
     deinit {
         os_log("Deinit operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
     }
 
-    init(brokerProfileQueriesData: [BrokerProfileQueryData],
+    init(dataBrokerID: Int64,
          database: DataBrokerProtectionRepository,
          operationType: OperationType,
          intervalBetweenOperations: TimeInterval? = nil,
@@ -52,9 +64,10 @@ final class DataBrokerOperationsCollection: Operation {
          notificationCenter: NotificationCenter = NotificationCenter.default,
          runner: WebOperationRunner,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         userNotificationService: DataBrokerProtectionUserNotificationService,
          showWebView: Bool) {
 
-        self.brokerProfileQueriesData = brokerProfileQueriesData
+        self.dataBrokerID = dataBrokerID
         self.database = database
         self.intervalBetweenOperations = intervalBetweenOperations
         self.priorityDate = priorityDate
@@ -63,6 +76,7 @@ final class DataBrokerOperationsCollection: Operation {
         self.runner = runner
         self.pixelHandler = pixelHandler
         self.showWebView = showWebView
+        self.userNotificationService = userNotificationService
         super.init()
     }
 
@@ -98,29 +112,50 @@ final class DataBrokerOperationsCollection: Operation {
         }
     }
 
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable:next function_body_length
-    private func runOperation() async {
-        let filteredAndSortedOperationsData: [BrokerOperationData]
+    private func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData], operationType: OperationType, priorityDate: Date?) -> [BrokerOperationData] {
         let operationsData: [BrokerOperationData]
 
         switch operationType {
         case .optOut:
             operationsData = brokerProfileQueriesData.flatMap { $0.optOutOperationsData }
-        case .scan:
-            operationsData = brokerProfileQueriesData.compactMap { $0.scanOperationData }
+        case .manualScan:
+            operationsData = brokerProfileQueriesData.filter { $0.profileQuery.deprecated == false }.compactMap { $0.scanOperationData }
         case .all:
             operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
         }
+
+        let filteredAndSortedOperationsData: [BrokerOperationData]
 
         if let priorityDate = priorityDate {
             filteredAndSortedOperationsData = operationsData
                 .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= priorityDate }
                 .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
-
         } else {
             filteredAndSortedOperationsData = operationsData
         }
+
+        return filteredAndSortedOperationsData
+    }
+
+    // swiftlint:disable:next function_body_length
+    private func runOperation() async {
+        let allBrokerProfileQueryData: [BrokerProfileQueryData]
+
+        do {
+            allBrokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
+        } catch {
+            os_log("DataBrokerOperationsCollection error: runOperation, error: %{public}@", log: .error, error.localizedDescription)
+            errorDelegate?.dataBrokerOperationsCollection(self, didErrorBeforeStartingBrokerOperations: error)
+            return
+        }
+
+        let brokerProfileQueriesData = allBrokerProfileQueryData.filter { $0.dataBroker.id == dataBrokerID }
+
+        let filteredAndSortedOperationsData = filterAndSortOperationsData(brokerProfileQueriesData: brokerProfileQueriesData,
+                                                                          operationType: operationType,
+                                                                          priorityDate: priorityDate)
+
+        os_log("filteredAndSortedOperationsData count: %{public}d for brokerID %{public}d", log: .dataBrokerProtection, filteredAndSortedOperationsData.count, dataBrokerID)
 
         for operationData in filteredAndSortedOperationsData {
             if isCancelled {
@@ -145,28 +180,30 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 runner: runner,
                                                                                 pixelHandler: pixelHandler,
                                                                                 showWebView: showWebView,
+                                                                                isManualScan: operationType == .manualScan,
+                                                                                userNotificationService: userNotificationService,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }
                     return !self.isCancelled
                 })
-                os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
 
                 if let sleepInterval = intervalBetweenOperations {
                     os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
                     try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
                 }
+
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-                if let error = error as? DataBrokerProtectionError,
-                   let dataBrokerName = brokerProfileQueriesData.first?.dataBroker.name {
-                    pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
-                } else {
-                    os_log("Cant handle error", log: .dataBrokerProtection)
-                }
+                self.error = error
+                errorDelegate?.dataBrokerOperationsCollection(self,
+                                                              didError: error,
+                                                              whileRunningBrokerOperationData: operationData,
+                                                              withDataBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
             }
         }
+
+        finish()
     }
-    // swiftlint:enable cyclomatic_complexity
 
     private func finish() {
         willChangeValue(forKey: #keyPath(isExecuting))
@@ -177,5 +214,7 @@ final class DataBrokerOperationsCollection: Operation {
 
         didChangeValue(forKey: #keyPath(isExecuting))
         didChangeValue(forKey: #keyPath(isFinished))
+
+        os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
     }
 }

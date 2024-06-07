@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionDeviceManager+EventMapping.swift
+//  EventMapping+NetworkProtectionError.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,70 +16,85 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
+import Common
 import Foundation
 import NetworkProtection
-import Common
+import PixelKit
 
 extension EventMapping where Event == NetworkProtectionError {
     static var networkProtectionAppDebugEvents: EventMapping<NetworkProtectionError> = .init { event, _, _, _ in
-
-        let domainEvent: Pixel.Event.Debug
+        let domainEvent: NetworkProtectionPixelEvent
+        let frequency: PixelKit.Frequency
 
         switch event {
         case .failedToEncodeRedeemRequest:
             domainEvent = .networkProtectionClientFailedToEncodeRedeemRequest
+            frequency = .standard
         case .invalidInviteCode:
             domainEvent = .networkProtectionClientInvalidInviteCode
+            frequency = .standard
         case .failedToRedeemInviteCode(let error):
-            domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error: error)
+            domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error)
+            frequency = .standard
         case .failedToParseRedeemResponse(let error):
-            domainEvent = .networkProtectionClientFailedToParseRedeemResponse(error: error)
+            domainEvent = .networkProtectionClientFailedToParseRedeemResponse(error)
+            frequency = .standard
         case .invalidAuthToken:
             domainEvent = .networkProtectionClientInvalidAuthToken
+            frequency = .standard
         case .failedToCastKeychainValueToData(field: let field):
             domainEvent = .networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: field)
+            frequency = .standard
         case .keychainReadError(field: let field, status: let status):
             domainEvent = .networkProtectionKeychainReadError(field: field, status: status)
+            frequency = .standard
         case .keychainWriteError(field: let field, status: let status):
             domainEvent = .networkProtectionKeychainWriteError(field: field, status: status)
+            frequency = .standard
+        case .keychainUpdateError(field: let field, status: let status):
+            domainEvent = .networkProtectionKeychainUpdateError(field: field, status: status)
+            frequency = .standard
         case .keychainDeleteError(status: let status):
             domainEvent = .networkProtectionKeychainDeleteError(status: status)
+            frequency = .standard
         case .noAuthTokenFound:
             domainEvent = .networkProtectionNoAuthTokenFoundError
-        case
-                .noServerRegistrationInfo,
+            frequency = .standard
+        case .failedToFetchLocationList(let error):
+            domainEvent = .networkProtectionClientFailedToFetchLocations(error)
+            frequency = .dailyAndCount
+        case .failedToParseLocationListResponse(let error):
+            domainEvent = .networkProtectionClientFailedToParseLocationsResponse(error)
+            frequency = .dailyAndCount
+        case .noServerRegistrationInfo,
                 .couldNotSelectClosestServer,
                 .couldNotGetPeerPublicKey,
                 .couldNotGetPeerHostName,
                 .couldNotGetInterfaceAddressRange,
                 .failedToEncodeRegisterKeyRequest,
-                .noServerListFound,
                 .serverListInconsistency,
                 .failedToFetchRegisteredServers,
                 .failedToFetchServerList,
                 .failedToParseServerListResponse,
                 .failedToParseRegisteredServersResponse,
-                .failedToEncodeServerList,
-                .failedToDecodeServerList,
-                .failedToWriteServerList,
-                .couldNotCreateServerListDirectory,
-                .failedToReadServerList,
                 .wireGuardCannotLocateTunnelFileDescriptor,
                 .wireGuardInvalidState,
                 .wireGuardDnsResolution,
                 .wireGuardSetNetworkSettings,
-                .startWireGuardBackend:
+                .startWireGuardBackend,
+                .failedToRetrieveAuthToken:
             domainEvent = .networkProtectionUnhandledError(function: #function, line: #line, error: event)
+            frequency = .standard
             return
         case .unhandledError(function: let function, line: let line, error: let error):
             domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
-
+            frequency = .standard
+            return
+        case .vpnAccessRevoked:
             return
         }
-        Pixel.fire(.debug(event: domainEvent))
+
+        let debugEvent = DebugEvent(eventType: .custom(domainEvent))
+        PixelKit.fire(debugEvent, frequency: .standard, includeAppVersionParameter: true)
     }
 }
-
-#endif

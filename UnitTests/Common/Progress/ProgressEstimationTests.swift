@@ -20,7 +20,7 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class ProgressEstimationTests: XCTestCase {
-    typealias Event = ProgressView.ProgressEvent
+    typealias Event = LoadingProgressView.ProgressEvent
 
     let milestones = [
         Event(progress: 0.25, interval: 0.0),
@@ -34,7 +34,7 @@ final class ProgressEstimationTests: XCTestCase {
     func testWhenProgressIsStartedEstimationIsInitial() {
         let event = Event.nextStep(for: 0.0, lastProgressEvent: nil, milestones: milestones)
 
-        XCTAssertEqual(event, Event(progress: milestones[0].progress, interval: ProgressView.Constants.animationDuration))
+        XCTAssertEqual(event, Event(progress: milestones[0].progress, interval: LoadingProgressView.Constants.animationDuration))
     }
 
     func testWhenProgressIsFinishedThenNoNextStep() {
@@ -73,7 +73,7 @@ final class ProgressEstimationTests: XCTestCase {
     func testWhenProgressMovesTooFastEstimationIsNotTooShort() {
         let event = Event.nextStep(for: 0.85, lastProgressEvent: Event(progress: 0.65, interval: 18.0 / 11.0), milestones: milestones)
 
-        XCTAssertEqual(event, Event(progress: 1.0, interval: milestones.last!.interval * ProgressView.Constants.minMultiplier))
+        XCTAssertEqual(event, Event(progress: 1.0, interval: milestones.last!.interval * LoadingProgressView.Constants.minMultiplier))
     }
 
     func testWhenProgressMovesSlowerEstimationIsLonger() {
