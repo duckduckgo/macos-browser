@@ -81,6 +81,7 @@ jobs:
       env:
         CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
       run: |
+        security default-keychain -s $RUNNER_TEMP/app-signing.keychain-db
         defaults write com.duckduckgo.macos.browser.review sync.environment Development
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
