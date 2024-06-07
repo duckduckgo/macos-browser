@@ -2,6 +2,7 @@
 
 import Foundation
 import CryptoKit
+import AppKit
 
 protocol EncryptionKeyGenerating {
     func randomKey() -> SymmetricKey
@@ -72,21 +73,23 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
     // MARK: - Keychain
 
     func store(key: SymmetricKey) throws {
-         let attributes: [String: Any] = [
-             kSecClass as String: kSecClassGenericPassword,
-             kSecAttrAccount as String: account,
-             kSecValueData as String: key.dataRepresentation.base64EncodedString(),
-             kSecAttrService as String: Constants.encryptionKeyServiceBase64,
-             kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked
-         ]
+        let attributes: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: account,
+            kSecValueData as String: key.dataRepresentation.base64EncodedString(),
+            kSecAttrService as String: Constants.encryptionKeyServiceBase64,
+            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked
+        ]
 
-         // Add the login item to the keychain
-         let status = SecItemAdd(attributes as CFDictionary, nil)
+        print("Store query: \(attributes)")
 
-         guard status == errSecSuccess else {
-             throw EncryptionKeyStoreError.storageFailed(status)
-         }
-     }
+        // Add the login item to the keychain
+        let status = SecItemAdd(attributes as CFDictionary, nil)
+
+        guard status == errSecSuccess else {
+            throw EncryptionKeyStoreError.storageFailed(status)
+        }
+    }
 
     func readKey() throws -> SymmetricKey {
         /// Needed to change how we save the key
@@ -98,6 +101,7 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
         /// If the base64 key does not exist we check if we have the legacy key
         /// if so we store it as base64 local item key
         if let key = try readKeyFromKeychain(account: account, format: .raw) {
+            print("storing legacy key")
             try store(key: key)
         }
 
@@ -108,6 +112,7 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
             return key
         } else {
             let generatedKey = generator.randomKey()
+            print("storing random key")
             try store(key: generatedKey)
             return generatedKey
         }
@@ -141,6 +146,7 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
         case .base64:
             query[kSecAttrService as String] = Constants.encryptionKeyServiceBase64
         }
+        print("Read query: \(query)")
         let status = SecItemCopyMatching(query as CFDictionary, &item)
 
         switch status {
@@ -164,6 +170,7 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
             }
             return SymmetricKey(data: finalData)
         case errSecItemNotFound:
+            print("Not found")
             return nil
         default:
             throw EncryptionKeyStoreError.readFailed(status)
@@ -271,8 +278,12 @@ extension ValueTransformer {
             fatalError("Unsupported type")
         }
         func registerValueTransformer<T: NSObject & NSSecureCoding>(for type: T.Type) -> NSValueTransformerName {
-            (try? EncryptedValueTransformer<T>.registerTransformer(keyStore: keyStore))!
-            return EncryptedValueTransformer<T>.transformerName
+            do {
+                try EncryptedValueTransformer<T>.registerTransformer(keyStore: keyStore)
+                return EncryptedValueTransformer<T>.transformerName
+            } catch {
+                fatalError("Failed to register transformer for \(type): \(error)")
+            }
         }
         return registerValueTransformer(for: encodableType)
     }
@@ -293,8 +304,12 @@ func registerValueTransformers(withAllowedPropertyClasses allowedPropertyClasses
 
     for propertyClass in allowedPropertyClasses {
         let propertyClassName = NSStringFromClass(propertyClass)
+        let transformerName = NSValueTransformerName(rawValue: propertyClassName + "Transformer")
+
+        guard ValueTransformer(forName: transformerName) == nil else { continue }
+
         let transformer = ValueTransformer.registerValueTransformer(for: propertyClass, with: keyStore)
-        assert(ValueTransformer(forName: .init(propertyClassName + "Transformer")) != nil)
+        assert(ValueTransformer(forName: transformerName) != nil)
         registeredTransformers.append(transformer)
     }
 
@@ -302,4 +317,14 @@ func registerValueTransformers(withAllowedPropertyClasses allowedPropertyClasses
 }
 
 var registeredTransformers = [NSValueTransformerName]()
+let keyStore = EncryptionKeyStore(generator: EncryptionKeyGenerator())
+let transformerNames = registerValueTransformers(withAllowedPropertyClasses: [
+                    NSImage.self,
+                    NSString.self,
+                    NSURL.self,
+                    NSNumber.self,
+                    NSError.self,
+                    NSData.self
+                ], keyStore: keyStore)
+print(transformerNames)
 
