@@ -93,8 +93,8 @@ class ClickToLoadTDSTests: XCTestCase {
         let mainTdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
         let ctlTdsName = DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName
 
-        let (fbMainRules, mainCTLRuleCount) = trackerRules(for: mainTdsName, ruleSets: ruleSets)
-        let (fbCTLRules, ctlCTLRuleCount) = trackerRules(for: ctlTdsName, ruleSets: ruleSets)
+        let (fbMainRules, mainCTLRuleCount) = getFBTrackerRules(for: mainTdsName, ruleSets: ruleSets)
+        let (fbCTLRules, ctlCTLRuleCount) = getFBTrackerRules(for: ctlTdsName, ruleSets: ruleSets)
 
         let fbMainRuleCount = fbMainRules!.count
         let fbCTLRuleCount = fbCTLRules!.count
@@ -113,7 +113,7 @@ class ClickToLoadTDSTests: XCTestCase {
     }
 }
 
-func trackerRules(for name: String, ruleSets: [ContentBlockerRulesList]) -> (rules: [KnownTracker.Rule]?, countCTLActions: Int) {
+func getFBTrackerRules(for name: String, ruleSets: [ContentBlockerRulesList]) -> (rules: [KnownTracker.Rule]?, countCTLActions: Int) {
     let tracker = ruleSets.first { $0.name == name }?.trackerData?.tds.trackers["facebook.net"]
     return (tracker?.rules, tracker?.countCTLActions ?? 0)
 }
