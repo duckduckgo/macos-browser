@@ -794,11 +794,6 @@ extension MainViewController {
         Application.appDelegate.subscriptionManager.accountManager.signOut()
         resetThankYouModalChecks(nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
-
-        // Clear pixel data
-        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProFeatureEnabled)
-        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProBetaUserThankYouDBP)
-        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProBetaUserThankYouVPN)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
