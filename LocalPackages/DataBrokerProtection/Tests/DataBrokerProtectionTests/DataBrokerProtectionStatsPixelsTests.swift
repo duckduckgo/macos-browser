@@ -142,7 +142,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
     }
 
     /// This test data has the following parameters
-    ///  - A broker that has two mirror sites
+    ///  - A broker that has two mirror sites but one was removed
     ///  - Four matches found
     ///  - One match was removed
     ///  - Two matches are in progress of being removed (this means we submitted the opt-out)
@@ -151,7 +151,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
     func testStatsByBroker_hasCorrectParams() {
         let mirrorSites: [MirrorSite] = [
             .init(name: "Mirror #1", url: "url.com", addedAt: Date()),
-            .init(name: "Mirror #2", url: "url.com", addedAt: Date())
+            .init(name: "Mirror #2", url: "url.com", addedAt: Date(), removedAt: Date().yesterday)
         ]
         let broker: DataBroker = .mockWith(mirroSites: mirrorSites)
         let historyEventsForFirstOptOutOperation: [HistoryEvent] = [
@@ -191,12 +191,12 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
 
         let result = sut.calculateByBroker(broker, data: [brokerProfileQueryData])
 
-        XCTAssertEqual(result.numberOfProfilesFound, 12)
-        XCTAssertEqual(result.numberOfOptOutsInProgress, 6)
-        XCTAssertEqual(result.numberOfSuccessfulOptOuts, 3)
-        XCTAssertEqual(result.numberOfFailureOptOuts, 3)
-        XCTAssertEqual(result.numberOfNewMatchesFound, 3)
-        XCTAssertEqual(result.numberOfReAppereances, 3)
+        XCTAssertEqual(result.numberOfProfilesFound, 8)
+        XCTAssertEqual(result.numberOfOptOutsInProgress, 4)
+        XCTAssertEqual(result.numberOfSuccessfulOptOuts, 2)
+        XCTAssertEqual(result.numberOfFailureOptOuts, 2)
+        XCTAssertEqual(result.numberOfNewMatchesFound, 2)
+        XCTAssertEqual(result.numberOfReAppereances, 2)
     }
 
     /// This test data has the following parameters

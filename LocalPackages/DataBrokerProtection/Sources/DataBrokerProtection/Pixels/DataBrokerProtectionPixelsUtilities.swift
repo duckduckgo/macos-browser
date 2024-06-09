@@ -28,14 +28,14 @@ final class DataBrokerProtectionPixelsUtilities {
     private static let calendar = Calendar.current
 
     static func shouldWeFirePixel(startDate: Date, endDate: Date, daysDifference: Frequency) -> Bool {
-        if let differenceBetweenDates = differenceBetweenDates(startDate: startDate, endDate: endDate) {
+        if let differenceBetweenDates = numberOfDaysFrom(startDate: startDate, endDate: endDate) {
             return differenceBetweenDates >= daysDifference.rawValue
         }
 
         return false
     }
 
-    static func differenceBetweenDates(startDate: Date, endDate: Date) -> Int? {
+    static func numberOfDaysFrom(startDate: Date, endDate: Date) -> Int? {
         let components = calendar.dateComponents([.day], from: startDate, to: endDate)
 
         return components.day

@@ -436,38 +436,24 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL, Consts.sleepDuration: String(sleepDuration)]
         case .initialScanPreStartDuration(let duration):
             return [Consts.durationInMs: String(duration)]
-        case .globalMetricsWeeklyStats(let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound):
-            return [Consts.numberOfRecordsFound: String(profilesFound),
-                    Consts.numberOfOptOutsInProgress: String(optOutsInProgress),
-                    Consts.numberOfSucessfulOptOuts: String(successfulOptOuts),
-                    Consts.numberOfOptOutsFailure: String(failedOptOuts),
-                    Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
-                    Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound)]
-        case .globalMetricsMonthlyStats(let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound):
-            return [Consts.numberOfRecordsFound: String(profilesFound),
-                    Consts.numberOfOptOutsInProgress: String(optOutsInProgress),
-                    Consts.numberOfSucessfulOptOuts: String(successfulOptOuts),
-                    Consts.numberOfOptOutsFailure: String(failedOptOuts),
-                    Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
-                    Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound)]
-        case .dataBrokerMetricsWeeklyStats(let dataBrokerURL, let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound, let numberOfReappereances):
-            return [Consts.dataBrokerParamKey: dataBrokerURL,
-                    Consts.numberOfRecordsFound: String(profilesFound),
-                    Consts.numberOfOptOutsInProgress: String(optOutsInProgress),
-                    Consts.numberOfSucessfulOptOuts: String(successfulOptOuts),
-                    Consts.numberOfOptOutsFailure: String(failedOptOuts),
-                    Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
-                    Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound),
-                    Consts.numberOfReappereances: String(numberOfReappereances)]
-        case .dataBrokerMetricsMonthlyStats(let dataBrokerURL, let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound, let numberOfReappereances):
-            return [Consts.dataBrokerParamKey: dataBrokerURL,
-                    Consts.numberOfRecordsFound: String(profilesFound),
-                    Consts.numberOfOptOutsInProgress: String(optOutsInProgress),
-                    Consts.numberOfSucessfulOptOuts: String(successfulOptOuts),
-                    Consts.numberOfOptOutsFailure: String(failedOptOuts),
-                    Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
-                    Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound),
-                    Consts.numberOfReappereances: String(numberOfReappereances)]
+        case .globalMetricsWeeklyStats(let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound),
+                        .globalMetricsMonthlyStats(let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound):
+                    return [Consts.numberOfRecordsFound: String(profilesFound),
+                            Consts.numberOfOptOutsInProgress: String(optOutsInProgress),
+                            Consts.numberOfSucessfulOptOuts: String(successfulOptOuts),
+                            Consts.numberOfOptOutsFailure: String(failedOptOuts),
+                            Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
+                            Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound)]
+        case .dataBrokerMetricsWeeklyStats(let dataBrokerURL, let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound, let numberOfReappereances),
+                     .dataBrokerMetricsMonthlyStats(let dataBrokerURL, let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound, let numberOfReappereances):
+                   return [Consts.dataBrokerParamKey: dataBrokerURL,
+                           Consts.numberOfRecordsFound: String(profilesFound),
+                           Consts.numberOfOptOutsInProgress: String(optOutsInProgress),
+                           Consts.numberOfSucessfulOptOuts: String(successfulOptOuts),
+                           Consts.numberOfOptOutsFailure: String(failedOptOuts),
+                           Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
+                           Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound),
+                           Consts.numberOfReappereances: String(numberOfReappereances)]
         }
     }
 }

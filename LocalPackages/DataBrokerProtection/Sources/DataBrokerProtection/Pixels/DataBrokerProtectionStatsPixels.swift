@@ -147,12 +147,16 @@ final class DataBrokerProtectionStatsPixels {
         let dateOfFirstScan = dateOfFirstScan(brokerProfileQueryData)
 
         if shouldFireWeeklyStats(dateOfFirstScan: dateOfFirstScan) {
-            firePixels(for: brokerProfileQueryData, frequency: .weekly)
+            firePixels(for: brokerProfileQueryData,
+                       frequency: .weekly,
+                       dateSinceLastSubmission: repository.getLatestStatsWeeklyPixelDate())
             repository.markStatsWeeklyPixelDate()
         }
 
         if shouldFireMonthlyStats(dateOfFirstScan: dateOfFirstScan) {
-            firePixels(for: brokerProfileQueryData, frequency: .monthly)
+            firePixels(for: brokerProfileQueryData,
+                       frequency: .monthly,
+                       dateSinceLastSubmission: repository.getLatestStatsMonthlyPixelDate())
             repository.markStatsMonthlyPixelDate()
         }
     }
@@ -187,17 +191,17 @@ final class DataBrokerProtectionStatsPixels {
         }
     }
 
-    private func firePixels(for brokerProfileQueryData: [BrokerProfileQueryData], frequency: Frequency) {
-        let statsByBroker = calculateStatsByBroker(brokerProfileQueryData)
+    private func firePixels(for brokerProfileQueryData: [BrokerProfileQueryData], frequency: Frequency, dateSinceLastSubmission: Date? = nil) {
+        let statsByBroker = calculateStatsByBroker(brokerProfileQueryData, dateSinceLastSubmission: dateSinceLastSubmission)
 
         fireGlobalStats(statsByBroker, brokerProfileQueryData: brokerProfileQueryData, frequency: frequency)
         fireStatsByBroker(statsByBroker, frequency: frequency)
     }
 
-    private func calculateStatsByBroker(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> [StatsByBroker] {
+    private func calculateStatsByBroker(_ brokerProfileQueryData: [BrokerProfileQueryData], dateSinceLastSubmission: Date? = nil) -> [StatsByBroker] {
         let profileQueriesGroupedByBroker = Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker })
         let statsByBroker = profileQueriesGroupedByBroker.map { (key: DataBroker, value: [BrokerProfileQueryData]) in
-            calculateByBroker(key, data: value)
+            calculateByBroker(key, data: value, dateSinceLastSubmission: dateSinceLastSubmission)
         }
 
         return statsByBroker
@@ -229,8 +233,8 @@ final class DataBrokerProtectionStatsPixels {
     }
 
     /// internal for testing purposes
-    func calculateByBroker(_ broker: DataBroker, data: [BrokerProfileQueryData]) -> StatsByBroker {
-        let mirrorSitesSize = broker.mirrorSites.count
+    func calculateByBroker(_ broker: DataBroker, data: [BrokerProfileQueryData], dateSinceLastSubmission: Date? = nil) -> StatsByBroker {
+        let mirrorSitesSize = broker.mirrorSites.filter { !$0.wasRemoved() }.count
         var numberOfProfilesFound = 0 // Number of unique matching profiles found since the beginning.
         var numberOfOptOutsInProgress = 0 // Number of opt-outs in progress since the beginning.
         var numberOfSuccessfulOptOuts = 0 // Number of successfull opt-outs since the beginning
@@ -264,7 +268,7 @@ final class DataBrokerProtectionStatsPixels {
 
         let numberOfFailureOptOuts = numberOfProfilesFound - numberOfOptOutsInProgress - numberOfSuccessfulOptOuts
         let numberOfNewMatchesFound = calculateNumberOfNewMatchesFound(data)
-        let durationOfFirstOptOut = calculateDurationOfFirstOptOut(data)
+        let durationOfFirstOptOut = calculateDurationOfFirstOptOut(data, from: dateSinceLastSubmission)
 
         return StatsByBroker(dataBrokerURL: broker.url,
                              numberOfProfilesFound: numberOfProfilesFound,
@@ -286,7 +290,7 @@ final class DataBrokerProtectionStatsPixels {
         let profileQueriesGroupedByBroker = Dictionary(grouping: brokerProfileQueryDataWithAMatch, by: { $0.dataBroker })
 
         profileQueriesGroupedByBroker.forEach { (key: DataBroker, value: [BrokerProfileQueryData]) in
-            let mirrorSitesCount = key.mirrorSites.count
+            let mirrorSitesCount = key.mirrorSites.filter { !$0.wasRemoved() }.count
 
             for query in value {
                 let matchesFoundEvents = query.scanJobData.historyEvents
@@ -318,7 +322,8 @@ final class DataBrokerProtectionStatsPixels {
     /// If an opt-out wasn't submitted yet, we return 0.
     ///
     /// internal for testing purposes
-    func calculateDurationOfFirstOptOut(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> Int {        guard let dateOfFirstScan = dateOfFirstScan(brokerProfileQueryData),
+    func calculateDurationOfFirstOptOut(_ brokerProfileQueryData: [BrokerProfileQueryData], from: Date? = nil) -> Int {
+        guard let dateOfFirstScan = dateOfFirstScan(brokerProfileQueryData),
               let dateOfFirstSubmittedOptOut = dateOfFirstSubmittedOptOut(brokerProfileQueryData) else {
             return 0
         }
@@ -327,7 +332,7 @@ final class DataBrokerProtectionStatsPixels {
             return 0
         }
 
-        guard let differenceInDays = DataBrokerProtectionPixelsUtilities.differenceBetweenDates(startDate: dateOfFirstScan, endDate: dateOfFirstSubmittedOptOut) else {
+        guard let differenceInDays = DataBrokerProtectionPixelsUtilities.numberOfDaysFrom(startDate: dateOfFirstScan, endDate: dateOfFirstSubmittedOptOut) else {
             return 0
         }
 
@@ -339,26 +344,33 @@ final class DataBrokerProtectionStatsPixels {
         return differenceInDays
     }
 
-    /// Returns the date of the first scan
-    private func dateOfFirstScan(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> Date? {
+    /// Returns the date of the first scan since the beginning if not from Date is provided
+    private func dateOfFirstScan(_ brokerProfileQueryData: [BrokerProfileQueryData], from: Date? = nil) -> Date? {
         let allScanOperations = brokerProfileQueryData.map { $0.scanJobData }
         let allScanHistoryEvents = allScanOperations.flatMap { $0.historyEvents }
         let scanStartedEventsSortedByDate = allScanHistoryEvents
             .filter { $0.type == .scanStarted }
             .sorted { $0.date < $1.date }
 
-        return scanStartedEventsSortedByDate.first?.date
+        if let from = from {
+            return scanStartedEventsSortedByDate.filter { from < $0.date }.first?.date
+        } else {
+            return scanStartedEventsSortedByDate.first?.date
+        }
     }
 
-    /// Returns the date of the first sumbitted opt-out
-    private func dateOfFirstSubmittedOptOut(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> Date? {
+    /// Returns the date of the first sumbitted opt-out. If no from date is provided, we return it from the beginning.
+    private func dateOfFirstSubmittedOptOut(_ brokerProfileQueryData: [BrokerProfileQueryData], from: Date? = nil) -> Date? {
         let firstOptOutSubmittedEvent = brokerProfileQueryData
             .flatMap { $0.optOutJobData }
             .flatMap { $0.historyEvents }
             .filter { $0.type == .optOutRequested }
             .sorted { $0.date < $1.date }
-            .first
 
-        return firstOptOutSubmittedEvent?.date
+        if let from = from {
+            return firstOptOutSubmittedEvent.filter { from < $0.date }.first?.date
+        } else {
+            return firstOptOutSubmittedEvent.first?.date
+        }
     }
 }
