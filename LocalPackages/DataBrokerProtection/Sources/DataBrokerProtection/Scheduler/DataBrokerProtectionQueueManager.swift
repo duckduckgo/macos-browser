@@ -250,11 +250,14 @@ private extension DefaultDataBrokerProtectionQueueManager {
 
         let engagementPixels = DataBrokerProtectionEngagementPixels(database: database, handler: pixelHandler)
         let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
+        let statsPixels = DataBrokerProtectionStatsPixels(database: database, handler: pixelHandler)
 
         // This will fire the DAU/WAU/MAU pixels,
         engagementPixels.fireEngagementPixel()
         // This will try to fire the event weekly report pixels
         eventPixels.tryToFireWeeklyPixels()
+        // This will try to fire the stats pixels
+        statsPixels.tryToFireStatsPixels()
     }
 }
 

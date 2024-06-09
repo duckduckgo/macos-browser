@@ -1008,6 +1008,13 @@ extension ScanJobData {
     }
 }
 
+extension OptOutJobData {
+    static func mock(with extractedProfile: ExtractedProfile,
+                     historyEvents: [HistoryEvent] = [HistoryEvent]()) -> OptOutJobData {
+        .init(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents, extractedProfile: extractedProfile)
+    }
+}
+
 extension DataBroker {
 
     static func mock(withId id: Int64) -> DataBroker {
@@ -1547,5 +1554,35 @@ extension SecureStorageError: Equatable {
         default:
             return false
         }
+    }
+}
+
+final class MockDataBrokerProtectionStatsPixelsRepository: DataBrokerProtectionStatsPixelsRepository {
+    var wasMarkStatsWeeklyPixelDateCalled: Bool = false
+    var wasMarkStatsMonthlyPixelDateCalled: Bool = false
+    var latestStatsWeeklyPixelDate: Date?
+    var latestStatsMonthlyPixelDate: Date?
+
+    func markStatsWeeklyPixelDate() {
+        wasMarkStatsWeeklyPixelDateCalled = true
+    }
+
+    func markStatsMonthlyPixelDate() {
+        wasMarkStatsMonthlyPixelDateCalled = true
+    }
+
+    func getLatestStatsWeeklyPixelDate() -> Date? {
+        return latestStatsWeeklyPixelDate
+    }
+
+    func getLatestStatsMonthlyPixelDate() -> Date? {
+        return latestStatsMonthlyPixelDate
+    }
+
+    func clear() {
+        wasMarkStatsWeeklyPixelDateCalled = false
+        wasMarkStatsMonthlyPixelDateCalled = false
+        latestStatsWeeklyPixelDate = nil
+        latestStatsMonthlyPixelDate = nil
     }
 }

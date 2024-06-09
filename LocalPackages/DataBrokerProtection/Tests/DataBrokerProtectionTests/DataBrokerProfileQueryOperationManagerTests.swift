@@ -1038,6 +1038,25 @@ extension DataBroker {
             )
         )
     }
+
+    static func mockWith(mirroSites: [MirrorSite]) -> DataBroker {
+        DataBroker(
+            id: 1,
+            name: "Test broker",
+            url: "testbroker.com",
+            steps: [
+                Step(type: .scan, actions: [Action]()),
+                Step(type: .optOut, actions: [Action]())
+            ],
+            version: "1.0",
+            schedulingConfig: DataBrokerScheduleConfig(
+                retryError: 0,
+                confirmOptOutScan: 0,
+                maintenanceScan: 0
+            ),
+            mirrorSites: mirroSites
+        )
+    }
 }
 
 extension ExtractedProfile {
