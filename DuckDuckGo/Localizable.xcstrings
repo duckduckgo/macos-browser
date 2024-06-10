@@ -1240,7 +1240,57 @@
       }
     },
     "After clicking import, your computer may ask you to enter a password. You may need to enter your password two times before importing starts. DuckDuckGo will not see that password.\n\nImported passwords are stored securely using encryption." : {
-      "comment" : "Warning that Chromium data import would require entering system passwords."
+      "comment" : "Warning that Chromium data import would require entering system passwords.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachdem du auf Importieren geklickt hast, fordert dich dein Computer möglicherweise auf, ein Passwort einzugeben. Möglicherweise musst du dein Passwort zweimal eingeben, bevor der Import beginnt. DuckDuckGo wird dieses Passwort nicht sehen.\n\nImportierte Passwörter werden durch Verschlüsselung sicher gespeichert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es posible que tu ordenador solicite que introduzcas una contraseña después de hacer clic en importar. Puede que tengas que introducir tu contraseña dos veces antes de empezar a importar. DuckDuckGo no verá esa contraseña.\n\nLas contraseñas importadas se almacenan de forma segura mediante encriptación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Après avoir cliqué sur Importer, votre ordinateur pourra vous demander de saisir un mot de passe. Vous devrez peut-être saisir votre mot de passe deux fois avant le lancement de l'importation. DuckDuckGo ne verra pas ce mot de passe.\n\nLes mots de passe importés sont stockés en toute sécurité grâce à un cryptage."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dopo aver fatto clic su \"Importa\", il tuo computer potrebbe chiederti di inserire una password e potrebbe essere necessario inserirla due volte prima che l'importazione abbia inizio. DuckDuckGo non visualizzerà mai questa password.\n\nLe password importate vengono archiviate in modo sicuro utilizzando la crittografia."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nadat je op importeren hebt geklikt, kan je computer je vragen om een wachtwoord in te voeren. Mogelijk moet je je wachtwoord twee keer invoeren voordat het importeren begint. DuckDuckGo zal dat wachtwoord niet zien.\n\nGeïmporteerde wachtwoorden worden veilig opgeslagen door middel van versleuteling."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Po kliknięciu opcji importu komputer może Cię poprosić o wprowadzenie hasła. Przed rozpoczęciem importowania może być konieczne dwukrotne wprowadzenie hasła. DuckDuckGo nie zobaczy tego hasła.\n\nZaimportowane hasła są bezpiecznie przechowywane przy użyciu szyfrowania."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depois de clicares em Importar, o teu computador pode pedir-te para introduzires uma palavra-passe. Poderás ter de a introduzir duas vezes antes a importação começar. O DuckDuckGo não verá essa palavra-passe.\n\nAs palavras-passe importadas são armazenadas com segurança por meio de encriptação."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "После нажатия кнопки «Импорт» компьютер может попросить вас ввести пароль. Прежде чем начнется импортирование, пароль, возможно, придется ввести дважды. DuckDuckGo его не увидит.\n\nИмпортированные пароли надежно хранятся в зашифрованном виде."
+          }
+        }
+      }
     },
     "after.bitwarden.installation.info" : {
       "comment" : "Setup of the integration with Bitwarden app",
@@ -1327,7 +1377,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Certains signets sont mal formatés ou trop longs et n'ont pas été synchronisés.\n"
+            "value" : "Certains signets sont mal formatés ou trop longs et n'ont pas été synchronisés."
           }
         },
         "it" : {
@@ -3401,8 +3451,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Speichern und autovervollständigen"
+            "state" : "translated",
+            "value" : "Zum Speichern und automatischen Ausfüllen auffordern"
           }
         },
         "en" : {
@@ -3413,44 +3463,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Guardar y autocompletar"
+            "state" : "translated",
+            "value" : "Solicitar guardar y autocompletar"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Enregistrement et saisie automatique"
+            "state" : "translated",
+            "value" : "Demander l'enregistrement et la saisie automatique"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Salva e compila automaticamente"
+            "state" : "translated",
+            "value" : "Chiedi di salvare e compilare automaticamente"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Opslaan en automatisch invullen"
+            "state" : "translated",
+            "value" : "Vragen om op te slaan en automatisch in te vullen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Zapisywanie i autouzupełnianie"
+            "state" : "translated",
+            "value" : "Poproś o zapisywanie i autouzupełnianie"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Guardar e preencher automaticamente"
+            "state" : "translated",
+            "value" : "Pedir para guardar e preencher automaticamente"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Сохранение и автозаполнение"
+            "state" : "translated",
+            "value" : "Предлагать сохранение и автозаполнение данных"
           }
         }
       }
@@ -4661,7 +4711,7 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Autovervollständigen sperren, nachdem der Computer inaktiv war für"
           }
         },
@@ -4673,43 +4723,43 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Bloquear autocompletar cuando el ordenador esté inactivo durante"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Verrouiller la saisie automatique après l'inactivité de l'ordinateur pendant"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Blocca la compilazione automatica quando il computer è inattivo per"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Automatisch invullen vergrendelen nadat de computer inactief is geweest"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Zablokuj autouzupełnianie, gdy komputer jest bezczynny przez"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Bloquear o preenchimento automático depois de o computador estar inativo durante"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Блокировать автозаполнение после простоя компьютера в течение"
           }
         }
@@ -4961,7 +5011,7 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Wenn es nicht gesperrt ist, kann jeder, der Zugriff auf dein Gerät hat, deine Autovervollständigen-Daten verwenden und ändern. Aus Sicherheitsgründen erfordert das Ausfüllen von Kreditkartenformularen immer eine Authentifizierung."
           }
         },
@@ -4973,43 +5023,43 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Si no está bloqueado, cualquier persona con acceso a tu dispositivo podrá utilizar y modificar tus datos de autocompletar. Por motivos de seguridad, el formulario de la tarjeta de crédito siempre requiere autenticación."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "En l'absence de verrouillage, toute personne ayant accès à votre appareil pourra utiliser et modifier vos données de saisie automatique. Pour des raisons de sécurité, le formulaire de carte bancaire nécessite une authentification systématique."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Se non è bloccata, chiunque abbia accesso al tuo dispositivo potrà utilizzare e modificare i tuoi dati con compilazione automatica. Per motivi di sicurezza, la compilazione del modulo della carta di credito richiede sempre l'autenticazione."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Indien niet vergrendeld, kan iedereen met toegang tot je apparaat je gegevens voor automatisch invullen gebruiken en wijzigen. Om veiligheidsredenen is verificatie altijd nodig bij het invullen van een creditcardformulier."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "W przypadku braku blokady każda osoba mająca dostęp do Twojego urządzenia będzie mogła używać danych autouzupełniania i je modyfikować. Ze względów bezpieczeństwa uzupełnianie formularza karty kredytowej zawsze wymaga uwierzytelnienia."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Se não estiver bloqueado, qualquer pessoa com acesso ao teu dispositivo poderá utilizar e modificar os teus dados de preenchimento automático. Por motivos de segurança, o preenchimento do formulário de cartão de crédito requer sempre autenticação."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "В отсутствие блокировки любой, у кого появится доступ к устройству, сможет использовать или изменить ваши автозаполняемые данные. Из соображений безопасности при заполнении платежных данных в формах всегда требуется аутентификация."
           }
         }
@@ -5259,10 +5309,58 @@
       "comment" : "Autofill autosaved data type",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Passwords"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraseñas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mots de passe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasła"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palavras-passe"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли"
           }
         }
       }
@@ -5691,10 +5789,58 @@
       "comment" : "Text confirming the password manager has been pinned to the toolbar",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcut hinzugefügt!"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Shortcut Added!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Acceso directo añadido!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourci ajouté !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scorciatoia aggiunta."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling toegevoegd!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodano skrót!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atalho adicionado!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ярлык добавлен!"
           }
         }
       }
@@ -5703,10 +5849,58 @@
       "comment" : "Button to pin the password manager shortcut to the toolbar",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcut hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Add Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir acceso directo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un raccourci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi scorciatoia"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sneltoets toevoegen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj skrót"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar atalho"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить ярлык"
           }
         }
       }
@@ -5715,10 +5909,58 @@
       "comment" : "Text prompting user to pin the password manager shortcut to the toolbar",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort-Shortcut hinzufügen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Add passwords shortcut?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Añadir acceso directo a contraseñas?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un raccourci pour les mots de passe ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungere una scorciatoia per le password?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoordsnelkoppeling toevoegen?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodać skrót do haseł?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar atalho de palavras-passe?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить ярлык для менеджера паролей?"
           }
         }
       }
@@ -6027,10 +6269,58 @@
       "comment" : "View Identities Content Button title in the autofill Settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identitäten öffnen …"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Open Identities…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir identidades…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les identités…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri identità..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identiteiten openen…"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz tożsamości…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir identidades…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть учетные данные…"
           }
         }
       }
@@ -6039,10 +6329,58 @@
       "comment" : "View Password Content Button title in the autofill Settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter öffnen …"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Open Passwords…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir contraseñas…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les mots de passe…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri password…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden openen..."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz hasła…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir palavras-passe…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть пароли..."
           }
         }
       }
@@ -6051,10 +6389,58 @@
       "comment" : "View Payment Methods Content Button title in the autofill Settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlungsmethoden öffnen …"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Open Payment Methods…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir métodos de pago…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les modes de paiement…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri metodi di pagamento..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Betaalmethoden openen..."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz metody płatności…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir métodos de pagamento…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть способы оплаты…"
           }
         }
       }
@@ -17875,7 +18261,7 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Passwörter exportieren …"
           }
         },
@@ -17887,43 +18273,43 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Exportar contraseñas…"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Exporter les mots de passe…"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Esporta password…"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Wachtwoorden exporteren ..."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Eksportuj hasła…"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Exportar palavras-passe…"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Экспортировать пароли…"
           }
         }
@@ -22450,6 +22836,7 @@
     },
     "Import" : {
       "comment" : "Menu item",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -23026,8 +23413,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Browserdaten importieren"
+            "state" : "translated",
+            "value" : "In DuckDuckGo importieren"
           }
         },
         "en" : {
@@ -23038,44 +23425,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Importar datos del navegador"
+            "state" : "translated",
+            "value" : "Importar a DuckDuckGo"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Importer les données du navigateur"
+            "state" : "translated",
+            "value" : "Importer dans DuckDuckGo"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Importa dati browser"
+            "state" : "translated",
+            "value" : "Importa in DuckDuckGo"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Browsergegevens importeren"
+            "state" : "translated",
+            "value" : "Importeren naar DuckDuckGo"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Importuj dane przeglądarki"
+            "state" : "translated",
+            "value" : "Importuj do DuckDuckGo"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Importar dados do navegador"
+            "state" : "translated",
+            "value" : "Importar para o DuckDuckGo"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Импорт данных браузера"
+            "state" : "translated",
+            "value" : "Импорт в DuckDuckGo"
           }
         }
       }
@@ -23146,7 +23533,7 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Passwörter importieren …"
           }
         },
@@ -23158,43 +23545,43 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Importar contraseñas"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Importer les mots de passe…"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Importa password…"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer **Bestand → Kluis exporteren** in de menubalk\n%4$d Selecteer de bestandsindeling: **.csv**\n%5$d Voer je Bitwarden-masterwachtwoord in\n%6$d Klik op %7$@ en bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@t"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Importuj hasła..."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Importar palavras-passe…"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Импортировать пароли..."
           }
         }
@@ -23204,10 +23591,58 @@
       "comment" : "Import Browser Data dialog title for final stage when choosing shortcuts to enable",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fast fertig!"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Almost done!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Casi listo!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C'est presque terminé !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quasi finito!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bijna klaar!"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prawie gotowe!"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quase pronto!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Почти готово!"
           }
         }
       }
@@ -23216,10 +23651,58 @@
       "comment" : "Subtitle explaining how users can find toolbar shortcuts.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst jederzeit mit der rechten Maustaste auf die Symbolleiste des Browsers klicken, um weitere Shortcuts wie diese zu finden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "You can always right-click on the browser toolbar to find more shortcuts like these."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siempre puedes hacer clic con el botón derecho en la barra de herramientas del navegador para encontrar más accesos directos como estos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez toujours faire un clic droit sur la barre d'outils du navigateur pour accéder à d'autres raccourcis de ce type."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per trovare altre scorciatoie come queste, puoi sempre fare clic con il tasto destro del mouse sulla barra degli strumenti del browser."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt altijd met de rechtermuisknop op de werkbalk van de browser klikken om meer van deze snelkoppelingen te vinden."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zawsze możesz kliknąć prawym przyciskiem myszy pasek narzędzi przeglądarki, aby znaleźć więcej takich skrótów."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podes sempre clicar com o botão direito do rato na barra de ferramentas do navegador para encontrares mais atalhos como estes."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Другие ярлыки можно всегда найти, щелкнув по панели инструментов браузера правой кнопкой мыши."
           }
         }
       }
@@ -23228,10 +23711,58 @@
       "comment" : "Subtitle explaining where users can find imported passwords.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst deine Passwörter unter DuckDuckGo-Einstellungen > Passwörter & Autovervollständigen verwalten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Access and manage your passwords in DuckDuckGo Settings > Passwords & Autofill."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consulta y gestiona tus contraseñas en Ajustes de DuckDuckGo > Contraseñas y autocompletar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accédez à vos mots de passe et gérez-les dans Paramètres de DuckDuckGo > Mots de passe et saisie automatique."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accedi e gestisci le tue password in Impostazioni di DuckDuckGo > Password e compilazione automatica."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open en beheer je wachtwoorden in DuckDuckGo Instellingen > Wachtwoorden en automatisch aanvullen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uzyskaj dostęp do swoich haseł i zarządzaj nimi w obszarze Ustawienia DuckDuckGo > Hasła i autouzupełnianie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acede e faz a gestão das tuas palavras-passe em Definições do DuckDuckGo > Palavras-passe e preenchimento automático."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Просмотреть и проконтролировать пароли в DuckDuckGo можно в разделе «Настройки > Пароли и автозаполнение»."
           }
         }
       }
@@ -23240,10 +23771,58 @@
       "comment" : "Import Browser Data title for option to choose source browser to import from",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importieren aus"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Import From"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar desde"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer depuis"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa da"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importeren vanuit"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importuj z"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar de"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импорт из"
           }
         }
       }
@@ -25772,10 +26351,58 @@
       "comment" : "Description for the setting to enable the bookmarks bar",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halte deine Lieblingslesezeichen griffbereit"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Put your favorite bookmarks in easy reach"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pon tus marcadores favoritos a tu alcance"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placez vos signets préférés à portée de main"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tieni i tuoi segnalibri preferiti a portata di mano"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Breng je favoriete bladwijzers binnen handbereik"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umieść ulubione zakładki w łatwo dostępnym miejscu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloca os teus marcadores favoritos num local de fácil alcance"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Любимые закладки всегда под рукой"
           }
         }
       }
@@ -25784,10 +26411,58 @@
       "comment" : "Title for the setting to enable the bookmarks bar",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichenleiste anzeigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Show Bookmarks Bar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar barra de marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la barre des signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra la barra dei segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzerbalk tonen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż pasek zakładek"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar barra de marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать панель закладок"
           }
         }
       }
@@ -25796,10 +26471,58 @@
       "comment" : "Description for the setting to enable the passwords shortcut",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter in der Adressleiste aufbewahren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Keep passwords nearby in the address bar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén las contraseñas a mano en la barra de direcciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gardez vos mots de passe à portée de main dans la barre d'adresse"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tieni le password a portata di mano nella barra degli indirizzi"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Houd wachtwoorden bij via de adresbalk"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trzymaj hasła w pobliżu, na pasku adresu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantém as palavras-passe por perto na barra de endereços"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удобное хранение паролей в адресной строке"
           }
         }
       }
@@ -25808,10 +26531,58 @@
       "comment" : "Title for the setting to enable the passwords shortcut",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort-Shortcut anzeigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Show Passwords Shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar acceso directo a contraseñas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher le raccourci des mots de passe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra scorciatoia per le password"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snelkoppeling voor wachtwoorden weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż skrót do haseł"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar atalho de palavras-passe"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать ярлык для паролей"
           }
         }
       }
@@ -25988,9 +26759,6 @@
           }
         }
       }
-    },
-    "Keep passwords nearby in the address bar" : {
-      "comment" : "Description for the setting to enable the passwords shortcut"
     },
     "learnmore.link" : {
       "comment" : "Learn More link",
@@ -32602,7 +33370,7 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Du bist bereit! Du kannst mich jederzeit im Dock antreffen.\nMöchtest du sehen, wie ich dich beschütze? Versuche, eine deiner Lieblingsseiten zu besuchen 👆\n\nBehalte die Adressleiste im Auge. Ich werde Tracker blockieren und die Sicherheit deiner Verbindung verbessern, wenn möglichu{00A0}🔒"
           }
         },
@@ -32614,43 +33382,43 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "¡Ya está todo listo! Puedes encontrarme en el Dock en cualquier momento.\n¿Quieres ver cómo te protejo? Prueba a visitar uno de tus sitios favoritos 👆\n\nNo pierdas de vista la barra de direcciones al navegar. Bloquearé los rastreadores y mejoraré la seguridad de tu conexión cuando sea posible{00A0}🔒"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Tout est prêt ! Vous pouvez me trouver sur le Dock à tout moment.\nVous voulez voir comment je vous protège ? Essayez de visiter l'un de vos sites préférés 👆\n\nContinuez à regarder la barre d'adresse au fur et à mesure. Je bloquerai les traqueurs et mettrai à niveau la sécurité de votre connexion si possible 🔒"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Tutto pronto! Puoi trovarmi nel dock in qualsiasi momento.\nVuoi vedere come ti proteggo? Prova a visitare uno dei tuoi siti preferiti 👆\n\nContinua a controllare la barra degli indirizzi mentre esplori. Bloccherò i sistemi di tracciamento e aggiornerò la sicurezza della tua connessione quando possibile{00A0} 🔒"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Je bent helemaal klaar! Je kunt me altijd vinden in het Dock.\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆\n\nKijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Wszystko gotowe! W każdej chwili możesz mnie znaleźć w Docku.\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Está tudo pronto! Podes encontrar-me na Dock em qualquer altura.\nQueres ver como te protejo? Experimenta visitar um dos teus sites favoritos 👆\n\nContinua a observar a barra de endereço à medida que vais avançando. Vou bloquear os rastreadores e melhorar a segurança da tua ligação sempre que possível 🔒"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Готово! Теперь меня всегда можно найти на док-панели.\nВам интересно, как я защищаю вашу конфиденциальность? Зайдите на свой любимый сайт...👆\n\nИ следите за адресной строкой. По возможности я заблокирую все трекеры и сделаю соединение более безопасным {00A0}🔒"
           }
         }
@@ -34815,8 +35583,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Fireproof?"
+            "state" : "translated",
+            "value" : "„Fireproof“ diese Website?"
           }
         },
         "en" : {
@@ -34827,44 +35595,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "¿Marcar como Fireproof?"
+            "state" : "translated",
+            "value" : "Marcar el sitio web como Fireproof"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Mode coupe-feu (Fireproof) ?"
+            "state" : "translated",
+            "value" : "Placer ce site Web en mode coupe-feu"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Attivare Fireproof?"
+            "state" : "translated",
+            "value" : "Fireproof questo sito"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Fireproof?"
+            "state" : "translated",
+            "value" : "Deze website fireproof maken"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ustawić jako Fireproof?"
+            "state" : "translated",
+            "value" : "Zabezpiecz tę witrynę funkcją Fireproof"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Utilizar o Fireproof?"
+            "state" : "translated",
+            "value" : "Faz o fireproof deste site"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Сделать огнеупорным?"
+            "state" : "translated",
+            "value" : "Fireproof-защита для сайта"
           }
         }
       }
@@ -34875,8 +35643,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Login bei Bitwarden speichern?"
+            "state" : "translated",
+            "value" : "Passwort bei Bitwarden speichern?"
           }
         },
         "en" : {
@@ -34887,44 +35655,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "¿Guardar inicio de sesión en Bitwarden?"
+            "state" : "translated",
+            "value" : "¿Guardar contraseña en Bitwarden?"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Enregistrer la connexion à Bitwarden ?"
+            "state" : "translated",
+            "value" : "Enregistrer le mot de passe dans Bitwarden ?"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Salvare l'accesso a Bitwarden?"
+            "state" : "translated",
+            "value" : "Salvare la password su Bitwarden?"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Login op Bitwarden opslaan?"
+            "state" : "translated",
+            "value" : "Wachtwoord opslaan in Bitwarden?"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Zapisać dane logowania w aplikacji Bitwarden?"
+            "state" : "translated",
+            "value" : "Zapisać hasło w aplikacji Bitwarden?"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Guardar início de sessão no Bitwarden?"
+            "state" : "translated",
+            "value" : "Guardar palavra-passe no Bitwarden?"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Сохранить логин в Bitwarden?"
+            "state" : "translated",
+            "value" : "Сохранить пароль в Bitwarden?"
           }
         }
       }
@@ -35932,10 +36700,58 @@
       "comment" : "Used as the title for menu item and related Settings page",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter und Autovervollständigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Passwords & Autofill"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraseñas y autocompletar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mots de passe et saisie automatique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password e compilazione automatica"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden en automatisch invullen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasła i autouzupełnianie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palavras-passe e preenchimento automático"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли и автозаполнение"
           }
         }
       }
@@ -37799,8 +38615,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Autovervollständigungs-Verknüpfung ausblenden"
+            "state" : "translated",
+            "value" : "Passwort-Shortcut ausblenden"
           }
         },
         "en" : {
@@ -37811,44 +38627,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ocultar acceso directo a Autocompletar"
+            "state" : "translated",
+            "value" : "Ocultar acceso directo a contraseñas"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Masquer le raccourci de saisie automatique"
+            "state" : "translated",
+            "value" : "Masquer le raccourci des mots de passe"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Nascondi scorciatoia compilazione automatica"
+            "state" : "translated",
+            "value" : "Nascondi scorciatoia per le password"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Snelkoppeling voor automatisch invullen verbergen"
+            "state" : "translated",
+            "value" : "Snelkoppeling voor wachtwoorden verbergen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ukryj skrót do autouzupełniania"
+            "state" : "translated",
+            "value" : "Ukryj skrót do haseł"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ocultar atalho de preenchimento automático"
+            "state" : "translated",
+            "value" : "Ocultar atalho de palavras-passe"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Скрыть ярлык для автозаполнения"
+            "state" : "translated",
+            "value" : "Скрыть ярлык для паролей"
           }
         }
       }
@@ -38039,8 +38855,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Autofill-Verknüpfung anzeigen"
+            "state" : "translated",
+            "value" : "Passwort-Shortcut anzeigen"
           }
         },
         "en" : {
@@ -38051,44 +38867,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Mostrar acceso directo a Autocompletar"
+            "state" : "translated",
+            "value" : "Mostrar acceso directo a contraseñas"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Afficher le raccourci de saisie automatique"
+            "state" : "translated",
+            "value" : "Afficher le raccourci des mots de passe"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Mostra scorciatoia compilazione automatica"
+            "state" : "translated",
+            "value" : "Mostra scorciatoia per le password"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Snelkoppeling voor automatisch invullen weergeven"
+            "state" : "translated",
+            "value" : "Snelkoppeling voor wachtwoorden weergeven"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pokaż skrót do autouzupełniania"
+            "state" : "translated",
+            "value" : "Pokaż skrót do haseł"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Mostrar atalho de preenchimento automático"
+            "state" : "translated",
+            "value" : "Mostrar atalho de palavras-passe"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Показывать ярлык для автозаполнения"
+            "state" : "translated",
+            "value" : "Показывать ярлык для паролей"
           }
         }
       }
@@ -39770,10 +40586,58 @@
       "comment" : "Import passwords button title for default empty state",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter importieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Import Passwords"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar contraseñas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer les mots de passe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa password"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden importeren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importuj hasła"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar palavras-passe"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импорт паролей"
           }
         }
       }
@@ -39964,8 +40828,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Keine Passwörter"
+            "state" : "translated",
+            "value" : "Noch keine Passwörter gespeichert"
           }
         },
         "en" : {
@@ -39976,44 +40840,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Sin contraseñas"
+            "state" : "translated",
+            "value" : "Aún no hay contraseñas guardadas"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Aucun mot de passe"
+            "state" : "translated",
+            "value" : "Aucun mot de passe n'a été enregistré"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Nessuna password"
+            "state" : "translated",
+            "value" : "Nessuna password ancora salvata"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Geen wachtwoorden"
+            "state" : "translated",
+            "value" : "Nog geen wachtwoorden opgeslagen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Brak haseł"
+            "state" : "translated",
+            "value" : "Nie zapisano jeszcze żadnych haseł"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Sem palavras-passe"
+            "state" : "translated",
+            "value" : "Ainda não há palavras-passe guardadas"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Нет паролей"
+            "state" : "translated",
+            "value" : "Сохраненных паролей пока нет"
           }
         }
       }
@@ -40684,8 +41548,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Zugang zu deinen Autovervollständigungs-Infos freischalten"
+            "state" : "translated",
+            "value" : "deine Passwörter freischalten und Informationen autovervollständigen"
           }
         },
         "en" : {
@@ -40696,44 +41560,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "desbloquear el acceso a tu información de autocompletar"
+            "state" : "translated",
+            "value" : "desbloquea tus contraseñas y completa automáticamente tu información"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "déverrouiller l'accès à vos informations de saisie automatique"
+            "state" : "translated",
+            "value" : "débloque vos mots de passe et saisit automatiquement les informations pour vous"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "sblocca l'accesso alla compilazione automatica delle informazioni"
+            "state" : "translated",
+            "value" : "sblocca le tue password e compila automaticamente le informazioni"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "toegang tot automatisch ingevulde gegevens ontgrendelen"
+            "state" : "translated",
+            "value" : "ontgrendel je wachtwoorden en vul gegevens automatisch in"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "odblokuj dostęp do informacji autouzupełniania"
+            "state" : "translated",
+            "value" : "odblokuj hasła i automatycznie uzupełniaj informacje"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "desbloquear o acesso às tuas informações de preenchimento automático"
+            "state" : "translated",
+            "value" : "desbloquear as palavras-passe e preencher automaticamente informações por ti"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "разблокировать доступ к автозаполняемым данным"
+            "state" : "translated",
+            "value" : "Разблокирует ваши пароли и автоматически заполнит информацию"
           }
         }
       }
@@ -42544,8 +43408,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Passwort speichern?"
+            "state" : "translated",
+            "value" : "Passwort in DuckDuckGo speichern?"
           }
         },
         "en" : {
@@ -42556,44 +43420,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "¿Guardar contraseña?"
+            "state" : "translated",
+            "value" : "¿Guardar contraseña en DuckDuckGo?"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Enregistrer le mot de passe ?"
+            "state" : "translated",
+            "value" : "Enregistrer le mot de passe dans DuckDuckGo ?"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Salvare password?"
+            "state" : "translated",
+            "value" : "Salvare la password in DuckDuckGo?"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wachtwoord opslaan?"
+            "state" : "translated",
+            "value" : "Wachtwoord opslaan in DuckDuckGo?"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Zapisać hasło?"
+            "state" : "translated",
+            "value" : "Zapisać hasło w DuckDuckGo?"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Guardar palavra-passe?"
+            "state" : "translated",
+            "value" : "Guardar palavra-passe no DuckDuckGo?"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Сохранить пароль?"
+            "state" : "translated",
+            "value" : "Сохранить пароль в DuckDuckGo?"
           }
         }
       }
@@ -42604,7 +43468,7 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Neues Passwort gespeichert"
           }
         },
@@ -42616,43 +43480,43 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Nueva contraseña guardada"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Nouveau mot de passe enregistré"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Nuova password salvata"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Nieuw wachtwoord opgeslagen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Zapisano nowe hasło"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Nova palavra-passe guardada"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Новый пароль сохранен"
           }
         }
@@ -43142,10 +44006,58 @@
       "comment" : "Title for the Update Credentials popover",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort aktualisieren?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Update password?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Actualizar contraseña?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le mot de passe ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornare password?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoord bijwerken?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zaktualizować hasło?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualizar palavra-passe?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить пароль?"
           }
         }
       }
@@ -47642,9 +48554,6 @@
         }
       }
     },
-    "Put your favorite bookmarks in easy reach" : {
-      "comment" : "Description for the setting to enable the bookmarks bar"
-    },
     "quit" : {
       "comment" : "Quit button",
       "extractionState" : "extracted_with_value",
@@ -48811,7 +49720,57 @@
       }
     },
     "Select Data to Import:" : {
-      "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks."
+      "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu importierende Daten auswählen:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona los datos a importar:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionner les données à importer :"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleziona i dati da importare:"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecteer gegevens om te importeren:"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wybierz dane do zaimportowania:"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecionar dados para importar:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите данные для импорта:"
+          }
+        }
+      }
     },
     "Select Profile:" : {
       "comment" : "Browser Profile picker title for Data Import",
@@ -49812,9 +50771,6 @@
         }
       }
     },
-    "Show Bookmarks Bar" : {
-      "comment" : "Title for the setting to enable the bookmarks bar"
-    },
     "Show Bookmarks Shortcut" : {
       "comment" : "Main Menu View item",
       "localizations" : {
@@ -50026,9 +50982,6 @@
           }
         }
       }
-    },
-    "Show Passwords Shortcut" : {
-      "comment" : "Title for the setting to enable the passwords shortcut"
     },
     "Show Previous Tab" : {
       "comment" : "Main Menu Window item",
