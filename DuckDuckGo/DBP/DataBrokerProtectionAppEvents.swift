@@ -25,31 +25,31 @@ import DataBrokerProtection
 
 struct DataBrokerProtectionAppEvents {
 
-    private let featureVisibility: DataBrokerProtectionFeatureGatekeeper
+    private let featureGatekeeper: DataBrokerProtectionFeatureGatekeeper
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
     private let loginItemsManager: LoginItemsManaging
     private let loginItemInterface: DataBrokerProtectionLoginItemInterface
-    
+
     enum WaitlistNotificationSource {
         case localPush
         case cardUI
     }
 
-    init(featureVisibility: DataBrokerProtectionFeatureGatekeeper,
+    init(featureGatekeeper: DataBrokerProtectionFeatureGatekeeper,
          loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          loginItemInterface: DataBrokerProtectionLoginItemInterface = DataBrokerProtectionManager.shared.loginItemInterface) {
-        self.featureVisibility = featureVisibility
+        self.featureGatekeeper = featureGatekeeper
         self.loginItemsManager = loginItemsManager
         self.loginItemInterface = loginItemInterface
     }
 
     func applicationDidFinishLaunching() {
-        guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
+        guard !featureGatekeeper.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
         /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
         /// since the waitlist flag might have been turned off
-        if !featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() {
-            featureVisibility.disableAndDeleteForWaitlistUsers()
+        if !featureGatekeeper.isFeatureVisible() && !featureGatekeeper.isPrivacyProEnabled() {
+            featureGatekeeper.disableAndDeleteForWaitlistUsers()
             return
         }
 
@@ -67,24 +67,24 @@ struct DataBrokerProtectionAppEvents {
                 try await Task.sleep(nanoseconds: 1_000_000_000)
                 loginItemInterface.appLaunched()
             } else {
-                featureVisibility.disableAndDeleteForWaitlistUsers()
+                featureGatekeeper.disableAndDeleteForWaitlistUsers()
             }
         }
 
     }
 
     func applicationDidBecomeActive() {
-        guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
+        guard !featureGatekeeper.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
         /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
         /// since the waitlist flag might have been turned off
-        if !featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() {
-            featureVisibility.disableAndDeleteForWaitlistUsers()
+        if !featureGatekeeper.isFeatureVisible() && !featureGatekeeper.isPrivacyProEnabled() {
+            featureGatekeeper.disableAndDeleteForWaitlistUsers()
             return
         }
 
         Task { @MainActor in
-            let prerequisitesMet = await featureVisibility.prerequisitesAreSatisfied()
+            let prerequisitesMet = await featureGatekeeper.prerequisitesAreSatisfied()
             guard prerequisitesMet else {
                 loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
                 return

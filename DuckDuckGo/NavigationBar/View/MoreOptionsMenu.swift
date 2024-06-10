@@ -138,11 +138,7 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
-        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist && DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
-            DataBrokerProtectionWaitlistViewControllerPresenter.show()
-        } else {
-            actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
-        }
+        actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
     }
 #endif // DBP
 
@@ -336,8 +332,8 @@ final class MoreOptionsMenu: NSMenu {
         }
 
 #if DBP
-        let dbpVisibility = DefaultDataBrokerProtectionFeatureVisibility()
-        if dbpVisibility.isFeatureVisible() || dbpVisibility.isPrivacyProEnabled() {
+        let dbpGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: accountManager)
+        if dbpGatekeeper.isFeatureVisible() || dbpGatekeeper.isPrivacyProEnabled() {
             let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
                                                       action: #selector(openDataBrokerProtection),
                                                       keyEquivalent: "")
@@ -363,7 +359,7 @@ final class MoreOptionsMenu: NSMenu {
             DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
 
         } else {
-            DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
+            dbpGatekeeper.disableAndDeleteForWaitlistUsers()
         }
 #endif // DBP
 

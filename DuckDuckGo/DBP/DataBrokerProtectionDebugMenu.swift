@@ -37,7 +37,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private let waitlistTimestampItem = NSMenuItem(title: "Waitlist Timestamp:")
     private let waitlistInviteCodeItem = NSMenuItem(title: "Waitlist Invite Code:")
     private let waitlistTermsAndConditionsAcceptedItem = NSMenuItem(title: "T&C Accepted:")
-    private let waitlistBypassItem = NSMenuItem(title: "Bypass Waitlist", action: #selector(DataBrokerProtectionDebugMenu.toggleBypassWaitlist))
 
     private let productionURLMenuItem = NSMenuItem(title: "Use Production URL", action: #selector(DataBrokerProtectionDebugMenu.useWebUIProductionURL))
 
@@ -67,13 +66,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 NSMenuItem(title: "Send Notification", action: #selector(DataBrokerProtectionDebugMenu.sendWaitlistAvailableNotification))
                     .targetting(self)
 
-                NSMenuItem(title: "Fetch Invite Code", action: #selector(DataBrokerProtectionDebugMenu.fetchInviteCode))
-                    .targetting(self)
-
                 NSMenuItem.separator()
-
-                waitlistBypassItem
-                    .targetting(self)
 
                 NSMenuItem.separator()
 
@@ -172,7 +165,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     // MARK: - Menu State Update
 
     override func update() {
-        updateWaitlistItems()
         updateWebUIMenuItemsState()
         updateEnvironmentMenu()
         updateShowStatusMenuIconMenu()
@@ -311,10 +303,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         os_log("DBP waitlist state cleaned", log: .dataBrokerProtection)
     }
 
-    @objc private func toggleBypassWaitlist() {
-        DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist.toggle()
-    }
-
     @objc private func resetTermsAndConditionsAcceptance() {
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
@@ -325,14 +313,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         DataBrokerProtectionWaitlist().sendInviteCodeAvailableNotification(completion: nil)
 
         os_log("DBP waitlist notification sent", log: .dataBrokerProtection)
-    }
-
-    @objc private func fetchInviteCode() {
-        os_log("Fetching invite code...", log: .dataBrokerProtection)
-
-        Task {
-            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
-        }
     }
 
     @objc private func toggleShowStatusMenuItem() {
@@ -384,23 +364,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         menuItem.target = self
         menuItem.representedObject = representedObject
         return menuItem
-    }
-
-    private func updateWaitlistItems() {
-        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: DataBrokerProtectionWaitlist.identifier, keychainAppGroup: Bundle.main.appGroup(bundle: .dbp))
-        waitlistTokenItem.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
-        waitlistInviteCodeItem.title = "Waitlist Invite Code: \(waitlistStorage.getWaitlistInviteCode() ?? "N/A")"
-
-        if let timestamp = waitlistStorage.getWaitlistTimestamp() {
-            waitlistTimestampItem.title = "Waitlist Timestamp: \(String(describing: timestamp))"
-        } else {
-            waitlistTimestampItem.title = "Waitlist Timestamp: N/A"
-        }
-
-        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
-        waitlistTermsAndConditionsAcceptedItem.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
-
-        waitlistBypassItem.state = DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist ? .on : .off
     }
 
     private func updateEnvironmentMenu() {

@@ -320,7 +320,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
 #if DBP
-        DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
+        DataBrokerProtectionAppEvents(featureVisibility: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: accountManager)).applicationDidFinishLaunching()
 #endif
 
         setUpAutoClearHandler()
@@ -350,7 +350,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         NetworkProtectionAppEvents(featureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 #if DBP
-        DataBrokerProtectionAppEvents().applicationDidBecomeActive()
+        DataBrokerProtectionAppEvents(featureVisibility: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: accountManager)).applicationDidBecomeActive()
 #endif
 
         AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
@@ -640,17 +640,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
-        if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
-
-#if DBP
-            if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
-                DispatchQueue.main.async {
-                    DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .localPush)
-                }
-            }
-#endif
-        }
-
         completionHandler()
     }
 
