@@ -320,7 +320,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
 #if DBP
-        DataBrokerProtectionAppEvents(featureVisibility: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: accountManager)).applicationDidFinishLaunching()
+        DataBrokerProtectionAppEvents(featureGatekeeper: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: accountManager)).applicationDidFinishLaunching()
 #endif
 
         setUpAutoClearHandler()
@@ -350,7 +350,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         NetworkProtectionAppEvents(featureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 #if DBP
-        DataBrokerProtectionAppEvents(featureVisibility: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: accountManager)).applicationDidBecomeActive()
+        DataBrokerProtectionAppEvents(featureGatekeeper: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: accountManager)).applicationDidBecomeActive()
 #endif
 
         AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()

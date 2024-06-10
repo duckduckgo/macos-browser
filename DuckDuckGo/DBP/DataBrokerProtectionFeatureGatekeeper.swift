@@ -32,7 +32,7 @@ protocol DataBrokerProtectionFeatureGatekeeper {
     func isPrivacyProEnabled() -> Bool
     func isEligibleForThankYouMessage() -> Bool
     func cleanUpDBPForPrivacyProIfNecessary() -> Bool
-    func prerequisitesAreSatisfied() async -> Bool
+    func arePrerequisitesSatisfied() async -> Bool
 }
 
 struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeatureGatekeeper {
@@ -45,14 +45,6 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     private let accountManager: AccountManaging
 
     private let dataBrokerProtectionKey = "data-broker-protection.cleaned-up-from-waitlist-to-privacy-pro"
-    private var dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro: Bool {
-        get {
-            return userDefaults.bool(forKey: dataBrokerProtectionKey)
-        }
-        nonmutating set {
-            userDefaults.set(newValue, forKey: dataBrokerProtectionKey)
-        }
-    }
 
     /// Temporary code to use while we have both redeem flow for diary study users. Should be removed later
     static var bypassWaitlist = false
@@ -93,26 +85,6 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
         regionCode = "US"
 #endif
         return (regionCode ?? "US") == "US"
-    }
-
-    private var isInternalUser: Bool {
-        NSApp.delegateTyped.internalUserDecider.isInternalUser
-    }
-
-    private var isWaitlistBetaActive: Bool {
-        return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlistBetaActive)
-    }
-
-    private var isWaitlistEnabled: Bool {
-        return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlist)
-    }
-
-    private var isWaitlistUser: Bool {
-        waitlistStorage.isWaitlistUser
-    }
-
-    private var wasWaitlistUser: Bool {
-        waitlistStorage.getWaitlistInviteCode() != nil
     }
 
     func isPrivacyProEnabled() -> Bool {
@@ -166,14 +138,58 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
         }
     }
 
-    func prerequisitesAreSatisfied() async -> Bool {
+    func arePrerequisitesSatisfied() async -> Bool {
         let entitlements = await accountManager.hasEntitlement(for: .dataBrokerProtection,
-                                                                                   cachePolicy: .reloadIgnoringLocalCacheData)
+                                                               cachePolicy: .reloadIgnoringLocalCacheData)
         let isAuthenticated = accountManager.accessToken != nil
 
         guard case let .success(result) = entitlements else { return false }
 
+        firePrerequisitePixelsIfNecessary(forEntitlementResult: result, isAuthenticatedResult: isAuthenticated)
+
         return result && isAuthenticated
+    }
+}
+
+private extension DefaultDataBrokerProtectionFeatureGatekeeper {
+
+    var dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro: Bool {
+        get {
+            return userDefaults.bool(forKey: dataBrokerProtectionKey)
+        }
+        nonmutating set {
+            userDefaults.set(newValue, forKey: dataBrokerProtectionKey)
+        }
+    }
+
+    var isInternalUser: Bool {
+        NSApp.delegateTyped.internalUserDecider.isInternalUser
+    }
+
+    var isWaitlistBetaActive: Bool {
+        return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlistBetaActive)
+    }
+
+    var isWaitlistEnabled: Bool {
+        return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlist)
+    }
+
+    var isWaitlistUser: Bool {
+        waitlistStorage.isWaitlistUser
+    }
+
+    var wasWaitlistUser: Bool {
+        waitlistStorage.getWaitlistInviteCode() != nil
+    }
+
+    func firePrerequisitePixelsIfNecessary(forEntitlementResult entitlementResult: Bool, isAuthenticatedResult: Bool) {
+        if !entitlementResult {
+            pixelHandler.fire(.gatekeeperEntitlementsInvalid)
+        }
+
+        if !isAuthenticatedResult {
+            pixelHandler.fire(.gatekeeperNotAuthenticated)
+        }
     }
 }
 #endif

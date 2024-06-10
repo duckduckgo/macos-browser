@@ -84,7 +84,7 @@ struct DataBrokerProtectionAppEvents {
         }
 
         Task { @MainActor in
-            let prerequisitesMet = await featureGatekeeper.prerequisitesAreSatisfied()
+            let prerequisitesMet = await featureGatekeeper.arePrerequisitesSatisfied()
             guard prerequisitesMet else {
                 loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
                 return

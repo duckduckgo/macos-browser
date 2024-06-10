@@ -135,7 +135,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
                                                            accountManager: mockAccountManager)
 
         // When
-        let result = await sut.prerequisitesAreSatisfied()
+        let result = await sut.arePrerequisitesSatisfied()
 
         // Then
         XCTAssertFalse(result)
@@ -152,7 +152,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
                                                            accountManager: mockAccountManager)
 
         // When
-        let result = await sut.prerequisitesAreSatisfied()
+        let result = await sut.arePrerequisitesSatisfied()
 
         // Then
         XCTAssertFalse(result)
@@ -169,7 +169,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
                                                            accountManager: mockAccountManager)
 
         // When
-        let result = await sut.prerequisitesAreSatisfied()
+        let result = await sut.arePrerequisitesSatisfied()
 
         // Then
         XCTAssertFalse(result)
@@ -186,7 +186,7 @@ final class DataBrokerProtectionFeatureGatekeeperTests: XCTestCase {
                                                            accountManager: mockAccountManager)
 
         // When
-        let result = await sut.prerequisitesAreSatisfied()
+        let result = await sut.arePrerequisitesSatisfied()
 
         // Then
         XCTAssertTrue(result)
