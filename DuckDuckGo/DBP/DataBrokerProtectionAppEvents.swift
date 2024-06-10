@@ -24,18 +24,26 @@ import Common
 import DataBrokerProtection
 
 struct DataBrokerProtectionAppEvents {
-    let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
+    private let featureVisibility: DataBrokerProtectionFeatureGatekeeper
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
+    private let loginItemsManager: LoginItemsManaging
+    private let loginItemInterface: DataBrokerProtectionLoginItemInterface
+    
     enum WaitlistNotificationSource {
         case localPush
         case cardUI
     }
 
-    func applicationDidFinishLaunching() {
-        let loginItemsManager = LoginItemsManager()
-        let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
-        let loginItemInterface = DataBrokerProtectionManager.shared.loginItemInterface
+    init(featureVisibility: DataBrokerProtectionFeatureGatekeeper,
+         loginItemsManager: LoginItemsManaging = LoginItemsManager(),
+         loginItemInterface: DataBrokerProtectionLoginItemInterface = DataBrokerProtectionManager.shared.loginItemInterface) {
+        self.featureVisibility = featureVisibility
+        self.loginItemsManager = loginItemsManager
+        self.loginItemInterface = loginItemInterface
+    }
 
+    func applicationDidFinishLaunching() {
         guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
         /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
@@ -45,9 +53,10 @@ struct DataBrokerProtectionAppEvents {
             return
         }
 
-        Task {
-            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
+        let loginItemsManager = LoginItemsManager()
+        let loginItemInterface = DataBrokerProtectionManager.shared.loginItemInterface
 
+        Task {
             // If we don't have profileQueries it means there's no user profile saved in our DB
             // In this case, let's disable the agent and delete any left-over data because there's nothing for it to do
             if let profileQueriesCount = try? DataBrokerProtectionManager.shared.dataManager.profileQueriesCount(),
@@ -65,8 +74,6 @@ struct DataBrokerProtectionAppEvents {
     }
 
     func applicationDidBecomeActive() {
-        let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
-
         guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
         /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
@@ -76,8 +83,12 @@ struct DataBrokerProtectionAppEvents {
             return
         }
 
-        Task {
-            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
+        Task { @MainActor in
+            let prerequisitesMet = await featureVisibility.prerequisitesAreSatisfied()
+            guard prerequisitesMet else {
+                loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
+                return
+            }
         }
     }
 
@@ -92,16 +103,6 @@ struct DataBrokerProtectionAppEvents {
             }
 
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
-        }
-    }
-
-    func windowDidBecomeMain() {
-        sendActiveDataBrokerProtectionWaitlistUserPixel()
-    }
-
-    private func sendActiveDataBrokerProtectionWaitlistUserPixel() {
-        if DefaultDataBrokerProtectionFeatureVisibility().waitlistIsOngoing {
-            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistUserActive, frequency: .daily)
         }
     }
 

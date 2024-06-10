@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionFeatureVisibility.swift
+//  DataBrokerProtectionFeatureGatekeeper.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -24,21 +24,25 @@ import Common
 import DataBrokerProtection
 import Subscription
 
-protocol DataBrokerProtectionFeatureVisibility {
+protocol DataBrokerProtectionFeatureGatekeeper {
+    var waitlistIsOngoing: Bool { get }
     func isFeatureVisible() -> Bool
     func disableAndDeleteForAllUsers()
     func disableAndDeleteForWaitlistUsers()
     func isPrivacyProEnabled() -> Bool
     func isEligibleForThankYouMessage() -> Bool
+    func cleanUpDBPForPrivacyProIfNecessary() -> Bool
+    func prerequisitesAreSatisfied() async -> Bool
 }
 
-struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeatureVisibility {
+struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeatureGatekeeper {
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
     private let waitlistStorage: WaitlistStorage
     private let subscriptionAvailability: SubscriptionFeatureAvailability
+    private let accountManager: AccountManaging
 
     private let dataBrokerProtectionKey = "data-broker-protection.cleaned-up-from-waitlist-to-privacy-pro"
     private var dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro: Bool {
@@ -58,13 +62,15 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
          pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
          userDefaults: UserDefaults = .standard,
          waitlistStorage: WaitlistStorage = DataBrokerProtectionWaitlist().waitlistStorage,
-         subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()) {
+         subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
+         accountManager: AccountManaging) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
         self.waitlistStorage = waitlistStorage
         self.subscriptionAvailability = subscriptionAvailability
+        self.accountManager = accountManager
     }
 
     var waitlistIsOngoing: Bool {
@@ -158,6 +164,16 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         } else {
             return isWaitlistEnabled && isWaitlistBetaActive
         }
+    }
+
+    func prerequisitesAreSatisfied() async -> Bool {
+        let entitlements = await accountManager.hasEntitlement(for: .dataBrokerProtection,
+                                                                                   cachePolicy: .reloadIgnoringLocalCacheData)
+        let isAuthenticated = accountManager.accessToken != nil
+
+        guard case let .success(result) = entitlements else { return false }
+
+        return result && isAuthenticated
     }
 }
 #endif
