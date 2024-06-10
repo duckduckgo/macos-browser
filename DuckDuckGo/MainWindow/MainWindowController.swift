@@ -46,7 +46,10 @@ final class MainWindowController: NSWindowController {
         let window = popUp ? PopUpWindow(frame: frame) : MainWindow(frame: frame)
         window.contentViewController = mainViewController
         self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
-
+        if mainViewController.isBurner {
+            // Fire Window: disable screen capture / screenshot taking
+            window.sharingType = .none
+        }
         super.init(window: window)
 
         setupWindow(window)
@@ -76,10 +79,6 @@ final class MainWindowController: NSWindowController {
     private func setupWindow(_ window: NSWindow) {
         window.delegate = self
 
-        if mainViewController.isBurner {
-            // Fire Window: disable screen capture / screenshot taking
-            window.sharingType = .none
-        }
         if shouldShowOnboarding {
             mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()
         }
