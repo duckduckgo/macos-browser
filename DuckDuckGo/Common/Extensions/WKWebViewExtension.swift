@@ -311,22 +311,27 @@ extension WKWebView {
     }
 
     func printOperation(with printInfo: NSPrintInfo = .shared, for frame: FrameHandle?) -> NSPrintOperation? {
-        if let frame = frame, responds(to: Selector.printOperationWithPrintInfoForFrame) {
-            return self.perform(Selector.printOperationWithPrintInfoForFrame, with: printInfo, with: frame)?.takeUnretainedValue() as? NSPrintOperation
+
+        let printOperation = if let frame = frame,
+           responds(to: Selector.printOperationWithPrintInfoForFrame),
+           let operationForFrame = self.perform(Selector.printOperationWithPrintInfoForFrame, with: printInfo, with: frame)?.takeUnretainedValue() as? NSPrintOperation {
+               operationForFrame
+        } else {
+            self.printOperation(with: printInfo)
         }
 
-        let printInfoDictionary = (NSPrintInfo.shared.dictionary() as? [NSPrintInfo.AttributeKey: Any]) ?? [:]
-        let printInfo = NSPrintInfo(dictionary: printInfoDictionary)
+        if #available(macOS 13.3, *) {
+            let observer = NotificationCenter.default
+                .addObserver(forName: .printInfoDidChange, object: nil, queue: .main) { [preferences=configuration.preferences, weak printOperation] _ in
+                    guard let printOperation else { return }
+                    preferences.shouldPrintBackgrounds = printOperation.printInfo.shouldPrintBackgrounds
+                }
+            printOperation.onDeinit {
+                withExtendedLifetime(observer) {}
+            }
+        }
 
-        printInfo.horizontalPagination = .automatic
-        printInfo.verticalPagination = .automatic
-        printInfo.leftMargin = 0
-        printInfo.rightMargin = 0
-        printInfo.topMargin = 0
-        printInfo.bottomMargin = 0
-        printInfo.scalingFactor = 0.95
-
-        return self.printOperation(with: printInfo)
+        return printOperation
     }
 
     func hudView(at point: NSPoint? = nil) -> WKPDFHUDViewWrapper? {
@@ -367,5 +372,11 @@ extension WKWebView {
         static let mediaMutedState = NSSelectorFromString("_mediaMutedState")
         static let setPageMuted = NSSelectorFromString("_setPageMuted:")
     }
+
+}
+
+extension Notification.Name {
+
+    static let printInfoDidChange = Notification.Name(rawValue: "NSPrintInfoDidChange")
 
 }

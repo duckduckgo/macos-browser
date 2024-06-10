@@ -10735,6 +10735,12 @@
         }
       }
     },
+    "Bottom Margin" : {
+
+    },
+    "Bottom:" : {
+
+    },
     "Bring All to Front" : {
       "comment" : "Main Menu Window item",
       "localizations" : {
@@ -25865,6 +25871,12 @@
         }
       }
     },
+    "Left Margin" : {
+
+    },
+    "Left:" : {
+
+    },
     "Let’s try doing it manually. It won’t take long." : {
       "comment" : "Suggestion to switch to a Manual File Data Import when data import fails.",
       "localizations" : {
@@ -29129,6 +29141,9 @@
           }
         }
       }
+    },
+    "Margins (inches)" : {
+
     },
     "menu.add.folder" : {
       "comment" : "Menu item to add a folder",
@@ -47247,6 +47262,15 @@
         }
       }
     },
+    "Print backgrounds" : {
+
+    },
+    "Print headers and footers" : {
+
+    },
+    "Print Headers and Footers" : {
+
+    },
     "print.menu.item" : {
       "comment" : "Menu item title",
       "extractionState" : "extracted_with_value",
@@ -48237,6 +48261,12 @@
           }
         }
       }
+    },
+    "Right Margin" : {
+
+    },
+    "Right:" : {
+
     },
     "save" : {
       "comment" : "Save button",
@@ -53528,6 +53558,12 @@
           }
         }
       }
+    },
+    "Top Margin" : {
+
+    },
+    "Top:" : {
+
     },
     "Transformations" : {
       "comment" : "Main Menu Edit item",

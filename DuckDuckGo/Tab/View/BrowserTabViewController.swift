@@ -1049,6 +1049,8 @@ extension BrowserTabViewController: TabDelegate {
         let contextInfo = Unmanaged<PrintContext>.passRetained(context).toOpaque()
 
         printOperation.printPanel.options.formUnion([.showsPaperSize, .showsOrientation, .showsScaling])
+        printOperation.printPanel.addAccessoryController(PrintPanelAccessoryViewController(printInfo: printOperation.printInfo))
+
         printOperation.runModal(for: window, delegate: self, didRun: didRunSelector, contextInfo: contextInfo)
 
         // get the Print Panel that (hopefully) was added to the window.sheets

@@ -1581,6 +1581,14 @@
 		7BEEA5142AD1236300A9E72B /* NetworkProtectionIPC in Frameworks */ = {isa = PBXBuildFile; productRef = 7BEEA5132AD1236300A9E72B /* NetworkProtectionIPC */; };
 		7BEEA5162AD1236E00A9E72B /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7BEEA5152AD1236E00A9E72B /* NetworkProtectionUI */; };
 		7BFF850F2B0C09DA00ECACA2 /* DuckDuckGo Personal Information Removal.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGo Personal Information Removal.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		8457032B2C11BD6500508922 /* PrintPanelAccessoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8457032A2C11BD6500508922 /* PrintPanelAccessoryView.swift */; };
+		8457032C2C11BD6500508922 /* PrintPanelAccessoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8457032A2C11BD6500508922 /* PrintPanelAccessoryView.swift */; };
+		8457032E2C12F18B00508922 /* NSPrintInfoExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8457032D2C12F18B00508922 /* NSPrintInfoExtension.swift */; };
+		8457032F2C12F18B00508922 /* NSPrintInfoExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8457032D2C12F18B00508922 /* NSPrintInfoExtension.swift */; };
+		845703312C12F36000508922 /* PrintingMarginsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845703302C12F36000508922 /* PrintingMarginsViewModel.swift */; };
+		845703322C12F36000508922 /* PrintingMarginsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845703302C12F36000508922 /* PrintingMarginsViewModel.swift */; };
+		845703342C12F39800508922 /* PrintSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845703332C12F39800508922 /* PrintSettingsViewModel.swift */; };
+		845703352C12F39800508922 /* PrintSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845703332C12F39800508922 /* PrintSettingsViewModel.swift */; };
 		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
 		850E8DFB2A6FEC5E00691187 /* BookmarksBarAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
@@ -3414,6 +3422,10 @@
 		7BEC20402B0F505F00243D3E /* AddBookmarkPopoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddBookmarkPopoverView.swift; sourceTree = "<group>"; };
 		7BEC20412B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddBookmarkFolderPopoverView.swift; sourceTree = "<group>"; };
 		7BF1A9D72AE054D300FCA683 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8457032A2C11BD6500508922 /* PrintPanelAccessoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintPanelAccessoryView.swift; sourceTree = "<group>"; };
+		8457032D2C12F18B00508922 /* NSPrintInfoExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPrintInfoExtension.swift; sourceTree = "<group>"; };
+		845703302C12F36000508922 /* PrintingMarginsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintingMarginsViewModel.swift; sourceTree = "<group>"; };
+		845703332C12F39800508922 /* PrintSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintSettingsViewModel.swift; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
 		850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarAppearance.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
@@ -5960,6 +5972,17 @@
 			path = VPNProxyExtension;
 			sourceTree = "<group>";
 		};
+		845703292C11BADC00508922 /* Printing */ = {
+			isa = PBXGroup;
+			children = (
+				8457032A2C11BD6500508922 /* PrintPanelAccessoryView.swift */,
+				8457032D2C12F18B00508922 /* NSPrintInfoExtension.swift */,
+				845703302C12F36000508922 /* PrintingMarginsViewModel.swift */,
+				845703332C12F39800508922 /* PrintSettingsViewModel.swift */,
+			);
+			path = Printing;
+			sourceTree = "<group>";
+		};
 		853014D425E6709500FB8205 /* Support */ = {
 			isa = PBXGroup;
 			children = (
@@ -6640,6 +6663,7 @@
 				B64C84DB2692D6E80048FEBE /* Permissions */,
 				37BF3F12286D8A4B00BD9014 /* PinnedTabs */,
 				4B0511A2262CAA5A00F6079C /* Preferences */,
+				845703292C11BADC00508922 /* Printing */,
 				B6FA893A269C414900588ECD /* PrivacyDashboard */,
 				AAC6881528626B6F00D54247 /* RecentlyClosed */,
 				85890634267B6CC500D23B0D /* SecureVault */,
@@ -9580,6 +9604,7 @@
 				3706FA98293F65D500E42796 /* SecureVaultSorting.swift in Sources */,
 				3706FA99293F65D500E42796 /* PreferencesSidebarModel.swift in Sources */,
 				3706FA9A293F65D500E42796 /* DuckPlayerURLExtension.swift in Sources */,
+				845703322C12F36000508922 /* PrintingMarginsViewModel.swift in Sources */,
 				3706FA9D293F65D500E42796 /* PermissionState.swift in Sources */,
 				3707C724294B5D2900682A9F /* StringExtension.swift in Sources */,
 				3706FA9F293F65D500E42796 /* FeedbackPresenter.swift in Sources */,
@@ -9763,6 +9788,7 @@
 				3706FB20293F65D500E42796 /* LocalUnprotectedDomains.swift in Sources */,
 				3707C719294B5D0F00682A9F /* HoveredLinkTabExtension.swift in Sources */,
 				3706FB21293F65D500E42796 /* NavigationBarBadgeAnimator.swift in Sources */,
+				8457032F2C12F18B00508922 /* NSPrintInfoExtension.swift in Sources */,
 				3706FB22293F65D500E42796 /* NSTextViewExtension.swift in Sources */,
 				3706FB23293F65D500E42796 /* DownloadsCellView.swift in Sources */,
 				3706FB25293F65D500E42796 /* PublishedAfter.swift in Sources */,
@@ -9876,6 +9902,7 @@
 				9F56CFAA2B82DC4300BB7F11 /* AddEditBookmarkFolderView.swift in Sources */,
 				37FD78122A29EBD100B36DB1 /* SyncErrorHandler.swift in Sources */,
 				987799F42999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift in Sources */,
+				8457032C2C11BD6500508922 /* PrintPanelAccessoryView.swift in Sources */,
 				3706FB7A293F65D500E42796 /* FileDownloadManager.swift in Sources */,
 				3706FB7B293F65D500E42796 /* BookmarkImport.swift in Sources */,
 				3706FB7C293F65D500E42796 /* KeySetDictionary.swift in Sources */,
@@ -9981,6 +10008,7 @@
 				3706FBB8293F65D500E42796 /* SavePaymentMethodPopover.swift in Sources */,
 				4BCF15EF2ABBDBFF0083F6DF /* SurveyRemoteMessaging.swift in Sources */,
 				B6CC266D2BAD9CD800F53F8D /* FileProgressPresenter.swift in Sources */,
+				845703352C12F39800508922 /* PrintSettingsViewModel.swift in Sources */,
 				3706FBB9293F65D500E42796 /* FindInPageViewController.swift in Sources */,
 				3706FBBA293F65D500E42796 /* Cryptography.swift in Sources */,
 				3706FBBC293F65D500E42796 /* NSViewExtension.swift in Sources */,
@@ -11058,6 +11086,7 @@
 				858A798326A8B75F00A75A42 /* CopyHandler.swift in Sources */,
 				1E7E2E9029029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift in Sources */,
 				4B8AC93926B48A5100879451 /* FirefoxLoginReader.swift in Sources */,
+				8457032B2C11BD6500508922 /* PrintPanelAccessoryView.swift in Sources */,
 				F18826902BC0105800D9AC4F /* PixelDataRecord.swift in Sources */,
 				F1C70D792BFF50A400599292 /* DataBrokerProtectionLoginItemInterface.swift in Sources */,
 				F18826912BC0105800D9AC4F /* PixelDataStore.swift in Sources */,
@@ -11344,6 +11373,7 @@
 				3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */,
 				1D43EB3C292B664A0065E5D6 /* BWMessageIdGenerator.swift in Sources */,
 				B6E6B9E32BA1F5F1008AA7E1 /* FilePresenter.swift in Sources */,
+				845703342C12F39800508922 /* PrintSettingsViewModel.swift in Sources */,
 				B6CC266C2BAD9CD800F53F8D /* FileProgressPresenter.swift in Sources */,
 				3158B14D2B0BF74D00AF130C /* DataBrokerProtectionManager.swift in Sources */,
 				4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */,
@@ -11495,6 +11525,7 @@
 				85C48CCC278D808F00D3263E /* NSAttributedStringExtension.swift in Sources */,
 				4B41EDB42B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift in Sources */,
 				AA7EB6E527E7D6DC00036718 /* AnimationView.swift in Sources */,
+				845703312C12F36000508922 /* PrintingMarginsViewModel.swift in Sources */,
 				8562599A269CA0A600EE44BC /* NSRectExtension.swift in Sources */,
 				4B37EE5F2B4CFC3C00A89A61 /* HomePageRemoteMessagingStorage.swift in Sources */,
 				4B9DB0472A983B24000927DB /* WaitlistRootView.swift in Sources */,
@@ -11536,6 +11567,7 @@
 				987799F32999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift in Sources */,
 				B6E3E5582BBFD51400A41922 /* PreviewViewController.swift in Sources */,
 				4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */,
+				8457032E2C12F18B00508922 /* NSPrintInfoExtension.swift in Sources */,
 				37F19A6728E1B43200740DC6 /* DuckPlayerPreferences.swift in Sources */,
 				1D01A3D42B88CF7700FE8150 /* AccessibilityPreferences.swift in Sources */,
 				B6C0B22E26E61CE70031CB7F /* DownloadViewModel.swift in Sources */,

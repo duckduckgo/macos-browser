@@ -316,6 +316,8 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         delegate?.closeTab(self)
     }
 
+    // MARK: - Printing
+
     func runPrintOperation(for frameHandle: FrameHandle?, in webView: WKWebView, completionHandler: ((Bool) -> Void)? = nil) {
         guard let printOperation = webView.printOperation(for: frameHandle) else { return }
 
@@ -369,4 +371,75 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         self.runPrintOperation(for: nil, in: self.webView)
     }
 
+    private static let headerFooterHeightMultiplier = 3.0
+
+    @objc(_webViewHeaderHeight:)
+    func webViewHeaderHeight(_ webView: WKWebView) -> CGFloat {
+        guard NSPrintOperation.current?.printInfo.shouldPrintHeadersAndFooters == true else { return 0 }
+
+        return NSLayoutManager().defaultLineHeight(for: .headerFooterFont) * Self.headerFooterHeightMultiplier
+    }
+
+    @objc(_webViewFooterHeight:)
+    func webViewFooterHeight(_ webView: WKWebView) -> CGFloat {
+        guard NSPrintOperation.current?.printInfo.shouldPrintHeadersAndFooters == true else { return 0 }
+
+        return NSLayoutManager().defaultLineHeight(for: .headerFooterFont) * Self.headerFooterHeightMultiplier
+    }
+
+    // TODO: Draw headers
+    @objc(_webView:drawHeaderInRect:forPageWithTitle:URL:)
+    func webView(_ webView: WKWebView, drawHeaderIn rect: CGRect, forPageWithTitle title: String, url: URL) {
+        guard rect.height > 0, NSPrintOperation.current?.printInfo.shouldPrintHeadersAndFooters == true else { return }
+
+        let font = NSFont.headerFooterFont
+
+        let df = DateFormatter()
+        df.locale = .current
+        df.dateStyle = .short
+        df.timeStyle = .short
+        let dateStr = df.string(from: Date())
+
+        (dateStr as NSString).draw(in: rect)
+//        NSGraphicsContext.current?.cgContext.draw
+//                    rdi = @"";
+//                    if (r15 != 0x0) {
+//                            rdi = r15;
+//                    }
+//                    r15 = [rdi retain];
+//                    rdi = r13;
+//                    r13 = [rdi retain];
+//                    CGRectGetMaxY(rdi);
+//                    [r14 ascender];
+//                    intrinsic_movapd(xmm0, xmm0 - xmm0);
+//                    [var_58 _drawUsingFont:r14 inRect:r15 leftString:r13 rightString:r9 baseline:rax];
+//                    [r13 release];
+//                    [r15 release];
+//                    [r14 release];
+//                    if (r13 != 0x0) {
+//                            CFRelease(r13);
+//                    }
+//                    rdi = var_30;
+//                    r15 = var_40;
+//                    rbx = var_38;
+//                    if (rdi != 0x0) {
+//                            CFRelease(rdi);
+//                    }
+//                    if (rbx != 0x0) {
+//                            CFRelease(rbx);
+//                    }
+
+    }
+
+    @objc(_webView:drawFooterInRect:forPageWithTitle:URL:)
+    func webView(_ webView: WKWebView, drawFooterIn rect: CGRect, forPageWithTitle title: String, url: URL) {
+        guard rect.height > 0, NSPrintOperation.current?.printInfo.shouldPrintHeadersAndFooters == true else { return }
+
+        (url.absoluteString as NSString).draw(in: rect)
+    }
+
+}
+
+extension NSFont {
+    static let headerFooterFont = NSFont.systemFont(ofSize: NSFont.systemFontSize)
 }
