@@ -21,20 +21,54 @@ import Foundation
 import Subscription
 import DataBrokerProtection
 import PixelKit
+import Common
 
 final class DataBrokerProtectionSubscriptionEventHandler {
-    private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
-    init(featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
+    private let authenticationManager: DataBrokerProtectionAuthenticationManaging
+    private let featureDisabler: DataBrokerProtectionFeatureDisabling
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+
+    init(featureDisabler: DataBrokerProtectionFeatureDisabling,
+         authenticationManager: DataBrokerProtectionAuthenticationManaging,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
         self.featureDisabler = featureDisabler
+        self.authenticationManager = authenticationManager
+        self.pixelHandler = pixelHandler
     }
 
     func registerForSubscriptionAccountManagerEvents() {
-        NotificationCenter.default.addObserver(self, selector: #selector(handleAccountDidSignOut), name: .accountDidSignOut, object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleAccountDidSignOut),
+                                               name: .accountDidSignOut,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(entitlementsDidChange),
+                                               name: .entitlementsDidChange,
+                                               object: nil)
     }
 
     @objc private func handleAccountDidSignOut() {
         featureDisabler.disableAndDelete()
+    }
+
+    @objc private func entitlementsDidChange() {
+        Task { @MainActor in
+            do {
+                if try await authenticationManager.hasValidEntitlement() {
+                    pixelHandler.fire(.entitlementCheckValid)
+                } else {
+                    pixelHandler.fire(.entitlementCheckInvalid)
+                    featureDisabler.disableAndDelete()
+                }
+            } catch {
+                /// We don't want to disable the agent in case of an error while checking for entitlements.
+                /// Since this is a destructive action, the only situation that should cause the data to be deleted and the agent to be removed is .success(false)
+                pixelHandler.fire(.entitlementCheckError)
+                assertionFailure("Error validating entitlement \(error)")
+            }
+        }
     }
 }
 

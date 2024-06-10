@@ -37,6 +37,7 @@ import Subscription
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
+// swiftlint:disable:next type_body_length
 final class NetworkProtectionTunnelController: TunnelController, TunnelSessionProvider {
 
     // MARK: - Settings
@@ -67,6 +68,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     private let controllerErrorStore = NetworkProtectionControllerErrorStore()
 
+    private let knownFailureStore = NetworkProtectionKnownFailureStore()
+
     // MARK: - VPN Tunnel & Configuration
 
     /// Auth token store
@@ -74,7 +77,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     // MARK: - Subscriptions
 
-    private let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+    private let accessTokenStorage: SubscriptionTokenKeychainStorage
 
     // MARK: - Debug Options Support
 
@@ -93,6 +96,13 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// For reference read: https://app.asana.com/0/1203137811378537/1206513608690551/f
     ///
     private var internalManager: NETunnelProviderManager?
+
+    /// Simply clears the internal manager so the VPN manager is reloaded next time it's requested.
+    ///
+    @MainActor
+    private func clearInternalManager() {
+        internalManager = nil
+    }
 
     /// The last known VPN status.
     ///
@@ -164,7 +174,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
          defaults: UserDefaults,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          notificationCenter: NotificationCenter = .default,
-         logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
+         logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
+         accessTokenStorage: SubscriptionTokenKeychainStorage) {
 
         self.logger = logger
         self.networkExtensionBundleID = networkExtensionBundleID
@@ -173,9 +184,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         self.settings = settings
         self.defaults = defaults
         self.tokenStore = tokenStore
+        self.accessTokenStorage = accessTokenStorage
 
         subscribeToSettingsChanges()
         subscribeToStatusChanges()
+        subscribeToConfigurationChanges()
     }
 
     // MARK: - Observing Status Changes
@@ -205,6 +218,31 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
 
         }
+    }
+
+    // MARK: - Observing Configuation Changes
+
+    private func subscribeToConfigurationChanges() {
+        notificationCenter.publisher(for: .NEVPNConfigurationChange)
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                Task { @MainActor in
+                    guard let manager = await self.manager else {
+                        return
+                    }
+
+                    do {
+                        try await manager.loadFromPreferences()
+
+                        if manager.connection.status == .invalid {
+                            self.clearInternalManager()
+                        }
+                    } catch {
+                        self.clearInternalManager()
+                    }
+                }
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Subscriptions
@@ -561,6 +599,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
         } catch {
             VPNOperationErrorRecorder().recordControllerStartFailure(error)
+            knownFailureStore.lastKnownFailure = KnownFailure(error)
 
             if case StartError.cancelled = error {
                 PixelKit.fire(
@@ -691,6 +730,14 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     func disableOnDemand(tunnelManager: NETunnelProviderManager) async throws {
         try await tunnelManager.loadFromPreferences()
 
+        guard tunnelManager.connection.status != .invalid else {
+            // An invalid connection status means the VPN isn't really configured
+            // so we don't want to save changed because that would re-create the VPN
+            // configuration.
+            clearInternalManager()
+            return
+        }
+
         tunnelManager.isOnDemandEnabled = false
 
         try await tunnelManager.saveToPreferences()
@@ -793,7 +840,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     }
 
     private func fetchAuthToken() throws -> NSString? {
-        if let accessToken = accountManager.accessToken {
+
+        if let accessToken = try? accessTokenStorage.getAccessToken() {
             os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
             return Self.adaptAccessTokenForVPN(accessToken) as NSString?
         }

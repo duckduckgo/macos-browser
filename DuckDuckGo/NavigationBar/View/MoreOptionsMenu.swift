@@ -57,7 +57,7 @@ final class MoreOptionsMenu: NSMenu {
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
-    private lazy var accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+    private let accountManager: AccountManaging
 
     private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
 
@@ -68,15 +68,17 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
-         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility,
          sharingMenu: NSMenu? = nil,
-         internalUserDecider: InternalUserDecider) {
+         internalUserDecider: InternalUserDecider,
+         accountManager: AccountManaging) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
         self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
         self.internalUserDecider = internalUserDecider
+        self.accountManager = accountManager
 
         super.init(title: "")
 
@@ -100,6 +102,7 @@ final class MoreOptionsMenu: NSMenu {
             return "\(UserText.sendFeedback) (version: \(AppVersion.shared.versionNumber).\(AppVersion.shared.buildNumber))"
         }()
         let feedbackMenuItem = NSMenuItem(title: feedbackString, action: nil, keyEquivalent: "")
+            .withImage(.sendFeedback)
 
         feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
         addItem(feedbackMenuItem)
@@ -286,6 +289,7 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(.passwordManagement)
             .withSubmenu(loginsSubMenu)
+            .withAccessibilityIdentifier("MoreOptionsMenu.autofill")
 
         addItem(NSMenuItem.separator())
     }
@@ -391,7 +395,9 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
-        let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
+        let subscriptionManager = Application.appDelegate.subscriptionManager
+        let platform = subscriptionManager.currentEnvironment.purchasePlatform
+        let shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
         if shouldHidePrivacyProDueToNoProducts {
             return []
         }
@@ -565,17 +571,17 @@ final class FeedbackSubMenu: NSMenu {
     private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, targetting target: AnyObject) {
         removeAllItems()
 
-        let reportBrokenSiteItem = NSMenuItem(title: UserText.reportBrokenSite,
-                                              action: #selector(AppDelegate.openReportBrokenSite(_:)),
-                                              keyEquivalent: "")
-            .withImage(.exclamation)
-        addItem(reportBrokenSiteItem)
-
         let browserFeedbackItem = NSMenuItem(title: UserText.browserFeedback,
                                              action: #selector(AppDelegate.openFeedback(_:)),
                                              keyEquivalent: "")
-            .withImage(.feedback)
+            .withImage(.browserFeedback)
         addItem(browserFeedbackItem)
+
+        let reportBrokenSiteItem = NSMenuItem(title: UserText.reportBrokenSite,
+                                              action: #selector(AppDelegate.openReportBrokenSite(_:)),
+                                              keyEquivalent: "")
+            .withImage(.siteBreakage)
+        addItem(reportBrokenSiteItem)
     }
 }
 
@@ -736,6 +742,7 @@ final class LoginsSubMenu: NSMenu {
     private func updateMenuItems(with target: AnyObject) {
         addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(MoreOptionsMenu.openAutofillWithAllItems), keyEquivalent: "")
             .targetting(target)
+            .withAccessibilityIdentifier("LoginsSubMenu.allItems")
 
         addItem(NSMenuItem.separator())
 

@@ -71,7 +71,9 @@ final class MainViewController: NSViewController {
 #endif
 
             let ipcClient = TunnelControllerIPCClient()
-            ipcClient.register()
+            ipcClient.register { error in
+                NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
+            }
             let vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
 
             return NetworkProtectionNavBarPopoverManager(
@@ -97,7 +99,8 @@ final class MainViewController: NSViewController {
                 connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: connectivityIssuesObserver,
                 controllerErrorMessageObserver: controllerErrorMessageObserver,
-                dataVolumeObserver: ipcClient.ipcDataVolumeObserver
+                dataVolumeObserver: ipcClient.ipcDataVolumeObserver,
+                knownFailureObserver: KnownFailureObserverThroughDistributedNotifications()
             )
         }()
 
@@ -192,13 +195,8 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
-
-        refreshNetworkProtectionMessages()
-
-#if DBP
+        refreshSurveyMessages()
         DataBrokerProtectionAppEvents().windowDidBecomeMain()
-        refreshDataBrokerProtectionMessages()
-#endif
     }
 
     func windowDidResignKey() {
@@ -220,19 +218,15 @@ final class MainViewController: NSViewController {
         }
     }
 
-    private let networkProtectionMessaging = DefaultNetworkProtectionRemoteMessaging()
+    private lazy var surveyMessaging: DefaultSurveyRemoteMessaging = {
+        return DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager)
+    }()
 
-    func refreshNetworkProtectionMessages() {
-        networkProtectionMessaging.fetchRemoteMessages()
+    func refreshSurveyMessages() {
+        Task {
+            await surveyMessaging.fetchRemoteMessages()
+        }
     }
-
-#if DBP
-    private let dataBrokerProtectionMessaging = DefaultDataBrokerProtectionRemoteMessaging()
-
-    func refreshDataBrokerProtectionMessages() {
-        dataBrokerProtectionMessaging.fetchRemoteMessages()
-    }
-#endif
 
     override func encodeRestorableState(with coder: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")

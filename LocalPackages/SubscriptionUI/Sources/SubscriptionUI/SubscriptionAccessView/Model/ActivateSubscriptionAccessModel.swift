@@ -20,10 +20,10 @@ import Foundation
 import Subscription
 
 public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, PurchaseRestoringSubscriptionAccessModel {
-    private var actionHandlers: SubscriptionAccessActionHandlers
 
+    private var actionHandlers: SubscriptionAccessActionHandlers
     public var title = UserText.activateModalTitle
-    public var description = UserText.activateModalDescription(platform: SubscriptionPurchaseEnvironment.current)
+    public let description: String
 
     public var email: String?
     public var emailLabel: String { UserText.email }
@@ -34,13 +34,18 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, Pur
     public var restorePurchaseDescription = UserText.restorePurchaseDescription
     public var restorePurchaseButtonTitle = UserText.restorePurchaseButton
 
-    public init(actionHandlers: SubscriptionAccessActionHandlers, shouldShowRestorePurchase: Bool) {
+    let subscriptionManager: SubscriptionManaging
+
+    public init(actionHandlers: SubscriptionAccessActionHandlers,
+                subscriptionManager: SubscriptionManaging) {
         self.actionHandlers = actionHandlers
-        self.shouldShowRestorePurchase = shouldShowRestorePurchase
+        self.shouldShowRestorePurchase =  subscriptionManager.currentEnvironment.purchasePlatform == .appStore
+        self.subscriptionManager = subscriptionManager
+        self.description = UserText.activateModalDescription(platform: subscriptionManager.currentEnvironment.purchasePlatform)
     }
 
     public func handleEmailAction() {
-        actionHandlers.openURLHandler(.activateSubscriptionViaEmail)
+        actionHandlers.openURLHandler(subscriptionManager.url(for: .activateViaEmail))
         actionHandlers.uiActionHandler(.activateAddEmailClick)
     }
 

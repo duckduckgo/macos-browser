@@ -21,6 +21,7 @@ import Combine
 import DDGSync
 import SwiftUI
 import Subscription
+import NetworkProtectionIPC
 
 final class PreferencesSidebarModel: ObservableObject {
 
@@ -30,6 +31,7 @@ final class PreferencesSidebarModel: ObservableObject {
     @Published var selectedTabIndex: Int = 0
     @Published private(set) var selectedPane: PreferencePaneIdentifier = .defaultBrowser
     private let vpnVisibility: NetworkProtectionFeatureVisibility
+    let vpnTunnelIPCClient: TunnelControllerIPCClient
 
     var selectedTabContent: AnyPublisher<Tab.TabContent, Never> {
         $selectedTabIndex.map { [tabSwitcherTabs] in tabSwitcherTabs[$0] }.eraseToAnyPublisher()
@@ -42,11 +44,13 @@ final class PreferencesSidebarModel: ObservableObject {
         tabSwitcherTabs: [Tab.TabContent],
         privacyConfigurationManager: PrivacyConfigurationManaging,
         syncService: DDGSyncing,
-        vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility()
+        vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
+        vpnTunnelIPCClient: TunnelControllerIPCClient = TunnelControllerIPCClient()
     ) {
         self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs
         self.vpnVisibility = vpnVisibility
+        self.vpnTunnelIPCClient = vpnTunnelIPCClient
 
         resetTabSelectionIfNeeded()
         refreshSections()
@@ -77,7 +81,7 @@ final class PreferencesSidebarModel: ObservableObject {
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
         syncService: DDGSyncing,
-        vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+        vpnVisibility: NetworkProtectionFeatureVisibility,
         includeDuckPlayer: Bool,
         userDefaults: UserDefaults = .netP
     ) {
@@ -109,6 +113,28 @@ final class PreferencesSidebarModel: ObservableObject {
                 self.refreshSections()
             }
             .store(in: &cancellables)
+    }
+
+    func vpnProtectionStatus() -> PrivacyProtectionStatus {
+        let recentConnectionStatus = vpnTunnelIPCClient.connectionStatusObserver.recentValue
+        let initialValue: Bool
+
+        if case .connected = recentConnectionStatus {
+            initialValue = true
+        } else {
+            initialValue = false
+        }
+
+        return PrivacyProtectionStatus(
+            statusPublisher: vpnTunnelIPCClient.connectionStatusObserver.publisher.receive(on: RunLoop.main),
+            initialValue: initialValue ? .on : .off
+        ) { newStatus in
+            if case .connected = newStatus {
+                return .on
+            } else {
+                return .off
+            }
+        }
     }
 
     // MARK: - Refreshing logic

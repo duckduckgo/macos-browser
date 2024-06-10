@@ -102,7 +102,7 @@ final class DataBrokerProtectionEventPixels {
         var removalsInTheLastWeek = 0
 
         for query in data {
-            let allHistoryEventsForQuery = query.scanOperationData.historyEvents + query.optOutOperationsData.flatMap { $0.historyEvents }
+            let allHistoryEventsForQuery = query.scanJobData.historyEvents + query.optOutJobData.flatMap { $0.historyEvents }
             let historyEventsInThePastWeek = allHistoryEventsForQuery.filter {
                 !didWeekPassedBetweenDates(start: $0.date, end: Date())
             }
@@ -132,7 +132,7 @@ final class DataBrokerProtectionEventPixels {
     }
 
     private func hadScanThisWeek(_ brokerProfileQuery: BrokerProfileQueryData) -> Bool {
-        return brokerProfileQuery.scanOperationData.historyEvents.contains { historyEvent in
+        return brokerProfileQuery.scanJobData.historyEvents.contains { historyEvent in
             !didWeekPassedBetweenDates(start: historyEvent.date, end: Date())
         }
     }

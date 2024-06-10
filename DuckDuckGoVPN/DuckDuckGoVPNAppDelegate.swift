@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppLauncher
 import Cocoa
 import Combine
 import Common
@@ -28,10 +29,13 @@ import NetworkProtectionUI
 import ServiceManagement
 import PixelKit
 import Subscription
+import VPNAppLauncher
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
-    private let _delegate = DuckDuckGoVPNAppDelegate()
+
+    public let accountManager: AccountManaging
+    private let _delegate: DuckDuckGoVPNAppDelegate
 
     override init() {
         os_log(.error, log: .networkProtection, "🟢 Status Bar Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
@@ -42,14 +46,31 @@ final class DuckDuckGoVPNApplication: NSApplication {
             exit(0)
         }
 
+        // MARK: - Configure Subscription
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
+                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
+                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
+        let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
+        accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
+                                        entitlementsCache: entitlementsCache,
+                                        subscriptionService: subscriptionService,
+                                        authService: authService)
+
+        _delegate = DuckDuckGoVPNAppDelegate(bouncer: NetworkProtectionBouncer(accountManager: accountManager),
+                                             accountManager: accountManager,
+                                             accessTokenStorage: accessTokenStorage,
+                                             subscriptionEnvironment: subscriptionEnvironment)
         super.init()
 
         setupPixelKit()
         self.delegate = _delegate
 
 #if DEBUG
-        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-
         if let token = accountManager.accessToken {
             os_log(.error, log: .networkProtection, "🟢 VPN Agent found token: %{public}d", token)
         } else {
@@ -104,7 +125,20 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private static let recentThreshold: TimeInterval = 5.0
 
     private let appLauncher = AppLauncher()
-    private let bouncer = NetworkProtectionBouncer()
+    private let bouncer: NetworkProtectionBouncer
+    private let accountManager: AccountManaging
+    private let accessTokenStorage: SubscriptionTokenKeychainStorage
+
+    public init(bouncer: NetworkProtectionBouncer,
+                accountManager: AccountManaging,
+                accessTokenStorage: SubscriptionTokenKeychainStorage,
+                subscriptionEnvironment: SubscriptionEnvironment) {
+        self.bouncer = bouncer
+        self.accountManager = accountManager
+        self.accessTokenStorage = accessTokenStorage
+        self.tunnelSettings = VPNSettings(defaults: .netP)
+        self.tunnelSettings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
+    }
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -126,7 +160,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 #endif
     }
 
-    private lazy var tunnelSettings = VPNSettings(defaults: .netP)
+    private let tunnelSettings: VPNSettings
     private lazy var userDefaults = UserDefaults.netP
     private lazy var proxySettings = TransparentProxySettings(defaults: .netP)
 
@@ -187,7 +221,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         networkExtensionBundleID: tunnelExtensionBundleID,
         networkExtensionController: networkExtensionController,
         settings: tunnelSettings,
-        defaults: userDefaults)
+        defaults: userDefaults,
+        accessTokenStorage: accessTokenStorage)
 
     /// An IPC server that provides access to the tunnel controller.
     ///
@@ -233,7 +268,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             connectionErrorObserver: errorObserver,
             connectivityIssuesObserver: DisabledConnectivityIssueObserver(),
             controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications(),
-            dataVolumeObserver: dataVolumeObserver
+            dataVolumeObserver: dataVolumeObserver,
+            knownFailureObserver: KnownFailureObserverThroughDistributedNotifications()
         )
     }()
 
@@ -280,20 +316,20 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             statusReporter: statusReporter,
             controller: tunnelController,
             iconProvider: iconProvider,
-            appLauncher: appLauncher,
+            uiActionHandler: appLauncher,
             menuItems: {
                 [
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .showSettings)
+                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
                     }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuFAQ, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .showFAQ)
+                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                     }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .shareFeedback)
+                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
                     }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .justOpen)
+                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.justOpen)
                     }),
                 ]
             },
@@ -317,9 +353,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
-        SubscriptionPurchaseEnvironment.currentServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
 
+        APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog, type: .info)
 
         setupMenuVisibility()
@@ -375,10 +410,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
 
     private func setUpSubscriptionMonitoring() {
-        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         guard accountManager.isUserAuthenticated else { return }
         let entitlementsCheck = {
-            await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+            await self.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
 
         Task {
@@ -388,7 +422,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     UserDefaults.netP.networkProtectionEntitlementsExpired = false
                 case .invalidEntitlement:
                     UserDefaults.netP.networkProtectionEntitlementsExpired = true
-                    PixelKit.fire(VPNPrivacyProPixel.vpnAccessRevokedDialogShown, frequency: .dailyAndCount)
 
                     guard let self else { return }
                     Task {

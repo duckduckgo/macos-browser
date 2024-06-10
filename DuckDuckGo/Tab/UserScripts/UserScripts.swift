@@ -50,6 +50,7 @@ final class UserScripts: UserScriptsProvider {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
+
         let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let privacyConfig = sourceProvider.privacyConfigurationManager.privacyConfig
         let sessionKey = sourceProvider.sessionKey ?? ""
@@ -94,7 +95,7 @@ final class UserScripts: UserScriptsProvider {
         }
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
+            subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature(subscriptionManager: Application.appDelegate.subscriptionManager))
             userScripts.append(subscriptionPagesUserScript)
 
             identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())

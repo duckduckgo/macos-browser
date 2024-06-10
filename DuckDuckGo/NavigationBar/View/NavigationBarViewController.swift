@@ -71,6 +71,10 @@ final class NavigationBarViewController: NSViewController {
         return progressView
     }()
 
+    private var subscriptionManager: SubscriptionManaging {
+        Application.appDelegate.subscriptionManager
+    }
+
     var addressBarViewController: AddressBarViewController?
 
     private var tabCollectionViewModel: TabCollectionViewModel
@@ -269,7 +273,9 @@ final class NavigationBarViewController: NSViewController {
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
-                                   internalUserDecider: internalUserDecider)
+                                   networkProtectionFeatureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager),
+                                   internalUserDecider: internalUserDecider,
+                                   accountManager: subscriptionManager.accountManager)
         menu.actionDelegate = self
         let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
         menu.popUp(positioning: nil, at: location, in: sender)
@@ -378,6 +384,7 @@ final class NavigationBarViewController: NSViewController {
         UserDefaults.netP
             .publisher(for: \.networkProtectionShouldShowVPNUninstalledMessage)
             .receive(on: DispatchQueue.main)
+            .removeDuplicates()
             .sink { [weak self] shouldShowUninstalledMessage in
                 if shouldShowUninstalledMessage {
                     self?.showVPNUninstalledFeedback()
@@ -388,7 +395,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @objc private func showVPNUninstalledFeedback() {
-        guard view.window?.isKeyWindow == true else { return }
+        // Only show the popover if we aren't already presenting one:
+        guard view.window?.isKeyWindow == true, (self.presentedViewControllers ?? []).isEmpty else { return }
 
         DispatchQueue.main.async {
             let viewController = PopoverMessageViewController(message: "DuckDuckGo VPN was uninstalled")
@@ -894,7 +902,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
-        if !isPopUpWindow && DefaultNetworkProtectionVisibility().isVPNVisible() {
+        if !isPopUpWindow && DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager).isVPNVisible() {
             let networkProtectionTitle = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }
@@ -1032,12 +1040,14 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
-        WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+        let url = subscriptionManager.url(for: .purchase)
+        WindowControllersManager.shared.showTab(with: .subscription(url))
         PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
-        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+        let url = subscriptionManager.url(for: .identityTheftRestoration)
+        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(url))
     }
 }
 

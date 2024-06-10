@@ -49,6 +49,16 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
+    @Published var showInBrowserToolbar: Bool {
+        didSet {
+            if showInBrowserToolbar {
+                pinningManager.pin(.networkProtection)
+            } else {
+                pinningManager.unpin(.networkProtection)
+            }
+        }
+    }
+
     @Published var notifyStatusChanges: Bool {
         didSet {
             settings.notifyStatusChanges = notifyStatusChanges
@@ -59,27 +69,32 @@ final class VPNPreferencesModel: ObservableObject {
 
     private var onboardingStatus: OnboardingStatus {
         didSet {
-            showUninstallVPN = DefaultNetworkProtectionVisibility().isInstalled
+            showUninstallVPN = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager).isInstalled
         }
     }
 
     private let settings: VPNSettings
+    private let pinningManager: PinningManager
     private var cancellables = Set<AnyCancellable>()
 
     init(settings: VPNSettings = .init(defaults: .netP),
+         pinningManager: PinningManager = LocalPinningManager.shared,
          defaults: UserDefaults = .netP) {
         self.settings = settings
+        self.pinningManager = pinningManager
 
         connectOnLogin = settings.connectOnLogin
         excludeLocalNetworks = settings.excludeLocalNetworks
         notifyStatusChanges = settings.notifyStatusChanges
         showInMenuBar = settings.showInMenuBar
+        showInBrowserToolbar = pinningManager.isPinned(.networkProtection)
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
 
         subscribeToOnboardingStatusChanges(defaults: defaults)
         subscribeToShowInMenuBarSettingChanges()
+        subscribeToShowInBrowserToolbarSettingsChanges()
         subscribeToLocationSettingChanges()
     }
 
@@ -94,6 +109,24 @@ final class VPNPreferencesModel: ObservableObject {
             .removeDuplicates()
             .assign(to: \.showInMenuBar, onWeaklyHeld: self)
             .store(in: &cancellables)
+    }
+
+    func subscribeToShowInBrowserToolbarSettingsChanges() {
+        NotificationCenter.default.publisher(for: .PinnedViewsChanged).sink { [weak self] notification in
+            guard let self = self else {
+                return
+            }
+
+            if let userInfo = notification.userInfo as? [String: Any],
+               let viewType = userInfo[LocalPinningManager.pinnedViewChangedNotificationViewTypeKey] as? String,
+               let view = PinnableView(rawValue: viewType) {
+                switch view {
+                case .networkProtection: self.showInBrowserToolbar = self.pinningManager.isPinned(.networkProtection)
+                default: break
+                }
+            }
+        }
+        .store(in: &cancellables)
     }
 
     func subscribeToLocationSettingChanges() {

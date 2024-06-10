@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1716212212537,
+    "version": 1717679238533,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -304,6 +304,9 @@
                     "domain": "www.thrifty.com"
                 },
                 {
+                    "domain": "sports.tipico.de"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -318,7 +321,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "6ea22969c48f1cb624808cd49a296f4d"
+            "hash": "0e21f0096d2a135a3c36332ae79b656c"
         },
         "autofill": {
             "exceptions": [
@@ -1228,6 +1231,11 @@
             "state": "enabled",
             "hash": "b685397a8317384bec3b8d7e8b7571bb"
         },
+        "dummyWebMessageListener": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
         "elementHiding": {
             "exceptions": [
                 {
@@ -1943,6 +1951,14 @@
                             {
                                 "selector": "#credential_picker_container",
                                 "type": "override"
+                            },
+                            {
+                                "selector": ".shop-display-ad",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".row.full-bleed-row",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -2057,6 +2073,15 @@
                             },
                             {
                                 "selector": ".subnav-ad-layout",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "canalrcn.com",
+                        "rules": [
+                            {
+                                "selector": ".pauta-en-vivo-mobile",
                                 "type": "hide-empty"
                             }
                         ]
@@ -2331,6 +2356,15 @@
                         "rules": [
                             {
                                 "selector": "[data-liberty-position-name]",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "economist.com",
+                        "rules": [
+                            {
+                                "selector": "[class^='adComponent']",
                                 "type": "hide-empty"
                             }
                         ]
@@ -3477,6 +3511,15 @@
                         ]
                     },
                     {
+                        "domain": "post-gazette.com",
+                        "rules": [
+                            {
+                                "selector": "[data-dfpads-position]",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "prajwaldesai.com",
                         "rules": [
                             {
@@ -3704,6 +3747,15 @@
                         ]
                     },
                     {
+                        "domain": "shattovet.com",
+                        "rules": [
+                            {
+                                "selector": "[class*='advertising']",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "si.com",
                         "rules": [
                             {
@@ -3917,6 +3969,15 @@
                         "rules": [
                             {
                                 "selector": ".tb-ad",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "toledoblade.com",
+                        "rules": [
+                            {
+                                "selector": "[data-dfpads-position]",
                                 "type": "hide-empty"
                             }
                         ]
@@ -4193,6 +4254,10 @@
                             {
                                 "selector": ".gam-placeholder",
                                 "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[class*='sdaContainer']",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -4253,6 +4318,14 @@
                             {
                                 "selector": ".parallax-container",
                                 "type": "hide-empty"
+                            },
+                            {
+                                "selector": "div:has(.react-parallax)",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "[id^=div-gpt-ad-]",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -4354,7 +4427,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "9a895fea083dabb6e3496242636a8370"
+            "hash": "4ba5333801a460fca5bf360d684fa994"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4713,6 +4786,15 @@
                     "domain": "tirerack.com"
                 },
                 {
+                    "domain": "milesplit.live"
+                },
+                {
+                    "domain": "dollargeneral.com"
+                },
+                {
+                    "domain": "monstergear.monsterenergy.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4728,7 +4810,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "05bddff3ae61a9536e38a6ef7d383eb3"
+            "hash": "a5053adfe1cf8c1ce1721c022fbb8b1a"
         },
         "harmfulApis": {
             "settings": {
@@ -6468,6 +6550,7 @@
                             {
                                 "rule": "google-analytics.com/analytics.js",
                                 "domains": [
+                                    "docs.llamaindex.ai",
                                     "doterra.com",
                                     "easyjet.com",
                                     "edx.org",
@@ -6643,7 +6726,9 @@
                                 "domains": [
                                     "abril.com.br",
                                     "algomalegalclinic.com",
+                                    "bodyelectricvitality.com.au",
                                     "cosmicbook.news",
+                                    "docs.llamaindex.ai",
                                     "eatroyo.com",
                                     "thesimsresource.com",
                                     "tradersync.com",
@@ -6772,6 +6857,7 @@
                                     "newschannel20.com",
                                     "newschannel9.com",
                                     "okcfox.com",
+                                    "post-gazette.com",
                                     "raleighcw.com",
                                     "siouxlandnews.com",
                                     "southernoregoncw.com",
@@ -6780,6 +6866,7 @@
                                     "thecw46.com",
                                     "thecwtc.com",
                                     "thenationaldesk.com",
+                                    "toledoblade.com",
                                     "triblive.com",
                                     "turnto10.com",
                                     "univisionseattle.com",
@@ -6834,13 +6921,20 @@
                                 "rule": "grow.me/main.js",
                                 "domains": [
                                     "budgetbytes.com",
-                                    "foodfornet.com"
+                                    "foodfornet.com",
+                                    "homesteadingfamily.com"
                                 ]
                             },
                             {
                                 "rule": "api.grow.me",
                                 "domains": [
                                     "foodfornet.com"
+                                ]
+                            },
+                            {
+                                "rule": "grow.me",
+                                "domains": [
+                                    "grilledcheesesocial.com"
                                 ]
                             }
                         ]
@@ -7077,11 +7171,7 @@
                             {
                                 "rule": "static.klaviyo.com/onsite/js/klaviyo.js",
                                 "domains": [
-                                    "essentialpraxis.com",
-                                    "kidsguide.com",
-                                    "muc-off.com",
-                                    "paria.cc",
-                                    "urbanebikes.com"
+                                    "<all>"
                                 ]
                             },
                             {
@@ -7095,8 +7185,12 @@
                                 "rule": "klaviyo.com/",
                                 "domains": [
                                     "andieswim.com",
+                                    "dreamfarm.com",
                                     "footweartruth.com",
+                                    "holdonbags.com",
                                     "kmail-lists.com",
+                                    "nestlenutritionstore.com",
+                                    "organakratom.com",
                                     "usafacts.org"
                                 ]
                             }
@@ -7124,6 +7218,12 @@
                                 "rule": "cdn.listrakbi.com/scripts/script.js",
                                 "domains": [
                                     "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "listrakbi.com",
+                                "domains": [
+                                    "fsastore.com"
                                 ]
                             }
                         ]
@@ -7246,7 +7346,8 @@
                             {
                                 "rule": "monetate.net",
                                 "domains": [
-                                    "kleen-ritecorp.com"
+                                    "kleen-ritecorp.com",
+                                    "qvc.com"
                                 ]
                             }
                         ]
@@ -7932,6 +8033,12 @@
                                 "domains": [
                                     "<all>"
                                 ]
+                            },
+                            {
+                                "rule": "c.slickstream.com/app/",
+                                "domains": [
+                                    "<all>"
+                                ]
                             }
                         ]
                     },
@@ -8458,7 +8565,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "d9db93f32201ee8d2e545eeead7cc66f"
+            "hash": "af06003f902448cd26fd4e538e64e70f"
         },
         "trackingCookies1p": {
             "settings": {

@@ -45,11 +45,11 @@ extension Preferences {
         let action: () -> Void
         @ObservedObject var protectionStatus: PrivacyProtectionStatus
 
-        init(pane: PreferencePaneIdentifier, isSelected: Bool, action: @escaping () -> Void) {
+        init(pane: PreferencePaneIdentifier, isSelected: Bool, status: PrivacyProtectionStatus? = nil, action: @escaping () -> Void) {
             self.pane = pane
             self.isSelected = isSelected
             self.action = action
-            self.protectionStatus = PrivacyProtectionStatus.status(for: pane)
+            self.protectionStatus = status ?? PrivacyProtectionStatus.status(for: pane)
         }
 
         var body: some View {
@@ -180,7 +180,8 @@ extension Preferences {
         private func sidebarSection(_ section: PreferencesSection) -> some View {
             ForEach(section.panes) { pane in
                 PaneSidebarItem(pane: pane,
-                                isSelected: model.selectedPane == pane) {
+                                isSelected: model.selectedPane == pane,
+                                status: pane == .vpn ? model.vpnProtectionStatus() : nil) {
                     model.selectPane(pane)
                 }
             }

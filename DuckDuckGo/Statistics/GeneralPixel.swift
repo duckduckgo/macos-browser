@@ -40,10 +40,32 @@ enum GeneralPixel: PixelKitEventV2 {
     case formAutofilled(kind: FormAutofillKind)
     case autofillItemSaved(kind: FormAutofillKind)
 
+    case autofillLoginsSaveLoginInlineDisplayed
+    case autofillLoginsSaveLoginInlineConfirmed
+    case autofillLoginsSaveLoginInlineDismissed
+
+    case autofillLoginsSavePasswordInlineDisplayed
+    case autofillLoginsSavePasswordInlineConfirmed
+    case autofillLoginsSavePasswordInlineDismissed
+
     case autofillLoginsSaveLoginModalExcludeSiteConfirmed
     case autofillLoginsSettingsResetExcludedDisplayed
     case autofillLoginsSettingsResetExcludedConfirmed
     case autofillLoginsSettingsResetExcludedDismissed
+
+    case autofillLoginsUpdatePasswordInlineDisplayed
+    case autofillLoginsUpdatePasswordInlineConfirmed
+    case autofillLoginsUpdatePasswordInlineDismissed
+
+    case autofillLoginsUpdateUsernameInlineDisplayed
+    case autofillLoginsUpdateUsernameInlineConfirmed
+    case autofillLoginsUpdateUsernameInlineDismissed
+
+    case autofillActiveUser
+    case autofillEnabledUser
+    case autofillOnboardedUser
+    case autofillLoginsStacked
+    case autofillCreditCardsStacked
 
     case bitwardenPasswordAutofilled
     case bitwardenPasswordSaved
@@ -95,13 +117,14 @@ enum GeneralPixel: PixelKitEventV2 {
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
 
+    // Survey
+    case surveyRemoteMessageDisplayed(messageID: String)
+    case surveyRemoteMessageDismissed(messageID: String)
+    case surveyRemoteMessageOpened(messageID: String)
+
     // VPN
     case vpnBreakageReport(category: String, description: String, metadata: String)
 
-    // VPN
-    case networkProtectionRemoteMessageDisplayed(messageID: String)
-    case networkProtectionRemoteMessageDismissed(messageID: String)
-    case networkProtectionRemoteMessageOpened(messageID: String)
     case networkProtectionEnabledOnSearch
     case networkProtectionGeoswitchingOpened
     case networkProtectionGeoswitchingSetNearest
@@ -130,9 +153,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case dataBrokerProtectionWaitlistCardUITapped
     case dataBrokerProtectionWaitlistTermsAndConditionsDisplayed
     case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
-    case dataBrokerProtectionRemoteMessageDisplayed(messageID: String)
-    case dataBrokerProtectionRemoteMessageDismissed(messageID: String)
-    case dataBrokerProtectionRemoteMessageOpened(messageID: String)
 
     // Login Item events
     case dataBrokerEnableLoginItemDaily
@@ -321,11 +341,8 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case burnerTabMisplaced
 
-    case networkProtectionRemoteMessageFetchingFailed
-    case networkProtectionRemoteMessageStorageFailed
-    case dataBrokerProtectionRemoteMessageFetchingFailed
-    case dataBrokerProtectionRemoteMessageStorageFailed
-
+    case surveyRemoteMessageFetchingFailed
+    case surveyRemoteMessageStorageFailed
     case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
 
     // Tracks installation without tracking retention.
@@ -334,6 +351,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case secureVaultKeystoreEventL1KeyMigration
     case secureVaultKeystoreEventL2KeyMigration
     case secureVaultKeystoreEventL2KeyPasswordMigration
+
+    case compilationFailed
 
     var name: String {
         switch self {
@@ -361,6 +380,20 @@ enum GeneralPixel: PixelKitEventV2 {
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
 
+        case .autofillLoginsSaveLoginInlineDisplayed:
+            return "m_mac_autofill_logins_save_login_inline_displayed"
+        case .autofillLoginsSaveLoginInlineConfirmed:
+            return "m_mac_autofill_logins_save_login_inline_confirmed"
+        case .autofillLoginsSaveLoginInlineDismissed:
+            return "m_mac_autofill_logins_save_login_inline_dismissed"
+
+        case .autofillLoginsSavePasswordInlineDisplayed:
+            return "m_mac_autofill_logins_save_password_inline_displayed"
+        case .autofillLoginsSavePasswordInlineConfirmed:
+            return "m_mac_autofill_logins_save_password_inline_confirmed"
+        case .autofillLoginsSavePasswordInlineDismissed:
+            return "m_mac_autofill_logins_save_password_inline_dismissed"
+
         case .autofillLoginsSaveLoginModalExcludeSiteConfirmed:
             return "m_mac_autofill_logins_save_login_exclude_site_confirmed"
         case .autofillLoginsSettingsResetExcludedDisplayed:
@@ -369,6 +402,31 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_autofill_settings_reset_excluded_confirmed"
         case .autofillLoginsSettingsResetExcludedDismissed:
             return "m_mac_autofill_settings_reset_excluded_dismissed"
+
+        case .autofillLoginsUpdatePasswordInlineDisplayed:
+            return "m_mac_autofill_logins_update_password_inline_displayed"
+        case .autofillLoginsUpdatePasswordInlineConfirmed:
+            return "m_mac_autofill_logins_update_password_inline_confirmed"
+        case .autofillLoginsUpdatePasswordInlineDismissed:
+            return "m_mac_autofill_logins_update_password_inline_dismissed"
+
+        case .autofillLoginsUpdateUsernameInlineDisplayed:
+            return "m_mac_autofill_logins_update_username_inline_displayed"
+        case .autofillLoginsUpdateUsernameInlineConfirmed:
+            return "m_mac_autofill_logins_update_username_inline_confirmed"
+        case .autofillLoginsUpdateUsernameInlineDismissed:
+            return "m_mac_autofill_logins_update_username_inline_dismissed"
+
+        case .autofillActiveUser:
+            return "m_mac_autofill_activeuser"
+        case .autofillEnabledUser:
+            return "m_mac_autofill_enableduser"
+        case .autofillOnboardedUser:
+            return "m_mac_autofill_onboardeduser"
+        case .autofillLoginsStacked:
+            return "m_mac_autofill_logins_stacked"
+        case .autofillCreditCardsStacked:
+            return "m_mac_autofill_creditcards_stacked"
 
         case .bitwardenPasswordAutofilled:
             return "m_mac_bitwarden_autofill_password"
@@ -469,12 +527,12 @@ enum GeneralPixel: PixelKitEventV2 {
         case .vpnBreakageReport:
             return "m_mac_vpn_breakage_report"
 
-        case .networkProtectionRemoteMessageDisplayed(let messageID):
-            return "m_mac_netp_remote_message_displayed_\(messageID)"
-        case .networkProtectionRemoteMessageDismissed(let messageID):
-            return "m_mac_netp_remote_message_dismissed_\(messageID)"
-        case .networkProtectionRemoteMessageOpened(let messageID):
-            return "m_mac_netp_remote_message_opened_\(messageID)"
+        case .surveyRemoteMessageDisplayed(let messageID):
+            return "m_mac_survey_remote_message_displayed_\(messageID)"
+        case .surveyRemoteMessageDismissed(let messageID):
+            return "m_mac_survey_remote_message_dismissed_\(messageID)"
+        case .surveyRemoteMessageOpened(let messageID):
+            return "m_mac_survey_remote_message_opened_\(messageID)"
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
 
@@ -514,12 +572,6 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_dbp_imp_terms"
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_dbp_ev_terms_accepted"
-        case .dataBrokerProtectionRemoteMessageDisplayed(let messageID):
-            return "m_mac_dbp_remote_message_displayed_\(messageID)"
-        case .dataBrokerProtectionRemoteMessageDismissed(let messageID):
-            return "m_mac_dbp_remote_message_dismissed_\(messageID)"
-        case .dataBrokerProtectionRemoteMessageOpened(let messageID):
-            return "m_mac_dbp_remote_message_opened_\(messageID)"
 
         case .dataBrokerEnableLoginItemDaily: return "m_mac_dbp_daily_login-item_enable"
         case .dataBrokerDisableLoginItemDaily: return "m_mac_dbp_daily_login-item_disable"
@@ -802,12 +854,8 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .burnerTabMisplaced: return "burner_tab_misplaced"
 
-        case .networkProtectionRemoteMessageFetchingFailed: return "netp_remote_message_fetching_failed"
-        case .networkProtectionRemoteMessageStorageFailed: return "netp_remote_message_storage_failed"
-
-        case .dataBrokerProtectionRemoteMessageFetchingFailed: return "dbp_remote_message_fetching_failed"
-        case .dataBrokerProtectionRemoteMessageStorageFailed: return "dbp_remote_message_storage_failed"
-
+        case .surveyRemoteMessageFetchingFailed: return "survey_remote_message_fetching_failed"
+        case .surveyRemoteMessageStorageFailed: return "survey_remote_message_storage_failed"
         case .loginItemUpdateError: return "login-item_update-error"
 
             // Installation Attribution
@@ -816,6 +864,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .secureVaultKeystoreEventL1KeyMigration: return "m_mac_secure_vault_keystore_event_l1-key-migration"
         case .secureVaultKeystoreEventL2KeyMigration: return "m_mac_secure_vault_keystore_event_l2-key-migration"
         case .secureVaultKeystoreEventL2KeyPasswordMigration: return "m_mac_secure_vault_keystore_event_l2-key-password-migration"
+
+        case .compilationFailed: return "compilation_failed"
         }
     }
 

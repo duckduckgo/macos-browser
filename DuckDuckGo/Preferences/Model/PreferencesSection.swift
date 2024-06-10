@@ -27,11 +27,9 @@ struct PreferencesSection: Hashable, Identifiable {
 
     @MainActor
     static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
-        var privacyPanes: [PreferencePaneIdentifier] = [.defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection]
-
-        if includingVPN {
-            privacyPanes.append(.vpn)
-        }
+        let privacyPanes: [PreferencePaneIdentifier] = [
+            .defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection
+        ]
 
         let regularPanes: [PreferencePaneIdentifier] = {
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .accessibility, .dataClearing]
@@ -61,15 +59,21 @@ struct PreferencesSection: Hashable, Identifiable {
         ]
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+            let subscriptionManager = Application.appDelegate.subscriptionManager
+            let platform = subscriptionManager.currentEnvironment.purchasePlatform
+            var shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
 
-            var shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
-
-            if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
+            if subscriptionManager.accountManager.isUserAuthenticated {
                 shouldHidePrivacyProDueToNoProducts = false
             }
 
             if !shouldHidePrivacyProDueToNoProducts {
-                let subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
+                var subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
+
+                if includingVPN {
+                    subscriptionPanes.append(.vpn)
+                }
+
                 sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
             }
         }

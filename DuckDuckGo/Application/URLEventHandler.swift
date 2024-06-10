@@ -20,17 +20,18 @@ import Common
 import Foundation
 import AppKit
 import PixelKit
-
+import Subscription
 import NetworkProtectionUI
+import VPNAppLauncher
 
 #if DBP
 import DataBrokerProtection
 #endif
 
-@MainActor
+// @MainActor
 final class URLEventHandler {
 
-    private let handler: @MainActor (URL) -> Void
+    private let handler: (URL) -> Void
 
     private var didFinishLaunching = false
     private var urlsToOpen = [URL]()
@@ -50,7 +51,9 @@ final class URLEventHandler {
         if !urlsToOpen.isEmpty {
 
             for url in urlsToOpen {
-                self.handler(url)
+                DispatchQueue.main.async {
+                    self.handler(url)
+                }
             }
 
             self.urlsToOpen = []
@@ -96,7 +99,9 @@ final class URLEventHandler {
 
     private func handleURLs(_ urls: [URL]) {
         if didFinishLaunching {
-            urls.forEach { self.handler($0) }
+            urls.forEach {
+                self.handler($0)
+            }
         } else {
             self.urlsToOpen.append(contentsOf: urls)
         }
@@ -113,54 +118,58 @@ final class URLEventHandler {
         }
 #endif
 
-        if url.isFileURL && url.pathExtension == WebKitDownloadTask.downloadExtension {
-            guard let mainViewController = {
-                if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController {
-                    return mainWindowController.mainViewController
-                }
-                return WindowsManager.openNewWindow(with: .newtab, source: .ui, isBurner: false)?.contentViewController as? MainViewController
-            }() else { return }
+        DispatchQueue.main.async {
+            if url.isFileURL && url.pathExtension == WebKitDownloadTask.downloadExtension {
+                guard let mainViewController = {
+                    if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController {
+                        return mainWindowController.mainViewController
+                    }
+                    return WindowsManager.openNewWindow(with: .newtab, source: .ui, isBurner: false)?.contentViewController as? MainViewController
+                }() else { return }
 
-            if !mainViewController.navigationBarViewController.isDownloadsPopoverShown {
-                mainViewController.navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: false)
+                if !mainViewController.navigationBarViewController.isDownloadsPopoverShown {
+                    mainViewController.navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: false)
+                }
+
+                return
             }
 
-            return
-        }
-
-        if url.scheme?.isNetworkProtectionScheme == false && url.scheme?.isDataBrokerProtectionScheme == false {
-            WaitlistModalDismisser.dismissWaitlistModalViewControllerIfNecessary(url)
-            WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
+            if url.scheme?.isNetworkProtectionScheme == false && url.scheme?.isDataBrokerProtectionScheme == false {
+                WaitlistModalDismisser.dismissWaitlistModalViewControllerIfNecessary(url)
+                WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
+            }
         }
     }
 
     /// Handles NetP URLs
-    ///
     private static func handleNetworkProtectionURL(_ url: URL) {
-        switch url {
-        case AppLaunchCommand.showStatus.launchURL:
-            Task {
-                await WindowControllersManager.shared.showNetworkProtectionStatus()
-            }
-        case AppLaunchCommand.showSettings.launchURL:
-            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
-        case AppLaunchCommand.shareFeedback.launchURL:
-            WindowControllersManager.shared.showShareFeedbackModal()
-        case AppLaunchCommand.justOpen.launchURL:
-            WindowControllersManager.shared.showMainWindow()
-        case AppLaunchCommand.showVPNLocations.launchURL:
-            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
-            WindowControllersManager.shared.showLocationPickerSheet()
-        case AppLaunchCommand.showPrivacyPro.launchURL:
-            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
-            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+        DispatchQueue.main.async {
+            switch url {
+            case VPNAppLaunchCommand.showStatus.launchURL:
+                Task {
+                    await WindowControllersManager.shared.showNetworkProtectionStatus()
+                }
+            case VPNAppLaunchCommand.showSettings.launchURL:
+                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
+            case VPNAppLaunchCommand.shareFeedback.launchURL:
+                WindowControllersManager.shared.showShareFeedbackModal()
+            case VPNAppLaunchCommand.justOpen.launchURL:
+                WindowControllersManager.shared.showMainWindow()
+            case VPNAppLaunchCommand.showVPNLocations.launchURL:
+                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
+                WindowControllersManager.shared.showLocationPickerSheet()
+            case VPNAppLaunchCommand.showPrivacyPro.launchURL:
+                let url = Application.appDelegate.subscriptionManager.url(for: .purchase)
+                WindowControllersManager.shared.showTab(with: .subscription(url))
+                PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
 #if !APPSTORE && !DEBUG
-        case AppLaunchCommand.moveAppToApplications.launchURL:
-            // this should be run after NSApplication.shared is set
-            PFMoveToApplicationsFolderIfNecessary(false)
+            case VPNAppLaunchCommand.moveAppToApplications.launchURL:
+                // this should be run after NSApplication.shared is set
+                PFMoveToApplicationsFolderIfNecessary(false)
 #endif
-        default:
-            return
+            default:
+                return
+            }
         }
     }
 
@@ -171,15 +180,14 @@ final class URLEventHandler {
         switch url {
         case DataBrokerProtectionNotificationCommand.showDashboard.url:
             NotificationCenter.default.post(name: DataBrokerProtectionNotifications.shouldReloadUI, object: nil)
-
-            WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+            DispatchQueue.main.async {
+                WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+            }
         default:
             return
         }
     }
-
 #endif
-
 }
 
 private extension String {

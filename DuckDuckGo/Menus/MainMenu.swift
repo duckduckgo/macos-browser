@@ -540,7 +540,7 @@ import SubscriptionUI
             toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
             toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
-            if DefaultNetworkProtectionVisibility().isVPNVisible() {
+            if DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager).isVPNVisible() {
                 toggleNetworkProtectionShortcutMenuItem.isHidden = false
                 toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             } else {
@@ -584,7 +584,6 @@ import SubscriptionUI
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
-                NSMenuItem(title: "Reset Passwords Survey", action: #selector(enablePasswordsSurveyAction), target: self)
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
@@ -607,6 +606,7 @@ import SubscriptionUI
             }
             NSMenuItem(title: "Sync & Backup")
                 .submenu(SyncDebugMenu())
+                .withAccessibilityIdentifier("MainMenu.syncAndBackup")
 
 #if DBP
             NSMenuItem(title: "Personal Information Removal")
@@ -620,24 +620,31 @@ import SubscriptionUI
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 
-            let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
             let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
+            let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+            let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
 
-            SubscriptionDebugMenu(
-                currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
-                updateEnvironment: {
-                    guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
-                    currentEnvironmentWrapper.wrappedValue = newEnvironment
-                    SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment
-                    VPNSettings(defaults: .netP).selectedEnvironment = newEnvironment == .staging ? .staging : .production
-                },
-                isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
-                updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
-                currentViewController: {
-                    WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            },
-                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)
-            )
+            var currentEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+            let updateServiceEnvironment: (SubscriptionEnvironment.ServiceEnvironment) -> Void = { env in
+                currentEnvironment.serviceEnvironment = env
+                SubscriptionManager.save(subscriptionEnvironment: currentEnvironment, userDefaults: subscriptionUserDefaults)
+            }
+            let updatePurchasingPlatform: (SubscriptionEnvironment.PurchasePlatform) -> Void = { platform in
+                currentEnvironment.purchasePlatform = platform
+                SubscriptionManager.save(subscriptionEnvironment: currentEnvironment, userDefaults: subscriptionUserDefaults)
+            }
+
+            SubscriptionDebugMenu(currentEnvironment: currentEnvironment,
+                                  updateServiceEnvironment: updateServiceEnvironment,
+                                  updatePurchasingPlatform: updatePurchasingPlatform,
+                                  isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
+                                  updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
+                                  currentViewController: { WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController },
+                                  subscriptionManager: Application.appDelegate.subscriptionManager)
+
+            NSMenuItem(title: "Privacy Pro Survey") {
+                NSMenuItem(title: "Reset Remote Message Cache", action: #selector(MainViewController.resetSurveyRemoteMessages))
+            }
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }
@@ -728,10 +735,6 @@ import SubscriptionUI
         AutofillPreferences().debugScriptEnabled = !AutofillPreferences().debugScriptEnabled
         NotificationCenter.default.post(name: .autofillScriptDebugSettingsDidChange, object: nil)
         updateAutofillDebugScriptMenuItem()
-    }
-
-    @objc private func enablePasswordsSurveyAction(_ sender: NSMenuItem) {
-        AutofillPreferences().autofillSurveyEnabled = true
     }
 
     @objc private func debugLoggingMenuItemAction(_ sender: NSMenuItem) {
