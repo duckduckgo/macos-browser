@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1717171433682,
+    "version": 1717679238533,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1951,6 +1951,14 @@
                             {
                                 "selector": "#credential_picker_container",
                                 "type": "override"
+                            },
+                            {
+                                "selector": ".shop-display-ad",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".row.full-bleed-row",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -4419,7 +4427,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "63fc18f451878e2f937e381f67d05581"
+            "hash": "4ba5333801a460fca5bf360d684fa994"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -6542,6 +6550,7 @@
                             {
                                 "rule": "google-analytics.com/analytics.js",
                                 "domains": [
+                                    "docs.llamaindex.ai",
                                     "doterra.com",
                                     "easyjet.com",
                                     "edx.org",
@@ -6719,6 +6728,7 @@
                                     "algomalegalclinic.com",
                                     "bodyelectricvitality.com.au",
                                     "cosmicbook.news",
+                                    "docs.llamaindex.ai",
                                     "eatroyo.com",
                                     "thesimsresource.com",
                                     "tradersync.com",
@@ -8555,7 +8565,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "c117c47ceb4270ad4dcf16bdd888b8b4"
+            "hash": "af06003f902448cd26fd4e538e64e70f"
         },
         "trackingCookies1p": {
             "settings": {
