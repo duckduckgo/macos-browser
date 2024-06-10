@@ -101,7 +101,7 @@ final class MainWindowController: NSWindowController {
         window?.toolbar = NSToolbar()
         window?.toolbar?.showsBaselineSeparator = true
 
-        moveTabBarView(toTitlebarView: true)
+//        moveTabBarView(toTitlebarView: true)
     }
 
     private var trafficLightsAlphaCancellable: AnyCancellable?
@@ -123,7 +123,7 @@ final class MainWindowController: NSWindowController {
             .sink(receiveValue: { [weak self] burningData in
                 guard let self else { return }
                 self.userInteraction(prevented: burningData != nil)
-                self.moveTabBarView(toTitlebarView: burningData == nil)
+//                self.moveTabBarView(toTitlebarView: burningData == nil)
             })
     }
 
@@ -186,6 +186,30 @@ final class MainWindowController: NSWindowController {
 
     private func register() {
         WindowControllersManager.shared.register(self)
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        super.mouseEntered(with: event)
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        super.mouseMoved(with: event)
+
+        if let contentView = self.window?.contentView {
+            let newConstant: CGFloat
+            if event.locationInWindow.y > contentView.bounds.height - 70 {
+                newConstant = 38 + 38 + 8
+            } else {
+                newConstant = 0
+            }
+
+            // Animate the constraint change
+            NSAnimationContext.runAnimationGroup({ context in
+                context.duration = 0.1
+                context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+                mainViewController.mainView.constraint.animator().constant = newConstant
+            })
+        }
     }
 
 }
@@ -280,7 +304,7 @@ extension MainWindowController: NSWindowDelegate {
             return true
         }
         Task {
-            moveTabBarView(toTitlebarView: false)
+//            moveTabBarView(toTitlebarView: false)
             await mainViewController.fireViewController.animateFireWhenClosing()
             sender.close()
         }

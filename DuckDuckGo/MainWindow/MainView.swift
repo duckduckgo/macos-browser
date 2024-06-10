@@ -31,6 +31,7 @@ final class MainView: NSView {
 
     private(set) var navigationBarTopConstraint: NSLayoutConstraint!
     private(set) var bookmarksBarHeightConstraint: NSLayoutConstraint!
+    private(set) var constraint: NSLayoutConstraint!
 
     @Published var isMouseAboveWebView: Bool = false
 
@@ -62,6 +63,8 @@ final class MainView: NSView {
 
         navigationBarTopConstraint = navigationBarContainerView.topAnchor.constraint(equalTo: topAnchor, constant: 38)
 
+        constraint = webContainerView.topAnchor.constraint(equalTo: topAnchor, constant: 0)
+
         NSLayoutConstraint.activate([
             tabBarContainerView.topAnchor.constraint(equalTo: topAnchor),
             tabBarContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -82,7 +85,7 @@ final class MainView: NSView {
             navigationBarContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             navigationBarContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
-            webContainerView.topAnchor.constraint(equalTo: bookmarksBarContainerView.bottomAnchor),
+            constraint,
             webContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
             webContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             webContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -221,6 +224,24 @@ final class MainView: NSView {
             isMouseAboveWebView = false
         }
     }
+
+//    override func mouseMoved(with event: NSEvent) {
+//        super.mouseMoved(with: event)
+//
+//        let locationInView = self.convert(event.locationInWindow, from: nil)
+//
+//        // Define the rectangle at the top with height 10 points
+//        let topRectangle = NSRect(x: 0, y: self.bounds.height - 100, width: self.bounds.width, height: 100)
+//
+//        // Check if the cursor is inside this rectangle
+//        if topRectangle.contains(locationInView) {
+//            constraint.constant = 38 + 34 + 1
+//            print("Mouse is in the top rectangle at: \(locationInView) \(bounds.height - 100)")
+//        } else {
+//            constraint.constant = 0
+//            print("Mouse moved inside view at: \(locationInView)")
+//        }
+//    }
 
     private func makeMouseAboveViewTrackingArea() -> NSTrackingArea {
         var bounds = bounds
