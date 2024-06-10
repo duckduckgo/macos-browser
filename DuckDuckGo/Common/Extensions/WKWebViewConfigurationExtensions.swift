@@ -36,6 +36,8 @@ extension WKWebViewConfiguration {
     func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, burnerMode: BurnerMode) {
         if case .burner(let websiteDataStore) = burnerMode {
             self.websiteDataStore = websiteDataStore
+            // Fire Window: disable audio/video item info reporting to macOS Control Center / Lock Screen
+            preferences.setValue(false, forKey: "mediaSessionEnabled")
         }
         allowsAirPlayForMediaPlayback = true
         if #available(macOS 12.3, *) {

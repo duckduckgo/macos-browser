@@ -312,7 +312,14 @@ final class MainViewController: NSViewController {
             }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] title in
-                self?.view.window?.title = title
+                guard let self else { return }
+                guard !isBurner else {
+                    // Fire Window: don‘t display active Tab title as the Window title
+                    view.window?.title = UserText.burnerWindowHeader
+                    return
+                }
+
+                view.window?.title = title
             }
             .store(in: &tabViewModelCancellables)
     }

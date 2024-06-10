@@ -49,7 +49,7 @@ final class MainWindowController: NSWindowController {
 
         super.init(window: window)
 
-        setupWindow()
+        setupWindow(window)
         setupToolbar()
         subscribeToTrafficLightsAlpha()
         subscribeToBurningData()
@@ -73,9 +73,13 @@ final class MainWindowController: NSWindowController {
 #endif
     }
 
-    private func setupWindow() {
-        window?.delegate = self
+    private func setupWindow(_ window: NSWindow) {
+        window.delegate = self
 
+        if mainViewController.isBurner {
+            // Fire Window: disable screen capture / screenshot taking
+            window.sharingType = .none
+        }
         if shouldShowOnboarding {
             mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()
         }
