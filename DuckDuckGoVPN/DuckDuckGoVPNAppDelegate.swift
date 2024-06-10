@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppLauncher
 import Cocoa
 import Combine
 import Common
@@ -28,6 +29,7 @@ import NetworkProtectionUI
 import ServiceManagement
 import PixelKit
 import Subscription
+import VPNAppLauncher
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
@@ -266,7 +268,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             connectionErrorObserver: errorObserver,
             connectivityIssuesObserver: DisabledConnectivityIssueObserver(),
             controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications(),
-            dataVolumeObserver: dataVolumeObserver
+            dataVolumeObserver: dataVolumeObserver,
+            knownFailureObserver: KnownFailureObserverThroughDistributedNotifications()
         )
     }()
 
@@ -313,20 +316,20 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             statusReporter: statusReporter,
             controller: tunnelController,
             iconProvider: iconProvider,
-            appLauncher: appLauncher,
+            uiActionHandler: appLauncher,
             menuItems: {
                 [
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .showSettings)
+                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
                     }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuFAQ, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .showFAQ)
+                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                     }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .shareFeedback)
+                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
                     }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .justOpen)
+                        try? await self?.appLauncher.launchApp(withCommand: VPNAppLaunchCommand.justOpen)
                     }),
                 ]
             },

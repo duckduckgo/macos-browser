@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppLauncher
 import Foundation
 
 /// Includes a convenience default initializer for `AppLauncher` that's specific to this App target.

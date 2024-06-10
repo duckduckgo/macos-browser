@@ -92,14 +92,6 @@ final class DataBrokerProtectionEngagementPixelsUserDefaults: DataBrokerProtecti
    - MAU Pixel Last Sent 2024-03-19
  */
 final class DataBrokerProtectionEngagementPixels {
-
-    enum ActiveUserFrequency: Int {
-        case daily = 1
-        case weekly = 7
-        case monthly = 28
-    }
-
-    private let calendar = Calendar.current
     private let database: DataBrokerProtectionRepository
     private let repository: DataBrokerProtectionEngagementPixelsRepository
     private let handler: EventMapping<DataBrokerProtectionPixels>
@@ -139,7 +131,7 @@ final class DataBrokerProtectionEngagementPixels {
             return true
         }
 
-        return shouldWeFirePixel(startDate: latestPixelFire, endDate: date, daysDifference: .daily)
+        return DataBrokerProtectionPixelsUtilities.shouldWeFirePixel(startDate: latestPixelFire, endDate: date, daysDifference: .daily)
     }
 
     private func shouldWeFireWeeklyPixel(date: Date) -> Bool {
@@ -147,7 +139,7 @@ final class DataBrokerProtectionEngagementPixels {
             return true
         }
 
-        return shouldWeFirePixel(startDate: latestPixelFire, endDate: date, daysDifference: .weekly)
+        return DataBrokerProtectionPixelsUtilities.shouldWeFirePixel(startDate: latestPixelFire, endDate: date, daysDifference: .weekly)
     }
 
     private func shouldWeFireMonthlyPixel(date: Date) -> Bool {
@@ -155,20 +147,6 @@ final class DataBrokerProtectionEngagementPixels {
             return true
         }
 
-        return shouldWeFirePixel(startDate: latestPixelFire, endDate: date, daysDifference: .monthly)
-    }
-
-    private func shouldWeFirePixel(startDate: Date, endDate: Date, daysDifference: ActiveUserFrequency) -> Bool {
-        if let differenceBetweenDates = differenceBetweenDates(startDate: startDate, endDate: endDate) {
-            return differenceBetweenDates >= daysDifference.rawValue
-        }
-
-        return false
-    }
-
-    private func differenceBetweenDates(startDate: Date, endDate: Date) -> Int? {
-        let components = calendar.dateComponents([.day], from: startDate, to: endDate)
-
-        return components.day
+        return DataBrokerProtectionPixelsUtilities.shouldWeFirePixel(startDate: latestPixelFire, endDate: date, daysDifference: .monthly)
     }
 }

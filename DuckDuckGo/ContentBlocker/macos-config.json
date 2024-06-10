@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1716586822463,
+    "version": 1717679238533,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1951,6 +1951,14 @@
                             {
                                 "selector": "#credential_picker_container",
                                 "type": "override"
+                            },
+                            {
+                                "selector": ".shop-display-ad",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".row.full-bleed-row",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -2065,6 +2073,15 @@
                             },
                             {
                                 "selector": ".subnav-ad-layout",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "canalrcn.com",
+                        "rules": [
+                            {
+                                "selector": ".pauta-en-vivo-mobile",
                                 "type": "hide-empty"
                             }
                         ]
@@ -2339,6 +2356,15 @@
                         "rules": [
                             {
                                 "selector": "[data-liberty-position-name]",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "economist.com",
+                        "rules": [
+                            {
+                                "selector": "[class^='adComponent']",
                                 "type": "hide-empty"
                             }
                         ]
@@ -3721,6 +3747,15 @@
                         ]
                     },
                     {
+                        "domain": "shattovet.com",
+                        "rules": [
+                            {
+                                "selector": "[class*='advertising']",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "si.com",
                         "rules": [
                             {
@@ -4222,7 +4257,7 @@
                             },
                             {
                                 "selector": "[class*='sdaContainer']",
-                                "type": "hide-empty"
+                                "type": "hide"
                             }
                         ]
                     },
@@ -4283,6 +4318,14 @@
                             {
                                 "selector": ".parallax-container",
                                 "type": "hide-empty"
+                            },
+                            {
+                                "selector": "div:has(.react-parallax)",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "[id^=div-gpt-ad-]",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -4384,7 +4427,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "1c7a079280844400d77a0b0baf89c967"
+            "hash": "4ba5333801a460fca5bf360d684fa994"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4749,6 +4792,9 @@
                     "domain": "dollargeneral.com"
                 },
                 {
+                    "domain": "monstergear.monsterenergy.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4764,7 +4810,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "3803c69233510b43ebaee8368b38a31d"
+            "hash": "a5053adfe1cf8c1ce1721c022fbb8b1a"
         },
         "harmfulApis": {
             "settings": {
@@ -6504,6 +6550,7 @@
                             {
                                 "rule": "google-analytics.com/analytics.js",
                                 "domains": [
+                                    "docs.llamaindex.ai",
                                     "doterra.com",
                                     "easyjet.com",
                                     "edx.org",
@@ -6681,6 +6728,7 @@
                                     "algomalegalclinic.com",
                                     "bodyelectricvitality.com.au",
                                     "cosmicbook.news",
+                                    "docs.llamaindex.ai",
                                     "eatroyo.com",
                                     "thesimsresource.com",
                                     "tradersync.com",
@@ -6881,6 +6929,12 @@
                                 "rule": "api.grow.me",
                                 "domains": [
                                     "foodfornet.com"
+                                ]
+                            },
+                            {
+                                "rule": "grow.me",
+                                "domains": [
+                                    "grilledcheesesocial.com"
                                 ]
                             }
                         ]
@@ -7131,8 +7185,12 @@
                                 "rule": "klaviyo.com/",
                                 "domains": [
                                     "andieswim.com",
+                                    "dreamfarm.com",
                                     "footweartruth.com",
+                                    "holdonbags.com",
                                     "kmail-lists.com",
+                                    "nestlenutritionstore.com",
+                                    "organakratom.com",
                                     "usafacts.org"
                                 ]
                             }
@@ -7160,6 +7218,12 @@
                                 "rule": "cdn.listrakbi.com/scripts/script.js",
                                 "domains": [
                                     "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "listrakbi.com",
+                                "domains": [
+                                    "fsastore.com"
                                 ]
                             }
                         ]
@@ -7282,7 +7346,8 @@
                             {
                                 "rule": "monetate.net",
                                 "domains": [
-                                    "kleen-ritecorp.com"
+                                    "kleen-ritecorp.com",
+                                    "qvc.com"
                                 ]
                             }
                         ]
@@ -8500,7 +8565,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "36ca79804d05bc24247f804f48fda77b"
+            "hash": "af06003f902448cd26fd4e538e64e70f"
         },
         "trackingCookies1p": {
             "settings": {

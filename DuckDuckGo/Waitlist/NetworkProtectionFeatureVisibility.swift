@@ -40,7 +40,6 @@ protocol NetworkProtectionFeatureVisibility {
 struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     private static var subscriptionAuthTokenPrefix: String { "ddg:" }
     private let vpnUninstaller: VPNUninstalling
-    private let featureOverrides: WaitlistBetaOverriding
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let defaults: UserDefaults
@@ -48,7 +47,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
-         featureOverrides: WaitlistBetaOverriding = DefaultWaitlistBetaOverrides(),
          vpnUninstaller: VPNUninstalling = VPNUninstaller(),
          defaults: UserDefaults = .netP,
          log: OSLog = .networkProtection,
@@ -57,7 +55,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         self.vpnUninstaller = vpnUninstaller
-        self.featureOverrides = featureOverrides
         self.defaults = defaults
         self.subscriptionManager = subscriptionManager
     }

@@ -37,13 +37,15 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let connectivityIssuesObserver: ConnectivityIssueObserver
         let controllerErrorMessageObserver: ControllerErrorMesssageObserver
         let dataVolumeObserver: DataVolumeObserver
+        let knownFailureObserver: KnownFailureObserver
 
         init(status: ConnectionStatus,
              isHavingConnectivityIssues: Bool = false,
              serverInfo: NetworkProtectionStatusServerInfo = MockStatusReporter.defaultServerInfo,
              tunnelErrorMessage: String? = nil,
              controllerErrorMessage: String? = nil,
-             dataVolume: DataVolume = .init()) {
+             dataVolume: DataVolume = .init(),
+             failure: KnownFailure? = nil) {
 
             let mockStatusObserver = MockConnectionStatusObserver()
             mockStatusObserver.subject.send(status)
@@ -68,6 +70,10 @@ final class TunnelControllerViewModelTests: XCTestCase {
             let mockDataVolumeObserver = MockDataVolumeObserver()
             mockDataVolumeObserver.subject.send(dataVolume)
             dataVolumeObserver = mockDataVolumeObserver
+
+            let mockKnownFailureObserver = MockKnownFailureObserver()
+            mockKnownFailureObserver.subject.send(failure)
+            knownFailureObserver = mockKnownFailureObserver
         }
 
         func forceRefresh() {
@@ -112,7 +118,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
-            appLauncher: MockAppLauncher())
+            uiActionHandler: MockVPNUIActionHandler())
 
         let isToggleOn = model.isToggleOn.wrappedValue
         XCTAssertFalse(isToggleOn)
@@ -134,7 +140,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
-            appLauncher: MockAppLauncher())
+            uiActionHandler: MockVPNUIActionHandler())
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnecting)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
@@ -163,7 +169,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
-            appLauncher: MockAppLauncher())
+            uiActionHandler: MockVPNUIActionHandler())
 
         let isToggleOn = model.isToggleOn.wrappedValue
         XCTAssertTrue(isToggleOn)
@@ -187,7 +193,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
-            appLauncher: MockAppLauncher())
+            uiActionHandler: MockVPNUIActionHandler())
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusConnecting)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
@@ -208,7 +214,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
-            appLauncher: MockAppLauncher())
+            uiActionHandler: MockVPNUIActionHandler())
 
         XCTAssertEqual(model.formattedDataVolume, .init(dataSent: "512 KB", dataReceived: "1 MB"))
     }
@@ -225,7 +231,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
-            appLauncher: MockAppLauncher())
+            uiActionHandler: MockVPNUIActionHandler())
         let networkProtectionWasStarted = expectation(description: "The model started the VPN when appropriate")
 
         controller.startCallback = {
@@ -257,7 +263,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             vpnSettings: .init(defaults: .standard),
             locationFormatter: MockVPNLocationFormatter(),
-            appLauncher: MockAppLauncher())
+            uiActionHandler: MockVPNUIActionHandler())
 
         let networkProtectionWasStopped = expectation(description: "The model stopped the VPN when appropriate")
 

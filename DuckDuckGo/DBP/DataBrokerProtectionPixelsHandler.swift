@@ -31,7 +31,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                 PixelKit.fire(DebugEvent(event, error: error))
             case .generalError(let error, _),
                     .secureVaultInitError(let error),
-                    .secureVaultError(let error):
+                    .secureVaultError(let error),
+                    .secureVaultKeyStoreReadError(let error),
+                    .secureVaultKeyStoreUpdateError(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerProfileSavedXPCError(error: let error),
                     .ipcServerImmediateScansFinishedWithError(error: let error),
@@ -91,7 +93,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .initialScanTotalDuration,
                     .initialScanSiteLoadDuration,
                     .initialScanPostLoadingDuration,
-                    .initialScanPreStartDuration:
+                    .initialScanPreStartDuration,
+                    .globalMetricsWeeklyStats,
+                    .globalMetricsMonthlyStats,
+                    .dataBrokerMetricsWeeklyStats,
+                    .dataBrokerMetricsMonthlyStats:
                 PixelKit.fire(event)
 
             case .homeViewShowNoPermissionError,

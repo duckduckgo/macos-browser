@@ -584,7 +584,6 @@ import SubscriptionUI
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
-                NSMenuItem(title: "Reset Passwords Survey", action: #selector(enablePasswordsSurveyAction), target: self)
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
@@ -607,6 +606,7 @@ import SubscriptionUI
             }
             NSMenuItem(title: "Sync & Backup")
                 .submenu(SyncDebugMenu())
+                .withAccessibilityIdentifier("MainMenu.syncAndBackup")
 
 #if DBP
             NSMenuItem(title: "Personal Information Removal")
@@ -735,10 +735,6 @@ import SubscriptionUI
         AutofillPreferences().debugScriptEnabled = !AutofillPreferences().debugScriptEnabled
         NotificationCenter.default.post(name: .autofillScriptDebugSettingsDidChange, object: nil)
         updateAutofillDebugScriptMenuItem()
-    }
-
-    @objc private func enablePasswordsSurveyAction(_ sender: NSMenuItem) {
-        AutofillPreferences().autofillSurveyEnabled = true
     }
 
     @objc private func debugLoggingMenuItemAction(_ sender: NSMenuItem) {

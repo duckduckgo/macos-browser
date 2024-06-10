@@ -102,6 +102,7 @@ final class MoreOptionsMenu: NSMenu {
             return "\(UserText.sendFeedback) (version: \(AppVersion.shared.versionNumber).\(AppVersion.shared.buildNumber))"
         }()
         let feedbackMenuItem = NSMenuItem(title: feedbackString, action: nil, keyEquivalent: "")
+            .withImage(.sendFeedback)
 
         feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
         addItem(feedbackMenuItem)
@@ -288,6 +289,7 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(.passwordManagement)
             .withSubmenu(loginsSubMenu)
+            .withAccessibilityIdentifier("MoreOptionsMenu.autofill")
 
         addItem(NSMenuItem.separator())
     }
@@ -569,17 +571,17 @@ final class FeedbackSubMenu: NSMenu {
     private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, targetting target: AnyObject) {
         removeAllItems()
 
-        let reportBrokenSiteItem = NSMenuItem(title: UserText.reportBrokenSite,
-                                              action: #selector(AppDelegate.openReportBrokenSite(_:)),
-                                              keyEquivalent: "")
-            .withImage(.exclamation)
-        addItem(reportBrokenSiteItem)
-
         let browserFeedbackItem = NSMenuItem(title: UserText.browserFeedback,
                                              action: #selector(AppDelegate.openFeedback(_:)),
                                              keyEquivalent: "")
-            .withImage(.feedback)
+            .withImage(.browserFeedback)
         addItem(browserFeedbackItem)
+
+        let reportBrokenSiteItem = NSMenuItem(title: UserText.reportBrokenSite,
+                                              action: #selector(AppDelegate.openReportBrokenSite(_:)),
+                                              keyEquivalent: "")
+            .withImage(.siteBreakage)
+        addItem(reportBrokenSiteItem)
     }
 }
 
@@ -740,6 +742,7 @@ final class LoginsSubMenu: NSMenu {
     private func updateMenuItems(with target: AnyObject) {
         addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(MoreOptionsMenu.openAutofillWithAllItems), keyEquivalent: "")
             .targetting(target)
+            .withAccessibilityIdentifier("LoginsSubMenu.allItems")
 
         addItem(NSMenuItem.separator())
 

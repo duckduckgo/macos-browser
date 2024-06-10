@@ -105,6 +105,7 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
             connectionState: "connected",
             lastStartErrorDescription: "none",
             lastTunnelErrorDescription: "none",
+            lastKnownFailureDescription: "none",
             connectedServer: "Paoli, PA",
             connectedServerIP: "123.123.123.123"
         )

@@ -70,11 +70,20 @@ public enum DataBrokerProtectionPixels {
         static let hasError = "has_error"
         static let brokerURL = "broker_url"
         static let sleepDuration = "sleep_duration"
+        static let numberOfRecordsFound = "num_found"
+        static let numberOfOptOutsInProgress = "num_inprogress"
+        static let numberOfSucessfulOptOuts = "num_optoutsuccess"
+        static let numberOfOptOutsFailure = "num_optoutfailure"
+        static let durationOfFirstOptOut = "duration_firstoptout"
+        static let numberOfNewRecordsFound = "num_new_found"
+        static let numberOfReappereances = "num_reappeared"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
     case generalError(error: Error, functionOccurredIn: String)
     case secureVaultInitError(error: Error)
+    case secureVaultKeyStoreReadError(error: Error)
+    case secureVaultKeyStoreUpdateError(error: Error)
     case secureVaultError(error: Error)
     case parentChildMatches(parent: String, child: String, value: Int)
 
@@ -169,6 +178,12 @@ public enum DataBrokerProtectionPixels {
     case entitlementCheckValid
     case entitlementCheckInvalid
     case entitlementCheckError
+    // Measure success/failure rate of Personal Information Removal Pixels
+    // https://app.asana.com/0/1204006570077678/1206889724879222/f
+    case globalMetricsWeeklyStats(profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int)
+    case globalMetricsMonthlyStats(profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int)
+    case dataBrokerMetricsWeeklyStats(dataBrokerURL: String, profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int, numberOfReappereances: Int)
+    case dataBrokerMetricsMonthlyStats(dataBrokerURL: String, profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int, numberOfReappereances: Int)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -203,6 +218,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .error: return "m_mac_data_broker_error"
         case .generalError: return "m_mac_data_broker_error"
         case .secureVaultInitError: return "m_mac_dbp_secure_vault_init_error"
+        case .secureVaultKeyStoreReadError: return "m_mac_dbp_secure_vault_keystore_read_error"
+        case .secureVaultKeyStoreUpdateError: return "m_mac_dbp_secure_vault_keystore_update_error"
         case .secureVaultError: return "m_mac_dbp_secure_vault_error"
 
         case .backgroundAgentStarted: return "m_mac_dbp_background-agent_started"
@@ -277,6 +294,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .entitlementCheckValid: return "m_mac_dbp_macos_entitlement_valid"
         case .entitlementCheckInvalid: return "m_mac_dbp_macos_entitlement_invalid"
         case .entitlementCheckError: return "m_mac_dbp_macos_entitlement_error"
+        case .globalMetricsWeeklyStats: return "m_mac_dbp_weekly_stats"
+        case .globalMetricsMonthlyStats: return "m_mac_dbp_monthly_stats"
+        case .dataBrokerMetricsWeeklyStats: return "m_mac_dbp_databroker_weekly_stats"
+        case .dataBrokerMetricsMonthlyStats: return "m_mac_dbp_databroker_monthly_stats"
         }
     }
 
@@ -375,6 +396,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .entitlementCheckInvalid,
                 .entitlementCheckError,
                 .secureVaultInitError,
+                .secureVaultKeyStoreReadError,
+                .secureVaultKeyStoreUpdateError,
                 .secureVaultError:
             return [:]
         case .ipcServerProfileSavedCalledByApp,
@@ -413,6 +436,24 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL, Consts.sleepDuration: String(sleepDuration)]
         case .initialScanPreStartDuration(let duration):
             return [Consts.durationInMs: String(duration)]
+        case .globalMetricsWeeklyStats(let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound),
+                        .globalMetricsMonthlyStats(let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound):
+                    return [Consts.numberOfRecordsFound: String(profilesFound),
+                            Consts.numberOfOptOutsInProgress: String(optOutsInProgress),
+                            Consts.numberOfSucessfulOptOuts: String(successfulOptOuts),
+                            Consts.numberOfOptOutsFailure: String(failedOptOuts),
+                            Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
+                            Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound)]
+        case .dataBrokerMetricsWeeklyStats(let dataBrokerURL, let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound, let numberOfReappereances),
+                     .dataBrokerMetricsMonthlyStats(let dataBrokerURL, let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound, let numberOfReappereances):
+                   return [Consts.dataBrokerParamKey: dataBrokerURL,
+                           Consts.numberOfRecordsFound: String(profilesFound),
+                           Consts.numberOfOptOutsInProgress: String(optOutsInProgress),
+                           Consts.numberOfSucessfulOptOuts: String(successfulOptOuts),
+                           Consts.numberOfOptOutsFailure: String(failedOptOuts),
+                           Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
+                           Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound),
+                           Consts.numberOfReappereances: String(numberOfReappereances)]
         }
     }
 }
@@ -432,7 +473,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             case .generalError(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .secureVaultInitError(let error),
-                    .secureVaultError(let error):
+                    .secureVaultError(let error),
+                    .secureVaultKeyStoreReadError(let error),
+                    .secureVaultKeyStoreUpdateError(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerProfileSavedXPCError(error: let error),
                     .ipcServerImmediateScansFinishedWithError(error: let error),
@@ -490,7 +533,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .initialScanTotalDuration,
                     .initialScanSiteLoadDuration,
                     .initialScanPostLoadingDuration,
-                    .initialScanPreStartDuration:
+                    .initialScanPreStartDuration,
+                    .globalMetricsWeeklyStats,
+                    .globalMetricsMonthlyStats,
+                    .dataBrokerMetricsWeeklyStats,
+                    .dataBrokerMetricsMonthlyStats:
 
                 PixelKit.fire(event)
 

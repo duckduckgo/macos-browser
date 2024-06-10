@@ -1,7 +1,7 @@
 //
-//  AppLaunching.swift
+//  MockVPNUIActionHandler.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,25 +16,24 @@
 //  limitations under the License.
 //
 
-// SPDX-License-Identifier: MIT
-// Copyright © 2018-2021 WireGuard LLC. All Rights Reserved.
-
 import Foundation
+import NetworkProtectionUI
 
-public enum AppLaunchCommand: Codable {
-    case justOpen
-    case shareFeedback
-    case showFAQ
-    case showStatus
-    case showSettings
-    case showVPNLocations
-    case startVPN
-    case stopVPN
-    case enableOnDemand
-    case moveAppToApplications
-    case showPrivacyPro
-}
+public final class MockVPNUIActionHandler: VPNUIActionHandler {
 
-public protocol AppLaunching {
-    func launchApp(withCommand command: AppLaunchCommand) async
+    public func moveAppToApplications() async {
+        // placeholder
+    }
+
+    public func shareFeedback() async {
+        // placeholder
+    }
+
+    public func showVPNLocations() async {
+        // placeholder
+    }
+
+    public func showPrivacyPro() async {
+        // placeholder
+    }
 }

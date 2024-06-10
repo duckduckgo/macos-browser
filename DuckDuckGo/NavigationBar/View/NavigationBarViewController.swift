@@ -394,6 +394,7 @@ final class NavigationBarViewController: NSViewController {
         UserDefaults.netP
             .publisher(for: \.networkProtectionShouldShowVPNUninstalledMessage)
             .receive(on: DispatchQueue.main)
+            .removeDuplicates()
             .sink { [weak self] shouldShowUninstalledMessage in
                 if shouldShowUninstalledMessage {
                     self?.showVPNUninstalledFeedback()
@@ -404,7 +405,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @objc private func showVPNUninstalledFeedback() {
-        guard view.window?.isKeyWindow == true else { return }
+        // Only show the popover if we aren't already presenting one:
+        guard view.window?.isKeyWindow == true, (self.presentedViewControllers ?? []).isEmpty else { return }
 
         DispatchQueue.main.async {
             let viewController = PopoverMessageViewController(message: "DuckDuckGo VPN was uninstalled")

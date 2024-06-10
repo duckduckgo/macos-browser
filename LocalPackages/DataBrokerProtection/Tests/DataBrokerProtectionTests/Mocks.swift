@@ -1008,6 +1008,13 @@ extension ScanJobData {
     }
 }
 
+extension OptOutJobData {
+    static func mock(with extractedProfile: ExtractedProfile,
+                     historyEvents: [HistoryEvent] = [HistoryEvent]()) -> OptOutJobData {
+        .init(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents, extractedProfile: extractedProfile)
+    }
+}
+
 extension DataBroker {
 
     static func mock(withId id: Int64) -> DataBroker {
@@ -1431,5 +1438,151 @@ final class MockDataProtectionStopAction: DataProtectionStopAction {
 
     func reset() {
         wasStopCalled = false
+    }
+}
+
+public final class MockDBPKeychainService: KeychainService {
+
+    public enum Mode {
+        case nothingFound
+        case migratedDataFound
+        case legacyDataFound
+        case readError
+        case updateError
+
+        var statusCode: Int32? {
+            switch self {
+            case .readError:
+                return -25295
+            case .updateError:
+                return -25299
+            default:
+                return nil
+            }
+        }
+    }
+
+    public var latestItemMatchingQuery: [String: Any] = [:]
+    public var latestUpdateQuery: [String: Any] = [:]
+    public var latestAddQuery: [String: Any] = [:]
+    public var latestUpdateAttributes: [String: Any] = [:]
+    public var addCallCount = 0
+    public var itemMatchingCallCount = 0
+    public var updateCallCount = 0
+
+    public var mode: Mode = .nothingFound
+
+    public init() {}
+
+    public func itemMatching(_ query: [String: Any], _ result: UnsafeMutablePointer<CFTypeRef?>?) -> OSStatus {
+        itemMatchingCallCount += 1
+        latestItemMatchingQuery = query
+
+        func setResult() {
+            let originalString = "Mock Keychain data!"
+            let data = originalString.data(using: .utf8)!
+            let encodedString = data.base64EncodedString()
+            let mockResult = encodedString.data(using: .utf8)! as CFData
+
+            if let result = result {
+                result.pointee = mockResult
+            }
+        }
+
+        switch mode {
+        case .nothingFound:
+            return errSecItemNotFound
+        case .migratedDataFound:
+            setResult()
+            return errSecSuccess
+        case .legacyDataFound, .updateError:
+            if itemMatchingCallCount == 2 {
+                setResult()
+                return errSecSuccess
+            } else {
+                return errSecItemNotFound
+            }
+        case .readError:
+            return errSecInvalidKeychain
+        }
+    }
+
+    public func add(_ query: [String: Any], _ result: UnsafeMutablePointer<CFTypeRef?>?) -> OSStatus {
+        latestAddQuery = query
+        addCallCount += 1
+        return errSecSuccess
+    }
+
+    public func update(_ query: [String: Any], _ attributesToUpdate: [String: Any]) -> OSStatus {
+        guard mode != .updateError else { return errSecDuplicateItem }
+        updateCallCount += 1
+        latestUpdateQuery = query
+        latestUpdateAttributes = attributesToUpdate
+        return errSecSuccess
+    }
+}
+
+struct MockGroupNameProvider: GroupNameProviding {
+    var appGroupName: String {
+        return "mockGroup"
+    }
+}
+
+extension SecureStorageError: Equatable {
+    public static func == (lhs: SecureStorageError, rhs: SecureStorageError) -> Bool {
+        switch (lhs, rhs) {
+        case (.initFailed(let cause1), .initFailed(let cause2)):
+            return cause1.localizedDescription == cause2.localizedDescription
+        case (.authError(let cause1), .authError(let cause2)):
+            return cause1.localizedDescription == cause2.localizedDescription
+        case (.failedToOpenDatabase(let cause1), .failedToOpenDatabase(let cause2)):
+            return cause1.localizedDescription == cause2.localizedDescription
+        case (.databaseError(let cause1), .databaseError(let cause2)):
+            return cause1.localizedDescription == cause2.localizedDescription
+        case (.keystoreError(let status1), .keystoreError(let status2)):
+            return status1 == status2
+        case (.secError(let status1), .secError(let status2)):
+            return status1 == status2
+        case (.keystoreReadError(let status1), .keystoreReadError(let status2)):
+            return status1 == status2
+        case (.keystoreUpdateError(let status1), .keystoreUpdateError(let status2)):
+            return status1 == status2
+        case (.authRequired, .authRequired), (.invalidPassword, .invalidPassword),
+            (.noL1Key, .noL1Key), (.noL2Key, .noL2Key), (.duplicateRecord, .duplicateRecord),
+            (.generalCryptoError, .generalCryptoError), (.encodingFailed, .encodingFailed):
+            return true
+        default:
+            return false
+        }
+    }
+}
+
+final class MockDataBrokerProtectionStatsPixelsRepository: DataBrokerProtectionStatsPixelsRepository {
+    var wasMarkStatsWeeklyPixelDateCalled: Bool = false
+    var wasMarkStatsMonthlyPixelDateCalled: Bool = false
+    var latestStatsWeeklyPixelDate: Date?
+    var latestStatsMonthlyPixelDate: Date?
+
+    func markStatsWeeklyPixelDate() {
+        wasMarkStatsWeeklyPixelDateCalled = true
+    }
+
+    func markStatsMonthlyPixelDate() {
+        wasMarkStatsMonthlyPixelDateCalled = true
+    }
+
+    func getLatestStatsWeeklyPixelDate() -> Date? {
+        return latestStatsWeeklyPixelDate
+    }
+
+    func getLatestStatsMonthlyPixelDate() -> Date? {
+        return latestStatsMonthlyPixelDate
+    }
+
+    func clear() {
+        wasMarkStatsWeeklyPixelDateCalled = false
+        wasMarkStatsMonthlyPixelDateCalled = false
+        latestStatsWeeklyPixelDate = nil
+        latestStatsMonthlyPixelDate = nil
     }
 }

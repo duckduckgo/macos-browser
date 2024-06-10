@@ -22,6 +22,7 @@ import NetworkExtension
 import NetworkProtection
 import ServiceManagement
 import SwiftUI
+import Common
 
 /// This view can be shown from any location where we want the user to be able to interact with VPN.
 /// This view shows status information about the VPN, and offers a chance to toggle it ON and OFF.
@@ -94,7 +95,7 @@ extension NetworkProtectionStatusView {
         ///
         private let runLoopMode: RunLoop.Mode?
 
-        private let appLauncher: AppLaunching
+        private let uiActionHandler: VPNUIActionHandler
 
         private let uninstallHandler: () async -> Void
 
@@ -106,6 +107,7 @@ extension NetworkProtectionStatusView {
         private static let serverInfoDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.serverInfoDispatchQueue", qos: .userInteractive)
         private static let tunnelErrorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.tunnelErrorDispatchQueue", qos: .userInteractive)
         private static let controllerErrorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.controllerErrorDispatchQueue", qos: .userInteractive)
+        private static let knownFailureDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.knownFailureDispatchQueue", qos: .userInteractive)
 
         // MARK: - Initialization & Deinitialization
 
@@ -113,7 +115,7 @@ extension NetworkProtectionStatusView {
                     onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
                     debugInformationPublisher: AnyPublisher<Bool, Never>,
-                    appLauncher: AppLaunching,
+                    uiActionHandler: VPNUIActionHandler,
                     menuItems: @escaping () -> [MenuItem],
                     agentLoginItem: LoginItem?,
                     isMenuBarStatusView: Bool,
@@ -130,7 +132,7 @@ extension NetworkProtectionStatusView {
             self.agentLoginItem = agentLoginItem
             self.isMenuBarStatusView = isMenuBarStatusView
             self.runLoopMode = runLoopMode
-            self.appLauncher = appLauncher
+            self.uiActionHandler = uiActionHandler
             self.uninstallHandler = uninstallHandler
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
@@ -138,12 +140,13 @@ extension NetworkProtectionStatusView {
                                                                   statusReporter: statusReporter,
                                                                   vpnSettings: .init(defaults: userDefaults),
                                                                   locationFormatter: locationFormatter,
-                                                                  appLauncher: appLauncher)
+                                                                  uiActionHandler: uiActionHandler)
 
             connectionStatus = statusReporter.statusObserver.recentValue
             isHavingConnectivityIssues = statusReporter.connectivityIssuesObserver.recentValue
             lastTunnelErrorMessage = statusReporter.connectionErrorObserver.recentValue
             lastControllerErrorMessage = statusReporter.controllerErrorMessageObserver.recentValue
+            knownFailure = statusReporter.knownFailureObserver.recentValue
             showDebugInformation = false
 
             // Particularly useful when unit testing with an initial status of our choosing.
@@ -151,6 +154,7 @@ extension NetworkProtectionStatusView {
             subscribeToConnectivityIssues()
             subscribeToTunnelErrorMessages()
             subscribeToControllerErrorMessages()
+            subscribeToKnownFailures()
             subscribeToDebugInformationChanges()
             refreshLoginItemStatus()
 
@@ -183,7 +187,13 @@ extension NetworkProtectionStatusView {
 
         func openPrivacyPro() {
             Task {
-                await appLauncher.launchApp(withCommand: .showPrivacyPro)
+                await uiActionHandler.showPrivacyPro()
+            }
+        }
+
+        func openFeedbackForm() {
+            Task {
+                await uiActionHandler.shareFeedback()
             }
         }
 
@@ -235,6 +245,14 @@ extension NetworkProtectionStatusView {
                         self.lastControllerErrorMessage = errorMessage
                     }
                 }.store(in: &cancellables)
+        }
+
+        private func subscribeToKnownFailures() {
+            statusReporter.knownFailureObserver.publisher
+                .removeDuplicates()
+                .subscribe(on: Self.knownFailureDispatchQueue)
+                .assign(to: \.knownFailure, onWeaklyHeld: self)
+                .store(in: &cancellables)
         }
 
         private func subscribeToDebugInformationChanges() {
@@ -339,6 +357,38 @@ extension NetworkProtectionStatusView {
                     }
                 }
 
+            }
+        }
+
+        @Published
+        private var knownFailure: KnownFailure?
+
+        var warningViewModel: WarningView.Model? {
+            if let warningMessage = warningMessage(for: knownFailure) {
+                return WarningView.Model(message: warningMessage,
+                                         actionTitle: UserText.vpnShareFeedback,
+                                         action: openFeedbackForm)
+            }
+
+            if let issueDescription {
+                return WarningView.Model(message: issueDescription, actionTitle: nil, action: nil)
+            }
+
+            return nil
+        }
+
+        func warningMessage(for knownFailure: KnownFailure?) -> String? {
+            guard let knownFailure else { return nil }
+
+            switch KnownFailure.SilentError(rawValue: knownFailure.error) {
+            case .operationNotPermitted:
+                return UserText.vpnOperationNotPermittedMessage
+            case .loginItemVersionMismatched:
+                return UserText.vpnLoginItemVersionMismatchedMessage
+            case .registeredServerFetchingFailed:
+                return UserText.vpnRegisteredServerFetchingFailedMessage
+            default:
+                return nil
             }
         }
     }

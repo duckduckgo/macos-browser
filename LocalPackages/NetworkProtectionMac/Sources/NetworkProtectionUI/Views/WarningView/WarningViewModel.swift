@@ -1,7 +1,7 @@
 //
-//  MockAppLauncher.swift
+//  WarningViewModel.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,15 +16,20 @@
 //  limitations under the License.
 //
 
-import Foundation
-import NetworkProtectionUI
+import SwiftUI
 
-public final class MockAppLauncher: AppLaunching {
-    public init() {
-    }
+extension WarningView {
+    final class Model: ObservableObject {
+        var message: String
+        var actionTitle: String?
+        var action: (() -> Void)?
 
-    public var spyLaunchAppCommand: AppLaunchCommand?
-    public func launchApp(withCommand command: AppLaunchCommand) async {
-        spyLaunchAppCommand = command
+        init(message: String,
+             actionTitle: String? = nil,
+             action: (() -> Void)?) {
+            self.message = message
+            self.actionTitle = actionTitle
+            self.action = action
+        }
     }
 }
