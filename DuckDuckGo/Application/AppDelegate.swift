@@ -104,6 +104,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #endif
 
+    private lazy var vpnRedditSessionWorkaround: VPNRedditSessionWorkaround = {
+        let ipcClient = TunnelControllerIPCClient()
+        let statusReporter = DefaultNetworkProtectionStatusReporter(
+            statusObserver: ipcClient.connectionStatusObserver,
+            serverInfoObserver: ipcClient.serverInfoObserver,
+            connectionErrorObserver: ipcClient.connectionErrorObserver,
+            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications(),
+            dataVolumeObserver: ipcClient.dataVolumeObserver,
+            knownFailureObserver: KnownFailureObserverThroughDistributedNotifications()
+        )
+
+        return VPNRedditSessionWorkaround(
+            accountManager: accountManager,
+            ipcClient: ipcClient,
+            statusReporter: statusReporter
+        )
+    }()
+
     private var didFinishLaunching = false
 
 #if SPARKLE
@@ -359,6 +378,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if isActive {
                 PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
             }
+        }
+
+        Task { @MainActor in
+            await vpnRedditSessionWorkaround.installRedditSessionWorkaround()
+        }
+    }
+
+    func applicationDidResignActive(_ notification: Notification) {
+        Task { @MainActor in
+            await vpnRedditSessionWorkaround.removeRedditSessionWorkaround()
         }
     }
 
