@@ -203,10 +203,10 @@ final class PasswordManagementViewController: NSViewController {
         deleteAllPasswordsMenuItem.title = UserText.deleteAllPasswords
         settingsMenuItem.title = UserText.settingsSuspended
         unlockYourAutofillLabel.title = UserText.passwordManagerUnlockAutofill
-        autofillTitleLabel.stringValue = UserText.autofill
+        autofillTitleLabel.stringValue = UserText.passwordManagementTitle
         emptyStateTitle.stringValue = UserText.pmEmptyStateDefaultTitle
         emptyStateMessage.stringValue = UserText.pmEmptyStateDefaultDescription
-        emptyStateButton.title = UserText.importData
+        emptyStateButton.title = UserText.pmEmptyStateDefaultButtonTitle
     }
 
     private func bindSyncDidFinish() -> AnyCancellable? {
@@ -987,8 +987,8 @@ final class PasswordManagementViewController: NSViewController {
 
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
-        case .allItems: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
-        case .logins: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
+        case .allItems: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
+        case .logins: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
         case .identities: showEmptyState(image: .identitiesEmpty, title: UserText.pmEmptyStateIdentitiesTitle)
         case .cards: showEmptyState(image: .creditCardsEmpty, title: UserText.pmEmptyStateCardsTitle)
         }
