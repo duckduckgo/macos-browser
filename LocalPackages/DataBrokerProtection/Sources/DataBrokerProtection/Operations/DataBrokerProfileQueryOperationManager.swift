@@ -139,11 +139,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                 stageCalculator.fireScanSuccess(matchesFound: extractedProfiles.count)
                 let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound(count: extractedProfiles.count))
                 try database.add(event)
+                let extractedProfilesForBroker = try database.fetchExtractedProfiles(for: brokerId)
 
                 for extractedProfile in extractedProfiles {
 
                     // We check if the profile exists in the database.
-                    let extractedProfilesForBroker = try database.fetchExtractedProfiles(for: brokerId)
                     let doesProfileExistsInDatabase = extractedProfilesForBroker.contains { $0.identifier == extractedProfile.identifier }
 
                     // If the profile exists we do not create a new opt-out operation

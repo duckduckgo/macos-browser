@@ -377,6 +377,16 @@ final class NavigationBarViewController: NSViewController {
                                                object: nil)
 
         NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showPasswordsAutoPinnedFeedback(_:)),
+                                               name: .passwordsAutoPinned,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showPasswordsPinningOption(_:)),
+                                               name: .passwordsPinningPrompt,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
                                                selector: #selector(showAutoconsentFeedback(_:)),
                                                name: AutoconsentUserScript.newSitePopupHiddenNotification,
                                                object: nil)
@@ -384,6 +394,7 @@ final class NavigationBarViewController: NSViewController {
         UserDefaults.netP
             .publisher(for: \.networkProtectionShouldShowVPNUninstalledMessage)
             .receive(on: DispatchQueue.main)
+            .removeDuplicates()
             .sink { [weak self] shouldShowUninstalledMessage in
                 if shouldShowUninstalledMessage {
                     self?.showVPNUninstalledFeedback()
@@ -394,7 +405,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @objc private func showVPNUninstalledFeedback() {
-        guard view.window?.isKeyWindow == true else { return }
+        // Only show the popover if we aren't already presenting one:
+        guard view.window?.isKeyWindow == true, (self.presentedViewControllers ?? []).isEmpty else { return }
 
         DispatchQueue.main.async {
             let viewController = PopoverMessageViewController(message: "DuckDuckGo VPN was uninstalled")
@@ -444,6 +456,34 @@ final class NavigationBarViewController: NSViewController {
             }
                                                               )
             self.isAutoFillAutosaveMessageVisible = true
+            self.passwordManagementButton.isHidden = false
+            popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
+        }
+    }
+
+    @objc private func showPasswordsAutoPinnedFeedback(_ sender: Notification) {
+        DispatchQueue.main.async {
+            let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerAutoPinnedPopoverText)
+            popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
+        }
+    }
+
+    @objc private func showPasswordsPinningOption(_ sender: Notification) {
+        guard view.window?.isKeyWindow == true else { return }
+
+        DispatchQueue.main.async {
+            let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerPinnedPromptPopoverText,
+                                                              buttonText: UserText.passwordManagerPinnedPromptPopoverButtonText,
+                                                              buttonAction: {},
+                                                              onDismiss: {
+                self.passwordManagementButton.isHidden = !LocalPinningManager.shared.isPinned(.autofill)
+            })
+
+            popoverMessage.viewModel.buttonAction = { [weak popoverMessage] in
+                LocalPinningManager.shared.pin(.autofill)
+                popoverMessage?.dismiss()
+            }
+
             self.passwordManagementButton.isHidden = false
             popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
         }

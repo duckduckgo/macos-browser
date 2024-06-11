@@ -47,7 +47,7 @@ struct DataImportView: ModalView {
             viewBody()
                 .padding(.leading, 20)
                 .padding(.trailing, 20)
-                .padding(.bottom, 32)
+                .padding(.bottom, 20)
 
             // if import in progress…
             if let importProgress = model.importProgress {
@@ -77,21 +77,32 @@ struct DataImportView: ModalView {
 
     private func viewHeader() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(UserText.importDataTitle)
-                .bold()
-                .padding(.bottom, 16)
+            if case .shortcuts = model.screen {
+                Text(UserText.importDataShortcutsTitle)
+                    .font(.title2.weight(.semibold))
+                    .padding(.bottom, 24)
 
-            // browser to import data from picker popup
-            if case .feedback = model.screen {} else {
-                DataImportSourcePicker(importSources: model.availableImportSources, selectedSource: model.importSource) { importSource in
-                    model.update(with: importSource)
+            } else {
+                Text(UserText.importDataTitle)
+                    .font(.title2.weight(.semibold))
+                    .padding(.bottom, 24)
+
+                Text(UserText.importDataSourceTitle)
+                    .padding(.bottom, 16)
+
+                // browser to import data from picker popup
+                if case .feedback = model.screen {} else {
+                    DataImportSourcePicker(importSources: model.availableImportSources, selectedSource: model.importSource) { importSource in
+                        model.update(with: importSource)
+                    }
+                    .disabled(model.isImportSourcePickerDisabled)
+                    .padding(.bottom, 16)
                 }
-                .disabled(model.isImportSourcePickerDisabled)
-                .padding(.bottom, 24)
             }
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func viewBody() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             // body
@@ -108,6 +119,8 @@ struct DataImportView: ModalView {
                 // Bookmarks/Passwords checkboxes
                 DataImportTypePicker(viewModel: $model)
                     .disabled(model.isImportSourcePickerDisabled)
+
+                importPasswordSubtitle()
 
             case .moreInfo:
                 // you will be asked for your keychain password blah blah...
@@ -146,6 +159,10 @@ struct DataImportView: ModalView {
                     model.initiateImport(fileURL: url)
                 }
 
+                if dataType == .passwords {
+                    importPasswordSubtitle()
+                }
+
             case .summary(let dataTypes, let isFileImport):
                 DataImportSummaryView(model, dataTypes: dataTypes, isFileImport: isFileImport)
 
@@ -154,6 +171,9 @@ struct DataImportView: ModalView {
                 .padding(.bottom, 20)
 
                 ReportFeedbackView(model: $model.reportModel)
+
+            case .shortcuts(let dataTypes):
+                DataImportShortcutsView(dataTypes: dataTypes)
             }
         }
     }
@@ -187,6 +207,13 @@ struct DataImportView: ModalView {
                 .disabled(model.buttons[idx].isDisabled)
             }
         }
+    }
+
+    private func importPasswordSubtitle() -> some View {
+        Text(UserText.importDataSubtitle)
+            .font(.subheadline)
+            .foregroundColor(Color(.greyText))
+            .padding(.top, 16)
     }
 
     private func handleImportProgress(_ progress: TaskProgress<DataImportViewModel, Never, DataImportProgressEvent>) async {

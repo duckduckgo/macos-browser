@@ -30,26 +30,20 @@ extension NSApplication {
         case unitTests
         case integrationTests
         case uiTests
-        case uiTestsInCI
         case xcPreviews
 
         /// Defines if app run type requires loading full environment, i.e. databases, saved state, keychain etc.
         var requiresEnvironment: Bool {
             switch self {
-            case .normal, .integrationTests, .uiTests, .uiTestsInCI:
+            case .normal, .integrationTests, .uiTests:
                 return true
             case .unitTests, .xcPreviews:
                 return false
             }
         }
-
-        var isUITests: Bool {
-            self == .uiTests || self == .uiTestsInCI
-        }
     }
 
     static let runType: RunType = {
-        let isCI = ProcessInfo.processInfo.environment["CI"] != nil
 #if DEBUG
         if let testBundlePath = ProcessInfo().environment["XCTestBundlePath"] {
             if testBundlePath.contains("Unit") {
@@ -57,20 +51,21 @@ extension NSApplication {
             } else if testBundlePath.contains("Integration") {
                 return .integrationTests
             } else {
-                return isCI ? .uiTestsInCI : .uiTests
+                return .uiTests
             }
         } else if ProcessInfo().environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
             return .xcPreviews
         } else if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
-            return isCI ? .uiTestsInCI : .uiTests
+            return .uiTests
         } else {
             return .normal
         }
 #elseif REVIEW
+        let isCI = ProcessInfo.processInfo.environment["CI"] != nil
         // UITEST_MODE is set from UI Tests code, but this check didn't work reliably
         // in CI on its own, so we're defaulting all CI runs of the REVIEW app to UI Tests
         if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" || isCI {
-            return isCI ? .uiTestsInCI : .uiTests
+            return .uiTests
         }
         return .normal
 #else

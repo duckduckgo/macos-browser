@@ -173,7 +173,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIt
         case .subscription:
             return UserText.subscription
         case .autofill:
-            return UserText.autofill
+            return UserText.passwordManagementTitle
         case .accessibility:
             return UserText.accessibility
         case .duckPlayer:
