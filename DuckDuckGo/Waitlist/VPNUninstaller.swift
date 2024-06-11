@@ -155,7 +155,7 @@ final class VPNUninstaller: VPNUninstalling {
     ///
     @MainActor
     func uninstall(removeSystemExtension: Bool) async throws {
-        pixelKit?.fire(IPCUninstallAttempt.begin)
+        pixelKit?.fire(IPCUninstallAttempt.begin, frequency: .dailyAndCount)
 
         do {
             // We can do this optimistically as it has little if any impact.
