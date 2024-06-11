@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import NetworkProtectionUI
 
 public enum UDSMessageResponse: Codable {
     case success(_ data: Data?)
