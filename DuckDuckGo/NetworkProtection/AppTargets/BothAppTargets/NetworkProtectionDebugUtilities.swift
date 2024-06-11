@@ -66,7 +66,7 @@ final class NetworkProtectionDebugUtilities {
 
     func removeSystemExtensionAndAgents() async throws {
         try await vpnUninstaller.removeSystemExtension()
-        try await vpnUninstaller.removeAgents()
+        vpnUninstaller.removeAgents()
     }
 
     func sendTestNotificationRequest() async throws {

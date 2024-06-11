@@ -20,8 +20,8 @@ import AppKit
 import Foundation
 
 public protocol AppLaunching {
-    @discardableResult
-    func launchApp(withCommand command: AppLaunchCommand) async throws -> NSRunningApplication
+    func launchApp(withCommand command: AppLaunchCommand) async throws
+    func runApp(withCommand command: AppLaunchCommand) async throws -> NSRunningApplication
 }
 
 /// Launches the main App
@@ -51,8 +51,13 @@ public final class AppLauncher: AppLaunching {
         mainBundleURL = appBundleURL
     }
 
-    @discardableResult
-    public func launchApp(withCommand command: AppLaunchCommand) async throws -> NSRunningApplication {
+    public func launchApp(withCommand command: AppLaunchCommand) async throws {
+        _ = try await runApp(withCommand: command)
+    }
+
+    /// The only difference with launchApp is this method returns the `NSRunningApplication`
+    ///
+    public func runApp(withCommand command: AppLaunchCommand) async throws -> NSRunningApplication {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.allowsRunningApplicationSubstitution = command.allowsRunningApplicationSubstitution
 

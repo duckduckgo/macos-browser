@@ -88,28 +88,28 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                     return [
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
-                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
+                                _ = try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showSettings)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
-                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
+                                _ = try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusViewShareFeedback,
                             action: {
-                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
+                                _ = try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
                             })
                     ]
                 } else {
                     return [
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
-                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
+                                _ = try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showFAQ)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusViewShareFeedback,
                             action: {
-                                try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
+                                _ = try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
                             })
                     ]
                 }

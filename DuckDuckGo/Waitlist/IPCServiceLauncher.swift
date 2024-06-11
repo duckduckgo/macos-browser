@@ -58,7 +58,7 @@ final class IPCServiceLauncher{
                 var hideApp = true
             }
 
-            runningApplication = try await appLauncher.launchApp(withCommand: UDSLaunchAppCommand())
+            runningApplication = try await appLauncher.runApp(withCommand: UDSLaunchAppCommand())
         case .loginItem(let loginItem, let loginItemsManager):
             try loginItemsManager.throwingEnableLoginItems([loginItem], log: .disabled)
         }
@@ -70,7 +70,7 @@ final class IPCServiceLauncher{
     ///
     func disable() async throws {
         switch launchMethod {
-        case .direct(let bundleID, let appLauncher):
+        case .direct:
             guard let runningApplication else {
                 throw DisableError.serviceNotRunning
             }
