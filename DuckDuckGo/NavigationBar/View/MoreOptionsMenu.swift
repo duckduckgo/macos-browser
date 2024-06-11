@@ -102,6 +102,7 @@ final class MoreOptionsMenu: NSMenu {
             return "\(UserText.sendFeedback) (version: \(AppVersion.shared.versionNumber).\(AppVersion.shared.buildNumber))"
         }()
         let feedbackMenuItem = NSMenuItem(title: feedbackString, action: nil, keyEquivalent: "")
+            .withImage(.sendFeedback)
 
         feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
         addItem(feedbackMenuItem)
@@ -284,7 +285,7 @@ final class MoreOptionsMenu: NSMenu {
         let loginsSubMenu = LoginsSubMenu(targetting: self,
                                           passwordManagerCoordinator: passwordManagerCoordinator)
 
-        addItem(withTitle: UserText.passwordManagement, action: #selector(openAutofillWithAllItems), keyEquivalent: "")
+        addItem(withTitle: UserText.passwordManagementTitle, action: #selector(openAutofillWithAllItems), keyEquivalent: "")
             .targetting(self)
             .withImage(.passwordManagement)
             .withSubmenu(loginsSubMenu)
@@ -570,17 +571,17 @@ final class FeedbackSubMenu: NSMenu {
     private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, targetting target: AnyObject) {
         removeAllItems()
 
-        let reportBrokenSiteItem = NSMenuItem(title: UserText.reportBrokenSite,
-                                              action: #selector(AppDelegate.openReportBrokenSite(_:)),
-                                              keyEquivalent: "")
-            .withImage(.exclamation)
-        addItem(reportBrokenSiteItem)
-
         let browserFeedbackItem = NSMenuItem(title: UserText.browserFeedback,
                                              action: #selector(AppDelegate.openFeedback(_:)),
                                              keyEquivalent: "")
-            .withImage(.feedback)
+            .withImage(.browserFeedback)
         addItem(browserFeedbackItem)
+
+        let reportBrokenSiteItem = NSMenuItem(title: UserText.reportBrokenSite,
+                                              action: #selector(AppDelegate.openReportBrokenSite(_:)),
+                                              keyEquivalent: "")
+            .withImage(.siteBreakage)
+        addItem(reportBrokenSiteItem)
     }
 }
 
@@ -626,7 +627,7 @@ final class ZoomSubMenu: NSMenu {
 final class BookmarksSubMenu: NSMenu {
 
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
-        super.init(title: UserText.passwordManagement)
+        super.init(title: UserText.passwordManagementTitle)
         self.autoenablesItems = false
         addMenuItems(with: tabCollectionViewModel, target: target)
     }
@@ -730,7 +731,7 @@ final class LoginsSubMenu: NSMenu {
 
     init(targetting target: AnyObject, passwordManagerCoordinator: PasswordManagerCoordinating) {
         self.passwordManagerCoordinator = passwordManagerCoordinator
-        super.init(title: UserText.passwordManagement)
+        super.init(title: UserText.passwordManagementTitle)
         updateMenuItems(with: target)
     }
 

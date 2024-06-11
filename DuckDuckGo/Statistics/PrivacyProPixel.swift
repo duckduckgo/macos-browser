@@ -29,9 +29,6 @@ fileprivate let appDistribution = "direct"
 
 enum PrivacyProPixel: PixelKitEventV2 {
     // Subscription
-    case privacyProFeatureEnabled
-    case privacyProBetaUserThankYouVPN
-    case privacyProBetaUserThankYouDBP
     case privacyProSubscriptionActive
     case privacyProOfferScreenImpression
     case privacyProPurchaseAttempt
@@ -74,10 +71,6 @@ enum PrivacyProPixel: PixelKitEventV2 {
 
     var name: String {
         switch self {
-        case .privacyProFeatureEnabled: return
-            "m_mac_\(appDistribution)_privacy-pro_feature_enabled"
-        case .privacyProBetaUserThankYouVPN: return "m_mac_\(appDistribution)_privacy-pro_promotion-dialog_shown_vpn"
-        case .privacyProBetaUserThankYouDBP: return "m_mac_\(appDistribution)_privacy-pro_promotion-dialog_shown_dbp"
         case .privacyProSubscriptionActive: return "m_mac_\(appDistribution)_privacy-pro_app_subscription_active"
         case .privacyProOfferScreenImpression: return "m_mac_\(appDistribution)_privacy-pro_offer_screen_impression"
         case .privacyProPurchaseAttempt: return "m_mac_\(appDistribution)_privacy-pro_terms-conditions_subscribe_click"

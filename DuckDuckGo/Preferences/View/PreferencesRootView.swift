@@ -37,7 +37,7 @@ enum Preferences {
                 return 355
             }
         }
-        static let paneContentWidth: CGFloat = 524
+        static let paneContentWidth: CGFloat = 544
         static let panePaddingHorizontal: CGFloat = 40
         static let panePaddingVertical: CGFloat = 40
     }
@@ -98,7 +98,7 @@ enum Preferences {
                 case .dataClearing:
                     DataClearingView(model: DataClearingPreferences.shared)
                 case .vpn:
-                    VPNView(model: VPNPreferencesModel())
+                    VPNView(model: VPNPreferencesModel(), status: model.vpnProtectionStatus())
                 case .subscription:
                     SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
                 case .autofill:

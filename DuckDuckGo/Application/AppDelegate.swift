@@ -207,7 +207,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
 #if SPARKLE
-        if !NSApp.runType.isUITests {
+        if NSApp.runType != .uiTests {
             updateController = UpdateController(internalUserDecider: internalUserDecider)
             stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
         }
@@ -272,7 +272,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         subscriptionManager.loadInitialData()
 
-        if [.normal, .uiTests, .uiTestsInCI].contains(NSApp.runType) {
+        if [.normal, .uiTests].contains(NSApp.runType) {
             stateRestorationManager.applicationDidFinishLaunching()
         }
 
@@ -306,6 +306,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         subscribeToEmailProtectionStatusNotifications()
         subscribeToDataImportCompleteNotification()
 
+        fireFailedCompilationsPixelIfNeeded()
+
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
         networkProtectionSubscriptionEventHandler?.registerForSubscriptionAccountManagerEvents()
@@ -324,6 +326,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setUpAutoClearHandler()
 
         setUpAutofillPixelReporter()
+    }
+
+    private func fireFailedCompilationsPixelIfNeeded() {
+        let store = FailedCompilationsStore()
+        if store.hasAnyFailures {
+            PixelKit.fire(DebugEvent(GeneralPixel.compilationFailed),
+                          frequency: .daily,
+                          withAdditionalParameters: store.summary,
+                          includeAppVersionParameter: true) { didFire, _ in
+                if !didFire {
+                    store.cleanup()
+                }
+            }
+        }
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {

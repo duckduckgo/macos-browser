@@ -58,6 +58,7 @@ public final class AppLauncher: AppLaunching {
     /// The only difference with launchApp is this method returns the `NSRunningApplication`
     ///
     public func runApp(withCommand command: AppLaunchCommand) async throws -> NSRunningApplication {
+
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.allowsRunningApplicationSubstitution = command.allowsRunningApplicationSubstitution
 

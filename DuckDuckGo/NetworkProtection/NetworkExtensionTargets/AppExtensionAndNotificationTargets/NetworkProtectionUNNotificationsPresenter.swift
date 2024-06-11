@@ -184,10 +184,10 @@ extension NetworkProtectionUNNotificationsPresenter: UNUserNotificationCenterDel
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         switch UNNotificationAction.Identifier(rawValue: response.actionIdentifier) {
         case .reconnect:
-            _ = try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showStatus)
+            try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showStatus)
 
         case .none:
-            _ = try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showStatus)
+            try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.showStatus)
         }
     }
 

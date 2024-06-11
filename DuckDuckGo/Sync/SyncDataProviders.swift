@@ -44,14 +44,11 @@ final class SyncDataProviders: DataProvidersSource {
             metricsEventsHandler: metricsEventsHandler
         )
 
-        // Credentials syncing is disabled in UI Tests in CI until we figure out Secure Vault errors
-        if NSApp.runType != .uiTestsInCI {
-            credentialsAdapter.setUpProviderIfNeeded(
-                secureVaultFactory: secureVaultFactory,
-                metadataStore: syncMetadata,
-                metricsEventsHandler: metricsEventsHandler
-            )
-        }
+        credentialsAdapter.setUpProviderIfNeeded(
+            secureVaultFactory: secureVaultFactory,
+            metadataStore: syncMetadata,
+            metricsEventsHandler: metricsEventsHandler
+        )
 
         settingsAdapter.setUpProviderIfNeeded(
             metadataDatabase: syncMetadataDatabase.db,
