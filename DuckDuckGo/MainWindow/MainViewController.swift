@@ -70,7 +70,7 @@ final class MainViewController: NSViewController {
             }
 #endif
 
-            let ipcClient = VPNControllerXPCClient()
+            let ipcClient = VPNControllerXPCClient.shared
             ipcClient.register { error in
                 NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
             }

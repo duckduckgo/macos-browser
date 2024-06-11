@@ -128,7 +128,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     init(defaults: UserDefaults = .netP,
          accountManager: AccountManaging) {
 
-        let ipcClient = VPNControllerXPCClient()
+        let ipcClient = VPNControllerXPCClient.shared
         ipcClient.register { _ in }
 
         self.accountManager = accountManager

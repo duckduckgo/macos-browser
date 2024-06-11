@@ -46,7 +46,7 @@ final class NetworkProtectionDebugUtilities {
         self.loginItemsManager = loginItemsManager
         self.settings = settings
 
-        let ipcClient = VPNControllerXPCClient()
+        let ipcClient = VPNControllerXPCClient.shared
 
         self.ipcClient = ipcClient
         self.vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
