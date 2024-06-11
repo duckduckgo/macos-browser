@@ -355,44 +355,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         return nil
     }
 
-    /*
-     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-
-         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseOfferPageEntry)
-         guard let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
-               let windowControllerManager = await WindowControllersManager.shared.lastKeyMainWindowController else {
-             return nil
-         }
-         let message = original
-
-         let actionHandlers = SubscriptionAccessActionHandlers(restorePurchases: {
-             if #available(macOS 12.0, *) {
-                 Task { @MainActor in
-                     let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: self.subscriptionManager)
-                     await subscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
-                     message.webView?.reload()
-                 }
-             }
-         }, openURLHandler: { url in
-             DispatchQueue.main.async {
-                 WindowControllersManager.shared.showTab(with: .subscription(url))
-             }
-         }, uiActionHandler: { event in
-             switch event {
-             case .activateAddEmailClick:
-                 PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
-             default:
-                 break
-             }
-         })
-
-         let subscriptionAccessViewController = await SubscriptionAccessViewController(subscriptionManager: subscriptionManager, actionHandlers: actionHandlers)
-         await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(subscriptionAccessViewController)
-
-         return nil
-     }
-     */
-
     func featureSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         struct FeatureSelection: Codable {
             let feature: String

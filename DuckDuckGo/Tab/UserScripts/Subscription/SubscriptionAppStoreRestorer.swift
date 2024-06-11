@@ -36,7 +36,7 @@ struct SubscriptionAppStoreRestorer {
         self.uiHandler = uiHandler
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
+    // swiftlint:disable:next cyclomatic_complexity
     func restoreAppStoreSubscription() async {
 
         defer {
