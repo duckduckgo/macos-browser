@@ -82,16 +82,16 @@ final class VPNUninstaller: VPNUninstalling {
         var name: String {
             switch self {
             case .begin:
-                return "vpn_browser_uninstall_attempt_ipc"
+                return "vpn_browser_uninstall_attempt_uds"
 
             case .cancelled:
-                return "vpn_browser_uninstall_cancelled_ipc"
+                return "vpn_browser_uninstall_cancelled_uds"
 
             case .success:
-                return "vpn_browser_uninstall_success_ipc"
+                return "vpn_browser_uninstall_success_uds"
 
             case .failure:
-                return "vpn_browser_uninstall_failure_ipc"
+                return "vpn_browser_uninstall_failure_uds"
             }
         }
 
