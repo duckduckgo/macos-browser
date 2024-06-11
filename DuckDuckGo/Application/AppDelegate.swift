@@ -87,10 +87,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    private var accountManager: AccountManaging {
-        subscriptionManager.accountManager
-    }
     public let subscriptionManager: SubscriptionManaging
+    public let subscriptionUIHandler: SubscriptionUIHandling
+
     public let vpnSettings = VPNSettings(defaults: .netP)
 
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
@@ -192,6 +191,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Configure Subscription
         subscriptionManager = SubscriptionManager()
+        subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
+            return WindowControllersManager.shared
+        })
 
         // Update VPN environment and match the Subscription environment
         vpnSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)

@@ -165,13 +165,13 @@ enum Preferences {
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 if #available(macOS 12.0, *) {
                     Task {
-                        guard let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
-                              let windowControllerManager = WindowControllersManager.shared.lastKeyMainWindowController else {
-                            return
-                        }
-
-                        let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: Application.appDelegate.subscriptionManager)
-                        await subscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
+//                        guard let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
+//                              let windowControllerManager = WindowControllersManager.shared.lastKeyMainWindowController else {
+//                            return
+//                        }
+                        let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: Application.appDelegate.subscriptionManager,
+                                                                                        uiHandler: Application.appDelegate.subscriptionUIHandler)
+                        await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
                     }
                 }
             },

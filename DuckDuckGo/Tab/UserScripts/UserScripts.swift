@@ -93,7 +93,9 @@ final class UserScripts: UserScriptsProvider {
         }
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature(subscriptionManager: Application.appDelegate.subscriptionManager))
+            let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: Application.appDelegate.subscriptionManager,
+                                                                   uiHandler: Application.appDelegate.subscriptionUIHandler)
+            subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
             userScripts.append(subscriptionPagesUserScript)
 
             identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())
