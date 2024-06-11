@@ -4132,7 +4132,6 @@
 		F1B33DF12BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAppStoreRestorer.swift; sourceTree = "<group>"; };
 		F1B33DF52BAD970E001128B3 /* SubscriptionErrorReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionErrorReporter.swift; sourceTree = "<group>"; };
 		F1C5763D2BFF972900C78647 /* SubscriptionUIHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionUIHandling.swift; sourceTree = "<group>"; };
-		F1C576402BFF996600C78647 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		F1C70D782BFF50A400599292 /* DataBrokerProtectionLoginItemInterface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionLoginItemInterface.swift; sourceTree = "<group>"; };
 		F1C70D7B2BFF510000599292 /* SubscriptionEnvironment+Default.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SubscriptionEnvironment+Default.swift"; sourceTree = "<group>"; };
 		F1D042932BFBA12300A31506 /* DataBrokerProtectionSettings+Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DataBrokerProtectionSettings+Environment.swift"; sourceTree = "<group>"; };
@@ -6553,7 +6552,6 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				F1C576402BFF996600C78647 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
