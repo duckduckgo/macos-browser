@@ -216,6 +216,14 @@ final class VPNUninstaller: VPNUninstalling {
             // We want to give some time for the login item to reset state before disabling it
             try? await Task.sleep(interval: 0.5)
 
+            // Workaround: since status updates are provided through XPC we want to make sure the
+            // VPN is marked as disconnected.  We may be able to more properly resolve this by using
+            // UDS for all VPN status updates.
+            //
+            // Ref: https://app.asana.com/0/0/1207499177312396/1207538373572594/f
+            //
+            VPNControllerXPCClient.shared.forceStatusToDisconnected()
+
             // While it may seem like a duplication of code, it's one thing to disable the IPC service
             // and it's nother one to "uninstall" our login items.  The uninstaller wants both things
             // to happen.

@@ -97,6 +97,16 @@ public final class VPNControllerXPCClient {
 
         self.register { _ in }
     }
+
+    /// Forces the XPC client status to be updated to disconnected.
+    ///
+    /// This is just used as a temporary mechanism to allow the main app to tell that the VPN has been disconnected
+    /// when it's uninstalled.  You should not call this method directly or rely on this for other logic.  This should be
+    /// replaced by status updates through XPC.
+    ///
+    public func forceStatusToDisconnected() {
+        xpcDelegate.statusChanged(status: .disconnected)
+    }
 }
 
 private final class TunnelControllerXPCClientDelegate: XPCClientInterfaceObjC {
@@ -141,6 +151,10 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterfaceObjC {
             return
         }
 
+        statusChanged(status: status)
+    }
+
+    func statusChanged(status: ConnectionStatus) {
         connectionStatusObserver.publish(status)
         clientDelegate?.statusChanged(status)
     }
