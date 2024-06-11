@@ -26,7 +26,7 @@ import DataBrokerProtection
 struct DataBrokerProtectionAppEvents {
 
     private let featureGatekeeper: DataBrokerProtectionFeatureGatekeeper
-    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let loginItemsManager: LoginItemsManaging
     private let loginItemInterface: DataBrokerProtectionLoginItemInterface
 
@@ -36,9 +36,11 @@ struct DataBrokerProtectionAppEvents {
     }
 
     init(featureGatekeeper: DataBrokerProtectionFeatureGatekeeper,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
          loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          loginItemInterface: DataBrokerProtectionLoginItemInterface = DataBrokerProtectionManager.shared.loginItemInterface) {
         self.featureGatekeeper = featureGatekeeper
+        self.pixelHandler = pixelHandler
         self.loginItemsManager = loginItemsManager
         self.loginItemInterface = loginItemInterface
     }
@@ -74,6 +76,16 @@ struct DataBrokerProtectionAppEvents {
     }
 
     func applicationDidBecomeActive() {
+
+        // Check feature prerequisites and disable the login item if they are not satisfied
+        Task { @MainActor in
+            let prerequisitesMet = await featureGatekeeper.arePrerequisitesSatisfied()
+            guard prerequisitesMet else {
+                loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
+                return
+            }
+        }
+
         guard !featureGatekeeper.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
         /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
@@ -81,14 +93,6 @@ struct DataBrokerProtectionAppEvents {
         if !featureGatekeeper.isFeatureVisible() && !featureGatekeeper.isPrivacyProEnabled() {
             featureGatekeeper.disableAndDeleteForWaitlistUsers()
             return
-        }
-
-        Task { @MainActor in
-            let prerequisitesMet = await featureGatekeeper.arePrerequisitesSatisfied()
-            guard prerequisitesMet else {
-                loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
-                return
-            }
         }
     }
 

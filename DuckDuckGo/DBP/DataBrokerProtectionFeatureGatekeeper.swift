@@ -141,13 +141,19 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     func arePrerequisitesSatisfied() async -> Bool {
         let entitlements = await accountManager.hasEntitlement(for: .dataBrokerProtection,
                                                                cachePolicy: .reloadIgnoringLocalCacheData)
+        var hasEntitlements: Bool
+        switch entitlements {
+        case .success(let value):
+            hasEntitlements = value
+        case .failure:
+            hasEntitlements = false
+        }
+
         let isAuthenticated = accountManager.accessToken != nil
 
-        guard case let .success(result) = entitlements else { return false }
+        firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: hasEntitlements, isAuthenticatedResult: isAuthenticated)
 
-        firePrerequisitePixelsIfNecessary(forEntitlementResult: result, isAuthenticatedResult: isAuthenticated)
-
-        return result && isAuthenticated
+        return hasEntitlements && isAuthenticated
     }
 }
 
@@ -182,13 +188,15 @@ private extension DefaultDataBrokerProtectionFeatureGatekeeper {
         waitlistStorage.getWaitlistInviteCode() != nil
     }
 
-    func firePrerequisitePixelsIfNecessary(forEntitlementResult entitlementResult: Bool, isAuthenticatedResult: Bool) {
-        if !entitlementResult {
+    func firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: Bool, isAuthenticatedResult: Bool) {
+        if !hasEntitlements {
             pixelHandler.fire(.gatekeeperEntitlementsInvalid)
+            os_log("🔴 DBP feature Gatekeeper: Entitlement check failed", log: .dataBrokerProtection)
         }
 
         if !isAuthenticatedResult {
             pixelHandler.fire(.gatekeeperNotAuthenticated)
+            os_log("🔴 DBP feature Gatekeeper: Authentication check failed", log: .dataBrokerProtection)
         }
     }
 }
