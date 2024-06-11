@@ -21,7 +21,7 @@ import SubscriptionUI
 
 @MainActor
 protocol SubscriptionUIHandling {
-    
+
     // MARK: ProgressViewController
     func presentProgressViewController(withTitle: String)
     func dismissProgressViewController()
