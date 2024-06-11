@@ -86,9 +86,6 @@ final class TunnelControllerIPCService {
                 let command = try JSONDecoder().decode(VPNIPCClientCommand.self, from: message)
 
                 switch command {
-                case .quitAgent:
-                    try await quitAgent()
-                    return nil
                 case .uninstall(let component):
                     try await uninstall(component)
                     return nil
@@ -185,26 +182,6 @@ extension TunnelControllerIPCService: XPCServerInterface {
         // that the requested operation was executed fully.  Failure to complete the
         // operation will be handled entirely within the tunnel controller.
         completion(nil)
-    }
-
-    func quitAgent() async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            quitAgent { error in
-                if let error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-
-                continuation.resume()
-            }
-        }
-    }
-
-    func quitAgent(completion: @escaping (Error?) -> Void) {
-        Task {
-            completion(nil)
-            exit(EXIT_SUCCESS)
-        }
     }
 
     func fetchLastError(completion: @escaping (Error?) -> Void) {
