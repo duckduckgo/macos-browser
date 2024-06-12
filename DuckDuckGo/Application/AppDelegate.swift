@@ -114,7 +114,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
     private lazy var vpnRedditSessionWorkaround: VPNRedditSessionWorkaround = {
-        let ipcClient = TunnelControllerIPCClient()
+        let ipcClient = VPNControllerXPCClient.shared
         let statusReporter = DefaultNetworkProtectionStatusReporter(
             statusObserver: ipcClient.connectionStatusObserver,
             serverInfoObserver: ipcClient.serverInfoObserver,
