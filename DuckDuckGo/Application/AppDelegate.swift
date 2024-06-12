@@ -97,7 +97,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
 
-    private var vpnXPCClient = VPNControllerXPCClient.shared
+    private var vpnXPCClient: VPNControllerXPCClient {
+        VPNControllerXPCClient.shared
+    }
 
     // MARK: - DBP
 
