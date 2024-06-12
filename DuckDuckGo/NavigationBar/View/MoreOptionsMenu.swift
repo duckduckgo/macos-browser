@@ -285,7 +285,7 @@ final class MoreOptionsMenu: NSMenu {
         let loginsSubMenu = LoginsSubMenu(targetting: self,
                                           passwordManagerCoordinator: passwordManagerCoordinator)
 
-        addItem(withTitle: UserText.passwordManagement, action: #selector(openAutofillWithAllItems), keyEquivalent: "")
+        addItem(withTitle: UserText.passwordManagementTitle, action: #selector(openAutofillWithAllItems), keyEquivalent: "")
             .targetting(self)
             .withImage(.passwordManagement)
             .withSubmenu(loginsSubMenu)
@@ -627,7 +627,7 @@ final class ZoomSubMenu: NSMenu {
 final class BookmarksSubMenu: NSMenu {
 
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
-        super.init(title: UserText.passwordManagement)
+        super.init(title: UserText.passwordManagementTitle)
         self.autoenablesItems = false
         addMenuItems(with: tabCollectionViewModel, target: target)
     }
@@ -731,7 +731,7 @@ final class LoginsSubMenu: NSMenu {
 
     init(targetting target: AnyObject, passwordManagerCoordinator: PasswordManagerCoordinating) {
         self.passwordManagerCoordinator = passwordManagerCoordinator
-        super.init(title: UserText.passwordManagement)
+        super.init(title: UserText.passwordManagementTitle)
         updateMenuItems(with: target)
     }
 

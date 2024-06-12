@@ -37,7 +37,7 @@ enum Preferences {
                 return 355
             }
         }
-        static let paneContentWidth: CGFloat = 524
+        static let paneContentWidth: CGFloat = 544
         static let panePaddingHorizontal: CGFloat = 40
         static let panePaddingVertical: CGFloat = 40
     }

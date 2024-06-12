@@ -411,10 +411,12 @@ struct UserText {
     static let restartBitwarden = NSLocalizedString("restart.bitwarden", value: "Restart Bitwarden", comment: "Button to restart Bitwarden application")
     static let restartBitwardenInfo = NSLocalizedString("restart.bitwarden.info", value: "Bitwarden is not responding. Please restart it to initiate the communication again", comment: "This string represents a message informing the user that Bitwarden is not responding and prompts them to restart the application to initiate communication again.")
 
-    static let autofillViewContentButton = NSLocalizedString("autofill.view-autofill-content", value: "View Autofill Content…", comment: "View Autofill Content Button name in the autofill settings")
-    static let autofillAskToSave = NSLocalizedString("autofill.ask-to-save", value: "Save and Autofill", comment: "Autofill settings section title")
+    static let autofillViewContentButtonPasswords = NSLocalizedString("autofill.view-autofill-content.passwords", value: "Open Passwords…", comment: "View Password Content Button title in the autofill Settings")
+    static let autofillViewContentButtonPaymentMethods = NSLocalizedString("autofill.view-autofill-content.payment-methods", value: "Open Payment Methods…", comment: "View Payment Methods Content Button title in the autofill Settings")
+    static let autofillViewContentButtonIdentities = NSLocalizedString("autofill.view-autofill-content.identities", value: "Open Identities…", comment: "View Identities Content Button title in the autofill Settings")
+    static let autofillAskToSave = NSLocalizedString("autofill.ask-to-save", value: "Ask to Save and Autofill", comment: "Autofill settings section title")
     static let autofillAskToSaveExplanation = NSLocalizedString("autofill.ask-to-save.explanation", value: "Receive prompts to save new information and autofill online forms.", comment: "Description of Autofill autosaving feature - used in settings")
-    static let autofillUsernamesAndPasswords = NSLocalizedString("autofill.usernames-and-passwords", value: "Usernames and passwords", comment: "Autofill autosaved data type")
+    static let autofillPasswords = NSLocalizedString("autofill.passwords", value: "Passwords", comment: "Autofill autosaved data type")
     static let autofillAddresses = NSLocalizedString("autofill.addresses", value: "Addresses", comment: "Autofill autosaved data type")
     static let autofillPaymentMethods = NSLocalizedString("autofill.payment-methods", value: "Payment methods", comment: "Autofill autosaved data type")
     static let autofillExcludedSites = NSLocalizedString("autofill.excluded-sites", value: "Excluded Sites", comment: "Autofill settings section title")
@@ -435,7 +437,6 @@ struct UserText {
     static let downloadsOpenPopupOnCompletion = NSLocalizedString("downloads.open.on.completion", value: "Automatically open the Downloads panel when downloads complete", comment: "Checkbox to open a Download Manager popover when downloads are completed")
 
     // MARK: Password Manager
-    static let passwordManagement = NSLocalizedString("passsword.management", value: "Autofill", comment: "Used as title for password management user interface")
     static let passwordManagementAllItems = NSLocalizedString("passsword.management.all-items", value: "All Items", comment: "Used as title for the Autofill All Items option")
     static let passwordManagementLogins = NSLocalizedString("passsword.management.logins", value: "Passwords", comment: "Used as title for the Autofill Logins option")
     static let passwordManagementIdentities = NSLocalizedString("passsword.management.identities", value: "Identities", comment: "Used as title for the Autofill Identities option")
@@ -446,19 +447,19 @@ struct UserText {
     static let passwordManagementUnlock = NSLocalizedString("passsword.management.unlock", value: "Unlock", comment: "Unlock Logins Vault menu")
     static let passwordManagementSavePayment = NSLocalizedString("passsword.management.save.payment", value: "Save Payment Method?", comment: "Title of dialog that allows the user to save a payment method")
     static let passwordManagementSaveAddress = NSLocalizedString("passsword.management.save.address", value: "Save Address?", comment: "Title of dialog that allows the user to save an address method")
-    static let passwordManagementSaveCredentialsPasswordManagerTitle = NSLocalizedString("passsword.management.save.credentials.password.manager.title", value: "Save Login to Bitwarden?", comment: "Title of the passwored manager section of dialog that allows the user to save credentials")
+    static let passwordManagementSaveCredentialsPasswordManagerTitle = NSLocalizedString("passsword.management.save.credentials.password.manager.title", value: "Save password to Bitwarden?", comment: "Title of the passwored manager section of dialog that allows the user to save credentials")
     static let passwordManagementSaveCredentialsUnlockPasswordManager = NSLocalizedString("passsword.management.save.credentials.unlock.password.manager", value: "Unlock Bitwarden to Save", comment: "In the password manager dialog, alerts the user that they need to unlock Bitworden before being able to save the credential")
-    static let passwordManagementSaveCredentialsFireproofCheckboxTitle = NSLocalizedString("passsword.management.save.credentials.fireproof.checkbox.title", value: "Fireproof?", comment: "In the password manager dialog, title of the section that allows the user to fireproof a website via a checkbox")
+    static let passwordManagementSaveCredentialsFireproofCheckboxTitle = NSLocalizedString("passsword.management.save.credentials.fireproof.checkbox.title", value: "Fireproof this website", comment: "In the password manager dialog, title of the section that allows the user to fireproof a website via a checkbox")
     static let passwordManagementSaveCredentialsFireproofCheckboxDescription = NSLocalizedString("passsword.management.save.credentials.fireproof.checkbox.description", value: "Keeps you signed in after using the Fire Button", comment: "In the password manager dialog, description of the section that allows the user to fireproof a website via a checkbox")
     static func passwordManagementSaveCredentialsAccountLabel(activeVault: String) -> String {
         let localized = NSLocalizedString("passsword.management.save.credentials.account.label", value: "Connected to %@", comment: "In the password manager dialog, label that specifies the password manager vault we are connected with")
         return String(format: localized, activeVault)
     }
+    static let passwordManagementTitle = NSLocalizedString("password.management.title", value: "Passwords & Autofill", comment: "Used as the title for menu item and related Settings page")
     static let settingsSuspended = NSLocalizedString("Settings…", comment: "Menu item")
     static let passwordManagerUnlockAutofill = NSLocalizedString("passsword.manager.unlock.autofill", value: "Unlock your Autofill info", comment: "In the password manager text of button to unlock autofill info")
     static let passwordManagerEmptyStateTitle = NSLocalizedString("passsword.manager.empty.state.title", value: "No logins or credit card info yet", comment: "In the password manager title when there are no items")
     static let passwordManagerEmptyStateMessage = NSLocalizedString("passsword.manager.empty.state.message", value: "If your logins are saved in another browser, you can import them into DuckDuckGo.", comment: "In the password manager message when there are no items")
-    static let importData = NSLocalizedString("Import", comment: "Menu item")
     static let passwordManagerAlertRemovePasswordConfirmation = NSLocalizedString("passsword.manager.alert.remove-password.confirmation", value: "Are you sure you want to delete this saved password", comment: "Text of the alert that asks the user to confirm they want to delete a password")
     static let passwordManagerAlertSaveChanges = NSLocalizedString("passsword.manager.alert.save-changes", value: "Save the changes you made?", comment: "Text of the alert that asks the user if the want to save the changes made")
     static let passwordManagerAlertDuplicatePassword = NSLocalizedString("passsword.manager.alert.duplicate.password", value: "Duplicate Password", comment: "Title of the alert that the password inserted already exists")
@@ -472,7 +473,11 @@ struct UserText {
     static let importBookmarks = NSLocalizedString("import.browser.data.bookmarks", value: "Import Bookmarks…", comment: "Opens Import Browser Data dialog")
     static let importPasswords = NSLocalizedString("import.browser.data.passwords", value: "Import Passwords…", comment: "Opens Import Browser Data dialog")
 
-    static let importDataTitle = NSLocalizedString("import.browser.data", value: "Import Browser Data", comment: "Import Browser Data dialog title")
+    static let importDataTitle = NSLocalizedString("import.browser.data", value: "Import to DuckDuckGo", comment: "Import Browser Data dialog title")
+    static let importDataShortcutsTitle = NSLocalizedString("import.browser.data.shortcuts", value: "Almost done!", comment: "Import Browser Data dialog title for final stage when choosing shortcuts to enable")
+    static let importDataShortcutsSubtitle = NSLocalizedString("import.browser.data.shortcuts.subtitle", value: "You can always right-click on the browser toolbar to find more shortcuts like these.", comment: "Subtitle explaining how users can find toolbar shortcuts.")
+    static let importDataSourceTitle = NSLocalizedString("import.browser.data.source.title", value: "Import From", comment: "Import Browser Data title for option to choose source browser to import from")
+    static let importDataSubtitle = NSLocalizedString("import.browser.data.source.subtitle", value: "Access and manage your passwords in DuckDuckGo Settings > Passwords & Autofill.", comment: "Subtitle explaining where users can find imported passwords.")
 
     static let exportLogins = NSLocalizedString("export.logins.data", value: "Export Passwords…", comment: "Opens Export Logins Data dialog")
     static let exportBookmarks = NSLocalizedString("export.bookmarks.menu.item", value: "Export Bookmarks…", comment: "Export bookmarks menu item")
@@ -769,6 +774,11 @@ struct UserText {
 
     static let bookmarkImportBookmarks = NSLocalizedString("import.bookmarks.bookmarks", value: "Bookmarks", comment: "Title text for the Bookmarks import option")
 
+    static let importShortcutsBookmarksTitle = NSLocalizedString("import.shortcuts.bookmarks.title", value: "Show Bookmarks Bar", comment: "Title for the setting to enable the bookmarks bar")
+    static let importShortcutsBookmarksSubtitle = NSLocalizedString("import.shortcuts.bookmarks.subtitle", value: "Put your favorite bookmarks in easy reach", comment: "Description for the setting to enable the bookmarks bar")
+    static let importShortcutsPasswordsTitle = NSLocalizedString("import.shortcuts.passwords.title", value: "Show Passwords Shortcut", comment: "Title for the setting to enable the passwords shortcut")
+    static let importShortcutsPasswordsSubtitle = NSLocalizedString("import.shortcuts.passwords.subtitle", value: "Keep passwords nearby in the address bar", comment: "Description for the setting to enable the passwords shortcut")
+
     static let openDeveloperTools = NSLocalizedString("main.menu.show.inspector", value: "Open Developer Tools", comment: "Show Web Inspector/Open Developer Tools")
     static let closeDeveloperTools = NSLocalizedString("main.menu.close.inspector", value: "Close Developer Tools", comment: "Hide Web Inspector/Close Developer Tools")
 
@@ -966,8 +976,8 @@ struct UserText {
     static let bitwardenCommunicationInfo = NSLocalizedString("bitwarden.connect.communication-info", value: "All communication between Bitwarden and DuckDuckGo is encrypted and the data never leaves your device.", comment: "Warns users that all communication between the DuckDuckGo browser and the password manager Bitwarden is encrypted and doesn't leave the user device")
     static let bitwardenHistoryInfo = NSLocalizedString("bitwarden.connect.history-info", value: "Bitwarden will have access to your browsing history.", comment: "Warn users that the password Manager Bitwarden will have access to their browsing history")
 
-    static let showAutofillShortcut = NSLocalizedString("pinning.show-autofill-shortcut", value: "Show Autofill Shortcut", comment: "Menu item for showing the autofill shortcut")
-    static let hideAutofillShortcut = NSLocalizedString("pinning.hide-autofill-shortcut", value: "Hide Autofill Shortcut", comment: "Menu item for hiding the autofill shortcut")
+    static let showAutofillShortcut = NSLocalizedString("pinning.show-autofill-shortcut", value: "Show Passwords Shortcut", comment: "Menu item for showing the passwords shortcut")
+    static let hideAutofillShortcut = NSLocalizedString("pinning.hide-autofill-shortcut", value: "Hide Passwords Shortcut", comment: "Menu item for hiding the passwords shortcut")
 
     static let showBookmarksShortcut = NSLocalizedString("pinning.show-bookmarks-shortcut", value: "Show Bookmarks Shortcut", comment: "Menu item for showing the bookmarks shortcut")
     static let hideBookmarksShortcut = NSLocalizedString("pinning.hide-bookmarks-shortcut", value: "Hide Bookmarks Shortcut", comment: "Menu item for hiding the bookmarks shortcut")
@@ -1049,6 +1059,15 @@ struct UserText {
     static let passwordManagerAutosaveButtonText = NSLocalizedString("autofill.popover.autosave.button.text",
                                                                       value: "View",
                                                                       comment: "Button to view the recently autosaved password")
+
+    static let passwordManagerAutoPinnedPopoverText = NSLocalizedString("autofill.popover.passwords.auto-pinned.text", value: "Shortcut Added!", comment: "Text confirming the password manager has been pinned to the toolbar")
+
+    static let passwordManagerPinnedPromptPopoverText = NSLocalizedString("autofill.popover.passwords.pin-prompt.text", 
+                                                                          value: "Add passwords shortcut?",
+                                                                          comment: "Text prompting user to pin the password manager shortcut to the toolbar")
+    static let passwordManagerPinnedPromptPopoverButtonText = NSLocalizedString("autofill.popover.passwords.pin-prompt.button.text",
+                                                                     value: "Add Shortcut",
+                                                                     comment: "Button to pin the password manager shortcut to the toolbar")
 
     static func openPasswordManagerButton(managerName: String) -> String {
         let localized = NSLocalizedString("autofill.popover.open-password-manager", value: "Open %@", comment: "Open password manager button")
