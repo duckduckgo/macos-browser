@@ -1,5 +1,5 @@
 //
-//  TunnelControllerProvider.swift
+//  VPNControllerUDSClient.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,21 +17,22 @@
 //
 
 import Foundation
-import NetworkProtection
-import NetworkProtectionIPC
+import UDSHelper
 
-final class TunnelControllerProvider {
-    static let shared = TunnelControllerProvider()
+public final class VPNControllerUDSClient {
 
-    let tunnelController: NetworkProtectionIPCTunnelController
+    private let udsClient: UDSClient
+    private let encoder = JSONEncoder()
 
-    private init() {
-        let ipcClient = VPNControllerXPCClient.shared
-        ipcClient.register { error in
-            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
-        }
-
-        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+    public init(udsClient: UDSClient) {
+        self.udsClient = udsClient
     }
+}
 
+extension VPNControllerUDSClient: VPNControllerIPCClient {
+
+    public func uninstall(_ component: VPNUninstallComponent) async throws {
+        let payload = try encoder.encode(VPNIPCClientCommand.uninstall(component))
+        try await udsClient.send(payload)
+    }
 }

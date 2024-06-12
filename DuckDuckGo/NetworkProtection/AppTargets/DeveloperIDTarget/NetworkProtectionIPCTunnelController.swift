@@ -21,6 +21,7 @@ import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
 import PixelKit
+import UDSHelper
 
 /// VPN tunnel controller through IPC.
 ///
@@ -57,6 +58,7 @@ final class NetworkProtectionIPCTunnelController {
     init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
          loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          ipcClient: NetworkProtectionIPCClient,
+         fileManager: FileManager = .default,
          pixelKit: PixelFiring? = PixelKit.shared,
          errorRecorder: VPNOperationErrorRecorder = VPNOperationErrorRecorder(),
          knownFailureStore: NetworkProtectionKnownFailureStore = NetworkProtectionKnownFailureStore()) {
