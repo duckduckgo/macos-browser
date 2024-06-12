@@ -33,13 +33,13 @@ final class UDSMessageTests: XCTestCase {
 
         switch response.body {
         case .request:
-            XCTFail()
+            XCTFail("Expected a response body")
         case .response(let result):
             switch result {
             case .success(let data):
                 XCTAssertEqual(data, responseData)
             case .failure:
-                XCTFail()
+                XCTFail("Expected a success response")
             }
         }
     }
