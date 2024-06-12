@@ -178,12 +178,17 @@ public enum DataBrokerProtectionPixels {
     case entitlementCheckValid
     case entitlementCheckInvalid
     case entitlementCheckError
+
     // Measure success/failure rate of Personal Information Removal Pixels
     // https://app.asana.com/0/1204006570077678/1206889724879222/f
     case globalMetricsWeeklyStats(profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int)
     case globalMetricsMonthlyStats(profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int)
     case dataBrokerMetricsWeeklyStats(dataBrokerURL: String, profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int, numberOfReappereances: Int)
     case dataBrokerMetricsMonthlyStats(dataBrokerURL: String, profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int, numberOfReappereances: Int)
+
+    // Feature Gatekeeper
+    case gatekeeperNotAuthenticated
+    case gatekeeperEntitlementsInvalid
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -294,10 +299,15 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .entitlementCheckValid: return "m_mac_dbp_macos_entitlement_valid"
         case .entitlementCheckInvalid: return "m_mac_dbp_macos_entitlement_invalid"
         case .entitlementCheckError: return "m_mac_dbp_macos_entitlement_error"
+
         case .globalMetricsWeeklyStats: return "m_mac_dbp_weekly_stats"
         case .globalMetricsMonthlyStats: return "m_mac_dbp_monthly_stats"
         case .dataBrokerMetricsWeeklyStats: return "m_mac_dbp_databroker_weekly_stats"
         case .dataBrokerMetricsMonthlyStats: return "m_mac_dbp_databroker_monthly_stats"
+
+            // Feature Gatekeeper
+        case .gatekeeperNotAuthenticated: return "m_mac_dbp_gatekeeper_not_authenticated"
+        case .gatekeeperEntitlementsInvalid: return "m_mac_dbp_gatekeeper_entitlements_invalid"
         }
     }
 
@@ -398,7 +408,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .secureVaultInitError,
                 .secureVaultKeyStoreReadError,
                 .secureVaultKeyStoreUpdateError,
-                .secureVaultError:
+                .secureVaultError,
+                .gatekeeperNotAuthenticated,
+                .gatekeeperEntitlementsInvalid:
             return [:]
         case .ipcServerProfileSavedCalledByApp,
                 .ipcServerProfileSavedReceivedByAgent,
@@ -537,7 +549,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .globalMetricsWeeklyStats,
                     .globalMetricsMonthlyStats,
                     .dataBrokerMetricsWeeklyStats,
-                    .dataBrokerMetricsMonthlyStats:
+                    .dataBrokerMetricsMonthlyStats,
+                    .gatekeeperNotAuthenticated,
+                    .gatekeeperEntitlementsInvalid:
 
                 PixelKit.fire(event)
 

@@ -48,14 +48,14 @@ final class NetworkProtectionIPCTunnelController {
         }
     }
 
-    private let featureVisibility: NetworkProtectionFeatureVisibility
+    private let featureGatekeeper: VPNFeatureGatekeeper
     private let loginItemsManager: LoginItemsManaging
     private let ipcClient: NetworkProtectionIPCClient
     private let pixelKit: PixelFiring?
     private let errorRecorder: VPNOperationErrorRecorder
     private let knownFailureStore: NetworkProtectionKnownFailureStore
 
-    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
+    init(featureGatekeeper: VPNFeatureGatekeeper = DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager),
          loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          ipcClient: NetworkProtectionIPCClient,
          fileManager: FileManager = .default,
@@ -63,7 +63,7 @@ final class NetworkProtectionIPCTunnelController {
          errorRecorder: VPNOperationErrorRecorder = VPNOperationErrorRecorder(),
          knownFailureStore: NetworkProtectionKnownFailureStore = NetworkProtectionKnownFailureStore()) {
 
-        self.featureVisibility = featureVisibility
+        self.featureGatekeeper = featureGatekeeper
         self.loginItemsManager = loginItemsManager
         self.ipcClient = ipcClient
         self.pixelKit = pixelKit
@@ -74,7 +74,7 @@ final class NetworkProtectionIPCTunnelController {
     // MARK: - Login Items Manager
 
     private func enableLoginItems() async throws {
-        guard try await featureVisibility.canStartVPN() else {
+        guard try await featureGatekeeper.canStartVPN() else {
             throw RequestError.notAuthorizedToEnableLoginItem
         }
 

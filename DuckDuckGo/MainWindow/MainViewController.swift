@@ -199,7 +199,6 @@ final class MainViewController: NSViewController {
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
         refreshSurveyMessages()
-        DataBrokerProtectionAppEvents().windowDidBecomeMain()
     }
 
     func windowDidResignKey() {

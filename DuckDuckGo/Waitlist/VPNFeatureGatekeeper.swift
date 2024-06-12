@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionFeatureVisibility.swift
+//  VPNFeatureGatekeeper.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -26,7 +26,7 @@ import LoginItems
 import PixelKit
 import Subscription
 
-protocol NetworkProtectionFeatureVisibility {
+protocol VPNFeatureGatekeeper {
     var isInstalled: Bool { get }
 
     func canStartVPN() async throws -> Bool
@@ -37,7 +37,7 @@ protocol NetworkProtectionFeatureVisibility {
     var onboardStatusPublisher: AnyPublisher<OnboardingStatus, Never> { get }
 }
 
-struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
+struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
     private static var subscriptionAuthTokenPrefix: String { "ddg:" }
     private let vpnUninstaller: VPNUninstalling
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
