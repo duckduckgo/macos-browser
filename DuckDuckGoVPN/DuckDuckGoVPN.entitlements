@@ -17,7 +17,6 @@
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)$(NETP_APP_GROUP)</string>
 		<string>$(NETP_APP_GROUP)</string>
 		<string>$(SUBSCRIPTION_APP_GROUP)</string>
 	</array>
