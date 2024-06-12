@@ -35,12 +35,7 @@ struct UDSReceiver {
         case connectionError(_ error: Error)
         case connectionClosed
     }
-/*
-    enum Event {
-        case received(_ message: UDSMessage<Command>)
-        case error(_ error: Error)
-    }
-*/
+
     private let log: OSLog
 
     init(log: OSLog) {
