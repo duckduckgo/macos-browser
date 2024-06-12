@@ -44,6 +44,7 @@ enum ErrorCategory: Equatable {
 public enum DataBrokerProtectionPixels {
     struct Consts {
         static let dataBrokerParamKey = "data_broker"
+        static let dataBrokerVersionKey = "broker_version"
         static let appVersionParamKey = "app_version"
         static let attemptIdParamKey = "attempt_id"
         static let durationParamKey = "duration"
@@ -103,7 +104,7 @@ public enum DataBrokerProtectionPixels {
     // Process Pixels
     case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double, tries: Int, emailPattern: String?)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double, brokerType: DataBrokerHierarchy)
-    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String, tries: Int, emailPattern: String?, actionID: String?)
+    case optOutFailure(dataBroker: String, dataBrokerVersion: String, attemptId: UUID, duration: Double, stage: String, tries: Int, emailPattern: String?, actionID: String?)
 
     // Backgrond Agent events
     case backgroundAgentStarted
@@ -137,8 +138,8 @@ public enum DataBrokerProtectionPixels {
 
     // Scan/Search pixels
     case scanSuccess(dataBroker: String, matchesFound: Int, duration: Double, tries: Int, isImmediateOperation: Bool)
-    case scanFailed(dataBroker: String, duration: Double, tries: Int, isImmediateOperation: Bool)
-    case scanError(dataBroker: String, duration: Double, category: String, details: String, isImmediateOperation: Bool)
+    case scanFailed(dataBroker: String, dataBrokerVersion: String, duration: Double, tries: Int, isImmediateOperation: Bool)
+    case scanError(dataBroker: String, dataBrokerVersion: String, duration: Double, category: String, details: String, isImmediateOperation: Bool)
 
     // KPIs - engagement
     case dailyActiveUser
@@ -350,8 +351,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return params
         case .optOutSuccess(let dataBroker, let attemptId, let duration, let type):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.isParent: String(type.rawValue)]
-        case .optOutFailure(let dataBroker, let attemptId, let duration, let stage, let tries, let pattern, let actionID):
-            var params = [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage, Consts.triesKey: String(tries)]
+        case .optOutFailure(let dataBroker, let dataBrokerVersion, let attemptId, let duration, let stage, let tries, let pattern, let actionID):
+            var params = [Consts.dataBrokerParamKey: dataBroker, Consts.dataBrokerVersionKey: dataBrokerVersion, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage, Consts.triesKey: String(tries)]
             if let pattern = pattern {
                 params[Consts.pattern] = pattern
             }
@@ -416,10 +417,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.bundleIDParamKey: Bundle.main.bundleIdentifier ?? "nil"]
         case .scanSuccess(let dataBroker, let matchesFound, let duration, let tries, let isImmediateOperation):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.matchesFoundKey: String(matchesFound), Consts.durationParamKey: String(duration), Consts.triesKey: String(tries), Consts.isImmediateOperation: isImmediateOperation.description]
-        case .scanFailed(let dataBroker, let duration, let tries, let isImmediateOperation):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.triesKey: String(tries), Consts.isImmediateOperation: isImmediateOperation.description]
-        case .scanError(let dataBroker, let duration, let category, let details, let isImmediateOperation):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.errorCategoryKey: category, Consts.errorDetailsKey: details, Consts.isImmediateOperation: isImmediateOperation.description]
+        case .scanFailed(let dataBroker, let dataBrokerVersion, let duration, let tries, let isImmediateOperation):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.dataBrokerVersionKey: dataBrokerVersion, Consts.durationParamKey: String(duration), Consts.triesKey: String(tries), Consts.isImmediateOperation: isImmediateOperation.description]
+        case .scanError(let dataBroker, let dataBrokerVersion, let duration, let category, let details, let isImmediateOperation):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.dataBrokerVersionKey: dataBrokerVersion, Consts.durationParamKey: String(duration), Consts.errorCategoryKey: category, Consts.errorDetailsKey: details, Consts.isImmediateOperation: isImmediateOperation.description]
         case .generateEmailHTTPErrorDaily(let statusCode, let environment, let wasOnWaitlist):
             return [Consts.environmentKey: environment,
                     Consts.httpCode: String(statusCode),
