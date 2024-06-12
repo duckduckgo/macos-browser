@@ -117,24 +117,37 @@ final class UpdateController: NSObject {
         restartApp()
     }
 
-    private func restartApp() {
-        guard let executablePath = Bundle.main.executablePath else {
-            print("Unable to find executable path")
-            return
-        }
+    //TODO: Refactor to AppRestarter
+
+    func restartApp() {
+        let pid = ProcessInfo.processInfo.processIdentifier
+        let destinationPath = Bundle.main.bundlePath
+        let quotedDestinationPath = shellQuotedString(destinationPath)
+
+        var preOpenCmd = "/usr/bin/xattr -d -r com.apple.quarantine \(quotedDestinationPath)"
+
+        let script = """
+        (while /bin/kill -0 \(pid) >&/dev/null; do /bin/sleep 0.1; done; \(preOpenCmd); /usr/bin/open \(quotedDestinationPath)) &
+        """
 
         let task = Process()
-        task.launchPath = executablePath
+        task.launchPath = "/bin/sh"
+        task.arguments = ["-c", script]
 
         do {
             try task.run()
         } catch {
-            print("Unable to launch the app: \(error)")
+            print("Unable to launch the task: \(error)")
             return
         }
 
         // Terminate the current app instance
         exit(0)
+    }
+
+    func shellQuotedString(_ string: String) -> String {
+        let escapedString = string.replacingOccurrences(of: "'", with: "'\\''")
+        return "'\(escapedString)'"
     }
 }
 
