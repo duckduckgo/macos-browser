@@ -38,7 +38,12 @@ final class DuckDuckGoVPNApplication: NSApplication {
     private let _delegate: DuckDuckGoVPNAppDelegate
 
     override init() {
-        os_log(.error, log: .networkProtection, "🟢 Status Bar Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
+        os_log(.default,
+               log: .networkProtection,
+               "🟢 Status Bar Agent starting\nPath: (%{public}@)\nVersion: %{public}@\nPID: %{public}d",
+               Bundle.main.bundlePath,
+               "\(Bundle.main.versionNumber!).\(Bundle.main.buildNumber)",
+               NSRunningApplication.current.processIdentifier)
 
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {

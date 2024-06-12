@@ -1,5 +1,5 @@
 //
-//  TunnelControllerProvider.swift
+//  VPNControllerIPCClient.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,22 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
 import NetworkProtection
-import NetworkProtectionIPC
 
-final class TunnelControllerProvider {
-    static let shared = TunnelControllerProvider()
+// Base protocol for any IPC server we implement.
+//
+public protocol VPNControllerIPCClient {
 
-    let tunnelController: NetworkProtectionIPCTunnelController
-
-    private init() {
-        let ipcClient = VPNControllerXPCClient.shared
-        ipcClient.register { error in
-            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
-        }
-
-        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
-    }
-
+    func uninstall(_ component: VPNUninstallComponent) async throws
 }

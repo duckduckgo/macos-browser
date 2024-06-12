@@ -93,7 +93,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     public let subscriptionManager: SubscriptionManaging
     public let vpnSettings = VPNSettings(defaults: .netP)
 
+    // MARK: - VPN
+
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
+
+    private var vpnXPCClient: VPNControllerXPCClient {
+        VPNControllerXPCClient.shared
+    }
+
+    // MARK: - DBP
+
 #if DBP
     private lazy var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler = {
         let authManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(subscriptionManager: subscriptionManager)
@@ -235,9 +244,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
 
         // Configure Event handlers
-        let ipcClient = TunnelControllerIPCClient()
-        let tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
-        let vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
+        let tunnelController = NetworkProtectionIPCTunnelController(ipcClient: vpnXPCClient)
+        let vpnUninstaller = VPNUninstaller(ipcClient: vpnXPCClient)
 
         networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager,
                                                                                               tunnelController: tunnelController,
