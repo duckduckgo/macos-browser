@@ -80,10 +80,3 @@ extension NetworkProtectionLocationListCompositeRepository {
         )
     }
 }
-
-extension TunnelControllerIPCClient {
-
-    convenience init() {
-        self.init(machServiceName: Bundle.main.vpnMenuAgentBundleId)
-    }
-}

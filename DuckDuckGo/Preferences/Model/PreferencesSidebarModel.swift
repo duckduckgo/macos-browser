@@ -31,7 +31,7 @@ final class PreferencesSidebarModel: ObservableObject {
     @Published var selectedTabIndex: Int = 0
     @Published private(set) var selectedPane: PreferencePaneIdentifier = .defaultBrowser
     private let vpnVisibility: NetworkProtectionFeatureVisibility
-    let vpnTunnelIPCClient: TunnelControllerIPCClient
+    let vpnTunnelIPCClient: VPNControllerXPCClient
 
     var selectedTabContent: AnyPublisher<Tab.TabContent, Never> {
         $selectedTabIndex.map { [tabSwitcherTabs] in tabSwitcherTabs[$0] }.eraseToAnyPublisher()
@@ -45,7 +45,7 @@ final class PreferencesSidebarModel: ObservableObject {
         privacyConfigurationManager: PrivacyConfigurationManaging,
         syncService: DDGSyncing,
         vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
-        vpnTunnelIPCClient: TunnelControllerIPCClient = TunnelControllerIPCClient()
+        vpnTunnelIPCClient: VPNControllerXPCClient = .shared
     ) {
         self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs

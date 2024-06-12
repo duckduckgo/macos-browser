@@ -1,5 +1,5 @@
 //
-//  TunnelControllerProvider.swift
+//  VPNControllerUDSClient+ConvenienceInitializers.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,21 +17,17 @@
 //
 
 import Foundation
-import NetworkProtection
 import NetworkProtectionIPC
+import UDSHelper
 
-final class TunnelControllerProvider {
-    static let shared = TunnelControllerProvider()
-
-    let tunnelController: NetworkProtectionIPCTunnelController
-
-    private init() {
-        let ipcClient = VPNControllerXPCClient.shared
-        ipcClient.register { error in
-            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
-        }
-
-        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+extension VPNControllerUDSClient {
+    convenience init() {
+        self.init(udsClient: .sharedVPNUDSClient)
     }
+}
 
+extension UDSClient {
+    static let sharedVPNUDSClient: UDSClient = {
+        return UDSClient(socketFileURL: VPNIPCResources.socketFileURL, log: .networkProtectionIPCLog)
+    }()
 }

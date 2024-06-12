@@ -1,5 +1,5 @@
 //
-//  TunnelControllerProvider.swift
+//  UDSMessage.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,21 +17,22 @@
 //
 
 import Foundation
-import NetworkProtection
-import NetworkProtectionIPC
 
-final class TunnelControllerProvider {
-    static let shared = TunnelControllerProvider()
+public enum UDSMessageResponse: Codable {
+    case success(_ data: Data?)
+    case failure
+}
 
-    let tunnelController: NetworkProtectionIPCTunnelController
+public enum UDSMessageBody: Codable {
+    case request(_ data: Data)
+    case response(_ response: UDSMessageResponse)
+}
 
-    private init() {
-        let ipcClient = VPNControllerXPCClient.shared
-        ipcClient.register { error in
-            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
-        }
+public struct UDSMessage: Codable {
+    public let uuid: UUID
+    public let body: UDSMessageBody
 
-        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+    public func successResponse(withPayload payload: Data?) -> UDSMessage {
+        UDSMessage(uuid: uuid, body: .response(.success(payload)))
     }
-
 }

@@ -1,5 +1,5 @@
 //
-//  TunnelControllerProvider.swift
+//  VPNControllerXPCClient+ConvenienceInitializers.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,21 +17,13 @@
 //
 
 import Foundation
-import NetworkProtection
 import NetworkProtectionIPC
 
-final class TunnelControllerProvider {
-    static let shared = TunnelControllerProvider()
+extension VPNControllerXPCClient {
 
-    let tunnelController: NetworkProtectionIPCTunnelController
+    static let shared = VPNControllerXPCClient()
 
-    private init() {
-        let ipcClient = VPNControllerXPCClient.shared
-        ipcClient.register { error in
-            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
-        }
-
-        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+    convenience init() {
+        self.init(machServiceName: Bundle.main.vpnMenuAgentBundleId)
     }
-
 }
