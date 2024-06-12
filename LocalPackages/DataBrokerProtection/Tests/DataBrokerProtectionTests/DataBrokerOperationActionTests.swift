@@ -28,7 +28,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     let emailService = EmailServiceMock()
     let captchaService = CaptchaServiceMock()
     let pixelHandler = MockDataBrokerProtectionPixelsHandler()
-    let stageCalulator = DataBrokerProtectionStageDurationCalculator(dataBroker: "broker", handler: MockDataBrokerProtectionPixelsHandler())
+    let stageCalulator = DataBrokerProtectionStageDurationCalculator(dataBroker: "broker", dataBrokerVersion: "1.1.1", handler: MockDataBrokerProtectionPixelsHandler())
 
     override func tearDown() async throws {
         webViewHandler.reset()
