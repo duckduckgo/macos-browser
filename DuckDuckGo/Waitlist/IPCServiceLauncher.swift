@@ -22,7 +22,7 @@ import Foundation
 import LoginItems
 import NetworkProtectionIPC
 
-final class IPCServiceLauncher{
+final class IPCServiceLauncher {
 
     enum DisableError: Error {
         case failedToStopService
