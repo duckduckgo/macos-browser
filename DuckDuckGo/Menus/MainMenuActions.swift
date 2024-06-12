@@ -744,7 +744,10 @@ extension MainViewController {
         }
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
 
-        let autofillPixelReporter = AutofillPixelReporter(userDefaults: .standard, eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in }, installDate: nil)
+        let autofillPixelReporter = AutofillPixelReporter(userDefaults: .standard, 
+                                                          autofillEnabled: AutofillPreferences().askToSaveUsernamesAndPasswords,
+                                                          eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
+                                                          installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
     }
 
