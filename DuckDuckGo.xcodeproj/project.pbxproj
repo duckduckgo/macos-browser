@@ -1573,6 +1573,10 @@
 		7BCB90C32C1863BA008E3543 /* VPNControllerXPCClient+ConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCB90C12C18626E008E3543 /* VPNControllerXPCClient+ConvenienceInitializers.swift */; };
 		7BD1688E2AD4A4C400D24876 /* NetworkExtensionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */; };
 		7BD3AF5D2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
+		7BD7B0012C19D3830039D20A /* VPNIPCResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD7B0002C19D3830039D20A /* VPNIPCResources.swift */; };
+		7BD7B0022C19D3830039D20A /* VPNIPCResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD7B0002C19D3830039D20A /* VPNIPCResources.swift */; };
+		7BD7B0032C19D3830039D20A /* VPNIPCResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD7B0002C19D3830039D20A /* VPNIPCResources.swift */; };
+		7BD7B0042C19D3830039D20A /* VPNIPCResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD7B0002C19D3830039D20A /* VPNIPCResources.swift */; };
 		7BDA36E62B7E037100AD5388 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B4D603E2A0B290200BCD287 /* NetworkExtension.framework */; };
 		7BDA36F52B7E055800AD5388 /* MacTransparentProxyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0099802B65C6B300FE7C31 /* MacTransparentProxyProvider.swift */; };
 		7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */; };
@@ -3418,6 +3422,7 @@
 		7BCB90C12C18626E008E3543 /* VPNControllerXPCClient+ConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VPNControllerXPCClient+ConvenienceInitializers.swift"; sourceTree = "<group>"; };
 		7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkExtensionController.swift; sourceTree = "<group>"; };
 		7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainType+ClientDefault.swift"; sourceTree = "<group>"; };
+		7BD7B0002C19D3830039D20A /* VPNIPCResources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNIPCResources.swift; sourceTree = "<group>"; };
 		7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionFeatureVisibility.swift; sourceTree = "<group>"; };
 		7BDA36E52B7E037100AD5388 /* VPNProxyExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VPNProxyExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BDA36EA2B7E037200AD5388 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -8268,6 +8273,7 @@
 				4BF0E5042AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift */,
 				7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */,
 				7B4D8A202BDA857300852966 /* VPNOperationErrorRecorder.swift */,
+				7BD7B0002C19D3830039D20A /* VPNIPCResources.swift */,
 			);
 			path = AppAndExtensionAndAgentTargets;
 			sourceTree = "<group>";
@@ -9594,6 +9600,7 @@
 				9FEE986E2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */,
 				3706FA8D293F65D500E42796 /* BookmarkTableCellView.swift in Sources */,
 				3706FA8E293F65D500E42796 /* BookmarkManagementSidebarViewController.swift in Sources */,
+				7BD7B0022C19D3830039D20A /* VPNIPCResources.swift in Sources */,
 				3706FA8F293F65D500E42796 /* NSStackViewExtension.swift in Sources */,
 				3706FA90293F65D500E42796 /* OptionalExtension.swift in Sources */,
 				3706FA91293F65D500E42796 /* PasswordManagementLoginItemView.swift in Sources */,
@@ -10764,6 +10771,7 @@
 				7BAF9E4C2A8A3CCA002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */,
 				7BA7CC592AD1203B0042E5CE /* UserText+NetworkProtection.swift in Sources */,
 				EEDE50112BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift in Sources */,
+				7BD7B0032C19D3830039D20A /* VPNIPCResources.swift in Sources */,
 				F1DA51942BF6081E00CF29FA /* AttributionPixelHandler.swift in Sources */,
 				7BA7CC562AD11FFB0042E5CE /* NetworkProtectionOptionKeyExtension.swift in Sources */,
 				7B2DDCFA2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */,
@@ -10805,6 +10813,7 @@
 				4B2D067C2A13340900DE1F49 /* Logging.swift in Sources */,
 				7B1459552B7D438F00047F2C /* VPNProxyLauncher.swift in Sources */,
 				EEDE50122BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift in Sources */,
+				7BD7B0042C19D3830039D20A /* VPNIPCResources.swift in Sources */,
 				F1DA51952BF6081E00CF29FA /* AttributionPixelHandler.swift in Sources */,
 				B6F92BAD2A6937B5002ABA6B /* OptionalExtension.swift in Sources */,
 				4BA7C4D92B3F61FB00AFE511 /* BundleExtension.swift in Sources */,
@@ -11076,6 +11085,7 @@
 				AABEE6A524AA0A7F0043105B /* SuggestionViewController.swift in Sources */,
 				1D6216B229069BBF00386B2C /* BWKeyStorage.swift in Sources */,
 				AA7E919F287872EA00AB6B62 /* VisitViewModel.swift in Sources */,
+				7BD7B0012C19D3830039D20A /* VPNIPCResources.swift in Sources */,
 				B6676BE12AA986A700525A21 /* AddressBarTextEditor.swift in Sources */,
 				B69B503B2726A12500758A2B /* Atb.swift in Sources */,
 				37A6A8F12AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */,

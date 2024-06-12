@@ -1,5 +1,5 @@
 //
-//  VPNControllerUDSClient+ConvenienceInitializers.swift
+//  VPNIPCResources.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,17 +17,7 @@
 //
 
 import Foundation
-import NetworkProtectionIPC
-import UDSHelper
 
-extension VPNControllerUDSClient {
-    convenience init() {
-        self.init(udsClient: .sharedVPNUDSClient)
-    }
-}
-
-extension UDSClient {
-    static let sharedVPNUDSClient: UDSClient = {
-        return UDSClient(socketFileURL: VPNIPCResources.socketFileURL, log: .networkProtectionIPCLog)
-    }()
+struct VPNIPCResources {
+    public static let socketFileURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .ipc))!.appendingPathComponent("vpn.ipc")
 }
