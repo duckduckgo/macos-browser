@@ -237,7 +237,11 @@ public final class UDSServer {
                 let responseMessage = message.successResponse(withPayload: responsePayload)
                 try await self.send(responseMessage, connection: connection)
             case .response:
-                // TBD
+                // We still don't fully support server to client messages.  This is the location where we'd
+                // add the handling for that.
+                //
+                // This will be useful if we, for example, want to move VPN status observation to UDS.
+                //
                 break
             }
 
