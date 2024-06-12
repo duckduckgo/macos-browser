@@ -59,7 +59,7 @@ final class MoreOptionsMenu: NSMenu {
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
     private let accountManager: AccountManaging
 
-    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
+    private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -68,7 +68,7 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
-         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility,
+         vpnFeatureGatekeeper: VPNFeatureGatekeeper,
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
          accountManager: AccountManaging) {
@@ -76,7 +76,7 @@ final class MoreOptionsMenu: NSMenu {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
-        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
+        self.vpnFeatureGatekeeper = vpnFeatureGatekeeper
         self.internalUserDecider = internalUserDecider
         self.accountManager = accountManager
 
