@@ -1368,6 +1368,8 @@
 		4BDFA4AE27BF19E500648192 /* ToggleableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */; };
 		4BE344EE2B2376DF003FC223 /* VPNFeedbackFormViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE344ED2B2376DF003FC223 /* VPNFeedbackFormViewModelTests.swift */; };
 		4BE344EF2B23786F003FC223 /* VPNFeedbackFormViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE344ED2B2376DF003FC223 /* VPNFeedbackFormViewModelTests.swift */; };
+		4BE3A6C12C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE3A6C02C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift */; };
+		4BE3A6C22C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE3A6C02C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift */; };
 		4BE4005327CF3DC3007D3161 /* SavePaymentMethodPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */; };
 		4BE4005527CF3F19007D3161 /* SavePaymentMethodViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4005427CF3F19007D3161 /* SavePaymentMethodViewController.swift */; };
 		4BE41A5E28446EAD00760399 /* BookmarksBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE41A5D28446EAD00760399 /* BookmarksBarViewModel.swift */; };
@@ -3300,6 +3302,7 @@
 		4BD57C032AC112DF00B580EE /* SurveyRemoteMessagingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyRemoteMessagingTests.swift; sourceTree = "<group>"; };
 		4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleableScrollView.swift; sourceTree = "<group>"; };
 		4BE344ED2B2376DF003FC223 /* VPNFeedbackFormViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNFeedbackFormViewModelTests.swift; sourceTree = "<group>"; };
+		4BE3A6C02C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNRedditSessionWorkaround.swift; sourceTree = "<group>"; };
 		4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavePaymentMethodPopover.swift; sourceTree = "<group>"; };
 		4BE4005427CF3F19007D3161 /* SavePaymentMethodViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavePaymentMethodViewController.swift; sourceTree = "<group>"; };
 		4BE41A5D28446EAD00760399 /* BookmarksBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewModel.swift; sourceTree = "<group>"; };
@@ -5188,6 +5191,7 @@
 				EEA3EEAF2B24EB5100E8333A /* VPNLocation */,
 				7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */,
 				B6F1B02D2BCE6B47005E863C /* TunnelControllerProvider.swift */,
+				4BE3A6C02C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift */,
 			);
 			path = BothAppTargets;
 			sourceTree = "<group>";
@@ -9895,6 +9899,7 @@
 				3706FB80293F65D500E42796 /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
 				B677FC552B064A9C0099EB04 /* DataImportViewModel.swift in Sources */,
 				D64A5FF92AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */,
+				4BE3A6C22C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift in Sources */,
 				3707C717294B5D0F00682A9F /* FindInPageTabExtension.swift in Sources */,
 				3706FB81293F65D500E42796 /* IndexPathExtension.swift in Sources */,
 				4BF97AD62B43C45800EB4240 /* NetworkProtectionNavBarPopoverManager.swift in Sources */,
@@ -11113,6 +11118,7 @@
 				B6C0B23626E732000031CB7F /* DownloadListItem.swift in Sources */,
 				9F872DA32B90920F00138637 /* BookmarkFolderInfo.swift in Sources */,
 				4B9DB0232A983B24000927DB /* WaitlistRequest.swift in Sources */,
+				4BE3A6C12C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift in Sources */,
 				B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */,
 				85774AFF2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift in Sources */,
 				4B9292A026670D2A00AD2C21 /* SpacerNode.swift in Sources */,
