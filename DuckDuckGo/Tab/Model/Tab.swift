@@ -114,7 +114,7 @@ protocol NewWindowPolicyDecisionMaker {
                      startupPreferences: StartupPreferences = StartupPreferences.shared,
                      certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator(),
                      tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController,
-                     phishingDetectionManager: PhishingDetectionManager = PhishingDetectionManager.shared,
+                     phishingDetectionManager: PhishingDetectionManager = PhishingDetectionManagerFactory.create(),
                      tabsPreferences: TabsPreferences = TabsPreferences.shared
     ) {
 
