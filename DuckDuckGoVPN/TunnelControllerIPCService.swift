@@ -21,6 +21,7 @@ import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
+import PixelKit
 import UDSHelper
 
 /// Takes care of handling incoming IPC requests from clients that need to be relayed to the tunnel, and handling state
@@ -37,6 +38,7 @@ final class TunnelControllerIPCService {
     private let statusReporter: NetworkProtectionStatusReporter
     private var cancellables = Set<AnyCancellable>()
     private let defaults: UserDefaults
+    private let pixelKit: PixelKit?
     private let udsServer: UDSServer
 
     enum IPCError: SilentErrorConvertible {
@@ -49,12 +51,35 @@ final class TunnelControllerIPCService {
         }
     }
 
+    enum UDSError: PixelKitEventV2 {
+        case udsServerStartFailure(_ error: Error)
+
+        var name: String {
+            switch self {
+            case .udsServerStartFailure:
+                return "vpn_agent_uds_server_start_failure"
+            }
+        }
+
+        var error: Error? {
+            switch self {
+            case .udsServerStartFailure(let error):
+                return error
+            }
+        }
+
+        var parameters: [String: String]? {
+            return nil
+        }
+    }
+
     init(tunnelController: NetworkProtectionTunnelController,
          uninstaller: VPNUninstalling,
          networkExtensionController: NetworkExtensionController,
          statusReporter: NetworkProtectionStatusReporter,
          fileManager: FileManager = .default,
-         defaults: UserDefaults = .netP) {
+         defaults: UserDefaults = .netP,
+         pixelKit: PixelKit? = .shared) {
 
         self.tunnelController = tunnelController
         self.uninstaller = uninstaller
@@ -62,6 +87,7 @@ final class TunnelControllerIPCService {
         server = .init(machServiceName: Bundle.main.bundleIdentifier!)
         self.statusReporter = statusReporter
         self.defaults = defaults
+        self.pixelKit = pixelKit
 
         let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .ipc))!.appendingPathComponent("vpn.ipc")
 
@@ -92,7 +118,8 @@ final class TunnelControllerIPCService {
                 }
             }
         } catch {
-            fatalError(error.localizedDescription)
+            pixelKit?.fire(UDSError.udsServerStartFailure(error))
+            assertionFailure(error.localizedDescription)
         }
     }
 
