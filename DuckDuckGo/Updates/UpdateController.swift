@@ -24,14 +24,22 @@ import SwiftUIExtensions
 import PixelKit
 import SwiftUI
 
+protocol UpdateControllerProtocol {
+
+    var isNewUpdateAvailable: Bool { get }
+    var isNewUpdateAvailablePublisher: Published<Bool>.Publisher { get }
+
+}
+
 #if SPARKLE
 
-final class UpdateController: NSObject {
+final class UpdateController: NSObject, UpdateControllerProtocol {
 
     enum Constants {
         static let internalChannelName = "internal-channel"
     }
 
+    //TODO: Extract out of this class
     lazy var notificationPresenter = UpdateNotificationPresenter()
 
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
@@ -64,8 +72,12 @@ final class UpdateController: NSObject {
             if availableUpdate != nil {
                 notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Relaunch to update.")
             }
+            isNewUpdateAvailable = availableUpdate != nil
         }
     }
+
+    @Published private(set) var isNewUpdateAvailable = false
+    var isNewUpdateAvailablePublisher: Published<Bool>.Publisher { $isNewUpdateAvailable }
 
     // MARK: - Private
 
@@ -124,7 +136,7 @@ final class UpdateController: NSObject {
         let destinationPath = Bundle.main.bundlePath
         let quotedDestinationPath = shellQuotedString(destinationPath)
 
-        var preOpenCmd = "/usr/bin/xattr -d -r com.apple.quarantine \(quotedDestinationPath)"
+        let preOpenCmd = "/usr/bin/xattr -d -r com.apple.quarantine \(quotedDestinationPath)"
 
         let script = """
         (while /bin/kill -0 \(pid) >&/dev/null; do /bin/sleep 0.1; done; \(preOpenCmd); /usr/bin/open \(quotedDestinationPath)) &
