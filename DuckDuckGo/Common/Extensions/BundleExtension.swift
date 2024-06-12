@@ -44,6 +44,11 @@ extension Bundle {
 #endif
     }
 
+    var buildNumber: String {
+        // swiftlint:disable:next force_cast
+        object(forInfoDictionaryKey: Keys.buildNumber) as! String
+    }
+
     var versionNumber: String? {
         object(forInfoDictionaryKey: Keys.versionNumber) as? String
     }
