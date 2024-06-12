@@ -1,5 +1,5 @@
 //
-//  TunnelControllerProvider.swift
+//  VPNIPCResources.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,21 +17,7 @@
 //
 
 import Foundation
-import NetworkProtection
-import NetworkProtectionIPC
 
-final class TunnelControllerProvider {
-    static let shared = TunnelControllerProvider()
-
-    let tunnelController: NetworkProtectionIPCTunnelController
-
-    private init() {
-        let ipcClient = VPNControllerXPCClient.shared
-        ipcClient.register { error in
-            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
-        }
-
-        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
-    }
-
+struct VPNIPCResources {
+    public static let socketFileURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .ipc))!.appendingPathComponent("vpn.ipc")
 }

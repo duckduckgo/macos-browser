@@ -36,10 +36,17 @@ extension Bundle {
         static let notificationsAgentProductName = "NOTIFICATIONS_AGENT_PRODUCT_NAME"
 #endif
 
+        static let ipcAppGroup = "IPC_APP_GROUP"
+
 #if DBP
         static let dbpBackgroundAgentBundleId = "DBP_BACKGROUND_AGENT_BUNDLE_ID"
         static let dbpBackgroundAgentProductName = "DBP_BACKGROUND_AGENT_PRODUCT_NAME"
 #endif
+    }
+
+    var buildNumber: String {
+        // swiftlint:disable:next force_cast
+        object(forInfoDictionaryKey: Keys.buildNumber) as! String
     }
 
     var versionNumber: String? {
@@ -104,6 +111,13 @@ extension Bundle {
         return appGroup
     }
 
+    var ipcAppGroupName: String {
+        guard let appGroup = object(forInfoDictionaryKey: Keys.ipcAppGroup) as? String else {
+            fatalError("Info.plist is missing \(Keys.ipcAppGroup)")
+        }
+        return appGroup
+    }
+
     var isInApplicationsDirectory: Bool {
         let directoryPaths = NSSearchPathForDirectoriesInDomains(.applicationDirectory, .localDomainMask, true)
 
@@ -129,6 +143,7 @@ extension Bundle {
 
 enum BundleGroup {
     case netP
+    case ipc
     case dbp
     case subs
 
@@ -136,6 +151,8 @@ enum BundleGroup {
         switch self {
         case .dbp:
             return "DBP_APP_GROUP"
+        case .ipc:
+            return "IPC_APP_GROUP"
         case .netP:
             return "NETP_APP_GROUP"
         case .subs:
