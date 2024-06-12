@@ -243,19 +243,6 @@ final class VPNUninstaller: VPNUninstalling {
             pixelKit?.fire(IPCUninstallAttempt.failure(error), frequency: .dailyAndCount)
         }
     }
-/*
-    private func enableLoginItems() throws {
-        do {
-            try IPCServiceLauncher.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: log)
-        } catch {
-            // Launch the login item as a regular app
-            //AppLauncher(appBundleURL: )
-        }
-    }
-
-    func disableLoginItems() {
-        loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
-    }*/
 
     func removeAgents() {
         loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
