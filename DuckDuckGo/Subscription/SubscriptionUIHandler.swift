@@ -22,27 +22,27 @@ import SubscriptionUI
 @MainActor
 final class SubscriptionUIHandler: SubscriptionUIHandling {
 
-    var currentWindow: NSWindow? {
+    fileprivate var currentWindow: NSWindow? {
         windowControllersManagerProvider().lastKeyMainWindowController?.window
     }
 
-    var currentMainViewController: MainViewController? {
+    fileprivate var currentMainViewController: MainViewController? {
         windowControllersManagerProvider().lastKeyMainWindowController?.mainViewController
     }
 
-    var windowControllersManager: WindowControllersManager {
+    fileprivate var windowControllersManager: WindowControllersManager {
         windowControllersManagerProvider()
     }
 
     typealias WindowControllersManagerProvider = () -> WindowControllersManager
-    nonisolated let windowControllersManagerProvider: WindowControllersManagerProvider
+    fileprivate nonisolated let windowControllersManagerProvider: WindowControllersManagerProvider
 
     nonisolated init(windowControllersManagerProvider: @escaping WindowControllersManagerProvider) {
         self.windowControllersManagerProvider = windowControllersManagerProvider
     }
 
-    var progressViewController: ProgressViewController?
-    var subscriptionAccessViewController: SubscriptionAccessViewController?
+    fileprivate var progressViewController: ProgressViewController?
+    fileprivate var subscriptionAccessViewController: SubscriptionAccessViewController?
 
     // MARK: - SubscriptionUIHandling
 
@@ -74,10 +74,10 @@ final class SubscriptionUIHandler: SubscriptionUIHandling {
             handler.subscriptionAccessActionHandleAction(event: event)
         })
 
-        subscriptionAccessViewController = SubscriptionAccessViewController(
-            subscriptionManager: Application.appDelegate.subscriptionManager,
-            actionHandlers: actionHandlers)
-        currentMainViewController?.presentAsSheet(self.subscriptionAccessViewController!)
+        let newSubscriptionAccessViewController = SubscriptionAccessViewController(subscriptionManager: Application.appDelegate.subscriptionManager,
+                                                                                   actionHandlers: actionHandlers)
+        currentMainViewController?.presentAsSheet(newSubscriptionAccessViewController)
+        subscriptionAccessViewController =  newSubscriptionAccessViewController
     }
 
     func show(alertType: SubscriptionAlertType, text: String? = nil, firstButtonAction: (() -> Void)? = nil) {
