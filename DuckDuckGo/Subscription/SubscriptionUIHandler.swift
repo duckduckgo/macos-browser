@@ -30,7 +30,6 @@ final class SubscriptionUIHandler: SubscriptionUIHandling {
     typealias WindowControllersManagerProvider = () -> WindowControllersManager
     fileprivate nonisolated let windowControllersManagerProvider: WindowControllersManagerProvider
     fileprivate var progressViewController: ProgressViewController?
-    fileprivate var subscriptionAccessViewController: SubscriptionAccessViewController?
 
     nonisolated init(windowControllersManagerProvider: @escaping WindowControllersManagerProvider) {
         self.windowControllersManagerProvider = windowControllersManagerProvider
@@ -53,11 +52,6 @@ final class SubscriptionUIHandler: SubscriptionUIHandling {
     }
 
     func presentSubscriptionAccessViewController(handler: any SubscriptionAccessActionHandling, message: WKScriptMessage) {
-
-        if let previousVC = subscriptionAccessViewController {
-            previousVC.dismiss()
-        }
-
         let actionHandlers = SubscriptionAccessActionHandlers(restorePurchases: {
             handler.subscriptionAccessActionRestorePurchases(message: message)
         }, openURLHandler: { url in
@@ -69,7 +63,6 @@ final class SubscriptionUIHandler: SubscriptionUIHandling {
         let newSubscriptionAccessViewController = SubscriptionAccessViewController(subscriptionManager: Application.appDelegate.subscriptionManager,
                                                                                    actionHandlers: actionHandlers)
         currentMainViewController?.presentAsSheet(newSubscriptionAccessViewController)
-        subscriptionAccessViewController =  newSubscriptionAccessViewController
     }
 
     func show(alertType: SubscriptionAlertType, text: String? = nil, firstButtonAction: (() -> Void)? = nil) {
