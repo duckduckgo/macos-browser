@@ -125,7 +125,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         return VPNRedditSessionWorkaround(
-            accountManager: accountManager,
+            accountManager: subscriptionManager.accountManager,
             ipcClient: ipcClient,
             statusReporter: statusReporter
         )
@@ -349,7 +349,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
 #if DBP
-        DataBrokerProtectionAppEvents(featureGatekeeper: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: accountManager)).applicationDidFinishLaunching()
+        DataBrokerProtectionAppEvents(featureGatekeeper: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: subscriptionManager.accountManager)).applicationDidFinishLaunching()
 #endif
 
         setUpAutoClearHandler()
@@ -379,7 +379,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 #if DBP
-        DataBrokerProtectionAppEvents(featureGatekeeper: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: accountManager)).applicationDidBecomeActive()
+        DataBrokerProtectionAppEvents(featureGatekeeper:
+                                        DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
+                                                                                        subscriptionManager.accountManager)).applicationDidBecomeActive()
 #endif
 
         AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
