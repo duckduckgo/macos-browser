@@ -18,15 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       pull-request-url: ${{ steps.create-pr.outputs.pull-request-url }}
-    needs:
-      - create_asana_tasks
-      - get_release_info
-    env:
-      RELEASE_URL: ${{ needs.get_release_info.outputs.release-url }}
     steps:
       - name: Create macOS PR Body
-        env:
-          ASANA_OUTPUT: ${{ needs.create_asana_tasks.outputs.asana-output }}
         run: |
           TEMPLATE="$(bash ./scripts/update_phishing_detection_data.sh pr-body)"
           PR_BODY_MACOS="${TEMPLATE//\{\{revision\}\}/$REVISION}"
@@ -38,9 +31,9 @@ jobs:
           path: macos/
           add-paths: |
             ./DuckDuckGo/PhishingDetection/
-          commit-message: Update phishing detection data to revision ${{ env.REVISION }}
-          branch: update-phishing-protection-${{ env.REVISION }}
-          title: Update phishing protection datasets to ${{ env.REVISION }}
+          commit-message: Update phishing detection data to revision $REVISION
+          branch: update-phishing-protection-$REVISION
+          title: Update phishing protection datasets to $REVISION
           body: "${{ env.PR_BODY_MACOS }}"
           token: ${{ secrets.DAX_WEB_AUTOFILL_AUTOMATION }}
 
