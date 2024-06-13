@@ -11,6 +11,23 @@ new_revision=$(curl -s "${API_URL}/revision" | jq -r '.revision')
 
 rm -f "$temp_filename"
 
+# If pr-body is the only argument, then we produce the PR body for this update
+if [ "$1" == "pr-body" ]; then
+	echo "# Phishing Detection Data Updates"
+	echo "Embedded data has been updated to revision {{revision}}"
+	echo "# Steps to test this PR:"
+	echo "1. Check there is data in hashPrefixes.json and filterSet.json"
+	echo "2. Check the revision in PhishingDetectionManagerFactory.swift is updated to $new_revision"
+	echo "3. Check the SHA256 of the data in hashPrefixes.json and filterSet.json is updated"
+	exit 0
+fi
+
+# if "revision" is the only argument, then we just return the current server revision
+if [ "$1" == "revision" ]; then
+	echo $new_revision
+	exit 0
+fi
+
 performUpdate() {
 	local data_type=$1
 	local provider_path=$2
@@ -28,10 +45,11 @@ performUpdate() {
 	fi
 
 	old_sha=$(grep 'private static let '${data_type}'DataSHA' "${provider_path}" | awk -F '"' '{print $2}')
-	old_revision=$(grep 'private static let revision' "${provider_path}" | awk -F '=' '{print $2}' | tr -d ' ')
+	old_revision=$(grep 'public static let revision' "${provider_path}" | awk -F '=' '{print $2}' | tr -d ' ')
 
 	printf "Existing SHA256: %s\n" "${old_sha}"
 	printf "Existing revision: %s\n" "${old_revision}"
+	printf "New revision: %s\n" "${new_revision}"
 
 	if [ $old_revision -lt $new_revision ]; then
         curl -o $temp_filename -s "${API_URL}/${data_type}"
@@ -54,10 +72,10 @@ performUpdate() {
 updateRevision() {
     local new_revision=$1
 	local provider_path=$2
-	old_revision=$(grep 'private static let revision' "${provider_path}" | awk -F '=' '{print $2}' | tr -d ' ')
+	old_revision=$(grep 'public static let revision' "${provider_path}" | awk -F '=' '{print $2}' | tr -d ' ')
 
 	if [ $old_revision -lt $new_revision ]; then
-		sed -i '' -e "s/private static let revision =.*/public static let revision = $new_revision/" "${provider_path}"
+		sed -i '' -e "s/public static let revision =.*/public static let revision = $new_revision/" "${provider_path}"
         printf "Updated revision from $old_revision to $new_revision\n"
 	fi
 }

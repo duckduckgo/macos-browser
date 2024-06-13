@@ -1,0 +1,47 @@
+name: Update Phishing Detection Datasets
+on:
+  push:
+jobs:
+  update_data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: duckduckgo/macos-browser
+          path: macos/
+          token: ${{ secrets.DAX_WEB_AUTOFILL_AUTOMATION }}
+      - name: Execute Update Script
+        run: |
+          REVISION="$(bash ./scripts/update_phishing_detection_data.sh | grep -oP 'Updated revision from \K\d+')"
+  create_pr:
+    runs-on: ubuntu-latest
+    outputs:
+      pull-request-url: ${{ steps.create-pr.outputs.pull-request-url }}
+    needs:
+      - create_asana_tasks
+      - get_release_info
+    env:
+      RELEASE_URL: ${{ needs.get_release_info.outputs.release-url }}
+    steps:
+      - name: Create macOS PR Body
+        env:
+          ASANA_OUTPUT: ${{ needs.create_asana_tasks.outputs.asana-output }}
+        run: |
+          TEMPLATE="$(bash ./scripts/update_phishing_detection_data.sh pr-body)"
+          PR_BODY_MACOS="${TEMPLATE//\{\{revision\}\}/$REVISION}"
+      # --- Effect ---
+      - name: Create PR for macOS
+        uses: peter-evans/create-pull-request@88bf0de51c7487d91e1abbb4899332e602c58bbf
+        id: create-pr
+        with:
+          path: macos/
+          add-paths: |
+            ./DuckDuckGo/PhishingDetection/
+          commit-message: Update phishing detection data to revision ${{ env.REVISION }}
+          branch: update-phishing-protection-${{ env.REVISION }}
+          title: Update phishing protection datasets to ${{ env.REVISION }}
+          body: "${{ env.PR_BODY_MACOS }}"
+          token: ${{ secrets.DAX_WEB_AUTOFILL_AUTOMATION }}
+
+      
