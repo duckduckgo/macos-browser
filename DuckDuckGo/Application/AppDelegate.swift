@@ -353,6 +353,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setUpAutoClearHandler()
 
         setUpAutofillPixelReporter()
+        updateController.checkNewApplicationVersion()
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {

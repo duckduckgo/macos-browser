@@ -39,9 +39,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         static let internalChannelName = "internal-channel"
     }
 
-    //TODO: Extract out of this class
     lazy var notificationPresenter = UpdateNotificationPresenter()
-
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
     init(internalUserDecider: InternalUserDecider) {
@@ -65,6 +63,17 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
             }
         }
         updater.checkForUpdates(sender)
+    }
+
+    func checkNewApplicationVersion() {
+        let updateStatus = UpdateDetector.isApplicationUpdated()
+        switch updateStatus {
+        case .noChange: break
+        case .updated:
+            notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "Browser Updated")
+        case .downgraded:
+            notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "Browser Downgraded")
+        }
     }
 
     var availableUpdate: Update? {
