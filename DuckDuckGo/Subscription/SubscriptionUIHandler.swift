@@ -22,27 +22,19 @@ import SubscriptionUI
 @MainActor
 final class SubscriptionUIHandler: SubscriptionUIHandling {
 
-    fileprivate var currentWindow: NSWindow? {
-        windowControllersManagerProvider().lastKeyMainWindowController?.window
-    }
-
+    fileprivate var currentWindow: NSWindow? { windowControllersManagerProvider().lastKeyMainWindowController?.window }
     fileprivate var currentMainViewController: MainViewController? {
         windowControllersManagerProvider().lastKeyMainWindowController?.mainViewController
     }
-
-    fileprivate var windowControllersManager: WindowControllersManager {
-        windowControllersManagerProvider()
-    }
-
+    fileprivate var windowControllersManager: WindowControllersManager { windowControllersManagerProvider() }
     typealias WindowControllersManagerProvider = () -> WindowControllersManager
     fileprivate nonisolated let windowControllersManagerProvider: WindowControllersManagerProvider
+    fileprivate var progressViewController: ProgressViewController?
+    fileprivate var subscriptionAccessViewController: SubscriptionAccessViewController?
 
     nonisolated init(windowControllersManagerProvider: @escaping WindowControllersManagerProvider) {
         self.windowControllersManagerProvider = windowControllersManagerProvider
     }
-
-    fileprivate var progressViewController: ProgressViewController?
-    fileprivate var subscriptionAccessViewController: SubscriptionAccessViewController?
 
     // MARK: - SubscriptionUIHandling
 
