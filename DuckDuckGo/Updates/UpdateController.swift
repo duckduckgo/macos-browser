@@ -78,8 +78,13 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     var availableUpdate: Update? {
         didSet {
-            if availableUpdate != nil {
-                notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Relaunch to update.")
+            if let availableUpdate {
+                switch availableUpdate.type {
+                case .critical:
+                    notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: "Critical update required. Restart to update.")
+                case .regular:
+                    notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Relaunch to update.")
+                }
             }
             isNewUpdateAvailable = availableUpdate != nil
         }
