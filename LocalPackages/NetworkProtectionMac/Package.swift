@@ -35,6 +35,7 @@ let package = Package(
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "153.0.0"),
         .package(url: "https://github.com/airbnb/lottie-spm", exact: "4.4.1"),
         .package(path: "../AppLauncher"),
+        .package(path: "../UDSHelper"),
         .package(path: "../XPCHelper"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../LoginItems"),
@@ -47,6 +48,7 @@ let package = Package(
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "XPCHelper", package: "XPCHelper"),
+                .product(name: "UDSHelper", package: "UDSHelper"),
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
             ],
             swiftSettings: [

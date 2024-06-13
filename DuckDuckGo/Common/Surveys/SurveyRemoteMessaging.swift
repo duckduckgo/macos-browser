@@ -73,7 +73,6 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching,
         vpnActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
         pirActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp),
-        networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
         minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard
     ) {

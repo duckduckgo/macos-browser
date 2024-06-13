@@ -97,7 +97,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .globalMetricsWeeklyStats,
                     .globalMetricsMonthlyStats,
                     .dataBrokerMetricsWeeklyStats,
-                    .dataBrokerMetricsMonthlyStats:
+                    .dataBrokerMetricsMonthlyStats,
+                    .gatekeeperNotAuthenticated,
+                    .gatekeeperEntitlementsInvalid:
+
                 PixelKit.fire(event)
 
             case .homeViewShowNoPermissionError,
