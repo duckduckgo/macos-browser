@@ -19,10 +19,10 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-class CapturingOnboardingAppearancePreferencesManager: OnboardingAppearancePreferencesManager {
-    var setShowBookmarksBarCalled = false
-
-    func setShowBookmarksBar() {
-        setShowBookmarksBarCalled = true
-    }
-}
+//class CapturingOnboardingAppearancePreferencesManager: OnboardingAppearancePreferencesManager {
+//    var setShowBookmarksBarCalled = false
+//
+//    func setShowBookmarksBar() {
+//        setShowBookmarksBarCalled = true
+//    }
+//}

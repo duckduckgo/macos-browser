@@ -43,7 +43,7 @@ class OnboardingManagerTests: XCTestCase {
         apperancePreferences = AppearancePreferences(persistor: appearancePersistor)
         startupPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: apperancePreferences)
         startupPreferences = StartupPreferences(persistor: startupPersistor)
-        manager = OnboardingActionsManager(navigationDelegate: navigationDelegate, dockCustomization: dockCustomization, dataImportView: dataImportView, defaultBrowserProvider: defaultBrowserProvider, appearancePreferences: apperancePreferences, startupPreferencesManager: startupPreferences)
+        manager = OnboardingActionsManager(navigationDelegate: navigationDelegate, dockCustomization: dockCustomization, dataImportView: dataImportView, defaultBrowserProvider: defaultBrowserProvider, appearancePreferences: apperancePreferences, startupPreferences: startupPreferences)
     }
 
     override func tearDown() {

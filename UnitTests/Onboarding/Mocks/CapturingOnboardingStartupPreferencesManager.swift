@@ -19,15 +19,15 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-class CapturingOnboardingStartupPreferencesManager: OnboardingStartupPreferencesManager {
-    var showHomeButtonLeftCalled = false
-    var setSessionRestoreCalled = false
-
-    func showHomeButtonLeft() {
-        showHomeButtonLeftCalled = true
-    }
-
-    func setSessionRestore() {
-        setSessionRestoreCalled = true
-    }
-}
+//class CapturingOnboardingStartupPreferencesManager: OnboardingStartupPreferencesManager {
+//    var showHomeButtonLeftCalled = false
+//    var setSessionRestoreCalled = false
+//
+//    func showHomeButtonLeft() {
+//        showHomeButtonLeftCalled = true
+//    }
+//
+//    func setSessionRestore() {
+//        setSessionRestoreCalled = true
+//    }
+//}
