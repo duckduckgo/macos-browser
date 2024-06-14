@@ -85,7 +85,7 @@ final class PrivacyDashboardViewController: NSViewController {
          dashboardMode: PrivacyDashboardMode = .dashboard,
          privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
         self.privacyDashboardController = PrivacyDashboardController(privacyInfo: privacyInfo,
-                                                                     dashboardMode: dashboardMode, 
+                                                                     dashboardMode: dashboardMode,
                                                                      variant: .control,
                                                                      privacyConfigurationManager: privacyConfigurationManager,
                                                                      eventMapping: toggleReportEvents)
@@ -194,8 +194,8 @@ final class PrivacyDashboardViewController: NSViewController {
 // MARK: - PrivacyDashboardControllerDelegate
 
 extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
-    
-    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, 
+
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController,
                                     didSelectBreakageCategory category: String) {
         // Not used in macOS
     }
@@ -265,7 +265,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardReportBrokenSiteDelega
     func privacyDashboardControllerDidRequestShowAlertForMissingDescription(_ privacyDashboardController: PrivacyDashboardController) {
         // Not used in macOS
     }
-    
+
     func privacyDashboardControllerDidRequestShowGeneralFeedback(_ privacyDashboardController: PrivacyDashboardController) {
         // Not used in macOS
     }
