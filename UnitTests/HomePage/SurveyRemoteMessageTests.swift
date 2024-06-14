@@ -59,6 +59,8 @@ final class SurveyRemoteMessageTests: XCTestCase {
         XCTAssertEqual(firstMessage.attributes.daysSinceVPNEnabled, 2)
         XCTAssertEqual(firstMessage.attributes.daysSincePIREnabled, 3)
         XCTAssertEqual(firstMessage.attributes.maximumDaysUntilSubscriptionExpirationOrRenewal, 30)
+        XCTAssertEqual(firstMessage.attributes.appStoreSubscriptionPurchasePlatforms, ["stripe"])
+        XCTAssertEqual(firstMessage.attributes.sparkleSubscriptionPurchasePlatforms, ["stripe"])
         XCTAssertNotNil(firstMessagePresentableSurveyURL)
     }
 

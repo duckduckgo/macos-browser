@@ -208,6 +208,26 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
                 }
             }
 
+            #if APPSTORE
+            if let appStorePurchasePlatforms = message.attributes.appStoreSubscriptionPurchasePlatforms {
+                if appStorePurchasePlatforms.contains(subscription.platform.rawValue) {
+                    attributeMatchStatus = true
+                } else {
+                    return false
+                }
+            }
+            #endif
+
+            #if SPARKLE
+            if let sparklePurchasePlatforms = message.attributes.sparkleSubscriptionPurchasePlatforms {
+                if sparklePurchasePlatforms.contains(subscription.platform.rawValue) {
+                    attributeMatchStatus = true
+                } else {
+                    return false
+                }
+            }
+            #endif
+
             return attributeMatchStatus
 
         }
