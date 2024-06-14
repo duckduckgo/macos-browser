@@ -1,5 +1,5 @@
 //
-//  MockAppearancePreferencesPersistor.swift
+//  CapturingDockCustomizer.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,28 +19,11 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
+class CapturingDockCustomizer: DockCustomization {
+    var isAddedToDock = false
 
-    var homeButtonPosition: HomeButtonPosition = .hidden
-
-    var showFullURL: Bool = false
-
-    var showAutocompleteSuggestions: Bool = false
-
-    var currentThemeName: String = ""
-
-    var defaultPageZoom: CGFloat = 1.0
-
-    var favoritesDisplayMode: String?
-
-    var isFavoriteVisible: Bool = true
-
-    var isContinueSetUpVisible: Bool = true
-
-    var isRecentActivityVisible: Bool = true
-
-    var showBookmarksBar: Bool = false
-
-    var bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn
-
+    func addToDock() -> Bool {
+        isAddedToDock = true
+        return true
+    }
 }

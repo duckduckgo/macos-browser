@@ -1,5 +1,5 @@
 //
-//  MockAppearancePreferencesPersistor.swift
+//  CapturingOnboardingNavigationDelegate.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,28 +19,15 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
+class CapturingOnboardingNavigationDelegate: OnboardingNavigationDelegate {
+    var goToSearchFromOnboardingCalled = false
+    var goToSettingsFromOnboardingCalled = false
 
-    var homeButtonPosition: HomeButtonPosition = .hidden
+    func goToSearchFromOnboarding() {
+        goToSearchFromOnboardingCalled = true
+    }
 
-    var showFullURL: Bool = false
-
-    var showAutocompleteSuggestions: Bool = false
-
-    var currentThemeName: String = ""
-
-    var defaultPageZoom: CGFloat = 1.0
-
-    var favoritesDisplayMode: String?
-
-    var isFavoriteVisible: Bool = true
-
-    var isContinueSetUpVisible: Bool = true
-
-    var isRecentActivityVisible: Bool = true
-
-    var showBookmarksBar: Bool = false
-
-    var bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn
-
+    func goToSettingsFromOnboarding() {
+        goToSettingsFromOnboardingCalled = true
+    }
 }
