@@ -12316,7 +12316,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.93.0;
 			};
 			name = CI;
 		};
@@ -12637,7 +12636,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.93.0;
 			};
 			name = Debug;
 		};
@@ -12645,7 +12643,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.93.0;
 			};
 			name = Release;
 		};
@@ -12674,7 +12671,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.93.0;
 			};
 			name = Review;
 		};
