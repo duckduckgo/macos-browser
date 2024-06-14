@@ -59,13 +59,17 @@ final class PrivacyDashboardViewController: NSViewController {
         }, keyValueStoring: UserDefaults.standard)
     }()
 
-    private let toggleReportEvents = EventMapping<ToggleReportEvents> { event, _, parameters, _ in
-        let domainEvent: GeneralPixel
+    private let toggleReportEvents = EventMapping<PrivacyDashboardEvents> { event, _, parameters, _ in
+        let domainEvent: GeneralPixel?
         switch event {
         case .toggleReportDismiss: domainEvent = .toggleReportDismiss
         case .toggleReportDoNotSend: domainEvent = .toggleReportDoNotSend
+        case .showReportBrokenSite, .reportBrokenSiteShown, .breakageCategorySelected, .reportBrokenSiteSent, .overallCategorySelected:
+            domainEvent = nil
         }
-        PixelKit.fire(domainEvent, withAdditionalParameters: parameters)
+        if let domainEvent {
+            PixelKit.fire(domainEvent, withAdditionalParameters: parameters)
+        }
     }
 
     private let permissionHandler = PrivacyDashboardPermissionHandler()
@@ -81,7 +85,8 @@ final class PrivacyDashboardViewController: NSViewController {
          dashboardMode: PrivacyDashboardMode = .dashboard,
          privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
         self.privacyDashboardController = PrivacyDashboardController(privacyInfo: privacyInfo,
-                                                                     dashboardMode: dashboardMode,
+                                                                     dashboardMode: dashboardMode, 
+                                                                     variant: .control,
                                                                      privacyConfigurationManager: privacyConfigurationManager,
                                                                      eventMapping: toggleReportEvents)
         super.init(nibName: nil, bundle: nil)
@@ -189,6 +194,11 @@ final class PrivacyDashboardViewController: NSViewController {
 // MARK: - PrivacyDashboardControllerDelegate
 
 extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, 
+                                    didSelectBreakageCategory category: String) {
+        // Not used in macOS
+    }
 
     func privacyDashboardControllerDidRequestShowReportBrokenSite(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController) {
         // Not used in macOS: PixelKit.fire(GeneralPixel.privacyDashboardReportBrokenSite)
@@ -251,6 +261,14 @@ extension PrivacyDashboardViewController: PrivacyDashboardNavigationDelegate {
 // MARK: - PrivacyDashboardReportBrokenSiteDelegate
 
 extension PrivacyDashboardViewController: PrivacyDashboardReportBrokenSiteDelegate {
+
+    func privacyDashboardControllerDidRequestShowAlertForMissingDescription(_ privacyDashboardController: PrivacyDashboardController) {
+        // Not used in macOS
+    }
+    
+    func privacyDashboardControllerDidRequestShowGeneralFeedback(_ privacyDashboardController: PrivacyDashboardController) {
+        // Not used in macOS
+    }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController,
                                     didRequestSubmitBrokenSiteReportWithCategory category: String,
