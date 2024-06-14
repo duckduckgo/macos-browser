@@ -91,7 +91,7 @@ class OnboardingManagerTests: XCTestCase {
     @MainActor
     func testOnImportData_DataImportViewShown2() {
         // Given
-        let mockWindow = MockWindow()
+        let mockWindow = MockOnboardingWindow()
         let mvc = MainWindowController(mainViewController: MainViewController(autofillPopoverPresenter: DefaultAutofillPopoverPresenter()), popUp: false)
         mvc.window = mockWindow
         WindowControllersManager.shared.lastKeyMainWindowController = mvc
@@ -144,57 +144,4 @@ class OnboardingManagerTests: XCTestCase {
         XCTAssertEqual(appearancePersistor.homeButtonPosition, .left)
     }
 
-}
-
-class CapturingOnboardingNavigationDelegate: OnboardingNavigationDelegate {
-    var goToSearchFromOnboardingCalled = false
-    var goToSettingsFromOnboardingCalled = false
-
-    func goToSearchFromOnboarding() {
-        goToSearchFromOnboardingCalled = true
-    }
-
-    func goToSettingsFromOnboarding() {
-        goToSettingsFromOnboardingCalled = true
-    }
-}
-
-class CapturingDockCustomizer: DockCustomization {
-    var isAddedToDock = false
-
-    func addToDock() -> Bool {
-        isAddedToDock = true
-        return true
-    }
-}
-
-class CapturingOnboardingAppearancePreferencesManager: OnboardingAppearancePreferencesManager {
-    var setShowBookmarksBarCalled = false
-
-    func setShowBookmarksBar() {
-        setShowBookmarksBarCalled = true
-    }
-}
-
-class CapturingOnboardingStartupPreferencesManager: OnboardingStartupPreferencesManager {
-    var showHomeButtonLeftCalled = false
-    var setSessionRestoreCalled = false
-
-    func showHomeButtonLeft() {
-        showHomeButtonLeftCalled = true
-    }
-
-    func setSessionRestore() {
-        setSessionRestoreCalled = true
-    }
-}
-
-class MockWindow: NSWindow {
-    var makeKeyAndOrderFrontCalled = false
-    var beginSheetCalled = false
-
-    override func beginSheet(_ sheetWindow: NSWindow, completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil) {
-        beginSheetCalled = true
-        handler?(.continue)
-    }
 }
