@@ -43,7 +43,7 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
     }
 
     public func hasValidEntitlement() async throws -> Bool {
-        switch await subscriptionManager.accountManager.hasEntitlement(for: .dataBrokerProtection,
+        switch await subscriptionManager.accountManager.hasEntitlement(forProductName: .dataBrokerProtection,
                                                                        cachePolicy: .reloadIgnoringLocalCacheData) {
         case let .success(result):
             return result
@@ -58,5 +58,5 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
 /// This protocol exists only as a wrapper on top of the AccountManager since it is a concrete type on BSK
 public protocol DataBrokerProtectionAccountManaging {
     var accessToken: String? { get }
-    func hasEntitlement(for cachePolicy: AccountManager.CachePolicy) async -> Result<Bool, Error>
+    func hasEntitlement(for cachePolicy: APICachePolicy) async -> Result<Bool, Error>
 }

@@ -320,7 +320,7 @@ final class MoreOptionsMenu: NSMenu {
             Task {
                 let isMenuItemEnabled: Bool
 
-                switch await accountManager.hasEntitlement(for: .networkProtection) {
+                switch await accountManager.hasEntitlement(forProductName: .networkProtection) {
                 case let .success(result):
                     isMenuItemEnabled = result
                 case .failure:
@@ -345,7 +345,7 @@ final class MoreOptionsMenu: NSMenu {
                 Task {
                     let isMenuItemEnabled: Bool
 
-                    switch await accountManager.hasEntitlement(for: .dataBrokerProtection) {
+                    switch await accountManager.hasEntitlement(forProductName: .dataBrokerProtection) {
                     case let .success(result):
                         isMenuItemEnabled = result
                     case .failure:
@@ -375,7 +375,7 @@ final class MoreOptionsMenu: NSMenu {
                 Task {
                     let isMenuItemEnabled: Bool
 
-                    switch await accountManager.hasEntitlement(for: .identityTheftRestoration) {
+                    switch await accountManager.hasEntitlement(forProductName: .identityTheftRestoration) {
                     case let .success(result):
                         isMenuItemEnabled = result
                     case .failure:

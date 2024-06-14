@@ -319,7 +319,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
     func collectPrivacyProInfo() async -> VPNMetadata.PrivacyProInfo {
-        let hasVPNEntitlement = (try? await accountManager.hasEntitlement(for: .networkProtection).get()) ?? false
+        let hasVPNEntitlement = (try? await accountManager.hasEntitlement(forProductName: .networkProtection).get()) ?? false
         return .init(
             hasPrivacyProAccount: accountManager.isUserAuthenticated,
             hasVPNEntitlement: hasVPNEntitlement

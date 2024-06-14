@@ -32,7 +32,7 @@ final public class DataBrokerAuthenticationManagerBuilder {
 }
 
 extension AccountManager: DataBrokerProtectionAccountManaging {
-    public func hasEntitlement(for cachePolicy: CachePolicy) async -> Result<Bool, any Error> {
-        await hasEntitlement(for: .dataBrokerProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+    public func hasEntitlement(for cachePolicy: APICachePolicy) async -> Result<Bool, any Error> {
+        await hasEntitlement(forProductName: .dataBrokerProtection, cachePolicy: .reloadIgnoringLocalCacheData)
     }
 }

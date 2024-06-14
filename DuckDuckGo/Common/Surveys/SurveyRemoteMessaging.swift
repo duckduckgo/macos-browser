@@ -31,8 +31,7 @@ protocol SurveyRemoteMessaging {
 
 protocol SurveyRemoteMessageSubscriptionFetching {
 
-    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionService.SubscriptionServiceError>
-
+    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionServiceError>
 }
 
 final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
@@ -51,16 +50,17 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
     private let userDefaults: UserDefaults
 
     convenience init(subscriptionManager: SubscriptionManaging) {
+        let subscriptionFetcher = SurveyRemoteMessageSubscriptionFetcher(subscriptionAPIService: subscriptionManager.subscriptionAPIService)
         #if DEBUG || REVIEW
         self.init(
             accountManager: subscriptionManager.accountManager,
-            subscriptionFetcher: subscriptionManager.subscriptionService,
+            subscriptionFetcher: subscriptionFetcher,
             minimumRefreshInterval: .seconds(30)
         )
         #else
         self.init(
             accountManager: subscriptionManager.accountManager,
-            subscriptionFetcher: subscriptionManager.subscriptionService,
+            subscriptionFetcher: subscriptionFetcher,
             minimumRefreshInterval: .hours(1)
         )
         #endif
@@ -260,10 +260,10 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
 }
 
-extension SubscriptionService: SurveyRemoteMessageSubscriptionFetching {
+struct SurveyRemoteMessageSubscriptionFetcher: SurveyRemoteMessageSubscriptionFetching {
+    let subscriptionAPIService: SubscriptionAPIServicing
 
     func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionServiceError> {
-        return await self.getSubscription(accessToken: accessToken, cachePolicy: .returnCacheDataElseLoad)
+        return await subscriptionAPIService.getSubscription(accessToken: accessToken, cachePolicy: .returnCacheDataElseLoad)
     }
-
 }

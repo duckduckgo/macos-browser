@@ -36,7 +36,6 @@ struct SubscriptionAppStoreRestorer {
         self.uiHandler = uiHandler
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     func restoreAppStoreSubscription() async {
 
         defer {
@@ -49,12 +48,9 @@ struct SubscriptionAppStoreRestorer {
             uiHandler.presentProgressViewController(withTitle: UserText.restoringSubscriptionTitle)
         }
 
-        let syncResult = await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
-
-        switch syncResult {
-        case .success:
-            break
-        case .failure(let error):
+        do {
+            try await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
+        } catch {
             switch error as? StoreKitError {
             case .some(.userCancelled):
                 return

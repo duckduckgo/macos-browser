@@ -48,7 +48,7 @@ final class NetworkProtectionSubscriptionEventHandler {
 
     private func subscribeToEntitlementChanges() {
         Task {
-            switch await subscriptionManager.accountManager.hasEntitlement(for: .networkProtection) {
+            switch await subscriptionManager.accountManager.hasEntitlement(forProductName: .networkProtection) {
             case .success(let hasEntitlements):
                 Task {
                     await handleEntitlementsChange(hasEntitlements: hasEntitlements)

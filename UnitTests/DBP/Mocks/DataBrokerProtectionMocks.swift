@@ -50,18 +50,18 @@ final class MockAccountManager: AccountManaging {
     func migrateAccessTokenToNewStore() throws {
     }
 
-    func hasEntitlement(for entitlement: Entitlement.ProductName, cachePolicy: CachePolicy) async -> Result<Bool, any Error> {
+    func hasEntitlement(forProductName productName: Entitlement.ProductName, cachePolicy: APICachePolicy) async -> Result<Bool, any Error> {
         hasEntitlementResult
     }
 
-    func hasEntitlement(for entitlement: Entitlement.ProductName) async -> Result<Bool, any Error> {
+    func hasEntitlement(forProductName productName: Entitlement.ProductName) async -> Result<Bool, any Error> {
         hasEntitlementResult
     }
 
     func updateCache(with entitlements: [Entitlement]) {
     }
 
-    func fetchEntitlements(cachePolicy: CachePolicy) async -> Result<[Entitlement], any Error> {
+    func fetchEntitlements(cachePolicy: APICachePolicy) async -> Result<[Entitlement], any Error> {
         .success([])
     }
 

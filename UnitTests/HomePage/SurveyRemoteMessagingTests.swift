@@ -289,7 +289,7 @@ final class MockSubscriptionFetcher: SurveyRemoteMessageSubscriptionFetching {
         platform: .apple,
         status: .autoRenewable)
 
-    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionService.SubscriptionServiceError> {
+    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionServiceError> {
         return .success(subscription)
     }
 

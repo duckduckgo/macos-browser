@@ -33,24 +33,24 @@ extension SubscriptionManager {
                                                                  key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
         let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
-        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let subscriptionAPIService = SubscriptionAPIService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authAPIService = AuthAPIService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
                                             entitlementsCache: entitlementsCache,
-                                            subscriptionService: subscriptionService,
-                                            authService: authService)
+                                            subscriptionAPIService: subscriptionAPIService,
+                                            authAPIService: authAPIService)
 
         if #available(macOS 12.0, *) {
             let storePurchaseManager = StorePurchaseManager()
             self.init(storePurchaseManager: storePurchaseManager,
                       accountManager: accountManager,
-                      subscriptionService: subscriptionService,
-                      authService: authService,
+                      subscriptionAPIService: subscriptionAPIService,
+                      authAPIService: authAPIService,
                       subscriptionEnvironment: subscriptionEnvironment)
         } else {
             self.init(accountManager: accountManager,
-                      subscriptionService: subscriptionService,
-                      authService: authService,
+                      subscriptionAPIService: subscriptionAPIService,
+                      authAPIService: authAPIService,
                       subscriptionEnvironment: subscriptionEnvironment)
         }
     }

@@ -101,8 +101,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         if accountManager.isUserAuthenticated {
             Task {
-                await self.updateSubscription(with: .returnCacheDataElseLoad)
-                await self.updateAllEntitlement(with: .returnCacheDataElseLoad)
+                await self.updateSubscription(cachePolicy: .returnCacheDataElseLoad)
+                await self.updateAllEntitlement(cachePolicy: .returnCacheDataElseLoad)
             }
         }
 
@@ -116,7 +116,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         subscriptionChangeObserver = NotificationCenter.default.addObserver(forName: .subscriptionDidChange, object: nil, queue: .main) { _ in
             Task { [weak self] in
-                await self?.updateSubscription(with: .returnCacheDataDontLoad)
+                await self?.updateSubscription(cachePolicy: .returnCacheDataDontLoad)
             }
         }
     }
@@ -189,7 +189,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         case .stripe:
             Task {
                 guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
-                      case let .success(response) = await subscriptionManager.subscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
+                      case let .success(response) = await subscriptionManager.subscriptionAPIService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
                 openURLHandler(customerPortalURL)
@@ -200,7 +200,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private func confirmIfSignedInToSameAccount() async -> Bool {
         if #available(macOS 12.0, *) {
             guard let lastTransactionJWSRepresentation = await subscriptionManager.storePurchaseManager().mostRecentTransaction() else { return false }
-            switch await subscriptionManager.authService.storeLogin(signature: lastTransactionJWSRepresentation) {
+            switch await subscriptionManager.authAPIService.storeLogin(signature: lastTransactionJWSRepresentation) {
             case .success(let response):
                 return response.externalID == accountManager.externalID
             case .failure:
@@ -263,19 +263,19 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 self?.fetchSubscriptionDetailsTask = nil
             }
 
-            await self?.updateSubscription(with: .reloadIgnoringLocalCacheData)
-            await self?.updateAllEntitlement(with: .reloadIgnoringLocalCacheData)
+            await self?.updateSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
+            await self?.updateAllEntitlement(cachePolicy: .reloadIgnoringLocalCacheData)
         }
     }
 
     @MainActor
-    private func updateSubscription(with cachePolicy: SubscriptionService.CachePolicy) async {
+    private func updateSubscription(cachePolicy: APICachePolicy) async {
         guard let token = accountManager.accessToken else {
-            subscriptionManager.subscriptionService.signOut()
+            subscriptionManager.subscriptionAPIService.signOut()
             return
         }
 
-        switch await subscriptionManager.subscriptionService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
+        switch await subscriptionManager.subscriptionAPIService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
         case .success(let subscription):
             updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
             subscriptionPlatform = subscription.platform
@@ -286,22 +286,22 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    private func updateAllEntitlement(with cachePolicy: AccountManaging.CachePolicy) async {
-        switch await self.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: cachePolicy) {
+    private func updateAllEntitlement(cachePolicy: APICachePolicy) async {
+        switch await self.accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: cachePolicy) {
         case let .success(result):
             hasAccessToVPN = result
         case .failure:
             hasAccessToVPN = false
         }
 
-        switch await self.accountManager.hasEntitlement(for: .dataBrokerProtection, cachePolicy: cachePolicy) {
+        switch await self.accountManager.hasEntitlement(forProductName: .dataBrokerProtection, cachePolicy: cachePolicy) {
         case let .success(result):
             hasAccessToDBP = result
         case .failure:
             hasAccessToDBP = false
         }
 
-        switch await self.accountManager.hasEntitlement(for: .identityTheftRestoration, cachePolicy: cachePolicy) {
+        switch await self.accountManager.hasEntitlement(forProductName: .identityTheftRestoration, cachePolicy: cachePolicy) {
         case let .success(result):
             hasAccessToITR = result
         case .failure:

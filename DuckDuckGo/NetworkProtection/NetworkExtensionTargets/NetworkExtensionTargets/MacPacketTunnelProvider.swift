@@ -361,15 +361,15 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             subscriptionEnvironment.serviceEnvironment = .staging
         }
 
-        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let subscriptionAPIService = SubscriptionAPIService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authAPIService = AuthAPIService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let accountManager = AccountManager(accessTokenStorage: tokenStore,
                                             entitlementsCache: entitlementsCache,
-                                            subscriptionService: subscriptionService,
-                                            authService: authService)
+                                            subscriptionAPIService: subscriptionAPIService,
+                                            authAPIService: authAPIService)
 
         let entitlementsCheck = {
-            await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+            await accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
 
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)

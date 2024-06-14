@@ -73,7 +73,7 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
             return false
         }
 
-        switch await subscriptionManager.accountManager.hasEntitlement(for: .networkProtection) {
+        switch await subscriptionManager.accountManager.hasEntitlement(forProductName: .networkProtection) {
         case .success(let hasEntitlement):
             return hasEntitlement
         case .failure(let error):

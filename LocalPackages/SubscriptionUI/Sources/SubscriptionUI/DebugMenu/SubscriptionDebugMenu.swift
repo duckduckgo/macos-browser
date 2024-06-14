@@ -192,7 +192,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func validateToken() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await subscriptionManager.authService.validateToken(accessToken: token) {
+            switch await subscriptionManager.authAPIService.validateToken(accessToken: token) {
             case .success(let response):
                 showAlert(title: "Validate token", message: "\(response)")
             case .failure(let error):
@@ -208,7 +208,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
             let entitlements: [Entitlement.ProductName] = [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
             for entitlement in entitlements {
-                if case let .success(result) = await accountManager.hasEntitlement(for: entitlement, cachePolicy: .reloadIgnoringLocalCacheData) {
+                if case let .success(result) = await accountManager.hasEntitlement(forProductName: entitlement, cachePolicy: .reloadIgnoringLocalCacheData) {
                     let resultSummary = "Entitlement check for \(entitlement.rawValue): \(result)"
                     results.append(resultSummary)
                     print(resultSummary)
@@ -223,7 +223,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func getSubscriptionDetails() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await subscriptionManager.subscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
+            switch await subscriptionManager.subscriptionAPIService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
             case .success(let response):
                 showAlert(title: "Subscription info", message: "\(response)")
             case .failure(let error):
@@ -235,8 +235,12 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @available(macOS 12.0, *)
     @objc
     func syncAppleIDAccount() {
-        Task {
-            await purchaseManager.syncAppleIDAccount()
+        Task { @MainActor in
+            do {
+                try await purchaseManager.syncAppleIDAccount()
+            } catch {
+                self.showAlert(title: "Error", message: error.localizedDescription)
+            }
         }
     }
 
