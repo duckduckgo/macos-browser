@@ -18,15 +18,17 @@ jobs:
           echo "REVISION=$REVISION" >> $GITHUB_ENV
           TEMPLATE="$(bash ./scripts/update_phishing_detection_data.sh pr-body)"
           PR_BODY_MACOS="${TEMPLATE//\{\{revision\}\}/$REVISION}"
-          echo "PR_BODY_MACOS=$PR_BODY_MACOS" >> $GITHUB_ENV
+          echo "PR_BODY_MACOS<<EOF" >> $GITHUB_ENV
+          echo "$PR_BODY_MACOS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
       - name: Create PR for macOS
         uses: peter-evans/create-pull-request@88bf0de51c7487d91e1abbb4899332e602c58bbf
         id: create-pr
         with:
           path: macos/
           add-paths: |
-            ./macos/DuckDuckGo/PhishingDetection/
-          commit-message: "Update phishing detection data to revision ${{ env.REVISION }}"
-          branch: "update-phishing-protection-${{ env.REVISION }}"
-          title: "Update phishing protection datasets to ${{ env.REVISION }}"
+            ./DuckDuckGo/PhishingDetection/
+          commit-message: Update phishing detection data to revision ${{ env.REVISION }}
+          branch: update-phishing-protection-${{ env.REVISION }}
+          title: Update phishing protection datasets to ${{ env.REVISION }}
           body: "${{ env.PR_BODY_MACOS }}"
