@@ -13,7 +13,8 @@ jobs:
           token: ${{ secrets.DAX_MACOS_BROWSER_PHISHING_AUTOMATION }}
       - name: Execute Update Script
         run: |
-          REVISION="$(bash ./macos/scripts/update_phishing_detection_data.sh | grep -oP 'Updated revision from \K\d+')"
+          cd ./macos
+          REVISION="$(bash ./scripts/update_phishing_detection_data.sh | grep -oP 'Updated revision from \K\d+')"
   create_pr:
     runs-on: ubuntu-latest
     outputs:
@@ -21,7 +22,7 @@ jobs:
     steps:
       - name: Create macOS PR Body
         run: |
-          TEMPLATE="$(bash ./macos/scripts/update_phishing_detection_data.sh pr-body)"
+          TEMPLATE="$(bash ./scripts/update_phishing_detection_data.sh pr-body)"
           PR_BODY_MACOS="${TEMPLATE//\{\{revision\}\}/$REVISION}"
       # --- Effect ---
       - name: Create PR for macOS
