@@ -74,7 +74,7 @@ class OnboardingManagerTests: XCTestCase {
 
     func testGoToAddressBar_NavigatesToSearch() {
         // When
-        manager.gotToAddressBar()
+        manager.goToAddressBar()
 
         // Then
         XCTAssertTrue(navigationDelegate.goToSearchFromOnboardingCalled)
@@ -95,7 +95,6 @@ class OnboardingManagerTests: XCTestCase {
         let mvc = MainWindowController(mainViewController: MainViewController(autofillPopoverPresenter: DefaultAutofillPopoverPresenter()), popUp: false)
         mvc.window = mockWindow
         WindowControllersManager.shared.lastKeyMainWindowController = mvc
-        let expectation = XCTestExpectation(description: "Completion handler called")
 
         // When
         manager.importData()

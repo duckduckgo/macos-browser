@@ -30,7 +30,7 @@ enum OnboardingSteps: String {
 
 protocol OnboardingActionsManaging {
     var configuration: OnboardingConfiguration { get }
-    func gotToAddressBar()
+    func goToAddressBar()
     func goToSettings()
     func addToDock()
     func importData()
@@ -55,7 +55,7 @@ struct OnboardingActionsManager: OnboardingActionsManaging {
     let appearancePreferences: AppearancePreferences
     let startupPreferences: StartupPreferences
 
-    var configuration: OnboardingConfiguration {
+    let configuration: OnboardingConfiguration = {
         var systemSettings: SystemSettings
 #if APPSTORE
         systemSettings = SystemSettings(rows: ["import", "default-browser"])
@@ -64,9 +64,9 @@ struct OnboardingActionsManager: OnboardingActionsManaging {
 #endif
         let stepDefinitions = StepDefinitions(systemSettings: systemSettings)
         return OnboardingConfiguration(stepDefinitions: stepDefinitions, env: "development")
-    }
+    }()
 
-    func gotToAddressBar() {
+    func goToAddressBar() {
         navigationDelegate?.goToSearchFromOnboarding()
     }
 
