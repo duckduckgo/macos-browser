@@ -15,16 +15,10 @@ jobs:
         run: |
           cd ./macos
           REVISION="$(bash ./scripts/update_phishing_detection_data.sh | grep -oP 'Updated revision from \K\d+')"
-  create_pr:
-    runs-on: ubuntu-latest
-    outputs:
-      pull-request-url: ${{ steps.create-pr.outputs.pull-request-url }}
-    steps:
-      - name: Create macOS PR Body
-        run: |
+          echo "REVISION=$REVISION" >> $GITHUB_ENV
           TEMPLATE="$(bash ./scripts/update_phishing_detection_data.sh pr-body)"
           PR_BODY_MACOS="${TEMPLATE//\{\{revision\}\}/$REVISION}"
-      # --- Effect ---
+          echo "PR_BODY_MACOS=$PR_BODY_MACOS" >> $GITHUB_ENV
       - name: Create PR for macOS
         uses: peter-evans/create-pull-request@88bf0de51c7487d91e1abbb4899332e602c58bbf
         id: create-pr
@@ -32,10 +26,7 @@ jobs:
           path: macos/
           add-paths: |
             ./DuckDuckGo/PhishingDetection/
-          commit-message: Update phishing detection data to revision $REVISION
-          branch: update-phishing-protection-$REVISION
-          title: Update phishing protection datasets to $REVISION
+          commit-message: Update phishing detection data to revision ${{ env.REVISION }}
+          branch: update-phishing-protection-${{ env.REVISION }}
+          title: Update phishing protection datasets to ${{ env.REVISION }}
           body: "${{ env.PR_BODY_MACOS }}"
-          token: ${{ secrets.DAX_MACOS_BROWSER_PHISHING_AUTOMATION }}
-
-      
