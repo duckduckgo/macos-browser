@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1717679238533,
+    "version": 1718303485463,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -307,6 +307,9 @@
                     "domain": "sports.tipico.de"
                 },
                 {
+                    "domain": "lotusbakeries.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -321,7 +324,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "0e21f0096d2a135a3c36332ae79b656c"
+            "hash": "168b747ef8adb3bd717684f1e1724c05"
         },
         "autofill": {
             "exceptions": [
@@ -946,7 +949,7 @@
                     "ruleActions": [
                         "block-ctl-fb"
                     ],
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "Youtube": {
                     "ruleActions": [
@@ -955,8 +958,9 @@
                     "state": "disabled"
                 }
             },
-            "state": "disabled",
-            "hash": "770f7ae0f752e976764771bccec352b2"
+            "state": "enabled",
+            "minSupportedVersion": "1.93.0",
+            "hash": "3b8fd857f944f1997ab9593de582491b"
         },
         "clickToPlay": {
             "exceptions": [
@@ -4626,6 +4630,9 @@
                     "domain": "proton.me"
                 },
                 {
+                    "domain": "nordstrom.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4666,7 +4673,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "aefca8e7a9a3d9b65370608dd639cd3f"
+            "hash": "eb816f6eaec8c0c712d583fc490ffe59"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -5083,6 +5090,26 @@
                 }
             ],
             "hash": "936f00970c108fd646f73d00b3f3f5b5"
+        },
+        "pluginPointFocusedViewPlugin": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "pluginPointNewTabPagePlugin": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "pluginPointNewTabPageSectionPlugin": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
+        "pluginPointNewTabPageShortcutPlugin": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
         },
         "privacyDashboard": {
             "exceptions": [],
@@ -6642,6 +6669,12 @@
                                 "rule": "www.google.com/maps/",
                                 "domains": [
                                     "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "google.com/adsense/search/",
+                                "domains": [
+                                    "ihowlist.com"
                                 ]
                             },
                             {
@@ -8565,7 +8598,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "af06003f902448cd26fd4e538e64e70f"
+            "hash": "97d6c51d24af39c870faf3f05c18746b"
         },
         "trackingCookies1p": {
             "settings": {
@@ -8942,17 +8975,15 @@
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
-        "windowsStartupBoost": {
-            "exceptions": [
-                {
-                    "domain": "marvel.com"
-                },
-                {
-                    "domain": "sundancecatalog.com"
-                }
-            ],
+        "windowsSpellChecker": {
+            "exceptions": [],
             "state": "disabled",
-            "hash": "dc1b4fa301193a03ddcd4bdf7ee3e610"
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsStartupBoost": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "windowsWaitlist": {
             "exceptions": [],

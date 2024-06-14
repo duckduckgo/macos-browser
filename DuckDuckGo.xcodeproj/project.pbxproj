@@ -238,7 +238,6 @@
 		3706FA80293F65D500E42796 /* TabLazyLoaderDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534CA2281132CB002621E7 /* TabLazyLoaderDataSource.swift */; };
 		3706FA81293F65D500E42796 /* LoginImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF426B0002B00E14D75 /* LoginImport.swift */; };
 		3706FA83293F65D500E42796 /* LazyLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534C9F28113101002621E7 /* LazyLoadable.swift */; };
-		3706FA84293F65D500E42796 /* ClickToLoadModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE427FF275D47FA00DAC26B /* ClickToLoadModel.swift */; };
 		3706FA85293F65D500E42796 /* KeyedCodingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A2272080090018F728 /* KeyedCodingExtension.swift */; };
 		3706FA87293F65D500E42796 /* DownloadListStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B22F26E61D630031CB7F /* DownloadListStore.swift */; };
 		3706FA88293F65D500E42796 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logging.swift */; };
@@ -685,14 +684,12 @@
 		3706FCB7293F65D500E42796 /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
 		3706FCB8293F65D500E42796 /* Onboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85B7184927677C2D00B4277F /* Onboarding.storyboard */; };
 		3706FCB9293F65D500E42796 /* FireproofDomains.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B0511AD262CAA5A00F6079C /* FireproofDomains.storyboard */; };
-		3706FCBA293F65D500E42796 /* clickToLoadConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = EA47767F272A21B700419EDA /* clickToLoadConfig.json */; };
 		3706FCBC293F65D500E42796 /* dark-shield.json in Resources */ = {isa = PBXBuildFile; fileRef = AA34396F2754D4E900B241FA /* dark-shield.json */; };
 		3706FCBD293F65D500E42796 /* dark-shield-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6EA27E880AE00036718 /* dark-shield-mouse-over.json */; };
 		3706FCBE293F65D500E42796 /* autoconsent-bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = B31055C327A1BA1D001AC618 /* autoconsent-bundle.js */; };
 		3706FCBF293F65D500E42796 /* ContentOverlay.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */; };
 		3706FCC0293F65D500E42796 /* FindInPage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */; };
 		3706FCC3293F65D500E42796 /* userscript.js in Resources */ = {isa = PBXBuildFile; fileRef = B31055BE27A1BA1D001AC618 /* userscript.js */; };
-		3706FCC4293F65D500E42796 /* fb-tds.json in Resources */ = {isa = PBXBuildFile; fileRef = EA4617EF273A28A700F110A2 /* fb-tds.json */; };
 		3706FCC6293F65D500E42796 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = AA68C3D62490F821001B8783 /* README.md */; };
 		3706FCC8293F65D500E42796 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA585D85248FD31400E9A3E2 /* Assets.xcassets */; };
 		3706FCC9293F65D500E42796 /* NavigationBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */; };
@@ -714,7 +711,6 @@
 		3706FCE4293F65D500E42796 /* Fire.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAB7320626DD0C37002FACF9 /* Fire.storyboard */; };
 		3706FCE6293F65D500E42796 /* social_images in Resources */ = {isa = PBXBuildFile; fileRef = EA18D1C9272F0DC8006DC101 /* social_images */; };
 		3706FCE7293F65D500E42796 /* shield-dot-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E827E880A600036718 /* shield-dot-mouse-over.json */; };
-		3706FCE9293F65D500E42796 /* fb-sdk.js in Resources */ = {isa = PBXBuildFile; fileRef = EAC80DDF271F6C0100BBF02D /* fb-sdk.js */; };
 		3706FCEA293F65D500E42796 /* PasswordManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85625993269C8F9600EE44BC /* PasswordManager.storyboard */; };
 		3706FCEB293F65D500E42796 /* dark-flame-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E127E7D05500036718 /* dark-flame-mouse-over.json */; };
 		3706FCEC293F65D500E42796 /* flame-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E027E7D05500036718 /* flame-mouse-over.json */; };
@@ -724,11 +720,8 @@
 		3706FCF0293F65D500E42796 /* httpsMobileV2BloomSpec.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */; };
 		3706FCF1293F65D500E42796 /* TabBarFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA2CB12C2587BB5600AA6FBE /* TabBarFooter.xib */; };
 		3706FCF3293F65D500E42796 /* FirePopoverCollectionViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAE246F22709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib */; };
-		3706FCF4293F65D500E42796 /* ProximaNova-Bold-webfont.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = EAA29AE7278D2E43007070CF /* ProximaNova-Bold-webfont.woff2 */; };
 		3706FCF5293F65D500E42796 /* dark-shield-dot.json in Resources */ = {isa = PBXBuildFile; fileRef = AA34396E2754D4E900B241FA /* dark-shield-dot.json */; };
 		3706FCF6293F65D500E42796 /* trackers-2.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439742754D55100B241FA /* trackers-2.json */; };
-		3706FCF7293F65D500E42796 /* ProximaNova-Reg-webfont.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = EAA29AE8278D2E43007070CF /* ProximaNova-Reg-webfont.woff2 */; };
-		3706FCF8293F65D500E42796 /* clickToLoad.js in Resources */ = {isa = PBXBuildFile; fileRef = EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */; };
 		3706FDDA293F661700E42796 /* EmbeddedTrackerDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9833913227AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift */; };
 		3706FDDB293F661700E42796 /* AutofillPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776583027F8325B009A6B35 /* AutofillPreferencesTests.swift */; };
 		3706FDDC293F661700E42796 /* FileManagerExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67C6C462654C643006C872E /* FileManagerExtensionTests.swift */; };
@@ -819,7 +812,6 @@
 		3706FE3A293F661700E42796 /* MockVariantManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B504A2726CA2900758A2B /* MockVariantManager.swift */; };
 		3706FE3C293F661700E42796 /* FireproofDomainsStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */; };
 		3706FE3D293F661700E42796 /* DataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6D8258C0CB300F6F690 /* DataEncryptionTests.swift */; };
-		3706FE3E293F661700E42796 /* ClickToLoadModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1E52B42798CF98002EC53C /* ClickToLoadModelTests.swift */; };
 		3706FE3F293F661700E42796 /* FileStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */; };
 		3706FE40293F661700E42796 /* BWResponseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1AC329378953006F4388 /* BWResponseTests.swift */; };
 		3706FE41293F661700E42796 /* DownloadListCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693955E26F1C17F0015B914 /* DownloadListCoordinatorTests.swift */; };
@@ -2524,15 +2516,7 @@
 		D64A5FF92AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */; };
 		EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */; };
 		EA18D1CA272F0DC8006DC101 /* social_images in Resources */ = {isa = PBXBuildFile; fileRef = EA18D1C9272F0DC8006DC101 /* social_images */; };
-		EA1E52B52798CF98002EC53C /* ClickToLoadModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1E52B42798CF98002EC53C /* ClickToLoadModelTests.swift */; };
-		EA4617F0273A28A700F110A2 /* fb-tds.json in Resources */ = {isa = PBXBuildFile; fileRef = EA4617EF273A28A700F110A2 /* fb-tds.json */; };
-		EA477680272A21B700419EDA /* clickToLoadConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = EA47767F272A21B700419EDA /* clickToLoadConfig.json */; };
 		EA8AE76A279FBDB20078943E /* ClickToLoadTDSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8AE769279FBDB20078943E /* ClickToLoadTDSTests.swift */; };
-		EAA29AE9278D2E43007070CF /* ProximaNova-Bold-webfont.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = EAA29AE7278D2E43007070CF /* ProximaNova-Bold-webfont.woff2 */; };
-		EAA29AEA278D2E43007070CF /* ProximaNova-Reg-webfont.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = EAA29AE8278D2E43007070CF /* ProximaNova-Reg-webfont.woff2 */; };
-		EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */ = {isa = PBXBuildFile; fileRef = EAC80DDF271F6C0100BBF02D /* fb-sdk.js */; };
-		EAE42800275D47FA00DAC26B /* ClickToLoadModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE427FF275D47FA00DAC26B /* ClickToLoadModel.swift */; };
-		EAFAD6CA2728BD1200F9DF00 /* clickToLoad.js in Resources */ = {isa = PBXBuildFile; fileRef = EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */; };
 		EE02D41A2BB4609900DBE6B3 /* UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE02D4192BB4609900DBE6B3 /* UITests.swift */; };
 		EE02D41C2BB460A600DBE6B3 /* BrowsingHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE02D41B2BB460A600DBE6B3 /* BrowsingHistoryTests.swift */; };
 		EE02D4202BB460C000DBE6B3 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = EE02D41F2BB460C000DBE6B3 /* BrowserServicesKit */; };
@@ -4110,15 +4094,7 @@
 		D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeButtonMenuFactory.swift; sourceTree = "<group>"; };
 		EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadUserScript.swift; sourceTree = "<group>"; };
 		EA18D1C9272F0DC8006DC101 /* social_images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = social_images; sourceTree = "<group>"; };
-		EA1E52B42798CF98002EC53C /* ClickToLoadModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToLoadModelTests.swift; sourceTree = "<group>"; };
-		EA4617EF273A28A700F110A2 /* fb-tds.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "fb-tds.json"; sourceTree = "<group>"; };
-		EA47767F272A21B700419EDA /* clickToLoadConfig.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = clickToLoadConfig.json; sourceTree = "<group>"; };
 		EA8AE769279FBDB20078943E /* ClickToLoadTDSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToLoadTDSTests.swift; sourceTree = "<group>"; };
-		EAA29AE7278D2E43007070CF /* ProximaNova-Bold-webfont.woff2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ProximaNova-Bold-webfont.woff2"; sourceTree = "<group>"; };
-		EAA29AE8278D2E43007070CF /* ProximaNova-Reg-webfont.woff2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ProximaNova-Reg-webfont.woff2"; sourceTree = "<group>"; };
-		EAC80DDF271F6C0100BBF02D /* fb-sdk.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fb-sdk.js"; sourceTree = "<group>"; };
-		EAE427FF275D47FA00DAC26B /* ClickToLoadModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadModel.swift; sourceTree = "<group>"; };
-		EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = clickToLoad.js; sourceTree = "<group>"; };
 		EE02D4192BB4609900DBE6B3 /* UITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITests.swift; sourceTree = "<group>"; };
 		EE02D41B2BB460A600DBE6B3 /* BrowsingHistoryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowsingHistoryTests.swift; sourceTree = "<group>"; };
 		EE0429DF2BA31D2F009EB20F /* FindInPageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindInPageTests.swift; sourceTree = "<group>"; };
@@ -5304,21 +5280,15 @@
 			isa = PBXGroup;
 			children = (
 				B68D21CE2ACBC9E7002DA3C2 /* Mocks */,
-				EAA29AEB278D2E51007070CF /* fonts */,
 				026ADE1326C3010C002518EE /* macos-config.json */,
 				9833913027AAA4B500DAF119 /* trackerData.json */,
-				EAE427FF275D47FA00DAC26B /* ClickToLoadModel.swift */,
+				EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */,
 				85AC3B0425D6B1D800C7D2AA /* ScriptSourceProviding.swift */,
 				9826B09F2747DF3D0092F683 /* ContentBlocking.swift */,
 				9812D894276CEDA5004B6181 /* ContentBlockerRulesLists.swift */,
 				9833912E27AAA3CE00DAF119 /* AppTrackerDataSetProvider.swift */,
 				9826B0A12747DFEB0092F683 /* AppPrivacyConfigurationDataProvider.swift */,
 				EA18D1C9272F0DC8006DC101 /* social_images */,
-				EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */,
-				EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */,
-				EA47767F272A21B700419EDA /* clickToLoadConfig.json */,
-				EA4617EF273A28A700F110A2 /* fb-tds.json */,
-				EAC80DDF271F6C0100BBF02D /* fb-sdk.js */,
 			);
 			path = ContentBlocker;
 			sourceTree = "<group>";
@@ -5486,7 +5456,6 @@
 			children = (
 				98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */,
 				9833913227AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift */,
-				EA1E52B42798CF98002EC53C /* ClickToLoadModelTests.swift */,
 				EA8AE769279FBDB20078943E /* ClickToLoadTDSTests.swift */,
 				B610F2E527AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift */,
 				B6AE39F029373AF200C37AA4 /* EmptyAttributionRulesProver.swift */,
@@ -8247,15 +8216,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		EAA29AEB278D2E51007070CF /* fonts */ = {
-			isa = PBXGroup;
-			children = (
-				EAA29AE7278D2E43007070CF /* ProximaNova-Bold-webfont.woff2 */,
-				EAA29AE8278D2E43007070CF /* ProximaNova-Reg-webfont.woff2 */,
-			);
-			path = fonts;
-			sourceTree = "<group>";
-		};
 		EEA3EEAF2B24EB5100E8333A /* VPNLocation */ = {
 			isa = PBXGroup;
 			children = (
@@ -9009,7 +8969,6 @@
 				3706FCB8293F65D500E42796 /* Onboarding.storyboard in Resources */,
 				56CEE90F2B7A725C00CF10AA /* InfoPlist.xcstrings in Resources */,
 				3706FCB9293F65D500E42796 /* FireproofDomains.storyboard in Resources */,
-				3706FCBA293F65D500E42796 /* clickToLoadConfig.json in Resources */,
 				3706FCBC293F65D500E42796 /* dark-shield.json in Resources */,
 				854DAAAE2A72B613001E2E24 /* BookmarksBarPromptAssets.xcassets in Resources */,
 				3706FCBD293F65D500E42796 /* dark-shield-mouse-over.json in Resources */,
@@ -9018,7 +8977,6 @@
 				3706FCC0293F65D500E42796 /* FindInPage.storyboard in Resources */,
 				EEC8EB3F2982CA440065AA39 /* JSAlert.storyboard in Resources */,
 				3706FCC3293F65D500E42796 /* userscript.js in Resources */,
-				3706FCC4293F65D500E42796 /* fb-tds.json in Resources */,
 				3706FCC6293F65D500E42796 /* README.md in Resources */,
 				3706FCC8293F65D500E42796 /* Assets.xcassets in Resources */,
 				3706FCC9293F65D500E42796 /* NavigationBar.storyboard in Resources */,
@@ -9041,7 +8999,6 @@
 				3706FCE4293F65D500E42796 /* Fire.storyboard in Resources */,
 				3706FCE6293F65D500E42796 /* social_images in Resources */,
 				3706FCE7293F65D500E42796 /* shield-dot-mouse-over.json in Resources */,
-				3706FCE9293F65D500E42796 /* fb-sdk.js in Resources */,
 				BD384ACB2BBC821B00EF3735 /* vpn-dark-mode.json in Resources */,
 				3706FCEA293F65D500E42796 /* PasswordManager.storyboard in Resources */,
 				BD384ACC2BBC821B00EF3735 /* vpn-light-mode.json in Resources */,
@@ -9053,11 +9010,8 @@
 				3706FCF0293F65D500E42796 /* httpsMobileV2BloomSpec.json in Resources */,
 				3706FCF1293F65D500E42796 /* TabBarFooter.xib in Resources */,
 				3706FCF3293F65D500E42796 /* FirePopoverCollectionViewItem.xib in Resources */,
-				3706FCF4293F65D500E42796 /* ProximaNova-Bold-webfont.woff2 in Resources */,
 				3706FCF5293F65D500E42796 /* dark-shield-dot.json in Resources */,
 				3706FCF6293F65D500E42796 /* trackers-2.json in Resources */,
-				3706FCF7293F65D500E42796 /* ProximaNova-Reg-webfont.woff2 in Resources */,
-				3706FCF8293F65D500E42796 /* clickToLoad.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9203,7 +9157,6 @@
 				85B7184A27677C2D00B4277F /* Onboarding.storyboard in Resources */,
 				56CEE90E2B7A725B00CF10AA /* InfoPlist.xcstrings in Resources */,
 				4B0511C3262CAA5A00F6079C /* FireproofDomains.storyboard in Resources */,
-				EA477680272A21B700419EDA /* clickToLoadConfig.json in Resources */,
 				AA3439712754D4E900B241FA /* dark-shield.json in Resources */,
 				859F30672A72B38500C20372 /* BookmarksBarPromptAssets.xcassets in Resources */,
 				AA7EB6EB27E880AE00036718 /* dark-shield-mouse-over.json in Resources */,
@@ -9212,7 +9165,6 @@
 				85A0117425AF2EDF00FA6A0C /* FindInPage.storyboard in Resources */,
 				EEC111E4294D06020086524F /* JSAlert.storyboard in Resources */,
 				B31055C627A1BA1D001AC618 /* userscript.js in Resources */,
-				EA4617F0273A28A700F110A2 /* fb-tds.json in Resources */,
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
 				85589E8D27BBBB870038AD11 /* NavigationBar.storyboard in Resources */,
@@ -9235,7 +9187,6 @@
 				AAB7320726DD0C37002FACF9 /* Fire.storyboard in Resources */,
 				EA18D1CA272F0DC8006DC101 /* social_images in Resources */,
 				AA7EB6E927E880A600036718 /* shield-dot-mouse-over.json in Resources */,
-				EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */,
 				BD384AC92BBC821A00EF3735 /* vpn-dark-mode.json in Resources */,
 				85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */,
 				BD384ACA2BBC821A00EF3735 /* vpn-light-mode.json in Resources */,
@@ -9247,11 +9198,8 @@
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
 				AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */,
 				AAE246F42709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib in Resources */,
-				EAA29AE9278D2E43007070CF /* ProximaNova-Bold-webfont.woff2 in Resources */,
 				AA3439702754D4E900B241FA /* dark-shield-dot.json in Resources */,
 				AA34397A2754D55100B241FA /* trackers-2.json in Resources */,
-				EAA29AEA278D2E43007070CF /* ProximaNova-Reg-webfont.woff2 in Resources */,
-				EAFAD6CA2728BD1200F9DF00 /* clickToLoad.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9621,7 +9569,6 @@
 				7BCB90C32C1863BA008E3543 /* VPNControllerXPCClient+ConvenienceInitializers.swift in Sources */,
 				EEC4A66E2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift in Sources */,
 				3706FA83293F65D500E42796 /* LazyLoadable.swift in Sources */,
-				3706FA84293F65D500E42796 /* ClickToLoadModel.swift in Sources */,
 				3706FA85293F65D500E42796 /* KeyedCodingExtension.swift in Sources */,
 				3706FA87293F65D500E42796 /* DownloadListStore.swift in Sources */,
 				37197EAB2942443D00394917 /* WebViewContainerView.swift in Sources */,
@@ -10557,7 +10504,6 @@
 				3706FE3A293F661700E42796 /* MockVariantManager.swift in Sources */,
 				3706FE3C293F661700E42796 /* FireproofDomainsStoreMock.swift in Sources */,
 				3706FE3D293F661700E42796 /* DataEncryptionTests.swift in Sources */,
-				3706FE3E293F661700E42796 /* ClickToLoadModelTests.swift in Sources */,
 				C17CA7B32B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift in Sources */,
 				3706FE3F293F661700E42796 /* FileStoreMock.swift in Sources */,
 				B6619F042B17123200CD9186 /* DataImportViewModelTests.swift in Sources */,
@@ -11014,7 +10960,6 @@
 				4B9DB03E2A983B24000927DB /* JoinWaitlistView.swift in Sources */,
 				1ED910D52B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */,
 				37534CA028113101002621E7 /* LazyLoadable.swift in Sources */,
-				EAE42800275D47FA00DAC26B /* ClickToLoadModel.swift in Sources */,
 				0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */,
 				31AA6B972B960B870025014E /* DataBrokerProtectionLoginItemPixels.swift in Sources */,
 				B6BF5D852946FFDA006742B1 /* PrivacyDashboardTabExtension.swift in Sources */,
@@ -11969,7 +11914,6 @@
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
 				B6AA64732994B43300D99CD6 /* FutureExtensionTests.swift in Sources */,
 				B603975329C1FFAE00902A34 /* ExpectedNavigationExtension.swift in Sources */,
-				EA1E52B52798CF98002EC53C /* ClickToLoadModelTests.swift in Sources */,
 				56BA1E802BAB2E43001CF69F /* ErrorPageTabExtensionTest.swift in Sources */,
 				B603975029C1FF5F00902A34 /* TestsURLExtension.swift in Sources */,
 				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,
@@ -13078,7 +13022,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 155.0.0;
+				version = 156.0.0;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
