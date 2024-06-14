@@ -44,19 +44,19 @@ final class NetworkProtectionAppEvents {
 #endif // DEBUG || REVIEW || RELEASE
 #endif // NETP_SYSTEM_EXTENSION
 
-    // MARK: - Feature Visibility
+    // MARK: - Feature Gatekeeping
 
-    private let featureVisibility: NetworkProtectionFeatureVisibility
+    private let featureGatekeeper: VPNFeatureGatekeeper
     private let uninstaller: VPNUninstalling
     private let defaults: UserDefaults
 
-    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+    init(featureGatekeeper: VPNFeatureGatekeeper,
          uninstaller: VPNUninstalling = VPNUninstaller(),
          defaults: UserDefaults = .netP) {
 
         self.defaults = defaults
         self.uninstaller = uninstaller
-        self.featureVisibility = featureVisibility
+        self.featureGatekeeper = featureGatekeeper
     }
 
     /// Call this method when the app finishes launching, to run the startup logic for NetP.
@@ -65,7 +65,7 @@ final class NetworkProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
 
         Task { @MainActor in
-            await featureVisibility.disableIfUserHasNoAccess()
+            await featureGatekeeper.disableIfUserHasNoAccess()
             restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
         }
     }
@@ -74,7 +74,7 @@ final class NetworkProtectionAppEvents {
     ///
     func applicationDidBecomeActive() {
         Task { @MainActor in
-            await featureVisibility.disableIfUserHasNoAccess()
+            await featureGatekeeper.disableIfUserHasNoAccess()
         }
     }
 

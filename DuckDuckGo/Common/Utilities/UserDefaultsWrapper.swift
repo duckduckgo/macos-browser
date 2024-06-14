@@ -74,7 +74,6 @@ public struct UserDefaultsWrapper<T> {
         case askToSavePaymentMethods = "preferences.ask-to-save.payment-methods"
         case autolockLocksFormFilling = "preferences.lock-autofill-form-fill"
         case autofillDebugScriptEnabled = "preferences.enable-autofill-debug-script"
-        case autofillSurveyEnabled = "preferences.enable-autofill-survey"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
@@ -117,6 +116,7 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowAllFavorites = "home.page.show.all.favorites"
         case homePageShowAllFeatures = "home.page.show.all.features"
         case homePageShowMakeDefault = "home.page.show.make.default"
+        case homePageShowAddToDock = "home.page.show.add.to.dock"
         case homePageShowImport = "home.page.show.import"
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"

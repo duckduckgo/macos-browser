@@ -21,7 +21,8 @@ import Subscription
 import NetworkProtection
 import Common
 
-extension NetworkProtectionKeychainTokenStore: SubscriptionTokenStorage {
+extension NetworkProtectionKeychainTokenStore: SubscriptionTokenStoring {
+
     public func store(accessToken: String) throws {
         try store(accessToken)
     }

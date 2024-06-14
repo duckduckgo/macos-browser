@@ -1,7 +1,7 @@
 {
   "name": "PeopleWiz",
   "url": "peoplewiz.com",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "parent": "peoplewhiz.com",
   "addedDatetime": 1709445600000,
   "steps": [
@@ -18,6 +18,7 @@
           "actionType": "extract",
           "id": "36ba376d-03c1-4ecc-92ed-2fe12bd79d6f",
           "selector": "[class^='ResultsTable__Record-sc']",
+          "noResultsSelector": "div[class^=ResultNotFound__NoResults]",
           "profile": {
             "name": {
               "selector": "[class^='ResultsTable__Name-sc']"
@@ -32,6 +33,9 @@
             "relativesList": {
               "selector": ".MuiGrid-item:nth-child(4) [class^='ResultsTable__AddressAndLocation-sc']",
               "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
             }
           }
         }

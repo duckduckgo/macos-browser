@@ -55,7 +55,11 @@ final class MainViewController: NSViewController {
         fatalError("MainViewController: Bad initializer")
     }
 
-    init(tabCollectionViewModel: TabCollectionViewModel? = nil, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, autofillPopoverPresenter: AutofillPopoverPresenter) {
+    init(tabCollectionViewModel: TabCollectionViewModel? = nil,
+         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         autofillPopoverPresenter: AutofillPopoverPresenter,
+         vpnXPCClient: VPNControllerXPCClient = .shared) {
+
         let tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = tabCollectionViewModel.isBurner
@@ -70,12 +74,14 @@ final class MainViewController: NSViewController {
             }
 #endif
 
-            let ipcClient = TunnelControllerIPCClient()
-            ipcClient.register()
-            let vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
+            vpnXPCClient.register { error in
+                NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
+            }
+
+            let vpnUninstaller = VPNUninstaller(ipcClient: vpnXPCClient)
 
             return NetworkProtectionNavBarPopoverManager(
-                ipcClient: ipcClient,
+                ipcClient: vpnXPCClient,
                 vpnUninstaller: vpnUninstaller)
         }()
         let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
@@ -90,14 +96,14 @@ final class MainViewController: NSViewController {
             connectivityIssuesObserver = connectivityIssuesObserver ?? DisabledConnectivityIssueObserver()
             controllerErrorMessageObserver = controllerErrorMessageObserver ?? ControllerErrorMesssageObserverThroughDistributedNotifications()
 
-            let ipcClient = networkProtectionPopoverManager.ipcClient
             return DefaultNetworkProtectionStatusReporter(
-                statusObserver: ipcClient.ipcStatusObserver,
-                serverInfoObserver: ipcClient.ipcServerInfoObserver,
-                connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
+                statusObserver: vpnXPCClient.ipcStatusObserver,
+                serverInfoObserver: vpnXPCClient.ipcServerInfoObserver,
+                connectionErrorObserver: vpnXPCClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: connectivityIssuesObserver,
                 controllerErrorMessageObserver: controllerErrorMessageObserver,
-                dataVolumeObserver: ipcClient.ipcDataVolumeObserver
+                dataVolumeObserver: vpnXPCClient.ipcDataVolumeObserver,
+                knownFailureObserver: KnownFailureObserverThroughDistributedNotifications()
             )
         }()
 
@@ -192,13 +198,7 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
-
-        refreshNetworkProtectionMessages()
-
-#if DBP
-        DataBrokerProtectionAppEvents().windowDidBecomeMain()
-        refreshDataBrokerProtectionMessages()
-#endif
+        refreshSurveyMessages()
     }
 
     func windowDidResignKey() {
@@ -220,19 +220,15 @@ final class MainViewController: NSViewController {
         }
     }
 
-    private let networkProtectionMessaging = DefaultNetworkProtectionRemoteMessaging()
+    private lazy var surveyMessaging: DefaultSurveyRemoteMessaging = {
+        return DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager)
+    }()
 
-    func refreshNetworkProtectionMessages() {
-        networkProtectionMessaging.fetchRemoteMessages()
+    func refreshSurveyMessages() {
+        Task {
+            await surveyMessaging.fetchRemoteMessages()
+        }
     }
-
-#if DBP
-    private let dataBrokerProtectionMessaging = DefaultDataBrokerProtectionRemoteMessaging()
-
-    func refreshDataBrokerProtectionMessages() {
-        dataBrokerProtectionMessaging.fetchRemoteMessages()
-    }
-#endif
 
     override func encodeRestorableState(with coder: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")

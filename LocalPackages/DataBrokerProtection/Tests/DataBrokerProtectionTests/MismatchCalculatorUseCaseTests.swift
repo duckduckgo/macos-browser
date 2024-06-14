@@ -40,7 +40,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             .mockParentWith(historyEvents: parentHistoryEvents),
             .mockChildtWith(historyEvents: childHistoryEvents)
         ]
-        let sut = MismatchCalculatorUseCase(
+        let sut = DefaultMismatchCalculator(
             database: database,
             pixelHandler: pixelHandler
         )
@@ -65,7 +65,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             .mockParentWith(historyEvents: parentHistoryEvents),
             .mockChildtWith(historyEvents: childHistoryEvents)
         ]
-        let sut = MismatchCalculatorUseCase(
+        let sut = DefaultMismatchCalculator(
             database: database,
             pixelHandler: pixelHandler
         )
@@ -90,7 +90,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             .mockParentWith(historyEvents: parentHistoryEvents),
             .mockChildtWith(historyEvents: childHistoryEvents)
         ]
-        let sut = MismatchCalculatorUseCase(
+        let sut = DefaultMismatchCalculator(
             database: database,
             pixelHandler: pixelHandler
         )
@@ -115,7 +115,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             .mockParentWith(historyEvents: parentHistoryEvents),
             .mockChildtWith(historyEvents: childHistoryEvents)
         ]
-        let sut = MismatchCalculatorUseCase(
+        let sut = DefaultMismatchCalculator(
             database: database,
             pixelHandler: pixelHandler
         )
@@ -136,7 +136,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
         database.brokerProfileQueryDataToReturn = [
             .mockParentWith(historyEvents: parentHistoryEvents)
         ]
-        let sut = MismatchCalculatorUseCase(
+        let sut = DefaultMismatchCalculator(
             database: database,
             pixelHandler: pixelHandler
         )
@@ -158,7 +158,7 @@ extension BrokerProfileQueryData {
                 schedulingConfig: DataBrokerScheduleConfig.mock
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50),
-            scanOperationData: ScanOperationData(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents)
+            scanJobData: ScanJobData(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents)
         )
     }
 
@@ -173,7 +173,7 @@ extension BrokerProfileQueryData {
                 parent: "parent.com"
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50),
-            scanOperationData: ScanOperationData(brokerId: 2, profileQueryId: 1, historyEvents: historyEvents)
+            scanJobData: ScanJobData(brokerId: 2, profileQueryId: 1, historyEvents: historyEvents)
         )
     }
 }

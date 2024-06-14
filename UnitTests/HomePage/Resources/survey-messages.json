@@ -1,0 +1,22 @@
+[
+    {
+        "id": "message-1",
+        "cardTitle": "Title 1",
+        "cardDescription": "Description 1",
+        "attributes": {
+            "subscriptionStatus": "Auto-Renewable",
+            "subscriptionBillingPeriod": "Monthly",
+            "minimumDaysSinceSubscriptionStarted": 1,
+            "maximumDaysUntilSubscriptionExpirationOrRenewal": 30,
+            "daysSinceVPNEnabled": 2,
+            "daysSincePIREnabled": 3,
+            "sparkleSubscriptionPurchasePlatforms": ["stripe"],
+            "appStoreSubscriptionPurchasePlatforms": ["stripe"]
+        },
+        "action": {
+            "actionTitle": "Action 1",
+            "actionType": "openSurveyURL",
+            "actionURL": "https://duckduckgo.com/"
+        }
+    }
+]

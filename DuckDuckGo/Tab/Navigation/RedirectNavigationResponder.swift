@@ -23,7 +23,7 @@ struct RedirectNavigationResponder: NavigationResponder {
 
     private let redirectManager: SubscriptionRedirectManager
 
-    init(redirectManager: SubscriptionRedirectManager = PrivacyProSubscriptionRedirectManager()) {
+    init(redirectManager: SubscriptionRedirectManager) {
         self.redirectManager = redirectManager
     }
 
@@ -37,4 +37,19 @@ struct RedirectNavigationResponder: NavigationResponder {
         }
     }
 
+//    private func redirectURL(for url: URL) -> URL? {
+//        guard url.isPart(ofDomain: "duckduckgo.com") else { return nil }
+//
+//        if url.pathComponents == URL.privacyPro.pathComponents {
+//            let isFeatureAvailable = DefaultSubscriptionFeatureAvailability().isFeatureAvailable
+//            let subscriptionManager = Application.appDelegate.subscriptionManager
+//            let platform = subscriptionManager.currentEnvironment.purchasePlatform
+//            let shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
+//            let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
+//            let url = SubscriptionURL.baseURL.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
+//            return isPurchasePageRedirectActive ? url : nil
+//        }
+//
+//        return nil
+//    }
 }

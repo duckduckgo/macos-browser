@@ -16,24 +16,21 @@
 //  limitations under the License.
 //
 
+import Foundation
 import BrowserServicesKit
 import Common
 import Combine
-import Foundation
 import Navigation
 import WebKit
 import UserScript
 import Subscription
-import SubscriptionUI
 import PixelKit
 
 public extension Notification.Name {
     static let subscriptionPageCloseAndOpenPreferences = Notification.Name("com.duckduckgo.subscriptionPage.CloseAndOpenPreferences")
 }
 
-///
 /// The user script that will be the broker for all subscription features
-///
 public final class SubscriptionPagesUserScript: NSObject, UserScript, UserScriptMessaging {
     public var source: String = ""
 
@@ -66,16 +63,14 @@ extension SubscriptionPagesUserScript: WKScriptMessageHandlerWithReply {
     }
 }
 
-// MARK: - Fallback for macOS 10.15
+/// Fallback for macOS 10.15
 extension SubscriptionPagesUserScript: WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         // unsupported
     }
 }
 
-///
 /// Use Subscription sub-feature
-///
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     weak var broker: UserScriptMessageBroker?
     var featureName = "useSubscription"
@@ -83,17 +78,26 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         .exact(hostname: "duckduckgo.com"),
         .exact(hostname: "abrown.duckduckgo.com")
     ])
+    let subscriptionManager: SubscriptionManaging
+    var accountManager: AccountManaging { subscriptionManager.accountManager }
+    var subscriptionPlatform: SubscriptionEnvironment.PurchasePlatform { subscriptionManager.currentEnvironment.purchasePlatform }
 
-    let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+    let stripePurchaseFlow: StripePurchaseFlow
+    let subscriptionErrorReporter = SubscriptionErrorReporter()
+    let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
+    let uiHandler: SubscriptionUIHandling
+
+    public init(subscriptionManager: SubscriptionManaging,
+                subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler(),
+                uiHandler: SubscriptionUIHandling) {
+        self.subscriptionManager = subscriptionManager
+        self.stripePurchaseFlow = StripePurchaseFlow(subscriptionManager: subscriptionManager)
+        self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
+        self.uiHandler = uiHandler
+    }
 
     func with(broker: UserScriptMessageBroker) {
         self.broker = broker
-    }
-
-    private let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
-
-    init(subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler()) {
-        self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
     }
 
     struct Handlers {
@@ -189,17 +193,13 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     func getSubscriptionOptions(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard DefaultSubscriptionFeatureAvailability().isSubscriptionPurchaseAllowed else { return SubscriptionOptions.empty }
 
-        if SubscriptionPurchaseEnvironment.current == .appStore {
+        switch subscriptionPlatform {
+        case .appStore:
             if #available(macOS 12.0, *) {
-                switch await AppStorePurchaseFlow.subscriptionOptions() {
-                case .success(let subscriptionOptions):
-                    return subscriptionOptions
-                case .failure:
-                    break
-                }
+                return await subscriptionManager.storePurchaseManager().subscriptionOptions()
             }
-        } else if SubscriptionPurchaseEnvironment.current == .stripe {
-            switch await StripePurchaseFlow.subscriptionOptions() {
+        case .stripe:
+            switch await stripePurchaseFlow.subscriptionOptions() {
             case .success(let subscriptionOptions):
                 return subscriptionOptions
             case .failure:
@@ -209,8 +209,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         return SubscriptionOptions.empty
     }
-
-    let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -223,74 +221,73 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         // Extract the origin from the webview URL to use for attribution pixel.
         subscriptionSuccessPixelHandler.origin = await originFrom(originalMessage: message)
-
-        if SubscriptionPurchaseEnvironment.current == .appStore {
+        if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
-                let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-                let progressViewController = await ProgressViewController(title: UserText.purchasingSubscriptionTitle)
-
                 defer {
-                    Task {
-                        await mainViewController?.dismiss(progressViewController)
+                    Task { @MainActor in
+                        uiHandler.dismissProgressViewController()
                     }
                 }
 
                 guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
                     assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
-                    SubscriptionErrorReporter.report(subscriptionActivationError: .generalError)
+                    subscriptionErrorReporter.report(subscriptionActivationError: .generalError)
                     return nil
                 }
 
                 os_log(.info, log: .subscription, "[Purchase] Starting purchase for: %{public}s", subscriptionSelection.id)
 
-                await mainViewController?.presentAsSheet(progressViewController)
+                await uiHandler.presentProgressViewController(withTitle: UserText.purchasingSubscriptionTitle)
 
                 // Check for active subscriptions
-                if await PurchaseManager.hasActiveSubscription() {
+                if await subscriptionManager.storePurchaseManager().hasActiveSubscription() {
                     PixelKit.fire(PrivacyProPixel.privacyProRestoreAfterPurchaseAttempt)
                     os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
-                    SubscriptionErrorReporter.report(subscriptionActivationError: .hasActiveSubscription)
-                    await WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionFoundAlert(originalMessage: message)
+                    subscriptionErrorReporter.report(subscriptionActivationError: .hasActiveSubscription)
+                    await showSubscriptionFoundAlert(originalMessage: message)
                     return nil
                 }
 
                 let emailAccessToken = try? EmailManager().getToken()
                 let purchaseTransactionJWS: String
+                let appStorePurchaseFlow = AppStorePurchaseFlow(subscriptionManager: subscriptionManager)
 
                 os_log(.info, log: .subscription, "[Purchase] Purchasing")
-                switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken, subscriptionAppGroup: subscriptionAppGroup) {
+                switch await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
                 case .success(let transactionJWS):
                     purchaseTransactionJWS = transactionJWS
                 case .failure(let error):
                     switch error {
                     case .noProductsFound:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
                     case .activeSubscriptionAlreadyPresent:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .activeSubscriptionAlreadyPresent)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .activeSubscriptionAlreadyPresent)
                     case .authenticatingWithTransactionFailed:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .generalError)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .generalError)
                     case .accountCreationFailed:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .accountCreationFailed)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .accountCreationFailed)
                     case .purchaseFailed:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .purchaseFailed)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .purchaseFailed)
                     case .cancelledByUser:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .cancelledByUser)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .cancelledByUser)
                     case .missingEntitlements:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .missingEntitlements)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .missingEntitlements)
+                    case .internalError:
+                        assertionFailure("Internal error")
                     }
 
                     if error != .cancelledByUser {
-                        await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                        await showSomethingWentWrongAlert()
                     }
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
                     return nil
                 }
 
-                await progressViewController.updateTitleText(UserText.completingPurchaseTitle)
+                await uiHandler.updateProgressViewController(title: UserText.completingPurchaseTitle)
 
                 os_log(.info, log: .subscription, "[Purchase] Completing purchase")
 
-                switch await AppStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS, subscriptionAppGroup: subscriptionAppGroup) {
+                switch await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS) {
                 case .success(let purchaseUpdate):
                     os_log(.info, log: .subscription, "[Purchase] Purchase complete")
                     PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .dailyAndCount)
@@ -300,44 +297,46 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 case .failure(let error):
                     switch error {
                     case .noProductsFound:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
                     case .activeSubscriptionAlreadyPresent:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .activeSubscriptionAlreadyPresent)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .activeSubscriptionAlreadyPresent)
                     case .authenticatingWithTransactionFailed:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .generalError)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .generalError)
                     case .accountCreationFailed:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .accountCreationFailed)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .accountCreationFailed)
                     case .purchaseFailed:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .purchaseFailed)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .purchaseFailed)
                     case .cancelledByUser:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .cancelledByUser)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .cancelledByUser)
                     case .missingEntitlements:
-                        SubscriptionErrorReporter.report(subscriptionActivationError: .missingEntitlements)
+                        subscriptionErrorReporter.report(subscriptionActivationError: .missingEntitlements)
                         DispatchQueue.main.async {
                             NotificationCenter.default.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
                         }
                         return nil
+                    case .internalError:
+                        assertionFailure("Internal error")
                     }
 
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "completed"))
                 }
             }
-        } else if SubscriptionPurchaseEnvironment.current == .stripe {
+        } else if subscriptionPlatform == .stripe {
             let emailAccessToken = try? EmailManager().getToken()
 
-            let result = await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken, subscriptionAppGroup: subscriptionAppGroup)
+            let result = await stripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken)
 
             switch result {
             case .success(let success):
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: success)
             case .failure(let error):
-                await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                await showSomethingWentWrongAlert()
 
                 switch error {
                 case .noProductsFound:
-                    SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
+                    subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
                 case .accountCreationFailed:
-                    SubscriptionErrorReporter.report(subscriptionActivationError: .accountCreationFailed)
+                    subscriptionErrorReporter.report(subscriptionActivationError: .accountCreationFailed)
                 }
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
             }
@@ -346,38 +345,13 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         return nil
     }
 
+    // MARK: functions used in SubscriptionAccessActionHandlers
+
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-
         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseOfferPageEntry)
-        guard let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
-              let windowControllerManager = await WindowControllersManager.shared.lastKeyMainWindowController else {
-            return nil
+        Task { @MainActor in
+            uiHandler.presentSubscriptionAccessViewController(handler: self, message: original)
         }
-        let message = original
-
-        let actionHandlers = SubscriptionAccessActionHandlers(restorePurchases: {
-            if #available(macOS 12.0, *) {
-                Task { @MainActor in
-                    await SubscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
-                    message.webView?.reload()
-                }
-            }
-        }, openURLHandler: { url in
-            DispatchQueue.main.async {
-                WindowControllersManager.shared.showTab(with: .subscription(url))
-            }
-        }, uiActionHandler: { event in
-            switch event {
-            case .activateAddEmailClick:
-                PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
-            default:
-                break
-            }
-        })
-
-        let vc = await SubscriptionAccessViewController(accountManager: accountManager, actionHandlers: actionHandlers, subscriptionAppGroup: subscriptionAppGroup)
-        await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(vc)
-
         return nil
     }
 
@@ -411,22 +385,30 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .personalInformationRemoval:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .unique)
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
-            await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+            Task { @MainActor in
+                self.uiHandler.showTab(with: .dataBrokerProtection)
+            }
         case .identityTheftRestoration:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .unique)
-            await WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+            let url = subscriptionManager.url(for: .identityTheftRestoration)
+            Task { @MainActor in
+                self.uiHandler.showTab(with: .identityTheftRestoration(url))
+            }
         }
 
         return nil
     }
 
     func completeStripePayment(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-        let progressViewController = await ProgressViewController(title: UserText.completingPurchaseTitle)
+        Task { @MainActor in
+            uiHandler.presentProgressViewController(withTitle: UserText.completingPurchaseTitle)
+        }
 
-        await mainViewController?.presentAsSheet(progressViewController)
-        await StripePurchaseFlow.completeSubscriptionPurchase(subscriptionAppGroup: subscriptionAppGroup)
-        await mainViewController?.dismiss(progressViewController)
+        await stripePurchaseFlow.completeSubscriptionPurchase()
+
+        Task { @MainActor in
+            uiHandler.dismissProgressViewController()
+        }
 
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
         subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
@@ -461,7 +443,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getAccessToken(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let accessToken = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).accessToken {
+        if let accessToken = accountManager.accessToken {
             return ["token": accessToken]
         } else {
             return [String: String]()
@@ -495,52 +477,76 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 }
 
-extension MainWindowController {
+extension SubscriptionPagesUseSubscriptionFeature {
+
+ // MARK: - UI interactions
 
     @MainActor
     func showSomethingWentWrongAlert() {
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
-        guard let window else { return }
-
-        window.show(.somethingWentWrongAlert())
+        uiHandler.show(alertType: .somethingWentWrong)
     }
 
     @MainActor
     func showSubscriptionNotFoundAlert() {
-        guard let window else { return }
-
-        window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
-            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+        uiHandler.show(alertType: .subscriptionNotFound, firstButtonAction: {
+            let url = self.subscriptionManager.url(for: .purchase)
+            self.uiHandler.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })
     }
 
     @MainActor
     func showSubscriptionInactiveAlert() {
-        guard let window else { return }
-
-        window.show(.subscriptionInactiveAlert(), firstButtonAction: {
-            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+        uiHandler.show(alertType: .subscriptionInactive, firstButtonAction: {
+            let url = self.subscriptionManager.url(for: .purchase)
+            self.uiHandler.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })
     }
 
     @MainActor
     func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) {
-        guard let window else { return }
-
-        window.show(.subscriptionFoundAlert(), firstButtonAction: {
+        uiHandler.show(alertType: .subscriptionFound, firstButtonAction: {
             if #available(macOS 12.0, *) {
                 Task {
-                    let result = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+                    let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: self.subscriptionManager)
+                    let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                     switch result {
-                    case .success:
-                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
+                    case .success: PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
                     case .failure: break
                     }
                     originalMessage.webView?.reload()
                 }
             }
         })
+    }
+}
+
+extension SubscriptionPagesUseSubscriptionFeature: SubscriptionAccessActionHandling {
+
+    func subscriptionAccessActionRestorePurchases(message: WKScriptMessage) {
+        if #available(macOS 12.0, *) {
+            Task { @MainActor in
+                let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: self.subscriptionManager,
+                                                                                uiHandler: self.uiHandler)
+                await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
+                message.webView?.reload()
+            }
+        }
+    }
+
+    func subscriptionAccessActionOpenURLHandler(url: URL) {
+        Task { @MainActor in
+            self.uiHandler.showTab(with: .subscription(url))
+        }
+    }
+
+    func subscriptionAccessActionHandleAction(event: SubscriptionAccessActionHandlingEvent) {
+        switch event {
+        case .activateAddEmailClick:
+            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+        default: break
+        }
     }
 }

@@ -61,7 +61,7 @@ final class DBPHomeViewController: NSViewController {
                                            featureToggles: features)
 
         return DataBrokerProtectionViewController(
-            scheduler: dataBrokerProtectionManager.scheduler,
+            agentInterface: dataBrokerProtectionManager.loginItemInterface,
             dataManager: dataBrokerProtectionManager.dataManager,
             privacyConfig: privacyConfigurationManager,
             prefs: prefs,
@@ -230,7 +230,9 @@ extension DBPHomeViewController {
 
 // MARK: - System configuration
 
+import AppLauncher
 import ServiceManagement
+import VPNAppLauncher
 
 extension DBPHomeViewController {
     func openLoginItemSettings() {
@@ -246,7 +248,7 @@ extension DBPHomeViewController {
     func moveToApplicationFolder() {
         pixelHandler.fire(.homeViewCTAMoveApplicationClicked)
         Task { @MainActor in
-            await AppLauncher(appBundleURL: Bundle.main.bundleURL).launchApp(withCommand: .moveAppToApplications)
+            try? await AppLauncher(appBundleURL: Bundle.main.bundleURL).launchApp(withCommand: VPNAppLaunchCommand.moveAppToApplications)
         }
     }
 }

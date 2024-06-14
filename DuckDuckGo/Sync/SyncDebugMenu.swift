@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import DDGSync
 import Bookmarks
 
@@ -31,6 +31,7 @@ final class SyncDebugMenu: NSMenu {
         buildItems {
             NSMenuItem(title: "Environment")
                 .submenu(environmentMenu)
+                .withAccessibilityIdentifier("SyncDebugMenu.environment")
             NSMenuItem(title: "Reset Favicons Fetcher Onboarding Dialog", action: #selector(resetFaviconsFetcherOnboardingDialog))
                 .targetting(self)
             NSMenuItem(title: "Populate Stub objects", action: #selector(createStubsForDebug))
@@ -58,14 +59,14 @@ final class SyncDebugMenu: NSMenu {
 
         let statusMenuItem = NSMenuItem(title: "Current: \(currentEnvironment.description)", action: nil, keyEquivalent: "")
         statusMenuItem.isEnabled = false
-        environmentMenu.addItem(statusMenuItem)
+        environmentMenu.addItem(statusMenuItem.withAccessibilityIdentifier("SyncDebugMenu.currentEnvironment"))
 
         let toggleMenuItem = NSMenuItem(
             title: "Switch to \(anotherEnvironment.description)",
             action: #selector(switchSyncEnvironment),
             target: self,
             representedObject: anotherEnvironment)
-        environmentMenu.addItem(toggleMenuItem)
+        environmentMenu.addItem(toggleMenuItem.withAccessibilityIdentifier("SyncDebugMenu.switchEnvironment"))
     }
 
     @objc func switchSyncEnvironment(_ sender: NSMenuItem) {
