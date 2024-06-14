@@ -29,15 +29,34 @@ enum OnboardingSteps: String {
 }
 
 protocol OnboardingActionsManaging {
+    /// Provides the configuration needed to set up the FE onboarding
     var configuration: OnboardingConfiguration { get }
+
+    /// At the end of the onboarding the user will be taken to the DuckDuckGo search page
     func goToAddressBar()
+
+    /// At the end of the onboarding the user can be taken to the Settings page
     func goToSettings()
+
+    /// At user imput adds the app to the dock
     func addToDock()
+
+    /// At user imput shows the import data flow
     func importData()
+
+    /// At user imput shows the system prompt to change default browser
     func setAsDefault()
+
+    /// At user imput shows the bookmarks bar
     func setBookmarkBar()
+
+    /// At user imput set the session restoration on startup
     func setSessionRestore()
+
+    /// At user imput set the session restoration on startup
     func setShowHomeButtonLeft()
+
+    /// It is called every time the user ends an onboarding step
     func stepCompleted(step _: OnboardingSteps)
 }
 

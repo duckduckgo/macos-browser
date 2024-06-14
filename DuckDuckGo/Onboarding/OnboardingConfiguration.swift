@@ -18,11 +18,13 @@
 
 import Foundation
 
+/// Configuration needed to set up the FE onboarding
 struct OnboardingConfiguration: Codable, Equatable {
     var stepDefinitions: StepDefinitions
     var env: String
 }
 
+/// Defines the onboarding steps desired
 struct StepDefinitions: Codable, Equatable {
     var systemSettings: SystemSettings
 }
