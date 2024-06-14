@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "2045f13479f3da34b827198b43ae7a47e01551cf",
-        "version" : "154.0.0"
+        "revision" : "918f29281acf07e66a59cf343d12fd676b90e446",
+        "version" : "154.0.1"
       }
     },
     {
@@ -147,7 +147,7 @@
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-syntax",
+      "location" : "https://github.com/apple/swift-syntax.git",
       "state" : {
         "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
         "version" : "509.1.1"
