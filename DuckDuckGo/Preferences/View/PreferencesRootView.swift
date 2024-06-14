@@ -37,7 +37,7 @@ enum Preferences {
                 return 355
             }
         }
-        static let paneContentWidth: CGFloat = 524
+        static let paneContentWidth: CGFloat = 544
         static let panePaddingHorizontal: CGFloat = 40
         static let panePaddingVertical: CGFloat = 40
     }
@@ -98,7 +98,7 @@ enum Preferences {
                 case .dataClearing:
                     DataClearingView(model: DataClearingPreferences.shared)
                 case .vpn:
-                    VPNView(model: VPNPreferencesModel())
+                    VPNView(model: VPNPreferencesModel(), status: model.vpnProtectionStatus())
                 case .subscription:
                     SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
                 case .autofill:
@@ -165,13 +165,9 @@ enum Preferences {
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 if #available(macOS 12.0, *) {
                     Task {
-                        guard let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
-                              let windowControllerManager = WindowControllersManager.shared.lastKeyMainWindowController else {
-                            return
-                        }
-
-                        let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: Application.appDelegate.subscriptionManager)
-                        await subscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
+                        let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: Application.appDelegate.subscriptionManager,
+                                                                                        uiHandler: Application.appDelegate.subscriptionUIHandler)
+                        await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
                     }
                 }
             },

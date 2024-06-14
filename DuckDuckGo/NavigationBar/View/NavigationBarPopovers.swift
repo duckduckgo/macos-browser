@@ -29,7 +29,6 @@ protocol PopoverPresenter {
 }
 
 protocol NetPPopoverManager: AnyObject {
-    var ipcClient: NetworkProtectionIPCClient { get }
     var isShown: Bool { get }
 
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover
@@ -485,4 +484,6 @@ extension NavigationBarPopovers: NSPopoverDelegate {
 
 extension Notification.Name {
     static let loginAutoSaved = Notification.Name(rawValue: "loginAutoSaved")
+    static let passwordsAutoPinned = Notification.Name(rawValue: "passwordsAutoPinned")
+    static let passwordsPinningPrompt = Notification.Name(rawValue: "passwordsPinningPrompt")
 }

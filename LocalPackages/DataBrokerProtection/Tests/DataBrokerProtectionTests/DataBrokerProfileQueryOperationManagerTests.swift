@@ -776,7 +776,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         } catch {
             if let lastPixelFired = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last {
                 switch lastPixelFired {
-                case .optOutFailure(_, _, _, _, let tries, _, _):
+                case .optOutFailure(_, _, _, _, _, let tries, _, _):
                     XCTAssertEqual(tries, 3)
                 default: XCTFail("We should be firing the opt-out submit-success pixel last")
                 }
@@ -1036,6 +1036,25 @@ extension DataBroker {
                 confirmOptOutScan: 0,
                 maintenanceScan: 0
             )
+        )
+    }
+
+    static func mockWith(mirroSites: [MirrorSite]) -> DataBroker {
+        DataBroker(
+            id: 1,
+            name: "Test broker",
+            url: "testbroker.com",
+            steps: [
+                Step(type: .scan, actions: [Action]()),
+                Step(type: .optOut, actions: [Action]())
+            ],
+            version: "1.0",
+            schedulingConfig: DataBrokerScheduleConfig(
+                retryError: 0,
+                confirmOptOutScan: 0,
+                maintenanceScan: 0
+            ),
+            mirrorSites: mirroSites
         )
     }
 }

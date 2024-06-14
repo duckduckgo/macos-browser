@@ -352,6 +352,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case secureVaultKeystoreEventL2KeyMigration
     case secureVaultKeystoreEventL2KeyPasswordMigration
 
+    case compilationFailed
+
     var name: String {
         switch self {
 
@@ -862,6 +864,8 @@ enum GeneralPixel: PixelKitEventV2 {
         case .secureVaultKeystoreEventL1KeyMigration: return "m_mac_secure_vault_keystore_event_l1-key-migration"
         case .secureVaultKeystoreEventL2KeyMigration: return "m_mac_secure_vault_keystore_event_l2-key-migration"
         case .secureVaultKeystoreEventL2KeyPasswordMigration: return "m_mac_secure_vault_keystore_event_l2-key-password-migration"
+
+        case .compilationFailed: return "compilation_failed"
         }
     }
 

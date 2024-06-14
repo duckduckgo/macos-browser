@@ -16,15 +16,14 @@
 //  limitations under the License.
 //
 
+import Foundation
 import BrowserServicesKit
 import Common
 import Combine
-import Foundation
 import Navigation
 import WebKit
 import UserScript
 import Subscription
-import SubscriptionUI
 import PixelKit
 
 public extension Notification.Name {
@@ -79,11 +78,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         .exact(hostname: "duckduckgo.com"),
         .exact(hostname: "abrown.duckduckgo.com")
     ])
-
-    @MainActor
-    var window: NSWindow? {
-        WindowControllersManager.shared.lastKeyMainWindowController?.window
-    }
     let subscriptionManager: SubscriptionManaging
     var accountManager: AccountManaging { subscriptionManager.accountManager }
     var subscriptionPlatform: SubscriptionEnvironment.PurchasePlatform { subscriptionManager.currentEnvironment.purchasePlatform }
@@ -91,12 +85,15 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     let stripePurchaseFlow: StripePurchaseFlow
     let subscriptionErrorReporter = SubscriptionErrorReporter()
     let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
+    let uiHandler: SubscriptionUIHandling
 
     public init(subscriptionManager: SubscriptionManaging,
-                subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler()) {
+                subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler(),
+                uiHandler: SubscriptionUIHandling) {
         self.subscriptionManager = subscriptionManager
         self.stripePurchaseFlow = StripePurchaseFlow(subscriptionManager: subscriptionManager)
         self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
+        self.uiHandler = uiHandler
     }
 
     func with(broker: UserScriptMessageBroker) {
@@ -226,12 +223,9 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         subscriptionSuccessPixelHandler.origin = await originFrom(originalMessage: message)
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
-                let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-                let progressViewController = await ProgressViewController(title: UserText.purchasingSubscriptionTitle)
-
                 defer {
-                    Task {
-                        await mainViewController?.dismiss(progressViewController)
+                    Task { @MainActor in
+                        uiHandler.dismissProgressViewController()
                     }
                 }
 
@@ -243,7 +237,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 os_log(.info, log: .subscription, "[Purchase] Starting purchase for: %{public}s", subscriptionSelection.id)
 
-                await mainViewController?.presentAsSheet(progressViewController)
+                await uiHandler.presentProgressViewController(withTitle: UserText.purchasingSubscriptionTitle)
 
                 // Check for active subscriptions
                 if await subscriptionManager.storePurchaseManager().hasActiveSubscription() {
@@ -289,7 +283,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     return nil
                 }
 
-                await progressViewController.updateTitleText(UserText.completingPurchaseTitle)
+                await uiHandler.updateProgressViewController(title: UserText.completingPurchaseTitle)
 
                 os_log(.info, log: .subscription, "[Purchase] Completing purchase")
 
@@ -351,39 +345,13 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         return nil
     }
 
+    // MARK: functions used in SubscriptionAccessActionHandlers
+
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-
         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseOfferPageEntry)
-        guard let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
-              let windowControllerManager = await WindowControllersManager.shared.lastKeyMainWindowController else {
-            return nil
+        Task { @MainActor in
+            uiHandler.presentSubscriptionAccessViewController(handler: self, message: original)
         }
-        let message = original
-
-        let actionHandlers = SubscriptionAccessActionHandlers(restorePurchases: {
-            if #available(macOS 12.0, *) {
-                Task { @MainActor in
-                    let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: self.subscriptionManager)
-                    await subscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
-                    message.webView?.reload()
-                }
-            }
-        }, openURLHandler: { url in
-            DispatchQueue.main.async {
-                WindowControllersManager.shared.showTab(with: .subscription(url))
-            }
-        }, uiActionHandler: { event in
-            switch event {
-            case .activateAddEmailClick:
-                PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
-            default:
-                break
-            }
-        })
-
-        let subscriptionAccessViewController = await SubscriptionAccessViewController(subscriptionManager: subscriptionManager, actionHandlers: actionHandlers)
-        await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(subscriptionAccessViewController)
-
         return nil
     }
 
@@ -417,23 +385,30 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .personalInformationRemoval:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .unique)
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
-            await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+            Task { @MainActor in
+                self.uiHandler.showTab(with: .dataBrokerProtection)
+            }
         case .identityTheftRestoration:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .unique)
             let url = subscriptionManager.url(for: .identityTheftRestoration)
-            await WindowControllersManager.shared.showTab(with: .identityTheftRestoration(url))
+            Task { @MainActor in
+                self.uiHandler.showTab(with: .identityTheftRestoration(url))
+            }
         }
 
         return nil
     }
 
     func completeStripePayment(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-        let progressViewController = await ProgressViewController(title: UserText.completingPurchaseTitle)
+        Task { @MainActor in
+            uiHandler.presentProgressViewController(withTitle: UserText.completingPurchaseTitle)
+        }
 
-        await mainViewController?.presentAsSheet(progressViewController)
         await stripePurchaseFlow.completeSubscriptionPurchase()
-        await mainViewController?.dismiss(progressViewController)
+
+        Task { @MainActor in
+            uiHandler.dismissProgressViewController()
+        }
 
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
         subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
@@ -504,48 +479,35 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
 extension SubscriptionPagesUseSubscriptionFeature {
 
-    /*
-     WARNING:
-     This code will be moved as part of https://app.asana.com/0/0/1207157941206686/f
-     */
-
-    // MARK: - UI interactions
+ // MARK: - UI interactions
 
     @MainActor
     func showSomethingWentWrongAlert() {
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
-        guard let window else { return }
-
-        window.show(.somethingWentWrongAlert())
+        uiHandler.show(alertType: .somethingWentWrong)
     }
 
     @MainActor
     func showSubscriptionNotFoundAlert() {
-        guard let window else { return }
-
-        window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
+        uiHandler.show(alertType: .subscriptionNotFound, firstButtonAction: {
             let url = self.subscriptionManager.url(for: .purchase)
-            WindowControllersManager.shared.showTab(with: .subscription(url))
+            self.uiHandler.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })
     }
 
     @MainActor
     func showSubscriptionInactiveAlert() {
-        guard let window else { return }
-
-        window.show(.subscriptionInactiveAlert(), firstButtonAction: {
+        uiHandler.show(alertType: .subscriptionInactive, firstButtonAction: {
             let url = self.subscriptionManager.url(for: .purchase)
-            WindowControllersManager.shared.showTab(with: .subscription(url))
+            self.uiHandler.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })
     }
 
     @MainActor
     func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) {
-        guard let window else { return }
-
-        window.show(.subscriptionFoundAlert(), firstButtonAction: {
+        uiHandler.show(alertType: .subscriptionFound, firstButtonAction: {
             if #available(macOS 12.0, *) {
                 Task {
                     let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: self.subscriptionManager)
@@ -558,5 +520,33 @@ extension SubscriptionPagesUseSubscriptionFeature {
                 }
             }
         })
+    }
+}
+
+extension SubscriptionPagesUseSubscriptionFeature: SubscriptionAccessActionHandling {
+
+    func subscriptionAccessActionRestorePurchases(message: WKScriptMessage) {
+        if #available(macOS 12.0, *) {
+            Task { @MainActor in
+                let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: self.subscriptionManager,
+                                                                                uiHandler: self.uiHandler)
+                await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
+                message.webView?.reload()
+            }
+        }
+    }
+
+    func subscriptionAccessActionOpenURLHandler(url: URL) {
+        Task { @MainActor in
+            self.uiHandler.showTab(with: .subscription(url))
+        }
+    }
+
+    func subscriptionAccessActionHandleAction(event: SubscriptionAccessActionHandlingEvent) {
+        switch event {
+        case .activateAddEmailClick:
+            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+        default: break
+        }
     }
 }

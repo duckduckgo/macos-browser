@@ -67,7 +67,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         return formatter
     }()
 
-    private let appLauncher: AppLaunching
+    private let uiActionHandler: VPNUIActionHandler
 
     // MARK: - Misc
 
@@ -91,7 +91,7 @@ public final class TunnelControllerViewModel: ObservableObject {
                 runLoopMode: RunLoop.Mode? = nil,
                 vpnSettings: VPNSettings,
                 locationFormatter: VPNLocationFormatting,
-                appLauncher: AppLaunching) {
+                uiActionHandler: VPNUIActionHandler) {
 
         self.tunnelController = controller
         self.onboardingStatusPublisher = onboardingStatusPublisher
@@ -99,7 +99,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         self.runLoopMode = runLoopMode
         self.vpnSettings = vpnSettings
         self.locationFormatter = locationFormatter
-        self.appLauncher = appLauncher
+        self.uiActionHandler = uiActionHandler
 
         connectionStatus = statusReporter.statusObserver.recentValue
         formattedDataVolume = statusReporter.dataVolumeObserver.recentValue.formatted(using: Self.byteCountFormatter)
@@ -520,13 +520,13 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     func showLocationSettings() {
         Task { @MainActor in
-            await appLauncher.launchApp(withCommand: .showVPNLocations)
+            await uiActionHandler.showVPNLocations()
         }
     }
 
     func moveToApplications() {
         Task { @MainActor in
-            await appLauncher.launchApp(withCommand: .moveAppToApplications)
+            await uiActionHandler.moveAppToApplications()
         }
     }
 }

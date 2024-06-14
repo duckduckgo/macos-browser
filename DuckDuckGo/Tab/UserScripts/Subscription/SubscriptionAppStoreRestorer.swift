@@ -28,23 +28,25 @@ struct SubscriptionAppStoreRestorer {
     private let subscriptionManager: SubscriptionManaging
     @MainActor var window: NSWindow? { WindowControllersManager.shared.lastKeyMainWindowController?.window }
     let subscriptionErrorReporter = SubscriptionErrorReporter()
+    let uiHandler: SubscriptionUIHandling
 
-    public init(subscriptionManager: SubscriptionManaging) {
+    public init(subscriptionManager: SubscriptionManaging,
+                uiHandler: SubscriptionUIHandling) {
         self.subscriptionManager = subscriptionManager
+        self.uiHandler = uiHandler
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
-    func restoreAppStoreSubscription(mainViewController: MainViewController, windowController: MainWindowController) async {
+    // swiftlint:disable:next cyclomatic_complexity
+    func restoreAppStoreSubscription() async {
 
-        let progressViewController = await ProgressViewController(title: UserText.restoringSubscriptionTitle)
         defer {
-            DispatchQueue.main.async {
-                mainViewController.dismiss(progressViewController)
+            Task { @MainActor in
+                uiHandler.dismissProgressViewController()
             }
         }
 
-        DispatchQueue.main.async {
-            mainViewController.presentAsSheet(progressViewController)
+        Task { @MainActor in
+            uiHandler.presentProgressViewController(withTitle: UserText.restoringSubscriptionTitle)
         }
 
         let syncResult = await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
@@ -60,14 +62,8 @@ struct SubscriptionAppStoreRestorer {
                 break
             }
 
-            let alert = await NSAlert.appleIDSyncFailedAlert(text: error.localizedDescription)
-
-            switch await alert.runModal() {
-            case .alertFirstButtonReturn:
-                // Continue button
-                break
-            default:
-                return
+            Task { @MainActor in
+                uiHandler.show(alertType: .appleIDSyncFailed, text: error.localizedDescription)
             }
         }
 
@@ -102,39 +98,28 @@ struct SubscriptionAppStoreRestorer {
 @available(macOS 12.0, *)
 extension SubscriptionAppStoreRestorer {
 
-    /*
-     WARNING: DUPLICATED CODE
-     This code will be moved as part of https://app.asana.com/0/0/1207157941206686/f
-     */
-
     // MARK: - UI interactions
 
     @MainActor
     func showSomethingWentWrongAlert() {
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
-        guard let window else { return }
-
-        window.show(.somethingWentWrongAlert())
+        uiHandler.show(alertType: .somethingWentWrong)
     }
 
     @MainActor
     func showSubscriptionNotFoundAlert() {
-        guard let window else { return }
-
-        window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
+        uiHandler.show(alertType: .subscriptionNotFound, firstButtonAction: {
             let url = subscriptionManager.url(for: .purchase)
-            WindowControllersManager.shared.showTab(with: .subscription(url))
+            uiHandler.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })
     }
 
     @MainActor
     func showSubscriptionInactiveAlert() {
-        guard let window else { return }
-
-        window.show(.subscriptionInactiveAlert(), firstButtonAction: {
+        uiHandler.show(alertType: .subscriptionInactive, firstButtonAction: {
             let url = subscriptionManager.url(for: .purchase)
-            WindowControllersManager.shared.showTab(with: .subscription(url))
+            uiHandler.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })
     }

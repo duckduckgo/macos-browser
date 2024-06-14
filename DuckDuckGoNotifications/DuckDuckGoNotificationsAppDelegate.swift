@@ -16,13 +16,13 @@
 //  limitations under the License.
 //
 
+import AppLauncher
 import Cocoa
 import Combine
 import Common
-import Networking
-import PixelKit
 import NetworkExtension
 import NetworkProtection
+import VPNAppLauncher
 
 @objc(Application)
 final class DuckDuckGoNotificationsApplication: NSApplication {
@@ -70,38 +70,6 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         os_log("Login item finished launching", log: .networkProtectionLoginItemLog, type: .info)
-
-        let dryRun: Bool
-
-#if DEBUG
-        dryRun = true
-#else
-        dryRun = false
-#endif
-
-        let pixelSource: String
-
-#if NETP_SYSTEM_EXTENSION
-        pixelSource = "vpnNotificationAgent"
-#else
-        pixelSource = "vpnNotificationAgentAppStore" // Should never get used, but just in case
-#endif
-
-        PixelKit.setUp(dryRun: dryRun,
-                       appVersion: AppVersion.shared.versionNumber,
-                       source: pixelSource,
-                       defaultHeaders: [:],
-                       defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
-
-            let url = URL.pixelUrl(forPixelNamed: pixelName)
-            let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
-            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
-            let request = APIRequest(configuration: configuration)
-
-            request.fetch { _, error in
-                onComplete(error == nil, error)
-            }
-        }
 
         startObservingVPNStatusChanges()
         os_log("Login item listening")
@@ -189,19 +157,5 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
         os_log("Presenting test notification", log: .networkProtection, type: .info)
         notificationsPresenter.showTestNotification()
     }
-
-}
-
-extension NSApplication {
-
-    enum RunType: Int, CustomStringConvertible {
-        case normal
-        var description: String {
-            switch self {
-            case .normal: return "normal"
-            }
-        }
-    }
-    static var runType: RunType { .normal }
 
 }

@@ -44,6 +44,7 @@ enum ErrorCategory: Equatable {
 public enum DataBrokerProtectionPixels {
     struct Consts {
         static let dataBrokerParamKey = "data_broker"
+        static let dataBrokerVersionKey = "broker_version"
         static let appVersionParamKey = "app_version"
         static let attemptIdParamKey = "attempt_id"
         static let durationParamKey = "duration"
@@ -70,6 +71,13 @@ public enum DataBrokerProtectionPixels {
         static let hasError = "has_error"
         static let brokerURL = "broker_url"
         static let sleepDuration = "sleep_duration"
+        static let numberOfRecordsFound = "num_found"
+        static let numberOfOptOutsInProgress = "num_inprogress"
+        static let numberOfSucessfulOptOuts = "num_optoutsuccess"
+        static let numberOfOptOutsFailure = "num_optoutfailure"
+        static let durationOfFirstOptOut = "duration_firstoptout"
+        static let numberOfNewRecordsFound = "num_new_found"
+        static let numberOfReappereances = "num_reappeared"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -96,7 +104,7 @@ public enum DataBrokerProtectionPixels {
     // Process Pixels
     case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double, tries: Int, emailPattern: String?)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double, brokerType: DataBrokerHierarchy)
-    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String, tries: Int, emailPattern: String?, actionID: String?)
+    case optOutFailure(dataBroker: String, dataBrokerVersion: String, attemptId: UUID, duration: Double, stage: String, tries: Int, emailPattern: String?, actionID: String?)
 
     // Backgrond Agent events
     case backgroundAgentStarted
@@ -130,8 +138,8 @@ public enum DataBrokerProtectionPixels {
 
     // Scan/Search pixels
     case scanSuccess(dataBroker: String, matchesFound: Int, duration: Double, tries: Int, isImmediateOperation: Bool)
-    case scanFailed(dataBroker: String, duration: Double, tries: Int, isImmediateOperation: Bool)
-    case scanError(dataBroker: String, duration: Double, category: String, details: String, isImmediateOperation: Bool)
+    case scanFailed(dataBroker: String, dataBrokerVersion: String, duration: Double, tries: Int, isImmediateOperation: Bool)
+    case scanError(dataBroker: String, dataBrokerVersion: String, duration: Double, category: String, details: String, isImmediateOperation: Bool)
 
     // KPIs - engagement
     case dailyActiveUser
@@ -171,6 +179,17 @@ public enum DataBrokerProtectionPixels {
     case entitlementCheckValid
     case entitlementCheckInvalid
     case entitlementCheckError
+
+    // Measure success/failure rate of Personal Information Removal Pixels
+    // https://app.asana.com/0/1204006570077678/1206889724879222/f
+    case globalMetricsWeeklyStats(profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int)
+    case globalMetricsMonthlyStats(profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int)
+    case dataBrokerMetricsWeeklyStats(dataBrokerURL: String, profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int, numberOfReappereances: Int)
+    case dataBrokerMetricsMonthlyStats(dataBrokerURL: String, profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int, numberOfReappereances: Int)
+
+    // Feature Gatekeeper
+    case gatekeeperNotAuthenticated
+    case gatekeeperEntitlementsInvalid
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -281,6 +300,15 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .entitlementCheckValid: return "m_mac_dbp_macos_entitlement_valid"
         case .entitlementCheckInvalid: return "m_mac_dbp_macos_entitlement_invalid"
         case .entitlementCheckError: return "m_mac_dbp_macos_entitlement_error"
+
+        case .globalMetricsWeeklyStats: return "m_mac_dbp_weekly_stats"
+        case .globalMetricsMonthlyStats: return "m_mac_dbp_monthly_stats"
+        case .dataBrokerMetricsWeeklyStats: return "m_mac_dbp_databroker_weekly_stats"
+        case .dataBrokerMetricsMonthlyStats: return "m_mac_dbp_databroker_monthly_stats"
+
+            // Feature Gatekeeper
+        case .gatekeeperNotAuthenticated: return "m_mac_dbp_gatekeeper_not_authenticated"
+        case .gatekeeperEntitlementsInvalid: return "m_mac_dbp_gatekeeper_entitlements_invalid"
         }
     }
 
@@ -333,8 +361,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return params
         case .optOutSuccess(let dataBroker, let attemptId, let duration, let type):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.isParent: String(type.rawValue)]
-        case .optOutFailure(let dataBroker, let attemptId, let duration, let stage, let tries, let pattern, let actionID):
-            var params = [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage, Consts.triesKey: String(tries)]
+        case .optOutFailure(let dataBroker, let dataBrokerVersion, let attemptId, let duration, let stage, let tries, let pattern, let actionID):
+            var params = [Consts.dataBrokerParamKey: dataBroker, Consts.dataBrokerVersionKey: dataBrokerVersion, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage, Consts.triesKey: String(tries)]
             if let pattern = pattern {
                 params[Consts.pattern] = pattern
             }
@@ -381,7 +409,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .secureVaultInitError,
                 .secureVaultKeyStoreReadError,
                 .secureVaultKeyStoreUpdateError,
-                .secureVaultError:
+                .secureVaultError,
+                .gatekeeperNotAuthenticated,
+                .gatekeeperEntitlementsInvalid:
             return [:]
         case .ipcServerProfileSavedCalledByApp,
                 .ipcServerProfileSavedReceivedByAgent,
@@ -399,10 +429,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.bundleIDParamKey: Bundle.main.bundleIdentifier ?? "nil"]
         case .scanSuccess(let dataBroker, let matchesFound, let duration, let tries, let isImmediateOperation):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.matchesFoundKey: String(matchesFound), Consts.durationParamKey: String(duration), Consts.triesKey: String(tries), Consts.isImmediateOperation: isImmediateOperation.description]
-        case .scanFailed(let dataBroker, let duration, let tries, let isImmediateOperation):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.triesKey: String(tries), Consts.isImmediateOperation: isImmediateOperation.description]
-        case .scanError(let dataBroker, let duration, let category, let details, let isImmediateOperation):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.errorCategoryKey: category, Consts.errorDetailsKey: details, Consts.isImmediateOperation: isImmediateOperation.description]
+        case .scanFailed(let dataBroker, let dataBrokerVersion, let duration, let tries, let isImmediateOperation):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.dataBrokerVersionKey: dataBrokerVersion, Consts.durationParamKey: String(duration), Consts.triesKey: String(tries), Consts.isImmediateOperation: isImmediateOperation.description]
+        case .scanError(let dataBroker, let dataBrokerVersion, let duration, let category, let details, let isImmediateOperation):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.dataBrokerVersionKey: dataBrokerVersion, Consts.durationParamKey: String(duration), Consts.errorCategoryKey: category, Consts.errorDetailsKey: details, Consts.isImmediateOperation: isImmediateOperation.description]
         case .generateEmailHTTPErrorDaily(let statusCode, let environment, let wasOnWaitlist):
             return [Consts.environmentKey: environment,
                     Consts.httpCode: String(statusCode),
@@ -419,6 +449,24 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL, Consts.sleepDuration: String(sleepDuration)]
         case .initialScanPreStartDuration(let duration):
             return [Consts.durationInMs: String(duration)]
+        case .globalMetricsWeeklyStats(let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound),
+                        .globalMetricsMonthlyStats(let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound):
+                    return [Consts.numberOfRecordsFound: String(profilesFound),
+                            Consts.numberOfOptOutsInProgress: String(optOutsInProgress),
+                            Consts.numberOfSucessfulOptOuts: String(successfulOptOuts),
+                            Consts.numberOfOptOutsFailure: String(failedOptOuts),
+                            Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
+                            Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound)]
+        case .dataBrokerMetricsWeeklyStats(let dataBrokerURL, let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound, let numberOfReappereances),
+                     .dataBrokerMetricsMonthlyStats(let dataBrokerURL, let profilesFound, let optOutsInProgress, let successfulOptOuts, let failedOptOuts, let durationOfFirstOptOut, let numberOfNewRecordsFound, let numberOfReappereances):
+                   return [Consts.dataBrokerParamKey: dataBrokerURL,
+                           Consts.numberOfRecordsFound: String(profilesFound),
+                           Consts.numberOfOptOutsInProgress: String(optOutsInProgress),
+                           Consts.numberOfSucessfulOptOuts: String(successfulOptOuts),
+                           Consts.numberOfOptOutsFailure: String(failedOptOuts),
+                           Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
+                           Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound),
+                           Consts.numberOfReappereances: String(numberOfReappereances)]
         }
     }
 }
@@ -498,7 +546,13 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .initialScanTotalDuration,
                     .initialScanSiteLoadDuration,
                     .initialScanPostLoadingDuration,
-                    .initialScanPreStartDuration:
+                    .initialScanPreStartDuration,
+                    .globalMetricsWeeklyStats,
+                    .globalMetricsMonthlyStats,
+                    .dataBrokerMetricsWeeklyStats,
+                    .dataBrokerMetricsMonthlyStats,
+                    .gatekeeperNotAuthenticated,
+                    .gatekeeperEntitlementsInvalid:
 
                 PixelKit.fire(event)
 

@@ -47,7 +47,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(isInstalled: false, visible: false)
         moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: passwordManagerCoordinator,
-                                   networkProtectionFeatureVisibility: networkProtectionVisibilityMock,
+                                   vpnFeatureGatekeeper: networkProtectionVisibilityMock,
                                    sharingMenu: NSMenu(),
                                    internalUserDecider: internalUserDecider,
                                    accountManager: accountManager)
@@ -68,7 +68,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     func testThatMoreOptionMenuHasTheExpectedItemsAuthenticated() {
         moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
-                                         networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
+                                         vpnFeatureGatekeeper: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
                                          sharingMenu: NSMenu(),
                                          internalUserDecider: internalUserDecider,
                                          accountManager: accountManager)
@@ -83,7 +83,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(moreOptionsMenu.items[7].isSeparatorItem)
         XCTAssertEqual(moreOptionsMenu.items[8].title, UserText.bookmarks)
         XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.downloads)
-        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagement)
+        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagementTitle)
         XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
         XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
 
@@ -100,7 +100,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         accountManager = AccountManagerMock(isUserAuthenticated: false)
         moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
-                                         networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
+                                         vpnFeatureGatekeeper: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
                                          sharingMenu: NSMenu(),
                                          internalUserDecider: internalUserDecider,
                                          accountManager: accountManager)
@@ -115,7 +115,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(moreOptionsMenu.items[7].isSeparatorItem)
         XCTAssertEqual(moreOptionsMenu.items[8].title, UserText.bookmarks)
         XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.downloads)
-        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagement)
+        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagementTitle)
         XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
         XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
 
@@ -164,7 +164,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
 }
 
-final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
+final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
 
     var onboardStatusPublisher: AnyPublisher<NetworkProtectionUI.OnboardingStatus, Never> {
         Just(.default).eraseToAnyPublisher()

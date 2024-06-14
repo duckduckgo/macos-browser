@@ -125,6 +125,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
         let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
         let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name,
+                                                                          dataBrokerVersion: brokerProfileQueryData.dataBroker.version,
                                                                           handler: pixelHandler,
                                                                           isImmediateOperation: isManual)
 
@@ -139,11 +140,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                 stageCalculator.fireScanSuccess(matchesFound: extractedProfiles.count)
                 let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound(count: extractedProfiles.count))
                 try database.add(event)
+                let extractedProfilesForBroker = try database.fetchExtractedProfiles(for: brokerId)
 
                 for extractedProfile in extractedProfiles {
 
                     // We check if the profile exists in the database.
-                    let extractedProfilesForBroker = try database.fetchExtractedProfiles(for: brokerId)
                     let doesProfileExistsInDatabase = extractedProfilesForBroker.contains { $0.identifier == extractedProfile.identifier }
 
                     // If the profile exists we do not create a new opt-out operation
@@ -293,7 +294,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         let retriesCalculatorUseCase = OperationRetriesCalculatorUseCase()
-        let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.url, handler: pixelHandler)
+        let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.url,
+                                                                                  dataBrokerVersion: brokerProfileQueryData.dataBroker.version,
+                                                                                  handler: pixelHandler)
         stageDurationCalculator.fireOptOutStart()
         os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 

@@ -93,7 +93,14 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .initialScanTotalDuration,
                     .initialScanSiteLoadDuration,
                     .initialScanPostLoadingDuration,
-                    .initialScanPreStartDuration:
+                    .initialScanPreStartDuration,
+                    .globalMetricsWeeklyStats,
+                    .globalMetricsMonthlyStats,
+                    .dataBrokerMetricsWeeklyStats,
+                    .dataBrokerMetricsMonthlyStats,
+                    .gatekeeperNotAuthenticated,
+                    .gatekeeperEntitlementsInvalid:
+
                 PixelKit.fire(event)
 
             case .homeViewShowNoPermissionError,

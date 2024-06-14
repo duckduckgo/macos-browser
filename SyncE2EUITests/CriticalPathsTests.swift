@@ -19,7 +19,25 @@
 import XCTest
 import JavaScriptCore
 
+extension XCUIElement {
+    /// Timeout constants for different test requirements
+    enum Timeouts {
+        /// Mostly, we use timeouts to wait for element existence. This is about 3x longer than needed, for CI resilience
+        static let elementExistence: Double = 5.0
+    }
+
+    @discardableResult
+    func assertExists(with timeout: TimeInterval = Timeouts.elementExistence) -> XCUIElement {
+        XCTAssertTrue(waitForExistence(timeout: timeout), "UI element didn't become available in a reasonable timeframe.")
+        return self
+    }
+}
+
 final class CriticalPathsTests: XCTestCase {
+
+    var isCI: Bool {
+        ProcessInfo.processInfo.environment["CI"] != nil
+    }
 
     var app: XCUIApplication!
     var debugMenuBarItem: XCUIElement!
@@ -33,43 +51,60 @@ final class CriticalPathsTests: XCTestCase {
         if app.windows.count == 0 {
             app.menuItems["newWindow:"].click()
         }
-        toggleInternalUserState()
+        selectDevelopmentEnvironment()
         cleanupAndResetData()
     }
 
     override func tearDown() {
-        toggleInternalUserState()
         cleanupAndResetData()
-        app.menuItems["closeAllWindows:"].click()
+        app.typeKey(",", modifierFlags: [.command, .option, .shift])
     }
 
     private func accessSettings() {
-        app.menuItems["openPreferences:"].click()
+        app.typeKey(",", modifierFlags: .command)
         let settingsWindow = app.windows["Settings"]
         XCTAssertTrue(settingsWindow.exists, "Settings window is not visible")
     }
 
-    private func toggleInternalUserState() {
+    private func selectDevelopmentEnvironment() {
         let menuBarsQuery = app.menuBars
         debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
         debugMenuBarItem.click()
-        internaluserstateMenuItem = menuBarsQuery.menuItems["internalUserState:"]
-        internaluserstateMenuItem.click()
+
+        let syncAndBackupMenuItem = menuBarsQuery.menuItems["MainMenu.syncAndBackup"]
+        syncAndBackupMenuItem.assertExists().hover()
+
+        let environmentMenuItem = syncAndBackupMenuItem.menuItems["SyncDebugMenu.environment"]
+        environmentMenuItem.assertExists().hover()
+
+        let currentEnvironmentMenuItem = syncAndBackupMenuItem.menuItems["SyncDebugMenu.currentEnvironment"]
+        currentEnvironmentMenuItem.assertExists()
+        if !currentEnvironmentMenuItem.title.contains("Development") {
+            let switchEnvironmentMenuItem = syncAndBackupMenuItem.menuItems["SyncDebugMenu.switchEnvironment"]
+            switchEnvironmentMenuItem.assertExists()
+            guard switchEnvironmentMenuItem.title == "Switch to Development" else {
+                XCTFail("Failed to switch to Development Sync environment")
+                return
+            }
+            switchEnvironmentMenuItem.click()
+        }
     }
 
     private func cleanupAndResetData() {
         let menuBarsQuery = app.menuBars
         debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
 
-        debugMenuBarItem.click()
+        debugMenuBarItem.assertExists().click()
         let resetDataMenuItem = menuBarsQuery.menuItems["MainMenu.resetData"]
-        resetDataMenuItem.hover()
+        resetDataMenuItem.assertExists().hover()
         let resetBookMarksData = resetDataMenuItem.menuItems["MainMenu.resetBookmarks"]
+        resetBookMarksData.assertExists().hover()
         resetBookMarksData.click()
 
         debugMenuBarItem.click()
-        resetDataMenuItem.hover()
+        resetDataMenuItem.assertExists().hover()
         let resetAutofillData = resetDataMenuItem.menuItems["MainMenu.resetSecureVaultData"]
+        resetAutofillData.assertExists().hover()
         resetAutofillData.click()
     }
 
@@ -221,10 +256,13 @@ final class CriticalPathsTests: XCTestCase {
         checkFavoriteNonUnified()
 
         // Remove Bookmarks
+        let settingsWindow = app.windows["Settings"]
+        settingsWindow.popUpButtons["Settings"].click()
+        settingsWindow.menuItems["Bookmarks"].click()
         bookmarksWindow.staticTexts["www.spreadprivacy.com"].rightClick()
-        bookmarksWindow.menus.menuItems["deleteBookmark:"].click()
+        bookmarksWindow.menus.menuItems["ContextualMenu.deleteBookmark"].click()
         bookmarksWindow.staticTexts["www.duckduckgo.com"].rightClick()
-        bookmarksWindow.menus.menuItems["deleteBookmark:"].click()
+        bookmarksWindow.menus.menuItems["ContextualMenu.deleteBookmark"].click()
 
         // Log In
         bookmarksWindow.splitGroups.children(matching: .popUpButton).element.click()
@@ -232,7 +270,6 @@ final class CriticalPathsTests: XCTestCase {
         logIn()
 
         // Toggle Unified Favorite
-        let settingsWindow = app.windows["Settings"]
         settingsWindow/*@START_MENU_TOKEN@*/.checkBoxes["Unify Favorites Across Devices"]/*[[".groups",".scrollViews.checkBoxes[\"Unify Favorites Across Devices\"]",".checkBoxes[\"Unify Favorites Across Devices\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.click()
 
         // Check Bookmarks
@@ -242,7 +279,7 @@ final class CriticalPathsTests: XCTestCase {
         checkUnifiedFavorites()
 
         // Check Logins
-        // checkLogins()
+        checkLogins()
     }
 
     private func logIn() {
@@ -275,29 +312,37 @@ final class CriticalPathsTests: XCTestCase {
     }
 
     private func addBookmarksAndFavorites() {
-        app.menuItems["showManageBookmarks:"].click()
+        app.menuItems["MainMenu.manageBookmarksMenuItem"].click()
         let bookmarksWindow = app.windows["Bookmarks"]
-        bookmarksWindow.buttons["  New Bookmark"].click()
+        let newBookmarkButton = bookmarksWindow.buttons["BookmarkManagementDetailViewController.newBookmarkButton"].assertExists()
+
+        newBookmarkButton.click()
+
         let sheetsQuery = app.windows["Bookmarks"].sheets
-        sheetsQuery.textFields["Title Text Field"].click()
-        sheetsQuery.textFields["Title Text Field"].typeText("www.duckduckgo.com")
-        sheetsQuery.textFields["URL Text Field"].click()
-        sheetsQuery.textFields["URL Text Field"].typeText("www.duckduckgo.com")
-        sheetsQuery.buttons["Add"].click()
-        bookmarksWindow.buttons["  New Bookmark"].click()
-        sheetsQuery.textFields["Title Text Field"].click()
-        sheetsQuery.textFields["Title Text Field"].typeText("www.spreadprivacy.com")
-        sheetsQuery.textFields["URL Text Field"].click()
-        sheetsQuery.textFields["URL Text Field"].typeText("www.spreadprivacy.com")
-        sheetsQuery.buttons["Add"].click()
-        bookmarksWindow.staticTexts["www.spreadprivacy.com"].rightClick()
-        bookmarksWindow.menuItems["toggleBookmarkAsFavorite:"].click()
+        let titleTextField = sheetsQuery.textFields["bookmark.add.name.textfield"].assertExists()
+        let urlTextField = sheetsQuery.textFields["bookmark.add.url.textfield"].assertExists()
+        let addButton = sheetsQuery.buttons["BookmarkDialogButtonsView.defaultButton"].assertExists()
+        let favoriteCheckBox = sheetsQuery.checkBoxes["bookmark.add.add.to.favorites.button"].assertExists()
+
+        titleTextField.click()
+        titleTextField.typeText("www.duckduckgo.com")
+        urlTextField.click()
+        urlTextField.typeText("www.duckduckgo.com")
+        addButton.click()
+
+        newBookmarkButton.click()
+        titleTextField.click()
+        titleTextField.typeText("www.spreadprivacy.com")
+        urlTextField.click()
+        urlTextField.typeText("www.spreadprivacy.com")
+        favoriteCheckBox.click()
+        addButton.click()
     }
 
     private func addLogin() {
         let bookmarksWindow = app.windows["Bookmarks"]
         bookmarksWindow.buttons["NavigationBarViewController.optionsButton"].click()
-        bookmarksWindow.menuItems["Autofill"].click()
+        bookmarksWindow.menuItems["MoreOptionsMenu.autofill"].click()
         bookmarksWindow.popovers.buttons["add item"].click()
         bookmarksWindow.popovers.menuItems["createNewLogin"].click()
         let usernameTextfieldTextField = bookmarksWindow.popovers.textFields["Username TextField"]
@@ -310,16 +355,13 @@ final class CriticalPathsTests: XCTestCase {
     }
 
     private func checkFavoriteNonUnified() {
-        let bookmarksWindow = app.windows["Bookmarks"]
-        let settingsWindow = app.windows["Settings"]
-        settingsWindow.popUpButtons["Settings"].click()
-        settingsWindow.menuItems["Bookmarks"].click()
-        bookmarksWindow.outlines.staticTexts["Favorites"].click()
-        let gitHub = bookmarksWindow.staticTexts["DuckDuckGo · GitHub"]
-        let spreadPrivacy = bookmarksWindow.staticTexts["www.spreadprivacy.com"]
+        app.typeKey("t", modifierFlags: [.command])
+        let newTabPage = app.windows["New Tab"]
+        let gitHub = newTabPage.staticTexts["DuckDuckGo · GitHub"]
+        let spreadPrivacy = newTabPage.staticTexts["www.spreadprivacy.com"]
         XCTAssertFalse(gitHub.exists)
         XCTAssertTrue(spreadPrivacy.exists)
-        bookmarksWindow.outlines.staticTexts["Bookmarks"].click()
+        app.typeKey("w", modifierFlags: [.command])
     }
 
     private func checkBookmarks() {
@@ -351,19 +393,20 @@ final class CriticalPathsTests: XCTestCase {
     }
 
     private func checkUnifiedFavorites() {
-        let bookmarksWindow = app.windows["Bookmarks"]
-        let gitHub = bookmarksWindow.staticTexts["DuckDuckGo · GitHub"]
-        let spreadPrivacy = bookmarksWindow.staticTexts["www.spreadprivacy.com"]
-        bookmarksWindow.outlines.staticTexts["Favorites"].click()
+        app.typeKey("t", modifierFlags: [.command])
+        let newTabPage = app.windows["New Tab"]
+        let gitHub = newTabPage.staticTexts["DuckDuckGo · GitHub"]
+        let spreadPrivacy = newTabPage.staticTexts["www.spreadprivacy.com"]
         XCTAssertTrue(gitHub.exists)
         XCTAssertTrue(spreadPrivacy.exists)
+        app.typeKey("w", modifierFlags: [.command])
     }
 
     private func checkLogins() {
-        let bookmarksWindow = app.windows["Bookmarks"]
-        bookmarksWindow.buttons["NavigationBarViewController.optionsButton"].click()
-        bookmarksWindow.menuItems["Autofill"].click()
-        let elementsQuery = bookmarksWindow.popovers.scrollViews.otherElements
+        let currentWindow = app.windows.firstMatch
+        app.buttons["NavigationBarViewController.optionsButton"].click()
+        app.menuItems["MoreOptionsMenu.autofill"].click()
+        let elementsQuery = currentWindow.popovers.scrollViews.otherElements
         elementsQuery.buttons["Da, Dax Login, daxthetest"].click()
         elementsQuery.buttons["Gi, Github, githubusername"].click()
         elementsQuery.buttons["My, mywebsite.com, mywebsite"].click()

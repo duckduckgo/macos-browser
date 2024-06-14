@@ -21,6 +21,8 @@ import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
+import PixelKit
+import UDSHelper
 
 /// Takes care of handling incoming IPC requests from clients that need to be relayed to the tunnel, and handling state
 /// changes that need to be relayed back to IPC clients.
@@ -32,16 +34,52 @@ final class TunnelControllerIPCService {
     private let tunnelController: NetworkProtectionTunnelController
     private let networkExtensionController: NetworkExtensionController
     private let uninstaller: VPNUninstalling
-    private let server: NetworkProtectionIPC.TunnelControllerIPCServer
+    private let server: NetworkProtectionIPC.VPNControllerXPCServer
     private let statusReporter: NetworkProtectionStatusReporter
     private var cancellables = Set<AnyCancellable>()
     private let defaults: UserDefaults
+    private let pixelKit: PixelKit?
+    private let udsServer: UDSServer
+
+    enum IPCError: SilentErrorConvertible {
+        case versionMismatched
+
+        var asSilentError: KnownFailure.SilentError? {
+            switch self {
+            case .versionMismatched: return .loginItemVersionMismatched
+            }
+        }
+    }
+
+    enum UDSError: PixelKitEventV2 {
+        case udsServerStartFailure(_ error: Error)
+
+        var name: String {
+            switch self {
+            case .udsServerStartFailure:
+                return "vpn_agent_uds_server_start_failure"
+            }
+        }
+
+        var error: Error? {
+            switch self {
+            case .udsServerStartFailure(let error):
+                return error
+            }
+        }
+
+        var parameters: [String: String]? {
+            return nil
+        }
+    }
 
     init(tunnelController: NetworkProtectionTunnelController,
          uninstaller: VPNUninstalling,
          networkExtensionController: NetworkExtensionController,
          statusReporter: NetworkProtectionStatusReporter,
-         defaults: UserDefaults = .netP) {
+         fileManager: FileManager = .default,
+         defaults: UserDefaults = .netP,
+         pixelKit: PixelKit? = .shared) {
 
         self.tunnelController = tunnelController
         self.uninstaller = uninstaller
@@ -49,10 +87,14 @@ final class TunnelControllerIPCService {
         server = .init(machServiceName: Bundle.main.bundleIdentifier!)
         self.statusReporter = statusReporter
         self.defaults = defaults
+        self.pixelKit = pixelKit
+
+        udsServer = UDSServer(socketFileURL: VPNIPCResources.socketFileURL, log: .networkProtectionIPCLog)
 
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
         subscribeToServerChanges()
+        subscribeToKnownFailureUpdates()
         subscribeToDataVolumeUpdates()
 
         server.serverDelegate = self
@@ -60,6 +102,23 @@ final class TunnelControllerIPCService {
 
     public func activate() {
         server.activate()
+
+        do {
+            try udsServer.start { [weak self] message in
+                guard let self else { return nil }
+
+                let command = try JSONDecoder().decode(VPNIPCClientCommand.self, from: message)
+
+                switch command {
+                case .uninstall(let component):
+                    try await uninstall(component)
+                    return nil
+                }
+            }
+        } catch {
+            pixelKit?.fire(UDSError.udsServerStartFailure(error))
+            assertionFailure(error.localizedDescription)
+        }
     }
 
     private func subscribeToErrorChanges() {
@@ -89,6 +148,15 @@ final class TunnelControllerIPCService {
             .store(in: &cancellables)
     }
 
+    private func subscribeToKnownFailureUpdates() {
+        statusReporter.knownFailureObserver.publisher
+            .subscribe(on: DispatchQueue.main)
+            .sink { [weak self] failure in
+                self?.server.knownFailureUpdated(failure)
+            }
+            .store(in: &cancellables)
+    }
+
     private func subscribeToDataVolumeUpdates() {
         statusReporter.dataVolumeObserver.publisher
             .subscribe(on: DispatchQueue.main)
@@ -101,11 +169,22 @@ final class TunnelControllerIPCService {
 
 // MARK: - Requests from the client
 
-extension TunnelControllerIPCService: IPCServerInterface {
+extension TunnelControllerIPCService: XPCServerInterface {
 
-    func register() {
+    func register(completion: @escaping (Error?) -> Void) {
+        register(version: version, bundlePath: bundlePath, completion: completion)
+    }
+
+    func register(version: String, bundlePath: String, completion: @escaping (Error?) -> Void) {
         server.serverInfoChanged(statusReporter.serverInfoObserver.recentValue)
         server.statusChanged(statusReporter.statusObserver.recentValue)
+        if self.version != version {
+            let error = TunnelControllerIPCService.IPCError.versionMismatched
+            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
+            completion(error)
+        } else {
+            completion(nil)
+        }
     }
 
     func start(completion: @escaping (Error?) -> Void) {
@@ -152,7 +231,7 @@ extension TunnelControllerIPCService: IPCServerInterface {
 
         switch command {
         case .removeSystemExtension:
-            try await uninstaller.removeSystemExtension()
+            try await uninstall(.systemExtension)
         case .expireRegistrationKey:
             // Intentional no-op: handled by the extension
             break
@@ -160,12 +239,45 @@ extension TunnelControllerIPCService: IPCServerInterface {
             // Intentional no-op: handled by the extension
             break
         case .removeVPNConfiguration:
-            try await uninstaller.removeVPNConfiguration()
+            try await uninstall(.configuration)
         case .uninstallVPN:
-            try await uninstaller.uninstall(includingSystemExtension: true)
+            try await uninstall(.all)
         case .disableConnectOnDemandAndShutDown:
             // Not implemented on macOS yet
             break
+        }
+    }
+
+    private func uninstall(_ component: VPNUninstallComponent) async throws {
+        switch component {
+        case .all:
+            try await uninstaller.uninstall(includingSystemExtension: true)
+        case .configuration:
+            try await uninstaller.removeVPNConfiguration()
+        case .systemExtension:
+            try await uninstaller.removeSystemExtension()
+        }
+    }
+}
+
+// MARK: - Error Handling
+
+extension TunnelControllerIPCService.IPCError: LocalizedError, CustomNSError {
+    var errorDescription: String? {
+        switch self {
+        case .versionMismatched: return "Login item version mismatched"
+        }
+    }
+
+    var errorCode: Int {
+        switch self {
+        case .versionMismatched: return 0
+        }
+    }
+
+    var errorUserInfo: [String: Any] {
+        switch self {
+        case .versionMismatched: return [:]
         }
     }
 }

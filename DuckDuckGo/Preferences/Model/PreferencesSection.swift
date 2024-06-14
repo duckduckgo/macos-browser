@@ -27,11 +27,9 @@ struct PreferencesSection: Hashable, Identifiable {
 
     @MainActor
     static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
-        var privacyPanes: [PreferencePaneIdentifier] = [.defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection]
-
-        if includingVPN {
-            privacyPanes.append(.vpn)
-        }
+        let privacyPanes: [PreferencePaneIdentifier] = [
+            .defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection
+        ]
 
         let regularPanes: [PreferencePaneIdentifier] = {
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .accessibility, .dataClearing]
@@ -70,7 +68,12 @@ struct PreferencesSection: Hashable, Identifiable {
             }
 
             if !shouldHidePrivacyProDueToNoProducts {
-                let subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
+                var subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
+
+                if includingVPN {
+                    subscriptionPanes.append(.vpn)
+                }
+
                 sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
             }
         }
@@ -170,7 +173,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIt
         case .subscription:
             return UserText.subscription
         case .autofill:
-            return UserText.autofill
+            return UserText.passwordManagementTitle
         case .accessibility:
             return UserText.accessibility
         case .duckPlayer:
