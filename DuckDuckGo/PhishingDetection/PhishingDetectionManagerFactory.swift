@@ -21,11 +21,11 @@ import PhishingDetection
 
 public class PhishingDetectionManagerFactory {
 
-    public static let revision = 1645868
+    public static let revision = 1646071
     private static let filterSetURL = Bundle.main.url(forResource: "filterSet", withExtension: "json")!
     private static let filterSetDataSHA = "c3127eb62e5655e46c177ebad399a4d7a616d4e6b655e71e6c336a9572a71dee"
     private static let hashPrefixURL = Bundle.main.url(forResource: "hashPrefixes", withExtension: "json")!
-    private static let hashPrefixDataSHA = "fc376b9c5345ad46b1c7eadfaa55a1d11167a2b10ee5457cb761a681388fe411"
+    private static let hashPrefixDataSHA = "1623184273842d8210891774cf51c44a710f569a34955aa4bcfca1b7a24e0d4b"
 
     public static func create() -> PhishingDetectionManager {
         let detectionClient = PhishingDetectionAPIClient()
