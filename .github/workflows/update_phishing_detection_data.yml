@@ -5,10 +5,10 @@ jobs:
   check_secrets:
     runs-on: ubuntu-latest
     steps:
-      - name: Check if secrets.GITHUB_TOKEN exists
+      - name: Check if secrets.DAX_MACOS_BROWSER_PHISHING_AUTOMATION exists
         run: |
-          if [ -z "${{ secrets.GITHUB_TOKEN }}" ]; then
-            echo "secrets.GITHUB_TOKEN does not exist"
+          if [ -z "${{ secrets.DAX_MACOS_BROWSER_PHISHING_AUTOMATION }}" ]; then
+            echo "secrets.DAX_MACOS_BROWSER_PHISHING_AUTOMATION does not exist"
             exit 1
           fi
   update_data:
@@ -19,7 +19,7 @@ jobs:
         with:
           repository: duckduckgo/macos-browser
           path: macos/
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.DAX_MACOS_BROWSER_PHISHING_AUTOMATION }}
       - name: Execute Update Script
         run: |
           REVISION="$(bash ./scripts/update_phishing_detection_data.sh | grep -oP 'Updated revision from \K\d+')"
@@ -44,6 +44,6 @@ jobs:
           branch: update-phishing-protection-$REVISION
           title: Update phishing protection datasets to $REVISION
           body: "${{ env.PR_BODY_MACOS }}"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.DAX_MACOS_BROWSER_PHISHING_AUTOMATION }}
 
       
