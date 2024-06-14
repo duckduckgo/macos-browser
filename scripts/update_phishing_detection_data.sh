@@ -3,7 +3,7 @@
 #
 ## The following URLs shall match the one in the client.
 ## Danger checks that the URLs match on every PR. If the code changes, the regex that Danger uses may need an update.
-API_URL="http://localhost:3000"
+API_URL="https://hugely-divine-toucan.ngrok-free.app"
 API_STAGING_URL="https://tbd.unknown.duckduckgo.com"
 
 temp_filename="phishing_data_new_file"
