@@ -25,8 +25,8 @@ jobs:
         with:
           path: macos/
           add-paths: |
-            ./DuckDuckGo/PhishingDetection/
-          commit-message: Update phishing detection data to revision ${{ env.REVISION }}
-          branch: update-phishing-protection-${{ env.REVISION }}
-          title: Update phishing protection datasets to ${{ env.REVISION }}
+            ./macos/DuckDuckGo/PhishingDetection/
+          commit-message: "Update phishing detection data to revision ${{ env.REVISION }}"
+          branch: "update-phishing-protection-${{ env.REVISION }}"
+          title: "Update phishing protection datasets to ${{ env.REVISION }}"
           body: "${{ env.PR_BODY_MACOS }}"
