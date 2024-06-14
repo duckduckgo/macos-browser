@@ -1147,7 +1147,6 @@ extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingHasFinished() {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: false)
-        tabCollectionViewModel.selectedTab?.setContent(.url(URL.duckDuckGo, credential: nil, source: .webViewUpdated))
     }
 
 }
