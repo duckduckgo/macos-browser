@@ -87,10 +87,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    private var accountManager: AccountManaging {
-        subscriptionManager.accountManager
-    }
     public let subscriptionManager: SubscriptionManaging
+    public let subscriptionUIHandler: SubscriptionUIHandling
+
     public let vpnSettings = VPNSettings(defaults: .netP)
 
     // MARK: - VPN
@@ -126,7 +125,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         return VPNRedditSessionWorkaround(
-            accountManager: accountManager,
+            accountManager: subscriptionManager.accountManager,
             ipcClient: ipcClient,
             statusReporter: statusReporter
         )
@@ -220,6 +219,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Configure Subscription
         subscriptionManager = SubscriptionManager()
+        subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
+            return WindowControllersManager.shared
+        })
 
         // Update VPN environment and match the Subscription environment
         vpnSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
@@ -339,7 +341,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         networkProtectionSubscriptionEventHandler?.registerForSubscriptionAccountManagerEvents()
 
-        NetworkProtectionAppEvents(featureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager)).applicationDidFinishLaunching()
+        NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 
 #if DBP
@@ -347,7 +349,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
 #if DBP
-        DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
+        DataBrokerProtectionAppEvents(featureGatekeeper: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: subscriptionManager.accountManager)).applicationDidFinishLaunching()
 #endif
 
         setUpAutoClearHandler()
@@ -375,9 +377,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
-        NetworkProtectionAppEvents(featureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
+        NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 #if DBP
-        DataBrokerProtectionAppEvents().applicationDidBecomeActive()
+        DataBrokerProtectionAppEvents(featureGatekeeper:
+                                        DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
+                                                                                        subscriptionManager.accountManager)).applicationDidBecomeActive()
 #endif
 
         AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
@@ -677,17 +681,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
-        if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
-
-#if DBP
-            if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
-                DispatchQueue.main.async {
-                    DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .localPush)
-                }
-            }
-#endif
-        }
-
         completionHandler()
     }
 

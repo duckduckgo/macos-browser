@@ -125,6 +125,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
         let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
         let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name,
+                                                                          dataBrokerVersion: brokerProfileQueryData.dataBroker.version,
                                                                           handler: pixelHandler,
                                                                           isImmediateOperation: isManual)
 
@@ -293,7 +294,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         let retriesCalculatorUseCase = OperationRetriesCalculatorUseCase()
-        let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.url, handler: pixelHandler)
+        let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.url,
+                                                                                  dataBrokerVersion: brokerProfileQueryData.dataBroker.version,
+                                                                                  handler: pixelHandler)
         stageDurationCalculator.fireOptOutStart()
         os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
