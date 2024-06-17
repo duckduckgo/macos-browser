@@ -127,8 +127,7 @@ jobs:
 
     - name: Start Node.js Server
       run: |
-          cd fake-broker
-          node app.js
+          node ./fake-broker/app.js
 
     - name: Check out the code
       if: github.event_name == 'pull_request' || github.event_name == 'push'
