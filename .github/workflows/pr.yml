@@ -117,9 +117,10 @@ jobs:
 
     steps:
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
-        node-version: '15'
+        node-version: "14.17.3"
+        architecture: 'x64'
 
     - name: Install Dependencies
       run: npm install
