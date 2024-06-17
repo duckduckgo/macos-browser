@@ -59,10 +59,6 @@ extension WKWebViewConfiguration {
             }
         }
 
-//        if urlSchemeHandler(forURLScheme: "duck") == nil {
-//            setURLSchemeHandler(OnboardingSchemeHandler(), forURLScheme: "duck")
-//        }
-
         let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
                                                           privacyConfigurationManager: contentBlocking.privacyConfigurationManager)
 
