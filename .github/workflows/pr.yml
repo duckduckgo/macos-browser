@@ -127,6 +127,7 @@ jobs:
 
     - name: Start Node.js Server
       run: |
+          ls -la
           node ./fake-broker/app.js
 
     - name: Check out the code
