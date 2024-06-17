@@ -50,21 +50,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         configureUpdater()
     }
 
-    func checkForUpdates(_ sender: Any!) {
-        if !SupportedOSChecker.isCurrentOSReceivingUpdates {
-            showNotSupportedInfo()
-        }
-
-        NSApp.windows.forEach {
-            if let controller = $0.windowController, "\(type(of: controller))" == "SUUpdateAlert" {
-                $0.orderFrontRegardless()
-                $0.makeKey()
-                $0.makeMain()
-            }
-        }
-        updater.checkForUpdates(sender)
-    }
-
     func checkNewApplicationVersion() {
         let updateStatus = UpdateDetector.isApplicationUpdated()
         switch updateStatus {
@@ -126,13 +111,13 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
         updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
         updater.updater.checkForUpdatesInBackground()
+
+        //TODO: - REMOVE
+//        notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Relaunch to update.")
     }
 
     private func showNotSupportedInfo() {
-        if NSAlert.osNotSupported().runModal() != .cancel {
-            let url = Preferences.UnsupportedDeviceInfoBox.softwareUpdateURL
-            NSWorkspace.shared.open(url)
-        }
+
     }
 
     @objc func openUpdatesPage() {
