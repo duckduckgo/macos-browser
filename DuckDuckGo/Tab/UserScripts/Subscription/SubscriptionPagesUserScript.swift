@@ -89,9 +89,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     public init(subscriptionManager: SubscriptionManaging,
                 subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler(),
+                stripePurchaseFlow: StripePurchaseFlowing,
                 uiHandler: SubscriptionUIHandling) {
         self.subscriptionManager = subscriptionManager
-        self.stripePurchaseFlow = StripePurchaseFlow(subscriptionManager: subscriptionManager)
+        self.stripePurchaseFlow = stripePurchaseFlow
         self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
         self.uiHandler = uiHandler
     }
@@ -250,7 +251,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 let emailAccessToken = try? EmailManager().getToken()
                 let purchaseTransactionJWS: String
-                let appStorePurchaseFlow = AppStorePurchaseFlow(subscriptionManager: subscriptionManager)
+                let appStorePurchaseFlow = AppStorePurchaseFlow(subscriptionManager: subscriptionManager,
+                                                                appStoreRestoreFlow: AppStoreRestoreFlow(subscriptionManager: subscriptionManager))
 
                 os_log(.info, log: .subscription, "[Purchase] Purchasing")
                 switch await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {

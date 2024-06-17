@@ -247,7 +247,8 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             let storePurchaseManager = StorePurchaseManager()
-            let appStorePurchaseFlow = AppStorePurchaseFlow(subscriptionManager: subscriptionManager)
+            let appStorePurchaseFlow = AppStorePurchaseFlow(subscriptionManager: subscriptionManager,
+                                                            appStoreRestoreFlow: AppStoreRestoreFlow(subscriptionManager: subscriptionManager))
             let vc = DebugPurchaseViewController(storePurchaseManager: storePurchaseManager, appStorePurchaseFlow: appStorePurchaseFlow)
             currentViewController()?.presentAsSheet(vc)
         }
