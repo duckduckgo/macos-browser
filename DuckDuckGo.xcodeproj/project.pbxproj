@@ -1472,8 +1472,6 @@
 		56A054172C1C37B0007D8FAB /* CapturingOnboardingNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054152C1C37B0007D8FAB /* CapturingOnboardingNavigationDelegate.swift */; };
 		56A0541F2C1CA1F5007D8FAB /* OnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0541E2C1CA1F5007D8FAB /* OnboardingTabExtension.swift */; };
 		56A054202C1CA1F5007D8FAB /* OnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0541E2C1CA1F5007D8FAB /* OnboardingTabExtension.swift */; };
-		56A054222C201017007D8FAB /* OnboardingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054212C201017007D8FAB /* OnboardingUserScript.swift */; };
-		56A054232C201017007D8FAB /* OnboardingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054212C201017007D8FAB /* OnboardingUserScript.swift */; };
 		56A054282C201D04007D8FAB /* MockSchemeTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054252C201D00007D8FAB /* MockSchemeTask.swift */; };
 		56A054292C201D05007D8FAB /* MockSchemeTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054252C201D00007D8FAB /* MockSchemeTask.swift */; };
 		56A0542D2C201DA8007D8FAB /* MockContentBlocking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0542A2C201D64007D8FAB /* MockContentBlocking.swift */; };
@@ -3382,7 +3380,6 @@
 		56A054122C1C3796007D8FAB /* CapturingDockCustomizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingDockCustomizer.swift; sourceTree = "<group>"; };
 		56A054152C1C37B0007D8FAB /* CapturingOnboardingNavigationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingOnboardingNavigationDelegate.swift; sourceTree = "<group>"; };
 		56A0541E2C1CA1F5007D8FAB /* OnboardingTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTabExtension.swift; sourceTree = "<group>"; };
-		56A054212C201017007D8FAB /* OnboardingUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingUserScript.swift; sourceTree = "<group>"; };
 		56A054252C201D00007D8FAB /* MockSchemeTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSchemeTask.swift; sourceTree = "<group>"; };
 		56A0542A2C201D64007D8FAB /* MockContentBlocking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockContentBlocking.swift; sourceTree = "<group>"; };
 		56A0542F2C2043C8007D8FAB /* OnboardingTabExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTabExtensionTests.swift; sourceTree = "<group>"; };
@@ -6252,7 +6249,6 @@
 				56A053FB2C19E8F7007D8FAB /* OnboardingActionsManager.swift */,
 				56A054012C1AFA5D007D8FAB /* OnboardingConfiguration.swift */,
 				56A0541E2C1CA1F5007D8FAB /* OnboardingTabExtension.swift */,
-				56A054212C201017007D8FAB /* OnboardingUserScript.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -9699,7 +9695,6 @@
 				3706FABA293F65D500E42796 /* BookmarkOutlineViewDataSource.swift in Sources */,
 				3706FABB293F65D500E42796 /* PasswordManagementBitwardenItemView.swift in Sources */,
 				1D220BF92B86192200F8BBC6 /* PreferencesEmailProtectionView.swift in Sources */,
-				56A054232C201017007D8FAB /* OnboardingUserScript.swift in Sources */,
 				9FA173E42B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift in Sources */,
 				3706FABD293F65D500E42796 /* NSNotificationName+PasswordManager.swift in Sources */,
 				3706FABE293F65D500E42796 /* RulesCompilationMonitor.swift in Sources */,
@@ -11111,7 +11106,6 @@
 				4B41EDAE2B168AFF001EEDF4 /* VPNFeedbackFormViewController.swift in Sources */,
 				AA5FA697275F90C400DCE9C9 /* FaviconImageCache.swift in Sources */,
 				1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */,
-				56A054222C201017007D8FAB /* OnboardingUserScript.swift in Sources */,
 				B62B483E2ADE48DE000DECE5 /* ArrayBuilder.swift in Sources */,
 				4B92929B26670D2A00AD2C21 /* BookmarkOutlineViewDataSource.swift in Sources */,
 				56D145EB29E6C99B00E3488A /* DataImportStatusProviding.swift in Sources */,
