@@ -22,16 +22,10 @@ import Navigation
 final class OnboardingTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        if navigationAction.url.isOnboardingScheme {
+        if navigationAction.url.isOnboarding {
             return .allow
         }
         return .next
-    }
-}
-
-extension URL {
-    var isOnboardingScheme: Bool {
-        scheme == "onboarding"
     }
 }
 

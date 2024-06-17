@@ -34,7 +34,7 @@ final class OnboardingPageTests: XCTestCase {
     }
     var tab: Tab!
 
-    @MainActor 
+    @MainActor
     override func setUp() {
         super.setUp()
         webViewConfiguration = WKWebViewConfiguration()
@@ -60,7 +60,7 @@ final class OnboardingPageTests: XCTestCase {
 
         // When
         let eOnboardingPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
-        tab.setContent(.url(URL(string: "onboarding://?platform=integration")!, credential: nil, source: .ui))
+        tab.setContent(.url(URL(string: "duck://onboarding?platform=integration")!, credential: nil, source: .ui))
         try await eOnboardingPageLoaded.value
 
         // Then
@@ -69,7 +69,6 @@ final class OnboardingPageTests: XCTestCase {
             XCTAssertNil(error)
             XCTAssertTrue(htmlContent?.contains("welcome") ?? false)
         }
-        print(tab.webView)
         XCTAssertEqual(tab.title, "Welcome")
         XCTAssertEqual(tabViewModel.title, "Welcome")
     }

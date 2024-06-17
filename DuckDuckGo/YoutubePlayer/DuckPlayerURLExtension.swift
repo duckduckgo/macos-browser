@@ -67,6 +67,10 @@ extension URL {
         }
     }
 
+    var isOnboarding: Bool {
+        return isDuckURLScheme && host == "onboarding"
+    }
+
     /// Returns true only if the URL represents a playlist itself, i.e. doesn't have `index` query parameter
     var isYoutubePlaylist: Bool {
         guard isYoutubeWatch, let components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
