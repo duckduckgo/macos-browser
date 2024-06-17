@@ -125,11 +125,6 @@ jobs:
     - name: Install Dependencies
       run: npm install
 
-    - name: Start Node.js Server
-      run: |
-          ls -la
-          node ./fake-broker/app.js
-
     - name: Check out the code
       if: github.event_name == 'pull_request' || github.event_name == 'push'
       uses: actions/checkout@v4
@@ -142,6 +137,12 @@ jobs:
       with:
         submodules: recursive
         ref: ${{ inputs.branch || github.ref_name }}
+
+    - name: Start Node.js Server
+      run: |
+        ls -la
+        node ./fake-broker/app.js
+
 
     - name: Set cache key hash
       run: |
