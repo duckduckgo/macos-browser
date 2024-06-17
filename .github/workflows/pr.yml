@@ -141,7 +141,9 @@ jobs:
     - name: Start Node.js Server
       run: |
         ls -la
-        node ./fake-broker/app.js
+        cd fake-broker
+        npm install express
+        node app.js
 
 
     - name: Set cache key hash
