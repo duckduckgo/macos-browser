@@ -37,22 +37,40 @@ final class FakeBrokerCITest: XCTestCase {
     }
 
     func testGetRequest() async {
-            let url = URL(string: "http://localhost:3000/")!
+        let url = URL(string: "http://localhost:3000/")!
 
-            do {
-                let (data, response) = try await URLSession.shared.data(from: url)
-                guard let httpResponse = response as? HTTPURLResponse else {
-                    XCTFail("Invalid response type")
-                    return
-                }
-
-                XCTAssertEqual(httpResponse.statusCode, 200, "Status code is not 200")
-
-                // Perform additional response validation here if needed
-            } catch {
-                XCTFail("Error: \(error.localizedDescription)")
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                XCTFail("Invalid response type")
+                return
             }
+
+            XCTAssertEqual(httpResponse.statusCode, 200, "Status code is not 200")
+
+            // Perform additional response validation here if needed
+        } catch {
+            XCTFail("Error: \(error.localizedDescription)")
         }
+    }
+
+    func testGetRequestFail() async {
+        let url = URL(string: "http://localhostFail:3000/")!
+
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                XCTFail("Invalid response type")
+                return
+            }
+
+            XCTAssertEqual(httpResponse.statusCode, 200, "Status code is not 200")
+
+            // Perform additional response validation here if needed
+        } catch {
+            XCTFail("Error: \(error.localizedDescription)")
+        }
+    }
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
