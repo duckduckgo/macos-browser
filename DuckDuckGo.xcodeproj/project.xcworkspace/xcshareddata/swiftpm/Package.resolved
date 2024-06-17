@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "daniel/duckplayer.pip.subfeature",
-        "revision" : "dfac22c6048b3d0cdda799b1b6e7b6919f24b686"
+        "revision" : "e9e239fe5dfeab87dcacbf5a31c8f555623a4ce2",
+        "version" : "156.0.0"
       }
     },
     {
