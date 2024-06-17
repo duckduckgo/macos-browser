@@ -137,11 +137,11 @@ class AutocompleteTests: XCTestCase {
             "The enclosing cell for the suggestion cell for the website didn't become available in a reasonable timeframe. If this is unexpected, it could be due to a significant change in the layout of this interface."
         )
 
-        // And that should be a website suggestion
+        // And that should be a search suggestion (not website)
         XCTAssertEqual(
             containerCellForWebsiteSuggestion.images.firstMatch.label,
-            "Web",
-            "Although the suggestion was found, it didn't have the \"Web\" image next to it in suggestions."
+            "Search",
+            "Although the suggestion was found, it didn't have the \"Search\" image next to it in suggestions."
         )
     }
 }

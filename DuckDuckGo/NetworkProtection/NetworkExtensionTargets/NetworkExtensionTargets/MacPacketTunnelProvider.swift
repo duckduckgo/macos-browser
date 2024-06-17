@@ -115,6 +115,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionWireguardErrorCannotStartWireguardBackend(code: code)
             case .noAuthTokenFound:
                 domainEvent = .networkProtectionNoAuthTokenFoundError
+            case .failedToFetchServerStatus(let error):
+                domainEvent = .networkProtectionClientFailedToFetchServerStatus(error)
+            case .failedToParseServerStatusResponse(let error):
+                domainEvent = .networkProtectionClientFailedToParseServerStatusResponse(error)
             case .unhandledError(function: let function, line: let line, error: let error):
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             case .failedToRetrieveAuthToken,
@@ -311,6 +315,24 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     frequency: .dailyAndCount,
                     includeAppVersionParameter: true
                 )
+            }
+        case .serverMigrationAttempt(let step):
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionServerMigrationAttempt,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionServerMigrationFailure(error),
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionServerMigrationSuccess,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
             }
         }
     }

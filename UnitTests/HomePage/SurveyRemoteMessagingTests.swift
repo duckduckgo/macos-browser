@@ -85,6 +85,36 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         XCTAssertTrue(request.didFetchMessages)
     }
 
+    func testWhenFetchingRemoteMessages_AndPurchasePlatformDoesNotMatch_ThenMessagesAreNotStored() async {
+        let request = MockNetworkProtectionRemoteMessagingRequest()
+        let storage = MockSurveyRemoteMessagingStorage()
+        let activationDateStorage = MockWaitlistActivationDateStore()
+
+        let messages = [mockMessage(id: "123", purchasePlatform: "stripe")]
+
+        request.result = .success(messages)
+        activationDateStorage._daysSinceActivation = 10
+
+        let messaging = DefaultSurveyRemoteMessaging(
+            messageRequest: request,
+            messageStorage: storage,
+            accountManager: accountManager,
+            subscriptionFetcher: subscriptionFetcher,
+            vpnActivationDateStore: activationDateStorage,
+            pirActivationDateStore: activationDateStorage,
+            minimumRefreshInterval: 0,
+            userDefaults: defaults
+        )
+
+        XCTAssertEqual(storage.storedMessages(), [])
+        XCTAssertNotNil(activationDateStorage.daysSinceActivation())
+
+        await messaging.fetchRemoteMessages()
+
+        XCTAssertTrue(request.didFetchMessages)
+        XCTAssertEqual(storage.storedMessages(), [])
+    }
+
     func testWhenFetchingRemoteMessages_AndWaitlistUserHasActivatedNetP_ThenMessagesAreFetched_AndMessagesAreStored() async {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         let storage = MockSurveyRemoteMessagingStorage()
@@ -199,7 +229,8 @@ final class SurveyRemoteMessagingTests: XCTestCase {
                              minimumDaysSinceSubscriptionStarted: Int = 0,
                              maximumDaysUntilSubscriptionExpirationOrRenewal: Int = 0,
                              daysSinceVPNEnabled: Int = 0,
-                             daysSincePIREnabled: Int = 0) -> SurveyRemoteMessage {
+                             daysSincePIREnabled: Int = 0,
+                             purchasePlatform: String = "apple") -> SurveyRemoteMessage {
         let remoteMessageJSON = """
         {
             "id": "\(id)",
@@ -210,7 +241,9 @@ final class SurveyRemoteMessagingTests: XCTestCase {
                     "minimumDaysSinceSubscriptionStarted": \(minimumDaysSinceSubscriptionStarted),
                     "maximumDaysUntilSubscriptionExpirationOrRenewal": \(maximumDaysUntilSubscriptionExpirationOrRenewal),
                     "daysSinceVPNEnabled": \(daysSinceVPNEnabled),
-                    "daysSincePIREnabled": \(daysSincePIREnabled)
+                    "daysSincePIREnabled": \(daysSincePIREnabled),
+                    "sparkleSubscriptionPurchasePlatforms": ["\(purchasePlatform)"],
+                    "appStoreSubscriptionPurchasePlatforms": ["\(purchasePlatform)"]
             },
             "action": {
                 "actionTitle": "Action 1"
