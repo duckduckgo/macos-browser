@@ -9,7 +9,9 @@
             "minimumDaysSinceSubscriptionStarted": 1,
             "maximumDaysUntilSubscriptionExpirationOrRenewal": 30,
             "daysSinceVPNEnabled": 2,
-            "daysSincePIREnabled": 3
+            "daysSincePIREnabled": 3,
+            "sparkleSubscriptionPurchasePlatforms": ["stripe"],
+            "appStoreSubscriptionPurchasePlatforms": ["stripe"]
         },
         "action": {
             "actionTitle": "Action 1",

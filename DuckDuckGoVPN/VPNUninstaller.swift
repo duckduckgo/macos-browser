@@ -48,7 +48,7 @@ final class VPNUninstaller: VPNUninstalling {
     }
 
     func uninstall(includingSystemExtension: Bool) async throws {
-        pixelKit?.fire(VPNUninstallAttempt.begin)
+        pixelKit?.fire(VPNUninstallAttempt.begin, frequency: .dailyAndCount)
 
         do {
             try await removeSystemExtension()

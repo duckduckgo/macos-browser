@@ -509,7 +509,7 @@ extension SubscriptionPagesUseSubscriptionFeature {
 
     @MainActor
     func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) {
-        uiHandler.show(alertType: .subscriptionInactive, firstButtonAction: {
+        uiHandler.show(alertType: .subscriptionFound, firstButtonAction: {
             if #available(macOS 12.0, *) {
                 Task {
                     let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: self.subscriptionManager)
