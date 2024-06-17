@@ -115,6 +115,7 @@ final class DuckPlayer {
     ) {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
+        isPiPFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
         mode = preferences.duckPlayerMode
         bindDuckPlayerModeIfNeeded()
 
@@ -202,7 +203,14 @@ final class DuckPlayer {
 
     @MainActor
     private func encodedSettings(with webView: WKWebView?) async -> InitialSetupSettings {
-        let isPiPEnabled = webView?.configuration.allowsPictureInPictureMediaPlayback == true
+        var isPiPEnabled = webView?.configuration.allowsPictureInPictureMediaPlayback == true
+
+        // Disable WebView PiP if if the subFeature is off
+        if !isPiPFeatureEnabled {
+            webView?.configuration.allowsPictureInPictureMediaPlayback = false
+            isPiPEnabled = false
+        }
+
         let pip = InitialSetupSettings.PIP(status: isPiPEnabled ? .enabled : .disabled)
 
         let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip)
@@ -223,6 +231,7 @@ final class DuckPlayer {
     }
     private var modeCancellable: AnyCancellable?
     private var isFeatureEnabledCancellable: AnyCancellable?
+    private var isPiPFeatureEnabled: Bool
 
     private func bindDuckPlayerModeIfNeeded() {
         if isFeatureEnabled {
