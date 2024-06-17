@@ -82,7 +82,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     var accountManager: AccountManaging { subscriptionManager.accountManager }
     var subscriptionPlatform: SubscriptionEnvironment.PurchasePlatform { subscriptionManager.currentEnvironment.purchasePlatform }
 
-    let stripePurchaseFlow: StripePurchaseFlow
+    let stripePurchaseFlow: StripePurchaseFlowing
     let subscriptionErrorReporter = SubscriptionErrorReporter()
     let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
     let uiHandler: SubscriptionUIHandling
