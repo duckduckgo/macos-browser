@@ -43,7 +43,7 @@ final class UpdateNotificationPresenter {
         notificationWindow.contentView = hostingController.view
 
         let screenFrame = NSScreen.main!.frame
-        notificationWindow.setFrameOrigin(NSPoint(x: screenFrame.width - notificationSize.width, y: screenFrame.height - notificationSize.height - 150))
+        notificationWindow.setFrameOrigin(NSPoint(x: screenFrame.width - notificationSize.width, y: screenFrame.height - notificationSize.height - 140))
 
         self.notificationWindow = notificationWindow
 
