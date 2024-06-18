@@ -236,11 +236,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func syncAppleIDAccount() {
         Task { @MainActor in
-            do {
-                try await purchaseManager.syncAppleIDAccount()
-            } catch {
-                self.showAlert(title: "Error", message: error.localizedDescription)
-            }
+            try? await purchaseManager.syncAppleIDAccount()
         }
     }
 
