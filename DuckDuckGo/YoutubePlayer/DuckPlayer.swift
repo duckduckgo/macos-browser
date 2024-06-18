@@ -202,7 +202,7 @@ final class DuckPlayer {
 
     @MainActor
     private func encodedSettings(with webView: WKWebView?) async -> InitialSetupSettings {
-        let isPiPEnabled = webView?.configuration.allowsPictureInPictureMediaPlayback == true
+        let isPiPEnabled = webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] == true
         let pip = InitialSetupSettings.PIP(status: isPiPEnabled ? .enabled : .disabled)
 
         let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip)

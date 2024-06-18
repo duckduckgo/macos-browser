@@ -48,6 +48,7 @@ final class MainWindowController: NSWindowController {
         self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
         if mainViewController.isBurner {
             // Fire Window: disable screen capture / screenshot taking
+            // !!! Must be set before calling windowController.initWithWindow: !!!
             window.sharingType = .none
         }
         super.init(window: window)

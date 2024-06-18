@@ -122,15 +122,18 @@ final class WindowsManager {
         openNewWindow(with: Tab(content: .contentFromURL(initialUrl, source: source), parentTab: parentTab, shouldLoadInBackground: true, burnerMode: BurnerMode(isBurner: isBurner)))
     }
 
-    class func openNewWindow(with tabCollection: TabCollection, isBurner: Bool, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
+    @discardableResult
+    class func openNewWindow(with tabCollection: TabCollection, isBurner: Bool, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) -> NSWindow? {
         let burnerMode = BurnerMode(isBurner: isBurner)
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, burnerMode: burnerMode)
-        openNewWindow(with: tabCollectionViewModel,
-                      burnerMode: burnerMode,
-                      droppingPoint: droppingPoint,
-                      contentSize: contentSize,
-                      popUp: popUp)
-        tabCollectionViewModel.setUpLazyLoadingIfNeeded()
+        defer {
+            tabCollectionViewModel.setUpLazyLoadingIfNeeded()
+        }
+        return openNewWindow(with: tabCollectionViewModel,
+                             burnerMode: burnerMode,
+                             droppingPoint: droppingPoint,
+                             contentSize: contentSize,
+                             popUp: popUp)
     }
 
     private static let defaultPopUpWidth: CGFloat = 1024
