@@ -76,7 +76,7 @@ final class TabViewModel {
     @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
 
     let zoomLevelSubject = PassthroughSubject<DefaultZoomValue, Never>()
-    private (set) var zoomLevel: DefaultZoomValue = .percent100 {
+    private(set) var zoomLevel: DefaultZoomValue = .percent100 {
         didSet {
             self.tab.webView.zoomLevel = zoomLevel
             if oldValue != zoomLevel {

@@ -20,7 +20,8 @@ let package = Package(
             name: "SubscriptionUI",
             dependencies: [
                 .product(name: "Subscription", package: "BrowserServicesKit"),
-                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
+                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
+                .product(name: "PreferencesViews", package: "SwiftUIExtensions"),
             ],
             resources: [
                 .process("Resources")

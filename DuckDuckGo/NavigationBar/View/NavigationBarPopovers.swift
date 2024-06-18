@@ -64,7 +64,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     private(set) var bookmarkPopover: AddBookmarkPopover?
     private weak var bookmarkPopoverDelegate: NSPopoverDelegate?
 
-    private (set) var zoomPopover: ZoomPopover?
+    private(set) var zoomPopover: ZoomPopover?
     private weak var zoomPopoverDelegate: NSPopoverDelegate?
 
     private let networkProtectionPopoverManager: NetPPopoverManager

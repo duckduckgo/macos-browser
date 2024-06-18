@@ -116,8 +116,8 @@ private struct InfoItemView: View {
 
 }
 
-#Preview { {
-
+#if DEBUG
+extension InfoItemView {
     struct PreviewView: View {
         @State var model = DataImportReportModel(importSource: .safari, importSourceVersion: UserAgent.safariVersion, error: {
             enum ImportError: DataImportError {
@@ -148,6 +148,9 @@ private struct InfoItemView: View {
                 .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
         }
     }
-    return PreviewView()
+}
 
-}()}
+#Preview {
+    InfoItemView.PreviewView()
+}
+#endif

@@ -484,7 +484,7 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
 
 #if DEBUG
 @available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: DownloadsViewController.preferredContentSize.width, height: DownloadsViewController.preferredContentSize.height)) { {
+#Preview(traits: DownloadsViewController.preferredContentSize.fixedLayout) { {
 
     let store = DownloadListStoreMock()
     store.fetchBlock = { completion in
