@@ -13021,7 +13021,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = 157.1.0;
+				branch = daniel/duckplayer.pip.subfeature;
 				kind = branch;
 			};
 		};

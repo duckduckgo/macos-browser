@@ -59,10 +59,10 @@ struct InitialSetupSettings: Codable {
     }
 
     struct PIP: Codable {
-        let status: Status
+        let state: State
     }
 
-    enum Status: String, Codable {
+    enum State: String, Codable {
         case enabled
         case disabled
     }
@@ -211,7 +211,7 @@ final class DuckPlayer {
             isPiPEnabled = false
         }
 
-        let pip = InitialSetupSettings.PIP(status: isPiPEnabled ? .enabled : .disabled)
+        let pip = InitialSetupSettings.PIP(state: isPiPEnabled ? .enabled : .disabled)
 
         let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip)
         let userValues = encodeUserValues()
