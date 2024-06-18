@@ -115,7 +115,8 @@ final class DuckPlayer {
     ) {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
-        isPiPFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
+        //isPiPFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
+        isPiPFeatureEnabled = true
         mode = preferences.duckPlayerMode
         bindDuckPlayerModeIfNeeded()
 
