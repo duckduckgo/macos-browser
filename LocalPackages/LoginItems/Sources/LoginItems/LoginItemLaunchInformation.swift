@@ -18,8 +18,9 @@
 
 import Foundation
 import AppKit
+import Common
 // swiftlint:disable:next enforce_os_log_wrapper
-import os.log
+//import os.log
 
 public struct LoginItemLaunchInformation: Equatable, Hashable {
 
@@ -34,20 +35,10 @@ public struct LoginItemLaunchInformation: Equatable, Hashable {
 
     // MARK: - Launch Information
 
-    private func systemBootTime() -> Date {
-        var tv = timeval()
-        var tvSize = MemoryLayout<timeval>.size
-        let err = sysctlbyname("kern.boottime", &tv, &tvSize, nil, 0)
-        guard err == 0, tvSize == MemoryLayout<timeval>.size else {
-            return Date(timeIntervalSince1970: 0)
-        }
-        return Date(timeIntervalSince1970: Double(tv.tv_sec) + Double(tv.tv_usec) / 1_000_000.0)
-    }
-
     /// Lets the login item app know if it was launched by the computer startup.
     ///
     public var wasLaunchedByStartup: Bool {
-        let lastSystemBootTime = self.systemBootTime()
+        let lastSystemBootTime = ProcessInfo.systemBootDate()
         let lastRunTime = Date(timeIntervalSince1970: lastRunTimestamp)
         let lastEnabledTime = Date(timeIntervalSince1970: lastEnabledTimestamp)
 
