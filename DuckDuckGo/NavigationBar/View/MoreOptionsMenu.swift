@@ -339,6 +339,7 @@ final class MoreOptionsMenu: NSMenu {
                                                       keyEquivalent: "")
                 .targetting(self)
                 .withImage(.dbpIcon)
+                .withAccessibilityIdentifier("optionsMenu.pir")
             items.append(dataBrokerProtectionItem)
 
             if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {

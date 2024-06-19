@@ -226,7 +226,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         }
 
         // When
-        sut.profileSaved()
+        sut.profileSaved(completion: nil)
 
         // Then
         XCTAssertTrue(startImmediateScansCalled)
@@ -247,7 +247,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockNotificationService.reset()
 
         // When
-        sut.profileSaved()
+        sut.profileSaved(completion: nil)
 
         // Then
         XCTAssertTrue(mockNotificationService.requestPermissionWasAsked)
@@ -268,7 +268,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockNotificationService.reset()
 
         // When
-        sut.profileSaved()
+        sut.profileSaved(completion: nil)
 
         // Then
         XCTAssertTrue(mockNotificationService.firstScanNotificationWasSent)
@@ -290,7 +290,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockQueueManager.startImmediateOperationsIfPermittedCompletionError = DataBrokerProtectionAgentErrorCollection(oneTimeError: NSError(domain: "test", code: 10))
 
         // When
-        sut.profileSaved()
+        sut.profileSaved(completion: nil)
 
         // Then
         XCTAssertFalse(mockNotificationService.firstScanNotificationWasSent)
@@ -312,7 +312,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockDataManager.shouldReturnHasMatches = true
 
         // When
-        sut.profileSaved()
+        sut.profileSaved(completion: nil)
 
         // Then
         XCTAssertTrue(mockNotificationService.checkInNotificationWasScheduled)
@@ -334,7 +334,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         mockDataManager.shouldReturnHasMatches = false
 
         // When
-        sut.profileSaved()
+        sut.profileSaved(completion: nil)
 
         // Then
         XCTAssertFalse(mockNotificationService.checkInNotificationWasScheduled)
@@ -358,7 +358,7 @@ final class DataBrokerProtectionAgentManagerTests: XCTestCase {
         }
 
         // When
-        sut.appLaunched()
+        sut.profileSaved(completion: nil)
 
         // Then
         XCTAssertTrue(startScheduledScansCalled)

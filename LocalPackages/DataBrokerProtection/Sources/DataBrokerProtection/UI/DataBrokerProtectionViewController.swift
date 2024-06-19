@@ -83,6 +83,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
         webView?.uiDelegate = self
         webView?.navigationDelegate = self
+        webView?.setAccessibilityIdentifier("webview.dpb")
         view = webView!
 
         addLoadingIndicator()

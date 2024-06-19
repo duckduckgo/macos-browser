@@ -166,8 +166,11 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionBackgroundActivi
 
 extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
 
-    public func profileSaved() {
+    public func profileSaved(completion: (() -> Void)?) {
         let backgroundAgentInitialScanStartTime = Date()
+
+        os_log("💪🏼💪🏼💪🏼💪🏼💪🏼Calling completion in profile saved", log: .dataBrokerProtection)
+        completion?()
 
         userNotificationService.requestNotificationPermission()
         queueManager.startImmediateOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies) { [weak self] errors in
@@ -204,7 +207,8 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
         }
     }
 
-    public func appLaunched() {
+    public func appLaunched(completion: (() -> Void)?) {
+        completion?()
         queueManager.startScheduledOperationsIfPermitted(showWebView: false,
                                                          operationDependencies:
                                                             operationDependencies) { [weak self] errors in

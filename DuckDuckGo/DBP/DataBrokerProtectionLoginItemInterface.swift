@@ -65,7 +65,7 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
     // MARK: - DataBrokerProtectionAppToAgentInterface
     // MARK: - DataBrokerProtectionAgentAppEvents
 
-    func profileSaved() {
+    func profileSaved(completion: (() -> Void)? = nil) {
         enableLoginItem()
 
         Task {
@@ -76,18 +76,20 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
                 if let error = error {
                     self.pixelHandler.fire(.ipcServerProfileSavedXPCError(error: error))
                 } else {
+                    completion?()
                     self.pixelHandler.fire(.ipcServerProfileSavedReceivedByAgent)
                 }
             }
         }
     }
 
-    func appLaunched() {
+    func appLaunched(completion: (() -> Void)? = nil) {
         pixelHandler.fire(.ipcServerAppLaunchedCalledByApp)
         ipcClient.appLaunched { error in
             if let error = error {
                 self.pixelHandler.fire(.ipcServerAppLaunchedXPCError(error: error))
             } else {
+                completion?()
                 self.pixelHandler.fire(.ipcServerAppLaunchedReceivedByAgent)
             }
         }

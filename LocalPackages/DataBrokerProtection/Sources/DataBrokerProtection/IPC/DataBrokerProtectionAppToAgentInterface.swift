@@ -60,8 +60,8 @@ public class DataBrokerProtectionAgentErrorCollection: NSObject, NSSecureCoding 
 }
 
 public protocol DataBrokerProtectionAgentAppEvents {
-    func profileSaved()
-    func appLaunched()
+    func profileSaved(completion: (() -> Void)?)
+    func appLaunched(completion: (() -> Void)?)
 }
 
 public protocol DataBrokerProtectionAgentDebugCommands {

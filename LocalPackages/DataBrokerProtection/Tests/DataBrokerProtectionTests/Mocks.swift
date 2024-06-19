@@ -1165,11 +1165,11 @@ final class MockIPCServer: DataBrokerProtectionIPCServer {
     }
 
     func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
-        serverDelegate?.profileSaved()
+        serverDelegate?.profileSaved(completion: nil)
     }
 
     func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
-        serverDelegate?.appLaunched()
+        serverDelegate?.appLaunched(completion: nil)
     }
 
     func openBrowser(domain: String) {
@@ -1189,7 +1189,7 @@ final class MockIPCServer: DataBrokerProtectionIPCServer {
     }
 
     func getDebugMetadata(completion: @escaping (DataBrokerProtection.DBPBackgroundAgentMetadata?) -> Void) {
-        serverDelegate?.profileSaved()
+        serverDelegate?.profileSaved(completion: nil)
     }
 }
 

@@ -67,7 +67,7 @@ public final class DataBrokerProtectionManager {
 
 extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
     public func dataBrokerProtectionDataManagerDidUpdateData() {
-        loginItemInterface.profileSaved()
+        loginItemInterface.profileSaved(completion: nil)
 
         let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
         dbpDateStore.setActivationDateIfNecessary()

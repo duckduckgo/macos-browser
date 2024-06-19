@@ -74,7 +74,7 @@ final class DBPUIViewModel {
 
 extension DBPUIViewModel: DBPUIScanOps {
     func profileSaved() {
-        agentInterface.profileSaved()
+        agentInterface.profileSaved(completion: nil)
     }
 
     func updateCacheWithCurrentScans() async {

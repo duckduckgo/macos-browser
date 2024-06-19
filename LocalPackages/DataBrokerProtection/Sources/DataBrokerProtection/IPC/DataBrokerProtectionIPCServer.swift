@@ -166,13 +166,17 @@ extension DefaultDataBrokerProtectionIPCServer: XPCServerInterface {
     // MARK: - DataBrokerProtectionAgentAppEvents
 
     func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
-        xpcMessageReceivedCompletion(nil)
-        serverDelegate?.profileSaved()
+//        xpcMessageReceivedCompletion(nil)
+        serverDelegate?.profileSaved {
+            xpcMessageReceivedCompletion(nil)
+        }
     }
 
     func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
-        xpcMessageReceivedCompletion(nil)
-        serverDelegate?.appLaunched()
+//        xpcMessageReceivedCompletion(nil)
+        serverDelegate?.appLaunched {
+            xpcMessageReceivedCompletion(nil)
+        }
     }
 
     // MARK: - DataBrokerProtectionAgentDebugCommands
