@@ -8,6 +8,7 @@ on:
     branches:
       - hotfix/*
       - release/*
+      - dominik/ui-tests-test-branch
       
 jobs:
   ui-tests:
