@@ -19,12 +19,14 @@
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
+import NetworkProtection
 
 extension Preferences {
 
     struct VPNView: View {
         @ObservedObject var model: VPNPreferencesModel
         @ObservedObject var status: PrivacyProtectionStatus
+        @State private var showsCustomDNSServerPageSheet = false
 
         var body: some View {
             PreferencePane(UserText.vpn, spacing: 4) {
@@ -117,6 +119,41 @@ extension Preferences {
                 }
                 .padding(.bottom, 12)
 
+                // SECTION: DNS Settings
+
+                PreferencePaneSection("DNS Server") {
+                    PreferencePaneSubSection {
+                        Picker(selection: $model.isCustomDNSSelected, label: EmptyView()) {
+                            Text("DuckDuckGo (Recommended)").tag(false)
+                            VStack(alignment: .leading, spacing: 0) {
+                                HStack(spacing: 15) {
+                                    Text("Custom")
+                                    Button("Set DNS Server...") {
+                                        showsCustomDNSServerPageSheet.toggle()
+                                    }.disabled(!model.isCustomDNSSelected)
+                                }
+                                if let dnsServersText = model.dnsSettings.dnsServersText {
+                                    TextMenuItemCaption(dnsServersText)
+                                        .padding(.top, 0)
+                                        .visibility(model.isCustomDNSSelected ? .visible : .gone)
+                                }
+                            }.tag(true)
+                        }
+                        .pickerStyle(.radioGroup)
+                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        .onChange(of: model.isCustomDNSSelected) { isCustomDNSSelected in
+                            guard !isCustomDNSSelected else { return }
+                            model.resetDNSSettings()
+                        }
+
+                        TextMenuItemCaption("DuckDuckGo routes DNS queries through our DNS servers so your internet provider can't see what websites you visit.")
+
+                    }
+                }.sheet(isPresented: $showsCustomDNSServerPageSheet) {
+                    CustomDNSServerPageSheet(settings: VPNSettings(defaults: .netP),
+                                             isSheetPresented: $showsCustomDNSServerPageSheet)
+                }
+
                 // SECTION: Uninstall
 
                 if model.showUninstallVPN {
@@ -130,5 +167,73 @@ extension Preferences {
                 }
             }
         }
+    }
+}
+
+struct CustomDNSServerPageSheet: View {
+    private let settings: VPNSettings
+
+    @State var customDNSServers = ""
+    @State var isValidDNSServers = true
+    @Binding var isSheetPresented: Bool
+
+    init(settings: VPNSettings, isSheetPresented: Binding<Bool>) {
+        self.settings = settings
+        self._isSheetPresented = isSheetPresented
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Custom DNS Server")
+                .fontWeight(.bold)
+
+            Divider()
+
+            Group {
+                HStack {
+                    Text("IPv4 Address:")
+                        .padding(.trailing, 10)
+                    Spacer()
+                    TextField("0.0.0.0", text: $customDNSServers)
+                        .frame(width: 250)
+                        .onChange(of: customDNSServers) { newValue in
+                            validateDNSServers(newValue)
+                        }
+                }
+                Text("Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn't secure or reliable.")
+                    .multilineText()
+                    .multilineTextAlignment(.leading)
+                    .fixMultilineScrollableText()
+                    .foregroundColor(.secondary)
+            }
+
+            Divider()
+
+            HStack(alignment: .center) {
+                Spacer()
+                Button(UserText.cancel) {
+                    isSheetPresented.toggle()
+                }
+                Button("Apply") {
+                    saveChanges()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!isValidDNSServers)
+            }
+        }
+        .padding(EdgeInsets(top: 16, leading: 20, bottom: 16, trailing: 20))
+        .frame(width: 400)
+        .onAppear {
+            customDNSServers = settings.dnsSettings.dnsServersText ?? ""
+        }
+    }
+
+    private func saveChanges() {
+        settings.dnsSettings = .custom([customDNSServers])
+        isSheetPresented.toggle()
+    }
+
+    private func validateDNSServers(_ text: String) {
+        isValidDNSServers = !text.isEmpty && text.isValidIpv4Host
     }
 }
