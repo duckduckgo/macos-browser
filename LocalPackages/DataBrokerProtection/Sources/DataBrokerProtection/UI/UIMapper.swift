@@ -61,6 +61,11 @@ struct MapperToUI {
             queries.filter { !$0.profileQuery.deprecated }
         }
 
+        let scannedBrokers: [DBPUIScanProgress.ScannedBroker] = filteredProfileQueriesGroupedByBroker.compactMap { (key, value) in
+            guard let name = value.first?.dataBroker.name, let url = value.first?.dataBroker.url else { return nil }
+            return DBPUIScanProgress.ScannedBroker(name: name, url: url)
+        }
+
         let totalScans = filteredProfileQueriesGroupedByBroker.reduce(0) { accumulator, element in
             return accumulator + element.value.totalScans
         }
@@ -68,7 +73,7 @@ struct MapperToUI {
             return accumulator + element.value.currentScans
         }
 
-        let scanProgress = DBPUIScanProgress(currentScans: currentScans, totalScans: totalScans)
+        let scanProgress = DBPUIScanProgress(currentScans: currentScans, totalScans: totalScans, scannedBrokers: scannedBrokers)
         let matches = mapMatchesToUI(brokerProfileQueryData)
 
         return .init(resultsFound: matches, scanProgress: scanProgress)
