@@ -70,32 +70,6 @@ extension Preferences {
                             spacing: 12
                         )
                     }
-
-                    VStack(alignment: .leading) {
-                        HStack(spacing: 10) {
-                            Image(.infoSubtle16)
-
-                            VStack {
-                                HStack {
-                                    Text(UserText.vpnSecureDNSSettingDescription)
-                                        .padding(0)
-                                        .font(.system(size: 11))
-                                        .foregroundColor(Color(.blackWhite60))
-                                        .multilineTextAlignment(.leading)
-                                        .fixMultilineScrollableText()
-
-                                    Spacer()
-                                }
-                            }
-                            .frame(idealWidth: .infinity, maxWidth: .infinity)
-
-                            Spacer()
-                        }
-                    }.frame(alignment: .topLeading)
-                        .frame(idealWidth: .infinity, maxWidth: .infinity)
-                        .padding(10)
-                        .background(Color(.blackWhite1))
-                        .roundedBorder()
                 }
                 .padding(.bottom, 12)
 
@@ -115,20 +89,21 @@ extension Preferences {
                 // SECTION: VPN Notifications
 
                 PreferencePaneSection(UserText.vpnNotificationsSettingsTitle) {
-                    ToggleMenuItem("VPN connection drops or status changes", isOn: $model.notifyStatusChanges)
+                    ToggleMenuItem(UserText.vpnNotificationsConnectionDropsOrStatusChangesTitle,
+                                   isOn: $model.notifyStatusChanges)
                 }
                 .padding(.bottom, 12)
 
                 // SECTION: DNS Settings
 
-                PreferencePaneSection("DNS Server") {
+                PreferencePaneSection(UserText.vpnDnsServerTitle) {
                     PreferencePaneSubSection {
                         Picker(selection: $model.isCustomDNSSelected, label: EmptyView()) {
-                            Text("DuckDuckGo (Recommended)").tag(false)
+                            Text(UserText.vpnDnsServerPickerDefaultTitle).tag(false)
                             VStack(alignment: .leading, spacing: 0) {
                                 HStack(spacing: 15) {
-                                    Text("Custom")
-                                    Button("Set DNS Server...") {
+                                    Text(UserText.vpnDnsServerPickerCustomTitle)
+                                    Button(UserText.vpnDnsServerPickerCustomButtonTitle) {
                                         showsCustomDNSServerPageSheet.toggle()
                                     }.disabled(!model.isCustomDNSSelected)
                                 }
@@ -146,7 +121,7 @@ extension Preferences {
                             model.resetDNSSettings()
                         }
 
-                        TextMenuItemCaption("DuckDuckGo routes DNS queries through our DNS servers so your internet provider can't see what websites you visit.")
+                        TextMenuItemCaption(UserText.vpnSecureDNSSettingDescription)
 
                     }
                 }.sheet(isPresented: $showsCustomDNSServerPageSheet) {
@@ -184,14 +159,14 @@ struct CustomDNSServerPageSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Custom DNS Server")
+            Text(UserText.vpnDnsServerSheetTitle)
                 .fontWeight(.bold)
 
             Divider()
 
             Group {
                 HStack {
-                    Text("IPv4 Address:")
+                    Text(UserText.vpnDnsServerIPv4Disclaimer)
                         .padding(.trailing, 10)
                     Spacer()
                     TextField("0.0.0.0", text: $customDNSServers)
@@ -200,7 +175,7 @@ struct CustomDNSServerPageSheet: View {
                             validateDNSServers(newValue)
                         }
                 }
-                Text("Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn't secure or reliable.")
+                Text(UserText.dataBrokerProtectionWaitlistAvailabilityDisclaimer)
                     .multilineText()
                     .multilineTextAlignment(.leading)
                     .fixMultilineScrollableText()
@@ -214,7 +189,7 @@ struct CustomDNSServerPageSheet: View {
                 Button(UserText.cancel) {
                     isSheetPresented.toggle()
                 }
-                Button("Apply") {
+                Button(UserText.vpnDnsServerApplyButtonTitle) {
                     saveChanges()
                 }
                 .keyboardShortcut(.defaultAction)

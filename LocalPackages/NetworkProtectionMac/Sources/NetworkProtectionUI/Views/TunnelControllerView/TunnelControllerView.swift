@@ -301,7 +301,7 @@ public struct TunnelControllerView: View {
                                 details: model.serverAddress)
 
             if model.dnsSettings.usesCustomDNS {
-                connectionDetailRow(title: "DNS Server",
+                connectionDetailRow(title: UserText.vpnDnsServer,
                                     details: String(describing: model.dnsSettings))
             }
 
