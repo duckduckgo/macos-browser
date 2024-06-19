@@ -26,13 +26,16 @@ import PixelKit
 struct SubscriptionAppStoreRestorer {
 
     private let subscriptionManager: SubscriptionManaging
-    @MainActor var window: NSWindow? { WindowControllersManager.shared.lastKeyMainWindowController?.window }
-    let subscriptionErrorReporter = SubscriptionErrorReporter()
+    let subscriptionErrorReporter: SubscriptionErrorReporting
     let uiHandler: SubscriptionUIHandling
 
     public init(subscriptionManager: SubscriptionManaging,
+                subscriptionErrorReporter: SubscriptionErrorReporting = SubscriptionErrorReporter(),
+                storePurchaseManager: StorePurchaseManaging,
+                appStoreRestoreFlow: AppStoreRestoreFlowing,
                 uiHandler: SubscriptionUIHandling) {
         self.subscriptionManager = subscriptionManager
+        self.subscriptionErrorReporter = subscriptionErrorReporter
         self.uiHandler = uiHandler
     }
 

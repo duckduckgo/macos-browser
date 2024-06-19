@@ -56,7 +56,7 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
     }
 }
 
-private extension URL {
+fileprivate extension URL {
 
     func addingQueryItems(from url: URL) -> URL {
         // If the origin value is of type "do+something" appending the percentEncodedQueryItem crashes the browser as + is replaced by a space.
