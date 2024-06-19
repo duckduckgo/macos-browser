@@ -20,6 +20,7 @@ import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 import NetworkProtection
+import PixelKit
 
 extension Preferences {
 
@@ -119,6 +120,7 @@ extension Preferences {
                         .onChange(of: model.isCustomDNSSelected) { isCustomDNSSelected in
                             guard !isCustomDNSSelected else { return }
                             model.resetDNSSettings()
+                            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .dailyAndCount)
                         }
 
                         TextMenuItemCaption(UserText.vpnSecureDNSSettingDescription)
@@ -206,6 +208,8 @@ struct CustomDNSServerPageSheet: View {
     private func saveChanges() {
         settings.dnsSettings = .custom([customDNSServers])
         isSheetPresented.toggle()
+
+        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom, frequency: .dailyAndCount)
     }
 
     private func validateDNSServers(_ text: String) {

@@ -66,6 +66,7 @@ struct VPNMetadata: Encodable {
         let showInMenuBarEnabled: Bool
         let selectedServer: String
         let selectedEnvironment: String
+        let customDNS: Bool
     }
 
     struct LoginItemState: Encodable {
@@ -314,7 +315,8 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             notifyStatusChangesEnabled: settings.notifyStatusChanges,
             showInMenuBarEnabled: settings.showInMenuBar,
             selectedServer: settings.selectedServer.stringValue ?? "automatic",
-            selectedEnvironment: settings.selectedEnvironment.rawValue
+            selectedEnvironment: settings.selectedEnvironment.rawValue,
+            customDNS: settings.dnsSettings.usesCustomDNS
         )
     }
 
