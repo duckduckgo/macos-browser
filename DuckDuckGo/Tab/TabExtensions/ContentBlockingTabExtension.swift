@@ -139,6 +139,9 @@ extension ContentBlockingTabExtension: ContentBlockerRulesUserScriptDelegate {
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
         trackersSubject.send(DetectedTracker(request: tracker, type: .tracker))
+        if tracker.state == BlockingState.blocked && tracker.ownerName == fbBlockingEnabledProvider.fbEntity {
+            fbBlockingEnabledProvider.trackerDetected()
+        }
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest request: DetectedRequest) {
@@ -151,6 +154,10 @@ extension ContentBlockingTabExtension: SurrogatesUserScriptDelegate {
 
     func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {
         return true
+    }
+
+    func surrogatesUserScriptShouldProcessCTLTrackers(_ script: SurrogatesUserScript) -> Bool {
+        fbBlockingEnabledProvider.fbBlockingEnabled
     }
 
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedRequest, withSurrogate host: String) {

@@ -13,6 +13,7 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
+		<string>$(IPC_APP_GROUP)</string>
 		<string>$(DBP_APP_GROUP)</string>
 		<string>$(NETP_APP_GROUP)</string>
 		<string>$(SUBSCRIPTION_APP_GROUP)</string>

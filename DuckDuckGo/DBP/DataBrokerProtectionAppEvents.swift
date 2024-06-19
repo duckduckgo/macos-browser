@@ -24,30 +24,41 @@ import Common
 import DataBrokerProtection
 
 struct DataBrokerProtectionAppEvents {
-    let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
+
+    private let featureGatekeeper: DataBrokerProtectionFeatureGatekeeper
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private let loginItemsManager: LoginItemsManaging
+    private let loginItemInterface: DataBrokerProtectionLoginItemInterface
 
     enum WaitlistNotificationSource {
         case localPush
         case cardUI
     }
 
-    func applicationDidFinishLaunching() {
-        let loginItemsManager = LoginItemsManager()
-        let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
-        let loginItemInterface = DataBrokerProtectionManager.shared.loginItemInterface
+    init(featureGatekeeper: DataBrokerProtectionFeatureGatekeeper,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
+         loginItemsManager: LoginItemsManaging = LoginItemsManager(),
+         loginItemInterface: DataBrokerProtectionLoginItemInterface = DataBrokerProtectionManager.shared.loginItemInterface) {
+        self.featureGatekeeper = featureGatekeeper
+        self.pixelHandler = pixelHandler
+        self.loginItemsManager = loginItemsManager
+        self.loginItemInterface = loginItemInterface
+    }
 
-        guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
+    func applicationDidFinishLaunching() {
+        guard !featureGatekeeper.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
         /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
         /// since the waitlist flag might have been turned off
-        if !featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() {
-            featureVisibility.disableAndDeleteForWaitlistUsers()
+        if !featureGatekeeper.isFeatureVisible() && !featureGatekeeper.isPrivacyProEnabled() {
+            featureGatekeeper.disableAndDeleteForWaitlistUsers()
             return
         }
 
-        Task {
-            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
+        let loginItemsManager = LoginItemsManager()
+        let loginItemInterface = DataBrokerProtectionManager.shared.loginItemInterface
 
+        Task {
             // If we don't have profileQueries it means there's no user profile saved in our DB
             // In this case, let's disable the agent and delete any left-over data because there's nothing for it to do
             if let profileQueriesCount = try? DataBrokerProtectionManager.shared.dataManager.profileQueriesCount(),
@@ -58,26 +69,30 @@ struct DataBrokerProtectionAppEvents {
                 try await Task.sleep(nanoseconds: 1_000_000_000)
                 loginItemInterface.appLaunched()
             } else {
-                featureVisibility.disableAndDeleteForWaitlistUsers()
+                featureGatekeeper.disableAndDeleteForWaitlistUsers()
             }
         }
 
     }
 
     func applicationDidBecomeActive() {
-        let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
 
-        guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
+        // Check feature prerequisites and disable the login item if they are not satisfied
+        Task { @MainActor in
+            let prerequisitesMet = await featureGatekeeper.arePrerequisitesSatisfied()
+            guard prerequisitesMet else {
+                loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
+                return
+            }
+        }
+
+        guard !featureGatekeeper.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
         /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
         /// since the waitlist flag might have been turned off
-        if !featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() {
-            featureVisibility.disableAndDeleteForWaitlistUsers()
+        if !featureGatekeeper.isFeatureVisible() && !featureGatekeeper.isPrivacyProEnabled() {
+            featureGatekeeper.disableAndDeleteForWaitlistUsers()
             return
-        }
-
-        Task {
-            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
         }
     }
 
@@ -92,16 +107,6 @@ struct DataBrokerProtectionAppEvents {
             }
 
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
-        }
-    }
-
-    func windowDidBecomeMain() {
-        sendActiveDataBrokerProtectionWaitlistUserPixel()
-    }
-
-    private func sendActiveDataBrokerProtectionWaitlistUserPixel() {
-        if DefaultDataBrokerProtectionFeatureVisibility().waitlistIsOngoing {
-            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistUserActive, frequency: .daily)
         }
     }
 

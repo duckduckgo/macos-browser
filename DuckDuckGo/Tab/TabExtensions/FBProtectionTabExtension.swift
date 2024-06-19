@@ -26,8 +26,11 @@ final class FBProtectionTabExtension {
 
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private weak var userContentController: UserContentControllerProtocol?
+    private weak var clickToLoadUserScript: ClickToLoadUserScript?
 
     private var cancellables = Set<AnyCancellable>()
+
+    let fbEntity = "Facebook, Inc."
 
     var fbBlockingEnabled = true
 
@@ -41,47 +44,50 @@ final class FBProtectionTabExtension {
         }.store(in: &cancellables)
         clickToLoadUserScriptPublisher.sink { [weak self] clickToLoadUserScript in
             clickToLoadUserScript?.delegate = self
+            self?.clickToLoadUserScript = clickToLoadUserScript
         }.store(in: &cancellables)
     }
 
+    @MainActor
+    public func trackerDetected() {
+        clickToLoadUserScript?.displayClickToLoadPlaceholders()
+    }
 }
 
 extension FBProtectionTabExtension {
 
-    private func toggleFBProtection(for url: URL) {
+    private func setFBProtection(for url: URL) {
         // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
         let privacyConfiguration = privacyConfigurationManager.privacyConfig
 
-        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
-        setFBProtection(enabled: featureEnabled)
+        let featureEnabled = privacyConfiguration.isFeature(.clickToLoad, enabledForDomain: url.host)
+        setFBProtection(enable: featureEnabled)
     }
 
     @discardableResult
-    private func setFBProtection(enabled: Bool) -> Bool {
+    private func setFBProtection(enable: Bool) -> Bool {
         if #unavailable(OSX 11) {  // disable CTL for Catalina and earlier
             return false
         }
-        guard self.fbBlockingEnabled != enabled else { return false }
+        guard self.fbBlockingEnabled != enable else { return false }
         guard let userContentController else {
             assertionFailure("Missing UserContentController")
             return false
         }
-        if enabled {
+        if enable {
             do {
-                try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+                try userContentController.enableGlobalContentRuleList(withIdentifier: DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName)
             } catch {
-                assertionFailure("Missing FB List")
                 return false
             }
         } else {
             do {
-                try userContentController.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+                try userContentController.disableGlobalContentRuleList(withIdentifier: DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName)
             } catch {
-                assertionFailure("FB List was not enabled")
                 return false
             }
         }
-        self.fbBlockingEnabled = enabled
+        self.fbBlockingEnabled = enable
 
         return true
     }
@@ -90,24 +96,27 @@ extension FBProtectionTabExtension {
 
 extension FBProtectionTabExtension: ClickToLoadUserScriptDelegate {
 
-    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) {
+    func clickToLoadUserScriptAllowFB() -> Bool {
         guard self.fbBlockingEnabled else {
-            replyHandler(true)
-            return
+            return true
         }
 
-        if setFBProtection(enabled: false) {
-            replyHandler(true)
+        if setFBProtection(enable: false) {
+            return true
         } else {
-            replyHandler(false)
+            return false
         }
     }
+
 }
 
 extension FBProtectionTabExtension: NavigationResponder {
 
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        toggleFBProtection(for: navigationAction.url)
+        if navigationAction.navigationType == NavigationType.other && navigationAction.isUserInitiated == false {
+            return .next
+        }
+        setFBProtection(for: navigationAction.url)
         return .next
     }
 
@@ -115,6 +124,8 @@ extension FBProtectionTabExtension: NavigationResponder {
 
 protocol FbBlockingEnabledProvider {
     var fbBlockingEnabled: Bool { get }
+    var fbEntity: String { get }
+    func trackerDetected()
 }
 
 protocol FBProtectionExtensionProtocol: AnyObject, FbBlockingEnabledProvider, NavigationResponder {

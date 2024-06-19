@@ -82,7 +82,9 @@ extension EventMapping where Event == NetworkProtectionError {
                 .wireGuardDnsResolution,
                 .wireGuardSetNetworkSettings,
                 .startWireGuardBackend,
-                .failedToRetrieveAuthToken:
+                .failedToRetrieveAuthToken,
+                .failedToFetchServerStatus,
+                .failedToParseServerStatusResponse:
             domainEvent = .networkProtectionUnhandledError(function: #function, line: #line, error: event)
             frequency = .standard
             return

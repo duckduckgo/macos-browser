@@ -38,10 +38,10 @@ final class ErrorInformation: NSObject, Codable {
 ///
 final class VPNOperationErrorHistory {
 
-    private let ipcClient: TunnelControllerIPCClient
+    private let ipcClient: VPNControllerXPCClient
     private let defaults: UserDefaults
 
-    init(ipcClient: TunnelControllerIPCClient,
+    init(ipcClient: VPNControllerXPCClient,
          defaults: UserDefaults = .netP) {
 
         self.ipcClient = ipcClient

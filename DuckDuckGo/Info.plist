@@ -550,5 +550,7 @@
 	<integer>10800</integer>
 	<key>ViewBridgeService</key>
 	<false/>
+	<key>IPC_APP_GROUP</key>
+	<string>$(IPC_APP_GROUP)</string>
 </dict>
 </plist>
