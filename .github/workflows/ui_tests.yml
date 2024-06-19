@@ -20,7 +20,7 @@ jobs:
         runner: [macos-13-xlarge, macos-14-xlarge]
 
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.runner }}
       cancel-in-progress: true
 
     outputs:
