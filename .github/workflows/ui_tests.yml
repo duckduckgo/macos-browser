@@ -145,4 +145,4 @@ jobs:
         asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
         asana-project: ${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}
         asana-task-name: GH Workflow Failure - UI Tests
-        asana-task-description: The UI Tests workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        asana-task-description: The UI Tests workflow run on ${{ github.ref_name }} branch has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
