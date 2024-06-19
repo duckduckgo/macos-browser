@@ -60,26 +60,4 @@ final class OnboardingNavigatingTests: XCTestCase {
         XCTAssertTrue(mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.isFirstResponder ?? false)
     }
 
-//    @MainActor
-//    func testOnReplaceTabWith_TabIsReplaced() {
-//        // Given
-//        let mvc = MainWindowController(mainViewController: MainViewController(autofillPopoverPresenter: DefaultAutofillPopoverPresenter()), popUp: false)
-//        let tab1 = Tab(content: .bookmarks)
-//        WindowControllersManager.shared.lastKeyMainWindowController = mvc
-//        XCTAssertNotNil(WindowControllersManager.shared.mainWindowControllers.first)
-//        print(WindowControllersManager.shared.allTabViewModels)
-//        WindowControllersManager.shared.lastKeyMainWindowController!.mainViewController.tabCollectionViewModel.appendNewTab()
-////        WindowControllersManager.shared.lastKeyMainWindowController!.mainViewController.tabCollectionViewModel.selectDisplayableTabIfPresent(tab1.content)
-////        mainWindowController?.mainViewController.tabCollectionViewModel.append(tab: tab)
-////        WindowControllersManager.shared.mainViewController.tabCollectionViewModel
-//        XCTAssertNotNil(WindowControllersManager.shared.selectedTab)
-//        let tab2 = Tab(content: .url(URL.duckDuckGo, credential: nil, source: .ui))
-//
-//        // When
-//        onboardingNavigation.replaceTabWith(tab2)
-//
-//        // Then
-//        XCTAssertEqual(WindowControllersManager.shared.selectedTab, tab2)
-//    }
-
 }
