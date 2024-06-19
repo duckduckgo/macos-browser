@@ -47,10 +47,6 @@ extension URL {
         return url.addingTimestamp(timestamp)
     }
 
-    var isDuckURLScheme: Bool {
-        navigationalScheme == .duck
-    }
-
     /**
      * Returns true if a URL represents a Private Player URL.
      *
@@ -65,10 +61,6 @@ extension URL {
         } else {
             return isPrivatePlayer
         }
-    }
-
-    var isOnboarding: Bool {
-        return isDuckURLScheme && host == "onboarding"
     }
 
     /// Returns true only if the URL represents a playlist itself, i.e. doesn't have `index` query parameter

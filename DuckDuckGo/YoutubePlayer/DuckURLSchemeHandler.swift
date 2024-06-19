@@ -41,7 +41,7 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
 }
 
-// MARK: Native UI Paged
+// MARK: - Native UI Paged
 extension DuckURLSchemeHandler {
     static let emptyHtml = """
     <html>
@@ -79,9 +79,9 @@ extension DuckURLSchemeHandler {
     }
 }
 
-// MARK: DuckPlayer
-extension DuckURLSchemeHandler {
-    private func handleDuckPlayer(requestURL: URL, urlSchemeTask: WKURLSchemeTask, webView: WKWebView) {
+// MARK: - DuckPlayer
+private extension DuckURLSchemeHandler {
+    func handleDuckPlayer(requestURL: URL, urlSchemeTask: WKURLSchemeTask, webView: WKWebView) {
         let youtubeHandler = YoutubePlayerNavigationHandler()
         let html = youtubeHandler.makeHTMLFromTemplate()
 
@@ -103,9 +103,9 @@ extension DuckURLSchemeHandler {
     }
 }
 
-// MARK: Onboarding
-extension DuckURLSchemeHandler {
-    private func handleOnboarding(urlSchemeTask: WKURLSchemeTask) {
+// MARK: - Onboarding
+private extension DuckURLSchemeHandler {
+    func handleOnboarding(urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = urlSchemeTask.request.url else {
             assertionFailure("No URL for Onboarding scheme handler")
             return
@@ -116,7 +116,7 @@ extension DuckURLSchemeHandler {
         urlSchemeTask.didFinish()
     }
 
-    private func onboardingResponse(for url: URL) -> (URLResponse, Data)? {
+    func onboardingResponse(for url: URL) -> (URLResponse, Data)? {
         var fileName = "index"
         var fileExtension = "html"
         var directoryURL = URL(fileURLWithPath: "/pages/onboarding")
@@ -141,7 +141,7 @@ extension DuckURLSchemeHandler {
         return (response, data)
     }
 
-    private func mimeType(for fileExtension: String) -> String? {
+    func mimeType(for fileExtension: String) -> String? {
         switch fileExtension {
         case "html": return "text/html"
         case "css": return "text/css"
@@ -172,5 +172,13 @@ extension URL {
         } else  {
             return nil
         }
+    }
+
+    var isOnboarding: Bool {
+        return isDuckURLScheme && host == "onboarding"
+    }
+
+    var isDuckURLScheme: Bool {
+        navigationalScheme == .duck
     }
 }

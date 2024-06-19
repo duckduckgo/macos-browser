@@ -40,7 +40,7 @@ final class OnboardingTabExtensionTests: XCTestCase {
     @MainActor
     func test_WhenNavigatingToOnboardingURL_thenNavigationPolicyIsAllow() async throws {
         // Given
-        let navigationAction = NavigationAction(request: URLRequest(url: URL(string: "onboarding://")!), navigationType: .custom(.tabContentUpdate), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: false, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let navigationAction = NavigationAction(request: URLRequest(url: URL(string: "duck://onboarding://")!), navigationType: .custom(.tabContentUpdate), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: false, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
 
         // When
         let navigationPolicy = await onboardingTabExtension.decidePolicy(for: navigationAction, preferences: &navigationPreferences)
