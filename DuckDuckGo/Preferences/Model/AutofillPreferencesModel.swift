@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import PixelKit
 
 final class AutofillPreferencesModel: ObservableObject {
 
@@ -24,6 +25,7 @@ final class AutofillPreferencesModel: ObservableObject {
         didSet {
             persistor.askToSaveUsernamesAndPasswords = askToSaveUsernamesAndPasswords
             NotificationCenter.default.post(name: .autofillUserSettingsDidChange, object: nil)
+            PixelKit.fire(askToSaveUsernamesAndPasswords ? GeneralPixel.autofillLoginsSettingsEnabled : GeneralPixel.autofillLoginsSettingsDisabled)
         }
     }
 
