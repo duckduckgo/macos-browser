@@ -311,7 +311,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     func manageLogins() {
         guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
         let navigationViewController = parentWindowController.mainViewController.navigationBarViewController
-        navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
+        navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems, source: PasswordManagementSource.sync)
     }
 
     private func setUpSyncOptionsObservables(apperancePreferences: AppearancePreferences) {
