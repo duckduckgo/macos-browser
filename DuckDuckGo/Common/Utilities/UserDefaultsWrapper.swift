@@ -150,6 +150,8 @@ public struct UserDefaultsWrapper<T> {
         case firstLaunchDate = "first.app.launch.date"
         case customConfigurationUrl = "custom.configuration.url"
 
+        case lastRemoteMessagingRefreshDate = "last.remote.messaging.refresh.date"
+
         // Data Broker Protection
 
         case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"

@@ -87,6 +87,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
+    public let remoteMessagingClient: RemoteMessagingClient
+
     public let subscriptionManager: SubscriptionManaging
     public let subscriptionUIHandler: SubscriptionUIHandling
 
@@ -157,6 +159,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
+        remoteMessagingClient = RemoteMessagingClient(database: RemoteMessagingDatabase())
+
         if NSApplication.runType.requiresEnvironment {
             Self.configurePixelKit()
 
@@ -201,6 +205,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                                   to: context)
                 }
             }
+
+            remoteMessagingClient.initializeDatabaseIfNeeded()
         }
 
 #if DEBUG
@@ -355,6 +361,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setUpAutoClearHandler()
 
         setUpAutofillPixelReporter()
+
+        refreshRemoteMessages()
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {
@@ -481,6 +489,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func applyPreferredTheme() {
         let appearancePreferences = AppearancePreferences()
         appearancePreferences.updateUserInterfaceStyle()
+    }
+
+    private func refreshRemoteMessages() {
+        Task {
+            try? await remoteMessagingClient.fetchAndProcess(
+                bookmarksDatabase: BookmarkDatabase.shared.db,
+                favoritesDisplayMode: AppearancePreferences.shared.favoritesDisplayMode
+            )
+        }
     }
 
     // MARK: - Sync
