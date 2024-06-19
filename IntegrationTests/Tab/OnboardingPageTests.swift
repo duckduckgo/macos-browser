@@ -55,7 +55,7 @@ final class OnboardingPageTests: XCTestCase {
         // Given
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
-        window = WindowsManager.openNewWindow(with: viewModel)!
+        window = try XCTUnwrap(WindowsManager.openNewWindow(with: viewModel))
         try await eNewtabPageLoaded.value
 
         // When
