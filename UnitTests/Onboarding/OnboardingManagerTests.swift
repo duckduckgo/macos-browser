@@ -19,13 +19,13 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 import SwiftUI
+import Combine
 
 class OnboardingManagerTests: XCTestCase {
 
     var manager: OnboardingActionsManaging!
-    var navigationDelegate: CapturingOnboardingNavigationDelegate!
+    var navigationDelegate: CapturingOnboardingNavigation!
     var dockCustomization: CapturingDockCustomizer!
-    var dataImportView: DataImportView!
     var defaultBrowserProvider: CapturingDefaultBrowserProvider!
     var apperancePreferences: AppearancePreferences!
     var startupPreferences: StartupPreferences!
@@ -34,23 +34,20 @@ class OnboardingManagerTests: XCTestCase {
 
     @MainActor override func setUp() {
         super.setUp()
-        dataImportView = DataImportView()
-        navigationDelegate = CapturingOnboardingNavigationDelegate()
+        navigationDelegate = CapturingOnboardingNavigation()
         dockCustomization = CapturingDockCustomizer()
-        dataImportView = DataImportView()
         defaultBrowserProvider = CapturingDefaultBrowserProvider()
         appearancePersistor = MockAppearancePreferencesPersistor()
         apperancePreferences = AppearancePreferences(persistor: appearancePersistor)
         startupPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: apperancePreferences)
         startupPreferences = StartupPreferences(persistor: startupPersistor)
-        manager = OnboardingActionsManager(navigationDelegate: navigationDelegate, dockCustomization: dockCustomization, dataImportView: dataImportView, defaultBrowserProvider: defaultBrowserProvider, appearancePreferences: apperancePreferences, startupPreferences: startupPreferences)
+        manager = OnboardingActionsManager(navigationDelegate: navigationDelegate, dockCustomization: dockCustomization, defaultBrowserProvider: defaultBrowserProvider, appearancePreferences: apperancePreferences, startupPreferences: startupPreferences)
     }
 
     override func tearDown() {
         manager = nil
         navigationDelegate = nil
         dockCustomization = nil
-        dataImportView = nil
         defaultBrowserProvider = nil
         apperancePreferences = nil
         startupPreferences = nil
@@ -74,10 +71,21 @@ class OnboardingManagerTests: XCTestCase {
 
     func testGoToAddressBar_NavigatesToSearch() {
         // When
+        var cancellables = Set<AnyCancellable>()
         manager.goToAddressBar()
 
         // Then
-        XCTAssertTrue(navigationDelegate.goToSearchFromOnboardingCalled)
+        XCTAssertTrue(navigationDelegate.replaceTabCalled)
+        XCTAssertEqual(navigationDelegate.tab?.url, URL.duckDuckGo)
+        guard let tab = navigationDelegate.tab else {
+            XCTFail("no tab was found in the onboarding navigation")
+            return
+        }
+        tab.navigationDidEndPublisher
+            .sink { [weak self] _ in
+                XCTAssertTrue(self?.navigationDelegate.focusOnAddressBarCalled ?? false)
+            }
+            .store(in: &cancellables)
     }
 
     func testGoToAddressBar_NavigatesToSettings() {
@@ -85,22 +93,17 @@ class OnboardingManagerTests: XCTestCase {
         manager.goToSettings()
 
         // Then
-        XCTAssertTrue(navigationDelegate.goToSettingsFromOnboardingCalled)
+        XCTAssertTrue(navigationDelegate.replaceTabCalled)
+        XCTAssertEqual(navigationDelegate.tab?.url, URL.settings)
     }
 
     @MainActor
-    func testOnImportData_DataImportViewShown2() {
-        // Given
-        let mockWindow = MockOnboardingWindow()
-        let mvc = MainWindowController(mainViewController: MainViewController(autofillPopoverPresenter: DefaultAutofillPopoverPresenter()), popUp: false)
-        mvc.window = mockWindow
-        WindowControllersManager.shared.lastKeyMainWindowController = mvc
-
+    func testOnImportData_DataImportViewShown() {
         // When
         manager.importData()
 
         // Then
-        XCTAssertTrue(mockWindow.beginSheetCalled, "A sheet should be begun on the window")
+        XCTAssertTrue(navigationDelegate.showImportDataViewCalled)
     }
 
     func testOnAddToDock_IsAddedToDock() {
@@ -136,11 +139,16 @@ class OnboardingManagerTests: XCTestCase {
     }
 
     func testOnShowHomeButtonLeft_homeButtonShown() {
+        // Given
+        let expectation = XCTestExpectation(description: "Home button position is set to left")
+
         // When
         manager.setShowHomeButtonLeft()
 
         // Then
-        XCTAssertEqual(appearancePersistor.homeButtonPosition, .left)
+        DispatchQueue.main.async {
+            XCTAssertEqual(self.appearancePersistor.homeButtonPosition, .left)
+        }
     }
 
 }

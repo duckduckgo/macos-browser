@@ -17,8 +17,9 @@
 //
 
 import Foundation
+import Combine
 
-enum OnboardingSteps: String {
+enum OnboardingSteps: String, CaseIterable {
     case summary
     case welcome
     case getStarted
@@ -60,19 +61,21 @@ protocol OnboardingActionsManaging {
     func stepCompleted(step _: OnboardingSteps)
 }
 
-protocol OnboardingNavigationDelegate: AnyObject {
-    func goToSearchFromOnboarding()
-    func goToSettingsFromOnboarding()
+protocol OnboardingNavigating: AnyObject {
+    func replaceTabWith(_ tab: Tab)
+    func focusOnAddressBar()
+    func showImportDataView()
 }
 
-struct OnboardingActionsManager: OnboardingActionsManaging {
+final class OnboardingActionsManager: OnboardingActionsManaging {
 
-    weak var navigationDelegate: OnboardingNavigationDelegate?
+    let navigation: OnboardingNavigating
     let dockCustomization: DockCustomization
-    let dataImportView: DataImportView
     let defaultBrowserProvider: DefaultBrowserProvider
     let appearancePreferences: AppearancePreferences
     let startupPreferences: StartupPreferences
+    let windowsControlManager: WindowControllersManager
+    var cancellables = Set<AnyCancellable>()
 
     let configuration: OnboardingConfiguration = {
         var systemSettings: SystemSettings
@@ -85,12 +88,31 @@ struct OnboardingActionsManager: OnboardingActionsManaging {
         return OnboardingConfiguration(stepDefinitions: stepDefinitions, env: "development")
     }()
 
-    func goToAddressBar() {
-        navigationDelegate?.goToSearchFromOnboarding()
+    init(navigationDelegate: OnboardingNavigating, dockCustomization: DockCustomization, defaultBrowserProvider: DefaultBrowserProvider, appearancePreferences: AppearancePreferences, startupPreferences: StartupPreferences) {
+        self.navigation = navigationDelegate
+        self.dockCustomization = dockCustomization
+        self.defaultBrowserProvider = defaultBrowserProvider
+        self.appearancePreferences = appearancePreferences
+        self.startupPreferences = startupPreferences
+        self.windowsControlManager = WindowControllersManager.shared
     }
 
+    @MainActor
+    func goToAddressBar() {
+        let tab = Tab(content: .url(URL.duckDuckGo, source: .ui))
+        navigation.replaceTabWith(tab)
+
+        tab.navigationDidEndPublisher
+            .sink { [weak self] _ in
+                self?.navigation.focusOnAddressBar()
+            }
+            .store(in: &cancellables)
+    }
+
+    @MainActor
     func goToSettings() {
-        navigationDelegate?.goToSettingsFromOnboarding()
+        let tab = Tab(content: .settings(pane: nil))
+        navigation.replaceTabWith(tab)
     }
 
     func addToDock() {
@@ -99,7 +121,7 @@ struct OnboardingActionsManager: OnboardingActionsManaging {
 
     @MainActor
     func importData() {
-        dataImportView.show(in: nil, completion: nil)
+        navigation.showImportDataView()
     }
 
     func setAsDefault() {
@@ -115,12 +137,14 @@ struct OnboardingActionsManager: OnboardingActionsManaging {
     }
 
     func setShowHomeButtonLeft() {
-        startupPreferences.homeButtonPosition = .left
-        startupPreferences.updateHomeButton()
+        DispatchQueue.main.async { [weak self] in
+            self?.startupPreferences.homeButtonPosition = .left
+            self?.startupPreferences.updateHomeButton()
+        }
     }
 
-    func stepCompleted(step _: OnboardingSteps) {
-        // Will send pixels
+    func stepCompleted(step: OnboardingSteps) {
+        print(step)
     }
 
 }
