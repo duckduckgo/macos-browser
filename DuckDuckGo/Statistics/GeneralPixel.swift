@@ -64,6 +64,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case autofillActiveUser
     case autofillEnabledUser
     case autofillOnboardedUser
+    case autofillToggledOn
+    case autofillToggledOff
     case autofillLoginsStacked
     case autofillCreditCardsStacked
 
@@ -423,6 +425,10 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_autofill_enableduser"
         case .autofillOnboardedUser:
             return "m_mac_autofill_onboardeduser"
+        case .autofillToggledOn:
+            return "m_mac_autofill_toggled_on"
+        case .autofillToggledOff:
+            return "m_mac_autofill_toggled_off"
         case .autofillLoginsStacked:
             return "m_mac_autofill_logins_stacked"
         case .autofillCreditCardsStacked:
