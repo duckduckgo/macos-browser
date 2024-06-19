@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   schedule:
      - cron: '0 3 * * 1-5' # 3AM UTC offsetted to legacy to avoid action-junit-report@v4 bug
+  push:
+    branches:
+      - hotfix/*
+      - release/*
       
 jobs:
   ui-tests:
@@ -13,6 +17,13 @@ jobs:
       fail-fast: false
       matrix:
         runner: [macos-13-xlarge, macos-14-xlarge]
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    outputs:
+      timeout: ${{ steps.set-output.outputs.timeout }}
 
     timeout-minutes: 120
 
@@ -61,6 +72,7 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Build for testing
+      id: build
       run: |
         set -o pipefail && xcodebuild build-for-testing \
           -scheme "UI Tests" \
@@ -72,6 +84,7 @@ jobs:
         | xcbeautify
 
     - name: Run UI Tests
+      id: run-tests
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
@@ -85,6 +98,14 @@ jobs:
           -retry-tests-on-failure \
         | tee -a xcodebuild.log \
         | tee ui-tests.log
+
+    - name: Set output
+      id: set-output
+      if: always()
+      run: |
+        if [[ "${{ steps.build.conclusion }}" == "cancelled" || "${{ steps.run-tests.conclusion }}" == "cancelled" ]]; then
+          echo "timeout=timeout" >> $GITHUB_OUTPUT
+        fi
 
     - name: Prepare test report
       if: always()
@@ -111,7 +132,7 @@ jobs:
 
   notify-failure:
     name: Notify on failure
-    if: ${{ always() && github.event_name == 'schedule' && (needs.ui-tests.result == 'failure' || needs.ui-tests.result == 'cancelled') }}
+    if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'push') && needs.ui-tests.outputs.timeout == 'timeout' }}
     needs: [ui-tests]
     runs-on: ubuntu-latest
 
