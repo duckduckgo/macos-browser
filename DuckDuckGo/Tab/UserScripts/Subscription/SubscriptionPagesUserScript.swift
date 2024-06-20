@@ -531,9 +531,9 @@ extension SubscriptionPagesUseSubscriptionFeature: SubscriptionAccessActionHandl
         if #available(macOS 12.0, *) {
             Task { @MainActor in
                 let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager)
-                let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: self.subscriptionManager,
-                                                                                appStoreRestoreFlow: appStoreRestoreFlow,
-                                                                                uiHandler: self.uiHandler)
+                let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(subscriptionManager: self.subscriptionManager,
+                                                                                       appStoreRestoreFlow: appStoreRestoreFlow,
+                                                                                       uiHandler: self.uiHandler)
                 await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
                 message.webView?.reload()
             }

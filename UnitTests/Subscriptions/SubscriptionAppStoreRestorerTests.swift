@@ -17,8 +17,16 @@
 //
 
 import XCTest
+@testable import Subscription
+import SubscriptionTestingUtilities
+@testable import DuckDuckGo_Privacy_Browser
+@testable import PixelKit
+import PixelKitTestingUtilities
 
+@available(macOS 12.0, *)
 final class SubscriptionAppStoreRestorerTests: XCTestCase {
+
+//    var subscriptionManager: SubscriptionManager
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -29,10 +37,34 @@ final class SubscriptionAppStoreRestorerTests: XCTestCase {
     }
 
     func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+
+        let accountManager = AccountManagerMock()
+        let apiService = APIServiceMock(mockAuthHeaders: [:], mockAPICallResults: .success(true))
+
+        let subscriptionEndpointService = SubscriptionEndpointServiceMock()
+
+        let authEndpointService = AuthEndpointServiceMock()
+
+        let storePurchaseManager = StorePurchaseManagerMock(purchasedProductIDs: <#T##[String]#>,
+                                                            purchaseQueue: <#T##[String]#>,
+                                                            areProductsAvailable: <#T##Bool#>,
+                                                            subscriptionOptionsResult: <#T##SubscriptionOptions?#>,
+                                                            syncAppleIDAccountResultError: <#T##Error?#>,
+                                                            mostRecentTransactionResult: <#T##String?#>,
+                                                            hasActiveSubscriptionResult: <#T##Bool#>,
+                                                            purchaseSubscriptionResult: <#T##Result<StorePurchaseManager.TransactionJWS, PurchaseManagerError>#>)
+
+        let subscriptionManager = SubscriptionManagerMock(accountManager: accountManager,
+                                                          subscriptionEndpointService: subscriptionEndpointService,
+                                                          authEndpointService: authEndpointService,
+                                                          storePurchaseManager: <#T##StorePurchaseManager#>,
+                                                          currentEnvironment: <#T##SubscriptionEnvironment#>,
+                                                          canPurchase: <#T##Bool#>)
+
+        let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(subscriptionManager: <#T##SubscriptionManager#>,
+                                                                               subscriptionErrorReporter: <#T##SubscriptionErrorReporter#>,
+                                                                               appStoreRestoreFlow: <#T##AppStoreRestoreFlow#>,
+                                                                               uiHandler: <#T##SubscriptionUIHandling#>)
+
     }
 }

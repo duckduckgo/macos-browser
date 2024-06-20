@@ -33,7 +33,7 @@ final class SubscriptionErrorReporterTests: XCTestCase {
     }
 
     let testUserDefault = UserDefaults(suiteName: #function)!
-    let reporter = SubscriptionErrorReporter()
+    let reporter = DefaultSubscriptionErrorReporter()
 
     func handle(error: SubscriptionError, expectedPixel: PrivacyProPixel) async throws {
         let pixelExpectation = expectation(description: "Pixel fired")
