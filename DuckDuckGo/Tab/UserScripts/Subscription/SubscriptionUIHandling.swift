@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import SubscriptionUI
+import WebKit
 
 @MainActor
 protocol SubscriptionUIHandling {
@@ -31,12 +32,18 @@ protocol SubscriptionUIHandling {
     func presentSubscriptionAccessViewController(handler: SubscriptionAccessActionHandling, message: WKScriptMessage)
 
     // MARK: Alerts
-    func show(alertType: SubscriptionAlertType)
-    func show(alertType: SubscriptionAlertType, firstButtonAction: (() -> Void)?)
-    func show(alertType: SubscriptionAlertType, text: String?)
+    func show(alertType: SubscriptionAlertType, text: String?) async -> NSApplication.ModalResponse
 
     // MARK: Tab
     func showTab(with content: Tab.TabContent)
+}
+
+@MainActor
+extension SubscriptionUIHandling {
+
+    func show(alertType: SubscriptionAlertType) async -> NSApplication.ModalResponse {
+        return await show(alertType: alertType, text: nil)
+    }
 }
 
 enum SubscriptionAlertType {

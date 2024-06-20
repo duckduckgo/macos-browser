@@ -37,29 +37,38 @@ struct SubscriptionAppStoreRestorer {
     }
 
     func restoreAppStoreSubscription() async {
-
-        defer {
-            Task { @MainActor in
-                uiHandler.dismissProgressViewController()
-            }
-        }
-
         Task { @MainActor in
             uiHandler.presentProgressViewController(withTitle: UserText.restoringSubscriptionTitle)
         }
 
         do {
             try await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
+            await continueRestore()
         } catch {
             switch error as? StoreKitError {
             case .some(.userCancelled):
-                return
+                Task { @MainActor in
+                    uiHandler.dismissProgressViewController()
+                }
             default:
-                break
+                Task { @MainActor in
+                    let alertResponse = await uiHandler.show(alertType: .appleIDSyncFailed, text: error.localizedDescription)
+                    if alertResponse == .alertFirstButtonReturn {
+                        Task {
+                            await continueRestore()
+                        }
+                    } else {
+                        uiHandler.dismissProgressViewController()
+                    }
+                }
             }
+        }
+    }
 
+    private func continueRestore() async {
+        defer {
             Task { @MainActor in
-                uiHandler.show(alertType: .appleIDSyncFailed, text: error.localizedDescription)
+                uiHandler.dismissProgressViewController()
             }
         }
 
@@ -99,24 +108,34 @@ extension SubscriptionAppStoreRestorer {
     @MainActor
     func showSomethingWentWrongAlert() {
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
-        uiHandler.show(alertType: .somethingWentWrong)
+        Task { @MainActor in
+            await uiHandler.show(alertType: .somethingWentWrong)
+        }
     }
 
     @MainActor
     func showSubscriptionNotFoundAlert() {
-        uiHandler.show(alertType: .subscriptionNotFound, firstButtonAction: {
-            let url = subscriptionManager.url(for: .purchase)
-            uiHandler.showTab(with: .subscription(url))
-            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
-        })
+        Task { @MainActor in
+            switch await uiHandler.show(alertType: .subscriptionNotFound) {
+            case .alertFirstButtonReturn:
+                let url = subscriptionManager.url(for: .purchase)
+                uiHandler.showTab(with: .subscription(url))
+                PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+            default: return
+            }
+        }
     }
 
     @MainActor
     func showSubscriptionInactiveAlert() {
-        uiHandler.show(alertType: .subscriptionInactive, firstButtonAction: {
-            let url = subscriptionManager.url(for: .purchase)
-            uiHandler.showTab(with: .subscription(url))
-            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
-        })
+        Task { @MainActor in
+            switch await uiHandler.show(alertType: .subscriptionInactive) {
+            case .alertFirstButtonReturn:
+                let url = subscriptionManager.url(for: .purchase)
+                uiHandler.showTab(with: .subscription(url))
+                PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+            default: return
+            }
+        }
     }
 }

@@ -477,52 +477,43 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         let url = originalMessage.webView?.url
         return url?.getParameter(named: AttributionParameter.origin)
     }
-}
 
-extension SubscriptionPagesUseSubscriptionFeature {
+    // MARK: - UI interactions
 
- // MARK: - UI interactions
+       @MainActor
+       func showSomethingWentWrongAlert() {
+           PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
+           Task { @MainActor in
+               switch await uiHandler.show(alertType: .somethingWentWrong) {
+               case .alertFirstButtonReturn:
+                   let url = subscriptionManager.url(for: .purchase)
+                   uiHandler.showTab(with: .subscription(url))
+                   PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+               default: return
+               }
+           }
+       }
 
-    @MainActor
-    func showSomethingWentWrongAlert() {
-        PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
-        uiHandler.show(alertType: .somethingWentWrong)
-    }
-
-    @MainActor
-    func showSubscriptionNotFoundAlert() {
-        uiHandler.show(alertType: .subscriptionNotFound, firstButtonAction: {
-            let url = self.subscriptionManager.url(for: .purchase)
-            self.uiHandler.showTab(with: .subscription(url))
-            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
-        })
-    }
-
-    @MainActor
-    func showSubscriptionInactiveAlert() {
-        uiHandler.show(alertType: .subscriptionInactive, firstButtonAction: {
-            let url = self.subscriptionManager.url(for: .purchase)
-            self.uiHandler.showTab(with: .subscription(url))
-            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
-        })
-    }
-
-    @MainActor
-    func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) {
-        uiHandler.show(alertType: .subscriptionFound, firstButtonAction: {
-            if #available(macOS 12.0, *) {
-                Task {
-                    let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: self.subscriptionManager)
-                    let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
-                    switch result {
-                    case .success: PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
-                    case .failure: break
-                    }
-                    originalMessage.webView?.reload()
-                }
-            }
-        })
-    }
+       @MainActor
+       func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) {
+           Task { @MainActor in
+               switch await uiHandler.show(alertType: .subscriptionFound) {
+               case .alertFirstButtonReturn:
+                   if #available(macOS 12.0, *) {
+                       Task {
+                           let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: self.subscriptionManager)
+                           let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
+                           switch result {
+                           case .success: PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
+                           case .failure: break
+                           }
+                           originalMessage.webView?.reload()
+                       }
+                   }
+               default: return
+               }
+           }
+       }
 }
 
 extension SubscriptionPagesUseSubscriptionFeature: SubscriptionAccessActionHandling {
