@@ -168,7 +168,7 @@ struct CustomDNSServerPageSheet: View {
 
             Group {
                 HStack {
-                    Text(UserText.vpnDnsServerIPv4Disclaimer)
+                    Text(UserText.vpnDnsServerIPv4Description)
                         .padding(.trailing, 10)
                     Spacer()
                     TextField("0.0.0.0", text: $customDNSServers)
@@ -177,7 +177,7 @@ struct CustomDNSServerPageSheet: View {
                             validateDNSServers(newValue)
                         }
                 }
-                Text(UserText.dataBrokerProtectionWaitlistAvailabilityDisclaimer)
+                Text(UserText.vpnDnsServerIPv4Disclaimer)
                     .multilineText()
                     .multilineTextAlignment(.leading)
                     .fixMultilineScrollableText()
@@ -209,7 +209,13 @@ struct CustomDNSServerPageSheet: View {
         settings.dnsSettings = .custom([customDNSServers])
         isSheetPresented.toggle()
 
-        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom, frequency: .dailyAndCount)
+        /// Updating `dnsSettings` does an IPv4 conversion before actually commiting the change,
+        /// so we do a final check to see which outcome the user ends up with
+        if settings.dnsSettings.usesCustomDNS {
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom, frequency: .dailyAndCount)
+        } else {
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .dailyAndCount)
+        }
     }
 
     private func validateDNSServers(_ text: String) {
