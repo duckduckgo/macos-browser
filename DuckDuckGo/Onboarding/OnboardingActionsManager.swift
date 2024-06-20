@@ -65,17 +65,21 @@ protocol OnboardingNavigating: AnyObject {
     func replaceTabWith(_ tab: Tab)
     func focusOnAddressBar()
     func showImportDataView()
+    func onboardingHasFinished()
 }
 
 final class OnboardingActionsManager: OnboardingActionsManaging {
 
-    let navigation: OnboardingNavigating
-    let dockCustomization: DockCustomization
-    let defaultBrowserProvider: DefaultBrowserProvider
-    let appearancePreferences: AppearancePreferences
-    let startupPreferences: StartupPreferences
-    let windowsControlManager: WindowControllersManager
-    var cancellables = Set<AnyCancellable>()
+    private let navigation: OnboardingNavigating
+    private let dockCustomization: DockCustomization
+    private let defaultBrowserProvider: DefaultBrowserProvider
+    private let appearancePreferences: AppearancePreferences
+    private let startupPreferences: StartupPreferences
+    private let windowsControlManager: WindowControllersManager
+    private var cancellables = Set<AnyCancellable>()
+
+    @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
+    static var isOnboardingFinished: Bool
 
     let configuration: OnboardingConfiguration = {
         var systemSettings: SystemSettings
@@ -99,6 +103,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
 
     @MainActor
     func goToAddressBar() {
+        onboardingHasFinished()
         let tab = Tab(content: .url(URL.duckDuckGo, source: .ui))
         navigation.replaceTabWith(tab)
 
@@ -111,6 +116,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
 
     @MainActor
     func goToSettings() {
+        onboardingHasFinished()
         let tab = Tab(content: .settings(pane: nil))
         navigation.replaceTabWith(tab)
     }
@@ -137,14 +143,27 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
     }
 
     func setShowHomeButtonLeft() {
-        DispatchQueue.main.async { [weak self] in
-            self?.startupPreferences.homeButtonPosition = .left
-            self?.startupPreferences.updateHomeButton()
+        onMainThreadIfNeeded {
+            self.startupPreferences.homeButtonPosition = .left
+            self.startupPreferences.updateHomeButton()
+        }
+    }
+
+    private func onMainThreadIfNeeded(_ function: @escaping () -> Void) {
+        if Thread.isMainThread {
+            function()
+        } else {
+            DispatchQueue.main.sync(execute: function)
         }
     }
 
     func stepCompleted(step: OnboardingSteps) {
         print(step)
+    }
+
+    private func onboardingHasFinished() {
+        Self.isOnboardingFinished = true
+        navigation.onboardingHasFinished()
     }
 
 }

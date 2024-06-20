@@ -1482,8 +1482,8 @@
 		56A054362C205820007D8FAB /* OnboardingPageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054322C205814007D8FAB /* OnboardingPageTests.swift */; };
 		56A0543B2C20878E007D8FAB /* DuckSchemeHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0543A2C20878E007D8FAB /* DuckSchemeHandlerTests.swift */; };
 		56A0543C2C20878E007D8FAB /* DuckSchemeHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0543A2C20878E007D8FAB /* DuckSchemeHandlerTests.swift */; };
-		56A0543E2C215FB3007D8FAB /* OnboardigUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0543D2C215FB3007D8FAB /* OnboardigUserScript.swift */; };
-		56A0543F2C215FB3007D8FAB /* OnboardigUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0543D2C215FB3007D8FAB /* OnboardigUserScript.swift */; };
+		56A0543E2C215FB3007D8FAB /* OnboardingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0543D2C215FB3007D8FAB /* OnboardingUserScript.swift */; };
+		56A0543F2C215FB3007D8FAB /* OnboardingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A0543D2C215FB3007D8FAB /* OnboardingUserScript.swift */; };
 		56A054412C22438C007D8FAB /* OnboardingNavigatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054402C22438C007D8FAB /* OnboardingNavigatingTests.swift */; };
 		56A054422C22438C007D8FAB /* OnboardingNavigatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054402C22438C007D8FAB /* OnboardingNavigatingTests.swift */; };
 		56A054442C2252CE007D8FAB /* OnboardingUserScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054432C2252CE007D8FAB /* OnboardingUserScriptTests.swift */; };
@@ -3394,7 +3394,7 @@
 		56A054322C205814007D8FAB /* OnboardingPageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageTests.swift; sourceTree = "<group>"; };
 		56A054382C207DA9007D8FAB /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../../../code/content-scope-scripts"; sourceTree = "<group>"; };
 		56A0543A2C20878E007D8FAB /* DuckSchemeHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckSchemeHandlerTests.swift; sourceTree = "<group>"; };
-		56A0543D2C215FB3007D8FAB /* OnboardigUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardigUserScript.swift; sourceTree = "<group>"; };
+		56A0543D2C215FB3007D8FAB /* OnboardingUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingUserScript.swift; sourceTree = "<group>"; };
 		56A054402C22438C007D8FAB /* OnboardingNavigatingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingNavigatingTests.swift; sourceTree = "<group>"; };
 		56A054432C2252CE007D8FAB /* OnboardingUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingUserScriptTests.swift; sourceTree = "<group>"; };
 		56A054462C22536A007D8FAB /* CapturingOnboardingActionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingOnboardingActionsManager.swift; sourceTree = "<group>"; };
@@ -6262,7 +6262,7 @@
 				56A053FB2C19E8F7007D8FAB /* OnboardingActionsManager.swift */,
 				56A054012C1AFA5D007D8FAB /* OnboardingConfiguration.swift */,
 				56A0541E2C1CA1F5007D8FAB /* OnboardingTabExtension.swift */,
-				56A0543D2C215FB3007D8FAB /* OnboardigUserScript.swift */,
+				56A0543D2C215FB3007D8FAB /* OnboardingUserScript.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -10288,7 +10288,7 @@
 				7BEC20462B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift in Sources */,
 				3706FC47293F65D500E42796 /* FavoritesView.swift in Sources */,
 				3706FC48293F65D500E42796 /* HomePage.swift in Sources */,
-				56A0543F2C215FB3007D8FAB /* OnboardigUserScript.swift in Sources */,
+				56A0543F2C215FB3007D8FAB /* OnboardingUserScript.swift in Sources */,
 				3706FC49293F65D500E42796 /* RoundedSelectionRowView.swift in Sources */,
 				4B9DB01E2A983B24000927DB /* Waitlist.swift in Sources */,
 				3706FC4A293F65D500E42796 /* LocalStatisticsStore.swift in Sources */,
@@ -11684,7 +11684,7 @@
 				EEC4A6692B2C87D300F7C0AA /* VPNLocationView.swift in Sources */,
 				AAC5E4D225D6A709007F5990 /* BookmarkList.swift in Sources */,
 				B602E81D2A1E25B1006D261F /* NEOnDemandRuleExtension.swift in Sources */,
-				56A0543E2C215FB3007D8FAB /* OnboardigUserScript.swift in Sources */,
+				56A0543E2C215FB3007D8FAB /* OnboardingUserScript.swift in Sources */,
 				C1372EF42BBC5BAD003F8793 /* SecureTextField.swift in Sources */,
 				4B9292D12667123700AD2C21 /* BookmarkTableRowView.swift in Sources */,
 				85589E9427BFE1E70038AD11 /* FavoritesView.swift in Sources */,

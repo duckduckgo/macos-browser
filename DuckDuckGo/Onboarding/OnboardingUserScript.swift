@@ -1,5 +1,5 @@
 //
-//  OnboardigUserScript.swift
+//  OnboardingUserScript.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -24,7 +24,7 @@ final class OnboardingUserScript: NSObject, Subfeature {
 
     let onboardingActionsManager: OnboardingActionsManaging
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "onboarding")])
-    var featureName: String = "onboarding"
+    let featureName: String = "onboarding"
     var broker: UserScriptMessageBroker?
 
     // MARK: - MessageNames

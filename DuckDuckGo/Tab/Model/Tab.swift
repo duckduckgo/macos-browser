@@ -37,10 +37,6 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func closeTab(_ tab: Tab)
 }
 
-protocol NavigationEndedDelegate {
-    func tabDidEndNavigation(_ tab: Tab)
-}
-
 protocol NewWindowPolicyDecisionMaker {
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
 }
@@ -60,7 +56,6 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     fileprivate weak var delegate: TabDelegate?
-    var navigationEndedDelegate: NavigationEndedDelegate?
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
     private let navigationDelegate = DistributedNavigationDelegate(log: .navigation)
@@ -75,7 +70,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
-    var navigationDidEndPublisher = PassthroughSubject<Tab, Never>()
+    let navigationDidEndPublisher = PassthroughSubject<Tab, Never>()
 
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
@@ -729,7 +724,11 @@ protocol NewWindowPolicyDecisionMaker {
     func startOnboarding() {
         userInteractionDialog = nil
 
-        setContent(.onboarding)
+        if true {
+            setContent(.newOnboarding(URL.onboarding))
+        } else {
+            setContent(.onboarding)
+        }
     }
 
     @MainActor(unsafe)

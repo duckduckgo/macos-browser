@@ -19,7 +19,6 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 import SwiftUI
-import Combine
 
 class OnboardingManagerTests: XCTestCase {
 
@@ -71,21 +70,26 @@ class OnboardingManagerTests: XCTestCase {
 
     func testGoToAddressBar_NavigatesToSearch() {
         // When
-        var cancellables = Set<AnyCancellable>()
         manager.goToAddressBar()
 
         // Then
         XCTAssertTrue(navigationDelegate.replaceTabCalled)
         XCTAssertEqual(navigationDelegate.tab?.url, URL.duckDuckGo)
-        guard let tab = navigationDelegate.tab else {
-            XCTFail("no tab was found in the onboarding navigation")
-            return
-        }
-        tab.navigationDidEndPublisher
-            .sink { [weak self] _ in
-                XCTAssertTrue(self?.navigationDelegate.focusOnAddressBarCalled ?? false)
-            }
-            .store(in: &cancellables)
+    }
+
+    func testGoToAddressBar_NavigatesToSearch_AndFocusOnBar() {
+        // When
+        manager.goToAddressBar()
+
+        // Then
+        XCTAssertTrue(navigationDelegate.replaceTabCalled)
+        XCTAssertEqual(navigationDelegate.tab?.url, URL.duckDuckGo)
+
+        // When
+        navigationDelegate.fireNavigationDidEnd()
+
+        // Then
+        XCTAssertTrue(navigationDelegate.focusOnAddressBarCalled)
     }
 
     func testGoToAddressBar_NavigatesToSettings() {
@@ -139,16 +143,11 @@ class OnboardingManagerTests: XCTestCase {
     }
 
     func testOnShowHomeButtonLeft_homeButtonShown() {
-        // Given
-        let expectation = XCTestExpectation(description: "Home button position is set to left")
-
         // When
         manager.setShowHomeButtonLeft()
 
         // Then
-        DispatchQueue.main.async {
-            XCTAssertEqual(self.appearancePersistor.homeButtonPosition, .left)
-        }
+        XCTAssertEqual(self.appearancePersistor.homeButtonPosition, .left)
     }
 
 }

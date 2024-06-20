@@ -28,6 +28,7 @@ extension Tab {
         case settings(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
+        case newOnboarding(URL)
         case none
         case dataBrokerProtection
         case subscription(URL)
@@ -187,7 +188,7 @@ extension TabContent {
 
     var title: String? {
         switch self {
-        case .url, .newtab, .none: return nil
+        case .url, .newtab, .newOnboarding, .none: return nil
         case .settings: return UserText.tabPreferencesTitle
         case .bookmarks: return UserText.tabBookmarksTitle
         case .onboarding: return UserText.tabOnboardingTitle
@@ -224,6 +225,8 @@ extension TabContent {
             return .bookmarks
         case .onboarding:
             return .welcome
+        case .newOnboarding(let url):
+            return url
         case .dataBrokerProtection:
             return .dataBrokerProtection
         case .subscription(let url), .identityTheftRestoration(let url):
@@ -237,7 +240,7 @@ extension TabContent {
         switch self {
         case .url(_, _, source: let source):
             return source
-        case .newtab, .settings, .bookmarks, .onboarding, .dataBrokerProtection,
+        case .newtab, .settings, .bookmarks, .onboarding, .newOnboarding, .dataBrokerProtection,
                 .subscription, .identityTheftRestoration, .none:
             return .ui
         }
@@ -297,7 +300,7 @@ extension TabContent {
 
     var canBeBookmarked: Bool {
         switch self {
-        case .newtab, .onboarding, .none:
+        case .newtab, .onboarding, .newOnboarding, .none:
             return false
         case .url, .settings, .bookmarks, .subscription, .identityTheftRestoration, .dataBrokerProtection:
             return true

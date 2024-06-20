@@ -289,10 +289,19 @@ extension WindowControllersManager {
 }
 
 extension WindowControllersManager: OnboardingNavigating {
+    @MainActor
+    func onboardingHasFinished() {
+        mainWindowController?.userInteraction(prevented: false)
+    }
+    
+    @MainActor
     func showImportDataView() {
-        DataImportView().show()
+        let view = DataImportView()
+        view.model = DataImportViewModel(screen:.shortcuts([.passwords]))
+        view.show()
     }
 
+    @MainActor
     func replaceTabWith(_ tab: Tab) {
         guard let tabToRemove = selectedTab else { return }
         guard let index = mainWindowController?.mainViewController.tabCollectionViewModel.indexInAllTabs(of: tabToRemove) else { return }
@@ -300,6 +309,7 @@ extension WindowControllersManager: OnboardingNavigating {
         mainWindowController?.mainViewController.tabCollectionViewModel.remove(at: index)
     }
 
+    @MainActor
     func focusOnAddressBar() {
         guard let mainVC = lastKeyMainWindowController?.mainViewController else { return }
         mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.stringValue = ""
