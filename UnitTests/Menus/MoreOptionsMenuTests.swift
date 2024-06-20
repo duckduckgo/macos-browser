@@ -43,7 +43,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         passwordManagerCoordinator = PasswordManagerCoordinator()
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
         internalUserDecider = InternalUserDeciderMock()
-        accountManager = AccountManagerMock(isUserAuthenticated: true)
+        accountManager = AccountManagerMock()
         networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(isInstalled: false, visible: false)
         moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: passwordManagerCoordinator,
@@ -97,7 +97,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     @MainActor
     func testThatMoreOptionMenuHasTheExpectedItemsNotAuthenticated() {
 
-        accountManager = AccountManagerMock(isUserAuthenticated: false)
+        accountManager = AccountManagerMock()
         moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
                                          vpnFeatureGatekeeper: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
