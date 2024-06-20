@@ -21,14 +21,14 @@ import Subscription
 import Common
 
 extension DefaultSubscriptionManager {
-
+    
     // Init the SubscriptionManager using the standard dependencies and configuration, to be used only in the dependencies tree root
     public convenience init() {
         // MARK: - Configure Subscription
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
         let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
-
+        
         let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
                                                                  key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
@@ -36,10 +36,10 @@ extension DefaultSubscriptionManager {
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let accountManager = DefaultAccountManager(accessTokenStorage: accessTokenStorage,
-                                            entitlementsCache: entitlementsCache,
-                                            subscriptionEndpointService: subscriptionEndpointService,
-                                            authEndpointService: authEndpointService)
-
+                                                   entitlementsCache: entitlementsCache,
+                                                   subscriptionEndpointService: subscriptionEndpointService,
+                                                   authEndpointService: authEndpointService)
+        
         if #available(macOS 12.0, *) {
             let storePurchaseManager = DefaultStorePurchaseManager()
             self.init(storePurchaseManager: storePurchaseManager,
