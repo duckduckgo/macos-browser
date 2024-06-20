@@ -37,11 +37,11 @@ enum SubscriptionError: Error {
          generalError
 }
 
-protocol SubscriptionErrorReporting {
+protocol SubscriptionErrorReporter {
     func report(subscriptionActivationError: SubscriptionError)
 }
 
-struct SubscriptionErrorReporter: SubscriptionErrorReporting {
+struct DefaultSubscriptionErrorReporter: SubscriptionErrorReporter {
 
     // swiftlint:disable:next cyclomatic_complexity
     func report(subscriptionActivationError: SubscriptionError) {

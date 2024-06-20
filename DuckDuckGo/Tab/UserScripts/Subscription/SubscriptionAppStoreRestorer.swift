@@ -24,18 +24,21 @@ import PixelKit
 
 @available(macOS 12.0, *)
 struct SubscriptionAppStoreRestorer {
+    private let subscriptionManager: SubscriptionManager
+    private let subscriptionErrorReporter: SubscriptionErrorReporter
+//    private let storePurchaseManager: StorePurchaseManager
+    private let appStoreRestoreFlow: AppStoreRestoreFlow
+    private let uiHandler: SubscriptionUIHandling
 
-    private let subscriptionManager: SubscriptionManaging
-    let subscriptionErrorReporter: SubscriptionErrorReporting
-    let uiHandler: SubscriptionUIHandling
-
-    public init(subscriptionManager: SubscriptionManaging,
-                subscriptionErrorReporter: SubscriptionErrorReporting = SubscriptionErrorReporter(),
-                storePurchaseManager: StorePurchaseManaging,
-                appStoreRestoreFlow: AppStoreRestoreFlowing,
+    public init(subscriptionManager: SubscriptionManager,
+                subscriptionErrorReporter: SubscriptionErrorReporter = DefaultSubscriptionErrorReporter(),
+//                storePurchaseManager: StorePurchaseManager,
+                appStoreRestoreFlow: AppStoreRestoreFlow,
                 uiHandler: SubscriptionUIHandling) {
         self.subscriptionManager = subscriptionManager
         self.subscriptionErrorReporter = subscriptionErrorReporter
+        self.appStoreRestoreFlow = appStoreRestoreFlow
+//        self.storePurchaseManager = storePurchaseManager
         self.uiHandler = uiHandler
     }
 
@@ -66,7 +69,6 @@ struct SubscriptionAppStoreRestorer {
             }
         }
 
-        let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: subscriptionManager)
         let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
 
         switch result {

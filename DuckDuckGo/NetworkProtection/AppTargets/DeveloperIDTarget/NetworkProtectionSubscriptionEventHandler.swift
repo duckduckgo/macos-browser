@@ -25,14 +25,14 @@ import NetworkProtectionUI
 
 final class NetworkProtectionSubscriptionEventHandler {
 
-    private let subscriptionManager: SubscriptionManaging
+    private let subscriptionManager: SubscriptionManager
     private let tunnelController: TunnelController
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let vpnUninstaller: VPNUninstalling
     private let userDefaults: UserDefaults
     private var cancellables = Set<AnyCancellable>()
 
-    init(subscriptionManager: SubscriptionManaging,
+    init(subscriptionManager: SubscriptionManager,
          tunnelController: TunnelController,
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          vpnUninstaller: VPNUninstalling,

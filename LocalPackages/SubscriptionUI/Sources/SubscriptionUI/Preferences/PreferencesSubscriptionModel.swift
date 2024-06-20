@@ -35,8 +35,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
-    private let subscriptionManager: SubscriptionManaging
-    private var accountManager: AccountManaging {
+    private let subscriptionManager: SubscriptionManager
+    private var accountManager: AccountManager {
         subscriptionManager.accountManager
     }
     private let openURLHandler: (URL) -> Void
@@ -91,7 +91,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     public init(openURLHandler: @escaping (URL) -> Void,
                 userEventHandler: @escaping (UserEvent) -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
-                subscriptionManager: SubscriptionManaging) {
+                subscriptionManager: SubscriptionManager) {
         self.subscriptionManager = subscriptionManager
         self.openURLHandler = openURLHandler
         self.userEventHandler = userEventHandler
@@ -189,7 +189,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         case .stripe:
             Task {
                 guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
-                      case let .success(response) = await subscriptionManager.subscriptionAPIService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
+                      case let .success(response) = await subscriptionManager.subscriptionEndpointService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
                 openURLHandler(customerPortalURL)
@@ -200,7 +200,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private func confirmIfSignedInToSameAccount() async -> Bool {
         if #available(macOS 12.0, *) {
             guard let lastTransactionJWSRepresentation = await subscriptionManager.storePurchaseManager().mostRecentTransaction() else { return false }
-            switch await subscriptionManager.authAPIService.storeLogin(signature: lastTransactionJWSRepresentation) {
+            switch await subscriptionManager.authEndpointService.storeLogin(signature: lastTransactionJWSRepresentation) {
             case .success(let response):
                 return response.externalID == accountManager.externalID
             case .failure:
@@ -242,7 +242,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
                 Task {
-                    let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: subscriptionManager)
+                    let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager)
                     await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                     fetchAndUpdateSubscriptionDetails()
                 }
@@ -271,11 +271,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @MainActor
     private func updateSubscription(cachePolicy: APICachePolicy) async {
         guard let token = accountManager.accessToken else {
-            subscriptionManager.subscriptionAPIService.signOut()
+            subscriptionManager.subscriptionEndpointService.signOut()
             return
         }
 
-        switch await subscriptionManager.subscriptionAPIService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
+        switch await subscriptionManager.subscriptionEndpointService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
         case .success(let subscription):
             updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
             subscriptionPlatform = subscription.platform

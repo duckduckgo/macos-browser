@@ -23,7 +23,7 @@ import Subscription
 final public class DataBrokerAuthenticationManagerBuilder {
 
     static func buildAuthenticationManager(redeemUseCase: RedeemUseCase = RedeemUseCase(),
-                                           subscriptionManager: SubscriptionManaging) -> DataBrokerProtectionAuthenticationManager {
+                                           subscriptionManager: SubscriptionManager) -> DataBrokerProtectionAuthenticationManager {
         let subscriptionManager = DataBrokerProtectionSubscriptionManager(subscriptionManager: subscriptionManager)
         return DataBrokerProtectionAuthenticationManager(redeemUseCase: redeemUseCase,
                                                          subscriptionManager: subscriptionManager)
@@ -31,7 +31,7 @@ final public class DataBrokerAuthenticationManagerBuilder {
     }
 }
 
-extension AccountManager: DataBrokerProtectionAccountManaging {
+extension DefaultAccountManager: DataBrokerProtectionAccountManaging {
     public func hasEntitlement(for cachePolicy: APICachePolicy) async -> Result<Bool, any Error> {
         await hasEntitlement(forProductName: .dataBrokerProtection, cachePolicy: .reloadIgnoringLocalCacheData)
     }

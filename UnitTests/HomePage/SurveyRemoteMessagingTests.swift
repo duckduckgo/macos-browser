@@ -27,7 +27,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
     private var defaults: UserDefaults!
     private let testGroupName = "remote-messaging"
 
-    private var accountManager: AccountManaging!
+    private var accountManager: AccountManager!
     private var subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching!
 
     override func setUp() {

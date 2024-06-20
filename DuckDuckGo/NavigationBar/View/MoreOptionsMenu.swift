@@ -57,7 +57,7 @@ final class MoreOptionsMenu: NSMenu {
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
-    private let accountManager: AccountManaging
+    private let accountManager: AccountManager
 
     private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
 
@@ -71,7 +71,7 @@ final class MoreOptionsMenu: NSMenu {
          vpnFeatureGatekeeper: VPNFeatureGatekeeper,
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
-         accountManager: AccountManaging) {
+         accountManager: AccountManager) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager

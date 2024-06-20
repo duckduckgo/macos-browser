@@ -20,37 +20,37 @@ import Foundation
 import Subscription
 import Common
 
-extension SubscriptionManager {
+extension DefaultSubscriptionManager {
 
     // Init the SubscriptionManager using the standard dependencies and configuration, to be used only in the dependencies tree root
     public convenience init() {
         // MARK: - Configure Subscription
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
-        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
 
         let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
                                                                  key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
         let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
-        let subscriptionAPIService = SubscriptionAPIService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let authAPIService = AuthAPIService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
+        let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let accountManager = DefaultAccountManager(accessTokenStorage: accessTokenStorage,
                                             entitlementsCache: entitlementsCache,
-                                            subscriptionAPIService: subscriptionAPIService,
-                                            authAPIService: authAPIService)
+                                            subscriptionEndpointService: subscriptionEndpointService,
+                                            authEndpointService: authEndpointService)
 
         if #available(macOS 12.0, *) {
-            let storePurchaseManager = StorePurchaseManager()
+            let storePurchaseManager = DefaultStorePurchaseManager()
             self.init(storePurchaseManager: storePurchaseManager,
                       accountManager: accountManager,
-                      subscriptionAPIService: subscriptionAPIService,
-                      authAPIService: authAPIService,
+                      subscriptionEndpointService: subscriptionEndpointService,
+                      authEndpointService: authEndpointService,
                       subscriptionEnvironment: subscriptionEnvironment)
         } else {
             self.init(accountManager: accountManager,
-                      subscriptionAPIService: subscriptionAPIService,
-                      authAPIService: authAPIService,
+                      subscriptionEndpointService: subscriptionEndpointService,
+                      authEndpointService: authEndpointService,
                       subscriptionEnvironment: subscriptionEnvironment)
         }
     }
