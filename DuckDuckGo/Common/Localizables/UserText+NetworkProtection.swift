@@ -169,7 +169,7 @@ extension UserText {
     // "vpn.dns.server.picker.custom.title" = Title of the custom DNS server option
     static let vpnDnsServerPickerCustomTitle = "Custom"
     // "vpn.dns.server.picker.custom.button.title" = Button title of the custom DNS server option
-    static let vpnDnsServerPickerCustomButtonTitle = "Set DNS Server…"
+    static let vpnDnsServerPickerCustomButtonTitle = "Change…"
     // "vpn.setting.description.secure.dns" - Secure DNS description
     static let vpnSecureDNSSettingDescription = "DuckDuckGo routes DNS queries through our DNS servers so your internet provider can't see what websites you visit."
 

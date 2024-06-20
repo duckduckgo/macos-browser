@@ -118,9 +118,12 @@ extension Preferences {
                         .pickerStyle(.radioGroup)
                         .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
                         .onChange(of: model.isCustomDNSSelected) { isCustomDNSSelected in
-                            guard !isCustomDNSSelected else { return }
-                            model.resetDNSSettings()
-                            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .dailyAndCount)
+                            if isCustomDNSSelected {
+                                showsCustomDNSServerPageSheet.toggle()
+                            } else {
+                                model.resetDNSSettings()
+                                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .dailyAndCount)
+                            }
                         }
 
                         TextMenuItemCaption(UserText.vpnSecureDNSSettingDescription)
