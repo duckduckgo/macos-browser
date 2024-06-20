@@ -39,8 +39,12 @@ class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
 
     var isRecentActivityVisible: Bool = true
 
-    var showBookmarksBar: Bool = false
+    var showBookmarksBar: Bool
 
     var bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn
+
+    init(showBookmarksBar: Bool = false) {
+        self.showBookmarksBar = showBookmarksBar
+    }
 
 }

@@ -31,7 +31,12 @@ class CapturingOnboardingActionsManager: OnboardingActionsManaging {
     var setBookmarkBarCalled = false
     var setSessionRestoreCalled = false
     var setShowHomeButtonLeftCalled = false
+    var onboardingStartedCalled = false
     var completedStep: OnboardingSteps?
+
+    func onboardingStarted() {
+        onboardingStartedCalled = true
+    }
 
     func goToAddressBar() {
         goToAddressBarCalled = true
@@ -61,7 +66,7 @@ class CapturingOnboardingActionsManager: OnboardingActionsManaging {
         setSessionRestoreCalled = true
     }
 
-    func setShowHomeButtonLeft() {
+    func setHomeButtonPosition() {
         setShowHomeButtonLeftCalled = true
     }
 

@@ -52,6 +52,7 @@ final class OnboardingUserScript: NSObject, Subfeature {
         self.broker = broker
     }
 
+    @MainActor
     func handler(forMethodNamed methodName: String) -> Handler? {
         switch MessageNames(rawValue: methodName) {
         case .`init`:
@@ -122,6 +123,7 @@ extension OnboardingUserScript {
         return Result()
     }
 
+    @MainActor
     private func setBookmarksBar(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         onboardingActionsManager.setBookmarkBar()
         return nil
@@ -133,7 +135,7 @@ extension OnboardingUserScript {
     }
 
     private func setShowHome(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        onboardingActionsManager.setShowHomeButtonLeft()
+        onboardingActionsManager.setHomeButtonPosition()
         return nil
     }
 

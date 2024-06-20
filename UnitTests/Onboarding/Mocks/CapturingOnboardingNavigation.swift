@@ -24,6 +24,8 @@ class CapturingOnboardingNavigation: OnboardingNavigating {
     var focusOnAddressBarCalled = false
     var showImportDataViewCalled = false
     var replaceTabCalled = false
+    var updatePreventUserInteractionCalled = false
+    var preventUserInteraction: Bool?
 
     func replaceTabWith(_ tab: Tab) {
         self.tab = tab
@@ -41,5 +43,10 @@ class CapturingOnboardingNavigation: OnboardingNavigating {
     func fireNavigationDidEnd() {
         guard let tab else { return }
         tab.navigationDidEndPublisher.send(tab)
+    }
+
+    func updatePreventUserInteraction(prevent: Bool) {
+        updatePreventUserInteractionCalled = true
+        preventUserInteraction = prevent
     }
 }

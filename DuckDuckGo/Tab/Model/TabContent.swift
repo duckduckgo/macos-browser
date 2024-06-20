@@ -102,7 +102,7 @@ extension TabContent {
         case URL.newtab, URL.Invalid.aboutNewtab, URL.Invalid.duckHome:
             return .newtab
         case URL.welcome, URL.Invalid.aboutWelcome:
-            return .onboarding
+            return .onboardingDeprecated
         case URL.settings, URL.Invalid.aboutPreferences, URL.Invalid.aboutConfig, URL.Invalid.aboutSettings, URL.Invalid.duckConfig, URL.Invalid.duckPreferences:
             return .anySettingsPane
         case URL.bookmarks, URL.Invalid.aboutBookmarks:

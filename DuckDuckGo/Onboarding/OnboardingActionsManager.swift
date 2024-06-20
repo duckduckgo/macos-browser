@@ -58,7 +58,7 @@ protocol OnboardingActionsManaging {
     func setSessionRestore()
 
     /// At user imput set the session restoration on startup
-    func setShowHomeButtonLeft()
+    func setHomeButtonPosition()
 
     /// It is called every time the user ends an onboarding step
     func stepCompleted(step _: OnboardingSteps)
@@ -140,16 +140,19 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
     }
 
     func setBookmarkBar() {
-        appearancePreferences.showBookmarksBar = true
+        print(appearancePreferences.showBookmarksBar)
+        appearancePreferences.showBookmarksBar = !appearancePreferences.showBookmarksBar
+        print(appearancePreferences.showBookmarksBar)
     }
 
     func setSessionRestore() {
-        startupPreferences.restorePreviousSession = true
+        startupPreferences.restorePreviousSession = !startupPreferences.restorePreviousSession
     }
 
-    func setShowHomeButtonLeft() {
+    func setHomeButtonPosition() {
         onMainThreadIfNeeded {
-            self.startupPreferences.homeButtonPosition = .left
+            let currentPosition =  self.startupPreferences.homeButtonPosition
+            self.startupPreferences.homeButtonPosition = (currentPosition == .hidden) ? .left : .hidden
             self.startupPreferences.updateHomeButton()
         }
     }

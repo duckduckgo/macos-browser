@@ -293,7 +293,7 @@ final class TabViewModel {
 
     private func updateAddressBarString() {
         addressBarString = {
-            guard ![.none, .onboarding, .newtab].contains(tab.content),
+            guard ![.none, .onboardingDeprecated, .newtab].contains(tab.content),
                   let url = tab.content.userEditableUrl else { return "" }
 
             if url.isBlobURL {

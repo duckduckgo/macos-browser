@@ -41,6 +41,7 @@ final class OnboardingUserScriptTests: XCTestCase {
 
         let result = try await handler([""], WKScriptMessage())
         XCTAssertEqual(result as? OnboardingConfiguration, mockManager.configuration)
+        XCTAssertTrue(mockManager.onboardingStartedCalled)
     }
 
     @MainActor
