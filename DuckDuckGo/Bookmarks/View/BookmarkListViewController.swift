@@ -55,8 +55,9 @@ final class BookmarkListViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
     private let bookmarkManager: BookmarkManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
+    private let rootNode: BookmarkNode
 
-    private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource)
+    private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource, rootNode: rootNode)
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
         BookmarkOutlineViewDataSource(
@@ -90,9 +91,11 @@ final class BookmarkListViewController: NSViewController {
         return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
     }()
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         rootNode: BookmarkNode = BookmarkNode.genericRootNode()) {
         self.bookmarkManager = bookmarkManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
+        self.rootNode = rootNode
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -633,7 +636,10 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
 
 final class BookmarkListPopover: NSPopover {
 
-    override init() {
+    private let rootNode: BookmarkNode
+
+    init(rootNode: BookmarkNode = BookmarkNode.genericRootNode()) {
+        self.rootNode = rootNode
         super.init()
 
         self.animates = false
