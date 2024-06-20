@@ -128,7 +128,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         if autofillPopoverPresenter.popoverIsShown == true && button.window == autofillPopoverPresenter.popoverPresentingWindow {
             autofillPopoverPresenter.dismiss()
         } else {
-            showPasswordManagementPopover(selectedCategory: nil, from: button, withDelegate: delegate, source: PasswordManagementSource.shortcut)
+            showPasswordManagementPopover(selectedCategory: nil, from: button, withDelegate: delegate, source: .shortcut)
         }
     }
 

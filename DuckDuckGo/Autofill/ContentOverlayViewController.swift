@@ -337,11 +337,11 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
-        autofillPreferencesModel.showAutofillPopover(.cards, source: PasswordManagementSource.manage)
+        autofillPreferencesModel.showAutofillPopover(.cards, source: .manage)
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestIdentitiesManagerForDomain domain: String) {
-        autofillPreferencesModel.showAutofillPopover(.identities, source: PasswordManagementSource.manage)
+        autofillPreferencesModel.showAutofillPopover(.identities, source: .manage)
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
@@ -349,7 +349,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         if mngr.isEnabled {
             mngr.bitwardenManagement.openBitwarden()
         } else {
-            autofillPreferencesModel.showAutofillPopover(.logins, source: PasswordManagementSource.manage)
+            autofillPreferencesModel.showAutofillPopover(.logins, source: .manage)
         }
     }
 
