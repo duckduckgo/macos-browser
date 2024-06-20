@@ -50,7 +50,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
     private let userDefaults: UserDefaults
 
     convenience init(subscriptionManager: SubscriptionManager) {
-        let subscriptionFetcher = SurveyRemoteMessageSubscriptionFetcher(subscriptionAPIService: subscriptionManager.subscriptionAPIService)
+        let subscriptionFetcher = SurveyRemoteMessageSubscriptionFetcher(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService)
         #if DEBUG || REVIEW
         self.init(
             accountManager: subscriptionManager.accountManager,
@@ -281,9 +281,9 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 }
 
 struct SurveyRemoteMessageSubscriptionFetcher: SurveyRemoteMessageSubscriptionFetching {
-    let subscriptionAPIService: SubscriptionEndpointService
+    let subscriptionEndpointService: SubscriptionEndpointService
 
     func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionServiceError> {
-        return await subscriptionAPIService.getSubscription(accessToken: accessToken, cachePolicy: .returnCacheDataElseLoad)
+        return await subscriptionEndpointService.getSubscription(accessToken: accessToken, cachePolicy: .returnCacheDataElseLoad)
     }
 }

@@ -33,24 +33,24 @@ extension DefaultSubscriptionManager {
                                                                  key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
         let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
-        let subscriptionAPIService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let authAPIService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let accountManager = DefaultAccountManager(accessTokenStorage: accessTokenStorage,
                                             entitlementsCache: entitlementsCache,
-                                            subscriptionAPIService: subscriptionAPIService,
-                                            authAPIService: authAPIService)
+                                            subscriptionEndpointService: subscriptionEndpointService,
+                                            authEndpointService: authEndpointService)
 
         if #available(macOS 12.0, *) {
             let storePurchaseManager = DefaultStorePurchaseManager()
             self.init(storePurchaseManager: storePurchaseManager,
                       accountManager: accountManager,
-                      subscriptionAPIService: subscriptionAPIService,
-                      authAPIService: authAPIService,
+                      subscriptionEndpointService: subscriptionEndpointService,
+                      authEndpointService: authEndpointService,
                       subscriptionEnvironment: subscriptionEnvironment)
         } else {
             self.init(accountManager: accountManager,
-                      subscriptionAPIService: subscriptionAPIService,
-                      authAPIService: authAPIService,
+                      subscriptionEndpointService: subscriptionEndpointService,
+                      authEndpointService: authEndpointService,
                       subscriptionEnvironment: subscriptionEnvironment)
         }
     }

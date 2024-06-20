@@ -338,7 +338,7 @@ extension HomePage.Models {
                     var subscription: Subscription?
 
                     if let token = subscriptionManager.accountManager.accessToken {
-                        switch await subscriptionManager.subscriptionAPIService.getSubscription(
+                        switch await subscriptionManager.subscriptionEndpointService.getSubscription(
                             accessToken: token,
                             cachePolicy: .returnCacheDataElseLoad
                         ) {

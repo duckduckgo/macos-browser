@@ -189,7 +189,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         case .stripe:
             Task {
                 guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
-                      case let .success(response) = await subscriptionManager.subscriptionAPIService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
+                      case let .success(response) = await subscriptionManager.subscriptionEndpointService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
                 openURLHandler(customerPortalURL)
@@ -200,7 +200,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private func confirmIfSignedInToSameAccount() async -> Bool {
         if #available(macOS 12.0, *) {
             guard let lastTransactionJWSRepresentation = await subscriptionManager.storePurchaseManager().mostRecentTransaction() else { return false }
-            switch await subscriptionManager.authAPIService.storeLogin(signature: lastTransactionJWSRepresentation) {
+            switch await subscriptionManager.authEndpointService.storeLogin(signature: lastTransactionJWSRepresentation) {
             case .success(let response):
                 return response.externalID == accountManager.externalID
             case .failure:
@@ -271,11 +271,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @MainActor
     private func updateSubscription(cachePolicy: APICachePolicy) async {
         guard let token = accountManager.accessToken else {
-            subscriptionManager.subscriptionAPIService.signOut()
+            subscriptionManager.subscriptionEndpointService.signOut()
             return
         }
 
-        switch await subscriptionManager.subscriptionAPIService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
+        switch await subscriptionManager.subscriptionEndpointService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
         case .success(let subscription):
             updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
             subscriptionPlatform = subscription.platform
