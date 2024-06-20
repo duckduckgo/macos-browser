@@ -54,7 +54,7 @@ final class RemoteMessagingClient {
     }
 
     let database: RemoteMessagingDatabase
-    private var store: RemoteMessagingStore?
+    private(set) var store: RemoteMessagingStore?
     private var isRemoteMessagingDatabaseLoaded = false
 
     private static let endpoint: URL = {

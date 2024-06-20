@@ -21,6 +21,7 @@ import Combine
 import SwiftUI
 import History
 import PixelKit
+import RemoteMessaging
 
 @MainActor
 final class HomePageViewController: NSViewController {
@@ -39,6 +40,7 @@ final class HomePageViewController: NSViewController {
         return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
     }()
 
+    var remoteMessagesModel: HomePage.Models.RemoteMessagesModel!
     var favoritesModel: HomePage.Models.FavoritesModel!
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
@@ -77,6 +79,7 @@ final class HomePageViewController: NSViewController {
     }
 
     override func loadView() {
+        remoteMessagesModel = createRemoteMessagesModel()
         favoritesModel = createFavoritesModel()
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
@@ -91,6 +94,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(featuresModel)
             .environmentObject(accessibilityPreferences)
             .environmentObject(appearancePreferences)
+            .environmentObject(remoteMessagesModel)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()
@@ -103,6 +107,7 @@ final class HomePageViewController: NSViewController {
         refreshModelsOnAppBecomingActive()
         subscribeToBookmarks()
         subscribeToBurningData()
+        subscribeToRemoteMessages()
     }
 
     override func viewWillAppear() {
@@ -196,6 +201,14 @@ final class HomePageViewController: NSViewController {
         })
     }
 
+    func createRemoteMessagesModel() -> HomePage.Models.RemoteMessagesModel {
+        return .init(fetchMessage: {
+            Application.appDelegate.remoteMessagingClient.store?.fetchScheduledRemoteMessage()
+        }, onDismiss: { message in
+            Application.appDelegate.remoteMessagingClient.store?.dismissRemoteMessage(withId: message.id)
+        })
+    }
+
     func refreshFavoritesModel() {
         favoritesModel.favorites = bookmarkManager.list?.favoriteBookmarks ?? []
     }
@@ -224,6 +237,15 @@ final class HomePageViewController: NSViewController {
                 self?.refreshFavoritesModel()
             }
         }.store(in: &cancellables)
+    }
+
+    private func subscribeToRemoteMessages() {
+        NotificationCenter.default.publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.refreshModels()
+            }
+            .store(in: &cancellables)
     }
 
     private func openUrl(_ url: URL, target: HomePage.Models.FavoritesModel.OpenTarget? = nil) {

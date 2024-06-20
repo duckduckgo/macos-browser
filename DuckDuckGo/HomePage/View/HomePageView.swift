@@ -31,6 +31,7 @@ extension HomePage.Views {
         @EnvironmentObject var model: AppearancePreferences
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
+        @EnvironmentObject var remoteMessagesModel: HomePage.Models.RemoteMessagesModel
 
         @State private var isHomeContentPopoverVisible = false
 
@@ -59,6 +60,7 @@ extension HomePage.Views {
                 ScrollView {
                     VStack(spacing: 0) {
                         Group {
+                            remoteMessage()
                             if includingContinueSetUpCards {
                                 ContinueSetUpView()
                                     .padding(.top, 64)
@@ -94,12 +96,29 @@ extension HomePage.Views {
                             })
                     }
                 }
-
             }
             .frame(maxWidth: .infinity)
             .background(backgroundColor)
             .onAppear {
                 LocalBookmarkManager.shared.requestSync()
+            }
+        }
+
+        @ViewBuilder
+        func remoteMessage() -> some View {
+            if let remoteMessage = remoteMessagesModel.remoteMessage, let modelType = remoteMessage.content {
+                HomeMessageView(viewModel: .init(
+                    messageId: remoteMessage.id,
+                    modelType: modelType,
+                    onDidClose: { _ in
+                        remoteMessagesModel.dismissRemoteMessage()
+                    },
+                    onDidAppear: {},
+                    openURLHandler: { url in
+                    WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
+                }))
+            } else {
+                EmptyView()
             }
         }
 
