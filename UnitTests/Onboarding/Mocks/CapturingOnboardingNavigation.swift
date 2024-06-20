@@ -28,7 +28,6 @@ class CapturingOnboardingNavigation: OnboardingNavigating {
     func replaceTabWith(_ tab: Tab) {
         self.tab = tab
         replaceTabCalled = true
-        tab.navigationDidEndPublisher.send(tab)
     }
 
     func focusOnAddressBar() {
@@ -37,5 +36,10 @@ class CapturingOnboardingNavigation: OnboardingNavigating {
 
     func showImportDataView() {
         showImportDataViewCalled = true
+    }
+
+    func fireNavigationDidEnd() {
+        guard let tab else { return }
+        tab.navigationDidEndPublisher.send(tab)
     }
 }

@@ -29,95 +29,77 @@ final class OnboardingUserScriptTests: XCTestCase {
         script = OnboardingUserScript(onboardingActionsManager: mockManager)
     }
 
-    @MainActor
-    func testSetInit_ReturnsExpectedParameters() async {
-        guard let handler = script.handler(forMethodNamed: "init") else {
-            XCTFail("Handler method not found")
-            return
-        }
+    override func tearDown() {
+        mockManager = nil
+        script = nil
+        super.tearDown()
+    }
 
-        let result = try? await handler([""], WKScriptMessage())
+    @MainActor
+    func testSetInit_ReturnsExpectedParameters() async throws {
+        let handler = try XCTUnwrap(script.handler(forMethodNamed: "init"))
+
+        let result = try await handler([""], WKScriptMessage())
         XCTAssertEqual(result as? OnboardingConfiguration, mockManager.configuration)
     }
 
     @MainActor
-    func testDismissToAddressBar_CallsGoToAddressBar() async {
-        guard let handler = script.handler(forMethodNamed: "dismissToAddressBar") else {
-            XCTFail("Handler method not found")
-            return
-        }
+    func testDismissToAddressBar_CallsGoToAddressBar() async throws {
+        let handler = try XCTUnwrap(script.handler(forMethodNamed: "dismissToAddressBar"))
 
-        let result = try? await handler([""], WKScriptMessage())
+        let result = try await handler([""], WKScriptMessage())
         XCTAssertTrue(mockManager.goToAddressBarCalled)
         XCTAssertNil(result)
     }
 
     @MainActor
-    func testDismissToSettings_CallsGoToSettings() async {
-        guard let handler = script.handler(forMethodNamed: "dismissToSettings") else {
-            XCTFail("Handler method not found")
-            return
-        }
+    func testDismissToSettings_CallsGoToSettings() async throws {
+        let handler = try XCTUnwrap(script.handler(forMethodNamed: "dismissToSettings"))
 
-        let result = try? await handler([""], WKScriptMessage())
+        let result = try await handler([""], WKScriptMessage())
         XCTAssertTrue(mockManager.goToSettingsCalled)
         XCTAssertNil(result)
     }
 
     @MainActor
-    func testRequestDockOptIn_CallsAddToDock() async {
-        guard let handler = script.handler(forMethodNamed: "requestDockOptIn") else {
-            XCTFail("Handler method not found")
-            return
-        }
+    func testRequestDockOptIn_CallsAddToDock() async throws {
+        let handler = try XCTUnwrap(script.handler(forMethodNamed: "requestDockOptIn"))
 
-        let result = try? await handler([""], WKScriptMessage())
+        let result = try await handler([""], WKScriptMessage())
         XCTAssertTrue(mockManager.addToDockCalled)
         XCTAssertNotNil(result)
     }
 
     @MainActor
-    func testRequestImport_CallsImportData() async {
-        guard let handler = script.handler(forMethodNamed: "requestImport") else {
-            XCTFail("Handler method not found")
-            return
-        }
+    func testRequestImport_CallsImportData() async throws {
+        let handler = try XCTUnwrap(script.handler(forMethodNamed: "requestImport"))
 
-        let result = try? await handler([""], WKScriptMessage())
+        let result = try await handler([""], WKScriptMessage())
         XCTAssertTrue(mockManager.importDataCalled)
         XCTAssertNotNil(result)
     }
 
     @MainActor
-    func testRequestSetAsDefault_CallsSetAsDefault() async {
-        guard let handler = script.handler(forMethodNamed: "requestSetAsDefault") else {
-            XCTFail("Handler method not found")
-            return
-        }
+    func testRequestSetAsDefault_CallsSetAsDefault() async throws {
+        let handler = try XCTUnwrap(script.handler(forMethodNamed: "requestSetAsDefault"))
 
-        let result = try? await handler([""], WKScriptMessage())
+        let result = try await handler([""], WKScriptMessage())
         XCTAssertTrue(mockManager.setAsDefaultCalled)
         XCTAssertNotNil(result)
     }
 
     @MainActor
-    func testSetBookmarksBar_CallsSetBookmarkBar() async {
-        guard let handler = script.handler(forMethodNamed: "setBookmarksBar") else {
-            XCTFail("Handler method not found")
-            return
-        }
+    func testSetBookmarksBar_CallsSetBookmarkBar() async throws {
+        let handler = try XCTUnwrap(script.handler(forMethodNamed: "setBookmarksBar"))
 
-        let result = try? await handler([""], WKScriptMessage())
+        let result = try await handler([""], WKScriptMessage())
         XCTAssertTrue(mockManager.setBookmarkBarCalled)
         XCTAssertNil(result)
     }
 
     @MainActor
-    func testSetSessionRestore_CallsSetSessionRestore() async {
-        guard let handler = script.handler(forMethodNamed: "setSessionRestore") else {
-            XCTFail("Handler method not found")
-            return
-        }
+    func testSetSessionRestore_CallsSetSessionRestore() async throws {
+        let handler = try XCTUnwrap(script.handler(forMethodNamed: "setSessionRestore"))
 
         let result = try? await handler([""], WKScriptMessage())
         XCTAssertTrue(mockManager.setSessionRestoreCalled)
@@ -125,27 +107,21 @@ final class OnboardingUserScriptTests: XCTestCase {
     }
 
     @MainActor
-    func testSetShowHome_CallsSetShowHomeButtonLeft() async {
-        guard let handler = script.handler(forMethodNamed: "setShowHomeButton") else {
-            XCTFail("Handler method not found")
-            return
-        }
+    func testSetShowHome_CallsSetShowHomeButtonLeft() async throws {
+        let handler = try XCTUnwrap(script.handler(forMethodNamed: "setShowHomeButton"))
 
-        let result = try? await handler([""], WKScriptMessage())
+        let result = try await handler([""], WKScriptMessage())
         XCTAssertTrue(mockManager.setShowHomeButtonLeftCalled)
         XCTAssertNil(result)
     }
 
     @MainActor
-    func testStepCompleted_CallsStepCompleted() async {
+    func testStepCompleted_CallsStepCompleted() async throws {
         let randomStep = OnboardingSteps.allCases.randomElement()!
         let params = ["id": randomStep.rawValue]
-        guard let handler = script.handler(forMethodNamed: "stepCompleted") else {
-            XCTFail("Handler method not found")
-            return
-        }
+        let handler = try XCTUnwrap(script.handler(forMethodNamed: "stepCompleted"))
 
-        let result = try? await handler(params, WKScriptMessage())
+        let result = try await handler(params, WKScriptMessage())
         XCTAssertEqual(mockManager.completedStep, randomStep)
         XCTAssertNil(result)
     }

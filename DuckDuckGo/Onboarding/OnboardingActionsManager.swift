@@ -69,13 +69,13 @@ protocol OnboardingNavigating: AnyObject {
 
 final class OnboardingActionsManager: OnboardingActionsManaging {
 
-    let navigation: OnboardingNavigating
-    let dockCustomization: DockCustomization
-    let defaultBrowserProvider: DefaultBrowserProvider
-    let appearancePreferences: AppearancePreferences
-    let startupPreferences: StartupPreferences
-    let windowsControlManager: WindowControllersManager
-    var cancellables = Set<AnyCancellable>()
+    private let navigation: OnboardingNavigating
+    private let dockCustomization: DockCustomization
+    private let defaultBrowserProvider: DefaultBrowserProvider
+    private let appearancePreferences: AppearancePreferences
+    private let startupPreferences: StartupPreferences
+    private let windowsControlManager: WindowControllersManager
+    private var cancellables = Set<AnyCancellable>()
 
     let configuration: OnboardingConfiguration = {
         var systemSettings: SystemSettings
@@ -137,9 +137,17 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
     }
 
     func setShowHomeButtonLeft() {
-        DispatchQueue.main.async { [weak self] in
-            self?.startupPreferences.homeButtonPosition = .left
-            self?.startupPreferences.updateHomeButton()
+        onMainThreadIfNeeded {
+            self.startupPreferences.homeButtonPosition = .left
+            self.startupPreferences.updateHomeButton()
+        }
+    }
+
+    private func onMainThreadIfNeeded(_ function: @escaping () -> Void) {
+        if Thread.isMainThread {
+            function()
+        } else {
+            DispatchQueue.main.sync(execute: function)
         }
     }
 
