@@ -38,15 +38,15 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "BookmarksBarCollectionViewItem")
 
-    @IBOutlet weak var mouseOverView: MouseOverView!
+    @IBOutlet private weak var mouseOverView: MouseOverView!
     @IBOutlet var stackView: NSStackView!
-    @IBOutlet var faviconView: NSImageView! {
+    @IBOutlet private var faviconView: NSImageView! {
         didSet {
             faviconView.setCornerRadius(3.0)
         }
     }
 
-    @IBOutlet var titleLabel: NSTextField!
+    @IBOutlet private var titleLabel: NSTextField!
 
     private enum EntityType {
         case bookmark(title: String, url: String, favicon: NSImage?, isFavorite: Bool)
@@ -62,7 +62,7 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
 
     weak var delegate: BookmarksBarCollectionViewItemDelegate?
     private var entityType: EntityType?
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -105,7 +105,7 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         mouseOverView.isEnabled = !isInteractionPrevented
         faviconView.isEnabled = !isInteractionPrevented
         titleLabel.isEnabled = !isInteractionPrevented
-        titleLabel.alphaValue = isInteractionPrevented ? 0.1 : 1
+        titleLabel.alphaValue = isInteractionPrevented ? 0.3 : 1
     }
 
     private func configureLayer() {
