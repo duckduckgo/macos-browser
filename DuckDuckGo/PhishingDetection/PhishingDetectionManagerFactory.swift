@@ -26,19 +26,25 @@ public class PhishingDetectionManagerFactory {
     private static let filterSetDataSHA = "c3127eb62e5655e46c177ebad399a4d7a616d4e6b655e71e6c336a9572a71dee"
     private static let hashPrefixURL = Bundle.main.url(forResource: "hashPrefixes", withExtension: "json")!
     private static let hashPrefixDataSHA = "fc376b9c5345ad46b1c7eadfaa55a1d11167a2b10ee5457cb761a681388fe411"
-    private static var instance: PhishingDetectionDataManager?
+    private static var instance: PhishingDetector?
 
-    public static func create() -> PhishingDetectionDataManager {
+    public static func create() -> PhishingDetector {
         if let instance = instance {
             return instance
         }
         let detectionClient = PhishingDetectionAPIClient()
         let dataProvider = PhishingDetectionDataProvider(revision: revision, filterSetURL: filterSetURL, filterSetDataSHA: filterSetDataSHA, hashPrefixURL: hashPrefixURL, hashPrefixDataSHA: hashPrefixDataSHA)
         let dataStore = PhishingDetectionDataStore(dataProvider: dataProvider)
+        Task {
+            await dataStore.loadData()
+        }
         let service = PhishingDetector(apiClient: detectionClient, dataProvider: dataProvider, dataStore: dataStore)
         let updateManager = PhishingDetectionUpdateManager(client: detectionClient, dataStore: dataStore)
         let dataActivities = PhishingDetectionDataActivities(detectionService: service, phishingDetectionDataProvider: dataProvider, updateManager: updateManager)
-        instance = PhishingDetectionDataManager(dataActivities: dataActivities, dataStore: dataStore, updateManager: updateManager)
-        return instance!
+        Task {
+            dataActivities.start()
+        }
+        instance = service
+        return service
     }
 }
