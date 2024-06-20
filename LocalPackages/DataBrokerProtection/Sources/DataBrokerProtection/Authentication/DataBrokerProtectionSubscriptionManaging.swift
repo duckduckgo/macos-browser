@@ -57,6 +57,6 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
 
 /// This protocol exists only as a wrapper on top of the AccountManager since it is a concrete type on BSK
 public protocol DataBrokerProtectionAccountManaging {
-    var accessToken: String? { get }
+    var accessToken: String? { get throws }
     func hasEntitlement(for cachePolicy: AccountManager.CachePolicy) async -> Result<Bool, Error>
 }
