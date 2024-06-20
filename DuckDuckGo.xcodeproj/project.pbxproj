@@ -13005,8 +13005,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 140.0.3;
+				kind = revision;
+				revision = 5f7977d4658f5d72a5db1023365eb0bebd949388;
 			};
 		};
 		4311906792B7676CE9535D76 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
@@ -13021,8 +13021,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 159.0.0;
+				kind = revision;
+				revision = 5f7977d4658f5d72a5db1023365eb0bebd949388;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -13085,8 +13085,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 137.0.0;
+				kind = revision;
+				revision = 5f7977d4658f5d72a5db1023365eb0bebd949388;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
