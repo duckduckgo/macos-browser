@@ -383,9 +383,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             subscriptionEnvironment.serviceEnvironment = .staging
         }
 
-        let subscriptionAPIService = SubscriptionAPIService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let authAPIService = AuthAPIService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let accountManager = AccountManager(accessTokenStorage: tokenStore,
+        let subscriptionAPIService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authAPIService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let accountManager = DefaultAccountManager(accessTokenStorage: tokenStore,
                                             entitlementsCache: entitlementsCache,
                                             subscriptionAPIService: subscriptionAPIService,
                                             authAPIService: authAPIService)

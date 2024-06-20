@@ -78,18 +78,18 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         .exact(hostname: "duckduckgo.com"),
         .exact(hostname: "abrown.duckduckgo.com")
     ])
-    let subscriptionManager: SubscriptionManaging
-    var accountManager: AccountManaging { subscriptionManager.accountManager }
+    let subscriptionManager: SubscriptionManager
+    var accountManager: AccountManager { subscriptionManager.accountManager }
     var subscriptionPlatform: SubscriptionEnvironment.PurchasePlatform { subscriptionManager.currentEnvironment.purchasePlatform }
 
-    let stripePurchaseFlow: StripePurchaseFlowing
+    let stripePurchaseFlow: StripePurchaseFlow
     let subscriptionErrorReporter = SubscriptionErrorReporter()
     let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
     let uiHandler: SubscriptionUIHandling
 
-    public init(subscriptionManager: SubscriptionManaging,
+    public init(subscriptionManager: SubscriptionManager,
                 subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler(),
-                stripePurchaseFlow: StripePurchaseFlowing,
+                stripePurchaseFlow: StripePurchaseFlow,
                 uiHandler: SubscriptionUIHandling) {
         self.subscriptionManager = subscriptionManager
         self.stripePurchaseFlow = stripePurchaseFlow
@@ -251,8 +251,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 let emailAccessToken = try? EmailManager().getToken()
                 let purchaseTransactionJWS: String
-                let appStorePurchaseFlow = AppStorePurchaseFlow(subscriptionManager: subscriptionManager,
-                                                                appStoreRestoreFlow: AppStoreRestoreFlow(subscriptionManager: subscriptionManager))
+                let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionManager: subscriptionManager,
+                                                                appStoreRestoreFlow: DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager))
 
                 os_log(.info, log: .subscription, "[Purchase] Purchasing")
                 switch await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
@@ -512,7 +512,7 @@ extension SubscriptionPagesUseSubscriptionFeature {
         uiHandler.show(alertType: .subscriptionFound, firstButtonAction: {
             if #available(macOS 12.0, *) {
                 Task {
-                    let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: self.subscriptionManager)
+                    let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: self.subscriptionManager)
                     let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                     switch result {
                     case .success: PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)

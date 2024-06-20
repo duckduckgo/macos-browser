@@ -35,8 +35,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
-    private let subscriptionManager: SubscriptionManaging
-    private var accountManager: AccountManaging {
+    private let subscriptionManager: SubscriptionManager
+    private var accountManager: AccountManager {
         subscriptionManager.accountManager
     }
     private let openURLHandler: (URL) -> Void
@@ -91,7 +91,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     public init(openURLHandler: @escaping (URL) -> Void,
                 userEventHandler: @escaping (UserEvent) -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
-                subscriptionManager: SubscriptionManaging) {
+                subscriptionManager: SubscriptionManager) {
         self.subscriptionManager = subscriptionManager
         self.openURLHandler = openURLHandler
         self.userEventHandler = userEventHandler
@@ -242,7 +242,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
                 Task {
-                    let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: subscriptionManager)
+                    let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager)
                     await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                     fetchAndUpdateSubscriptionDetails()
                 }

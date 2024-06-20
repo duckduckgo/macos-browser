@@ -20,7 +20,7 @@ import Foundation
 import Subscription
 @testable import DuckDuckGo_Privacy_Browser
 
-final class MockAccountManager: AccountManaging {
+final class MockAccountManager: AccountManager {
     var hasEntitlementResult: Result<Bool, any Error> = .success(true)
 
     var delegate: AccountManagerKeychainAccessDelegate?

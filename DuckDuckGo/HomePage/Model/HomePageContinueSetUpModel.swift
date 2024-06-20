@@ -54,7 +54,7 @@ extension HomePage.Models {
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
-        private let subscriptionManager: SubscriptionManaging
+        private let subscriptionManager: SubscriptionManager
 
         @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
         var shouldShowAllFeatures: Bool {
@@ -111,7 +111,7 @@ extension HomePage.Models {
              surveyRemoteMessaging: SurveyRemoteMessaging,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
              permanentSurveyManager: SurveyManager = PermanentSurveyManager(),
-             subscriptionManager: SubscriptionManaging = Application.appDelegate.subscriptionManager) {
+             subscriptionManager: SubscriptionManager = Application.appDelegate.subscriptionManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dockCustomizer = dockCustomizer
             self.dataImportProvider = dataImportProvider

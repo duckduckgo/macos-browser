@@ -28,7 +28,7 @@ public protocol DataBrokerProtectionSubscriptionManaging {
 
 public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtectionSubscriptionManaging {
 
-    let subscriptionManager: SubscriptionManaging
+    let subscriptionManager: SubscriptionManager
 
     public var isUserAuthenticated: Bool {
         subscriptionManager.accountManager.accessToken != nil
@@ -38,7 +38,7 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
         subscriptionManager.accountManager.accessToken
     }
 
-    public init(subscriptionManager: SubscriptionManaging) {
+    public init(subscriptionManager: SubscriptionManager) {
         self.subscriptionManager = subscriptionManager
     }
 

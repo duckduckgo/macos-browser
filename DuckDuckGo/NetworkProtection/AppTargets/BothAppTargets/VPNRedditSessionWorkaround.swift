@@ -25,11 +25,11 @@ import Common
 
 final class VPNRedditSessionWorkaround {
 
-    private let accountManager: AccountManaging
+    private let accountManager: AccountManager
     private let ipcClient: VPNControllerXPCClient
     private let statusReporter: NetworkProtectionStatusReporter
 
-    init(accountManager: AccountManaging,
+    init(accountManager: AccountManager,
          ipcClient: VPNControllerXPCClient = .shared,
          statusReporter: NetworkProtectionStatusReporter) {
         self.accountManager = accountManager
