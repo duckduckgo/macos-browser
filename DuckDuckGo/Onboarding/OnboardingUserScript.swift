@@ -90,6 +90,7 @@ final class OnboardingUserScript: NSObject, Subfeature {
 extension OnboardingUserScript {
     @MainActor
     private func setInit(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        onboardingActionsManager.onboardingStarted()
         return onboardingActionsManager.configuration
     }
 

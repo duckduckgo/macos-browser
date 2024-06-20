@@ -113,7 +113,6 @@ final class BookmarksBarViewController: NSViewController {
         clippedItemsIndicator.isEnabled = !prevented
         viewModel.isInteractionPrevented = prevented
         bookmarksBarCollectionView.reloadData()
-
     }
 
     private func frameDidChangeNotification() {

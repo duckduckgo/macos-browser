@@ -33,6 +33,9 @@ protocol OnboardingActionsManaging {
     /// Provides the configuration needed to set up the FE onboarding
     var configuration: OnboardingConfiguration { get }
 
+    /// Used for any setup necessary for during th eonboarding
+    func onboardingStarted()
+
     /// At the end of the onboarding the user will be taken to the DuckDuckGo search page
     func goToAddressBar()
 
@@ -65,7 +68,7 @@ protocol OnboardingNavigating: AnyObject {
     func replaceTabWith(_ tab: Tab)
     func focusOnAddressBar()
     func showImportDataView()
-    func onboardingHasFinished()
+    func updatePreventUserInteraction(prevent: Bool)
 }
 
 final class OnboardingActionsManager: OnboardingActionsManaging {
@@ -75,7 +78,6 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
     private let defaultBrowserProvider: DefaultBrowserProvider
     private let appearancePreferences: AppearancePreferences
     private let startupPreferences: StartupPreferences
-    private let windowsControlManager: WindowControllersManager
     private var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
@@ -98,7 +100,10 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         self.defaultBrowserProvider = defaultBrowserProvider
         self.appearancePreferences = appearancePreferences
         self.startupPreferences = startupPreferences
-        self.windowsControlManager = WindowControllersManager.shared
+    }
+
+    func onboardingStarted() {
+        navigation.updatePreventUserInteraction(prevent: true)
     }
 
     @MainActor
@@ -163,7 +168,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
 
     private func onboardingHasFinished() {
         Self.isOnboardingFinished = true
-        navigation.onboardingHasFinished()
+        navigation.updatePreventUserInteraction(prevent: false)
     }
 
 }

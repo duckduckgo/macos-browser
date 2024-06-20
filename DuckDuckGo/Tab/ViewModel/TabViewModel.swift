@@ -101,7 +101,7 @@ final class TabViewModel {
         case .subscription, .identityTheftRestoration:
             return true
 
-        case .newtab, .settings, .bookmarks, .onboarding, .newOnboarding, .dataBrokerProtection, .none:
+        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
             return false
         }
     }
@@ -164,8 +164,8 @@ final class TabViewModel {
                         .newtab,
                         .settings,
                         .bookmarks,
-                        .newOnboarding,
                         .onboarding,
+                        .onboardingDeprecated,
                         .none,
                         .dataBrokerProtection,
                         .subscription,
@@ -306,7 +306,7 @@ final class TabViewModel {
     private func updatePassiveAddressBarString(showFullURL: Bool? = nil) {
         let showFullURL = showFullURL ?? appearancePreferences.showFullURL
         passiveAddressBarAttributedString = switch tab.content {
-        case .newtab, .onboarding, .newOnboarding, .none:
+        case .newtab, .onboardingDeprecated, .onboarding, .none:
                 .init() // empty
         case .settings:
                 .settingsTrustedIndicator
@@ -367,9 +367,9 @@ final class TabViewModel {
             } else {
                 title = UserText.tabHomeTitle
             }
-        case .onboarding:
+        case .onboardingDeprecated:
             title = UserText.tabOnboardingTitle
-        case .url, .none, .subscription, .identityTheftRestoration, .newOnboarding:
+        case .url, .none, .subscription, .identityTheftRestoration, .onboarding:
             if let tabTitle = tab.title?.trimmingWhitespace(), !tabTitle.isEmpty {
                 title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
@@ -413,7 +413,7 @@ final class TabViewModel {
             Favicon.duckPlayer
         case .url(let url, _, _) where url.isEmailProtection:
             Favicon.emailProtection
-        case .url, .onboarding, .newOnboarding, .none:
+        case .url, .onboardingDeprecated, .onboarding, .none:
             tabFavicon ?? tab.favicon
         }
     }

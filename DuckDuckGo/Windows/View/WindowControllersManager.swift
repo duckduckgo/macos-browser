@@ -290,8 +290,8 @@ extension WindowControllersManager {
 
 extension WindowControllersManager: OnboardingNavigating {
     @MainActor
-    func onboardingHasFinished() {
-        mainWindowController?.userInteraction(prevented: false)
+    func updatePreventUserInteraction(prevent: Bool) {
+        mainWindowController?.userInteraction(prevented: prevent)
     }
     
     @MainActor

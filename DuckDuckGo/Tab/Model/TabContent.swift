@@ -27,8 +27,8 @@ extension Tab {
         case url(URL, credential: URLCredential? = nil, source: URLSource)
         case settings(pane: PreferencePaneIdentifier?)
         case bookmarks
-        case onboarding
-        case newOnboarding(URL)
+        case onboardingDeprecated
+        case onboarding(URL)
         case none
         case dataBrokerProtection
         case subscription(URL)
@@ -188,10 +188,10 @@ extension TabContent {
 
     var title: String? {
         switch self {
-        case .url, .newtab, .newOnboarding, .none: return nil
+        case .url, .newtab, .onboarding, .none: return nil
         case .settings: return UserText.tabPreferencesTitle
         case .bookmarks: return UserText.tabBookmarksTitle
-        case .onboarding: return UserText.tabOnboardingTitle
+        case .onboardingDeprecated: return UserText.tabOnboardingTitle
         case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
         case .subscription, .identityTheftRestoration: return nil
         }
@@ -223,9 +223,9 @@ extension TabContent {
             return .settings
         case .bookmarks:
             return .bookmarks
-        case .onboarding:
+        case .onboardingDeprecated:
             return .welcome
-        case .newOnboarding(let url):
+        case .onboarding(let url):
             return url
         case .dataBrokerProtection:
             return .dataBrokerProtection
@@ -240,7 +240,7 @@ extension TabContent {
         switch self {
         case .url(_, _, source: let source):
             return source
-        case .newtab, .settings, .bookmarks, .onboarding, .newOnboarding, .dataBrokerProtection,
+        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .dataBrokerProtection,
                 .subscription, .identityTheftRestoration, .none:
             return .ui
         }
@@ -300,7 +300,7 @@ extension TabContent {
 
     var canBeBookmarked: Bool {
         switch self {
-        case .newtab, .onboarding, .newOnboarding, .none:
+        case .newtab, .onboardingDeprecated, .onboarding, .none:
             return false
         case .url, .settings, .bookmarks, .subscription, .identityTheftRestoration, .dataBrokerProtection:
             return true

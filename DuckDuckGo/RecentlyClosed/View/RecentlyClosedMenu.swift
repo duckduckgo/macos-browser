@@ -84,7 +84,7 @@ private extension NSMenuItem {
             if title.count > MainMenu.Constants.maxTitleLength {
                 title = String(title.truncated(length: MainMenu.Constants.maxTitleLength))
             }
-        case .onboarding, .newOnboarding, .none:
+        case .onboardingDeprecated, .onboarding, .none:
             return nil
         }
 
