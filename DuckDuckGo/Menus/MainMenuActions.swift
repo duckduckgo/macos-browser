@@ -19,11 +19,12 @@
 import BrowserServicesKit
 import Cocoa
 import Common
-import WebKit
 import Configuration
+import Crashes
 import History
 import PixelKit
 import Subscription
+import WebKit
 
 // Actions are sent to objects of responder chain
 
@@ -720,8 +721,12 @@ extension MainViewController {
 
     @objc func crashOnException(_ sender: Any?) {
         DispatchQueue.main.async {
-            NSException(name: .internalInconsistencyException, reason: "Exception raised from Main Menu", userInfo: nil).raise()
+            self.navigationBarViewController.addressBarViewController?.addressBarTextField.suggestionViewController.tableView.view(atColumn: 1, row: .max, makeIfNecessary: false)
         }
+    }
+
+    @objc func crashOnCxxException(_ sender: Any?) {
+        throwTestCppExteption()
     }
 
     @objc func resetSecureVaultData(_ sender: Any?) {

@@ -39,7 +39,7 @@ import Subscription
 import NetworkProtectionIPC
 import DataBrokerProtection
 
-// @MainActor
+// swiftlint:disable:next type_body_length
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG
@@ -140,14 +140,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Date.monthAgo)
     static var firstLaunchDate: Date
 
+    @UserDefaultsWrapper
+    private var didCrashDuringCrashHandlersSetUp: Bool
+
     static var isNewUser: Bool {
         return firstLaunchDate >= Date.weekAgo
     }
 
     // swiftlint:disable:next function_body_length
     override init() {
-        if case .normal = NSApplication.runType {
-            CrashLogMessageExtractor.installSignalHandlers()
+        let didCrashDuringCrashHandlersSetUp = UserDefaultsWrapper(key: .didCrashDuringCrashHandlersSetUp, defaultValue: false)
+        _didCrashDuringCrashHandlersSetUp = didCrashDuringCrashHandlersSetUp
+        if case .normal = NSApplication.runType,
+           !didCrashDuringCrashHandlersSetUp.wrappedValue {
+
+            didCrashDuringCrashHandlersSetUp.wrappedValue = true
+            CrashLogMessageExtractor.setUp()
+            didCrashDuringCrashHandlersSetUp.wrappedValue = false
         }
 
         do {
@@ -359,6 +368,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setUpAutoClearHandler()
 
         setUpAutofillPixelReporter()
+
+        if didCrashDuringCrashHandlersSetUp {
+            PixelKit.fire(GeneralPixel.crashOnCrashHandlersSetUp)
+            didCrashDuringCrashHandlersSetUp = false
+        }
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {

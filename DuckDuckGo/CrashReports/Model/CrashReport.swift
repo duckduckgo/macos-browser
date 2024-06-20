@@ -145,52 +145,6 @@ final class JSONCrashReport: CrashReport {
 
 }
 
-@available(macOS 12, *)
-extension CrashCollection {
-
-    func startAttachingCrashLogMessages(didFindCrashReports: @escaping (_ pixelParameters: [[String: String]], _ payloads: [Data], _ uploadReports: @escaping () -> Void) -> Void) {
-        start(process: { payloads in
-            payloads.compactMap { payload in
-                var dict = payload.dictionaryRepresentation()
-
-                var pid: pid_t?
-                if #available(macOS 14.0, *) {
-                    pid = payload.crashDiagnostics?.first?.metaData.pid
-                }
-                var crashDiagnostics = dict["crashDiagnostics"] as? [[AnyHashable: Any]] ?? []
-                var crashDiagnosticsDict = crashDiagnostics.first ?? [:]
-                var diagnosticMetaDataDict = crashDiagnosticsDict["diagnosticMetaData"] as? [AnyHashable: Any] ?? [:]
-                var objCexceptionReason = diagnosticMetaDataDict["objectiveCexceptionReason"] as? [AnyHashable: Any] ?? [:]
-
-                var exceptionMessage = (objCexceptionReason["composedMessage"] as? String)?.sanitized()
-
-                // append crash log message if loaded
-                if let crashInfo = CrashLogMessageExtractor.crashLogMessage(for: payload.timeStampBegin, pid: pid), !crashInfo.isEmpty {
-                    if let existingMessage = exceptionMessage, !existingMessage.isEmpty {
-                        exceptionMessage = existingMessage + "\n\n---\n\n" + crashInfo
-                    } else {
-                        exceptionMessage = crashInfo
-                    }
-                }
-
-                objCexceptionReason["composedMessage"] = exceptionMessage
-                diagnosticMetaDataDict["objectiveCexceptionReason"] = objCexceptionReason
-                crashDiagnosticsDict["diagnosticMetaData"] = diagnosticMetaDataDict
-                crashDiagnostics[0] = crashDiagnosticsDict
-                dict["crashDiagnostics"] = crashDiagnostics
-
-                guard JSONSerialization.isValidJSONObject(dict) else {
-                    assertionFailure("Invalid JSON object: \(dict)")
-                    return nil
-                }
-                return try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys])
-            }
-
-        }, didFindCrashReports: didFindCrashReports)
-    }
-
-}
-
 struct CrashDataPayload: CrashReportPresenting {
     let data: Data
 
