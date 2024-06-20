@@ -13059,7 +13059,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "dominik/rmf-bsk";
+				branch = "dominik/rmf-macos";
 				kind = branch;
 			};
 		};
