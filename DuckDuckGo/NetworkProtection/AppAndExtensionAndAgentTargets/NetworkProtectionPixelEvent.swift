@@ -95,6 +95,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionWireguardErrorCannotStartWireguardBackend(code: Int32)
 
     case networkProtectionNoAuthTokenFoundError
+    case networkProtectionAccessTokenKeychainLockedError
+    case networkProtectionAccessTokenKeychainError
 
     case networkProtectionRekeyAttempt
     case networkProtectionRekeyCompleted
@@ -269,6 +271,12 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionNoAuthTokenFoundError:
             return "netp_no_auth_token_found_error"
 
+        case .networkProtectionAccessTokenKeychainLockedError:
+            return "netp_access_token_keychain_locked_error"
+
+        case .networkProtectionAccessTokenKeychainError:
+            return "netp_access_token_keychain_error"
+
         case .networkProtectionRekeyAttempt:
             return "netp_rekey_attempt"
 
@@ -389,6 +397,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor,
                 .networkProtectionWireguardErrorFailedDNSResolution,
                 .networkProtectionNoAuthTokenFoundError,
+                .networkProtectionAccessTokenKeychainError,
+                .networkProtectionAccessTokenKeychainLockedError,
                 .networkProtectionRekeyAttempt,
                 .networkProtectionRekeyCompleted,
                 .networkProtectionRekeyFailure,
@@ -465,7 +475,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionRekeyAttempt,
                 .networkProtectionRekeyCompleted,
                 .networkProtectionServerMigrationAttempt,
-                .networkProtectionServerMigrationSuccess:
+                .networkProtectionServerMigrationSuccess,
+                .networkProtectionAccessTokenKeychainError,
+                .networkProtectionAccessTokenKeychainLockedError:
             return nil
         }
     }

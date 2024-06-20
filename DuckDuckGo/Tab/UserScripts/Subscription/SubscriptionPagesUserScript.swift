@@ -178,7 +178,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let accessToken = accountManager.accessToken,
+        if let accessToken = try? accountManager.accessToken,
            case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
             accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
         }
@@ -443,7 +443,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getAccessToken(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let accessToken = accountManager.accessToken {
+        if let accessToken = try? accountManager.accessToken {
             return ["token": accessToken]
         } else {
             return [String: String]()

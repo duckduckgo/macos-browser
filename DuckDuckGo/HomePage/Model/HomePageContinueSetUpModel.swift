@@ -337,7 +337,7 @@ extension HomePage.Models {
                 Task { @MainActor in
                     var subscription: Subscription?
 
-                    if let token = subscriptionManager.accountManager.accessToken {
+                    if let token = try? subscriptionManager.accountManager.accessToken {
                         switch await subscriptionManager.subscriptionService.getSubscription(
                             accessToken: token,
                             cachePolicy: .returnCacheDataElseLoad

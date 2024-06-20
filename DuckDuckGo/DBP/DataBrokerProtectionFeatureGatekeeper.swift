@@ -149,7 +149,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
             hasEntitlements = false
         }
 
-        let isAuthenticated = accountManager.accessToken != nil
+        let isAuthenticated = (try? accountManager.accessToken) != nil
 
         firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: hasEntitlements, isAuthenticatedResult: isAuthenticated)
 

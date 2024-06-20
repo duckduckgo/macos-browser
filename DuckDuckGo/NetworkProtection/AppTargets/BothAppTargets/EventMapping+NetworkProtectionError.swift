@@ -94,6 +94,12 @@ extension EventMapping where Event == NetworkProtectionError {
             return
         case .vpnAccessRevoked:
             return
+        case .keychainError:
+            domainEvent = .networkProtectionAccessTokenKeychainError
+            frequency = .dailyAndCount
+        case .keychainLocked:
+            domainEvent = .networkProtectionAccessTokenKeychainLockedError
+            frequency = .dailyAndCount
         }
 
         let debugEvent = DebugEvent(eventType: .custom(domainEvent))

@@ -119,7 +119,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
     /// Because the result of the message fetch is cached, it means that they won't be immediately updated if the user suddenly qualifies, but the refresh interval for remote messages is only 1 hour so it
     /// won't take long for the message to appear to the user.
     private func process(messages: [SurveyRemoteMessage]) async -> [SurveyRemoteMessage] {
-        guard let token = accountManager.accessToken else {
+        guard let token = try? accountManager.accessToken else {
             return []
         }
 

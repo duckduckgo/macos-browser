@@ -183,7 +183,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func showAccountDetails() {
         let title = accountManager.isUserAuthenticated ? "Authenticated" : "Not Authenticated"
         let message = accountManager.isUserAuthenticated ? ["AuthToken: \(accountManager.authToken ?? "")",
-                                                                                "AccessToken: \(accountManager.accessToken ?? "")",
+                                                                                "AccessToken: \((try? accountManager.accessToken) ?? "")",
                                                                                 "Email: \(accountManager.email ?? "")"].joined(separator: "\n") : nil
         showAlert(title: title, message: message)
     }
@@ -191,7 +191,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func validateToken() {
         Task {
-            guard let token = accountManager.accessToken else { return }
+            guard let token = try? accountManager.accessToken else { return }
             switch await subscriptionManager.authService.validateToken(accessToken: token) {
             case .success(let response):
                 showAlert(title: "Validate token", message: "\(response)")
@@ -222,7 +222,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func getSubscriptionDetails() {
         Task {
-            guard let token = accountManager.accessToken else { return }
+            guard let token = try? accountManager.accessToken else { return }
             switch await subscriptionManager.subscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
             case .success(let response):
                 showAlert(title: "Subscription info", message: "\(response)")

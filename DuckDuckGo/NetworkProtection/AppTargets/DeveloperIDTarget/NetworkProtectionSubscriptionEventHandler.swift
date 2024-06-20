@@ -98,7 +98,7 @@ final class NetworkProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignIn() {
-        guard subscriptionManager.accountManager.accessToken != nil else {
+        guard (try? subscriptionManager.accountManager.accessToken) != nil else {
             assertionFailure("[NetP Subscription] AccountManager signed in but token could not be retrieved")
             return
         }

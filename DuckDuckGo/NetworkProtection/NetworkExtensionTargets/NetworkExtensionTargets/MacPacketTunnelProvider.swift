@@ -128,6 +128,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 return
             case .vpnAccessRevoked:
                 return
+            case .keychainError:
+                domainEvent = .networkProtectionAccessTokenKeychainError
+            case .keychainLocked:
+                domainEvent = .networkProtectionAccessTokenKeychainLockedError
             }
 
             PixelKit.fire(domainEvent, frequency: .dailyAndCount, includeAppVersionParameter: true)

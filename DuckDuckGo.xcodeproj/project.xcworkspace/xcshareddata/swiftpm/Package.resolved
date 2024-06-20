@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "201a932642275eeccc213940a1e85c6c19a6f3d0",
-        "version" : "158.1.0"
+        "branch" : "sam/sub-access-token-throws",
+        "revision" : "1830ff269ebcb40cba6e73c41aef6bc8e265d143"
       }
     },
     {

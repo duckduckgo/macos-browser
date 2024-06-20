@@ -31,11 +31,11 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
     let subscriptionManager: SubscriptionManaging
 
     public var isUserAuthenticated: Bool {
-        subscriptionManager.accountManager.accessToken != nil
+        (try? subscriptionManager.accountManager.accessToken) != nil
     }
 
     public var accessToken: String? {
-        subscriptionManager.accountManager.accessToken
+        try? subscriptionManager.accountManager.accessToken
     }
 
     public init(subscriptionManager: SubscriptionManaging) {
