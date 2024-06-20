@@ -23,16 +23,55 @@ import SecureStorage
 typealias DataBrokerProtectionVaultFactory = SecureVaultFactory<DefaultDataBrokerProtectionSecureVault<DefaultDataBrokerProtectionDatabaseProvider>>
 
 // swiftlint:disable identifier_name
-let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = SecureVaultFactory<DefaultDataBrokerProtectionSecureVault>(
+let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = {
+    var fileURL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL()
+    var keystoreProvider: SecureStorageKeyStoreProvider = DataBrokerProtectionKeyStoreProvider()
+//    if let testBundlePath = ProcessInfo().environment["XCTestBundlePath"] {
+//        if testBundlePath.contains("Integration") {
+//            fileURL = DefaultDataBrokerProtectionDatabaseProvider.databaseFilePath(directoryName: "PIRTest", fileName: "TestVault.db", appGroupIdentifier: Bundle.main.appGroupName)
+//            keystoreProvider = TestPIRKeyStoreProvider()
+//        }
+//    }
+
+    return SecureVaultFactory<DefaultDataBrokerProtectionSecureVault>(
     makeCryptoProvider: {
         return DataBrokerProtectionCryptoProvider()
     }, makeKeyStoreProvider: { _ in
-        return DataBrokerProtectionKeyStoreProvider()
+        return keystoreProvider
     }, makeDatabaseProvider: { key in
-        return try DefaultDataBrokerProtectionDatabaseProvider(key: key)
+        return try DefaultDataBrokerProtectionDatabaseProvider(file: fileURL, key: key)
     }
 )
+}()
 // swiftlint:enable identifier_name
+
+final class TestPIRKeyStoreProvider: DataBrokerProtectionKeyStoreProvider {
+    override func readData(named name: String, serviceName: String) throws -> Data? {
+        let fileManager = FileManager.default
+        let tempDir = fileManager.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent(name)
+
+        do {
+            let data = try Data(contentsOf: fileURL)
+            return data
+        } catch {
+            print(error)
+            return nil
+        }
+    }
+
+    override func writeData(_ data: Data, named name: String, serviceName: String) throws {
+        let fileManager = FileManager.default
+        let tempDir = fileManager.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent(name)
+
+        do {
+            try data.write(to: fileURL)
+        } catch {
+            print(error)
+        }
+    }
+}
 
 protocol DataBrokerProtectionSecureVault: SecureVault {
     func save(profile: DataBrokerProtectionProfile) throws -> Int64

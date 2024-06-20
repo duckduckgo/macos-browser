@@ -21,7 +21,7 @@ import Foundation
 import BrowserServicesKit
 import SecureStorage
 
-final class DataBrokerProtectionKeyStoreProvider: SecureStorageKeyStoreProvider {
+class DataBrokerProtectionKeyStoreProvider: SecureStorageKeyStoreProvider {
 
     struct Constants {
         static let defaultServiceName = "DataBrokerProtection DuckDuckGo Secure Vault"
@@ -72,6 +72,25 @@ final class DataBrokerProtectionKeyStoreProvider: SecureStorageKeyStoreProvider 
 
     func readData(named: String, serviceName: String) throws -> Data? {
         try readOrMigrate(named: named, serviceName: serviceName)
+    }
+
+    func writeData(_ data: Data, named name: String, serviceName: String) throws {
+        let base64String = data.base64EncodedString()
+
+        guard let base64Data = base64String.data(using: .utf8) else {
+            throw SecureStorageError.encodingFailed
+        }
+
+        var query = attributesForEntry(named: name, serviceName: serviceName)
+        query[kSecAttrService as String] = serviceName
+        query[kSecAttrAccessible as String] = keychainAccessibilityValue
+        query[kSecValueData as String] = base64Data
+
+        let status = keychainService.add(query, nil)
+
+        guard status == errSecSuccess else {
+            throw SecureStorageError.keystoreError(status: status)
+        }
     }
 
     func attributesForEntry(named: String, serviceName: String) -> [String: Any] {

@@ -42,6 +42,10 @@ public struct LoginItem: Equatable, Hashable {
         NSRunningApplication.runningApplications(withBundleIdentifier: agentBundleID)
     }
 
+    public var application: NSRunningApplication? {
+        NSRunningApplication.runningApplications(withBundleIdentifier: agentBundleID).first
+    }
+
     public enum Status {
         case notRegistered
         case enabled

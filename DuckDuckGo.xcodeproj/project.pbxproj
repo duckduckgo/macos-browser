@@ -2486,6 +2486,8 @@
 		C13909F52B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */; };
 		C13909FB2B861039001626ED /* AutofillActionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909FA2B861039001626ED /* AutofillActionPresenter.swift */; };
 		C13909FC2B861039001626ED /* AutofillActionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909FA2B861039001626ED /* AutofillActionPresenter.swift */; };
+		C157E3502C24474A00E61773 /* PIRScanIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C157E34F2C24474A00E61773 /* PIRScanIntegrationTests.swift */; };
+		C157E3512C24474A00E61773 /* PIRScanIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C157E34F2C24474A00E61773 /* PIRScanIntegrationTests.swift */; };
 		C16127EE2BDFB46400966BB9 /* DataImportShortcutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16127ED2BDFB46400966BB9 /* DataImportShortcutsView.swift */; };
 		C16127EF2BDFB46400966BB9 /* DataImportShortcutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16127ED2BDFB46400966BB9 /* DataImportShortcutsView.swift */; };
 		C168B9AC2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */; };
@@ -4078,6 +4080,7 @@
 		C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionExecutor.swift; sourceTree = "<group>"; };
 		C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillDeleteAllPasswordsExecutorTests.swift; sourceTree = "<group>"; };
 		C13909FA2B861039001626ED /* AutofillActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionPresenter.swift; sourceTree = "<group>"; };
+		C157E34F2C24474A00E61773 /* PIRScanIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PIRScanIntegrationTests.swift; sourceTree = "<group>"; };
 		C16127ED2BDFB46400966BB9 /* DataImportShortcutsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportShortcutsView.swift; sourceTree = "<group>"; };
 		C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillNeverPromptWebsitesManager.swift; sourceTree = "<group>"; };
 		C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopoversTests.swift; sourceTree = "<group>"; };
@@ -5024,6 +5027,7 @@
 		4B1AD89E25FC27E200261379 /* IntegrationTests */ = {
 			isa = PBXGroup;
 			children = (
+				C157E34E2C24470F00E61773 /* PIR */,
 				B603972A29BEDF0F00902A34 /* Common */,
 				B31055CC27A1BA39001AC618 /* Autoconsent */,
 				B6EC37DC29B5D05A001ACE79 /* Downloads */,
@@ -8164,6 +8168,14 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		C157E34E2C24470F00E61773 /* PIR */ = {
+			isa = PBXGroup;
+			children = (
+				C157E34F2C24474A00E61773 /* PIRScanIntegrationTests.swift */,
+			);
+			path = PIR;
+			sourceTree = "<group>";
+		};
 		C17CA7AF2B9B52EB008EC3C1 /* View */ = {
 			isa = PBXGroup;
 			children = (
@@ -10668,6 +10680,7 @@
 				3706FEA6293F662100E42796 /* EncryptionKeyStoreTests.swift in Sources */,
 				B6F5656A299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
 				B693766F2B6B5F27005BD9D4 /* ErrorPageTests.swift in Sources */,
+				C157E3512C24474A00E61773 /* PIRScanIntegrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10710,6 +10723,7 @@
 				4B1AD8D525FC38DD00261379 /* EncryptionKeyStoreTests.swift in Sources */,
 				B6F56568299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
 				B693766E2B6B5F27005BD9D4 /* ErrorPageTests.swift in Sources */,
+				C157E3502C24474A00E61773 /* PIRScanIntegrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
