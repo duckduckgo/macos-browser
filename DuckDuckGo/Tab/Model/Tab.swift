@@ -55,7 +55,7 @@ protocol NewWindowPolicyDecisionMaker {
         var downloadManager: FileDownloadManagerProtocol
         var certificateTrustEvaluator: CertificateTrustEvaluating
         var tunnelController: NetworkProtectionIPCTunnelController?
-        var phishingDetectionManager: PhishingDetectionManager
+        var phishingDetector: PhishingDetecting
         var phishingStateManager: PhishingStateManager
     }
 
@@ -114,7 +114,7 @@ protocol NewWindowPolicyDecisionMaker {
                      startupPreferences: StartupPreferences = StartupPreferences.shared,
                      certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator(),
                      tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController,
-                     phishingDetectionManager: PhishingDetectionManager = PhishingDetectionManagerFactory.create(),
+                     phishingDetector: PhishingDetector = PhishingDetectionManagerFactory.create(),
                      tabsPreferences: TabsPreferences = TabsPreferences.shared
     ) {
 
@@ -158,7 +158,7 @@ protocol NewWindowPolicyDecisionMaker {
                   startupPreferences: startupPreferences,
                   certificateTrustEvaluator: certificateTrustEvaluator,
                   tunnelController: tunnelController,
-                  phishingDetectionManager: phishingDetectionManager,
+                  phishingDetector: phishingDetector,
                   tabsPreferences: tabsPreferences)
     }
 
@@ -193,7 +193,7 @@ protocol NewWindowPolicyDecisionMaker {
          startupPreferences: StartupPreferences,
          certificateTrustEvaluator: CertificateTrustEvaluating,
          tunnelController: NetworkProtectionIPCTunnelController?,
-         phishingDetectionManager: PhishingDetectionManager,
+         phishingDetector: PhishingDetector,
          tabsPreferences: TabsPreferences
     ) {
 
@@ -256,7 +256,7 @@ protocol NewWindowPolicyDecisionMaker {
                                                        downloadManager: downloadManager,
                                                        certificateTrustEvaluator: certificateTrustEvaluator,
                                                        tunnelController: tunnelController,
-                                                       phishingDetectionManager: phishingDetectionManager,
+                                                       phishingDetector: phishingDetector,
                                                        phishingStateManager: phishingState))
 
         super.init()

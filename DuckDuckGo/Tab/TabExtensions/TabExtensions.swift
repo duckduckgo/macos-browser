@@ -73,7 +73,7 @@ protocol TabExtensionDependencies {
     var duckPlayer: DuckPlayer { get }
     var certificateTrustEvaluator: CertificateTrustEvaluating { get }
     var tunnelController: NetworkProtectionIPCTunnelController? { get }
-    var phishingDetectionManager: PhishingDetectionManager { get }
+    var phishingDetector: PhishingDetecting { get }
     var phishingStateManager: PhishingStateManager { get }
 }
 
@@ -203,7 +203,7 @@ extension TabExtensionsBuilder {
         add {
             SpecialErrorPageTabExtension(webViewPublisher: args.webViewFuture,
                                   scriptsPublisher: userScripts.compactMap { $0 },
-                                  phishingDetectionManager: dependencies.phishingDetectionManager,
+                                  phishingDetector: dependencies.phishingDetector,
                                   phishingStateManager: dependencies.phishingStateManager)
         }
 

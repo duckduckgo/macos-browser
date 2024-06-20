@@ -49,7 +49,7 @@ final class SpecialErrorPageTabExtension {
     private var shouldBypassSSLError = false
     private var urlCredentialCreator: URLCredentialCreating
     private var featureFlagger: FeatureFlagger
-    private var phishingDetectionManager: PhishingDetectionManaging
+    private var phishingDetector: PhishingDetecting
     private var phishingStateManager: PhishingStateManager
 #if DEBUG
     var errorPageType: ErrorType?
@@ -66,11 +66,11 @@ final class SpecialErrorPageTabExtension {
         scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
-        phishingDetectionManager: some PhishingDetectionManaging,
+        phishingDetector: some PhishingDetecting,
         phishingStateManager: PhishingStateManager) {
             self.featureFlagger = featureFlagger
             self.urlCredentialCreator = urlCredentialCreator
-            self.phishingDetectionManager = phishingDetectionManager
+            self.phishingDetector = phishingDetector
             self.phishingStateManager = phishingStateManager
             webViewPublisher.sink { [weak self] webView in
                 self?.webView = webView
@@ -129,7 +129,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
             return .next
         }
         // Check the URL
-        let isMalicious = await phishingDetectionManager.isMalicious(url: url)
+        let isMalicious = await phishingDetector.isMalicious(url: url)
         if isMalicious {
             errorPageType = .phishing
             specialErrorPageUserScript?.failingURL = navigationAction.url
