@@ -45,11 +45,13 @@ struct SubscriptionAppStoreRestorer {
             try await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
             await continueRestore()
         } catch {
+            Task { @MainActor in
+                uiHandler.dismissProgressViewController()
+            }
+
             switch error as? StoreKitError {
             case .some(.userCancelled):
-                Task { @MainActor in
-                    uiHandler.dismissProgressViewController()
-                }
+                break
             default:
                 Task { @MainActor in
                     let alertResponse = await uiHandler.show(alertType: .appleIDSyncFailed, text: error.localizedDescription)
@@ -57,8 +59,6 @@ struct SubscriptionAppStoreRestorer {
                         Task {
                             await continueRestore()
                         }
-                    } else {
-                        uiHandler.dismissProgressViewController()
                     }
                 }
             }
@@ -88,24 +88,19 @@ struct SubscriptionAppStoreRestorer {
             switch error {
             case .missingAccountOrTransactions:
                 subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
-                await showSubscriptionNotFoundAlert()
+                showSubscriptionNotFoundAlert()
             case .subscriptionExpired:
                 subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionExpired)
-                await showSubscriptionInactiveAlert()
+                showSubscriptionInactiveAlert()
             case .pastTransactionAuthenticationError, .failedToObtainAccessToken, .failedToFetchAccountDetails, .failedToFetchSubscriptionDetails:
                 subscriptionErrorReporter.report(subscriptionActivationError: .generalError)
-                await showSomethingWentWrongAlert()
+                showSomethingWentWrongAlert()
             }
         }
     }
-}
-
-@available(macOS 12.0, *)
-extension SubscriptionAppStoreRestorer {
 
     // MARK: - UI interactions
 
-    @MainActor
     func showSomethingWentWrongAlert() {
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
         Task { @MainActor in
@@ -113,7 +108,6 @@ extension SubscriptionAppStoreRestorer {
         }
     }
 
-    @MainActor
     func showSubscriptionNotFoundAlert() {
         Task { @MainActor in
             switch await uiHandler.show(alertType: .subscriptionNotFound) {
@@ -126,7 +120,6 @@ extension SubscriptionAppStoreRestorer {
         }
     }
 
-    @MainActor
     func showSubscriptionInactiveAlert() {
         Task { @MainActor in
             switch await uiHandler.show(alertType: .subscriptionInactive) {
