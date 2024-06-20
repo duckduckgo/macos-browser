@@ -52,6 +52,7 @@ struct VPNMetadata: Encodable {
         let connectionState: String
         let lastStartErrorDescription: String
         let lastTunnelErrorDescription: String
+        let lastKnownFailureDescription: String
         let connectedServer: String
         let connectedServerIP: String
     }
@@ -119,13 +120,18 @@ protocol VPNMetadataCollector {
 final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
     private let statusReporter: NetworkProtectionStatusReporter
-    private let ipcClient: TunnelControllerIPCClient
+    private let ipcClient: VPNControllerXPCClient
     private let defaults: UserDefaults
+    private let accountManager: AccountManaging
+    private let settings: VPNSettings
 
-    init(defaults: UserDefaults = .netP) {
-        let ipcClient = TunnelControllerIPCClient()
-        ipcClient.register()
+    init(defaults: UserDefaults = .netP,
+         accountManager: AccountManaging) {
 
+        let ipcClient = VPNControllerXPCClient.shared
+        ipcClient.register { _ in }
+
+        self.accountManager = accountManager
         self.ipcClient = ipcClient
         self.defaults = defaults
 
@@ -135,12 +141,23 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             connectionErrorObserver: ipcClient.connectionErrorObserver,
             connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
             controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications(),
-            dataVolumeObserver: ipcClient.dataVolumeObserver
+            dataVolumeObserver: ipcClient.dataVolumeObserver,
+            knownFailureObserver: KnownFailureObserverThroughDistributedNotifications()
         )
 
         // Force refresh just in case. A refresh is requested when the IPC client is created, but distributed notifications don't guarantee delivery
         // so we'll play it safe and add one more attempt.
         self.statusReporter.forceRefresh()
+
+        self.settings = VPNSettings(defaults: defaults)
+        updateSettings()
+    }
+
+    func updateSettings() {
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        settings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
     }
 
     @MainActor
@@ -253,12 +270,14 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
         let connectionState = String(describing: statusReporter.statusObserver.recentValue)
         let lastTunnelErrorDescription = await errorHistory.lastTunnelErrorDescription
+        let lastKnownFailureDescription = NetworkProtectionKnownFailureStore().lastKnownFailure?.description ?? "none"
         let connectedServer = statusReporter.serverInfoObserver.recentValue.serverLocation?.serverLocation ?? "none"
         let connectedServerIP = statusReporter.serverInfoObserver.recentValue.serverAddress ?? "none"
         return .init(onboardingState: onboardingState,
                      connectionState: connectionState,
                      lastStartErrorDescription: errorHistory.lastStartErrorDescription,
                      lastTunnelErrorDescription: lastTunnelErrorDescription,
+                     lastKnownFailureDescription: lastKnownFailureDescription,
                      connectedServer: connectedServer,
                      connectedServerIP: connectedServerIP)
     }
@@ -287,8 +306,6 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
     func collectVPNSettingsState() -> VPNMetadata.VPNSettingsState {
-        let settings = VPNSettings(defaults: defaults)
-
         return .init(
             connectOnLoginEnabled: settings.connectOnLogin,
             includeAllNetworksEnabled: settings.includeAllNetworks,
@@ -302,10 +319,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
     func collectPrivacyProInfo() async -> VPNMetadata.PrivacyProInfo {
-        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-
         let hasVPNEntitlement = (try? await accountManager.hasEntitlement(for: .networkProtection).get()) ?? false
-
         return .init(
             hasPrivacyProAccount: accountManager.isUserAuthenticated,
             hasVPNEntitlement: hasVPNEntitlement

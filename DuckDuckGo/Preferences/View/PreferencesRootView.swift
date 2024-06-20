@@ -37,7 +37,7 @@ enum Preferences {
                 return 355
             }
         }
-        static let paneContentWidth: CGFloat = 524
+        static let paneContentWidth: CGFloat = 544
         static let panePaddingHorizontal: CGFloat = 40
         static let panePaddingVertical: CGFloat = 40
     }
@@ -98,7 +98,7 @@ enum Preferences {
                 case .dataClearing:
                     DataClearingView(model: DataClearingPreferences.shared)
                 case .vpn:
-                    VPNView(model: VPNPreferencesModel())
+                    VPNView(model: VPNPreferencesModel(), status: model.vpnProtectionStatus())
                 case .subscription:
                     SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
                 case .autofill:
@@ -138,7 +138,8 @@ enum Preferences {
                         WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
                     case .openITR:
                         PixelKit.fire(PrivacyProPixel.privacyProIdentityRestorationSettings)
-                        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+                        let url = Application.appDelegate.subscriptionManager.url(for: .identityTheftRestoration)
+                        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(url))
                     case .iHaveASubscriptionClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseClick)
                     case .activateAddEmailClick:
@@ -164,12 +165,9 @@ enum Preferences {
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 if #available(macOS 12.0, *) {
                     Task {
-                        guard let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
-                              let windowControllerManager = WindowControllersManager.shared.lastKeyMainWindowController else {
-                            return
-                        }
-
-                        await SubscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
+                        let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: Application.appDelegate.subscriptionManager,
+                                                                                        uiHandler: Application.appDelegate.subscriptionUIHandler)
+                        await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
                     }
                 }
             },
@@ -179,7 +177,7 @@ enum Preferences {
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,
                                                 sheetActionHandler: sheetActionHandler,
-                                                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+                                                subscriptionManager: Application.appDelegate.subscriptionManager)
         }
     }
 }

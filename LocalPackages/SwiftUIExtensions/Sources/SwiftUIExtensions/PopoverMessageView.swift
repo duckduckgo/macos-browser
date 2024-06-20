@@ -24,7 +24,7 @@ public final class PopoverMessageViewModel: ObservableObject {
     @Published var message: String
     @Published var image: NSImage?
     @Published var buttonText: String?
-    @Published var buttonAction: (() -> Void)?
+    @Published public var buttonAction: (() -> Void)?
 
     public init(message: String,
                 image: NSImage? = nil,

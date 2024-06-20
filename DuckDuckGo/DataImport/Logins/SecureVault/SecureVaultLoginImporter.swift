@@ -60,6 +60,10 @@ final class SecureVaultLoginImporter: LoginImporter {
             }
         }
 
+        if successful.count > 0 {
+            NotificationCenter.default.post(name: .autofillSaveEvent, object: nil, userInfo: nil)
+        }
+
         return .init(successful: successful.count, duplicate: duplicates.count, failed: failed.count)
     }
 

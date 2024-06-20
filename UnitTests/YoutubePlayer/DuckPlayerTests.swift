@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import XCTest
+import Common
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -87,6 +88,19 @@ final class DuckPlayerTests: XCTestCase {
 
         duckPlayer.mode = .disabled
         XCTAssertNil(duckPlayer.title(for: feedItem))
+    }
+
+    @MainActor
+    func testEnabledPiPFlag() async {
+        let configuration = WKWebViewConfiguration()
+
+        configuration.applyStandardConfiguration(contentBlocking: ContentBlockingMock(),
+                                                 burnerMode: .regular)
+#if APPSTORE
+        XCTAssertFalse(configuration.allowsPictureInPictureMediaPlayback)
+#else
+        XCTAssertTrue(configuration.allowsPictureInPictureMediaPlayback)
+#endif
     }
 
     func testThatTitleForRecentlyVisitedPageIsNotAdjustedForNonDuckPlayerFeedItems() {

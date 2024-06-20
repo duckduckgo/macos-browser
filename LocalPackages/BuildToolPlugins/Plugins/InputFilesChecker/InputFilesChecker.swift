@@ -50,10 +50,7 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
     "Unit Tests": [
         .init("BWEncryptionTests.swift", .source),
-        .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source),
-        .init("NetworkProtectionRemoteMessageTests.swift", .source),
-        .init("network-protection-messages.json", .resource),
-        .init("dbp-messages.json", .resource),
+        .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source)
     ],
 
     "Integration Tests": []

@@ -29,7 +29,7 @@ import NetworkProtectionIPC
 ///
 final class NetworkProtectionDebugUtilities {
 
-    private let ipcClient: TunnelControllerIPCClient
+    private let ipcClient: VPNControllerXPCClient
     private let vpnUninstaller: VPNUninstaller
 
     // MARK: - Login Items Management
@@ -46,7 +46,7 @@ final class NetworkProtectionDebugUtilities {
         self.loginItemsManager = loginItemsManager
         self.settings = settings
 
-        let ipcClient = TunnelControllerIPCClient()
+        let ipcClient = VPNControllerXPCClient.shared
 
         self.ipcClient = ipcClient
         self.vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
@@ -59,8 +59,6 @@ final class NetworkProtectionDebugUtilities {
 
         settings.resetToDefaults()
 
-        DefaultHomePageRemoteMessagingStorage.networkProtection().removeStoredAndDismissedMessages()
-
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
@@ -68,7 +66,7 @@ final class NetworkProtectionDebugUtilities {
 
     func removeSystemExtensionAndAgents() async throws {
         try await vpnUninstaller.removeSystemExtension()
-        vpnUninstaller.disableLoginItems()
+        vpnUninstaller.removeAgents()
     }
 
     func sendTestNotificationRequest() async throws {

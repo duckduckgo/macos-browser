@@ -38,7 +38,7 @@ enum Stage: String {
 
 protocol StageDurationCalculator {
     var attemptId: UUID { get }
-    var isManualScan: Bool { get }
+    var isImmediateOperation: Bool { get }
 
     func durationSinceLastStage() -> Double
     func durationSinceStartTime() -> Double
@@ -63,10 +63,11 @@ protocol StageDurationCalculator {
 }
 
 final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator {
-    let isManualScan: Bool
+    let isImmediateOperation: Bool
     let handler: EventMapping<DataBrokerProtectionPixels>
     let attemptId: UUID
     let dataBroker: String
+    let dataBrokerVersion: String
     let startTime: Date
     var lastStateTime: Date
     private (set) var actionID: String?
@@ -76,14 +77,16 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     init(attemptId: UUID = UUID(),
          startTime: Date = Date(),
          dataBroker: String,
+         dataBrokerVersion: String,
          handler: EventMapping<DataBrokerProtectionPixels>,
-         isManualScan: Bool = false) {
+         isImmediateOperation: Bool = false) {
         self.attemptId = attemptId
         self.startTime = startTime
         self.lastStateTime = startTime
         self.dataBroker = dataBroker
+        self.dataBrokerVersion = dataBrokerVersion
         self.handler = handler
-        self.isManualScan = isManualScan
+        self.isImmediateOperation = isImmediateOperation
     }
 
     /// Returned in milliseconds
@@ -154,6 +157,7 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
 
     func fireOptOutFailure(tries: Int) {
         handler.fire(.optOutFailure(dataBroker: dataBroker,
+                                    dataBrokerVersion: dataBrokerVersion,
                                     attemptId: attemptId,
                                     duration: durationSinceStartTime(),
                                     stage: stage.rawValue,
@@ -163,11 +167,11 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     }
 
     func fireScanSuccess(matchesFound: Int) {
-        handler.fire(.scanSuccess(dataBroker: dataBroker, matchesFound: matchesFound, duration: durationSinceStartTime(), tries: 1, isManualScan: isManualScan))
+        handler.fire(.scanSuccess(dataBroker: dataBroker, matchesFound: matchesFound, duration: durationSinceStartTime(), tries: 1, isImmediateOperation: isImmediateOperation))
     }
 
     func fireScanFailed() {
-        handler.fire(.scanFailed(dataBroker: dataBroker, duration: durationSinceStartTime(), tries: 1, isManualScan: isManualScan))
+        handler.fire(.scanFailed(dataBroker: dataBroker, dataBrokerVersion: dataBrokerVersion, duration: durationSinceStartTime(), tries: 1, isImmediateOperation: isImmediateOperation))
     }
 
     func fireScanError(error: Error) {
@@ -202,10 +206,11 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
         handler.fire(
             .scanError(
                 dataBroker: dataBroker,
+                dataBrokerVersion: dataBrokerVersion,
                 duration: durationSinceStartTime(),
                 category: errorCategory.toString,
                 details: error.localizedDescription,
-                isManualScan: isManualScan
+                isImmediateOperation: isImmediateOperation
             )
         )
     }

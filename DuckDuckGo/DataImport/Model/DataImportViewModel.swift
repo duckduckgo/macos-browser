@@ -70,6 +70,7 @@ struct DataImportViewModel {
         case fileImport(dataType: DataType, summary: Set<DataType> = [])
         case summary(Set<DataType>, isFileImport: Bool = false)
         case feedback
+        case shortcuts(Set<DataType>)
 
         var isFileImport: Bool {
             if case .fileImport = self { true } else { false }
@@ -338,8 +339,23 @@ struct DataImportViewModel {
             // errors occurred during import: show feedback screen
             self.screen = .feedback
         } else {
-            // When we skip a manual import, and there are no next non-imported data types, we dismiss
-            self.dismiss(using: dismiss)
+            // When we skip a manual import, and there are no next non-imported data types,
+            // if some data was successfully imported we present the shortcuts screen, otherwise we dismiss
+            var dataTypes: Set<DataType> = []
+
+            // Filter out only the successful results with a positive count of successful summaries
+            for dataTypeImportResult in summary {
+                guard case .success(let summary) = dataTypeImportResult.result, summary.successful > 0 else {
+                    continue
+                }
+                dataTypes.insert(dataTypeImportResult.dataType)
+            }
+
+            if !dataTypes.isEmpty {
+                self.screen = .shortcuts(dataTypes)
+            } else {
+                self.dismiss(using: dismiss)
+            }
         }
     }
 
@@ -630,11 +646,13 @@ extension DataImportViewModel {
             if let screen = screenForNextDataTypeRemainingToImport(after: DataType.allCases.last(where: dataTypes.contains)) {
                 return .next(screen)
             } else {
-                return .done
+                return .next(.shortcuts(dataTypes))
             }
 
         case .feedback:
             return .submit
+        case .shortcuts:
+            return .done
         }
     }
 

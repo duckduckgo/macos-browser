@@ -17,77 +17,88 @@
 //
 
 import WebKit
+import Common
 import UserScript
-import BrowserServicesKit
 
 protocol ClickToLoadUserScriptDelegate: AnyObject {
 
-    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void)
+    func clickToLoadUserScriptAllowFB() -> Bool
 }
 
-final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerWithReply {
-
-    var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
-    var forMainFrameOnly: Bool { false }
-    var messageNames: [String] { ["getImage", "enableFacebook", "initClickToLoad" ] }
-    let source: String
-
-    init(scriptSourceProvider: ScriptSourceProviding) {
-        self.source = scriptSourceProvider.clickToLoadSource
-    }
+final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
+    weak var broker: UserScriptMessageBroker?
+    weak var webView: WKWebView?
 
     weak var delegate: ClickToLoadUserScriptDelegate?
 
+#if DEBUG
+    var devMode: Bool = true
+#else
+    var devMode: Bool = false
+#endif
+
+    // this isn't an issue to be set to 'all' because the page
+    public let messageOriginPolicy: MessageOriginPolicy = .all
+    public let featureName: String = "clickToLoad"
+
+    // MARK: - Subfeature
+
+    public func with(broker: UserScriptMessageBroker) {
+        self.broker = broker
+    }
+
+    // MARK: - MessageNames
+
+    enum MessageNames: String, CaseIterable {
+        case getClickToLoadState
+        case unblockClickToLoadContent
+        case updateFacebookCTLBreakageFlags
+        case addDebugFlag
+    }
+
+    public func handler(forMethodNamed methodName: String) -> Handler? {
+        switch MessageNames(rawValue: methodName) {
+        case .getClickToLoadState:
+            return handleGetClickToLoadState
+        case .unblockClickToLoadContent:
+            return handleUnblockClickToLoadContent
+        case .updateFacebookCTLBreakageFlags:
+            return handleDebugFlagsMock
+        case .addDebugFlag:
+            return handleDebugFlagsMock
+        default:
+            assertionFailure("ClickToLoadUserScript: Failed to parse User Script message: \(methodName)")
+            return nil
+        }
+    }
+
     @MainActor
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
-                               replyHandler: @escaping (Any?, String?) -> Void) {
-        if message.name == "initClickToLoad" {
-            let host = message.body as? String
-            let controller = userContentController as? UserContentController
-            let privacyConfigurationManager = controller!.privacyConfigurationManager
-            let privacyConfiguration = privacyConfigurationManager.privacyConfig
-
-            let locallyProtected = privacyConfiguration.isProtected(domain: host)
-            let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: host)
-            if locallyProtected && featureEnabled {
-                replyHandler(true, nil)
-            } else {
-                replyHandler(false, nil)
-            }
-            return
-        }
-        if message.name == "enableFacebook" {
-            guard let delegate = delegate else { return }
-            delegate.clickToLoadUserScriptAllowFB(self) { _ in
-                guard let isLogin = message.body as? Bool else {
-                    replyHandler(nil, nil)
-                    return
-                }
-
-                replyHandler(isLogin, nil)
-            }
-
-            return
-        }
-
-        var image: String
-
-        guard let arg = message.body as? String else {
-            replyHandler(nil, nil)
-            return
-        }
-        if message.name == "getImage" {
-            image = ClickToLoadModel.getImage[arg]!
-        } else {
-            assertionFailure("Uknown message type")
-            replyHandler(nil, nil)
-            return
-        }
-        replyHandler(image, nil)
+    private func handleGetClickToLoadState(params: Any, message: UserScriptMessage) -> Encodable? {
+        webView = message.messageWebView
+        return [
+            "devMode": devMode,
+            "youtubePreviewsEnabled": false
+        ]
     }
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        assertionFailure("SHOULDN'T BE HERE!")
+    @MainActor
+    private func handleUnblockClickToLoadContent(params: Any, message: UserScriptMessage) -> Encodable? {
+        guard let delegate = delegate else { return false }
+
+        // only worry about CTL FB for now
+        return delegate.clickToLoadUserScriptAllowFB()
     }
 
+    @MainActor
+    private func handleDebugFlagsMock(params: Any, message: UserScriptMessage) -> Encodable? {
+        // breakage flags not supported on Mac yet
+        return nil
+    }
+
+    @MainActor
+    public func displayClickToLoadPlaceholders() {
+        guard let webView else { return }
+
+        broker?.push(method: "displayClickToLoadPlaceholders", params: ["ruleAction": ["block"]], for: self, into: webView)
+    }
 }

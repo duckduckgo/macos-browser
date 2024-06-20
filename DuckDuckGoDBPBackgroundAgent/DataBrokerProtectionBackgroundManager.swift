@@ -25,8 +25,6 @@ import Subscription
 
 public final class DataBrokerProtectionBackgroundManager {
 
-    static let shared = DataBrokerProtectionBackgroundManager()
-
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
     private let authenticationRepository: AuthenticationRepository = KeychainAuthenticationData()
@@ -70,10 +68,12 @@ public final class DataBrokerProtectionBackgroundManager {
                                                     userNotificationService: userNotificationService)
     }()
 
-    private init() {
+    public init(subscriptionManager: SubscriptionManaging) {
         let redeemUseCase = RedeemUseCase(authenticationService: authenticationService,
                                           authenticationRepository: authenticationRepository)
-        self.authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(redeemUseCase: redeemUseCase)
+        self.authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(
+            redeemUseCase: redeemUseCase,
+            subscriptionManager: subscriptionManager)
 
         _ = ipcServiceManager
     }

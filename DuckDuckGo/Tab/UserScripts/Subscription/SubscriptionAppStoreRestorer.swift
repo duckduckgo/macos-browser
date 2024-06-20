@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import Subscription
 import SubscriptionUI
 import enum StoreKit.StoreKitError
@@ -25,21 +25,31 @@ import PixelKit
 @available(macOS 12.0, *)
 struct SubscriptionAppStoreRestorer {
 
-    // swiftlint:disable:next cyclomatic_complexity
-    static func restoreAppStoreSubscription(mainViewController: MainViewController, windowController: MainWindowController) async {
+    private let subscriptionManager: SubscriptionManaging
+    @MainActor var window: NSWindow? { WindowControllersManager.shared.lastKeyMainWindowController?.window }
+    let subscriptionErrorReporter = SubscriptionErrorReporter()
+    let uiHandler: SubscriptionUIHandling
 
-        let progressViewController = await ProgressViewController(title: UserText.restoringSubscriptionTitle)
+    public init(subscriptionManager: SubscriptionManaging,
+                uiHandler: SubscriptionUIHandling) {
+        self.subscriptionManager = subscriptionManager
+        self.uiHandler = uiHandler
+    }
+
+    // swiftlint:disable:next cyclomatic_complexity
+    func restoreAppStoreSubscription() async {
+
         defer {
-            DispatchQueue.main.async {
-                mainViewController.dismiss(progressViewController)
+            Task { @MainActor in
+                uiHandler.dismissProgressViewController()
             }
         }
 
-        DispatchQueue.main.async {
-            mainViewController.presentAsSheet(progressViewController)
+        Task { @MainActor in
+            uiHandler.presentProgressViewController(withTitle: UserText.restoringSubscriptionTitle)
         }
 
-        let syncResult = await PurchaseManager.shared.syncAppleIDAccount()
+        let syncResult = await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
 
         switch syncResult {
         case .success:
@@ -52,18 +62,13 @@ struct SubscriptionAppStoreRestorer {
                 break
             }
 
-            let alert = await NSAlert.appleIDSyncFailedAlert(text: error.localizedDescription)
-
-            switch await alert.runModal() {
-            case .alertFirstButtonReturn:
-                // Continue button
-                break
-            default:
-                return
+            Task { @MainActor in
+                uiHandler.show(alertType: .appleIDSyncFailed, text: error.localizedDescription)
             }
         }
 
-        let result = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: subscriptionManager)
+        let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
 
         switch result {
         case .success:
@@ -77,15 +82,45 @@ struct SubscriptionAppStoreRestorer {
 
             switch error {
             case .missingAccountOrTransactions:
-                SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
-                await windowController.showSubscriptionNotFoundAlert()
+                subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
+                await showSubscriptionNotFoundAlert()
             case .subscriptionExpired:
-                SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionExpired)
-                await windowController.showSubscriptionInactiveAlert()
+                subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionExpired)
+                await showSubscriptionInactiveAlert()
             case .pastTransactionAuthenticationError, .failedToObtainAccessToken, .failedToFetchAccountDetails, .failedToFetchSubscriptionDetails:
-                SubscriptionErrorReporter.report(subscriptionActivationError: .generalError)
-                await windowController.showSomethingWentWrongAlert()
+                subscriptionErrorReporter.report(subscriptionActivationError: .generalError)
+                await showSomethingWentWrongAlert()
             }
         }
+    }
+}
+
+@available(macOS 12.0, *)
+extension SubscriptionAppStoreRestorer {
+
+    // MARK: - UI interactions
+
+    @MainActor
+    func showSomethingWentWrongAlert() {
+        PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
+        uiHandler.show(alertType: .somethingWentWrong)
+    }
+
+    @MainActor
+    func showSubscriptionNotFoundAlert() {
+        uiHandler.show(alertType: .subscriptionNotFound, firstButtonAction: {
+            let url = subscriptionManager.url(for: .purchase)
+            uiHandler.showTab(with: .subscription(url))
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+        })
+    }
+
+    @MainActor
+    func showSubscriptionInactiveAlert() {
+        uiHandler.show(alertType: .subscriptionInactive, firstButtonAction: {
+            let url = subscriptionManager.url(for: .purchase)
+            uiHandler.showTab(with: .subscription(url))
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+        })
     }
 }

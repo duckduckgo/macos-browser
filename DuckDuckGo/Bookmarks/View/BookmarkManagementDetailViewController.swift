@@ -34,8 +34,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     private let toolbarButtonsStackView = NSStackView()
     private lazy var newBookmarkButton = MouseOverButton(title: "  " + UserText.newBookmark, target: self, action: #selector(presentAddBookmarkModal))
+        .withAccessibilityIdentifier("BookmarkManagementDetailViewController.newBookmarkButton")
     private lazy var newFolderButton = MouseOverButton(title: "  " + UserText.newFolder, target: self, action: #selector(presentAddFolderModal))
+        .withAccessibilityIdentifier("BookmarkManagementDetailViewController.newFolderButton")
     private lazy var deleteItemsButton = MouseOverButton(title: "  " + UserText.bookmarksBarContextMenuDelete, target: self, action: #selector(delete))
+        .withAccessibilityIdentifier("BookmarkManagementDetailViewController.deleteItemsButton")
 
     private lazy var separator = NSBox()
     private lazy var scrollView = NSScrollView()

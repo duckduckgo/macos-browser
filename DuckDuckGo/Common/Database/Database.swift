@@ -45,17 +45,14 @@ final class Database {
 
             let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
 
-            // Encryption is disabled for UI Tests to make them work in CI
-            if NSApp.runType != .uiTests {
-                _=mainModel.registerValueTransformers(withAllowedPropertyClasses: [
-                    NSImage.self,
-                    NSString.self,
-                    NSURL.self,
-                    NSNumber.self,
-                    NSError.self,
-                    NSData.self
-                ], keyStore: keyStore)
-            }
+            _=mainModel.registerValueTransformers(withAllowedPropertyClasses: [
+                NSImage.self,
+                NSString.self,
+                NSURL.self,
+                NSNumber.self,
+                NSError.self,
+                NSData.self
+            ], keyStore: keyStore)
 
             let httpsUpgradeModel = HTTPSUpgrade.managedObjectModel
 

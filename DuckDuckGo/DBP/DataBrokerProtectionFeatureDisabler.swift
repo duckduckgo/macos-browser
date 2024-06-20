@@ -31,23 +31,21 @@ protocol DataBrokerProtectionFeatureDisabling {
 }
 
 struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling {
-    private let scheduler: DataBrokerProtectionLoginItemScheduler
+    private let loginItemInterface: DataBrokerProtectionLoginItemInterface
     private let dataManager: InMemoryDataCacheDelegate
 
-    init(scheduler: DataBrokerProtectionLoginItemScheduler = DataBrokerProtectionManager.shared.scheduler,
+    init(loginItemInterface: DataBrokerProtectionLoginItemInterface = DataBrokerProtectionManager.shared.loginItemInterface,
          dataManager: InMemoryDataCacheDelegate = DataBrokerProtectionManager.shared.dataManager) {
         self.dataManager = dataManager
-        self.scheduler = scheduler
+        self.loginItemInterface = loginItemInterface
     }
 
     func disableAndDelete() {
-        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist {
-            scheduler.stopScheduler()
-
-            scheduler.disableLoginItem()
+        if !DefaultDataBrokerProtectionFeatureGatekeeper.bypassWaitlist {
 
             do {
                 try dataManager.removeAllData()
+                // the dataManagers delegate handles login item disabling
             } catch {
                 os_log("DataBrokerProtectionFeatureDisabler error: disableAndDelete, error: %{public}@", log: .error, error.localizedDescription)
             }

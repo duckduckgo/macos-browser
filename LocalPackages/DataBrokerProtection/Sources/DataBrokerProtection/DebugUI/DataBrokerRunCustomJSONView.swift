@@ -117,7 +117,7 @@ struct DataBrokerRunCustomJSONView: View {
                             Text(scanResult.extractedProfile.name ?? "No name")
                                 .padding(.horizontal, 10)
                             Divider()
-                            Text(scanResult.extractedProfile.addresses?.first?.fullAddress ?? "No address")
+                            Text(scanResult.extractedProfile.addresses?.map { $0.fullAddress }.joined(separator: ", ") ?? "No address")
                                 .padding(.horizontal, 10)
                             Divider()
                             Text(scanResult.extractedProfile.relatives?.joined(separator: ",") ?? "No relatives")
