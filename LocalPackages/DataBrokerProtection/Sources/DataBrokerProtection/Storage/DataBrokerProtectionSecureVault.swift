@@ -26,12 +26,12 @@ typealias DataBrokerProtectionVaultFactory = SecureVaultFactory<DefaultDataBroke
 let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = {
     var fileURL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL()
     var keystoreProvider: SecureStorageKeyStoreProvider = DataBrokerProtectionKeyStoreProvider()
-//    if let testBundlePath = ProcessInfo().environment["XCTestBundlePath"] {
-//        if testBundlePath.contains("Integration") {
+    if let testBundlePath = ProcessInfo().environment["XCTestBundlePath"] {
+        if testBundlePath.contains("Integration") {
 //            fileURL = DefaultDataBrokerProtectionDatabaseProvider.databaseFilePath(directoryName: "PIRTest", fileName: "TestVault.db", appGroupIdentifier: Bundle.main.appGroupName)
 //            keystoreProvider = TestPIRKeyStoreProvider()
-//        }
-//    }
+        }
+    }
 
     return SecureVaultFactory<DefaultDataBrokerProtectionSecureVault>(
     makeCryptoProvider: {
@@ -49,11 +49,16 @@ final class TestPIRKeyStoreProvider: DataBrokerProtectionKeyStoreProvider {
     override func readData(named name: String, serviceName: String) throws -> Data? {
         let fileManager = FileManager.default
         let tempDir = fileManager.temporaryDirectory
-        let fileURL = tempDir.appendingPathComponent(name)
+
+        let fileURL = tempDir.appendingPathComponent(String(name.prefix(3)))
 
         do {
             let data = try Data(contentsOf: fileURL)
-            return data
+            guard let itemString = String(data: data, encoding: .utf8),
+                  let decodedData = Data(base64Encoded: itemString) else {
+                throw SecureStorageError.keystoreError(status: 1)
+            }
+            return decodedData
         } catch {
             print(error)
             return nil
@@ -63,10 +68,16 @@ final class TestPIRKeyStoreProvider: DataBrokerProtectionKeyStoreProvider {
     override func writeData(_ data: Data, named name: String, serviceName: String) throws {
         let fileManager = FileManager.default
         let tempDir = fileManager.temporaryDirectory
-        let fileURL = tempDir.appendingPathComponent(name)
+        let fileURL = tempDir.appendingPathComponent(String(name.prefix(3)))
+
+        let base64String = data.base64EncodedString()
+
+        guard let base64Data = base64String.data(using: .utf8) else {
+            throw SecureStorageError.encodingFailed
+        }
 
         do {
-            try data.write(to: fileURL)
+            try base64Data.write(to: fileURL)
         } catch {
             print(error)
         }
