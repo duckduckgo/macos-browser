@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
      - cron: '0 3 * * 1-5' # 3AM UTC offsetted to legacy to avoid action-junit-report@v4 bug
-  push:
+  pull_request:
     branches:
       - hotfix/*
       - release/*
@@ -119,7 +119,7 @@ jobs:
 
   notify-failure:
     name: Notify on failure
-    if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'push') && (needs.ui-tests.result == 'failure' || needs.ui-tests.result == 'cancelled') }}
+    if: ${{ always() && github.event_name == 'schedule' && (needs.ui-tests.result == 'failure' || needs.ui-tests.result == 'cancelled') }}
     needs: [ui-tests]
     runs-on: ubuntu-latest
 
@@ -131,7 +131,4 @@ jobs:
         asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
         asana-project: ${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}
         asana-task-name: GH Workflow Failure - UI Tests
-        asana-task-description: |
-          The UI Tests workflow run on ${{ github.ref_name }} branch has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}.
-
-          If the workflow was run on push and got cancelled because it was superseded by another push event, feel free to close this task straight away.
+        asana-task-description: The UI Tests workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
