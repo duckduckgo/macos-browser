@@ -140,9 +140,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
     }
 
     func setBookmarkBar() {
-        print(appearancePreferences.showBookmarksBar)
         appearancePreferences.showBookmarksBar = !appearancePreferences.showBookmarksBar
-        print(appearancePreferences.showBookmarksBar)
     }
 
     func setSessionRestore() {
