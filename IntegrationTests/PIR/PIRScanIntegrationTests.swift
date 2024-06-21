@@ -31,6 +31,7 @@ final class PIRScanIntegrationTests: XCTestCase {
 
     override func setUpWithError() throws {
         loginItemsManager = LoginItemsManager()
+        loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
         loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
 
         communicationLayer = DBPUICommunicationLayer(webURLSettings: DataBrokerProtectionWebUIURLSettings(UserDefaults.standard))
@@ -41,6 +42,11 @@ final class PIRScanIntegrationTests: XCTestCase {
         viewModel = DBPUIViewModel(dataManager: pirProtectionManager.dataManager, agentInterface: pirProtectionManager.loginItemInterface, webUISettings: DataBrokerProtectionWebUIURLSettings(UserDefaults.standard))
 
         pirProtectionManager.dataManager.cache.scanDelegate = viewModel
+    }
+
+    override func tearDown() async throws {
+        try pirProtectionManager.dataManager.database.deleteProfileData()
+        loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
     }
 
     /*
@@ -60,26 +66,33 @@ final class PIRScanIntegrationTests: XCTestCase {
      This test shows an example of an integration test that uses a `while` loop to await
      a scan starting
      */
-    func testWhenSaveProfileInViewModelScanStarts() async throws {
-        try await Task.sleep(nanoseconds: 3_000_000_000)
-
-        try pirProtectionManager.dataManager.database.deleteProfileData()
-        print(try pirProtectionManager.dataManager.database.fetchAllBrokerProfileQueryData())
-
+    func testWhenProfileIsSaved_ThenScanStarts() async throws {
         // Given
-        pirProtectionManager.dataManager.cache.profile = mockProfile
+        let database = pirProtectionManager.dataManager.database
+        let cache = pirProtectionManager.dataManager.cache
+        try database.deleteProfileData()
+        XCTAssert(try database.fetchAllBrokerProfileQueryData().isEmpty)
 
-        _ = try await communicationLayer.saveProfile(params: [], original: WKScriptMessage())
+        cache.profile = mockProfile
 
-        let _ = await communicationDelegate.getInitialScanState()
+        let expectation = expectation(description: "Result is returned")
 
-        while await communicationDelegate.getBackgroundAgentMetadata().lastStartedSchedulerOperationTimestamp == nil {
-            try pirProtectionManager.dataManager.prepareBrokerProfileQueryDataCache()
+        // When
+        Task { @MainActor in
+            _ = try await communicationLayer.saveProfile(params: [], original: WKScriptMessage())
         }
 
-        let metaData = await communicationDelegate.getBackgroundAgentMetadata()
+        Task {
+            while await communicationDelegate.getBackgroundAgentMetadata().lastStartedSchedulerOperationTimestamp == nil {
+                try pirProtectionManager.dataManager.prepareBrokerProfileQueryDataCache()
+            }
 
-        print(metaData)
+            expectation.fulfill()
+        }
+
+        await fulfillment(of: [expectation], timeout: 10)
+        let metaData = await communicationDelegate.getBackgroundAgentMetadata()
+        XCTAssertNotNil(metaData.lastStartedSchedulerOperationBrokerUrl)
     }
 }
 
