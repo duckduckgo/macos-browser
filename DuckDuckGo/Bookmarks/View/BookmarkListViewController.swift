@@ -26,14 +26,14 @@ protocol BookmarkListViewControllerDelegate: AnyObject {
 
 }
 
-enum BookmarkListType {
+enum BookmarkContentMode {
     case panel
     case bar
 }
 
 final class BookmarkListViewController: NSViewController {
 
-    static let preferredContentSize = CGSize(width: 420, height: 500)
+    static let preferredContentSize = CGSize(width: 284, height: 500)
 
     weak var delegate: BookmarkListViewControllerDelegate?
     var currentTabWebsite: WebsiteInfo?
@@ -48,7 +48,7 @@ final class BookmarkListViewController: NSViewController {
     private lazy var manageBookmarksButton = MouseOverButton(title: UserText.bookmarksManage, target: self, action: #selector(openManagementInterface))
     private lazy var boxDivider = NSBox()
 
-    private lazy var scrollView = NSScrollView(frame: NSRect(x: 0, y: 0, width: 420, height: 408))
+    private lazy var scrollView = NSScrollView(frame: NSRect(x: 0, y: 0, width: 284, height: 408))
     private lazy var outlineView = BookmarksOutlineView(frame: scrollView.frame)
 
     private lazy var emptyState = NSView()
@@ -61,7 +61,7 @@ final class BookmarkListViewController: NSViewController {
     private let bookmarkManager: BookmarkManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
     private let rootNode: BookmarkNode
-    private let bookmarkListType: BookmarkListType
+    private let contentMode: BookmarkContentMode
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource, rootNode: rootNode)
 
@@ -97,11 +97,11 @@ final class BookmarkListViewController: NSViewController {
         return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
     }()
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, rootNode: BookmarkNode, bookmarkListType: BookmarkListType = .panel) {
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, rootNode: BookmarkNode, contentMode: BookmarkContentMode = .panel) {
         self.bookmarkManager = bookmarkManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
         self.rootNode = rootNode
-        self.bookmarkListType = bookmarkListType
+        self.contentMode = contentMode
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -112,14 +112,13 @@ final class BookmarkListViewController: NSViewController {
     override func loadView() { // swiftlint:disable:this function_body_length
         view = ColorView(frame: .zero, backgroundColor: .popoverBackground)
 
-        if bookmarkListType == .panel {
+        if contentMode == .panel {
             view.addSubview(titleTextField)
             view.addSubview(boxDivider)
             view.addSubview(emptyState)
+            view.addSubview(scrollView)
+            view.addSubview(stackView)
         }
-
-        view.addSubview(stackView)
-        view.addSubview(scrollView)
 
         view.autoresizesSubviews = false
 
@@ -144,7 +143,7 @@ final class BookmarkListViewController: NSViewController {
         stackView.addArrangedSubview(newFolderButton)
         stackView.addArrangedSubview(buttonsDivider)
         stackView.addArrangedSubview(manageBookmarksButton)
-        stackView.isHidden = bookmarkListType == .bar
+        stackView.isHidden = contentMode == .bar
 
         newBookmarkButton.bezelStyle = .shadowlessSquare
         newBookmarkButton.cornerRadius = 4
@@ -213,12 +212,16 @@ final class BookmarkListViewController: NSViewController {
         outlineView.dataSource = dataSource
         outlineView.delegate = dataSource
 
-        let clipView = NSClipView(frame: scrollView.frame)
-        clipView.translatesAutoresizingMaskIntoConstraints = true
-        clipView.autoresizingMask = [.width, .height]
-        clipView.documentView = outlineView
-        clipView.drawsBackground = false
-        scrollView.contentView = clipView
+        if contentMode == .panel {
+            let clipView = NSClipView(frame: scrollView.frame)
+            clipView.translatesAutoresizingMaskIntoConstraints = true
+            clipView.autoresizingMask = [.width, .height]
+            clipView.documentView = outlineView
+            clipView.drawsBackground = false
+            scrollView.contentView = clipView
+        } else {
+            view.addSubview(outlineView)
+        }
 
         emptyState.addSubview(emptyStateImageView)
         emptyState.addSubview(emptyStateTitle)
@@ -256,7 +259,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     private func setupLayout() {
-        if bookmarkListType == .panel {
+        if contentMode == .panel {
             titleTextField.setContentHuggingPriority(.defaultHigh, for: .vertical)
             titleTextField.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
             titleTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 12).isActive = true
@@ -319,11 +322,10 @@ final class BookmarkListViewController: NSViewController {
             importButton.topAnchor.constraint(equalTo: emptyStateMessage.bottomAnchor, constant: 8).isActive = true
             importButton.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
         } else {
-            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            outlineView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+            outlineView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+            outlineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            outlineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         }
     }
 
@@ -656,13 +658,13 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
 
 final class BookmarkListPopover: NSPopover {
 
-    init(rootNode: BookmarkNode = BookmarkNode.genericRootNode(), type: BookmarkListType = .panel) {
+    init(rootNode: BookmarkNode = BookmarkNode.genericRootNode(), contentMode: BookmarkContentMode = .panel) {
         super.init()
 
         self.animates = false
         self.behavior = .transient
 
-        setupContentController(rootNode: rootNode, type: type)
+        setupContentController(rootNode: rootNode, contentMode: contentMode)
     }
 
     required init?(coder: NSCoder) {
@@ -672,8 +674,8 @@ final class BookmarkListPopover: NSPopover {
     // swiftlint:disable:next force_cast
     var viewController: BookmarkListViewController { contentViewController as! BookmarkListViewController }
 
-    private func setupContentController(rootNode: BookmarkNode, type: BookmarkListType) {
-        let controller = BookmarkListViewController(rootNode: rootNode, bookmarkListType: type)
+    private func setupContentController(rootNode: BookmarkNode, contentMode: BookmarkContentMode) {
+        let controller = BookmarkListViewController(rootNode: rootNode, contentMode: contentMode)
         controller.delegate = self
         contentViewController = controller
     }

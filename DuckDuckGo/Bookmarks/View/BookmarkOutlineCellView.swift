@@ -132,7 +132,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
             trailingAnchor.constraint(equalTo: countLabel.trailingAnchor),
 
             menuButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
-           menuButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 5),
+            menuButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 5),
             menuButton.trailingAnchor.constraint(equalTo: trailingAnchor),
             menuButton.topAnchor.constraint(equalTo: topAnchor),
             menuButton.bottomAnchor.constraint(equalTo: bottomAnchor),
