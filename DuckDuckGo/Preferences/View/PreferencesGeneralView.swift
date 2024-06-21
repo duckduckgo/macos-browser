@@ -174,11 +174,11 @@ extension Preferences {
                         ToggleMenuItem(UserText.downloadsOpenPopupOnCompletion,
                                        isOn: $downloadsModel.shouldOpenPopupOnCompletion)
                     }.padding(.bottom, 5)
-
+                    
                     // MARK: Location
                     PreferencePaneSubSection {
                         Text(UserText.downloadsLocation).bold()
-
+                        
                         HStack {
                             NSPathControlView(url: downloadsModel.selectedDownloadLocation)
                             Button(UserText.downloadsChangeDirectory) {
@@ -186,24 +186,22 @@ extension Preferences {
                             }
                         }
                         .disabled(downloadsModel.alwaysRequestDownloadLocation)
-
+                        
                         ToggleMenuItem(UserText.downloadsAlwaysAsk,
                                        isOn: $downloadsModel.alwaysRequestDownloadLocation)
                     }
-
-                // SECTION 7: Phishing Detection
-//                PreferencePaneSection(UserText.phishingDetection) {
-//                    PreferencePaneSubSection {
-//                        ToggleMenuItem(UserText.phishingDetectionIsEnabled,
-//                                       isOn: $phishingDetectionModel.toggleEnabled)
-//                    }.padding(.bottom, 5)
-//                        .disabled(phishingDetectionModel.isEnabled)
-//                }
-                PreferencePaneSection("Malicious Site Protection") {
-                    PreferencePaneSubSection {
-                        ToggleMenuItem("Allow DuckDuckGo to warn you if a site you are visiting has been flagged as potentially malicious.",
-                                       isOn: $phishingDetectionModel.isEnabled)
-                    }.padding(.bottom, 5)
+                    
+                    // SECTION 7: Phishing Detection
+                    PreferencePaneSection(UserText.phishingDetectionHeader) {
+                        PreferencePaneSubSection {
+                            ToggleMenuItem(UserText.phishingDetectionIsEnabled,
+                                           isOn: $phishingDetectionModel.isEnabled)
+                        }.padding(.bottom, 5)
+                        Text(UserText.phishingDetectionEnabledWarning)
+                            .font(.footnote)
+                            .foregroundColor(.red)
+                            .padding(.top, 5)
+                    }
                 }
 
             }
