@@ -32,6 +32,7 @@ protocol SubscriptionUIHandling {
     func presentSubscriptionAccessViewController(handler: SubscriptionAccessActionHandling, message: WKScriptMessage)
 
     // MARK: Alerts
+    @discardableResult
     func show(alertType: SubscriptionAlertType, text: String?) async -> NSApplication.ModalResponse
 
     // MARK: Tab
@@ -41,6 +42,7 @@ protocol SubscriptionUIHandling {
 @MainActor
 extension SubscriptionUIHandling {
 
+    @discardableResult
     func show(alertType: SubscriptionAlertType) async -> NSApplication.ModalResponse {
         return await show(alertType: alertType, text: nil)
     }

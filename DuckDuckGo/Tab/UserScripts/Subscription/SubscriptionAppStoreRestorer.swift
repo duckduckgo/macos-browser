@@ -58,15 +58,9 @@ struct SubscriptionAppStoreRestorer {
     }
 
     private func continueRestore() async {
-        defer {
-            Task {
-                await uiHandler.dismissProgressViewController()
-            }
-        }
-
         let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager)
         let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
-
+        await uiHandler.dismissProgressViewController()
         switch result {
         case .success:
             PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
@@ -76,51 +70,44 @@ struct SubscriptionAppStoreRestorer {
             default:
                 PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreFailureOther, frequency: .dailyAndCount)
             }
-
             switch error {
             case .missingAccountOrTransactions:
                 subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
-                showSubscriptionNotFoundAlert()
+                await showSubscriptionNotFoundAlert()
             case .subscriptionExpired:
                 subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionExpired)
-                showSubscriptionInactiveAlert()
+                await showSubscriptionInactiveAlert()
             case .pastTransactionAuthenticationError, .failedToObtainAccessToken, .failedToFetchAccountDetails, .failedToFetchSubscriptionDetails:
                 subscriptionErrorReporter.report(subscriptionActivationError: .generalError)
-                showSomethingWentWrongAlert()
+                await showSomethingWentWrongAlert()
             }
         }
     }
 
     // MARK: - UI interactions
 
-    func showSomethingWentWrongAlert() {
+    func showSomethingWentWrongAlert() async {
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
-        Task {
-            await uiHandler.show(alertType: .somethingWentWrong)
+        await uiHandler.show(alertType: .somethingWentWrong)
+    }
+
+    func showSubscriptionNotFoundAlert() async {
+        switch await uiHandler.show(alertType: .subscriptionNotFound) {
+        case .alertFirstButtonReturn:
+            let url = subscriptionManager.url(for: .purchase)
+            await uiHandler.showTab(with: .subscription(url))
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+        default: return
         }
     }
 
-    func showSubscriptionNotFoundAlert() {
-        Task {
-            switch await uiHandler.show(alertType: .subscriptionNotFound) {
-            case .alertFirstButtonReturn:
-                let url = subscriptionManager.url(for: .purchase)
-                await uiHandler.showTab(with: .subscription(url))
-                PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
-            default: return
-            }
-        }
-    }
-
-    func showSubscriptionInactiveAlert() {
-        Task {
-            switch await uiHandler.show(alertType: .subscriptionInactive) {
-            case .alertFirstButtonReturn:
-                let url = subscriptionManager.url(for: .purchase)
-                await uiHandler.showTab(with: .subscription(url))
-                PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
-            default: return
-            }
+    func showSubscriptionInactiveAlert() async {
+        switch await uiHandler.show(alertType: .subscriptionInactive) {
+        case .alertFirstButtonReturn:
+            let url = subscriptionManager.url(for: .purchase)
+            await uiHandler.showTab(with: .subscription(url))
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+        default: return
         }
     }
 }
