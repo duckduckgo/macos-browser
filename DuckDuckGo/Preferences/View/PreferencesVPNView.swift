@@ -125,9 +125,19 @@ extension Preferences {
                                 PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .dailyAndCount)
                             }
                         }
+                        .onChange(of: showsCustomDNSServerPageSheet) { showsCustomDNSServerPageSheet in
+                            guard !showsCustomDNSServerPageSheet else { return }
+                            /// Flip the setting back if no DNS server is defined
+                            if model.isCustomDNSSelected, !model.dnsSettings.usesCustomDNS {
+                                model.isCustomDNSSelected = false
+                            }
+                        }
 
-                        TextMenuItemCaption(UserText.vpnSecureDNSSettingDescription)
-
+                        if model.isCustomDNSSelected {
+                            TextMenuItemCaption(UserText.vpnDnsServerIPv4Disclaimer)
+                        } else {
+                            TextMenuItemCaption(UserText.vpnSecureDNSSettingDescription)
+                        }
                     }
                 }.sheet(isPresented: $showsCustomDNSServerPageSheet) {
                     CustomDNSServerPageSheet(settings: VPNSettings(defaults: .netP),
