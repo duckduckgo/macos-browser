@@ -319,12 +319,15 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         popover.close()
     }
 
-    func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate, source: PasswordManagementSource) {
+    func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate, source: PasswordManagementSource?) {
         guard closeTransientPopovers() else { return }
 
         let popover = autofillPopoverPresenter.show(positionedBelow: button, withDomain: passwordManagementDomain, selectedCategory: selectedCategory)
         bindIsMouseDownState(of: button, to: popover)
-        PixelKit.fire(GeneralPixel.autofillManagementOpened, withAdditionalParameters: ["source": source.rawValue])
+
+        if let source = source {
+            PixelKit.fire(GeneralPixel.autofillManagementOpened, withAdditionalParameters: ["source": source.rawValue])
+        }
     }
 
     func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
