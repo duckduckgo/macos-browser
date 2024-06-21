@@ -1083,6 +1083,10 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
     }
 
+    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .subscription)
+    }
+
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
         let url = subscriptionManager.url(for: .identityTheftRestoration)
         WindowControllersManager.shared.showTab(with: .identityTheftRestoration(url))

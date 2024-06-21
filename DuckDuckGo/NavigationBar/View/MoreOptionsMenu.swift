@@ -44,6 +44,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
 #endif
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu)
+    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu)
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu)
 }
 
@@ -231,6 +232,10 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedSubscriptionPurchasePage(self)
     }
 
+    @objc func openSubscriptionSettings(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedSubscriptionPreferences(self)
+    }
+
     @objc func openIdentityTheftRestoration(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedIdentityTheftRestoration(self)
     }
@@ -291,16 +296,28 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func addSubscriptionItems() {
-        var items: [NSMenuItem] = []
-
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable && !accountManager.isUserAuthenticated {
-            items.append(contentsOf: makeInactiveSubscriptionItems())
-        } else {
-            items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
+        func shouldHideDueToNoProduct() -> Bool {
+            let subscriptionManager = Application.appDelegate.subscriptionManager
+            let platform = subscriptionManager.currentEnvironment.purchasePlatform
+            return platform == .appStore && subscriptionManager.canPurchase == false
         }
 
-        if !items.isEmpty {
-            items.forEach { addItem($0) }
+        let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem).withImage(.subscriptionIcon)
+
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable && !accountManager.isUserAuthenticated {
+            privacyProItem.target = self
+            privacyProItem.action = #selector(openSubscriptionPurchasePage(_:))
+            
+            // Do not add for App Store when purchase not available in the region
+            if !shouldHideDueToNoProduct() {
+                addItem(privacyProItem)
+                addItem(NSMenuItem.separator())
+            }
+        } else {
+            privacyProItem.submenu = SubscriptionSubMenu(targeting: self,
+                                                         subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability(),
+                                                         accountManager: accountManager)
+            addItem(privacyProItem)
             addItem(NSMenuItem.separator())
         }
     }
@@ -387,24 +404,15 @@ final class MoreOptionsMenu: NSMenu {
             }
         }
 
-        return items
-    }
+        items.append(NSMenuItem.separator())
 
-    private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
-        let subscriptionManager = Application.appDelegate.subscriptionManager
-        let platform = subscriptionManager.currentEnvironment.purchasePlatform
-        let shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
-        if shouldHidePrivacyProDueToNoProducts {
-            return []
-        }
-
-        let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem,
-                                        action: #selector(openSubscriptionPurchasePage(_:)),
-                                        keyEquivalent: "")
+        let subscriptionSettingsItem = NSMenuItem(title: UserText.subscriptionSettingsOptionsMenuItem,
+                                                  action: #selector(openSubscriptionSettings),
+                                                  keyEquivalent: "")
             .targetting(self)
-            .withImage(.subscriptionIcon)
-
-        return [privacyProItem]
+        items.append(subscriptionSettingsItem)
+        
+        return items
     }
 
     private func addPageItems() {
@@ -764,6 +772,137 @@ final class LoginsSubMenu: NSMenu {
         addItem(withTitle: UserText.passwordManagementCreditCards, action: #selector(MoreOptionsMenu.openAutofillWithCreditCards), keyEquivalent: "")
             .targetting(target)
             .withImage(.creditCardGlyph)
+    }
+
+}
+
+final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
+
+    var subscriptionFeatureAvailability: SubscriptionFeatureAvailability
+    var accountManager: AccountManaging
+
+    var networkProtectionItem: NSMenuItem!
+    var dataBrokerProtectionItem: NSMenuItem!
+    var identityTheftRestorationItem: NSMenuItem!
+    var subscriptionSettingsItem: NSMenuItem!
+
+    init(targeting target: AnyObject,
+         subscriptionFeatureAvailability: SubscriptionFeatureAvailability,
+         accountManager: AccountManaging) {
+
+        self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
+        self.accountManager = accountManager
+
+        super.init(title: "")
+
+        self.networkProtectionItem = makeNetworkProtectionItem(target: target)
+        self.dataBrokerProtectionItem = makeDataBrokerProtectionItem(target: target)
+        self.identityTheftRestorationItem = makeIdentityTheftRestorationItem(target: target)
+        self.subscriptionSettingsItem = makeSubscriptionSettingsItem(target: target)
+
+        delegate = self
+
+        addMenuItems()
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func addMenuItems() {
+        addItem(networkProtectionItem)
+        addItem(dataBrokerProtectionItem)
+        addItem(identityTheftRestorationItem)
+        addItem(NSMenuItem.separator())
+        addItem(subscriptionSettingsItem)
+    }
+
+    private func makeNetworkProtectionItem(target: AnyObject) -> NSMenuItem {
+        print("makeNetworkProtectionItem")
+        return NSMenuItem(title: UserText.networkProtection,
+                   action: #selector(MoreOptionsMenu.showNetworkProtectionStatus(_:)),
+                   keyEquivalent: "")
+        .targetting(target)
+        .withImage(.image(for: .vpnIcon))
+    }
+
+    private func makeDataBrokerProtectionItem(target: AnyObject) -> NSMenuItem {
+        print("makeDataBrokerProtectionItem")
+        return NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
+                   action: #selector(MoreOptionsMenu.openDataBrokerProtection),
+                   keyEquivalent: "")
+        .targetting(target)
+        .withImage(.dbpIcon)
+    }
+
+    private func makeIdentityTheftRestorationItem(target: AnyObject) -> NSMenuItem {
+        print("makeDataBrokerProtectionItem")
+        return NSMenuItem(title: UserText.identityTheftRestorationOptionsMenuItem,
+                   action: #selector(MoreOptionsMenu.openIdentityTheftRestoration),
+                   keyEquivalent: "")
+        .targetting(target)
+        .withImage(.itrIcon)
+    }
+
+    private func makeSubscriptionSettingsItem(target: AnyObject) -> NSMenuItem {
+        print("makeSubscriptionSettingsItem")
+        return NSMenuItem(title: UserText.subscriptionSettingsOptionsMenuItem,
+                   action: #selector(MoreOptionsMenu.openSubscriptionSettings),
+                   keyEquivalent: "")
+        .targetting(target)
+    }
+
+    private func refreshAvailabilityBasedOnEntitlements() {
+        print("refreshAvailabilityBasedOnEntitlements")
+
+        guard subscriptionFeatureAvailability.isFeatureAvailable, accountManager.isUserAuthenticated else { return }
+
+        Task {
+            let isMenuItemEnabled: Bool
+
+            switch await accountManager.hasEntitlement(for: .networkProtection) {
+            case let .success(result):
+                isMenuItemEnabled = result
+            case .failure:
+                isMenuItemEnabled = false
+            }
+
+            networkProtectionItem.isEnabled = isMenuItemEnabled
+        }
+
+        Task {
+            let isMenuItemEnabled: Bool
+
+            switch await accountManager.hasEntitlement(for: .dataBrokerProtection) {
+            case let .success(result):
+                isMenuItemEnabled = result
+            case .failure:
+                isMenuItemEnabled = false
+            }
+
+            dataBrokerProtectionItem.isEnabled = isMenuItemEnabled
+
+            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
+        }
+
+        Task {
+            let isMenuItemEnabled: Bool
+
+            switch await accountManager.hasEntitlement(for: .identityTheftRestoration) {
+            case let .success(result):
+                isMenuItemEnabled = result
+            case .failure:
+                isMenuItemEnabled = false
+            }
+
+            identityTheftRestorationItem.isEnabled = isMenuItemEnabled
+
+        }
+    }
+
+    public func menuWillOpen(_ menu: NSMenu) {
+        print("menuWillOpen")
+        refreshAvailabilityBasedOnEntitlements()
     }
 
 }
