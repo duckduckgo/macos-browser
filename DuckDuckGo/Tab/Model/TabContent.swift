@@ -28,7 +28,7 @@ extension Tab {
         case settings(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboardingDeprecated
-        case onboarding(URL)
+        case onboarding
         case none
         case dataBrokerProtection
         case subscription(URL)
@@ -103,6 +103,8 @@ extension TabContent {
             return .newtab
         case URL.welcome, URL.Invalid.aboutWelcome:
             return .onboardingDeprecated
+        case URL.onboarding:
+            return .onboarding
         case URL.settings, URL.Invalid.aboutPreferences, URL.Invalid.aboutConfig, URL.Invalid.aboutSettings, URL.Invalid.duckConfig, URL.Invalid.duckPreferences:
             return .anySettingsPane
         case URL.bookmarks, URL.Invalid.aboutBookmarks:
@@ -225,8 +227,8 @@ extension TabContent {
             return .bookmarks
         case .onboardingDeprecated:
             return .welcome
-        case .onboarding(let url):
-            return url
+        case .onboarding:
+            return URL.onboarding
         case .dataBrokerProtection:
             return .dataBrokerProtection
         case .subscription(let url), .identityTheftRestoration(let url):

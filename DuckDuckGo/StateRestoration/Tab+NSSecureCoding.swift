@@ -123,8 +123,7 @@ private extension Tab.TabContent {
             guard let url = url else { return nil }
             self = .identityTheftRestoration(url)
         case .onboarding:
-            guard let url = url else { return nil }
-            self = .onboarding(url)
+            self = .onboarding
         }
     }
 

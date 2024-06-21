@@ -32,7 +32,7 @@ final class BookmarksBarVisibilityManagerTests: XCTestCase {
         .settings(pane: nil),
         .bookmarks,
         .onboardingDeprecated,
-        .onboarding(URL.onboarding),
+        .onboarding,
         .dataBrokerProtection,
         .subscription(URL.duckDuckGo),
         .identityTheftRestoration(URL.duckDuckGo)

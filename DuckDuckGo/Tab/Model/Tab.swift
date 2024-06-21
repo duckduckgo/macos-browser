@@ -726,7 +726,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         // Here we will chose based on the variant
         if true {
-            setContent(.onboarding(URL.onboarding))
+            setContent(.onboarding)
         } else {
             setContent(.onboardingDeprecated)
         }
