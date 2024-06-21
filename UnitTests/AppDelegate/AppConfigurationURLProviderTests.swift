@@ -27,7 +27,7 @@ final class AppConfigurationURLProviderTests: XCTestCase {
         XCTAssertEqual(AppConfigurationURLProvider().url(for: .bloomFilterExcludedDomains).absoluteString, "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")
         XCTAssertEqual(AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString, "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")
         XCTAssertEqual(AppConfigurationURLProvider().url(for: .surrogates).absoluteString, "https://staticcdn.duckduckgo.com/surrogates.txt")
-        XCTAssertEqual(AppConfigurationURLProvider().url(for: .trackerDataSet).absoluteString, "https://staticcdn.duckduckgo.com/trackerblocking/v5/current/macos-tds.json")
+        XCTAssertEqual(AppConfigurationURLProvider().url(for: .trackerDataSet).absoluteString, "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")
         XCTAssertEqual(AppConfigurationURLProvider().url(for: .FBConfig).absoluteString, "https://staticcdn.duckduckgo.com/useragents/")
     }
 

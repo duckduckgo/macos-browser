@@ -67,6 +67,7 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     let handler: EventMapping<DataBrokerProtectionPixels>
     let attemptId: UUID
     let dataBroker: String
+    let dataBrokerVersion: String
     let startTime: Date
     var lastStateTime: Date
     private (set) var actionID: String?
@@ -76,12 +77,14 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     init(attemptId: UUID = UUID(),
          startTime: Date = Date(),
          dataBroker: String,
+         dataBrokerVersion: String,
          handler: EventMapping<DataBrokerProtectionPixels>,
          isImmediateOperation: Bool = false) {
         self.attemptId = attemptId
         self.startTime = startTime
         self.lastStateTime = startTime
         self.dataBroker = dataBroker
+        self.dataBrokerVersion = dataBrokerVersion
         self.handler = handler
         self.isImmediateOperation = isImmediateOperation
     }
@@ -154,6 +157,7 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
 
     func fireOptOutFailure(tries: Int) {
         handler.fire(.optOutFailure(dataBroker: dataBroker,
+                                    dataBrokerVersion: dataBrokerVersion,
                                     attemptId: attemptId,
                                     duration: durationSinceStartTime(),
                                     stage: stage.rawValue,
@@ -167,7 +171,7 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     }
 
     func fireScanFailed() {
-        handler.fire(.scanFailed(dataBroker: dataBroker, duration: durationSinceStartTime(), tries: 1, isImmediateOperation: isImmediateOperation))
+        handler.fire(.scanFailed(dataBroker: dataBroker, dataBrokerVersion: dataBrokerVersion, duration: durationSinceStartTime(), tries: 1, isImmediateOperation: isImmediateOperation))
     }
 
     func fireScanError(error: Error) {
@@ -202,6 +206,7 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
         handler.fire(
             .scanError(
                 dataBroker: dataBroker,
+                dataBrokerVersion: dataBrokerVersion,
                 duration: durationSinceStartTime(),
                 category: errorCategory.toString,
                 details: error.localizedDescription,

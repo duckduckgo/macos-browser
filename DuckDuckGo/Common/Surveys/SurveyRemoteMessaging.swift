@@ -73,7 +73,6 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching,
         vpnActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
         pirActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp),
-        networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
         minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard
     ) {
@@ -207,6 +206,26 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
                     return false
                 }
             }
+
+            #if APPSTORE
+            if let appStorePurchasePlatforms = message.attributes.appStoreSubscriptionPurchasePlatforms {
+                if appStorePurchasePlatforms.contains(subscription.platform.rawValue) {
+                    attributeMatchStatus = true
+                } else {
+                    return false
+                }
+            }
+            #endif
+
+            #if SPARKLE
+            if let sparklePurchasePlatforms = message.attributes.sparkleSubscriptionPurchasePlatforms {
+                if sparklePurchasePlatforms.contains(subscription.platform.rawValue) {
+                    attributeMatchStatus = true
+                } else {
+                    return false
+                }
+            }
+            #endif
 
             return attributeMatchStatus
 

@@ -199,42 +199,6 @@ struct DataBrokerProtectionWaitlist: Waitlist {
         self.redeemAuthenticationRepository = redeemAuthenticationRepository
     }
 
-    func redeemDataBrokerProtectionInviteCodeIfAvailable() async throws {
-        if DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist || DefaultDataBrokerProtectionFeatureVisibility().isPrivacyProEnabled() {
-            return
-        }
-
-        do {
-            guard waitlistStorage.getWaitlistToken() != nil else {
-                os_log("User not in DBP waitlist, returning...", log: .default)
-                return
-            }
-
-            guard redeemAuthenticationRepository.getAccessToken() == nil else {
-                os_log("Invite code already redeemed, returning...", log: .default)
-                return
-            }
-
-            var inviteCode = waitlistStorage.getWaitlistInviteCode()
-
-            if inviteCode == nil {
-                os_log("No DBP invite code found, fetching...", log: .default)
-                inviteCode = try await fetchInviteCode()
-            }
-
-            if let code = inviteCode {
-                try await redeemInviteCode(code)
-            } else {
-                os_log("No DBP invite code available")
-                throw WaitlistInviteCodeFetchError.noCodeAvailable
-            }
-
-        } catch {
-            os_log("DBP Invite code error: %{public}@", log: .error, error.localizedDescription)
-            throw error
-        }
-    }
-
     private func fetchInviteCode() async throws -> String {
 
         // First check if we have it stored locally

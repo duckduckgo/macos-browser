@@ -41,7 +41,7 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
     }
 
     func disableAndDelete() {
-        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist {
+        if !DefaultDataBrokerProtectionFeatureGatekeeper.bypassWaitlist {
 
             do {
                 try dataManager.removeAllData()

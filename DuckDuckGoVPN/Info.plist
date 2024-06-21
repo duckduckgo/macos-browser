@@ -4,8 +4,12 @@
 <dict>
 	<key>DISTRIBUTED_NOTIFICATIONS_PREFIX</key>
 	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
+	<key>IPC_APP_GROUP</key>
+	<string>$(IPC_APP_GROUP)</string>
 	<key>NETP_APP_GROUP</key>
 	<string>$(NETP_APP_GROUP)</string>
+	<key>SYSEX_BUNDLE_ID</key>
+	<string>$(SYSEX_BUNDLE_ID)</string>
 	<key>PROXY_EXTENSION_BUNDLE_ID</key>
 	<string>$(PROXY_EXTENSION_BUNDLE_ID)</string>
 	<key>SUBSCRIPTION_APP_GROUP</key>

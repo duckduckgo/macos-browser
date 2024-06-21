@@ -21,6 +21,7 @@ import Foundation
 
 public protocol AppLaunching {
     func launchApp(withCommand command: AppLaunchCommand) async throws
+    func runApp(withCommand command: AppLaunchCommand) async throws -> NSRunningApplication
 }
 
 /// Launches the main App
@@ -51,6 +52,13 @@ public final class AppLauncher: AppLaunching {
     }
 
     public func launchApp(withCommand command: AppLaunchCommand) async throws {
+        _ = try await runApp(withCommand: command)
+    }
+
+    /// The only difference with launchApp is this method returns the `NSRunningApplication`
+    ///
+    public func runApp(withCommand command: AppLaunchCommand) async throws -> NSRunningApplication {
+
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.allowsRunningApplicationSubstitution = command.allowsRunningApplicationSubstitution
 
@@ -68,7 +76,9 @@ public final class AppLauncher: AppLaunching {
 
         do {
             if let launchURL = command.launchURL {
-                try await NSWorkspace.shared.open([launchURL], withApplicationAt: mainBundleURL, configuration: configuration)
+                return try await NSWorkspace.shared.open([launchURL], withApplicationAt: mainBundleURL, configuration: configuration)
+            } else {
+                return try await NSWorkspace.shared.openApplication(at: mainBundleURL, configuration: configuration)
             }
         } catch {
             throw AppLaunchError.workspaceOpenError(error)

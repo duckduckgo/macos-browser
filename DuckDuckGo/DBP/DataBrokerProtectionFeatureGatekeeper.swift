@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionFeatureVisibility.swift
+//  DataBrokerProtectionFeatureGatekeeper.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -24,31 +24,27 @@ import Common
 import DataBrokerProtection
 import Subscription
 
-protocol DataBrokerProtectionFeatureVisibility {
+protocol DataBrokerProtectionFeatureGatekeeper {
+    var waitlistIsOngoing: Bool { get }
     func isFeatureVisible() -> Bool
     func disableAndDeleteForAllUsers()
     func disableAndDeleteForWaitlistUsers()
     func isPrivacyProEnabled() -> Bool
     func isEligibleForThankYouMessage() -> Bool
+    func cleanUpDBPForPrivacyProIfNecessary() -> Bool
+    func arePrerequisitesSatisfied() async -> Bool
 }
 
-struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeatureVisibility {
+struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeatureGatekeeper {
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
     private let waitlistStorage: WaitlistStorage
     private let subscriptionAvailability: SubscriptionFeatureAvailability
+    private let accountManager: AccountManaging
 
     private let dataBrokerProtectionKey = "data-broker-protection.cleaned-up-from-waitlist-to-privacy-pro"
-    private var dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro: Bool {
-        get {
-            return userDefaults.bool(forKey: dataBrokerProtectionKey)
-        }
-        nonmutating set {
-            userDefaults.set(newValue, forKey: dataBrokerProtectionKey)
-        }
-    }
 
     /// Temporary code to use while we have both redeem flow for diary study users. Should be removed later
     static var bypassWaitlist = false
@@ -58,13 +54,15 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
          pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
          userDefaults: UserDefaults = .standard,
          waitlistStorage: WaitlistStorage = DataBrokerProtectionWaitlist().waitlistStorage,
-         subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()) {
+         subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
+         accountManager: AccountManaging) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
         self.waitlistStorage = waitlistStorage
         self.subscriptionAvailability = subscriptionAvailability
+        self.accountManager = accountManager
     }
 
     var waitlistIsOngoing: Bool {
@@ -87,26 +85,6 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         regionCode = "US"
 #endif
         return (regionCode ?? "US") == "US"
-    }
-
-    private var isInternalUser: Bool {
-        NSApp.delegateTyped.internalUserDecider.isInternalUser
-    }
-
-    private var isWaitlistBetaActive: Bool {
-        return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlistBetaActive)
-    }
-
-    private var isWaitlistEnabled: Bool {
-        return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlist)
-    }
-
-    private var isWaitlistUser: Bool {
-        waitlistStorage.isWaitlistUser
-    }
-
-    private var wasWaitlistUser: Bool {
-        waitlistStorage.getWaitlistInviteCode() != nil
     }
 
     func isPrivacyProEnabled() -> Bool {
@@ -157,6 +135,68 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
             return isWaitlistBetaActive
         } else {
             return isWaitlistEnabled && isWaitlistBetaActive
+        }
+    }
+
+    func arePrerequisitesSatisfied() async -> Bool {
+        let entitlements = await accountManager.hasEntitlement(for: .dataBrokerProtection,
+                                                               cachePolicy: .reloadIgnoringLocalCacheData)
+        var hasEntitlements: Bool
+        switch entitlements {
+        case .success(let value):
+            hasEntitlements = value
+        case .failure:
+            hasEntitlements = false
+        }
+
+        let isAuthenticated = accountManager.accessToken != nil
+
+        firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: hasEntitlements, isAuthenticatedResult: isAuthenticated)
+
+        return hasEntitlements && isAuthenticated
+    }
+}
+
+private extension DefaultDataBrokerProtectionFeatureGatekeeper {
+
+    var dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro: Bool {
+        get {
+            return userDefaults.bool(forKey: dataBrokerProtectionKey)
+        }
+        nonmutating set {
+            userDefaults.set(newValue, forKey: dataBrokerProtectionKey)
+        }
+    }
+
+    var isInternalUser: Bool {
+        NSApp.delegateTyped.internalUserDecider.isInternalUser
+    }
+
+    var isWaitlistBetaActive: Bool {
+        return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlistBetaActive)
+    }
+
+    var isWaitlistEnabled: Bool {
+        return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlist)
+    }
+
+    var isWaitlistUser: Bool {
+        waitlistStorage.isWaitlistUser
+    }
+
+    var wasWaitlistUser: Bool {
+        waitlistStorage.getWaitlistInviteCode() != nil
+    }
+
+    func firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: Bool, isAuthenticatedResult: Bool) {
+        if !hasEntitlements {
+            pixelHandler.fire(.gatekeeperEntitlementsInvalid)
+            os_log("🔴 DBP feature Gatekeeper: Entitlement check failed", log: .dataBrokerProtection)
+        }
+
+        if !isAuthenticatedResult {
+            pixelHandler.fire(.gatekeeperNotAuthenticated)
+            os_log("🔴 DBP feature Gatekeeper: Authentication check failed", log: .dataBrokerProtection)
         }
     }
 }

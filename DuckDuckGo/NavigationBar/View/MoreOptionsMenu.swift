@@ -59,7 +59,7 @@ final class MoreOptionsMenu: NSMenu {
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
     private let accountManager: AccountManaging
 
-    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
+    private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -68,7 +68,7 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
-         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility,
+         vpnFeatureGatekeeper: VPNFeatureGatekeeper,
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
          accountManager: AccountManaging) {
@@ -76,7 +76,7 @@ final class MoreOptionsMenu: NSMenu {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
-        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
+        self.vpnFeatureGatekeeper = vpnFeatureGatekeeper
         self.internalUserDecider = internalUserDecider
         self.accountManager = accountManager
 
@@ -138,11 +138,7 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
-        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist && DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
-            DataBrokerProtectionWaitlistViewControllerPresenter.show()
-        } else {
-            actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
-        }
+        actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
     }
 #endif // DBP
 
@@ -285,7 +281,7 @@ final class MoreOptionsMenu: NSMenu {
         let loginsSubMenu = LoginsSubMenu(targetting: self,
                                           passwordManagerCoordinator: passwordManagerCoordinator)
 
-        addItem(withTitle: UserText.passwordManagement, action: #selector(openAutofillWithAllItems), keyEquivalent: "")
+        addItem(withTitle: UserText.passwordManagementTitle, action: #selector(openAutofillWithAllItems), keyEquivalent: "")
             .targetting(self)
             .withImage(.passwordManagement)
             .withSubmenu(loginsSubMenu)
@@ -336,8 +332,8 @@ final class MoreOptionsMenu: NSMenu {
         }
 
 #if DBP
-        let dbpVisibility = DefaultDataBrokerProtectionFeatureVisibility()
-        if dbpVisibility.isFeatureVisible() || dbpVisibility.isPrivacyProEnabled() {
+        let dbpGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: accountManager)
+        if dbpGatekeeper.isFeatureVisible() || dbpGatekeeper.isPrivacyProEnabled() {
             let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
                                                       action: #selector(openDataBrokerProtection),
                                                       keyEquivalent: "")
@@ -363,7 +359,7 @@ final class MoreOptionsMenu: NSMenu {
             DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
 
         } else {
-            DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
+            dbpGatekeeper.disableAndDeleteForWaitlistUsers()
         }
 #endif // DBP
 
@@ -627,7 +623,7 @@ final class ZoomSubMenu: NSMenu {
 final class BookmarksSubMenu: NSMenu {
 
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
-        super.init(title: UserText.passwordManagement)
+        super.init(title: UserText.passwordManagementTitle)
         self.autoenablesItems = false
         addMenuItems(with: tabCollectionViewModel, target: target)
     }
@@ -731,7 +727,7 @@ final class LoginsSubMenu: NSMenu {
 
     init(targetting target: AnyObject, passwordManagerCoordinator: PasswordManagerCoordinating) {
         self.passwordManagerCoordinator = passwordManagerCoordinator
-        super.init(title: UserText.passwordManagement)
+        super.init(title: UserText.passwordManagementTitle)
         updateMenuItems(with: target)
     }
 
