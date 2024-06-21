@@ -1,5 +1,5 @@
 //
-//  CapturingOnboardingNavigationDelegate.swift
+//  CapturingOnboardingNavigation.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,15 +19,27 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-class CapturingOnboardingNavigationDelegate: OnboardingNavigationDelegate {
-    var goToSearchFromOnboardingCalled = false
-    var goToSettingsFromOnboardingCalled = false
+class CapturingOnboardingNavigation: OnboardingNavigating {
+    var tab: Tab?
+    var focusOnAddressBarCalled = false
+    var showImportDataViewCalled = false
+    var replaceTabCalled = false
 
-    func goToSearchFromOnboarding() {
-        goToSearchFromOnboardingCalled = true
+    func replaceTabWith(_ tab: Tab) {
+        self.tab = tab
+        replaceTabCalled = true
     }
 
-    func goToSettingsFromOnboarding() {
-        goToSettingsFromOnboardingCalled = true
+    func focusOnAddressBar() {
+        focusOnAddressBarCalled = true
+    }
+
+    func showImportDataView() {
+        showImportDataViewCalled = true
+    }
+
+    func fireNavigationDidEnd() {
+        guard let tab else { return }
+        tab.navigationDidEndPublisher.send(tab)
     }
 }

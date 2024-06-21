@@ -287,3 +287,22 @@ extension WindowControllersManager {
     }
 
 }
+
+extension WindowControllersManager: OnboardingNavigating {
+    func showImportDataView() {
+        DataImportView().show()
+    }
+
+    func replaceTabWith(_ tab: Tab) {
+        guard let tabToRemove = selectedTab else { return }
+        guard let index = mainWindowController?.mainViewController.tabCollectionViewModel.indexInAllTabs(of: tabToRemove) else { return }
+        mainWindowController?.mainViewController.tabCollectionViewModel.append(tab: tab)
+        mainWindowController?.mainViewController.tabCollectionViewModel.remove(at: index)
+    }
+
+    func focusOnAddressBar() {
+        guard let mainVC = lastKeyMainWindowController?.mainViewController else { return }
+        mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.stringValue = ""
+        mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+    }
+}

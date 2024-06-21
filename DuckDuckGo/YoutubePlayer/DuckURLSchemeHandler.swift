@@ -80,8 +80,8 @@ extension DuckURLSchemeHandler {
 }
 
 // MARK: - DuckPlayer
-extension DuckURLSchemeHandler {
-    private func handleDuckPlayer(requestURL: URL, urlSchemeTask: WKURLSchemeTask, webView: WKWebView) {
+private extension DuckURLSchemeHandler {
+    func handleDuckPlayer(requestURL: URL, urlSchemeTask: WKURLSchemeTask, webView: WKWebView) {
         let youtubeHandler = YoutubePlayerNavigationHandler()
         let html = youtubeHandler.makeHTMLFromTemplate()
 
