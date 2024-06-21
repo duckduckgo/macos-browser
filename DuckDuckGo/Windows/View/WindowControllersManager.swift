@@ -57,7 +57,6 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
         return mainWindowControllers.first(where: {
             let isMain = $0.window?.isMainWindow ?? false
             let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
-
             return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
         })
     }
@@ -293,12 +292,10 @@ extension WindowControllersManager: OnboardingNavigating {
     func updatePreventUserInteraction(prevent: Bool) {
         mainWindowController?.userInteraction(prevented: prevent)
     }
-    
+
     @MainActor
     func showImportDataView() {
-        let view = DataImportView()
-        view.model = DataImportViewModel(screen:.shortcuts([.passwords]))
-        view.show()
+        DataImportView().show()
     }
 
     @MainActor
