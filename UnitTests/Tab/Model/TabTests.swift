@@ -370,9 +370,8 @@ final class TabTests: XCTestCase {
         XCTAssertTrue(tab.webView.configuration.preferences[.mediaSessionEnabled])
     }
 
-    @available(macOS 14.0, *)
     @MainActor func testWhenFireWindow_mediaSessionDisabled() {
-        let tab = Tab(content: .url(.empty, source: .ui), burnerMode: .burner(websiteDataStore: WKWebsiteDataStore(forIdentifier: .init())))
+        let tab = Tab(content: .url(.empty, source: .ui), burnerMode: BurnerMode(isBurner: true))
 
         XCTAssertFalse(tab.webView.configuration.preferences[.mediaSessionEnabled])
     }

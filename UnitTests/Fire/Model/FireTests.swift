@@ -280,30 +280,6 @@ final class FireTests: XCTestCase {
         XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
     }
 
-    // Burner window content sharing (screen capture) should be disabled
-    func testWhenBurnerWindow_sharingTypeIsNone() {
-        // collect sharing type passed at NSWindowController.setWindow in initWithWindow (sharingType should be set before initWithWindow: call)
-        _=NSWindowController.swizzleSetWindowOnce
-
-        let regularWindow = WindowsManager.openNewWindow(with: .empty, source: .ui, isBurner: false, parentTab: nil)!
-        XCTAssertEqual(regularWindow.windowController?.windowSharingType?.rawValue, NSWindow.SharingType.readOnly.rawValue)
-        XCTAssertEqual(regularWindow.sharingType, .readOnly)
-
-        let window = WindowsManager.openNewWindow(with: .empty, source: .ui, isBurner: true, parentTab: nil)!
-        XCTAssertEqual(window.windowController?.windowSharingType?.rawValue, NSWindow.SharingType.none.rawValue)
-        XCTAssertEqual(window.sharingType, .none)
-
-        if #available(macOS 14.0, *) {
-            let window = WindowsManager.openNewWindow(burnerMode: .burner(websiteDataStore: WKWebsiteDataStore(forIdentifier: UUID())))!
-            XCTAssertEqual(window.windowController?.windowSharingType?.rawValue, NSWindow.SharingType.none.rawValue)
-            XCTAssertEqual(window.sharingType, .none)
-        }
-
-        let window3 = WindowsManager.openNewWindow(with: .init(), isBurner: true)!
-        XCTAssertEqual(window3.windowController?.windowSharingType?.rawValue, NSWindow.SharingType.none.rawValue)
-        XCTAssertEqual(window.sharingType, .none)
-    }
-
     func preparePersistedState(withFileName fileName: String) -> FileStore {
         let fileStore = FileStoreMock()
         let state = SavedStateMock()
@@ -327,32 +303,6 @@ fileprivate extension TabCollectionViewModel {
         tabCollectionViewModel.append(tab: Tab(content: .none))
         tabCollectionViewModel.append(tab: Tab(content: .none))
         return tabCollectionViewModel
-    }
-
-}
-
-fileprivate extension NSWindowController {
-
-    static var swizzleSetWindowOnce: Void = {
-        let setWindowMethod = class_getInstanceMethod(NSWindowController.self, #selector(setter: NSWindowController.window))!
-        let swizzledSetWindowMethod = class_getInstanceMethod(NSWindowController.self, #selector(NSWindowController.swizzled_setWindow))!
-
-        method_exchangeImplementations(setWindowMethod, swizzledSetWindowMethod)
-    }()
-
-    private static let windowSharingTypeKey = UnsafeRawPointer(bitPattern: "windowSharingTypeKey".hashValue)!
-    var windowSharingType: NSWindow.SharingType? {
-        get {
-            objc_getAssociatedObject(self, Self.windowSharingTypeKey) as? NSWindow.SharingType
-        }
-        set {
-            objc_setAssociatedObject(self, Self.windowSharingTypeKey, newValue, .OBJC_ASSOCIATION_RETAIN)
-        }
-    }
-
-    @objc dynamic func swizzled_setWindow(_ window: NSWindow?) {
-        self.windowSharingType = window?.sharingType
-        self.swizzled_setWindow(window) // call original
     }
 
 }

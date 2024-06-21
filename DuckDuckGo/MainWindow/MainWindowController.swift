@@ -46,11 +46,7 @@ final class MainWindowController: NSWindowController {
         let window = popUp ? PopUpWindow(frame: frame) : MainWindow(frame: frame)
         window.contentViewController = mainViewController
         self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
-        if mainViewController.isBurner {
-            // Fire Window: disable screen capture / screenshot taking
-            // !!! Must be set before calling windowController.initWithWindow: !!!
-            window.sharingType = .none
-        }
+
         super.init(window: window)
 
         setupWindow(window)
