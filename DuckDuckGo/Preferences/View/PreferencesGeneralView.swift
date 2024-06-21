@@ -31,6 +31,7 @@ extension Preferences {
         @ObservedObject var searchModel: SearchPreferences
         @ObservedObject var tabsModel: TabsPreferences
         @ObservedObject var dataClearingModel: DataClearingPreferences
+        @ObservedObject var phishingDetectionModel: PhishingDetectionPreferences
         @State private var showingCustomHomePageSheet = false
         @State private var isAddedToDock = false
         var dockCustomizer: DockCustomizer
@@ -190,6 +191,22 @@ extension Preferences {
                                        isOn: $downloadsModel.alwaysRequestDownloadLocation)
                     }
                 }
+                
+                // SECTION 7: Phishing Detection
+//                PreferencePaneSection(UserText.phishingDetection) {
+//                    PreferencePaneSubSection {
+//                        ToggleMenuItem(UserText.phishingDetectionIsEnabled,
+//                                       isOn: $phishingDetectionModel.toggleEnabled)
+//                    }.padding(.bottom, 5)
+//                        .disabled(phishingDetectionModel.isEnabled)
+//                }
+                PreferencePaneSection("Malicious Site Protection") {
+                    PreferencePaneSubSection {
+                        ToggleMenuItem("Allow DuckDuckGo to warn you if a site you are visiting has been flagged as potentially malicious.",
+                                       isOn: $phishingDetectionModel.isEnabled)
+                    }.padding(.bottom, 5)
+                }
+
             }
         }
     }

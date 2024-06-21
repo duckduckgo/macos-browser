@@ -156,7 +156,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
-
+        
         if NSApplication.runType.requiresEnvironment {
             Self.configurePixelKit()
 
@@ -265,11 +265,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             HistoryCoordinator.shared.migrateModelV5toV6IfNeeded()
         }
 
-        let phishingDetectionManager = PhishingDetectionManagerFactory.create()
-        phishingDetectionManager.loadDataAsync()
-        phishingDetectionManager.startDataActivities()
-        
-        
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         bookmarksManager.loadBookmarks()
 
