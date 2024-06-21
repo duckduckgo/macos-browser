@@ -18,7 +18,7 @@
 
 import Foundation
 
-public class PhishingStateManager {
+public class PhishingTabStateManager {
     public var tabIsPhishing: Bool = false
 
     public init(){}

@@ -97,6 +97,8 @@ public struct UserDefaultsWrapper<T> {
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
 
         case homeButtonPosition = "preferences.appeareance.home-button-position"
+        
+        case phishingDetectionEnabled = "preferences.security.phishing-detection-enabled"
 
         // ATB
         case installDate = "statistics.installdate.key"
