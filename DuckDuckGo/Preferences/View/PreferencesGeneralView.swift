@@ -190,8 +190,7 @@ extension Preferences {
                         ToggleMenuItem(UserText.downloadsAlwaysAsk,
                                        isOn: $downloadsModel.alwaysRequestDownloadLocation)
                     }
-                }
-                
+
                 // SECTION 7: Phishing Detection
 //                PreferencePaneSection(UserText.phishingDetection) {
 //                    PreferencePaneSubSection {

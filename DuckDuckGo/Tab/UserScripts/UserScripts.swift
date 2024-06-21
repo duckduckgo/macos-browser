@@ -63,9 +63,8 @@ final class UserScripts: UserScriptsProvider {
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
 
         autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
-        
-        specialErrorPageUserScript = SpecialErrorPageUserScript()
 
+        specialErrorPageUserScript = SpecialErrorPageUserScript()
 
         specialPages = SpecialPagesUserScript()
 
