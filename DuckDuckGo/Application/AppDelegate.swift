@@ -156,7 +156,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
-        
+
         if NSApplication.runType.requiresEnvironment {
             Self.configurePixelKit()
 
