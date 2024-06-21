@@ -281,7 +281,7 @@ private extension BookmarksBarViewController {
 
     private func handleClick(for folder: BookmarkFolder, in view: NSView) {
         let folderNode = createNode(for: folder)
-        let popup = BookmarkListPopover(rootNode: folderNode)
+        let popup = BookmarkListPopover(rootNode: folderNode, type: .bar)
         popup.show(positionedBelow: view)
     }
 

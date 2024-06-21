@@ -26,6 +26,11 @@ protocol BookmarkListViewControllerDelegate: AnyObject {
 
 }
 
+enum BookmarkListType {
+    case panel
+    case bar
+}
+
 final class BookmarkListViewController: NSViewController {
 
     static let preferredContentSize = CGSize(width: 420, height: 500)
@@ -56,6 +61,7 @@ final class BookmarkListViewController: NSViewController {
     private let bookmarkManager: BookmarkManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
     private let rootNode: BookmarkNode
+    private let bookmarkListType: BookmarkListType
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource, rootNode: rootNode)
 
@@ -91,10 +97,11 @@ final class BookmarkListViewController: NSViewController {
         return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
     }()
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, rootNode: BookmarkNode) {
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, rootNode: BookmarkNode, bookmarkListType: BookmarkListType = .panel) {
         self.bookmarkManager = bookmarkManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
         self.rootNode = rootNode
+        self.bookmarkListType = bookmarkListType
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -105,11 +112,14 @@ final class BookmarkListViewController: NSViewController {
     override func loadView() { // swiftlint:disable:this function_body_length
         view = ColorView(frame: .zero, backgroundColor: .popoverBackground)
 
-        view.addSubview(titleTextField)
-        view.addSubview(boxDivider)
+        if bookmarkListType == .panel {
+            view.addSubview(titleTextField)
+            view.addSubview(boxDivider)
+            view.addSubview(emptyState)
+        }
+
         view.addSubview(stackView)
         view.addSubview(scrollView)
-        view.addSubview(emptyState)
 
         view.autoresizesSubviews = false
 
@@ -129,10 +139,12 @@ final class BookmarkListViewController: NSViewController {
         stackView.setHuggingPriority(.defaultHigh, for: .horizontal)
         stackView.setHuggingPriority(.defaultHigh, for: .vertical)
         stackView.translatesAutoresizingMaskIntoConstraints = false
+
         stackView.addArrangedSubview(newBookmarkButton)
         stackView.addArrangedSubview(newFolderButton)
         stackView.addArrangedSubview(buttonsDivider)
         stackView.addArrangedSubview(manageBookmarksButton)
+        stackView.isHidden = bookmarkListType == .bar
 
         newBookmarkButton.bezelStyle = .shadowlessSquare
         newBookmarkButton.cornerRadius = 4
@@ -244,66 +256,75 @@ final class BookmarkListViewController: NSViewController {
     }
 
     private func setupLayout() {
-        titleTextField.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        titleTextField.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
-        titleTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 12).isActive = true
-        titleTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
+        if bookmarkListType == .panel {
+            titleTextField.setContentHuggingPriority(.defaultHigh, for: .vertical)
+            titleTextField.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+            titleTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 12).isActive = true
+            titleTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
 
-        newBookmarkButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
-        newBookmarkButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
+            newBookmarkButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
+            newBookmarkButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
 
-        newFolderButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
-        newFolderButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
+            newFolderButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
+            newFolderButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
 
-        buttonsDivider.widthAnchor.constraint(equalToConstant: 13).isActive = true
-        buttonsDivider.heightAnchor.constraint(equalToConstant: 18).isActive = true
+            buttonsDivider.widthAnchor.constraint(equalToConstant: 13).isActive = true
+            buttonsDivider.heightAnchor.constraint(equalToConstant: 18).isActive = true
 
-        manageBookmarksButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
-        let titleWidth = (manageBookmarksButton.title as NSString)
-            .size(withAttributes: [.font: manageBookmarksButton.font as Any]).width
-        let buttonWidth = manageBookmarksButton.image!.size.height + titleWidth + 18
-        manageBookmarksButton.widthAnchor.constraint(equalToConstant: buttonWidth).isActive = true
+            manageBookmarksButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
+            let titleWidth = (manageBookmarksButton.title as NSString)
+                .size(withAttributes: [.font: manageBookmarksButton.font as Any]).width
+            let buttonWidth = manageBookmarksButton.image!.size.height + titleWidth + 18
+            manageBookmarksButton.widthAnchor.constraint(equalToConstant: buttonWidth).isActive = true
 
-        stackView.centerYAnchor.constraint(equalTo: titleTextField.centerYAnchor).isActive = true
-        view.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: 20).isActive = true
+            stackView.centerYAnchor.constraint(equalTo: titleTextField.centerYAnchor).isActive = true
 
-        boxDivider.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 12).isActive = true
-        boxDivider.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        view.trailingAnchor.constraint(equalTo: boxDivider.trailingAnchor).isActive = true
+            view.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: 20).isActive = true
 
-        scrollView.topAnchor.constraint(equalTo: boxDivider.bottomAnchor).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            boxDivider.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 12).isActive = true
+            boxDivider.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            view.trailingAnchor.constraint(equalTo: boxDivider.trailingAnchor).isActive = true
 
-        emptyState.topAnchor.constraint(equalTo: boxDivider.bottomAnchor).isActive = true
-        emptyState.centerXAnchor.constraint(equalTo: boxDivider.centerXAnchor).isActive = true
-        emptyState.widthAnchor.constraint(equalToConstant: 342).isActive = true
-        emptyState.heightAnchor.constraint(equalToConstant: 383).isActive = true
+            scrollView.topAnchor.constraint(equalTo: boxDivider.bottomAnchor).isActive = true
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
 
-        emptyStateImageView.translatesAutoresizingMaskIntoConstraints = false
-        emptyStateImageView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
-        emptyStateImageView.setContentHuggingPriority(.init(rawValue: 251), for: .vertical)
-        emptyStateImageView.topAnchor.constraint(equalTo: emptyState.topAnchor, constant: 94.5).isActive = true
-        emptyStateImageView.widthAnchor.constraint(equalToConstant: 128).isActive = true
-        emptyStateImageView.heightAnchor.constraint(equalToConstant: 96).isActive = true
-        emptyStateImageView.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+            emptyState.topAnchor.constraint(equalTo: boxDivider.bottomAnchor).isActive = true
+            emptyState.centerXAnchor.constraint(equalTo: boxDivider.centerXAnchor).isActive = true
+            emptyState.widthAnchor.constraint(equalToConstant: 342).isActive = true
+            emptyState.heightAnchor.constraint(equalToConstant: 383).isActive = true
 
-        emptyStateTitle.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        emptyStateTitle.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
-        emptyStateTitle.topAnchor.constraint(equalTo: emptyStateImageView.bottomAnchor, constant: 8).isActive = true
-        emptyStateTitle.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
-        emptyStateTitle.widthAnchor.constraint(equalToConstant: 192).isActive = true
+            emptyStateImageView.translatesAutoresizingMaskIntoConstraints = false
+            emptyStateImageView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+            emptyStateImageView.setContentHuggingPriority(.init(rawValue: 251), for: .vertical)
+            emptyStateImageView.topAnchor.constraint(equalTo: emptyState.topAnchor, constant: 94.5).isActive = true
+            emptyStateImageView.widthAnchor.constraint(equalToConstant: 128).isActive = true
+            emptyStateImageView.heightAnchor.constraint(equalToConstant: 96).isActive = true
+            emptyStateImageView.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
 
-        emptyStateMessage.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        emptyStateMessage.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
-        emptyStateMessage.topAnchor.constraint(equalTo: emptyStateTitle.bottomAnchor, constant: 8).isActive = true
-        emptyStateMessage.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+            emptyStateTitle.setContentHuggingPriority(.defaultHigh, for: .vertical)
+            emptyStateTitle.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+            emptyStateTitle.topAnchor.constraint(equalTo: emptyStateImageView.bottomAnchor, constant: 8).isActive = true
+            emptyStateTitle.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+            emptyStateTitle.widthAnchor.constraint(equalToConstant: 192).isActive = true
 
-        emptyStateMessage.widthAnchor.constraint(equalToConstant: 192).isActive = true
+            emptyStateMessage.setContentHuggingPriority(.defaultHigh, for: .vertical)
+            emptyStateMessage.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+            emptyStateMessage.topAnchor.constraint(equalTo: emptyStateTitle.bottomAnchor, constant: 8).isActive = true
+            emptyStateMessage.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
 
-        importButton.topAnchor.constraint(equalTo: emptyStateMessage.bottomAnchor, constant: 8).isActive = true
-        importButton.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+            emptyStateMessage.widthAnchor.constraint(equalToConstant: 192).isActive = true
+
+            importButton.topAnchor.constraint(equalTo: emptyStateMessage.bottomAnchor, constant: 8).isActive = true
+            importButton.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+        } else {
+            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        }
     }
 
     override func viewDidLoad() {
@@ -635,16 +656,13 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
 
 final class BookmarkListPopover: NSPopover {
 
-    private let rootNode: BookmarkNode
-
-    init(rootNode: BookmarkNode = BookmarkNode.genericRootNode()) {
-        self.rootNode = rootNode
+    init(rootNode: BookmarkNode = BookmarkNode.genericRootNode(), type: BookmarkListType = .panel) {
         super.init()
 
         self.animates = false
         self.behavior = .transient
 
-        setupContentController()
+        setupContentController(rootNode: rootNode, type: type)
     }
 
     required init?(coder: NSCoder) {
@@ -654,8 +672,8 @@ final class BookmarkListPopover: NSPopover {
     // swiftlint:disable:next force_cast
     var viewController: BookmarkListViewController { contentViewController as! BookmarkListViewController }
 
-    private func setupContentController() {
-        let controller = BookmarkListViewController(rootNode: rootNode)
+    private func setupContentController(rootNode: BookmarkNode, type: BookmarkListType) {
+        let controller = BookmarkListViewController(rootNode: rootNode, bookmarkListType: type)
         controller.delegate = self
         contentViewController = controller
     }
