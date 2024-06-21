@@ -387,30 +387,20 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .personalInformationRemoval:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .unique)
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
-            Task { @MainActor in
-                self.uiHandler.showTab(with: .dataBrokerProtection)
-            }
+            await uiHandler.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .unique)
             let url = subscriptionManager.url(for: .identityTheftRestoration)
-            Task { @MainActor in
-                self.uiHandler.showTab(with: .identityTheftRestoration(url))
-            }
+            await uiHandler.showTab(with: .identityTheftRestoration(url))
         }
 
         return nil
     }
 
     func completeStripePayment(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        Task { @MainActor in
-            uiHandler.presentProgressViewController(withTitle: UserText.completingPurchaseTitle)
-        }
-
+        await uiHandler.presentProgressViewController(withTitle: UserText.completingPurchaseTitle)
         await stripePurchaseFlow.completeSubscriptionPurchase()
-
-        Task { @MainActor in
-            uiHandler.dismissProgressViewController()
-        }
+        await uiHandler.dismissProgressViewController()
 
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
         subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
@@ -459,7 +449,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     @MainActor
-    func pushPurchaseUpdate(originalMessage: WKScriptMessage, purchaseUpdate: PurchaseUpdate) async {
+    func pushPurchaseUpdate(originalMessage: WKScriptMessage, purchaseUpdate: PurchaseUpdate) {
         pushAction(method: .onPurchaseUpdate, webView: originalMessage.webView!, params: purchaseUpdate)
     }
 
@@ -482,11 +472,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     func showSomethingWentWrongAlert() {
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
-        Task { @MainActor in
+        Task {
             switch await uiHandler.show(alertType: .somethingWentWrong) {
             case .alertFirstButtonReturn:
                 let url = subscriptionManager.url(for: .purchase)
-                uiHandler.showTab(with: .subscription(url))
+                await uiHandler.showTab(with: .subscription(url))
                 PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
             default: return
             }
@@ -494,7 +484,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) {
-        Task { @MainActor in
+        Task {
             switch await uiHandler.show(alertType: .subscriptionFound) {
             case .alertFirstButtonReturn:
                 if #available(macOS 12.0, *) {
@@ -505,7 +495,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                         case .success: PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
                         case .failure: break
                         }
-                        originalMessage.webView?.reload()
+                        await originalMessage.webView?.reload()
                     }
                 }
             default: return
@@ -518,18 +508,18 @@ extension SubscriptionPagesUseSubscriptionFeature: SubscriptionAccessActionHandl
 
     func subscriptionAccessActionRestorePurchases(message: WKScriptMessage) {
         if #available(macOS 12.0, *) {
-            Task { @MainActor in
+            Task {
                 let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: self.subscriptionManager,
                                                                                 uiHandler: self.uiHandler)
                 await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
-                message.webView?.reload()
+                await message.webView?.reload()
             }
         }
     }
 
     func subscriptionAccessActionOpenURLHandler(url: URL) {
-        Task { @MainActor in
-            self.uiHandler.showTab(with: .subscription(url))
+        Task {
+            await self.uiHandler.showTab(with: .subscription(url))
         }
     }
 

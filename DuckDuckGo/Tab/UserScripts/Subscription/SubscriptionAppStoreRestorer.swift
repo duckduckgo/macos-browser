@@ -37,29 +37,21 @@ struct SubscriptionAppStoreRestorer {
     }
 
     func restoreAppStoreSubscription() async {
-        Task { @MainActor in
-            uiHandler.presentProgressViewController(withTitle: UserText.restoringSubscriptionTitle)
-        }
+        await uiHandler.presentProgressViewController(withTitle: UserText.restoringSubscriptionTitle)
 
         do {
             try await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
             await continueRestore()
         } catch {
-            Task { @MainActor in
-                uiHandler.dismissProgressViewController()
-            }
+            await uiHandler.dismissProgressViewController()
 
             switch error as? StoreKitError {
             case .some(.userCancelled):
                 break
             default:
-                Task { @MainActor in
-                    let alertResponse = await uiHandler.show(alertType: .appleIDSyncFailed, text: error.localizedDescription)
-                    if alertResponse == .alertFirstButtonReturn {
-                        Task {
-                            await continueRestore()
-                        }
-                    }
+                let alertResponse = await uiHandler.show(alertType: .appleIDSyncFailed, text: error.localizedDescription)
+                if alertResponse == .alertFirstButtonReturn {
+                    await continueRestore()
                 }
             }
         }
@@ -67,8 +59,8 @@ struct SubscriptionAppStoreRestorer {
 
     private func continueRestore() async {
         defer {
-            Task { @MainActor in
-                uiHandler.dismissProgressViewController()
+            Task {
+                await uiHandler.dismissProgressViewController()
             }
         }
 
@@ -103,17 +95,17 @@ struct SubscriptionAppStoreRestorer {
 
     func showSomethingWentWrongAlert() {
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
-        Task { @MainActor in
+        Task {
             await uiHandler.show(alertType: .somethingWentWrong)
         }
     }
 
     func showSubscriptionNotFoundAlert() {
-        Task { @MainActor in
+        Task {
             switch await uiHandler.show(alertType: .subscriptionNotFound) {
             case .alertFirstButtonReturn:
                 let url = subscriptionManager.url(for: .purchase)
-                uiHandler.showTab(with: .subscription(url))
+                await uiHandler.showTab(with: .subscription(url))
                 PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
             default: return
             }
@@ -121,11 +113,11 @@ struct SubscriptionAppStoreRestorer {
     }
 
     func showSubscriptionInactiveAlert() {
-        Task { @MainActor in
+        Task {
             switch await uiHandler.show(alertType: .subscriptionInactive) {
             case .alertFirstButtonReturn:
                 let url = subscriptionManager.url(for: .purchase)
-                uiHandler.showTab(with: .subscription(url))
+                await uiHandler.showTab(with: .subscription(url))
                 PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
             default: return
             }
