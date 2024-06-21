@@ -35,6 +35,12 @@ final class BookmarkNode: Hashable {
 
     let uniqueID: Int
     let representedObject: AnyObject
+    
+    /// I created this property because at some point we were losing the reference to parent.
+    /// Causing the isRoot to be true, when it was not
+    /// I need to take a double look at this.
+    let shouldHaveRootAsParent: Bool
+    
     var canHaveChildNodes = false
     var childNodes = [BookmarkNode]()
 
@@ -73,18 +79,19 @@ final class BookmarkNode: Hashable {
     ///   - parent: An optional parent node.
     ///   - uniqueId: A unique identifier for the node. This should be used only in unit tests.
     /// - Attention: Use this initializer only in tests. 
-    init(representedObject: AnyObject, parent: BookmarkNode?, uniqueId: Int) {
+    init(representedObject: AnyObject, parent: BookmarkNode?, uniqueId: Int, shouldHaveRootAsParent: Bool = false) {
         self.representedObject = representedObject
         self.parent = parent
         self.uniqueID = uniqueId
+        self.shouldHaveRootAsParent = shouldHaveRootAsParent
     }
 
     /// Creates an instance of a bookmark node.
     /// - Parameters:
     ///   - representedObject: The represented object contained in the node.
     ///   - parent: An optional parent node.
-    convenience init(representedObject: AnyObject, parent: BookmarkNode?) {
-        self.init(representedObject: representedObject, parent: parent, uniqueId: BookmarkNode.incrementingID)
+    convenience init(representedObject: AnyObject, parent: BookmarkNode?, shouldHaveRootAsParent: Bool = false) {
+        self.init(representedObject: representedObject, parent: parent, uniqueId: BookmarkNode.incrementingID, shouldHaveRootAsParent: shouldHaveRootAsParent)
         BookmarkNode.incrementingID += 1
     }
 

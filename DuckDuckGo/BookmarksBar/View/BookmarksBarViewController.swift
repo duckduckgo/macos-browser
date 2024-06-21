@@ -259,7 +259,7 @@ private extension BookmarksBarViewController {
     func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for folder: BookmarkFolder, item: BookmarksBarCollectionViewItem) {
         switch action {
         case .clickItem:
-            showSubmenuFor(folder: folder, fromView: item.view)
+            handleClick(for: folder, in: item.view)
         case .edit:
             showDialog(view: BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: nil))
         case .moveToEnd:
@@ -277,6 +277,20 @@ private extension BookmarksBarViewController {
         default:
             assertionFailure("Received unexpected action for bookmark folder")
         }
+    }
+
+    private func handleClick(for folder: BookmarkFolder, in view: NSView) {
+        let folderNode = createNode(for: folder)
+        let popup = BookmarkListPopover(rootNode: folderNode)
+        popup.show(positionedBelow: view)
+    }
+
+    private func createNode(for folder: BookmarkFolder) -> BookmarkNode {
+        let rootNode = BookmarkNode.genericRootNode()
+        let folderNode = BookmarkNode(representedObject: folder, parent: rootNode, shouldHaveRootAsParent: true)
+        folderNode.canHaveChildNodes = true
+
+        return folderNode
     }
 
     func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {

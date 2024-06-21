@@ -91,8 +91,7 @@ final class BookmarkListViewController: NSViewController {
         return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
     }()
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-         rootNode: BookmarkNode = BookmarkNode.genericRootNode()) {
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, rootNode: BookmarkNode) {
         self.bookmarkManager = bookmarkManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
         self.rootNode = rootNode
@@ -656,7 +655,7 @@ final class BookmarkListPopover: NSPopover {
     var viewController: BookmarkListViewController { contentViewController as! BookmarkListViewController }
 
     private func setupContentController() {
-        let controller = BookmarkListViewController()
+        let controller = BookmarkListViewController(rootNode: rootNode)
         controller.delegate = self
         contentViewController = controller
     }
@@ -702,7 +701,7 @@ private let previewEmptyState = false
         customAssertionFailure = { _, _, _ in }
 
         return bkman
-    }())
+    }(), rootNode: BookmarkNode.genericRootNode())
 
     var c: AnyCancellable!
     c = vc.publisher(for: \.view.window).sink { window in
