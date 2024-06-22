@@ -49,4 +49,5 @@ class CapturingOnboardingNavigation: OnboardingNavigating {
         updatePreventUserInteractionCalled = true
         preventUserInteraction = prevent
     }
+
 }

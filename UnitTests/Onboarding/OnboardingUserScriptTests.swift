@@ -112,7 +112,7 @@ final class OnboardingUserScriptTests: XCTestCase {
         let handler = try XCTUnwrap(script.handler(forMethodNamed: "setShowHomeButton"))
 
         let result = try await handler([""], WKScriptMessage())
-        XCTAssertTrue(mockManager.setShowHomeButtonLeftCalled)
+        XCTAssertTrue(mockManager.setHomeButtonPositionCalled)
         XCTAssertNil(result)
     }
 
