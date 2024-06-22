@@ -307,7 +307,7 @@ final class MoreOptionsMenu: NSMenu {
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable && !accountManager.isUserAuthenticated {
             privacyProItem.target = self
             privacyProItem.action = #selector(openSubscriptionPurchasePage(_:))
-            
+
             // Do not add for App Store when purchase not available in the region
             if !shouldHideDueToNoProduct() {
                 addItem(privacyProItem)
@@ -320,99 +320,6 @@ final class MoreOptionsMenu: NSMenu {
             addItem(privacyProItem)
             addItem(NSMenuItem.separator())
         }
-    }
-
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
-    private func makeActiveSubscriptionItems() -> [NSMenuItem] {
-        var items: [NSMenuItem] = []
-
-        let subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
-        let networkProtectionItem: NSMenuItem
-
-        networkProtectionItem = makeNetworkProtectionItem()
-
-        items.append(networkProtectionItem)
-
-        if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {
-            Task {
-                let isMenuItemEnabled: Bool
-
-                switch await accountManager.hasEntitlement(for: .networkProtection) {
-                case let .success(result):
-                    isMenuItemEnabled = result
-                case .failure:
-                    isMenuItemEnabled = false
-                }
-
-                networkProtectionItem.isEnabled = isMenuItemEnabled
-            }
-        }
-
-#if DBP
-        let dbpGatekeeper = DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: accountManager)
-        if dbpGatekeeper.isFeatureVisible() || dbpGatekeeper.isPrivacyProEnabled() {
-            let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
-                                                      action: #selector(openDataBrokerProtection),
-                                                      keyEquivalent: "")
-                .targetting(self)
-                .withImage(.dbpIcon)
-            items.append(dataBrokerProtectionItem)
-
-            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {
-                Task {
-                    let isMenuItemEnabled: Bool
-
-                    switch await accountManager.hasEntitlement(for: .dataBrokerProtection) {
-                    case let .success(result):
-                        isMenuItemEnabled = result
-                    case .failure:
-                        isMenuItemEnabled = false
-                    }
-
-                    dataBrokerProtectionItem.isEnabled = isMenuItemEnabled
-                }
-            }
-
-            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
-
-        } else {
-            dbpGatekeeper.disableAndDeleteForWaitlistUsers()
-        }
-#endif // DBP
-
-        if accountManager.isUserAuthenticated {
-            let identityTheftRestorationItem = NSMenuItem(title: UserText.identityTheftRestorationOptionsMenuItem,
-                                                          action: #selector(openIdentityTheftRestoration),
-                                                          keyEquivalent: "")
-                .targetting(self)
-                .withImage(.itrIcon)
-            items.append(identityTheftRestorationItem)
-
-            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {
-                Task {
-                    let isMenuItemEnabled: Bool
-
-                    switch await accountManager.hasEntitlement(for: .identityTheftRestoration) {
-                    case let .success(result):
-                        isMenuItemEnabled = result
-                    case .failure:
-                        isMenuItemEnabled = false
-                    }
-
-                    identityTheftRestorationItem.isEnabled = isMenuItemEnabled
-                }
-            }
-        }
-
-        items.append(NSMenuItem.separator())
-
-        let subscriptionSettingsItem = NSMenuItem(title: UserText.subscriptionSettingsOptionsMenuItem,
-                                                  action: #selector(openSubscriptionSettings),
-                                                  keyEquivalent: "")
-            .targetting(self)
-        items.append(subscriptionSettingsItem)
-        
-        return items
     }
 
     private func addPageItems() {
