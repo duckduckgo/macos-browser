@@ -93,7 +93,7 @@ final class OnboardingUITests: XCTestCase {
 
         for command in commands {
             let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/bin/zsh") // Using zsh; adjust if using bash or another shell
+            process.executableURL = URL(fileURLWithPath: "/bin/zsh")
             process.arguments = ["-c", command]
 
             try process.run()
