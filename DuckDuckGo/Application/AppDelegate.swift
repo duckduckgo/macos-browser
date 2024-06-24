@@ -89,8 +89,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    public let activeRemoteMessageModel: ActiveRemoteMessageModel
-    public let remoteMessagingClient: RemoteMessagingClient
+    let activeRemoteMessageModel: ActiveRemoteMessageModel
+    private let remoteMessagingClient: RemoteMessagingClient
 
     public let subscriptionManager: SubscriptionManaging
     public let subscriptionUIHandler: SubscriptionUIHandling
@@ -165,7 +165,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         remoteMessagingClient = RemoteMessagingClient(
             database: RemoteMessagingDatabase(),
             bookmarksDatabase: BookmarkDatabase.shared.db,
-            appearancePreferences: .shared
+            appearancePreferences: .shared,
+            internalUserDecider: internalUserDecider
         )
 
         if NSApplication.runType.requiresEnvironment {

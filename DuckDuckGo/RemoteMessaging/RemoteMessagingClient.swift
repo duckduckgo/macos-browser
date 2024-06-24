@@ -29,13 +29,42 @@ import Subscription
 
 final class RemoteMessagingClient {
 
-    init(database: RemoteMessagingDatabase, bookmarksDatabase: CoreDataDatabase, appearancePreferences: AppearancePreferences) {
+    struct Constants {
+        static let minimumConfigurationRefreshInterval: TimeInterval = 60 * 60 * 4
+    }
+
+    init(
+        database: RemoteMessagingDatabase,
+        bookmarksDatabase: CoreDataDatabase,
+        appearancePreferences: AppearancePreferences,
+        internalUserDecider: InternalUserDecider
+    ) {
         self.database = database
         self.bookmarksDatabase = bookmarksDatabase
         self.appearancePreferences = appearancePreferences
+        self.internalUserDecider = internalUserDecider
+
+        subscribeToInternalUserFlagChangesIfNeeded()
+    }
+
+    private func subscribeToInternalUserFlagChangesIfNeeded() {
+        guard !internalUserDecider.isInternalUser else {
+            return
+        }
+
+        internalUserCancellable = internalUserDecider.isInternalUserPublisher
+            .sink { [weak self] isInternalUser in
+                if isInternalUser {
+                    self?.initializeDatabaseIfNeeded()
+                    self?.startRefreshingRemoteMessages()
+                }
+            }
     }
 
     func initializeDatabaseIfNeeded() {
+        guard internalUserDecider.isInternalUser else {
+            return
+        }
         guard !isRemoteMessagingDatabaseLoaded else {
             return
         }
@@ -56,12 +85,27 @@ final class RemoteMessagingClient {
         isRemoteMessagingDatabaseLoaded = true
     }
 
-    let database: RemoteMessagingDatabase
-    let bookmarksDatabase: CoreDataDatabase
-    let appearancePreferences: AppearancePreferences
+    func startRefreshingRemoteMessages() {
+        guard internalUserDecider.isInternalUser else {
+            return
+        }
+        timerCancellable = Timer.publish(every: Constants.minimumConfigurationRefreshInterval, on: .main, in: .default)
+            .autoconnect()
+            .prepend(Date())
+            .asVoid()
+            .sink { [weak self] in
+                self?.refreshRemoteMessages()
+            }
+    }
+
+    private let database: RemoteMessagingDatabase
+    private let bookmarksDatabase: CoreDataDatabase
+    private let appearancePreferences: AppearancePreferences
+    private let internalUserDecider: InternalUserDecider
     private(set) var store: RemoteMessagingStore?
     private var isRemoteMessagingDatabaseLoaded = false
     private var timerCancellable: AnyCancellable?
+    private var internalUserCancellable: AnyCancellable?
 
     private static let endpoint: URL = {
 #if DEBUG
@@ -73,24 +117,6 @@ final class RemoteMessagingClient {
 
     @UserDefaultsWrapper(key: .lastRemoteMessagingRefreshDate, defaultValue: .distantPast)
     static private var lastRemoteMessagingRefreshDate: Date
-
-    struct Constants {
-        static let minimumConfigurationRefreshInterval: TimeInterval = 60 * 60 * 4
-    }
-
-    static private var shouldRefresh: Bool {
-        return Date().timeIntervalSince(Self.lastRemoteMessagingRefreshDate) > Constants.minimumConfigurationRefreshInterval
-    }
-
-    func startRefreshingRemoteMessages() {
-        timerCancellable = Timer.publish(every: Constants.minimumConfigurationRefreshInterval, on: .main, in: .default)
-            .autoconnect()
-            .prepend(Date())
-            .asVoid()
-            .sink { [weak self] in
-                self?.refreshRemoteMessages()
-            }
-    }
 
     private func refreshRemoteMessages() {
         Task {
@@ -233,7 +259,7 @@ final class RemoteMessagingClient {
         }
     }
 
-    static func fetchRemoteMessages(remoteMessageRequest: RemoteMessageRequest) async -> Result<RemoteMessageResponse.JsonRemoteMessagingConfig, RemoteMessageResponse.StatusError> {
+    private static func fetchRemoteMessages(remoteMessageRequest: RemoteMessageRequest) async -> Result<RemoteMessageResponse.JsonRemoteMessagingConfig, RemoteMessageResponse.StatusError> {
         return await withCheckedContinuation { continuation in
             remoteMessageRequest.getRemoteMessage(completionHandler: { result in
                 switch result {
