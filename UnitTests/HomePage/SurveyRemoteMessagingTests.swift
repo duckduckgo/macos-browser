@@ -27,14 +27,14 @@ final class SurveyRemoteMessagingTests: XCTestCase {
     private var defaults: UserDefaults!
     private let testGroupName = "remote-messaging"
 
-    private var accountManager: AccountManaging!
+    private var accountManager: AccountManager!
     private var subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching!
 
     override func setUp() {
         defaults = UserDefaults(suiteName: testGroupName)!
         defaults.removePersistentDomain(forName: testGroupName)
 
-        accountManager = AccountManagerMock(isUserAuthenticated: true, accessToken: "mock-token")
+        accountManager = AccountManagerMock(accessToken: "mock-token")
         subscriptionFetcher = MockSubscriptionFetcher()
     }
 
@@ -322,7 +322,7 @@ final class MockSubscriptionFetcher: SurveyRemoteMessageSubscriptionFetching {
         platform: .apple,
         status: .autoRenewable)
 
-    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionService.SubscriptionServiceError> {
+    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionServiceError> {
         return .success(subscription)
     }
 

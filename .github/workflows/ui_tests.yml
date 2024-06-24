@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   schedule:
      - cron: '0 3 * * 1-5' # 3AM UTC offsetted to legacy to avoid action-junit-report@v4 bug
+  pull_request:
+    branches:
+      - hotfix/*
+      - release/*
       
 jobs:
   ui-tests:
@@ -13,6 +17,10 @@ jobs:
       fail-fast: false
       matrix:
         runner: [macos-13-xlarge, macos-14-xlarge]
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.runner }}
+      cancel-in-progress: true
 
     timeout-minutes: 120
 

@@ -87,7 +87,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    public let subscriptionManager: SubscriptionManaging
+    public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
 
     public let vpnSettings = VPNSettings(defaults: .netP)
@@ -218,7 +218,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         // Configure Subscription
-        subscriptionManager = SubscriptionManager()
+        subscriptionManager = DefaultSubscriptionManager()
         subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
             return WindowControllersManager.shared
         })
@@ -636,13 +636,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @MainActor
     private func setUpAutoClearHandler() {
-        DispatchQueue.main.async {
-            self.autoClearHandler = AutoClearHandler(preferences: .shared,
+        let autoClearHandler = AutoClearHandler(preferences: .shared,
                                                 fireViewModel: FireCoordinator.fireViewModel,
-                                                     stateRestorationManager: self.stateRestorationManager)
-            self.autoClearHandler.handleAppLaunch()
-            self.autoClearHandler.onAutoClearCompleted = {
+                                                stateRestorationManager: self.stateRestorationManager)
+        self.autoClearHandler = autoClearHandler
+        DispatchQueue.main.async {
+            autoClearHandler.handleAppLaunch()
+            autoClearHandler.onAutoClearCompleted = {
                 NSApplication.shared.reply(toApplicationShouldTerminate: true)
             }
         }
