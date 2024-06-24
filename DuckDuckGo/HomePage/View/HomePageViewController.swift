@@ -40,7 +40,6 @@ final class HomePageViewController: NSViewController {
         return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
     }()
 
-    var remoteMessagesModel: HomePage.Models.RemoteMessagesModel!
     var favoritesModel: HomePage.Models.FavoritesModel!
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
@@ -79,7 +78,6 @@ final class HomePageViewController: NSViewController {
     }
 
     override func loadView() {
-        remoteMessagesModel = createRemoteMessagesModel()
         favoritesModel = createFavoritesModel()
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
@@ -94,7 +92,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(featuresModel)
             .environmentObject(accessibilityPreferences)
             .environmentObject(appearancePreferences)
-            .environmentObject(remoteMessagesModel)
+            .environmentObject(Application.appDelegate.remoteMessagesModel)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()
@@ -202,16 +200,8 @@ final class HomePageViewController: NSViewController {
         })
     }
 
-    func createRemoteMessagesModel() -> HomePage.Models.RemoteMessagesModel {
-        return .init(fetchMessage: {
-            Application.appDelegate.remoteMessagingClient.store?.fetchScheduledRemoteMessage()
-        }, onDismiss: { message in
-            Application.appDelegate.remoteMessagingClient.store?.dismissRemoteMessage(withId: message.id)
-        })
-    }
-
     func refreshRemoteMessagesModel() {
-        remoteMessagesModel.updateRemoteMessage()
+        Application.appDelegate.remoteMessagesModel.updateRemoteMessage()
     }
 
     func refreshFavoritesModel() {

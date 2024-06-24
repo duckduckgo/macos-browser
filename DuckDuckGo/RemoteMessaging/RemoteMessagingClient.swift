@@ -59,7 +59,7 @@ final class RemoteMessagingClient {
 
     private static let endpoint: URL = {
 #if DEBUG
-        URL(string: "https://raw.githubusercontent.com/duckduckgo/remote-messaging-config/main/samples/ios/sample2.json")!
+        URL(string: "https://www.jsonblob.com/api/1252947611702124544")!
 #else
         URL(string: "https://staticcdn.duckduckgo.com/remotemessaging/config/v1/ios-config.json")!
 #endif

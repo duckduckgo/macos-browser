@@ -38,8 +38,10 @@ import NetworkProtection
 import Subscription
 import NetworkProtectionIPC
 import DataBrokerProtection
+import RemoteMessaging
 
 // @MainActor
+// swiftlint:disable:next type_body_length
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG
@@ -84,9 +86,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var syncFeatureFlagsCancellable: AnyCancellable?
     private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
+    private var remoteMessagesCancellable: AnyCancellable?
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
+    public let remoteMessagesModel: HomePage.Models.RemoteMessagesModel
     public let remoteMessagingClient: RemoteMessagingClient
 
     public let subscriptionManager: SubscriptionManaging
@@ -159,7 +163,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
-        remoteMessagingClient = RemoteMessagingClient(database: RemoteMessagingDatabase())
+        let remoteMessagingClient = RemoteMessagingClient(database: RemoteMessagingDatabase())
+        let remoteMessagesModel = HomePage.Models.RemoteMessagesModel(fetchMessage: {
+            remoteMessagingClient.store?.fetchScheduledRemoteMessage()
+        }, onDismiss: { message in
+            remoteMessagingClient.store?.dismissRemoteMessage(withId: message.id)
+        })
+        remoteMessagesCancellable = NotificationCenter.default.publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { _ in
+                remoteMessagesModel.updateRemoteMessage()
+            }
+        self.remoteMessagingClient = remoteMessagingClient
+        self.remoteMessagesModel = remoteMessagesModel
 
         if NSApplication.runType.requiresEnvironment {
             Self.configurePixelKit()
