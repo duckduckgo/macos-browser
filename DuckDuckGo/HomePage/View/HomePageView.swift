@@ -31,7 +31,7 @@ extension HomePage.Views {
         @EnvironmentObject var model: AppearancePreferences
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
-        @EnvironmentObject var remoteMessagesModel: HomePage.Models.RemoteMessagesModel
+        @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
 
         @State private var isHomeContentPopoverVisible = false
 
@@ -106,16 +106,16 @@ extension HomePage.Views {
 
         @ViewBuilder
         func remoteMessage() -> some View {
-            if let remoteMessage = remoteMessagesModel.remoteMessage, let modelType = remoteMessage.content {
+            if let remoteMessage = activeRemoteMessageModel.remoteMessage, let modelType = remoteMessage.content {
                 HomeMessageView(viewModel: .init(
                     messageId: remoteMessage.id,
                     modelType: modelType,
                     onDidClose: { _ in
-                        remoteMessagesModel.dismissRemoteMessage()
+                        activeRemoteMessageModel.dismissRemoteMessage()
                     },
                     onDidAppear: {},
                     openURLHandler: { url in
-                    WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
+                        WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
                 }))
             } else {
                 EmptyView()

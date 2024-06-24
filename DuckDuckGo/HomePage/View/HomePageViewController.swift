@@ -92,7 +92,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(featuresModel)
             .environmentObject(accessibilityPreferences)
             .environmentObject(appearancePreferences)
-            .environmentObject(Application.appDelegate.remoteMessagesModel)
+            .environmentObject(Application.appDelegate.activeRemoteMessageModel)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()
@@ -105,7 +105,6 @@ final class HomePageViewController: NSViewController {
         refreshModelsOnAppBecomingActive()
         subscribeToBookmarks()
         subscribeToBurningData()
-        subscribeToRemoteMessages()
     }
 
     override func viewWillAppear() {
@@ -142,7 +141,6 @@ final class HomePageViewController: NSViewController {
         refreshRecentlyVisitedModel()
         refreshDefaultBrowserModel()
         refreshContinueSetUpModel()
-        refreshRemoteMessagesModel()
     }
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
@@ -200,10 +198,6 @@ final class HomePageViewController: NSViewController {
         })
     }
 
-    func refreshRemoteMessagesModel() {
-        Application.appDelegate.remoteMessagesModel.updateRemoteMessage()
-    }
-
     func refreshFavoritesModel() {
         favoritesModel.favorites = bookmarkManager.list?.favoriteBookmarks ?? []
     }
@@ -232,15 +226,6 @@ final class HomePageViewController: NSViewController {
                 self?.refreshFavoritesModel()
             }
         }.store(in: &cancellables)
-    }
-
-    private func subscribeToRemoteMessages() {
-        NotificationCenter.default.publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.refreshModels()
-            }
-            .store(in: &cancellables)
     }
 
     private func openUrl(_ url: URL, target: HomePage.Models.FavoritesModel.OpenTarget? = nil) {

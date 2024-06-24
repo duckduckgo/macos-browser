@@ -990,12 +990,12 @@
 		376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */; };
 		3767190028E58513003A2A15 /* DuckPlayerURLExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376718FF28E58513003A2A15 /* DuckPlayerURLExtensionTests.swift */; };
 		3767190328E724D8003A2A15 /* DuckPlayerURLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767190128E724B2003A2A15 /* DuckPlayerURLExtension.swift */; };
-		3768D8352C24B9F7004120AE /* HomePageRemoteMessagesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8342C24B9F7004120AE /* HomePageRemoteMessagesModel.swift */; };
-		3768D8362C24B9F7004120AE /* HomePageRemoteMessagesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8342C24B9F7004120AE /* HomePageRemoteMessagesModel.swift */; };
 		3768D8382C24BFF5004120AE /* HomeMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8372C24BFF5004120AE /* HomeMessageView.swift */; };
 		3768D8392C24BFF5004120AE /* HomeMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8372C24BFF5004120AE /* HomeMessageView.swift */; };
 		3768D83B2C24C0A8004120AE /* HomeMessageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D83A2C24C0A8004120AE /* HomeMessageViewModel.swift */; };
 		3768D83C2C24C0A8004120AE /* HomeMessageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D83A2C24C0A8004120AE /* HomeMessageViewModel.swift */; };
+		3768D8402C29C1F1004120AE /* ActiveRemoteMessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */; };
+		3768D8412C29C1F1004120AE /* ActiveRemoteMessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */; };
 		376C4DB928A1A48A00CC0F5B /* FirePopoverViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376C4DB828A1A48A00CC0F5B /* FirePopoverViewModelTests.swift */; };
 		376E2D2629428353001CD31B /* PrivacyReferenceTestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163BC293A579E00963C10 /* PrivacyReferenceTestHelper.swift */; };
 		376E2D2729428353001CD31B /* BrokenSiteReportingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */; };
@@ -3014,9 +3014,9 @@
 		376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SyncE2EUITestsAppStore.xcconfig; sourceTree = "<group>"; };
 		376718FF28E58513003A2A15 /* DuckPlayerURLExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerURLExtensionTests.swift; sourceTree = "<group>"; };
 		3767190128E724B2003A2A15 /* DuckPlayerURLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerURLExtension.swift; sourceTree = "<group>"; };
-		3768D8342C24B9F7004120AE /* HomePageRemoteMessagesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageRemoteMessagesModel.swift; sourceTree = "<group>"; };
 		3768D8372C24BFF5004120AE /* HomeMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMessageView.swift; sourceTree = "<group>"; };
 		3768D83A2C24C0A8004120AE /* HomeMessageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMessageViewModel.swift; sourceTree = "<group>"; };
+		3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRemoteMessageModel.swift; sourceTree = "<group>"; };
 		376C4DB828A1A48A00CC0F5B /* FirePopoverViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverViewModelTests.swift; sourceTree = "<group>"; };
 		376CC8B4296EB630006B63A7 /* AppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppStore.xcconfig; sourceTree = "<group>"; };
 		376CC8B5296EBA8F006B63A7 /* BuildNumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BuildNumber.xcconfig; sourceTree = "<group>"; };
@@ -4722,6 +4722,7 @@
 			isa = PBXGroup;
 			children = (
 				371209202C232E3F003ADF3D /* RemoteMessagingClient.swift */,
+				3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */,
 				371209292C2333A0003ADF3D /* RemoteMessagingDatabase.swift */,
 				3712092B2C23383C003ADF3D /* RemoteMessagingStoreErrorHandling.swift */,
 				3712092D2C233C52003ADF3D /* RemoteMessagingSurveyURLBuilder.swift */,
@@ -6072,7 +6073,6 @@
 		85589E8527BBB8DD0038AD11 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				3768D8342C24B9F7004120AE /* HomePageRemoteMessagesModel.swift */,
 				85589E8627BBB8F20038AD11 /* HomePageFavoritesModel.swift */,
 				85AC7ADC27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift */,
 				85589E9027BFB9810038AD11 /* HomePageRecentlyVisitedModel.swift */,
@@ -9669,6 +9669,7 @@
 				3706FAB6293F65D500E42796 /* YoutubePlayerUserScript.swift in Sources */,
 				1D8057C92A83CB3C00F4FED6 /* SupportedOsChecker.swift in Sources */,
 				373D9B4929EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */,
+				3768D8412C29C1F1004120AE /* ActiveRemoteMessageModel.swift in Sources */,
 				3706FAB8293F65D500E42796 /* FaviconImageCache.swift in Sources */,
 				3706FAB9293F65D500E42796 /* TabBarViewController.swift in Sources */,
 				3706FABA293F65D500E42796 /* BookmarkOutlineViewDataSource.swift in Sources */,
@@ -10084,7 +10085,6 @@
 				B6ABD0CF2BC042CE0000EB69 /* NSURL+sandboxExtensionRetainCount.m in Sources */,
 				B62B483F2ADE48DE000DECE5 /* ArrayBuilder.swift in Sources */,
 				569277C229DDCBB500B633EF /* HomePageContinueSetUpModel.swift in Sources */,
-				3768D8362C24B9F7004120AE /* HomePageRemoteMessagesModel.swift in Sources */,
 				3706FBD7293F65D500E42796 /* ContentBlockerRulesLists.swift in Sources */,
 				3706FBD8293F65D500E42796 /* NSViewControllerExtension.swift in Sources */,
 				3706FBD9293F65D500E42796 /* NSAppearanceExtension.swift in Sources */,
@@ -11008,6 +11008,7 @@
 				4B723E0E26B0006300E14D75 /* LoginImport.swift in Sources */,
 				4B9DB03E2A983B24000927DB /* JoinWaitlistView.swift in Sources */,
 				1ED910D52B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */,
+				3768D8402C29C1F1004120AE /* ActiveRemoteMessageModel.swift in Sources */,
 				37534CA028113101002621E7 /* LazyLoadable.swift in Sources */,
 				0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */,
 				31AA6B972B960B870025014E /* DataBrokerProtectionLoginItemPixels.swift in Sources */,
@@ -11301,7 +11302,6 @@
 				4B67854A2AA8DE75008A5004 /* VPNFeatureGatekeeper.swift in Sources */,
 				B64C852A26942AC90048FEBE /* PermissionContextMenu.swift in Sources */,
 				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
-				3768D8352C24B9F7004120AE /* HomePageRemoteMessagesModel.swift in Sources */,
 				B693955526F04BEC0015B914 /* NSSavePanelExtension.swift in Sources */,
 				9826B0A22747DFEB0092F683 /* AppPrivacyConfigurationDataProvider.swift in Sources */,
 				B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */,

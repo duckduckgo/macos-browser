@@ -1,5 +1,5 @@
 //
-//  HomePageRemoteMessagesModel.swift
+//  ActiveRemoteMessageModel.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,20 +16,34 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import RemoteMessaging
 
-extension HomePage.Models {
-
-final class RemoteMessagesModel: ObservableObject {
+final class ActiveRemoteMessageModel: ObservableObject {
 
     @Published var remoteMessage: RemoteMessageModel?
     let fetchMessage: () -> RemoteMessageModel?
     let onDismiss: (RemoteMessageModel) -> Void
 
+    convenience init(client: RemoteMessagingClient) {
+        self.init { [weak client] in
+            client?.store?.fetchScheduledRemoteMessage()
+        } onDismiss: { [weak client] message in
+            client?.store?.dismissRemoteMessage(withId: message.id)
+        }
+    }
+
     init(fetchMessage: @escaping () -> RemoteMessageModel?, onDismiss: @escaping (RemoteMessageModel) -> Void) {
         self.fetchMessage = fetchMessage
         self.onDismiss = onDismiss
+
+        messagesDidChangeCancellable = NotificationCenter.default
+            .publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateRemoteMessage()
+            }
     }
 
     func updateRemoteMessage() {
@@ -42,6 +56,6 @@ final class RemoteMessagesModel: ObservableObject {
             self.remoteMessage = nil
         }
     }
-}
 
+    private var messagesDidChangeCancellable: AnyCancellable?
 }

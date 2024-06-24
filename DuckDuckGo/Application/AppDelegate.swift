@@ -86,11 +86,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var syncFeatureFlagsCancellable: AnyCancellable?
     private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
-    private var remoteMessagesCancellable: AnyCancellable?
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    public let remoteMessagesModel: HomePage.Models.RemoteMessagesModel
+    public let activeRemoteMessageModel: ActiveRemoteMessageModel
     public let remoteMessagingClient: RemoteMessagingClient
 
     public let subscriptionManager: SubscriptionManaging
@@ -163,19 +162,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
-        let remoteMessagingClient = RemoteMessagingClient(database: RemoteMessagingDatabase())
-        let remoteMessagesModel = HomePage.Models.RemoteMessagesModel(fetchMessage: {
-            remoteMessagingClient.store?.fetchScheduledRemoteMessage()
-        }, onDismiss: { message in
-            remoteMessagingClient.store?.dismissRemoteMessage(withId: message.id)
-        })
-        remoteMessagesCancellable = NotificationCenter.default.publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
-            .receive(on: DispatchQueue.main)
-            .sink { _ in
-                remoteMessagesModel.updateRemoteMessage()
-            }
-        self.remoteMessagingClient = remoteMessagingClient
-        self.remoteMessagesModel = remoteMessagesModel
+        remoteMessagingClient = RemoteMessagingClient(database: RemoteMessagingDatabase())
+        activeRemoteMessageModel = ActiveRemoteMessageModel(client: remoteMessagingClient)
 
         if NSApplication.runType.requiresEnvironment {
             Self.configurePixelKit()
