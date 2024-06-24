@@ -33,7 +33,7 @@ protocol OnboardingActionsManaging {
     /// Provides the configuration needed to set up the FE onboarding
     var configuration: OnboardingConfiguration { get }
 
-    /// Used for any setup necessary for during th eonboarding
+    /// Used for any setup necessary for during the onboarding
     func onboardingStarted()
 
     /// At the end of the onboarding the user will be taken to the DuckDuckGo search page
