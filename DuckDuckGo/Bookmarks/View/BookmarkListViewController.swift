@@ -122,74 +122,108 @@ final class BookmarkListViewController: NSViewController {
 
         view.autoresizesSubviews = false
 
-        titleTextField.isEditable = false
-        titleTextField.isBordered = false
-        titleTextField.drawsBackground = false
-        titleTextField.translatesAutoresizingMaskIntoConstraints = false
-        titleTextField.font = .systemFont(ofSize: 17)
-        titleTextField.textColor = .labelColor
+        if contentMode == .panel {
+            titleTextField.isEditable = false
+            titleTextField.isBordered = false
+            titleTextField.drawsBackground = false
+            titleTextField.translatesAutoresizingMaskIntoConstraints = false
+            titleTextField.font = .systemFont(ofSize: 17)
+            titleTextField.textColor = .labelColor
 
-        boxDivider.boxType = .separator
-        boxDivider.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        boxDivider.translatesAutoresizingMaskIntoConstraints = false
+            boxDivider.boxType = .separator
+            boxDivider.setContentHuggingPriority(.defaultHigh, for: .vertical)
+            boxDivider.translatesAutoresizingMaskIntoConstraints = false
 
-        stackView.orientation = .horizontal
-        stackView.spacing = 4
-        stackView.setHuggingPriority(.defaultHigh, for: .horizontal)
-        stackView.setHuggingPriority(.defaultHigh, for: .vertical)
-        stackView.translatesAutoresizingMaskIntoConstraints = false
+            stackView.orientation = .horizontal
+            stackView.spacing = 4
+            stackView.setHuggingPriority(.defaultHigh, for: .horizontal)
+            stackView.setHuggingPriority(.defaultHigh, for: .vertical)
+            stackView.translatesAutoresizingMaskIntoConstraints = false
 
-        stackView.addArrangedSubview(newBookmarkButton)
-        stackView.addArrangedSubview(newFolderButton)
-        stackView.addArrangedSubview(buttonsDivider)
-        stackView.addArrangedSubview(manageBookmarksButton)
-        stackView.isHidden = contentMode == .bar
+            stackView.addArrangedSubview(newBookmarkButton)
+            stackView.addArrangedSubview(newFolderButton)
+            stackView.addArrangedSubview(buttonsDivider)
+            stackView.addArrangedSubview(manageBookmarksButton)
+            stackView.isHidden = contentMode == .bar
 
-        newBookmarkButton.bezelStyle = .shadowlessSquare
-        newBookmarkButton.cornerRadius = 4
-        newBookmarkButton.normalTintColor = .button
-        newBookmarkButton.mouseDownColor = .buttonMouseDown
-        newBookmarkButton.mouseOverColor = .buttonMouseOver
-        newBookmarkButton.translatesAutoresizingMaskIntoConstraints = false
-        newBookmarkButton.toolTip = UserText.newBookmarkTooltip
+            newBookmarkButton.bezelStyle = .shadowlessSquare
+            newBookmarkButton.cornerRadius = 4
+            newBookmarkButton.normalTintColor = .button
+            newBookmarkButton.mouseDownColor = .buttonMouseDown
+            newBookmarkButton.mouseOverColor = .buttonMouseOver
+            newBookmarkButton.translatesAutoresizingMaskIntoConstraints = false
+            newBookmarkButton.toolTip = UserText.newBookmarkTooltip
 
-        newFolderButton.bezelStyle = .shadowlessSquare
-        newFolderButton.cornerRadius = 4
-        newFolderButton.normalTintColor = .button
-        newFolderButton.mouseDownColor = .buttonMouseDown
-        newFolderButton.mouseOverColor = .buttonMouseOver
-        newFolderButton.translatesAutoresizingMaskIntoConstraints = false
-        newFolderButton.toolTip = UserText.newFolderTooltip
+            newFolderButton.bezelStyle = .shadowlessSquare
+            newFolderButton.cornerRadius = 4
+            newFolderButton.normalTintColor = .button
+            newFolderButton.mouseDownColor = .buttonMouseDown
+            newFolderButton.mouseOverColor = .buttonMouseOver
+            newFolderButton.translatesAutoresizingMaskIntoConstraints = false
+            newFolderButton.toolTip = UserText.newFolderTooltip
 
-        buttonsDivider.boxType = .separator
-        buttonsDivider.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        buttonsDivider.translatesAutoresizingMaskIntoConstraints = false
+            buttonsDivider.boxType = .separator
+            buttonsDivider.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+            buttonsDivider.translatesAutoresizingMaskIntoConstraints = false
 
-        manageBookmarksButton.bezelStyle = .shadowlessSquare
-        manageBookmarksButton.cornerRadius = 4
-        manageBookmarksButton.normalTintColor = .button
-        manageBookmarksButton.mouseDownColor = .buttonMouseDown
-        manageBookmarksButton.mouseOverColor = .buttonMouseOver
-        manageBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
-        manageBookmarksButton.font = .systemFont(ofSize: 12)
-        manageBookmarksButton.toolTip = UserText.manageBookmarksTooltip
-        manageBookmarksButton.image = {
-            let image = NSImage.externalAppScheme
-            image.alignmentRect = NSRect(x: 0, y: 0, width: image.size.width + 6, height: image.size.height)
-            return image
-        }()
-        manageBookmarksButton.imagePosition = .imageLeading
-        manageBookmarksButton.imageHugsTitle = true
+            manageBookmarksButton.bezelStyle = .shadowlessSquare
+            manageBookmarksButton.cornerRadius = 4
+            manageBookmarksButton.normalTintColor = .button
+            manageBookmarksButton.mouseDownColor = .buttonMouseDown
+            manageBookmarksButton.mouseOverColor = .buttonMouseOver
+            manageBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
+            manageBookmarksButton.font = .systemFont(ofSize: 12)
+            manageBookmarksButton.toolTip = UserText.manageBookmarksTooltip
+            manageBookmarksButton.image = {
+                let image = NSImage.externalAppScheme
+                image.alignmentRect = NSRect(x: 0, y: 0, width: image.size.width + 6, height: image.size.height)
+                return image
+            }()
+            manageBookmarksButton.imagePosition = .imageLeading
+            manageBookmarksButton.imageHugsTitle = true
 
-        scrollView.borderType = .noBorder
-        scrollView.drawsBackground = false
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.hasHorizontalScroller = false
-        scrollView.usesPredominantAxisScrolling = false
-        scrollView.autohidesScrollers = true
-        scrollView.automaticallyAdjustsContentInsets = false
-        scrollView.scrollerInsets = NSEdgeInsets(top: 5, left: 0, bottom: 5, right: 0)
-        scrollView.contentInsets = NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 12)
+            scrollView.borderType = .noBorder
+            scrollView.drawsBackground = false
+            scrollView.translatesAutoresizingMaskIntoConstraints = false
+            scrollView.hasHorizontalScroller = false
+            scrollView.usesPredominantAxisScrolling = false
+            scrollView.autohidesScrollers = true
+            scrollView.automaticallyAdjustsContentInsets = false
+            scrollView.scrollerInsets = NSEdgeInsets(top: 5, left: 0, bottom: 5, right: 0)
+            scrollView.contentInsets = NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 12)
+
+            emptyState.addSubview(emptyStateImageView)
+            emptyState.addSubview(emptyStateTitle)
+            emptyState.addSubview(emptyStateMessage)
+            emptyState.addSubview(importButton)
+
+            emptyState.isHidden = true
+            emptyState.translatesAutoresizingMaskIntoConstraints = false
+
+            emptyStateTitle.translatesAutoresizingMaskIntoConstraints = false
+            emptyStateTitle.alignment = .center
+            emptyStateTitle.drawsBackground = false
+            emptyStateTitle.isBordered = false
+            emptyStateTitle.isEditable = false
+            emptyStateTitle.font = .systemFont(ofSize: 15, weight: .semibold)
+            emptyStateTitle.textColor = .labelColor
+            emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.bookmarksEmptyStateTitle,
+                                                                            lineHeight: 1.14,
+                                                                            kern: -0.23)
+
+            emptyStateMessage.translatesAutoresizingMaskIntoConstraints = false
+            emptyStateMessage.alignment = .center
+            emptyStateMessage.drawsBackground = false
+            emptyStateMessage.isBordered = false
+            emptyStateMessage.isEditable = false
+            emptyStateMessage.font = .systemFont(ofSize: 13)
+            emptyStateMessage.textColor = .labelColor
+            emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.bookmarksEmptyStateMessage,
+                                                                              lineHeight: 1.05,
+                                                                              kern: -0.08)
+
+            importButton.translatesAutoresizingMaskIntoConstraints = false
+        }
 
         let column = NSTableColumn()
         column.width = scrollView.frame.width - 32
@@ -222,38 +256,6 @@ final class BookmarkListViewController: NSViewController {
         } else {
             view.addSubview(outlineView)
         }
-
-        emptyState.addSubview(emptyStateImageView)
-        emptyState.addSubview(emptyStateTitle)
-        emptyState.addSubview(emptyStateMessage)
-        emptyState.addSubview(importButton)
-
-        emptyState.isHidden = true
-        emptyState.translatesAutoresizingMaskIntoConstraints = false
-
-        emptyStateTitle.translatesAutoresizingMaskIntoConstraints = false
-        emptyStateTitle.alignment = .center
-        emptyStateTitle.drawsBackground = false
-        emptyStateTitle.isBordered = false
-        emptyStateTitle.isEditable = false
-        emptyStateTitle.font = .systemFont(ofSize: 15, weight: .semibold)
-        emptyStateTitle.textColor = .labelColor
-        emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.bookmarksEmptyStateTitle,
-                                                                        lineHeight: 1.14,
-                                                                        kern: -0.23)
-
-        emptyStateMessage.translatesAutoresizingMaskIntoConstraints = false
-        emptyStateMessage.alignment = .center
-        emptyStateMessage.drawsBackground = false
-        emptyStateMessage.isBordered = false
-        emptyStateMessage.isEditable = false
-        emptyStateMessage.font = .systemFont(ofSize: 13)
-        emptyStateMessage.textColor = .labelColor
-        emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.bookmarksEmptyStateMessage,
-                                                                          lineHeight: 1.05,
-                                                                          kern: -0.08)
-
-        importButton.translatesAutoresizingMaskIntoConstraints = false
 
         setupLayout()
     }
