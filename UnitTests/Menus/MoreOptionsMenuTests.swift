@@ -22,6 +22,7 @@ import NetworkProtectionUI
 import XCTest
 import Subscription
 import SubscriptionTestingUtilities
+import BrowserServicesKit
 
 @testable import DuckDuckGo_Privacy_Browser
 
