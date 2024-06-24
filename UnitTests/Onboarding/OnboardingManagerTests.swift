@@ -154,7 +154,7 @@ class OnboardingManagerTests: XCTestCase {
 
     func testOnSetBookmarksBar_andBarNotShown_ThenBarIsShown() {
         // When
-        manager.setBookmarkBar()
+        manager.setBookmarkBar(enabled: true)
 
         // Then
         XCTAssertTrue(appearancePersistor.showBookmarksBar)
@@ -165,7 +165,7 @@ class OnboardingManagerTests: XCTestCase {
         apperancePreferences.showBookmarksBar = true
 
         // When
-        manager.setBookmarkBar()
+        manager.setBookmarkBar(enabled: false)
 
         // Then
         XCTAssertFalse(appearancePersistor.showBookmarksBar)
@@ -173,7 +173,7 @@ class OnboardingManagerTests: XCTestCase {
 
     func testOnSetSessionRestore_andSessionRestoreOff_sessionRestorationSetOn() {
         // When
-        manager.setSessionRestore()
+        manager.setSessionRestore(enabled: true)
 
         // Then
         XCTAssertTrue(startupPersistor.restorePreviousSession)
@@ -184,7 +184,7 @@ class OnboardingManagerTests: XCTestCase {
         startupPreferences.restorePreviousSession = true
 
         // When
-        manager.setSessionRestore()
+        manager.setSessionRestore(enabled: false)
 
         // Then
         XCTAssertFalse(startupPersistor.restorePreviousSession)
@@ -192,7 +192,7 @@ class OnboardingManagerTests: XCTestCase {
 
     func testOnSetHomeButtonPosition_ifHidden_showHomeButton() {
         // When
-        manager.setHomeButtonPosition()
+        manager.setHomeButtonPosition(enabled: true)
 
         // Then
         XCTAssertEqual(self.appearancePersistor.homeButtonPosition, .left)
@@ -203,7 +203,7 @@ class OnboardingManagerTests: XCTestCase {
         startupPreferences.homeButtonPosition = .left
 
         // When
-        manager.setHomeButtonPosition()
+        manager.setHomeButtonPosition(enabled: false)
 
         // Then
         XCTAssertEqual(self.appearancePersistor.homeButtonPosition, .hidden)

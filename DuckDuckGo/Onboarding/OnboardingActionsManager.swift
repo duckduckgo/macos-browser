@@ -52,13 +52,13 @@ protocol OnboardingActionsManaging {
     func setAsDefault()
 
     /// At user imput shows the bookmarks bar
-    func setBookmarkBar()
+    func setBookmarkBar(enabled: Bool)
 
     /// At user imput set the session restoration on startup
-    func setSessionRestore()
+    func setSessionRestore(enabled: Bool)
 
     /// At user imput set the session restoration on startup
-    func setHomeButtonPosition()
+    func setHomeButtonPosition(enabled: Bool)
 
     /// It is called every time the user ends an onboarding step
     func stepCompleted(step _: OnboardingSteps)
@@ -139,18 +139,17 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         try? defaultBrowserProvider.presentDefaultBrowserPrompt()
     }
 
-    func setBookmarkBar() {
-        appearancePreferences.showBookmarksBar = !appearancePreferences.showBookmarksBar
+    func setBookmarkBar(enabled: Bool) {
+        appearancePreferences.showBookmarksBar = enabled
     }
 
-    func setSessionRestore() {
-        startupPreferences.restorePreviousSession = !startupPreferences.restorePreviousSession
+    func setSessionRestore(enabled: Bool) {
+        startupPreferences.restorePreviousSession = enabled
     }
 
-    func setHomeButtonPosition() {
+    func setHomeButtonPosition(enabled: Bool) {
         onMainThreadIfNeeded {
-            let currentPosition =  self.startupPreferences.homeButtonPosition
-            self.startupPreferences.homeButtonPosition = (currentPosition == .hidden) ? .left : .hidden
+            self.startupPreferences.homeButtonPosition = enabled ? .left : .hidden
             self.startupPreferences.updateHomeButton()
         }
     }

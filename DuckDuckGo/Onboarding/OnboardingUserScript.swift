@@ -116,17 +116,20 @@ extension OnboardingUserScript {
 
     @MainActor
     private func setBookmarksBar(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        onboardingActionsManager.setBookmarkBar()
+        guard let params = params as? [String: Bool], let enabled = params["enabled"] else { return nil }
+        onboardingActionsManager.setBookmarkBar(enabled: enabled)
         return nil
     }
 
     private func setSessionRestore(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        onboardingActionsManager.setSessionRestore()
+        guard let params = params as? [String: Bool], let enabled = params["enabled"] else { return nil }
+        onboardingActionsManager.setSessionRestore(enabled: enabled)
         return nil
     }
 
     private func setShowHome(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        onboardingActionsManager.setHomeButtonPosition()
+        guard let params = params as? [String: Bool], let enabled = params["enabled"] else { return nil }
+        onboardingActionsManager.setHomeButtonPosition(enabled: enabled)
         return nil
     }
 
