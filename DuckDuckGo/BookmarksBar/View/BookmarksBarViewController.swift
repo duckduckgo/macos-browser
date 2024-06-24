@@ -110,6 +110,7 @@ final class BookmarksBarViewController: NSViewController {
     }
 
     func userInteraction(prevented: Bool) {
+        bookmarksBarCollectionView.isSelectable = !prevented
         clippedItemsIndicator.isEnabled = !prevented
         viewModel.isInteractionPrevented = prevented
         bookmarksBarCollectionView.reloadData()
