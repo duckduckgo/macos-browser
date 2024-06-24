@@ -133,7 +133,7 @@ private extension Tab.TabContent {
         case .newtab: return .newtab
         case .bookmarks: return .bookmarks
         case .settings: return .preferences
-        case .onboardingDeprecated: return .onboarding
+        case .onboardingDeprecated: return .onboardingDeprecated
         case .onboarding: return .onboarding
         case .none: return .newtab
         case .dataBrokerProtection: return .dataBrokerProtection

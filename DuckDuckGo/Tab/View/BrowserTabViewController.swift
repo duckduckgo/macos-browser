@@ -577,7 +577,6 @@ final class BrowserTabViewController: NSViewController {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func showTabContent(of tabViewModel: TabViewModel?) {
         guard tabCollectionViewModel.allTabsCount > 0 else {
             view.window?.performClose(self)
@@ -594,16 +593,7 @@ final class BrowserTabViewController: NSViewController {
             addAndLayoutChild(bookmarksViewControllerCreatingIfNeeded())
 
         case let .settings(pane):
-            let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
-            if preferencesViewController.parent !== self {
-                removeAllTabContent()
-            }
-            if let pane = pane, preferencesViewController.model.selectedPane != pane {
-                preferencesViewController.model.selectPane(pane)
-            }
-            if preferencesViewController.parent !== self {
-                addAndLayoutChild(preferencesViewController)
-            }
+            showTabContentForSettings(pane: pane)
         case .onboardingDeprecated:
             removeAllTabContent()
             if !OnboardingViewModel.isOnboardingFinished {
@@ -613,16 +603,10 @@ final class BrowserTabViewController: NSViewController {
 
         case .onboarding:
             removeAllTabContent()
-            if shouldReplaceWebView(for: tabViewModel) {
-                removeAllTabContent(includingWebView: true)
-                changeWebView(tabViewModel: tabViewModel)
-            }
+            updateTabIfNeeded(tabViewModel: tabViewModel)
 
         case .url, .subscription, .identityTheftRestoration:
-            if shouldReplaceWebView(for: tabViewModel) {
-                removeAllTabContent(includingWebView: true)
-                changeWebView(tabViewModel: tabViewModel)
-            }
+            updateTabIfNeeded(tabViewModel: tabViewModel)
 
         case .newtab:
             removeAllTabContent()
@@ -637,6 +621,26 @@ final class BrowserTabViewController: NSViewController {
 #endif
         default:
             removeAllTabContent()
+        }
+    }
+
+    func updateTabIfNeeded(tabViewModel: TabViewModel?) {
+        if shouldReplaceWebView(for: tabViewModel) {
+            removeAllTabContent(includingWebView: true)
+            changeWebView(tabViewModel: tabViewModel)
+        }
+    }
+
+    func showTabContentForSettings(pane: PreferencePaneIdentifier?) {
+        let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
+        if preferencesViewController.parent !== self {
+            removeAllTabContent()
+        }
+        if let pane = pane, preferencesViewController.model.selectedPane != pane {
+            preferencesViewController.model.selectPane(pane)
+        }
+        if preferencesViewController.parent !== self {
+            addAndLayoutChild(preferencesViewController)
         }
     }
 
