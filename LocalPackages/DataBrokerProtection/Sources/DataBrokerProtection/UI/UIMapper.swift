@@ -351,7 +351,7 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
         guard let broker = self.first?.dataBroker else { return 0 }
         return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
     }
-    
+
     /// Returns an array of brokers which have been scanned
     ///
     /// Note 1: A Broker is considered scanned if all scan jobs for that broker have been run.
