@@ -144,6 +144,7 @@ final class HomePageViewController: NSViewController {
         refreshRecentlyVisitedModel()
         refreshDefaultBrowserModel()
         refreshContinueSetUpModel()
+        refreshRemoteMessagesModel()
     }
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
@@ -207,6 +208,10 @@ final class HomePageViewController: NSViewController {
         }, onDismiss: { message in
             Application.appDelegate.remoteMessagingClient.store?.dismissRemoteMessage(withId: message.id)
         })
+    }
+
+    func refreshRemoteMessagesModel() {
+        remoteMessagesModel.updateRemoteMessage()
     }
 
     func refreshFavoritesModel() {

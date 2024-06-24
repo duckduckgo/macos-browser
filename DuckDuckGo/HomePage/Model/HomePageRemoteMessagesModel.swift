@@ -30,7 +30,6 @@ final class RemoteMessagesModel: ObservableObject {
     init(fetchMessage: @escaping () -> RemoteMessageModel?, onDismiss: @escaping (RemoteMessageModel) -> Void) {
         self.fetchMessage = fetchMessage
         self.onDismiss = onDismiss
-        updateRemoteMessage()
     }
 
     func updateRemoteMessage() {
