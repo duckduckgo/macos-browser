@@ -70,7 +70,7 @@ final class OnboardingUserScript: NSObject, Subfeature {
         guard let messageName = MessageNames(rawValue: methodName) else { return nil }
         return methodHandlers[messageName]
     }
-    
+
     // MARK: - UserValuesNotification
 
     struct UserValuesNotification: Encodable {
