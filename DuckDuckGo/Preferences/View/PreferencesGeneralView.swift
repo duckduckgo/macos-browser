@@ -174,11 +174,11 @@ extension Preferences {
                         ToggleMenuItem(UserText.downloadsOpenPopupOnCompletion,
                                        isOn: $downloadsModel.shouldOpenPopupOnCompletion)
                     }.padding(.bottom, 5)
-                    
+
                     // MARK: Location
                     PreferencePaneSubSection {
                         Text(UserText.downloadsLocation).bold()
-                        
+
                         HStack {
                             NSPathControlView(url: downloadsModel.selectedDownloadLocation)
                             Button(UserText.downloadsChangeDirectory) {
@@ -186,11 +186,11 @@ extension Preferences {
                             }
                         }
                         .disabled(downloadsModel.alwaysRequestDownloadLocation)
-                        
+
                         ToggleMenuItem(UserText.downloadsAlwaysAsk,
                                        isOn: $downloadsModel.alwaysRequestDownloadLocation)
                     }
-                    
+
                     // SECTION 7: Phishing Detection
                     PreferencePaneSection(UserText.phishingDetectionHeader) {
                         PreferencePaneSubSection {
