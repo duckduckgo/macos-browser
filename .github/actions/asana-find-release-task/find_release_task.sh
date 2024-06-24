@@ -47,8 +47,8 @@ find_release_task() {
 			#   and likely something went wrong.
 			if [[ -n "$created_at" && "$created_at" != "null" ]]; then
 				created_at_timestamp="$(TZ=UTC date -j -f "%Y-%m-%dT%H:%M:%S." "$created_at" +%s)"
-				four_days_ago="$(date -j -v-5d +%s)"
-				if [[ "$created_at_timestamp" -le "$four_days_ago" ]]; then
+				five_days_ago="$(date -j -v-5d +%s)"
+				if [[ "$created_at_timestamp" -le "$five_days_ago" ]]; then
 					echo "::error::Found release task: ${asana_app_url}/${release_task_id} but it's older than 5 days, skipping."
 					exit 1
 				fi
