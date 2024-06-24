@@ -173,6 +173,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
                   let (videoID, timestamp) = navigationAction.url.youtubeVideoParams else {
                 return .cancel
             }
+            PixelExperiment.fireOnboardingDuckplayerUsed8to14Pixel()
 
             return .redirect(mainFrame) { navigator in
                 // pop current backForwardList item
@@ -188,6 +189,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
                   let (videoID, timestamp) = navigationAction.url.youtubeVideoParams else {
                 return .cancel
             }
+            PixelExperiment.fireOnboardingDuckplayerUsed8to14Pixel()
 
             return .redirect(mainFrame) { navigator in
                 navigator.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
@@ -204,6 +206,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         if navigationAction.url.isDuckURLScheme || navigationAction.url.isDuckPlayer {
             if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
                 PixelKit.fire(GeneralPixel.duckPlayerViewFromSERP)
+                PixelExperiment.fireOnboardingDuckplayerUsed8to14Pixel()
             }
             return .allow
         }

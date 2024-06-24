@@ -57,7 +57,8 @@ enum PixelExperiment: String, CaseIterable {
 
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
     //  remember to keep it clear for privacy triage.
-    case control
+    case control = "c"
+    case newOnboarding = "o"
 }
 
 // These functions contain the business logic for determining if the pixel should be fired or not.
@@ -65,6 +66,54 @@ extension PixelExperiment {
 
     static func fireEnrollmentPixel() {
         logic.fireEnrollmentPixel()
+    }
+
+    static func fireSerpPixel() {
+        logic.fireSerpPixel()
+    }
+
+    static func fireOnboardingHomeButtonEnabledPixel() {
+        logic.fireOnboardingHomeButtonEnabledPixel()
+    }
+
+    static func fireOnboardingBookmarksBarShownPixel() {
+        logic.fireOnboardingBookmarksBarShownPixel()
+    }
+
+    static func fireOnboardingSessionRestoreEnabledPixel() {
+        logic.fireOnboardingSessionRestoreEnabledPixel()
+    }
+
+    static func fireOnboardingSetAsDefaultRequestedPixel() {
+        logic.fireOnboardingSetAsDefaultRequestedPixel()
+    }
+
+    static func fireOnboardingImportRequestedPixel() {
+        logic.fireOnboardingImportRequestedPixel()
+    }
+
+    static func fireOnboardingSearchPerformed8to14Pixel() {
+        logic.fireOnboardingSearchPerformed8to14Pixel()
+    }
+
+    static func fireOnboardingHomeButtonUsed8to14Pixel() {
+        logic.fireOnboardingHomeButtonUsed8to14Pixel()
+    }
+
+    static func fireOnboardingBookmarkUsed8to14Pixel() {
+        logic.fireOnboardingBookmarkUsed8to14Pixel()
+    }
+
+    static func fireOnboardingSessionRestoreEnabled8to14Pixel() {
+        logic.fireOnboardingSessionRestoreEnabled8to14Pixel()
+    }
+
+    static func fireOnboardingSetAsDefaultEnabled8to14Pixel() {
+        logic.fireOnboardingSetAsDefaultEnabled8to14Pixel()
+    }
+
+    static func fireOnboardingDuckplayerUsed8to14Pixel() {
+        logic.fireOnboardingDuckplayerUsed8to14Pixel()
     }
 
     static func fireFirstSerpPixel() {
@@ -137,6 +186,68 @@ final internal class PixelExperimentLogic {
     // You'll need additional pixels for your experiment.  Pass the cohort as a parameter.
     func fireEnrollmentPixel() {
         // You'll probably need this at least.
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingCohortAssigned(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireSerpPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.serp(cohort: cohort.rawValue), frequency: .standard, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingHomeButtonEnabledPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingHomeButtonEnabled(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingBookmarksBarShownPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingBookmarksBarShown(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingSessionRestoreEnabledPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingSessionRestoreEnabled(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingSetAsDefaultRequestedPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingSetAsDefaultRequested(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingImportRequestedPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingImportRequested(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingSearchPerformed8to14Pixel() {
+        guard isDay8to14 == true, allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingSearchPerformed8to14(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingHomeButtonUsed8to14Pixel() {
+        guard isDay8to14 == true, allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingHomeButtonUsed8to14(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingBookmarkUsed8to14Pixel() {
+        guard isDay8to14 == false, allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingBookmarkUsed8to14(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingSessionRestoreEnabled8to14Pixel() {
+        guard isDay8to14 == true, allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingSessionRestoreEnabled8to14(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingSetAsDefaultEnabled8to14Pixel() {
+        guard isDay8to14 == true, allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingSetAsDefaultEnabled8to14(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingDuckplayerUsed8to14Pixel() {
+        guard isDay8to14 == false, allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingDuckplayerUsed8to14(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
     }
 
     // Often used
@@ -155,6 +266,13 @@ final internal class PixelExperimentLogic {
                 PixelKit.fire(GeneralPixel.serpDay21to27(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
             }
         }
+    }
+
+    var isDay8to14: Bool {
+        if daysSinceEnrollment >= 8 && daysSinceEnrollment <= 14 {
+            return true
+        }
+        return false
     }
 
     func cleanup() {

@@ -252,9 +252,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = RecentlyClosedCoordinator.shared
 
         // Clean up previous experiment
-//        if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts { // Re-implement https://app.asana.com/0/0/1207002879349166/f
-//            PixelExperiment.cleanup()
-//        }
+        if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts { // Re-implement https://app.asana.com/0/0/1207002879349166/f
+            PixelExperiment.cleanup()
+        }
+        PixelExperiment.install()
 
         if LocalStatisticsStore().atb == nil {
             AppDelegate.firstLaunchDate = Date()

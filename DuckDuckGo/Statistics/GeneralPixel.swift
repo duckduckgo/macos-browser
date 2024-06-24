@@ -29,7 +29,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
 
-    case serp
+    case serp(cohort: String)
     case serpInitial(cohort: String)
     case serpDay21to27(cohort: String)
 
@@ -193,6 +193,28 @@ enum GeneralPixel: PixelKitEventV2 {
     case autocompleteClickHistory
     case autocompleteToggledOff
     case autocompleteToggledOn
+
+    // Onboarding Experiment
+    case onboardingCohortAssigned(cohort: String)
+    case onboardingHomeButtonEnabled(cohort: String)
+    case onboardingBookmarksBarShown(cohort: String)
+    case onboardingSessionRestoreEnabled(cohort: String)
+    case onboardingSetAsDefaultRequested(cohort: String)
+    case onboardingImportRequested(cohort: String)
+    case onboardingStepCompleteWelcome
+    case onboardingStepCompleteGetStarted
+    case onboardingStepCompletePrivateByDefault
+    case onboardingStepCompleteCleanerBrowsing
+    case onboardingStepCompleteSystemSettings
+    case onboardingStepCompleteCustomize
+    case onboardingExceptionReported(message: String, id: String)
+    case onboardingSearchPerformed8to14(cohort: String)
+    case onboardingHomeButtonUsed8to14(cohort: String)
+    case onboardingBookmarkUsed8to14(cohort: String)
+    case onboardingSessionRestoreEnabled8to14(cohort: String)
+    case onboardingSetAsDefaultEnabled8to14(cohort: String)
+    case onboardingDuckplayerUsed8to14(cohort: String)
+
 
     // MARK: - Debug
 
@@ -619,6 +641,28 @@ enum GeneralPixel: PixelKitEventV2 {
         case .autocompleteToggledOff: return "m_mac_autocomplete_toggled_off"
         case .autocompleteToggledOn: return "m_mac_autocomplete_toggled_on"
 
+            // Onboarding experiment
+        case .onboardingCohortAssigned: return "m_mac_onboarding.cohort-assigned"
+        case .onboardingHomeButtonEnabled: return
+            "m_mac_onboarding.home-button-enabled"
+        case .onboardingBookmarksBarShown: return "m_mac_onboarding.bookmarks-bar-shown"
+        case .onboardingSessionRestoreEnabled: return "m_mac_onboarding.session-restore-enabled"
+        case .onboardingSetAsDefaultRequested: return "m_mac_onboarding.set-as-default-requested"
+        case .onboardingImportRequested: return "m_mac_onboarding.import-requested"
+        case .onboardingStepCompleteWelcome: return "m_mac_onboarding.step-complete-welcome"
+        case .onboardingStepCompleteGetStarted: return "m_mac_onboarding.step-complete-getStarted"
+        case .onboardingStepCompletePrivateByDefault: return "m_mac_onboarding.step-complete-privateByDefault"
+        case .onboardingStepCompleteCleanerBrowsing: return "m_mac_onboarding.step-complete-cleanerBrowsing"
+        case .onboardingStepCompleteSystemSettings: return "m_mac_onboarding.step-complete-systemSettings"
+        case .onboardingStepCompleteCustomize: return "m_mac_onboarding.step-complete-customize"
+        case .onboardingExceptionReported: return "m_mac_onboarding.exception-reported"
+        case .onboardingSearchPerformed8to14: return "m_mac_onboarding.search-performed-8-14"
+        case .onboardingHomeButtonUsed8to14: return "m_mac_onboarding.home-button-used-8-14"
+        case .onboardingBookmarkUsed8to14: return "m_mac_onboarding.bookmark-used-8-14"
+        case .onboardingSessionRestoreEnabled8to14: return "m_mac_onboarding.session-restore-enabled-8-14"
+        case .onboardingSetAsDefaultEnabled8to14: return "m_mac_onboarding.set-as-default-enabled-8-14"
+        case .onboardingDuckplayerUsed8to14: return "m_mac_onboarding.duckplayer-used-8-14"
+
             // DEBUG
         case .assertionFailure:
             return "assertion_failure"
@@ -908,6 +952,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .launchInitial(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
 
+        case .serp(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+
         case .serpInitial(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
 
@@ -934,6 +981,34 @@ enum GeneralPixel: PixelKitEventV2 {
                 PixelKit.Parameters.vpnBreakageDescription: description,
                 PixelKit.Parameters.vpnBreakageMetadata: metadata
             ]
+
+        case .onboardingCohortAssigned(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .onboardingHomeButtonEnabled(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .onboardingBookmarksBarShown(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .onboardingSessionRestoreEnabled(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .onboardingSetAsDefaultRequested(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .onboardingImportRequested(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .onboardingExceptionReported(let message, let id):
+            return [PixelKit.Parameters.assertionMessage: message, "id": id]
+        case .onboardingSearchPerformed8to14(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .onboardingHomeButtonUsed8to14(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .onboardingBookmarkUsed8to14(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .onboardingSessionRestoreEnabled8to14(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .onboardingSetAsDefaultEnabled8to14(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .onboardingDuckplayerUsed8to14(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+
         default: return nil
         }
     }

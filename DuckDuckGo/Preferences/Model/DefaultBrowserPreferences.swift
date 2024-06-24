@@ -65,6 +65,7 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
         if result != 0 {
             throw SystemDefaultBrowserProviderError.unableToSetDefaultURLHandler
         }
+        PixelExperiment.fireOnboardingSetAsDefaultRequestedPixel()
     }
 
     func openSystemPreferences() {
@@ -88,6 +89,9 @@ final class DefaultBrowserPreferences: ObservableObject {
 #endif
                 if AppDelegate.isNewUser && self.isDefault {
                     PixelKit.fire(GeneralPixel.setAsDefaultInitial, frequency: .legacyInitial)
+                }
+                if self.isDefault {
+                    PixelExperiment.fireOnboardingSetAsDefaultEnabled8to14Pixel()
                 }
             }
         }
