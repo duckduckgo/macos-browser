@@ -27,9 +27,9 @@ import Subscription
 ///
 final class NetworkProtectionBouncer {
 
-    let accountManager: AccountManaging
+    let accountManager: AccountManager
 
-    init(accountManager: AccountManaging) {
+    init(accountManager: AccountManager) {
         self.accountManager = accountManager
     }
 
