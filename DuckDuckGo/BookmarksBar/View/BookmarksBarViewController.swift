@@ -280,17 +280,8 @@ private extension BookmarksBarViewController {
     }
 
     private func handleClick(for folder: BookmarkFolder, in view: NSView) {
-        let folderNode = createNode(for: folder)
-        let popup = BookmarkListPopover(rootNode: folderNode, contentMode: .bar)
+        let popup = BookmarkListPopover(contentMode: .bar(bookmarkFolderId: folder.id))
         popup.show(positionedBelow: view)
-    }
-
-    private func createNode(for folder: BookmarkFolder) -> BookmarkNode {
-        let rootNode = BookmarkNode.genericRootNode()
-        let folderNode = BookmarkNode(representedObject: folder, parent: rootNode, shouldHaveRootAsParent: true)
-        folderNode.canHaveChildNodes = true
-
-        return folderNode
     }
 
     func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {

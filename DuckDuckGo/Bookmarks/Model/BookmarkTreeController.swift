@@ -25,23 +25,36 @@ protocol BookmarkTreeControllerDataSource: AnyObject {
 }
 
 final class BookmarkTreeController {
-
+    let bookmarkId: String?
     let rootNode: BookmarkNode
 
     private weak var dataSource: BookmarkTreeControllerDataSource?
 
-    init(dataSource: BookmarkTreeControllerDataSource, rootNode: BookmarkNode) {
+    var isForBookmarkId: Bool {
+        bookmarkId != nil
+    }
+
+    init(dataSource: BookmarkTreeControllerDataSource, rootNode: BookmarkNode, bookmarkId: String? = nil) {
         self.dataSource = dataSource
         self.rootNode = rootNode
+        self.bookmarkId = bookmarkId
 
         rebuild()
     }
 
-    convenience init(dataSource: BookmarkTreeControllerDataSource) {
-        self.init(dataSource: dataSource, rootNode: BookmarkNode.genericRootNode())
+    convenience init(dataSource: BookmarkTreeControllerDataSource, bookmarkId: String? = nil) {
+        self.init(dataSource: dataSource, rootNode: BookmarkNode.genericRootNode(), bookmarkId: bookmarkId)
     }
 
     // MARK: - Public
+
+    func calculateRootNode(bookmarkManager: BookmarkManager) -> BookmarkNode {
+        if let folderBookmarkId = self.bookmarkId, let folder = bookmarkManager.getBookmarkFolder(withId: folderBookmarkId) {
+            return rootNode.findOrCreateChildNode(with: folder)
+        }
+
+        return rootNode
+    }
 
     func rebuild() {
         rebuildChildNodes(node: rootNode)

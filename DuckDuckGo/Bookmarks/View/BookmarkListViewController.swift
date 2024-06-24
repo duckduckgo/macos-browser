@@ -26,9 +26,17 @@ protocol BookmarkListViewControllerDelegate: AnyObject {
 
 }
 
-enum BookmarkContentMode {
+enum BookmarkContentMode: Equatable {
     case panel
-    case bar
+    case bar(bookmarkFolderId: String)
+
+    var isBar: Bool {
+        if case .bar = self {
+            return true
+        }
+
+        return false
+    }
 }
 
 final class BookmarkListViewController: NSViewController {
@@ -60,10 +68,8 @@ final class BookmarkListViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
     private let bookmarkManager: BookmarkManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
-    private let rootNode: BookmarkNode
     private let contentMode: BookmarkContentMode
-
-    private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource, rootNode: rootNode)
+    private let treeController: BookmarkTreeController
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
         BookmarkOutlineViewDataSource(
@@ -97,10 +103,17 @@ final class BookmarkListViewController: NSViewController {
         return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
     }()
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, rootNode: BookmarkNode, contentMode: BookmarkContentMode = .panel) {
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, contentMode: BookmarkContentMode = .panel) {
         self.bookmarkManager = bookmarkManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
-        self.rootNode = rootNode
+
+        switch contentMode {
+        case .panel:
+            self.treeController = BookmarkTreeController(dataSource: treeControllerDataSource)
+        case .bar(let bookmarkFolderId):
+            self.treeController = BookmarkTreeController(dataSource: treeControllerDataSource, bookmarkId: bookmarkFolderId)
+        }
+
         self.contentMode = contentMode
         super.init(nibName: nil, bundle: nil)
     }
@@ -144,7 +157,7 @@ final class BookmarkListViewController: NSViewController {
             stackView.addArrangedSubview(newFolderButton)
             stackView.addArrangedSubview(buttonsDivider)
             stackView.addArrangedSubview(manageBookmarksButton)
-            stackView.isHidden = contentMode == .bar
+            stackView.isHidden = contentMode.isBar
 
             newBookmarkButton.bezelStyle = .shadowlessSquare
             newBookmarkButton.cornerRadius = 4
@@ -660,13 +673,17 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
 
 final class BookmarkListPopover: NSPopover {
 
-    init(rootNode: BookmarkNode = BookmarkNode.genericRootNode(), contentMode: BookmarkContentMode = .panel) {
+    init(contentMode: BookmarkContentMode = .panel) {
         super.init()
 
         self.animates = false
         self.behavior = .transient
 
-        setupContentController(rootNode: rootNode, contentMode: contentMode)
+        setupContentController(contentMode: contentMode)
+
+        if contentMode.isBar {
+            self.setValue(true, forKey: "shouldHideAnchor")
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -676,8 +693,8 @@ final class BookmarkListPopover: NSPopover {
     // swiftlint:disable:next force_cast
     var viewController: BookmarkListViewController { contentViewController as! BookmarkListViewController }
 
-    private func setupContentController(rootNode: BookmarkNode, contentMode: BookmarkContentMode) {
-        let controller = BookmarkListViewController(rootNode: rootNode, contentMode: contentMode)
+    private func setupContentController(contentMode: BookmarkContentMode) {
+        let controller = BookmarkListViewController(contentMode: contentMode)
         controller.delegate = self
         contentViewController = controller
     }
@@ -723,7 +740,7 @@ private let previewEmptyState = false
         customAssertionFailure = { _, _, _ in }
 
         return bkman
-    }(), rootNode: BookmarkNode.genericRootNode())
+    }())
 
     var c: AnyCancellable!
     c = vc.publisher(for: \.view.window).sink { window in

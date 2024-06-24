@@ -87,7 +87,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     func nodeForItem(_ item: Any?) -> BookmarkNode {
         guard let item = item as? BookmarkNode else {
-            return treeController.rootNode
+            return treeController.calculateRootNode(bookmarkManager: bookmarkManager)
         }
 
         return item
@@ -171,6 +171,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                      proposedItem item: Any?,
                      proposedChildIndex index: Int) -> NSDragOperation {
         let destinationNode = nodeForItem(item)
+        print("Destination node: \(destinationNode.getIdentifier() ?? "No value")")
 
         if contentMode == .foldersOnly {
             // when in folders sidebar mode only allow moving a folder to another folder (or root)
@@ -310,9 +311,18 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
 
         let parent: ParentFolderType = (representedObject as? BookmarkFolder).map { .parent(uuid: $0.id) } ?? .root
-        bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: parent) { error in
-            if let error = error {
-                os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
+
+        if treeController.isForBookmarkId && parent == .root {
+            bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: .parent(uuid: treeController.bookmarkId!)) { error in
+                if let error = error {
+                    os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
+                }
+            }
+        } else {
+            bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: parent) { error in
+                if let error = error {
+                    os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
+                }
             }
         }
 

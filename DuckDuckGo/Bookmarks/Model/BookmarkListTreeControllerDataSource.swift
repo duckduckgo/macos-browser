@@ -27,10 +27,22 @@ final class BookmarkListTreeControllerDataSource: BookmarkTreeControllerDataSour
     }
 
     func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
-        return node.isRoot && !node.shouldHaveRootAsParent ? childNodesForRootNode(node) : childNodes(node)
+        return node.isRoot ? childNodesForRootNode(node) : childNodes(node)
     }
 
     // MARK: - Private
+
+    private func returnNodes(for folderId: String) -> [BookmarkNode] {
+        guard let folder = bookmarkManager.getBookmarkFolder(withId: folderId) else {
+            return []
+        }
+
+        let rootNode = BookmarkNode.genericRootNode()
+        let folderNode = rootNode.createChildNode(folder)
+        folderNode.canHaveChildNodes = !folder.children.isEmpty
+
+        return [folderNode]
+    }
 
     private func childNodesForRootNode(_ node: BookmarkNode) -> [BookmarkNode] {
         let topLevelNodes = bookmarkManager.list?.topLevelEntities.compactMap { (item) -> BookmarkNode? in
