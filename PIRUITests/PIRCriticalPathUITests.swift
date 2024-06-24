@@ -53,7 +53,7 @@ final class PIRCriticalPathUITests: XCTestCase {
 
     func testSaveProfileStartsScan() throws {
 
-//        clearPIRData()
+        clearPIRData()
 
         // Open PIR
         openPIR()
@@ -82,6 +82,8 @@ private extension PIRCriticalPathUITests {
         menuBarsQuery.menuItems["Personal Information Removal"].assertExists().click()
 
         menuBarsQuery.menuItems["Reset All State and Delete All Data"].assertExists().click()
+
+        app.dialogs["alert"].buttons["Uninstall"].assertExists().click()
 
         print(app.debugDescription)
     }
