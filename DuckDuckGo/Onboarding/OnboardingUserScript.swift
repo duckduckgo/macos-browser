@@ -52,34 +52,25 @@ final class OnboardingUserScript: NSObject, Subfeature {
         self.broker = broker
     }
 
+    private lazy var methodHandlers: [MessageNames: Handler] = [
+            .`init`: setInit,
+            .dismissToAddressBar: dismissToAddressBar,
+            .dismissToSettings: dismissToSettings,
+            .requestDockOptIn: requestDockOptIn,
+            .requestImport: requestImport,
+            .requestSetAsDefault: requestSetAsDefault,
+            .setBookmarksBar: setBookmarksBar,
+            .setSessionRestore: setSessionRestore,
+            .setShowHomeButton: setShowHome,
+            .stepCompleted: stepCompleted
+    ]
+
     @MainActor
     func handler(forMethodNamed methodName: String) -> Handler? {
-        switch MessageNames(rawValue: methodName) {
-        case .`init`:
-            return setInit
-        case .dismissToAddressBar:
-            return dismissToAddressBar
-        case .dismissToSettings:
-            return dismissToSettings
-        case .requestDockOptIn:
-            return requestDockOptIn
-        case .requestImport:
-            return requestImport
-        case .requestSetAsDefault:
-            return requestSetAsDefault
-        case .setBookmarksBar:
-            return setBookmarksBar
-        case .setSessionRestore:
-            return setSessionRestore
-        case .setShowHomeButton:
-            return setShowHome
-        case .stepCompleted:
-            return stepCompleted
-        default:
-            return nil
-        }
+        guard let messageName = MessageNames(rawValue: methodName) else { return nil }
+        return methodHandlers[messageName]
     }
-
+    
     // MARK: - UserValuesNotification
 
     struct UserValuesNotification: Encodable {

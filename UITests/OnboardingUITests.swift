@@ -60,7 +60,7 @@ final class OnboardingUITests: XCTestCase {
         welcomeWindow.webViews["Welcome"].buttons["Skip"].click()
         welcomeWindow.webViews["Welcome"].click()
         welcomeWindow.webViews["Welcome"].buttons["Import"].click()
-        welcomeWindow.sheets/*@START_MENU_TOKEN@*/.buttons["Cancel"]/*[[".groups.buttons[\"Cancel\"]",".buttons[\"Cancel\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.click()
+        welcomeWindow.sheets.buttons["Cancel"].click()
         welcomeWindow.webViews["Welcome"].buttons["Skip"].click()
         welcomeWindow.webViews["Welcome"].click()
         welcomeWindow.webViews["Welcome"].buttons["Next"].click()

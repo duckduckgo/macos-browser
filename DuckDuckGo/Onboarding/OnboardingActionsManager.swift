@@ -81,7 +81,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
     private var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
-    static var isOnboardingFinished: Bool
+    static private(set) var isOnboardingFinished: Bool
 
     let configuration: OnboardingConfiguration = {
         var systemSettings: SystemSettings
