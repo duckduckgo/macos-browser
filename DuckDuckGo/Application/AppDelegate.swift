@@ -636,13 +636,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @MainActor
     private func setUpAutoClearHandler() {
-        DispatchQueue.main.async {
-            self.autoClearHandler = AutoClearHandler(preferences: .shared,
+        let autoClearHandler = AutoClearHandler(preferences: .shared,
                                                 fireViewModel: FireCoordinator.fireViewModel,
-                                                     stateRestorationManager: self.stateRestorationManager)
-            self.autoClearHandler.handleAppLaunch()
-            self.autoClearHandler.onAutoClearCompleted = {
+                                                stateRestorationManager: self.stateRestorationManager)
+        self.autoClearHandler = autoClearHandler
+        DispatchQueue.main.async {
+            autoClearHandler.handleAppLaunch()
+            autoClearHandler.onAutoClearCompleted = {
                 NSApplication.shared.reply(toApplicationShouldTerminate: true)
             }
         }
