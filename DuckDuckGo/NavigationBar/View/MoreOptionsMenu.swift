@@ -683,6 +683,7 @@ final class LoginsSubMenu: NSMenu {
 
 }
 
+@MainActor
 final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
 
     var subscriptionFeatureAvailability: SubscriptionFeatureAvailability
@@ -761,49 +762,31 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
 
     private func refreshAvailabilityBasedOnEntitlements() {
         print("refreshAvailabilityBasedOnEntitlements")
-
         guard subscriptionFeatureAvailability.isFeatureAvailable, accountManager.isUserAuthenticated else { return }
 
-        Task {
-            let isMenuItemEnabled: Bool
-
-            switch await accountManager.hasEntitlement(for: .networkProtection) {
+        @Sendable func hasEntitlement(for entitlement: Entitlement.ProductName) async -> Bool {
+            switch await self.accountManager.hasEntitlement(for: .networkProtection) {
             case let .success(result):
-                isMenuItemEnabled = result
+                return result
             case .failure:
-                isMenuItemEnabled = false
+                return false
             }
-
-            networkProtectionItem.isEnabled = isMenuItemEnabled
         }
 
-        Task {
-            let isMenuItemEnabled: Bool
+        Task.detached(priority: .background) { [weak self] in
+            guard let self else { return }
 
-            switch await accountManager.hasEntitlement(for: .dataBrokerProtection) {
-            case let .success(result):
-                isMenuItemEnabled = result
-            case .failure:
-                isMenuItemEnabled = false
+            let isNetworkProtectionItemEnabled = await hasEntitlement(for: .networkProtection)
+            let isDataBrokerProtectionItemEnabled = await hasEntitlement(for: .dataBrokerProtection)
+            let isIdentityTheftRestorationItemEnabled = await hasEntitlement(for: .identityTheftRestoration)
+
+            Task { @MainActor in
+                self.networkProtectionItem.isEnabled = isNetworkProtectionItemEnabled
+                self.dataBrokerProtectionItem.isEnabled = isDataBrokerProtectionItemEnabled
+                self.identityTheftRestorationItem.isEnabled = isIdentityTheftRestorationItemEnabled
+
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
             }
-
-            dataBrokerProtectionItem.isEnabled = isMenuItemEnabled
-
-            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
-        }
-
-        Task {
-            let isMenuItemEnabled: Bool
-
-            switch await accountManager.hasEntitlement(for: .identityTheftRestoration) {
-            case let .success(result):
-                isMenuItemEnabled = result
-            case .failure:
-                isMenuItemEnabled = false
-            }
-
-            identityTheftRestorationItem.isEnabled = isMenuItemEnabled
-
         }
     }
 
