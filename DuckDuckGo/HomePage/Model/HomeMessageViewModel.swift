@@ -32,53 +32,15 @@ struct HomeMessageViewModel {
     let modelType: RemoteMessageModelType
 
     var image: String? {
-        switch modelType {
-        case .small:
-            return nil
-        case .medium(_, _, let placeholder):
-            return placeholder.rawValue
-        case .bigSingleAction(_, _, let placeholder, _, _):
-            return placeholder.rawValue
-        case .bigTwoAction(_, _, let placeholder, _, _, _, _):
-            return placeholder.rawValue
-        case .promoSingleAction(_, _, let placeholder, _, _):
-            return placeholder.rawValue
-        }
+        modelType.image
     }
 
     var title: String {
-        switch modelType {
-        case .small(let titleText, _):
-            return titleText
-        case .medium(let titleText, _, _):
-            return titleText
-        case .bigSingleAction(let titleText, _, _, _, _):
-            return titleText
-        case .bigTwoAction(let titleText, _, _, _, _, _, _):
-            return titleText
-        case .promoSingleAction(let titleText, _, _, _, _):
-            return titleText
-        }
+        modelType.title
     }
 
     var subtitle: String {
-        let subtitle = {
-            switch modelType {
-            case .small(_, let descriptionText):
-                return descriptionText
-            case .medium(_, let descriptionText, _):
-                return descriptionText
-            case .bigSingleAction(_, let descriptionText, _, _, _):
-                return descriptionText
-            case .bigTwoAction(_, let descriptionText, _, _, _, _, _):
-                return descriptionText
-            case .promoSingleAction(_, let descriptionText, _, _, _):
-                return descriptionText
-            }
-        }()
-        return subtitle
-            .replacingOccurrences(of: "<b>", with: "**")
-            .replacingOccurrences(of: "</b>", with: "**")
+        modelType.subtitle
     }
 
     var buttons: [HomeMessageButtonViewModel] {
@@ -116,7 +78,6 @@ struct HomeMessageViewModel {
     }
 
     let onDidClose: (ButtonAction?) -> Void
-    let onDidAppear: () -> Void
     let openURLHandler: (URL) -> Void
 
     func mapActionToViewModel(remoteAction: RemoteAction,
@@ -192,5 +153,57 @@ extension RemoteAction {
             return true
         }
         return false
+    }
+}
+
+private extension RemoteMessageModelType {
+    var image: String? {
+        switch self {
+        case .small:
+            return nil
+        case .medium(_, _, let placeholder):
+            return placeholder.rawValue
+        case .bigSingleAction(_, _, let placeholder, _, _):
+            return placeholder.rawValue
+        case .bigTwoAction(_, _, let placeholder, _, _, _, _):
+            return placeholder.rawValue
+        case .promoSingleAction(_, _, let placeholder, _, _):
+            return placeholder.rawValue
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .small(let titleText, _):
+            return titleText
+        case .medium(let titleText, _, _):
+            return titleText
+        case .bigSingleAction(let titleText, _, _, _, _):
+            return titleText
+        case .bigTwoAction(let titleText, _, _, _, _, _, _):
+            return titleText
+        case .promoSingleAction(let titleText, _, _, _, _):
+            return titleText
+        }
+    }
+
+    var subtitle: String {
+        let subtitle = {
+            switch self {
+            case .small(_, let descriptionText):
+                return descriptionText
+            case .medium(_, let descriptionText, _):
+                return descriptionText
+            case .bigSingleAction(_, let descriptionText, _, _, _):
+                return descriptionText
+            case .bigTwoAction(_, let descriptionText, _, _, _, _, _):
+                return descriptionText
+            case .promoSingleAction(_, let descriptionText, _, _, _):
+                return descriptionText
+            }
+        }()
+        return subtitle
+            .replacingOccurrences(of: "<b>", with: "**")
+            .replacingOccurrences(of: "</b>", with: "**")
     }
 }

@@ -37,6 +37,7 @@ final class ActiveRemoteMessageModel: ObservableObject {
     init(fetchMessage: @escaping () -> RemoteMessageModel?, onDismiss: @escaping (RemoteMessageModel) -> Void) {
         self.fetchMessage = fetchMessage
         self.onDismiss = onDismiss
+        updateRemoteMessage()
 
         messagesDidChangeCancellable = NotificationCenter.default
             .publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
@@ -46,15 +47,15 @@ final class ActiveRemoteMessageModel: ObservableObject {
             }
     }
 
-    func updateRemoteMessage() {
-        remoteMessage = fetchMessage()
-    }
-
     func dismissRemoteMessage() {
         if let remoteMessage {
             onDismiss(remoteMessage)
             self.remoteMessage = nil
         }
+    }
+
+    private func updateRemoteMessage() {
+        remoteMessage = fetchMessage()
     }
 
     private var messagesDidChangeCancellable: AnyCancellable?

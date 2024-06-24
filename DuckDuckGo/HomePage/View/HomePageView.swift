@@ -113,7 +113,6 @@ extension HomePage.Views {
                     onDidClose: { _ in
                         activeRemoteMessageModel.dismissRemoteMessage()
                     },
-                    onDidAppear: {},
                     openURLHandler: { url in
                         WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
                 }))

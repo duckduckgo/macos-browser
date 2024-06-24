@@ -163,7 +163,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
         remoteMessagingClient = RemoteMessagingClient(database: RemoteMessagingDatabase())
-        activeRemoteMessageModel = ActiveRemoteMessageModel(client: remoteMessagingClient)
 
         if NSApplication.runType.requiresEnvironment {
             Self.configurePixelKit()
@@ -212,6 +211,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
             remoteMessagingClient.initializeDatabaseIfNeeded()
         }
+        activeRemoteMessageModel = ActiveRemoteMessageModel(client: remoteMessagingClient)
 
 #if DEBUG
         AppPrivacyFeatures.shared = NSApplication.runType.requiresEnvironment

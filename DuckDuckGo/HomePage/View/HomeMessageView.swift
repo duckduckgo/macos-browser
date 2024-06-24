@@ -84,9 +84,6 @@ struct HomeMessageView: View {
                                 x: 0,
                                 y: Const.Offset.shadowVertical))
         .padding(.top, 20)
-        .onAppear {
-            viewModel.onDidAppear()
-        }
     }
 
     private var closeButtonHeader: some View {
@@ -131,10 +128,8 @@ struct HomeMessageView: View {
     private var subtitle: some View {
         if #available(macOS 12.0, *), let attributed = try? AttributedString(markdown: viewModel.subtitle) {
             Text(attributed)
-//                .daxBodyRegular()
         } else {
             Text(viewModel.subtitle)
-//                .daxBodyRegular()
         }
     }
 
@@ -148,12 +143,9 @@ struct HomeMessageView: View {
             } label: {
                 HStack {
                     if case .share = buttonModel.actionStyle {
-                        Image("Share-24")
-                            .resizable()
-                            .frame(width: 24, height: 24)
+                        Image("Share")
                     }
                     Text(buttonModel.title)
-//                        .daxButton()
                 }
             }
             .buttonStyle(HomeMessageButtonStyle(viewModel: viewModel, buttonModel: buttonModel))
@@ -299,7 +291,6 @@ struct HomeMessageView_Previews: PreviewProvider {
             HomeMessageView(viewModel: HomeMessageViewModel(messageId: "Small",
                                                             modelType: small,
                                                             onDidClose: { _ in },
-                                                            onDidAppear: {},
                                                             openURLHandler: { url in
                 WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
             }))
@@ -307,33 +298,29 @@ struct HomeMessageView_Previews: PreviewProvider {
             HomeMessageView(viewModel: HomeMessageViewModel(messageId: "Critical",
                                                             modelType: critical,
                                                             onDidClose: { _ in },
-                                                            onDidAppear: {},
                                                             openURLHandler: { url in
-                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
+                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .ui))
             }))
 
             HomeMessageView(viewModel: HomeMessageViewModel(messageId: "Big Single",
                                                             modelType: bigSingle,
                                                             onDidClose: { _ in },
-                                                            onDidAppear: {},
                                                             openURLHandler: { url in
-                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
+                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .ui))
             }))
 
             HomeMessageView(viewModel: HomeMessageViewModel(messageId: "Big Two",
                                                             modelType: bigTwo,
                                                             onDidClose: { _ in },
-                                                            onDidAppear: {},
                                                             openURLHandler: { url in
-                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
+                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .ui))
             }))
 
             HomeMessageView(viewModel: HomeMessageViewModel(messageId: "Promo",
                                                             modelType: promo,
                                                             onDidClose: { _ in },
-                                                            onDidAppear: {},
                                                             openURLHandler: { url in
-                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
+                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .ui))
             }))
         }
         .frame(height: 200)
