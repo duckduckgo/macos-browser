@@ -34,7 +34,7 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         defaults = UserDefaults(suiteName: testGroupName)!
         defaults.removePersistentDomain(forName: testGroupName)
 
-        accountManager = AccountManagerMock(isUserAuthenticated: true, accessToken: "mock-token")
+        accountManager = AccountManagerMock(accessToken: "mock-token")
         subscriptionFetcher = MockSubscriptionFetcher()
     }
 

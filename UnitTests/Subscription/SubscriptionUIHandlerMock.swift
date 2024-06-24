@@ -26,11 +26,13 @@ public struct SubscriptionUIHandlerMock: SubscriptionUIHandling {
         case didDismissProgressViewController
         case didUpdateProgressViewController
         case didPresentSubscriptionAccessViewController
-        case didShowAlert(DuckDuckGo_Privacy_Browser.SubscriptionAlertType)
-        case didShowTab(DuckDuckGo_Privacy_Browser.Tab.TabContent)
+        case didShowAlert(SubscriptionAlertType)
+        case didShowTab(Tab.TabContent)
     }
 
     let didPerformActionCallback: (_ action: UIHandlerMockPerformedAction) -> Void
+
+    public var alertResponse: NSApplication.ModalResponse?
 
     public func presentProgressViewController(withTitle: String) {
         didPerformActionCallback(.didDismissProgressViewController)
@@ -44,23 +46,23 @@ public struct SubscriptionUIHandlerMock: SubscriptionUIHandling {
         didPerformActionCallback(.didUpdateProgressViewController)
     }
 
-    public func presentSubscriptionAccessViewController(handler: DuckDuckGo_Privacy_Browser.SubscriptionAccessActionHandling, message: WKScriptMessage) {
+    public func presentSubscriptionAccessViewController(handler: SubscriptionAccessActionHandling, message: WKScriptMessage) {
         didPerformActionCallback(.didPresentSubscriptionAccessViewController)
     }
 
-    public func show(alertType: DuckDuckGo_Privacy_Browser.SubscriptionAlertType) {
-        didPerformActionCallback(.didShowAlert(alertType))
+    @discardableResult
+    public func dismissProgressViewAndShow(alertType: SubscriptionAlertType, text: String?) async -> NSApplication.ModalResponse {
+        dismissProgressViewController()
+        return await show(alertType: alertType, text: text)
     }
 
-    public func show(alertType: DuckDuckGo_Privacy_Browser.SubscriptionAlertType, firstButtonAction: (() -> Void)?) {
+    @discardableResult
+    public func show(alertType: SubscriptionAlertType, text: String?) async -> NSApplication.ModalResponse {
         didPerformActionCallback(.didShowAlert(alertType))
+        return alertResponse!
     }
 
-    public func show(alertType: DuckDuckGo_Privacy_Browser.SubscriptionAlertType, text: String?) {
-        didPerformActionCallback(.didShowAlert(alertType))
-    }
-
-    public func showTab(with content: DuckDuckGo_Privacy_Browser.Tab.TabContent) {
+    public func showTab(with content: Tab.TabContent) {
         didPerformActionCallback(.didShowTab(content))
     }
 }

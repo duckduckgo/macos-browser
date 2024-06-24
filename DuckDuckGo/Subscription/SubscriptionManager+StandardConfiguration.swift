@@ -36,9 +36,9 @@ extension DefaultSubscriptionManager {
         let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let accountManager = DefaultAccountManager(accessTokenStorage: accessTokenStorage,
-                                            entitlementsCache: entitlementsCache,
-                                            subscriptionEndpointService: subscriptionEndpointService,
-                                            authEndpointService: authEndpointService)
+                                                   entitlementsCache: entitlementsCache,
+                                                   subscriptionEndpointService: subscriptionEndpointService,
+                                                   authEndpointService: authEndpointService)
 
         if #available(macOS 12.0, *) {
             let storePurchaseManager = DefaultStorePurchaseManager()
