@@ -57,7 +57,6 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
         return mainWindowControllers.first(where: {
             let isMain = $0.window?.isMainWindow ?? false
             let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
-
             return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
         })
     }
@@ -289,10 +288,17 @@ extension WindowControllersManager {
 }
 
 extension WindowControllersManager: OnboardingNavigating {
+    @MainActor
+    func updatePreventUserInteraction(prevent: Bool) {
+        mainWindowController?.userInteraction(prevented: prevent)
+    }
+
+    @MainActor
     func showImportDataView() {
         DataImportView().show()
     }
 
+    @MainActor
     func replaceTabWith(_ tab: Tab) {
         guard let tabToRemove = selectedTab else { return }
         guard let index = mainWindowController?.mainViewController.tabCollectionViewModel.indexInAllTabs(of: tabToRemove) else { return }
@@ -300,6 +306,7 @@ extension WindowControllersManager: OnboardingNavigating {
         mainWindowController?.mainViewController.tabCollectionViewModel.remove(at: index)
     }
 
+    @MainActor
     func focusOnAddressBar() {
         guard let mainVC = lastKeyMainWindowController?.mainViewController else { return }
         mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.stringValue = ""

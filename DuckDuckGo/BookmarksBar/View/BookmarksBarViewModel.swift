@@ -71,6 +71,7 @@ final class BookmarksBarViewModel: NSObject {
     }
 
     weak var delegate: BookmarksBarViewModelDelegate?
+    var isInteractionPrevented = false
 
     private let bookmarkManager: BookmarkManager
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -327,7 +328,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 
         let bookmarksBarItem = bookmarksBarItems[indexPath.item]
         bookmarksCollectionViewItem.delegate = self
-        bookmarksCollectionViewItem.updateItem(from: bookmarksBarItem.entity)
+        bookmarksCollectionViewItem.updateItem(from: bookmarksBarItem.entity, isInteractionPrevented: isInteractionPrevented)
 
         return bookmarksCollectionViewItem
     }

@@ -60,14 +60,14 @@ final class OnboardingPageTests: XCTestCase {
 
         // When
         let eOnboardingPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
-        tab.setContent(.url(URL(string: "duck://onboarding?platform=integration")!, credential: nil, source: .ui))
+        tab.setContent(.onboarding)
         try await eOnboardingPageLoaded.value
 
         // Then
         extractHTML(from: tab.webView) { htmlContent, error in
             XCTAssertNotNil(htmlContent)
             XCTAssertNil(error)
-            XCTAssertTrue(htmlContent?.contains("welcome") ?? false)
+            XCTAssertTrue(htmlContent?.contains("<title>Welcome</title>") ?? false)
         }
         XCTAssertEqual(tab.title, "Welcome")
         XCTAssertEqual(tabViewModel.title, "Welcome")

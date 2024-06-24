@@ -109,6 +109,13 @@ final class BookmarksBarViewController: NSViewController {
         self.bookmarksBarPromptShown = true
     }
 
+    func userInteraction(prevented: Bool) {
+        bookmarksBarCollectionView.isSelectable = !prevented
+        clippedItemsIndicator.isEnabled = !prevented
+        viewModel.isInteractionPrevented = prevented
+        bookmarksBarCollectionView.reloadData()
+    }
+
     private func frameDidChangeNotification() {
         self.viewModel.clipOrRestoreBookmarksBarItems()
         self.refreshClippedIndicator()

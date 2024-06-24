@@ -724,7 +724,12 @@ protocol NewWindowPolicyDecisionMaker {
     func startOnboarding() {
         userInteractionDialog = nil
 
-        setContent(.onboarding)
+        // Here we will chose based on the variant
+        if true {
+            setContent(.onboarding)
+        } else {
+            setContent(.onboardingDeprecated)
+        }
     }
 
     @MainActor(unsafe)

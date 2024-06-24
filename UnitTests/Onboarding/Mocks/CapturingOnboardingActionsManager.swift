@@ -30,8 +30,16 @@ class CapturingOnboardingActionsManager: OnboardingActionsManaging {
     var setAsDefaultCalled = false
     var setBookmarkBarCalled = false
     var setSessionRestoreCalled = false
-    var setShowHomeButtonLeftCalled = false
+    var setHomeButtonPositionCalled = false
+    var onboardingStartedCalled = false
     var completedStep: OnboardingSteps?
+    var bookmarkBarVisible: Bool?
+    var homeButtonVisible: Bool?
+    var sessionRestoreEnabled: Bool?
+
+    func onboardingStarted() {
+        onboardingStartedCalled = true
+    }
 
     func goToAddressBar() {
         goToAddressBarCalled = true
@@ -53,16 +61,19 @@ class CapturingOnboardingActionsManager: OnboardingActionsManaging {
         setAsDefaultCalled = true
     }
 
-    func setBookmarkBar() {
+    func setBookmarkBar(enabled: Bool) {
         setBookmarkBarCalled = true
+        bookmarkBarVisible = enabled
     }
 
-    func setSessionRestore() {
+    func setSessionRestore(enabled: Bool) {
         setSessionRestoreCalled = true
+        sessionRestoreEnabled = enabled
     }
 
-    func setShowHomeButtonLeft() {
-        setShowHomeButtonLeftCalled = true
+    func setHomeButtonPosition(enabled: Bool) {
+        setHomeButtonPositionCalled = true
+        homeButtonVisible = enabled
     }
 
     func stepCompleted(step: OnboardingSteps) {

@@ -41,6 +41,7 @@ final class OnboardingUserScriptTests: XCTestCase {
 
         let result = try await handler([""], WKScriptMessage())
         XCTAssertEqual(result as? OnboardingConfiguration, mockManager.configuration)
+        XCTAssertTrue(mockManager.onboardingStartedCalled)
     }
 
     @MainActor
@@ -90,28 +91,37 @@ final class OnboardingUserScriptTests: XCTestCase {
 
     @MainActor
     func testSetBookmarksBar_CallsSetBookmarkBar() async throws {
+        let randomBool = Bool.random()
+        let params = ["enabled": randomBool]
         let handler = try XCTUnwrap(script.handler(forMethodNamed: "setBookmarksBar"))
 
-        let result = try await handler([""], WKScriptMessage())
+        let result = try await handler(params, WKScriptMessage())
         XCTAssertTrue(mockManager.setBookmarkBarCalled)
+        XCTAssertEqual(mockManager.bookmarkBarVisible, randomBool)
         XCTAssertNil(result)
     }
 
     @MainActor
     func testSetSessionRestore_CallsSetSessionRestore() async throws {
+        let randomBool = Bool.random()
+        let params = ["enabled": randomBool]
         let handler = try XCTUnwrap(script.handler(forMethodNamed: "setSessionRestore"))
 
-        let result = try? await handler([""], WKScriptMessage())
+        let result = try? await handler(params, WKScriptMessage())
         XCTAssertTrue(mockManager.setSessionRestoreCalled)
+        XCTAssertEqual(mockManager.sessionRestoreEnabled, randomBool)
         XCTAssertNil(result)
     }
 
     @MainActor
     func testSetShowHome_CallsSetShowHomeButtonLeft() async throws {
+        let randomBool = Bool.random()
+        let params = ["enabled": randomBool]
         let handler = try XCTUnwrap(script.handler(forMethodNamed: "setShowHomeButton"))
 
-        let result = try await handler([""], WKScriptMessage())
-        XCTAssertTrue(mockManager.setShowHomeButtonLeftCalled)
+        let result = try await handler(params, WKScriptMessage())
+        XCTAssertTrue(mockManager.setHomeButtonPositionCalled)
+        XCTAssertEqual(mockManager.homeButtonVisible, randomBool)
         XCTAssertNil(result)
     }
 

@@ -33,6 +33,9 @@ protocol OnboardingActionsManaging {
     /// Provides the configuration needed to set up the FE onboarding
     var configuration: OnboardingConfiguration { get }
 
+    /// Used for any setup necessary for during the onboarding
+    func onboardingStarted()
+
     /// At the end of the onboarding the user will be taken to the DuckDuckGo search page
     func goToAddressBar()
 
@@ -49,13 +52,13 @@ protocol OnboardingActionsManaging {
     func setAsDefault()
 
     /// At user imput shows the bookmarks bar
-    func setBookmarkBar()
+    func setBookmarkBar(enabled: Bool)
 
     /// At user imput set the session restoration on startup
-    func setSessionRestore()
+    func setSessionRestore(enabled: Bool)
 
     /// At user imput set the session restoration on startup
-    func setShowHomeButtonLeft()
+    func setHomeButtonPosition(enabled: Bool)
 
     /// It is called every time the user ends an onboarding step
     func stepCompleted(step _: OnboardingSteps)
@@ -65,6 +68,7 @@ protocol OnboardingNavigating: AnyObject {
     func replaceTabWith(_ tab: Tab)
     func focusOnAddressBar()
     func showImportDataView()
+    func updatePreventUserInteraction(prevent: Bool)
 }
 
 final class OnboardingActionsManager: OnboardingActionsManaging {
@@ -74,8 +78,10 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
     private let defaultBrowserProvider: DefaultBrowserProvider
     private let appearancePreferences: AppearancePreferences
     private let startupPreferences: StartupPreferences
-    private let windowsControlManager: WindowControllersManager
     private var cancellables = Set<AnyCancellable>()
+
+    @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
+    static private(set) var isOnboardingFinished: Bool
 
     let configuration: OnboardingConfiguration = {
         var systemSettings: SystemSettings
@@ -94,11 +100,15 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         self.defaultBrowserProvider = defaultBrowserProvider
         self.appearancePreferences = appearancePreferences
         self.startupPreferences = startupPreferences
-        self.windowsControlManager = WindowControllersManager.shared
+    }
+
+    func onboardingStarted() {
+        navigation.updatePreventUserInteraction(prevent: true)
     }
 
     @MainActor
     func goToAddressBar() {
+        onboardingHasFinished()
         let tab = Tab(content: .url(URL.duckDuckGo, source: .ui))
         navigation.replaceTabWith(tab)
 
@@ -111,6 +121,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
 
     @MainActor
     func goToSettings() {
+        onboardingHasFinished()
         let tab = Tab(content: .settings(pane: nil))
         navigation.replaceTabWith(tab)
     }
@@ -128,17 +139,17 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         try? defaultBrowserProvider.presentDefaultBrowserPrompt()
     }
 
-    func setBookmarkBar() {
-        appearancePreferences.showBookmarksBar = true
+    func setBookmarkBar(enabled: Bool) {
+        appearancePreferences.showBookmarksBar = enabled
     }
 
-    func setSessionRestore() {
-        startupPreferences.restorePreviousSession = true
+    func setSessionRestore(enabled: Bool) {
+        startupPreferences.restorePreviousSession = enabled
     }
 
-    func setShowHomeButtonLeft() {
+    func setHomeButtonPosition(enabled: Bool) {
         onMainThreadIfNeeded {
-            self.startupPreferences.homeButtonPosition = .left
+            self.startupPreferences.homeButtonPosition = enabled ? .left : .hidden
             self.startupPreferences.updateHomeButton()
         }
     }
@@ -153,6 +164,11 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
 
     func stepCompleted(step: OnboardingSteps) {
         print(step)
+    }
+
+    private func onboardingHasFinished() {
+        Self.isOnboardingFinished = true
+        navigation.updatePreventUserInteraction(prevent: false)
     }
 
 }

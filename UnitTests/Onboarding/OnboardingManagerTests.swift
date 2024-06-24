@@ -68,22 +68,48 @@ class OnboardingManagerTests: XCTestCase {
         XCTAssertEqual(manager.configuration, expectedConfig)
     }
 
+    func testOnOnboardingStarted_UserInteractionIsPrevented() {
+        // Given
+        navigationDelegate.preventUserInteraction = false
+
+        // When
+        manager.onboardingStarted()
+
+        // Then
+        XCTAssertTrue(navigationDelegate.updatePreventUserInteractionCalled)
+        XCTAssertTrue(navigationDelegate.preventUserInteraction ?? false)
+    }
+
     func testGoToAddressBar_NavigatesToSearch() {
+        // Given
+        let isOnboardingFinished = UserDefaultsWrapper(key: .onboardingFinished, defaultValue: true)
+        isOnboardingFinished.wrappedValue = false
+
         // When
         manager.goToAddressBar()
 
         // Then
         XCTAssertTrue(navigationDelegate.replaceTabCalled)
         XCTAssertEqual(navigationDelegate.tab?.url, URL.duckDuckGo)
+        XCTAssertTrue(navigationDelegate.updatePreventUserInteractionCalled)
+        XCTAssertFalse(navigationDelegate.preventUserInteraction ?? true)
+        XCTAssertTrue(isOnboardingFinished.wrappedValue)
     }
 
     func testGoToAddressBar_NavigatesToSearch_AndFocusOnBar() {
+        // Given
+        let isOnboardingFinished = UserDefaultsWrapper(key: .onboardingFinished, defaultValue: true)
+        isOnboardingFinished.wrappedValue = false
+
         // When
         manager.goToAddressBar()
 
         // Then
         XCTAssertTrue(navigationDelegate.replaceTabCalled)
         XCTAssertEqual(navigationDelegate.tab?.url, URL.duckDuckGo)
+        XCTAssertTrue(navigationDelegate.updatePreventUserInteractionCalled)
+        XCTAssertFalse(navigationDelegate.preventUserInteraction ?? true)
+        XCTAssertTrue(isOnboardingFinished.wrappedValue)
 
         // When
         navigationDelegate.fireNavigationDidEnd()
@@ -126,28 +152,61 @@ class OnboardingManagerTests: XCTestCase {
         XCTAssertTrue(defaultBrowserProvider.presentDefaultBrowserPromptCalled)
     }
 
-    func testOnSetBookmarksBar_BookmarksBarIsShown() {
+    func testOnSetBookmarksBar_andBarNotShown_ThenBarIsShown() {
         // When
-        manager.setBookmarkBar()
+        manager.setBookmarkBar(enabled: true)
 
         // Then
         XCTAssertTrue(appearancePersistor.showBookmarksBar)
     }
 
-    func testOnSetSessionRestore_sessionRestorationSet() {
+    func testOnSetBookmarksBar_andBarIsShown_ThenBarIsShown() {
+        // Given
+        apperancePreferences.showBookmarksBar = true
+
         // When
-        manager.setSessionRestore()
+        manager.setBookmarkBar(enabled: false)
+
+        // Then
+        XCTAssertFalse(appearancePersistor.showBookmarksBar)
+    }
+
+    func testOnSetSessionRestore_andSessionRestoreOff_sessionRestorationSetOn() {
+        // When
+        manager.setSessionRestore(enabled: true)
 
         // Then
         XCTAssertTrue(startupPersistor.restorePreviousSession)
     }
 
-    func testOnShowHomeButtonLeft_homeButtonShown() {
+    func testOnSetSessionRestore_andSessionRestoreOn_sessionRestorationSetOff() {
+        // Given
+        startupPreferences.restorePreviousSession = true
+
         // When
-        manager.setShowHomeButtonLeft()
+        manager.setSessionRestore(enabled: false)
+
+        // Then
+        XCTAssertFalse(startupPersistor.restorePreviousSession)
+    }
+
+    func testOnSetHomeButtonPosition_ifHidden_showHomeButton() {
+        // When
+        manager.setHomeButtonPosition(enabled: true)
 
         // Then
         XCTAssertEqual(self.appearancePersistor.homeButtonPosition, .left)
+    }
+
+    func testOnSetHomeButtonPosition_ifShown_hideHomeButton() {
+        // Given
+        startupPreferences.homeButtonPosition = .left
+
+        // When
+        manager.setHomeButtonPosition(enabled: false)
+
+        // Then
+        XCTAssertEqual(self.appearancePersistor.homeButtonPosition, .hidden)
     }
 
 }

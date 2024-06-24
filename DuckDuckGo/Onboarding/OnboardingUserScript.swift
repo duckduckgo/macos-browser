@@ -52,31 +52,23 @@ final class OnboardingUserScript: NSObject, Subfeature {
         self.broker = broker
     }
 
+    private lazy var methodHandlers: [MessageNames: Handler] = [
+            .`init`: setInit,
+            .dismissToAddressBar: dismissToAddressBar,
+            .dismissToSettings: dismissToSettings,
+            .requestDockOptIn: requestDockOptIn,
+            .requestImport: requestImport,
+            .requestSetAsDefault: requestSetAsDefault,
+            .setBookmarksBar: setBookmarksBar,
+            .setSessionRestore: setSessionRestore,
+            .setShowHomeButton: setShowHome,
+            .stepCompleted: stepCompleted
+    ]
+
+    @MainActor
     func handler(forMethodNamed methodName: String) -> Handler? {
-        switch MessageNames(rawValue: methodName) {
-        case .`init`:
-            return setInit
-        case .dismissToAddressBar:
-            return dismissToAddressBar
-        case .dismissToSettings:
-            return dismissToSettings
-        case .requestDockOptIn:
-            return requestDockOptIn
-        case .requestImport:
-            return requestImport
-        case .requestSetAsDefault:
-            return requestSetAsDefault
-        case .setBookmarksBar:
-            return setBookmarksBar
-        case .setSessionRestore:
-            return setSessionRestore
-        case .setShowHomeButton:
-            return setShowHome
-        case .stepCompleted:
-            return stepCompleted
-        default:
-            return nil
-        }
+        guard let messageName = MessageNames(rawValue: methodName) else { return nil }
+        return methodHandlers[messageName]
     }
 
     // MARK: - UserValuesNotification
@@ -90,6 +82,7 @@ final class OnboardingUserScript: NSObject, Subfeature {
 extension OnboardingUserScript {
     @MainActor
     private func setInit(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        onboardingActionsManager.onboardingStarted()
         return onboardingActionsManager.configuration
     }
 
@@ -121,18 +114,22 @@ extension OnboardingUserScript {
         return Result()
     }
 
+    @MainActor
     private func setBookmarksBar(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        onboardingActionsManager.setBookmarkBar()
+        guard let params = params as? [String: Bool], let enabled = params["enabled"] else { return nil }
+        onboardingActionsManager.setBookmarkBar(enabled: enabled)
         return nil
     }
 
     private func setSessionRestore(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        onboardingActionsManager.setSessionRestore()
+        guard let params = params as? [String: Bool], let enabled = params["enabled"] else { return nil }
+        onboardingActionsManager.setSessionRestore(enabled: enabled)
         return nil
     }
 
     private func setShowHome(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        onboardingActionsManager.setShowHomeButtonLeft()
+        guard let params = params as? [String: Bool], let enabled = params["enabled"] else { return nil }
+        onboardingActionsManager.setHomeButtonPosition(enabled: enabled)
         return nil
     }
 
