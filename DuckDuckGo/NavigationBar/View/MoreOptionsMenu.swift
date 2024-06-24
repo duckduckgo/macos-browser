@@ -60,6 +60,7 @@ final class MoreOptionsMenu: NSMenu {
     private let accountManager: AccountManager
 
     private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
+    private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -69,6 +70,7 @@ final class MoreOptionsMenu: NSMenu {
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
          vpnFeatureGatekeeper: VPNFeatureGatekeeper,
+         subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
          accountManager: AccountManager) {
@@ -77,6 +79,7 @@ final class MoreOptionsMenu: NSMenu {
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
         self.vpnFeatureGatekeeper = vpnFeatureGatekeeper
+        self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.internalUserDecider = internalUserDecider
         self.accountManager = accountManager
 
@@ -293,7 +296,7 @@ final class MoreOptionsMenu: NSMenu {
     private func addSubscriptionItems() {
         var items: [NSMenuItem] = []
 
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable && !accountManager.isUserAuthenticated {
+        if subscriptionFeatureAvailability.isFeatureAvailable && !accountManager.isUserAuthenticated {
             items.append(contentsOf: makeInactiveSubscriptionItems())
         } else {
             items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
@@ -309,7 +312,6 @@ final class MoreOptionsMenu: NSMenu {
     private func makeActiveSubscriptionItems() -> [NSMenuItem] {
         var items: [NSMenuItem] = []
 
-        let subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
         let networkProtectionItem: NSMenuItem
 
         networkProtectionItem = makeNetworkProtectionItem()

@@ -69,6 +69,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
                                          vpnFeatureGatekeeper: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
+                                          subscriptionFeatureAvailability: SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true, isSubscriptionPurchaseAllowed: true),
                                          sharingMenu: NSMenu(),
                                          internalUserDecider: internalUserDecider,
                                          accountManager: accountManager)
@@ -88,10 +89,9 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
 
         XCTAssertTrue(moreOptionsMenu.items[13].isSeparatorItem)
-        XCTAssertTrue(moreOptionsMenu.items[14].title.hasPrefix(UserText.networkProtection))
-        XCTAssertTrue(moreOptionsMenu.items[15].title.hasPrefix(UserText.identityTheftRestorationOptionsMenuItem))
-        XCTAssertTrue(moreOptionsMenu.items[16].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.settings)
+        XCTAssertTrue(moreOptionsMenu.items[14].title.hasPrefix(UserText.subscriptionOptionsMenuItem))
+        XCTAssertTrue(moreOptionsMenu.items[15].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.settings)
     }
 
     @MainActor
