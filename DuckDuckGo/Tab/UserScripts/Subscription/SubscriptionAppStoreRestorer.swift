@@ -51,6 +51,7 @@ struct SubscriptionAppStoreRestorer {
             default:
                 let alertResponse = await uiHandler.show(alertType: .appleIDSyncFailed, text: error.localizedDescription)
                 if alertResponse == .alertFirstButtonReturn {
+                    await uiHandler.presentProgressViewController(withTitle: UserText.restoringSubscriptionTitle)
                     await continueRestore()
                 }
             }

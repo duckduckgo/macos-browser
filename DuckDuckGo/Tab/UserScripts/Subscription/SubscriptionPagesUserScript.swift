@@ -227,6 +227,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
                     assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
                     subscriptionErrorReporter.report(subscriptionActivationError: .generalError)
+                    await uiHandler.dismissProgressViewController()
                     return nil
                 }
 
@@ -239,8 +240,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     PixelKit.fire(PrivacyProPixel.privacyProRestoreAfterPurchaseAttempt)
                     os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
                     subscriptionErrorReporter.report(subscriptionActivationError: .hasActiveSubscription)
-                    await uiHandler.dismissProgressViewController()
                     await showSubscriptionFoundAlert(originalMessage: message)
+                    await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
                     return nil
                 }
 
@@ -254,8 +255,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 case .success(let transactionJWS):
                     purchaseTransactionJWS = transactionJWS
                 case .failure(let error):
-                    await uiHandler.dismissProgressViewController()
-
                     switch error {
                     case .noProductsFound:
                         subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
@@ -277,6 +276,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                     if error != .cancelledByUser {
                         await showSomethingWentWrongAlert()
+                    } else {
+                        await uiHandler.dismissProgressViewController()
                     }
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
                     return nil
@@ -285,8 +286,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 await uiHandler.updateProgressViewController(title: UserText.completingPurchaseTitle)
 
                 os_log(.info, log: .subscription, "[Purchase] Completing purchase")
-
-                switch await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS) {
+                let completePurchaseResult = await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS)
+                switch completePurchaseResult {
                 case .success(let purchaseUpdate):
                     os_log(.info, log: .subscription, "[Purchase] Purchase complete")
                     PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .dailyAndCount)
@@ -312,6 +313,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                         DispatchQueue.main.async {
                             NotificationCenter.default.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
                         }
+                        await uiHandler.dismissProgressViewController()
                         return nil
                     case .internalError:
                         assertionFailure("Internal error")
@@ -322,16 +324,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             }
         } else if subscriptionPlatform == .stripe {
             let emailAccessToken = try? EmailManager().getToken()
-
             let result = await stripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken)
-
             switch result {
             case .success(let success):
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: success)
             case .failure(let error):
-                await uiHandler.dismissProgressViewController()
                 await showSomethingWentWrongAlert()
-
                 switch error {
                 case .noProductsFound:
                     subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
@@ -339,7 +337,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     subscriptionErrorReporter.report(subscriptionActivationError: .accountCreationFailed)
                 }
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
-                return nil
             }
         }
 
@@ -472,7 +469,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     func showSomethingWentWrongAlert() async {
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
-        switch await uiHandler.show(alertType: .somethingWentWrong) {
+        switch await uiHandler.dismissProgressViewAndShow(alertType: .somethingWentWrong, text: nil) {
         case .alertFirstButtonReturn:
             let url = subscriptionManager.url(for: .purchase)
             await uiHandler.showTab(with: .subscription(url))
@@ -482,7 +479,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) async {
-        switch await uiHandler.show(alertType: .subscriptionFound) {
+
+        switch await uiHandler.dismissProgressViewAndShow(alertType: .subscriptionFound, text: nil) {
         case .alertFirstButtonReturn:
             if #available(macOS 12.0, *) {
                 let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: self.subscriptionManager)

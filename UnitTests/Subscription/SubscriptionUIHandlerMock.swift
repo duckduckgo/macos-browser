@@ -50,6 +50,13 @@ public struct SubscriptionUIHandlerMock: SubscriptionUIHandling {
         didPerformActionCallback(.didPresentSubscriptionAccessViewController)
     }
 
+    @discardableResult
+    public func dismissProgressViewAndShow(alertType: SubscriptionAlertType, text: String?) async -> NSApplication.ModalResponse {
+        dismissProgressViewController()
+        return await show(alertType: alertType, text: text)
+    }
+
+    @discardableResult
     public func show(alertType: SubscriptionAlertType, text: String?) async -> NSApplication.ModalResponse {
         didPerformActionCallback(.didShowAlert(alertType))
         return alertResponse!

@@ -33,6 +33,8 @@ protocol SubscriptionUIHandling {
 
     // MARK: Alerts
     @discardableResult
+    func dismissProgressViewAndShow(alertType: SubscriptionAlertType, text: String?) async -> NSApplication.ModalResponse
+    @discardableResult
     func show(alertType: SubscriptionAlertType, text: String?) async -> NSApplication.ModalResponse
 
     // MARK: Tab

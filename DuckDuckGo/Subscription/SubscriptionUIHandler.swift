@@ -67,6 +67,13 @@ final class SubscriptionUIHandler: SubscriptionUIHandling {
         currentMainViewController?.presentAsSheet(newSubscriptionAccessViewController)
     }
 
+    @discardableResult
+    func dismissProgressViewAndShow(alertType: SubscriptionAlertType, text: String?) async -> NSApplication.ModalResponse {
+        dismissProgressViewController()
+        return await show(alertType: alertType, text: text)
+    }
+
+    @discardableResult
     func show(alertType: SubscriptionAlertType, text: String?) async -> NSApplication.ModalResponse {
         var alert: NSAlert {
             switch alertType {
