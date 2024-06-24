@@ -273,7 +273,7 @@ final class NavigationBarViewController: NSViewController {
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
-                                   networkProtectionFeatureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager),
+                                   vpnFeatureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager),
                                    internalUserDecider: internalUserDecider,
                                    accountManager: subscriptionManager.accountManager)
         menu.actionDelegate = self
@@ -940,7 +940,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
-        if !isPopUpWindow && DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager).isVPNVisible() {
+        if !isPopUpWindow && DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager).isVPNVisible() {
             let networkProtectionTitle = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }

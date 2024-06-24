@@ -223,7 +223,7 @@ public struct TunnelControllerView: View {
                     loopStartFrame: 130,
                     loopEndFrame: 370
                 ), isAnimating: $model.isVPNEnabled)
-}
+    }
 
     @ViewBuilder
     private func statusBadge(isConnected: Bool) -> some View {

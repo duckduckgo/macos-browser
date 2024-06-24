@@ -37,7 +37,7 @@ protocol NetworkProtectionIPCClient {
     func stop(completion: @escaping (Error?) -> Void)
 }
 
-extension TunnelControllerIPCClient: NetworkProtectionIPCClient {
+extension VPNControllerXPCClient: NetworkProtectionIPCClient {
     public var ipcStatusObserver: any NetworkProtection.ConnectionStatusObserver { connectionStatusObserver }
     public var ipcServerInfoObserver: any NetworkProtection.ConnectionServerInfoObserver { serverInfoObserver }
     public var ipcConnectionErrorObserver: any NetworkProtection.ConnectionErrorObserver { connectionErrorObserver }
@@ -49,7 +49,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     let ipcClient: NetworkProtectionIPCClient
     let vpnUninstaller: VPNUninstalling
 
-    init(ipcClient: TunnelControllerIPCClient,
+    init(ipcClient: VPNControllerXPCClient,
          vpnUninstaller: VPNUninstalling) {
         self.ipcClient = ipcClient
         self.vpnUninstaller = vpnUninstaller

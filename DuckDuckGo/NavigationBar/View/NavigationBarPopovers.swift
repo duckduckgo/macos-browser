@@ -29,7 +29,6 @@ protocol PopoverPresenter {
 }
 
 protocol NetPPopoverManager: AnyObject {
-    var ipcClient: NetworkProtectionIPCClient { get }
     var isShown: Bool { get }
 
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover
