@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Common
 import Foundation
 import BrowserServicesKit
@@ -28,8 +29,10 @@ import Subscription
 
 final class RemoteMessagingClient {
 
-    init(database: RemoteMessagingDatabase) {
+    init(database: RemoteMessagingDatabase, bookmarksDatabase: CoreDataDatabase, appearancePreferences: AppearancePreferences) {
         self.database = database
+        self.bookmarksDatabase = bookmarksDatabase
+        self.appearancePreferences = appearancePreferences
     }
 
     func initializeDatabaseIfNeeded() {
@@ -54,8 +57,11 @@ final class RemoteMessagingClient {
     }
 
     let database: RemoteMessagingDatabase
+    let bookmarksDatabase: CoreDataDatabase
+    let appearancePreferences: AppearancePreferences
     private(set) var store: RemoteMessagingStore?
     private var isRemoteMessagingDatabaseLoaded = false
+    private var timerCancellable: AnyCancellable?
 
     private static let endpoint: URL = {
 #if DEBUG
@@ -76,14 +82,33 @@ final class RemoteMessagingClient {
         return Date().timeIntervalSince(Self.lastRemoteMessagingRefreshDate) > Constants.minimumConfigurationRefreshInterval
     }
 
+    func startRefreshingRemoteMessages() {
+        timerCancellable = Timer.publish(every: Constants.minimumConfigurationRefreshInterval, on: .main, in: .default)
+            .autoconnect()
+            .prepend(Date())
+            .asVoid()
+            .sink { [weak self] in
+                self?.refreshRemoteMessages()
+            }
+    }
+
+    private func refreshRemoteMessages() {
+        Task {
+            try? await fetchAndProcess()
+        }
+    }
+
     /// Convenience function
-    func fetchAndProcess(bookmarksDatabase: CoreDataDatabase, favoritesDisplayMode: FavoritesDisplayMode) async throws {
+    private func fetchAndProcess() async throws {
 
         var bookmarksCount = 0
         var favoritesCount = 0
         let context = bookmarksDatabase.makeContext(concurrencyType: .privateQueueConcurrencyType)
         context.performAndWait {
-            let displayedFavoritesFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: favoritesDisplayMode.displayedFolder.rawValue, in: context)!
+            let displayedFavoritesFolder = BookmarkUtils.fetchFavoritesFolder(
+                withUUID: appearancePreferences.favoritesDisplayMode.displayedFolder.rawValue,
+                in: context
+            )!
 
             let bookmarksCountRequest = BookmarkEntity.fetchRequest()
             bookmarksCountRequest.predicate = NSPredicate(
