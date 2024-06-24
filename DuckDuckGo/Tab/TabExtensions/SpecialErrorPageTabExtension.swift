@@ -49,7 +49,7 @@ final class SpecialErrorPageTabExtension {
     private var shouldBypassSSLError = false
     private var urlCredentialCreator: URLCredentialCreating
     private var featureFlagger: FeatureFlagger
-    private var phishingDetector: PhishingDetectionProtocol
+    private var phishingDetector: PhishingSiteDetecting
     private var phishingStateManager: PhishingTabStateManager
 #if DEBUG
     var errorPageType: ErrorType?
@@ -66,7 +66,7 @@ final class SpecialErrorPageTabExtension {
         scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
-        phishingDetector: some PhishingDetectionProtocol,
+        phishingDetector: some PhishingSiteDetecting,
         phishingStateManager: PhishingTabStateManager) {
             self.featureFlagger = featureFlagger
             self.urlCredentialCreator = urlCredentialCreator
