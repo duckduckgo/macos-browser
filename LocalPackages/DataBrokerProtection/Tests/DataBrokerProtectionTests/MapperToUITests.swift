@@ -45,7 +45,7 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(result.scanProgress.totalScans, 2)
     }
 
-    func testWhenAScanRanOnAllProfileQueriesOnTheSameBroker_thenCurrentScansReflectsThatScansWereDoneOnThatBroker() {
+    func testWhenAScanRanOnAllProfileQueriesOnTheSameBroker_thenScannedBrokersAndCurrentScansReflectsThat() {
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
@@ -55,6 +55,8 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.currentScans, 1)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, "Broker #1")
         XCTAssertTrue(result.resultsFound.isEmpty)
     }
 
@@ -78,7 +80,7 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(result.resultsFound.count, 2)
     }
 
-    func testWhenAllScansRan_thenCurrentScansEqualsTotalScans() {
+    func testWhenAllScansRan_thenScannedBrokersAndCurrentScansEqualsTotalScans() {
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
@@ -88,6 +90,9 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.totalScans, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.currentScans, 2)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
     }
 
     func testWhenScansHaveDeprecatedProfileQueries_thenThoseAreNotTakenIntoAccount() {
@@ -102,6 +107,8 @@ final class MapperToUITests: XCTestCase {
 
         XCTAssertEqual(result.scanProgress.totalScans, 2)
         XCTAssertEqual(result.scanProgress.currentScans, 2)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
         XCTAssertEqual(result.resultsFound.count, 1)
     }
 
@@ -118,6 +125,8 @@ final class MapperToUITests: XCTestCase {
 
         XCTAssertEqual(result.scanProgress.totalScans, 2)
         XCTAssertEqual(result.scanProgress.currentScans, 2)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
         XCTAssertEqual(result.resultsFound.count, 1)
     }
 
@@ -212,7 +221,7 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(result.scanProgress.totalScans, 2)
     }
 
-    func testWhenMirrorSiteIsNotInRemovedPeriod_thenItShouldBeAddedToCurrentScans() {
+    func testWhenMirrorSiteIsNotInRemovedPeriod_thenItShouldBeAddedToScannedBrokersAndCurrentScans() {
         let brokerWithMirrorSiteNotRemovedAndWithScan = BrokerProfileQueryData.mock(
             dataBrokerName: "Broker #1",
             lastRunDate: Date(),
@@ -227,9 +236,11 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.currentScans, 2)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "mirror"])
     }
 
-    func testWhenMirrorSiteIsInRemovedPeriod_thenItShouldNotBeAddedToCurrentScans() {
+    func testWhenMirrorSiteIsInRemovedPeriod_thenItShouldNotBeAddedToScannedBrokersCurrentScans() {
         let brokerWithMirrorSiteRemovedAndWithScan = BrokerProfileQueryData.mock(
             dataBrokerName: "Broker #2",
             lastRunDate: Date(),
@@ -244,6 +255,8 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.currentScans, 1)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #2"])
     }
 
     func testWhenMirrorSiteIsNotInRemovedPeriod_thenMatchIsAdded() {

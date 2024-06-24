@@ -61,19 +61,25 @@ struct MapperToUI {
             queries.filter { !$0.profileQuery.deprecated }
         }
 
-        let scannedBrokers: [DBPUIScanProgress.ScannedBroker] = filteredProfileQueriesGroupedByBroker.compactMap { (key, value) in
-            guard let name = value.first?.dataBroker.name, let url = value.first?.dataBroker.url else { return nil }
-            return DBPUIScanProgress.ScannedBroker(name: name, url: url)
-        }
-
         let totalScans = filteredProfileQueriesGroupedByBroker.reduce(0) { accumulator, element in
             return accumulator + element.value.totalScans
         }
-        let currentScans = filteredProfileQueriesGroupedByBroker.reduce(0) { accumulator, element in
-            return accumulator + element.value.currentScans
+
+        let (completedScans, scannedBrokers): (Int, [DBPUIScanProgress.ScannedBroker]) = filteredProfileQueriesGroupedByBroker.reduce((0, [])) { accumulator, element in
+
+            let scannedBrokers = element.value.scannedBrokers
+            guard scannedBrokers.count != 0 else { return accumulator }
+
+            var (currentScans, brokers) = accumulator
+
+            currentScans += scannedBrokers.count
+
+            brokers.append(contentsOf: scannedBrokers)
+
+            return (currentScans, brokers)
         }
 
-        let scanProgress = DBPUIScanProgress(currentScans: currentScans, totalScans: totalScans, scannedBrokers: scannedBrokers)
+        let scanProgress = DBPUIScanProgress(currentScans: completedScans, totalScans: totalScans, scannedBrokers: scannedBrokers)
         let matches = mapMatchesToUI(brokerProfileQueryData)
 
         return .init(resultsFound: matches, scanProgress: scanProgress)
@@ -345,17 +351,20 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
         guard let broker = self.first?.dataBroker else { return 0 }
         return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
     }
+    
+    /// Returns an array of brokers which have been scanned
+    ///
+    /// Note 1: A Broker is considered scanned if all scan jobs for that broker have been run.
+    /// Note 2: Mirror brokers will be included in the returned array when `MirrorSite.shouldWeIncludeMirrorSite` returns true
+    var scannedBrokers: [DBPUIScanProgress.ScannedBroker] {
+        guard let broker = self.first?.dataBroker,
+                self.allSatisfy({ $0.scanJobData.lastRunDate != nil }) else { return [] }
 
-    var currentScans: Int {
-        guard let broker = self.first?.dataBroker else { return 0 }
-
-        let didAllQueriesFinished = allSatisfy { $0.scanJobData.lastRunDate != nil }
-
-        if !didAllQueriesFinished {
-            return 0
-        } else {
-            return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+        let mirrorBrokers: [DBPUIScanProgress.ScannedBroker] = broker.mirrorSites.compactMap {
+            guard $0.shouldWeIncludeMirrorSite() else { return nil }
+            return DBPUIScanProgress.ScannedBroker(name: $0.name, url: $0.url)
         }
+        return [DBPUIScanProgress.ScannedBroker(name: broker.name, url: broker.url)] + mirrorBrokers
     }
 
     var lastOperation: BrokerJobData? {
