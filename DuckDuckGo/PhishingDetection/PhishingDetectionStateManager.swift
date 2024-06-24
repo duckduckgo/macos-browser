@@ -18,7 +18,12 @@
 
 import Foundation
 
-public class PhishingTabStateManager {
+public protocol PhishingTabStateManaging {
+    var tabIsPhishing: Bool { get }
+    func setIsPhishing(_ isPhishing: Bool)
+}
+
+public class PhishingTabStateManager: PhishingTabStateManaging {
     public var tabIsPhishing: Bool = false
 
     public init(){}

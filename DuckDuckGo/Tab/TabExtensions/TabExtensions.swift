@@ -73,7 +73,7 @@ protocol TabExtensionDependencies {
     var duckPlayer: DuckPlayer { get }
     var certificateTrustEvaluator: CertificateTrustEvaluating { get }
     var tunnelController: NetworkProtectionIPCTunnelController? { get }
-    var phishingDetector: PhishingDetectionProtocol { get }
+    var phishingDetector: PhishingSiteDetecting { get }
     var phishingStateManager: PhishingTabStateManager { get }
 }
 

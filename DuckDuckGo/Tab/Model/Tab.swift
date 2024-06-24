@@ -55,7 +55,7 @@ protocol NewWindowPolicyDecisionMaker {
         var downloadManager: FileDownloadManagerProtocol
         var certificateTrustEvaluator: CertificateTrustEvaluating
         var tunnelController: NetworkProtectionIPCTunnelController?
-        var phishingDetector: PhishingDetectionProtocol
+        var phishingDetector: PhishingSiteDetecting
         var phishingStateManager: PhishingTabStateManager
     }
 
@@ -114,7 +114,7 @@ protocol NewWindowPolicyDecisionMaker {
                      startupPreferences: StartupPreferences = StartupPreferences.shared,
                      certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator(),
                      tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController,
-                     phishingDetector: PhishingDetectionProtocol = PhishingDetection.shared,
+                     phishingDetector: PhishingSiteDetecting = PhishingDetection.shared,
                      tabsPreferences: TabsPreferences = TabsPreferences.shared
     ) {
 
@@ -193,7 +193,7 @@ protocol NewWindowPolicyDecisionMaker {
          startupPreferences: StartupPreferences,
          certificateTrustEvaluator: CertificateTrustEvaluating,
          tunnelController: NetworkProtectionIPCTunnelController?,
-         phishingDetector: PhishingDetectionProtocol,
+         phishingDetector: PhishingSiteDetecting,
          tabsPreferences: TabsPreferences
     ) {
 

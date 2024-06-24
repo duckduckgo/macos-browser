@@ -20,11 +20,11 @@ import Foundation
 import PhishingDetection
 import Combine
 
-protocol PhishingDetectionProtocol {
+protocol PhishingSiteDetecting {
     func checkIsMaliciousIfEnabled(url: URL) async -> Bool
 }
 
-public class PhishingDetection: PhishingDetectionProtocol {
+public class PhishingDetection: PhishingSiteDetecting {
     static let shared: PhishingDetection = PhishingDetection()
     private var detector: PhishingDetecting
     private var updateManager: PhishingDetectionUpdateManaging
@@ -38,7 +38,7 @@ public class PhishingDetection: PhishingDetectionProtocol {
     private let hashPrefixURL: URL
     private let hashPrefixDataSHA: String
 
-    init(
+    private init(
         revision: Int = 1645643,
         filterSetURL: URL = Bundle.main.url(forResource: "filterSet", withExtension: "json")!,
         filterSetDataSHA: String = "c3127eb62e5655e46c177ebad399a4d7a616d4e6b655e71e6c336a9572a71dee",
@@ -70,7 +70,9 @@ public class PhishingDetection: PhishingDetectionProtocol {
         self.updateManager = updateManager ?? PhishingDetectionUpdateManager(client: detectionClient, dataStore: self.dataStore)
         self.dataActivities = dataActivities ?? PhishingDetectionDataActivities(detectionService: self.detector, phishingDetectionDataProvider: resolvedDataProvider, updateManager: self.updateManager)
         self.detectionPreferences = detectionPreferences
-
+        if self.detectionPreferences.isEnabled {
+            startUpdateTasks()
+        }
         self.setupBindings()
     }
 
@@ -88,7 +90,7 @@ public class PhishingDetection: PhishingDetectionProtocol {
         }
     }
 
-    public func handleIsEnabledChange(enabled: Bool) {
+    private func handleIsEnabledChange(enabled: Bool) {
         if enabled {
             startUpdateTasks()
         } else {
@@ -96,16 +98,14 @@ public class PhishingDetection: PhishingDetectionProtocol {
         }
     }
 
-    func startUpdateTasks() {
+    private func startUpdateTasks() {
         Task {
             await dataStore.loadData()
-        }
-        Task {
             dataActivities.start()
         }
     }
 
-    func stopUpdateTasks() {
+    private func stopUpdateTasks() {
         dataActivities.stop()
     }
 
