@@ -70,13 +70,13 @@ struct MapperToUI {
             let scannedBrokers = element.value.scannedBrokers
             guard scannedBrokers.count != 0 else { return accumulator }
 
-            var (currentScans, brokers) = accumulator
+            var (completedScans, brokers) = accumulator
 
-            currentScans += scannedBrokers.count
+            completedScans += scannedBrokers.count
 
             brokers.append(contentsOf: scannedBrokers)
 
-            return (currentScans, brokers)
+            return (completedScans, brokers)
         }
 
         let scanProgress = DBPUIScanProgress(currentScans: completedScans, totalScans: totalScans, scannedBrokers: scannedBrokers)
