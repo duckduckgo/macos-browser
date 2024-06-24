@@ -95,3 +95,21 @@ DBP_APP_GROUP[config=CI][sdk=*] = $(DBP_BASE_APP_GROUP).debug
 DBP_APP_GROUP[config=Review][sdk=*] = $(DBP_BASE_APP_GROUP).review
 DBP_APP_GROUP[config=Debug][sdk=*] = $(DBP_BASE_APP_GROUP).debug
 DBP_APP_GROUP[config=Release][sdk=*] = $(DBP_BASE_APP_GROUP)
+
+// IPC
+
+// IMPORTANT: The reason this app group was created is because IPC through
+// Unix Domain Sockets requires the socket file path to be no longer than
+// 108 characters.  Sandboxing requirements force us to place said socket
+// within an app group container.
+//
+// Name coding:
+//  - ipc.a = ipc app store release
+//  - ipc.a.d = ipc app store debug
+//  - ipc.a.r = ipc app store review
+//
+IPC_APP_GROUP_BASE = $(DEVELOPMENT_TEAM).com.ddg.ipc.a
+IPC_APP_GROUP[config=CI][sdk=*] = $(IPC_APP_GROUP_BASE).d
+IPC_APP_GROUP[config=Review][sdk=*] = $(IPC_APP_GROUP_BASE).r
+IPC_APP_GROUP[config=Debug][sdk=*] = $(IPC_APP_GROUP_BASE).d
+IPC_APP_GROUP[config=Release][sdk=*] = $(IPC_APP_GROUP_BASE)

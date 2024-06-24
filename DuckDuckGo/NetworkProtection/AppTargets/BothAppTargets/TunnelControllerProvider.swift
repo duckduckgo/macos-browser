@@ -26,10 +26,11 @@ final class TunnelControllerProvider {
     let tunnelController: NetworkProtectionIPCTunnelController
 
     private init() {
-        let ipcClient = TunnelControllerIPCClient()
+        let ipcClient = VPNControllerXPCClient.shared
         ipcClient.register { error in
             NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
         }
+
         tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
     }
 

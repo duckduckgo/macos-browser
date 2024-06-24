@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppLauncher
 import BrowserServicesKit
 import Common
 import LoginItems
@@ -81,16 +82,16 @@ final class VPNUninstaller: VPNUninstalling {
         var name: String {
             switch self {
             case .begin:
-                return "vpn_browser_uninstall_attempt_ipc"
+                return "vpn_browser_uninstall_attempt_uds"
 
             case .cancelled:
-                return "vpn_browser_uninstall_cancelled_ipc"
+                return "vpn_browser_uninstall_cancelled_uds"
 
             case .success:
-                return "vpn_browser_uninstall_success_ipc"
+                return "vpn_browser_uninstall_success_uds"
 
             case .failure:
-                return "vpn_browser_uninstall_failure_ipc"
+                return "vpn_browser_uninstall_failure_uds"
             }
         }
 
@@ -118,27 +119,36 @@ final class VPNUninstaller: VPNUninstalling {
     }
 
     private let log: OSLog
+    private let ipcServiceLauncher: IPCServiceLauncher
     private let loginItemsManager: LoginItemsManaging
     private let pinningManager: LocalPinningManager
     private let settings: VPNSettings
     private let userDefaults: UserDefaults
     private let vpnMenuLoginItem: LoginItem
-    private let ipcClient: TunnelControllerIPCClient
+    private let ipcClient: VPNControllerIPCClient
     private let pixelKit: PixelFiring?
 
     @MainActor
     private var isDisabling = false
 
-    init(loginItemsManager: LoginItemsManaging = LoginItemsManager(),
+    init(ipcServiceLauncher: IPCServiceLauncher? = nil,
+         loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          pinningManager: LocalPinningManager = .shared,
          userDefaults: UserDefaults = .netP,
          settings: VPNSettings = .init(defaults: .netP),
-         ipcClient: TunnelControllerIPCClient = TunnelControllerIPCClient(),
+         ipcClient: VPNControllerIPCClient = VPNControllerUDSClient(),
          vpnMenuLoginItem: LoginItem = .vpnMenu,
          pixelKit: PixelFiring? = PixelKit.shared,
          log: OSLog = .networkProtection) {
 
+        let vpnAgentBundleID = Bundle.main.vpnMenuAgentBundleId
+        let appLauncher = AppLauncher(appBundleURL: Bundle.main.vpnMenuAgentURL)
+        let ipcServiceLaunchMethod = IPCServiceLauncher.LaunchMethod.direct(
+            bundleID: vpnAgentBundleID,
+            appLauncher: appLauncher)
+
         self.log = log
+        self.ipcServiceLauncher = ipcServiceLauncher ?? IPCServiceLauncher(launchMethod: ipcServiceLaunchMethod)
         self.loginItemsManager = loginItemsManager
         self.pinningManager = pinningManager
         self.settings = settings
@@ -155,7 +165,7 @@ final class VPNUninstaller: VPNUninstalling {
     ///
     @MainActor
     func uninstall(removeSystemExtension: Bool) async throws {
-        pixelKit?.fire(IPCUninstallAttempt.begin)
+        pixelKit?.fire(IPCUninstallAttempt.begin, frequency: .dailyAndCount)
 
         do {
             // We can do this optimistically as it has little if any impact.
@@ -176,15 +186,20 @@ final class VPNUninstaller: VPNUninstalling {
             }
 
             do {
-                try enableLoginItems()
+                try await ipcServiceLauncher.enable()
             } catch {
                 throw UninstallError.runAgentError(error)
             }
 
             // Allow some time for the login items to fully launch
+            try await Task.sleep(nanoseconds: 500 * NSEC_PER_MSEC)
 
             do {
-                try await ipcClient.command(.uninstallVPN)
+                if removeSystemExtension {
+                    try await ipcClient.uninstall(.all)
+                } else {
+                    try await ipcClient.uninstall(.configuration)
+                }
             } catch {
                 print("Failed to uninstall VPN, with error: \(error.localizedDescription)")
 
@@ -200,7 +215,23 @@ final class VPNUninstaller: VPNUninstalling {
 
             // We want to give some time for the login item to reset state before disabling it
             try? await Task.sleep(interval: 0.5)
-            disableLoginItems()
+
+            // Workaround: since status updates are provided through XPC we want to make sure the
+            // VPN is marked as disconnected.  We may be able to more properly resolve this by using
+            // UDS for all VPN status updates.
+            //
+            // Ref: https://app.asana.com/0/0/1207499177312396/1207538373572594/f
+            //
+            VPNControllerXPCClient.shared.forceStatusToDisconnected()
+
+            // While it may seem like a duplication of code, it's one thing to disable the IPC service
+            // and it's nother one to "uninstall" our login items.  The uninstaller wants both things
+            // to happen.
+            //
+            // As an example of why this is important, we want all agents to be disabled even if the IPC
+            // service is not based on login items.
+            try await ipcServiceLauncher.disable()
+            removeAgents()
 
             notifyVPNUninstalled()
             isDisabling = false
@@ -213,18 +244,14 @@ final class VPNUninstaller: VPNUninstalling {
         }
     }
 
-    private func enableLoginItems() throws {
-        try loginItemsManager.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: log)
-    }
-
-    func disableLoginItems() {
+    func removeAgents() {
         loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
     }
 
     func removeSystemExtension() async throws {
 #if NETP_SYSTEM_EXTENSION
         do {
-            try await ipcClient.command(.removeSystemExtension)
+            try await ipcClient.uninstall(.all)
         } catch {
             throw UninstallError.systemExtensionError(error)
         }
@@ -238,7 +265,7 @@ final class VPNUninstaller: VPNUninstalling {
     private func removeVPNConfiguration() async throws {
         // Remove the agent VPN configuration
         do {
-            try await ipcClient.command(.removeVPNConfiguration)
+            try await ipcClient.uninstall(.configuration)
         } catch {
             throw UninstallError.vpnConfigurationError(error)
         }

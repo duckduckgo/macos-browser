@@ -47,7 +47,7 @@ final class UserScripts: UserScriptsProvider {
     let specialErrorPageUserScript: SpecialErrorPageUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
-        clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
+        clickToLoadScript = ClickToLoadUserScript()
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
 
@@ -78,6 +78,8 @@ final class UserScripts: UserScriptsProvider {
 
         userScripts.append(autoconsentUserScript)
 
+        contentScopeUserScriptIsolated.registerSubfeature(delegate: clickToLoadScript)
+
         if let youtubeOverlayScript {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
         }
@@ -94,7 +96,9 @@ final class UserScripts: UserScriptsProvider {
         }
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature(subscriptionManager: Application.appDelegate.subscriptionManager))
+            let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: Application.appDelegate.subscriptionManager,
+                                                                   uiHandler: Application.appDelegate.subscriptionUIHandler)
+            subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
             userScripts.append(subscriptionPagesUserScript)
 
             identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())
@@ -111,7 +115,6 @@ final class UserScripts: UserScriptsProvider {
         pageObserverScript,
         printingUserScript,
         hoverUserScript,
-        clickToLoadScript,
         contentScopeUserScript,
         contentScopeUserScriptIsolated,
         autofillScript
