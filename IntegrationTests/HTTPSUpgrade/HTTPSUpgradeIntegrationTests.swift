@@ -89,7 +89,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
             .promise()
 
         // run test
-        _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('start').click(); return true })()")
+        try await tab.webView.evaluateJavaScript("(function() { document.getElementById('start').click(); })()") as Void?
 
         // await for popup to open and close
         _=try await comingBackToFirstTabPromise.value
@@ -97,7 +97,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
 
         // download results
-        _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
+        try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); })()") as Void?
 
         let fileUrl = try await downloadTaskFuture.value.output
             .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
@@ -167,7 +167,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
             .promise()
 
         // run test
-        _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('start').click(); return true })()")
+        try await tab.webView.evaluateJavaScript("(function() { document.getElementById('start').click(); })()") as Void?
 
         // await for popup to open and close
         _=try await comingBackToFirstTabPromise.value
@@ -175,7 +175,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
 
         // download results
-        _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
+        try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); })()") as Void?
 
         let fileUrl = try await downloadTaskFuture.value.output
             .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()

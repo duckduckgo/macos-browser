@@ -31,8 +31,7 @@ protocol SurveyRemoteMessaging {
 
 protocol SurveyRemoteMessageSubscriptionFetching {
 
-    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionService.SubscriptionServiceError>
-
+    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionServiceError>
 }
 
 final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
@@ -43,24 +42,25 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
     private let messageRequest: HomePageRemoteMessagingRequest
     private let messageStorage: SurveyRemoteMessagingStorage
-    private let accountManager: AccountManaging
+    private let accountManager: AccountManager
     private let subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching
     private let vpnActivationDateStore: WaitlistActivationDateStore
     private let pirActivationDateStore: WaitlistActivationDateStore
     private let minimumRefreshInterval: TimeInterval
     private let userDefaults: UserDefaults
 
-    convenience init(subscriptionManager: SubscriptionManaging) {
+    convenience init(subscriptionManager: SubscriptionManager) {
+        let subscriptionFetcher = SurveyRemoteMessageSubscriptionFetcher(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService)
         #if DEBUG || REVIEW
         self.init(
             accountManager: subscriptionManager.accountManager,
-            subscriptionFetcher: subscriptionManager.subscriptionService,
+            subscriptionFetcher: subscriptionFetcher,
             minimumRefreshInterval: .seconds(30)
         )
         #else
         self.init(
             accountManager: subscriptionManager.accountManager,
-            subscriptionFetcher: subscriptionManager.subscriptionService,
+            subscriptionFetcher: subscriptionFetcher,
             minimumRefreshInterval: .hours(1)
         )
         #endif
@@ -69,7 +69,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
     init(
         messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.surveysRequest(),
         messageStorage: SurveyRemoteMessagingStorage = DefaultSurveyRemoteMessagingStorage.surveys(),
-        accountManager: AccountManaging,
+        accountManager: AccountManager,
         subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching,
         vpnActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
         pirActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp),
@@ -280,10 +280,10 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
 }
 
-extension SubscriptionService: SurveyRemoteMessageSubscriptionFetching {
+struct SurveyRemoteMessageSubscriptionFetcher: SurveyRemoteMessageSubscriptionFetching {
+    let subscriptionEndpointService: SubscriptionEndpointService
 
     func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionServiceError> {
-        return await self.getSubscription(accessToken: accessToken, cachePolicy: .returnCacheDataElseLoad)
+        return await subscriptionEndpointService.getSubscription(accessToken: accessToken, cachePolicy: .returnCacheDataElseLoad)
     }
-
 }

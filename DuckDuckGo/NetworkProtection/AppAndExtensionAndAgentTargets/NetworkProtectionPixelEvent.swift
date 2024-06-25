@@ -100,6 +100,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionRekeyCompleted
     case networkProtectionRekeyFailure(_ error: Error)
 
+    case networkProtectionDNSUpdateCustom
+    case networkProtectionDNSUpdateDefault
+
     case networkProtectionSystemExtensionActivationFailure(_ error: Error)
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
@@ -296,6 +299,12 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionServerMigrationSuccess:
             return "netp_ev_server_migration_attempt_success"
 
+        case .networkProtectionDNSUpdateCustom:
+            return "netp_ev_update_dns_custom"
+
+        case .networkProtectionDNSUpdateDefault:
+            return "netp_ev_update_dns_default"
+
         case .networkProtectionUnhandledError:
             return "netp_unhandled_error"
         }
@@ -394,7 +403,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionRekeyFailure,
                 .networkProtectionSystemExtensionActivationFailure,
                 .networkProtectionServerMigrationAttempt,
-                .networkProtectionServerMigrationSuccess:
+                .networkProtectionServerMigrationSuccess,
+                .networkProtectionDNSUpdateCustom,
+                .networkProtectionDNSUpdateDefault:
             return nil
         }
     }
@@ -465,7 +476,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionRekeyAttempt,
                 .networkProtectionRekeyCompleted,
                 .networkProtectionServerMigrationAttempt,
-                .networkProtectionServerMigrationSuccess:
+                .networkProtectionServerMigrationSuccess,
+                .networkProtectionDNSUpdateCustom,
+                .networkProtectionDNSUpdateDefault:
             return nil
         }
     }
