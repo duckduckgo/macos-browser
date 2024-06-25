@@ -65,21 +65,11 @@ struct MapperToUI {
             return accumulator + element.value.totalScans
         }
 
-        let (completedScans, scannedBrokers): (Int, [DBPUIScanProgress.ScannedBroker]) = filteredProfileQueriesGroupedByBroker.reduce((0, [])) { accumulator, element in
-
-            let scannedBrokers = element.value.scannedBrokers
-            guard scannedBrokers.count != 0 else { return accumulator }
-
-            var (completedScans, brokers) = accumulator
-
-            completedScans += scannedBrokers.count
-
-            brokers.append(contentsOf: scannedBrokers)
-
-            return (completedScans, brokers)
+        let scannedBrokers: [DBPUIScanProgress.ScannedBroker] = filteredProfileQueriesGroupedByBroker.flatMap {_, brokerQueryData in
+            brokerQueryData.scannedBrokers
         }
 
-        let scanProgress = DBPUIScanProgress(currentScans: completedScans, totalScans: totalScans, scannedBrokers: scannedBrokers)
+        let scanProgress = DBPUIScanProgress(currentScans: scannedBrokers.count, totalScans: totalScans, scannedBrokers: scannedBrokers)
         let matches = mapMatchesToUI(brokerProfileQueryData)
 
         return .init(resultsFound: matches, scanProgress: scanProgress)
@@ -360,10 +350,10 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
         guard let broker = self.first?.dataBroker,
                 self.allSatisfy({ $0.scanJobData.lastRunDate != nil }) else { return [] }
 
-        let mirrorBrokers: [DBPUIScanProgress.ScannedBroker] = broker.mirrorSites.compactMap {
-            guard $0.shouldWeIncludeMirrorSite() else { return nil }
-            return DBPUIScanProgress.ScannedBroker(name: $0.name, url: $0.url)
+        let mirrorBrokers = broker.mirrorSites.compactMap {
+            $0.shouldWeIncludeMirrorSite() ? $0.mapToScannedBrokerUI : nil
         }
+
         return [DBPUIScanProgress.ScannedBroker(name: broker.name, url: broker.url)] + mirrorBrokers
     }
 

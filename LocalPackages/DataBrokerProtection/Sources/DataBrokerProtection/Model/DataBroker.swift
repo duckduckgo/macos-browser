@@ -77,6 +77,12 @@ struct MirrorSite: Codable, Sendable {
     }
 }
 
+extension MirrorSite {
+    var mapToScannedBrokerUI: DBPUIScanProgress.ScannedBroker {
+        DBPUIScanProgress.ScannedBroker(name: name, url: url)
+    }
+}
+
 public enum DataBrokerHierarchy: Int {
     case parent = 1
     case child = 0
