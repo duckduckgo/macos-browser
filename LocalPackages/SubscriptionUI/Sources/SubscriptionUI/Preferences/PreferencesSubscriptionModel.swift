@@ -236,7 +236,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         print("openLearnMore")
         // TODO:
     }
-    
+
     @MainActor
     func addEmailAction() {
         print("addEmailAction")
@@ -294,6 +294,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             await self?.updateSubscription(with: .reloadIgnoringLocalCacheData)
             await self?.updateAllEntitlement(with: .reloadIgnoringLocalCacheData)
+            // TODO: self?.accountManager.fetchAccountDetails(with: token)
         }
     }
 

@@ -35,8 +35,9 @@ public struct PreferencesSubscriptionView: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 20) { // was spacing: 0
+        VStack(alignment: .leading, spacing: 12) {
 
+            // Title and dialogs
             TextMenuTitle(UserText.preferencesTitle)
                 .sheet(isPresented: $showingSheet) {
                     SubscriptionAccessView(model: model.sheetModel)
@@ -53,9 +54,7 @@ public struct PreferencesSubscriptionView: View {
                     }
                 }
 
-//            Spacer()
-//                .frame(height: 20)
-
+            // Header
             VStack {
                 switch state {
                 case .noSubscription:
@@ -82,20 +81,20 @@ public struct PreferencesSubscriptionView: View {
             }
             .padding(10)
             .roundedBorder()
+            .padding(.top, 4)
+            .padding(.bottom, 12)
 
-//            if [.subscriptionPendingActivation, .subscriptionExpired].contains(state) {
+            // Activate section
+            if [.subscriptionActive, .subscriptionExpired].contains(state) {
                 activateSection
-//                    .padding(.vertical, 8)
-//            }
+            }
 
-//            if state == .subscriptionActive {
+            // Settings section
+            if state == .subscriptionActive {
                 settingsSection
-//                    .padding(.vertical, 8)
-//            }
+            }
 
-//            Spacer()
-//                .frame(height: 24)
-
+            // Help section
             footerView
         }
         .onAppear(perform: {
@@ -218,15 +217,15 @@ public struct PreferencesSubscriptionView: View {
     @ViewBuilder
     private var activateSection: some View {
         PreferencePaneSection {
-            TextMenuItemHeader(UserText.activateSectionTitle)
+            TextMenuItemHeader(UserText.activateSectionTitle, bottomPadding: 0)
             if model.hasEmail {
                 TextMenuItemCaption(UserText.activateSectionWithEmailCaption)
-                    .padding(.bottom, 4)
+                    .padding(.bottom, 2)
                 emailView
             } else {
                 TextMenuItemCaption(UserText.activateSectionNoEmailCaption)
+                    .padding(.bottom, 8)
                 TextButton(UserText.addEmailButton, weight: .semibold) { model.addEmailAction() }
-                    .padding(.vertical, 12)
             }
         }
     }
@@ -234,9 +233,11 @@ public struct PreferencesSubscriptionView: View {
     @ViewBuilder
     private var settingsSection: some View {
         PreferencePaneSection {
-            TextMenuItemHeader(UserText.settingsSectionTitle)
-            VStack(alignment: .leading, spacing: 12) {
-                TextMenuItemCaption(model.subscriptionDetails ?? "")
+            TextMenuItemHeader(UserText.settingsSectionTitle, bottomPadding: 0)
+            TextMenuItemCaption(model.subscriptionDetails ?? "")
+                .padding(.bottom, 8)
+
+            VStack(alignment: .leading, spacing: 16) {
                 TextButton(UserText.updatePlanOrCancelButton, weight: .semibold) {
                     model.userEventHandler(.changePlanOrBillingClick)
                     Task {
@@ -258,7 +259,7 @@ public struct PreferencesSubscriptionView: View {
     @ViewBuilder
     private var footerView: some View {
         PreferencePaneSection {
-            TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle)
+            TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle, bottomPadding: 0)
             HStack(alignment: .top, spacing: 6) {
                 TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
                 Button(UserText.viewFaqsButton) { model.openFAQ() }
