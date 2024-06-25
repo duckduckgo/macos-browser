@@ -724,13 +724,11 @@ protocol NewWindowPolicyDecisionMaker {
     func startOnboarding() {
         userInteractionDialog = nil
 
-        // Here we will chose based on the variant
         if PixelExperiment.cohort == .newOnboarding {
             setContent(.onboarding)
         } else {
             setContent(.onboardingDeprecated)
         }
-        PixelExperiment.fireEnrollmentPixel()
     }
 
     @MainActor(unsafe)

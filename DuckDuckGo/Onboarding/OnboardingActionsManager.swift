@@ -203,5 +203,10 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         navigation.updatePreventUserInteraction(prevent: false)
     }
 
+    private func onboardingHasFinished() {
+        Self.isOnboardingFinished = true
+        navigation.updatePreventUserInteraction(prevent: false)
+    }
+
 }
 
