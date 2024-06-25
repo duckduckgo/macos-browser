@@ -25,7 +25,7 @@ public struct PreferencesSubscriptionView: View {
     @State private var state: PreferencesSubscriptionState = .noSubscription
 
     @ObservedObject var model: PreferencesSubscriptionModel
-    @State private var showingSheet = false
+    @State private var showingSheet = false // TODO: Rename it
     @State private var showingRemoveConfirmationDialog = false
 
     @State private var manageSubscriptionSheet: ManageSubscriptionSheet?
@@ -35,7 +35,7 @@ public struct PreferencesSubscriptionView: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 20) { // was spacing: 0
 
             TextMenuTitle(UserText.preferencesTitle)
                 .sheet(isPresented: $showingSheet) {
@@ -53,8 +53,8 @@ public struct PreferencesSubscriptionView: View {
                     }
                 }
 
-            Spacer()
-                .frame(height: 20)
+//            Spacer()
+//                .frame(height: 20)
 
             VStack {
                 switch state {
@@ -63,14 +63,16 @@ public struct PreferencesSubscriptionView: View {
                 case .subscriptionPendingActivation:
                     pendingActivationHeaderView
                 case .subscriptionActive:
-                    authenticatedHeaderView
+                    EmptyView() // new design omits header for active subscription
                 case .subscriptionExpired:
                     expiredHeaderView
                 }
 
-                Divider()
-                    .foregroundColor(Color.secondary)
-                    .padding(.horizontal, -10)
+                if state != .subscriptionActive {
+                    Divider()
+                        .foregroundColor(Color.secondary)
+                        .padding(.horizontal, -10)
+                }
 
                 if state == .subscriptionActive {
                     servicesRowsForActiveSubscriptionView
@@ -81,14 +83,25 @@ public struct PreferencesSubscriptionView: View {
             .padding(10)
             .roundedBorder()
 
-            Spacer()
-                .frame(height: 24)
+//            if [.subscriptionPendingActivation, .subscriptionExpired].contains(state) {
+                activateSection
+//                    .padding(.vertical, 8)
+//            }
+
+//            if state == .subscriptionActive {
+                settingsSection
+//                    .padding(.vertical, 8)
+//            }
+
+//            Spacer()
+//                .frame(height: 24)
 
             footerView
         }
         .onAppear(perform: {
             if model.isUserAuthenticated {
                 model.userEventHandler(.activeSubscriptionSettingsClick)
+                model.fetchAndUpdateSubscriptionDetails()
             }
         })
         .onReceive(model.statePublisher, perform: updateState(state:))
@@ -96,45 +109,6 @@ public struct PreferencesSubscriptionView: View {
 
     private func updateState(state: PreferencesSubscriptionState) {
         self.state = state
-    }
-
-    @ViewBuilder
-    private var authenticatedHeaderView: some View {
-        UniversalHeaderView {
-            Image(.subscriptionActiveIcon)
-                .padding(4)
-        } content: {
-            TextMenuItemHeader(UserText.preferencesSubscriptionActiveHeader)
-            TextMenuItemCaption(model.subscriptionDetails ?? "")
-        } buttons: {
-            Button(UserText.addToAnotherDeviceButton) {
-                model.userEventHandler(.addToAnotherDeviceClick)
-                showingSheet.toggle()
-            }
-
-            Menu {
-                Button(UserText.changePlanOrBillingButton, action: {
-                    model.userEventHandler(.changePlanOrBillingClick)
-                    Task {
-                        switch await model.changePlanOrBillingAction() {
-                        case .presentSheet(let sheet):
-                            manageSubscriptionSheet = sheet
-                        case .navigateToManageSubscription(let navigationAction):
-                            navigationAction()
-                        }
-                    }
-                })
-                Button(UserText.removeFromThisDeviceButton, action: {
-                    showingRemoveConfirmationDialog.toggle()
-                })
-            } label: {
-                Text(UserText.manageSubscriptionButton)
-            }
-            .fixedSize()
-        }
-        .onAppear {
-            model.fetchAndUpdateSubscriptionDetails()
-        }
     }
 
     @ViewBuilder
@@ -170,9 +144,6 @@ public struct PreferencesSubscriptionView: View {
             Button(UserText.restorePurchaseButton) { model.refreshSubscriptionPendingState() }
                 .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
-        .onAppear {
-            model.fetchAndUpdateSubscriptionDetails()
-        }
     }
 
     @ViewBuilder
@@ -185,23 +156,11 @@ public struct PreferencesSubscriptionView: View {
             TextMenuItemCaption(UserText.preferencesSubscriptionExpiredCaption)
         } buttons: {
             // We need to improve re-purchase flow
-             Button(UserText.viewPlansExpiredButtonTitle) { model.purchaseAction() }
+            Button(UserText.viewPlansExpiredButtonTitle) { model.purchaseAction() }
                 .buttonStyle(DefaultActionButtonStyle(enabled: true))
-            Menu {
-                Button(UserText.addToAnotherDeviceButton) {
-                    model.userEventHandler(.addToAnotherDeviceClick)
-                    showingSheet.toggle()
-                }
-                Button(UserText.removeFromThisDeviceButton, action: {
-                    showingRemoveConfirmationDialog.toggle()
-                })
-            } label: {
-                Text(UserText.manageDevicesButton)
-            }
-            .fixedSize()
-        }
-        .onAppear {
-            model.fetchAndUpdateSubscriptionDetails()
+            Button(UserText.removeFromThisDeviceButton, action: {
+                showingRemoveConfirmationDialog.toggle()
+            })
         }
     }
 
@@ -257,6 +216,46 @@ public struct PreferencesSubscriptionView: View {
     }
 
     @ViewBuilder
+    private var activateSection: some View {
+        PreferencePaneSection {
+            TextMenuItemHeader(UserText.activateSectionTitle)
+            if model.hasEmail {
+                TextMenuItemCaption(UserText.activateSectionWithEmailCaption)
+                    .padding(.bottom, 4)
+                emailView
+            } else {
+                TextMenuItemCaption(UserText.activateSectionNoEmailCaption)
+                TextButton(UserText.addEmailButton, weight: .semibold) { model.addEmailAction() }
+                    .padding(.vertical, 12)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var settingsSection: some View {
+        PreferencePaneSection {
+            TextMenuItemHeader(UserText.settingsSectionTitle)
+            VStack(alignment: .leading, spacing: 12) {
+                TextMenuItemCaption(model.subscriptionDetails ?? "")
+                TextButton(UserText.updatePlanOrCancelButton, weight: .semibold) {
+                    model.userEventHandler(.changePlanOrBillingClick)
+                    Task {
+                        switch await model.changePlanOrBillingAction() {
+                        case .presentSheet(let sheet):
+                            manageSubscriptionSheet = sheet
+                        case .navigateToManageSubscription(let navigationAction):
+                            navigationAction()
+                        }
+                    }
+                }
+                TextButton(UserText.removeFromThisDeviceButton, weight: .semibold) {
+                    showingRemoveConfirmationDialog.toggle()
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
     private var footerView: some View {
         PreferencePaneSection {
             TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle)
@@ -265,6 +264,31 @@ public struct PreferencesSubscriptionView: View {
                 Button(UserText.viewFaqsButton) { model.openFAQ() }
             }
         }
+    }
+
+    @ViewBuilder
+    private var emailView: some View {
+        VStack {
+            VStack(alignment: .center) {
+                HStack(alignment: .center, spacing: 8) {
+                    Image("email-icon", bundle: .module)
+                        .padding(4)
+                        .background(Color(.badgeBackground))
+                        .cornerRadius(4)
+
+                    Text(verbatim: model.email ?? "")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixMultilineScrollableText()
+                        .font(.body)
+                        .foregroundColor(Color(.textPrimary))
+
+                    Button(UserText.editEmailButton) { model.editEmailAction() }
+                }
+            }
+            .padding(.vertical, 0)
+        }
+        .padding(10)
+        .roundedBorder()
     }
 
     @ViewBuilder

@@ -31,6 +31,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var hasAccessToDBP: Bool = false
     @Published var hasAccessToITR: Bool = false
 
+    @Published var email: String?
+    var hasEmail: Bool { !(email?.isEmpty ?? true) }
+
     private var subscriptionPlatform: Subscription.Platform?
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
@@ -56,7 +59,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
              iHaveASubscriptionClick,
              activateAddEmailClick,
              postSubscriptionAddEmailClick,
-             addToAnotherDeviceClick,
              addDeviceEnterEmail,
              restorePurchaseStoreClick,
              activeSubscriptionSettingsClick,
@@ -104,6 +106,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 await self.updateSubscription(with: .returnCacheDataElseLoad)
                 await self.updateAllEntitlement(with: .returnCacheDataElseLoad)
             }
+
+            self.email = accountManager.email
         }
 
         signInObserver = NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { [weak self] _ in
@@ -145,6 +149,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func updateUserAuthenticatedState(_ isUserAuthenticated: Bool) {
         self.isUserAuthenticated = isUserAuthenticated
+        self.email = accountManager.email
         sheetModel = makeSubscriptionAccessModel()
     }
 
@@ -230,6 +235,30 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @MainActor
     func openIdentityTheftRestoration() {
         userEventHandler(.openITR)
+    }
+
+    @MainActor
+    func addEmailAction() {
+        print("addEmailAction")
+        // TODO: trigger silent token refresh
+        let addEmailURL: URL = subscriptionManager.url(for: .addEmail)
+        userEventHandler(.addDeviceEnterEmail) // TODO: check if correct pixel is fired here
+        openURLHandler(addEmailURL)
+    }
+
+    @MainActor
+    func editEmailAction() {
+        print("editEmailAction")
+        // TODO: trigger silent token refresh
+        let manageEmailURL: URL = subscriptionManager.url(for: .manageEmail)
+        userEventHandler(.postSubscriptionAddEmailClick) // TODO: check if correct pixel is fired here
+        openURLHandler(manageEmailURL)
+    }
+
+    @MainActor
+    func openLearnMore() {
+        print("openLearnMore")
+        // TODO: 
     }
 
     @MainActor
