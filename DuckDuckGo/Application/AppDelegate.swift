@@ -346,6 +346,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidBecomeActive(_ notification: Notification) {
         guard didFinishLaunching else { return }
 
+        fireOnboardingTestPixels()
+
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
@@ -360,6 +362,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if isActive {
                 PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
             }
+        }
+    }
+
+    private func fireOnboardingTestPixels() {
+        if SystemDefaultBrowserProvider().isDefault {
+            PixelExperiment.fireOnboardingSetAsDefaultEnabled5to7Pixel()
+        }
+
+        if StartupPreferences.shared.restorePreviousSession {
+            PixelExperiment.fireOnboardingSessionRestoreEnabled5to7Pixel()
         }
     }
 
