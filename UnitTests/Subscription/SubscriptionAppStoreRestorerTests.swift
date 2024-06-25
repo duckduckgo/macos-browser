@@ -22,49 +22,68 @@ import SubscriptionTestingUtilities
 @testable import DuckDuckGo_Privacy_Browser
 @testable import PixelKit
 import PixelKitTestingUtilities
+import Common
 
 @available(macOS 12.0, *)
 final class SubscriptionAppStoreRestorerTests: XCTestCase {
 
-//    var subscriptionManager: SubscriptionManager
+    var pixelKit: PixelKit?
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
 
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        PixelKit.tearDown()
+        pixelKit?.clearFrequencyHistoryForAllPixels()
     }
 
-    func testExample() throws {
+    let testUserDefault = UserDefaults(suiteName: #function)!
 
-        let accountManager = AccountManagerMock()
-        let apiService = APIServiceMock(mockAuthHeaders: [:], mockAPICallResults: .success(true))
+    func testBaseSuccessfulPurchase() async throws {
+        let pixelExpectation = expectation(description: "Pixel fired")
+        pixelExpectation.expectedFulfillmentCount = 2 // All pixels are .dailyAndCount
+        let expectedPixel = PrivacyProPixel.privacyProRestorePurchaseStoreSuccess
+        let pixelKit = PixelKit(dryRun: false,
+                                appVersion: "1.0.0",
+                                defaultHeaders: [:],
+                                defaults: testUserDefault) { pixelName, _, _, _, _, _ in
+            if pixelName.hasPrefix(expectedPixel.name) {
+                pixelExpectation.fulfill()
+            } else {
+                XCTFail("Wrong pixel fired: \(pixelName)")
+            }
+        }
+        PixelKit.setSharedForTesting(pixelKit: pixelKit)
 
-        let subscriptionEndpointService = SubscriptionEndpointServiceMock()
+        let progressViewPresentedExpectation = expectation(description: "Progress view presented")
+        let progressViewDismissedExpectation = expectation(description: "Progress view dismissed")
 
-        let authEndpointService = AuthEndpointServiceMock()
+        let uiHandler = await SubscriptionUIHandlerMock { action in
+            switch action {
+            case .didPresentProgressViewController:
+                progressViewPresentedExpectation.fulfill()
+            case .didDismissProgressViewController:
+                progressViewDismissedExpectation.fulfill()
+            case .didUpdateProgressViewController:
+                break
+            case .didPresentSubscriptionAccessViewController:
+                break
+            case .didShowAlert:
+                break
+            case .didShowTab:
+                break
+            }
+        }
 
-        let storePurchaseManager = StorePurchaseManagerMock(purchasedProductIDs: <#T##[String]#>,
-                                                            purchaseQueue: <#T##[String]#>,
-                                                            areProductsAvailable: <#T##Bool#>,
-                                                            subscriptionOptionsResult: <#T##SubscriptionOptions?#>,
-                                                            syncAppleIDAccountResultError: <#T##Error?#>,
-                                                            mostRecentTransactionResult: <#T##String?#>,
-                                                            hasActiveSubscriptionResult: <#T##Bool#>,
-                                                            purchaseSubscriptionResult: <#T##Result<StorePurchaseManager.TransactionJWS, PurchaseManagerError>#>)
+        let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(
+            subscriptionManager: SubscriptionMockFactory.subscriptionManager,
+            appStoreRestoreFlow: SubscriptionMockFactory.appStoreRestoreFlow,
+            uiHandler: uiHandler)
+        await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
 
-        let subscriptionManager = SubscriptionManagerMock(accountManager: accountManager,
-                                                          subscriptionEndpointService: subscriptionEndpointService,
-                                                          authEndpointService: authEndpointService,
-                                                          storePurchaseManager: <#T##StorePurchaseManager#>,
-                                                          currentEnvironment: <#T##SubscriptionEnvironment#>,
-                                                          canPurchase: <#T##Bool#>)
-
-        let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(subscriptionManager: <#T##SubscriptionManager#>,
-                                                                               subscriptionErrorReporter: <#T##SubscriptionErrorReporter#>,
-                                                                               appStoreRestoreFlow: <#T##AppStoreRestoreFlow#>,
-                                                                               uiHandler: <#T##SubscriptionUIHandling#>)
-
+        await fulfillment(of: [progressViewDismissedExpectation,
+                               progressViewPresentedExpectation,
+                               pixelExpectation], timeout: 3.0)
     }
 }
