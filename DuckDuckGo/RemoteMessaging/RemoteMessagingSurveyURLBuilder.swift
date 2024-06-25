@@ -24,11 +24,11 @@ import Subscription
 
 struct DefaultRemoteMessagingSurveyURLBuilder: RemoteMessagingSurveyActionMapping {
 
-    private let statisticsStore: StatisticsStore
+    private let statisticsStore: BrowserServicesKit.StatisticsStore
     private let vpnActivationDateStore: WaitlistActivationDateStore
     private let subscription: Subscription?
 
-    init(statisticsStore: StatisticsStore = LocalStatisticsStore(),
+    init(statisticsStore: BrowserServicesKit.StatisticsStore = LocalStatisticsStore(),
          vpnActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
          subscription: Subscription?) {
         self.statisticsStore = statisticsStore

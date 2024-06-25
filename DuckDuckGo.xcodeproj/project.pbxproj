@@ -3025,6 +3025,7 @@
 		3768D8372C24BFF5004120AE /* HomeMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMessageView.swift; sourceTree = "<group>"; };
 		3768D83A2C24C0A8004120AE /* HomeMessageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMessageViewModel.swift; sourceTree = "<group>"; };
 		3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRemoteMessageModel.swift; sourceTree = "<group>"; };
+		3768D8422C2B6993004120AE /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		376C4DB828A1A48A00CC0F5B /* FirePopoverViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverViewModelTests.swift; sourceTree = "<group>"; };
 		376CC8B4296EB630006B63A7 /* AppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppStore.xcconfig; sourceTree = "<group>"; };
 		376CC8B5296EBA8F006B63A7 /* BuildNumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BuildNumber.xcconfig; sourceTree = "<group>"; };
@@ -6599,6 +6600,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				3768D8422C2B6993004120AE /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,

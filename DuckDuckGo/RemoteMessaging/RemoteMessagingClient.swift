@@ -27,7 +27,106 @@ import RemoteMessaging
 import NetworkProtection
 import Subscription
 
-final class RemoteMessagingClient {
+final class MacOSRemoteMessagingDataSource: RemoteMessagingDataSource {
+
+    init(
+        bookmarksDatabase: CoreDataDatabase,
+        appearancePreferences: AppearancePreferences,
+        internalUserDecider: InternalUserDecider
+    ) {
+        self.bookmarksDatabase = bookmarksDatabase
+        self.appearancePreferences = appearancePreferences
+        self.internalUserDecider = internalUserDecider
+    }
+
+    let bookmarksDatabase: CoreDataDatabase
+    let appearancePreferences: AppearancePreferences
+    var statisticsStore: BrowserServicesKit.StatisticsStore!
+    var variantManager: VariantManager!
+    var surveyActionMapper: RemoteMessagingSurveyActionMapping!
+    var internalUserDecider: InternalUserDecider
+
+    var appTheme: String {
+        appearancePreferences.currentThemeName.rawValue
+    }
+
+    var isInternalUser: Bool {
+        internalUserDecider.isInternalUser
+    }
+
+    var isWidgetInstalled: Bool {
+        false
+    }
+
+    var bookmarksCount: Int = 0
+    var favoritesCount: Int = 0
+
+    var daysSinceNetworkProtectionEnabled: Int = -1
+    var isPrivacyProEligibleUser: Bool = false
+    var isPrivacyProSubscriber: Bool = false
+    var privacyProDaysSinceSubscribed: Int = -1
+    var privacyProDaysUntilExpiry: Int = -1
+    var privacyProPurchasePlatform: String?
+    var isPrivacyProSubscriptionActive: Bool = false
+    var isPrivacyProSubscriptionExpiring: Bool = false
+    var isPrivacyProSubscriptionExpired: Bool = false
+
+    func refreshState() async {
+        bookmarksCount = 0
+        favoritesCount = 0
+        let context = bookmarksDatabase.makeContext(concurrencyType: .privateQueueConcurrencyType)
+        context.performAndWait {
+            bookmarksCount = BookmarkUtils.numberOfBookmarks(in: context)
+            favoritesCount = BookmarkUtils.numberOfFavorites(for: appearancePreferences.favoritesDisplayMode, in: context)
+        }
+
+        statisticsStore = LocalStatisticsStore()
+        variantManager = DefaultVariantManager()
+        let subscriptionManager = await Application.appDelegate.subscriptionManager
+
+        isPrivacyProSubscriber = subscriptionManager.accountManager.isUserAuthenticated
+        isPrivacyProEligibleUser = subscriptionManager.canPurchase
+
+        let activationDateStore = DefaultWaitlistActivationDateStore(source: .netP)
+        daysSinceNetworkProtectionEnabled = activationDateStore.daysSinceActivation() ?? -1
+
+        privacyProDaysSinceSubscribed = -1
+        privacyProDaysUntilExpiry = -1
+        isPrivacyProSubscriptionActive = false
+        isPrivacyProSubscriptionExpiring = false
+        isPrivacyProSubscriptionExpired = false
+
+        if let accessToken = subscriptionManager.accountManager.accessToken {
+            let subscriptionResult = await subscriptionManager.subscriptionEndpointService.getSubscription(accessToken: accessToken)
+
+            if case let .success(subscription) = subscriptionResult {
+                privacyProDaysSinceSubscribed = Calendar.current.numberOfDaysBetween(subscription.startedAt, and: Date()) ?? -1
+                privacyProDaysUntilExpiry = Calendar.current.numberOfDaysBetween(Date(), and: subscription.expiresOrRenewsAt) ?? -1
+                privacyProPurchasePlatform = subscription.platform.rawValue
+
+                switch subscription.status {
+                case .autoRenewable, .gracePeriod:
+                    isPrivacyProSubscriptionActive = true
+                case .notAutoRenewable:
+                    isPrivacyProSubscriptionActive = true
+                    isPrivacyProSubscriptionExpiring = true
+                case .expired, .inactive:
+                    isPrivacyProSubscriptionExpired = true
+                case .unknown:
+                    break // Not supported in RMF
+                }
+
+                surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: subscription)
+            } else {
+                surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: nil)
+            }
+        } else {
+            surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: nil)
+        }
+    }
+}
+
+final class RemoteMessagingClient: RemoteMessagingClientBase {
 
     struct Constants {
         static let minimumConfigurationRefreshInterval: TimeInterval = 60 * 60 * 4
@@ -40,9 +139,15 @@ final class RemoteMessagingClient {
         internalUserDecider: InternalUserDecider
     ) {
         self.database = database
-        self.bookmarksDatabase = bookmarksDatabase
         self.appearancePreferences = appearancePreferences
         self.internalUserDecider = internalUserDecider
+
+        let dataSource = MacOSRemoteMessagingDataSource(
+            bookmarksDatabase: bookmarksDatabase,
+            appearancePreferences: appearancePreferences,
+            internalUserDecider: internalUserDecider
+        )
+        super.init(endpoint: Self.endpoint, dataSource: dataSource)
 
         subscribeToInternalUserFlagChangesIfNeeded()
     }
@@ -53,6 +158,8 @@ final class RemoteMessagingClient {
         }
 
         internalUserCancellable = internalUserDecider.isInternalUserPublisher
+            .filter { $0 }
+            .prefix(1)
             .sink { [weak self] isInternalUser in
                 if isInternalUser {
                     self?.initializeDatabaseIfNeeded()
@@ -99,7 +206,6 @@ final class RemoteMessagingClient {
     }
 
     private let database: RemoteMessagingDatabase
-    private let bookmarksDatabase: CoreDataDatabase
     private let appearancePreferences: AppearancePreferences
     private let internalUserDecider: InternalUserDecider
     private(set) var store: RemoteMessagingStore?
@@ -119,135 +225,12 @@ final class RemoteMessagingClient {
     static private var lastRemoteMessagingRefreshDate: Date
 
     private func refreshRemoteMessages() {
-        Task {
-            try? await fetchAndProcess()
-        }
-    }
-
-    /// Convenience function
-    private func fetchAndProcess() async throws {
-
-        var bookmarksCount = 0
-        var favoritesCount = 0
-        let context = bookmarksDatabase.makeContext(concurrencyType: .privateQueueConcurrencyType)
-        context.performAndWait {
-            bookmarksCount = BookmarkUtils.numberOfBookmarks(in: context)
-            favoritesCount = BookmarkUtils.numberOfFavorites(for: appearancePreferences.favoritesDisplayMode, in: context)
-        }
-
-        try await fetchAndProcess(bookmarksCount: bookmarksCount, favoritesCount: favoritesCount)
-    }
-
-    // swiftlint:disable:next function_body_length
-    private func fetchAndProcess(bookmarksCount: Int,
-                                 favoritesCount: Int,
-                                 statisticsStore: StatisticsStore = LocalStatisticsStore(),
-                                 variantManager: VariantManager = DefaultVariantManager()) async throws {
-
         guard let store else {
             return
         }
 
-        let result = await Self.fetchRemoteMessages(remoteMessageRequest: RemoteMessageRequest(endpoint: Self.endpoint))
-
-        switch result {
-        case .success(let statusResponse):
-            os_log("Successfully fetched remote messages", log: .remoteMessaging, type: .debug)
-
-            let subscriptionManager = await Application.appDelegate.subscriptionManager
-
-            let isPrivacyProSubscriber = subscriptionManager.accountManager.isUserAuthenticated
-            let canPurchase = subscriptionManager.canPurchase
-
-            let activationDateStore = DefaultWaitlistActivationDateStore(source: .netP)
-            let daysSinceNetworkProtectionEnabled = activationDateStore.daysSinceActivation() ?? -1
-
-            var privacyProDaysSinceSubscribed: Int = -1
-            var privacyProDaysUntilExpiry: Int = -1
-            var privacyProPurchasePlatform: String?
-            var privacyProIsActive: Bool = false
-            var privacyProIsExpiring: Bool = false
-            var privacyProIsExpired: Bool = false
-            let surveyActionMapper: DefaultRemoteMessagingSurveyURLBuilder
-
-            if let accessToken = subscriptionManager.accountManager.accessToken {
-                let subscriptionResult = await subscriptionManager.subscriptionEndpointService.getSubscription(accessToken: accessToken)
-
-                if case let .success(subscription) = subscriptionResult {
-                    privacyProDaysSinceSubscribed = Calendar.current.numberOfDaysBetween(subscription.startedAt, and: Date()) ?? -1
-                    privacyProDaysUntilExpiry = Calendar.current.numberOfDaysBetween(Date(), and: subscription.expiresOrRenewsAt) ?? -1
-                    privacyProPurchasePlatform = subscription.platform.rawValue
-
-                    switch subscription.status {
-                    case .autoRenewable, .gracePeriod:
-                        privacyProIsActive = true
-                    case .notAutoRenewable:
-                        privacyProIsActive = true
-                        privacyProIsExpiring = true
-                    case .expired, .inactive:
-                        privacyProIsExpired = true
-                    case .unknown:
-                        break // Not supported in RMF
-                    }
-
-                    surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: subscription)
-                } else {
-                    surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: nil)
-                }
-            } else {
-                surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: nil)
-            }
-
-            let dismissedMessageIds = store.fetchDismissedRemoteMessageIds()
-
-            let remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(
-                appAttributeMatcher: AppAttributeMatcher(statisticsStore: statisticsStore,
-                                                         variantManager: variantManager,
-                                                         isInternalUser: await Application.appDelegate.internalUserDecider.isInternalUser),
-                userAttributeMatcher: UserAttributeMatcher(statisticsStore: statisticsStore,
-                                                           variantManager: variantManager,
-                                                           bookmarksCount: bookmarksCount,
-                                                           favoritesCount: favoritesCount,
-                                                           appTheme: AppearancePreferences.shared.currentThemeName.rawValue,
-                                                           isWidgetInstalled: false,
-                                                           daysSinceNetPEnabled: daysSinceNetworkProtectionEnabled,
-                                                           isPrivacyProEligibleUser: canPurchase,
-                                                           isPrivacyProSubscriber: isPrivacyProSubscriber,
-                                                           privacyProDaysSinceSubscribed: privacyProDaysSinceSubscribed,
-                                                           privacyProDaysUntilExpiry: privacyProDaysUntilExpiry,
-                                                           privacyProPurchasePlatform: privacyProPurchasePlatform,
-                                                           isPrivacyProSubscriptionActive: privacyProIsActive,
-                                                           isPrivacyProSubscriptionExpiring: privacyProIsExpiring,
-                                                           isPrivacyProSubscriptionExpired: privacyProIsExpired,
-                                                           dismissedMessageIds: dismissedMessageIds),
-                percentileStore: RemoteMessagingPercentileUserDefaultsStore(userDefaults: .standard),
-                surveyActionMapper: surveyActionMapper,
-                dismissedMessageIds: dismissedMessageIds
-            )
-
-            let processor = RemoteMessagingConfigProcessor(remoteMessagingConfigMatcher: remoteMessagingConfigMatcher)
-            let config = store.fetchRemoteMessagingConfig()
-
-            if let processorResult = processor.process(jsonRemoteMessagingConfig: statusResponse,
-                                                       currentConfig: config) {
-                store.saveProcessedResult(processorResult)
-            }
-        case .failure(let error):
-            os_log("Failed to fetch remote messages", log: .remoteMessaging, type: .error)
-            throw error
-        }
-    }
-
-    private static func fetchRemoteMessages(remoteMessageRequest: RemoteMessageRequest) async -> Result<RemoteMessageResponse.JsonRemoteMessagingConfig, RemoteMessageResponse.StatusError> {
-        return await withCheckedContinuation { continuation in
-            remoteMessageRequest.getRemoteMessage(completionHandler: { result in
-                switch result {
-                case .success(let response):
-                    continuation.resume(returning: .success(response))
-                case .failure(let error):
-                    continuation.resume(returning: .failure(error))
-                }
-            })
+        Task {
+            try? await fetchAndProcess(remoteMessagingStore: store)
         }
     }
 }

@@ -28,15 +28,6 @@
       }
     },
     {
-      "identity" : "browserserviceskit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
-      "state" : {
-        "branch" : "dominik/rmf-macos",
-        "revision" : "c7cd7196ebf960f3ac57dcf8e3f199be75e2c39c"
-      }
-    },
-    {
       "identity" : "content-scope-scripts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
