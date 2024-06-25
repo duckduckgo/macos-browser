@@ -348,7 +348,7 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
     /// Note 2: Mirror brokers will be included in the returned array when `MirrorSite.shouldWeIncludeMirrorSite` returns true
     var scannedBrokers: [DBPUIScanProgress.ScannedBroker] {
         guard let broker = self.first?.dataBroker,
-                self.allSatisfy({ $0.scanJobData.lastRunDate != nil }) else { return [] }
+                self.contains(where: { $0.scanJobData.lastRunDate != nil }) else { return [] }
 
         let mirrorBrokers = broker.mirrorSites.compactMap {
             $0.shouldWeIncludeMirrorSite() ? $0.mapToScannedBrokerUI : nil

@@ -60,6 +60,21 @@ final class MapperToUITests: XCTestCase {
         XCTAssertTrue(result.resultsFound.isEmpty)
     }
 
+    func testWhenAScanRanOnOneProfileQueryOnTheSameBroker_thenScannedBrokersAndCurrentScansReflectsThat() {
+        let brokerProfileQueryData: [BrokerProfileQueryData] = [
+            .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
+            .mock(dataBrokerName: "Broker #1"),
+            .mock(dataBrokerName: "Broker #2")
+        ]
+
+        let result = sut.initialScanState(brokerProfileQueryData)
+
+        XCTAssertEqual(result.scanProgress.currentScans, 1)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, "Broker #1")
+        XCTAssertTrue(result.resultsFound.isEmpty)
+    }
+
     func testWhenAScanRanAndHasAMatch_thenResultsFoundIsUpdated() {
         let brokerProfileQueryData: [BrokerProfileQueryData] = [.mock(), .mock(), .mock(lastRunDate: Date(), extractedProfile: .mockWithoutRemovedDate)]
 
@@ -343,6 +358,28 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(result.scanSchedule.nextScan.dataBrokers.count, 3)
         XCTAssertTrue(areDatesEqualsOnDayMonthAndYear(date1: Date().tomorrow, date2: Date(timeIntervalSince1970: result.scanSchedule.nextScan.date)))
     }
+
+    func testBrokersWithACompleteScan_areOrderedByLastRunDate() {
+
+        // Given
+        let calendar = Calendar.current
+        let minusOneHour = calendar.date(byAdding: .hour, value: -1, to: Date())
+        let minusTwoHours = calendar.date(byAdding: .hour, value: -2, to: Date())
+
+        let brokerProfileQueryData: [BrokerProfileQueryData] = [
+            .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
+            .mock(dataBrokerName: "Broker #2", lastRunDate: minusOneHour),
+            .mock(dataBrokerName: "Broker #3", lastRunDate: minusTwoHours)
+        ]
+
+        let result = sut.initialScanState(brokerProfileQueryData)
+
+        XCTAssertEqual(result.scanProgress.currentScans, 3)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, "Broker #3")
+        XCTAssertTrue(result.resultsFound.isEmpty)
+    }
+
 }
 
 extension Date {
