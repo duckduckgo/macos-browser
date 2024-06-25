@@ -65,15 +65,14 @@ extension WKWebViewConfiguration {
 
 extension WKPreferences {
 
-    // swiftlint:disable redundant_string_enum_value
+    // !!! Do not change the key names as they are directly mirrored into WKPreferences keys !!!
     enum Key: String {
-        case allowsPictureInPictureMediaPlayback = "allowsPictureInPictureMediaPlayback"
-        case mediaSessionEnabled = "mediaSessionEnabled"
-        case developerExtrasEnabled = "developerExtrasEnabled"
-        case backspaceKeyNavigationEnabled = "backspaceKeyNavigationEnabled"
-        case fullScreenEnabled = "fullScreenEnabled"
+        case allowsPictureInPictureMediaPlayback
+        case mediaSessionEnabled
+        case developerExtrasEnabled
+        case backspaceKeyNavigationEnabled
+        case fullScreenEnabled
     }
-    // swiftlint:enable redundant_string_enum_value
 
     subscript(_ key: Key, default defaultValue: Bool = false) -> Bool {
         get {
