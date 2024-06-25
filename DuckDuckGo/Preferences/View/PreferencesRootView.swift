@@ -148,8 +148,6 @@ enum Preferences {
                         PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .unique)
                     case .restorePurchaseStoreClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
-                    case .addToAnotherDeviceClick:
-                        PixelKit.fire(PrivacyProPixel.privacyProSettingsAddDevice)
                     case .addDeviceEnterEmail:
                         PixelKit.fire(PrivacyProPixel.privacyProAddDeviceEnterEmail)
                     case .activeSubscriptionSettingsClick:
