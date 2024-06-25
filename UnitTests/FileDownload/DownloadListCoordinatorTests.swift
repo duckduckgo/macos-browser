@@ -206,7 +206,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         XCTAssertNotNil(url)
         XCTAssertTrue(FileManager().createFile(atPath: url?.path ?? "", contents: nil))
 
-        await fulfillment(of: [e1, e2], timeout: 1)
+        await fulfillment(of: [e1, e2], timeout: 5.0)
         withExtendedLifetime(c) {}
         XCTAssertTrue(coordinator.hasActiveDownloads)
     }

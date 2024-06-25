@@ -57,9 +57,10 @@ final class MoreOptionsMenu: NSMenu {
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
-    private let accountManager: AccountManaging
+    private let accountManager: AccountManager
 
     private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
+    private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -69,14 +70,16 @@ final class MoreOptionsMenu: NSMenu {
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
          vpnFeatureGatekeeper: VPNFeatureGatekeeper,
+         subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
-         accountManager: AccountManaging) {
+         accountManager: AccountManager) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
         self.vpnFeatureGatekeeper = vpnFeatureGatekeeper
+        self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.internalUserDecider = internalUserDecider
         self.accountManager = accountManager
 
@@ -293,7 +296,7 @@ final class MoreOptionsMenu: NSMenu {
     private func addSubscriptionItems() {
         var items: [NSMenuItem] = []
 
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable && !accountManager.isUserAuthenticated {
+        if subscriptionFeatureAvailability.isFeatureAvailable && !accountManager.isUserAuthenticated {
             items.append(contentsOf: makeInactiveSubscriptionItems())
         } else {
             items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
@@ -309,7 +312,6 @@ final class MoreOptionsMenu: NSMenu {
     private func makeActiveSubscriptionItems() -> [NSMenuItem] {
         var items: [NSMenuItem] = []
 
-        let subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
         let networkProtectionItem: NSMenuItem
 
         networkProtectionItem = makeNetworkProtectionItem()
@@ -320,7 +322,7 @@ final class MoreOptionsMenu: NSMenu {
             Task {
                 let isMenuItemEnabled: Bool
 
-                switch await accountManager.hasEntitlement(for: .networkProtection) {
+                switch await accountManager.hasEntitlement(forProductName: .networkProtection) {
                 case let .success(result):
                     isMenuItemEnabled = result
                 case .failure:
@@ -345,7 +347,7 @@ final class MoreOptionsMenu: NSMenu {
                 Task {
                     let isMenuItemEnabled: Bool
 
-                    switch await accountManager.hasEntitlement(for: .dataBrokerProtection) {
+                    switch await accountManager.hasEntitlement(forProductName: .dataBrokerProtection) {
                     case let .success(result):
                         isMenuItemEnabled = result
                     case .failure:
@@ -375,7 +377,7 @@ final class MoreOptionsMenu: NSMenu {
                 Task {
                     let isMenuItemEnabled: Bool
 
-                    switch await accountManager.hasEntitlement(for: .identityTheftRestoration) {
+                    switch await accountManager.hasEntitlement(forProductName: .identityTheftRestoration) {
                     case let .success(result):
                         isMenuItemEnabled = result
                     case .failure:
