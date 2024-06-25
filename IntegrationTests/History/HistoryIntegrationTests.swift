@@ -103,7 +103,7 @@ class HistoryIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=try await tab.webView.evaluateJavaScript("(function() { document.title = 'Title 2'; return true })()")
+        try await tab.webView.evaluateJavaScript("(function() { document.title = 'Title 2'; })()") as Void?
         _=try await titleChangedPromise2.value
 
         XCTAssertEqual(HistoryCoordinator.shared.history?.count, 1)
@@ -143,7 +143,7 @@ class HistoryIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('link').click(); return true })()")
+        try await tab.webView.evaluateJavaScript("(function() { document.getElementById('link').click(); })()") as Void?
         _=try await titleChangedPromise.value
 
         XCTAssertEqual(HistoryCoordinator.shared.history?.count, 2)

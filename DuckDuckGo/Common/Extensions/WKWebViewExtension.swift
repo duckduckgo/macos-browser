@@ -262,19 +262,6 @@ extension WKWebView {
         }
     }
 
-    @MainActor
-    func evaluateJavaScript<T>(_ script: String) async throws -> T? {
-        try await withUnsafeThrowingContinuation { c in
-            evaluateJavaScript(script) { result, error in
-                if let error {
-                    c.resume(with: .failure(error))
-                } else {
-                    c.resume(with: .success(result as? T))
-                }
-            }
-        }
-    }
-
     func close() {
         self.evaluateJavaScript("window.close()")
     }
