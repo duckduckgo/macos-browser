@@ -27,6 +27,8 @@ final class UpdateNotificationPresenter {
     private var hideTimer: Timer?
 
     func showUpdateNotification(icon: NSImage, text: String) {
+        //TODO: - Show as a subwindow or don't present it if the window is presented
+
         // Close the current notification if it's still visible
         closeUpdateNotification()
 
@@ -38,6 +40,7 @@ final class UpdateNotificationPresenter {
             self?.closeUpdateNotification()
             self?.openUpdatesPage()
         })
+
         let hostingController = NSHostingController(rootView: updateNotificationView)
         let notificationWindow = UpdateNotificationWindow(contentRect: notificationSize, styleMask: .borderless, backing: .buffered, defer: false)
         notificationWindow.contentView = hostingController.view

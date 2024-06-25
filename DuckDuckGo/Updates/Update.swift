@@ -27,9 +27,15 @@ final class Update {
     }
 
     let type: UpdateType
+    let version: String
+    let build: String
 
-    internal init(type: Update.UpdateType) {
+    internal init(type: Update.UpdateType,
+                  version: String,
+                  build: String) {
         self.type = type
+        self.version = version
+        self.build = build
     }
 
 }
@@ -38,7 +44,11 @@ extension Update {
 
     convenience init(appcastItem: SUAppcastItem) {
         let isCritical = appcastItem.isCriticalUpdate
-        self.init(type: isCritical ? .critical : .regular)
+        let version = appcastItem.displayVersionString
+        let build = appcastItem.versionString
+        self.init(type: isCritical ? .critical : .regular,
+                  version: version,
+                  build: build)
     }
 
 }

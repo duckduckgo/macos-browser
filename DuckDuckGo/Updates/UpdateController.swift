@@ -24,10 +24,23 @@ import SwiftUIExtensions
 import PixelKit
 import SwiftUI
 
-protocol UpdateControllerProtocol {
+protocol UpdateControllerProtocol: AnyObject {
 
     var isNewUpdateAvailable: Bool { get }
     var isNewUpdateAvailablePublisher: Published<Bool>.Publisher { get }
+
+    var availableUpdate: Update? { get }
+    var availableUpdatePublisher: Published<Update?>.Publisher { get }
+
+    var isUpdateBeingLoaded: Bool { get }
+    var isUpdateBeingLoadedPublisher: Published<Bool>.Publisher { get }
+
+    var lastUpdateCheckDate: Date? { get }
+
+    func checkForUpdate()
+    func checkForUpdateInBackground()
+
+    func runUpdate()
 
 }
 
@@ -50,18 +63,10 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         configureUpdater()
     }
 
-    func checkNewApplicationVersion() {
-        let updateStatus = UpdateDetector.isApplicationUpdated()
-        switch updateStatus {
-        case .noChange: break
-        case .updated:
-            notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "Browser Updated")
-        case .downgraded:
-            notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "Browser Downgraded")
-        }
-    }
+    @Published private(set) var isUpdateBeingLoaded = false
+    var isUpdateBeingLoadedPublisher: Published<Bool>.Publisher { $isUpdateBeingLoaded }
 
-    var availableUpdate: Update? {
+    @Published private(set) var availableUpdate: Update? {
         didSet {
             if let availableUpdate {
                 switch availableUpdate.type {
@@ -74,9 +79,34 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
             isNewUpdateAvailable = availableUpdate != nil
         }
     }
+    var availableUpdatePublisher: Published<Update?>.Publisher { $availableUpdate }
 
     @Published private(set) var isNewUpdateAvailable = false
     var isNewUpdateAvailablePublisher: Published<Bool>.Publisher { $isNewUpdateAvailable }
+
+    var lastUpdateCheckDate: Date? {
+        updater.updater.lastUpdateCheckDate
+    }
+    // MARK: - Public
+
+    func checkNewApplicationVersion() {
+        let updateStatus = UpdateDetector.isApplicationUpdated()
+        switch updateStatus {
+        case .noChange: break
+        case .updated:
+            notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "Browser Updated")
+        case .downgraded:
+            notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "Browser Downgraded")
+        }
+    }
+
+    func checkForUpdate() {
+        updater.updater.checkForUpdates()
+    }
+
+    func checkForUpdateInBackground() {
+        updater.updater.checkForUpdatesInBackground()
+    }
 
     // MARK: - Private
 
@@ -110,14 +140,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 //#endif
 
         updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
-        updater.updater.checkForUpdatesInBackground()
 
-        //TODO: - REMOVE
-//        notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Relaunch to update.")
-    }
-
-    private func showNotSupportedInfo() {
-
+        checkForUpdateInBackground()
     }
 
     @objc func openUpdatesPage() {
@@ -172,6 +196,10 @@ extension UpdateController: SPUStandardUserDriverDelegate {
 
 extension UpdateController: SPUUpdaterDelegate {
 
+    func updater(_ updater: SPUUpdater, mayPerform updateCheck: SPUUpdateCheck) throws {
+        isUpdateBeingLoaded = true
+    }
+
     func allowedChannels(for updater: SPUUpdater) -> Set<String> {
         if internalUserDecider.isInternalUser {
             return Set([Constants.internalChannelName])
@@ -218,11 +246,11 @@ extension UpdateController: SPUUpdaterDelegate {
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
         isUpdateDownloaded = true
+        isUpdateBeingLoaded = false
         refreshUpdateObjectIfNeeded(appcastItem: item)
     }
 
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
-
     }
 
 }

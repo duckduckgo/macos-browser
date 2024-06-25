@@ -18,12 +18,47 @@
 
 import SwiftUI
 import Common
+import Combine
 
 final class AboutModel: ObservableObject, PreferencesTabOpening {
+
+    enum UpdateState {
+
+        case loading
+        case upToDate
+        case newVersionAvailable
+
+        init(from update: Update?, isLoading: Bool) {
+            if isLoading {
+                self = .loading
+            } else {
+                if update != nil {
+                    self = .newVersionAvailable
+                } else {
+                    self = .upToDate
+                }
+            }
+        }
+    }
+
+    @Published var updateState = UpdateState.upToDate
     let appVersion = AppVersion()
+    weak var updateController: UpdateControllerProtocol?
+
+    init(updateController: UpdateControllerProtocol) {
+        self.updateController = updateController
+        subscribeToUpdateInfo(updateController: updateController)
+        refreshUpdateState()
+    }
+
+    private var cancellable: AnyCancellable?
 
     let displayableAboutURL: String = URL.aboutDuckDuckGo
         .toString(decodePunycode: false, dropScheme: true, dropTrailingSlash: false)
+
+    var lastUpdateCheckDate: Date? {
+        updateController?.lastUpdateCheckDate
+    }
 
     @MainActor
     func openFeedbackForm() {
@@ -33,4 +68,27 @@ final class AboutModel: ObservableObject, PreferencesTabOpening {
     func copy(_ value: String) {
         NSPasteboard.general.copy(value)
     }
+
+    func checkForUpdate() {
+        updateController?.checkForUpdateInBackground()
+    }
+
+    func restartToUpdate() {
+        updateController?.runUpdate()
+    }
+
+    private func subscribeToUpdateInfo(updateController: UpdateControllerProtocol) {
+        cancellable = updateController.availableUpdatePublisher
+            .combineLatest(updateController.isUpdateBeingLoadedPublisher)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.refreshUpdateState()
+            }
+    }
+
+    private func refreshUpdateState() {
+        guard let updateController else { return }
+        updateState = UpdateState(from: updateController.availableUpdate, isLoading: updateController.isUpdateBeingLoaded)
+    }
+
 }

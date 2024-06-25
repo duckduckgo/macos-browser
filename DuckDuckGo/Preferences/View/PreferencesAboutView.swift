@@ -42,14 +42,12 @@ extension Preferences {
                 }
 
                 PreferencePaneSection {
-                    HStack {
+                    HStack(alignment: .top) {
                         Image(.aboutPageLogo)
                         VStack(alignment: .leading, spacing: 8) {
 #if APPSTORE
                             Text(UserText.duckDuckGoForMacAppStore).font(.companyName)
-#else
-                            Text(UserText.duckDuckGo).font(.companyName)
-#endif
+
                             Text(UserText.privacySimplified).font(.privacySimplified)
                                 .fixedSize(horizontal: false, vertical: true)
                                 .multilineTextAlignment(.leading)
@@ -60,7 +58,27 @@ extension Preferences {
                                         model.copy(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
                                     })
                                 }))
+#else
+                            Text(UserText.duckDuckGo).font(.companyName)
+
+                            Text(UserText.privacySimplified).font(.privacySimplified)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .multilineTextAlignment(.leading)
+                                .padding(.bottom, 4)
+
+                            HStack {
+                                statusIcon.frame(width: 16, height: 16)
+                                VStack(alignment: .leading) {
+                                    versionText
+                                    lastCheckedText
+                                }
+                            }
+                            .padding(.bottom, 4)
+
+                            updateButton
+#endif
                         }
+                        .padding(.top, 10)
                     }
                     .padding(.bottom, 8)
 
@@ -87,6 +105,82 @@ extension Preferences {
                 return string
             }
             return "default"
+        }
+
+        @ViewBuilder
+        private var statusIcon: some View {
+            switch model.updateState {
+            case .loading:
+                ProgressView()
+                    .scaleEffect(0.6)
+            case .upToDate:
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+            case .newVersionAvailable:
+                Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundColor(.red)
+            }
+        }
+
+        @ViewBuilder
+        private var versionText: some View {
+            HStack(spacing: 0) {
+                Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                    .contextMenu(ContextMenu(menuItems: {
+                        Button(UserText.copy, action: {
+                            model.copy(UserText .versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                        })
+                    }))
+                switch model.updateState {
+                case .loading:
+                    Text(" — Checking for update")
+                case .upToDate:
+                    Text(" — DuckDuckGo is up to date")
+                case .newVersionAvailable:
+                    Text(" — newer version available")
+                }
+            }
+        }
+
+        private var lastCheckedText: some View {
+            Text("Last checked: \(lastCheckedFormattedDate(model.lastUpdateCheckDate))")
+                .foregroundColor(.secondary)
+        }
+
+        private func lastCheckedFormattedDate(_ date: Date?) -> String {
+            guard let date = date else { return "-" }
+
+            let relativeDateFormatter = RelativeDateTimeFormatter()
+            relativeDateFormatter.dateTimeStyle = .named
+
+            let dateFormatter = DateFormatter()
+            dateFormatter.timeStyle = .short
+
+            let relativeDate = relativeDateFormatter.localizedString(for: date, relativeTo: Date())
+
+            return relativeDate
+        }
+
+        @ViewBuilder
+        private var updateButton: some View {
+            switch model.updateState {
+            case .loading:
+                Button("Check for Update") {
+                    model.checkForUpdate()
+                }
+                .buttonStyle(UpdateButtonStyle(enabled: false))
+                .disabled(true)
+            case .upToDate:
+                Button("Check for Update") {
+                    model.checkForUpdate()
+                }
+                .buttonStyle(UpdateButtonStyle(enabled: true))
+            case .newVersionAvailable:
+                Button("Restart to Update") {
+                    model.restartToUpdate()
+                }
+                .buttonStyle(UpdateButtonStyle(enabled: true))
+            }
         }
 
     }
@@ -186,4 +280,29 @@ extension Preferences {
             Text(verbatim: UserText.aboutUnsupportedDeviceInfo2Part4)
         }
     }
+}
+
+struct UpdateButtonStyle: ButtonStyle {
+
+    public let enabled: Bool
+
+    public init(enabled: Bool) {
+        self.enabled = enabled
+    }
+
+    public func makeBody(configuration: Self.Configuration) -> some View {
+
+        let enabledBackgroundColor = configuration.isPressed ? Color(NSColor.controlAccentColor).opacity(0.5) : Color(NSColor.controlAccentColor)
+        let disabledBackgroundColor = Color.gray.opacity(0.1)
+        let labelColor = enabled ? Color.white : Color.primary.opacity(0.3)
+
+        configuration.label
+            .lineLimit(1)
+            .frame(height: 28)
+            .padding(.horizontal, 24)
+            .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
+            .foregroundColor(labelColor)
+            .cornerRadius(8)
+    }
+
 }

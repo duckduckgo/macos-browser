@@ -53,6 +53,15 @@
         }
       }
     },
+    " — Checking for update" : {
+
+    },
+    " — DuckDuckGo is up to date" : {
+
+    },
+    " — newer version available" : {
+
+    },
     " %@" : {
       "localizations" : {
         "de" : {
@@ -11853,6 +11862,9 @@
           }
         }
       }
+    },
+    "Check for Update" : {
+
     },
     "check.allow.integration" : {
       "comment" : "Setup of the integration with Bitwarden app",
@@ -26759,6 +26771,9 @@
           }
         }
       }
+    },
+    "Last checked: %@" : {
+
     },
     "learnmore.link" : {
       "comment" : "Learn More link",
@@ -49252,6 +49267,9 @@
           }
         }
       }
+    },
+    "Restart to Update" : {
+
     },
     "restart.bitwarden" : {
       "comment" : "Button to restart Bitwarden application",
