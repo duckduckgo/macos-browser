@@ -39,9 +39,9 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         scriptPublisher = PassthroughSubject<MockSpecialErrorPageScriptProvider, Never>()
         credentialCreator = MockCredentialCreator()
         let featureFlagger = MockFeatureFlagger()
-        let phishingStateManager = PhishingStateManager()
-        let phishingDetectionManager = PhishingDetectionManagerFactory.create()
-        errorPageExtension = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, phishingDetectionManager: phishingDetectionManager,
+        let phishingStateManager = PhishingTabStateManager()
+        let phishingDetection = PhishingDetection.shared
+        errorPageExtension = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, phishingDetector: phishingDetection,
                                                           phishingStateManager: phishingStateManager)
     }
 
