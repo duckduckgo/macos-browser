@@ -217,12 +217,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func removeFromThisDeviceAction() {
-        userEventHandler(.removeSubscriptionClick)
-        accountManager.signOut()
-    }
-
-    @MainActor
     func openVPN() {
         userEventHandler(.openVPN)
     }
@@ -237,6 +231,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         userEventHandler(.openITR)
     }
 
+    @MainActor
+    func openLearnMore() {
+        print("openLearnMore")
+        // TODO:
+    }
+    
     @MainActor
     func addEmailAction() {
         print("addEmailAction")
@@ -256,9 +256,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func openLearnMore() {
-        print("openLearnMore")
-        // TODO: 
+    func removeFromThisDeviceAction() {
+        userEventHandler(.removeSubscriptionClick)
+        accountManager.signOut()
     }
 
     @MainActor
