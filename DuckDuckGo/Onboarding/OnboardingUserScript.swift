@@ -64,7 +64,9 @@ final class OnboardingUserScript: NSObject, Subfeature {
             .setBookmarksBar: setBookmarksBar,
             .setSessionRestore: setSessionRestore,
             .setShowHomeButton: setShowHome,
-            .stepCompleted: stepCompleted
+            .stepCompleted: stepCompleted,
+            .reportInitException: reportException,
+            .reportPageException: reportException
     ]
 
     @MainActor

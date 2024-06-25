@@ -193,7 +193,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         }
     }
 
-    func reportException(with param: [String : String]) {
+    func reportException(with param: [String: String]) {
         let message = param["message"] ?? ""
         let id = param["id"] ?? ""
         PixelKit.fire(GeneralPixel.onboardingExceptionReported(message: message, id: id), frequency: .standard)
@@ -206,4 +206,3 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
     }
 
 }
-

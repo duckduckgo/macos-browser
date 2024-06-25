@@ -45,6 +45,17 @@ final class OnboardingUserScriptTests: XCTestCase {
     }
 
     @MainActor
+    func testReportPageException_CallsGoToAddressBar() async throws {
+        let params = ["sabrina": "awesome"]
+        let handler = try XCTUnwrap(script.handler(forMethodNamed: "reportPageException"))
+
+        let result = try await handler(params, WKScriptMessage())
+        XCTAssertTrue(mockManager.reportExceptionCalled)
+        XCTAssertEqual(mockManager.exceptionParams, params)
+        XCTAssertNil(result)
+    }
+
+    @MainActor
     func testDismissToAddressBar_CallsGoToAddressBar() async throws {
         let handler = try XCTUnwrap(script.handler(forMethodNamed: "dismissToAddressBar"))
 

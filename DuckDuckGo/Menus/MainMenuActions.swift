@@ -809,6 +809,11 @@ extension MainViewController {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
     }
 
+    @objc func changePixelExperimentInstalledDateToLessMoreThan5DayAgo(_ sender: Any?) {
+        let moreThanFiveDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())
+        UserDefaults.standard.set(moreThanFiveDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.pixelExperimentEnrollmentDate.rawValue)
+    }
+
     @objc func changeInstallDateToToday(_ sender: Any?) {
         UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }

@@ -216,7 +216,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case onboardingSetAsDefaultEnabled5to7(cohort: String)
     case onboardingDuckplayerUsed5to7(cohort: String)
 
-
     // MARK: - Debug
 
     case assertionFailure(message: String, file: StaticString, line: UInt)
