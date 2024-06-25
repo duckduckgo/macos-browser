@@ -304,6 +304,7 @@ fileprivate extension TabCollectionViewModel {
 // MARK: - BookmarksBarViewModelDelegateMock
 
 final class BookmarksBarViewModelDelegateMock: BookmarksBarViewModelDelegate {
+
     private(set) var didCallViewModelReceivedAction = false
     private(set) var capturedAction: BookmarksBarViewModel.BookmarksBarItemAction?
     private(set) var capturedItem: BookmarksBarCollectionViewItem?
@@ -320,4 +321,5 @@ final class BookmarksBarViewModelDelegateMock: BookmarksBarViewModelDelegate {
 
     func bookmarksBarViewModelReloadedData() {}
 
+    func bookmarksBarViewModelShouldClosePopover() {}
 }
