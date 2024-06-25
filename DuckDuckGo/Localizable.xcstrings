@@ -26875,7 +26875,7 @@
     },
     "letsmove.alert.message" : {
       "comment" : "Message of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -26935,7 +26935,7 @@
     },
     "letsmove.alert.title" : {
       "comment" : "Title of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -26995,7 +26995,7 @@
     },
     "letsmove.could.not.move" : {
       "comment" : "Error message when moving the app to the /Applications folder failed",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -27055,7 +27055,7 @@
     },
     "letsmove.dont.move.button" : {
       "comment" : "Do Not Move to the /Applications folder button title",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -27115,7 +27115,7 @@
     },
     "letsmove.move.button" : {
       "comment" : "Move the /Applications folder button title",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -38545,6 +38545,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@: возобновить доступ на сайте %2$@"
+          }
+        }
+      }
+    },
+    "phishing-detection.enabled.checkbox" : {
+      "comment" : "Checkbox that enables or disables the phishing detection feature in the browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Allow DuckDuckGo to warn you when you visit fraudulent sites"
+          }
+        }
+      }
+    },
+    "phishing-detection.enabled.header" : {
+      "comment" : "Header for phishing site protection section in the settings page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Malicious Site Protection"
+          }
+        }
+      }
+    },
+    "phishing-detection.enabled.warning" : {
+      "comment" : "A description box to warn users away from disabling phishing protection",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "It is highly recommended to keep this setting enabled. Disabling it may put your personal information at risk. Only do so if you understand the risks"
           }
         }
       }

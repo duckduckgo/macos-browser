@@ -28,9 +28,9 @@ public class PhishingDetection: PhishingSiteDetecting {
     static let shared: PhishingDetection = PhishingDetection()
     private var detector: PhishingDetecting
     private var updateManager: PhishingDetectionUpdateManaging
-    private var dataActivities: PhishingDetectionDataActivities
+    private var dataActivities: PhishingDetectionDataActivityHandling
     private var detectionPreferences: PhishingDetectionPreferences
-    private var dataStore: PhishingDetectionDataStore
+    private var dataStore: PhishingDetectionDataStoring
     private var cancellable: AnyCancellable?
     private let revision: Int
     private let filterSetURL: URL
@@ -46,10 +46,10 @@ public class PhishingDetection: PhishingSiteDetecting {
         hashPrefixDataSHA: String = "fc376b9c5345ad46b1c7eadfaa55a1d11167a2b10ee5457cb761a681388fe411",
         detectionClient: PhishingDetectionAPIClient = PhishingDetectionAPIClient(),
         dataProvider: PhishingDetectionDataProvider? = nil,
-        dataStore: PhishingDetectionDataStore? = nil,
+        dataStore: PhishingDetectionDataStoring? = nil,
         detector: PhishingDetecting? = nil,
         updateManager: PhishingDetectionUpdateManaging? = nil,
-        dataActivities: PhishingDetectionDataActivities? = nil,
+        dataActivities: PhishingDetectionDataActivityHandling? = nil,
         detectionPreferences: PhishingDetectionPreferences = PhishingDetectionPreferences.shared
     ) {
         self.revision = revision
@@ -74,6 +74,18 @@ public class PhishingDetection: PhishingSiteDetecting {
             startUpdateTasks()
         }
         self.setupBindings()
+    }
+
+    convenience init(
+        dataActivities: PhishingDetectionDataActivityHandling,
+        dataStore: PhishingDetectionDataStoring,
+        detector: PhishingDetecting
+    ) {
+        self.init(
+            dataStore: dataStore,
+            detector: detector, 
+            dataActivities: dataActivities
+        )
     }
 
     private func setupBindings() {
