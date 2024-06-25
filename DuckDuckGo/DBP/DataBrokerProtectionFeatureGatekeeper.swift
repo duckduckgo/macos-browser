@@ -42,7 +42,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     private let userDefaults: UserDefaults
     private let waitlistStorage: WaitlistStorage
     private let subscriptionAvailability: SubscriptionFeatureAvailability
-    private let accountManager: AccountManaging
+    private let accountManager: AccountManager
 
     private let dataBrokerProtectionKey = "data-broker-protection.cleaned-up-from-waitlist-to-privacy-pro"
 
@@ -55,7 +55,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
          userDefaults: UserDefaults = .standard,
          waitlistStorage: WaitlistStorage = DataBrokerProtectionWaitlist().waitlistStorage,
          subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
-         accountManager: AccountManaging) {
+         accountManager: AccountManager) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
         self.pixelHandler = pixelHandler
@@ -139,7 +139,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     }
 
     func arePrerequisitesSatisfied() async -> Bool {
-        let entitlements = await accountManager.hasEntitlement(for: .dataBrokerProtection,
+        let entitlements = await accountManager.hasEntitlement(forProductName: .dataBrokerProtection,
                                                                cachePolicy: .reloadIgnoringLocalCacheData)
         var hasEntitlements: Bool
         switch entitlements {

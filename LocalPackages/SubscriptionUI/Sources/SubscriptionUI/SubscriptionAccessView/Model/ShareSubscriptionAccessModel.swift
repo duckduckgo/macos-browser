@@ -28,9 +28,9 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public var emailLabel: String { UserText.email }
     public var emailDescription: String { hasEmail ? UserText.shareModalHasEmailDescription : UserText.shareModalNoEmailDescription }
     public var emailButtonTitle: String { hasEmail ? UserText.manageEmailButton : UserText.addEmailButton }
-    private let subscriptionManager: SubscriptionManaging
+    private let subscriptionManager: SubscriptionManager
 
-    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?, subscriptionManager: SubscriptionManaging) {
+    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?, subscriptionManager: SubscriptionManager) {
         self.actionHandlers = actionHandlers
         self.email = email
         self.subscriptionManager = subscriptionManager
@@ -52,7 +52,7 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         Task {
             if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
                 if #available(macOS 12.0, iOS 15.0, *) {
-                    let appStoreAccountManagementFlow = AppStoreAccountManagementFlow(subscriptionManager: subscriptionManager)
+                    let appStoreAccountManagementFlow = DefaultAppStoreAccountManagementFlow(subscriptionManager: subscriptionManager)
                     await appStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
                 }
             }
