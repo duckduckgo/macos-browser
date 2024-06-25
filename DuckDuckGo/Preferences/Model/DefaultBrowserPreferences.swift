@@ -91,7 +91,7 @@ final class DefaultBrowserPreferences: ObservableObject {
                     PixelKit.fire(GeneralPixel.setAsDefaultInitial, frequency: .legacyInitial)
                 }
                 if self.isDefault {
-                    PixelExperiment.fireOnboardingSetAsDefaultEnabled8to14Pixel()
+                    PixelExperiment.fireOnboardingSetAsDefaultEnabled5to7Pixel()
                 }
             }
         }

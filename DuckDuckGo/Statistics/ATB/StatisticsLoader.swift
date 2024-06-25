@@ -61,7 +61,7 @@ final class StatisticsLoader {
                     }
                 }
                 PixelExperiment.fireSerpPixel()
-                PixelExperiment.fireOnboardingSearchPerformed8to14Pixel()
+                PixelExperiment.fireOnboardingSearchPerformed5to7Pixel()
                 self.fireDailyOsVersionCounterPixel()
                 self.fireDockPixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {

@@ -59,6 +59,7 @@ final class DockCustomizer: DockCustomization {
     // to restart after a brief delay to apply the changes.
     @discardableResult
     func addToDock() -> Bool {
+        PixelExperiment.fireOnboardingAddToDockRequestedPixel()
         let appPath = Bundle.main.bundleURL.path
         guard !isAddedToDock,
               let bundleIdentifier = Bundle.main.bundleIdentifier,

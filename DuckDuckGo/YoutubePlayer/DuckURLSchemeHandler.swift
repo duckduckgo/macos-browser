@@ -100,6 +100,7 @@ private extension DuckURLSchemeHandler {
             urlSchemeTask.didReceive(data)
             urlSchemeTask.didFinish()
         }
+        PixelExperiment.fireOnboardingDuckplayerUsed5to7Pixel()
     }
 }
 

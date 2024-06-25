@@ -95,7 +95,14 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         systemSettings = SystemSettings(rows: ["dock", "import", "default-browser"])
 #endif
         let stepDefinitions = StepDefinitions(systemSettings: systemSettings)
-        return OnboardingConfiguration(stepDefinitions: stepDefinitions, env: "development")
+        let preferredLocale = Bundle.main.preferredLocalizations.first ?? "en"
+        var env: String
+#if DEBUG
+        env = "development"
+#else
+        env = "production"
+#endif
+        return OnboardingConfiguration(stepDefinitions: stepDefinitions, env: env, locale: preferredLocale)
     }()
 
     init(navigationDelegate: OnboardingNavigating, dockCustomization: DockCustomization, defaultBrowserProvider: DefaultBrowserProvider, appearancePreferences: AppearancePreferences, startupPreferences: StartupPreferences) {

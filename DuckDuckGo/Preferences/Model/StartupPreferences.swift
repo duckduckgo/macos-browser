@@ -69,7 +69,7 @@ final class StartupPreferences: ObservableObject, PreferencesTabOpening {
             persistor.restorePreviousSession = restorePreviousSession
             if restorePreviousSession {
                 PixelExperiment.fireOnboardingSessionRestoreEnabledPixel()
-                PixelExperiment.fireOnboardingSessionRestoreEnabled8to14Pixel()
+                PixelExperiment.fireOnboardingSessionRestoreEnabled5to7Pixel()
             }
         }
     }
