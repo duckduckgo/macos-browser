@@ -25,13 +25,12 @@ performUpdate() {
 		printf "Error: %s does not exist\n" "${provider_path}"
 		exit 1
 	fi
+	old_sha="$(grep "${data_type}DataSHA: String =" "${provider_path}" | awk -F '"' '{print $2}')"
 
-	old_sha="$(grep "private static let ${data_type}DataSHA" "${provider_path}" | awk -F '"' '{print $2}')"
-
-	old_revision=$(grep 'private static let revision' "${provider_path}" | awk -F '=' '{print $2}' | tr -d ' ')
+	old_revision=$(grep 'revision: Int' "${provider_path}" | awk -F '[=,]' '{print $2}' | xargs)
 
 	printf "Existing SHA256: %s\n" "${old_sha}"
-	printf "Existing revision: %s\n" "${old_revision}"
+	printf "Existing revision: %s, new revision: %s\n" "${old_revision}" "${new_revision}"
 
 	if [ "$old_revision" -lt "$new_revision" ]; then
         curl -o "$temp_filename" -s "${API_URL}/${data_type}"
@@ -54,20 +53,20 @@ performUpdate() {
 updateRevision() {
     local new_revision=$1
 	local provider_path=$2
-	old_revision=$(grep 'private static let revision' "${provider_path}" | awk -F '=' '{print $2}' | tr -d ' ')
+	old_revision=$(grep 'revision: Int' "${provider_path}" | awk -F '[=,]' '{print $2}' | xargs)
 
 	if [ "$old_revision" -lt "$new_revision" ]; then
-		sed -i '' -e "s/private static let revision =.*/public static let revision = $new_revision/" "${provider_path}"
+		sed -i '' -e "s/revision: Int =.*/public static let revision = $new_revision/" "${provider_path}"
 		printf "Updated revision from %s to %s\n" "$old_revision" "$new_revision"
 	fi
 }
 
 performUpdate hashPrefix \
-		"${PWD}/DuckDuckGo/PhishingDetection/PhishingDetectionManagerFactory.swift" \
+		"${PWD}/DuckDuckGo/PhishingDetection/PhishingDetection.swift" \
 		"${PWD}/DuckDuckGo/PhishingDetection/hashPrefixes.json"
 
 performUpdate filterSet \
-		"${PWD}/DuckDuckGo/PhishingDetection/PhishingDetectionManagerFactory.swift" \
+		"${PWD}/DuckDuckGo/PhishingDetection/PhishingDetection.swift" \
 		"${PWD}/DuckDuckGo/PhishingDetection/filterSet.json"
 
-updateRevision "$new_revision" "${PWD}/DuckDuckGo/PhishingDetection/PhishingDetectionManagerFactory.swift" 
+updateRevision "$new_revision" "${PWD}/DuckDuckGo/PhishingDetection/PhishingDetection.swift" 
