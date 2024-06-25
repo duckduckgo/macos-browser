@@ -171,7 +171,7 @@ final class RemoteMessagingClient {
             let surveyActionMapper: DefaultRemoteMessagingSurveyURLBuilder
 
             if let accessToken = subscriptionManager.accountManager.accessToken {
-                let subscriptionResult = await subscriptionManager.subscriptionService.getSubscription(accessToken: accessToken)
+                let subscriptionResult = await subscriptionManager.subscriptionEndpointService.getSubscription(accessToken: accessToken)
 
                 if case let .success(subscription) = subscriptionResult {
                     privacyProDaysSinceSubscribed = Calendar.current.numberOfDaysBetween(subscription.startedAt, and: Date()) ?? -1
