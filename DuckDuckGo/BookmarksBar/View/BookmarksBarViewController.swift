@@ -32,6 +32,7 @@ final class BookmarksBarViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
 
     private var cancellables = Set<AnyCancellable>()
+    private var popup: BookmarkListPopover?
 
     fileprivate var clipThreshold: CGFloat {
         let viewWidthWithoutClipIndicator = view.frame.width - clippedItemsIndicator.frame.minX
@@ -224,6 +225,10 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         bookmarksBarCollectionView.reloadData()
     }
 
+    func bookmarksBarViewModelShouldClosePopover() {
+        popup?.close()
+    }
+
 }
 
 // MARK: - Private
@@ -280,8 +285,8 @@ private extension BookmarksBarViewController {
     }
 
     private func handleClick(for folder: BookmarkFolder, in view: NSView) {
-        let popup = BookmarkListPopover(contentMode: .bar(bookmarkFolderId: folder.id))
-        popup.show(positionedBelow: view)
+        self.popup = BookmarkListPopover(contentMode: .bar(bookmarkFolderId: folder.id))
+        popup?.show(positionedBelow: view)
     }
 
     func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {

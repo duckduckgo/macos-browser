@@ -25,6 +25,7 @@ protocol BookmarksBarViewModelDelegate: AnyObject {
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem)
     func bookmarksBarViewModelWidthForContainer() -> CGFloat
     func bookmarksBarViewModelReloadedData()
+    func bookmarksBarViewModelShouldClosePopover()
 
 }
 
@@ -127,12 +128,19 @@ final class BookmarksBarViewModel: NSObject {
     private func subscribeToBookmarks() {
         bookmarkManager.listPublisher.receive(on: RunLoop.main).sink { [weak self] list in
             let containerWidth = self?.delegate?.bookmarksBarViewModelWidthForContainer() ?? 0
+            self?.checkForChangesInTopLevelBookmarks(from: list?.topLevelEntities ?? [])
             self?.update(from: list?.topLevelEntities ?? [], containerWidth: containerWidth)
             self?.delegate?.bookmarksBarViewModelReloadedData()
         }.store(in: &cancellables)
     }
 
     // MARK: - Functions
+
+    func checkForChangesInTopLevelBookmarks(from bookmarkEntities: [BaseBookmarkEntity]) {
+        if bookmarkEntities.count != self.bookmarksBarItems.count {
+            self.delegate?.bookmarksBarViewModelShouldClosePopover()
+        }
+    }
 
     func update(from bookmarkEntities: [BaseBookmarkEntity], containerWidth: CGFloat) {
         clippedItems = []
