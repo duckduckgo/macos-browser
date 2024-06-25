@@ -71,7 +71,7 @@ final class NavigationBarViewController: NSViewController {
         return progressView
     }()
 
-    private var subscriptionManager: SubscriptionManaging {
+    private var subscriptionManager: SubscriptionManager {
         Application.appDelegate.subscriptionManager
     }
 

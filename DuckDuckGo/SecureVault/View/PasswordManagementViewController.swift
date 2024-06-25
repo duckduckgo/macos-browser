@@ -993,8 +993,8 @@ final class PasswordManagementViewController: NSViewController {
         switch category {
         case .allItems: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
         case .logins: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
-        case .identities: showEmptyState(image: .identitiesEmpty, title: UserText.pmEmptyStateIdentitiesTitle)
-        case .cards: showEmptyState(image: .creditCardsEmpty, title: UserText.pmEmptyStateCardsTitle)
+        case .identities: showEmptyState(image: .identityAdd128, title: UserText.pmEmptyStateIdentitiesTitle)
+        case .cards: showEmptyState(image: .creditCardsAdd128, title: UserText.pmEmptyStateCardsTitle)
         }
     }
 

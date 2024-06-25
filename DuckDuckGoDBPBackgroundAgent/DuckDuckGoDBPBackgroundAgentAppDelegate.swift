@@ -29,7 +29,7 @@ import Subscription
 @objc(Application)
 final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
     private let _delegate: DuckDuckGoDBPBackgroundAgentAppDelegate
-    private let subscriptionManager: SubscriptionManaging
+    private let subscriptionManager: SubscriptionManager
 
     override init() {
         os_log(.error, log: .dbpBackgroundAgent, "🟢 DBP background Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
@@ -68,7 +68,7 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
         }
 
         // Configure Subscription
-        subscriptionManager = SubscriptionManager()
+        subscriptionManager = DefaultSubscriptionManager()
 
         _delegate = DuckDuckGoDBPBackgroundAgentAppDelegate(subscriptionManager: subscriptionManager)
 
@@ -87,10 +87,10 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
     private let settings = DataBrokerProtectionSettings()
     private var cancellables = Set<AnyCancellable>()
     private var statusBarMenu: StatusBarMenu?
-    private let subscriptionManager: SubscriptionManaging
+    private let subscriptionManager: SubscriptionManager
     private var manager: DataBrokerProtectionAgentManager?
 
-    init(subscriptionManager: SubscriptionManaging) {
+    init(subscriptionManager: SubscriptionManager) {
         self.subscriptionManager = subscriptionManager
     }
 

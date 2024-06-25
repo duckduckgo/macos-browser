@@ -43,14 +43,14 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let defaults: UserDefaults
-    private let subscriptionManager: SubscriptionManaging
+    private let subscriptionManager: SubscriptionManager
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
          vpnUninstaller: VPNUninstalling = VPNUninstaller(),
          defaults: UserDefaults = .netP,
          log: OSLog = .networkProtection,
-         subscriptionManager: SubscriptionManaging) {
+         subscriptionManager: SubscriptionManager) {
 
         self.privacyConfigurationManager = privacyConfigurationManager
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
@@ -73,7 +73,7 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
             return false
         }
 
-        switch await subscriptionManager.accountManager.hasEntitlement(for: .networkProtection) {
+        switch await subscriptionManager.accountManager.hasEntitlement(forProductName: .networkProtection) {
         case .success(let hasEntitlement):
             return hasEntitlement
         case .failure(let error):

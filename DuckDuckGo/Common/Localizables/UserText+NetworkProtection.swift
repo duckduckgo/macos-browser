@@ -132,6 +132,8 @@ extension UserText {
     static let vpnNotificationsSettingsTitle = "Notifications"
     // "vpn.advanced.settings.title" - VPN Advanced section title in VPN settings
     static let vpnAdvancedSettingsTitle = "Advanced"
+    // "vpn.notifications.connection.drops.or.status.changes.title" - Title of the VPN notification option
+    static let vpnNotificationsConnectionDropsOrStatusChangesTitle = "VPN connection drops or status changes"
 
     // MARK: - Location
     // "vpn.location.change.button.title" - Title of the VPN location preference change button
@@ -159,6 +161,27 @@ extension UserText {
         return String(format: message, count)
     }
 
+    // MARK: - DNS
+    // "vpn.dns.server.title" - Title of the DNS Server section
+    static let vpnDnsServerTitle = "DNS Server"
+    // "vpn.dns.server.picker.default.title" - Title of the default DNS server option
+    static let vpnDnsServerPickerDefaultTitle = "DuckDuckGo (Recommended)"
+    // "vpn.dns.server.picker.custom.title" = Title of the custom DNS server option
+    static let vpnDnsServerPickerCustomTitle = "Custom"
+    // "vpn.dns.server.picker.custom.button.title" = Button title of the custom DNS server option
+    static let vpnDnsServerPickerCustomButtonTitle = "Change…"
+    // "vpn.setting.description.secure.dns" - Secure DNS description
+    static let vpnSecureDNSSettingDescription = "DuckDuckGo routes DNS queries through our DNS servers so your internet provider can't see what websites you visit."
+
+    // "vpn.dns.server.sheet.title" - Title of the DNS Server sheet
+    static let vpnDnsServerSheetTitle = "Custom DNS Server"
+    // "vpn.dns.server.ipv4.description" - Description of the IPv4 text field
+    static let vpnDnsServerIPv4Description = "IPv4 Address:"
+    // "vpn.dns.server.disclaimer" - Disclaimer for the custom DNS server option
+    static let vpnDnsServerIPv4Disclaimer = "Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn't secure or reliable."
+    // "vpn.dns.server.apply.button.title" - Title for the Apply custom DNS server button
+    static let vpnDnsServerApplyButtonTitle = "Apply"
+
     // MARK: - Settings
     // "vpn.setting.title.connect.on.login" - Connect on Login setting title
     static let vpnConnectOnLoginSettingTitle = "Connect to VPN when logging in to your computer"
@@ -172,8 +195,6 @@ extension UserText {
     static let vpnExcludeLocalNetworksSettingTitle = "Exclude local networks"
     // "vpn.setting.description.exclude.local.networks" - Exclude Local Networks setting description
     static let vpnExcludeLocalNetworksSettingDescription = "Bypass the VPN for local network connections, like to a printer."
-    // "vpn.setting.description.secure.dns" - Secure DNS setting description
-    static let vpnSecureDNSSettingDescription = "Our VPN uses Secure DNS to keep your online activity private, so that your Internet provider can't see what websites you visit."
     // "vpn.button.title.uninstall.vpn" - Uninstall VPN button title
     static let openVPNButtonTitle = "Open VPN…"
     static let uninstallVPNButtonTitle = "Uninstall DuckDuckGo VPN…"
