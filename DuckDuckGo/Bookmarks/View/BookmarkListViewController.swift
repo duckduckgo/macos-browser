@@ -401,7 +401,7 @@ final class BookmarkListViewController: NSViewController {
             delegate?.popoverShouldClose(self)
         } else {
             if outlineView.isItemExpanded(item) {
-                outlineView.animator().collapseItem(item)
+                outlineView.collapseItem(item)
             } else {
                 outlineView.animator().expandItem(item)
             }
