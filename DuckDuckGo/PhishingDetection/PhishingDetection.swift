@@ -83,7 +83,7 @@ public class PhishingDetection: PhishingSiteDetecting {
     ) {
         self.init(
             dataStore: dataStore,
-            detector: detector, 
+            detector: detector,
             dataActivities: dataActivities
         )
     }
