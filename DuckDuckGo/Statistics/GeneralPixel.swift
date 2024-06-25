@@ -68,6 +68,18 @@ enum GeneralPixel: PixelKitEventV2 {
     case autofillToggledOff
     case autofillLoginsStacked
     case autofillCreditCardsStacked
+    case autofillIdentitiesStacked
+
+    case autofillManagementOpened
+    case autofillManagementCopyUsername
+    case autofillManagementCopyPassword
+    case autofillManagementDeleteLogin
+    case autofillManagementDeleteAllLogins
+    case autofillManagementSaveLogin
+    case autofillManagementUpdateLogin
+
+    case autofillLoginsSettingsEnabled
+    case autofillLoginsSettingsDisabled
 
     case bitwardenPasswordAutofilled
     case bitwardenPasswordSaved
@@ -433,6 +445,28 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_autofill_logins_stacked"
         case .autofillCreditCardsStacked:
             return "m_mac_autofill_creditcards_stacked"
+        case .autofillIdentitiesStacked:
+            return "m_mac_autofill_identities_stacked"
+
+        case .autofillManagementOpened:
+            return "m_mac_autofill_management_opened"
+        case .autofillManagementCopyUsername:
+            return "m_mac_autofill_management_copy_username"
+        case .autofillManagementCopyPassword:
+            return "m_mac_autofill_management_copy_password"
+        case .autofillManagementDeleteLogin:
+            return "m_mac_autofill_management_delete_login"
+        case .autofillManagementDeleteAllLogins:
+            return "m_mac_autofill_management_delete_all_logins"
+        case .autofillManagementSaveLogin:
+            return "m_mac_autofill_management_save_login"
+        case .autofillManagementUpdateLogin:
+            return "m_mac_autofill_management_update_login"
+
+        case .autofillLoginsSettingsEnabled:
+            return "m_mac_autofill_logins_settings_enabled"
+        case .autofillLoginsSettingsDisabled:
+            return "m_mac_autofill_logins_settings_disabled"
 
         case .bitwardenPasswordAutofilled:
             return "m_mac_bitwarden_autofill_password"

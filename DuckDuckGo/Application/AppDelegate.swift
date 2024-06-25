@@ -670,6 +670,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     PixelKit.fire(GeneralPixel.autofillLoginsStacked, withAdditionalParameters: params)
                 case .autofillCreditCardsStacked:
                     PixelKit.fire(GeneralPixel.autofillCreditCardsStacked, withAdditionalParameters: params)
+                case .autofillIdentitiesStacked:
+                    PixelKit.fire(GeneralPixel.autofillIdentitiesStacked, withAdditionalParameters: params)
                 }
             },
             passwordManager: PasswordManagerCoordinator.shared,

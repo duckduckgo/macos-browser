@@ -19,10 +19,16 @@
 import Combine
 import BrowserServicesKit
 import Common
+import PixelKit
 
 final class PasswordManagementLoginModel: ObservableObject, PasswordManagementItemModel {
 
     typealias Model = SecureVaultModels.WebsiteCredentials
+
+    enum FieldType: String {
+        case username
+        case password
+    }
 
     static let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
@@ -154,8 +160,16 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         credentials = nil
     }
 
-    func copy(_ value: String) {
+    func copy(_ value: String, fieldType: FieldType? = nil) {
         NSPasteboard.general.copy(value)
+        if let fieldType = fieldType {
+            switch fieldType {
+            case .username:
+                PixelKit.fire(GeneralPixel.autofillManagementCopyUsername)
+            case .password:
+                PixelKit.fire(GeneralPixel.autofillManagementCopyPassword)
+            }
+        }
     }
 
     func save() {

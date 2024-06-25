@@ -34,6 +34,14 @@ enum PasswordManager: String, CaseIterable {
     case bitwarden
 }
 
+enum PasswordManagementSource: String {
+    case settings
+    case overflow = "overflow_menu"
+    case shortcut = "menu_bar_shortcut"
+    case manage = "manage_button"
+    case sync
+}
+
 enum AutofillAutoLockThreshold: String, CaseIterable {
     case oneMinute
     case fiveMinutes
