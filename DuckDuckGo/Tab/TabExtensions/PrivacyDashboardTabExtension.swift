@@ -190,7 +190,6 @@ extension PrivacyDashboardTabExtension: NavigationResponder {
         resetConnectionUpgradedTo(navigationAction: navigationAction)
         let url = navigationAction.url
         let malicious = phishingStateManager.tabIsPhishing
-        self.phishingStateManager.setIsPhishing(malicious)
         await MainActor.run {
             self.privacyInfo?.isPhishing = malicious
         }

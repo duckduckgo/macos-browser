@@ -34,6 +34,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     override func setUp() {
         // disable GPC redirects
         WebTrackingProtectionPreferences.shared.isGPCEnabled = false
+        PhishingDetectionPreferences.shared.isEnabled = true
 
         window = WindowsManager.openNewWindow(with: .none)!
     }

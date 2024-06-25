@@ -130,6 +130,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         }
         // Check the URL
         let isMalicious = await phishingDetector.checkIsMaliciousIfEnabled(url: url)
+        self.phishingStateManager.setIsPhishing(isMalicious)
         if isMalicious {
             errorPageType = .phishing
             specialErrorPageUserScript?.failingURL = navigationAction.url
