@@ -278,10 +278,7 @@ final internal class PixelExperimentLogic {
     }
 
     var isDay5to7: Bool {
-        if daysSinceEnrollment >= 5 && daysSinceEnrollment <= 7 {
-            return true
-        }
-        return false
+        return daysSinceEnrollment >= 5 && daysSinceEnrollment <= 7
     }
 
     func cleanup() {
