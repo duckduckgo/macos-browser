@@ -104,7 +104,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     private let log: OSLog
     private weak var delegate: WebKitDownloadTaskDelegate?
 
-    private let download: WebKitDownload
+    private var download: WebKitDownload!
     /// used to report the download progress, byte count and estimated time
     let progress: Progress
     /// used to report file progress in Finder and Dock
@@ -567,18 +567,25 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     }
 
     deinit {
-        DispatchQueue.main.asyncOrNow { [download] in
-            // WebKit objects must be deallocated on the main thread
-            withExtendedLifetime(download) {}
-        }
-
 #if DEBUG
+        let downloadDescr = download.debugDescription
         @MainActor(unsafe) func performRegardlessOfMainThread() {
-            os_log(.debug, log: log, "<Task \(download)>.deinit")
+            os_log(.debug, log: log, "<Task \(downloadDescr)>.deinit")
             assert(state.isCompleted, "FileDownloadTask is deallocated without finish(with:) been called")
         }
         performRegardlessOfMainThread()
 #endif
+
+        // WebKit objects must be deallocated on the main thread on pre-macOS 12
+        if #unavailable(macOS 12), !Thread.isMainThread {
+            let extendLifetime = DispatchWorkItem { [download] in
+                withExtendedLifetime(download) {}
+            }
+            // to avoid race condition we clear the ivar first,
+            // then pass the WKDownload liftime extension to the main queue
+            self.download = nil
+            DispatchQueue.main.async(execute: extendLifetime)
+        }
     }
 
 }
