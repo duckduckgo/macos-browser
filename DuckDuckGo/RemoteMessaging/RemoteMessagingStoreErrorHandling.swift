@@ -18,32 +18,41 @@
 
 import Common
 import Foundation
+import Persistence
+import PixelKit
 import RemoteMessaging
 
 public class RemoteMessagingStoreErrorHandling: EventMapping<RemoteMessagingStoreError> {
 
     public init() {
         super.init { event, error, _, _ in
-            switch event {
-            case .saveConfigFailed:
-                break
-//                Pixel.fire(pixel: .dbRemoteMessagingSaveConfigError, error: error)
-            case .invalidateConfigFailed:
-                break
-//                Pixel.fire(pixel: .dbRemoteMessagingInvalidateConfigError, error: error)
-            case .updateMessageShownFailed:
-                break
-//                Pixel.fire(pixel: .dbRemoteMessagingUpdateMessageShownError, error: error)
-            case .saveMessageFailed:
-                break
-//                Pixel.fire(pixel: .dbRemoteMessagingSaveMessageError, error: error)
-            case .updateMessageStatusFailed:
-                break
-//                Pixel.fire(pixel: .dbRemoteMessagingUpdateMessageStatusError, error: error)
-            case .deleteScheduledMessageFailed:
-                break
-//                Pixel.fire(pixel: .dbRemoteMessagingDeleteScheduledMessageError, error: error)
-            }
+
+            let params: [String: String]? = {
+                guard let nsError = error as? NSError else {
+                    return nil
+                }
+                let processedErrors = CoreDataErrorsParser.parse(error: nsError)
+                return processedErrors.errorPixelParameters
+            }()
+
+            let pixel: GeneralPixel = {
+                switch event {
+                case .saveConfigFailed:
+                    return .remoteMessagingSaveConfigError
+                case .invalidateConfigFailed:
+                    return .remoteMessagingInvalidateConfigError
+                case .updateMessageShownFailed:
+                    return .remoteMessagingUpdateMessageShownError
+                case .saveMessageFailed:
+                    return .remoteMessagingSaveMessageError
+                case .updateMessageStatusFailed:
+                    return .remoteMessagingUpdateMessageStatusError
+                case .deleteScheduledMessageFailed:
+                    return .remoteMessagingDeleteScheduledMessageError
+                }
+            }()
+
+            PixelKit.fire(pixel, withAdditionalParameters: params, withError: error)
         }
     }
 
