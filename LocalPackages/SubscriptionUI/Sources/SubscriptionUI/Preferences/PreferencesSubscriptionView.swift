@@ -74,9 +74,9 @@ public struct PreferencesSubscriptionView: View {
                 }
 
                 if state == .subscriptionActive {
-                    servicesRowsForActiveSubscriptionView
+                    featureRowsForActiveSubscription
                 } else {
-                    servicesRowsForNoSubscriptionView
+                    featureRowsForNoSubscriptionView
                 }
             }
             .padding(10)
@@ -95,7 +95,7 @@ public struct PreferencesSubscriptionView: View {
             }
 
             // Help section
-            footerView
+            helpSection
         }
         .onAppear(perform: {
             if model.isUserAuthenticated {
@@ -164,7 +164,7 @@ public struct PreferencesSubscriptionView: View {
     }
 
     @ViewBuilder
-    private var servicesRowsForNoSubscriptionView: some View {
+    private var featureRowsForNoSubscriptionView: some View {
         SectionView(iconName: "VPN-Icon",
                     title: UserText.vpnServiceTitle,
                     description: UserText.vpnServiceDescription)
@@ -185,7 +185,7 @@ public struct PreferencesSubscriptionView: View {
     }
 
     @ViewBuilder
-    private var servicesRowsForActiveSubscriptionView: some View {
+    private var featureRowsForActiveSubscription: some View {
         SectionView(iconName: "VPN-Icon",
                     title: UserText.vpnServiceTitle,
                     description: UserText.vpnServiceDescription,
@@ -257,7 +257,7 @@ public struct PreferencesSubscriptionView: View {
     }
 
     @ViewBuilder
-    private var footerView: some View {
+    private var helpSection: some View {
         PreferencePaneSection {
             TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle, bottomPadding: 0)
             HStack(alignment: .top, spacing: 6) {
