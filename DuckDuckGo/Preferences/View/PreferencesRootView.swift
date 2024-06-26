@@ -160,17 +160,22 @@ enum Preferences {
                 }
             }
 
-            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
-                if #available(macOS 12.0, *) {
-                    Task {
-                        let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: Application.appDelegate.subscriptionManager,
-                                                                                        uiHandler: Application.appDelegate.subscriptionUIHandler)
-                        await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
+            let sheetActionHandler = SubscriptionAccessActionHandlers(
+                openActivateViaEmailURL: {
+                    let url = Application.appDelegate.subscriptionManager.url(for: .activateViaEmail)
+                    WindowControllersManager.shared.showTab(with: .subscription(url))
+                },
+                restorePurchases: {
+                    if #available(macOS 12.0, *) {
+                        Task {
+                            let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: Application.appDelegate.subscriptionManager,
+                                                                                            uiHandler: Application.appDelegate.subscriptionUIHandler)
+                            await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
+                        }
                     }
-                }
-            },
-                                                                      openURLHandler: openURL,
-                                                                      uiActionHandler: handleUIEvent)
+                },
+                uiActionHandler: handleUIEvent
+            )
 
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,

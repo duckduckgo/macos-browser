@@ -22,28 +22,27 @@ import Subscription
 public final class SubscriptionAccessViewModel {
 
     private var actionHandlers: SubscriptionAccessActionHandlers
+    private let purchasePlatform: SubscriptionEnvironment.PurchasePlatform
+
     public var title = UserText.activateModalTitle
-    public lazy var description = UserText.activateModalDescription(platform: subscriptionManager.currentEnvironment.purchasePlatform)
+    public lazy var description = UserText.activateModalDescription(platform: purchasePlatform)
 
     public var emailLabel = UserText.email
     public var emailDescription = UserText.activateModalEmailDescription
     public var emailButtonTitle = UserText.enterEmailButton
 
-    public private(set) var shouldShowRestorePurchase: Bool
+    public var shouldShowRestorePurchase: Bool { purchasePlatform == .appStore }
     public var restorePurchaseDescription = UserText.restorePurchaseDescription
     public var restorePurchaseButtonTitle = UserText.restorePurchaseButton
 
-    let subscriptionManager: SubscriptionManaging
-
     public init(actionHandlers: SubscriptionAccessActionHandlers,
-                subscriptionManager: SubscriptionManaging) {
+                purchasePlatform: SubscriptionEnvironment.PurchasePlatform) {
         self.actionHandlers = actionHandlers
-        self.shouldShowRestorePurchase =  subscriptionManager.currentEnvironment.purchasePlatform == .appStore
-        self.subscriptionManager = subscriptionManager
+        self.purchasePlatform = purchasePlatform
     }
 
     public func handleEmailAction() {
-        actionHandlers.openURLHandler(subscriptionManager.url(for: .activateViaEmail))
+        actionHandlers.openActivateViaEmailURL()
         actionHandlers.uiActionHandler(.activateAddEmailClick)
     }
 
@@ -54,13 +53,13 @@ public final class SubscriptionAccessViewModel {
 }
 
 public final class SubscriptionAccessActionHandlers {
+    var openActivateViaEmailURL: () -> Void
     var restorePurchases: () -> Void
-    var openURLHandler: (URL) -> Void
     var uiActionHandler: (PreferencesSubscriptionModel.UserEvent) -> Void
 
-    public init(restorePurchases: @escaping () -> Void, openURLHandler: @escaping (URL) -> Void, uiActionHandler: @escaping (PreferencesSubscriptionModel.UserEvent) -> Void) {
+    public init(openActivateViaEmailURL: @escaping () -> Void, restorePurchases: @escaping () -> Void, uiActionHandler: @escaping (PreferencesSubscriptionModel.UserEvent) -> Void) {
+        self.openActivateViaEmailURL = openActivateViaEmailURL
         self.restorePurchases = restorePurchases
-        self.openURLHandler = openURLHandler
         self.uiActionHandler = uiActionHandler
     }
 }

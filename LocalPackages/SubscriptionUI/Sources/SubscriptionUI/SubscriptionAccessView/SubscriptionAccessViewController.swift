@@ -37,7 +37,8 @@ public final class SubscriptionAccessViewController: NSViewController {
     }
 
     public override func loadView() {
-        lazy var sheetModel = SubscriptionAccessViewModel(actionHandlers: actionHandlers, subscriptionManager: subscriptionManager)
+        lazy var sheetModel = SubscriptionAccessViewModel(actionHandlers: actionHandlers,
+                                                          purchasePlatform: subscriptionManager.currentEnvironment.purchasePlatform)
         let subscriptionAccessView = SubscriptionAccessView(model: sheetModel,
                                                             dismiss: { [weak self] in
                 guard let self = self else { return }

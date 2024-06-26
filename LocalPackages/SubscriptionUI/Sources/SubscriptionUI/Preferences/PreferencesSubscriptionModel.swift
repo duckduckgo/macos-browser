@@ -37,7 +37,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var subscriptionPlatform: Subscription.Platform?
 
     lazy var sheetModel = SubscriptionAccessViewModel(actionHandlers: sheetActionHandler,
-                                                      subscriptionManager: subscriptionManager)
+                                                      purchasePlatform: subscriptionManager.currentEnvironment.purchasePlatform)
 
     private let subscriptionManager: SubscriptionManaging
     private var accountManager: AccountManaging {
