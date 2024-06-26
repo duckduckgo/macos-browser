@@ -582,7 +582,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
                 withExtendedLifetime(download) {}
             }
             // to avoid race condition we clear the ivar first,
-            // then pass the WKDownload liftime extension to the main queue
+            // then pass the WKDownload lifetime extension to the main queue
             self.download = nil
             DispatchQueue.main.async(execute: extendLifetime)
         }
@@ -756,7 +756,7 @@ extension WebKitDownloadTask {
             return ""
         }
         return MainActor.assumeIsolated {
-            "<Task \(download) – \(state)>"
+            "<Task \(download!) – \(state)>"
         }
     }
 
