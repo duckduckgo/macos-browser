@@ -37,7 +37,7 @@ protocol XPCClientInterfaceObjC {
     func serverInfoChanged(payload: Data)
     func statusChanged(payload: Data)
     func dataVolumeUpdated(payload: Data)
-    func knownFailureUpdated(failure: KnownFailure?)
+    func knownFailureUpdated(payload: Data)
 }
 
 public final class VPNControllerXPCClient {
@@ -166,6 +166,14 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterfaceObjC {
 
         dataVolumeObserver.publish(dataVolume)
         clientDelegate?.dataVolumeUpdated(dataVolume)
+    }
+
+    func knownFailureUpdated(payload: Data) {
+        guard let failure = try? JSONDecoder().decode(KnownFailure?.self, from: payload) else {
+            return
+        }
+
+        knownFailureUpdated(failure: failure)
     }
 
     func knownFailureUpdated(failure: KnownFailure?) {
