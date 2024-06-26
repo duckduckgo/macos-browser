@@ -55,8 +55,8 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.currentScans, 1)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, "Broker #1")
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.first!.name, "Broker #1")
         XCTAssertTrue(result.resultsFound.isEmpty)
     }
 
@@ -70,8 +70,8 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.currentScans, 1)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, "Broker #1")
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.first!.name, "Broker #1")
         XCTAssertTrue(result.resultsFound.isEmpty)
     }
 
@@ -106,8 +106,8 @@ final class MapperToUITests: XCTestCase {
 
         XCTAssertEqual(result.scanProgress.totalScans, result.scanProgress.currentScans)
         XCTAssertEqual(result.scanProgress.currentScans, 2)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
     }
 
     func testWhenScansHaveDeprecatedProfileQueries_thenThoseAreNotTakenIntoAccount() {
@@ -122,8 +122,8 @@ final class MapperToUITests: XCTestCase {
 
         XCTAssertEqual(result.scanProgress.totalScans, 2)
         XCTAssertEqual(result.scanProgress.currentScans, 2)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
         XCTAssertEqual(result.resultsFound.count, 1)
     }
 
@@ -140,8 +140,8 @@ final class MapperToUITests: XCTestCase {
 
         XCTAssertEqual(result.scanProgress.totalScans, 2)
         XCTAssertEqual(result.scanProgress.currentScans, 2)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
         XCTAssertEqual(result.resultsFound.count, 1)
     }
 
@@ -251,8 +251,8 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.currentScans, 2)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "mirror"])
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "mirror"])
     }
 
     func testWhenMirrorSiteIsInRemovedPeriod_thenItShouldNotBeAddedToScannedBrokersCurrentScans() {
@@ -270,8 +270,8 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.currentScans, 1)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #2"])
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers.map{ $0.name }.sorted(), ["Broker #2"])
     }
 
     func testWhenMirrorSiteIsNotInRemovedPeriod_thenMatchIsAdded() {
@@ -362,24 +362,41 @@ final class MapperToUITests: XCTestCase {
     func testBrokersWithACompleteScan_areOrderedByLastRunDate() {
 
         // Given
-        let calendar = Calendar.current
-        let minusOneHour = calendar.date(byAdding: .hour, value: -1, to: Date())
-        let minusTwoHours = calendar.date(byAdding: .hour, value: -2, to: Date())
-
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
-            .mock(dataBrokerName: "Broker #2", lastRunDate: minusOneHour),
-            .mock(dataBrokerName: "Broker #3", lastRunDate: minusTwoHours)
+            .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
+            .mock(dataBrokerName: "Broker #1", lastRunDate: .minusTwoHours),
+            .mock(dataBrokerName: "Broker #2", lastRunDate: .minusOneHour),
+            .mock(dataBrokerName: "Broker #2", lastRunDate: .minusThreeHours),
+            .mock(dataBrokerName: "Broker #3", lastRunDate: .minusTwoHours),
+            .mock(dataBrokerName: "Broker #3"),
+            .mock(dataBrokerName: "Broker #3", lastRunDate: Date()),
+            .mock(dataBrokerName: "Broker #4"),
+            .mock(dataBrokerName: "Broker #5"),
+            .mock(dataBrokerName: "Broker #7", lastRunDate: .minusThreeHours),
+            .mock(dataBrokerName: "Broker #6", lastRunDate: .minusThreeHours)
+        ]
+
+        let expected: [DBPUIScanProgress.ScannedBroker] = [
+            .mock("Broker #2"),
+            .mock("Broker #7"),
+            .mock("Broker #6"),
+            .mock("Broker #1"),
+            .mock("Broker #3")
         ]
 
         let result = sut.initialScanState(brokerProfileQueryData)
 
-        XCTAssertEqual(result.scanProgress.currentScans, 3)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
-        XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, "Broker #3")
-        XCTAssertTrue(result.resultsFound.isEmpty)
+        XCTAssertEqual(result.scanProgress.currentScans, 5)
+        XCTAssertEqual(result.scanProgress.partiallyScannedBrokers, expected)
     }
 
+}
+
+extension DBPUIScanProgress.ScannedBroker {
+    static func mock(_ name: String) -> DBPUIScanProgress.ScannedBroker {
+        .init(name: name, url: "test.com")
+    }
 }
 
 extension Date {
@@ -394,5 +411,22 @@ extension Date {
         let calendar = Calendar.current
 
         return calendar.date(byAdding: .day, value: 1, to: self)
+    }
+
+    static var minusOneHour: Date? {
+        nowMinusHour(1)
+    }
+
+    static var minusTwoHours: Date? {
+        nowMinusHour(2)
+    }
+
+    static var minusThreeHours: Date? {
+        nowMinusHour(3)
+    }
+
+    private static func nowMinusHour(_ hour: Int) -> Date? {
+        let calendar = Calendar.current
+        return calendar.date(byAdding: .hour, value: -hour, to: Date())
     }
 }

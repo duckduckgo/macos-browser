@@ -52,24 +52,27 @@ struct MapperToUI {
     }
 
     func initialScanState(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIInitialScanState {
-        // Total and current scans are misleading. The UI are counting this per broker and
-        // not by the total real cans that the app is doing.
-        let profileQueriesGroupedByBroker = Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.name })
 
-        // We don't want to consider deprecated queries when reporting manual scans to the UI
-        let filteredProfileQueriesGroupedByBroker = profileQueriesGroupedByBroker.mapValues { queries in
-            queries.filter { !$0.profileQuery.deprecated }
+        let withoutDeprecated = brokerProfileQueryData.filter { !$0.profileQuery.deprecated }
+
+        let groupedByBroker = Dictionary(grouping: withoutDeprecated, by: { $0.dataBroker.name }).values
+
+        let totalScans = groupedByBroker.reduce(0) { accumulator, brokerQueryData in
+            return accumulator + brokerQueryData.totalScans
         }
 
-        let totalScans = filteredProfileQueriesGroupedByBroker.reduce(0) { accumulator, element in
-            return accumulator + element.value.totalScans
+        let withSortedGroups = groupedByBroker.map { $0.sortedByRunDate() }
+
+        let sorted = withSortedGroups.sortedByRunDate()
+
+        let partiallyScannedBrokers = sorted.flatMap { brokerQueryGroup in
+            brokerQueryGroup.scannedBrokers
         }
 
-        let scannedBrokers: [DBPUIScanProgress.ScannedBroker] = filteredProfileQueriesGroupedByBroker.flatMap {_, brokerQueryData in
-            brokerQueryData.scannedBrokers
-        }
-
-        let scanProgress = DBPUIScanProgress(currentScans: scannedBrokers.count, totalScans: totalScans, scannedBrokers: scannedBrokers)
+        let scanProgress = DBPUIScanProgress(currentScans: partiallyScannedBrokers.count,
+                                             totalScans: totalScans,
+                                             partiallyScannedBrokers: partiallyScannedBrokers)
+        
         let matches = mapMatchesToUI(brokerProfileQueryData)
 
         return .init(resultsFound: matches, scanProgress: scanProgress)
@@ -335,6 +338,27 @@ fileprivate extension BrokerProfileQueryData {
     }
 }
 
+private extension Array where Element == [BrokerProfileQueryData] {
+
+    /// Sorts the 2-dimensional array in ascending order based on the `lastRunDate` value of the first element of each internal array
+    ///
+    /// - Returns: An array of `[BrokerProfileQueryData]` values sorted by the first `lastRunDate` of each element
+    func sortedByRunDate() -> Self {
+        sorted { lhs, rhs in
+            switch (lhs.first?.scanJobData.lastRunDate, rhs.first?.scanJobData.lastRunDate) {
+            case let (lhsDate?, rhsDate?):
+                return lhsDate < rhsDate
+            case (nil, _?):
+                return false
+            case (_?, nil):
+                return true
+            case (nil, nil):
+                return true
+            }
+        }
+    }
+}
+
 fileprivate extension Array where Element == BrokerProfileQueryData {
 
     var totalScans: Int {
@@ -342,9 +366,9 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
         return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
     }
 
-    /// Returns an array of brokers which have been scanned
+    /// Returns an array of brokers which have been partially scanned
     ///
-    /// Note 1: A Broker is considered scanned if all scan jobs for that broker have been run.
+    /// Note 1: A Broker is considered partially scanned if at least one scan job for that broker has completed
     /// Note 2: Mirror brokers will be included in the returned array when `MirrorSite.shouldWeIncludeMirrorSite` returns true
     var scannedBrokers: [DBPUIScanProgress.ScannedBroker] {
         guard let broker = self.first?.dataBroker,
@@ -394,6 +418,24 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
                 return false
             }
         }).first
+    }
+    
+    /// Sorts the array in ascending order based on `lastRunDate`
+    ///
+    /// - Returns: An array of `BrokerProfileQueryData` sorted by `lastRunDate`
+    func sortedByRunDate() -> Self {
+        sorted { lhs, rhs in
+            switch (lhs.scanJobData.lastRunDate, rhs.scanJobData.lastRunDate) {
+            case let (lhsDate?, rhsDate?):
+                return lhsDate < rhsDate
+            case (nil, _?):
+                return true
+            case (_?, nil):
+                return false
+            case (nil, nil):
+                return false
+            }
+        }
     }
 }
 

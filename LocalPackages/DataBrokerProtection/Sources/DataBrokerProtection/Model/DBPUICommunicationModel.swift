@@ -161,14 +161,14 @@ struct DBPUIOptOutMatch: DBPUISendableMessage {
 /// Data representing the initial scan progress
 struct DBPUIScanProgress: DBPUISendableMessage {
 
-    struct ScannedBroker: Codable {
+    struct ScannedBroker: Codable, Equatable {
         let name: String
         let url: String
     }
 
     let currentScans: Int
     let totalScans: Int
-    let scannedBrokers: [ScannedBroker]
+    let partiallyScannedBrokers: [ScannedBroker]
 }
 
 /// Data to represent the intial scan state
@@ -239,6 +239,6 @@ struct DBPUIDebugMetadata: DBPUISendableMessage {
 extension DBPUIInitialScanState {
     static var empty: DBPUIInitialScanState {
         .init(resultsFound: [DBPUIDataBrokerProfileMatch](),
-              scanProgress: DBPUIScanProgress(currentScans: 0, totalScans: 0, scannedBrokers: []))
+              scanProgress: DBPUIScanProgress(currentScans: 0, totalScans: 0, partiallyScannedBrokers: []))
     }
 }
