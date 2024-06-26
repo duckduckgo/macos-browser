@@ -25,7 +25,7 @@ public struct PreferencesSubscriptionView: View {
     @State private var state: PreferencesSubscriptionState = .noSubscription
 
     @ObservedObject var model: PreferencesSubscriptionModel
-    @State private var showingSheet = false // TODO: Rename it
+    @State private var showingActivateSubscriptionSheet = false
     @State private var showingRemoveConfirmationDialog = false
 
     @State private var manageSubscriptionSheet: ManageSubscriptionSheet?
@@ -39,7 +39,7 @@ public struct PreferencesSubscriptionView: View {
 
             // Title and dialogs
             TextMenuTitle(UserText.preferencesTitle)
-                .sheet(isPresented: $showingSheet) {
+                .sheet(isPresented: $showingActivateSubscriptionSheet) {
                     SubscriptionAccessView(model: model.sheetModel)
                 }
                 .sheet(isPresented: $showingRemoveConfirmationDialog) {
@@ -124,7 +124,7 @@ public struct PreferencesSubscriptionView: View {
             Button(UserText.purchaseButton) { model.purchaseAction() }
                 .buttonStyle(DefaultActionButtonStyle(enabled: true))
             Button(UserText.haveSubscriptionButton) {
-                showingSheet.toggle()
+                showingActivateSubscriptionSheet.toggle()
                 model.userEventHandler(.iHaveASubscriptionClick)
             }
             .buttonStyle(DismissActionButtonStyle())

@@ -263,7 +263,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             }
 
             Task { @MainActor in
-                userEventHandler(eventType) // TODO: check if correct pixel is fired here
+                userEventHandler(eventType)
                 openURLHandler(url)
             }
         }

@@ -384,7 +384,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
-        
+
 #if DBP
         DataBrokerProtectionAppEvents(featureGatekeeper:
                                         DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
