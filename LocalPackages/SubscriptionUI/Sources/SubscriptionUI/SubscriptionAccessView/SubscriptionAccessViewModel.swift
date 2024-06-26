@@ -1,5 +1,5 @@
 //
-//  ActivateSubscriptionAccessModel.swift
+//  SubscriptionAccessViewModel.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Foundation
 import Subscription
 
-public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, PurchaseRestoringSubscriptionAccessModel {
+public final class SubscriptionAccessViewModel {
 
     private var actionHandlers: SubscriptionAccessActionHandlers
     public var title = UserText.activateModalTitle
@@ -52,5 +52,17 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, Pur
     public func handleRestorePurchaseAction() {
         actionHandlers.restorePurchases()
         actionHandlers.uiActionHandler(.restorePurchaseStoreClick)
+    }
+}
+
+public final class SubscriptionAccessActionHandlers {
+    var restorePurchases: () -> Void
+    var openURLHandler: (URL) -> Void
+    var uiActionHandler: (PreferencesSubscriptionModel.UserEvent) -> Void
+
+    public init(restorePurchases: @escaping () -> Void, openURLHandler: @escaping (URL) -> Void, uiActionHandler: @escaping (PreferencesSubscriptionModel.UserEvent) -> Void) {
+        self.restorePurchases = restorePurchases
+        self.openURLHandler = openURLHandler
+        self.uiActionHandler = uiActionHandler
     }
 }

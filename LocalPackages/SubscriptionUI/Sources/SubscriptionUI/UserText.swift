@@ -118,25 +118,8 @@ enum UserText {
     static let activateModalEmailDescription = NSLocalizedString("subscription.activate.modal.email.description", value: "Use your email to activate your subscription on this device.", comment: "Activate subscription modal description for email address channel")
     static let restorePurchaseDescription = NSLocalizedString("subscription.activate.modal.restore.purchase.description", value: "Your subscription is automatically available in DuckDuckGo on any device signed in to your Apple ID.", comment: "Activate subscription modal description via restore purchase from Apple ID")
 
-    // MARK: - Share subscription modal
-    static let shareModalTitle = NSLocalizedString("subscription.share.modal.title", value: "Use your subscription on other devices", comment: "Share subscription modal view title")
-    static func shareModalDescription(platform: SubscriptionEnvironment.PurchasePlatform) -> String {
-        switch platform {
-        case .appStore:
-            NSLocalizedString("subscription.appstore.share.modal.description", value: "Access your subscription via Apple ID or by adding an email address.", comment: "Share subscription modal view subtitle description")
-        case .stripe:
-            NSLocalizedString("subscription.share.modal.description", value: "Activate your Privacy Pro subscription via an email address.", comment: "Share subscription modal view subtitle description")
-        }
-    }
-
-    static let shareModalHasEmailDescription = NSLocalizedString("subscription.share.modal.has.email.description", value: "Use this email to activate your subscription from browser settings in the DuckDuckGo app on other devices", comment: "Share subscription modal description for email address channel")
-    static let shareModalNoEmailDescription = NSLocalizedString("subscription.share.modal.no.email.description", value: "Add an email address to access your subscription in DuckDuckGo on other devices. We’ll only use this address to verify your subscription.", comment: "Share subscription modal description for email address channel")
-
-    static let restorePurchasesDescription = NSLocalizedString("subscription.share.modal.restore.purchases.description", value: "Your subscription is automatically available in DuckDuckGo on any device signed in to your Apple ID.", comment: "Share subscription modal description for restoring Apple ID purchases")
-
     // MARK: - Activate/share modal buttons
     static let restorePurchaseButton = NSLocalizedString("subscription.modal.restore.purchase.button", value: "Restore Purchase", comment: "Button for restoring past subscription purchase")
-    static let manageEmailButton = NSLocalizedString("subscription.modal.manage.email.button", value: "Manage Email", comment: "Button for opening manage email address page")
     static let enterEmailButton = NSLocalizedString("subscription.modal.enter.email.button", value: "Enter Email", comment: "Button for opening page to enter email address")
 
     // MARK: - Alerts

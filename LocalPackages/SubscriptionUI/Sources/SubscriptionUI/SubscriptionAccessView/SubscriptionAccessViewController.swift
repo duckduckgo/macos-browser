@@ -37,7 +37,8 @@ public final class SubscriptionAccessViewController: NSViewController {
     }
 
     public override func loadView() {
-        let subscriptionAccessView = SubscriptionAccessView(model: makeSubscriptionAccessModel(),
+        lazy var sheetModel = SubscriptionAccessViewModel(actionHandlers: actionHandlers, subscriptionManager: subscriptionManager)
+        let subscriptionAccessView = SubscriptionAccessView(model: sheetModel,
                                                             dismiss: { [weak self] in
                 guard let self = self else { return }
                 self.presentingViewController?.dismiss(self)
@@ -52,13 +53,5 @@ public final class SubscriptionAccessViewController: NSViewController {
         hostingView.translatesAutoresizingMaskIntoConstraints = true
 
         view.addSubview(hostingView)
-    }
-
-    private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
-        if subscriptionManager.accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: actionHandlers, email: subscriptionManager.accountManager.email, subscriptionManager: subscriptionManager)
-        } else {
-            ActivateSubscriptionAccessModel(actionHandlers: actionHandlers, subscriptionManager: subscriptionManager)
-        }
     }
 }

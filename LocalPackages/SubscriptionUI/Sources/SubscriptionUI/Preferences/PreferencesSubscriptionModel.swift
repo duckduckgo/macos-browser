@@ -36,7 +36,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private var subscriptionPlatform: Subscription.Platform?
 
-    lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
+    lazy var sheetModel = SubscriptionAccessViewModel(actionHandlers: sheetActionHandler,
+                                                      subscriptionManager: subscriptionManager)
 
     private let subscriptionManager: SubscriptionManaging
     private var accountManager: AccountManaging {
@@ -139,18 +140,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
     }
 
-    private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
-        if accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email, subscriptionManager: subscriptionManager)
-        } else {
-            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, subscriptionManager: subscriptionManager)
-        }
-    }
-
     private func updateUserAuthenticatedState(_ isUserAuthenticated: Bool) {
         self.isUserAuthenticated = isUserAuthenticated
         self.email = accountManager.email
-        sheetModel = makeSubscriptionAccessModel()
     }
 
     @MainActor
@@ -240,6 +232,19 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     func addEmailAction() {
         print("addEmailAction")
         // TODO: trigger silent token refresh
+//        Task {
+//            if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
+//                if #available(macOS 12.0, iOS 15.0, *) {
+//                    let appStoreAccountManagementFlow = AppStoreAccountManagementFlow(subscriptionManager: subscriptionManager)
+//                    await appStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
+//                }
+//            }
+//
+//            DispatchQueue.main.async {
+//                self.actionHandlers.openURLHandler(mailURL)
+//            }
+//        }
+
         let addEmailURL: URL = subscriptionManager.url(for: .addEmail)
         userEventHandler(.addDeviceEnterEmail) // TODO: check if correct pixel is fired here
         openURLHandler(addEmailURL)

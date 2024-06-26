@@ -22,11 +22,11 @@ import SwiftUIExtensions
 public struct SubscriptionAccessView: View {
 
     @Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
-    private let model: SubscriptionAccessModel
+    private let model: SubscriptionAccessViewModel
 
     private let dismissAction: (() -> Void)?
 
-    public init(model: SubscriptionAccessModel, dismiss: (() -> Void)? = nil) {
+    public init(model: SubscriptionAccessViewModel, dismiss: (() -> Void)? = nil) {
         self.model = model
         self.dismissAction = dismiss
     }
@@ -86,16 +86,16 @@ public struct SubscriptionAccessView: View {
                 }
                 .roundedBorder()
 
-                if let purchaseRestoringModel = model as? PurchaseRestoringSubscriptionAccessModel, purchaseRestoringModel.shouldShowRestorePurchase {
+                if model.shouldShowRestorePurchase {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(purchaseRestoringModel.restorePurchaseDescription)
+                        Text(model.restorePurchaseDescription)
                             .font(.system(size: 13, weight: .regular, design: .default))
                             .foregroundColor(Color("TextSecondary", bundle: .module))
                             .fixMultilineScrollableText()
                         HStack {
-                            TextButton(purchaseRestoringModel.restorePurchaseButtonTitle) {
+                            TextButton(model.restorePurchaseButtonTitle) {
                                 dismiss {
-                                    purchaseRestoringModel.handleRestorePurchaseAction()
+                                    model.handleRestorePurchaseAction()
                                 }
                             }
                             Spacer()
