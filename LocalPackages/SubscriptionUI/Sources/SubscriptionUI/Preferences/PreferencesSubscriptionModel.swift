@@ -230,33 +230,43 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func addEmailAction() {
-        print("addEmailAction")
-        // TODO: trigger silent token refresh
-//        Task {
-//            if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
-//                if #available(macOS 12.0, iOS 15.0, *) {
-//                    let appStoreAccountManagementFlow = AppStoreAccountManagementFlow(subscriptionManager: subscriptionManager)
-//                    await appStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
-//                }
-//            }
-//
-//            DispatchQueue.main.async {
-//                self.actionHandlers.openURLHandler(mailURL)
-//            }
-//        }
-
-        let addEmailURL: URL = subscriptionManager.url(for: .addEmail)
-        userEventHandler(.addDeviceEnterEmail) // TODO: check if correct pixel is fired here
-        openURLHandler(addEmailURL)
+        handleEmailAction(type: .add)
     }
 
     @MainActor
     func editEmailAction() {
-        print("editEmailAction")
-        // TODO: trigger silent token refresh
-        let manageEmailURL: URL = subscriptionManager.url(for: .manageEmail)
-        userEventHandler(.postSubscriptionAddEmailClick) // TODO: check if correct pixel is fired here
-        openURLHandler(manageEmailURL)
+        handleEmailAction(type: .edit)
+    }
+
+    private enum SubscriptionEmailActionType {
+        case add, edit
+    }
+    private func handleEmailAction(type: SubscriptionEmailActionType) {
+        let eventType: UserEvent
+        let url: URL
+
+        switch type {
+        case .add:
+            eventType = .addDeviceEnterEmail
+            url = subscriptionManager.url(for: .addEmail)
+        case .edit:
+            eventType = .postSubscriptionAddEmailClick
+            url = subscriptionManager.url(for: .manageEmail)
+        }
+
+        Task {
+            if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
+                if #available(macOS 12.0, iOS 15.0, *) {
+                    let appStoreAccountManagementFlow = AppStoreAccountManagementFlow(subscriptionManager: subscriptionManager)
+                    await appStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
+                }
+            }
+
+            Task { @MainActor in
+                userEventHandler(eventType) // TODO: check if correct pixel is fired here
+                openURLHandler(url)
+            }
+        }
     }
 
     @MainActor
