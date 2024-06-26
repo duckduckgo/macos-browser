@@ -478,7 +478,7 @@ class DownloadsIntegrationTests: XCTestCase {
             return true;
         })();
         """
-        try! await tab.webView.evaluateJavaScript(js)
+        try! await tab.webView.evaluateJavaScript(js) as Void?
 
         let fileUrl = try await downloadTaskFuture.get().output
             .timeout(5, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
@@ -512,7 +512,7 @@ class DownloadsIntegrationTests: XCTestCase {
             return true;
         })();
         """
-        try! await tab.webView.evaluateJavaScript(js)
+        try! await tab.webView.evaluateJavaScript(js) as Void?
 
         let fileUrl = try await downloadTaskFuture.get().output
             .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()

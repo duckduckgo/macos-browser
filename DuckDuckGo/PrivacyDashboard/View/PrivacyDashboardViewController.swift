@@ -64,7 +64,8 @@ final class PrivacyDashboardViewController: NSViewController {
         switch event {
         case .toggleReportDismiss: domainEvent = .toggleReportDismiss
         case .toggleReportDoNotSend: domainEvent = .toggleReportDoNotSend
-        case .showReportBrokenSite, .reportBrokenSiteShown, .breakageCategorySelected, .reportBrokenSiteSent, .overallCategorySelected:
+        case .showReportBrokenSite, .reportBrokenSiteShown, .breakageCategorySelected, .reportBrokenSiteSent, .overallCategorySelected,
+                .skipToggleStep, .toggleProtectionOff:
             domainEvent = nil
         }
         if let domainEvent {

@@ -34,10 +34,10 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, Pur
     public var restorePurchaseDescription = UserText.restorePurchaseDescription
     public var restorePurchaseButtonTitle = UserText.restorePurchaseButton
 
-    let subscriptionManager: SubscriptionManaging
+    let subscriptionManager: SubscriptionManager
 
     public init(actionHandlers: SubscriptionAccessActionHandlers,
-                subscriptionManager: SubscriptionManaging) {
+                subscriptionManager: SubscriptionManager) {
         self.actionHandlers = actionHandlers
         self.shouldShowRestorePurchase =  subscriptionManager.currentEnvironment.purchasePlatform == .appStore
         self.subscriptionManager = subscriptionManager

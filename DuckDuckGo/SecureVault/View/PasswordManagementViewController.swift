@@ -323,6 +323,7 @@ final class PasswordManagementViewController: NSViewController {
             self.refreshData {
                 self.select(category: .logins)
             }
+            PixelKit.fire(GeneralPixel.autofillManagementDeleteAllLogins)
         }
     }
 
@@ -540,8 +541,10 @@ final class PasswordManagementViewController: NSViewController {
                     self?.syncModelsOnCredentials(savedCredentials, select: true)
                 }
                 NotificationCenter.default.post(name: .autofillSaveEvent, object: nil, userInfo: nil)
+                PixelKit.fire(GeneralPixel.autofillManagementSaveLogin)
             } else {
                 syncModelsOnCredentials(savedCredentials)
+                PixelKit.fire(GeneralPixel.autofillManagementUpdateLogin)
             }
             postChange()
             requestSync()
@@ -635,6 +638,7 @@ final class PasswordManagementViewController: NSViewController {
                     try self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
                     self.requestSync()
                     self.refreshData()
+                    PixelKit.fire(GeneralPixel.autofillManagementDeleteLogin)
                 } catch {
                     PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
@@ -989,8 +993,8 @@ final class PasswordManagementViewController: NSViewController {
         switch category {
         case .allItems: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
         case .logins: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
-        case .identities: showEmptyState(image: .identitiesEmpty, title: UserText.pmEmptyStateIdentitiesTitle)
-        case .cards: showEmptyState(image: .creditCardsEmpty, title: UserText.pmEmptyStateCardsTitle)
+        case .identities: showEmptyState(image: .identityAdd128, title: UserText.pmEmptyStateIdentitiesTitle)
+        case .cards: showEmptyState(image: .creditCardsAdd128, title: UserText.pmEmptyStateCardsTitle)
         }
     }
 

@@ -68,13 +68,13 @@ extension Preferences {
                 // Autofill Content  Button
                 PreferencePaneSection {
                     Button(UserText.autofillViewContentButtonPasswords) {
-                        model.showAutofillPopover(.logins)
+                        model.showAutofillPopover(.logins, source: .settings)
                     }
                     Button(UserText.autofillViewContentButtonIdentities) {
-                        model.showAutofillPopover(.identities)
+                        model.showAutofillPopover(.identities, source: .settings)
                     }
                     Button(UserText.autofillViewContentButtonPaymentMethods) {
-                        model.showAutofillPopover(.cards)
+                        model.showAutofillPopover(.cards, source: .settings)
                     }
 #if APPSTORE
                     Button(UserText.importPasswords) {

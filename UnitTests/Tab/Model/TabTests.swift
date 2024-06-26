@@ -24,7 +24,6 @@ import XCTest
 
 // swiftlint:disable opening_brace
 @available(macOS 12.0, *)
-@MainActor
 final class TabTests: XCTestCase {
 
     struct URLs {
@@ -74,7 +73,7 @@ final class TabTests: XCTestCase {
 
     // MARK: - Tab Content
 
-    func testWhenSettingURLThenTabTypeChangesToStandard() {
+    @MainActor func testWhenSettingURLThenTabTypeChangesToStandard() {
         let tab = Tab(content: .settings(pane: .autofill))
         XCTAssertEqual(tab.content, .settings(pane: .autofill))
 
@@ -84,14 +83,14 @@ final class TabTests: XCTestCase {
 
     // MARK: - Equality
 
-    func testWhenTabsAreIdenticalThenTheyAreEqual() {
+    @MainActor func testWhenTabsAreIdenticalThenTheyAreEqual() {
         let tab = Tab()
         let tab2 = tab
 
         XCTAssert(tab == tab2)
     }
 
-    func testWhenTabsArentIdenticalThenTheyArentEqual() {
+    @MainActor func testWhenTabsArentIdenticalThenTheyArentEqual() {
         let tab = Tab()
         tab.url = URL.duckDuckGo
         let tab2 = Tab()
@@ -102,7 +101,7 @@ final class TabTests: XCTestCase {
 
     // MARK: - Dialogs
 
-    func testWhenAlertDialogIsShowingChangingURLClearsDialog() {
+    @MainActor func testWhenAlertDialogIsShowingChangingURLClearsDialog() {
         let tab = Tab()
         tab.url = .duckDuckGo
         let webViewMock = WebViewMock()
@@ -113,7 +112,7 @@ final class TabTests: XCTestCase {
         XCTAssertNil(tab.userInteractionDialog)
     }
 
-    func testWhenDownloadDialogIsShowingChangingURLDoesNOTClearDialog() {
+    @MainActor func testWhenDownloadDialogIsShowingChangingURLDoesNOTClearDialog() {
         // GIVEN
         let tab = Tab(content: .none, extensionsBuilder: TestTabExtensionsBuilder(load: [DownloadsTabExtension.self]))
         tab.url = .duckDuckGo
@@ -361,6 +360,20 @@ final class TabTests: XCTestCase {
 
         let burnerTab = Tab(content: .newtab, burnerMode: BurnerMode(isBurner: true))
         XCTAssertTrue(burnerTab.faviconManagement !== FaviconManager.shared)
+    }
+
+    // MARK: - Control Center Media Session enabled
+
+    @MainActor func testWhenRegularWindow_mediaSessionEnabled() {
+        let tab = Tab(content: .url(.empty, source: .ui), burnerMode: .regular)
+
+        XCTAssertTrue(tab.webView.configuration.preferences[.mediaSessionEnabled])
+    }
+
+    @MainActor func testWhenFireWindow_mediaSessionDisabled() {
+        let tab = Tab(content: .url(.empty, source: .ui), burnerMode: BurnerMode(isBurner: true))
+
+        XCTAssertFalse(tab.webView.configuration.preferences[.mediaSessionEnabled])
     }
 
 }

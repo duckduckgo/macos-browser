@@ -122,3 +122,10 @@ final class DuckPlayerTests: XCTestCase {
         }
     }
 }
+
+extension WKWebViewConfiguration {
+    var allowsPictureInPictureMediaPlayback: Bool {
+        get { preferences[.allowsPictureInPictureMediaPlayback] }
+        set { preferences[.allowsPictureInPictureMediaPlayback] = newValue }
+    }
+}

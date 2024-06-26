@@ -117,7 +117,7 @@ class AutoconsentIntegrationTests: XCTestCase {
                     errorDescription!
                 }
             }
-            let html = try await tab.webView.evaluateJavaScript("document.documentElement.outerHTML") as? String
+            let html = try await tab.webView.evaluateJavaScript("document.documentElement.outerHTML") as String?
 
             if let html {
                 throw ErrorWithHTML(originalError: error, html: html)
@@ -126,7 +126,7 @@ class AutoconsentIntegrationTests: XCTestCase {
             }
         }
 
-        let isBannerHidden = try await tab.webView.evaluateJavaScript("window.getComputedStyle(banner).display === 'none'") as? Bool
+        let isBannerHidden = try await tab.webView.evaluateJavaScript("window.getComputedStyle(banner).display === 'none'") as Bool?
         XCTAssertTrue(isBannerHidden == true)
     }
 
@@ -168,7 +168,7 @@ class AutoconsentIntegrationTests: XCTestCase {
         let cookieConsentManaged = try await cookieConsentManagedPromise.value
         XCTAssertTrue(cookieConsentManaged == true)
 
-        let isBannerHidden = try await tab.webView.evaluateJavaScript("window.getComputedStyle(banner).display === 'none'") as? Bool
+        let isBannerHidden = try await tab.webView.evaluateJavaScript("window.getComputedStyle(banner).display === 'none'") as Bool?
         XCTAssertTrue(isBannerHidden == true)
     }
 
