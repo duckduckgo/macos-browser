@@ -448,6 +448,24 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
+    /// https://app.asana.com/0/1204006570077678/1207642874812352/f
+    /// We had a crash where the Int.max was exceeded when calculating the backoff. This checks that we are not passings that max.
+    func testWhenOptOutFailedMoreThanTheThresholdAndExceedsTheMaxInt_thenWeRetryAtTheSchedulingRetryAndNotCrash() throws {
+        let expectedOptOutDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
+
+        var historyEvents = [HistoryEvent]()
+        for _ in 0...1074 {
+            historyEvents.append(.init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)))
+        }
+        let calculator = OperationPreferredDateCalculator()
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+                                                                     historyEvents: historyEvents,
+                                                                     extractedProfileID: nil,
+                                                                     schedulingConfig: schedulingConfig)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+
     func testOptOutStarted_thenOptOutDateDoesNotChange() throws {
         let expectedOptOutDate: Date? = nil
 
