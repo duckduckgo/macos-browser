@@ -23,10 +23,9 @@ public final class SubscriptionAccessViewModel {
 
     private var actionHandlers: SubscriptionAccessActionHandlers
     public var title = UserText.activateModalTitle
-    public let description: String
+    public lazy var description = UserText.activateModalDescription(platform: subscriptionManager.currentEnvironment.purchasePlatform)
 
-    public var email: String?
-    public var emailLabel: String { UserText.email }
+    public var emailLabel = UserText.email
     public var emailDescription = UserText.activateModalEmailDescription
     public var emailButtonTitle = UserText.enterEmailButton
 
@@ -41,7 +40,6 @@ public final class SubscriptionAccessViewModel {
         self.actionHandlers = actionHandlers
         self.shouldShowRestorePurchase =  subscriptionManager.currentEnvironment.purchasePlatform == .appStore
         self.subscriptionManager = subscriptionManager
-        self.description = UserText.activateModalDescription(platform: subscriptionManager.currentEnvironment.purchasePlatform)
     }
 
     public func handleEmailAction() {

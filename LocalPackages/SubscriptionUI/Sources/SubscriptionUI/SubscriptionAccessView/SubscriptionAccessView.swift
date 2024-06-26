@@ -61,13 +61,6 @@ public struct SubscriptionAccessView: View {
                         }
                         .padding(.vertical, 10)
 
-                        if let header = model.email, !header.isEmpty {
-                            Text(header)
-                                .bold()
-                                .foregroundColor(Color("TextPrimary", bundle: .module))
-                                .padding(.bottom, 4)
-                        }
-
                         Text(model.emailDescription)
                             .font(.system(size: 13, weight: .regular, design: .default))
                             .foregroundColor(Color("TextSecondary", bundle: .module))
