@@ -27,7 +27,7 @@ import RemoteMessaging
 import NetworkProtection
 import Subscription
 
-final class MacOSRemoteMessagingDataSource2: RemoteMessagingDataSource2 {
+final class MacOSRemoteMessagingDataSource: RemoteMessagingDataSource {
 
     init(
         bookmarksDatabase: CoreDataDatabase,
@@ -128,105 +128,6 @@ final class MacOSRemoteMessagingDataSource2: RemoteMessagingDataSource2 {
     }
 }
 
-final class MacOSRemoteMessagingDataSource: RemoteMessagingDataSource {
-
-    init(
-        bookmarksDatabase: CoreDataDatabase,
-        appearancePreferences: AppearancePreferences,
-        internalUserDecider: InternalUserDecider
-    ) {
-        self.bookmarksDatabase = bookmarksDatabase
-        self.appearancePreferences = appearancePreferences
-        self.internalUserDecider = internalUserDecider
-    }
-
-    let bookmarksDatabase: CoreDataDatabase
-    let appearancePreferences: AppearancePreferences
-    var statisticsStore: BrowserServicesKit.StatisticsStore!
-    var variantManager: VariantManager!
-    var surveyActionMapper: RemoteMessagingSurveyActionMapping!
-    var internalUserDecider: InternalUserDecider
-
-    var appTheme: String {
-        appearancePreferences.currentThemeName.rawValue
-    }
-
-    var isInternalUser: Bool {
-        internalUserDecider.isInternalUser
-    }
-
-    var isWidgetInstalled: Bool {
-        false
-    }
-
-    var bookmarksCount: Int = 0
-    var favoritesCount: Int = 0
-
-    var daysSinceNetworkProtectionEnabled: Int = -1
-    var isPrivacyProEligibleUser: Bool = false
-    var isPrivacyProSubscriber: Bool = false
-    var privacyProDaysSinceSubscribed: Int = -1
-    var privacyProDaysUntilExpiry: Int = -1
-    var privacyProPurchasePlatform: String?
-    var isPrivacyProSubscriptionActive: Bool = false
-    var isPrivacyProSubscriptionExpiring: Bool = false
-    var isPrivacyProSubscriptionExpired: Bool = false
-
-    func refreshState() async {
-        bookmarksCount = 0
-        favoritesCount = 0
-        let context = bookmarksDatabase.makeContext(concurrencyType: .privateQueueConcurrencyType)
-        context.performAndWait {
-            bookmarksCount = BookmarkUtils.numberOfBookmarks(in: context)
-            favoritesCount = BookmarkUtils.numberOfFavorites(for: appearancePreferences.favoritesDisplayMode, in: context)
-        }
-
-        statisticsStore = LocalStatisticsStore()
-        variantManager = DefaultVariantManager()
-        let subscriptionManager = await Application.appDelegate.subscriptionManager
-
-        isPrivacyProSubscriber = subscriptionManager.accountManager.isUserAuthenticated
-        isPrivacyProEligibleUser = subscriptionManager.canPurchase
-
-        let activationDateStore = DefaultWaitlistActivationDateStore(source: .netP)
-        daysSinceNetworkProtectionEnabled = activationDateStore.daysSinceActivation() ?? -1
-
-        privacyProDaysSinceSubscribed = -1
-        privacyProDaysUntilExpiry = -1
-        isPrivacyProSubscriptionActive = false
-        isPrivacyProSubscriptionExpiring = false
-        isPrivacyProSubscriptionExpired = false
-
-        if let accessToken = subscriptionManager.accountManager.accessToken {
-            let subscriptionResult = await subscriptionManager.subscriptionEndpointService.getSubscription(accessToken: accessToken)
-
-            if case let .success(subscription) = subscriptionResult {
-                privacyProDaysSinceSubscribed = Calendar.current.numberOfDaysBetween(subscription.startedAt, and: Date()) ?? -1
-                privacyProDaysUntilExpiry = Calendar.current.numberOfDaysBetween(Date(), and: subscription.expiresOrRenewsAt) ?? -1
-                privacyProPurchasePlatform = subscription.platform.rawValue
-
-                switch subscription.status {
-                case .autoRenewable, .gracePeriod:
-                    isPrivacyProSubscriptionActive = true
-                case .notAutoRenewable:
-                    isPrivacyProSubscriptionActive = true
-                    isPrivacyProSubscriptionExpiring = true
-                case .expired, .inactive:
-                    isPrivacyProSubscriptionExpired = true
-                case .unknown:
-                    break // Not supported in RMF
-                }
-
-                surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: subscription)
-            } else {
-                surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: nil)
-            }
-        } else {
-            surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: nil)
-        }
-    }
-}
-
 final class RemoteMessagingClient: RemoteMessagingClientBase {
 
     struct Constants {
@@ -243,7 +144,7 @@ final class RemoteMessagingClient: RemoteMessagingClientBase {
         self.appearancePreferences = appearancePreferences
         self.internalUserDecider = internalUserDecider
 
-        let dataSource = MacOSRemoteMessagingDataSource2(
+        let dataSource = MacOSRemoteMessagingDataSource(
             bookmarksDatabase: bookmarksDatabase,
             appearancePreferences: appearancePreferences,
             internalUserDecider: internalUserDecider
