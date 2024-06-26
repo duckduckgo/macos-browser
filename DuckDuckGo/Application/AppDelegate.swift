@@ -87,7 +87,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    public let subscriptionManager: SubscriptionManaging
+    public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
 
     public let vpnSettings = VPNSettings(defaults: .netP)
@@ -218,7 +218,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         // Configure Subscription
-        subscriptionManager = SubscriptionManager()
+        subscriptionManager = DefaultSubscriptionManager()
         subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
             return WindowControllersManager.shared
         })
@@ -636,13 +636,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @MainActor
     private func setUpAutoClearHandler() {
-        DispatchQueue.main.async {
-            self.autoClearHandler = AutoClearHandler(preferences: .shared,
+        let autoClearHandler = AutoClearHandler(preferences: .shared,
                                                 fireViewModel: FireCoordinator.fireViewModel,
-                                                     stateRestorationManager: self.stateRestorationManager)
-            self.autoClearHandler.handleAppLaunch()
-            self.autoClearHandler.onAutoClearCompleted = {
+                                                stateRestorationManager: self.stateRestorationManager)
+        self.autoClearHandler = autoClearHandler
+        DispatchQueue.main.async {
+            autoClearHandler.handleAppLaunch()
+            autoClearHandler.onAutoClearCompleted = {
                 NSApplication.shared.reply(toApplicationShouldTerminate: true)
             }
         }
@@ -650,23 +652,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setUpAutofillPixelReporter() {
         autofillPixelReporter = AutofillPixelReporter(
-                userDefaults: .standard,
-                eventMapping: EventMapping<AutofillPixelEvent> {event, _, params, _ in
-                    switch event {
-                    case .autofillActiveUser:
-                        PixelKit.fire(GeneralPixel.autofillActiveUser)
-                    case .autofillEnabledUser:
-                        PixelKit.fire(GeneralPixel.autofillEnabledUser)
-                    case .autofillOnboardedUser:
-                        PixelKit.fire(GeneralPixel.autofillOnboardedUser)
-                    case .autofillLoginsStacked:
-                        PixelKit.fire(GeneralPixel.autofillLoginsStacked, withAdditionalParameters: params)
-                    case .autofillCreditCardsStacked:
-                        PixelKit.fire(GeneralPixel.autofillCreditCardsStacked, withAdditionalParameters: params)
-                    }
-                },
-                passwordManager: PasswordManagerCoordinator.shared,
-                installDate: AppDelegate.firstLaunchDate)
+            userDefaults: .standard,
+            autofillEnabled: AutofillPreferences().askToSaveUsernamesAndPasswords,
+            eventMapping: EventMapping<AutofillPixelEvent> {event, _, params, _ in
+                switch event {
+                case .autofillActiveUser:
+                    PixelKit.fire(GeneralPixel.autofillActiveUser)
+                case .autofillEnabledUser:
+                    PixelKit.fire(GeneralPixel.autofillEnabledUser)
+                case .autofillOnboardedUser:
+                    PixelKit.fire(GeneralPixel.autofillOnboardedUser)
+                case .autofillToggledOn:
+                    PixelKit.fire(GeneralPixel.autofillToggledOn, withAdditionalParameters: params)
+                case .autofillToggledOff:
+                    PixelKit.fire(GeneralPixel.autofillToggledOff, withAdditionalParameters: params)
+                case .autofillLoginsStacked:
+                    PixelKit.fire(GeneralPixel.autofillLoginsStacked, withAdditionalParameters: params)
+                case .autofillCreditCardsStacked:
+                    PixelKit.fire(GeneralPixel.autofillCreditCardsStacked, withAdditionalParameters: params)
+                case .autofillIdentitiesStacked:
+                    PixelKit.fire(GeneralPixel.autofillIdentitiesStacked, withAdditionalParameters: params)
+                }
+            },
+            passwordManager: PasswordManagerCoordinator.shared,
+            installDate: AppDelegate.firstLaunchDate)
+
+        _ = NotificationCenter.default.addObserver(forName: .autofillUserSettingsDidChange,
+                                                   object: nil,
+                                                   queue: nil) { [weak self] _ in
+            self?.autofillPixelReporter?.updateAutofillEnabledStatus(AutofillPreferences().askToSaveUsernamesAndPasswords)
+        }
     }
 }
 

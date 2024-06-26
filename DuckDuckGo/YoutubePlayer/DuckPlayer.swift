@@ -59,10 +59,10 @@ struct InitialSetupSettings: Codable {
     }
 
     struct PIP: Codable {
-        let status: Status
+        let state: State
     }
 
-    enum Status: String, Codable {
+    enum State: String, Codable {
         case enabled
         case disabled
     }
@@ -115,6 +115,7 @@ final class DuckPlayer {
     ) {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
+        isPiPFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
         mode = preferences.duckPlayerMode
         bindDuckPlayerModeIfNeeded()
 
@@ -202,8 +203,15 @@ final class DuckPlayer {
 
     @MainActor
     private func encodedSettings(with webView: WKWebView?) async -> InitialSetupSettings {
-        let isPiPEnabled = webView?.configuration.allowsPictureInPictureMediaPlayback == true
-        let pip = InitialSetupSettings.PIP(status: isPiPEnabled ? .enabled : .disabled)
+        var isPiPEnabled = webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] == true
+
+        // Disable WebView PiP if if the subFeature is off
+        if !isPiPFeatureEnabled {
+            webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] = false
+            isPiPEnabled = false
+        }
+
+        let pip = InitialSetupSettings.PIP(state: isPiPEnabled ? .enabled : .disabled)
 
         let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip)
         let userValues = encodeUserValues()
@@ -223,6 +231,7 @@ final class DuckPlayer {
     }
     private var modeCancellable: AnyCancellable?
     private var isFeatureEnabledCancellable: AnyCancellable?
+    private var isPiPFeatureEnabled: Bool
 
     private func bindDuckPlayerModeIfNeeded() {
         if isFeatureEnabled {

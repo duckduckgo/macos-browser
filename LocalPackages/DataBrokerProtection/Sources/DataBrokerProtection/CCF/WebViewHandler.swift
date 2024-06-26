@@ -127,40 +127,34 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     }
 
     func evaluateJavaScript(_ javaScript: String) async throws {
-        _ = webView?.evaluateJavaScript(javaScript, in: nil, in: WKContentWorld.page)
+        try await webView?.evaluateJavaScript(javaScript) as Void?
     }
 
     func takeSnaphost(path: String, fileName: String) async throws {
-        let script = "document.body.scrollHeight"
+        guard let height: CGFloat = try await webView?.evaluateJavaScript("document.body.scrollHeight") else { return }
 
-        let result = try await webView?.evaluateJavaScript(script)
-
-        if let height = result as? CGFloat {
-            webView?.frame = CGRect(origin: .zero, size: CGSize(width: 1024, height: height))
-            let configuration = WKSnapshotConfiguration()
-            configuration.rect = CGRect(x: 0, y: 0, width: webView?.frame.size.width ?? 0.0, height: height)
-            if let image = try await webView?.takeSnapshot(configuration: configuration) {
-                saveToDisk(image: image, path: path, fileName: fileName)
-            }
+        webView?.frame = CGRect(origin: .zero, size: CGSize(width: 1024, height: height))
+        let configuration = WKSnapshotConfiguration()
+        configuration.rect = CGRect(x: 0, y: 0, width: webView?.frame.size.width ?? 0.0, height: height)
+        if let image = try await webView?.takeSnapshot(configuration: configuration) {
+            saveToDisk(image: image, path: path, fileName: fileName)
         }
     }
 
     func saveHTML(path: String, fileName: String) async throws {
-        let result = try await webView?.evaluateJavaScript("document.documentElement.outerHTML")
+        guard let htmlString: String = try await webView?.evaluateJavaScript("document.documentElement.outerHTML") else { return }
         let fileManager = FileManager.default
 
-        if let htmlString = result as? String {
-            do {
-                if !fileManager.fileExists(atPath: path) {
-                    try fileManager.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
-                }
-
-                let fileURL = URL(fileURLWithPath: "\(path)/\(fileName)")
-                try htmlString.write(to: fileURL, atomically: true, encoding: .utf8)
-                print("HTML content saved to file: \(fileURL)")
-            } catch {
-                print("Error writing HTML content to file: \(error)")
+        do {
+            if !fileManager.fileExists(atPath: path) {
+                try fileManager.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
             }
+
+            let fileURL = URL(fileURLWithPath: "\(path)/\(fileName)")
+            try htmlString.write(to: fileURL, atomically: true, encoding: .utf8)
+            print("HTML content saved to file: \(fileURL)")
+        } catch {
+            os_log(.error, "Error writing HTML content to file: \(error)")
         }
     }
 

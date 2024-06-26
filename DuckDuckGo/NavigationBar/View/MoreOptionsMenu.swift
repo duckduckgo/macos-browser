@@ -58,9 +58,10 @@ final class MoreOptionsMenu: NSMenu {
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
-    private let accountManager: AccountManaging
+    private let accountManager: AccountManager
 
     private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
+    private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -70,14 +71,16 @@ final class MoreOptionsMenu: NSMenu {
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
          vpnFeatureGatekeeper: VPNFeatureGatekeeper,
+         subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
-         accountManager: AccountManaging) {
+         accountManager: AccountManager) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
         self.vpnFeatureGatekeeper = vpnFeatureGatekeeper
+        self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.internalUserDecider = internalUserDecider
         self.accountManager = accountManager
 
@@ -687,7 +690,7 @@ final class LoginsSubMenu: NSMenu {
 final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
 
     var subscriptionFeatureAvailability: SubscriptionFeatureAvailability
-    var accountManager: AccountManaging
+    var accountManager: AccountManager
 
     var networkProtectionItem: NSMenuItem!
     var dataBrokerProtectionItem: NSMenuItem!
@@ -696,7 +699,7 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
 
     init(targeting target: AnyObject,
          subscriptionFeatureAvailability: SubscriptionFeatureAvailability,
-         accountManager: AccountManaging) {
+         accountManager: AccountManager) {
 
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.accountManager = accountManager
@@ -764,8 +767,8 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
         print("refreshAvailabilityBasedOnEntitlements")
         guard subscriptionFeatureAvailability.isFeatureAvailable, accountManager.isUserAuthenticated else { return }
 
-        @Sendable func hasEntitlement(for entitlement: Entitlement.ProductName) async -> Bool {
-            switch await self.accountManager.hasEntitlement(for: .networkProtection) {
+        @Sendable func hasEntitlement(for productName: Entitlement.ProductName) async -> Bool {
+            switch await self.accountManager.hasEntitlement(forProductName: productName) {
             case let .success(result):
                 return result
             case .failure:

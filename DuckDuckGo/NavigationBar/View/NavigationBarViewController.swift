@@ -71,7 +71,7 @@ final class NavigationBarViewController: NSViewController {
         return progressView
     }()
 
-    private var subscriptionManager: SubscriptionManaging {
+    private var subscriptionManager: SubscriptionManager {
         Application.appDelegate.subscriptionManager
     }
 
@@ -514,8 +514,8 @@ final class NavigationBarViewController: NSViewController {
         popovers.toggleDownloadsPopover(from: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
     }
 
-    func showPasswordManagerPopover(selectedCategory: SecureVaultSorting.Category?) {
-        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory, from: passwordManagementButton, withDelegate: self)
+    func showPasswordManagerPopover(selectedCategory: SecureVaultSorting.Category?, source: PasswordManagementSource) {
+        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory, from: passwordManagementButton, withDelegate: self, source: source)
     }
 
     func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount) {
@@ -1050,7 +1050,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category) {
-        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory, from: passwordManagementButton, withDelegate: self)
+        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory, from: passwordManagementButton, withDelegate: self, source: .overflow)
     }
 
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {

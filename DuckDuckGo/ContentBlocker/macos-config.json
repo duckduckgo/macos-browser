@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1718389872223,
+    "version": 1719225510541,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -326,11 +326,12 @@
                 "disabledCMPs": [
                     "generic-cosmetic",
                     "termsfeed3",
-                    "tarteaucitron.js"
+                    "healthline-media",
+                    "ketch"
                 ]
             },
             "state": "enabled",
-            "hash": "83e6459ca9323d451eef92c3f975f9f6"
+            "hash": "9422e16c6f2f205fdb61e27e37abcd07"
         },
         "autofill": {
             "exceptions": [
@@ -340,6 +341,11 @@
             ],
             "state": "enabled",
             "hash": "b1ae580a636957bcbe90d16aa92c40bd"
+        },
+        "brokenSiteReportExperiment": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "clickToLoad": {
             "exceptions": [
@@ -1061,7 +1067,13 @@
                 "firstPartyCookiePolicy": {
                     "threshold": 604800,
                     "maxAge": 604800
-                }
+                },
+                "thirdPartyCookieNames": [
+                    "user_id",
+                    "__Secure-3PAPISID",
+                    "SAPISID",
+                    "APISID"
+                ]
             },
             "exceptions": [
                 {
@@ -1087,7 +1099,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "8ea32fe77b484cffbbf3782cc0725008"
+            "hash": "e045fd25b82f8ac2cbd02877153bd9c2"
         },
         "customUserAgent": {
             "settings": {
@@ -1132,6 +1144,10 @@
                     {
                         "domain": "id.seb.se",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2025"
+                    },
+                    {
+                        "domain": "xfinity.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2149"
                     }
                 ],
                 "webViewDefault": [
@@ -1159,7 +1175,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "c52448ca8da413a93de9822cac039920"
+            "hash": "9041426e18cddda346a67be333bc3729"
         },
         "dbp": {
             "state": "enabled",
@@ -1187,6 +1203,11 @@
         },
         "duckPlayer": {
             "exceptions": [],
+            "features": {
+                "pip": {
+                    "state": "enabled"
+                }
+            },
             "settings": {
                 "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c",
                 "overlays": {
@@ -1251,7 +1272,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "b685397a8317384bec3b8d7e8b7571bb"
+            "hash": "bacc01ec18acadc564c507f12bc01442"
         },
         "dummyWebMessageListener": {
             "exceptions": [],
@@ -4666,6 +4687,9 @@
                     "domain": "nordstrom.com"
                 },
                 {
+                    "domain": "xfinity.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4709,7 +4733,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "60450dfeaadcda674d04afb533108591"
+            "hash": "df0ff6af6c5ae7c141d275cd75f27ce7"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -4847,6 +4871,9 @@
                     "domain": "monstergear.monsterenergy.com"
                 },
                 {
+                    "domain": "npr.org"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4865,7 +4892,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "9f454f11b58ebabddbcf73068fc0c937"
+            "hash": "8d7152a7ac339ca9333a3dbb246a3d76"
         },
         "harmfulApis": {
             "settings": {
@@ -6140,6 +6167,12 @@
                                 "domains": [
                                     "shapermint.com"
                                 ]
+                            },
+                            {
+                                "rule": "datadoghq-browser-agent.com",
+                                "domains": [
+                                    "indeed.com"
+                                ]
                             }
                         ]
                     },
@@ -6307,7 +6340,7 @@
                     "dynamicyield.com": {
                         "rules": [
                             {
-                                "rule": "cdn.dynamicyield.com/api/",
+                                "rule": "dynamicyield.com/api/",
                                 "domains": [
                                     "<all>"
                                 ]
@@ -7389,6 +7422,12 @@
                                 ]
                             },
                             {
+                                "rule": "digital-cloud-west.medallia.com/",
+                                "domains": [
+                                    "walgreens.com"
+                                ]
+                            },
+                            {
                                 "rule": "survey.medallia.com/",
                                 "domains": [
                                     "<all>"
@@ -8117,6 +8156,16 @@
                             }
                         ]
                     },
+                    "siteimproveanalytics.com": {
+                        "rules": [
+                            {
+                                "rule": "siteimproveanalytics.com",
+                                "domains": [
+                                    "codot.gov"
+                                ]
+                            }
+                        ]
+                    },
                     "skimresources.com": {
                         "rules": [
                             {
@@ -8669,7 +8718,7 @@
                     "domain": "noaprints.com"
                 }
             ],
-            "hash": "5afa59b15a6f7294ceda3b6996e96c35"
+            "hash": "182c58c5b1a32bc6c061b88bfbb044b0"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9057,6 +9106,11 @@
             "hash": "62636b478aa50f4bc1e57e6b73fc1e0e"
         },
         "windowsPermissionUsage": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsPrecisionScroll": {
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"

@@ -16,17 +16,18 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import SubscriptionUI
+import WebKit
 
 @MainActor
 final class SubscriptionUIHandler: SubscriptionUIHandling {
 
-    fileprivate var currentWindow: NSWindow? { windowControllersManagerProvider().lastKeyMainWindowController?.window }
-    fileprivate var currentMainViewController: MainViewController? {
-        windowControllersManagerProvider().lastKeyMainWindowController?.mainViewController
-    }
     fileprivate var windowControllersManager: WindowControllersManager { windowControllersManagerProvider() }
+    fileprivate var mainWindowController: MainWindowController? { windowControllersManager.lastKeyMainWindowController }
+    fileprivate var currentWindow: NSWindow? { mainWindowController?.window }
+    fileprivate var currentMainViewController: MainViewController? { mainWindowController?.mainViewController }
+
     typealias WindowControllersManagerProvider = () -> WindowControllersManager
     fileprivate nonisolated let windowControllersManagerProvider: WindowControllersManagerProvider
     fileprivate var progressViewController: ProgressViewController?
@@ -38,8 +39,9 @@ final class SubscriptionUIHandler: SubscriptionUIHandling {
     // MARK: - SubscriptionUIHandling
 
     func presentProgressViewController(withTitle title: String) {
-        progressViewController = ProgressViewController(title: title)
-        currentMainViewController?.presentAsSheet(progressViewController!)
+        let newProgressViewController = ProgressViewController(title: title)
+        currentMainViewController?.presentAsSheet(newProgressViewController)
+        progressViewController = newProgressViewController
     }
 
     func dismissProgressViewController() {
@@ -66,44 +68,35 @@ final class SubscriptionUIHandler: SubscriptionUIHandling {
         currentMainViewController?.presentAsSheet(newSubscriptionAccessViewController)
     }
 
-    func show(alertType: SubscriptionAlertType, text: String? = nil, firstButtonAction: (() -> Void)? = nil) {
+    @discardableResult
+    func dismissProgressViewAndShow(alertType: SubscriptionAlertType, text: String?) async -> NSApplication.ModalResponse {
+        dismissProgressViewController()
+        return await show(alertType: alertType, text: text)
+    }
 
-        var alert: NSAlert?
-        switch alertType {
-        case .somethingWentWrong:
-            alert = .somethingWentWrongAlert()
-        case .subscriptionNotFound:
-            alert = .subscriptionNotFoundAlert()
-        case .subscriptionInactive:
-            alert = .subscriptionInactiveAlert()
-        case .subscriptionFound:
-            alert = .subscriptionFoundAlert()
-        case .appleIDSyncFailed:
-            guard let text else {
-                assertionFailure("Trying to present appleIDSyncFailed alert without required text")
-                return
+    @discardableResult
+    func show(alertType: SubscriptionAlertType, text: String?) async -> NSApplication.ModalResponse {
+        var alert: NSAlert {
+            switch alertType {
+            case .somethingWentWrong:
+                return .somethingWentWrongAlert()
+            case .subscriptionNotFound:
+                return .subscriptionNotFoundAlert()
+            case .subscriptionInactive:
+                return .subscriptionInactiveAlert()
+            case .subscriptionFound:
+                return .subscriptionFoundAlert()
+            case .appleIDSyncFailed:
+                return .appleIDSyncFailedAlert(text: text ?? "Error")
             }
-            alert = .appleIDSyncFailedAlert(text: text)
         }
 
-        guard let alert else {
-            assertionFailure("Missing subscription alert")
-            return
+        guard let currentWindow else {
+            assertionFailure("Missing current window")
+            return .alertSecondButtonReturn
         }
 
-        currentWindow?.show(alert, firstButtonAction: firstButtonAction)
-    }
-
-    func show(alertType: SubscriptionAlertType) {
-        show(alertType: alertType, text: nil, firstButtonAction: nil)
-    }
-
-    func show(alertType: SubscriptionAlertType, firstButtonAction: (() -> Void)?) {
-        show(alertType: alertType, text: nil, firstButtonAction: firstButtonAction)
-    }
-
-    func show(alertType: SubscriptionAlertType, text: String?) {
-        show(alertType: alertType, text: text, firstButtonAction: nil)
+        return await alert.beginSheetModal(for: currentWindow)
     }
 
     func showTab(with content: Tab.TabContent) {
