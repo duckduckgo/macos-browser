@@ -247,6 +247,9 @@ extension VPNControllerXPCClient: VPNControllerIPCClient {
         case .systemExtension:
             try await self.command(.removeSystemExtension)
         }
+    }
 
+    public func quit() async throws {
+        try await self.command(.removeSystemExtension)
     }
 }
