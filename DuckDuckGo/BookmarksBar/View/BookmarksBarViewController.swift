@@ -286,7 +286,7 @@ private extension BookmarksBarViewController {
 
     private func handleClick(for folder: BookmarkFolder, in view: NSView) {
         self.popup = BookmarkListPopover(contentMode: .bar(bookmarkFolderId: folder.id))
-        popup?.show(positionedBelow: view)
+        popup?.showAsMenu(positionedBelow: view)
     }
 
     func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {

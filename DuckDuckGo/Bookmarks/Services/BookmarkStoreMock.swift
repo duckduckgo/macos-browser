@@ -175,7 +175,7 @@ public final class BookmarkStoreMock: BookmarkStore {
     func handleFavoritesAfterDisablingSync() {}
 }
 
-extension ParentFolderType: Equatable {
+extension ParentFolderType {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         switch (lhs, rhs) {
         case (.root, .root):
