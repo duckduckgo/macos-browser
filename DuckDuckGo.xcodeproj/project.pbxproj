@@ -55,6 +55,10 @@
 		1D36E65C298ACD2900AA485D /* AppIconChanger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36E65A298ACD2900AA485D /* AppIconChanger.swift */; };
 		1D36F4242A3B85C50052B527 /* TabCleanupPreparer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36F4232A3B85C50052B527 /* TabCleanupPreparer.swift */; };
 		1D36F4252A3B85C50052B527 /* TabCleanupPreparer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36F4232A3B85C50052B527 /* TabCleanupPreparer.swift */; };
+		1D39E5772C2BFD5700757339 /* ReleaseNotesTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D39E5762C2BFD5700757339 /* ReleaseNotesTabExtension.swift */; };
+		1D39E5782C2BFD5700757339 /* ReleaseNotesTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D39E5762C2BFD5700757339 /* ReleaseNotesTabExtension.swift */; };
+		1D39E57A2C2C0F3700757339 /* ReleaseNotesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D39E5792C2C0F3700757339 /* ReleaseNotesUserScript.swift */; };
+		1D39E57B2C2C0F3700757339 /* ReleaseNotesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D39E5792C2C0F3700757339 /* ReleaseNotesUserScript.swift */; };
 		1D3B1AB92934062B006F4388 /* PasswordManagerCoordinatingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1AB82934062B006F4388 /* PasswordManagerCoordinatingMock.swift */; };
 		1D3B1ABF29369FC8006F4388 /* BWEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1ABE29369FC8006F4388 /* BWEncryptionTests.swift */; };
 		1D3B1AC22936B816006F4388 /* BWMessageIdGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1AC12936B816006F4388 /* BWMessageIdGeneratorTests.swift */; };
@@ -2879,6 +2883,9 @@
 		1D36E657298AA3BA00AA485D /* InternalUserDeciderStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderStore.swift; sourceTree = "<group>"; };
 		1D36E65A298ACD2900AA485D /* AppIconChanger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconChanger.swift; sourceTree = "<group>"; };
 		1D36F4232A3B85C50052B527 /* TabCleanupPreparer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCleanupPreparer.swift; sourceTree = "<group>"; };
+		1D39E5752C2B04C600757339 /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../../../content-scope-scripts"; sourceTree = "<group>"; };
+		1D39E5762C2BFD5700757339 /* ReleaseNotesTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReleaseNotesTabExtension.swift; sourceTree = "<group>"; };
+		1D39E5792C2C0F3700757339 /* ReleaseNotesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReleaseNotesUserScript.swift; sourceTree = "<group>"; };
 		1D3B1AB82934062B006F4388 /* PasswordManagerCoordinatingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerCoordinatingMock.swift; sourceTree = "<group>"; };
 		1D3B1ABE29369FC8006F4388 /* BWEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWEncryptionTests.swift; sourceTree = "<group>"; };
 		1D3B1AC12936B816006F4388 /* BWMessageIdGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWMessageIdGeneratorTests.swift; sourceTree = "<group>"; };
@@ -4576,6 +4583,8 @@
 				1D72D5912BFF3DF000AEDE36 /* UpdateNotificationWindow.swift */,
 				1D72D5952BFF3FAF00AEDE36 /* UpdateNotificationView.swift */,
 				1D9297BE2C1B062900A38521 /* UpdateDetector.swift */,
+				1D39E5762C2BFD5700757339 /* ReleaseNotesTabExtension.swift */,
+				1D39E5792C2C0F3700757339 /* ReleaseNotesUserScript.swift */,
 			);
 			path = Updates;
 			sourceTree = "<group>";
@@ -4878,6 +4887,7 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
+				1D39E5752C2B04C600757339 /* content-scope-scripts */,
 				7B9167A82C09E88800322310 /* AppLauncher */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
@@ -9859,6 +9869,7 @@
 				3706FB31293F65D500E42796 /* PinnedTabsHostingView.swift in Sources */,
 				B6AFE6BC29A5D3F8002FF962 /* PrivacyDashboardTabExtension.swift in Sources */,
 				3706FB32293F65D500E42796 /* FirefoxBookmarksReader.swift in Sources */,
+				1D39E57B2C2C0F3700757339 /* ReleaseNotesUserScript.swift in Sources */,
 				3706FB33293F65D500E42796 /* DeviceIdleStateDetector.swift in Sources */,
 				1DB67F2A2B6FEB17003DF243 /* WebViewSnapshotRenderer.swift in Sources */,
 				3706FB35293F65D500E42796 /* FlatButton.swift in Sources */,
@@ -9929,6 +9940,7 @@
 				3706FB67293F65D500E42796 /* DownloadListCoordinator.swift in Sources */,
 				3706FB68293F65D500E42796 /* NSNotificationName+Debug.swift in Sources */,
 				3706FB69293F65D500E42796 /* NavigationBarBadgeAnimationView.swift in Sources */,
+				1D39E5782C2BFD5700757339 /* ReleaseNotesTabExtension.swift in Sources */,
 				1D1A334A2A6FEB170080ACED /* BurnerMode.swift in Sources */,
 				B603971B29BA084C00902A34 /* JSAlertController.swift in Sources */,
 				9FEE986A2B85B869002E44E8 /* BookmarksDialogViewModel.swift in Sources */,
@@ -11063,6 +11075,7 @@
 				B66260DD29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift in Sources */,
 				1D1A33492A6FEB170080ACED /* BurnerMode.swift in Sources */,
 				14505A08256084EF00272CC6 /* UserAgent.swift in Sources */,
+				1D39E5772C2BFD5700757339 /* ReleaseNotesTabExtension.swift in Sources */,
 				987799F12999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */,
 				1D220BF82B86192200F8BBC6 /* PreferencesEmailProtectionView.swift in Sources */,
 				4B8AC93526B3B2FD00879451 /* NSAlert+DataImport.swift in Sources */,
@@ -11536,6 +11549,7 @@
 				B6B4D1CA2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */,
 				AA6197C4276B314D008396F0 /* FaviconUrlReference.swift in Sources */,
 				B696AFFB2AC5924800C93203 /* FileLineError.swift in Sources */,
+				1D39E57A2C2C0F3700757339 /* ReleaseNotesUserScript.swift in Sources */,
 				85CC1D7B26A05ECF0062F04E /* PasswordManagementItemListModel.swift in Sources */,
 				AABEE6A924AB4B910043105B /* SuggestionTableCellView.swift in Sources */,
 				AA6820F125503DA9005ED0D5 /* FireViewModel.swift in Sources */,

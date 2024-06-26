@@ -18,9 +18,31 @@
 
 import Foundation
 import WebKit
+import ContentScopeScripts
 
 final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
 
+    func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
+        guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
+            assertionFailure("No URL for Duck scheme handler")
+            return
+        }
+
+        switch requestURL.type {
+        case .onboarding, .releaseNotes:
+            handleOnboarding(urlSchemeTask: urlSchemeTask)
+        case .duckPlayer:
+            handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
+        default:
+            handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
+        }
+    }
+
+    func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
+}
+
+// MARK: - Native UI Paged
+extension DuckURLSchemeHandler {
     static let emptyHtml = """
     <html>
       <head>
@@ -42,28 +64,24 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
     </html>
     """
 
-    func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
-        guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
-            assertionFailure("No URL for Private Player scheme handler")
-            return
-        }
+    private func handleNativeUIPages(requestURL: URL, urlSchemeTask: WKURLSchemeTask) {
+        // return empty page for native UI pages navigations (like the Home page or Settings) if the request is not for the Duck Player
+        let data = Self.emptyHtml.utf8data
 
-        guard requestURL.isDuckPlayer else {
-            // return empty page for native UI pages navigations (like the Home page or Settings) if the request is not for the Duck Player
-            let data = Self.emptyHtml.utf8data
+        let response = URLResponse(url: requestURL,
+                                   mimeType: "text/html",
+                                   expectedContentLength: data.count,
+                                   textEncodingName: nil)
 
-            let response = URLResponse(url: requestURL,
-                                       mimeType: "text/html",
-                                       expectedContentLength: data.count,
-                                       textEncodingName: nil)
+        urlSchemeTask.didReceive(response)
+        urlSchemeTask.didReceive(data)
+        urlSchemeTask.didFinish()
+    }
+}
 
-            urlSchemeTask.didReceive(response)
-            urlSchemeTask.didReceive(data)
-            urlSchemeTask.didFinish()
-
-            return
-        }
-
+// MARK: - DuckPlayer
+extension DuckURLSchemeHandler {
+    private func handleDuckPlayer(requestURL: URL, urlSchemeTask: WKURLSchemeTask, webView: WKWebView) {
         let youtubeHandler = YoutubePlayerNavigationHandler()
         let html = youtubeHandler.makeHTMLFromTemplate()
 
@@ -83,6 +101,99 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
             urlSchemeTask.didFinish()
         }
     }
+}
 
-    func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
+// MARK: - Onboarding
+private extension DuckURLSchemeHandler {
+    func handleOnboarding(urlSchemeTask: WKURLSchemeTask) {
+        guard let requestURL = urlSchemeTask.request.url else {
+            assertionFailure("No URL for Onboarding scheme handler")
+            return
+        }
+        guard let (response, data) = onboardingResponse(for: requestURL) else { return }
+        urlSchemeTask.didReceive(response)
+        urlSchemeTask.didReceive(data)
+        urlSchemeTask.didFinish()
+    }
+
+    func onboardingResponse(for url: URL) -> (URLResponse, Data)? {
+        var fileName = "index"
+        var fileExtension = "html"
+        var directoryURL: URL
+        if url.isOnboarding {
+            directoryURL = URL(fileURLWithPath: "/pages/onboarding")
+        } else if url.isReleaseNotesScheme {
+            directoryURL = URL(fileURLWithPath: "/pages/release-notes")
+        } else {
+            assertionFailure("Unknown scheme")
+            return nil
+        }
+        directoryURL.appendPathComponent(url.path)
+
+        if !directoryURL.pathExtension.isEmpty {
+            fileExtension = directoryURL.pathExtension
+            directoryURL.deletePathExtension()
+            fileName = directoryURL.lastPathComponent
+            directoryURL.deleteLastPathComponent()
+        }
+
+        guard let file = ContentScopeScripts.Bundle.path(forResource: fileName, ofType: fileExtension, inDirectory: directoryURL.path) else {
+            assertionFailure("\(fileExtension) template not found")
+            return nil
+        }
+
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)) else {
+            return nil
+        }
+        let response = URLResponse(url: url, mimeType: mimeType(for: fileExtension), expectedContentLength: data.count, textEncodingName: nil)
+        return (response, data)
+    }
+
+    func mimeType(for fileExtension: String) -> String? {
+        switch fileExtension {
+        case "html": return "text/html"
+        case "css": return "text/css"
+        case "js": return "text/javascript"
+        case "png": return "image/png"
+        case "jpg", "jpeg": return "image/jpeg"
+        case "gif": return "image/gif"
+        case "svg": return "image/svg+xml"
+        case "ico": return "image/x-icon"
+        case "riv": return "application/octet-stream"
+        default: return nil
+        }
+    }
+
+}
+
+extension URL {
+    enum URLType {
+        case onboarding
+        case duckPlayer
+        case releaseNotes
+    }
+
+    var type: URLType? {
+        if self.isDuckPlayer {
+            return .duckPlayer
+        } else if self.isOnboarding {
+            return .onboarding
+        } else if self.isReleaseNotesScheme {
+            return .releaseNotes
+        } else {
+            return nil
+        }
+    }
+
+    var isOnboarding: Bool {
+        return isDuckURLScheme && host == "onboarding"
+    }
+
+    var isDuckURLScheme: Bool {
+        navigationalScheme == .duck
+    }
+
+    var isReleaseNotesScheme: Bool {
+        return isDuckURLScheme && host == "release-notes"
+    }
 }

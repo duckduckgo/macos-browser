@@ -201,6 +201,10 @@ extension TabExtensionsBuilder {
                                   scriptsPublisher: userScripts.compactMap { $0 })
         }
 
+        add {
+            ReleaseNotesTabExtension()
+        }
+
         if let tunnelController = dependencies.tunnelController {
             add {
                 NetworkProtectionControllerTabExtension(tunnelController: tunnelController)
