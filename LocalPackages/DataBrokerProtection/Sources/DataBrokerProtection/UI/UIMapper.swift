@@ -424,15 +424,11 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
     ///
     /// - Returns: An array of `BrokerProfileQueryData` sorted by `lastRunDate`
     func sortedByRunDate() -> Self {
-        sorted { lhs, rhs in
+        filter({ $0.scanJobData.lastRunDate != nil }).sorted { lhs, rhs in
             switch (lhs.scanJobData.lastRunDate, rhs.scanJobData.lastRunDate) {
             case let (lhsDate?, rhsDate?):
                 return lhsDate < rhsDate
-            case (nil, _?):
-                return true
-            case (_?, nil):
-                return false
-            case (nil, nil):
+            default:
                 return false
             }
         }

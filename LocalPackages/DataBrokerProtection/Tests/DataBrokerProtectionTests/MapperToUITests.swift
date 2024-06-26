@@ -366,6 +366,7 @@ final class MapperToUITests: XCTestCase {
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
             .mock(dataBrokerName: "Broker #1", lastRunDate: .minusTwoHours),
+            .mock(dataBrokerName: "Broker #2"),
             .mock(dataBrokerName: "Broker #2", lastRunDate: .minusOneHour),
             .mock(dataBrokerName: "Broker #2", lastRunDate: .minusThreeHours),
             .mock(dataBrokerName: "Broker #3", lastRunDate: .minusTwoHours),
