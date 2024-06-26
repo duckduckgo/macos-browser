@@ -27,6 +27,107 @@ import RemoteMessaging
 import NetworkProtection
 import Subscription
 
+final class MacOSRemoteMessagingDataSource2: RemoteMessagingDataSource2 {
+
+    init(
+        bookmarksDatabase: CoreDataDatabase,
+        appearancePreferences: AppearancePreferences,
+        internalUserDecider: InternalUserDecider
+    ) {
+        self.bookmarksDatabase = bookmarksDatabase
+        self.appearancePreferences = appearancePreferences
+        self.internalUserDecider = internalUserDecider
+    }
+
+    let bookmarksDatabase: CoreDataDatabase
+    let appearancePreferences: AppearancePreferences
+    let internalUserDecider: InternalUserDecider
+
+    func refreshConfigMatcher(with store: RemoteMessagingStoring) async -> RemoteMessagingConfigMatcher {
+
+        var bookmarksCount = 0
+        var favoritesCount = 0
+        let context = bookmarksDatabase.makeContext(concurrencyType: .privateQueueConcurrencyType)
+        context.performAndWait {
+            bookmarksCount = BookmarkUtils.numberOfBookmarks(in: context)
+            favoritesCount = BookmarkUtils.numberOfFavorites(for: appearancePreferences.favoritesDisplayMode, in: context)
+        }
+
+        let statisticsStore = LocalStatisticsStore()
+        let variantManager = DefaultVariantManager()
+        let subscriptionManager = await Application.appDelegate.subscriptionManager
+
+        let isPrivacyProSubscriber = subscriptionManager.accountManager.isUserAuthenticated
+        let isPrivacyProEligibleUser = subscriptionManager.canPurchase
+
+        let activationDateStore = DefaultWaitlistActivationDateStore(source: .netP)
+        let daysSinceNetworkProtectionEnabled = activationDateStore.daysSinceActivation() ?? -1
+
+        var privacyProDaysSinceSubscribed = -1
+        var privacyProDaysUntilExpiry = -1
+        var isPrivacyProSubscriptionActive = false
+        var isPrivacyProSubscriptionExpiring = false
+        var isPrivacyProSubscriptionExpired = false
+        var privacyProPurchasePlatform: String? = nil
+        let surveyActionMapper: RemoteMessagingSurveyActionMapping
+
+        if let accessToken = subscriptionManager.accountManager.accessToken {
+            let subscriptionResult = await subscriptionManager.subscriptionEndpointService.getSubscription(accessToken: accessToken)
+
+            if case let .success(subscription) = subscriptionResult {
+                privacyProDaysSinceSubscribed = Calendar.current.numberOfDaysBetween(subscription.startedAt, and: Date()) ?? -1
+                privacyProDaysUntilExpiry = Calendar.current.numberOfDaysBetween(Date(), and: subscription.expiresOrRenewsAt) ?? -1
+                privacyProPurchasePlatform = subscription.platform.rawValue
+
+                switch subscription.status {
+                case .autoRenewable, .gracePeriod:
+                    isPrivacyProSubscriptionActive = true
+                case .notAutoRenewable:
+                    isPrivacyProSubscriptionActive = true
+                    isPrivacyProSubscriptionExpiring = true
+                case .expired, .inactive:
+                    isPrivacyProSubscriptionExpired = true
+                case .unknown:
+                    break // Not supported in RMF
+                }
+
+                surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: subscription)
+            } else {
+                surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: nil)
+            }
+        } else {
+            surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: nil)
+        }
+
+        let dismissedMessageIds = store.fetchDismissedRemoteMessageIds()
+
+        return RemoteMessagingConfigMatcher(
+            appAttributeMatcher: AppAttributeMatcher(statisticsStore: statisticsStore,
+                                                     variantManager: variantManager,
+                                                     isInternalUser: internalUserDecider.isInternalUser),
+            userAttributeMatcher: UserAttributeMatcher(statisticsStore: statisticsStore,
+                                                       variantManager: variantManager,
+                                                       bookmarksCount: bookmarksCount,
+                                                       favoritesCount: favoritesCount,
+                                                       appTheme: appearancePreferences.currentThemeName.rawValue,
+                                                       isWidgetInstalled: false,
+                                                       daysSinceNetPEnabled: daysSinceNetworkProtectionEnabled,
+                                                       isPrivacyProEligibleUser: isPrivacyProEligibleUser,
+                                                       isPrivacyProSubscriber: isPrivacyProSubscriber,
+                                                       privacyProDaysSinceSubscribed: privacyProDaysSinceSubscribed,
+                                                       privacyProDaysUntilExpiry: privacyProDaysUntilExpiry,
+                                                       privacyProPurchasePlatform: privacyProPurchasePlatform,
+                                                       isPrivacyProSubscriptionActive: isPrivacyProSubscriptionActive,
+                                                       isPrivacyProSubscriptionExpiring: isPrivacyProSubscriptionExpiring,
+                                                       isPrivacyProSubscriptionExpired: isPrivacyProSubscriptionExpired,
+                                                       dismissedMessageIds: dismissedMessageIds),
+            percentileStore: RemoteMessagingPercentileUserDefaultsStore(userDefaults: .standard),
+            surveyActionMapper: surveyActionMapper,
+            dismissedMessageIds: dismissedMessageIds
+        )
+    }
+}
+
 final class MacOSRemoteMessagingDataSource: RemoteMessagingDataSource {
 
     init(
@@ -142,7 +243,7 @@ final class RemoteMessagingClient: RemoteMessagingClientBase {
         self.appearancePreferences = appearancePreferences
         self.internalUserDecider = internalUserDecider
 
-        let dataSource = MacOSRemoteMessagingDataSource(
+        let dataSource = MacOSRemoteMessagingDataSource2(
             bookmarksDatabase: bookmarksDatabase,
             appearancePreferences: appearancePreferences,
             internalUserDecider: internalUserDecider
