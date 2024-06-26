@@ -105,7 +105,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if accountManager.isUserAuthenticated {
             Task {
                 await self.updateSubscription(cachePolicy: .returnCacheDataElseLoad)
-                await self.updateAllEntitlement(cachePolicy: .returnCacheDataElseLoad)
+                await self.loadCachedEntitlements()
             }
 
             self.email = accountManager.email
@@ -306,9 +306,49 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 self?.fetchSubscriptionDetailsTask = nil
             }
 
+            await self?.fetchEmailAndRemoteEntitlements()
             await self?.updateSubscription(cachePolicy: .reloadIgnoringLocalCacheData)
-            await self?.updateAllEntitlement(cachePolicy: .reloadIgnoringLocalCacheData)
-            // TODO: self?.accountManager.fetchAccountDetails(with: token)
+        }
+    }
+
+    @MainActor
+    private func loadCachedEntitlements() async {
+        switch await self.accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .returnCacheDataDontLoad) {
+        case let .success(result):
+            hasAccessToVPN = result
+        case .failure:
+            hasAccessToVPN = false
+        }
+
+        switch await self.accountManager.hasEntitlement(forProductName: .dataBrokerProtection, cachePolicy: .returnCacheDataDontLoad) {
+        case let .success(result):
+            hasAccessToDBP = result
+        case .failure:
+            hasAccessToDBP = false
+        }
+
+        switch await self.accountManager.hasEntitlement(forProductName: .identityTheftRestoration, cachePolicy: .returnCacheDataDontLoad) {
+        case let .success(result):
+            hasAccessToITR = result
+        case .failure:
+            hasAccessToITR = false
+        }
+    }
+
+    @MainActor func fetchEmailAndRemoteEntitlements() async {
+        guard let accessToken = accountManager.accessToken else { return }
+
+        if case let .success(response) = await subscriptionManager.authEndpointService.validateToken(accessToken: accessToken) {
+            if accountManager.email != response.account.email {
+                email = response.account.email
+                accountManager.storeAccount(token: accessToken, email: response.account.email, externalID: response.account.externalID)
+            }
+
+            let entitlements = response.account.entitlements.compactMap { $0.product }
+            hasAccessToVPN = entitlements.contains(.networkProtection)
+            hasAccessToDBP = entitlements.contains(.dataBrokerProtection)
+            hasAccessToITR = entitlements.contains(.identityTheftRestoration)
+            accountManager.updateCache(with: response.account.entitlements)
         }
     }
 
@@ -326,30 +366,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             subscriptionStatus = subscription.status
         case .failure:
             break
-        }
-    }
-
-    @MainActor
-    private func updateAllEntitlement(cachePolicy: APICachePolicy) async {
-        switch await self.accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: cachePolicy) {
-        case let .success(result):
-            hasAccessToVPN = result
-        case .failure:
-            hasAccessToVPN = false
-        }
-
-        switch await self.accountManager.hasEntitlement(forProductName: .dataBrokerProtection, cachePolicy: cachePolicy) {
-        case let .success(result):
-            hasAccessToDBP = result
-        case .failure:
-            hasAccessToDBP = false
-        }
-
-        switch await self.accountManager.hasEntitlement(forProductName: .identityTheftRestoration, cachePolicy: cachePolicy) {
-        case let .success(result):
-            hasAccessToITR = result
-        case .failure:
-            hasAccessToITR = false
         }
     }
 
