@@ -1,7 +1,7 @@
 {
   "name": "Wellnut",
   "url": "wellnut.com",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -27,6 +27,7 @@
           "actionType": "extract",
           "id": "2846bcb5-84c4-4f20-8ff8-6118849b9828",
           "selector": ".card",
+          "noResultsSelector": "//div[contains(@class, 'page-404')]//h1[contains(text(), 'Sorry')]",
           "profile": {
             "name": {
               "selector": ".card-title",

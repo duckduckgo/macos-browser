@@ -18,6 +18,7 @@
           "actionType": "extract",
           "id": "14dfda23-a4c3-483f-a67f-e89322636036",
           "selector": ".person-container",
+          "noResultsSelector": "//h1[text()='Search Not Found']",
           "profile": {
             "name": {
               "selector": ".text-xl"

@@ -27,6 +27,7 @@
           "actionType": "extract",
           "id": "633a36d1-a68c-4435-93eb-de82d940e7f7",
           "selector": ".b-pfl-list",
+          "noResultsSelector": "//h3[contains(text(), 'No people found')]",
           "profile": {
             "name": {
               "selector": ".name"
