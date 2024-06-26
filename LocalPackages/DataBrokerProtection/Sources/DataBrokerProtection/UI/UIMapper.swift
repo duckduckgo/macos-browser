@@ -72,7 +72,7 @@ struct MapperToUI {
         let scanProgress = DBPUIScanProgress(currentScans: partiallyScannedBrokers.count,
                                              totalScans: totalScans,
                                              partiallyScannedBrokers: partiallyScannedBrokers)
-        
+
         let matches = mapMatchesToUI(brokerProfileQueryData)
 
         return .init(resultsFound: matches, scanProgress: scanProgress)
@@ -419,7 +419,7 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
             }
         }).first
     }
-    
+
     /// Sorts the array in ascending order based on `lastRunDate`
     ///
     /// - Returns: An array of `BrokerProfileQueryData` sorted by `lastRunDate`
