@@ -27,7 +27,7 @@ import RemoteMessaging
 import NetworkProtection
 import Subscription
 
-final class MacOSRemoteMessagingDataSource: RemoteMessagingDataSource {
+final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherProviding {
 
     init(
         bookmarksDatabase: CoreDataDatabase,
@@ -43,6 +43,7 @@ final class MacOSRemoteMessagingDataSource: RemoteMessagingDataSource {
     let appearancePreferences: AppearancePreferences
     let internalUserDecider: InternalUserDecider
 
+    // swiftlint:disable:next function_body_length
     func refreshConfigMatcher(with store: RemoteMessagingStoring) async -> RemoteMessagingConfigMatcher {
 
         var bookmarksCount = 0
@@ -68,7 +69,7 @@ final class MacOSRemoteMessagingDataSource: RemoteMessagingDataSource {
         var isPrivacyProSubscriptionActive = false
         var isPrivacyProSubscriptionExpiring = false
         var isPrivacyProSubscriptionExpired = false
-        var privacyProPurchasePlatform: String? = nil
+        var privacyProPurchasePlatform: String?
         let surveyActionMapper: RemoteMessagingSurveyActionMapping
 
         if let accessToken = subscriptionManager.accountManager.accessToken {
@@ -144,12 +145,12 @@ final class RemoteMessagingClient: RemoteMessagingClientBase {
         self.appearancePreferences = appearancePreferences
         self.internalUserDecider = internalUserDecider
 
-        let dataSource = MacOSRemoteMessagingDataSource(
+        let provider = RemoteMessagingConfigMatcherProvider(
             bookmarksDatabase: bookmarksDatabase,
             appearancePreferences: appearancePreferences,
             internalUserDecider: internalUserDecider
         )
-        super.init(endpoint: Self.endpoint, dataSource: dataSource)
+        super.init(endpoint: Self.endpoint, configMatcherProvider: provider)
 
         subscribeToInternalUserFlagChangesIfNeeded()
     }
