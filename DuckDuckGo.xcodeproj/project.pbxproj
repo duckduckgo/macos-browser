@@ -996,6 +996,8 @@
 		3768D83C2C24C0A8004120AE /* HomeMessageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D83A2C24C0A8004120AE /* HomeMessageViewModel.swift */; };
 		3768D8402C29C1F1004120AE /* ActiveRemoteMessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */; };
 		3768D8412C29C1F1004120AE /* ActiveRemoteMessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */; };
+		3768D8442C2CC884004120AE /* RemoteMessagingConfigMatcherProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8432C2CC884004120AE /* RemoteMessagingConfigMatcherProvider.swift */; };
+		3768D8452C2CC884004120AE /* RemoteMessagingConfigMatcherProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3768D8432C2CC884004120AE /* RemoteMessagingConfigMatcherProvider.swift */; };
 		376C4DB928A1A48A00CC0F5B /* FirePopoverViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376C4DB828A1A48A00CC0F5B /* FirePopoverViewModelTests.swift */; };
 		376E2D2629428353001CD31B /* PrivacyReferenceTestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163BC293A579E00963C10 /* PrivacyReferenceTestHelper.swift */; };
 		376E2D2729428353001CD31B /* BrokenSiteReportingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */; };
@@ -3025,6 +3027,7 @@
 		3768D8372C24BFF5004120AE /* HomeMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMessageView.swift; sourceTree = "<group>"; };
 		3768D83A2C24C0A8004120AE /* HomeMessageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMessageViewModel.swift; sourceTree = "<group>"; };
 		3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRemoteMessageModel.swift; sourceTree = "<group>"; };
+		3768D8432C2CC884004120AE /* RemoteMessagingConfigMatcherProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingConfigMatcherProvider.swift; sourceTree = "<group>"; };
 		376C4DB828A1A48A00CC0F5B /* FirePopoverViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverViewModelTests.swift; sourceTree = "<group>"; };
 		376CC8B4296EB630006B63A7 /* AppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppStore.xcconfig; sourceTree = "<group>"; };
 		376CC8B5296EBA8F006B63A7 /* BuildNumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BuildNumber.xcconfig; sourceTree = "<group>"; };
@@ -4732,6 +4735,7 @@
 			isa = PBXGroup;
 			children = (
 				371209202C232E3F003ADF3D /* RemoteMessagingClient.swift */,
+				3768D8432C2CC884004120AE /* RemoteMessagingConfigMatcherProvider.swift */,
 				3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */,
 				371209292C2333A0003ADF3D /* RemoteMessagingDatabase.swift */,
 				3712092B2C23383C003ADF3D /* RemoteMessagingStoreErrorHandling.swift */,
@@ -9692,6 +9696,7 @@
 				3706FABE293F65D500E42796 /* RulesCompilationMonitor.swift in Sources */,
 				3706FABF293F65D500E42796 /* CrashReportReader.swift in Sources */,
 				B6B4D1C62B0B3B5400C26286 /* DataImportReportModel.swift in Sources */,
+				3768D8452C2CC884004120AE /* RemoteMessagingConfigMatcherProvider.swift in Sources */,
 				3706FAC0293F65D500E42796 /* DataTaskProviding.swift in Sources */,
 				3706FAC1293F65D500E42796 /* FeedbackViewController.swift in Sources */,
 				3706FAC2293F65D500E42796 /* FaviconSelector.swift in Sources */,
@@ -11507,6 +11512,7 @@
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
 				C13909EF2B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
+				3768D8442C2CC884004120AE /* RemoteMessagingConfigMatcherProvider.swift in Sources */,
 				9812D895276CEDA5004B6181 /* ContentBlockerRulesLists.swift in Sources */,
 				4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */,
 				C16127EE2BDFB46400966BB9 /* DataImportShortcutsView.swift in Sources */,
@@ -13097,7 +13103,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "dominik/rmf-macos";
+				branch = "dominik/rmf-refactor";
 				kind = branch;
 			};
 		};
