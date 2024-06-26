@@ -204,7 +204,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 let emailAccessToken = try? EmailManager().getToken()
                 let purchaseTransactionJWS: String
-                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager)
+                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
+                                                                     storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                     subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                                     authEndpointService: subscriptionManager.authEndpointService)
                 let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionManager: subscriptionManager,
                                                                        appStoreRestoreFlow: appStoreRestoreFlow)
 
@@ -441,7 +444,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         switch await uiHandler.dismissProgressViewAndShow(alertType: .subscriptionFound, text: nil) {
         case .alertFirstButtonReturn:
             if #available(macOS 12.0, *) {
-                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: self.subscriptionManager)
+                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
+                                                                     storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                     subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                                     authEndpointService: subscriptionManager.authEndpointService)
                 let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                 switch result {
                 case .success: PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
@@ -461,7 +467,10 @@ extension SubscriptionPagesUseSubscriptionFeature: SubscriptionAccessActionHandl
     func subscriptionAccessActionRestorePurchases(message: WKScriptMessage) {
         if #available(macOS 12.0, *) {
             Task { @MainActor in
-                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager)
+                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
+                                                                     storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                     subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                                     authEndpointService: subscriptionManager.authEndpointService)
                 let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(subscriptionManager: self.subscriptionManager,
                                                                                        appStoreRestoreFlow: appStoreRestoreFlow,
                                                                                        uiHandler: self.uiHandler)

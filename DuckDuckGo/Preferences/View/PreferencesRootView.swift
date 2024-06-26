@@ -165,7 +165,11 @@ enum Preferences {
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 if #available(macOS 12.0, *) {
                     Task {
-                        let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: Application.appDelegate.subscriptionManager)
+                        let subscriptionManager = Application.appDelegate.subscriptionManager
+                        let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
+                                                                             storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                             subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                                             authEndpointService: subscriptionManager.authEndpointService)
                         let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(
                             subscriptionManager: Application.appDelegate.subscriptionManager,
                             appStoreRestoreFlow: appStoreRestoreFlow,

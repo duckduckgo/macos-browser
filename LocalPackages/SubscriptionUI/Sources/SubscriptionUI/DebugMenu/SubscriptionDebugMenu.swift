@@ -243,8 +243,12 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             let storePurchaseManager = DefaultStorePurchaseManager()
+            let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
+                                                                 storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                 subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                                 authEndpointService: subscriptionManager.authEndpointService)
             let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionManager: subscriptionManager,
-                                                            appStoreRestoreFlow: DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager))
+                                                            appStoreRestoreFlow: appStoreRestoreFlow)
             let vc = DebugPurchaseViewController(storePurchaseManager: storePurchaseManager, appStorePurchaseFlow: appStorePurchaseFlow)
             currentViewController()?.presentAsSheet(vc)
         }
@@ -314,7 +318,10 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func restorePurchases(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             Task {
-                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager)
+                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
+                                                                     storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                     subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                                     authEndpointService: subscriptionManager.authEndpointService)
                 await appStoreRestoreFlow.restoreAccountFromPastPurchase()
             }
         }
