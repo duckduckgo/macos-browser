@@ -221,7 +221,7 @@ public struct PreferencesSubscriptionView: View {
             if model.hasEmail {
                 Text(.init(UserText.activateSectionWithEmailCaption)) // required to parse markdown formatting
                     .onURLTap(onTap: { url in
-                        model.openURLAction(url)
+                        model.openLearnMore(url)
                     })
                     .foregroundColor(Color(.textSecondary))
                     .padding(.bottom, 2)
@@ -230,7 +230,7 @@ public struct PreferencesSubscriptionView: View {
             } else {
                 Text(.init(UserText.activateSectionNoEmailCaption)) // required to parse markdown formatting
                     .onURLTap(onTap: { url in
-                        model.openURLAction(url)
+                        model.openLearnMore(url)
                     })
                     .foregroundColor(Color(.textSecondary))
                     .padding(.bottom, 8)

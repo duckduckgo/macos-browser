@@ -224,7 +224,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func openURLAction(_ url: URL) {
+    func openLearnMore(_ url: URL) {
         openURLHandler(url)
     }
 
