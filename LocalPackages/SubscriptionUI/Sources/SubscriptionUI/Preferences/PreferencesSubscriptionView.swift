@@ -219,12 +219,22 @@ public struct PreferencesSubscriptionView: View {
         PreferencePaneSection {
             TextMenuItemHeader(UserText.activateSectionTitle, bottomPadding: 0)
             if model.hasEmail {
-                TextMenuItemCaption(UserText.activateSectionWithEmailCaption)
+                Text(.init(UserText.activateSectionWithEmailCaption)) // required to parse markdown formatting
+                    .onURLTap(onTap: { url in
+                        model.openURLAction(url)
+                    })
+                    .foregroundColor(Color(.textSecondary))
                     .padding(.bottom, 2)
+
                 emailView
             } else {
-                TextMenuItemCaption(UserText.activateSectionNoEmailCaption)
+                Text(.init(UserText.activateSectionNoEmailCaption)) // required to parse markdown formatting
+                    .onURLTap(onTap: { url in
+                        model.openURLAction(url)
+                    })
+                    .foregroundColor(Color(.textSecondary))
                     .padding(.bottom, 8)
+
                 TextButton(UserText.addEmailButton, weight: .semibold) { model.addEmailAction() }
             }
         }

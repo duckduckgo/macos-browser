@@ -232,9 +232,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func openLearnMore() {
-        print("openLearnMore")
-        // TODO:
+    func openURLAction(_ url: URL) {
+        openURLHandler(url)
     }
 
     @MainActor
