@@ -377,7 +377,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
+        subscriptionManager.updateSubscriptionStatus { isActive in
+            if isActive {
+                PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
+            }
+        }
+
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
+        
 #if DBP
         DataBrokerProtectionAppEvents(featureGatekeeper:
                                         DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
@@ -385,12 +392,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
         AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
-
-        subscriptionManager.updateSubscriptionStatus { isActive in
-            if isActive {
-                PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
-            }
-        }
 
         Task { @MainActor in
             await vpnRedditSessionWorkaround.installRedditSessionWorkaround()
