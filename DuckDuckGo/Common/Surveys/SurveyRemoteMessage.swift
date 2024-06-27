@@ -42,6 +42,7 @@ struct SurveyRemoteMessage: Codable, Equatable, Identifiable, Hashable {
         let maximumDaysUntilSubscriptionExpirationOrRenewal: Int?
         let daysSinceVPNEnabled: Int?
         let daysSincePIREnabled: Int?
+        let hideIfInteractedWithMessage: [String]?
     }
 
     let id: String

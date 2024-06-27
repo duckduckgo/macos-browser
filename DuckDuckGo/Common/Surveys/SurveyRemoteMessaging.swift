@@ -131,6 +131,13 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
             var attributeMatchStatus = false
 
+            if let interactedMessagesToCheck = message.attributes.hideIfInteractedWithMessage {
+                let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
+                for interactedMessage in interactedMessagesToCheck where dismissedMessageIDs.contains(interactedMessage) {
+                    return false
+                }
+            }
+
             // Check subscription status:
             if let messageSubscriptionStatus = message.attributes.subscriptionStatus {
                 if let subscriptionStatus = Subscription.Status(rawValue: messageSubscriptionStatus) {
