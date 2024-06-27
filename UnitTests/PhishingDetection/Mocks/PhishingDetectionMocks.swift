@@ -56,3 +56,15 @@ final class MockPhishingDetection: PhishingDetecting {
         return url.absoluteString.contains("malicious")
     }
 }
+
+final class MockPhishingSiteDetector: PhishingSiteDetecting {
+    var isMalicious: Bool = false
+
+    init(isMalicious: Bool) {
+        self.isMalicious = isMalicious
+    }
+
+    func checkIsMaliciousIfEnabled(url: URL) async -> Bool {
+        return isMalicious
+    }
+}
