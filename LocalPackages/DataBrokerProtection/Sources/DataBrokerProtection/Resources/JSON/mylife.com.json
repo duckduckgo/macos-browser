@@ -1,7 +1,7 @@
 {
   "name": "mylife",
   "url": "mylife.com",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "addedDatetime": 1715797497496,
   "steps": [
     {
@@ -17,6 +17,7 @@
           "actionType": "extract",
           "id": "9a08be56-d596-48e5-8745-0574b541e9df",
           "selector": ".ais-InfiniteHits-item",
+          "noResultsSelector": "//h1[@class='search-result-heading' and contains(text(), \"We didn't find\")]",
           "profile": {
             "name": {
               "selector": ".hit-name",

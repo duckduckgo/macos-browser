@@ -1,7 +1,7 @@
 {
   "name": "Search People FREE",
   "url": "searchpeoplefree.com",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -18,6 +18,7 @@
           "actionType": "extract",
           "id": "f41ee88d-149e-48ac-9371-efbaa151c773",
           "selector": "//li[@class='toc l-i mb-5']",
+          "noResultsSelector": "//h2[contains(text(), 'Not Found')]",
           "profile": {
             "name": {
               "selector": ".h2",
