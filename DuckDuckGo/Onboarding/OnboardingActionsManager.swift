@@ -18,6 +18,8 @@
 
 import Foundation
 import Combine
+import PixelKit
+import Common
 
 enum OnboardingSteps: String, CaseIterable {
     case summary
@@ -62,6 +64,9 @@ protocol OnboardingActionsManaging {
 
     /// It is called every time the user ends an onboarding step
     func stepCompleted(step _: OnboardingSteps)
+
+    /// It is called in case of error loading the pages
+    func reportException(with param: [String: String])
 }
 
 protocol OnboardingNavigating: AnyObject {
@@ -91,7 +96,14 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         systemSettings = SystemSettings(rows: ["dock", "import", "default-browser"])
 #endif
         let stepDefinitions = StepDefinitions(systemSettings: systemSettings)
-        return OnboardingConfiguration(stepDefinitions: stepDefinitions, env: "development")
+        let preferredLocale = Bundle.main.preferredLocalizations.first ?? "en"
+        var env: String
+#if DEBUG
+        env = "development"
+#else
+        env = "production"
+#endif
+        return OnboardingConfiguration(stepDefinitions: stepDefinitions, env: env, locale: preferredLocale)
     }()
 
     init(navigationDelegate: OnboardingNavigating, dockCustomization: DockCustomization, defaultBrowserProvider: DefaultBrowserProvider, appearancePreferences: AppearancePreferences, startupPreferences: StartupPreferences) {
@@ -163,7 +175,29 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
     }
 
     func stepCompleted(step: OnboardingSteps) {
-        print(step)
+        switch step {
+        case .summary:
+            break
+        case .welcome:
+            PixelKit.fire(GeneralPixel.onboardingStepCompleteWelcome, frequency: .legacyDaily)
+        case .getStarted:
+            PixelKit.fire(GeneralPixel.onboardingStepCompleteGetStarted, frequency: .legacyDaily)
+        case .privateByDefault:
+            PixelKit.fire(GeneralPixel.onboardingStepCompletePrivateByDefault, frequency: .legacyDaily)
+        case .cleanerBrowsing:
+            PixelKit.fire(GeneralPixel.onboardingStepCompleteCleanerBrowsing, frequency: .legacyDaily)
+        case .systemSettings:
+            PixelKit.fire(GeneralPixel.onboardingStepCompleteSystemSettings, frequency: .legacyDaily)
+        case .customize:
+            PixelKit.fire(GeneralPixel.onboardingStepCompleteCustomize, frequency: .legacyDaily)
+        }
+    }
+
+    func reportException(with param: [String: String]) {
+        let message = param["message"] ?? ""
+        let id = param["id"] ?? ""
+        PixelKit.fire(GeneralPixel.onboardingExceptionReported(message: message, id: id), frequency: .standard)
+        os_log("Onboarding error: %{public}@", log: .error, "\(id): \(message)")
     }
 
     private func onboardingHasFinished() {

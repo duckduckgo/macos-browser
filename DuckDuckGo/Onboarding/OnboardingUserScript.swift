@@ -42,6 +42,8 @@ final class OnboardingUserScript: NSObject, Subfeature {
         case requestAddToDock
         case requestImport
         case requestSetAsDefault
+        case reportInitException
+        case reportPageException
     }
 
     init(onboardingActionsManager: OnboardingActionsManaging) {
@@ -62,7 +64,9 @@ final class OnboardingUserScript: NSObject, Subfeature {
             .setBookmarksBar: setBookmarksBar,
             .setSessionRestore: setSessionRestore,
             .setShowHomeButton: setShowHome,
-            .stepCompleted: stepCompleted
+            .stepCompleted: stepCompleted,
+            .reportInitException: reportException,
+            .reportPageException: reportException
     ]
 
     @MainActor
@@ -137,6 +141,12 @@ extension OnboardingUserScript {
         if let params = params as? [String: String], let stepString = params["id"], let step = OnboardingSteps(rawValue: stepString) {
             onboardingActionsManager.stepCompleted(step: step)
         }
+        return nil
+    }
+
+    private func reportException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let params = params as? [String: String] else { return nil }
+        onboardingActionsManager.reportException(with: params)
         return nil
     }
 

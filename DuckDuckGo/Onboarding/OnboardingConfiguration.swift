@@ -22,6 +22,7 @@ import Foundation
 struct OnboardingConfiguration: Codable, Equatable {
     var stepDefinitions: StepDefinitions
     var env: String
+    var locale: String
 }
 
 /// Defines the onboarding steps desired

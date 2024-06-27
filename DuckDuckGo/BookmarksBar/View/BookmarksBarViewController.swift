@@ -245,6 +245,7 @@ private extension BookmarksBarViewController {
             openInNewWindow(bookmark: bookmark)
         case .clickItem:
             WindowControllersManager.shared.open(bookmark: bookmark)
+            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
         case .toggleFavorites:
             bookmark.isFavorite.toggle()
             bookmarkManager.update(bookmark: bookmark)
@@ -296,21 +297,25 @@ private extension BookmarksBarViewController {
     func openInNewTab(bookmark: Bookmark) {
         guard let url = bookmark.urlObject else { return }
         tabCollectionViewModel.appendNewTab(with: .url(url, source: .bookmark), selected: true)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func openInNewWindow(bookmark: Bookmark) {
         guard let url = bookmark.urlObject else { return }
         WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func openAllInNewTabs(folder: BookmarkFolder) {
         let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tabs: tabs)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func openAllInNewWindow(folder: BookmarkFolder) {
         let tabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollectionViewModel.burnerMode)
         WindowsManager.openNewWindow(with: tabCollection, isBurner: tabCollectionViewModel.isBurner)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func showSubmenuFor(folder: BookmarkFolder, fromView view: NSView) {

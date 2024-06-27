@@ -21,7 +21,7 @@ import Foundation
 
 class CapturingOnboardingActionsManager: OnboardingActionsManaging {
 
-    var configuration: OnboardingConfiguration = OnboardingConfiguration(stepDefinitions: StepDefinitions(systemSettings: SystemSettings(rows: [])), env: "environment")
+    var configuration: OnboardingConfiguration = OnboardingConfiguration(stepDefinitions: StepDefinitions(systemSettings: SystemSettings(rows: [])), env: "environment", locale: "en")
 
     var goToAddressBarCalled = false
     var goToSettingsCalled = false
@@ -32,6 +32,8 @@ class CapturingOnboardingActionsManager: OnboardingActionsManaging {
     var setSessionRestoreCalled = false
     var setHomeButtonPositionCalled = false
     var onboardingStartedCalled = false
+    var reportExceptionCalled = false
+    var exceptionParams: [String: String] = [:]
     var completedStep: OnboardingSteps?
     var bookmarkBarVisible: Bool?
     var homeButtonVisible: Bool?
@@ -78,5 +80,10 @@ class CapturingOnboardingActionsManager: OnboardingActionsManaging {
 
     func stepCompleted(step: OnboardingSteps) {
         completedStep = step
+    }
+
+    func reportException(with param: [String: String]) {
+        reportExceptionCalled = true
+        exceptionParams = param
     }
 }

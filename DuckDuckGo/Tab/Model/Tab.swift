@@ -724,8 +724,7 @@ protocol NewWindowPolicyDecisionMaker {
     func startOnboarding() {
         userInteractionDialog = nil
 
-        // Here we will chose based on the variant
-        if true {
+        if PixelExperiment.cohort == .newOnboarding {
             setContent(.onboarding)
         } else {
             setContent(.onboardingDeprecated)
