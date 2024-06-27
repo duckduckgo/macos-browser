@@ -51,13 +51,8 @@ final class SpecialErrorPageTabExtension {
     private var featureFlagger: FeatureFlagger
     private var phishingDetector: PhishingSiteDetecting
     private var phishingStateManager: PhishingTabStateManager
-#if DEBUG
-    var errorPageType: ErrorType?
-    var phishingUrlExemptions: Set<String> = []
-#else
     private var errorPageType: ErrorType?
     private var phishingUrlExemptions: Set<String> = []
-#endif
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -110,14 +105,6 @@ final class SpecialErrorPageTabExtension {
             webView?.setDocumentHtml(html)
         }
     }
-#if DEBUG
-    public func setSSLErrorPageType() {
-        errorPageType = .ssl
-    }
-    public func setPhishingErrorPageType() {
-        errorPageType = .phishing
-    }
-#endif
 
 }
 
