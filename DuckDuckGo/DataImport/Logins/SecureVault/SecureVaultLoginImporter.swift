@@ -22,6 +22,10 @@ import SecureStorage
 
 final class SecureVaultLoginImporter: LoginImporter {
 
+    private enum ImporterError: Error {
+        case duplicate
+    }
+
     func importLogins(_ logins: [ImportedLoginCredential], progressCallback: @escaping (Int) throws -> Void) throws -> DataImport.DataTypeSummary {
         let vault = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
 
@@ -31,6 +35,14 @@ final class SecureVaultLoginImporter: LoginImporter {
 
         let encryptionKey = try vault.getEncryptionKey()
         let hashingSalt = try vault.getHashingSalt()
+
+        let signatures: Set<String>
+
+        if let results = try? vault.accounts().compactMap(\.signature) {
+            signatures = Set(results)
+        } else {
+            signatures = Set()
+        }
 
         try vault.inDatabaseTransaction { database in
             for (idx, login) in logins.enumerated() {
@@ -46,10 +58,16 @@ final class SecureVaultLoginImporter: LoginImporter {
                 }
 
                 do {
+                    if let signature = try vault.encryptPassword(for: credentials).account.signature,
+                        signatures.contains(signature) {
+                        throw ImporterError.duplicate
+                    }
                     _ = try vault.storeWebsiteCredentials(credentials, in: database, encryptedUsing: encryptionKey, hashedUsing: hashingSalt)
                     successful.append(importSummaryValue)
                 } catch {
                     if case .duplicateRecord = error as? SecureStorageError {
+                        duplicates.append(importSummaryValue)
+                    } else if case .duplicate = error as? ImporterError {
                         duplicates.append(importSummaryValue)
                     } else {
                         failed.append(importSummaryValue)
