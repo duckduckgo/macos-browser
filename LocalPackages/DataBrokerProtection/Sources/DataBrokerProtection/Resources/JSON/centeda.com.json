@@ -27,7 +27,7 @@
           "actionType": "extract",
           "id": "e779b827-702d-402d-ae79-f3681ad50008",
           "selector": ".search-result > a",
-          "noResultsSelector": ".no-phone-info",
+          "noResultsSelector": "//div[@class='no-phone-info'] | //h1[contains(text(), 'Oops')]",
           "profile": {
             "name": {
               "selector": ".title",

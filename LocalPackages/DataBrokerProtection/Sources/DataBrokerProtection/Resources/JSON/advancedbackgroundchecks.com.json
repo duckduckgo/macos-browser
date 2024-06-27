@@ -18,7 +18,7 @@
           "actionType": "extract",
           "id": "d760163d-4a1f-476a-bc3e-4f3ccedc29f1",
           "selector": ".card-block",
-          "noResultsSelector": "//div[@id='site-content']//p[contains(text(), 'We could not find any results')] | //div[@id='results_container' and contains(text(), 'Not found')]",
+          "noResultsSelector": "//div[@id='site-content']//p[contains(text(), 'We could not find any results')]",
           "profile": {
             "name": {
               "selector": ".card-title",

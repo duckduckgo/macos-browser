@@ -18,7 +18,7 @@
           "actionType": "extract",
           "id": "57dfbc89-94c8-49f0-9952-c58c92883ffd",
           "selector": ".b-pfl-list",
-          "noResultsSelector": ".no-records-found",
+          "noResultsSelector": "//h3[@class='no-records-found'] | //div[@id='results_container' and contains(text(), 'Not found')]",
           "profile": {
             "name": {
               "selector": ".name"
