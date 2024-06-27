@@ -78,8 +78,11 @@ struct MirrorSite: Codable, Sendable {
 }
 
 extension MirrorSite {
-    var mapToScannedBrokerUI: DBPUIScanProgress.ScannedBroker {
-        DBPUIScanProgress.ScannedBroker(name: name, url: url)
+
+    typealias ScannedBroker = DBPUIScanProgress.ScannedBroker
+
+    func scannedBroker(withStatus status: ScannedBroker.Status) -> ScannedBroker {
+        ScannedBroker(name: name, url: url, status: status)
     }
 }
 
