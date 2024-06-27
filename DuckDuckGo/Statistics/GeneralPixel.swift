@@ -644,7 +644,7 @@ enum GeneralPixel: PixelKitEventV2 {
             // Onboarding experiment
         case .onboardingCohortAssigned: return "m_mac_onboarding_cohort-assigned"
         case .onboardingHomeButtonEnabled: return
-            "m_mac_onboarding.home-button-enabled"
+            "m_mac_onboarding_home-button-enabled"
         case .onboardingBookmarksBarShown: return "m_mac_onboarding_bookmarks-bar-shown"
         case .onboardingSessionRestoreEnabled: return "m_mac_onboarding_session-restore-enabled"
         case .onboardingSetAsDefaultRequested: return "m_mac_onboarding_set-as-default-requested"

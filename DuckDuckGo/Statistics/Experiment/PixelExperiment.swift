@@ -57,8 +57,8 @@ enum PixelExperiment: String, CaseIterable {
 
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
     //  remember to keep it clear for privacy triage.
-    case control = "c"
-    case newOnboarding = "o"
+    case control = "oa"
+    case newOnboarding = "ob"
 }
 
 // These functions contain the business logic for determining if the pixel should be fired or not.
@@ -230,32 +230,32 @@ final internal class PixelExperimentLogic {
     }
 
     func fireOnboardingSearchPerformed5to7Pixel() {
-        guard isDay5to7 == true, allocatedCohort != nil, let cohort else { return }
+        guard isDay5to7, allocatedCohort != nil, let cohort else { return }
         PixelKit.fire(GeneralPixel.onboardingSearchPerformed5to7(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
     }
 
     func fireOnboardingHomeButtonUsed5to7Pixel() {
-        guard isDay5to7 == true, allocatedCohort != nil, let cohort else { return }
+        guard isDay5to7, allocatedCohort != nil, let cohort else { return }
         PixelKit.fire(GeneralPixel.onboardingHomeButtonUsed5to7(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
     }
 
     func fireOnboardingBookmarkUsed5to7Pixel() {
-        guard isDay5to7 == true, allocatedCohort != nil, let cohort else { return }
+        guard isDay5to7, allocatedCohort != nil, let cohort else { return }
         PixelKit.fire(GeneralPixel.onboardingBookmarkUsed5to7(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
     }
 
     func fireOnboardingSessionRestoreEnabled5to7Pixel() {
-        guard isDay5to7 == true, allocatedCohort != nil, let cohort else { return }
+        guard isDay5to7, allocatedCohort != nil, let cohort else { return }
         PixelKit.fire(GeneralPixel.onboardingSessionRestoreEnabled5to7(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
     }
 
     func fireOnboardingSetAsDefaultEnabled5to7Pixel() {
-        guard isDay5to7 == true, allocatedCohort != nil, let cohort else { return }
+        guard isDay5to7, allocatedCohort != nil, let cohort else { return }
         PixelKit.fire(GeneralPixel.onboardingSetAsDefaultEnabled5to7(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
     }
 
     func fireOnboardingDuckplayerUsed5to7Pixel() {
-        guard isDay5to7 == true, allocatedCohort != nil, let cohort else { return }
+        guard isDay5to7, allocatedCohort != nil, let cohort else { return }
         PixelKit.fire(GeneralPixel.onboardingDuckplayerUsed5to7(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
     }
 
@@ -277,7 +277,7 @@ final internal class PixelExperimentLogic {
         }
     }
 
-    var isDay5to7: Bool {
+    private var isDay5to7: Bool {
         return daysSinceEnrollment >= 5 && daysSinceEnrollment <= 7
     }
 
