@@ -138,6 +138,13 @@ private func passwordsSuccessSummary(_ summary: DataImport.DataTypeSummary) -> s
                              comment: "Data import summary format of how many passwords (%lld) failed to import.",
                              count: summary.failed)
         }
+        if summary.duplicate > 0 {
+            lineSeparator()
+            importSummaryRow(image: .failed,
+                             text: "Duplicate Passwords Skipped: ",
+                             comment: "Data import summary format of how many passwords (%lld) were skipped due to being duplicates.",
+                             count: summary.duplicate)
+        }
     }
 }
 
