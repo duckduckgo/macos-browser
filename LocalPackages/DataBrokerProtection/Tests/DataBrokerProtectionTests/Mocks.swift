@@ -53,6 +53,34 @@ extension BrokerProfileQueryData {
             optOutJobData: extractedProfile != nil ? [.mock(with: extractedProfile!)] : [OptOutJobData]()
         )
     }
+
+    static func mockQueries(withId id: Int,
+                        validProfileCountAndId: Int64,
+                        deprecatedProfileCountAndId: Int64) -> [BrokerProfileQueryData] {
+
+        var queries: [BrokerProfileQueryData] = []
+
+        let scanJobDataValid = ScanJobData.mock(withBrokerId: 2, profileQueryId: validProfileCountAndId)
+        let optoutJobDataValid = OptOutJobData.mock(with: 2, profileQueryId: validProfileCountAndId)
+        let scanJobDataInValid = ScanJobData.mock(withBrokerId: 2, profileQueryId: deprecatedProfileCountAndId)
+        let optoutJobDataInValid = OptOutJobData.mock(with: 2, profileQueryId: deprecatedProfileCountAndId)
+
+        for _ in 0..<validProfileCountAndId {
+            queries.append(.init(dataBroker: .mock(withId: 2),
+                                 profileQuery: .mock,
+                                 scanJobData: scanJobDataValid,
+                                 optOutJobData: [optoutJobDataValid]))
+        }
+
+        for _ in 0..<deprecatedProfileCountAndId {
+            queries.append(.init(dataBroker: .mock(withId: 2),
+                                 profileQuery: .mockDeprecated,
+                                 scanJobData: scanJobDataInValid,
+                                 optOutJobData: [optoutJobDataInValid]))
+        }
+        
+        return queries
+    }
 }
 
 extension DataBrokerScheduleConfig {
@@ -983,6 +1011,10 @@ extension ProfileQuery {
     static var mockWithoutId: ProfileQuery {
         .init(firstName: "First", lastName: "Last", city: "City", state: "State", birthYear: 1980)
     }
+
+    static var mockDeprecated: ProfileQuery {
+        .init(firstName: "First", lastName: "Last", city: "City", state: "State", birthYear: 1980, deprecated: true)
+    }
 }
 
 extension ScanJobData {
@@ -999,10 +1031,10 @@ extension ScanJobData {
         ScanJobData(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents)
     }
 
-    static func mock(withBrokerId brokerId: Int64) -> ScanJobData {
+    static func mock(withBrokerId brokerId: Int64, profileQueryId: Int64 = 1) -> ScanJobData {
         .init(
             brokerId: brokerId,
-            profileQueryId: 1,
+            profileQueryId: profileQueryId,
             historyEvents: [HistoryEvent]()
         )
     }
@@ -1012,6 +1044,13 @@ extension OptOutJobData {
     static func mock(with extractedProfile: ExtractedProfile,
                      historyEvents: [HistoryEvent] = [HistoryEvent]()) -> OptOutJobData {
         .init(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents, extractedProfile: extractedProfile)
+    }
+
+    static func mock(with brokerId: Int64, profileQueryId: Int64) -> OptOutJobData {
+        .init(brokerId: brokerId,
+              profileQueryId: profileQueryId,
+              historyEvents: [],
+              extractedProfile: ExtractedProfile())
     }
 }
 
