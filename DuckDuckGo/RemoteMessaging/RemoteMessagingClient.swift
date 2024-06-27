@@ -23,27 +23,43 @@ import Persistence
 import PixelKit
 import RemoteMessaging
 
-final class RemoteMessagingClient: RemoteMessagingClientBase {
+final class RemoteMessagingClient: RemoteMessagingProcessing {
 
     struct Constants {
         static let minimumConfigurationRefreshInterval: TimeInterval = 60 * 60 * 4
     }
 
-    init(
+    let endpoint: URL = {
+#if DEBUG
+        URL(string: "https://www.jsonblob.com/api/1252947611702124544")!
+#else
+        URL(string: "https://staticcdn.duckduckgo.com/remotemessaging/config/v1/ios-config.json")!
+#endif
+    }()
+    let configMatcherProvider: RemoteMessagingConfigMatcherProviding
+
+    convenience init(
         database: RemoteMessagingDatabase,
         bookmarksDatabase: CoreDataDatabase,
         appearancePreferences: AppearancePreferences,
         internalUserDecider: InternalUserDecider
     ) {
-        self.database = database
-        self.internalUserDecider = internalUserDecider
-
         let provider = RemoteMessagingConfigMatcherProvider(
             bookmarksDatabase: bookmarksDatabase,
             appearancePreferences: appearancePreferences,
             internalUserDecider: internalUserDecider
         )
-        super.init(endpoint: Self.endpoint, configMatcherProvider: provider)
+        self.init(database: database, internalUserDecider: internalUserDecider, configMatcherProvider: provider)
+    }
+
+    init(
+        database: RemoteMessagingDatabase,
+        internalUserDecider: InternalUserDecider,
+        configMatcherProvider: RemoteMessagingConfigMatcherProviding
+    ) {
+        self.database = database
+        self.internalUserDecider = internalUserDecider
+        self.configMatcherProvider = configMatcherProvider
 
         subscribeToInternalUserFlagChangesIfNeeded()
     }
@@ -108,14 +124,6 @@ final class RemoteMessagingClient: RemoteMessagingClientBase {
     private var timerCancellable: AnyCancellable?
     private var internalUserCancellable: AnyCancellable?
 
-    private static let endpoint: URL = {
-#if DEBUG
-        URL(string: "https://www.jsonblob.com/api/1252947611702124544")!
-#else
-        URL(string: "https://staticcdn.duckduckgo.com/remotemessaging/config/v1/ios-config.json")!
-#endif
-    }()
-
     @UserDefaultsWrapper(key: .lastRemoteMessagingRefreshDate, defaultValue: .distantPast)
     static private var lastRemoteMessagingRefreshDate: Date
 
@@ -125,7 +133,7 @@ final class RemoteMessagingClient: RemoteMessagingClientBase {
         }
 
         Task {
-            try? await fetchAndProcess(remoteMessagingStore: store)
+            try? await fetchAndProcess(using: store)
         }
     }
 }
