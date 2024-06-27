@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="JFF-Nj-8om">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -58,6 +59,17 @@
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="X6g-3K-JDi">
                                 <rect key="frame" x="0.0" y="-2" width="676" height="5"/>
                             </box>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="Pbn-uk-iJf">
+                                <rect key="frame" x="20" y="20" width="142" height="17"/>
+                                <buttonCell key="cell" type="roundTextured" title="Import Bookmarks..." bezelStyle="texturedRounded" imagePosition="leading" alignment="center" imageScaling="proportionallyDown" inset="2" id="CgH-qm-9us">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <imageReference key="image" image="square.and.arrow.down" catalog="system" symbolScale="medium"/>
+                                    <connections>
+                                        <action selector="importBookmarksClicked:" target="JFF-Nj-8om" id="L2L-md-2OA"/>
+                                    </connections>
+                                </buttonCell>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="X6g-3K-JDi" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" id="0AB-Ps-M7N"/>
@@ -67,6 +79,8 @@
                             <constraint firstItem="cjE-4p-vxI" firstAttribute="centerX" secondItem="R54-3G-cms" secondAttribute="centerX" id="T6z-7g-NZA"/>
                             <constraint firstAttribute="trailing" secondItem="Mgr-xJ-Pl5" secondAttribute="trailing" constant="8" id="UCG-Ww-dsY"/>
                             <constraint firstAttribute="trailing" secondItem="X6g-3K-JDi" secondAttribute="trailing" id="ZaK-nU-eHk"/>
+                            <constraint firstItem="Pbn-uk-iJf" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" constant="20" symbolic="YES" id="bPU-D0-qHa"/>
+                            <constraint firstItem="Pbn-uk-iJf" firstAttribute="centerY" secondItem="R54-3G-cms" secondAttribute="centerY" id="cPZ-VT-0aI"/>
                             <constraint firstItem="Mgr-xJ-Pl5" firstAttribute="centerY" secondItem="R54-3G-cms" secondAttribute="centerY" constant="-1" id="eoh-hW-GcD"/>
                             <constraint firstItem="D39-Of-BIh" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" id="hOd-Bz-o5j"/>
                             <constraint firstAttribute="bottom" secondItem="X6g-3K-JDi" secondAttribute="bottom" id="iWj-iC-9gW"/>
@@ -81,6 +95,7 @@
                     <connections>
                         <outlet property="bookmarksBarCollectionView" destination="vwg-NL-UPk" id="1LG-QE-Dgd"/>
                         <outlet property="clippedItemsIndicator" destination="Mgr-xJ-Pl5" id="4ww-Po-dNb"/>
+                        <outlet property="importBookmarksButton" destination="Pbn-uk-iJf" id="DTf-Qt-3Cl"/>
                         <outlet property="promptAnchor" destination="cjE-4p-vxI" id="IGH-2v-PGD"/>
                     </connections>
                 </viewController>
@@ -91,6 +106,7 @@
     </scenes>
     <resources>
         <image name="Chevron-Double-Right-16" width="16" height="16"/>
+        <image name="square.and.arrow.down" catalog="system" width="15" height="17"/>
         <namedColor name="AddressBarFocusedBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

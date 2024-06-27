@@ -23,6 +23,7 @@ import Foundation
 
 final class BookmarksBarViewController: NSViewController {
 
+    @IBOutlet weak var importBookmarksButton: NSButton!
     @IBOutlet private var bookmarksBarCollectionView: NSCollectionView!
     @IBOutlet private var clippedItemsIndicator: NSButton!
     @IBOutlet private var promptAnchor: NSView!
@@ -76,6 +77,7 @@ final class BookmarksBarViewController: NSViewController {
             BookmarkPasteboardWriter.bookmarkUTIInternalType,
             FolderPasteboardWriter.folderUTIInternalType
         ])
+        importBookmarksButton.title = UserText.importBookmarks
 
         bookmarksBarCollectionView.delegate = viewModel
         bookmarksBarCollectionView.dataSource = viewModel
@@ -149,6 +151,13 @@ final class BookmarksBarViewController: NSViewController {
                 self?.refreshClippedIndicator()
             }
             .store(in: &cancellables)
+
+        viewModel.$bookmarksBarItems
+            .receive(on: RunLoop.main)
+            .sink { [weak self] items in
+                self?.importBookmarksButton.isHidden = !items.isEmpty
+            }
+            .store(in: &cancellables)
     }
 
     private func unsubscribeFromEvents() {
@@ -175,6 +184,9 @@ final class BookmarksBarViewController: NSViewController {
     private func refreshFavicons() {
         dispatchPrecondition(condition: .onQueue(.main))
         bookmarksBarCollectionView.reloadData()
+    }
+    @IBAction func importBookmarksClicked(_ sender: Any) {
+        DataImportView().show()
     }
 
     @IBAction
