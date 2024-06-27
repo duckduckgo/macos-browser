@@ -41,6 +41,7 @@ public struct UserDefaultsWrapper<T> {
         case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
         case configFBConfigEtag = "config.storage.fbconfig.etag"
+        case configStorageRemoteMessagingConfigEtag = "config.storage.remotemessagingconfig.etag"
 
         case configLastInstalled = "config.last.installed"
 

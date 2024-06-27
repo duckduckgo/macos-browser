@@ -166,7 +166,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             database: RemoteMessagingDatabase(),
             bookmarksDatabase: BookmarkDatabase.shared.db,
             appearancePreferences: .shared,
-            internalUserDecider: internalUserDecider
+            internalUserDecider: internalUserDecider,
+            configurationStore: ConfigurationStore.shared
         )
 
         if NSApplication.runType.requiresEnvironment {

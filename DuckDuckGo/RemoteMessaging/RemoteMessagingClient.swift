@@ -17,6 +17,7 @@
 //
 
 import Combine
+import Configuration
 import Foundation
 import BrowserServicesKit
 import Persistence
@@ -27,38 +28,51 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
 
     struct Constants {
         static let minimumConfigurationRefreshInterval: TimeInterval = 60 * 60 * 4
+        static let endpoint: URL = {
+#if DEBUG
+            URL(string: "https://staticcdn.kapusta.cc/macos-desktop-browser/remote-messaging-config.json")!
+#else
+            URL(string: "https://staticcdn.duckduckgo.com/remotemessaging/config/v1/ios-config.json")!
+#endif
+        }()
     }
 
-    let endpoint: URL = {
-#if DEBUG
-        URL(string: "https://www.jsonblob.com/api/1252947611702124544")!
-#else
-        URL(string: "https://staticcdn.duckduckgo.com/remotemessaging/config/v1/ios-config.json")!
-#endif
-    }()
+    let endpoint: URL = Constants.endpoint
+    let configurationFetcher: RemoteMessagingConfigFetching
     let configMatcherProvider: RemoteMessagingConfigMatcherProviding
 
     convenience init(
         database: RemoteMessagingDatabase,
         bookmarksDatabase: CoreDataDatabase,
         appearancePreferences: AppearancePreferences,
-        internalUserDecider: InternalUserDecider
+        internalUserDecider: InternalUserDecider,
+        configurationStore: ConfigurationStoring
     ) {
         let provider = RemoteMessagingConfigMatcherProvider(
             bookmarksDatabase: bookmarksDatabase,
             appearancePreferences: appearancePreferences,
             internalUserDecider: internalUserDecider
         )
-        self.init(database: database, internalUserDecider: internalUserDecider, configMatcherProvider: provider)
+        self.init(
+            database: database,
+            internalUserDecider: internalUserDecider,
+            configMatcherProvider: provider,
+            configurationStore: configurationStore
+        )
     }
 
     init(
         database: RemoteMessagingDatabase,
         internalUserDecider: InternalUserDecider,
-        configMatcherProvider: RemoteMessagingConfigMatcherProviding
+        configMatcherProvider: RemoteMessagingConfigMatcherProviding,
+        configurationStore: ConfigurationStoring
     ) {
         self.database = database
         self.internalUserDecider = internalUserDecider
+        self.configurationFetcher = RemoteMessagingConfigFetcher(
+            configurationFetcher: ConfigurationFetcher(store: configurationStore, urlSession: .session(), log: .remoteMessaging, eventMapping: nil),
+            configurationStore: ConfigurationStore.shared
+        )
         self.configMatcherProvider = configMatcherProvider
 
         subscribeToInternalUserFlagChangesIfNeeded()
