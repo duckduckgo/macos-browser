@@ -139,7 +139,8 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     }
 
     func arePrerequisitesSatisfied() async -> Bool {
-        let entitlements = await accountManager.hasEntitlement(forProductName: .dataBrokerProtection)
+        let entitlements = await accountManager.hasEntitlement(forProductName: .dataBrokerProtection,
+                                                               cachePolicy: .reloadIgnoringLocalCacheData)
         var hasEntitlements: Bool
         switch entitlements {
         case .success(let value):
