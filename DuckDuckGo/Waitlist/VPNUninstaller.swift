@@ -74,6 +74,7 @@ final class VPNUninstaller: VPNUninstalling {
     }
 
     enum IPCUninstallAttempt: PixelKitEventV2 {
+        case prevented
         case begin
         case cancelled(_ reason: UninstallCancellationReason)
         case success
@@ -81,6 +82,9 @@ final class VPNUninstaller: VPNUninstalling {
 
         var name: String {
             switch self {
+            case .prevented:
+                return "vpn_browser_uninstall_prevented_uds"
+
             case .begin:
                 return "vpn_browser_uninstall_attempt_uds"
 
@@ -97,7 +101,8 @@ final class VPNUninstaller: VPNUninstalling {
 
         var parameters: [String: String]? {
             switch self {
-            case .begin,
+            case .prevented,
+                    .begin,
                     .success,
                     .failure:
                 return nil
@@ -108,7 +113,8 @@ final class VPNUninstaller: VPNUninstalling {
 
         var error: Error? {
             switch self {
-            case .begin,
+            case .prevented,
+                    .begin,
                     .cancelled,
                     .success:
                 return nil
@@ -165,6 +171,15 @@ final class VPNUninstaller: VPNUninstalling {
     ///
     @MainActor
     func uninstall(removeSystemExtension: Bool) async throws {
+        // We want to check service launcher pre-requisited before firing any pixel,
+        // because if our VPN menu app isn't available where we're expecting to find it
+        // we want to avoid adding noise to our uninstall attempts and instead fire
+        // a daily pixel telling us the app wasn't found.
+        guard ipcServiceLauncher.checkPrerequisites() else {
+            pixelKit?.fire(IPCUninstallAttempt.prevented, frequency: .daily)
+            return
+        }
+
         pixelKit?.fire(IPCUninstallAttempt.begin, frequency: .dailyAndCount)
 
         do {
