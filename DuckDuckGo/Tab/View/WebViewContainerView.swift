@@ -141,15 +141,19 @@ final class WebViewContainerView: NSView {
 
                 if NSWorkspace.isMissionControlActive(),
                    let fullScreenWindowController, fullScreenWindowController.responds(to: Selector.initWithWindowWebViewPage) {
-                    // we have no legal access to `closeFullScreenWindowController()` that would just work closing the
+                    // we have no access to `WebViewImpl::closeFullScreenWindowController()` method that would just work closing the
                     // WKFullScreenWindowController and reset a full screen manager reference to it.
-                    // - if we just call `fullScreenWindowController.close()` – the reference will remain dangling leading to a crash later.
+                    // - if we call `close` method directly on the Window Controller – the reference in WebViewImpl will remain dangling leading to a crash later.
                     // - we may call `webView.closeAllMediaPresentations {}` but in case there‘s a Picture-In-Picture video run in parallel
                     //   this will lead to a crash because of [one-shot] close callback will be fired twice – for both full screen and PiP videos.
                     //   https://app.asana.com/0/1201037661562251/1207643414069383/f
                     //
                     // to overcome those issues we close the original full screen window here
                     // and re-initialize the existing WKFullScreenWindowController with a new window and updating its _webView reference
+                    // by calling [WKFullScreenWindowController initWithWindow:webView:page:] for an already initialized controller
+                    // so it can be reused again for full screen video presentation.
+                    // https://github.com/WebKit/WebKit/blob/398e5e25e9f250e1a4e3f4dde3ae54dd09dbe23e/Source/WebKit/UIProcess/mac/WKFullScreenWindowController.mm#L96
+                    //
                     DispatchQueue.main.async { [weak fullScreenWindowController, weak webView=self.webView] in
                         guard let webView, let fullScreenWindowController,
                               let window = fullScreenWindowController.window,
