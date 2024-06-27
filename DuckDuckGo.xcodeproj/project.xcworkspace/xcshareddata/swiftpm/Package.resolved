@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "28687a848cff47267e64e3bfcdf5c92effbee5ce",
-        "version" : "159.0.2"
+        "branch" : "graeme/deduplicate-passwords",
+        "revision" : "1f687a7fefe07fcb694ec1f517736321d3bc7822"
       }
     },
     {
