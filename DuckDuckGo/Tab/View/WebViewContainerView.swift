@@ -144,7 +144,7 @@ final class WebViewContainerView: NSView {
                     // we have no legal access to `closeFullScreenWindowController()` that would just work closing the
                     // WKFullScreenWindowController and reset a full screen manager reference to it.
                     // - if we just call `fullScreenWindowController.close()` – the reference will remain dangling leading to a crash later.
-                    // - we may call `webView.closeAllMediaPresentations {}` but in case there‘s a Picture-In-Picture vide run in parallel
+                    // - we may call `webView.closeAllMediaPresentations {}` but in case there‘s a Picture-In-Picture video run in parallel
                     //   this will lead to a crash because of [one-shot] close callback will be fired twice – for both full screen and PiP videos.
                     //   https://app.asana.com/0/1201037661562251/1207643414069383/f
                     //
@@ -158,8 +158,7 @@ final class WebViewContainerView: NSView {
                         window.close()
                         fullScreenWindowController.window = nil
 
-                        let fullScreenWindowClass = type(of: window)
-                        let newWindow = fullScreenWindowClass.init(contentRect: NSScreen.main?.frame ?? .zero, styleMask: window.styleMask, backing: .buffered, defer: false)
+                        let newWindow = type(of: window).init(contentRect: NSScreen.main?.frame ?? .zero, styleMask: window.styleMask, backing: .buffered, defer: false)
 
                         fullScreenWindowController.perform(Selector.initWithWindowWebViewPage, withArguments: [newWindow, webView, NSValue(pointer: nil)])
                         fullScreenWindowController.setValue(pageRef, forKey: Key.page)
