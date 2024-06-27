@@ -32,7 +32,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionControllerStartFailure(_ error: Error)
 
     case networkProtectionTunnelStartAttempt
-    case networkProtectionTunnelStartAttemptWithoutAccessToken
+    case networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken
     case networkProtectionTunnelStartSuccess
     case networkProtectionTunnelStartFailure(_ error: Error)
 
@@ -135,8 +135,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionTunnelStartAttempt:
             return "netp_tunnel_start_attempt"
 
-        case .networkProtectionTunnelStartAttemptWithoutAccessToken:
-            return "netp_tunnel_start_attempt_without_access_token"
+        case .networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken:
+            return "netp_tunnel_start_attempt_on_demand_without_access_token"
 
         case .networkProtectionTunnelStartSuccess:
             return "netp_tunnel_start_success"
@@ -369,7 +369,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionControllerStartCancelled,
                 .networkProtectionControllerStartFailure,
                 .networkProtectionTunnelStartAttempt,
-                .networkProtectionTunnelStartAttemptWithoutAccessToken,
+                .networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken,
                 .networkProtectionTunnelStartSuccess,
                 .networkProtectionTunnelStartFailure,
                 .networkProtectionTunnelStopAttempt,
@@ -443,7 +443,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionControllerStartSuccess,
                 .networkProtectionControllerStartCancelled,
                 .networkProtectionTunnelStartAttempt,
-                .networkProtectionTunnelStartAttemptWithoutAccessToken,
+                .networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken,
                 .networkProtectionTunnelStartSuccess,
                 .networkProtectionTunnelStopAttempt,
                 .networkProtectionTunnelStopSuccess,

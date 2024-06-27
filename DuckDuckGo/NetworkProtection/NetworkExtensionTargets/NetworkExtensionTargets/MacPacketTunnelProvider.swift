@@ -334,9 +334,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     frequency: .dailyAndCount,
                     includeAppVersionParameter: true)
             }
-        case .tunnelStartWithoutAccessToken:
+        case .tunnelStartOnDemandWithoutAccessToken:
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionTunnelStartAttemptWithoutAccessToken,
+                NetworkProtectionPixelEvent.networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken,
                 frequency: .dailyAndCount,
                 includeAppVersionParameter: true)
         }
