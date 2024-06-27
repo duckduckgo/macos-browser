@@ -729,7 +729,6 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
     }
 
     private func makeNetworkProtectionItem(target: AnyObject) -> NSMenuItem {
-        print("makeNetworkProtectionItem")
         return NSMenuItem(title: UserText.networkProtection,
                    action: #selector(MoreOptionsMenu.showNetworkProtectionStatus(_:)),
                    keyEquivalent: "")
@@ -738,7 +737,6 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
     }
 
     private func makeDataBrokerProtectionItem(target: AnyObject) -> NSMenuItem {
-        print("makeDataBrokerProtectionItem")
         return NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
                    action: #selector(MoreOptionsMenu.openDataBrokerProtection),
                    keyEquivalent: "")
@@ -747,7 +745,6 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
     }
 
     private func makeIdentityTheftRestorationItem(target: AnyObject) -> NSMenuItem {
-        print("makeDataBrokerProtectionItem")
         return NSMenuItem(title: UserText.identityTheftRestorationOptionsMenuItem,
                    action: #selector(MoreOptionsMenu.openIdentityTheftRestoration),
                    keyEquivalent: "")
@@ -756,7 +753,6 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
     }
 
     private func makeSubscriptionSettingsItem(target: AnyObject) -> NSMenuItem {
-        print("makeSubscriptionSettingsItem")
         return NSMenuItem(title: UserText.subscriptionSettingsOptionsMenuItem,
                    action: #selector(MoreOptionsMenu.openSubscriptionSettings),
                    keyEquivalent: "")
@@ -764,7 +760,6 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
     }
 
     private func refreshAvailabilityBasedOnEntitlements() {
-        print("refreshAvailabilityBasedOnEntitlements")
         guard subscriptionFeatureAvailability.isFeatureAvailable, accountManager.isUserAuthenticated else { return }
 
         @Sendable func hasEntitlement(for productName: Entitlement.ProductName) async -> Bool {
@@ -794,7 +789,6 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
     }
 
     public func menuWillOpen(_ menu: NSMenu) {
-        print("menuWillOpen")
         refreshAvailabilityBasedOnEntitlements()
     }
 
