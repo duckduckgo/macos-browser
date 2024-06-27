@@ -27,7 +27,7 @@ import RemoteMessaging
 final class RemoteMessagingClient: RemoteMessagingProcessing {
 
     struct Constants {
-        static let minimumConfigurationRefreshInterval: TimeInterval = 60 * 60 * 4
+        static let minimumConfigurationRefreshInterval: TimeInterval = 60 * 30
         static let endpoint: URL = {
 #if DEBUG
             URL(string: "https://staticcdn.kapusta.cc/macos-desktop-browser/remote-messaging-config.json")!
