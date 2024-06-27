@@ -224,14 +224,13 @@ final class VPNUninstaller: VPNUninstalling {
             //
             VPNControllerXPCClient.shared.forceStatusToDisconnected()
 
-            // While it may seem like a duplication of code, it's one thing to disable the IPC service
-            // and it's nother one to "uninstall" our login items.  The uninstaller wants both things
-            // to happen.
-            //
-            // As an example of why this is important, we want all agents to be disabled even if the IPC
-            // service is not based on login items.
-            try await ipcServiceLauncher.disable()
+            // When the agent is registered as a login item, we want to unregister it
+            // and stop it from running, which is achieved by the next call.
             removeAgents()
+
+            // When the agent was started directly (not as a login item) we want to stop it,
+            // as the above call won't do anything for it.
+            try await stopAgents()
 
             notifyVPNUninstalled()
             isDisabling = false
@@ -242,6 +241,18 @@ final class VPNUninstaller: VPNUninstalling {
         } catch {
             pixelKit?.fire(IPCUninstallAttempt.failure(error), frequency: .dailyAndCount)
         }
+    }
+
+    // Stop the VPN agents.
+    //
+    // There's some intentional redundancy here, as we really want to make sure the
+    // agent stops running, so we'll first ask politely through IPC and then try to just
+    // kill it if still running.
+    //
+    func stopAgents() async throws {
+        try await ipcClient.quit()
+        try? await Task.sleep(interval: 0.1)
+        try await ipcServiceLauncher.disable()
     }
 
     func removeAgents() {
