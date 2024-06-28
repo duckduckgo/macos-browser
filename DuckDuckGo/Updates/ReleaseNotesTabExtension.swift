@@ -18,8 +18,57 @@
 
 import Foundation
 import Navigation
+import Combine
+import Common
+
+protocol ReleaseNotesUserScriptProvider {
+
+    var releaseNotesUserScript: ReleaseNotesUserScript? { get }
+
+}
+
+extension UserScripts: ReleaseNotesUserScriptProvider {}
+
+public struct ReleaseNotesValues: Codable {
+
+    let status: String
+    let currentVersion: String
+    let latestVersion: String?
+    let lastUpdate: UInt
+    let releaseTitle: String?
+    let releaseNotes: [String]?
+    let releaseNotesPrivacyPro: [String]?
+
+}
 
 final class ReleaseNotesTabExtension: NavigationResponder {
+
+    private var cancellables = Set<AnyCancellable>()
+    private weak var webView: WKWebView? {
+        didSet {
+            releaseNotesUserScript?.webView = webView
+        }
+    }
+    private weak var releaseNotesUserScript: ReleaseNotesUserScript?
+
+    init(scriptsPublisher: some Publisher<some ReleaseNotesUserScriptProvider, Never>,
+         webViewPublisher: some Publisher<WKWebView, Never>) {
+
+        webViewPublisher.sink { [weak self] webView in
+            self?.webView = webView
+        }.store(in: &cancellables)
+
+        scriptsPublisher.sink { [weak self] scripts in
+            self?.releaseNotesUserScript = scripts.releaseNotesUserScript
+            self?.releaseNotesUserScript?.webView = self?.webView
+
+            DispatchQueue.main.async { [weak self] in
+                //TODO: - Only if URL is release notes
+                self?.setUpYoutubeScriptsIfNeeded(for: self?.webView?.url)
+            }
+        }.store(in: &cancellables)
+    }
+
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         if navigationAction.url.isReleaseNotesScheme {
@@ -27,6 +76,20 @@ final class ReleaseNotesTabExtension: NavigationResponder {
         }
         return .next
     }
+
+    @MainActor
+    private func setUpYoutubeScriptsIfNeeded(for url: URL?) {
+        let updateController = Application.appDelegate.updateController!
+        Publishers.CombineLatest(updateController.isUpdateBeingLoadedPublisher, updateController.latestUpdatePublisher)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                //TODO: - if url is release notes
+                self.releaseNotesUserScript?.onUpdate()
+            }
+            .store(in: &cancellables)
+    }
+
 }
 
 protocol ReleaseNotesTabExtensionProtocol: AnyObject, NavigationResponder {}
@@ -37,4 +100,46 @@ extension ReleaseNotesTabExtension: ReleaseNotesTabExtensionProtocol, TabExtensi
 
 extension TabExtensions {
     var releaseNotes: ReleaseNotesTabExtensionProtocol? { resolve(ReleaseNotesTabExtension.self) }
+}
+
+extension ReleaseNotesValues {
+
+    init(status: String,
+         currentVersion: String,
+         lastUpdate: UInt) {
+        self.init(status: status,
+                  currentVersion: currentVersion,
+                  latestVersion: nil,
+                  lastUpdate: lastUpdate,
+                  releaseTitle: nil,
+                  releaseNotes: nil,
+                  releaseNotesPrivacyPro: nil)
+    }
+
+    init(from updateController: UpdateController?) {
+        let currentVersion = AppVersion().versionAndBuildNumber
+        let lastUpdate = UInt((updateController?.lastUpdateCheckDate ?? Date()).timeIntervalSince1970)
+        let status: String
+        let latestVersion: String
+
+        if let updateController,
+           !updateController.isUpdateBeingLoaded,
+           let latestUpdate = updateController.latestUpdate {
+            status = latestUpdate.isInstalled ? "loaded" : "updateReady"
+            latestVersion = "\(latestUpdate.version).\(latestUpdate.build)"
+            self.init(status: status,
+                      currentVersion: currentVersion,
+                      latestVersion: latestVersion,
+                      lastUpdate: lastUpdate,
+                      releaseTitle: latestUpdate.title,
+                      releaseNotes: latestUpdate.releaseNotes,
+                      releaseNotesPrivacyPro: latestUpdate.releaseNotesPrivacyPro)
+            return
+        }
+
+        self.init(status: "loading",
+                  currentVersion: currentVersion,
+                  lastUpdate: lastUpdate)
+    }
+
 }

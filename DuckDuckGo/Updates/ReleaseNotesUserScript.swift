@@ -19,60 +19,54 @@
 import Foundation
 import UserScript
 import WebKit
+import Combine
 
 final class ReleaseNotesUserScript: NSObject, Subfeature {
 
-//    let onboardingActionsManager: OnboardingActionsManaging
+    lazy var updateController: UpdateControllerProtocol = Application.appDelegate.updateController
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "release-notes")])
-    let featureName: String = "release-notes"
-    var broker: UserScriptMessageBroker?
+    let featureName: String = "releaseNotes"
+    weak var broker: UserScriptMessageBroker?
+    weak var webView: WKWebView?
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - MessageNames
     enum MessageNames: String, CaseIterable {
-        case `init`
-        case dismissToSettings
-        case dismissToAddressBar
-        case requestDockOptIn
-        case stepCompleted
-        case setBlockCookiePopups
-        case setDuckPlayer
-        case setBookmarksBar
-        case setSessionRestore
-        case setShowHomeButton
-        case requestAddToDock
-        case requestImport
-        case requestSetAsDefault
+        case initialSetup
+        case reportPageException
+        case reportInitException
+        case browserRestart
     }
 
     override init() {
         super.init()
     }
 
-//    init(onboardingActionsManager: OnboardingActionsManaging) {
-//        self.onboardingActionsManager = onboardingActionsManager
-//    }
-
     public func with(broker: UserScriptMessageBroker) {
         self.broker = broker
     }
 
-    private lazy var methodHandlers: [MessageNames: Handler] = [:
-//            .`init`: setInit,
-//            .dismissToAddressBar: dismissToAddressBar,
-//            .dismissToSettings: dismissToSettings,
-//            .requestDockOptIn: requestDockOptIn,
-//            .requestImport: requestImport,
-//            .requestSetAsDefault: requestSetAsDefault,
-//            .setBookmarksBar: setBookmarksBar,
-//            .setSessionRestore: setSessionRestore,
-//            .setShowHomeButton: setShowHome,
-//            .stepCompleted: stepCompleted
+    private lazy var methodHandlers: [MessageNames: Handler] = [
+        .initialSetup: initialSetup,
+        .reportPageException: reportPageException,
+        .reportInitException: reportInitException,
+        .browserRestart: browserRestart
     ]
 
     @MainActor
     func handler(forMethodNamed methodName: String) -> Handler? {
         guard let messageName = MessageNames(rawValue: methodName) else { return nil }
         return methodHandlers[messageName]
+    }
+
+    public func onUpdate() {
+        guard let webView = webView else {
+            return assertionFailure("Could not access webView")
+        }
+
+        let updateController = Application.appDelegate.updateController
+        let values = ReleaseNotesValues(from: updateController)
+        broker?.push(method: "onUpdate", params: values, for: self, into: webView)
     }
 
     // MARK: - UserValuesNotification
@@ -85,67 +79,34 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
 
 extension ReleaseNotesUserScript {
     @MainActor
-    private func setInit(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        onboardingActionsManager.onboardingStarted()
-//        return onboardingActionsManager.configuration
+    private func initialSetup(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        // Initialize the page right after sending the initial setup result
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.onUpdate()
+        }
+        return InitialSetupResult(env: "development", locale: "en")
+    }
+
+    struct InitialSetupResult: Encodable {
+        let env: String
+        let locale: String
+    }
+
+    @MainActor
+    private func reportPageException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         return nil
     }
 
     @MainActor
-    private func dismissToAddressBar(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        onboardingActionsManager.goToAddressBar()
+    private func reportInitException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         return nil
     }
 
-    @MainActor
-    private func dismissToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        onboardingActionsManager.goToSettings()
-        return nil
-    }
-
-    private func requestDockOptIn(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        onboardingActionsManager.addToDock()
-        return Result()
-    }
-
-    @MainActor
-    private func requestImport(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        onboardingActionsManager.importData()
-        return Result()
-    }
-
-    private func requestSetAsDefault(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        onboardingActionsManager.setAsDefault()
-        return Result()
-    }
-
-    @MainActor
-    private func setBookmarksBar(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        guard let params = params as? [String: Bool], let enabled = params["enabled"] else { return nil }
-//        onboardingActionsManager.setBookmarkBar(enabled: enabled)
-        return nil
-    }
-
-    private func setSessionRestore(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        guard let params = params as? [String: Bool], let enabled = params["enabled"] else { return nil }
-//        onboardingActionsManager.setSessionRestore(enabled: enabled)
-        return nil
-    }
-
-    private func setShowHome(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        guard let params = params as? [String: Bool], let enabled = params["enabled"] else { return nil }
-//        onboardingActionsManager.setHomeButtonPosition(enabled: enabled)
-        return nil
-    }
-
-    private func stepCompleted(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        if let params = params as? [String: String], let stepString = params["id"], let step = OnboardingSteps(rawValue: stepString) {
-//            onboardingActionsManager.stepCompleted(step: step)
-//        }
+    private func browserRestart(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        updateController.runUpdate()
         return nil
     }
 
     struct Result: Encodable {}
 
 }
-

@@ -250,7 +250,8 @@ final class MoreOptionsMenu: NSMenu {
 
     private func addUpdateItem() {
 #if SPARKLE
-        if let update = Application.appDelegate.updateController.availableUpdate {
+        if let update = Application.appDelegate.updateController.latestUpdate,
+           !update.isInstalled {
             addItem(UpdateMenuItemFactory.menuItem(for: update))
             addItem(NSMenuItem.separator())
         }

@@ -26,29 +26,79 @@ final class Update {
         case critical
     }
 
+    let isInstalled: Bool
     let type: UpdateType
     let version: String
     let build: String
+    let date: Date
+    let releaseNotes: [String]
+    let releaseNotesPrivacyPro: [String]
 
-    internal init(type: Update.UpdateType,
+    var title: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM dd yyyy"
+        return formatter.string(from: date)
+    }
+
+    internal init(isInstalled: Bool,
+                  type: Update.UpdateType,
                   version: String,
-                  build: String) {
+                  build: String,
+                  date: Date,
+                  releaseNotes: [String],
+                  releaseNotesPrivacyPro: [String]) {
+        self.isInstalled = isInstalled
         self.type = type
         self.version = version
         self.build = build
+        self.date = date
+        self.releaseNotes = releaseNotes
+        self.releaseNotesPrivacyPro = releaseNotesPrivacyPro
     }
 
 }
 
 extension Update {
 
-    convenience init(appcastItem: SUAppcastItem) {
+    static func releaseNotes(from description: String?) -> [String] {
+        guard let description else { return [] }
+
+        var releaseNotes = [String]()
+
+        let pattern = "<li>(.*?)</li>"
+
+        do {
+            let regex = try NSRegularExpression(pattern: pattern, options: [])
+            let matches = regex.matches(in: description, options: [], range: NSRange(location: 0, length: description.utf16.count))
+
+            for match in matches {
+                if let range = Range(match.range(at: 1), in: description) {
+                    let item = String(description[range])
+                    releaseNotes.append(item)
+                }
+            }
+        } catch {
+            assertionFailure("Error creating regular expression: \(error)")
+        }
+
+        return releaseNotes
+    }
+
+    convenience init(appcastItem: SUAppcastItem, isInstalled: Bool) {
         let isCritical = appcastItem.isCriticalUpdate
         let version = appcastItem.displayVersionString
         let build = appcastItem.versionString
-        self.init(type: isCritical ? .critical : .regular,
+        let date = appcastItem.date ?? Date()
+        let releaseNotes = Self.releaseNotes(from: appcastItem.itemDescription)
+
+        //TODO: - Release notes for PP
+        self.init(isInstalled: isInstalled,
+                  type: isCritical ? .critical : .regular,
                   version: version,
-                  build: build)
+                  build: build,
+                  date: date,
+                  releaseNotes: releaseNotes,
+                  releaseNotesPrivacyPro: [])
     }
 
 }

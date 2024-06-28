@@ -202,7 +202,7 @@ extension TabExtensionsBuilder {
         }
 
         add {
-            ReleaseNotesTabExtension()
+            ReleaseNotesTabExtension(scriptsPublisher: userScripts.compactMap { $0 }, webViewPublisher: args.webViewFuture)
         }
 
         if let tunnelController = dependencies.tunnelController {

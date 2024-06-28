@@ -29,8 +29,8 @@ protocol UpdateControllerProtocol: AnyObject {
     var isNewUpdateAvailable: Bool { get }
     var isNewUpdateAvailablePublisher: Published<Bool>.Publisher { get }
 
-    var availableUpdate: Update? { get }
-    var availableUpdatePublisher: Published<Update?>.Publisher { get }
+    var latestUpdate: Update? { get }
+    var latestUpdatePublisher: Published<Update?>.Publisher { get }
 
     var isUpdateBeingLoaded: Bool { get }
     var isUpdateBeingLoadedPublisher: Published<Bool>.Publisher { get }
@@ -66,20 +66,21 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     @Published private(set) var isUpdateBeingLoaded = false
     var isUpdateBeingLoadedPublisher: Published<Bool>.Publisher { $isUpdateBeingLoaded }
 
-    @Published private(set) var availableUpdate: Update? {
+    @Published private(set) var latestUpdate: Update? {
         didSet {
-            if let availableUpdate {
-                switch availableUpdate.type {
+            if let latestUpdate, !latestUpdate.isInstalled {
+                switch latestUpdate.type {
                 case .critical:
                     notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: "Critical update required. Restart to update.")
                 case .regular:
                     notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Relaunch to update.")
                 }
             }
-            isNewUpdateAvailable = availableUpdate != nil
+            isNewUpdateAvailable = latestUpdate != nil
         }
     }
-    var availableUpdatePublisher: Published<Update?>.Publisher { $availableUpdate }
+
+    var latestUpdatePublisher: Published<Update?>.Publisher { $latestUpdate }
 
     @Published private(set) var isNewUpdateAvailable = false
     var isNewUpdateAvailablePublisher: Published<Bool>.Publisher { $isNewUpdateAvailable }
@@ -118,16 +119,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         return true
     }
 
-    private var isUpdateFound: Bool = false
-    private var isUpdateDownloaded: Bool = false
-
-    private func refreshUpdateObjectIfNeeded(appcastItem: SUAppcastItem) {
-        if isUpdateFound && isUpdateDownloaded {
-            availableUpdate = Update(appcastItem: appcastItem)
-        } else {
-            availableUpdate = nil
-        }
-    }
+//    private var isUpdateDownloaded: Bool = false
 
     private func configureUpdater() {
     // The default configuration of Sparkle updates is in Info.plist
@@ -240,18 +232,24 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        isUpdateFound = true
-        refreshUpdateObjectIfNeeded(appcastItem: item)
+        // Waiting until the update is downloaded
+    }
+
+    func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
+        if let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem {
+            latestUpdate = Update(appcastItem: item, isInstalled: true)
+        } else {
+            latestUpdate = nil
+        }
+        isUpdateBeingLoaded = false
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
-        isUpdateDownloaded = true
+        latestUpdate = Update(appcastItem: item, isInstalled: false)
         isUpdateBeingLoaded = false
-        refreshUpdateObjectIfNeeded(appcastItem: item)
     }
 
-    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
-    }
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {}
 
 }
 

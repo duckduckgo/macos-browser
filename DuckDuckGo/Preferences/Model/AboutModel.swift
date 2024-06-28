@@ -78,7 +78,7 @@ final class AboutModel: ObservableObject, PreferencesTabOpening {
     }
 
     private func subscribeToUpdateInfo(updateController: UpdateControllerProtocol) {
-        cancellable = updateController.availableUpdatePublisher
+        cancellable = updateController.latestUpdatePublisher
             .combineLatest(updateController.isUpdateBeingLoadedPublisher)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
@@ -88,7 +88,7 @@ final class AboutModel: ObservableObject, PreferencesTabOpening {
 
     private func refreshUpdateState() {
         guard let updateController else { return }
-        updateState = UpdateState(from: updateController.availableUpdate, isLoading: updateController.isUpdateBeingLoaded)
+        updateState = UpdateState(from: updateController.latestUpdate, isLoading: updateController.isUpdateBeingLoaded)
     }
 
 }
