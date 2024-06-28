@@ -304,15 +304,19 @@ extension DuckPlayer {
 #if DEBUG
 
 final class DuckPlayerPreferencesPersistorMock: DuckPlayerPreferencesPersistor {
-
     var duckPlayerModeBool: Bool?
     var youtubeOverlayInteracted: Bool
     var youtubeOverlayAnyButtonPressed: Bool
+    var duckPlayerAutoplay: Bool
 
-    init(duckPlayerMode: DuckPlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false, youtubeOverlayAnyButtonPressed: Bool = false) {
+    init(duckPlayerMode: DuckPlayerMode = .alwaysAsk,
+         youtubeOverlayInteracted: Bool = false,
+         youtubeOverlayAnyButtonPressed: Bool = false,
+         duckPlayerAutoplay: Bool = false) {
         self.duckPlayerModeBool = duckPlayerMode.boolValue
         self.youtubeOverlayInteracted = youtubeOverlayInteracted
         self.youtubeOverlayAnyButtonPressed = youtubeOverlayAnyButtonPressed
+        self.duckPlayerAutoplay = duckPlayerAutoplay
     }
 }
 

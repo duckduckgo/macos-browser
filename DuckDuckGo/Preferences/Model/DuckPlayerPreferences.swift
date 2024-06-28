@@ -26,6 +26,7 @@ protocol DuckPlayerPreferencesPersistor {
     var duckPlayerModeBool: Bool? { get set }
     var youtubeOverlayInteracted: Bool { get set }
     var youtubeOverlayAnyButtonPressed: Bool { get set }
+    var duckPlayerAutoplay: Bool { get set }
 }
 
 struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersistor {
@@ -38,6 +39,10 @@ struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersisto
 
     @UserDefaultsWrapper(key: .youtubeOverlayButtonsUsed, defaultValue: false)
     var youtubeOverlayAnyButtonPressed: Bool
+
+    @UserDefaultsWrapper(key: .duckPlayerAutoplay, defaultValue: true)
+    var duckPlayerAutoplay: Bool
+
 }
 
 final class DuckPlayerPreferences: ObservableObject {
@@ -52,7 +57,11 @@ final class DuckPlayerPreferences: ObservableObject {
     }
 
     @Published
-    var autoplayEnabled: Bool = false
+    var duckPlayerAutoplay: Bool {
+        didSet {
+            persistor.duckPlayerAutoplay = duckPlayerAutoplay
+        }
+    }
 
     var shouldDisplayAutoPlaySettings: Bool = true
 
@@ -73,6 +82,7 @@ final class DuckPlayerPreferences: ObservableObject {
         duckPlayerMode = .init(persistor.duckPlayerModeBool)
         youtubeOverlayInteracted = persistor.youtubeOverlayInteracted
         youtubeOverlayAnyButtonPressed = persistor.youtubeOverlayAnyButtonPressed
+        duckPlayerAutoplay = persistor.duckPlayerAutoplay
     }
 
     private var persistor: DuckPlayerPreferencesPersistor

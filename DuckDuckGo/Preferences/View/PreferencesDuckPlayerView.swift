@@ -72,7 +72,7 @@ extension Preferences {
                 // Auto Play
                 if model.shouldDisplayAutoPlaySettings {
                     PreferencePaneSection(UserText.duckPlayerAutoplayTitle) {
-                        ToggleMenuItem(UserText.duckPlayerAutoplayPreference, isOn: $model.autoplayEnabled)
+                        ToggleMenuItem(UserText.duckPlayerAutoplayPreference, isOn: $model.duckPlayerAutoplay)
                     }
                 }
             }
