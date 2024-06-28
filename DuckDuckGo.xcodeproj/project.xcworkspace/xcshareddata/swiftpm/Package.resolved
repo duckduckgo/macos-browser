@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "michal/signout-on-401",
-        "revision" : "4322ef251213dd370b8aef493a66d5d64b54d8d9"
+        "revision" : "d975cee533d1479e2dd897ee19f816b6de58fe20"
       }
     },
     {
