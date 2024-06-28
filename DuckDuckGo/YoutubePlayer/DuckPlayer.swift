@@ -56,9 +56,14 @@ enum DuckPlayerMode: Equatable, Codable {
 struct InitialSetupSettings: Codable {
     struct PlayerSettings: Codable {
         let pip: PIP
+        let autoplay: Autoplay
     }
 
     struct PIP: Codable {
+        let state: State
+    }
+
+    struct Autoplay: Codable {
         let state: State
     }
 
@@ -116,6 +121,10 @@ final class DuckPlayer {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
         isPiPFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
+
+#warning("Change the subfeature once BSK is done")
+        isAutoplayEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
+
         mode = preferences.duckPlayerMode
         bindDuckPlayerModeIfNeeded()
 
@@ -212,8 +221,9 @@ final class DuckPlayer {
         }
 
         let pip = InitialSetupSettings.PIP(state: isPiPEnabled ? .enabled : .disabled)
+        let autoplay = InitialSetupSettings.Autoplay(state: isAutoplayEnabled ? .enabled : .disabled)
 
-        let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip)
+        let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip, autoplay: autoplay)
         let userValues = encodeUserValues()
 
         return InitialSetupSettings(userValues: userValues, settings: playerSettings)
@@ -232,6 +242,7 @@ final class DuckPlayer {
     private var modeCancellable: AnyCancellable?
     private var isFeatureEnabledCancellable: AnyCancellable?
     private var isPiPFeatureEnabled: Bool
+    private var isAutoplayEnabled: Bool
 
     private func bindDuckPlayerModeIfNeeded() {
         if isFeatureEnabled {
