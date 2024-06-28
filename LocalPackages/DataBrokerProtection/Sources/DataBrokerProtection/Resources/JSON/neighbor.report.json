@@ -1,7 +1,7 @@
 {
   "name": "Neighbor Report",
   "url": "neighbor.report",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "addedDatetime": 1703570400000,
   "steps": [
     {
@@ -17,6 +17,7 @@
           "actionType": "extract",
           "id": "1ec79c67-40b0-4f91-baf8-996073109092",
           "selector": ".lstd",
+          "noResultsSelector": "//h1[contains(text(), 'Error 404')]",
           "profile": {
             "name": {
               "selector": "(.//a[@class='persons'])[1]"
