@@ -41,6 +41,15 @@ final class IPCServiceLauncher {
         self.launchMethod = launchMethod
     }
 
+    func checkPrerequisites() -> Bool {
+        switch launchMethod {
+        case .direct(_, let appLauncher):
+            return appLauncher.targetAppExists()
+        case .loginItem:
+            return true
+        }
+    }
+
     /// Enables the IPC service
     ///
     func enable() async throws {
