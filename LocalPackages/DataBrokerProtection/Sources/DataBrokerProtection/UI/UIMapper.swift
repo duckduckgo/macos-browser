@@ -61,9 +61,9 @@ struct MapperToUI {
             return accumulator + brokerQueryData.totalScans
         }
 
-        let withSortedGroups = groupedByBroker.map { $0.sortedByRunDate() }
+        let withSortedGroups = groupedByBroker.map { $0.sortedByLastRunDate() }
 
-        let sorted = withSortedGroups.sortedByRunDate()
+        let sorted = withSortedGroups.sortedByLastRunDate()
 
         let partiallyScannedBrokers = sorted.flatMap { brokerQueryGroup in
             brokerQueryGroup.scannedBrokers
@@ -338,23 +338,42 @@ fileprivate extension BrokerProfileQueryData {
     }
 }
 
+/// Extension on `Optional` which provides comparison abilities when the wrapped type is `Date`
+private extension Optional where Wrapped == Date {
+
+    static func < (lhs: Date?, rhs: Date?) -> Bool {
+        switch (lhs, rhs) {
+        case let (lhsDate?, rhsDate?):
+            return lhsDate < rhsDate
+        case (nil, _?):
+            return false
+        case (_?, nil):
+            return true
+        case (nil, nil):
+            return false
+        }
+    }
+
+    static func == (lhs: Date?, rhs: Date?) -> Bool {
+        switch (lhs, rhs) {
+        case let (lhs?, rhs?):
+            return lhs == rhs
+        case (nil, nil):
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 private extension Array where Element == [BrokerProfileQueryData] {
 
     /// Sorts the 2-dimensional array in ascending order based on the `lastRunDate` value of the first element of each internal array
     ///
     /// - Returns: An array of `[BrokerProfileQueryData]` values sorted by the first `lastRunDate` of each element
-    func sortedByRunDate() -> Self {
-        sorted { lhs, rhs in
-            switch (lhs.first?.scanJobData.lastRunDate, rhs.first?.scanJobData.lastRunDate) {
-            case let (lhsDate?, rhsDate?):
-                return lhsDate < rhsDate
-            case (nil, _?):
-                return false
-            case (_?, nil):
-                return true
-            case (nil, nil):
-                return true
-            }
+    func sortedByLastRunDate() -> Self {
+        self.sorted { lhs, rhs in
+            lhs.first?.scanJobData.lastRunDate < rhs.first?.scanJobData.lastRunDate
         }
     }
 }
@@ -371,7 +390,7 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
     /// Returns an array of brokers which have been either fully or partially scanned
     ///
     /// A broker is considered fully scanned is all scan jobs for that broker have completed.
-    /// A Broker is considered partially scanned if at least one scan job for that broker has completed
+    /// A broker is considered partially scanned if at least one scan job for that broker has completed
     /// Mirror brokers will be included in the returned array when `MirrorSite.shouldWeIncludeMirrorSite` returns true
     var scannedBrokers: [ScannedBroker] {
         guard let broker = self.first?.dataBroker else { return [] }
@@ -437,18 +456,9 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
     /// Sorts the array in ascending order based on `lastRunDate`
     ///
     /// - Returns: An array of `BrokerProfileQueryData` sorted by `lastRunDate`
-    func sortedByRunDate() -> Self {
+    func sortedByLastRunDate() -> Self {
         self.sorted { lhs, rhs in
-            switch (lhs.scanJobData.lastRunDate, rhs.scanJobData.lastRunDate) {
-            case let (lhsDate?, rhsDate?):
-                return lhsDate < rhsDate
-            case (nil, _?):
-                return false
-            case (_?, nil):
-                return true
-            case (nil, nil):
-                return true
-            }
+            lhs.scanJobData.lastRunDate < rhs.scanJobData.lastRunDate
         }
     }
 }
