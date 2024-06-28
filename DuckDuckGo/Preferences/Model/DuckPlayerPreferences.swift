@@ -51,6 +51,11 @@ final class DuckPlayerPreferences: ObservableObject {
         }
     }
 
+    @Published
+    var autoplayEnabled: Bool = false
+
+    var shouldDisplayAutoPlaySettings: Bool = true
+
     var youtubeOverlayInteracted: Bool {
         didSet {
             persistor.youtubeOverlayInteracted = youtubeOverlayInteracted
