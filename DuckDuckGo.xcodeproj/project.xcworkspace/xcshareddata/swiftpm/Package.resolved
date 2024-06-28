@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "bd75e8eff671451c83522776bdd020c250fa97a4",
-        "version" : "162.0.0"
+        "branch" : "bunn/duckplayer/autoplay",
+        "revision" : "b1ae00c28f13dd0f013ea3c42d324f6ff86dda96"
       }
     },
     {

@@ -121,9 +121,7 @@ final class DuckPlayer {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
         isPiPFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
-
-#warning("Change the subfeature once BSK is done")
-        isAutoplayEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
+        isAutoplayEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
 
         mode = preferences.duckPlayerMode
         bindDuckPlayerModeIfNeeded()
