@@ -1,7 +1,7 @@
 {
   "name": "Spokeo",
   "url": "spokeo.com",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "addedDatetime": 1692572400000,
   "mirrorSites": [
     {
@@ -43,6 +43,7 @@
           "actionType": "extract",
           "id": "bd52ece4-55ba-4839-8360-a201c99d6ae6",
           "selector": ".single-column-list-item",
+          "noResultsSelector": ".no_results_container",
           "profile": {
             "name": {
               "selector": ".title",
