@@ -33,8 +33,6 @@ final class BookmarksBarViewControllerTests: XCTestCase {
         let mainViewController = MainViewController(bookmarkManager: bookmarksManager, autofillPopoverPresenter: DefaultAutofillPopoverPresenter())
         let mainWindowcontroller = MainWindowController(mainViewController: mainViewController, popUp: false)
         mainWindowcontroller.window = mockWindow
-        let tabCollectionViewModel = TabCollectionViewModel()
-        let bookmarkManager = MockBookmarkManager()
         vc = mainViewController.bookmarksBarViewController
         WindowControllersManager.shared.lastKeyMainWindowController = mainWindowcontroller
     }
