@@ -121,7 +121,7 @@ final class DuckPlayer {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
         isPiPFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
-        isAutoplayEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
+        isAutoplayFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
 
         mode = preferences.duckPlayerMode
         bindDuckPlayerModeIfNeeded()
@@ -212,6 +212,8 @@ final class DuckPlayer {
     private func encodedSettings(with webView: WKWebView?) async -> InitialSetupSettings {
         var isPiPEnabled = webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] == true
 
+        let isAutoplayEnabled = isAutoplayFeatureEnabled && DuckPlayerPreferences.shared.duckPlayerAutoplay
+
         // Disable WebView PiP if if the subFeature is off
         if !isPiPFeatureEnabled {
             webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] = false
@@ -240,7 +242,7 @@ final class DuckPlayer {
     private var modeCancellable: AnyCancellable?
     private var isFeatureEnabledCancellable: AnyCancellable?
     private var isPiPFeatureEnabled: Bool
-    private var isAutoplayEnabled: Bool
+    private var isAutoplayFeatureEnabled: Bool
 
     private func bindDuckPlayerModeIfNeeded() {
         if isFeatureEnabled {
