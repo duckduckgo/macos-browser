@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "jacek/toggle-reports-limiter",
-        "revision" : "0b9f898c9d4856ba0f1126c44bf282141ed0408f"
+        "revision" : "a51fed4db0c332cd4f02eafca2d9c7a178c0829a",
+        "version" : "163.0.0"
       }
     },
     {
