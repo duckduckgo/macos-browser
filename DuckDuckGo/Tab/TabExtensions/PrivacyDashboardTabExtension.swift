@@ -29,7 +29,7 @@ final class PrivacyDashboardTabExtension {
 
     private let contentBlocking: any ContentBlockingProtocol
     private let certificateTrustEvaluator: CertificateTrustEvaluating
-    private var phishingStateManager: PhishingStateManager
+    private var phishingStateManager: PhishingTabStateManager
 
     @Published private(set) var privacyInfo: PrivacyInfo?
 
@@ -45,7 +45,7 @@ final class PrivacyDashboardTabExtension {
          didUpgradeToHttpsPublisher: some Publisher<URL, Never>,
          trackersPublisher: some Publisher<DetectedTracker, Never>,
          webViewPublisher: some Publisher<WKWebView, Never>,
-         phishingStateManager: PhishingStateManager) {
+         phishingStateManager: PhishingTabStateManager) {
 
         self.contentBlocking = contentBlocking
         self.certificateTrustEvaluator = certificateTrustEvaluator
@@ -190,7 +190,6 @@ extension PrivacyDashboardTabExtension: NavigationResponder {
         resetConnectionUpgradedTo(navigationAction: navigationAction)
         let url = navigationAction.url
         let malicious = phishingStateManager.tabIsPhishing
-        self.phishingStateManager.setIsPhishing(malicious)
         await MainActor.run {
             self.privacyInfo?.isPhishing = malicious
         }

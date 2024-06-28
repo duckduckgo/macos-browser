@@ -34,6 +34,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
     override func setUp() {
         // disable GPC redirects
         WebTrackingProtectionPreferences.shared.isGPCEnabled = false
+        PhishingDetectionPreferences.shared.isEnabled = true
 
         window = WindowsManager.openNewWindow(with: .none)!
     }
@@ -57,7 +58,6 @@ class PhishingDetectionIntegrationTests: XCTestCase {
         let url = URL(string: "http://privacy-test-pages.site/")!
         _=await tab.setUrl(url, source: .link)?.result
         XCTAssertFalse(tab.phishingState.tabIsPhishing)
-        XCTAssertTrue(errorPage.errorPageType.isNil)
     }
 
     @MainActor
@@ -65,27 +65,27 @@ class PhishingDetectionIntegrationTests: XCTestCase {
         var cancellables = Set<AnyCancellable>()
         let tabViewModel = self.tabViewModel
         let tab = tabViewModel.tab
-        var errorPage = tab.specialErrorPage as! SpecialErrorPageTabExtension
+        var errorPage = try XCTUnwrap(tab.specialErrorPage as? SpecialErrorPageTabExtension)
 
         // load fake phishing test page - errorPageType = Phishing
-        let expectation1 = XCTestExpectation(description: "Should emit phishing error type")
         let url = URL(string: "http://privacy-test-pages.site/security/badware/phishing.html")!
         _=await tab.setUrl(url, source: .link)?.result
         XCTAssertTrue(tab.phishingState.tabIsPhishing)
-
-        errorPage.errorPageType.publisher
-            .sink { errorPageType in
-                XCTAssertEqual(errorPageType.description, "Phishing")
-                expectation1.fulfill()
-            }
-            .store(in: &cancellables)
-        await fulfillment(of: [expectation1], timeout: 1.0)
-
-        // load any other page, errorPageType is nil
-        _=await tab.setUrl(URL.testsServer, source: .link)?.result
-        XCTAssertFalse(tab.phishingState.tabIsPhishing)
-        errorPage = tab.specialErrorPage as! SpecialErrorPageTabExtension
-        XCTAssertTrue(errorPage.errorPageType.isNil)
     }
 
+    @MainActor
+    func testWhenPhishingDetectedThenNotDetected_tabIsNotMarkedPhishing() async throws {
+        var cancellables = Set<AnyCancellable>()
+        let tabViewModel = self.tabViewModel
+        let tab = tabViewModel.tab
+        var errorPage = try XCTUnwrap(tab.specialErrorPage as? SpecialErrorPageTabExtension)
+
+        // load fake phishing test page - errorPageType = Phishing
+        let url = URL(string: "http://privacy-test-pages.site/security/badware/phishing.html")!
+        _=await tab.setUrl(url, source: .link)?.result
+        XCTAssertTrue(tab.phishingState.tabIsPhishing)
+        let url2 = URL(string: "http://privacy-test-pages.site/")!
+        _=await tab.setUrl(url2, source: .link)?.result
+        XCTAssertFalse(tab.phishingState.tabIsPhishing)
+    }
 }

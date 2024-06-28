@@ -73,8 +73,8 @@ protocol TabExtensionDependencies {
     var duckPlayer: DuckPlayer { get }
     var certificateTrustEvaluator: CertificateTrustEvaluating { get }
     var tunnelController: NetworkProtectionIPCTunnelController? { get }
-    var phishingDetector: PhishingDetecting { get }
-    var phishingStateManager: PhishingStateManager { get }
+    var phishingDetector: PhishingSiteDetecting { get }
+    var phishingStateManager: PhishingTabStateManager { get }
 }
 
 // swiftlint:disable:next large_tuple

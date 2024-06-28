@@ -4,7 +4,6 @@
 ## The following URLs shall match the one in the client.
 ## Danger checks that the URLs match on every PR. If the code changes, the regex that Danger uses may need an update.
 API_URL="http://localhost:3000"
-API_STAGING_URL="https://tbd.unknown.duckduckgo.com"
 
 temp_filename="phishing_data_new_file"
 new_revision=$(curl -s "${API_URL}/revision" | jq -r '.revision')
@@ -26,18 +25,18 @@ performUpdate() {
 		printf "Error: %s does not exist\n" "${provider_path}"
 		exit 1
 	fi
+	old_sha="$(grep "${data_type}DataSHA: String =" "${provider_path}" | awk -F '"' '{print $2}')"
 
-	old_sha=$(grep 'private static let '${data_type}'DataSHA' "${provider_path}" | awk -F '"' '{print $2}')
-	old_revision=$(grep 'private static let revision' "${provider_path}" | awk -F '=' '{print $2}' | tr -d ' ')
+	old_revision=$(grep 'revision: Int' "${provider_path}" | awk -F '[=,]' '{print $2}' | xargs)
 
 	printf "Existing SHA256: %s\n" "${old_sha}"
-	printf "Existing revision: %s\n" "${old_revision}"
+	printf "Existing revision: %s, new revision: %s\n" "${old_revision}" "${new_revision}"
 
-	if [ $old_revision -lt $new_revision ]; then
-        curl -o $temp_filename -s "${API_URL}/${data_type}"
-		cat "$temp_filename" | jq -r '.insert' > "$data_path"
+	if [ "$old_revision" -lt "$new_revision" ]; then
+        curl -o "$temp_filename" -s "${API_URL}/${data_type}"
+		jq -r '.insert' "$temp_filename" > "$data_path"
 
-		new_sha=$(shasum -a 256 "$data_path" | awk -F ' ' '{print $1}')
+		new_sha="$(shasum -a 256 "$data_path" | awk -F ' ' '{print $1}')"
 
 		printf "New SHA256: %s\n" "$new_sha"
 
@@ -54,20 +53,20 @@ performUpdate() {
 updateRevision() {
     local new_revision=$1
 	local provider_path=$2
-	old_revision=$(grep 'private static let revision' "${provider_path}" | awk -F '=' '{print $2}' | tr -d ' ')
+	old_revision=$(grep 'revision: Int' "${provider_path}" | awk -F '[=,]' '{print $2}' | xargs)
 
-	if [ $old_revision -lt $new_revision ]; then
-		sed -i '' -e "s/private static let revision =.*/public static let revision = $new_revision/" "${provider_path}"
-        printf "Updated revision from $old_revision to $new_revision\n"
+	if [ "$old_revision" -lt "$new_revision" ]; then
+		sed -i '' -e "s/revision: Int =.*/public static let revision = $new_revision/" "${provider_path}"
+		printf "Updated revision from %s to %s\n" "$old_revision" "$new_revision"
 	fi
 }
 
 performUpdate hashPrefix \
-		"${PWD}/DuckDuckGo/PhishingDetection/PhishingDetectionManagerFactory.swift" \
+		"${PWD}/DuckDuckGo/PhishingDetection/PhishingDetection.swift" \
 		"${PWD}/DuckDuckGo/PhishingDetection/hashPrefixes.json"
 
 performUpdate filterSet \
-		"${PWD}/DuckDuckGo/PhishingDetection/PhishingDetectionManagerFactory.swift" \
+		"${PWD}/DuckDuckGo/PhishingDetection/PhishingDetection.swift" \
 		"${PWD}/DuckDuckGo/PhishingDetection/filterSet.json"
 
-updateRevision $new_revision "${PWD}/DuckDuckGo/PhishingDetection/PhishingDetectionManagerFactory.swift" 
+updateRevision "$new_revision" "${PWD}/DuckDuckGo/PhishingDetection/PhishingDetection.swift" 

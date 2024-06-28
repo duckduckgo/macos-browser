@@ -55,8 +55,8 @@ protocol NewWindowPolicyDecisionMaker {
         var downloadManager: FileDownloadManagerProtocol
         var certificateTrustEvaluator: CertificateTrustEvaluating
         var tunnelController: NetworkProtectionIPCTunnelController?
-        var phishingDetector: PhishingDetecting
-        var phishingStateManager: PhishingStateManager
+        var phishingDetector: PhishingSiteDetecting
+        var phishingStateManager: PhishingTabStateManager
     }
 
     fileprivate weak var delegate: TabDelegate?
@@ -74,7 +74,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
-    let phishingState: PhishingStateManager = PhishingStateManager()
+    let phishingState: PhishingTabStateManager = PhishingTabStateManager()
 
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
@@ -114,7 +114,7 @@ protocol NewWindowPolicyDecisionMaker {
                      startupPreferences: StartupPreferences = StartupPreferences.shared,
                      certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator(),
                      tunnelController: NetworkProtectionIPCTunnelController? = TunnelControllerProvider.shared.tunnelController,
-                     phishingDetector: PhishingDetector = PhishingDetectionManagerFactory.create(),
+                     phishingDetector: PhishingSiteDetecting = PhishingDetection.shared,
                      tabsPreferences: TabsPreferences = TabsPreferences.shared
     ) {
 
@@ -193,7 +193,7 @@ protocol NewWindowPolicyDecisionMaker {
          startupPreferences: StartupPreferences,
          certificateTrustEvaluator: CertificateTrustEvaluating,
          tunnelController: NetworkProtectionIPCTunnelController?,
-         phishingDetector: PhishingDetector,
+         phishingDetector: PhishingSiteDetecting,
          tabsPreferences: TabsPreferences
     ) {
 

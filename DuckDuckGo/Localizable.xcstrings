@@ -38549,6 +38549,42 @@
         }
       }
     },
+    "phishing-detection.enabled.checkbox" : {
+      "comment" : "Checkbox that enables or disables the phishing detection feature in the browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Allow DuckDuckGo to warn you when you visit fraudulent sites"
+          }
+        }
+      }
+    },
+    "phishing-detection.enabled.header" : {
+      "comment" : "Header for phishing site protection section in the settings page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Malicious Site Protection"
+          }
+        }
+      }
+    },
+    "phishing-detection.enabled.warning" : {
+      "comment" : "A description box to warn users away from disabling phishing protection",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "It is highly recommended to keep this setting enabled. Disabling it may put your personal information at risk. Only do so if you understand the risks"
+          }
+        }
+      }
+    },
     "phishing.error.page.advanced.button" : {
       "comment" : "Button shown in an error page that warns users of security risks on a website due to Phishing issues. The buttons allows the user to see advanced options on click.",
       "extractionState" : "extracted_with_value",

@@ -31,6 +31,7 @@ extension Preferences {
         @ObservedObject var searchModel: SearchPreferences
         @ObservedObject var tabsModel: TabsPreferences
         @ObservedObject var dataClearingModel: DataClearingPreferences
+        @ObservedObject var phishingDetectionModel: PhishingDetectionPreferences
         @State private var showingCustomHomePageSheet = false
         @State private var isAddedToDock = false
         var dockCustomizer: DockCustomizer
@@ -189,7 +190,20 @@ extension Preferences {
                         ToggleMenuItem(UserText.downloadsAlwaysAsk,
                                        isOn: $downloadsModel.alwaysRequestDownloadLocation)
                     }
+
+                    // SECTION 7: Phishing Detection
+                    PreferencePaneSection(UserText.phishingDetectionHeader) {
+                        PreferencePaneSubSection {
+                            ToggleMenuItem(UserText.phishingDetectionIsEnabled,
+                                           isOn: $phishingDetectionModel.isEnabled)
+                        }.padding(.bottom, 5)
+                        Text(UserText.phishingDetectionEnabledWarning)
+                            .font(.footnote)
+                            .foregroundColor(.red)
+                            .padding(.top, 5)
+                    }
                 }
+
             }
         }
     }

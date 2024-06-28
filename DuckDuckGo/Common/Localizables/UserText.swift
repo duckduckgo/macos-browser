@@ -436,6 +436,10 @@ struct UserText {
 
     static let downloadsOpenPopupOnCompletion = NSLocalizedString("downloads.open.on.completion", value: "Automatically open the Downloads panel when downloads complete", comment: "Checkbox to open a Download Manager popover when downloads are completed")
 
+    static let phishingDetectionHeader = NSLocalizedString("phishing-detection.enabled.header", value: "Malicious Site Protection", comment: "Header for phishing site protection section in the settings page")
+    static let phishingDetectionIsEnabled = NSLocalizedString("phishing-detection.enabled.checkbox", value: "Allow DuckDuckGo to warn you when you visit fraudulent sites", comment: "Checkbox that enables or disables the phishing detection feature in the browser")
+    static let phishingDetectionEnabledWarning = NSLocalizedString("phishing-detection.enabled.warning", value: "It is highly recommended to keep this setting enabled. Disabling it may put your personal information at risk. Only do so if you understand the risks", comment: "A description box to warn users away from disabling phishing protection")
+
     // MARK: Password Manager
     static let passwordManagementAllItems = NSLocalizedString("passsword.management.all-items", value: "All Items", comment: "Used as title for the Autofill All Items option")
     static let passwordManagementLogins = NSLocalizedString("passsword.management.logins", value: "Passwords", comment: "Used as title for the Autofill Logins option")

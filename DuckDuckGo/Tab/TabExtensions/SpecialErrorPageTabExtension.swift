@@ -49,15 +49,10 @@ final class SpecialErrorPageTabExtension {
     private var shouldBypassSSLError = false
     private var urlCredentialCreator: URLCredentialCreating
     private var featureFlagger: FeatureFlagger
-    private var phishingDetector: PhishingDetecting
-    private var phishingStateManager: PhishingStateManager
-#if DEBUG
-    var errorPageType: ErrorType?
-    var phishingUrlExemptions: Set<String> = []
-#else
+    private var phishingDetector: PhishingSiteDetecting
+    private var phishingStateManager: PhishingTabStateManager
     private var errorPageType: ErrorType?
     private var phishingUrlExemptions: Set<String> = []
-#endif
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -66,8 +61,8 @@ final class SpecialErrorPageTabExtension {
         scriptsPublisher: some Publisher<some SpecialErrorPageScriptProvider, Never>,
         urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger,
-        phishingDetector: some PhishingDetecting,
-        phishingStateManager: PhishingStateManager) {
+        phishingDetector: some PhishingSiteDetecting,
+        phishingStateManager: PhishingTabStateManager) {
             self.featureFlagger = featureFlagger
             self.urlCredentialCreator = urlCredentialCreator
             self.phishingDetector = phishingDetector
@@ -110,14 +105,6 @@ final class SpecialErrorPageTabExtension {
             webView?.setDocumentHtml(html)
         }
     }
-#if DEBUG
-    public func setSSLErrorPageType() {
-        errorPageType = .ssl
-    }
-    public func setPhishingErrorPageType() {
-        errorPageType = .phishing
-    }
-#endif
 
 }
 
@@ -129,7 +116,8 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
             return .next
         }
         // Check the URL
-        let isMalicious = await phishingDetector.isMalicious(url: url)
+        let isMalicious = await phishingDetector.checkIsMaliciousIfEnabled(url: url)
+        self.phishingStateManager.setIsPhishing(isMalicious)
         if isMalicious {
             errorPageType = .phishing
             specialErrorPageUserScript?.failingURL = navigationAction.url
