@@ -73,7 +73,7 @@ final class PhishingDetectionTests: XCTestCase {
         let isMalicious = await phishingDetection.checkIsMaliciousIfEnabled(url: URL(string: "https://malicious.com")!)
         XCTAssertTrue(isMalicious)
     }
-    
+
     func testIsNotMalicious() async {
         PhishingDetectionPreferences.shared.isEnabled = true
         let isMalicious = await phishingDetection.checkIsMaliciousIfEnabled(url: URL(string: "https://trusted.com")!)

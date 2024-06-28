@@ -43,7 +43,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         let featureFlagger = MockFeatureFlagger()
         credentialCreator = MockCredentialCreator()
         phishingStateManager = PhishingTabStateManager()
-        phishingDetection = MockPhishingSiteDetector(isMalicious:true)
+        phishingDetection = MockPhishingSiteDetector(isMalicious: true)
         errorPageExtension = SpecialErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger, phishingDetector: phishingDetection,
                                                           phishingStateManager: phishingStateManager)
     }

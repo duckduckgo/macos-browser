@@ -20,6 +20,9 @@ import Foundation
 import PhishingDetection
 import Combine
 
+/// PhishingDetection is implemented using two datasets that are embedded into the client as a Bundle in `DataProvider`,
+/// and kept up to date by `DataActivities` and `UpdateManager`. If the feature is disabled in `Preferences`,
+/// we stop the background tasks and don't check `isMalicious` on any URLs. 
 protocol PhishingSiteDetecting {
     func checkIsMaliciousIfEnabled(url: URL) async -> Bool
 }
