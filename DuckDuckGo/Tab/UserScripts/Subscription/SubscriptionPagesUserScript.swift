@@ -78,8 +78,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         .exact(hostname: "duckduckgo.com"),
         .exact(hostname: "abrown.duckduckgo.com")
     ])
-    let subscriptionManager: SubscriptionManaging
-    var accountManager: AccountManaging { subscriptionManager.accountManager }
+    let subscriptionManager: SubscriptionManager
+    var accountManager: AccountManager { subscriptionManager.accountManager }
     var subscriptionPlatform: SubscriptionEnvironment.PurchasePlatform { subscriptionManager.currentEnvironment.purchasePlatform }
 
     let stripePurchaseFlow: StripePurchaseFlow
@@ -87,11 +87,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
     let uiHandler: SubscriptionUIHandling
 
-    public init(subscriptionManager: SubscriptionManaging,
+    public init(subscriptionManager: SubscriptionManager,
                 subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler(),
+                stripePurchaseFlow: StripePurchaseFlow,
                 uiHandler: SubscriptionUIHandling) {
         self.subscriptionManager = subscriptionManager
-        self.stripePurchaseFlow = StripePurchaseFlow(subscriptionManager: subscriptionManager)
+        self.stripePurchaseFlow = stripePurchaseFlow
         self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
         self.uiHandler = uiHandler
     }
@@ -223,15 +224,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         subscriptionSuccessPixelHandler.origin = await originFrom(originalMessage: message)
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
-                defer {
-                    Task { @MainActor in
-                        uiHandler.dismissProgressViewController()
-                    }
-                }
-
                 guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
                     assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
                     subscriptionErrorReporter.report(subscriptionActivationError: .generalError)
+                    await uiHandler.dismissProgressViewController()
                     return nil
                 }
 
@@ -245,12 +241,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
                     subscriptionErrorReporter.report(subscriptionActivationError: .hasActiveSubscription)
                     await showSubscriptionFoundAlert(originalMessage: message)
+                    await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
                     return nil
                 }
 
                 let emailAccessToken = try? EmailManager().getToken()
                 let purchaseTransactionJWS: String
-                let appStorePurchaseFlow = AppStorePurchaseFlow(subscriptionManager: subscriptionManager)
+                let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionManager: subscriptionManager,
+                                                                appStoreRestoreFlow: DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager))
 
                 os_log(.info, log: .subscription, "[Purchase] Purchasing")
                 switch await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
@@ -278,6 +276,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                     if error != .cancelledByUser {
                         await showSomethingWentWrongAlert()
+                    } else {
+                        await uiHandler.dismissProgressViewController()
                     }
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
                     return nil
@@ -286,8 +286,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 await uiHandler.updateProgressViewController(title: UserText.completingPurchaseTitle)
 
                 os_log(.info, log: .subscription, "[Purchase] Completing purchase")
-
-                switch await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS) {
+                let completePurchaseResult = await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS)
+                switch completePurchaseResult {
                 case .success(let purchaseUpdate):
                     os_log(.info, log: .subscription, "[Purchase] Purchase complete")
                     PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .dailyAndCount)
@@ -313,6 +313,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                         DispatchQueue.main.async {
                             NotificationCenter.default.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
                         }
+                        await uiHandler.dismissProgressViewController()
                         return nil
                     case .internalError:
                         assertionFailure("Internal error")
@@ -323,15 +324,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             }
         } else if subscriptionPlatform == .stripe {
             let emailAccessToken = try? EmailManager().getToken()
-
             let result = await stripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken)
-
             switch result {
             case .success(let success):
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: success)
             case .failure(let error):
                 await showSomethingWentWrongAlert()
-
                 switch error {
                 case .noProductsFound:
                     subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
@@ -342,6 +340,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             }
         }
 
+        await uiHandler.dismissProgressViewController()
         return nil
     }
 
@@ -385,30 +384,20 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .personalInformationRemoval:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .unique)
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
-            Task { @MainActor in
-                self.uiHandler.showTab(with: .dataBrokerProtection)
-            }
+            await uiHandler.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
             PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .unique)
             let url = subscriptionManager.url(for: .identityTheftRestoration)
-            Task { @MainActor in
-                self.uiHandler.showTab(with: .identityTheftRestoration(url))
-            }
+            await uiHandler.showTab(with: .identityTheftRestoration(url))
         }
 
         return nil
     }
 
     func completeStripePayment(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        Task { @MainActor in
-            uiHandler.presentProgressViewController(withTitle: UserText.completingPurchaseTitle)
-        }
-
+        await uiHandler.presentProgressViewController(withTitle: UserText.completingPurchaseTitle)
         await stripePurchaseFlow.completeSubscriptionPurchase()
-
-        Task { @MainActor in
-            uiHandler.dismissProgressViewController()
-        }
+        await uiHandler.dismissProgressViewController()
 
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
         subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
@@ -457,7 +446,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     @MainActor
-    func pushPurchaseUpdate(originalMessage: WKScriptMessage, purchaseUpdate: PurchaseUpdate) async {
+    func pushPurchaseUpdate(originalMessage: WKScriptMessage, purchaseUpdate: PurchaseUpdate) {
         pushAction(method: .onPurchaseUpdate, webView: originalMessage.webView!, params: purchaseUpdate)
     }
 
@@ -475,51 +464,37 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         let url = originalMessage.webView?.url
         return url?.getParameter(named: AttributionParameter.origin)
     }
-}
 
-extension SubscriptionPagesUseSubscriptionFeature {
+    // MARK: - UI interactions
 
- // MARK: - UI interactions
-
-    @MainActor
-    func showSomethingWentWrongAlert() {
+    func showSomethingWentWrongAlert() async {
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
-        uiHandler.show(alertType: .somethingWentWrong)
-    }
-
-    @MainActor
-    func showSubscriptionNotFoundAlert() {
-        uiHandler.show(alertType: .subscriptionNotFound, firstButtonAction: {
-            let url = self.subscriptionManager.url(for: .purchase)
-            self.uiHandler.showTab(with: .subscription(url))
+        switch await uiHandler.dismissProgressViewAndShow(alertType: .somethingWentWrong, text: nil) {
+        case .alertFirstButtonReturn:
+            let url = subscriptionManager.url(for: .purchase)
+            await uiHandler.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
-        })
+        default: return
+        }
     }
 
-    @MainActor
-    func showSubscriptionInactiveAlert() {
-        uiHandler.show(alertType: .subscriptionInactive, firstButtonAction: {
-            let url = self.subscriptionManager.url(for: .purchase)
-            self.uiHandler.showTab(with: .subscription(url))
-            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
-        })
-    }
+    func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) async {
 
-    @MainActor
-    func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) {
-        uiHandler.show(alertType: .subscriptionFound, firstButtonAction: {
+        switch await uiHandler.dismissProgressViewAndShow(alertType: .subscriptionFound, text: nil) {
+        case .alertFirstButtonReturn:
             if #available(macOS 12.0, *) {
-                Task {
-                    let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: self.subscriptionManager)
-                    let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
-                    switch result {
-                    case .success: PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
-                    case .failure: break
-                    }
+                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: self.subscriptionManager)
+                let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
+                switch result {
+                case .success: PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
+                case .failure: break
+                }
+                Task { @MainActor in
                     originalMessage.webView?.reload()
                 }
             }
-        })
+        default: return
+        }
     }
 }
 
@@ -537,8 +512,8 @@ extension SubscriptionPagesUseSubscriptionFeature: SubscriptionAccessActionHandl
     }
 
     func subscriptionAccessActionOpenURLHandler(url: URL) {
-        Task { @MainActor in
-            self.uiHandler.showTab(with: .subscription(url))
+        Task {
+            await self.uiHandler.showTab(with: .subscription(url))
         }
     }
 

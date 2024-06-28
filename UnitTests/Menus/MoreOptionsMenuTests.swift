@@ -22,6 +22,7 @@ import NetworkProtectionUI
 import XCTest
 import Subscription
 import SubscriptionTestingUtilities
+import BrowserServicesKit
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -43,7 +44,8 @@ final class MoreOptionsMenuTests: XCTestCase {
         passwordManagerCoordinator = PasswordManagerCoordinator()
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
         internalUserDecider = InternalUserDeciderMock()
-        accountManager = AccountManagerMock(isUserAuthenticated: true)
+        accountManager = AccountManagerMock()
+        accountManager.accessToken = "something" // accountManager.isUserAuthenticated becomes true
         networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(isInstalled: false, visible: false)
         moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: passwordManagerCoordinator,
@@ -69,6 +71,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
                                          vpnFeatureGatekeeper: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
+                                          subscriptionFeatureAvailability: SubscriptionFeatureAvailabilityMock(isFeatureAvailable: false, isSubscriptionPurchaseAllowed: false),
                                          sharingMenu: NSMenu(),
                                          internalUserDecider: internalUserDecider,
                                          accountManager: accountManager)
@@ -96,14 +99,14 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     @MainActor
     func testThatMoreOptionMenuHasTheExpectedItemsNotAuthenticated() {
-
-        accountManager = AccountManagerMock(isUserAuthenticated: false)
+        accountManager = AccountManagerMock()
         moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                         passwordManagerCoordinator: passwordManagerCoordinator,
-                                         vpnFeatureGatekeeper: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
-                                         sharingMenu: NSMenu(),
-                                         internalUserDecider: internalUserDecider,
-                                         accountManager: accountManager)
+                                          passwordManagerCoordinator: passwordManagerCoordinator,
+                                          vpnFeatureGatekeeper: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
+                                          subscriptionFeatureAvailability: SubscriptionFeatureAvailabilityMock(isFeatureAvailable: false, isSubscriptionPurchaseAllowed: false),
+                                          sharingMenu: NSMenu(),
+                                          internalUserDecider: internalUserDecider,
+                                          accountManager: accountManager)
 
         XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)
         XCTAssertTrue(moreOptionsMenu.items[1].isSeparatorItem)

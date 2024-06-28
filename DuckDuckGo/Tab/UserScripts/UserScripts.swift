@@ -95,7 +95,9 @@ final class UserScripts: UserScriptsProvider {
         }
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: Application.appDelegate.subscriptionManager,
+            let subscriptionManager = Application.appDelegate.subscriptionManager
+            let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
+                                                                   stripePurchaseFlow: DefaultStripePurchaseFlow(subscriptionManager: subscriptionManager),
                                                                    uiHandler: Application.appDelegate.subscriptionUIHandler)
             subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
             userScripts.append(subscriptionPagesUserScript)

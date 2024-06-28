@@ -32,6 +32,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionControllerStartFailure(_ error: Error)
 
     case networkProtectionTunnelStartAttempt
+    case networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken
     case networkProtectionTunnelStartSuccess
     case networkProtectionTunnelStartFailure(_ error: Error)
 
@@ -100,6 +101,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionRekeyCompleted
     case networkProtectionRekeyFailure(_ error: Error)
 
+    case networkProtectionDNSUpdateCustom
+    case networkProtectionDNSUpdateDefault
+
     case networkProtectionSystemExtensionActivationFailure(_ error: Error)
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
@@ -130,6 +134,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
         case .networkProtectionTunnelStartAttempt:
             return "netp_tunnel_start_attempt"
+
+        case .networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken:
+            return "netp_tunnel_start_attempt_on_demand_without_access_token"
 
         case .networkProtectionTunnelStartSuccess:
             return "netp_tunnel_start_success"
@@ -296,6 +303,12 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionServerMigrationSuccess:
             return "netp_ev_server_migration_attempt_success"
 
+        case .networkProtectionDNSUpdateCustom:
+            return "netp_ev_update_dns_custom"
+
+        case .networkProtectionDNSUpdateDefault:
+            return "netp_ev_update_dns_default"
+
         case .networkProtectionUnhandledError:
             return "netp_unhandled_error"
         }
@@ -356,6 +369,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionControllerStartCancelled,
                 .networkProtectionControllerStartFailure,
                 .networkProtectionTunnelStartAttempt,
+                .networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken,
                 .networkProtectionTunnelStartSuccess,
                 .networkProtectionTunnelStartFailure,
                 .networkProtectionTunnelStopAttempt,
@@ -394,7 +408,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionRekeyFailure,
                 .networkProtectionSystemExtensionActivationFailure,
                 .networkProtectionServerMigrationAttempt,
-                .networkProtectionServerMigrationSuccess:
+                .networkProtectionServerMigrationSuccess,
+                .networkProtectionDNSUpdateCustom,
+                .networkProtectionDNSUpdateDefault:
             return nil
         }
     }
@@ -427,6 +443,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionControllerStartSuccess,
                 .networkProtectionControllerStartCancelled,
                 .networkProtectionTunnelStartAttempt,
+                .networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken,
                 .networkProtectionTunnelStartSuccess,
                 .networkProtectionTunnelStopAttempt,
                 .networkProtectionTunnelStopSuccess,
@@ -465,7 +482,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionRekeyAttempt,
                 .networkProtectionRekeyCompleted,
                 .networkProtectionServerMigrationAttempt,
-                .networkProtectionServerMigrationSuccess:
+                .networkProtectionServerMigrationSuccess,
+                .networkProtectionDNSUpdateCustom,
+                .networkProtectionDNSUpdateDefault:
             return nil
         }
     }

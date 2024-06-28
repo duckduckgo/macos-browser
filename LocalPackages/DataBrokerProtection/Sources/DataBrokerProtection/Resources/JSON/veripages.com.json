@@ -1,7 +1,7 @@
 {
   "name": "Veripages",
   "url": "veripages.com",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "parent": "verecor.com",
   "addedDatetime": 1691989200000,
   "steps": [
@@ -27,6 +27,7 @@
           "actionType": "extract",
           "id": "4bb4d602-8697-4ad0-ab7e-fef2b5b8406c",
           "selector": ".search-item",
+          "noResultsSelector": "//h1[contains(text(), 'Oops')]",
           "profile": {
             "name": {
               "selector": ".search-item-title",

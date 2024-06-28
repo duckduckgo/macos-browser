@@ -12,7 +12,7 @@ let package = Package(
             targets: ["SubscriptionUI"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "159.0.1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "162.0.0"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
