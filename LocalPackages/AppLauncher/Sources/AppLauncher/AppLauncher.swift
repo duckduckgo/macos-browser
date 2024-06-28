@@ -46,9 +46,15 @@ public final class AppLauncher: AppLaunching {
     }
 
     private let mainBundleURL: URL
+    private var workspace: NSWorkspace
+    private var fileManager: FileManager
 
-    public init(appBundleURL: URL) {
+    public init(appBundleURL: URL,
+                workspace: NSWorkspace = .shared,
+                fileManager: FileManager = .default) {
         mainBundleURL = appBundleURL
+        self.workspace = workspace
+        self.fileManager = fileManager
     }
 
     public func launchApp(withCommand command: AppLaunchCommand) async throws {
@@ -76,12 +82,16 @@ public final class AppLauncher: AppLaunching {
 
         do {
             if let launchURL = command.launchURL {
-                return try await NSWorkspace.shared.open([launchURL], withApplicationAt: mainBundleURL, configuration: configuration)
+                return try await workspace.open([launchURL], withApplicationAt: mainBundleURL, configuration: configuration)
             } else {
-                return try await NSWorkspace.shared.openApplication(at: mainBundleURL, configuration: configuration)
+                return try await workspace.openApplication(at: mainBundleURL, configuration: configuration)
             }
         } catch {
             throw AppLaunchError.workspaceOpenError(error)
         }
+    }
+
+    public func targetAppExists() -> Bool {
+        fileManager.fileExists(atPath: mainBundleURL.path)
     }
 }
