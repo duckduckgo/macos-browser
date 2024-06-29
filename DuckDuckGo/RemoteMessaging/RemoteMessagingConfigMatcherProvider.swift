@@ -108,7 +108,6 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
                                                        bookmarksCount: bookmarksCount,
                                                        favoritesCount: favoritesCount,
                                                        appTheme: appearancePreferences.currentThemeName.rawValue,
-                                                       isWidgetInstalled: false,
                                                        daysSinceNetPEnabled: daysSinceNetworkProtectionEnabled,
                                                        isPrivacyProEligibleUser: isPrivacyProEligibleUser,
                                                        isPrivacyProSubscriber: isPrivacyProSubscriber,
