@@ -1,7 +1,7 @@
 {
   "name": "Kwold",
   "url": "kwold.com",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "parent": "verecor.com",
   "addedDatetime": 1702965600000,
   "steps": [
@@ -27,6 +27,7 @@
           "actionType": "extract",
           "id": "ec9f8ae6-199e-441b-9722-ffc6737b4595",
           "selector": ".card",
+          "noResultsSelector": "//div[@class='page-404' and h1[starts-with(text(), 'Sorry')]]",
           "profile": {
             "name": {
               "selector": ".card-title",
