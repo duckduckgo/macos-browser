@@ -38,8 +38,8 @@ final class SubscriptionUIHandler: SubscriptionUIHandling {
 
     // MARK: - SubscriptionUIHandling
 
-    func presentProgressViewController(withTitle: String) {
-        let newProgressViewController = ProgressViewController(title: UserText.purchasingSubscriptionTitle)
+    func presentProgressViewController(withTitle title: String) {
+        let newProgressViewController = ProgressViewController(title: title)
         currentMainViewController?.presentAsSheet(newProgressViewController)
         progressViewController = newProgressViewController
     }
@@ -50,14 +50,15 @@ final class SubscriptionUIHandler: SubscriptionUIHandling {
     }
 
     func updateProgressViewController(title: String) {
-        progressViewController?.updateTitleText(UserText.completingPurchaseTitle)
+        progressViewController?.updateTitleText(title)
     }
 
     func presentSubscriptionAccessViewController(handler: any SubscriptionAccessActionHandling, message: WKScriptMessage) {
-        let actionHandlers = SubscriptionAccessActionHandlers(restorePurchases: {
-            handler.subscriptionAccessActionRestorePurchases(message: message)
-        }, openURLHandler: { url in
+        let actionHandlers = SubscriptionAccessActionHandlers(openActivateViaEmailURL: {
+            let url = Application.appDelegate.subscriptionManager.url(for: .activateViaEmail)
             handler.subscriptionAccessActionOpenURLHandler(url: url)
+        }, restorePurchases: {
+            handler.subscriptionAccessActionRestorePurchases(message: message)
         }, uiActionHandler: { event in
             handler.subscriptionAccessActionHandleAction(event: event)
         })

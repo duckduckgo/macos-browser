@@ -378,6 +378,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         syncService?.scheduler.notifyAppLifecycleEvent()
 
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
+
 #if DBP
         DataBrokerProtectionAppEvents(featureGatekeeper:
                                         DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
