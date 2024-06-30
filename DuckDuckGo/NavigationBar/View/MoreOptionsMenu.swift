@@ -58,7 +58,8 @@ final class MoreOptionsMenu: NSMenu {
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
-    private let accountManager: AccountManager
+    private var accountManager: AccountManager { subscriptionManager.accountManager }
+    private let subscriptionManager: SubscriptionManager
 
     private let vpnFeatureGatekeeper: VPNFeatureGatekeeper
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
@@ -74,7 +75,7 @@ final class MoreOptionsMenu: NSMenu {
          subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
-         accountManager: AccountManager) {
+         subscriptionManager: SubscriptionManager) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
@@ -82,7 +83,7 @@ final class MoreOptionsMenu: NSMenu {
         self.vpnFeatureGatekeeper = vpnFeatureGatekeeper
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
         self.internalUserDecider = internalUserDecider
-        self.accountManager = accountManager
+        self.subscriptionManager = subscriptionManager
 
         super.init(title: "")
 
@@ -299,15 +300,16 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func addSubscriptionItems() {
+        guard subscriptionFeatureAvailability.isFeatureAvailable else { return }
+
         func shouldHideDueToNoProduct() -> Bool {
-            let subscriptionManager = Application.appDelegate.subscriptionManager
             let platform = subscriptionManager.currentEnvironment.purchasePlatform
             return platform == .appStore && subscriptionManager.canPurchase == false
         }
 
         let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem).withImage(.subscriptionIcon)
 
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable && !accountManager.isUserAuthenticated {
+        if !accountManager.isUserAuthenticated {
             privacyProItem.target = self
             privacyProItem.action = #selector(openSubscriptionPurchasePage(_:))
 
