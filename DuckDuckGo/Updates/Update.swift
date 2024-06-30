@@ -74,7 +74,15 @@ extension Update {
             for match in matches {
                 if let range = Range(match.range(at: 1), in: description) {
                     let item = String(description[range])
-                    releaseNotes.append(item)
+
+                    // Convert HTML to plain text
+                    if let data = item.data(using: .utf8),
+                       let attributedString = try? NSAttributedString(data: data,
+                                                                      options: [.documentType: NSAttributedString.DocumentType.html,
+                                                                                .characterEncoding: String.Encoding.utf8.rawValue],
+                                                                      documentAttributes: nil) {
+                        releaseNotes.append(attributedString.string)
+                    }
                 }
             }
         } catch {
