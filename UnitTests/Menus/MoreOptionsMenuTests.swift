@@ -210,7 +210,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     // MARK: Preferences
-    @MainActor 
+    @MainActor
     func testWhenClickingOnPreferenceMenuItemThenTheActionDelegateIsAlerted() {
         setupMoreOptionsMenu()
 
@@ -220,7 +220,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     // MARK: - Bookmarks
 
-    @MainActor 
+    @MainActor
     func testWhenClickingOnBookmarkAllTabsMenuItemThenTheActionDelegateIsAlerted() throws {
         setupMoreOptionsMenu()
 
