@@ -45,6 +45,10 @@ struct BookmarkList {
     private var favoriteBookmarksOrdered: [IdentifiableBookmark]
     private var itemsDict: [String: [Bookmark]]
 
+    lazy var flattenedItems: [BaseBookmarkEntity]  = {
+        return flattenBookmarks(bookmarks: self.topLevelEntities)
+    }()
+
     var totalBookmarks: Int {
         return allBookmarkURLsOrdered.count
     }
@@ -147,6 +151,24 @@ struct BookmarkList {
     func bookmarks() -> [IdentifiableBookmark] {
         return allBookmarkURLsOrdered
     }
+
+    func flattenBookmarks(bookmarks: [BaseBookmarkEntity]) -> [BaseBookmarkEntity] {
+        var flattenedBookmarks: [BaseBookmarkEntity] = []
+
+        for bookmark in bookmarks {
+            flattenedBookmarks.append(bookmark)
+
+            if let folder = bookmark as? BookmarkFolder {
+                let children = flattenBookmarks(bookmarks: folder.children)
+                flattenedBookmarks += children
+            }
+        }
+
+        return flattenedBookmarks
+    }
+}
+
+private extension Bookmark {
 
 }
 

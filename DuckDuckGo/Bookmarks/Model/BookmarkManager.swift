@@ -49,6 +49,7 @@ protocol BookmarkManager: AnyObject {
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
     func handleFavoritesAfterDisablingSync()
+    func search(by parameter: String) -> [BaseBookmarkEntity]
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
@@ -59,7 +60,6 @@ protocol BookmarkManager: AnyObject {
 }
 
 final class LocalBookmarkManager: BookmarkManager {
-
     static let shared = LocalBookmarkManager()
 
     init(bookmarkStore: BookmarkStore? = nil, faviconManagement: FaviconManagement? = nil) {
@@ -336,6 +336,14 @@ final class LocalBookmarkManager: BookmarkManager {
             completion(error)
 
         }
+    }
+
+    func search(by searchParameter: String) -> [BaseBookmarkEntity] {
+        guard var bookmarkList = self.list else {
+            return [BaseBookmarkEntity]()
+        }
+
+        return bookmarkList.flattenedItems.filter { $0.title.contains(searchParameter) }
     }
 
     // MARK: - Favicons

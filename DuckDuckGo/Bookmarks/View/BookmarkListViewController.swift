@@ -51,6 +51,7 @@ final class BookmarkListViewController: NSViewController {
     private lazy var emptyStateMessage = NSTextField()
     private lazy var emptyStateImageView = NSImageView(image: .bookmarksEmpty)
     private lazy var importButton = NSButton(title: UserText.importBookmarksButtonTitle, target: self, action: #selector(onImportClicked))
+    private lazy var searchBar = NSSearchField()
 
     private var cancellables = Set<AnyCancellable>()
     private let bookmarkManager: BookmarkManager
@@ -108,6 +109,7 @@ final class BookmarkListViewController: NSViewController {
         view.addSubview(stackView)
         view.addSubview(scrollView)
         view.addSubview(emptyState)
+        view.addSubview(searchBar)
 
         view.autoresizesSubviews = false
 
@@ -151,6 +153,9 @@ final class BookmarkListViewController: NSViewController {
         buttonsDivider.boxType = .separator
         buttonsDivider.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         buttonsDivider.translatesAutoresizingMaskIntoConstraints = false
+
+        searchBar.delegate = self
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
 
         manageBookmarksButton.bezelStyle = .shadowlessSquare
         manageBookmarksButton.cornerRadius = 4
@@ -269,7 +274,11 @@ final class BookmarkListViewController: NSViewController {
         boxDivider.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         view.trailingAnchor.constraint(equalTo: boxDivider.trailingAnchor).isActive = true
 
-        scrollView.topAnchor.constraint(equalTo: boxDivider.bottomAnchor).isActive = true
+        searchBar.topAnchor.constraint(equalTo: boxDivider.bottomAnchor).isActive = true
+        searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8).isActive = true
+        searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+
+        scrollView.topAnchor.constraint(equalTo: searchBar.bottomAnchor).isActive = true
         scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
@@ -625,6 +634,25 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
 
         let newTabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
         WindowsManager.openNewWindow(with: newTabCollection, isBurner: tabCollection.isBurner)
+    }
+
+}
+
+// MARK: - BookmarkListViewController NSSearchDelegate
+
+extension BookmarkListViewController: NSSearchFieldDelegate {
+
+    func controlTextDidChange(_ obj: Notification) {
+        if let searchField = obj.object as? NSSearchField {
+            let searchQuery = searchField.stringValue
+
+            let startTime = Date()
+            let results = bookmarkManager.search(by: searchQuery)
+            print("BookmarkListViewController: Results found: \(results.count)")
+            let endTime = Date()
+            let executionTime = endTime.timeIntervalSince(startTime)
+            print("BookmarkListViewController: Execution time: \(executionTime) seconds")
+        }
     }
 
 }
