@@ -219,7 +219,7 @@ private struct UsernameLabel: View {
 
                 if isHovering && model.username != "" {
                     Button {
-                        model.copy(model.username)
+                        model.copy(model.username, fieldType: .username)
                     } label: {
                         Image(.copy)
                     }
@@ -380,7 +380,7 @@ private struct PasswordView: View {
 
                     if isHovering && model.password != "" {
                         CopyButton {
-                            model.copy(model.password)
+                            model.copy(model.password, fieldType: .password)
                         }
                         .tooltip(UserText.copyPasswordTooltip)
                     }

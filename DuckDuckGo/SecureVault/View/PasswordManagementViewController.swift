@@ -323,6 +323,7 @@ final class PasswordManagementViewController: NSViewController {
             self.refreshData {
                 self.select(category: .logins)
             }
+            PixelKit.fire(GeneralPixel.autofillManagementDeleteAllLogins)
         }
     }
 
@@ -540,8 +541,10 @@ final class PasswordManagementViewController: NSViewController {
                     self?.syncModelsOnCredentials(savedCredentials, select: true)
                 }
                 NotificationCenter.default.post(name: .autofillSaveEvent, object: nil, userInfo: nil)
+                PixelKit.fire(GeneralPixel.autofillManagementSaveLogin)
             } else {
                 syncModelsOnCredentials(savedCredentials)
+                PixelKit.fire(GeneralPixel.autofillManagementUpdateLogin)
             }
             postChange()
             requestSync()
@@ -635,6 +638,7 @@ final class PasswordManagementViewController: NSViewController {
                     try self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
                     self.requestSync()
                     self.refreshData()
+                    PixelKit.fire(GeneralPixel.autofillManagementDeleteLogin)
                 } catch {
                     PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }

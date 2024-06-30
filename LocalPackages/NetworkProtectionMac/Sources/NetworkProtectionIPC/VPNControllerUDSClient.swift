@@ -35,4 +35,9 @@ extension VPNControllerUDSClient: VPNControllerIPCClient {
         let payload = try encoder.encode(VPNIPCClientCommand.uninstall(component))
         try await udsClient.send(payload)
     }
+
+    public func quit() async throws {
+        let payload = try encoder.encode(VPNIPCClientCommand.quit)
+        try await udsClient.send(payload)
+    }
 }

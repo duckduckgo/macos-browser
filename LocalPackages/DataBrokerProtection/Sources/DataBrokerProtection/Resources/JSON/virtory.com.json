@@ -1,7 +1,7 @@
 {
   "name": "Virtory",
   "url": "virtory.com",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -27,6 +27,7 @@
           "actionType": "extract",
           "id": "3ab2b9a0-647d-4ad2-9709-ef934c977a48",
           "selector": ".card",
+          "noResultsSelector": "//div[contains(@class, 'page-404')]//h1[contains(text(), 'Sorry')]",
           "profile": {
             "name": {
               "selector": ".card-title",

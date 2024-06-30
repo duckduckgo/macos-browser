@@ -91,7 +91,7 @@ final class WebViewContainerView: NSView {
                 fullScreenWindowController.associatedTab = tab
 
                 self.observeTabMainWindow(fullScreenWindowController)
-                self.observeFullScreenWindowWillExitFullScreen(fullScreenWindow)
+                self.observeFullScreenWindowWillExitFullScreen(fullScreenWindowController)
             }
             .store(in: &cancellables)
     }
@@ -132,21 +132,54 @@ final class WebViewContainerView: NSView {
 
      https://app.asana.com/0/1177771139624306/1204370242122745/f
     */
-    private func observeFullScreenWindowWillExitFullScreen(_ fullScreenWindow: NSWindow) {
-        if #available(macOS 12.0, *) { // works fine on Big Sur
-            NotificationCenter.default.publisher(for: NSWindow.willExitFullScreenNotification, object: fullScreenWindow)
-                .sink { [weak self] _ in
-                    guard let self else { return }
-                    self.cancellables.removeAll()
+    private func observeFullScreenWindowWillExitFullScreen(_ fullScreenWindowController: NSWindowController) {
+        guard #available(macOS 12.0, *) else { return } // works fine on Big Sur
+        NotificationCenter.default.publisher(for: NSWindow.willExitFullScreenNotification, object: fullScreenWindowController.window)
+            .sink { [weak self, weak fullScreenWindowController] _ in
+                guard let self else { return }
+                self.cancellables.removeAll()
 
-                    if NSWorkspace.isMissionControlActive() {
-                        // closeAllMediaPresentations causes all Full Screen windows to be closed and removed from their WebViews
-                        // (and reinstantiated the next time Full Screen is requested)
-                        webView.closeAllMediaPresentations {}
+                if NSWorkspace.isMissionControlActive(),
+                   let fullScreenWindowController, fullScreenWindowController.responds(to: Selector.initWithWindowWebViewPage) {
+                    // we have no access to `WebViewImpl::closeFullScreenWindowController()` method that would just work closing the
+                    // WKFullScreenWindowController and reset a full screen manager reference to it.
+                    // - if we call `close` method directly on the Window Controller – the reference in WebViewImpl will remain dangling leading to a crash later.
+                    // - we may call `webView.closeAllMediaPresentations {}` but in case there‘s a Picture-In-Picture video run in parallel
+                    //   this will lead to a crash because of [one-shot] close callback will be fired twice – for both full screen and PiP videos.
+                    //   https://app.asana.com/0/1201037661562251/1207643414069383/f
+                    //
+                    // to overcome those issues we close the original full screen window here
+                    // and re-initialize the existing WKFullScreenWindowController with a new window and updating its _webView reference
+                    // by calling [WKFullScreenWindowController initWithWindow:webView:page:] for an already initialized controller
+                    // so it can be reused again for full screen video presentation.
+                    // https://github.com/WebKit/WebKit/blob/398e5e25e9f250e1a4e3f4dde3ae54dd09dbe23e/Source/WebKit/UIProcess/mac/WKFullScreenWindowController.mm#L96
+                    //
+                    DispatchQueue.main.async { [weak fullScreenWindowController, weak webView=self.webView] in
+                        guard let webView, let fullScreenWindowController,
+                              let window = fullScreenWindowController.window,
+                              let pageRef = fullScreenWindowController.value(forKey: Key.page) else { return }
+
+                        window.close()
+                        fullScreenWindowController.window = nil
+
+                        let newWindow = type(of: window).init(contentRect: NSScreen.main?.frame ?? .zero, styleMask: window.styleMask, backing: .buffered, defer: false)
+
+                        fullScreenWindowController.perform(Selector.initWithWindowWebViewPage, withArguments: [newWindow, webView, NSValue(pointer: nil)])
+                        fullScreenWindowController.setValue(pageRef, forKey: Key.page)
+
+                        // prevent fullScreenWindowController getting released after we‘ve reset its window
+                        _=Unmanaged.passUnretained(fullScreenWindowController).retain()
                     }
                 }
-                .store(in: &cancellables)
-        }
+            }
+            .store(in: &cancellables)
+    }
+
+    private enum Selector {
+        static let initWithWindowWebViewPage = NSSelectorFromString("initWithWindow:webView:page:")
+    }
+    private enum Key {
+        static let page = "page"
     }
 
     override func removeFromSuperview() {

@@ -1,5 +1,5 @@
 //
-//  VPNIPCClientCommand.swift
+//  Text+OnURLTap.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,15 +16,20 @@
 //  limitations under the License.
 //
 
-import Foundation
+import SwiftUI
 
-public enum VPNUninstallComponent: Codable {
-    case all
-    case configuration
-    case systemExtension
-}
+public extension Text {
 
-public enum VPNIPCClientCommand: Codable {
-    case uninstall(_ component: VPNUninstallComponent)
-    case quit
+    /// We only support URL tap handler in `Text` views on iOS 15+ and macOS 12+.
+    /// Right now there's no simple way to offer this in lower versions.
+    ///
+    @ViewBuilder
+    func onURLTap(onTap: @escaping (URL) -> Void) -> some View {
+        if #available(iOS 15.0, macOS 12.0, *) {
+            self.environment(\.openURL, OpenURLAction { url in
+                onTap(url)
+                return .handled
+            })
+        }
+    }
 }
