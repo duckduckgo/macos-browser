@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1719225510541,
+    "version": 1719853254811,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -301,6 +301,9 @@
                     "domain": "malmostadsteater.se"
                 },
                 {
+                    "domain": "hertz.co.uk"
+                },
+                {
                     "domain": "hertz.com"
                 },
                 {
@@ -331,7 +334,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "9422e16c6f2f205fdb61e27e37abcd07"
+            "hash": "e5cf758c3a0af66a24bde8901315893e"
         },
         "autofill": {
             "exceptions": [
@@ -950,6 +953,72 @@
                     "domain": "pocketbook.digital"
                 },
                 {
+                    "domain": "vinted.at"
+                },
+                {
+                    "domain": "vinted.be"
+                },
+                {
+                    "domain": "vinted.com"
+                },
+                {
+                    "domain": "vinted.co.uk"
+                },
+                {
+                    "domain": "vinted.cz"
+                },
+                {
+                    "domain": "vinted.de"
+                },
+                {
+                    "domain": "vinted.dk"
+                },
+                {
+                    "domain": "vinted.es"
+                },
+                {
+                    "domain": "vinted.fi"
+                },
+                {
+                    "domain": "vinted.fr"
+                },
+                {
+                    "domain": "vinted.gr"
+                },
+                {
+                    "domain": "vinted.hr"
+                },
+                {
+                    "domain": "vinted.hu"
+                },
+                {
+                    "domain": "vinted.it"
+                },
+                {
+                    "domain": "vinted.lt"
+                },
+                {
+                    "domain": "vinted.lu"
+                },
+                {
+                    "domain": "vinted.nl"
+                },
+                {
+                    "domain": "vinted.pl"
+                },
+                {
+                    "domain": "vinted.pt"
+                },
+                {
+                    "domain": "vinted.ro"
+                },
+                {
+                    "domain": "vinted.se"
+                },
+                {
+                    "domain": "vinted.sk"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -975,7 +1044,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "1.93.0",
-            "hash": "9ce67c4f464cafb0976eb0dcdbc3aa05"
+            "hash": "de5445a7452409483eeef786759d392f"
         },
         "clickToPlay": {
             "exceptions": [
@@ -1148,6 +1217,10 @@
                     {
                         "domain": "xfinity.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2149"
+                    },
+                    {
+                        "domain": "manage.wix.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2166"
                     }
                 ],
                 "webViewDefault": [
@@ -1175,7 +1248,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "9041426e18cddda346a67be333bc3729"
+            "hash": "132d12636968cac6025e986bd8358ce2"
         },
         "dbp": {
             "state": "enabled",
@@ -1273,11 +1346,6 @@
             },
             "state": "enabled",
             "hash": "bacc01ec18acadc564c507f12bc01442"
-        },
-        "dummyWebMessageListener": {
-            "exceptions": [],
-            "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "elementHiding": {
             "exceptions": [
@@ -2439,6 +2507,15 @@
                             {
                                 "selector": "[class*='mps-']",
                                 "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "eporner.com",
+                        "rules": [
+                            {
+                                "selector": "#admobiletop",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -4473,7 +4550,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "c24633690a4839ab81a20b4810482402"
+            "hash": "3cada5c612306aa43f10db2af34b4463"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5317,6 +5394,11 @@
             "state": "disabled",
             "hash": "3c850040d1c9b3e06841b1491c5d2940"
         },
+        "remoteMessaging": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "requestFilterer": {
             "state": "disabled",
             "exceptions": [
@@ -5395,6 +5477,18 @@
             "exceptions": [],
             "minSupportedVersion": "1.70.0",
             "hash": "0a35f748d63fc61a777ea5e712728fa3"
+        },
+        "toggleReports": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "dismissLogicEnabled": true,
+                "dismissInterval": 172800,
+                "promptLimitLogicEnabled": true,
+                "promptInterval": 172800,
+                "maxPromptCount": 3
+            },
+            "hash": "a05b4413a3745762c46ec89aa5037693"
         },
         "trackerAllowlist": {
             "state": "enabled",
@@ -9104,6 +9198,16 @@
                 ]
             },
             "hash": "62636b478aa50f4bc1e57e6b73fc1e0e"
+        },
+        "webViewBlobDownload": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsExternalPreviewReleases": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "windowsPermissionUsage": {
             "exceptions": [],
