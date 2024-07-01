@@ -341,7 +341,7 @@ extension URL {
     }
 
     var isExternalSchemeLink: Bool {
-        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript].contains(navigationalScheme)
+        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript, .duck].contains(navigationalScheme)
     }
 
     // MARK: - DuckDuckGo

@@ -618,7 +618,7 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor
     @discardableResult
     func goBack() -> ExpectedNavigation? {
-        guard canGoBack else {
+        guard canGoBack, let backItem = webView.backForwardList.backItem else {
             if canBeClosedWithBack {
                 delegate?.closeTab(self)
             }
@@ -626,7 +626,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         userInteractionDialog = nil
-        let navigation = webView.navigator()?.goBack(withExpectedNavigationType: .backForward(distance: -1))
+        let navigation = webView.navigator()?.go(to: backItem, withExpectedNavigationType: .backForward(distance: -1))
         // update TabContent source to .historyEntry on navigation
         navigation?.appendResponder(willStart: { [weak self] navigation in
             guard let self,
@@ -640,10 +640,10 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor
     @discardableResult
     func goForward() -> ExpectedNavigation? {
-        guard canGoForward else { return nil }
+        guard canGoForward, let forwardItem = webView.backForwardList.forwardItem else { return nil }
 
         userInteractionDialog = nil
-        let navigation = webView.navigator()?.goForward(withExpectedNavigationType: .backForward(distance: 1))
+        let navigation = webView.navigator()?.go(to: forwardItem, withExpectedNavigationType: .backForward(distance: 1))
         // update TabContent source to .historyEntry on navigation
         navigation?.appendResponder(willStart: { [weak self] navigation in
             guard let self,
