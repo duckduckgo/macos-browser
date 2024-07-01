@@ -253,7 +253,7 @@ extension TabContent {
 
     var isUrl: Bool {
         switch self {
-        case .url, .subscription, .identityTheftRestoration:
+        case .url, .subscription, .identityTheftRestoration, .releaseNotes:
             return true
         default:
             return false

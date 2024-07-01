@@ -134,7 +134,7 @@ final class TabPreviewViewController: NSViewController {
         switch tabViewModel.tabContent {
         case .url:
             urlTextField.stringValue = tabViewModel.addressBarString
-        case .bookmarks, .dataBrokerProtection, .newtab, .onboarding, .settings:
+        case .bookmarks, .dataBrokerProtection, .newtab, .onboarding, .settings, .releaseNotes:
             urlTextField.stringValue = "DuckDuckGo Browser"
         default:
             urlTextField.stringValue = ""
