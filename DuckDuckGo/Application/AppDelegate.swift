@@ -162,14 +162,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
-        remoteMessagingClient = RemoteMessagingClient(
-            database: RemoteMessagingDatabase(),
-            bookmarksDatabase: BookmarkDatabase.shared.db,
-            appearancePreferences: .shared,
-            internalUserDecider: internalUserDecider,
-            configurationStore: ConfigurationStore.shared
-        )
-
         if NSApplication.runType.requiresEnvironment {
             Self.configurePixelKit()
 
@@ -214,10 +206,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                                   to: context)
                 }
             }
-
-            remoteMessagingClient.initializeDatabaseIfNeeded()
         }
-        activeRemoteMessageModel = ActiveRemoteMessageModel(client: remoteMessagingClient)
 
 #if DEBUG
         AppPrivacyFeatures.shared = NSApplication.runType.requiresEnvironment
@@ -227,6 +216,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #else
         AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
 #endif
+
+        remoteMessagingClient = RemoteMessagingClient(
+            database: RemoteMessagingDatabase(),
+            bookmarksDatabase: BookmarkDatabase.shared.db,
+            appearancePreferences: .shared,
+            internalUserDecider: internalUserDecider,
+            configurationStore: ConfigurationStore.shared,
+            privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
+        )
+        if NSApplication.runType.requiresEnvironment {
+            remoteMessagingClient.initializeDatabaseIfNeeded()
+        }
+        activeRemoteMessageModel = ActiveRemoteMessageModel(client: remoteMessagingClient)
 
         featureFlagger = DefaultFeatureFlagger(
             internalUserDecider: internalUserDecider,
