@@ -16803,6 +16803,30 @@
         }
       }
     },
+    "duck-player.autoplay-preference" : {
+      "comment" : "Autoplay preference in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Autoplay videos when opened in Duck Player"
+          }
+        }
+      }
+    },
+    "duck-player.autoplay-title" : {
+      "comment" : "Autoplay title in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Autoplay"
+          }
+        }
+      }
+    },
     "duck-player.explanation" : {
       "comment" : "Private YouTube Player explanation in settings",
       "extractionState" : "extracted_with_value",
