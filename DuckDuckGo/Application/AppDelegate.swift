@@ -397,6 +397,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         syncService?.scheduler.notifyAppLifecycleEvent()
 
         NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
+
 #if DBP
         DataBrokerProtectionAppEvents(featureGatekeeper:
                                         DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
@@ -405,8 +406,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
 
-        subscriptionManager.updateSubscriptionStatus { isActive in
-            if isActive {
+        subscriptionManager.refreshCachedSubscriptionAndEntitlements { isSubscriptionActive in
+            if isSubscriptionActive {
                 PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
             }
         }
