@@ -1,5 +1,5 @@
 //
-//  MockOnboardingWindow.swift
+//  MockWindow.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-class MockOnboardingWindow: NSWindow {
+class MockWindow: NSWindow {
     var makeKeyAndOrderFrontCalled = false
     var beginSheetCalled = false
 

@@ -25,7 +25,6 @@ protocol BookmarksBarViewModelDelegate: AnyObject {
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem)
     func bookmarksBarViewModelWidthForContainer() -> CGFloat
     func bookmarksBarViewModelReloadedData()
-
 }
 
 final class BookmarksBarViewModel: NSObject {
@@ -91,6 +90,7 @@ final class BookmarksBarViewModel: NSObject {
         return calculationLabel
     }()
 
+    @Published
     private(set) var bookmarksBarItems: [BookmarksBarItem] = [] {
         didSet {
             let itemsWidth = bookmarksBarItems.reduce(CGFloat(0)) { total, item in
