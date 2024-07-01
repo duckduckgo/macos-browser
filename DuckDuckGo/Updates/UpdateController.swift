@@ -26,11 +26,11 @@ import SwiftUI
 
 protocol UpdateControllerProtocol: AnyObject {
 
-    var isNewUpdateAvailable: Bool { get }
-    var isNewUpdateAvailablePublisher: Published<Bool>.Publisher { get }
-
     var latestUpdate: Update? { get }
     var latestUpdatePublisher: Published<Update?>.Publisher { get }
+
+    var isUpdateAvailableToInstall: Bool { get }
+    var isUpdateAvailableToInstallPublisher: Published<Bool>.Publisher { get }
 
     var isUpdateBeingLoaded: Bool { get }
     var isUpdateBeingLoadedPublisher: Published<Bool>.Publisher { get }
@@ -75,15 +75,17 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
                 case .regular:
                     notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Relaunch to update.")
                 }
+                isUpdateAvailableToInstall = !latestUpdate.isInstalled
+            } else {
+                isUpdateAvailableToInstall = false
             }
-            isNewUpdateAvailable = latestUpdate != nil
         }
     }
 
     var latestUpdatePublisher: Published<Update?>.Publisher { $latestUpdate }
 
-    @Published private(set) var isNewUpdateAvailable = false
-    var isNewUpdateAvailablePublisher: Published<Bool>.Publisher { $isNewUpdateAvailable }
+    @Published private(set) var isUpdateAvailableToInstall = false
+    var isUpdateAvailableToInstallPublisher: Published<Bool>.Publisher { $isUpdateAvailableToInstall }
 
     var lastUpdateCheckDate: Date? {
         updater.updater.lastUpdateCheckDate
@@ -118,8 +120,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     private var areAutomaticUpdatesEnabled: Bool {
         return true
     }
-
-//    private var isUpdateDownloaded: Bool = false
 
     private func configureUpdater() {
     // The default configuration of Sparkle updates is in Info.plist

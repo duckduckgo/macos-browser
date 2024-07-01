@@ -32,7 +32,7 @@ final class AboutModel: ObservableObject, PreferencesTabOpening {
             if isLoading {
                 self = .loading
             } else {
-                if update != nil {
+                if let update, !update.isInstalled {
                     self = .newVersionAvailable
                 } else {
                     self = .upToDate

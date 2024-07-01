@@ -55,7 +55,7 @@ final class MoreOptionsMenuButton: MouseOverButton {
     }
 
     private func subscribeToUpdateInfo() {
-        cancellable = updateController?.isNewUpdateAvailablePublisher
+        cancellable = updateController?.isUpdateAvailableToInstallPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isAvailable in
                 self?.isNotificationVisible = isAvailable
