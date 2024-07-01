@@ -44,7 +44,7 @@ extension AppDelegate {
             }
         }
 
-        WindowControllersManager.shared.showTab(with: .settings(pane: .about))
+        showAbout(sender)
 #endif
     }
 
@@ -143,6 +143,16 @@ extension AppDelegate {
     }
 
     // MARK: - Help
+
+    @MainActor
+    @objc func showAbout(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .settings(pane: .about))
+    }
+
+    @MainActor
+    @objc func showReleaseNotes(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .releaseNotes)
+    }
 
     #if FEEDBACK
 

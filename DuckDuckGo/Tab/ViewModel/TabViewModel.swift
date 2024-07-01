@@ -98,7 +98,7 @@ final class TabViewModel {
         switch tab.content {
         case .url(let url, _, _):
             return !(url.isDuckPlayer || url.isDuckURLScheme)
-        case .subscription, .identityTheftRestoration:
+        case .subscription, .identityTheftRestoration, .releaseNotes:
             return true
 
         case .newtab, .settings, .bookmarks, .onboarding, .dataBrokerProtection, .none:
@@ -168,7 +168,8 @@ final class TabViewModel {
                         .none,
                         .dataBrokerProtection,
                         .subscription,
-                        .identityTheftRestoration:
+                        .identityTheftRestoration,
+                        .releaseNotes:
                     // Update the address bar instantly for built-in content types or user-initiated navigations
                     return Just( () ).eraseToAnyPublisher()
                 }
@@ -317,6 +318,8 @@ final class TabViewModel {
                 .subscriptionTrustedIndicator
         case .identityTheftRestoration:
                 .identityTheftRestorationTrustedIndicator
+        case .releaseNotes:
+                .releaseNotesTrustedIndicator
         case .url(let url, _, _) where url.isDuckPlayer:
                 .duckPlayerTrustedIndicator
         case .url(let url, _, _) where url.isEmailProtection:
@@ -378,6 +381,8 @@ final class TabViewModel {
             } else {
                 title = addressBarString
             }
+        case .releaseNotes:
+            title = UserText.releaseNotesTitle
         }
         if title.isEmpty {
             title = UserText.tabUntitledTitle
@@ -408,6 +413,8 @@ final class TabViewModel {
             Favicon.subscription
         case .identityTheftRestoration:
             Favicon.identityTheftRestoration
+        case .releaseNotes:
+            Favicon.home
         case .url(let url, _, _) where url.isDuckPlayer:
             Favicon.duckPlayer
         case .url(let url, _, _) where url.isEmailProtection:
@@ -541,5 +548,7 @@ private extension NSAttributedString {
                                                                              title: UserText.duckPlayer)
     static let emailProtectionTrustedIndicator = trustedIndicatorAttributedString(with: .emailProtectionIcon,
                                                                                   title: UserText.emailProtectionPreferences)
+    static let releaseNotesTrustedIndicator = trustedIndicatorAttributedString(with: .duckPlayerSettings,
+                                                                               title: UserText.releaseNotesTitle)
 
 }

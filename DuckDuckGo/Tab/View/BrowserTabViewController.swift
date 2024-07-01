@@ -467,7 +467,7 @@ final class BrowserTabViewController: NSViewController {
              .url(_, _, source: .reload):
             return true
 
-        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .onboarding, .identityTheftRestoration:
+        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .onboarding, .identityTheftRestoration, .releaseNotes:
             return true
 
         case .none:
@@ -488,7 +488,7 @@ final class BrowserTabViewController: NSViewController {
             return
         case .onboarding:
             getView = { [weak self] in self?.transientTabContentViewController?.view }
-        case .url, .subscription, .identityTheftRestoration:
+        case .url, .subscription, .identityTheftRestoration, .releaseNotes:
             getView = { [weak self] in self?.webView }
         case .settings:
             getView = { [weak self] in self?.preferencesViewController?.view }
@@ -611,7 +611,7 @@ final class BrowserTabViewController: NSViewController {
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
-        case .url, .subscription, .identityTheftRestoration:
+        case .url, .subscription, .identityTheftRestoration, .releaseNotes:
             if shouldReplaceWebView(for: tabViewModel) {
                 removeAllTabContent(includingWebView: true)
                 changeWebView(tabViewModel: tabViewModel)

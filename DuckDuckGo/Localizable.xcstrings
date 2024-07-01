@@ -52904,6 +52904,18 @@
         }
       }
     },
+    "tab.releaseNotes.title" : {
+      "comment" : "Title of deticated tab for Release Notes",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Release Notes"
+          }
+        }
+      }
+    },
     "Text Replacement" : {
       "comment" : "Main Menu Edit-Substitutions item",
       "localizations" : {

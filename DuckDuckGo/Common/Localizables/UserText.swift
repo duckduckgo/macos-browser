@@ -221,6 +221,7 @@ struct UserText {
     static let tabPreferencesTitle = NSLocalizedString("tab.preferences.title", value: "Settings", comment: "Tab preferences title")
     static let tabBookmarksTitle = NSLocalizedString("tab.bookmarks.title", value: "Bookmarks", comment: "Tab bookmarks title")
     static let tabOnboardingTitle = NSLocalizedString("tab.onboarding.title", value: "Welcome", comment: "Tab onboarding title")
+    static let releaseNotesTitle = NSLocalizedString("tab.releaseNotes.title", value: "Release Notes", comment: "Title of deticated tab for Release Notes")
 
     // MARK: Error Pages
     static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Failed to open page", comment: "Tab error title")

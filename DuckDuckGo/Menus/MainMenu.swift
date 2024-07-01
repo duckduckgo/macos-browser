@@ -93,15 +93,10 @@ import SubscriptionUI
 
     // MARK: Help
 
-    let helpMenu = NSMenu(title: UserText.mainMenuHelp) {
-        NSMenuItem(title: UserText.mainMenuHelpDuckDuckGoHelp, action: #selector(NSApplication.showHelp), keyEquivalent: "?")
-            .hidden()
-
-#if FEEDBACK
-        NSMenuItem.separator()
-        NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
-#endif
-    }
+    let helpMenu = NSMenu(title: UserText.mainMenuHelp)
+    let aboutMenuItem = NSMenuItem(title: UserText.about, action: #selector(AppDelegate.showAbout))
+    let updatesMenuItem = NSMenuItem(title: "Browser Updates", action: #selector(AppDelegate.showReleaseNotes))
+    let sendFeedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
 
     // MARK: - Initialization
 
@@ -378,7 +373,18 @@ import SubscriptionUI
 
     func buildHelpMenu() -> NSMenuItem {
         NSMenuItem(title: UserText.mainMenuHelp)
-            .submenu(helpMenu)
+            .submenu(helpMenu.buildItems {
+                NSMenuItem(title: UserText.mainMenuHelpDuckDuckGoHelp, action: #selector(NSApplication.showHelp), keyEquivalent: "?")
+                    .hidden()
+
+                NSMenuItem.separator()
+
+                aboutMenuItem
+                updatesMenuItem
+#if FEEDBACK
+                sendFeedbackMenuItem
+#endif
+            })
     }
 
     required init(coder: NSCoder) {

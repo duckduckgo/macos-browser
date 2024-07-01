@@ -94,6 +94,7 @@ private extension Tab.TabContent {
         case dataBrokerProtection = 6
         case subscription = 7
         case identityTheftRestoration = 8
+        case releaseNotes = 9
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -121,6 +122,8 @@ private extension Tab.TabContent {
         case .identityTheftRestoration:
             guard let url = url else { return nil }
             self = .identityTheftRestoration(url)
+        case .releaseNotes:
+            self = .releaseNotes
         }
     }
 
@@ -135,6 +138,7 @@ private extension Tab.TabContent {
         case .dataBrokerProtection: return .dataBrokerProtection
         case .subscription: return .subscription
         case .identityTheftRestoration: return .identityTheftRestoration
+        case .releaseNotes: return .releaseNotes
         }
     }
 

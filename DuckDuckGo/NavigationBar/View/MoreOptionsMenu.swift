@@ -131,6 +131,10 @@ final class MoreOptionsMenu: NSMenu {
 
         addPageItems()
 
+        let helpItem = NSMenuItem(title: UserText.mainMenuHelp, action: nil, keyEquivalent: "").withImage(.helpMenuItemIcon)
+        helpItem.submenu = HelpSubMenu(targetting: self)
+        addItem(helpItem)
+
         let preferencesItem = NSMenuItem(title: UserText.settings, action: #selector(openPreferences(_:)), keyEquivalent: "")
             .targetting(self)
             .withImage(.preferences)
@@ -781,6 +785,35 @@ final class LoginsSubMenu: NSMenu {
             .withImage(.creditCardGlyph)
     }
 
+}
+
+@MainActor
+final class HelpSubMenu: NSMenu {
+
+    init(targetting target: AnyObject) {
+        super.init(title: UserText.mainMenuHelp)
+
+        updateMenuItems(targetting: target)
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func updateMenuItems(targetting target: AnyObject) {
+        removeAllItems()
+
+        let about = (NSApp.mainMenuTyped.aboutMenuItem.copy() as? NSMenuItem)!
+        addItem(about)
+
+        let updates = (NSApp.mainMenuTyped.updatesMenuItem.copy() as? NSMenuItem)!
+        addItem(updates)
+
+#if FEEDBACK
+        let feedback = (NSApp.mainMenuTyped.sendFeedbackMenuItem.copy() as? NSMenuItem)!
+        addItem(feedback)
+#endif
+    }
 }
 
 extension MoreOptionsMenu: EmailManagerRequestDelegate {}
