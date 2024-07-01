@@ -346,6 +346,11 @@ extension URL {
 
     // MARK: - DuckDuckGo
 
+    static var onboarding: URL {
+        let onboardingUrlString = "duck://onboarding"
+        return URL(string: onboardingUrlString)!
+    }
+
     static var duckDuckGo: URL {
         let duckDuckGoUrlString = "https://duckduckgo.com/"
         return URL(string: duckDuckGoUrlString)!
