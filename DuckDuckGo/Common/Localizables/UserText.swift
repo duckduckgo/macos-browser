@@ -1217,6 +1217,10 @@ struct UserText {
 
     static let identityTheftRestorationOptionsMenuItem = "Identity Theft Restoration"
 
+    // Key: "subscription.settings.menu.item"
+    // Comment: "Title for Subscription Settings item in the options menu"
+    static let subscriptionSettingsOptionsMenuItem = "Subscription Settings"
+
     // Key: "preferences.subscription"
     // Comment: "Show subscription preferences"
     static let subscription = "Privacy Pro"

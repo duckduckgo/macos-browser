@@ -275,7 +275,7 @@ final class NavigationBarViewController: NSViewController {
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
                                    vpnFeatureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager),
                                    internalUserDecider: internalUserDecider,
-                                   accountManager: subscriptionManager.accountManager)
+                                   subscriptionManager: subscriptionManager)
         menu.actionDelegate = self
         let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
         menu.popUp(positioning: nil, at: location, in: sender)
@@ -1081,6 +1081,10 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         let url = subscriptionManager.url(for: .purchase)
         WindowControllersManager.shared.showTab(with: .subscription(url))
         PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+    }
+
+    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .subscription)
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
