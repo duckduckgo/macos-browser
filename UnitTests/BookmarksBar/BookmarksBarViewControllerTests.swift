@@ -89,13 +89,3 @@ final class BookmarksBarViewControllerTests: XCTestCase {
     }
 
 }
-
-class MockWindow: NSWindow {
-    var makeKeyAndOrderFrontCalled = false
-    var beginSheetCalled = false
-
-    override func beginSheet(_ sheetWindow: NSWindow, completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil) {
-        beginSheetCalled = true
-        handler?(.continue)
-    }
-}

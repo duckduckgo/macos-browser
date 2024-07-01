@@ -153,7 +153,7 @@ final class BookmarksBarViewController: NSViewController {
             .store(in: &cancellables)
 
         viewModel.$bookmarksBarItems
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] items in
                 self?.importBookmarksButton.isHidden = !items.isEmpty
             }
