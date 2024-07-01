@@ -493,10 +493,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG || REVIEW
         let environment = ServerEnvironment(
-            UserDefaultsWrapper(
-                key: .syncEnvironment,
-                defaultValue: defaultEnvironment.description
-            ).wrappedValue
+            UserDefaultsWrapper(key: .syncEnvironment, defaultValue: defaultEnvironment.description).wrappedValue
         ) ?? defaultEnvironment
 #else
         let environment = defaultEnvironment
