@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import BrowserServicesKit
 
 protocol DuckPlayerPreferencesPersistor {
     /// The persistor hadles raw Bool values but each one translates into a DuckPlayerMode:
@@ -48,6 +49,7 @@ struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersisto
 final class DuckPlayerPreferences: ObservableObject {
 
     static let shared = DuckPlayerPreferences()
+    private let privacyConfigurationManager: PrivacyConfigurationManaging
 
     @Published
     var duckPlayerMode: DuckPlayerMode {
@@ -63,7 +65,9 @@ final class DuckPlayerPreferences: ObservableObject {
         }
     }
 
-    var shouldDisplayAutoPlaySettings: Bool = true
+    var shouldDisplayAutoPlaySettings: Bool {
+        privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
+    }
 
     var youtubeOverlayInteracted: Bool {
         didSet {
@@ -77,12 +81,14 @@ final class DuckPlayerPreferences: ObservableObject {
         }
     }
 
-    init(persistor: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor()) {
+    init(persistor: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor(),
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
         self.persistor = persistor
         duckPlayerMode = .init(persistor.duckPlayerModeBool)
         youtubeOverlayInteracted = persistor.youtubeOverlayInteracted
         youtubeOverlayAnyButtonPressed = persistor.youtubeOverlayAnyButtonPressed
         duckPlayerAutoplay = persistor.duckPlayerAutoplay
+        self.privacyConfigurationManager = privacyConfigurationManager
     }
 
     private var persistor: DuckPlayerPreferencesPersistor
