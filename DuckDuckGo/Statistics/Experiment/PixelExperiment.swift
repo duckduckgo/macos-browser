@@ -48,6 +48,9 @@ enum PixelExperiment: String, CaseIterable {
 
     /// Enables this experiment for new users when called from the new installation path.
     static func install() {
+        if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts { // Re-implement https://app.asana.com/0/0/1207002879349166/f
+            PixelExperiment.cleanup()
+        }
         logic.install()
     }
 
@@ -126,6 +129,16 @@ extension PixelExperiment {
 
     static func fireDay21To27SerpPixel() {
         logic.fireDay21To27SerpPixel()
+    }
+
+    static func fireOnboardingTestPixels() {
+        if SystemDefaultBrowserProvider().isDefault {
+            PixelExperiment.fireOnboardingSetAsDefaultEnabled5to7Pixel()
+        }
+
+        if StartupPreferences.shared.restorePreviousSession {
+            PixelExperiment.fireOnboardingSessionRestoreEnabled5to7Pixel()
+        }
     }
 
 }

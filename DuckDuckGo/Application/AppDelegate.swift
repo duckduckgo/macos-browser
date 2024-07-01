@@ -280,10 +280,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
-        // Clean up previous experiment
-        if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts { // Re-implement https://app.asana.com/0/0/1207002879349166/f
-            PixelExperiment.cleanup()
-        }
         PixelExperiment.install()
 
         if LocalStatisticsStore().atb == nil {
@@ -375,7 +371,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidBecomeActive(_ notification: Notification) {
         guard didFinishLaunching else { return }
 
-        fireOnboardingTestPixels()
+        PixelExperiment.fireOnboardingTestPixels()
 
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
@@ -404,16 +400,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidResignActive(_ notification: Notification) {
         Task { @MainActor in
             await vpnRedditSessionWorkaround.removeRedditSessionWorkaround()
-        }
-    }
-
-    private func fireOnboardingTestPixels() {
-        if SystemDefaultBrowserProvider().isDefault {
-            PixelExperiment.fireOnboardingSetAsDefaultEnabled5to7Pixel()
-        }
-
-        if StartupPreferences.shared.restorePreviousSession {
-            PixelExperiment.fireOnboardingSessionRestoreEnabled5to7Pixel()
         }
     }
 
