@@ -148,8 +148,6 @@ enum Preferences {
                         PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .unique)
                     case .restorePurchaseStoreClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
-                    case .addToAnotherDeviceClick:
-                        PixelKit.fire(PrivacyProPixel.privacyProSettingsAddDevice)
                     case .addDeviceEnterEmail:
                         PixelKit.fire(PrivacyProPixel.privacyProAddDeviceEnterEmail)
                     case .activeSubscriptionSettingsClick:
@@ -162,21 +160,22 @@ enum Preferences {
                 }
             }
 
-            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
-                if #available(macOS 12.0, *) {
-                    Task {
-                        guard let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
-                              let windowControllerManager = WindowControllersManager.shared.lastKeyMainWindowController else {
-                            return
+            let sheetActionHandler = SubscriptionAccessActionHandlers(
+                openActivateViaEmailURL: {
+                    let url = Application.appDelegate.subscriptionManager.url(for: .activateViaEmail)
+                    WindowControllersManager.shared.showTab(with: .subscription(url))
+                },
+                restorePurchases: {
+                    if #available(macOS 12.0, *) {
+                        Task {
+                            let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: Application.appDelegate.subscriptionManager,
+                                                                                            uiHandler: Application.appDelegate.subscriptionUIHandler)
+                            await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
                         }
-
-                        let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: Application.appDelegate.subscriptionManager)
-                        await subscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
                     }
-                }
-            },
-                                                                      openURLHandler: openURL,
-                                                                      uiActionHandler: handleUIEvent)
+                },
+                uiActionHandler: handleUIEvent
+            )
 
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,

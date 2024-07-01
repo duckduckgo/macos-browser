@@ -1,5 +1,5 @@
 //
-//  TunnelControllerIPCServer.swift
+//  VPNControllerXPCServer.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import XPCHelper
 
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
-public protocol IPCServerInterface: AnyObject {
+public protocol XPCServerInterface: AnyObject {
     var version: String { get }
     var bundlePath: String { get }
 
@@ -59,7 +59,7 @@ public protocol IPCServerInterface: AnyObject {
     func command(_ command: VPNCommand) async throws
 }
 
-public extension IPCServerInterface {
+public extension XPCServerInterface {
     var version: String { DefaultIPCMetadataCollector.version }
     var bundlePath: String { DefaultIPCMetadataCollector.bundlePath }
 }
@@ -70,7 +70,7 @@ public extension IPCServerInterface {
 /// calls to the IPC interface when appropriate.
 ///
 @objc
-protocol XPCServerInterface {
+protocol XPCServerInterfaceObjC {
     /// Registers a connection with the server.
     ///
     /// This is the point where the server will start sending status updates to the client.
@@ -96,8 +96,8 @@ protocol XPCServerInterface {
     func command(_ payload: Data, completion: @escaping (Error?) -> Void)
 }
 
-public final class TunnelControllerIPCServer {
-    let xpc: XPCServer<XPCClientInterface, XPCServerInterface>
+public final class VPNControllerXPCServer {
+    let xpc: XPCServer<XPCClientInterfaceObjC, XPCServerInterfaceObjC>
 
     enum IPCError: Error {
         case cannotDecodeDebugCommand
@@ -105,11 +105,11 @@ public final class TunnelControllerIPCServer {
 
     /// The delegate.
     ///
-    public weak var serverDelegate: IPCServerInterface?
+    public weak var serverDelegate: XPCServerInterface?
 
     public init(machServiceName: String) {
-        let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
-        let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
+        let clientInterface = NSXPCInterface(with: XPCClientInterfaceObjC.self)
+        let serverInterface = NSXPCInterface(with: XPCServerInterfaceObjC.self)
 
         xpc = XPCServer(
             machServiceName: machServiceName,
@@ -126,7 +126,7 @@ public final class TunnelControllerIPCServer {
 
 // MARK: - Outgoing communication to the clients
 
-extension TunnelControllerIPCServer: IPCClientInterface {
+extension VPNControllerXPCServer: XPCClientInterface {
 
     public func errorChanged(_ error: String?) {
         xpc.forEachClient { client in
@@ -179,15 +179,24 @@ extension TunnelControllerIPCServer: IPCClientInterface {
     }
 
     public func knownFailureUpdated(_ failure: KnownFailure?) {
+        let payload: Data
+
+        do {
+            payload = try JSONEncoder().encode(failure)
+        } catch {
+            return
+        }
+
         xpc.forEachClient { client in
-            client.knownFailureUpdated(failure: failure)
+            client.knownFailureUpdated(payload: payload)
         }
     }
 }
 
 // MARK: - Incoming communication from a client
 
-extension TunnelControllerIPCServer: XPCServerInterface {
+extension VPNControllerXPCServer: XPCServerInterfaceObjC {
+
     func register(completion: @escaping (Error?) -> Void) {
         serverDelegate?.register(completion: completion)
     }

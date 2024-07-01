@@ -66,6 +66,7 @@ struct VPNMetadata: Encodable {
         let showInMenuBarEnabled: Bool
         let selectedServer: String
         let selectedEnvironment: String
+        let customDNS: Bool
     }
 
     struct LoginItemState: Encodable {
@@ -120,15 +121,17 @@ protocol VPNMetadataCollector {
 final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
     private let statusReporter: NetworkProtectionStatusReporter
-    private let ipcClient: TunnelControllerIPCClient
+    private let ipcClient: VPNControllerXPCClient
     private let defaults: UserDefaults
-    private let accountManager: AccountManaging
+    private let accountManager: AccountManager
     private let settings: VPNSettings
 
     init(defaults: UserDefaults = .netP,
-         accountManager: AccountManaging) {
-        let ipcClient = TunnelControllerIPCClient()
+         accountManager: AccountManager) {
+
+        let ipcClient = VPNControllerXPCClient.shared
         ipcClient.register { _ in }
+
         self.accountManager = accountManager
         self.ipcClient = ipcClient
         self.defaults = defaults
@@ -154,7 +157,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     func updateSettings() {
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
-        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
         settings.alignTo(subscriptionEnvironment: subscriptionEnvironment)
     }
 
@@ -312,12 +315,13 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             notifyStatusChangesEnabled: settings.notifyStatusChanges,
             showInMenuBarEnabled: settings.showInMenuBar,
             selectedServer: settings.selectedServer.stringValue ?? "automatic",
-            selectedEnvironment: settings.selectedEnvironment.rawValue
+            selectedEnvironment: settings.selectedEnvironment.rawValue,
+            customDNS: settings.dnsSettings.usesCustomDNS
         )
     }
 
     func collectPrivacyProInfo() async -> VPNMetadata.PrivacyProInfo {
-        let hasVPNEntitlement = (try? await accountManager.hasEntitlement(for: .networkProtection).get()) ?? false
+        let hasVPNEntitlement = (try? await accountManager.hasEntitlement(forProductName: .networkProtection).get()) ?? false
         return .init(
             hasPrivacyProAccount: accountManager.isUserAuthenticated,
             hasVPNEntitlement: hasVPNEntitlement

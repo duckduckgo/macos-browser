@@ -34,11 +34,16 @@ import VPNAppLauncher
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
 
-    public let accountManager: AccountManaging
+    public let accountManager: AccountManager
     private let _delegate: DuckDuckGoVPNAppDelegate
 
     override init() {
-        os_log(.error, log: .networkProtection, "🟢 Status Bar Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
+        os_log(.default,
+               log: .networkProtection,
+               "🟢 Status Bar Agent starting\nPath: (%{public}@)\nVersion: %{public}@\nPID: %{public}d",
+               Bundle.main.bundlePath,
+               "\(Bundle.main.versionNumber!).\(Bundle.main.buildNumber)",
+               NSRunningApplication.current.processIdentifier)
 
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
@@ -49,17 +54,17 @@ final class DuckDuckGoVPNApplication: NSApplication {
         // MARK: - Configure Subscription
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
         let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
-        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
-        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let subscriptionEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
                                                                  key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
         let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
-        accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
+        accountManager = DefaultAccountManager(accessTokenStorage: accessTokenStorage,
                                         entitlementsCache: entitlementsCache,
-                                        subscriptionService: subscriptionService,
-                                        authService: authService)
+                                        subscriptionEndpointService: subscriptionEndpointService,
+                                        authEndpointService: authEndpointService)
 
         _delegate = DuckDuckGoVPNAppDelegate(bouncer: NetworkProtectionBouncer(accountManager: accountManager),
                                              accountManager: accountManager,
@@ -126,11 +131,11 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private let appLauncher = AppLauncher()
     private let bouncer: NetworkProtectionBouncer
-    private let accountManager: AccountManaging
+    private let accountManager: AccountManager
     private let accessTokenStorage: SubscriptionTokenKeychainStorage
 
     public init(bouncer: NetworkProtectionBouncer,
-                accountManager: AccountManaging,
+                accountManager: AccountManager,
                 accessTokenStorage: SubscriptionTokenKeychainStorage,
                 subscriptionEnvironment: SubscriptionEnvironment) {
         self.bouncer = bouncer
@@ -412,7 +417,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private func setUpSubscriptionMonitoring() {
         guard accountManager.isUserAuthenticated else { return }
         let entitlementsCheck = {
-            await self.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+            await self.accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
 
         Task {

@@ -70,7 +70,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         let url = URL(string: "https://privacy-test-pages.site/privacy-protections/amp/")!
         _=try await tab.setUrl(url, source: .link)?.result.get()
 
-        let itemsCount = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('li').length") as? Int ?? 0
+        let itemsCount = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('li').length") as Int? ?? 0
         XCTAssertTrue(itemsCount > 0, "no items")
 
         // go through links on the page
@@ -82,8 +82,8 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             }
 
             // extract "Expected" URL
-            guard let name = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('li')[\(i)].getElementsByTagName('a')[0].innerText") as? String,
-                  let expected = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('li')[\(i)].getElementsByClassName('expected')[0].innerText") as? String,
+            guard let name: String = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('li')[\(i)].getElementsByTagName('a')[0].innerText"),
+                  let expected: String = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('li')[\(i)].getElementsByClassName('expected')[0].innerText"),
                   let expectedUrl = URL(string: expected.lowercased().dropping(prefix: "expected: "))
             else {
                 XCTFail("Could not parse element at \(i)")
@@ -121,7 +121,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             }.timeout(10, "#\(i + 1) \(name)").first().promise()
 
             // click
-            _=try await tab.webView.evaluateJavaScript("(function() { document.getElementsByTagName('li')[\(i)].getElementsByTagName('a')[0].click(); return true })()")
+            try await tab.webView.evaluateJavaScript("(function() { document.getElementsByTagName('li')[\(i)].getElementsByTagName('a')[0].click(); })()") as Void?
             // get the NavigationAction url
             let resultUrl = try await navigationWillStartPromise.value
 
@@ -154,7 +154,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         _=try await tab.setUrl(url, source: .link)?.result.get()
 
         // run test
-        _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('start').click(); return true })()")
+        try await tab.webView.evaluateJavaScript("(function() { document.getElementById('start').click(); })()") as Void?
 
         _=try await Future<Void, Never> { promise in
             onDidFinish = { _ in
@@ -171,7 +171,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         let downloadTaskPromise = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
         for i in 0...4 {
             do {
-                _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
+                try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); })()") as Void?
                 try await Task.sleep(nanoseconds: 300.asNanos)
                 break
             } catch {
@@ -229,7 +229,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             .promise()
 
         // run test
-        _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('start').click(); return true })()")
+        try await tab.webView.evaluateJavaScript("(function() { document.getElementById('start').click(); })()") as Void?
 
         // await for popup to open and close
         _=try await comingBackToFirstTabPromise.value
@@ -256,7 +256,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             let persistor = DownloadsPreferencesUserDefaultsPersistor()
             persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
             let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
-            _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
+            try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); })()") as Void?
 
             let fileUrl = try await downloadTaskFuture.value.output
                 .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()

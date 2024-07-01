@@ -55,7 +55,11 @@ final class MainViewController: NSViewController {
         fatalError("MainViewController: Bad initializer")
     }
 
-    init(tabCollectionViewModel: TabCollectionViewModel? = nil, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, autofillPopoverPresenter: AutofillPopoverPresenter) {
+    init(tabCollectionViewModel: TabCollectionViewModel? = nil,
+         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         autofillPopoverPresenter: AutofillPopoverPresenter,
+         vpnXPCClient: VPNControllerXPCClient = .shared) {
+
         let tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = tabCollectionViewModel.isBurner
@@ -70,14 +74,14 @@ final class MainViewController: NSViewController {
             }
 #endif
 
-            let ipcClient = TunnelControllerIPCClient()
-            ipcClient.register { error in
+            vpnXPCClient.register { error in
                 NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
             }
-            let vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
+
+            let vpnUninstaller = VPNUninstaller(ipcClient: vpnXPCClient)
 
             return NetworkProtectionNavBarPopoverManager(
-                ipcClient: ipcClient,
+                ipcClient: vpnXPCClient,
                 vpnUninstaller: vpnUninstaller)
         }()
         let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
@@ -92,14 +96,13 @@ final class MainViewController: NSViewController {
             connectivityIssuesObserver = connectivityIssuesObserver ?? DisabledConnectivityIssueObserver()
             controllerErrorMessageObserver = controllerErrorMessageObserver ?? ControllerErrorMesssageObserverThroughDistributedNotifications()
 
-            let ipcClient = networkProtectionPopoverManager.ipcClient
             return DefaultNetworkProtectionStatusReporter(
-                statusObserver: ipcClient.ipcStatusObserver,
-                serverInfoObserver: ipcClient.ipcServerInfoObserver,
-                connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
+                statusObserver: vpnXPCClient.ipcStatusObserver,
+                serverInfoObserver: vpnXPCClient.ipcServerInfoObserver,
+                connectionErrorObserver: vpnXPCClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: connectivityIssuesObserver,
                 controllerErrorMessageObserver: controllerErrorMessageObserver,
-                dataVolumeObserver: ipcClient.ipcDataVolumeObserver,
+                dataVolumeObserver: vpnXPCClient.ipcDataVolumeObserver,
                 knownFailureObserver: KnownFailureObserverThroughDistributedNotifications()
             )
         }()
@@ -196,7 +199,6 @@ final class MainViewController: NSViewController {
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
         refreshSurveyMessages()
-        DataBrokerProtectionAppEvents().windowDidBecomeMain()
     }
 
     func windowDidResignKey() {
@@ -312,7 +314,14 @@ final class MainViewController: NSViewController {
             }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] title in
-                self?.view.window?.title = title
+                guard let self else { return }
+                guard !isBurner else {
+                    // Fire Window: don‘t display active Tab title as the Window title
+                    view.window?.title = UserText.burnerWindowHeader
+                    return
+                }
+
+                view.window?.title = title
             }
             .store(in: &tabViewModelCancellables)
     }

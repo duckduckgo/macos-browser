@@ -69,9 +69,14 @@ final class VPNPreferencesModel: ObservableObject {
 
     private var onboardingStatus: OnboardingStatus {
         didSet {
-            showUninstallVPN = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager).isInstalled
+            showUninstallVPN = DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager).isInstalled
         }
     }
+
+    @Published public var dnsSettings: NetworkProtectionDNSSettings = .default
+
+    @Published public var isCustomDNSSelected = false
+    @Published public var customDNSServers: String?
 
     private let settings: VPNSettings
     private let pinningManager: PinningManager
@@ -96,6 +101,7 @@ final class VPNPreferencesModel: ObservableObject {
         subscribeToShowInMenuBarSettingChanges()
         subscribeToShowInBrowserToolbarSettingsChanges()
         subscribeToLocationSettingChanges()
+        subscribeToDNSSettingsChanges()
     }
 
     func subscribeToOnboardingStatusChanges(defaults: UserDefaults) {
@@ -136,6 +142,18 @@ final class VPNPreferencesModel: ObservableObject {
             .store(in: &cancellables)
     }
 
+    func subscribeToDNSSettingsChanges() {
+        settings.dnsSettingsPublisher
+            .assign(to: \.dnsSettings, onWeaklyHeld: self)
+            .store(in: &cancellables)
+        isCustomDNSSelected = settings.dnsSettings.usesCustomDNS
+        customDNSServers = settings.dnsSettings.dnsServersText
+    }
+
+    func resetDNSSettings() {
+        settings.dnsSettings = .default
+    }
+
     @MainActor
     func uninstallVPN() async {
         let response = await uninstallVPNConfirmationAlert().runModal()
@@ -163,5 +181,14 @@ final class VPNPreferencesModel: ObservableObject {
         cancelButton.keyEquivalent = "\r"
 
         return alert
+    }
+}
+
+extension NetworkProtectionDNSSettings {
+    var dnsServersText: String? {
+        switch self {
+        case .default: return nil
+        case .custom(let servers): return servers.joined(separator: ", ")
+        }
     }
 }

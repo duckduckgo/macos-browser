@@ -31,19 +31,19 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private var purchasePlatformItem: NSMenuItem?
 
     var currentViewController: () -> NSViewController?
-    let subscriptionManager: SubscriptionManaging
-    var accountManager: AccountManaging {
+    let subscriptionManager: SubscriptionManager
+    var accountManager: AccountManager {
         subscriptionManager.accountManager
     }
 
     private var _purchaseManager: Any?
     @available(macOS 12.0, *)
-    fileprivate var purchaseManager: StorePurchaseManager {
+    fileprivate var purchaseManager: DefaultStorePurchaseManager {
         if _purchaseManager == nil {
-            _purchaseManager = StorePurchaseManager()
+            _purchaseManager = DefaultStorePurchaseManager()
         }
         // swiftlint:disable:next force_cast
-        return _purchaseManager as! StorePurchaseManager
+        return _purchaseManager as! DefaultStorePurchaseManager
     }
 
     required init(coder: NSCoder) {
@@ -56,7 +56,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                 isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
-                subscriptionManager: SubscriptionManaging) {
+                subscriptionManager: SubscriptionManager) {
         self.currentEnvironment = currentEnvironment
         self.updateServiceEnvironment = updateServiceEnvironment
         self.updatePurchasingPlatform = updatePurchasingPlatform
@@ -192,7 +192,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func validateToken() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await subscriptionManager.authService.validateToken(accessToken: token) {
+            switch await subscriptionManager.authEndpointService.validateToken(accessToken: token) {
             case .success(let response):
                 showAlert(title: "Validate token", message: "\(response)")
             case .failure(let error):
@@ -208,7 +208,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
             let entitlements: [Entitlement.ProductName] = [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
             for entitlement in entitlements {
-                if case let .success(result) = await accountManager.hasEntitlement(for: entitlement, cachePolicy: .reloadIgnoringLocalCacheData) {
+                if case let .success(result) = await accountManager.hasEntitlement(forProductName: entitlement, cachePolicy: .reloadIgnoringLocalCacheData) {
                     let resultSummary = "Entitlement check for \(entitlement.rawValue): \(result)"
                     results.append(resultSummary)
                     print(resultSummary)
@@ -223,7 +223,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func getSubscriptionDetails() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await subscriptionManager.subscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
+            switch await subscriptionManager.subscriptionEndpointService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
             case .success(let response):
                 showAlert(title: "Subscription info", message: "\(response)")
             case .failure(let error):
@@ -235,15 +235,16 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @available(macOS 12.0, *)
     @objc
     func syncAppleIDAccount() {
-        Task {
-            await purchaseManager.syncAppleIDAccount()
+        Task { @MainActor in
+            try? await purchaseManager.syncAppleIDAccount()
         }
     }
 
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
-            let storePurchaseManager = StorePurchaseManager()
-            let appStorePurchaseFlow = AppStorePurchaseFlow(subscriptionManager: subscriptionManager)
+            let storePurchaseManager = DefaultStorePurchaseManager()
+            let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionManager: subscriptionManager,
+                                                            appStoreRestoreFlow: DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager))
             let vc = DebugPurchaseViewController(storePurchaseManager: storePurchaseManager, appStorePurchaseFlow: appStorePurchaseFlow)
             currentViewController()?.presentAsSheet(vc)
         }
@@ -313,7 +314,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func restorePurchases(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             Task {
-                let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: subscriptionManager)
+                let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager)
                 await appStoreRestoreFlow.restoreAccountFromPastPurchase()
             }
         }

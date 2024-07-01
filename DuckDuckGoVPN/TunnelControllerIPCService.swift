@@ -21,6 +21,8 @@ import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
+import PixelKit
+import UDSHelper
 
 /// Takes care of handling incoming IPC requests from clients that need to be relayed to the tunnel, and handling state
 /// changes that need to be relayed back to IPC clients.
@@ -32,10 +34,12 @@ final class TunnelControllerIPCService {
     private let tunnelController: NetworkProtectionTunnelController
     private let networkExtensionController: NetworkExtensionController
     private let uninstaller: VPNUninstalling
-    private let server: NetworkProtectionIPC.TunnelControllerIPCServer
+    private let server: NetworkProtectionIPC.VPNControllerXPCServer
     private let statusReporter: NetworkProtectionStatusReporter
     private var cancellables = Set<AnyCancellable>()
     private let defaults: UserDefaults
+    private let pixelKit: PixelKit?
+    private let udsServer: UDSServer
 
     enum IPCError: SilentErrorConvertible {
         case versionMismatched
@@ -47,11 +51,35 @@ final class TunnelControllerIPCService {
         }
     }
 
+    enum UDSError: PixelKitEventV2 {
+        case udsServerStartFailure(_ error: Error)
+
+        var name: String {
+            switch self {
+            case .udsServerStartFailure:
+                return "vpn_agent_uds_server_start_failure"
+            }
+        }
+
+        var error: Error? {
+            switch self {
+            case .udsServerStartFailure(let error):
+                return error
+            }
+        }
+
+        var parameters: [String: String]? {
+            return nil
+        }
+    }
+
     init(tunnelController: NetworkProtectionTunnelController,
          uninstaller: VPNUninstalling,
          networkExtensionController: NetworkExtensionController,
          statusReporter: NetworkProtectionStatusReporter,
-         defaults: UserDefaults = .netP) {
+         fileManager: FileManager = .default,
+         defaults: UserDefaults = .netP,
+         pixelKit: PixelKit? = .shared) {
 
         self.tunnelController = tunnelController
         self.uninstaller = uninstaller
@@ -59,6 +87,9 @@ final class TunnelControllerIPCService {
         server = .init(machServiceName: Bundle.main.bundleIdentifier!)
         self.statusReporter = statusReporter
         self.defaults = defaults
+        self.pixelKit = pixelKit
+
+        udsServer = UDSServer(socketFileURL: VPNIPCResources.socketFileURL, log: .networkProtectionIPCLog)
 
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
@@ -71,6 +102,26 @@ final class TunnelControllerIPCService {
 
     public func activate() {
         server.activate()
+
+        do {
+            try udsServer.start { [weak self] message in
+                guard let self else { return nil }
+
+                let command = try JSONDecoder().decode(VPNIPCClientCommand.self, from: message)
+
+                switch command {
+                case .uninstall(let component):
+                    try await uninstall(component)
+                    return nil
+                case .quit:
+                    quitAgent()
+                    return nil
+                }
+            }
+        } catch {
+            pixelKit?.fire(UDSError.udsServerStartFailure(error))
+            assertionFailure(error.localizedDescription)
+        }
     }
 
     private func subscribeToErrorChanges() {
@@ -121,7 +172,7 @@ final class TunnelControllerIPCService {
 
 // MARK: - Requests from the client
 
-extension TunnelControllerIPCService: IPCServerInterface {
+extension TunnelControllerIPCService: XPCServerInterface {
 
     func register(completion: @escaping (Error?) -> Void) {
         register(version: version, bundlePath: bundlePath, completion: completion)
@@ -183,7 +234,7 @@ extension TunnelControllerIPCService: IPCServerInterface {
 
         switch command {
         case .removeSystemExtension:
-            try await uninstaller.removeSystemExtension()
+            try await uninstall(.systemExtension)
         case .expireRegistrationKey:
             // Intentional no-op: handled by the extension
             break
@@ -191,13 +242,30 @@ extension TunnelControllerIPCService: IPCServerInterface {
             // Intentional no-op: handled by the extension
             break
         case .removeVPNConfiguration:
-            try await uninstaller.removeVPNConfiguration()
+            try await uninstall(.configuration)
         case .uninstallVPN:
-            try await uninstaller.uninstall(includingSystemExtension: true)
+            try await uninstall(.all)
         case .disableConnectOnDemandAndShutDown:
             // Not implemented on macOS yet
             break
+        case .quitAgent:
+            quitAgent()
         }
+    }
+
+    private func uninstall(_ component: VPNUninstallComponent) async throws {
+        switch component {
+        case .all:
+            try await uninstaller.uninstall(includingSystemExtension: true)
+        case .configuration:
+            try await uninstaller.removeVPNConfiguration()
+        case .systemExtension:
+            try await uninstaller.removeSystemExtension()
+        }
+    }
+
+    private func quitAgent() {
+        exit(EXIT_SUCCESS)
     }
 }
 

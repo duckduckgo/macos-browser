@@ -23,13 +23,13 @@ import Combine
 import NetworkProtection
 import NetworkProtectionUI
 import NetworkProtectionIPC
+import PixelKit
 
 protocol PopoverPresenter {
     func show(_ popover: NSPopover, positionedBelow view: NSView)
 }
 
 protocol NetPPopoverManager: AnyObject {
-    var ipcClient: NetworkProtectionIPCClient { get }
     var isShown: Bool { get }
 
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover
@@ -128,7 +128,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         if autofillPopoverPresenter.popoverIsShown == true && button.window == autofillPopoverPresenter.popoverPresentingWindow {
             autofillPopoverPresenter.dismiss()
         } else {
-            showPasswordManagementPopover(selectedCategory: nil, from: button, withDelegate: delegate)
+            showPasswordManagementPopover(selectedCategory: nil, from: button, withDelegate: delegate, source: .shortcut)
         }
     }
 
@@ -319,11 +319,15 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         popover.close()
     }
 
-    func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
+    func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate, source: PasswordManagementSource?) {
         guard closeTransientPopovers() else { return }
 
         let popover = autofillPopoverPresenter.show(positionedBelow: button, withDomain: passwordManagementDomain, selectedCategory: selectedCategory)
         bindIsMouseDownState(of: button, to: popover)
+
+        if let source = source {
+            PixelKit.fire(GeneralPixel.autofillManagementOpened, withAdditionalParameters: ["source": source.rawValue])
+        }
     }
 
     func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {

@@ -531,7 +531,7 @@ class AddressBarTests: XCTestCase {
         _=window.makeFirstResponder(addressBarTextField)
         type("some-text")
 
-        try await Task.sleep(interval: 0.01)
+        try await Task.sleep(interval: 1.0)
         try await didFinishNavigation.value
         XCTAssertTrue(isAddressBarFirstResponder)
         XCTAssertEqual(addressBarValue, "some-text")

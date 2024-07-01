@@ -1043,13 +1043,14 @@ extension BrowserTabViewController: TabDelegate {
     private class PrintContext {
         let request: PrintDialogRequest
         weak var printPanel: NSWindow?
-        var isAborted = false
+        var shouldRemoveWebView = false
         init(request: PrintDialogRequest) {
             self.request = request
         }
     }
     func runPrintOperation(with request: PrintDialogRequest) -> ModalSheetCancellable? {
-        guard let window = view.window else { return nil }
+        guard let window = view.window,
+              let webView = tabViewModel?.tab.webView else { return nil }
 
         let printOperation = request.parameters
         let didRunSelector = #selector(printOperationDidRun(printOperation:success:contextInfo:))
@@ -1065,10 +1066,25 @@ extension BrowserTabViewController: TabDelegate {
         // get the Print Panel that (hopefully) was added to the window.sheets
         context.printPanel = Set(window.sheets).subtracting(windowSheetsBeforPrintOperation).first
 
-        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
-        return ModalSheetCancellable(ownerWindow: window, modalSheet: context.printPanel, returnCode: nil, condition: !context.request.isComplete) {
-            context.isAborted = true
-        }
+        // when subscribing to another Tab, the print dialog will be cancelled on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: context.printPanel, returnCode: .cancel, condition: {
+            guard !context.request.isComplete else { return false }
+
+            // the print operation must complete when the web view is visible
+            // otherwise UI gets broken
+            if webView.window == nil {
+                self.view.addSubview(webView)
+                context.shouldRemoveWebView = true
+            }
+            return true
+
+        }(), cancellationHandler: {
+            if context.shouldRemoveWebView {
+                DispatchQueue.main.async {
+                    webView.removeFromSuperview()
+                }
+            }
+        })
     }
 
     @objc private func printOperationDidRun(printOperation: NSPrintOperation, success: Bool, contextInfo: UnsafeMutableRawPointer?) {
@@ -1077,13 +1093,6 @@ extension BrowserTabViewController: TabDelegate {
             return
         }
         let context = Unmanaged<PrintContext>.fromOpaque(contextInfo).takeRetainedValue()
-
-        // don‘t submit the query when tab is switched
-        if context.isAborted { return }
-        if let window = view.window, let printPanel = context.printPanel, window.sheets.contains(printPanel) {
-            window.endSheet(printPanel)
-        }
-
         context.request.submit(success)
     }
 

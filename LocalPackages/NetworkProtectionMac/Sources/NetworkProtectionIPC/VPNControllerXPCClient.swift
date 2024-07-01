@@ -1,5 +1,5 @@
 //
-//  TunnelControllerIPCClient.swift
+//  VPNControllerXPCClient.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import XPCHelper
 
 /// This protocol describes the client-side IPC interface for controlling the tunnel
 ///
-public protocol IPCClientInterface: AnyObject {
+public protocol XPCClientInterface: AnyObject {
     func errorChanged(_ error: String?)
     func serverInfoChanged(_ serverInfo: NetworkProtectionStatusServerInfo)
     func statusChanged(_ status: ConnectionStatus)
@@ -32,19 +32,19 @@ public protocol IPCClientInterface: AnyObject {
 
 /// This is the XPC interface with parameters that can be packed properly
 @objc
-protocol XPCClientInterface {
+protocol XPCClientInterfaceObjC {
     func errorChanged(error: String?)
     func serverInfoChanged(payload: Data)
     func statusChanged(payload: Data)
     func dataVolumeUpdated(payload: Data)
-    func knownFailureUpdated(failure: KnownFailure?)
+    func knownFailureUpdated(payload: Data)
 }
 
-public final class TunnelControllerIPCClient {
+public final class VPNControllerXPCClient {
 
     // MARK: - XPC Communication
 
-    let xpc: XPCClient<XPCClientInterface, XPCServerInterface>
+    let xpc: XPCClient<XPCClientInterfaceObjC, XPCServerInterfaceObjC>
 
     // MARK: - Observers offered
 
@@ -56,7 +56,7 @@ public final class TunnelControllerIPCClient {
 
     /// The delegate.
     ///
-    public weak var clientDelegate: IPCClientInterface? {
+    public weak var clientDelegate: XPCClientInterface? {
         didSet {
             xpcDelegate.clientDelegate = self.clientDelegate
         }
@@ -65,8 +65,8 @@ public final class TunnelControllerIPCClient {
     private let xpcDelegate: TunnelControllerXPCClientDelegate
 
     public init(machServiceName: String) {
-        let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
-        let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
+        let clientInterface = NSXPCInterface(with: XPCClientInterfaceObjC.self)
+        let serverInterface = NSXPCInterface(with: XPCServerInterfaceObjC.self)
         self.xpcDelegate = TunnelControllerXPCClientDelegate(
             clientDelegate: self.clientDelegate,
             serverInfoObserver: self.serverInfoObserver,
@@ -97,18 +97,28 @@ public final class TunnelControllerIPCClient {
 
         self.register { _ in }
     }
+
+    /// Forces the XPC client status to be updated to disconnected.
+    ///
+    /// This is just used as a temporary mechanism to allow the main app to tell that the VPN has been disconnected
+    /// when it's uninstalled.  You should not call this method directly or rely on this for other logic.  This should be
+    /// replaced by status updates through XPC.
+    ///
+    public func forceStatusToDisconnected() {
+        xpcDelegate.statusChanged(status: .disconnected)
+    }
 }
 
-private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
+private final class TunnelControllerXPCClientDelegate: XPCClientInterfaceObjC {
 
-    weak var clientDelegate: IPCClientInterface?
+    weak var clientDelegate: XPCClientInterface?
     let serverInfoObserver: ConnectionServerInfoObserverThroughIPC
     let connectionErrorObserver: ConnectionErrorObserverThroughIPC
     let connectionStatusObserver: ConnectionStatusObserverThroughIPC
     let dataVolumeObserver: DataVolumeObserverThroughIPC
     let knownFailureObserver: KnownFailureObserverThroughIPC
 
-    init(clientDelegate: IPCClientInterface?,
+    init(clientDelegate: XPCClientInterface?,
          serverInfoObserver: ConnectionServerInfoObserverThroughIPC,
          connectionErrorObserver: ConnectionErrorObserverThroughIPC,
          connectionStatusObserver: ConnectionStatusObserverThroughIPC,
@@ -141,6 +151,10 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
             return
         }
 
+        statusChanged(status: status)
+    }
+
+    func statusChanged(status: ConnectionStatus) {
         connectionStatusObserver.publish(status)
         clientDelegate?.statusChanged(status)
     }
@@ -154,6 +168,14 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
         clientDelegate?.dataVolumeUpdated(dataVolume)
     }
 
+    func knownFailureUpdated(payload: Data) {
+        guard let failure = try? JSONDecoder().decode(KnownFailure?.self, from: payload) else {
+            return
+        }
+
+        knownFailureUpdated(failure: failure)
+    }
+
     func knownFailureUpdated(failure: KnownFailure?) {
         knownFailureObserver.publish(failure)
         clientDelegate?.knownFailureUpdated(failure)
@@ -162,7 +184,8 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
 
 // MARK: - Outgoing communication to the server
 
-extension TunnelControllerIPCClient: IPCServerInterface {
+extension VPNControllerXPCClient: XPCServerInterface {
+
     public func register(completion: @escaping (Error?) -> Void) {
         register(version: version, bundlePath: bundlePath, completion: self.onComplete(completion))
     }
@@ -218,5 +241,23 @@ extension TunnelControllerIPCClient: IPCServerInterface {
                 continuation.resume(throwing: error)
             })
         }
+    }
+}
+
+extension VPNControllerXPCClient: VPNControllerIPCClient {
+
+    public func uninstall(_ component: VPNUninstallComponent) async throws {
+        switch component {
+        case .all:
+            try await self.command(.uninstallVPN)
+        case .configuration:
+            try await self.command(.removeVPNConfiguration)
+        case .systemExtension:
+            try await self.command(.removeSystemExtension)
+        }
+    }
+
+    public func quit() async throws {
+        try await self.command(.removeSystemExtension)
     }
 }

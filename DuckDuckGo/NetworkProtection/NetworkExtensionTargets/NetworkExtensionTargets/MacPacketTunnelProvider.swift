@@ -115,6 +115,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionWireguardErrorCannotStartWireguardBackend(code: code)
             case .noAuthTokenFound:
                 domainEvent = .networkProtectionNoAuthTokenFoundError
+            case .failedToFetchServerStatus(let error):
+                domainEvent = .networkProtectionClientFailedToFetchServerStatus(error)
+            case .failedToParseServerStatusResponse(let error):
+                domainEvent = .networkProtectionClientFailedToParseServerStatusResponse(error)
             case .unhandledError(function: let function, line: let line, error: let error):
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             case .failedToRetrieveAuthToken,
@@ -312,6 +316,29 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true
                 )
             }
+        case .serverMigrationAttempt(let step):
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionServerMigrationAttempt,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionServerMigrationFailure(error),
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionServerMigrationSuccess,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            }
+        case .tunnelStartOnDemandWithoutAccessToken:
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken,
+                frequency: .dailyAndCount,
+                includeAppVersionParameter: true)
         }
     }
 
@@ -327,8 +354,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // swiftlint:disable:next function_body_length
     @MainActor @objc public init() {
-        let isSubscriptionEnabled = false
-
 #if NETP_SYSTEM_EXTENSION
         let defaults = UserDefaults.standard
 #else
@@ -346,7 +371,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                                            serviceName: Self.tokenServiceName,
                                                                            errorEvents: debugEvents,
-                                                                           isSubscriptionEnabled: isSubscriptionEnabled,
+                                                                           isSubscriptionEnabled: false,
                                                                            accessTokenProvider: { nil }
         )
         let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
@@ -361,15 +386,15 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             subscriptionEnvironment.serviceEnvironment = .staging
         }
 
-        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
-        let accountManager = AccountManager(accessTokenStorage: tokenStore,
+        let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let accountManager = DefaultAccountManager(accessTokenStorage: tokenStore,
                                             entitlementsCache: entitlementsCache,
-                                            subscriptionService: subscriptionService,
-                                            authService: authService)
+                                            subscriptionEndpointService: subscriptionEndpointService,
+                                            authEndpointService: authEndpointService)
 
         let entitlementsCheck = {
-            await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+            await accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
 
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
@@ -384,7 +409,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
                    defaults: defaults,
-                   isSubscriptionEnabled: isSubscriptionEnabled,
+                   isSubscriptionEnabled: true,
                    entitlementCheck: entitlementsCheck)
 
         setupPixels()

@@ -114,6 +114,10 @@ public final class TunnelControllerViewModel: ObservableObject {
         subscribeToStatusChanges()
         subscribeToServerInfoChanges()
         subscribeToDataVolumeUpdates()
+
+        vpnSettings.dnsSettingsPublisher
+            .assign(to: \.dnsSettings, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     deinit {
@@ -464,6 +468,9 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     @Published
     private var internalServerAttributes: NetworkProtectionServerInfo.ServerAttributes?
+
+    @Published
+    var dnsSettings: NetworkProtectionDNSSettings = .default
 
     @Published
     var formattedDataVolume: FormattedDataVolume

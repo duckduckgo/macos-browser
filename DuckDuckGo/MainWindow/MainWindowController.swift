@@ -49,7 +49,7 @@ final class MainWindowController: NSWindowController {
 
         super.init(window: window)
 
-        setupWindow()
+        setupWindow(window)
         setupToolbar()
         subscribeToTrafficLightsAlpha()
         subscribeToBurningData()
@@ -73,8 +73,8 @@ final class MainWindowController: NSWindowController {
 #endif
     }
 
-    private func setupWindow() {
-        window?.delegate = self
+    private func setupWindow(_ window: NSWindow) {
+        window.delegate = self
 
         if shouldShowOnboarding {
             mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()

@@ -27,14 +27,14 @@ final class SurveyRemoteMessagingTests: XCTestCase {
     private var defaults: UserDefaults!
     private let testGroupName = "remote-messaging"
 
-    private var accountManager: AccountManaging!
+    private var accountManager: AccountManager!
     private var subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching!
 
     override func setUp() {
         defaults = UserDefaults(suiteName: testGroupName)!
         defaults.removePersistentDomain(forName: testGroupName)
 
-        accountManager = AccountManagerMock(isUserAuthenticated: true, accessToken: "mock-token")
+        accountManager = AccountManagerMock(accessToken: "mock-token")
         subscriptionFetcher = MockSubscriptionFetcher()
     }
 
@@ -83,6 +83,36 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         await messaging.fetchRemoteMessages()
 
         XCTAssertTrue(request.didFetchMessages)
+    }
+
+    func testWhenFetchingRemoteMessages_AndPurchasePlatformDoesNotMatch_ThenMessagesAreNotStored() async {
+        let request = MockNetworkProtectionRemoteMessagingRequest()
+        let storage = MockSurveyRemoteMessagingStorage()
+        let activationDateStorage = MockWaitlistActivationDateStore()
+
+        let messages = [mockMessage(id: "123", purchasePlatform: "stripe")]
+
+        request.result = .success(messages)
+        activationDateStorage._daysSinceActivation = 10
+
+        let messaging = DefaultSurveyRemoteMessaging(
+            messageRequest: request,
+            messageStorage: storage,
+            accountManager: accountManager,
+            subscriptionFetcher: subscriptionFetcher,
+            vpnActivationDateStore: activationDateStorage,
+            pirActivationDateStore: activationDateStorage,
+            minimumRefreshInterval: 0,
+            userDefaults: defaults
+        )
+
+        XCTAssertEqual(storage.storedMessages(), [])
+        XCTAssertNotNil(activationDateStorage.daysSinceActivation())
+
+        await messaging.fetchRemoteMessages()
+
+        XCTAssertTrue(request.didFetchMessages)
+        XCTAssertEqual(storage.storedMessages(), [])
     }
 
     func testWhenFetchingRemoteMessages_AndWaitlistUserHasActivatedNetP_ThenMessagesAreFetched_AndMessagesAreStored() async {
@@ -194,12 +224,82 @@ final class SurveyRemoteMessagingTests: XCTestCase {
         XCTAssertEqual(presentableMessages, [message])
     }
 
+    func testWhenMessageHasBeenDismissed_AndOtherMessageShouldHideBasedOnThat_ThenPresentableMessagesAreEmpty() async {
+        let request = MockNetworkProtectionRemoteMessagingRequest()
+        let storage = MockSurveyRemoteMessagingStorage()
+        let activationDateStorage = MockWaitlistActivationDateStore()
+        let dismissedMessageID = "dismissed-message"
+
+        let messages = [
+            mockMessage(id: "123", hideIfInteractedWithMessage: dismissedMessageID)
+        ]
+
+        request.result = .success(messages)
+        activationDateStorage._daysSinceActivation = 10
+
+        let messaging = DefaultSurveyRemoteMessaging(
+            messageRequest: request,
+            messageStorage: storage,
+            accountManager: accountManager,
+            subscriptionFetcher: subscriptionFetcher,
+            vpnActivationDateStore: activationDateStorage,
+            pirActivationDateStore: activationDateStorage,
+            minimumRefreshInterval: 0,
+            userDefaults: defaults
+        )
+
+        storage.dismissRemoteMessage(with: dismissedMessageID)
+        XCTAssertEqual(storage.storedMessages(), [])
+        XCTAssertNotNil(activationDateStorage.daysSinceActivation())
+
+        await messaging.fetchRemoteMessages()
+
+        XCTAssertTrue(request.didFetchMessages)
+        XCTAssertEqual(storage.storedMessages(), [])
+    }
+
+    func testWhenMessageHasBeenDismissed_AndOtherMessageShouldNotHideBasedOnThat_ThenPresentableMessagesAreNotEmpty() async {
+        let request = MockNetworkProtectionRemoteMessagingRequest()
+        let storage = MockSurveyRemoteMessagingStorage()
+        let activationDateStorage = MockWaitlistActivationDateStore()
+        let dismissedMessageID = "dismissed-message"
+
+        let messages = [
+            mockMessage(id: "123", hideIfInteractedWithMessage: dismissedMessageID)
+        ]
+
+        request.result = .success(messages)
+        activationDateStorage._daysSinceActivation = 10
+
+        let messaging = DefaultSurveyRemoteMessaging(
+            messageRequest: request,
+            messageStorage: storage,
+            accountManager: accountManager,
+            subscriptionFetcher: subscriptionFetcher,
+            vpnActivationDateStore: activationDateStorage,
+            pirActivationDateStore: activationDateStorage,
+            minimumRefreshInterval: 0,
+            userDefaults: defaults
+        )
+
+        storage.dismissRemoteMessage(with: "unrelated-dismissed-message")
+        XCTAssertEqual(storage.storedMessages(), [])
+        XCTAssertNotNil(activationDateStorage.daysSinceActivation())
+
+        await messaging.fetchRemoteMessages()
+
+        XCTAssertTrue(request.didFetchMessages)
+        XCTAssertEqual(storage.storedMessages(), messages)
+    }
+
     private func mockMessage(id: String,
                              subscriptionStatus: String = Subscription.Status.autoRenewable.rawValue,
                              minimumDaysSinceSubscriptionStarted: Int = 0,
                              maximumDaysUntilSubscriptionExpirationOrRenewal: Int = 0,
                              daysSinceVPNEnabled: Int = 0,
-                             daysSincePIREnabled: Int = 0) -> SurveyRemoteMessage {
+                             daysSincePIREnabled: Int = 0,
+                             purchasePlatform: String = "apple",
+                             hideIfInteractedWithMessage: String = "") -> SurveyRemoteMessage {
         let remoteMessageJSON = """
         {
             "id": "\(id)",
@@ -210,7 +310,10 @@ final class SurveyRemoteMessagingTests: XCTestCase {
                     "minimumDaysSinceSubscriptionStarted": \(minimumDaysSinceSubscriptionStarted),
                     "maximumDaysUntilSubscriptionExpirationOrRenewal": \(maximumDaysUntilSubscriptionExpirationOrRenewal),
                     "daysSinceVPNEnabled": \(daysSinceVPNEnabled),
-                    "daysSincePIREnabled": \(daysSincePIREnabled)
+                    "daysSincePIREnabled": \(daysSincePIREnabled),
+                    "sparkleSubscriptionPurchasePlatforms": ["\(purchasePlatform)"],
+                    "appStoreSubscriptionPurchasePlatforms": ["\(purchasePlatform)"],
+                    "hideIfInteractedWithMessage": ["\(hideIfInteractedWithMessage)"]
             },
             "action": {
                 "actionTitle": "Action 1"
@@ -289,7 +392,7 @@ final class MockSubscriptionFetcher: SurveyRemoteMessageSubscriptionFetching {
         platform: .apple,
         status: .autoRenewable)
 
-    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionService.SubscriptionServiceError> {
+    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionServiceError> {
         return .success(subscription)
     }
 

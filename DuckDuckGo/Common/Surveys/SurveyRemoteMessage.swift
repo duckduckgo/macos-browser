@@ -36,10 +36,13 @@ struct SurveyRemoteMessage: Codable, Equatable, Identifiable, Hashable {
     struct Attributes: Codable, Equatable, Hashable {
         let subscriptionStatus: String?
         let subscriptionBillingPeriod: String?
+        let sparkleSubscriptionPurchasePlatforms: [String]?
+        let appStoreSubscriptionPurchasePlatforms: [String]?
         let minimumDaysSinceSubscriptionStarted: Int?
         let maximumDaysUntilSubscriptionExpirationOrRenewal: Int?
         let daysSinceVPNEnabled: Int?
         let daysSincePIREnabled: Int?
+        let hideIfInteractedWithMessage: [String]?
     }
 
     let id: String

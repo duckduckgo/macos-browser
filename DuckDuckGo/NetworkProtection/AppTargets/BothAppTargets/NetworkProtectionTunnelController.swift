@@ -284,6 +284,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 .setSelectedServer,
                 .setSelectedEnvironment,
                 .setSelectedLocation,
+                .setDNSSettings,
                 .setShowInMenuBar,
                 .setDisableRekeying:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
@@ -639,6 +640,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
 #endif
 
+        if let data = try? JSONEncoder().encode(settings.dnsSettings) {
+            options[NetworkProtectionOptionKey.dnsSettings] = NSData(data: data)
+        }
+
         if case .custom(let keyValidity) = settings.registrationKeyValidity {
             options[NetworkProtectionOptionKey.keyValidity] = String(describing: keyValidity) as NSString
         }
@@ -842,7 +847,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     private func fetchAuthToken() throws -> NSString? {
 
         if let accessToken = try? accessTokenStorage.getAccessToken() {
-            os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
+            os_log(.error, log: .networkProtection, "🟢 TunnelController found token")
             return Self.adaptAccessTokenForVPN(accessToken) as NSString?
         }
         os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
