@@ -84,7 +84,13 @@ extension ReleaseNotesUserScript {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.onUpdate()
         }
-        return InitialSetupResult(env: "development", locale: "en")
+
+#if DEBUG
+        let env = "development"
+#else
+        let env = "production"
+#endif
+        return InitialSetupResult(env: env, locale: Locale.current.identifier)
     }
 
     struct InitialSetupResult: Encodable {
