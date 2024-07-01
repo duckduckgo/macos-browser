@@ -68,7 +68,7 @@ extension Preferences {
 
                     TextMenuItemCaption(UserText.duckPlayerExplanation)
                 }
-                
+
                 // Auto Play
                 if model.shouldDisplayAutoPlaySettings {
                     PreferencePaneSection(UserText.duckPlayerAutoplayTitle) {
