@@ -160,26 +160,27 @@ enum Preferences {
                 }
             }
 
-            let sheetActionHandler = SubscriptionAccessActionHandlers(openActivateViaEmailURL: {
-                let url = Application.appDelegate.subscriptionManager.url(for: .activateViaEmail)
-                WindowControllersManager.shared.showTab(with: .subscription(url))
-            },
-                                                                      restorePurchases: {
-                if #available(macOS 12.0, *) {
-                    Task {
-                        let subscriptionManager = Application.appDelegate.subscriptionManager
-                        let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
-                                                                             storePurchaseManager: subscriptionManager.storePurchaseManager(),
-                                                                             subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
-                                                                             authEndpointService: subscriptionManager.authEndpointService)
-                        let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(
-                            subscriptionManager: Application.appDelegate.subscriptionManager,
-                            appStoreRestoreFlow: appStoreRestoreFlow,
-                            uiHandler: Application.appDelegate.subscriptionUIHandler)
-                        await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
+            let sheetActionHandler = SubscriptionAccessActionHandlers(
+                openActivateViaEmailURL: {
+                    let url = Application.appDelegate.subscriptionManager.url(for: .activateViaEmail)
+                    WindowControllersManager.shared.showTab(with: .subscription(url))
+                }, restorePurchases: {
+                    if #available(macOS 12.0, *) {
+                        Task {
+                            let subscriptionManager = Application.appDelegate.subscriptionManager
+                            let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
+                                                                                 storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                                 subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                                                 authEndpointService: subscriptionManager.authEndpointService)
+                            let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(
+                                subscriptionManager: Application.appDelegate.subscriptionManager,
+                                appStoreRestoreFlow: appStoreRestoreFlow,
+                                uiHandler: Application.appDelegate.subscriptionUIHandler)
+                            await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
+                        }
                     }
-                }
-            }, uiActionHandler: handleUIEvent)
+                }, uiActionHandler: handleUIEvent)
+
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,
                                                 sheetActionHandler: sheetActionHandler,
