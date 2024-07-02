@@ -81,7 +81,7 @@ extension ReleaseNotesUserScript {
     @MainActor
     private func initialSetup(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         // Initialize the page right after sending the initial setup result
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.onUpdate()
         }
 
