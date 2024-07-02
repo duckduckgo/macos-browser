@@ -41,8 +41,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     let subscriptionErrorReporter = DefaultSubscriptionErrorReporter()
     let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
     let uiHandler: SubscriptionUIHandling
-//    let appStoreRestoreFlow: AppStoreRestoreFlow
-//    let appStorePurchaseFlow: AppStorePurchaseFlow
 
     public init(subscriptionManager: SubscriptionManager,
                 subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler(),

@@ -1,7 +1,7 @@
 {
   "name": "Verecor",
   "url": "verecor.com",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "addedDatetime": 1677132000000,
   "steps": [
     {
@@ -26,6 +26,7 @@
           "actionType": "extract",
           "id": "59e6d7e7-6159-4414-85ff-5dc7dbf6ddfc",
           "selector": ".search-item",
+          "noResultsSelector": "//div[contains(@class, 'page-404')]//h1[contains(text(), 'Sorry')]",
           "profile": {
             "name": {
               "selector": "h4"

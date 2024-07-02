@@ -33,7 +33,7 @@ public struct SubscriptionUIHandlerMock: SubscriptionUIHandling {
     let didPerformActionCallback: (_ action: UIHandlerMockPerformedAction) -> Void
 
     public init(alertResponse: NSApplication.ModalResponse? = nil,
-         didPerformActionCallback: @escaping (UIHandlerMockPerformedAction) -> Void) {
+                didPerformActionCallback: @escaping (UIHandlerMockPerformedAction) -> Void) {
         self.didPerformActionCallback = didPerformActionCallback
         self.alertResponse = alertResponse
     }

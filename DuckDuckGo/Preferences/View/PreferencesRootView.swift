@@ -148,8 +148,6 @@ enum Preferences {
                         PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .unique)
                     case .restorePurchaseStoreClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
-                    case .addToAnotherDeviceClick:
-                        PixelKit.fire(PrivacyProPixel.privacyProSettingsAddDevice)
                     case .addDeviceEnterEmail:
                         PixelKit.fire(PrivacyProPixel.privacyProAddDeviceEnterEmail)
                     case .activeSubscriptionSettingsClick:
@@ -162,7 +160,11 @@ enum Preferences {
                 }
             }
 
-            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
+            let sheetActionHandler = SubscriptionAccessActionHandlers(openActivateViaEmailURL: {
+                let url = Application.appDelegate.subscriptionManager.url(for: .activateViaEmail)
+                WindowControllersManager.shared.showTab(with: .subscription(url))
+            },
+                                                                      restorePurchases: {
                 if #available(macOS 12.0, *) {
                     Task {
                         let subscriptionManager = Application.appDelegate.subscriptionManager
@@ -177,10 +179,7 @@ enum Preferences {
                         await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
                     }
                 }
-            },
-                                                                      openURLHandler: openURL,
-                                                                      uiActionHandler: handleUIEvent)
-
+            }, uiActionHandler: handleUIEvent)
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,
                                                 sheetActionHandler: sheetActionHandler,

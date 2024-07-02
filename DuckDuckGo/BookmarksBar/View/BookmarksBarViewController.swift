@@ -23,6 +23,7 @@ import Foundation
 
 final class BookmarksBarViewController: NSViewController {
 
+    @IBOutlet weak var importBookmarksButton: NSButton!
     @IBOutlet private var bookmarksBarCollectionView: NSCollectionView!
     @IBOutlet private var clippedItemsIndicator: NSButton!
     @IBOutlet private var promptAnchor: NSView!
@@ -76,6 +77,7 @@ final class BookmarksBarViewController: NSViewController {
             BookmarkPasteboardWriter.bookmarkUTIInternalType,
             FolderPasteboardWriter.folderUTIInternalType
         ])
+        importBookmarksButton.title = UserText.importBookmarks
 
         bookmarksBarCollectionView.delegate = viewModel
         bookmarksBarCollectionView.dataSource = viewModel
@@ -107,6 +109,13 @@ final class BookmarksBarViewController: NSViewController {
     func showBookmarksBarPrompt() {
         BookmarksBarPromptPopover().show(relativeTo: promptAnchor.bounds, of: promptAnchor, preferredEdge: .minY)
         self.bookmarksBarPromptShown = true
+    }
+
+    func userInteraction(prevented: Bool) {
+        bookmarksBarCollectionView.isSelectable = !prevented
+        clippedItemsIndicator.isEnabled = !prevented
+        viewModel.isInteractionPrevented = prevented
+        bookmarksBarCollectionView.reloadData()
     }
 
     private func frameDidChangeNotification() {
@@ -142,6 +151,13 @@ final class BookmarksBarViewController: NSViewController {
                 self?.refreshClippedIndicator()
             }
             .store(in: &cancellables)
+
+        viewModel.$bookmarksBarItems
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] items in
+                self?.importBookmarksButton.isHidden = !items.isEmpty
+            }
+            .store(in: &cancellables)
     }
 
     private func unsubscribeFromEvents() {
@@ -168,6 +184,9 @@ final class BookmarksBarViewController: NSViewController {
     private func refreshFavicons() {
         dispatchPrecondition(condition: .onQueue(.main))
         bookmarksBarCollectionView.reloadData()
+    }
+    @IBAction func importBookmarksClicked(_ sender: Any) {
+        DataImportView().show()
     }
 
     @IBAction
@@ -238,6 +257,7 @@ private extension BookmarksBarViewController {
             openInNewWindow(bookmark: bookmark)
         case .clickItem:
             WindowControllersManager.shared.open(bookmark: bookmark)
+            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
         case .toggleFavorites:
             bookmark.isFavorite.toggle()
             bookmarkManager.update(bookmark: bookmark)
@@ -289,21 +309,25 @@ private extension BookmarksBarViewController {
     func openInNewTab(bookmark: Bookmark) {
         guard let url = bookmark.urlObject else { return }
         tabCollectionViewModel.appendNewTab(with: .url(url, source: .bookmark), selected: true)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func openInNewWindow(bookmark: Bookmark) {
         guard let url = bookmark.urlObject else { return }
         WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func openAllInNewTabs(folder: BookmarkFolder) {
         let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tabs: tabs)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func openAllInNewWindow(folder: BookmarkFolder) {
         let tabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollectionViewModel.burnerMode)
         WindowsManager.openNewWindow(with: tabCollection, isBurner: tabCollectionViewModel.isBurner)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func showSubmenuFor(folder: BookmarkFolder, fromView view: NSView) {
