@@ -18,6 +18,7 @@
 
 import Foundation
 import WebKit
+import PhishingDetection
 
 final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
 
@@ -46,6 +47,18 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
         guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
             assertionFailure("No URL for Private Player scheme handler")
             return
+        }
+
+        if requestURL.isPhishingErrorPage {
+            if let urlString = requestURL.getParameter(named: "url"), let url = URL(string: urlString) {
+                let error = PhishingDetectionError.detected
+                let nsError = NSError(domain: PhishingDetectionError.errorDomain, code: error.errorCode, userInfo: [
+                    NSURLErrorFailingURLErrorKey: url,
+                    NSLocalizedDescriptionKey: error.errorUserInfo[NSLocalizedDescriptionKey] ?? "Phishing detected"
+                ])
+                urlSchemeTask.didFailWithError(nsError)
+                return
+            }
         }
 
         guard requestURL.isDuckPlayer else {

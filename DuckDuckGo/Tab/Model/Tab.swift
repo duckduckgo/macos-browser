@@ -1162,14 +1162,13 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         let url = error.failingUrl ?? navigation.url
         guard navigation.isCurrent else { return }
-
         invalidateInteractionStateData()
 
         if !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
                    // don‘t show an error page if the error was already handled
                    // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
-            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */ {
-
+            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */
+            || error.errorCode == PhishingDetectionError.detected.errorCode {
             self.error = error
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
             if error.errorCode != NSURLErrorServerCertificateUntrusted {
@@ -1197,12 +1196,13 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL, alternate: Bool) {
-        let html = ErrorPageHTMLTemplate(error: error, header: header).makeHTMLFromTemplate()
-        if alternate {
-            webView.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
-        } else {
-            // this should be updated using an error page update script call when (if) we have a dynamic error page content implemented
-            webView.setDocumentHtml(html)
+        if let html = ErrorPageHTMLFactory.makeTemplate(for: error, url: url)?.makeHTMLFromTemplate() {
+            if alternate {
+                webView.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
+            } else {
+                // this should be updated using an error page update script call when (if) we have a dynamic error page content implemented
+                webView.setDocumentHtml(html)
+            }
         }
     }
 

@@ -2534,6 +2534,8 @@
 		CDBB2B2A2C19D2250057B2D8 /* hashPrefixes.json in Resources */ = {isa = PBXBuildFile; fileRef = CDBB2B272C19D2250057B2D8 /* hashPrefixes.json */; };
 		CDBB2B2B2C19D2250057B2D8 /* filterSet.json in Resources */ = {isa = PBXBuildFile; fileRef = CDBB2B282C19D2250057B2D8 /* filterSet.json */; };
 		CDBB2B2C2C19D2250057B2D8 /* filterSet.json in Resources */ = {isa = PBXBuildFile; fileRef = CDBB2B282C19D2250057B2D8 /* filterSet.json */; };
+		CDE4667F2C33FE6700D9418B /* ErrorPageHTMLFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE4667E2C33FE6700D9418B /* ErrorPageHTMLFactory.swift */; };
+		CDE466802C33FE6700D9418B /* ErrorPageHTMLFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE4667E2C33FE6700D9418B /* ErrorPageHTMLFactory.swift */; };
 		D64A5FF82AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */; };
 		D64A5FF92AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */; };
 		EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */; };
@@ -4124,6 +4126,7 @@
 		CDBB2B242C19D1D10057B2D8 /* PhishingDetectionStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhishingDetectionStateManager.swift; sourceTree = "<group>"; };
 		CDBB2B272C19D2250057B2D8 /* hashPrefixes.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = hashPrefixes.json; sourceTree = "<group>"; };
 		CDBB2B282C19D2250057B2D8 /* filterSet.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = filterSet.json; sourceTree = "<group>"; };
+		CDE4667E2C33FE6700D9418B /* ErrorPageHTMLFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorPageHTMLFactory.swift; sourceTree = "<group>"; };
 		D64A5FF72AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeButtonMenuFactory.swift; sourceTree = "<group>"; };
 		EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadUserScript.swift; sourceTree = "<group>"; };
 		EA18D1C9272F0DC8006DC101 /* social_images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = social_images; sourceTree = "<group>"; };
@@ -7905,6 +7908,7 @@
 				B684121B2B6A1D880092F66A /* SSLErrorPageHTMLTemplate.swift */,
 				56BA1E812BAC506F001CF69F /* SpecialErrorPageUserScript.swift */,
 				CD2C47E22BFCF96900D197A9 /* PhishingErrorPageHTMLTemplate.swift */,
+				CDE4667E2C33FE6700D9418B /* ErrorPageHTMLFactory.swift */,
 			);
 			path = ErrorPage;
 			sourceTree = "<group>";
@@ -9653,6 +9657,7 @@
 				3706FA81293F65D500E42796 /* LoginImport.swift in Sources */,
 				560C40002BCD5A1E00F589CE /* PermanentSurveyManager.swift in Sources */,
 				C13909FC2B861039001626ED /* AutofillActionPresenter.swift in Sources */,
+				CDE466802C33FE6700D9418B /* ErrorPageHTMLFactory.swift in Sources */,
 				4BF97AD72B43C53D00EB4240 /* NetworkProtectionIPCTunnelController.swift in Sources */,
 				7BCB90C32C1863BA008E3543 /* VPNControllerXPCClient+ConvenienceInitializers.swift in Sources */,
 				EEC4A66E2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift in Sources */,
@@ -11382,6 +11387,7 @@
 				AAB8203C26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift in Sources */,
 				AAADFD06264AA282001555EA /* TimeIntervalExtension.swift in Sources */,
 				4B6785472AA8DE68008A5004 /* VPNUninstaller.swift in Sources */,
+				CDE4667F2C33FE6700D9418B /* ErrorPageHTMLFactory.swift in Sources */,
 				4B0526642B1D55D80054955A /* VPNFeedbackCategory.swift in Sources */,
 				4B9292D42667123700AD2C21 /* BookmarkListViewController.swift in Sources */,
 				9F56CFB12B843F6C00BB7F11 /* BookmarksDialogViewFactory.swift in Sources */,

@@ -337,7 +337,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         XCTAssertEqual(policy.debugDescription, "cancel")
         let expectedSpecificMessage = PhishingError().specificMessage(for: phishingURLString, eTldPlus1: phishingURLString).escapedUnicodeHtmlString()
         XCTAssertTrue(mockWebView.capturedHTML.contains(expectedSpecificMessage))
-        XCTAssertTrue(phishingStateManager.tabIsPhishing)
+        XCTAssertTrue(phishingStateManager.isShowingPhishingError)
      }
 
     @MainActor func testWhenPhishingDetected_AndVisitSiteClicked_ThenNavigationProceeds() async {
@@ -356,7 +356,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         XCTAssertEqual(policy.debugDescription, "next")
         XCTAssertTrue(mockWebView.reloadCalled)
         XCTAssertTrue(mockWebView.canGoBack)
-        XCTAssertTrue(phishingStateManager.tabIsPhishing)
+        XCTAssertTrue(phishingStateManager.isShowingPhishingError)
      }
 
     @MainActor func testWhenPhishingNotDetected_ThenNavigationProceeds() async {
@@ -373,7 +373,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         // THEN
         XCTAssertEqual(policy.debugDescription, "next")
         XCTAssertFalse(mockWebView.reloadCalled)
-        XCTAssertFalse(phishingStateManager.tabIsPhishing)
+        XCTAssertFalse(phishingStateManager.isShowingPhishingError)
      }
 
 }

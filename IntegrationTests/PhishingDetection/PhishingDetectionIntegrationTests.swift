@@ -57,7 +57,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
         // load the test page
         let url = URL(string: "http://privacy-test-pages.site/")!
         _=await tab.setUrl(url, source: .link)?.result
-        XCTAssertFalse(tab.phishingState.tabIsPhishing)
+        XCTAssertFalse(tab.phishingState.isShowingPhishingError)
     }
 
     @MainActor
@@ -70,7 +70,7 @@ class PhishingDetectionIntegrationTests: XCTestCase {
         // load fake phishing test page - errorPageType = Phishing
         let url = URL(string: "http://privacy-test-pages.site/security/badware/phishing.html")!
         _=await tab.setUrl(url, source: .link)?.result
-        XCTAssertTrue(tab.phishingState.tabIsPhishing)
+        XCTAssertTrue(tab.phishingState.isShowingPhishingError)
     }
 
     @MainActor
@@ -83,9 +83,9 @@ class PhishingDetectionIntegrationTests: XCTestCase {
         // load fake phishing test page - errorPageType = Phishing
         let url = URL(string: "http://privacy-test-pages.site/security/badware/phishing.html")!
         _=await tab.setUrl(url, source: .link)?.result
-        XCTAssertTrue(tab.phishingState.tabIsPhishing)
+        XCTAssertTrue(tab.phishingState.isShowingPhishingError)
         let url2 = URL(string: "http://privacy-test-pages.site/")!
         _=await tab.setUrl(url2, source: .link)?.result
-        XCTAssertFalse(tab.phishingState.tabIsPhishing)
+        XCTAssertFalse(tab.phishingState.isShowingPhishingError)
     }
 }
