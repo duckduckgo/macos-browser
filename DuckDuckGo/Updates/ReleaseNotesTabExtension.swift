@@ -122,9 +122,14 @@ extension ReleaseNotesValues {
         let status: String
         let latestVersion: String
 
-        if let updateController,
-           !updateController.isUpdateBeingLoaded,
-           let latestUpdate = updateController.latestUpdate {
+        guard let updateController, !updateController.isUpdateBeingLoaded else {
+            self.init(status: "loading",
+                      currentVersion: currentVersion,
+                      lastUpdate: lastUpdate)
+            return
+        }
+
+        if let latestUpdate = updateController.latestUpdate {
             status = latestUpdate.isInstalled ? "loaded" : "updateReady"
             latestVersion = "\(latestUpdate.version).\(latestUpdate.build)"
             self.init(status: status,
@@ -135,11 +140,11 @@ extension ReleaseNotesValues {
                       releaseNotes: latestUpdate.releaseNotes,
                       releaseNotesPrivacyPro: latestUpdate.releaseNotesPrivacyPro)
             return
+        } else {
+            self.init(status: "loaded",
+                      currentVersion: currentVersion,
+                      lastUpdate: lastUpdate)
         }
-
-        self.init(status: "loading",
-                  currentVersion: currentVersion,
-                  lastUpdate: lastUpdate)
     }
 
 }
