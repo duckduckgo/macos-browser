@@ -20,8 +20,16 @@ import XCTest
 
 final class OnboardingUITests: XCTestCase {
 
-    func testOnboardingToBrowsing() throws {
+    override func setUpWithError() throws {
         try resetApplicationData()
+    }
+
+    override func tearDownWithError() throws {
+        try resetApplicationData()
+        try runCommand("/usr/bin/defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true")
+    }
+
+    func testOnboardingToBrowsing() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
         app.launchEnvironment["UITEST_MODE"] = "1"
@@ -92,16 +100,20 @@ final class OnboardingUITests: XCTestCase {
         ]
 
         for command in commands {
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/bin/zsh")
-            process.arguments = ["-c", command]
+            try runCommand(command)
+        }
+    }
 
-            try process.run()
-            process.waitUntilExit()
+    func runCommand(_ command: String) throws {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        process.arguments = ["-c", command]
 
-            if process.terminationStatus != 0 {
-                throw NSError(domain: "ProcessErrorDomain", code: Int(process.terminationStatus), userInfo: [NSLocalizedDescriptionKey: "Command failed: \(command)"])
-            }
+        try process.run()
+        process.waitUntilExit()
+
+        if process.terminationStatus != 0 {
+            throw NSError(domain: "ProcessErrorDomain", code: Int(process.terminationStatus), userInfo: [NSLocalizedDescriptionKey: "Command failed: \(command)"])
         }
     }
 
