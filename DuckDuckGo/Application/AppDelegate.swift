@@ -223,7 +223,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             appearancePreferences: .shared,
             internalUserDecider: internalUserDecider,
             configurationStore: ConfigurationStore.shared,
-            privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
+            remoteMessagingAvailabilityProvider: PrivacyConfigurationRemoteMessagingAvailabilityProvider(
+                privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
+            )
         )
         if NSApplication.runType.requiresEnvironment {
             remoteMessagingClient.initializeDatabaseIfNeeded()

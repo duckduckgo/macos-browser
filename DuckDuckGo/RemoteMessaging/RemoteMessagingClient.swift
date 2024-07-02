@@ -40,12 +40,8 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
     let endpoint: URL = Constants.endpoint
     let configurationFetcher: RemoteMessagingConfigFetching
     let configMatcherProvider: RemoteMessagingConfigMatcherProviding
-    let privacyConfigurationManager: PrivacyConfigurationManaging
+    let remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
     private(set) var store: RemoteMessagingStore?
-
-    var isRemoteMessagingEnabled: Bool {
-        privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .remoteMessaging)
-    }
 
     convenience init(
         database: RemoteMessagingDatabase,
@@ -53,7 +49,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         appearancePreferences: AppearancePreferences,
         internalUserDecider: InternalUserDecider,
         configurationStore: ConfigurationStoring,
-        privacyConfigurationManager: PrivacyConfigurationManaging
+        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
     ) {
         let provider = RemoteMessagingConfigMatcherProvider(
             bookmarksDatabase: bookmarksDatabase,
@@ -65,7 +61,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
             internalUserDecider: internalUserDecider,
             configMatcherProvider: provider,
             configurationStore: configurationStore,
-            privacyConfigurationManager: privacyConfigurationManager
+            remoteMessagingAvailabilityProvider: remoteMessagingAvailabilityProvider
         )
     }
 
@@ -74,7 +70,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         internalUserDecider: InternalUserDecider,
         configMatcherProvider: RemoteMessagingConfigMatcherProviding,
         configurationStore: ConfigurationStoring,
-        privacyConfigurationManager: PrivacyConfigurationManaging
+        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
     ) {
         self.database = database
         self.internalUserDecider = internalUserDecider
@@ -83,7 +79,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
             configurationStore: ConfigurationStore.shared
         )
         self.configMatcherProvider = configMatcherProvider
-        self.privacyConfigurationManager = privacyConfigurationManager
+        self.remoteMessagingAvailabilityProvider = remoteMessagingAvailabilityProvider
 
         subscribeToInternalUserFlagChangesIfNeeded()
     }
@@ -127,7 +123,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         store = RemoteMessagingStore(
             database: database.db,
             errorEvents: RemoteMessagingStoreErrorHandling(),
-            privacyConfigurationManager: privacyConfigurationManager
+            remoteMessagingAvailabilityProvider: remoteMessagingAvailabilityProvider
         )
         isRemoteMessagingDatabaseLoaded = true
     }
@@ -137,7 +133,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
             timerCancellable?.cancel()
             return
         }
-        guard isRemoteMessagingEnabled else {
+        guard remoteMessagingAvailabilityProvider.isRemoteMessagingAvailable else {
             timerCancellable?.cancel()
             return
         }
