@@ -23,7 +23,7 @@ import Foundation
 
 final class BookmarksBarViewController: NSViewController {
 
-    @IBOutlet weak var importBookmarksButton: NSButton!
+//    @IBOutlet weak var importBookmarksButton: NSButton!
     @IBOutlet private var bookmarksBarCollectionView: NSCollectionView!
     @IBOutlet private var clippedItemsIndicator: NSButton!
     @IBOutlet private var promptAnchor: NSView!
@@ -77,7 +77,7 @@ final class BookmarksBarViewController: NSViewController {
             BookmarkPasteboardWriter.bookmarkUTIInternalType,
             FolderPasteboardWriter.folderUTIInternalType
         ])
-        importBookmarksButton.title = UserText.importBookmarks
+//        importBookmarksButton.title = UserText.importBookmarks
 
         bookmarksBarCollectionView.delegate = viewModel
         bookmarksBarCollectionView.dataSource = viewModel
@@ -155,7 +155,8 @@ final class BookmarksBarViewController: NSViewController {
         viewModel.$bookmarksBarItems
             .receive(on: DispatchQueue.main)
             .sink { [weak self] items in
-                self?.importBookmarksButton.isHidden = !items.isEmpty
+//                self?.importBookmarksButton.isHidden = !items.isEmpty
+                self?.bookmarksBarCollectionView.isHidden = items.isEmpty
             }
             .store(in: &cancellables)
     }
