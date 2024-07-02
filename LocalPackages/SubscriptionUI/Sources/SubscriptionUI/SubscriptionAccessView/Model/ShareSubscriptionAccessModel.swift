@@ -52,7 +52,9 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         Task {
             if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
                 if #available(macOS 12.0, iOS 15.0, *) {
-                    let appStoreAccountManagementFlow = DefaultAppStoreAccountManagementFlow(subscriptionManager: subscriptionManager)
+                    let appStoreAccountManagementFlow = DefaultAppStoreAccountManagementFlow(authEndpointService: subscriptionManager.authEndpointService,
+                                                                                             storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                                             accountManager: subscriptionManager.accountManager)
                     await appStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
                 }
             }

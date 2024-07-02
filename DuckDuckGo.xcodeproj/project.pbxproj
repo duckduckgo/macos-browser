@@ -2587,6 +2587,8 @@
 		F18826912BC0105800D9AC4F /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
 		F18826922BC0105900D9AC4F /* PixelDataRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */; };
 		F18826932BC0105900D9AC4F /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
+		F19547A92C33FA4C0041ACC9 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = F19547A82C33FA4C0041ACC9 /* Subscription */; };
+		F19547AB2C33FA650041ACC9 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = F19547AA2C33FA650041ACC9 /* Subscription */; };
 		F198C7122BD18A28000BF24D /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F198C7112BD18A28000BF24D /* PixelKit */; };
 		F198C7142BD18A30000BF24D /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F198C7132BD18A30000BF24D /* PixelKit */; };
 		F198C7162BD18A44000BF24D /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F198C7152BD18A44000BF24D /* PixelKit */; };
@@ -2597,7 +2599,6 @@
 		F198C7202BD18D92000BF24D /* SwiftLintTool in Frameworks */ = {isa = PBXBuildFile; productRef = F198C71F2BD18D92000BF24D /* SwiftLintTool */; };
 		F1AFDBD22C231B7A00710F2C /* SubscriptionAppStoreRestorerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFDBD12C231B7A00710F2C /* SubscriptionAppStoreRestorerTests.swift */; };
 		F1AFDBD42C231B9700710F2C /* SubscriptionErrorReporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFDBD32C231B9700710F2C /* SubscriptionErrorReporterTests.swift */; };
-		F1AFDBD62C2321D600710F2C /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F1AFDBD52C2321D600710F2C /* PixelKit */; };
 		F1AFDBD72C23221700710F2C /* SubscriptionErrorReporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFDBD32C231B9700710F2C /* SubscriptionErrorReporterTests.swift */; };
 		F1AFDBD92C23221700710F2C /* SubscriptionAppStoreRestorerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AFDBD12C231B7A00710F2C /* SubscriptionAppStoreRestorerTests.swift */; };
 		F1B33DF22BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B33DF12BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift */; };
@@ -2652,9 +2653,7 @@
 		F1DA51972BF6083A00CF29FA /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */; };
 		F1DA51982BF6083B00CF29FA /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */; };
 		F1DA51992BF6083B00CF29FA /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */; };
-		F1DA51A32BF6114200CF29FA /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = F1DA51A22BF6114200CF29FA /* Subscription */; };
 		F1DA51A52BF6114200CF29FA /* SubscriptionTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F1DA51A42BF6114200CF29FA /* SubscriptionTestingUtilities */; };
-		F1DA51A72BF6114B00CF29FA /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = F1DA51A62BF6114B00CF29FA /* Subscription */; };
 		F1DA51A92BF6114C00CF29FA /* SubscriptionTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F1DA51A82BF6114C00CF29FA /* SubscriptionTestingUtilities */; };
 		F1DF95E32BD1807C0045E591 /* Crashes in Frameworks */ = {isa = PBXBuildFile; productRef = 08D4923DC968236E22E373E2 /* Crashes */; };
 		F1DF95E42BD1807C0045E591 /* Crashes in Frameworks */ = {isa = PBXBuildFile; productRef = 537FC71EA5115A983FAF3170 /* Crashes */; };
@@ -4132,7 +4131,6 @@
 		F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift"; sourceTree = "<group>"; };
 		F118EA842BEACC7000F77634 /* NonStandardPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonStandardPixel.swift; sourceTree = "<group>"; };
 		F1476FBF2C1359FB00EAE46A /* SubscriptionUIHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionUIHandler.swift; sourceTree = "<group>"; };
-		F16F92872C2AC5E40007C93E /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPixel.swift; sourceTree = "<group>"; };
 		F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyProPixel.swift; sourceTree = "<group>"; };
 		F18826832BBEE31700D9AC4F /* PixelKit+Assertion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PixelKit+Assertion.swift"; sourceTree = "<group>"; };
@@ -4204,10 +4202,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				3706FE88293F661700E42796 /* OHHTTPStubs in Frameworks */,
+				F19547AB2C33FA650041ACC9 /* Subscription in Frameworks */,
 				F116A7C72BD1925500F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CF2B316E0200A595BB /* SnapshotTesting in Frameworks */,
 				F1DA51A52BF6114200CF29FA /* SubscriptionTestingUtilities in Frameworks */,
-				F1DA51A32BF6114200CF29FA /* Subscription in Frameworks */,
 				3706FE89293F661700E42796 /* OHHTTPStubsSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4406,11 +4404,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				B6DA44172616C13800DD1EC2 /* OHHTTPStubs in Frameworks */,
+				F19547A92C33FA4C0041ACC9 /* Subscription in Frameworks */,
 				F116A7C32BD1924B00F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CB2B316DF100A595BB /* SnapshotTesting in Frameworks */,
-				F1AFDBD62C2321D600710F2C /* PixelKit in Frameworks */,
 				F1DA51A92BF6114C00CF29FA /* SubscriptionTestingUtilities in Frameworks */,
-				F1DA51A72BF6114B00CF29FA /* Subscription in Frameworks */,
 				B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6567,7 +6564,6 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				F16F92872C2AC5E40007C93E /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -8411,8 +8407,8 @@
 				3706FDD8293F661700E42796 /* OHHTTPStubsSwift */,
 				B65CD8CE2B316E0200A595BB /* SnapshotTesting */,
 				F116A7C62BD1925500F3FCF7 /* PixelKitTestingUtilities */,
-				F1DA51A22BF6114200CF29FA /* Subscription */,
 				F1DA51A42BF6114200CF29FA /* SubscriptionTestingUtilities */,
+				F19547AA2C33FA650041ACC9 /* Subscription */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = 3706FE99293F661700E42796 /* Unit Tests App Store.xctest */;
@@ -8814,9 +8810,8 @@
 				B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */,
 				B65CD8CA2B316DF100A595BB /* SnapshotTesting */,
 				F116A7C22BD1924B00F3FCF7 /* PixelKitTestingUtilities */,
-				F1DA51A62BF6114B00CF29FA /* Subscription */,
 				F1DA51A82BF6114C00CF29FA /* SubscriptionTestingUtilities */,
-				F1AFDBD52C2321D600710F2C /* PixelKit */,
+				F19547A82C33FA4C0041ACC9 /* Subscription */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */;
@@ -13058,8 +13053,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 160.0.0;
+				branch = fcappelli/subscription_refactoring_5;
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -13686,6 +13681,16 @@
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = PixelKitTestingUtilities;
 		};
+		F19547A82C33FA4C0041ACC9 /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
+		F19547AA2C33FA650041ACC9 /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
 		F198C7112BD18A28000BF24D /* PixelKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
@@ -13726,11 +13731,6 @@
 			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
 			productName = SwiftLintTool;
 		};
-		F1AFDBD52C2321D600710F2C /* PixelKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = PixelKit;
-		};
 		F1D0428D2BFB9F9C00A31506 /* Subscription */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
@@ -13751,20 +13751,10 @@
 			package = F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */;
 			productName = BareBonesBrowserKit;
 		};
-		F1DA51A22BF6114200CF29FA /* Subscription */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = Subscription;
-		};
 		F1DA51A42BF6114200CF29FA /* SubscriptionTestingUtilities */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = SubscriptionTestingUtilities;
-		};
-		F1DA51A62BF6114B00CF29FA /* Subscription */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = Subscription;
 		};
 		F1DA51A82BF6114C00CF29FA /* SubscriptionTestingUtilities */ = {
 			isa = XCSwiftPackageProductDependency;

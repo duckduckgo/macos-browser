@@ -247,8 +247,11 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                                                                  storePurchaseManager: subscriptionManager.storePurchaseManager(),
                                                                  subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
                                                                  authEndpointService: subscriptionManager.authEndpointService)
-            let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionManager: subscriptionManager,
-                                                            appStoreRestoreFlow: appStoreRestoreFlow)
+            let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                                   storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                   accountManager: subscriptionManager.accountManager,
+                                                                   appStoreRestoreFlow: appStoreRestoreFlow,
+                                                                   authEndpointService: subscriptionManager.authEndpointService)
             let vc = DebugPurchaseViewController(storePurchaseManager: storePurchaseManager, appStorePurchaseFlow: appStorePurchaseFlow)
             currentViewController()?.presentAsSheet(vc)
         }

@@ -208,8 +208,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                                                                      storePurchaseManager: subscriptionManager.storePurchaseManager(),
                                                                      subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
                                                                      authEndpointService: subscriptionManager.authEndpointService)
-                let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionManager: subscriptionManager,
-                                                                       appStoreRestoreFlow: appStoreRestoreFlow)
+                let appStorePurchaseFlow = DefaultAppStorePurchaseFlow(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                                       storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                       accountManager: subscriptionManager.accountManager,
+                                                                       appStoreRestoreFlow: appStoreRestoreFlow,
+                                                                       authEndpointService: subscriptionManager.authEndpointService)
 
                 os_log(.info, log: .subscription, "[Purchase] Purchasing")
                 switch await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
