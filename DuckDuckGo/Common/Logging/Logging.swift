@@ -42,7 +42,6 @@ extension OSLog {
         case duckPlayer = "Duck Player"
         case tabSnapshots = "Tab Snapshots"
         case sync = "Sync"
-        case networkProtection = "VPN"
         case dbp = "dbp"
     }
 
@@ -70,7 +69,6 @@ extension OSLog {
     @OSLogWrapper(AppCategories.duckPlayer) static var duckPlayer
     @OSLogWrapper(AppCategories.tabSnapshots) static var tabSnapshots
     @OSLogWrapper(AppCategories.sync) static var sync
-    @OSLogWrapper(AppCategories.networkProtection) static var networkProtection
     @OSLogWrapper(AppCategories.dbp) static var dbp
 
     // Debug->Logging categories will only be enabled for one day

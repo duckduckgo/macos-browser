@@ -138,6 +138,33 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - PacketTunnelProvider.Event reporting
 
+    private static func log(_ step: AttemptStep, named name: String, log: OSLog) {
+        switch step {
+        case .begin:
+            os_log("🔵 %{public}@ attempt begins", log: log, type: .info, name)
+        case .failure(let error):
+            os_log("🔴 %{public}@ attempt failed with error: %{public}@", log: log, type: .error, name, error.localizedDescription)
+        case .success:
+            os_log("🟢 %{public}@ attempt succeeded", log: log, type: .info, name)
+        }
+    }
+
+    private static func log(_ step: FailureRecoveryStep, log: OSLog) {
+        switch step {
+        case .started:
+            os_log("🔵 Failure Recovery attempt started", log: log, type: .info)
+        case .failed(let error):
+            os_log("🔴 Failure Recovery attempt failed with error: %{public}@", log: log, type: .error, error.localizedDescription)
+        case .completed(let health):
+            switch health {
+            case .healthy:
+                os_log("🟢 Failure Recovery attempt completed", log: log, type: .info)
+            case .unhealthy:
+                os_log("🔴 Failure Recovery attempt ended as unhealthy", log: log, type: .error)
+            }
+        }
+    }
+
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
 
 #if NETP_SYSTEM_EXTENSION
@@ -200,6 +227,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .rekeyAttempt(let step):
+            log(step, named: "Rekey", log: .networkProtectionKeyManagement)
+
             switch step {
             case .begin:
                 PixelKit.fire(
@@ -218,6 +247,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelStartAttempt(let step):
+            log(step, named: "Tunnel Start", log: .networkProtection)
+
             switch step {
             case .begin:
                 PixelKit.fire(
@@ -236,6 +267,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelStopAttempt(let step):
+            log(step, named: "Tunnel Stop", log: .networkProtection)
+
             switch step {
             case .begin:
                 PixelKit.fire(
@@ -254,6 +287,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelUpdateAttempt(let step):
+            log(step, named: "Tunnel Update", log: .networkProtection)
+
             switch step {
             case .begin:
                 PixelKit.fire(
@@ -272,6 +307,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelWakeAttempt(let step):
+            log(step, named: "Tunnel Wake", log: .networkProtectionSleepLog)
+
             switch step {
             case .begin:
                 PixelKit.fire(
@@ -290,6 +327,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .failureRecoveryAttempt(let step):
+            log(step, log: .networkProtectionServerFailureRecoveryLog)
+
             switch step {
             case .started:
                 PixelKit.fire(
@@ -317,6 +356,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 )
             }
         case .serverMigrationAttempt(let step):
+            log(step, named: "Server Migration", log: .networkProtection)
+
             switch step {
             case .begin:
                 PixelKit.fire(
