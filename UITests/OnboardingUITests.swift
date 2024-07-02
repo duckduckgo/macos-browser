@@ -24,7 +24,7 @@ final class OnboardingUITests: XCTestCase {
         try resetApplicationData()
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchEnvironment["UITEST_MODE"] = "1"
+        app.launchEnvironment["UITEST_MODE_ONBOARDING"] = "1"
         app.launch()
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
         app.typeKey("n", modifierFlags: .command)

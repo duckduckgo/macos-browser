@@ -30,12 +30,13 @@ extension NSApplication {
         case unitTests
         case integrationTests
         case uiTests
+        case uiTestsOnboarding
         case xcPreviews
 
         /// Defines if app run type requires loading full environment, i.e. databases, saved state, keychain etc.
         var requiresEnvironment: Bool {
             switch self {
-            case .normal, .integrationTests, .uiTests:
+            case .normal, .integrationTests, .uiTests, .uiTestsOnboarding:
                 return true
             case .unitTests, .xcPreviews:
                 return false
@@ -55,6 +56,8 @@ extension NSApplication {
             }
         } else if ProcessInfo().environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
             return .xcPreviews
+        } else if ProcessInfo.processInfo.environment["UITEST_MODE_ONBOARDING"] == "1"{
+            return .uiTestsOnboarding
         } else if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
             return .uiTests
         } else {
