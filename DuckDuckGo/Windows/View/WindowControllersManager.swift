@@ -57,6 +57,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
         return mainWindowControllers.first(where: {
             let isMain = $0.window?.isMainWindow ?? false
             let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
+
             return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
         })
     }
@@ -136,14 +137,11 @@ extension WindowControllersManager {
         } else {
             show(url: url, source: .bookmark)
         }
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func show(url: URL?, source: Tab.TabContent.URLSource, newTab: Bool = false) {
         let nonPopupMainWindowControllers = mainWindowControllers.filter { $0.window?.isPopUpWindow == false }
-        if source == .bookmark {
-            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-        }
+
         // If there is a main window, open the URL in it
         if let windowController = nonPopupMainWindowControllers.first(where: { $0.window?.isMainWindow == true })
             // If a last key window is available, open the URL in it
@@ -288,31 +286,4 @@ extension WindowControllersManager {
         })
     }
 
-}
-
-extension WindowControllersManager: OnboardingNavigating {
-    @MainActor
-    func updatePreventUserInteraction(prevent: Bool) {
-        mainWindowController?.userInteraction(prevented: prevent)
-    }
-
-    @MainActor
-    func showImportDataView() {
-        DataImportView().show()
-    }
-
-    @MainActor
-    func replaceTabWith(_ tab: Tab) {
-        guard let tabToRemove = selectedTab else { return }
-        guard let index = mainWindowController?.mainViewController.tabCollectionViewModel.indexInAllTabs(of: tabToRemove) else { return }
-        mainWindowController?.mainViewController.tabCollectionViewModel.append(tab: tab)
-        mainWindowController?.mainViewController.tabCollectionViewModel.remove(at: index)
-    }
-
-    @MainActor
-    func focusOnAddressBar() {
-        guard let mainVC = lastKeyMainWindowController?.mainViewController else { return }
-        mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.stringValue = ""
-        mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
-    }
 }

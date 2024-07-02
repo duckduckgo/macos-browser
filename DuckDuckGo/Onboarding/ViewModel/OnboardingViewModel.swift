@@ -80,7 +80,12 @@ final class OnboardingViewModel: ObservableObject {
                 OnboardingViewModel.isOnboardingFinished = true
                 return true
             }
-
+            guard let tabsContent = (WindowsManager.mainWindows.first?.contentViewController as? MainViewController)?.tabCollectionViewModel.tabs.map(\.content) else { return false }
+            if !tabsContent.isEmpty, tabsContent != [.newtab] {
+                // there‘s some tabs content not equal to the new tab page: it means there‘s a session restored
+                OnboardingViewModel.isOnboardingFinished = true
+                return true
+            }
             return false
         }
         set {

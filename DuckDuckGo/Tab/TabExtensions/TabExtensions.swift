@@ -201,10 +201,6 @@ extension TabExtensionsBuilder {
                                   scriptsPublisher: userScripts.compactMap { $0 })
         }
 
-        add {
-            OnboardingTabExtension()
-        }
-
         if let tunnelController = dependencies.tunnelController {
             add {
                 NetworkProtectionControllerTabExtension(tunnelController: tunnelController)

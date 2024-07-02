@@ -60,8 +60,7 @@ final class StatisticsLoader {
                         completion()
                     }
                 }
-                PixelExperiment.fireSerpPixel()
-                PixelExperiment.fireOnboardingSearchPerformed5to7Pixel()
+                PixelKit.fire(GeneralPixel.serp)
                 self.fireDailyOsVersionCounterPixel()
                 self.fireDockPixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {

@@ -47,6 +47,10 @@ extension URL {
         return url.addingTimestamp(timestamp)
     }
 
+    var isDuckURLScheme: Bool {
+        navigationalScheme == .duck
+    }
+
     /**
      * Returns true if a URL represents a Private Player URL.
      *

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -64,7 +64,6 @@
         <collectionViewItem id="mo5-Bi-OJI" customClass="BookmarksBarCollectionViewItem" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
             <connections>
                 <outlet property="faviconView" destination="aEY-jN-qvL" id="vuC-Cm-ECU"/>
-                <outlet property="mouseOverView" destination="IHK-ff-XkT" id="bZ1-cF-QUA"/>
                 <outlet property="titleLabel" destination="fMp-kj-J3A" id="Sxw-1t-GqZ"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="Zhf-KI-eAw"/>
             </connections>

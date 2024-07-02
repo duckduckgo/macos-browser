@@ -25,6 +25,7 @@ protocol BookmarksBarViewModelDelegate: AnyObject {
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem)
     func bookmarksBarViewModelWidthForContainer() -> CGFloat
     func bookmarksBarViewModelReloadedData()
+
 }
 
 final class BookmarksBarViewModel: NSObject {
@@ -70,7 +71,6 @@ final class BookmarksBarViewModel: NSObject {
     }
 
     weak var delegate: BookmarksBarViewModelDelegate?
-    var isInteractionPrevented = false
 
     private let bookmarkManager: BookmarkManager
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -90,7 +90,6 @@ final class BookmarksBarViewModel: NSObject {
         return calculationLabel
     }()
 
-    @Published
     private(set) var bookmarksBarItems: [BookmarksBarItem] = [] {
         didSet {
             let itemsWidth = bookmarksBarItems.reduce(CGFloat(0)) { total, item in
@@ -328,7 +327,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 
         let bookmarksBarItem = bookmarksBarItems[indexPath.item]
         bookmarksCollectionViewItem.delegate = self
-        bookmarksCollectionViewItem.updateItem(from: bookmarksBarItem.entity, isInteractionPrevented: isInteractionPrevented)
+        bookmarksCollectionViewItem.updateItem(from: bookmarksBarItem.entity)
 
         return bookmarksCollectionViewItem
     }

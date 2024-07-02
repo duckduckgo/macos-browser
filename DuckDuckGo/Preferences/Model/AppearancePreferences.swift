@@ -69,13 +69,7 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
     }
 
     @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .right)
-    var homeButtonPosition: HomeButtonPosition {
-        didSet {
-            if homeButtonPosition != .hidden {
-                PixelExperiment.fireOnboardingHomeButtonEnabledPixel()
-            }
-        }
-    }
+    var homeButtonPosition: HomeButtonPosition
 }
 
 enum HomeButtonPosition: String, CaseIterable {
@@ -200,9 +194,6 @@ final class AppearancePreferences: ObservableObject {
         didSet {
             persistor.showBookmarksBar = showBookmarksBar
             NotificationCenter.default.post(name: Notifications.showBookmarksBarSettingChanged, object: nil)
-            if showBookmarksBar {
-                PixelExperiment.fireOnboardingBookmarksBarShownPixel()
-            }
         }
     }
     @Published var bookmarksBarAppearance: BookmarksBarAppearance {

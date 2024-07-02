@@ -49,14 +49,7 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var burnerWindowBackgroundView: NSImageView!
 
     @IBOutlet weak var addTabButton: MouseOverButton!
-
-    var footerAddButton: MouseOverButton?
     let tabCollectionViewModel: TabCollectionViewModel
-    var isInteractionPrevented: Bool = false {
-        didSet {
-            footerAddButton?.isEnabled = !isInteractionPrevented
-        }
-    }
 
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     private let pinnedTabsViewModel: PinnedTabsViewModel?
@@ -882,7 +875,6 @@ extension TabBarViewController: NSCollectionViewDataSource {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
             footer.toolTip = UserText.newTabTooltip
-            self.footerAddButton = footer.addButton
         }
 
         return view

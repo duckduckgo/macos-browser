@@ -206,7 +206,7 @@ final class MainViewController: NSViewController {
     }
 
     func showBookmarkPromptIfNeeded() {
-        guard !bookmarksBarViewController.bookmarksBarPromptShown, OnboardingActionsManager.isOnboardingFinished else { return }
+        guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
         if bookmarksBarIsVisible {
             // Don't show this to users who obviously know about the bookmarks bar already
             bookmarksBarViewController.bookmarksBarPromptShown = true

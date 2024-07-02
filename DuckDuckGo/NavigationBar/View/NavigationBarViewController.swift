@@ -267,7 +267,6 @@ final class NavigationBarViewController: NSViewController {
             return
         }
         selectedTabViewModel.tab.openHomePage()
-        PixelExperiment.fireOnboardingHomeButtonUsed5to7Pixel()
     }
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {

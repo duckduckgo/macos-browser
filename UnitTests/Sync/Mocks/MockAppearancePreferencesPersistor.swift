@@ -19,7 +19,7 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
+struct MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
 
     var homeButtonPosition: HomeButtonPosition = .hidden
 
