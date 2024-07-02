@@ -724,6 +724,13 @@ protocol NewWindowPolicyDecisionMaker {
     func startOnboarding() {
         userInteractionDialog = nil
 
+#if DEBUG || REVIEW
+        if Application.runType == .uiTestsOnboarding {
+            setContent(.onboarding)
+            return
+        }
+#endif
+
         if PixelExperiment.cohort == .newOnboarding {
             setContent(.onboarding)
         } else {
