@@ -182,6 +182,7 @@ final class HomePageViewController: NSViewController {
         return .init(open: { [weak self] bookmark, target in
             guard let urlObject = bookmark.urlObject else { return }
             self?.openUrl(urlObject, target: target)
+            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
         }, removeFavorite: { [weak self] bookmark in
             bookmark.isFavorite = !bookmark.isFavorite
             self?.bookmarkManager.update(bookmark: bookmark)

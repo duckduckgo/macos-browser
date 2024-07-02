@@ -89,11 +89,12 @@ private extension Tab.TabContent {
         case preferences = 1
         case bookmarks = 2
         case newtab = 3
-        case onboarding = 4
+        case onboardingDeprecated = 4
         case duckPlayer = 5
         case dataBrokerProtection = 6
         case subscription = 7
         case identityTheftRestoration = 8
+        case onboarding = 9
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -108,8 +109,8 @@ private extension Tab.TabContent {
             self = .bookmarks
         case .preferences:
             self = .settings(pane: preferencePane)
-        case .onboarding:
-            self = .onboarding
+        case .onboardingDeprecated:
+            self = .onboardingDeprecated
         case .duckPlayer:
             guard let videoID = videoID else { return nil }
             self = .url(.duckPlayer(videoID, timestamp: timestamp), source: .pendingStateRestoration)
@@ -121,6 +122,8 @@ private extension Tab.TabContent {
         case .identityTheftRestoration:
             guard let url = url else { return nil }
             self = .identityTheftRestoration(url)
+        case .onboarding:
+            self = .onboarding
         }
     }
 
@@ -130,6 +133,7 @@ private extension Tab.TabContent {
         case .newtab: return .newtab
         case .bookmarks: return .bookmarks
         case .settings: return .preferences
+        case .onboardingDeprecated: return .onboardingDeprecated
         case .onboarding: return .onboarding
         case .none: return .newtab
         case .dataBrokerProtection: return .dataBrokerProtection

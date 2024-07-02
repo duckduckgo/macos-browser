@@ -467,7 +467,7 @@ final class BrowserTabViewController: NSViewController {
              .url(_, _, source: .reload):
             return true
 
-        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .onboarding, .identityTheftRestoration:
+        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .onboardingDeprecated, .onboarding, .identityTheftRestoration:
             return true
 
         case .none:
@@ -486,9 +486,9 @@ final class BrowserTabViewController: NSViewController {
         case .newtab:
             // don‘t steal focus from the address bar at .newtab page
             return
-        case .onboarding:
+        case .onboardingDeprecated:
             getView = { [weak self] in self?.transientTabContentViewController?.view }
-        case .url, .subscription, .identityTheftRestoration:
+        case .url, .subscription, .identityTheftRestoration, .onboarding:
             getView = { [weak self] in self?.webView }
         case .settings:
             getView = { [weak self] in self?.preferencesViewController?.view }
@@ -577,7 +577,6 @@ final class BrowserTabViewController: NSViewController {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func showTabContent(of tabViewModel: TabViewModel?) {
         guard tabCollectionViewModel.allTabsCount > 0 else {
             view.window?.performClose(self)
@@ -594,28 +593,20 @@ final class BrowserTabViewController: NSViewController {
             addAndLayoutChild(bookmarksViewControllerCreatingIfNeeded())
 
         case let .settings(pane):
-            let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
-            if preferencesViewController.parent !== self {
-                removeAllTabContent()
-            }
-            if let pane = pane, preferencesViewController.model.selectedPane != pane {
-                preferencesViewController.model.selectPane(pane)
-            }
-            if preferencesViewController.parent !== self {
-                addAndLayoutChild(preferencesViewController)
-            }
-        case .onboarding:
+            showTabContentForSettings(pane: pane)
+        case .onboardingDeprecated:
             removeAllTabContent()
             if !OnboardingViewModel.isOnboardingFinished {
                 requestDisableUI()
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
+        case .onboarding:
+            removeAllTabContent()
+            updateTabIfNeeded(tabViewModel: tabViewModel)
+
         case .url, .subscription, .identityTheftRestoration:
-            if shouldReplaceWebView(for: tabViewModel) {
-                removeAllTabContent(includingWebView: true)
-                changeWebView(tabViewModel: tabViewModel)
-            }
+            updateTabIfNeeded(tabViewModel: tabViewModel)
 
         case .newtab:
             removeAllTabContent()
@@ -630,6 +621,26 @@ final class BrowserTabViewController: NSViewController {
 #endif
         default:
             removeAllTabContent()
+        }
+    }
+
+    func updateTabIfNeeded(tabViewModel: TabViewModel?) {
+        if shouldReplaceWebView(for: tabViewModel) {
+            removeAllTabContent(includingWebView: true)
+            changeWebView(tabViewModel: tabViewModel)
+        }
+    }
+
+    func showTabContentForSettings(pane: PreferencePaneIdentifier?) {
+        let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
+        if preferencesViewController.parent !== self {
+            removeAllTabContent()
+        }
+        if let pane = pane, preferencesViewController.model.selectedPane != pane {
+            preferencesViewController.model.selectPane(pane)
+        }
+        if preferencesViewController.parent !== self {
+            addAndLayoutChild(preferencesViewController)
         }
     }
 

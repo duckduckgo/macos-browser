@@ -341,10 +341,15 @@ extension URL {
     }
 
     var isExternalSchemeLink: Bool {
-        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript].contains(navigationalScheme)
+        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript, .duck].contains(navigationalScheme)
     }
 
     // MARK: - DuckDuckGo
+
+    static var onboarding: URL {
+        let onboardingUrlString = "duck://onboarding"
+        return URL(string: onboardingUrlString)!
+    }
 
     static var duckDuckGo: URL {
         let duckDuckGoUrlString = "https://duckduckgo.com/"

@@ -73,9 +73,6 @@ final class MockAccountManager: AccountManager {
         .success(AccountDetails(email: "", externalID: ""))
     }
 
-    func refreshSubscriptionAndEntitlements() async {
-    }
-
     func checkForEntitlements(wait waitTime: Double, retry retryCount: Int) async -> Bool {
         true
     }
