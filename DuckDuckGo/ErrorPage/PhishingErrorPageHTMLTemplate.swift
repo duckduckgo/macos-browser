@@ -21,7 +21,7 @@ import ContentScopeScripts
 import WebKit
 import Common
 
-struct PhishingErrorPageHTMLTemplate {
+struct PhishingErrorPageHTMLTemplate: ErrorPageHTMLTemplating {
     let domain: String
     let tld = TLD()
 

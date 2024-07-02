@@ -19,16 +19,13 @@
 import Foundation
 
 public protocol PhishingTabStateManaging {
-    var tabIsPhishing: Bool { get }
-    func setIsPhishing(_ isPhishing: Bool)
+    var didBypassError: Bool { get set }
+    var isShowingPhishingError: Bool { get set }
 }
 
 public class PhishingTabStateManager: PhishingTabStateManaging {
-    public var tabIsPhishing: Bool = false
+    public var didBypassError: Bool = false
+    public var isShowingPhishingError: Bool = false
 
     public init(){}
-
-    public func setIsPhishing(_ isPhishing: Bool) {
-        tabIsPhishing = isPhishing
-    }
 }

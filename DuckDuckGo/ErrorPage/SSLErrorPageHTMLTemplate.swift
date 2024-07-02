@@ -21,7 +21,7 @@ import ContentScopeScripts
 import WebKit
 import Common
 
-struct ErrorPageHTMLTemplate {
+struct ErrorPageHTMLTemplate: ErrorPageHTMLTemplating {
 
     static var htmlTemplatePath: String {
         guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/errorpage") else {
@@ -45,7 +45,7 @@ struct ErrorPageHTMLTemplate {
 
 }
 
-struct SSLErrorPageHTMLTemplate {
+struct SSLErrorPageHTMLTemplate: ErrorPageHTMLTemplating {
     let domain: String
     let errorCode: Int
     let tld = TLD()

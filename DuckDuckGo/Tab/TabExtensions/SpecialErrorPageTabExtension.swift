@@ -85,13 +85,6 @@ final class SpecialErrorPageTabExtension {
     }
 
     @MainActor
-    private func loadPhishingErrorHTML(url: URL) {
-        let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-        let html = PhishingErrorPageHTMLTemplate(domain: domain).makeHTMLFromTemplate()
-        webView?.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
-    }
-
-    @MainActor
     private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL, alternate: Bool) {
         let html = ErrorPageHTMLTemplate(error: error, header: header).makeHTMLFromTemplate()
         loadHTML(html: html, url: url, alternate: alternate)
@@ -112,17 +105,18 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let url = navigationAction.url
-        if phishingUrlExemptions.contains(url.absoluteString) || url.isDuckDuckGo || url.isDuckURLScheme {
+        self.phishingStateManager.didBypassError = phishingUrlExemptions.contains(url.absoluteString)
+        if self.phishingStateManager.didBypassError || url.isDuckDuckGo || url.isDuckURLScheme {
             return .next
         }
         // Check the URL
         let isMalicious = await phishingDetector.checkIsMaliciousIfEnabled(url: url)
-        self.phishingStateManager.setIsPhishing(isMalicious)
+        self.phishingStateManager.isShowingPhishingError = isMalicious
         if isMalicious {
             errorPageType = .phishing
             specialErrorPageUserScript?.failingURL = navigationAction.url
-            loadPhishingErrorHTML(url: navigationAction.url)
-            return .cancel
+            return .redirect(navigationAction.mainFrameTarget!) { navigator in navigator.load(URLRequest(url: URL(string: "duck://error?reason=phishing&url=\(navigationAction.url.absoluteString)")!))
+            }
         }
         errorPageType = nil
         return .next
@@ -178,6 +172,8 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
         if errorPageType == .phishing {
             if let urlString = webView?.url?.absoluteString {
                 phishingUrlExemptions.insert(urlString)
+                self.phishingStateManager.didBypassError = true
+                self.phishingStateManager.isShowingPhishingError = false
             }
         } else if errorPageType == .ssl {
             shouldBypassSSLError = true

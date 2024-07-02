@@ -112,8 +112,7 @@ final class PrivacyDashboardTabExtension {
         // Avoid hitting the API if the URL is not valid (i.e. user typing)
         guard url.isValid else { return }
         guard !(url.isDuckURLScheme || url.isDuckDuckGo) else { return }
-        let malicious = phishingStateManager.tabIsPhishing
-        self.phishingStateManager.setIsPhishing(malicious)
+        let malicious = phishingStateManager.didBypassError
         await MainActor.run {
             self.privacyInfo?.isPhishing = malicious
         }
@@ -144,7 +143,7 @@ extension PrivacyDashboardTabExtension {
         privacyInfo = PrivacyInfo(url: url,
                                   parentEntity: entity,
                                   protectionStatus: makeProtectionStatus(for: host),
-                                  isPhishing: self.phishingStateManager.tabIsPhishing)
+                                  isPhishing: self.phishingStateManager.didBypassError)
 
         previousPrivacyInfosByURL[url.absoluteString] = privacyInfo
 
@@ -189,7 +188,7 @@ extension PrivacyDashboardTabExtension: NavigationResponder {
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         resetConnectionUpgradedTo(navigationAction: navigationAction)
         let url = navigationAction.url
-        let malicious = phishingStateManager.tabIsPhishing
+        let malicious = phishingStateManager.didBypassError
         await MainActor.run {
             self.privacyInfo?.isPhishing = malicious
         }
