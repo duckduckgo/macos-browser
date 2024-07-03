@@ -45,6 +45,7 @@ final class UserScripts: UserScriptsProvider {
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
     let specialErrorPageUserScript: SpecialErrorPageUserScript?
+    let onboardingUserScript: OnboardingUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript()
@@ -65,6 +66,8 @@ final class UserScripts: UserScriptsProvider {
         autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
         specialErrorPageUserScript = SpecialErrorPageUserScript()
+
+        onboardingUserScript = OnboardingUserScript(onboardingActionsManager: sourceProvider.onboardingActionsManager!)
 
         specialPages = SpecialPagesUserScript()
 
@@ -92,11 +95,16 @@ final class UserScripts: UserScriptsProvider {
             if let youtubePlayerUserScript {
                 specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
             }
+            if let onboardingUserScript {
+                specialPages.registerSubfeature(delegate: onboardingUserScript)
+            }
             userScripts.append(specialPages)
         }
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: Application.appDelegate.subscriptionManager,
+            let subscriptionManager = Application.appDelegate.subscriptionManager
+            let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
+                                                                   stripePurchaseFlow: DefaultStripePurchaseFlow(subscriptionManager: subscriptionManager),
                                                                    uiHandler: Application.appDelegate.subscriptionUIHandler)
             subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
             userScripts.append(subscriptionPagesUserScript)

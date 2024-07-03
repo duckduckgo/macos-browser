@@ -207,6 +207,10 @@ extension TabExtensionsBuilder {
                                   phishingStateManager: dependencies.phishingStateManager)
         }
 
+        add {
+            OnboardingTabExtension()
+        }
+
         if let tunnelController = dependencies.tunnelController {
             add {
                 NetworkProtectionControllerTabExtension(tunnelController: tunnelController)

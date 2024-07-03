@@ -223,7 +223,7 @@ class AddressBarTests: XCTestCase {
 
     @MainActor
     func testWhenRestoringToOnboarding_addressBarIsNotActive() async throws {
-        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .onboarding, privacyFeatures: privacyFeaturesMock)]))
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .onboardingDeprecated, privacyFeatures: privacyFeaturesMock)]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         XCTAssertEqual(window.firstResponder, mainViewController.browserTabViewController.transientTabContentViewController!.view)
     }
@@ -531,7 +531,7 @@ class AddressBarTests: XCTestCase {
         _=window.makeFirstResponder(addressBarTextField)
         type("some-text")
 
-        try await Task.sleep(interval: 0.01)
+        try await Task.sleep(interval: 1.0)
         try await didFinishNavigation.value
         XCTAssertTrue(isAddressBarFirstResponder)
         XCTAssertEqual(addressBarValue, "some-text")

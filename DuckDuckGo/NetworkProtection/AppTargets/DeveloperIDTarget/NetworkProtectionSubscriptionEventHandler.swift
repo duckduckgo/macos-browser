@@ -25,14 +25,14 @@ import NetworkProtectionUI
 
 final class NetworkProtectionSubscriptionEventHandler {
 
-    private let subscriptionManager: SubscriptionManaging
+    private let subscriptionManager: SubscriptionManager
     private let tunnelController: TunnelController
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let vpnUninstaller: VPNUninstalling
     private let userDefaults: UserDefaults
     private var cancellables = Set<AnyCancellable>()
 
-    init(subscriptionManager: SubscriptionManaging,
+    init(subscriptionManager: SubscriptionManager,
          tunnelController: TunnelController,
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          vpnUninstaller: VPNUninstalling,
@@ -48,7 +48,7 @@ final class NetworkProtectionSubscriptionEventHandler {
 
     private func subscribeToEntitlementChanges() {
         Task {
-            switch await subscriptionManager.accountManager.hasEntitlement(for: .networkProtection) {
+            switch await subscriptionManager.accountManager.hasEntitlement(forProductName: .networkProtection) {
             case .success(let hasEntitlements):
                 Task {
                     await handleEntitlementsChange(hasEntitlements: hasEntitlements)

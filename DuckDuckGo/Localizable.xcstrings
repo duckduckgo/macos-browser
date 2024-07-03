@@ -428,6 +428,9 @@
         }
       }
     },
+    "0.0.0.0" : {
+
+    },
     "1." : {
       "localizations" : {
         "de" : {
@@ -2424,6 +2427,9 @@
           }
         }
       }
+    },
+    "Apply" : {
+
     },
     "auth.alert.login.button" : {
       "comment" : "Authentication Alert Sign In Button",
@@ -13573,6 +13579,12 @@
         }
       }
     },
+    "Custom" : {
+
+    },
+    "Custom DNS Server" : {
+
+    },
     "dashboard.permission.allow" : {
       "comment" : "Privacy Dashboard: Website can always access input media device",
       "extractionState" : "extracted_with_value",
@@ -16791,6 +16803,30 @@
         }
       }
     },
+    "duck-player.autoplay-preference" : {
+      "comment" : "Autoplay preference in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Autoplay videos when opened in Duck Player"
+          }
+        }
+      }
+    },
+    "duck-player.autoplay-title" : {
+      "comment" : "Autoplay title in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Autoplay"
+          }
+        }
+      }
+    },
     "duck-player.explanation" : {
       "comment" : "Private YouTube Player explanation in settings",
       "extractionState" : "extracted_with_value",
@@ -17030,6 +17066,9 @@
           }
         }
       }
+    },
+    "DuckDuckGo (Recommended)" : {
+
     },
     "DuckDuckGo browser version" : {
       "comment" : "Data import failure Report dialog description of a report field providing current DuckDuckGo Browser version",
@@ -26706,6 +26745,9 @@
           }
         }
       }
+    },
+    "IPv4 Address:" : {
+
     },
     "JavaScript Console" : {
       "comment" : "Main Menu View-Developer item",
@@ -55202,6 +55244,9 @@
           }
         }
       }
+    },
+    "Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn't secure or reliable." : {
+
     },
     "version" : {
       "comment" : "Displays the version and build numbers",

@@ -167,6 +167,8 @@ struct DataImportViewModel {
         self.requestPrimaryPasswordCallback = requestPrimaryPasswordCallback
         self.openPanelCallback = openPanelCallback
         self.reportSenderFactory = reportSenderFactory
+
+        PixelExperiment.fireOnboardingImportRequestedPixel()
     }
 
     /// Import button press (starts browser data import)

@@ -1,7 +1,7 @@
 {
   "name": "Veriforia",
   "url": "veriforia.com",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
   "steps": [
@@ -27,6 +27,7 @@
           "actionType": "extract",
           "id": "e5894fdf-3afb-459e-b1a3-a8852d116346",
           "selector": ".search-item",
+          "noResultsSelector": "//div[contains(@class, 'page-404')]//h1[contains(text(), 'Sorry')]",
           "profile": {
             "name": {
               "selector": ".//div[@class='col-sm-24 col-md-19 col-text']"

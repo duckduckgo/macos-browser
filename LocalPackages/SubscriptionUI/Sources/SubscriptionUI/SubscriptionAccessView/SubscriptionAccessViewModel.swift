@@ -1,5 +1,5 @@
 //
-//  ActivateSubscriptionAccessModel.swift
+//  SubscriptionAccessViewModel.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,38 +19,47 @@
 import Foundation
 import Subscription
 
-public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, PurchaseRestoringSubscriptionAccessModel {
+public final class SubscriptionAccessViewModel {
 
     private var actionHandlers: SubscriptionAccessActionHandlers
-    public var title = UserText.activateModalTitle
-    public let description: String
+    private let purchasePlatform: SubscriptionEnvironment.PurchasePlatform
 
-    public var email: String?
-    public var emailLabel: String { UserText.email }
+    public var title = UserText.activateModalTitle
+    public lazy var description = UserText.activateModalDescription(platform: purchasePlatform)
+
+    public var emailLabel = UserText.email
     public var emailDescription = UserText.activateModalEmailDescription
     public var emailButtonTitle = UserText.enterEmailButton
 
-    public private(set) var shouldShowRestorePurchase: Bool
+    public var shouldShowRestorePurchase: Bool { purchasePlatform == .appStore }
     public var restorePurchaseDescription = UserText.restorePurchaseDescription
     public var restorePurchaseButtonTitle = UserText.restorePurchaseButton
 
-    let subscriptionManager: SubscriptionManaging
-
     public init(actionHandlers: SubscriptionAccessActionHandlers,
-                subscriptionManager: SubscriptionManaging) {
+                purchasePlatform: SubscriptionEnvironment.PurchasePlatform) {
         self.actionHandlers = actionHandlers
-        self.shouldShowRestorePurchase =  subscriptionManager.currentEnvironment.purchasePlatform == .appStore
-        self.subscriptionManager = subscriptionManager
-        self.description = UserText.activateModalDescription(platform: subscriptionManager.currentEnvironment.purchasePlatform)
+        self.purchasePlatform = purchasePlatform
     }
 
     public func handleEmailAction() {
-        actionHandlers.openURLHandler(subscriptionManager.url(for: .activateViaEmail))
+        actionHandlers.openActivateViaEmailURL()
         actionHandlers.uiActionHandler(.activateAddEmailClick)
     }
 
     public func handleRestorePurchaseAction() {
         actionHandlers.restorePurchases()
         actionHandlers.uiActionHandler(.restorePurchaseStoreClick)
+    }
+}
+
+public final class SubscriptionAccessActionHandlers {
+    var openActivateViaEmailURL: () -> Void
+    var restorePurchases: () -> Void
+    var uiActionHandler: (PreferencesSubscriptionModel.UserEvent) -> Void
+
+    public init(openActivateViaEmailURL: @escaping () -> Void, restorePurchases: @escaping () -> Void, uiActionHandler: @escaping (PreferencesSubscriptionModel.UserEvent) -> Void) {
+        self.openActivateViaEmailURL = openActivateViaEmailURL
+        self.restorePurchases = restorePurchases
+        self.uiActionHandler = uiActionHandler
     }
 }
