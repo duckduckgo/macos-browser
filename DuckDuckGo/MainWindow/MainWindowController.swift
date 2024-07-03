@@ -129,12 +129,12 @@ final class MainWindowController: NSWindowController {
             .removeDuplicates()
             .sink(receiveValue: { [weak self] burningData in
                 guard let self else { return }
-                self.userInteraction(prevented: burningData != nil)
+                self.userInteraction(prevented: burningData != nil, forBurning: true)
                 self.moveTabBarView(toTitlebarView: burningData == nil)
             })
     }
 
-    func userInteraction(prevented: Bool) {
+    func userInteraction(prevented: Bool, forBurning: Bool = false) {
         mainViewController.tabCollectionViewModel.changesEnabled = !prevented
         mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.contentChangeEnabled = !prevented
 
@@ -145,6 +145,15 @@ final class MainWindowController: NSWindowController {
 
         NSApplication.shared.mainMenuTyped.autoupdatingMenusForUserPrevention.forEach { $0.autoenablesItems = !prevented }
         NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
+
+        guard forBurning else { return }
+        if prevented {
+             window?.styleMask.remove(.closable)
+             mainViewController.view.makeMeFirstResponder()
+         } else {
+             window?.styleMask.update(with: .closable)
+             mainViewController.adjustFirstResponder()
+         }
     }
 
     private func moveTabBarView(toTitlebarView: Bool) {
