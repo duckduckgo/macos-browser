@@ -96,6 +96,9 @@
                                                 <integer key="value" value="4"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="importBookmarksClicked:" target="JFF-Nj-8om" id="VgQ-gs-fxb"/>
+                                        </connections>
                                     </customView>
                                 </subviews>
                                 <constraints>
@@ -136,6 +139,9 @@
                     <connections>
                         <outlet property="bookmarksBarCollectionView" destination="vwg-NL-UPk" id="1LG-QE-Dgd"/>
                         <outlet property="clippedItemsIndicator" destination="Mgr-xJ-Pl5" id="4ww-Po-dNb"/>
+                        <outlet property="importBookmarksIcon" destination="gwe-JW-nZ6" id="fsM-2E-Q5V"/>
+                        <outlet property="importBookmarksLabel" destination="jeg-Iv-FxB" id="p0A-Bi-qZg"/>
+                        <outlet property="importBookmarksMouseOverView" destination="Nr2-47-6rU" id="rCq-gq-9C4"/>
                         <outlet property="promptAnchor" destination="cjE-4p-vxI" id="IGH-2v-PGD"/>
                     </connections>
                 </viewController>

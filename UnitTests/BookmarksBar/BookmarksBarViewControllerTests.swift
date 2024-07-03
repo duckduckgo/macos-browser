@@ -74,7 +74,9 @@ final class BookmarksBarViewControllerTests: XCTestCase {
 
         // Then
         wait(for: [expectation], timeout: 2.0)
-        XCTAssertTrue(vc.importBookmarksButton.isHidden)
+        XCTAssertTrue(vc.importBookmarksIcon.isHidden)
+        XCTAssertTrue(vc.importBookmarksLabel.isHidden)
+        XCTAssertTrue(vc.importBookmarksMouseOverView.isHidden)
     }
 
     @MainActor
@@ -85,7 +87,9 @@ final class BookmarksBarViewControllerTests: XCTestCase {
             window.makeKeyAndOrderFront(nil)
 
         // Then
-        XCTAssertFalse(vc.importBookmarksButton.isHidden)
+        XCTAssertFalse(vc.importBookmarksIcon.isHidden)
+        XCTAssertFalse(vc.importBookmarksLabel.isHidden)
+        XCTAssertFalse(vc.importBookmarksMouseOverView.isHidden)
     }
 
 }
