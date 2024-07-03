@@ -49,6 +49,12 @@ protocol BookmarkManager: AnyObject {
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
     func handleFavoritesAfterDisablingSync()
+
+    /// Searches for bookmarks and folders by title.
+    ///
+    /// - Parameters:
+    ///   - query: The query we will use to filter bookmarks. We will check if query is contained in the title.
+    /// - Returns: An array of bookmarks that matches the query.
     func search(by query: String) -> [BaseBookmarkEntity]
 
     // Wrapper definition in a protocol is not supported yet
