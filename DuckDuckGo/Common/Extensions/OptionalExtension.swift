@@ -41,3 +41,12 @@ extension Optional: OptionalProtocol {
     }
 
 }
+
+extension Optional where Wrapped == String {
+    var isNilOrEmpty: Bool {
+        if case .some(let wrapped) = self {
+            return wrapped.isEmpty
+        }
+        return true
+    }
+}

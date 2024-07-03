@@ -36,12 +36,12 @@ final class SecureVaultLoginImporter: LoginImporter {
         let encryptionKey = try vault.getEncryptionKey()
         let hashingSalt = try vault.getHashingSalt()
 
-        let signatures: Set<String>
+        let accounts: [SecureVaultModels.WebsiteAccount]
 
-        if let results = try? vault.accounts().compactMap(\.signature) {
-            signatures = Set(results)
+        if let results = try? vault.accounts() {
+            accounts = results
         } else {
-            signatures = Set()
+            accounts = .init()
         }
 
         try vault.inDatabaseTransaction { database in
@@ -58,9 +58,13 @@ final class SecureVaultLoginImporter: LoginImporter {
                 }
 
                 do {
-                    if let signature = try vault.encryptPassword(for: credentials).account.signature,
-                        signatures.contains(signature) {
-                        throw ImporterError.duplicate
+                    if let signature = try vault.encryptPassword(for: credentials, key: encryptionKey, salt: hashingSalt).account.signature {
+                        let isDuplicate = accounts.contains {
+                            $0.isDuplicateOf(accountToBeImported: account, signatureOfAccountToBeImported: signature)
+                        }
+                        if isDuplicate {
+                            throw ImporterError.duplicate
+                        }
                     }
                     _ = try vault.storeWebsiteCredentials(credentials, in: database, encryptedUsing: encryptionKey, hashedUsing: hashingSalt)
                     successful.append(importSummaryValue)
@@ -85,4 +89,42 @@ final class SecureVaultLoginImporter: LoginImporter {
         return .init(successful: successful.count, duplicate: duplicates.count, failed: failed.count)
     }
 
+}
+
+private extension SecureVaultModels.WebsiteAccount {
+    /*
+     Rules
+     username: is a duplicate if:
+     it's an exact match
+     one entry has a value and the other entry doesn't, it's not a duplicate
+     password: is a duplicate if:
+     it's an exact match
+     one entry has a value and the other entry doesn't, it's not a duplicate
+     url: is a duplicate if:
+     if the cleaned* version of the URL is an exact match, it's a duplicate
+     notes: is a duplicate if:
+     it's an exact match
+     the stored entry has a value and the import entry doesn't
+     title: is a duplicate if:
+     it's an exact match
+     the stored entry has a value and the import entry doesn't
+     */
+    func isDuplicateOf(accountToBeImported: Self, signatureOfAccountToBeImported: String) -> Bool {
+        guard signature == signatureOfAccountToBeImported else {
+            return false
+        }
+        guard username == accountToBeImported.username || accountToBeImported.username.isNilOrEmpty else {
+            return false
+        }
+        guard domain == accountToBeImported.domain || accountToBeImported.domain.isNilOrEmpty else {
+            return false
+        }
+        guard notes == accountToBeImported.notes || accountToBeImported.notes.isNilOrEmpty else {
+            return false
+        }
+        guard title == accountToBeImported.title || accountToBeImported.title.isNilOrEmpty else {
+            return false
+        }
+        return true
+    }
 }
