@@ -413,7 +413,7 @@ final class LocalBookmarkManager: BookmarkManager {
         while !stack.isEmpty {
             let current = stack.removeFirst()
 
-            if current.title.lowercased().contains(query) || query.isBlank {
+            if current.title.lowercased().contains(query) {
                 result.append(current)
             }
 
