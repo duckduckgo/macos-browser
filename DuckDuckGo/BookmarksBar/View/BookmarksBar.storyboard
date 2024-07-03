@@ -60,7 +60,7 @@
                                 <rect key="frame" x="0.0" y="-2" width="676" height="5"/>
                             </box>
                             <customView verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YdB-zl-3Cf">
-                                <rect key="frame" x="12" y="26" width="65" height="28"/>
+                                <rect key="frame" x="10" y="26" width="65" height="28"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gwe-JW-nZ6">
                                         <rect key="frame" x="4" y="3" width="16.5" height="24"/>
@@ -128,7 +128,7 @@
                             <constraint firstItem="D39-Of-BIh" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" id="hOd-Bz-o5j"/>
                             <constraint firstAttribute="bottom" secondItem="X6g-3K-JDi" secondAttribute="bottom" id="iWj-iC-9gW"/>
                             <constraint firstItem="cjE-4p-vxI" firstAttribute="centerY" secondItem="R54-3G-cms" secondAttribute="centerY" id="s3N-bi-7Hr"/>
-                            <constraint firstItem="YdB-zl-3Cf" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" constant="12" id="zyW-Tf-ym2"/>
+                            <constraint firstItem="YdB-zl-3Cf" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" constant="10" id="zyW-Tf-ym2"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">

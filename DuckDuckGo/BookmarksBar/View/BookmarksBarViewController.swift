@@ -66,6 +66,8 @@ final class BookmarksBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        setUpImportBookmarksButton()
+
         addContextMenu()
 
         viewModel.delegate = self
@@ -87,6 +89,13 @@ final class BookmarksBarViewController: NSViewController {
 
         view.postsFrameChangedNotifications = true
         bookmarksBarCollectionView.setAccessibilityIdentifier("BookmarksBarViewController.bookmarksBarCollectionView")
+    }
+
+    private func setUpImportBookmarksButton() {
+        importBookmarksIcon.image = NSImage(named: "Import-16D")
+        importBookmarksIcon.isHidden = true
+        importBookmarksLabel.isHidden = true
+        importBookmarksMouseOverView.isHidden = true
     }
 
     private func addContextMenu() {
@@ -157,10 +166,11 @@ final class BookmarksBarViewController: NSViewController {
         viewModel.$bookmarksBarItems
             .receive(on: DispatchQueue.main)
             .sink { [weak self] items in
-                self?.importBookmarksIcon.isHidden = !items.isEmpty
-                self?.importBookmarksLabel.isHidden = !items.isEmpty
-                self?.importBookmarksMouseOverView.isHidden = !items.isEmpty
-                self?.bookmarksBarCollectionView.isHidden = items.isEmpty
+                if self?.bookmarkManager.list != nil {
+                    self?.importBookmarksIcon.isHidden = !items.isEmpty
+                    self?.importBookmarksLabel.isHidden = !items.isEmpty
+                    self?.importBookmarksMouseOverView.isHidden = !items.isEmpty
+                }
             }
             .store(in: &cancellables)
     }
