@@ -91,7 +91,7 @@ final class SecureVaultLoginImporter: LoginImporter {
 
 }
 
-private extension SecureVaultModels.WebsiteAccount {
+extension SecureVaultModels.WebsiteAccount {
     /*
      Rules
      username: is a duplicate if:

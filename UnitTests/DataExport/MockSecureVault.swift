@@ -36,6 +36,18 @@ let MockSecureVaultFactory = SecureVaultFactory<MockSecureVault>(
 )
 
 final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
+    enum MockError: Error {
+        case noStubSet
+    }
+
+    var stubEncryptPassword: ((BrowserServicesKit.SecureVaultModels.WebsiteCredentials, Data?, Data?) -> SecureVaultModels.WebsiteCredentials)?
+
+    func encryptPassword(for credentials: BrowserServicesKit.SecureVaultModels.WebsiteCredentials, key l2Key: Data?, salt: Data?) throws -> BrowserServicesKit.SecureVaultModels.WebsiteCredentials {
+        guard let stubEncryptPassword = stubEncryptPassword?(credentials, l2Key, salt) else {
+            throw MockError.noStubSet
+        }
+        return stubEncryptPassword
+    }
 
     public typealias MockSecureVaultDatabaseProviders = SecureStorageProviders<T>
 
@@ -186,7 +198,11 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         return nil
     }
 
-    func inDatabaseTransaction(_ block: @escaping (Database) throws -> Void) throws {}
+    var spyInDatabaseTransactionBlock: ((Database) throws -> Void)?
+
+    func inDatabaseTransaction(_ block: @escaping (Database) throws -> Void) throws {
+        spyInDatabaseTransactionBlock = block
+    }
 
     func modifiedSyncableCredentials() throws -> [SecureVaultModels.SyncableCredentials] {
         []

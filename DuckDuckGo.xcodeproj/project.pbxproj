@@ -2533,6 +2533,8 @@
 		EE66418D2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66418B2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift */; };
 		EE66666F2B56EDE4001D898D /* VPNLocationsHostingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */; };
 		EE6666702B56EDE4001D898D /* VPNLocationsHostingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */; };
+		EE66F10C2C3431030071856E /* SecureVaultModels_WebsiteAccountTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66F10B2C3431030071856E /* SecureVaultModels_WebsiteAccountTests.swift */; };
+		EE66F10D2C3431030071856E /* SecureVaultModels_WebsiteAccountTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66F10B2C3431030071856E /* SecureVaultModels_WebsiteAccountTests.swift */; };
 		EE7295E32A545B9A008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295E22A545B9A008C0991 /* NetworkProtection */; };
 		EE7295E72A545BBB008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295E62A545BBB008C0991 /* NetworkProtection */; };
 		EE7295E92A545BC4008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295E82A545BC4008C0991 /* NetworkProtection */; };
@@ -2566,6 +2568,10 @@
 		EED735362BB46B6000F173D6 /* AutocompleteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED735352BB46B6000F173D6 /* AutocompleteTests.swift */; };
 		EEDE50112BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */; };
 		EEDE50122BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */; };
+		EEE0E1CD2C32F5690058E148 /* CSVImporterIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE0E1CC2C32F5690058E148 /* CSVImporterIntegrationTests.swift */; };
+		EEE0E1CF2C32F6530058E148 /* mock_login_data_large.csv in Resources */ = {isa = PBXBuildFile; fileRef = EEE0E1CE2C32F6530058E148 /* mock_login_data_large.csv */; };
+		EEE0E1D02C32F6530058E148 /* mock_login_data_large.csv in Resources */ = {isa = PBXBuildFile; fileRef = EEE0E1CE2C32F6530058E148 /* mock_login_data_large.csv */; };
+		EEE0E1D12C32F8620058E148 /* CSVImporterIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE0E1CC2C32F5690058E148 /* CSVImporterIntegrationTests.swift */; };
 		EEF12E6F2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */; };
 		EEF53E182950CED5002D78F4 /* JSAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */; };
 		F116A7C32BD1924B00F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C22BD1924B00F3FCF7 /* PixelKitTestingUtilities */; };
@@ -4104,6 +4110,7 @@
 		EE54F7B22BBFEA48006218DB /* BookmarksAndFavoritesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksAndFavoritesTests.swift; sourceTree = "<group>"; };
 		EE66418B2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift"; sourceTree = "<group>"; };
 		EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationsHostingViewController.swift; sourceTree = "<group>"; };
+		EE66F10B2C3431030071856E /* SecureVaultModels_WebsiteAccountTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureVaultModels_WebsiteAccountTests.swift; sourceTree = "<group>"; };
 		EE7F74902BB5D76600CD9456 /* BookmarksBarTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarTests.swift; sourceTree = "<group>"; };
 		EE9D81C22BC57A3700338BE3 /* StateRestorationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateRestorationTests.swift; sourceTree = "<group>"; };
 		EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionVPNCountryLabelsModel.swift; sourceTree = "<group>"; };
@@ -4119,6 +4126,8 @@
 		EECE10E429DD77E60044D027 /* FeatureFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlag.swift; sourceTree = "<group>"; };
 		EED735352BB46B6000F173D6 /* AutocompleteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutocompleteTests.swift; sourceTree = "<group>"; };
 		EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtection+VPNAgentConvenienceInitializers.swift"; sourceTree = "<group>"; };
+		EEE0E1CC2C32F5690058E148 /* CSVImporterIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporterIntegrationTests.swift; sourceTree = "<group>"; };
+		EEE0E1CE2C32F6530058E148 /* mock_login_data_large.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mock_login_data_large.csv; sourceTree = "<group>"; };
 		EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPacketTunnelProvider.swift; sourceTree = "<group>"; };
 		EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModelTests.swift; sourceTree = "<group>"; };
 		F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift"; sourceTree = "<group>"; };
@@ -5024,6 +5033,7 @@
 		4B1AD89E25FC27E200261379 /* IntegrationTests */ = {
 			isa = PBXGroup;
 			children = (
+				EEE0E1CB2C32F53C0058E148 /* DataImport */,
 				B603972A29BEDF0F00902A34 /* Common */,
 				B31055CC27A1BA39001AC618 /* Autoconsent */,
 				B6EC37DC29B5D05A001ACE79 /* Downloads */,
@@ -5437,6 +5447,7 @@
 				4B8AC93C26B49BE600879451 /* FirefoxLoginReaderTests.swift */,
 				4BB99D0E26FE1A84001E4761 /* SafariBookmarksReaderTests.swift */,
 				4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */,
+				EE66F10B2C3431030071856E /* SecureVaultModels_WebsiteAccountTests.swift */,
 			);
 			path = DataImport;
 			sourceTree = "<group>";
@@ -8268,6 +8279,15 @@
 			path = AppAndExtensionAndAgentTargets;
 			sourceTree = "<group>";
 		};
+		EEE0E1CB2C32F53C0058E148 /* DataImport */ = {
+			isa = PBXGroup;
+			children = (
+				EEE0E1CE2C32F6530058E148 /* mock_login_data_large.csv */,
+				EEE0E1CC2C32F5690058E148 /* CSVImporterIntegrationTests.swift */,
+			);
+			path = DataImport;
+			sourceTree = "<group>";
+		};
 		EEF53E162950CEB6002D78F4 /* JSAlert */ = {
 			isa = PBXGroup;
 			children = (
@@ -9038,6 +9058,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EEE0E1D02C32F6530058E148 /* mock_login_data_large.csv in Resources */,
 				B64E42AC2B909DC9006C1346 /* test.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -9053,6 +9074,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EEE0E1CF2C32F6530058E148 /* mock_login_data_large.csv in Resources */,
 				B64E42AB2B909DC9006C1346 /* test.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -10378,6 +10400,7 @@
 				4B9DB05D2A983B55000927DB /* WaitlistViewModelTests.swift in Sources */,
 				3706FDEF293F661700E42796 /* PinnedTabsManagerTests.swift in Sources */,
 				3706FDF0293F661700E42796 /* WebKitVersionProviderTests.swift in Sources */,
+				EE66F10D2C3431030071856E /* SecureVaultModels_WebsiteAccountTests.swift in Sources */,
 				3706FDF1293F661700E42796 /* AtbAndVariantCleanupTests.swift in Sources */,
 				1D1C36E729FB019C001FA40C /* HistoryTabExtensionTests.swift in Sources */,
 				1D9FDEBB2B9B5E090040B78C /* WebTrackingProtectionPreferencesTests.swift in Sources */,
@@ -10667,6 +10690,7 @@
 				B603972D29BEDF2100902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				3706FEA6293F662100E42796 /* EncryptionKeyStoreTests.swift in Sources */,
 				B6F5656A299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
+				EEE0E1CD2C32F5690058E148 /* CSVImporterIntegrationTests.swift in Sources */,
 				B693766F2B6B5F27005BD9D4 /* ErrorPageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -10709,6 +10733,7 @@
 				B603972C29BEDF2100902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				4B1AD8D525FC38DD00261379 /* EncryptionKeyStoreTests.swift in Sources */,
 				B6F56568299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
+				EEE0E1D12C32F8620058E148 /* CSVImporterIntegrationTests.swift in Sources */,
 				B693766E2B6B5F27005BD9D4 /* ErrorPageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -11777,6 +11802,7 @@
 				9FA5A0A92BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift in Sources */,
 				B6619F062B17138D00CD9186 /* DataImportSourceViewModelTests.swift in Sources */,
 				4BBF0917282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift in Sources */,
+				EE66F10C2C3431030071856E /* SecureVaultModels_WebsiteAccountTests.swift in Sources */,
 				B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */,
 				9F982F132B822B7B00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift in Sources */,
 				B630E7FE29C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */,
