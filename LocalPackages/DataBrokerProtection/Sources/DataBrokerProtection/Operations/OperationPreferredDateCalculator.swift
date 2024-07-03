@@ -99,6 +99,13 @@ struct OperationPreferredDateCalculator {
     private func calculateNextRunDateOnError(schedulingConfig: DataBrokerScheduleConfig,
                                              historyEvents: [HistoryEvent]) -> TimeInterval {
         let pastTries = historyEvents.filter { $0.isError }.count
-        return min(Int(pow(2.0, Double(pastTries))), schedulingConfig.retryError).hoursToSeconds
+        let doubleValue = pow(2.0, Double(pastTries))
+
+        if doubleValue > Double(schedulingConfig.retryError) {
+            return schedulingConfig.retryError.hoursToSeconds
+        } else {
+            let intValue = Int(doubleValue)
+            return intValue.hoursToSeconds
+        }
     }
 }

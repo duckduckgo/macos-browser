@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21C52" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22758" systemVersion="23F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="FaviconHostReferenceManagedObject" representedClassName="FaviconHostReferenceManagedObject" syncable="YES" codeGenerationType="class">
         <attribute name="dateCreated" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="documentUrlEncrypted" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
@@ -16,16 +16,14 @@
         <attribute name="relation" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="urlEncrypted" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
     </entity>
-    <entity name="FaviconUrlReferenceManagedObject" representedClassName="FaviconUrlReferenceManagedObject" syncable="YES" codeGenerationType="class">
+    <entity name="FaviconUrlReferenceManagedObject" representedClassName="FaviconUrlReferenceManagedObject" versionHashModifier="added UUID index" syncable="YES" codeGenerationType="class">
         <attribute name="dateCreated" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="documentUrlEncrypted" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
         <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="mediumFaviconUrlEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
         <attribute name="smallFaviconUrlEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
+        <fetchIndex name="byUUIDIndex">
+            <fetchIndexElement property="identifier" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
-    <elements>
-        <element name="FaviconHostReferenceManagedObject" positionX="-54" positionY="-9" width="128" height="119"/>
-        <element name="FaviconManagedObject" positionX="-63" positionY="-18" width="128" height="14"/>
-        <element name="FaviconUrlReferenceManagedObject" positionX="-18" positionY="63" width="128" height="104"/>
-    </elements>
 </model>

@@ -1,7 +1,7 @@
 {
   "name": "CurAdvisor",
   "url": "curadvisor.com",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -27,6 +27,7 @@
           "actionType": "extract",
           "id": "c9babcb9-540e-48ac-900b-b32229e28124",
           "selector": ".card",
+          "noResultsSelector": "//div[@class='page-404' and h1[starts-with(text(), 'Sorry')]]",
           "profile": {
             "name": {
               "selector": ".card-title",
