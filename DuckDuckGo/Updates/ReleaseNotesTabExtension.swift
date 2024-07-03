@@ -117,7 +117,7 @@ extension ReleaseNotesValues {
     }
 
     init(from updateController: UpdateController?) {
-        let currentVersion = AppVersion().versionAndBuildNumber
+        let currentVersion = "\(AppVersion().versionNumber) (\(AppVersion().buildNumber))"
         let lastUpdate = UInt((updateController?.lastUpdateCheckDate ?? Date()).timeIntervalSince1970)
         let status: String
         let latestVersion: String
@@ -131,7 +131,7 @@ extension ReleaseNotesValues {
 
         if let latestUpdate = updateController.latestUpdate {
             status = latestUpdate.isInstalled ? "loaded" : "updateReady"
-            latestVersion = "\(latestUpdate.version).\(latestUpdate.build)"
+            latestVersion = "\(latestUpdate.version) (\(latestUpdate.build))"
             self.init(status: status,
                       currentVersion: currentVersion,
                       latestVersion: latestVersion,

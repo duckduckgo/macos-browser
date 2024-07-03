@@ -1,5 +1,5 @@
 //
-//  AboutModel.swift
+//  AboutPreferences.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,9 @@ import SwiftUI
 import Common
 import Combine
 
-final class AboutModel: ObservableObject, PreferencesTabOpening {
+final class AboutPreferences: ObservableObject, PreferencesTabOpening {
+
+    static let shared = AboutPreferences()
 
     enum UpdateState {
 
@@ -41,14 +43,25 @@ final class AboutModel: ObservableObject, PreferencesTabOpening {
         }
     }
 
-    @Published var updateState = UpdateState.upToDate
+    @Published var updateState = UpdateState.upToDate {
+        didSet {
+            print("updateState: \(updateState)")
+        }
+    }
     let appVersion = AppVersion()
-    weak var updateController: UpdateControllerProtocol?
 
-    init(updateController: UpdateControllerProtocol) {
-        self.updateController = updateController
-        subscribeToUpdateInfo(updateController: updateController)
-        refreshUpdateState()
+    var updateController: UpdateControllerProtocol? {
+        return Application.appDelegate.updateController
+    }
+
+    var areAutomaticUpdatesEnabled: Bool {
+        get {
+            return updateController?.areAutomaticUpdatesEnabled ?? false
+        }
+
+        set {
+            updateController?.areAutomaticUpdatesEnabled = newValue
+        }
     }
 
     private var cancellable: AnyCancellable?
@@ -77,13 +90,20 @@ final class AboutModel: ObservableObject, PreferencesTabOpening {
         updateController?.runUpdate()
     }
 
-    private func subscribeToUpdateInfo(updateController: UpdateControllerProtocol) {
+    private var subscribed = false
+    func subscribeToUpdateInfoIfNeeded() {
+        guard let updateController, !subscribed else { return }
+
         cancellable = updateController.latestUpdatePublisher
             .combineLatest(updateController.isUpdateBeingLoadedPublisher)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.refreshUpdateState()
             }
+
+        subscribed = true
+
+        refreshUpdateState()
     }
 
     private func refreshUpdateState() {

@@ -42,6 +42,8 @@ protocol UpdateControllerProtocol: AnyObject {
 
     func runUpdate()
 
+    var areAutomaticUpdatesEnabled: Bool { get set }
+
 }
 
 #if SPARKLE
@@ -73,7 +75,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
                 case .critical:
                     notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: "Critical update required. Restart to update.")
                 case .regular:
-                    notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Relaunch to update.")
+                    notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Restart to update.")
                 }
                 isUpdateAvailableToInstall = !latestUpdate.isInstalled
             } else {
@@ -90,6 +92,21 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     var lastUpdateCheckDate: Date? {
         updater.updater.lastUpdateCheckDate
     }
+
+    @UserDefaultsWrapper(key: .automaticUpdates, defaultValue: true)
+    var areAutomaticUpdatesEnabled: Bool {
+        didSet {
+            if updater.updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
+                updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
+
+                // Reinitialize in order to reset the current loaded state
+                configureUpdater()
+            }
+        }
+    }
+
+    var shouldShowManualUpdateDialog = false
+
     // MARK: - Public
 
     func checkNewApplicationVersion() {
@@ -113,13 +130,9 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     // MARK: - Private
 
-    private var updater: SPUStandardUpdaterController!
+    private(set) var updater: SPUStandardUpdaterController!
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
     private var internalUserDecider: InternalUserDecider
-
-    private var areAutomaticUpdatesEnabled: Bool {
-        return true
-    }
 
     private func configureUpdater() {
     // The default configuration of Sparkle updates is in Info.plist
@@ -131,7 +144,9 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 //        updater.updater.updateCheckInterval = 0
 //#endif
 
-        updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
+        if updater.updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
+            updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
+        }
 
         checkForUpdateInBackground()
     }
@@ -141,7 +156,12 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     }
 
     @objc func runUpdate() {
-        restartApp()
+        if areAutomaticUpdatesEnabled {
+            restartApp()
+        } else {
+            shouldShowManualUpdateDialog = true
+            checkForUpdate()
+        }
     }
 
     //TODO: Refactor to AppRestarter
@@ -181,7 +201,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 extension UpdateController: SPUStandardUserDriverDelegate {
 
     func standardUserDriverShouldHandleShowingScheduledUpdate(_ update: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
-        return !areAutomaticUpdatesEnabled
+        return shouldShowManualUpdateDialog
     }
 
 }
@@ -189,6 +209,10 @@ extension UpdateController: SPUStandardUserDriverDelegate {
 extension UpdateController: SPUUpdaterDelegate {
 
     func updater(_ updater: SPUUpdater, mayPerform updateCheck: SPUUpdateCheck) throws {
+        onUpdateCheckStart()
+    }
+
+    private func onUpdateCheckStart() {
         isUpdateBeingLoaded = true
     }
 
@@ -232,20 +256,34 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        // Waiting until the update is downloaded
+        guard !areAutomaticUpdatesEnabled else {
+            // If automatic updates are enabled, we are waiting until the update is downloaded
+            return
+        }
+        // For manual updates, show the available update without downloading
+        onUpdateCheckEnd(item: item, isInstalled: false)
     }
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
-        if let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem {
-            latestUpdate = Update(appcastItem: item, isInstalled: true)
-        } else {
-            latestUpdate = nil
-        }
-        isUpdateBeingLoaded = false
+        let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem
+        onUpdateCheckEnd(item: item, isInstalled: true)
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
-        latestUpdate = Update(appcastItem: item, isInstalled: false)
+        guard areAutomaticUpdatesEnabled else {
+            // If manual are enabled, we don't download
+            return
+        }
+        // Automatic updates present the available update after it's downloaded
+        onUpdateCheckEnd(item: item, isInstalled: false)
+    }
+
+    private func onUpdateCheckEnd(item: SUAppcastItem?, isInstalled: Bool) {
+        if let item {
+            latestUpdate = Update(appcastItem: item, isInstalled: isInstalled)
+        } else {
+            latestUpdate = nil
+        }
         isUpdateBeingLoaded = false
     }
 

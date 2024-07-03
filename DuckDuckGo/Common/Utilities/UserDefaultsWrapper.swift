@@ -170,6 +170,9 @@ public struct UserDefaultsWrapper<T> {
         case networkProtectionWaitlistActiveOverrideRawValue = "networkProtectionWaitlistActiveOverrideRawValue"
         case networkProtectionWaitlistEnabledOverrideRawValue = "networkProtectionWaitlistEnabledOverrideRawValue"
 
+        // Updates
+        case automaticUpdates = "updates.automatic"
+
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"
         case pixelExperimentCohort = "pixel.experiment.cohort"

@@ -72,9 +72,8 @@ final class UpdateNotificationPresenter {
     }
 
     func openUpdatesPage() {
-        //TODO: Open Updates page
         DispatchQueue.main.async {
-            WindowControllersManager.shared.showTab(with: .newtab)
+            WindowControllersManager.shared.showTab(with: .releaseNotes)
         }
     }
 

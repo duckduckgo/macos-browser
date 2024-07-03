@@ -28,7 +28,8 @@ fileprivate extension Font {
 extension Preferences {
 
     struct AboutView: View {
-        @ObservedObject var model: AboutModel
+        @ObservedObject var model: AboutPreferences
+        @State private var areAutomaticUpdatesEnabled: Bool = false
 
         var body: some View {
             PreferencePane {
@@ -90,12 +91,36 @@ extension Preferences {
                         model.openNewTab(with: .privacyPolicy)
                     }
 
-                    #if FEEDBACK
+#if FEEDBACK
                     Button(UserText.sendFeedback) {
                         model.openFeedbackForm()
                     }
                     .padding(.top, 4)
-                    #endif
+#endif
+                }.onAppear {
+                    model.subscribeToUpdateInfoIfNeeded()
+                }
+
+                // Automatic/manual Updates
+                PreferencePaneSection("Browser Updates") {
+
+                    PreferencePaneSubSection {
+                        Picker(selection: $areAutomaticUpdatesEnabled, content: {
+                            Text("Automatically install updates (recommended)").tag(true)
+                                .padding(.bottom, 4).accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.automatically")
+                            Text("Check for updates but let you choose to install them").tag(false)
+                                .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.manually")
+                        }, label: {})
+                        .pickerStyle(.radioGroup)
+                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker")
+                        .onChange(of: areAutomaticUpdatesEnabled) { newValue in
+                            model.areAutomaticUpdatesEnabled = newValue
+                        }
+                        .onAppear {
+                            areAutomaticUpdatesEnabled = model.areAutomaticUpdatesEnabled
+                        }
+                    }
                 }
             }
         }

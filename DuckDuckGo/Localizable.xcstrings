@@ -6454,6 +6454,9 @@
         }
       }
     },
+    "Automatically install updates (recommended)" : {
+
+    },
     "automatically.clear.data" : {
       "comment" : "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.",
       "extractionState" : "extracted_with_value",
@@ -11864,6 +11867,9 @@
       }
     },
     "Check for Update" : {
+
+    },
+    "Check for updates but let you choose to install them" : {
 
     },
     "check.allow.integration" : {

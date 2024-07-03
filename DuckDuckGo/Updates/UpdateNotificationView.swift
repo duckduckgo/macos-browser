@@ -57,6 +57,6 @@ struct UpdateNotificationView: View {
 
 struct UpdateNotificationView_Previews: PreviewProvider {
     static var previews: some View {
-        UpdateNotificationView(icon: NSImage(named: NSImage.cautionName)!, text: "Critical update required. Relaunch to update.", onClose: {}, onTap: {})
+        UpdateNotificationView(icon: NSImage(named: NSImage.cautionName)!, text: "Critical update required. Restart to update.", onClose: {}, onTap: {})
     }
 }
