@@ -27,6 +27,7 @@ extension Tab {
         case url(URL, credential: URLCredential? = nil, source: URLSource)
         case settings(pane: PreferencePaneIdentifier?)
         case bookmarks
+        case onboardingDeprecated
         case onboarding
         case none
         case dataBrokerProtection
@@ -102,6 +103,8 @@ extension TabContent {
         case URL.newtab, URL.Invalid.aboutNewtab, URL.Invalid.duckHome:
             return .newtab
         case URL.welcome, URL.Invalid.aboutWelcome:
+            return .onboardingDeprecated
+        case URL.onboarding:
             return .onboarding
         case URL.settings, URL.Invalid.aboutPreferences, URL.Invalid.aboutConfig, URL.Invalid.aboutSettings, URL.Invalid.duckConfig, URL.Invalid.duckPreferences:
             return .anySettingsPane
@@ -192,10 +195,10 @@ extension TabContent {
 
     var title: String? {
         switch self {
-        case .url, .newtab, .none: return nil
+        case .url, .newtab, .onboarding, .none: return nil
         case .settings: return UserText.tabPreferencesTitle
         case .bookmarks: return UserText.tabBookmarksTitle
-        case .onboarding: return UserText.tabOnboardingTitle
+        case .onboardingDeprecated: return UserText.tabOnboardingTitle
         case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
         case .releaseNotes: return UserText.releaseNotesTitle
         case .subscription, .identityTheftRestoration: return nil
@@ -228,8 +231,10 @@ extension TabContent {
             return .settings
         case .bookmarks:
             return .bookmarks
-        case .onboarding:
+        case .onboardingDeprecated:
             return .welcome
+        case .onboarding:
+            return URL.onboarding
         case .dataBrokerProtection:
             return .dataBrokerProtection
         case .releaseNotes:
@@ -245,8 +250,8 @@ extension TabContent {
         switch self {
         case .url(_, _, source: let source):
             return source
-        case .newtab, .settings, .bookmarks, .onboarding, .dataBrokerProtection,
-                .subscription, .identityTheftRestoration, .releaseNotes, .none:
+        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .releaseNotes, .dataBrokerProtection,
+                .subscription, .identityTheftRestoration, .none:
             return .ui
         }
     }
@@ -305,7 +310,7 @@ extension TabContent {
 
     var canBeBookmarked: Bool {
         switch self {
-        case .newtab, .onboarding, .none:
+        case .newtab, .onboardingDeprecated, .onboarding, .none:
             return false
         case .url, .settings, .bookmarks, .subscription, .identityTheftRestoration, .dataBrokerProtection, .releaseNotes:
             return true

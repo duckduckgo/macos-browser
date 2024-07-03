@@ -54,7 +54,7 @@ extension HomePage.Models {
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
-        private let subscriptionManager: SubscriptionManaging
+        private let subscriptionManager: SubscriptionManager
 
         @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
         var shouldShowAllFeatures: Bool {
@@ -80,9 +80,6 @@ extension HomePage.Models {
 
         @UserDefaultsWrapper(key: .homePageShowPermanentSurvey, defaultValue: true)
         private var shouldShowPermanentSurvey: Bool
-
-        @UserDefaultsWrapper(key: .shouldShowDBPWaitlistInvitedCardUI, defaultValue: false)
-        private var shouldShowDBPWaitlistInvitedCardUI: Bool
 
         @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
         private var isFirstSession: Bool
@@ -114,7 +111,7 @@ extension HomePage.Models {
              surveyRemoteMessaging: SurveyRemoteMessaging,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
              permanentSurveyManager: SurveyManager = PermanentSurveyManager(),
-             subscriptionManager: SubscriptionManaging = Application.appDelegate.subscriptionManager) {
+             subscriptionManager: SubscriptionManager = Application.appDelegate.subscriptionManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dockCustomizer = dockCustomizer
             self.dataImportProvider = dataImportProvider
@@ -148,8 +145,6 @@ extension HomePage.Models {
                 visitSurvey()
             case .surveyRemoteMessage(let message):
                 handle(remoteMessage: message)
-            case .dataBrokerProtectionWaitlistInvited:
-                performDataBrokerProtectionWaitlistInvitedAction()
             }
         }
 
@@ -180,13 +175,6 @@ extension HomePage.Models {
             tabCollectionViewModel.append(tab: tab)
         }
 
-        @MainActor
-        private func performDataBrokerProtectionWaitlistInvitedAction() {
-        #if DBP
-            DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
-        #endif
-        }
-
         func performDockAction() {
             PixelKit.fire(GeneralPixel.userAddedToDockFromNewTabPageCard,
                           includeAppVersionParameter: false)
@@ -210,18 +198,12 @@ extension HomePage.Models {
             case .surveyRemoteMessage(let message):
                 surveyRemoteMessaging.dismiss(message: message)
                 PixelKit.fire(GeneralPixel.surveyRemoteMessageDismissed(messageID: message.id))
-            case .dataBrokerProtectionWaitlistInvited:
-                shouldShowDBPWaitlistInvitedCardUI = false
             }
             refreshFeaturesMatrix()
         }
 
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
-
-            if shouldDBPWaitlistCardBeVisible {
-                features.append(.dataBrokerProtectionWaitlistInvited)
-            }
 
             for message in surveyRemoteMessaging.presentableRemoteMessages() {
                 features.append(.surveyRemoteMessage(message))
@@ -253,9 +235,8 @@ extension HomePage.Models {
                 return shouldEmailProtectionCardBeVisible
             case .permanentSurvey:
                 return shouldPermanentSurveyBeVisible
-            case .surveyRemoteMessage,
-                 .dataBrokerProtectionWaitlistInvited:
-                return false // These are handled separately
+            case .surveyRemoteMessage:
+                return false // This is handled separately
             }
         }
 
@@ -324,14 +305,6 @@ extension HomePage.Models {
             !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
         }
 
-        private var shouldDBPWaitlistCardBeVisible: Bool {
-#if DBP
-            shouldShowDBPWaitlistInvitedCardUI
-#else
-            return false
-#endif
-        }
-
         private var shouldEmailProtectionCardBeVisible: Bool {
             shouldShowEmailProtectionSetting &&
             !emailManager.isSignedIn
@@ -365,7 +338,7 @@ extension HomePage.Models {
                     var subscription: Subscription?
 
                     if let token = subscriptionManager.accountManager.accessToken {
-                        switch await subscriptionManager.subscriptionService.getSubscription(
+                        switch await subscriptionManager.subscriptionEndpointService.getSubscription(
                             accessToken: token,
                             cachePolicy: .returnCacheDataElseLoad
                         ) {
@@ -412,7 +385,6 @@ extension HomePage.Models {
         case importBookmarksAndPasswords
         case permanentSurvey
         case surveyRemoteMessage(SurveyRemoteMessage)
-        case dataBrokerProtectionWaitlistInvited
 
         var title: String {
             switch self {
@@ -430,8 +402,6 @@ extension HomePage.Models {
                 return PermanentSurveyManager.title
             case .surveyRemoteMessage(let message):
                 return message.cardTitle
-            case .dataBrokerProtectionWaitlistInvited:
-                return "Personal Information Removal"
             }
         }
 
@@ -451,8 +421,6 @@ extension HomePage.Models {
                 return PermanentSurveyManager.body
             case .surveyRemoteMessage(let message):
                 return message.cardDescription
-            case .dataBrokerProtectionWaitlistInvited:
-                return "You're invited to try Personal Information Removal beta!"
             }
         }
 
@@ -472,8 +440,6 @@ extension HomePage.Models {
                 return PermanentSurveyManager.actionTitle
             case .surveyRemoteMessage(let message):
                 return message.action.actionTitle
-            case .dataBrokerProtectionWaitlistInvited:
-                return "Get Started"
             }
         }
 
@@ -504,8 +470,6 @@ extension HomePage.Models {
                 return .survey128.resized(to: iconSize)!
             case .surveyRemoteMessage:
                 return .privacyProSurvey.resized(to: iconSize)!
-            case .dataBrokerProtectionWaitlistInvited:
-                return .dbpInformationRemover.resized(to: iconSize)!
             }
         }
     }

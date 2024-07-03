@@ -87,10 +87,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    private var accountManager: AccountManaging {
-        subscriptionManager.accountManager
-    }
-    public let subscriptionManager: SubscriptionManaging
+    public let subscriptionManager: SubscriptionManager
+    public let subscriptionUIHandler: SubscriptionUIHandling
+
     public let vpnSettings = VPNSettings(defaults: .netP)
 
     // MARK: - VPN
@@ -126,7 +125,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         return VPNRedditSessionWorkaround(
-            accountManager: accountManager,
+            accountManager: subscriptionManager.accountManager,
             ipcClient: ipcClient,
             statusReporter: statusReporter
         )
@@ -219,7 +218,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         // Configure Subscription
-        subscriptionManager = SubscriptionManager()
+        subscriptionManager = DefaultSubscriptionManager()
+        subscriptionUIHandler = SubscriptionUIHandler(windowControllersManagerProvider: {
+            return WindowControllersManager.shared
+        })
 
         // Update VPN environment and match the Subscription environment
         vpnSettings.alignTo(subscriptionEnvironment: subscriptionManager.currentEnvironment)
@@ -278,10 +280,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
-        // Clean up previous experiment
-//        if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts { // Re-implement https://app.asana.com/0/0/1207002879349166/f
-//            PixelExperiment.cleanup()
-//        }
+        PixelExperiment.install()
 
         if LocalStatisticsStore().atb == nil {
             AppDelegate.firstLaunchDate = Date()
@@ -339,7 +338,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         networkProtectionSubscriptionEventHandler?.registerForSubscriptionAccountManagerEvents()
 
-        NetworkProtectionAppEvents(featureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager)).applicationDidFinishLaunching()
+        NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 
 #if DBP
@@ -347,7 +346,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
 #if DBP
-        DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
+        DataBrokerProtectionAppEvents(featureGatekeeper: DefaultDataBrokerProtectionFeatureGatekeeper(accountManager: subscriptionManager.accountManager)).applicationDidFinishLaunching()
 #endif
 
         setUpAutoClearHandler()
@@ -373,18 +372,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidBecomeActive(_ notification: Notification) {
         guard didFinishLaunching else { return }
 
+        PixelExperiment.fireOnboardingTestPixels()
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
-        NetworkProtectionAppEvents(featureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
+        NetworkProtectionAppEvents(featureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
+
 #if DBP
-        DataBrokerProtectionAppEvents().applicationDidBecomeActive()
+        DataBrokerProtectionAppEvents(featureGatekeeper:
+                                        DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
+                                                                                        subscriptionManager.accountManager)).applicationDidBecomeActive()
 #endif
 
         AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
 
-        subscriptionManager.updateSubscriptionStatus { isActive in
-            if isActive {
+        subscriptionManager.refreshCachedSubscriptionAndEntitlements { isSubscriptionActive in
+            if isSubscriptionActive {
                 PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
             }
         }
@@ -491,10 +494,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG || REVIEW
         let environment = ServerEnvironment(
-            UserDefaultsWrapper(
-                key: .syncEnvironment,
-                defaultValue: defaultEnvironment.description
-            ).wrappedValue
+            UserDefaultsWrapper(key: .syncEnvironment, defaultValue: defaultEnvironment.description).wrappedValue
         ) ?? defaultEnvironment
 #else
         let environment = defaultEnvironment
@@ -633,13 +633,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @MainActor
     private func setUpAutoClearHandler() {
-        DispatchQueue.main.async {
-            self.autoClearHandler = AutoClearHandler(preferences: .shared,
+        let autoClearHandler = AutoClearHandler(preferences: .shared,
                                                 fireViewModel: FireCoordinator.fireViewModel,
-                                                     stateRestorationManager: self.stateRestorationManager)
-            self.autoClearHandler.handleAppLaunch()
-            self.autoClearHandler.onAutoClearCompleted = {
+                                                stateRestorationManager: self.stateRestorationManager)
+        self.autoClearHandler = autoClearHandler
+        DispatchQueue.main.async {
+            autoClearHandler.handleAppLaunch()
+            autoClearHandler.onAutoClearCompleted = {
                 NSApplication.shared.reply(toApplicationShouldTerminate: true)
             }
         }
@@ -647,23 +649,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setUpAutofillPixelReporter() {
         autofillPixelReporter = AutofillPixelReporter(
-                userDefaults: .standard,
-                eventMapping: EventMapping<AutofillPixelEvent> {event, _, params, _ in
-                    switch event {
-                    case .autofillActiveUser:
-                        PixelKit.fire(GeneralPixel.autofillActiveUser)
-                    case .autofillEnabledUser:
-                        PixelKit.fire(GeneralPixel.autofillEnabledUser)
-                    case .autofillOnboardedUser:
-                        PixelKit.fire(GeneralPixel.autofillOnboardedUser)
-                    case .autofillLoginsStacked:
-                        PixelKit.fire(GeneralPixel.autofillLoginsStacked, withAdditionalParameters: params)
-                    case .autofillCreditCardsStacked:
-                        PixelKit.fire(GeneralPixel.autofillCreditCardsStacked, withAdditionalParameters: params)
-                    }
-                },
-                passwordManager: PasswordManagerCoordinator.shared,
-                installDate: AppDelegate.firstLaunchDate)
+            userDefaults: .standard,
+            autofillEnabled: AutofillPreferences().askToSaveUsernamesAndPasswords,
+            eventMapping: EventMapping<AutofillPixelEvent> {event, _, params, _ in
+                switch event {
+                case .autofillActiveUser:
+                    PixelKit.fire(GeneralPixel.autofillActiveUser)
+                case .autofillEnabledUser:
+                    PixelKit.fire(GeneralPixel.autofillEnabledUser)
+                case .autofillOnboardedUser:
+                    PixelKit.fire(GeneralPixel.autofillOnboardedUser)
+                case .autofillToggledOn:
+                    PixelKit.fire(GeneralPixel.autofillToggledOn, withAdditionalParameters: params)
+                case .autofillToggledOff:
+                    PixelKit.fire(GeneralPixel.autofillToggledOff, withAdditionalParameters: params)
+                case .autofillLoginsStacked:
+                    PixelKit.fire(GeneralPixel.autofillLoginsStacked, withAdditionalParameters: params)
+                case .autofillCreditCardsStacked:
+                    PixelKit.fire(GeneralPixel.autofillCreditCardsStacked, withAdditionalParameters: params)
+                case .autofillIdentitiesStacked:
+                    PixelKit.fire(GeneralPixel.autofillIdentitiesStacked, withAdditionalParameters: params)
+                }
+            },
+            passwordManager: PasswordManagerCoordinator.shared,
+            installDate: AppDelegate.firstLaunchDate)
+
+        _ = NotificationCenter.default.addObserver(forName: .autofillUserSettingsDidChange,
+                                                   object: nil,
+                                                   queue: nil) { [weak self] _ in
+            self?.autofillPixelReporter?.updateAutofillEnabledStatus(AutofillPreferences().askToSaveUsernamesAndPasswords)
+        }
     }
 }
 
@@ -678,17 +693,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
-        if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
-
-#if DBP
-            if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
-                DispatchQueue.main.async {
-                    DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .localPush)
-                }
-            }
-#endif
-        }
-
         completionHandler()
     }
 

@@ -79,7 +79,7 @@ final class NavigationBarPopoversTests: XCTestCase {
 
     func testShowsPasswordPopoverWithCategory() throws {
         // When
-        sut.showPasswordManagementPopover(selectedCategory: nil, from: MouseOverButton(), withDelegate: MockNSPopoverDelegate())
+        sut.showPasswordManagementPopover(selectedCategory: nil, from: MouseOverButton(), withDelegate: MockNSPopoverDelegate(), source: nil)
 
         // Then
         XCTAssertTrue(autofillPopoverPresenter.didShowWithCategory)

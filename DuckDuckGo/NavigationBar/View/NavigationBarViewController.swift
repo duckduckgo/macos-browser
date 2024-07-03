@@ -71,7 +71,7 @@ final class NavigationBarViewController: NSViewController {
         return progressView
     }()
 
-    private var subscriptionManager: SubscriptionManaging {
+    private var subscriptionManager: SubscriptionManager {
         Application.appDelegate.subscriptionManager
     }
 
@@ -267,15 +267,16 @@ final class NavigationBarViewController: NSViewController {
             return
         }
         selectedTabViewModel.tab.openHomePage()
+        PixelExperiment.fireOnboardingHomeButtonUsed5to7Pixel()
     }
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
-                                   networkProtectionFeatureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager),
+                                   vpnFeatureGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager),
                                    internalUserDecider: internalUserDecider,
-                                   accountManager: subscriptionManager.accountManager)
+                                   subscriptionManager: subscriptionManager)
         menu.actionDelegate = self
         let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
         menu.popUp(positioning: nil, at: location, in: sender)
@@ -514,8 +515,8 @@ final class NavigationBarViewController: NSViewController {
         popovers.toggleDownloadsPopover(from: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
     }
 
-    func showPasswordManagerPopover(selectedCategory: SecureVaultSorting.Category?) {
-        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory, from: passwordManagementButton, withDelegate: self)
+    func showPasswordManagerPopover(selectedCategory: SecureVaultSorting.Category?, source: PasswordManagementSource) {
+        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory, from: passwordManagementButton, withDelegate: self, source: source)
     }
 
     func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount) {
@@ -940,7 +941,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
-        if !isPopUpWindow && DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager).isVPNVisible() {
+        if !isPopUpWindow && DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager).isVPNVisible() {
             let networkProtectionTitle = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }
@@ -1050,7 +1051,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category) {
-        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory, from: passwordManagementButton, withDelegate: self)
+        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory, from: passwordManagementButton, withDelegate: self, source: .overflow)
     }
 
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
@@ -1081,6 +1082,10 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         let url = subscriptionManager.url(for: .purchase)
         WindowControllersManager.shared.showTab(with: .subscription(url))
         PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+    }
+
+    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .subscription)
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {

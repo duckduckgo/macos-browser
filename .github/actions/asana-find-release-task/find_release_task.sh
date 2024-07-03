@@ -41,15 +41,15 @@ find_release_task() {
 			release_task_id="$(jq -r ".data[] | select(.name == \"${task_name}\").gid" <<< "$response")"
 			created_at="$(jq -r ".data[] | select(.name == \"${task_name}\").created_at" <<< "$response")"
 
-			# Only consider release tasks created in the last 4 days.
+			# Only consider release tasks created in the last 5 days.
 			# - We don't want to bump internal release automatically for release tasks that are open for more than a week.
 			# - The automatic check is only done Tuesday-Friday. If the release task is still open next Tuesday, it's unexpected,
 			#   and likely something went wrong.
 			if [[ -n "$created_at" && "$created_at" != "null" ]]; then
 				created_at_timestamp="$(TZ=UTC date -j -f "%Y-%m-%dT%H:%M:%S." "$created_at" +%s)"
-				four_days_ago="$(date -j -v-4d +%s)"
-				if [[ "$created_at_timestamp" -le "$four_days_ago" ]]; then
-					echo "::error::Found release task: ${asana_app_url}/${release_task_id} but it's older than 4 days, skipping."
+				five_days_ago="$(date -j -v-5d +%s)"
+				if [[ "$created_at_timestamp" -le "$five_days_ago" ]]; then
+					echo "::error::Found release task: ${asana_app_url}/${release_task_id} but it's older than 5 days, skipping."
 					exit 1
 				fi
 			fi

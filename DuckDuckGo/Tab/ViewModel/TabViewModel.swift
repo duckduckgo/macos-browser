@@ -101,7 +101,7 @@ final class TabViewModel {
         case .subscription, .identityTheftRestoration, .releaseNotes:
             return true
 
-        case .newtab, .settings, .bookmarks, .onboarding, .dataBrokerProtection, .none:
+        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
             return false
         }
     }
@@ -165,6 +165,7 @@ final class TabViewModel {
                         .settings,
                         .bookmarks,
                         .onboarding,
+                        .onboardingDeprecated,
                         .none,
                         .dataBrokerProtection,
                         .subscription,
@@ -293,7 +294,7 @@ final class TabViewModel {
 
     private func updateAddressBarString() {
         addressBarString = {
-            guard ![.none, .onboarding, .newtab].contains(tab.content),
+            guard ![.none, .onboardingDeprecated, .newtab].contains(tab.content),
                   let url = tab.content.userEditableUrl else { return "" }
 
             if url.isBlobURL {
@@ -306,7 +307,7 @@ final class TabViewModel {
     private func updatePassiveAddressBarString(showFullURL: Bool? = nil) {
         let showFullURL = showFullURL ?? appearancePreferences.showFullURL
         passiveAddressBarAttributedString = switch tab.content {
-        case .newtab, .onboarding, .none:
+        case .newtab, .onboardingDeprecated, .onboarding, .none:
                 .init() // empty
         case .settings:
                 .settingsTrustedIndicator
@@ -369,9 +370,9 @@ final class TabViewModel {
             } else {
                 title = UserText.tabHomeTitle
             }
-        case .onboarding:
+        case .onboardingDeprecated:
             title = UserText.tabOnboardingTitle
-        case .url, .none, .subscription, .identityTheftRestoration:
+        case .url, .none, .subscription, .identityTheftRestoration, .onboarding:
             if let tabTitle = tab.title?.trimmingWhitespace(), !tabTitle.isEmpty {
                 title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
@@ -419,7 +420,7 @@ final class TabViewModel {
             Favicon.duckPlayer
         case .url(let url, _, _) where url.isEmailProtection:
             Favicon.emailProtection
-        case .url, .onboarding, .none:
+        case .url, .onboardingDeprecated, .onboarding, .none:
             tabFavicon ?? tab.favicon
         }
     }

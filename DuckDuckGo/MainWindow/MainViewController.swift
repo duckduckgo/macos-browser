@@ -199,7 +199,6 @@ final class MainViewController: NSViewController {
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
         refreshSurveyMessages()
-        DataBrokerProtectionAppEvents().windowDidBecomeMain()
     }
 
     func windowDidResignKey() {
@@ -207,7 +206,7 @@ final class MainViewController: NSViewController {
     }
 
     func showBookmarkPromptIfNeeded() {
-        guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
+        guard !bookmarksBarViewController.bookmarksBarPromptShown, OnboardingActionsManager.isOnboardingFinished else { return }
         if bookmarksBarIsVisible {
             // Don't show this to users who obviously know about the bookmarks bar already
             bookmarksBarViewController.bookmarksBarPromptShown = true
@@ -315,7 +314,14 @@ final class MainViewController: NSViewController {
             }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] title in
-                self?.view.window?.title = title
+                guard let self else { return }
+                guard !isBurner else {
+                    // Fire Window: don‘t display active Tab title as the Window title
+                    view.window?.title = UserText.burnerWindowHeader
+                    return
+                }
+
+                view.window?.title = title
             }
             .store(in: &tabViewModelCancellables)
     }

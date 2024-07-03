@@ -36,7 +36,7 @@ final class SurveyRemoteMessageTests: XCTestCase {
         let decoder = JSONDecoder()
         let decodedMessages = try decoder.decode([SurveyRemoteMessage].self, from: data)
 
-        XCTAssertEqual(decodedMessages.count, 1)
+        XCTAssertEqual(decodedMessages.count, 2)
 
         guard let firstMessage = decodedMessages.first(where: { $0.id == "message-1"}) else {
             XCTFail("Failed to find expected message")
@@ -59,7 +59,16 @@ final class SurveyRemoteMessageTests: XCTestCase {
         XCTAssertEqual(firstMessage.attributes.daysSinceVPNEnabled, 2)
         XCTAssertEqual(firstMessage.attributes.daysSincePIREnabled, 3)
         XCTAssertEqual(firstMessage.attributes.maximumDaysUntilSubscriptionExpirationOrRenewal, 30)
+        XCTAssertEqual(firstMessage.attributes.appStoreSubscriptionPurchasePlatforms, ["stripe"])
+        XCTAssertEqual(firstMessage.attributes.sparkleSubscriptionPurchasePlatforms, ["stripe"])
         XCTAssertNotNil(firstMessagePresentableSurveyURL)
+
+        guard let lastMessage = decodedMessages.first(where: { $0.id == "message-2"}) else {
+            XCTFail("Failed to find expected message")
+            return
+        }
+
+        XCTAssertEqual(lastMessage.attributes.hideIfInteractedWithMessage, ["message-1"])
     }
 
     func testWhenGettingSurveyURL_AndSurveyURLHasParameters_ThenParametersAreReplaced() {

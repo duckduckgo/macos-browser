@@ -23,4 +23,5 @@ import NetworkProtection
 public protocol VPNControllerIPCClient {
 
     func uninstall(_ component: VPNUninstallComponent) async throws
+    func quit() async throws
 }

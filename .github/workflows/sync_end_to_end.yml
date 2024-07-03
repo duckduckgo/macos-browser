@@ -83,7 +83,6 @@ jobs:
       run: |
         defaults write com.duckduckgo.macos.browser.review sync.environment Development
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
-        defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
         set -o pipefail && xcodebuild test-without-building \
           -scheme "Sync End-to-End UI Tests" \
           -configuration Review \

@@ -46,9 +46,10 @@ final class UserScripts: UserScriptsProvider {
     let youtubePlayerUserScript: YoutubePlayerUserScript?
     let sslErrorPageUserScript: SSLErrorPageUserScript?
     let releaseNotesUserScript: ReleaseNotesUserScript?
+    let onboardingUserScript: OnboardingUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
-        clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
+        clickToLoadScript = ClickToLoadUserScript()
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
 
@@ -67,6 +68,8 @@ final class UserScripts: UserScriptsProvider {
 
         sslErrorPageUserScript = SSLErrorPageUserScript()
 
+        onboardingUserScript = OnboardingUserScript(onboardingActionsManager: sourceProvider.onboardingActionsManager!)
+
         specialPages = SpecialPagesUserScript()
 
         if DuckPlayer.shared.isAvailable {
@@ -80,6 +83,8 @@ final class UserScripts: UserScriptsProvider {
         releaseNotesUserScript = ReleaseNotesUserScript()
 
         userScripts.append(autoconsentUserScript)
+
+        contentScopeUserScriptIsolated.registerSubfeature(delegate: clickToLoadScript)
 
         if let youtubeOverlayScript {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
@@ -95,11 +100,18 @@ final class UserScripts: UserScriptsProvider {
             if let releaseNotesUserScript {
                 specialPages.registerSubfeature(delegate: releaseNotesUserScript)
             }
+            if let onboardingUserScript {
+                specialPages.registerSubfeature(delegate: onboardingUserScript)
+            }
             userScripts.append(specialPages)
         }
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature(subscriptionManager: Application.appDelegate.subscriptionManager))
+            let subscriptionManager = Application.appDelegate.subscriptionManager
+            let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
+                                                                   stripePurchaseFlow: DefaultStripePurchaseFlow(subscriptionManager: subscriptionManager),
+                                                                   uiHandler: Application.appDelegate.subscriptionUIHandler)
+            subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
             userScripts.append(subscriptionPagesUserScript)
 
             identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())
@@ -116,7 +128,6 @@ final class UserScripts: UserScriptsProvider {
         pageObserverScript,
         printingUserScript,
         hoverUserScript,
-        clickToLoadScript,
         contentScopeUserScript,
         contentScopeUserScriptIsolated,
         autofillScript

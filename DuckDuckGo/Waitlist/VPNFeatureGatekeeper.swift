@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionFeatureVisibility.swift
+//  VPNFeatureGatekeeper.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -26,7 +26,7 @@ import LoginItems
 import PixelKit
 import Subscription
 
-protocol NetworkProtectionFeatureVisibility {
+protocol VPNFeatureGatekeeper {
     var isInstalled: Bool { get }
 
     func canStartVPN() async throws -> Bool
@@ -37,20 +37,20 @@ protocol NetworkProtectionFeatureVisibility {
     var onboardStatusPublisher: AnyPublisher<OnboardingStatus, Never> { get }
 }
 
-struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
+struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
     private static var subscriptionAuthTokenPrefix: String { "ddg:" }
     private let vpnUninstaller: VPNUninstalling
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let defaults: UserDefaults
-    private let subscriptionManager: SubscriptionManaging
+    private let subscriptionManager: SubscriptionManager
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
          vpnUninstaller: VPNUninstalling = VPNUninstaller(),
          defaults: UserDefaults = .netP,
          log: OSLog = .networkProtection,
-         subscriptionManager: SubscriptionManaging) {
+         subscriptionManager: SubscriptionManager) {
 
         self.privacyConfigurationManager = privacyConfigurationManager
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
@@ -73,7 +73,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return false
         }
 
-        switch await subscriptionManager.accountManager.hasEntitlement(for: .networkProtection) {
+        switch await subscriptionManager.accountManager.hasEntitlement(forProductName: .networkProtection) {
         case .success(let hasEntitlement):
             return hasEntitlement
         case .failure(let error):

@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import BrowserServicesKit
 
 protocol DuckPlayerPreferencesPersistor {
     /// The persistor hadles raw Bool values but each one translates into a DuckPlayerMode:
@@ -26,6 +27,7 @@ protocol DuckPlayerPreferencesPersistor {
     var duckPlayerModeBool: Bool? { get set }
     var youtubeOverlayInteracted: Bool { get set }
     var youtubeOverlayAnyButtonPressed: Bool { get set }
+    var duckPlayerAutoplay: Bool { get set }
 }
 
 struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersistor {
@@ -38,17 +40,33 @@ struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersisto
 
     @UserDefaultsWrapper(key: .youtubeOverlayButtonsUsed, defaultValue: false)
     var youtubeOverlayAnyButtonPressed: Bool
+
+    @UserDefaultsWrapper(key: .duckPlayerAutoplay, defaultValue: true)
+    var duckPlayerAutoplay: Bool
+
 }
 
 final class DuckPlayerPreferences: ObservableObject {
 
     static let shared = DuckPlayerPreferences()
+    private let privacyConfigurationManager: PrivacyConfigurationManaging
 
     @Published
     var duckPlayerMode: DuckPlayerMode {
         didSet {
             persistor.duckPlayerModeBool = duckPlayerMode.boolValue
         }
+    }
+
+    @Published
+    var duckPlayerAutoplay: Bool {
+        didSet {
+            persistor.duckPlayerAutoplay = duckPlayerAutoplay
+        }
+    }
+
+    var shouldDisplayAutoPlaySettings: Bool {
+        privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
     }
 
     var youtubeOverlayInteracted: Bool {
@@ -63,11 +81,14 @@ final class DuckPlayerPreferences: ObservableObject {
         }
     }
 
-    init(persistor: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor()) {
+    init(persistor: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor(),
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
         self.persistor = persistor
         duckPlayerMode = .init(persistor.duckPlayerModeBool)
         youtubeOverlayInteracted = persistor.youtubeOverlayInteracted
         youtubeOverlayAnyButtonPressed = persistor.youtubeOverlayAnyButtonPressed
+        duckPlayerAutoplay = persistor.duckPlayerAutoplay
+        self.privacyConfigurationManager = privacyConfigurationManager
     }
 
     private var persistor: DuckPlayerPreferencesPersistor

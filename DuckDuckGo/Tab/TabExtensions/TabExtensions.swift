@@ -205,6 +205,10 @@ extension TabExtensionsBuilder {
             ReleaseNotesTabExtension(scriptsPublisher: userScripts.compactMap { $0 }, webViewPublisher: args.webViewFuture)
         }
 
+        add {
+            OnboardingTabExtension()
+        }
+
         if let tunnelController = dependencies.tunnelController {
             add {
                 NetworkProtectionControllerTabExtension(tunnelController: tunnelController)

@@ -80,8 +80,8 @@ extension DuckURLSchemeHandler {
 }
 
 // MARK: - DuckPlayer
-extension DuckURLSchemeHandler {
-    private func handleDuckPlayer(requestURL: URL, urlSchemeTask: WKURLSchemeTask, webView: WKWebView) {
+private extension DuckURLSchemeHandler {
+    func handleDuckPlayer(requestURL: URL, urlSchemeTask: WKURLSchemeTask, webView: WKWebView) {
         let youtubeHandler = YoutubePlayerNavigationHandler()
         let html = youtubeHandler.makeHTMLFromTemplate()
 
@@ -100,10 +100,11 @@ extension DuckURLSchemeHandler {
             urlSchemeTask.didReceive(data)
             urlSchemeTask.didFinish()
         }
+        PixelExperiment.fireOnboardingDuckplayerUsed5to7Pixel()
     }
 }
 
-// MARK: - Onboarding
+// MARK: - Onboarding & Release Notes
 private extension DuckURLSchemeHandler {
     func handleOnboarding(urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = urlSchemeTask.request.url else {
@@ -196,4 +197,5 @@ extension URL {
     var isReleaseNotesScheme: Bool {
         return isDuckURLScheme && host == "release-notes"
     }
+
 }

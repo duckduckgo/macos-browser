@@ -23,33 +23,26 @@ import WebKit
 
 extension WKWebViewConfiguration {
 
-    var allowsPictureInPictureMediaPlayback: Bool {
-        get {
-            return preferences.value(forKey: "allowsPictureInPictureMediaPlayback") as? Bool ?? false
-        }
-        set {
-            preferences.setValue(newValue, forKey: "allowsPictureInPictureMediaPlayback")
-        }
-    }
-
     @MainActor
     func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, burnerMode: BurnerMode) {
         if case .burner(let websiteDataStore) = burnerMode {
             self.websiteDataStore = websiteDataStore
+            // Fire Window: disable audio/video item info reporting to macOS Control Center / Lock Screen
+            preferences[.mediaSessionEnabled] = false
         }
         allowsAirPlayForMediaPlayback = true
         if #available(macOS 12.3, *) {
             preferences.isElementFullscreenEnabled = true
         } else {
-            preferences.setValue(true, forKey: "fullScreenEnabled")
+            preferences[.fullScreenEnabled] = true
         }
 
 #if !APPSTORE
-        allowsPictureInPictureMediaPlayback = true
+        preferences[.allowsPictureInPictureMediaPlayback] = true
 #endif
 
-        preferences.setValue(true, forKey: "developerExtrasEnabled")
-        preferences.setValue(false, forKey: "backspaceKeyNavigationEnabled")
+        preferences[.developerExtrasEnabled] = true
+        preferences[.backspaceKeyNavigationEnabled] = false
         preferences.javaScriptCanOpenWindowsAutomatically = true
         preferences.isFraudulentWebsiteWarningEnabled = false
 
@@ -67,6 +60,33 @@ extension WKWebViewConfiguration {
 
         _=NSPopover.swizzleShowRelativeToRectOnce
      }
+
+}
+
+extension WKPreferences {
+
+    // !!! Do not change the key names as they are directly mirrored into WKPreferences keys !!!
+    enum Key: String {
+        case allowsPictureInPictureMediaPlayback
+        case mediaSessionEnabled
+        case developerExtrasEnabled
+        case backspaceKeyNavigationEnabled
+        case fullScreenEnabled
+    }
+
+    subscript(_ key: Key, default defaultValue: Bool = false) -> Bool {
+        get {
+            value(forKey: key.rawValue) as? Bool ?? defaultValue
+        }
+        set {
+            setValue(newValue, forKey: key.rawValue)
+        }
+    }
+
+    // prevent crashing on undefined key
+    open override func setValue(_ value: Any?, forUndefinedKey key: String) {
+        assertionFailure("WKPreferences.setValueForUndefinedKey: \(key)")
+    }
 
 }
 
