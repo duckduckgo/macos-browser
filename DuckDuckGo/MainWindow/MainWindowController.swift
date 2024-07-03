@@ -146,7 +146,7 @@ final class MainWindowController: NSWindowController {
         NSApplication.shared.mainMenuTyped.autoupdatingMenusForUserPrevention.forEach { $0.autoenablesItems = !prevented }
         NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
 
-        guard forBurning == true else { return }
+        guard forBurning else { return }
         if prevented {
              window?.styleMask.remove(.closable)
              mainViewController.view.makeMeFirstResponder()
