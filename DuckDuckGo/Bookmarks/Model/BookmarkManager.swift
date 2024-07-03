@@ -49,6 +49,7 @@ protocol BookmarkManager: AnyObject {
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
     func handleFavoritesAfterDisablingSync()
+    func search(by query: String) -> [BaseBookmarkEntity]
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
@@ -387,5 +388,34 @@ final class LocalBookmarkManager: BookmarkManager {
             self.requestSync()
 
         }
+    }
+
+    // MARK: - Search
+
+    func search(by query: String) -> [BaseBookmarkEntity] {
+        guard let topLevelEntities = list?.topLevelEntities else {
+            return [BaseBookmarkEntity]()
+        }
+
+        return search(query: query, in: topLevelEntities)
+    }
+
+    private func search(query: String, in bookmarks: [BaseBookmarkEntity]) -> [BaseBookmarkEntity] {
+        var result: [BaseBookmarkEntity] = []
+
+        var stack: [BaseBookmarkEntity] = bookmarks
+        while !stack.isEmpty {
+            let current = stack.removeFirst()
+
+            if current.title.lowercased().contains(query) || query.isBlank {
+                result.append(current)
+            }
+
+            if let folder = current as? BookmarkFolder {
+                stack.append(contentsOf: folder.children)
+            }
+        }
+
+        return result
     }
 }

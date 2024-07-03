@@ -103,4 +103,8 @@ class MockBookmarkManager: BookmarkManager {
     func requestSync() {
     }
 
+    func search(by query: String) -> [BaseBookmarkEntity] {
+        return [BaseBookmarkEntity]()
+    }
+
 }
