@@ -38,6 +38,7 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "BookmarksBarCollectionViewItem")
 
+    @IBOutlet private weak var mouseOverView: MouseOverView!
     @IBOutlet var stackView: NSStackView!
     @IBOutlet private var faviconView: NSImageView! {
         didSet {
@@ -69,7 +70,7 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         createMenu()
     }
 
-    func updateItem(from entity: BaseBookmarkEntity) {
+    func updateItem(from entity: BaseBookmarkEntity, isInteractionPrevented: Bool) {
         self.title = entity.title
 
         if let bookmark = entity as? Bookmark {
@@ -101,6 +102,10 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         case .folder:
             faviconView.image = .folder16
         }
+        mouseOverView.isEnabled = !isInteractionPrevented
+        faviconView.isEnabled = !isInteractionPrevented
+        titleLabel.isEnabled = !isInteractionPrevented
+        titleLabel.alphaValue = isInteractionPrevented ? 0.3 : 1
     }
 
     private func configureLayer() {

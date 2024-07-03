@@ -613,6 +613,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
 
         let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
         tabCollection.append(tabs: tabs)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func openAllInNewWindow(_ sender: NSMenuItem) {
@@ -625,6 +626,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
 
         let newTabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
         WindowsManager.openNewWindow(with: newTabCollection, isBurner: tabCollection.isBurner)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
 }

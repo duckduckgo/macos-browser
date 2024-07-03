@@ -48,6 +48,9 @@ enum PixelExperiment: String, CaseIterable {
 
     /// Enables this experiment for new users when called from the new installation path.
     static func install() {
+        if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts { // Re-implement https://app.asana.com/0/0/1207002879349166/f
+            PixelExperiment.cleanup()
+        }
         logic.install()
     }
 
@@ -57,7 +60,8 @@ enum PixelExperiment: String, CaseIterable {
 
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
     //  remember to keep it clear for privacy triage.
-    case control
+    case control = "oa"
+    case newOnboarding = "ob"
 }
 
 // These functions contain the business logic for determining if the pixel should be fired or not.
@@ -67,12 +71,74 @@ extension PixelExperiment {
         logic.fireEnrollmentPixel()
     }
 
+    static func fireSerpPixel() {
+        logic.fireSerpPixel()
+    }
+
+    static func fireOnboardingHomeButtonEnabledPixel() {
+        logic.fireOnboardingHomeButtonEnabledPixel()
+    }
+
+    static func fireOnboardingBookmarksBarShownPixel() {
+        logic.fireOnboardingBookmarksBarShownPixel()
+    }
+
+    static func fireOnboardingSessionRestoreEnabledPixel() {
+        logic.fireOnboardingSessionRestoreEnabledPixel()
+    }
+
+    static func fireOnboardingSetAsDefaultRequestedPixel() {
+        logic.fireOnboardingSetAsDefaultRequestedPixel()
+    }
+
+    static func fireOnboardingAddToDockRequestedPixel() {
+        logic.fireOnboardingAddToDockRequestedPixel()
+    }
+
+    static func fireOnboardingImportRequestedPixel() {
+        logic.fireOnboardingImportRequestedPixel()
+    }
+
+    static func fireOnboardingSearchPerformed5to7Pixel() {
+        logic.fireOnboardingSearchPerformed5to7Pixel()
+    }
+
+    static func fireOnboardingHomeButtonUsed5to7Pixel() {
+        logic.fireOnboardingHomeButtonUsed5to7Pixel()
+    }
+
+    static func fireOnboardingBookmarkUsed5to7Pixel() {
+        logic.fireOnboardingBookmarkUsed5to7Pixel()
+    }
+
+    static func fireOnboardingSessionRestoreEnabled5to7Pixel() {
+        logic.fireOnboardingSessionRestoreEnabled5to7Pixel()
+    }
+
+    static func fireOnboardingSetAsDefaultEnabled5to7Pixel() {
+        logic.fireOnboardingSetAsDefaultEnabled5to7Pixel()
+    }
+
+    static func fireOnboardingDuckplayerUsed5to7Pixel() {
+        logic.fireOnboardingDuckplayerUsed5to7Pixel()
+    }
+
     static func fireFirstSerpPixel() {
         logic.fireFirstSerpPixel()
     }
 
     static func fireDay21To27SerpPixel() {
         logic.fireDay21To27SerpPixel()
+    }
+
+    static func fireOnboardingTestPixels() {
+        if SystemDefaultBrowserProvider().isDefault {
+            PixelExperiment.fireOnboardingSetAsDefaultEnabled5to7Pixel()
+        }
+
+        if StartupPreferences.shared.restorePreviousSession {
+            PixelExperiment.fireOnboardingSessionRestoreEnabled5to7Pixel()
+        }
     }
 
 }
@@ -137,6 +203,73 @@ final internal class PixelExperimentLogic {
     // You'll need additional pixels for your experiment.  Pass the cohort as a parameter.
     func fireEnrollmentPixel() {
         // You'll probably need this at least.
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingCohortAssigned(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireSerpPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.serp(cohort: cohort.rawValue), frequency: .standard, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingHomeButtonEnabledPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingHomeButtonEnabled(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingBookmarksBarShownPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingBookmarksBarShown(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingSessionRestoreEnabledPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingSessionRestoreEnabled(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingSetAsDefaultRequestedPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingSetAsDefaultRequested(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingAddToDockRequestedPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingAddToDockRequested(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingImportRequestedPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingImportRequested(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingSearchPerformed5to7Pixel() {
+        guard isDay5to7, allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingSearchPerformed5to7(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingHomeButtonUsed5to7Pixel() {
+        guard isDay5to7, allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingHomeButtonUsed5to7(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingBookmarkUsed5to7Pixel() {
+        guard isDay5to7, allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingBookmarkUsed5to7(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingSessionRestoreEnabled5to7Pixel() {
+        guard isDay5to7, allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingSessionRestoreEnabled5to7(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingSetAsDefaultEnabled5to7Pixel() {
+        guard isDay5to7, allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingSetAsDefaultEnabled5to7(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
+    }
+
+    func fireOnboardingDuckplayerUsed5to7Pixel() {
+        guard isDay5to7, allocatedCohort != nil, let cohort else { return }
+        PixelKit.fire(GeneralPixel.onboardingDuckplayerUsed5to7(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
     }
 
     // Often used
@@ -155,6 +288,10 @@ final internal class PixelExperimentLogic {
                 PixelKit.fire(GeneralPixel.serpDay21to27(cohort: cohort.rawValue), frequency: .legacyInitial, includeAppVersionParameter: false)
             }
         }
+    }
+
+    private var isDay5to7: Bool {
+        return daysSinceEnrollment >= 5 && daysSinceEnrollment <= 7
     }
 
     func cleanup() {

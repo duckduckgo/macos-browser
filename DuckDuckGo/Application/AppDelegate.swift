@@ -294,10 +294,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
-        // Clean up previous experiment
-//        if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts { // Re-implement https://app.asana.com/0/0/1207002879349166/f
-//            PixelExperiment.cleanup()
-//        }
+        PixelExperiment.install()
 
         if LocalStatisticsStore().atb == nil {
             AppDelegate.firstLaunchDate = Date()
@@ -393,6 +390,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidBecomeActive(_ notification: Notification) {
         guard didFinishLaunching else { return }
 
+        PixelExperiment.fireOnboardingTestPixels()
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
@@ -514,10 +512,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG || REVIEW
         let environment = ServerEnvironment(
-            UserDefaultsWrapper(
-                key: .syncEnvironment,
-                defaultValue: defaultEnvironment.description
-            ).wrappedValue
+            UserDefaultsWrapper(key: .syncEnvironment, defaultValue: defaultEnvironment.description).wrappedValue
         ) ?? defaultEnvironment
 #else
         let environment = defaultEnvironment

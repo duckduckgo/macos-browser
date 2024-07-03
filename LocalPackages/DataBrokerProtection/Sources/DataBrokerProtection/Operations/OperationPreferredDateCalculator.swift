@@ -101,14 +101,11 @@ struct OperationPreferredDateCalculator {
         let pastTries = historyEvents.filter { $0.isError }.count
         let doubleValue = pow(2.0, Double(pastTries))
 
-        // Check if the double value is within the range of Int before converting
-        let intValue: Int
-        if doubleValue > Double(Int.max) {
-            intValue = Int.max
+        if doubleValue > Double(schedulingConfig.retryError) {
+            return schedulingConfig.retryError.hoursToSeconds
         } else {
-            intValue = Int(doubleValue)
+            let intValue = Int(doubleValue)
+            return intValue.hoursToSeconds
         }
-
-        return min(intValue, schedulingConfig.retryError).hoursToSeconds
     }
 }

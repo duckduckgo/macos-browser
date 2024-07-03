@@ -35,7 +35,6 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
-
 }
 
 protocol NewWindowPolicyDecisionMaker {
@@ -71,6 +70,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
+    let navigationDidEndPublisher = PassthroughSubject<Tab, Never>()
 
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
@@ -618,7 +618,7 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor
     @discardableResult
     func goBack() -> ExpectedNavigation? {
-        guard canGoBack else {
+        guard canGoBack, let backItem = webView.backForwardList.backItem else {
             if canBeClosedWithBack {
                 delegate?.closeTab(self)
             }
@@ -626,7 +626,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         userInteractionDialog = nil
-        let navigation = webView.navigator()?.goBack(withExpectedNavigationType: .backForward(distance: -1))
+        let navigation = webView.navigator()?.go(to: backItem, withExpectedNavigationType: .backForward(distance: -1))
         // update TabContent source to .historyEntry on navigation
         navigation?.appendResponder(willStart: { [weak self] navigation in
             guard let self,
@@ -640,10 +640,10 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor
     @discardableResult
     func goForward() -> ExpectedNavigation? {
-        guard canGoForward else { return nil }
+        guard canGoForward, let forwardItem = webView.backForwardList.forwardItem else { return nil }
 
         userInteractionDialog = nil
-        let navigation = webView.navigator()?.goForward(withExpectedNavigationType: .backForward(distance: 1))
+        let navigation = webView.navigator()?.go(to: forwardItem, withExpectedNavigationType: .backForward(distance: 1))
         // update TabContent source to .historyEntry on navigation
         navigation?.appendResponder(willStart: { [weak self] navigation in
             guard let self,
@@ -724,7 +724,18 @@ protocol NewWindowPolicyDecisionMaker {
     func startOnboarding() {
         userInteractionDialog = nil
 
-        setContent(.onboarding)
+#if DEBUG || REVIEW
+        if Application.runType == .uiTestsOnboarding {
+            setContent(.onboarding)
+            return
+        }
+#endif
+
+        if PixelExperiment.cohort == .newOnboarding {
+            setContent(.onboarding)
+        } else {
+            setContent(.onboardingDeprecated)
+        }
     }
 
     @MainActor(unsafe)
@@ -1140,6 +1151,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func navigationDidFinish(_ navigation: Navigation) {
         invalidateInteractionStateData()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
+        navigationDidEndPublisher.send(self)
     }
 
     @MainActor

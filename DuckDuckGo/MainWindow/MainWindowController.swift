@@ -67,6 +67,13 @@ final class MainWindowController: NSWindowController {
     private var shouldShowOnboarding: Bool {
 #if DEBUG
         return false
+#elseif REVIEW
+        if Application.runType == .uiTests {
+            return false
+        } else {
+            let onboardingIsComplete = OnboardingViewModel.isOnboardingFinished || LocalStatisticsStore().waitlistUnlocked
+            return !onboardingIsComplete
+        }
 #else
         let onboardingIsComplete = OnboardingViewModel.isOnboardingFinished || LocalStatisticsStore().waitlistUnlocked
         return !onboardingIsComplete
@@ -132,18 +139,12 @@ final class MainWindowController: NSWindowController {
         mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.contentChangeEnabled = !prevented
 
         mainViewController.tabBarViewController.fireButton.isEnabled = !prevented
+        mainViewController.tabBarViewController.isInteractionPrevented = prevented
         mainViewController.navigationBarViewController.controlsForUserPrevention.forEach { $0?.isEnabled = !prevented }
+        mainViewController.bookmarksBarViewController.userInteraction(prevented: prevented)
 
         NSApplication.shared.mainMenuTyped.autoupdatingMenusForUserPrevention.forEach { $0.autoenablesItems = !prevented }
         NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
-
-        if prevented {
-            window?.styleMask.remove(.closable)
-            mainViewController.view.makeMeFirstResponder()
-        } else {
-            window?.styleMask.update(with: .closable)
-            mainViewController.adjustFirstResponder()
-        }
     }
 
     private func moveTabBarView(toTitlebarView: Bool) {
@@ -318,11 +319,13 @@ fileprivate extension MainMenu {
 fileprivate extension NavigationBarViewController {
 
     var controlsForUserPrevention: [NSControl?] {
-        return [optionsButton,
+        return [homeButton,
+                optionsButton,
                 bookmarkListButton,
                 passwordManagementButton,
                 addressBarViewController?.addressBarTextField,
-                addressBarViewController?.passiveTextField
+                addressBarViewController?.passiveTextField,
+                addressBarViewController?.addressBarButtonsViewController?.bookmarkButton
         ]
     }
 
