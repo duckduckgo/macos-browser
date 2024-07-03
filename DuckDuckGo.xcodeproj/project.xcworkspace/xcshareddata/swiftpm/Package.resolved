@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "graeme/deduplicate-passwords",
-        "revision" : "1f687a7fefe07fcb694ec1f517736321d3bc7822"
+        "revision" : "d90ee33bbc2dc6147f6337d2af722d3a5ec68b2c"
       }
     },
     {
