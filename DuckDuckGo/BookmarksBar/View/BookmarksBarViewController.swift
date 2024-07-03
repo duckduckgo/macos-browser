@@ -30,7 +30,7 @@ final class BookmarksBarViewController: NSViewController {
     @IBOutlet private var clippedItemsIndicator: NSButton!
     @IBOutlet private var promptAnchor: NSView!
 
-    private let bookmarkManager = LocalBookmarkManager.shared
+    private let bookmarkManager: BookmarkManager
     private let viewModel: BookmarksBarViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
 
@@ -50,7 +50,8 @@ final class BookmarksBarViewController: NSViewController {
         }!
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+        self.bookmarkManager = bookmarkManager
         self.tabCollectionViewModel = tabCollectionViewModel
         self.viewModel = BookmarksBarViewModel(bookmarkManager: bookmarkManager, tabCollectionViewModel: tabCollectionViewModel)
 
