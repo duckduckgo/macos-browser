@@ -59,11 +59,11 @@
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="X6g-3K-JDi">
                                 <rect key="frame" x="0.0" y="-2" width="676" height="5"/>
                             </box>
-                            <customView verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YdB-zl-3Cf" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="12" y="16" width="65" height="24"/>
+                            <customView verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YdB-zl-3Cf">
+                                <rect key="frame" x="12" y="26" width="65" height="28"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gwe-JW-nZ6">
-                                        <rect key="frame" x="4" y="1" width="16.5" height="24"/>
+                                        <rect key="frame" x="4" y="3" width="16.5" height="24"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="16" id="TNn-Xg-utS"/>
                                             <constraint firstAttribute="height" constant="16" id="ZuD-h5-gbG"/>
@@ -73,9 +73,9 @@
                                         </imageCell>
                                     </imageView>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jeg-Iv-FxB">
-                                        <rect key="frame" x="22" y="4" width="37" height="16"/>
+                                        <rect key="frame" x="22" y="7" width="37" height="15"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="16" id="L4P-aC-UPW"/>
+                                            <constraint firstAttribute="height" constant="15" id="L4P-aC-UPW"/>
                                         </constraints>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="dAL-mz-5FX">
                                             <font key="font" metaFont="system"/>
@@ -83,33 +83,40 @@
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="Nr2-47-6rU" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="65" height="28"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <integer key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </customView>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="Nr2-47-6rU" firstAttribute="leading" secondItem="YdB-zl-3Cf" secondAttribute="leading" id="0bx-A0-2hv"/>
                                     <constraint firstItem="gwe-JW-nZ6" firstAttribute="centerY" secondItem="YdB-zl-3Cf" secondAttribute="centerY" id="4th-lJ-sVJ"/>
+                                    <constraint firstAttribute="trailing" secondItem="Nr2-47-6rU" secondAttribute="trailing" id="68B-Qb-2Cy"/>
                                     <constraint firstItem="jeg-Iv-FxB" firstAttribute="leading" secondItem="gwe-JW-nZ6" secondAttribute="trailing" constant="4" id="Hte-Hn-pTm"/>
-                                    <constraint firstAttribute="height" constant="24" id="IWa-7p-Qsd"/>
+                                    <constraint firstAttribute="height" constant="28" id="IWa-7p-Qsd"/>
                                     <constraint firstAttribute="trailing" secondItem="jeg-Iv-FxB" secondAttribute="trailing" constant="8" id="d8s-mn-8EF"/>
+                                    <constraint firstItem="Nr2-47-6rU" firstAttribute="top" secondItem="YdB-zl-3Cf" secondAttribute="top" id="e7t-is-nFh"/>
                                     <constraint firstItem="jeg-Iv-FxB" firstAttribute="centerY" secondItem="YdB-zl-3Cf" secondAttribute="centerY" id="eKI-2A-AvJ"/>
                                     <constraint firstItem="gwe-JW-nZ6" firstAttribute="leading" secondItem="YdB-zl-3Cf" secondAttribute="leading" constant="4" id="fZU-zg-CEj"/>
+                                    <constraint firstAttribute="bottom" secondItem="Nr2-47-6rU" secondAttribute="bottom" id="hrd-Jq-Mcf"/>
                                 </constraints>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
-                                        <color key="value" name="ButtonMouseOverColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
-                                        <color key="value" name="ButtonMouseDownColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="4"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
                             </customView>
                         </subviews>
                         <constraints>
                             <constraint firstItem="X6g-3K-JDi" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" id="0AB-Ps-M7N"/>
+                            <constraint firstItem="YdB-zl-3Cf" firstAttribute="top" secondItem="vwg-NL-UPk" secondAttribute="top" id="0gz-SM-ZOO"/>
                             <constraint firstItem="D39-Of-BIh" firstAttribute="top" secondItem="R54-3G-cms" secondAttribute="top" constant="2" id="1I1-kg-gBo"/>
                             <constraint firstAttribute="bottom" secondItem="D39-Of-BIh" secondAttribute="bottom" constant="2" id="1fG-Jn-HEl"/>
-                            <constraint firstItem="YdB-zl-3Cf" firstAttribute="centerY" secondItem="R54-3G-cms" secondAttribute="centerY" id="6yA-JZ-QPe"/>
                             <constraint firstAttribute="trailing" secondItem="D39-Of-BIh" secondAttribute="trailing" id="Cvo-oT-HF2"/>
                             <constraint firstItem="cjE-4p-vxI" firstAttribute="centerX" secondItem="R54-3G-cms" secondAttribute="centerX" id="T6z-7g-NZA"/>
                             <constraint firstAttribute="trailing" secondItem="Mgr-xJ-Pl5" secondAttribute="trailing" constant="8" id="UCG-Ww-dsY"/>
