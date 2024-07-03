@@ -29,7 +29,7 @@ extension Preferences {
 
     struct AboutView: View {
         @ObservedObject var model: AboutPreferences
-        @State private var areAutomaticUpdatesEnabled: Bool = false
+        @State private var areAutomaticUpdatesEnabled: Bool = true
 
         var body: some View {
             PreferencePane {
