@@ -155,7 +155,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 withAdditionalParameters: [PixelKit.Parameters.vpnCohort: PixelKit.cohort(from: defaults.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
         case .reportConnectionAttempt(attempt: let attempt):
-            vpnLogger.log(attempt, log: .networkProtection)
+            vpnLogger.log(attempt)
 
             switch attempt {
             case .connecting:
@@ -175,6 +175,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .reportTunnelFailure(result: let result):
+            vpnLogger.log(result)
+
             switch result {
             case .failureDetected:
                 PixelKit.fire(
@@ -190,6 +192,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 break
             }
         case .reportLatency(let result):
+            vpnLogger.log(result)
+
             switch result {
             case .error:
                 PixelKit.fire(
@@ -204,7 +208,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .rekeyAttempt(let step):
-            vpnLogger.log(step, named: "Rekey", log: .networkProtectionKeyManagement)
+            vpnLogger.log(step, named: "Rekey")
 
             switch step {
             case .begin:
@@ -224,7 +228,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelStartAttempt(let step):
-            vpnLogger.log(step, named: "Tunnel Start", log: .networkProtection)
+            vpnLogger.log(step, named: "Tunnel Start")
 
             switch step {
             case .begin:
@@ -244,7 +248,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelStopAttempt(let step):
-            vpnLogger.log(step, named: "Tunnel Stop", log: .networkProtection)
+            vpnLogger.log(step, named: "Tunnel Stop")
 
             switch step {
             case .begin:
@@ -264,7 +268,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelUpdateAttempt(let step):
-            vpnLogger.log(step, named: "Tunnel Update", log: .networkProtection)
+            vpnLogger.log(step, named: "Tunnel Update")
 
             switch step {
             case .begin:
@@ -284,7 +288,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelWakeAttempt(let step):
-            vpnLogger.log(step, named: "Tunnel Wake", log: .networkProtectionSleepLog)
+            vpnLogger.log(step, named: "Tunnel Wake")
 
             switch step {
             case .begin:
@@ -304,7 +308,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .failureRecoveryAttempt(let step):
-            vpnLogger.log(step, log: .networkProtectionServerFailureRecoveryLog)
+            vpnLogger.log(step)
 
             switch step {
             case .started:
@@ -333,7 +337,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 )
             }
         case .serverMigrationAttempt(let step):
-            vpnLogger.log(step, named: "Server Migration", log: .networkProtection)
+            vpnLogger.log(step, named: "Server Migration")
 
             switch step {
             case .begin:
@@ -353,6 +357,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelStartOnDemandWithoutAccessToken:
+            vpnLogger.logStartingWithoutAuthToken()
+
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken,
                 frequency: .dailyAndCount,
