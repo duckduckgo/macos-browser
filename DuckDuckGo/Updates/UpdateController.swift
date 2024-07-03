@@ -100,7 +100,10 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
                 updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
 
                 // Reinitialize in order to reset the current loaded state
-                configureUpdater()
+                if !areAutomaticUpdatesEnabled {
+                    configureUpdater()
+                    latestUpdate = nil
+                }
             }
         }
     }
@@ -135,8 +138,9 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     private var internalUserDecider: InternalUserDecider
 
     private func configureUpdater() {
-    // The default configuration of Sparkle updates is in Info.plist
-    updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
+        // The default configuration of Sparkle updates is in Info.plist
+        updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
+        shouldShowManualUpdateDialog = false
 
     //TODO: Uncomment
 //#if DEBUG
@@ -203,6 +207,8 @@ extension UpdateController: SPUStandardUserDriverDelegate {
     func standardUserDriverShouldHandleShowingScheduledUpdate(_ update: SUAppcastItem, andInImmediateFocus immediateFocus: Bool) -> Bool {
         return shouldShowManualUpdateDialog
     }
+
+    func standardUserDriverWillHandleShowingUpdate(_ handleShowingUpdate: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {}
 
 }
 
@@ -287,7 +293,9 @@ extension UpdateController: SPUUpdaterDelegate {
         isUpdateBeingLoaded = false
     }
 
-    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {}
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
+        print("")
+    }
 
 }
 
