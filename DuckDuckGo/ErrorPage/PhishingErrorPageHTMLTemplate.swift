@@ -18,13 +18,8 @@
 
 import Foundation
 import ContentScopeScripts
-import WebKit
-import Common
 
 struct PhishingErrorPageHTMLTemplate: ErrorPageHTMLTemplating {
-    let domain: String
-    let tld = TLD()
-
     static var htmlTemplatePath: String {
         guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/specialerrorpage") else {
             assertionFailure("HTML template not found")
@@ -39,20 +34,19 @@ struct PhishingErrorPageHTMLTemplate: ErrorPageHTMLTemplating {
             assertionFailure("Should be able to load template")
             return ""
         }
-        let eTldPlus1 = tld.eTLDplus1(domain) ?? domain
-        let loadTimeData = createJSONString(header: phishingError.header, body: phishingError.body(for: domain), advancedButton: phishingError.advancedButton, leaveSiteButton: phishingError.leaveSiteButton, advancedInfoHeader: phishingError.advancedInfoTitle, specificMessage: phishingError.specificMessage(for: domain, eTldPlus1: eTldPlus1), advancedInfoBody: phishingError.advancedInfoBody, visitSiteButton: phishingError.visitSiteButton)
+        let loadTimeData = createJSONString(header: phishingError.header, body: phishingError.body, advancedButton: phishingError.advancedButton, leaveSiteButton: phishingError.leaveSiteButton, advancedInfoHeader: phishingError.advancedInfoTitle, readMore: phishingError.readMoreCTA, advancedInfoBody: phishingError.advancedInfoBody, visitSiteButton: phishingError.visitSiteButton)
         return html.replacingOccurrences(of: "$LOAD_TIME_DATA$", with: loadTimeData, options: .literal)
     }
 
-    private func createJSONString(header: String, body: String, advancedButton: String, leaveSiteButton: String, advancedInfoHeader: String, specificMessage: String, advancedInfoBody: String, visitSiteButton: String) -> String {
+    private func createJSONString(header: String, body: String, advancedButton: String, leaveSiteButton: String, advancedInfoHeader: String, readMore: String, advancedInfoBody: String, visitSiteButton: String) -> String {
         let innerDictionary: [String: Any] = [
             "header": header.escapedUnicodeHtmlString(),
             "body": body.escapedUnicodeHtmlString(),
             "advancedButton": advancedButton.escapedUnicodeHtmlString(),
             "leaveSiteButton": leaveSiteButton.escapedUnicodeHtmlString(),
             "advancedInfoHeader": advancedInfoHeader.escapedUnicodeHtmlString(),
-            "specificMessage": specificMessage.escapedUnicodeHtmlString(),
-            "advancedInfoBody": advancedInfoBody.escapedUnicodeHtmlString(),
+            "specificMessage": advancedInfoBody.escapedUnicodeHtmlString(),
+            "advancedInfoBody": readMore.escapedUnicodeHtmlString(),
             "visitSiteButton": visitSiteButton.escapedUnicodeHtmlString()
         ]
 
@@ -79,9 +73,8 @@ public struct PhishingError {
         return UserText.phishingErrorPageHeader
     }
 
-    func body(for domain: String) -> String {
-        let boldDomain = "<span style=\"font-weight: 600;\">\(domain)</span>"
-        return UserText.phishingErrorPageBody(boldDomain)
+    var body: String {
+        return UserText.phishingErrorPageBody
     }
 
     var advancedButton: String {
@@ -104,9 +97,7 @@ public struct PhishingError {
         return UserText.phishingErrorAdvancedInfoBodyPhishing
     }
 
-    func specificMessage(for domain: String, eTldPlus1: String) -> String {
-        let boldDomain = "<span style=\"font-weight: 600;\">\(domain)</span>"
-        let boldETldPlus1 = "<span style=\"font-weight: 600;\">\(eTldPlus1)</span>"
-        return UserText.phishingErrorPageBody(boldDomain)
+    var readMoreCTA: String {
+        return UserText.phishingErrorPageReadMore
     }
 }

@@ -261,19 +261,17 @@ struct UserText {
     }
 
     // MARK: Phishing Error Page
-    static let phishingErrorPageHeader = NSLocalizedString("phishing.error.page.header", value: "Warning: This site may be malicious", comment: "Title shown in an error page that warn users of security risks on a website due to Phishing issues")
-    static let phishingErrorPageTabTitle = NSLocalizedString("phishing.error.page.tab.title", value: "Warning: Site May Be Malicious", comment: "Title shown in an error page tab that warn users of security risks on a website due to Phishing issues")
-    static func phishingErrorPageBody(_ domain: String) -> String {
-        let localized = NSLocalizedString("phishing.error.page.body",
-                                          value: "This website may try to trick you into doing something dangerous, like installing software or disclosing personal or financial information, like passwords, phone numbers or credit cards.",
-                                          comment: "Error description shown in an error page that warns users of security risks on a website due to Phishing issues. %1$@ represent the site domain.")
-        return String(format: localized, domain)
-    }
+    static let phishingErrorPageHeader = NSLocalizedString("phishing.error.page.header", value: "Warning: This site puts your personal information at risk", comment: "Title shown in an error page that warn users of security risks on a website due to Phishing issues")
+    static let phishingErrorPageTabTitle = NSLocalizedString("phishing.error.page.tab.title", value: "Warning: Deceptive Site Ahead", comment: "Title shown in an error page tab that warn users of security risks on a website due to Phishing issues")
+    static let phishingErrorPageBody =  NSLocalizedString("phishing.error.page.body",
+                                          value: "This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers. <a href=\"https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/\">Learn more</a>",
+                                          comment: "Error description shown in an error page that warns users of security risks on a website due to Phishing issues.")
     static let phishingErrorPageAdvancedButton = NSLocalizedString("phishing.error.page.advanced.button", value: "Advanced…", comment: "Button shown in an error page that warns users of security risks on a website due to Phishing issues. The buttons allows the user to see advanced options on click.")
     static let phishingErrorPageLeaveSiteButton = NSLocalizedString("phishing.error.page.leave.site.button", value: "Leave This Site", comment: "Button shown in an error page that warns users of security risks on a website due to Phishing issues. The buttons allows the user to leave the website and navigate to previous page.")
     static let phishingErrorPageVisitSiteButton = NSLocalizedString("phishing.error.page.visit.site.button", value: "Accept Risk and Visit Site", comment: "Button shown in an error page that warns users of security risks on a website due to Phishing issues. The buttons allows the user to visit the website anyway despite the risks.")
     static let phishingErrorAdvancedInfoTitle = NSLocalizedString("phishing.error.page.advanced.info.title", value: "DuckDuckGo warns you when a website has been flagged as malicious.", comment: "Title of the Advanced info section shown in an error page that warns users of security risks on a website due to Phishing issues.")
-    static let phishingErrorAdvancedInfoBodyPhishing = NSLocalizedString("phishing.error.page.advanced.info.body.credential.phishing", value: "Warnings are shown for websites that have been reported as deceptive.", comment: "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to Phishing issues.")
+    static let phishingErrorAdvancedInfoBodyPhishing = NSLocalizedString("phishing.error.page.advanced.info.body.credential.phishing", value: "Warnings are shown for websites that have been reported to be deceptive. Deceptive websites try to trick you into believing they are legitimate websites you trust. If you understand the risks involved, you can continue anyway.", comment: "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to Phishing issues.")
+    static let phishingErrorPageReadMore = NSLocalizedString("phishing.error.page.read.more", value: "See our <a href=\"https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/\">Phishing and Malware Protection help page</a> for more information.", comment: "A call-to-action to read more on our help pages for phishing and malware protection.")
 
 
 
@@ -440,8 +438,8 @@ struct UserText {
     static let downloadsOpenPopupOnCompletion = NSLocalizedString("downloads.open.on.completion", value: "Automatically open the Downloads panel when downloads complete", comment: "Checkbox to open a Download Manager popover when downloads are completed")
 
     static let phishingDetectionHeader = NSLocalizedString("phishing-detection.enabled.header", value: "Malicious Site Protection", comment: "Header for phishing site protection section in the settings page")
-    static let phishingDetectionIsEnabled = NSLocalizedString("phishing-detection.enabled.checkbox", value: "Allow DuckDuckGo to warn you when you visit fraudulent sites", comment: "Checkbox that enables or disables the phishing detection feature in the browser")
-    static let phishingDetectionEnabledWarning = NSLocalizedString("phishing-detection.enabled.warning", value: "It is highly recommended to keep this setting enabled. Disabling it may put your personal information at risk. Only do so if you understand the risks", comment: "A description box to warn users away from disabling phishing protection")
+    static let phishingDetectionIsEnabled = NSLocalizedString("phishing-detection.enabled.checkbox", value: "Allow DuckDuckGo to warn you before loading a webpage that has been flagged as malicious or fraudulent.", comment: "Checkbox that enables or disables the phishing detection feature in the browser")
+    static let phishingDetectionEnabledWarning = NSLocalizedString("phishing-detection.enabled.warning", value: "Disabling this feature can put your personal information at risk. Only do so if you fully understand the risk involved.", comment: "A description box to warn users away from disabling phishing protection")
 
     // MARK: Password Manager
     static let passwordManagementAllItems = NSLocalizedString("passsword.management.all-items", value: "All Items", comment: "Used as title for the Autofill All Items option")

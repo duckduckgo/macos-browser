@@ -37,10 +37,11 @@ class ErrorPageHTMLFactoryTests: XCTestCase {
         let error = PhishingDetectionError.detected
         let url = URL(string: "https://example.com")!
         let template = ErrorPageHTMLFactory.makeTemplate(for: error, url: url)
-
+        
         XCTAssertNotNil(template)
         XCTAssertTrue(template is PhishingErrorPageHTMLTemplate)
-        XCTAssertEqual((template as? PhishingErrorPageHTMLTemplate)?.domain, "example.com")
+        let htmlTemplate = template!.makeHTMLFromTemplate()
+        XCTAssertTrue(htmlTemplate.contains("Phishing"))
     }
 
     func testDefaultErrorTemplate() {

@@ -27,14 +27,14 @@ protocol ErrorPageHTMLTemplating {
 final class ErrorPageHTMLFactory {
     static func makeTemplate(for error: Error, url: URL, errorCode: Int? = nil, header: String? = nil) -> ErrorPageHTMLTemplating? {
         let domain = url.host ?? url.absoluteString
-        let defaultHeader = "Error"
+        let defaultHeader = UserText.errorPageHeader
         let nsError = error as NSError
         let wkError = WKError(_nsError: nsError)
         switch wkError.code {
         case WKError.Code(rawValue: NSURLErrorServerCertificateUntrusted):
             return SSLErrorPageHTMLTemplate(domain: domain, errorCode: errorCode ?? 0)
         case WKError.Code(rawValue: PhishingDetectionError.detected.rawValue):
-            return PhishingErrorPageHTMLTemplate(domain: domain)
+            return PhishingErrorPageHTMLTemplate()
         default:
             return ErrorPageHTMLTemplate(error: wkError, header: header ?? defaultHeader)
         }

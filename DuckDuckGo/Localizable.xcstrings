@@ -38598,7 +38598,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allow DuckDuckGo to warn you when you visit fraudulent sites"
+            "value" : "Allow DuckDuckGo to warn you before loading a webpage that has been flagged as malicious or fraudulent."
           }
         }
       }
@@ -38622,7 +38622,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "It is highly recommended to keep this setting enabled. Disabling it may put your personal information at risk. Only do so if you understand the risks"
+            "value" : "Disabling this feature can put your personal information at risk. Only do so if you fully understand the risk involved."
           }
         }
       }
@@ -38646,7 +38646,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Warnings are shown for websites that have been reported as deceptive."
+            "value" : "Warnings are shown for websites that have been reported to be deceptive. Deceptive websites try to trick you into believing they are legitimate websites you trust. If you understand the risks involved, you can continue anyway."
           }
         }
       }
@@ -38664,13 +38664,13 @@
       }
     },
     "phishing.error.page.body" : {
-      "comment" : "Error description shown in an error page that warns users of security risks on a website due to Phishing issues. %1$@ represent the site domain.",
+      "comment" : "Error description shown in an error page that warns users of security risks on a website due to Phishing issues.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "This website may try to trick you into doing something dangerous, like installing software or disclosing personal or financial information, like passwords, phone numbers or credit cards."
+            "value" : "This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers. <a href=\"https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/\">Learn more</a>"
           }
         }
       }
@@ -38682,7 +38682,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Warning: This site may be malicious"
+            "value" : "Warning: This site puts your personal information at risk"
           }
         }
       }
@@ -38699,6 +38699,18 @@
         }
       }
     },
+    "phishing.error.page.read.more" : {
+      "comment" : "A call-to-action to read more on our help pages for phishing and malware protection.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "See our <a href=\"https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/\">Phishing and Malware Protection help page</a> for more information."
+          }
+        }
+      }
+    },
     "phishing.error.page.tab.title" : {
       "comment" : "Title shown in an error page tab that warn users of security risks on a website due to Phishing issues",
       "extractionState" : "extracted_with_value",
@@ -38706,7 +38718,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Warning: Site May Be Malicious"
+            "value" : "Warning: Deceptive Site Ahead"
           }
         }
       }
