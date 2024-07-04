@@ -164,6 +164,7 @@ final class BookmarkListViewController: NSViewController {
         searchBookmarksButton.toolTip = UserText.bookmarksSearch
 
         searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.delegate = self
 
         buttonsDivider.boxType = .separator
         buttonsDivider.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -675,6 +676,30 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
         PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
+}
+
+// MARK: - Search field delegate
+
+extension BookmarkListViewController: NSSearchFieldDelegate {
+
+    func controlTextDidChange(_ obj: Notification) {
+        if let searchField = obj.object as? NSSearchField {
+            let searchQuery = searchField.stringValue
+
+            let result = bookmarkSearchViewModel.search(by: searchQuery)
+
+            switch result {
+            case .emptyQuery:
+                print("Empty query")
+            case let.results(bookmarks):
+                if bookmarks.isEmpty {
+                    print("No bookmarks were found")
+                } else {
+                    print("We found \(bookmarks.count) bookmarks")
+                }
+            }
+        }
+    }
 }
 
 // MARK: - BookmarkListPopover
