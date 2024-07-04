@@ -214,12 +214,12 @@ extension DuckPlayerTabExtension: NavigationResponder {
            let (videoID, timestamp) = navigationAction.url.youtubeVideoParams {
             // if webview.url is not empty, open new tab if settings is ON
             if shouldOpenInNewTab, let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
+                // Inject the WindowControllersManager here instead of using the singleton
                 WindowControllersManager.shared.show(url: navigationAction.url, source: .link, newTab: true)
                 return .cancel
             } else {
                 return decidePolicy(for: navigationAction, withYoutubeVideoID: videoID, timestamp: timestamp)
             }
-
         }
         return .next
     }
