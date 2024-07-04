@@ -39,6 +39,7 @@ final class BookmarkListViewController: NSViewController {
     private lazy var newBookmarkButton = MouseOverButton(image: .addBookmark, target: self, action: #selector(newBookmarkButtonClicked))
     private lazy var newFolderButton = MouseOverButton(image: .addFolder, target: self, action: #selector(newFolderButtonClicked))
     private lazy var searchBookmarksButton = MouseOverButton(image: .searchBookmarks, target: self, action: #selector(searchBookmarkButtonClicked))
+    private var isSearchVisible = false
 
     private lazy var buttonsDivider = NSBox()
     private lazy var manageBookmarksButton = MouseOverButton(title: UserText.bookmarksManage, target: self, action: #selector(openManagementInterface))
@@ -53,6 +54,7 @@ final class BookmarkListViewController: NSViewController {
     private lazy var emptyStateImageView = NSImageView(image: .bookmarksEmpty)
     private lazy var importButton = NSButton(title: UserText.importBookmarksButtonTitle, target: self, action: #selector(onImportClicked))
     private lazy var searchBar = NSSearchField()
+    private var boxDividerTopConstraint = NSLayoutConstraint()
 
     private var cancellables = Set<AnyCancellable>()
     private let bookmarkManager: BookmarkManager
@@ -112,7 +114,6 @@ final class BookmarkListViewController: NSViewController {
         view.addSubview(stackView)
         view.addSubview(scrollView)
         view.addSubview(emptyState)
-        view.addSubview(searchBar)
 
         view.autoresizesSubviews = false
 
@@ -161,6 +162,8 @@ final class BookmarkListViewController: NSViewController {
         searchBookmarksButton.mouseOverColor = .buttonMouseOver
         searchBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
         searchBookmarksButton.toolTip = UserText.bookmarksSearch
+
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
 
         buttonsDivider.boxType = .separator
         buttonsDivider.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -259,7 +262,7 @@ final class BookmarkListViewController: NSViewController {
         titleTextField.setContentHuggingPriority(.defaultHigh, for: .vertical)
         titleTextField.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
         titleTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 12).isActive = true
-        titleTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
+        titleTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
 
         newBookmarkButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
         newBookmarkButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
@@ -282,7 +285,8 @@ final class BookmarkListViewController: NSViewController {
         stackView.centerYAnchor.constraint(equalTo: titleTextField.centerYAnchor).isActive = true
         view.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: 20).isActive = true
 
-        boxDivider.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 12).isActive = true
+        boxDividerTopConstraint = boxDivider.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 12)
+        boxDividerTopConstraint.isActive = true
         boxDivider.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         view.trailingAnchor.constraint(equalTo: boxDivider.trailingAnchor).isActive = true
 
@@ -365,7 +369,28 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @objc func searchBookmarkButtonClicked(_ sender: NSButton) {
+        isSearchVisible.toggle()
 
+        if isSearchVisible {
+            showSearchBar()
+        } else {
+            hideSearchBar()
+        }
+    }
+
+    private func showSearchBar() {
+        view.addSubview(searchBar)
+
+        boxDividerTopConstraint.isActive = false
+        searchBar.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 8).isActive = true
+        searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+        view.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor, constant: 16).isActive = true
+        boxDivider.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 10).isActive = true
+    }
+
+    private func hideSearchBar() {
+        searchBar.removeFromSuperview()
+        boxDividerTopConstraint.isActive = true
     }
 
     @objc func openManagementInterface(_ sender: NSButton) {
