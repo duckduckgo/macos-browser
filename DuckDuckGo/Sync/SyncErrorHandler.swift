@@ -34,21 +34,21 @@ protocol SyncErrorHandling {
 public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
 
     @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
-    private (set) var isSyncBookmarksPaused: Bool {
+    private(set) var isSyncBookmarksPaused: Bool {
         didSet {
             isSyncPausedChangedPublisher.send()
         }
     }
 
     @UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false)
-    private (set) var isSyncCredentialsPaused: Bool {
+    private(set) var isSyncCredentialsPaused: Bool {
         didSet {
             isSyncPausedChangedPublisher.send()
         }
     }
 
     @UserDefaultsWrapper(key: .syncIsPaused, defaultValue: false)
-    private (set) var isSyncPaused: Bool {
+    private(set) var isSyncPaused: Bool {
         didSet {
             isSyncPausedChangedPublisher.send()
         }

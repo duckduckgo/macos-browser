@@ -32,3 +32,13 @@ extension NSSize {
     }
 
 }
+
+extension CGSize {
+    /// #Preview helper to convert CGSize to Preview Traits
+    @available(macOS 14.0, *)
+    var fixedLayout: PreviewTrait<Preview.ViewTraits> {
+        MainActor.assumeIsolated {
+            .fixedLayout(width: width, height: height)
+        }
+    }
+}

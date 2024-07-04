@@ -672,43 +672,41 @@ extension BookmarkListPopover: BookmarkListViewControllerDelegate {
 }
 
 #if DEBUG
-private let previewEmptyState = false
+// swiftlint:disable:next identifier_name
+func _mockPreviewBookmarkManager(previewEmptyState: Bool) -> BookmarkManager {
+    let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: previewEmptyState ? [] : [
+        BookmarkFolder(id: "1", title: "Folder 1", children: [
+            BookmarkFolder(id: "2", title: "Nested Folder", children: [
+                Bookmark(id: "b1", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "2")
+            ])
+        ]),
+        BookmarkFolder(id: "3", title: "Another Folder", children: [
+            BookmarkFolder(id: "4", title: "Nested Folder", children: [
+                BookmarkFolder(id: "5", title: "Another Nested Folder", children: [
+                    Bookmark(id: "b2", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "5")
+                ])
+            ])
+        ]),
+        Bookmark(id: "b3", url: URL.duckDuckGo.absoluteString, title: "Bookmark 1", isFavorite: false, parentFolderUUID: ""),
+        Bookmark(id: "b4", url: URL.duckDuckGo.absoluteString, title: "Bookmark 2", isFavorite: false, parentFolderUUID: ""),
+        Bookmark(id: "b5", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "")
+    ]))
+    bkman.loadBookmarks()
+    customAssertionFailure = { _, _, _ in }
+
+    return bkman
+}
+
 @available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: BookmarkListViewController.preferredContentSize.width, height: BookmarkListViewController.preferredContentSize.height)) { {
+#Preview("Test Bookmark data",
+         traits: BookmarkListViewController.preferredContentSize.fixedLayout) {
+    BookmarkListViewController(bookmarkManager: _mockPreviewBookmarkManager(previewEmptyState: false))
+        ._preview_hidingWindowControlsOnAppear()
+}
 
-    let vc = BookmarkListViewController(bookmarkManager: {
-        let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: previewEmptyState ? [] : [
-            BookmarkFolder(id: "1", title: "Folder 1", children: [
-                BookmarkFolder(id: "2", title: "Nested Folder", children: [
-                    Bookmark(id: "b1", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "2")
-                ])
-            ]),
-            BookmarkFolder(id: "3", title: "Another Folder", children: [
-                BookmarkFolder(id: "4", title: "Nested Folder", children: [
-                    BookmarkFolder(id: "5", title: "Another Nested Folder", children: [
-                        Bookmark(id: "b2", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "5")
-                    ])
-                ])
-            ]),
-            Bookmark(id: "b3", url: URL.duckDuckGo.absoluteString, title: "Bookmark 1", isFavorite: false, parentFolderUUID: ""),
-            Bookmark(id: "b4", url: URL.duckDuckGo.absoluteString, title: "Bookmark 2", isFavorite: false, parentFolderUUID: ""),
-            Bookmark(id: "b5", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "")
-        ]))
-        bkman.loadBookmarks()
-        customAssertionFailure = { _, _, _ in }
-
-        return bkman
-    }())
-
-    var c: AnyCancellable!
-    c = vc.publisher(for: \.view.window).sink { window in
-        window?.titlebarAppearsTransparent = true
-        window?.titleVisibility = .hidden
-        window?.styleMask = []
-        withExtendedLifetime(c) {}
-    }
-
-    return vc
-
-}() }
+@available(macOS 14.0, *)
+#Preview("Empty Scope", traits: BookmarkListViewController.preferredContentSize.fixedLayout) {
+    BookmarkListViewController(bookmarkManager: _mockPreviewBookmarkManager(previewEmptyState: true))
+        ._preview_hidingWindowControlsOnAppear()
+}
 #endif
