@@ -28,12 +28,46 @@ struct BookmarkSearchResultsView: View {
             if viewModel.searchResult.isEmpty {
                 Text("No results")
             } else {
-                ForEach(viewModel.searchResult, id: \.id) { bookmark in
-                    Text(bookmark.title)
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        ForEach(viewModel.searchResult, id: \.id) { bookmark in
+                            BookmarkSearchResultCellView(bookmark: bookmark)
+                                .frame(maxWidth: .infinity)
+                                .padding(.leading, 8)
+                        }
+                    }
                 }
+                .padding(.top, 8)
             }
         }
         .frame(maxWidth: .infinity)
         .frame(height: 408)
+    }
+}
+
+struct BookmarkSearchResultCellView: View {
+    let bookmark: BaseBookmarkEntity
+
+    var body: some View {
+        HStack {
+            if let bookmark = bookmark as? Bookmark {
+                let favicon = bookmark.favicon(.small) ?? .bookmarkDefaultFavicon
+                Image(nsImage: favicon)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 16, height: 16)
+                    .padding(.leading, 8)
+            } else {
+                Image(.folder)
+                    .padding(.leading, 8)
+            }
+
+            Text(bookmark.title)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(Color(.controlTextColor))
+                .padding(.leading, 6)
+            Spacer()
+        }
+        .frame(height: 28)
     }
 }
