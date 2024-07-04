@@ -47,9 +47,13 @@ enum Preferences {
         @ObservedObject var model: PreferencesSidebarModel
 
         var subscriptionModel: PreferencesSubscriptionModel?
+        let subscriptionManager: SubscriptionManager
+        let subscriptionUIHandler: SubscriptionUIHandling
 
-        init(model: PreferencesSidebarModel) {
+        init(model: PreferencesSidebarModel, subscriptionManager: SubscriptionManager, subscriptionUIHandler: SubscriptionUIHandling) {
             self.model = model
+            self.subscriptionManager = subscriptionManager
+            self.subscriptionUIHandler = subscriptionUIHandler
             self.subscriptionModel = makeSubscriptionViewModel()
         }
 
@@ -138,7 +142,7 @@ enum Preferences {
                         WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
                     case .openITR:
                         PixelKit.fire(PrivacyProPixel.privacyProIdentityRestorationSettings)
-                        let url = Application.appDelegate.subscriptionManager.url(for: .identityTheftRestoration)
+                        let url = subscriptionManager.url(for: .identityTheftRestoration)
                         WindowControllersManager.shared.showTab(with: .identityTheftRestoration(url))
                     case .iHaveASubscriptionClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseClick)
@@ -162,20 +166,19 @@ enum Preferences {
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(
                 openActivateViaEmailURL: {
-                    let url = Application.appDelegate.subscriptionManager.url(for: .activateViaEmail)
+                    let url = subscriptionManager.url(for: .activateViaEmail)
                     WindowControllersManager.shared.showTab(with: .subscription(url))
                 }, restorePurchases: {
                     if #available(macOS 12.0, *) {
                         Task {
-                            let subscriptionManager = Application.appDelegate.subscriptionManager
                             let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
                                                                                  storePurchaseManager: subscriptionManager.storePurchaseManager(),
                                                                                  subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
                                                                                  authEndpointService: subscriptionManager.authEndpointService)
                             let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(
-                                subscriptionManager: Application.appDelegate.subscriptionManager,
+                                subscriptionManager: subscriptionManager,
                                 appStoreRestoreFlow: appStoreRestoreFlow,
-                                uiHandler: Application.appDelegate.subscriptionUIHandler)
+                                uiHandler: subscriptionUIHandler)
                             await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
                         }
                     }
@@ -184,7 +187,7 @@ enum Preferences {
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,
                                                 sheetActionHandler: sheetActionHandler,
-                                                subscriptionManager: Application.appDelegate.subscriptionManager)
+                                                subscriptionManager: subscriptionManager)
         }
     }
 }
