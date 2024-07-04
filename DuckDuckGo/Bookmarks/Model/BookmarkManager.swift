@@ -409,16 +409,16 @@ final class LocalBookmarkManager: BookmarkManager {
     private func search(query: String, in bookmarks: [BaseBookmarkEntity]) -> [BaseBookmarkEntity] {
         var result: [BaseBookmarkEntity] = []
 
-        var stack: [BaseBookmarkEntity] = bookmarks
-        while !stack.isEmpty {
-            let current = stack.removeFirst()
+        var queue: [BaseBookmarkEntity] = bookmarks
+        while !queue.isEmpty {
+            let current = queue.removeFirst()
 
             if current.title.lowercased().contains(query) {
                 result.append(current)
             }
 
             if let folder = current as? BookmarkFolder {
-                stack.append(contentsOf: folder.children)
+                queue.append(contentsOf: folder.children)
             }
         }
 
