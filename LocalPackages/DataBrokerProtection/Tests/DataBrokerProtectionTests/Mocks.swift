@@ -34,7 +34,8 @@ extension BrokerProfileQueryData {
                      extractedProfile: ExtractedProfile? = nil,
                      scanHistoryEvents: [HistoryEvent] = [HistoryEvent](),
                      mirrorSites: [MirrorSite] = [MirrorSite](),
-                     deprecated: Bool = false) -> BrokerProfileQueryData {
+                     deprecated: Bool = false,
+                     optOutJobData: [OptOutJobData]? = nil) -> BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
                 name: dataBrokerName,
@@ -1560,6 +1561,7 @@ extension SecureStorageError: Equatable {
 }
 
 final class MockDataBrokerProtectionStatsPixelsRepository: DataBrokerProtectionStatsPixelsRepository {
+    var customStatsPixelsLastSentTimestamp: Date?
     var wasMarkStatsWeeklyPixelDateCalled: Bool = false
     var wasMarkStatsMonthlyPixelDateCalled: Bool = false
     var latestStatsWeeklyPixelDate: Date?
