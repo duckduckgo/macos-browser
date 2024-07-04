@@ -65,7 +65,7 @@ final class SecureVaultLoginImporter: LoginImporter {
                     if Self.featureFlagger.isFeatureOn(.deduplicateLoginsOnImport),
                         let signature = try vault.encryptPassword(for: credentials, key: encryptionKey, salt: hashingSalt).account.signature {
                         let isDuplicate = accounts.contains {
-                            $0.isDuplicateOf(accountToBeImported: account, signatureOfAccountToBeImported: signature)
+                            $0.isDuplicateOf(accountToBeImported: account, signatureOfAccountToBeImported: signature, passwordToBeImported: login.password)
                         }
                         if isDuplicate {
                             throw ImporterError.duplicate
@@ -114,8 +114,8 @@ extension SecureVaultModels.WebsiteAccount {
      it's an exact match
      the stored entry has a value and the import entry doesn't
      */
-    func isDuplicateOf(accountToBeImported: Self, signatureOfAccountToBeImported: String) -> Bool {
-        guard signature == signatureOfAccountToBeImported else {
+    func isDuplicateOf(accountToBeImported: Self, signatureOfAccountToBeImported: String, passwordToBeImported: String?) -> Bool {
+        guard signature == signatureOfAccountToBeImported || passwordToBeImported.isNilOrEmpty else {
             return false
         }
         guard username == accountToBeImported.username || accountToBeImported.username.isNilOrEmpty else {
@@ -127,7 +127,7 @@ extension SecureVaultModels.WebsiteAccount {
         guard notes == accountToBeImported.notes || accountToBeImported.notes.isNilOrEmpty else {
             return false
         }
-        guard title == accountToBeImported.title || accountToBeImported.title.isNilOrEmpty else {
+        guard patternMatchedTitle() == accountToBeImported.patternMatchedTitle() || accountToBeImported.patternMatchedTitle().isEmpty else {
             return false
         }
         return true
