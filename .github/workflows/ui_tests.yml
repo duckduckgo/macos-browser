@@ -82,7 +82,6 @@ jobs:
     - name: Run UI Tests
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
-        defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
         set -o pipefail && xcodebuild test-without-building \
           -scheme "UI Tests" \
           -configuration Review \
