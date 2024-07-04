@@ -113,10 +113,11 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         let isMalicious = await phishingDetector.checkIsMaliciousIfEnabled(url: url)
         self.phishingStateManager.isShowingPhishingError = isMalicious
         if isMalicious {
+            let token = PhishingRedirectTokenManager.shared.generateToken(for: url)
             errorPageType = .phishing
             specialErrorPageUserScript?.failingURL = navigationAction.url
             if let mainFrameTarget = navigationAction.mainFrameTarget {
-                return .redirect(mainFrameTarget) { navigator in navigator.load(URLRequest(url: URL(string: "duck://error?reason=phishing&url=\(navigationAction.url.absoluteString)")!))
+                return .redirect(mainFrameTarget) { navigator in navigator.load(URLRequest(url: URL(string: "duck://error?reason=phishing&url=\(navigationAction.url.absoluteString)&token=\(token)")!))
                 }
             } else {
                 // pixel

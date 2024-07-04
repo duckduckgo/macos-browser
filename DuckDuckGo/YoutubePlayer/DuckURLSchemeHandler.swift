@@ -171,8 +171,8 @@ private extension DuckURLSchemeHandler {
         }
         guard requestURL.isPhishingErrorPage else { return }
         guard let urlString = requestURL.getParameter(named: "url"), let url = URL(string: urlString) else { return }
+        guard let token = requestURL.getParameter(named: "token"), PhishingRedirectTokenManager.shared.validateToken(token, for: url) else { return }
 
-        
         let error = PhishingDetectionError.detected
         let nsError = NSError(domain: PhishingDetectionError.errorDomain, code: error.errorCode, userInfo: [
             NSURLErrorFailingURLErrorKey: url,
