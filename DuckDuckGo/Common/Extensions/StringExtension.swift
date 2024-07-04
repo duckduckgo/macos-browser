@@ -85,6 +85,10 @@ extension String {
         data(using: .utf8)!
     }
 
+    var isBlank: Bool {
+        self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     // MARK: - URL
 
     var url: URL? {

@@ -50,6 +50,13 @@ protocol BookmarkManager: AnyObject {
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
     func handleFavoritesAfterDisablingSync()
 
+    /// Searches for bookmarks and folders by title. If query is blank empty list is returned
+    ///
+    /// - Parameters:
+    ///   - query: The query we will use to filter bookmarks. We will check if query is contained in the title.
+    /// - Returns: An array of bookmarks that matches the query.
+    func search(by query: String) -> [BaseBookmarkEntity]
+
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
@@ -387,5 +394,34 @@ final class LocalBookmarkManager: BookmarkManager {
             self.requestSync()
 
         }
+    }
+
+    // MARK: - Search
+
+    func search(by query: String) -> [BaseBookmarkEntity] {
+        guard let topLevelEntities = list?.topLevelEntities, !query.isBlank else {
+            return [BaseBookmarkEntity]()
+        }
+
+        return search(query: query, in: topLevelEntities)
+    }
+
+    private func search(query: String, in bookmarks: [BaseBookmarkEntity]) -> [BaseBookmarkEntity] {
+        var result: [BaseBookmarkEntity] = []
+
+        var queue: [BaseBookmarkEntity] = bookmarks
+        while !queue.isEmpty {
+            let current = queue.removeFirst()
+
+            if current.title.lowercased().contains(query) {
+                result.append(current)
+            }
+
+            if let folder = current as? BookmarkFolder {
+                queue.append(contentsOf: folder.children)
+            }
+        }
+
+        return result
     }
 }
