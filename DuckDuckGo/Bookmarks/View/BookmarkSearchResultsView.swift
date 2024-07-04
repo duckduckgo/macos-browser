@@ -24,8 +24,16 @@ struct BookmarkSearchResultsView: View {
     @ObservedObject var viewModel: BookmarkSearchViewModel
 
     var body: some View {
-        ForEach(viewModel.searchResult, id: \.id) { bookmark in
-            Text(bookmark.title)
-        }.frame(maxWidth: .infinity)
+        VStack {
+            if viewModel.searchResult.isEmpty {
+                Text("No results")
+            } else {
+                ForEach(viewModel.searchResult, id: \.id) { bookmark in
+                    Text(bookmark.title)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 408)
     }
 }
