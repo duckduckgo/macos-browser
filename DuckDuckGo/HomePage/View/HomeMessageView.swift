@@ -18,100 +18,61 @@
 
 import SwiftUI
 import RemoteMessaging
+import SwiftUIExtensions
 
 struct HomeMessageView: View {
 
-    struct ShareItem: Identifiable {
-        var id: String {
-            value
-        }
-
-        var item: Any {
-            if let url = URL(string: value) {
-                return url
-            } else {
-                return value
-            }
-        }
-
-        let value: String
-        let title: String?
-    }
-
     let viewModel: HomeMessageViewModel
 
-    @State var activityItem: ShareItem?
-
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            VStack(spacing: 8) {
-                Group {
-                    if case .promoSingleAction = viewModel.modelType {
+        ZStack {
+            RoundedRectangle(cornerRadius: 12)
+                .foregroundColor(Color.blackWhite3)
+                .cornerRadius(8)
+            VStack(spacing: 12) {
+                HStack(spacing: 12) {
+                    image
+                    VStack(alignment: .leading, spacing: 8) {
                         title
-                            .font(.title3)
-                            .padding(.top, 16)
-                        image
-                    } else {
-                        image
-                        title
-                            .font(.headline)
+                        subtitle
                     }
-
-                    subtitle
-                        .padding(.top, 8)
+                    Spacer(minLength: 0)
+                    if case .bigSingleAction = viewModel.modelType {
+                        button
+                    }
+                    closeButton
                 }
-                .padding(.horizontal, 24)
-
-                HStack {
-                    buttons
+                if case .bigTwoAction = viewModel.modelType {
+                    HStack(spacing: 10) {
+                        buttons
+                        Spacer()
+                    }
+                    .padding(.top, 4)
+                    .padding(.leading, 60)
                 }
-                .padding(.top, 8)
-                .padding(.horizontal, 8)
             }
-            .multilineTextAlignment(.center)
-            .padding(.vertical)
-            .padding(.horizontal, 8)
-
-            closeButtonHeader
-                .alignmentGuide(.top) { dimension in
-                    dimension[.top]
-                }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
         }
-        .background(RoundedRectangle(cornerRadius: Const.Radius.corner)
-                        .fill(Color.background)
-                        .shadow(color: Color.shadow,
-                                radius: Const.Radius.shadow,
-                                x: 0,
-                                y: Const.Offset.shadowVertical))
-        .padding(.top, 20)
-    }
-
-    private var closeButtonHeader: some View {
-        VStack {
-            HStack {
-                Spacer()
-                closeButton
-                    .padding(0)
-            }
-        }
+        .padding(.top, 64)
+        .padding(.bottom, 32)
     }
 
     private var closeButton: some View {
         Button {
             viewModel.onDidClose(.close)
         } label: {
-            Image(.closeLarge)
-                .foregroundColor(.primary)
+            Image(.close)
+                .padding(12)
         }
         .buttonStyle(.plain)
-        .frame(width: Const.Size.closeButtonWidth, height: Const.Size.closeButtonWidth)
     }
 
     private var image: some View {
         Group {
             if let image = viewModel.image {
                 Image(image)
-                    .scaledToFit()
+                    .frame(width: 48, height: 48)
             } else {
                 EmptyView()
             }
@@ -120,8 +81,7 @@ struct HomeMessageView: View {
 
     private var title: some View {
         Text(viewModel.title)
-            .padding(.top, Const.Spacing.imageAndTitle)
-            .frame(maxWidth: .infinity)
+            .font(.system(size: 13).bold())
    }
 
     @ViewBuilder
@@ -133,198 +93,91 @@ struct HomeMessageView: View {
         }
     }
 
-    private var buttons: some View {
-        ForEach(viewModel.buttons, id: \.title) { buttonModel in
-            Button {
-                buttonModel.action()
-                if case .share(let value, let title) = buttonModel.actionStyle {
-                    activityItem = ShareItem(value: value, title: title)
-                }
-            } label: {
-                HStack {
-                    if case .share = buttonModel.actionStyle {
-                        Image("Share")
-                    }
-                    Text(buttonModel.title)
-                }
-            }
-            .buttonStyle(HomeMessageButtonStyle(viewModel: viewModel, buttonModel: buttonModel))
-            .padding([.bottom], Const.Padding.buttonVerticalInset)
-//            .sheet(item: $activityItem) { activityItem in
-//                ActivityViewController(activityItems: [activityItem.item]) { _, result, _, _ in
-//
-//                    Pixel.fire(pixel: .remoteMessageSheet, withAdditionalParameters: [
-//                        PixelParameters.message: "\(viewModel.messageId)",
-//                        PixelParameters.sheetResult: "\(result)"
-//                    ])
-//
-//                }
-//                .modifier(ActivityViewPresentationModifier())
-//            }
-
-        }
-    }
-}
-
-private struct HomeMessageButtonStyle: ButtonStyle {
-
-    let viewModel: HomeMessageViewModel
-    let buttonModel: HomeMessageButtonViewModel
-
-    var foregroundColor: Color {
-        if case .promoSingleAction = viewModel.modelType {
-            return .cancelButtonForeground
-        }
-
-        if case .cancel = buttonModel.actionStyle {
-            return .cancelButtonForeground
-        }
-
-        return .primaryButtonText
-    }
-
-    var backgroundColor: Color {
-        if case .promoSingleAction = viewModel.modelType {
-            return .cancelButtonBackground
-        }
-
-        if case .cancel = buttonModel.actionStyle {
-            return .cancelButtonBackground
-        }
-
-        return .button
-    }
-
-    func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label
-            .padding(.horizontal, Const.Padding.buttonHorizontal)
-            .padding(.vertical, Const.Padding.buttonVertical)
-            .frame(height: Const.Size.buttonHeight)
-            .foregroundColor(configuration.isPressed ? foregroundColor.opacity(0.5) : foregroundColor)
-            .background(backgroundColor)
-            .cornerRadius(Const.Radius.corner)
-    }
-}
-
-private extension Color {
-//    static let button = Color.accentColor
-    static let primaryButtonText = Color("RemoteMessagePrimaryActionTextColor")
-    static let background = Color("HomeMessageBackgroundColor")
-    static let shadow = Color("HomeMessageShadowColor")
-}
-
-private extension Image {
-    static let dismiss = Image("HomeMessageDismissIcon")
-}
-
-private enum Const {
-    enum Font {
-        static let title = NSFont.boldSystemFont(ofSize: 17)
-        static let subtitle = NSFont.systemFont(ofSize: 15)
-        static let button = NSFont.boldSystemFont(ofSize: 15)
-    }
-
-    enum Radius {
-        static let shadow: CGFloat = 3
-        static let corner: CGFloat = 8
-    }
-
-    enum Padding {
-        static let buttonHorizontal: CGFloat = 16
-        static let buttonVertical: CGFloat = 9
-        static let buttonVerticalInset: CGFloat = 8
-        static let textHorizontalInset: CGFloat = 30
-    }
-
-    enum Spacing {
-        static let imageAndTitle: CGFloat = 8
-        static let titleAndSubtitle: CGFloat = 4
-        static let subtitleAndButtons: CGFloat = 6
-        static let line: CGFloat = 4
-    }
-
-    enum Size {
-        static let closeButtonWidth: CGFloat = 44
-        static let buttonHeight: CGFloat = 40
-    }
-
-    enum Offset {
-        static let shadowVertical: CGFloat = 2
-    }
-}
-
-struct HomeMessageView_Previews: PreviewProvider {
-
-    static let small: RemoteMessageModelType =
-        .small(titleText: "Small", descriptionText: "Description")
-
-    static let critical: RemoteMessageModelType =
-        .medium(titleText: "Critical",
-                descriptionText: "Description text",
-                placeholder: .criticalUpdate)
-
-    static let bigSingle: RemoteMessageModelType =
-        .bigSingleAction(titleText: "Big Single",
-                         descriptionText: "This is a description",
-                         placeholder: .ddgAnnounce,
-                         primaryActionText: "Primary",
-                         primaryAction: .dismiss)
-
-    static let bigTwo: RemoteMessageModelType =
-        .bigTwoAction(titleText: "Big Two",
-                      descriptionText: "This is a <b>big</b> two style",
-                      placeholder: .macComputer,
-                      primaryActionText: "App Store",
-                      primaryAction: .appStore,
-                      secondaryActionText: "Dismiss",
-                      secondaryAction: .dismiss)
-
-    static let promo: RemoteMessageModelType =
-        .promoSingleAction(titleText: "Promotional",
-                           descriptionText: "Description <b>with bold</b> to make a statement.",
-                           placeholder: .newForMacAndWindows,
-                           actionText: "Share",
-                           action: .share(value: "value", title: "title"))
-
-    static var previews: some View {
+    private var button: some View {
         Group {
-            HomeMessageView(viewModel: HomeMessageViewModel(messageId: "Small",
-                                                            modelType: small,
-                                                            onDidClose: { _ in },
-                                                            openURLHandler: { url in
-                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
-            }))
-
-            HomeMessageView(viewModel: HomeMessageViewModel(messageId: "Critical",
-                                                            modelType: critical,
-                                                            onDidClose: { _ in },
-                                                            openURLHandler: { url in
-                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .ui))
-            }))
-
-            HomeMessageView(viewModel: HomeMessageViewModel(messageId: "Big Single",
-                                                            modelType: bigSingle,
-                                                            onDidClose: { _ in },
-                                                            openURLHandler: { url in
-                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .ui))
-            }))
-
-            HomeMessageView(viewModel: HomeMessageViewModel(messageId: "Big Two",
-                                                            modelType: bigTwo,
-                                                            onDidClose: { _ in },
-                                                            openURLHandler: { url in
-                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .ui))
-            }))
-
-            HomeMessageView(viewModel: HomeMessageViewModel(messageId: "Promo",
-                                                            modelType: promo,
-                                                            onDidClose: { _ in },
-                                                            openURLHandler: { url in
-                WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .ui))
-            }))
+            if let buttonModel = viewModel.buttons.first {
+                buttonModel.secondaryButton
+            } else {
+                EmptyView()
+            }
         }
-        .frame(height: 200)
-        .padding(.horizontal)
-
     }
+
+    private var buttons: some View {
+        ForEach(viewModel.buttons, id: \.title, content: \.button)
+    }
+}
+
+extension HomeMessageButtonViewModel {
+    var button: some View {
+        Group {
+            if actionStyle == .default {
+                primaryButton
+            } else {
+                secondaryButton
+            }
+        }
+    }
+
+    var primaryButton: some View {
+        Button(action: action) {
+            Text(title)
+        }
+        .buttonStyle(DefaultActionButtonStyle(enabled: true))
+    }
+
+    var secondaryButton: some View {
+        Button(action: action) {
+            Text(title)
+        }
+        .buttonStyle(DismissActionButtonStyle())
+    }
+}
+
+#Preview("Small") {
+    let small = RemoteMessageModelType.small(titleText: "Title Goes Here", descriptionText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus mattis ut et leo. Curabitur ut dolor id est blandit rhoncus ac id metus.")
+
+    return HomeMessageView(viewModel: .init(messageId: "1", modelType: small, onDidClose: { _ in }, openURLHandler: { _ in }))
+}
+
+#Preview("Medium") {
+    let medium = RemoteMessageModelType.medium(titleText: "Update Available!", descriptionText: "A new version of DuckDuckGo Browser is available. Update now to enjoy improved privacy features and enhanced performance.", placeholder: .appUpdate)
+
+    return HomeMessageView(viewModel: .init(messageId: "1", modelType: medium, onDidClose: { _ in }, openURLHandler: { _ in }))
+}
+
+#Preview("Big Single Action") {
+    let bigSingleAction = RemoteMessageModelType.bigSingleAction(
+        titleText: "Update Available!",
+        descriptionText: "A new version of DuckDuckGo Browser is available. Update now to enjoy improved privacy features and enhanced performance.",
+        placeholder: .appUpdate,
+        primaryActionText: "Update Now",
+        primaryAction: .dismiss
+    )
+
+    return HomeMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, openURLHandler: { _ in }))
+}
+
+#Preview("Big Single Action #2") {
+    let bigSingleAction = RemoteMessageModelType.bigSingleAction(
+        titleText: "Tell Us Why You Left Privacy Pro",
+        descriptionText: "By taking our brief survey, you'll help us improve Privacy Pro for all subscribers.",
+        placeholder: .privacyShield,
+        primaryActionText: "Take Survey...",
+        primaryAction: .dismiss
+    )
+
+    return HomeMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, openURLHandler: { _ in }))
+}
+
+#Preview("Big Two Action") {
+    let bigTwoAction = RemoteMessageModelType.bigTwoAction(titleText: "macOS Update Recommended",
+                                                           descriptionText: "Support for macOS Big Sur is ending soon. Update to macOS Monterey or newer <b>before July 8, 2024</b>, to keep getting the latest browser updates and improvements.",
+                                                           placeholder: .criticalUpdate,
+                                                           primaryActionText: "How To Update macOS",
+                                                           primaryAction: .appStore,
+                                                           secondaryActionText: "Remind Me Later",
+                                                           secondaryAction: .dismiss)
+
+    return HomeMessageView(viewModel: .init(messageId: "1", modelType: bigTwoAction, onDidClose: { _ in }, openURLHandler: { _ in }))
 }

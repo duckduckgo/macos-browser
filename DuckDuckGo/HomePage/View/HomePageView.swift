@@ -106,7 +106,7 @@ extension HomePage.Views {
 
         @ViewBuilder
         func remoteMessage() -> some View {
-            if let remoteMessage = activeRemoteMessageModel.remoteMessage, let modelType = remoteMessage.content {
+            if let remoteMessage = activeRemoteMessageModel.remoteMessage, let modelType = remoteMessage.content, modelType.isSupported {
                 HomeMessageView(viewModel: .init(
                     messageId: remoteMessage.id,
                     modelType: modelType,

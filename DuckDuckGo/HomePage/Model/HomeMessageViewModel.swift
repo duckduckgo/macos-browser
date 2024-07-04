@@ -20,12 +20,23 @@ import Foundation
 import BrowserServicesKit
 import RemoteMessaging
 
+extension RemoteMessageModelType {
+    var isSupported: Bool {
+        switch self {
+        case .promoSingleAction:
+            return false
+        default:
+            return true
+        }
+    }
+}
+
 struct HomeMessageViewModel {
     enum ButtonAction {
         case close
-        case action(isShare: Bool) // a generic action that is specific to the type of message
-        case primaryAction(isShare: Bool)
-        case secondaryAction(isShare: Bool)
+        case action // a generic action that is specific to the type of message
+        case primaryAction
+        case secondaryAction
     }
 
     let messageId: String
@@ -45,35 +56,27 @@ struct HomeMessageViewModel {
 
     var buttons: [HomeMessageButtonViewModel] {
         switch modelType {
-        case .small:
-            return []
-        case .medium:
+        case .small, .medium, .promoSingleAction:
             return []
         case .bigSingleAction(_, _, _, let primaryActionText, let primaryAction):
             return [
                 HomeMessageButtonViewModel(title: primaryActionText,
                                            actionStyle: primaryAction.actionStyle(),
                                            action: mapActionToViewModel(remoteAction: primaryAction, buttonAction:
-                                                .primaryAction(isShare: primaryAction.isShare), onDidClose: onDidClose))
+                                                .primaryAction, onDidClose: onDidClose))
             ]
         case .bigTwoAction(_, _, _, let primaryActionText, let primaryAction, let secondaryActionText, let secondaryAction):
             return [
                 HomeMessageButtonViewModel(title: secondaryActionText,
                                            actionStyle: secondaryAction.actionStyle(isSecondaryAction: true),
                                            action: mapActionToViewModel(remoteAction: secondaryAction, buttonAction:
-                                                .secondaryAction(isShare: secondaryAction.isShare), onDidClose: onDidClose)),
+                                                .secondaryAction, onDidClose: onDidClose)),
 
                 HomeMessageButtonViewModel(title: primaryActionText,
                                            actionStyle: primaryAction.actionStyle(),
                                            action: mapActionToViewModel(remoteAction: primaryAction, buttonAction:
-                                           .primaryAction(isShare: primaryAction.isShare), onDidClose: onDidClose))
+                                                .primaryAction, onDidClose: onDidClose))
             ]
-        case .promoSingleAction(_, _, _, let actionText, let action):
-            return [
-                HomeMessageButtonViewModel(title: actionText,
-                                           actionStyle: action.actionStyle(),
-                                           action: mapActionToViewModel(remoteAction: action, buttonAction:
-                                                .action(isShare: action.isShare), onDidClose: onDidClose))]
         }
     }
 
@@ -85,11 +88,7 @@ struct HomeMessageViewModel {
                               onDidClose: @escaping (HomeMessageViewModel.ButtonAction?) -> Void) -> () -> Void {
 
         switch remoteAction {
-        case .share:
-            return {
-                onDidClose(buttonAction)
-            }
-        case .url(let value):
+        case .url(let value), .share(let value, _):
             return {
                 if let url = URL.makeURL(from: value) {
                     openURLHandler(url)
@@ -118,26 +117,21 @@ struct HomeMessageViewModel {
 }
 
 struct HomeMessageButtonViewModel {
-    enum ActionStyle {
+    enum ActionStyle: Equatable {
         case `default`
-        case share(value: String, title: String?)
         case cancel
     }
 
     let title: String
     var actionStyle: ActionStyle = .default
     let action: () -> Void
-
 }
 
 extension RemoteAction {
 
     func actionStyle(isSecondaryAction: Bool = false) -> HomeMessageButtonViewModel.ActionStyle {
         switch self {
-        case .share(let value, let title):
-            return .share(value: value, title: title)
-
-        case .appStore, .url, .survey:
+        case .appStore, .url, .survey, .share:
             if isSecondaryAction {
                 return .cancel
             }
@@ -147,13 +141,6 @@ extension RemoteAction {
             return .cancel
         }
     }
-
-    var isShare: Bool {
-        if case .share = self.actionStyle() {
-            return true
-        }
-        return false
-    }
 }
 
 private extension RemoteMessageModelType {
@@ -161,28 +148,25 @@ private extension RemoteMessageModelType {
         switch self {
         case .small:
             return nil
-        case .medium(_, _, let placeholder):
+        case .medium(_, _, let placeholder), .bigSingleAction(_, _, let placeholder, _, _), .bigTwoAction(_, _, let placeholder, _, _, _, _):
             return placeholder.rawValue
-        case .bigSingleAction(_, _, let placeholder, _, _):
-            return placeholder.rawValue
-        case .bigTwoAction(_, _, let placeholder, _, _, _, _):
-            return placeholder.rawValue
-        case .promoSingleAction(_, _, let placeholder, _, _):
-            return placeholder.rawValue
+        case .promoSingleAction:
+            assertionFailure("promoSingleAction is not supported on macOS")
+            return nil
         }
     }
 
     var title: String {
         switch self {
-        case .small(let titleText, _):
+        case .small(let titleText, _),
+                .medium(let titleText, _, _),
+                .bigSingleAction(let titleText, _, _, _, _),
+                .bigTwoAction(let titleText, _, _, _, _, _, _):
+
             return titleText
-        case .medium(let titleText, _, _):
-            return titleText
-        case .bigSingleAction(let titleText, _, _, _, _):
-            return titleText
-        case .bigTwoAction(let titleText, _, _, _, _, _, _):
-            return titleText
+
         case .promoSingleAction(let titleText, _, _, _, _):
+            assertionFailure("promoSingleAction is not supported on macOS")
             return titleText
         }
     }
@@ -190,15 +174,15 @@ private extension RemoteMessageModelType {
     var subtitle: String {
         let subtitle = {
             switch self {
-            case .small(_, let descriptionText):
+            case .small(_, let descriptionText),
+                    .medium(_, let descriptionText, _),
+                    .bigSingleAction(_, let descriptionText, _, _, _),
+                    .bigTwoAction(_, let descriptionText, _, _, _, _, _):
+
                 return descriptionText
-            case .medium(_, let descriptionText, _):
-                return descriptionText
-            case .bigSingleAction(_, let descriptionText, _, _, _):
-                return descriptionText
-            case .bigTwoAction(_, let descriptionText, _, _, _, _, _):
-                return descriptionText
+
             case .promoSingleAction(_, let descriptionText, _, _, _):
+                assertionFailure("promoSingleAction is not supported on macOS")
                 return descriptionText
             }
         }()
