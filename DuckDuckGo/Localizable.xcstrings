@@ -53747,6 +53747,18 @@
         }
       }
     },
+    "tooltip.bookmarks.search" : {
+      "comment" : "Tooltip to activate the bookmark search",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Search bookmarks"
+          }
+        }
+      }
+    },
     "tooltip.bookmarks.shortcut" : {
       "comment" : "Tooltip for the bookmarks shortcut",
       "extractionState" : "extracted_with_value",

@@ -38,6 +38,7 @@ final class BookmarkListViewController: NSViewController {
     private lazy var stackView = NSStackView()
     private lazy var newBookmarkButton = MouseOverButton(image: .addBookmark, target: self, action: #selector(newBookmarkButtonClicked))
     private lazy var newFolderButton = MouseOverButton(image: .addFolder, target: self, action: #selector(newFolderButtonClicked))
+    private lazy var searchBookmarksButton = MouseOverButton(image: .searchBookmarks, target: self, action: #selector(searchBookmarkButtonClicked))
 
     private lazy var buttonsDivider = NSBox()
     private lazy var manageBookmarksButton = MouseOverButton(title: UserText.bookmarksManage, target: self, action: #selector(openManagementInterface))
@@ -51,10 +52,12 @@ final class BookmarkListViewController: NSViewController {
     private lazy var emptyStateMessage = NSTextField()
     private lazy var emptyStateImageView = NSImageView(image: .bookmarksEmpty)
     private lazy var importButton = NSButton(title: UserText.importBookmarksButtonTitle, target: self, action: #selector(onImportClicked))
+    private lazy var searchBar = NSSearchField()
 
     private var cancellables = Set<AnyCancellable>()
     private let bookmarkManager: BookmarkManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
+    private let bookmarkSearchViewModel: BookmarkSearchViewModel
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource)
 
@@ -93,6 +96,7 @@ final class BookmarkListViewController: NSViewController {
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.bookmarkManager = bookmarkManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
+        self.bookmarkSearchViewModel = BookmarkSearchViewModel(manager: bookmarkManager)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -108,6 +112,7 @@ final class BookmarkListViewController: NSViewController {
         view.addSubview(stackView)
         view.addSubview(scrollView)
         view.addSubview(emptyState)
+        view.addSubview(searchBar)
 
         view.autoresizesSubviews = false
 
@@ -129,6 +134,7 @@ final class BookmarkListViewController: NSViewController {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.addArrangedSubview(newBookmarkButton)
         stackView.addArrangedSubview(newFolderButton)
+        stackView.addArrangedSubview(searchBookmarksButton)
         stackView.addArrangedSubview(buttonsDivider)
         stackView.addArrangedSubview(manageBookmarksButton)
 
@@ -147,6 +153,14 @@ final class BookmarkListViewController: NSViewController {
         newFolderButton.mouseOverColor = .buttonMouseOver
         newFolderButton.translatesAutoresizingMaskIntoConstraints = false
         newFolderButton.toolTip = UserText.newFolderTooltip
+
+        searchBookmarksButton.bezelStyle = .shadowlessSquare
+        searchBookmarksButton.cornerRadius = 4
+        searchBookmarksButton.normalTintColor = .button
+        searchBookmarksButton.mouseDownColor = .buttonMouseDown
+        searchBookmarksButton.mouseOverColor = .buttonMouseOver
+        searchBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
+        searchBookmarksButton.toolTip = UserText.bookmarksSearch
 
         buttonsDivider.boxType = .separator
         buttonsDivider.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -253,6 +267,9 @@ final class BookmarkListViewController: NSViewController {
         newFolderButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
         newFolderButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
 
+        searchBookmarksButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
+        searchBookmarksButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
+
         buttonsDivider.widthAnchor.constraint(equalToConstant: 13).isActive = true
         buttonsDivider.heightAnchor.constraint(equalToConstant: 18).isActive = true
 
@@ -345,6 +362,10 @@ final class BookmarkListViewController: NSViewController {
         let parentFolder = sender.representedObject as? BookmarkFolder
         let view = BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: parentFolder)
         showDialog(view: view)
+    }
+
+    @objc func searchBookmarkButtonClicked(_ sender: NSButton) {
+
     }
 
     @objc func openManagementInterface(_ sender: NSButton) {
