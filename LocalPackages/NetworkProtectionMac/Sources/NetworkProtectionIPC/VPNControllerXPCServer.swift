@@ -179,8 +179,16 @@ extension VPNControllerXPCServer: XPCClientInterface {
     }
 
     public func knownFailureUpdated(_ failure: KnownFailure?) {
+        let payload: Data
+
+        do {
+            payload = try JSONEncoder().encode(failure)
+        } catch {
+            return
+        }
+
         xpc.forEachClient { client in
-            client.knownFailureUpdated(failure: failure)
+            client.knownFailureUpdated(payload: payload)
         }
     }
 }

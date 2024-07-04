@@ -467,7 +467,7 @@ final class BrowserTabViewController: NSViewController {
              .url(_, _, source: .reload):
             return true
 
-        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .onboarding, .identityTheftRestoration:
+        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .onboardingDeprecated, .onboarding, .identityTheftRestoration:
             return true
 
         case .none:
@@ -486,9 +486,9 @@ final class BrowserTabViewController: NSViewController {
         case .newtab:
             // don‘t steal focus from the address bar at .newtab page
             return
-        case .onboarding:
+        case .onboardingDeprecated:
             getView = { [weak self] in self?.transientTabContentViewController?.view }
-        case .url, .subscription, .identityTheftRestoration:
+        case .url, .subscription, .identityTheftRestoration, .onboarding:
             getView = { [weak self] in self?.webView }
         case .settings:
             getView = { [weak self] in self?.preferencesViewController?.view }
@@ -577,7 +577,6 @@ final class BrowserTabViewController: NSViewController {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func showTabContent(of tabViewModel: TabViewModel?) {
         guard tabCollectionViewModel.allTabsCount > 0 else {
             view.window?.performClose(self)
@@ -594,28 +593,20 @@ final class BrowserTabViewController: NSViewController {
             addAndLayoutChild(bookmarksViewControllerCreatingIfNeeded())
 
         case let .settings(pane):
-            let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
-            if preferencesViewController.parent !== self {
-                removeAllTabContent()
-            }
-            if let pane = pane, preferencesViewController.model.selectedPane != pane {
-                preferencesViewController.model.selectPane(pane)
-            }
-            if preferencesViewController.parent !== self {
-                addAndLayoutChild(preferencesViewController)
-            }
-        case .onboarding:
+            showTabContentForSettings(pane: pane)
+        case .onboardingDeprecated:
             removeAllTabContent()
             if !OnboardingViewModel.isOnboardingFinished {
                 requestDisableUI()
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
+        case .onboarding:
+            removeAllTabContent()
+            updateTabIfNeeded(tabViewModel: tabViewModel)
+
         case .url, .subscription, .identityTheftRestoration:
-            if shouldReplaceWebView(for: tabViewModel) {
-                removeAllTabContent(includingWebView: true)
-                changeWebView(tabViewModel: tabViewModel)
-            }
+            updateTabIfNeeded(tabViewModel: tabViewModel)
 
         case .newtab:
             removeAllTabContent()
@@ -630,6 +621,26 @@ final class BrowserTabViewController: NSViewController {
 #endif
         default:
             removeAllTabContent()
+        }
+    }
+
+    func updateTabIfNeeded(tabViewModel: TabViewModel?) {
+        if shouldReplaceWebView(for: tabViewModel) {
+            removeAllTabContent(includingWebView: true)
+            changeWebView(tabViewModel: tabViewModel)
+        }
+    }
+
+    func showTabContentForSettings(pane: PreferencePaneIdentifier?) {
+        let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
+        if preferencesViewController.parent !== self {
+            removeAllTabContent()
+        }
+        if let pane = pane, preferencesViewController.model.selectedPane != pane {
+            preferencesViewController.model.selectPane(pane)
+        }
+        if preferencesViewController.parent !== self {
+            addAndLayoutChild(preferencesViewController)
         }
     }
 
@@ -1032,13 +1043,14 @@ extension BrowserTabViewController: TabDelegate {
     private class PrintContext {
         let request: PrintDialogRequest
         weak var printPanel: NSWindow?
-        var isAborted = false
+        var shouldRemoveWebView = false
         init(request: PrintDialogRequest) {
             self.request = request
         }
     }
     func runPrintOperation(with request: PrintDialogRequest) -> ModalSheetCancellable? {
-        guard let window = view.window else { return nil }
+        guard let window = view.window,
+              let webView = tabViewModel?.tab.webView else { return nil }
 
         let printOperation = request.parameters
         let didRunSelector = #selector(printOperationDidRun(printOperation:success:contextInfo:))
@@ -1054,10 +1066,25 @@ extension BrowserTabViewController: TabDelegate {
         // get the Print Panel that (hopefully) was added to the window.sheets
         context.printPanel = Set(window.sheets).subtracting(windowSheetsBeforPrintOperation).first
 
-        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
-        return ModalSheetCancellable(ownerWindow: window, modalSheet: context.printPanel, returnCode: nil, condition: !context.request.isComplete) {
-            context.isAborted = true
-        }
+        // when subscribing to another Tab, the print dialog will be cancelled on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: context.printPanel, returnCode: .cancel, condition: {
+            guard !context.request.isComplete else { return false }
+
+            // the print operation must complete when the web view is visible
+            // otherwise UI gets broken
+            if webView.window == nil {
+                self.view.addSubview(webView)
+                context.shouldRemoveWebView = true
+            }
+            return true
+
+        }(), cancellationHandler: {
+            if context.shouldRemoveWebView {
+                DispatchQueue.main.async {
+                    webView.removeFromSuperview()
+                }
+            }
+        })
     }
 
     @objc private func printOperationDidRun(printOperation: NSPrintOperation, success: Bool, contextInfo: UnsafeMutableRawPointer?) {
@@ -1066,13 +1093,6 @@ extension BrowserTabViewController: TabDelegate {
             return
         }
         let context = Unmanaged<PrintContext>.fromOpaque(contextInfo).takeRetainedValue()
-
-        // don‘t submit the query when tab is switched
-        if context.isAborted { return }
-        if let window = view.window, let printPanel = context.printPanel, window.sheets.contains(printPanel) {
-            window.endSheet(printPanel)
-        }
-
         context.request.submit(success)
     }
 

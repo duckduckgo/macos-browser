@@ -68,6 +68,13 @@ extension Preferences {
 
                     TextMenuItemCaption(UserText.duckPlayerExplanation)
                 }
+
+                // Auto Play
+                if model.shouldDisplayAutoPlaySettings {
+                    PreferencePaneSection(UserText.duckPlayerAutoplayTitle) {
+                        ToggleMenuItem(UserText.duckPlayerAutoplayPreference, isOn: $model.duckPlayerAutoplay)
+                    }
+                }
             }
         }
     }

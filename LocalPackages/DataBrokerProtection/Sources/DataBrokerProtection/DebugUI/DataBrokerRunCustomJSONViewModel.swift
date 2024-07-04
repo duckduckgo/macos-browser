@@ -140,6 +140,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
     var alert: AlertUI?
     var selectedDataBroker: DataBroker?
+    var error: Error?
 
     let brokers: [DataBroker]
 
@@ -343,6 +344,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
     @MainActor
     func runJSON(jsonString: String) {
+        self.error = nil
         if let data = jsonString.data(using: .utf8) {
             do {
                 let decoder = JSONDecoder()
@@ -368,13 +370,15 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                             }
                             group.leave()
                         } catch {
-                            print("Error when scanning: \(error)")
+                            self.error = error
                             group.leave()
                         }
                     }
                 }
                 group.notify(queue: .main) {
-                    if self.results.count == 0 {
+                    if let error = self.error {
+                        self.showAlert(for: error)
+                    } else if self.results.count == 0 {
                         self.showNoResultsAlert()
                     }
                 }
@@ -580,7 +584,7 @@ extension DataBrokerProtectionError {
         switch self {
         case .httpError(let code):
             if code == 404 {
-                return "No results."
+                return "No results (404)"
             } else {
                 return "Error."
             }
@@ -592,7 +596,7 @@ extension DataBrokerProtectionError {
         switch self {
         case .httpError(let code):
             if code == 404 {
-                return "No results were found."
+                return "No results were found. (404 was returned)"
             } else {
                 return "Failed with HTTP error code: \(code)"
             }
