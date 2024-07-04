@@ -38,20 +38,13 @@ final class BookmarkListTreeControllerDataSource: BookmarkTreeControllerDataSour
 
     private func nodesFor(query: String, root: BookmarkNode) -> [BookmarkNode] {
         let results = bookmarkManager.search(by: query)
-        return results.compactMap { (item) -> BookmarkNode? in
-            if let folder = item as? BookmarkFolder {
-                let itemNode = root.createChildNode(item)
-                itemNode.canHaveChildNodes = false
-                return itemNode
-            } else if item is Bookmark {
-                let itemNode = root.findOrCreateChildNode(with: item)
-                itemNode.canHaveChildNodes = false
-                return itemNode
-            } else {
-                assertionFailure("\(#file): Tried to display non-bookmark type in bookmark list")
-                return nil
-            }
+        let nodes = results.compactMap { (item) -> BookmarkNode in
+            let itemNode = root.createChildNode(item)
+            itemNode.canHaveChildNodes = false
+            return itemNode
         }
+
+        return nodes
     }
 
     private func childNodesForRootNode(_ node: BookmarkNode) -> [BookmarkNode] {
