@@ -183,7 +183,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasExecuteCalledForSolveCaptcha = false
     var wasExecuteJavascriptCalled = false
     var wasSetCookiesCalled = false
-    var errorStatusCodeToThrow: Int? = nil
+    var errorStatusCodeToThrow: Int?
 
     func initializeWebView(showWebView: Bool) async {
         wasInitializeWebViewCalled = true
