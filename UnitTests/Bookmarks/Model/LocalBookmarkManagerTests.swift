@@ -269,6 +269,28 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertTrue(results.isEmpty)
     }
 
+    func testWhenQueryIsEmptyThenSearchResultsAreEmpty() {
+        let bookmarkStore = BookmarkStoreMock(bookmarks: topLevelBookmarks())
+        let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+
+        sut.loadBookmarks()
+
+        let results = sut.search(by: "")
+
+        XCTAssertTrue(results.isEmpty)
+    }
+
+    func testWhenQueryIsBlankThenSearchResultsAreEmpty() {
+        let bookmarkStore = BookmarkStoreMock(bookmarks: topLevelBookmarks())
+        let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+
+        sut.loadBookmarks()
+
+        let results = sut.search(by: "    ")
+
+        XCTAssertTrue(results.isEmpty)
+    }
+
     func testWhenASearchIsDoneThenCorrectResultsAreReturnedAndIntheRightOrder() {
         let bookmarkStore = BookmarkStoreMock(bookmarks: topLevelBookmarks())
         let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())

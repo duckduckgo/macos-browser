@@ -50,7 +50,7 @@ protocol BookmarkManager: AnyObject {
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
     func handleFavoritesAfterDisablingSync()
 
-    /// Searches for bookmarks and folders by title.
+    /// Searches for bookmarks and folders by title. If query is blank empty list is returned
     ///
     /// - Parameters:
     ///   - query: The query we will use to filter bookmarks. We will check if query is contained in the title.
@@ -399,7 +399,7 @@ final class LocalBookmarkManager: BookmarkManager {
     // MARK: - Search
 
     func search(by query: String) -> [BaseBookmarkEntity] {
-        guard let topLevelEntities = list?.topLevelEntities else {
+        guard let topLevelEntities = list?.topLevelEntities, !query.isBlank else {
             return [BaseBookmarkEntity]()
         }
 

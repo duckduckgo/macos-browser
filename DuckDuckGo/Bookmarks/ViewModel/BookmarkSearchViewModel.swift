@@ -21,9 +21,10 @@ import Foundation
 struct BookmarkSearchViewModel {
 
     enum BookmarkSearchResult: Equatable {
-        case noResults
         case emptyQuery
         case results([BaseBookmarkEntity])
+
+        static let noResults = Self.results([])
     }
 
     let manager: BookmarkManager
