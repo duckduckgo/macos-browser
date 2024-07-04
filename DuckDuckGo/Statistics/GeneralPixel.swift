@@ -613,8 +613,8 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_sync_success_rate_daily"
         case .syncLocalTimestampResolutionTriggered(let feature):
             return "m_mac_sync_\(feature.name)_local_timestamp_resolution_triggered"
-        case .syncBookmarksCountLimitExceededDaily: return "m_mac_sync_bookmarks_count_limit_exceeded_daily"
-        case .syncCredentialsCountLimitExceededDaily: return "m_mac_sync_credentials_count_limit_exceeded_daily"
+        case .syncBookmarksCountLimitExceededDaily: return "m_mac_sync_bookmarks_object_limit_exceeded"
+        case .syncCredentialsCountLimitExceededDaily: return "m_mac_sync_credentials_object_limit_exceeded"
         case .syncBookmarksRequestSizeLimitExceededDaily: return "m_mac_sync_bookmarks_request_size_limit_exceeded_daily"
         case .syncCredentialsRequestSizeLimitExceededDaily: return "m_mac_sync_credentials_request_size_limit_exceeded_daily"
 
