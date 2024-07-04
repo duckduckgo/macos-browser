@@ -131,19 +131,6 @@ extension URL {
         youtubeVideoParams?.videoID
     }
 
-    // MARK: - Error Pages
-    var isErrorPage: Bool {
-        self.isDuckURLScheme && self.host == "error"
-    }
-
-    var isPhishingErrorPage: Bool {
-        self.isErrorPage && self.getParameter(named: "reason") == "phishing" && self.getParameter(named: "url") != nil
-    }
-
-    var isSSLErrorPage: Bool {
-        self.isErrorPage && self.getParameter(named: "reason") == "certificate" && self.getParameter(named: "url") != nil
-    }
-
     // MARK: - Private
 
     private var isYoutubeNoCookie: Bool {

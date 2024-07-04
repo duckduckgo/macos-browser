@@ -34,6 +34,8 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
             handleOnboarding(urlSchemeTask: urlSchemeTask)
         case .duckPlayer:
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
+        case .phishingErrorPage:
+            handleErrorPage(urlSchemeTask: urlSchemeTask)
         default:
             handleNativeUIPages(requestURL: requestURL, urlSchemeTask: urlSchemeTask)
         }
@@ -160,10 +162,16 @@ private extension DuckURLSchemeHandler {
 
 }
 
+// MARK: Error Page
 private extension DuckURLSchemeHandler {
-    func handleErrorPage(urlSchemeTask: WKURLSchemeTask, error: Error) {
-        guard let isPhishingErrorPage = requestURL.isPhishingErrorPage else { return }
+    func handleErrorPage(urlSchemeTask: WKURLSchemeTask) {
+        guard let requestURL = urlSchemeTask.request.url else {
+            assertionFailure("No URL for Onboarding scheme handler")
+            return
+        }
+        guard requestURL.isPhishingErrorPage else { return }
         guard let urlString = requestURL.getParameter(named: "url"), let url = URL(string: urlString) else { return }
+
         
         let error = PhishingDetectionError.detected
         let nsError = NSError(domain: PhishingDetectionError.errorDomain, code: error.errorCode, userInfo: [
@@ -179,6 +187,7 @@ extension URL {
     enum URLType {
         case onboarding
         case duckPlayer
+        case phishingErrorPage
     }
 
     var type: URLType? {
@@ -186,7 +195,9 @@ extension URL {
             return .duckPlayer
         } else if self.isOnboarding {
             return .onboarding
-        } else  {
+        } else if self.isPhishingErrorPage {
+            return .phishingErrorPage
+        } else {
             return nil
         }
     }
@@ -197,5 +208,13 @@ extension URL {
 
     var isDuckURLScheme: Bool {
         navigationalScheme == .duck
+    }
+
+    var isErrorPage: Bool {
+        self.isDuckURLScheme && self.host == "error"
+    }
+
+    var isPhishingErrorPage: Bool {
+        self.isErrorPage && self.getParameter(named: "reason") == "phishing" && self.getParameter(named: "url") != nil
     }
 }

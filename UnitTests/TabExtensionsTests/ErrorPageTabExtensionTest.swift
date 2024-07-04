@@ -324,9 +324,12 @@ final class ErrorPageTabExtensionTest: XCTestCase {
     }
 
     @MainActor func testWhenPhishingDetected_ThenPhishingErrorPageIsShown() async {
-         // GIVEN
-         let mockWebView = MockWKWebView(url: URL(string: phishingURLString)!)
-         let navigationAction = NavigationAction(request: URLRequest(url: URL(string: phishingURLString)!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        // GIVEN
+        let mockWebView = MockWKWebView(url: URL(string: phishingURLString)!)
+        let mainFrameNavigation = Navigation(identity: NavigationIdentity(nil), responders: ResponderChain(), state: .started, isCurrent: true)
+        let urlRequest = URLRequest(url: URL(string: phishingURLString)!)
+        let mainFrameTarget = FrameInfo(frame: WKFrameInfo(), isMainFrame: true)
+        let navigationAction = NavigationAction(request: urlRequest, navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: [NavigationAction](), isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: mainFrameTarget, shouldDownload: false, mainFrameNavigation: mainFrameNavigation)
         var preferences = NavigationPreferences(userAgent: "dummy", contentMode: .desktop, javaScriptEnabled: true)
         errorPageExtension.webView = mockWebView
 
@@ -334,16 +337,17 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         let policy = await errorPageExtension.decidePolicy(for: navigationAction, preferences: &preferences)
 
         // THEN
-        XCTAssertEqual(policy.debugDescription, "cancel")
-        let expectedSpecificMessage = PhishingError().specificMessage(for: phishingURLString, eTldPlus1: phishingURLString).escapedUnicodeHtmlString()
-        XCTAssertTrue(mockWebView.capturedHTML.contains(expectedSpecificMessage))
+        XCTAssertEqual(policy.debugDescription, "redirect")
         XCTAssertTrue(phishingStateManager.isShowingPhishingError)
      }
 
     @MainActor func testWhenPhishingDetected_AndVisitSiteClicked_ThenNavigationProceeds() async {
          // GIVEN
          let mockWebView = MockWKWebView(url: URL(string: phishingURLString)!)
-         let navigationAction = NavigationAction(request: URLRequest(url: URL(string: phishingURLString)!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let mainFrameNavigation = Navigation(identity: NavigationIdentity(nil), responders: ResponderChain(), state: .started, isCurrent: true)
+        let urlRequest = URLRequest(url: URL(string: phishingURLString)!)
+        let mainFrameTarget = FrameInfo(frame: WKFrameInfo(), isMainFrame: true)
+        let navigationAction = NavigationAction(request: urlRequest, navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: [NavigationAction](), isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: mainFrameTarget, shouldDownload: false, mainFrameNavigation: mainFrameNavigation)
         var preferences = NavigationPreferences(userAgent: "dummy", contentMode: .desktop, javaScriptEnabled: true)
         errorPageExtension.webView = mockWebView
         _ = await errorPageExtension.decidePolicy(for: navigationAction, preferences: &preferences)
@@ -356,14 +360,18 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         XCTAssertEqual(policy.debugDescription, "next")
         XCTAssertTrue(mockWebView.reloadCalled)
         XCTAssertTrue(mockWebView.canGoBack)
-        XCTAssertTrue(phishingStateManager.isShowingPhishingError)
+        XCTAssertFalse(phishingStateManager.isShowingPhishingError)
+        XCTAssertTrue(phishingStateManager.didBypassError)
      }
 
     @MainActor func testWhenPhishingNotDetected_ThenNavigationProceeds() async {
          // GIVEN
         phishingDetection.isMalicious = false
          let mockWebView = MockWKWebView(url: URL(string: phishingURLString)!)
-         let navigationAction = NavigationAction(request: URLRequest(url: URL(string: phishingURLString)!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let mainFrameNavigation = Navigation(identity: NavigationIdentity(nil), responders: ResponderChain(), state: .started, isCurrent: true)
+        let urlRequest = URLRequest(url: URL(string: phishingURLString)!)
+        let mainFrameTarget = FrameInfo(frame: WKFrameInfo(), isMainFrame: true)
+        let navigationAction = NavigationAction(request: urlRequest, navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: [NavigationAction](), isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: mainFrameTarget, shouldDownload: false, mainFrameNavigation: mainFrameNavigation)
         var preferences = NavigationPreferences(userAgent: "dummy", contentMode: .desktop, javaScriptEnabled: true)
         errorPageExtension.webView = mockWebView
 

@@ -21,7 +21,7 @@ import UserScript
 
 @testable import DuckDuckGo_Privacy_Browser
 
-final class SSLErrorPageUserScriptTests: XCTestCase {
+final class SpecialErrorPageUserScriptTests: XCTestCase {
 
     var delegate: CapturingSpecialErrorPageUserScriptDelegate!
     var userScript: SpecialErrorPageUserScript!
