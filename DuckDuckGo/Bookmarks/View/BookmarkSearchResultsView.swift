@@ -1,5 +1,5 @@
 //
-//  BookmarkSearchViewModel.swift
+//  BookmarkSearchResultsView.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,23 +17,15 @@
 //
 
 import Foundation
+import SwiftUI
 
-final class BookmarkSearchViewModel: ObservableObject {
-    private let manager: BookmarkManager
+struct BookmarkSearchResultsView: View {
 
-    @Published var searchResult: [BaseBookmarkEntity] = []
+    @ObservedObject var viewModel: BookmarkSearchViewModel
 
-    init(manager: BookmarkManager) {
-        self.manager = manager
-    }
-
-    func search(by query: String) {
-        if query.isBlank {
-            return
-        }
-
-        let filteredBookmarks = manager.search(by: query)
-
-        searchResult = filteredBookmarks
+    var body: some View {
+        ForEach(viewModel.searchResult, id: \.id) { bookmark in
+            Text(bookmark.title)
+        }.frame(maxWidth: .infinity)
     }
 }

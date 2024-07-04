@@ -18,6 +18,7 @@
 
 import AppKit
 import Combine
+import SwiftUI
 
 protocol BookmarkListViewControllerDelegate: AnyObject {
 
@@ -60,6 +61,7 @@ final class BookmarkListViewController: NSViewController {
     private let bookmarkManager: BookmarkManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
     private let bookmarkSearchViewModel: BookmarkSearchViewModel
+    private let searchResultsView: NSHostingView<BookmarkSearchResultsView>
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource)
 
@@ -99,6 +101,7 @@ final class BookmarkListViewController: NSViewController {
         self.bookmarkManager = bookmarkManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
         self.bookmarkSearchViewModel = BookmarkSearchViewModel(manager: bookmarkManager)
+        self.searchResultsView = NSHostingView(rootView: BookmarkSearchResultsView(viewModel: bookmarkSearchViewModel))
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -113,6 +116,7 @@ final class BookmarkListViewController: NSViewController {
         view.addSubview(boxDivider)
         view.addSubview(stackView)
         view.addSubview(scrollView)
+        view.addSubview(searchResultsView)
         view.addSubview(emptyState)
 
         view.autoresizesSubviews = false
@@ -165,6 +169,9 @@ final class BookmarkListViewController: NSViewController {
 
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.delegate = self
+
+        searchResultsView.translatesAutoresizingMaskIntoConstraints = false
+        searchResultsView.isHidden = true
 
         buttonsDivider.boxType = .separator
         buttonsDivider.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -686,19 +693,26 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
         if let searchField = obj.object as? NSSearchField {
             let searchQuery = searchField.stringValue
 
-            let result = bookmarkSearchViewModel.search(by: searchQuery)
-
-            switch result {
-            case .emptyQuery:
-                print("Empty query")
-            case let.results(bookmarks):
-                if bookmarks.isEmpty {
-                    print("No bookmarks were found")
-                } else {
-                    print("We found \(bookmarks.count) bookmarks")
+            if searchQuery.isBlank {
+                searchResultsView.isHidden = true
+                scrollView.isHidden = false
+            } else {
+                if searchResultsView.isHidden {
+                    showSearchResults()
                 }
+
+                bookmarkSearchViewModel.search(by: searchQuery)
             }
         }
+    }
+
+    private func showSearchResults() {
+        searchResultsView.isHidden = false
+        scrollView.isHidden = true
+        searchResultsView.topAnchor.constraint(equalTo: boxDivider.bottomAnchor).isActive = true
+        searchResultsView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        searchResultsView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        searchResultsView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
     }
 }
 
