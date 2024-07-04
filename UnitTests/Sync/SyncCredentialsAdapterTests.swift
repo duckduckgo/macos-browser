@@ -74,10 +74,12 @@ final class SyncCredentialsAdapterTests: XCTestCase {
 }
 
 class CapturingAdapterErrorHandler: SyncErrorHandling {
+    
     var handleBookmarkErrorCalled = false
     var syncCredentialsSuccededCalled = false
     var handleCredentialErrorCalled = false
     var syncBookmarksSuccededCalled = false
+    var handleSettingsError = false
     var capturedError: Error?
 
     func handleBookmarkError(_ error: Error) {
@@ -90,6 +92,11 @@ class CapturingAdapterErrorHandler: SyncErrorHandling {
         capturedError = error
     }
 
+    func handleSettingsError(_ error: Error) {
+        handleSettingsError = true
+        capturedError = error
+    }
+
     func syncBookmarksSucceded() {
         syncBookmarksSuccededCalled = true
     }
@@ -97,6 +104,7 @@ class CapturingAdapterErrorHandler: SyncErrorHandling {
     func syncCredentialsSucceded() {
         syncCredentialsSuccededCalled = true
     }
+
 }
 
 class MockMetadataStore: SyncMetadataStore {
