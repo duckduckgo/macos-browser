@@ -22,6 +22,10 @@ import SecureStorage
 
 final class SecureVaultLoginImporter: LoginImporter {
 
+    static var featureFlagger: FeatureFlagger {
+        NSApp.delegateTyped.featureFlagger
+    }
+
     private enum ImporterError: Error {
         case duplicate
     }
@@ -58,7 +62,8 @@ final class SecureVaultLoginImporter: LoginImporter {
                 }
 
                 do {
-                    if let signature = try vault.encryptPassword(for: credentials, key: encryptionKey, salt: hashingSalt).account.signature {
+                    if Self.featureFlagger.isFeatureOn(.deduplicateLoginsOnImport),
+                        let signature = try vault.encryptPassword(for: credentials, key: encryptionKey, salt: hashingSalt).account.signature {
                         let isDuplicate = accounts.contains {
                             $0.isDuplicateOf(accountToBeImported: account, signatureOfAccountToBeImported: signature)
                         }
