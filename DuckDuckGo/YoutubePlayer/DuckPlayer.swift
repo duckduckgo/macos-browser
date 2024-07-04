@@ -77,7 +77,7 @@ struct InitialSetupSettings: Codable {
 }
 
 // Values that the YouTube Overlays can use to determine the current state
-struct OverlayInitialSetupSettings: Codable {
+struct OverlaysInitialSettings: Codable {
     let userValues: UserValues
 }
 

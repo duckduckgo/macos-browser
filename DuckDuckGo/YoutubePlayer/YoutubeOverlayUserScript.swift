@@ -123,13 +123,13 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
         encodeInitialSetup()
     }
 
-    private func encodeInitialSetup() -> OverlayInitialSetupSettings {
+    private func encodeInitialSetup() -> OverlaysInitialSettings {
         let userValues = UserValues(
             duckPlayerMode: duckPlayerPreferences.duckPlayerMode,
             overlayInteracted: duckPlayerPreferences.youtubeOverlayInteracted
         )
 
-        return OverlayInitialSetupSettings(
+        return OverlaysInitialSettings(
             userValues: userValues
         )
     }
