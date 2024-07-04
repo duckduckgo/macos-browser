@@ -23,6 +23,7 @@ import Foundation
 
 final class BookmarksBarViewController: NSViewController {
 
+    @IBOutlet weak var importBookmarksButton: NSView!
     @IBOutlet weak var importBookmarksMouseOverView: MouseOverView!
     @IBOutlet weak var importBookmarksLabel: NSTextField!
     @IBOutlet weak var importBookmarksIcon: NSImageView!
@@ -94,9 +95,7 @@ final class BookmarksBarViewController: NSViewController {
 
     private func setUpImportBookmarksButton() {
         importBookmarksIcon.image = NSImage(named: "Import-16D")
-        importBookmarksIcon.isHidden = true
-        importBookmarksLabel.isHidden = true
-        importBookmarksMouseOverView.isHidden = true
+        importBookmarksButton.isHidden = true
     }
 
     private func addContextMenu() {
@@ -168,9 +167,7 @@ final class BookmarksBarViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] items in
                 if self?.bookmarkManager.list != nil {
-                    self?.importBookmarksIcon.isHidden = !items.isEmpty
-                    self?.importBookmarksLabel.isHidden = !items.isEmpty
-                    self?.importBookmarksMouseOverView.isHidden = !items.isEmpty
+                    self?.importBookmarksButton.isHidden = !items.isEmpty
                 }
             }
             .store(in: &cancellables)
