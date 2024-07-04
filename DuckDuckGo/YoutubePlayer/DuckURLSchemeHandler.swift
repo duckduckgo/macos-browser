@@ -171,7 +171,15 @@ private extension DuckURLSchemeHandler {
         }
         guard requestURL.isPhishingErrorPage else { return }
         guard let urlString = requestURL.getParameter(named: "url"), let url = URL(string: urlString) else { return }
-        guard let token = requestURL.getParameter(named: "token"), PhishingRedirectTokenManager.shared.validateToken(token, for: url) else { return }
+        guard let token = requestURL.getParameter(named: "token"), URLTokenValidator.shared.validateToken(token, for: url) else {
+            let error = WKError.unknown
+            let nsError = NSError(domain: "Unexpected Error", code: error.rawValue, userInfo: [
+                NSURLErrorFailingURLErrorKey: "about:blank",
+                NSLocalizedDescriptionKey: "Unexpected Error"
+            ])
+            urlSchemeTask.didFailWithError(nsError)
+            return
+        }
 
         let error = PhishingDetectionError.detected
         let nsError = NSError(domain: PhishingDetectionError.errorDomain, code: error.errorCode, userInfo: [
