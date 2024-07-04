@@ -346,7 +346,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
          let mockWebView = MockWKWebView(url: URL(string: phishingURLString)!)
         let mainFrameNavigation = Navigation(identity: NavigationIdentity(nil), responders: ResponderChain(), state: .started, isCurrent: true)
         let urlRequest = URLRequest(url: URL(string: phishingURLString)!)
-        let mainFrameTarget = FrameInfo(frame: WKFrameInfo(), isMainFrame: true)
+        let mainFrameTarget = FrameInfo(webView: nil, handle: FrameHandle(rawValue: 1 as UInt64)!, isMainFrame: true, url: URL(string: phishingURLString)!, securityOrigin: .empty)
         let navigationAction = NavigationAction(request: urlRequest, navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: [NavigationAction](), isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: mainFrameTarget, shouldDownload: false, mainFrameNavigation: mainFrameNavigation)
         var preferences = NavigationPreferences(userAgent: "dummy", contentMode: .desktop, javaScriptEnabled: true)
         errorPageExtension.webView = mockWebView
@@ -370,7 +370,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
          let mockWebView = MockWKWebView(url: URL(string: phishingURLString)!)
         let mainFrameNavigation = Navigation(identity: NavigationIdentity(nil), responders: ResponderChain(), state: .started, isCurrent: true)
         let urlRequest = URLRequest(url: URL(string: phishingURLString)!)
-        let mainFrameTarget = FrameInfo(frame: WKFrameInfo(), isMainFrame: true)
+        let mainFrameTarget = FrameInfo(webView: nil, handle: FrameHandle(rawValue: 1 as UInt64)!, isMainFrame: true, url: URL(string: phishingURLString)!, securityOrigin: .empty)
         let navigationAction = NavigationAction(request: urlRequest, navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: [NavigationAction](), isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: mainFrameTarget, shouldDownload: false, mainFrameNavigation: mainFrameNavigation)
         var preferences = NavigationPreferences(userAgent: "dummy", contentMode: .desktop, javaScriptEnabled: true)
         errorPageExtension.webView = mockWebView
