@@ -25,6 +25,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     enum ContentMode {
         case bookmarksAndFolders
         case foldersOnly
+        case search
     }
 
     @Published var selectedFolders: [BookmarkFolder] = []
@@ -32,7 +33,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     let treeController: BookmarkTreeController
     private(set) var expandedNodesIDs = Set<String>()
 
-    private let contentMode: ContentMode
+    private var contentMode: ContentMode
     private let bookmarkManager: BookmarkManager
     private let showMenuButtonOnHover: Bool
     private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
@@ -62,9 +63,17 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func reloadData() {
+        contentMode = .bookmarksAndFolders
         favoritesPseudoFolder.count = bookmarkManager.list?.favoriteBookmarks.count ?? 0
         bookmarksPseudoFolder.count = bookmarkManager.list?.totalBookmarks ?? 0
         treeController.rebuild()
+    }
+
+    func reloadData(with query: String) {
+        contentMode = .search
+        favoritesPseudoFolder.count = bookmarkManager.list?.favoriteBookmarks.count ?? 0
+        bookmarksPseudoFolder.count = bookmarkManager.list?.totalBookmarks ?? 0
+        treeController.rebuild(with: query)
     }
 
     // MARK: - Private
@@ -133,7 +142,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         cell.delegate = self
 
         if let bookmark = node.representedObject as? Bookmark {
-            cell.update(from: bookmark)
+            cell.update(from: bookmark, isSearch: contentMode == .search)
 
             if bookmark.favicon(.small) == nil {
                 presentFaviconsFetcherOnboarding?()
@@ -142,7 +151,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
 
         if let folder = node.representedObject as? BookmarkFolder {
-            cell.update(from: folder)
+            cell.update(from: folder, isSearch: contentMode == .search)
             return cell
         }
 
@@ -178,6 +187,14 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                 || (destinationNode.representedObject as? PseudoFolder == .bookmarks) {
                 return .move
             }
+            return .none
+        }
+
+        if contentMode == .search {
+            if destinationNode.representedObject is BookmarkFolder {
+                return .move
+            }
+
             return .none
         }
 
@@ -324,6 +341,10 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         view.insets = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
 
         return view
+    }
+
+    func outlineView(_ outlineView: NSOutlineView, shouldShowOutlineCellForItem item: Any) -> Bool {
+        return contentMode != .search
     }
 
     // MARK: - NSTableViewDelegate

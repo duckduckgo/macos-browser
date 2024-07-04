@@ -694,25 +694,13 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
             let searchQuery = searchField.stringValue
 
             if searchQuery.isBlank {
-                searchResultsView.isHidden = true
-                scrollView.isHidden = false
+                dataSource.reloadData()
+                outlineView.reloadData()
             } else {
-                if searchResultsView.isHidden {
-                    showSearchResults()
-                }
-
-                bookmarkSearchViewModel.search(by: searchQuery)
+                dataSource.reloadData(with: searchQuery)
+                outlineView.reloadData()
             }
         }
-    }
-
-    private func showSearchResults() {
-        searchResultsView.isHidden = false
-        scrollView.isHidden = true
-        searchResultsView.topAnchor.constraint(equalTo: boxDivider.bottomAnchor).isActive = true
-        searchResultsView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        searchResultsView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        searchResultsView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
     }
 }
 

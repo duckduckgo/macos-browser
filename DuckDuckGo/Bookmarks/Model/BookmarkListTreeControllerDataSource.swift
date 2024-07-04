@@ -26,11 +26,33 @@ final class BookmarkListTreeControllerDataSource: BookmarkTreeControllerDataSour
         self.bookmarkManager = bookmarkManager
     }
 
-    func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
-        return node.isRoot ? childNodesForRootNode(node) : childNodes(node)
+    func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode, query: String) -> [BookmarkNode] {
+        if query.isBlank {
+            return node.isRoot ? childNodesForRootNode(node) : childNodes(node)
+        } else {
+            return nodesFor(query: query, root: node)
+        }
     }
 
     // MARK: - Private
+
+    private func nodesFor(query: String, root: BookmarkNode) -> [BookmarkNode] {
+        let results = bookmarkManager.search(by: query)
+        return results.compactMap { (item) -> BookmarkNode? in
+            if let folder = item as? BookmarkFolder {
+                let itemNode = root.createChildNode(item)
+                itemNode.canHaveChildNodes = false
+                return itemNode
+            } else if item is Bookmark {
+                let itemNode = root.findOrCreateChildNode(with: item)
+                itemNode.canHaveChildNodes = false
+                return itemNode
+            } else {
+                assertionFailure("\(#file): Tried to display non-bookmark type in bookmark list")
+                return nil
+            }
+        }
+    }
 
     private func childNodesForRootNode(_ node: BookmarkNode) -> [BookmarkNode] {
         let topLevelNodes = bookmarkManager.list?.topLevelEntities.compactMap { (item) -> BookmarkNode? in
