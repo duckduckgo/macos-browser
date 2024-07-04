@@ -34,6 +34,7 @@ final class DuckPlayerTabExtension {
     private let isBurner: Bool
     private var cancellables = Set<AnyCancellable>()
     private var youtubePlayerCancellables = Set<AnyCancellable>()
+    private var shouldOpenInNewTab = true // Get this settings from preferences
 
     private weak var webView: WKWebView? {
         didSet {
@@ -117,7 +118,7 @@ extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
             PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaHoverButton)
         }
         // to be standardised across the app
-        let isRequestingNewTab = NSApp.isCommandPressed
+        let isRequestingNewTab = NSApp.isCommandPressed || shouldOpenInNewTab
         if isRequestingNewTab {
             shouldSelectNextNewTab = NSApp.isShiftPressed
             webView.loadInNewWindow(url)
@@ -211,7 +212,14 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // Navigating to a Youtube URL
         if navigationAction.url.isYoutubeVideo,
            let (videoID, timestamp) = navigationAction.url.youtubeVideoParams {
-            return decidePolicy(for: navigationAction, withYoutubeVideoID: videoID, timestamp: timestamp)
+            // if webview.url is not empty, open new tab if settings is ON
+            if shouldOpenInNewTab, let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
+                WindowControllersManager.shared.show(url: navigationAction.url, source: .link, newTab: true)
+                return .cancel
+            } else {
+                return decidePolicy(for: navigationAction, withYoutubeVideoID: videoID, timestamp: timestamp)
+            }
+
         }
         return .next
     }
