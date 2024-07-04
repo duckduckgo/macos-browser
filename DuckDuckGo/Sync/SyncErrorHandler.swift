@@ -209,7 +209,7 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
 }
 
 extension SyncErrorHandler: SyncErrorHandling {
-    
+
     func syncCredentialsSucceded() {
         lastSyncSuccessTime = Date()
         resetCredentialsErrors()
