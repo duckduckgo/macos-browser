@@ -23,14 +23,14 @@ import Foundation
  `URLTokenValidator` is responsible for generating and validating URL signatures to securely pass URLs around in Special Pages.
 
  This class ensures only legitimate redirects to special pages are allowed.
-  - Secret key is generated randomly on each app startup, to prevent access.
-  - Nonce/timestamp is also implemented to mitigate replay attacks.
-  - Base64URLEncoding is used since we're passing the tokens in URLs.
+  - Secret key is generated randomly on each app startup, to prevent unwanted reading of the key.
+  - Nonce/timestamp is implemented to mitigate replay attacks, within a 60 second window.
+  - Base64URLEncoding is used since we may be passing the tokens in URL parameters.
  */
 public class URLTokenValidator {
     public static let shared = URLTokenValidator()
+    public var timeWindow: TimeInterval = 60
     private let secretKey: Data
-    private let timeWindow: TimeInterval = 1500 // 25 minutes
 
     private init() {
         self.secretKey = URLTokenValidator.generateRandomKey()
