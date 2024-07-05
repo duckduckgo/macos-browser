@@ -44,16 +44,16 @@ protocol DataBrokerProtectionCustomStatsProvider {
     ///   - endDate: The end date to filter matches and requests. All matches and requests are considered up to this date.
     ///   - queryData: An array of BrokerProfileQueryData objects containing data broker query information, scan job data, and opt-out job data.
     /// - Returns: A CustomStats object containing the statistics for each data broker and the global statistics.
-    func customDataBrokerStats(startDate: Date?,
-                               endDate: Date,
-                               andQueryData queryData: [BrokerProfileQueryData]) -> CustomStats
+    func customStats(startDate: Date?,
+                     endDate: Date,
+                     andQueryData queryData: [BrokerProfileQueryData]) -> CustomStats
 }
 
 struct DefaultDataBrokerProtectionCustomStatsProvider: DataBrokerProtectionCustomStatsProvider {
 
-    func customDataBrokerStats(startDate: Date?,
-                               endDate: Date,
-                               andQueryData queryData: [BrokerProfileQueryData]) -> CustomStats {
+    func customStats(startDate: Date?,
+                     endDate: Date,
+                     andQueryData queryData: [BrokerProfileQueryData]) -> CustomStats {
 
         var customDataBrokerStats: [CustomDataBrokerStat] = []
         var totalGlobalMatches: Int = 0
@@ -69,6 +69,10 @@ struct DefaultDataBrokerProtectionCustomStatsProvider: DataBrokerProtectionCusto
             let matchesBetweenDates = matchesBetween(startDate: startDate, endDate: endDate, queryData: brokerQueryData)
 
             let totalMatches = matchesBetweenDates.count
+
+            // If this data broker has no associated matches, skip to the next data broker
+            guard totalMatches != 0 else { continue }
+
             totalGlobalMatches += totalMatches
 
             // Get opt-outs since start date
@@ -81,18 +85,20 @@ struct DefaultDataBrokerProtectionCustomStatsProvider: DataBrokerProtectionCusto
 
             // Calculate opt-out success rate
             let optOutSuccessRate = totalMatches > 0 ? Double(totalOptOutRequests) / Double(totalMatches) : 0
+            let roundedOptOutSuccessRate = (optOutSuccessRate * 100).rounded() / 100
 
             let dataBrokerName = groupedByBroker[dataBroker]?.first?.dataBroker.name ?? ""
 
             let customDataBrokerStat = CustomDataBrokerStat(dataBrokerName: dataBrokerName,
-                                                             optoutSubmitSuccessRate: optOutSuccessRate)
+                                                             optoutSubmitSuccessRate: roundedOptOutSuccessRate)
 
             customDataBrokerStats.append(customDataBrokerStat)
 
         }
 
         let globalSuccessRate = totalGlobalMatches > 0 ? Double(totalGlobalRequests) / Double(totalGlobalMatches) : 0
-        let globalStats = CustomGlobalStat(optoutSubmitSuccessRate: globalSuccessRate)
+        let roundedGlobalSuccessRate = (globalSuccessRate * 100).rounded() / 100
+        let globalStats = CustomGlobalStat(optoutSubmitSuccessRate: roundedGlobalSuccessRate)
         return CustomStats(customDataBrokerStats: customDataBrokerStats, customGlobalStat: globalStats)
     }
 }

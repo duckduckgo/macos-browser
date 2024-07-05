@@ -26,6 +26,7 @@ import SecureStorage
 @testable import DataBrokerProtection
 
 extension BrokerProfileQueryData {
+
     static func mock(with steps: [Step] = [Step](),
                      dataBrokerName: String = "test",
                      url: String = "test.com",
@@ -53,6 +54,191 @@ extension BrokerProfileQueryData {
                                                  lastRunDate: lastRunDate),
             optOutJobData: extractedProfile != nil ? [.mock(with: extractedProfile!)] : [OptOutJobData]()
         )
+    }
+
+    static var queryDataTwoBrokersOneBroker100PercentSuccess: [BrokerProfileQueryData] {
+
+        let scanEventsOne = events(brokerId: 1,
+                                   profileQueryId: 1,
+                                   type: .matchesFound(count: 3),
+                                   dates: [.nowMinus(hours: 23), .nowMinus(hours: 26), .nowMinus(hours: 2)])
+
+        let scanEventsTwo = events(brokerId: 2,
+                                   profileQueryId: 1,
+                                   type: .matchesFound(count: 3),
+                                   dates: [.nowMinus(hours: 23), .nowMinus(hours: 26), .nowMinus(hours: 2)])
+
+        let optOutEvents = events(brokerId: 2,
+                                  profileQueryId: 1,
+                                  type: .optOutRequested,
+                                  dates: [.nowMinus(hours: 3)])
+
+        return [
+            queryData(brokerId: 1,
+                      brokerName: "CustomStats Broker 1",
+                      scanEvents: scanEventsOne,
+                      optOutEvents: []),
+            queryData(brokerId: 2,
+                      brokerName: "CustomStats Broker 2",
+                      scanEvents: scanEventsTwo,
+                      optOutEvents: optOutEvents)
+        ]
+    }
+
+    static var queryDataManyBrokersOneBroker50PercentSuccess: [BrokerProfileQueryData] {
+
+        let scanEventsOneProfileOne = events(brokerId: 1,
+                                             profileQueryId: 1,
+                                             type: .matchesFound(count: 3),
+                                             dates: [.nowMinus(hours: 23), .nowMinus(hours: 26), .nowMinus(hours: 2)])
+
+        let scanEventsOneProfileTwo = events(brokerId: 1,
+                                             profileQueryId: 2,
+                                             type: .matchesFound(count: 3),
+                                             dates: [.nowMinus(hours: 23), .nowMinus(hours: 26), .nowMinus(hours: 2)])
+
+        let scanEventsTwo = events(brokerId: 2,
+                                   profileQueryId: 1,
+                                   type: .matchesFound(count: 3),
+                                   dates: [.nowMinus(hours: 23), .nowMinus(hours: 26), .nowMinus(hours: 2)])
+
+        let scanEventsThree = events(brokerId: 3,
+                                     profileQueryId: 1,
+                                     type: .matchesFound(count: 3),
+                                     dates: [.nowMinus(hours: 23), .nowMinus(hours: 26), .nowMinus(hours: 2)])
+
+        let scanEventsFour = events(brokerId: 4,
+                                    profileQueryId: 1,
+                                    type: .matchesFound(count: 3),
+                                    dates: [.nowMinus(hours: 23), .nowMinus(hours: 26), .nowMinus(hours: 2)])
+
+        let optOutEvents = events(brokerId: 1,
+                                  profileQueryId: 1,
+                                  type: .optOutRequested,
+                                  dates: [.nowMinus(hours: 3)])
+
+        return [
+            queryData(brokerId: 1,
+                      brokerName: "CustomStats Broker 1",
+                      scanEvents: scanEventsOneProfileOne + scanEventsOneProfileTwo,
+                      optOutEvents: optOutEvents),
+            queryData(brokerId: 2,
+                      brokerName: "CustomStats Broker 2",
+                      scanEvents: scanEventsTwo,
+                      optOutEvents: []),
+            queryData(brokerId: 3,
+                      brokerName: "CustomStats Broker 3",
+                      scanEvents: scanEventsThree,
+                      optOutEvents: []),
+            queryData(brokerId: 4,
+                      brokerName: "CustomStats Broker 4",
+                      scanEvents: scanEventsFour,
+                      optOutEvents: []),
+
+        ]
+    }
+
+    static var queryDataTwoBrokersOneWithNoMatches: [BrokerProfileQueryData] {
+
+        let scanEventsOne = events(brokerId: 1,
+                                   profileQueryId: 1,
+                                   type: .matchesFound(count: 3),
+                                   dates: [.nowMinus(hours: 23), .nowMinus(hours: 26), .nowMinus(hours: 2)])
+
+        let optOutEvents = events(brokerId: 1,
+                                  profileQueryId: 1,
+                                  type: .optOutRequested,
+                                  dates: [.nowMinus(hours: 3)])
+
+        return [
+            queryData(brokerId: 1,
+                      brokerName: "CustomStats Broker 1",
+                      scanEvents: scanEventsOne,
+                      optOutEvents: optOutEvents),
+            queryData(brokerId: 2,
+                      brokerName: "CustomStats Broker 2",
+                      scanEvents: [],
+                      optOutEvents: [])
+        ]
+    }
+
+    static var queryDataOneBrokerMultipleMatchesAndOptOuts: [BrokerProfileQueryData] {
+        let scanEvents = events(brokerId: 1,
+                                profileQueryId: 1,
+                                type: .matchesFound(count: 3),
+                                dates: [.nowMinus(hours: 50), .nowMinus(hours: 30), .nowMinus(hours: 25)])
+
+        let optOutEvents = events(brokerId: 1,
+                                  profileQueryId: 1,
+                                  type: .optOutRequested,
+                                  dates: [.nowMinus(hours: 48), .nowMinus(hours: 29)])
+
+        return [
+            queryData(brokerId: 1,
+                      brokerName: "CustomStats Broker 1",
+                      scanEvents: scanEvents,
+                      optOutEvents: optOutEvents)
+        ]
+    }
+
+    static var queryDataOverlappingDateRanges: [BrokerProfileQueryData] {
+        let scanEventsOne = events(brokerId: 1,
+                                   profileQueryId: 1,
+                                   type: .matchesFound(count: 2),
+                                   dates: [.nowMinus(hours: 45), .nowMinus(hours: 27)])
+
+        let optOutEventsOne = events(brokerId: 1,
+                                     profileQueryId: 1,
+                                     type: .optOutRequested,
+                                     dates: [.nowMinus(hours: 42)])
+
+        let scanEventsTwo = events(brokerId: 2,
+                                   profileQueryId: 1,
+                                   type: .matchesFound(count: 2),
+                                   dates: [.nowMinus(hours: 40), .nowMinus(hours: 26)])
+
+        let optOutEventsTwo = events(brokerId: 2,
+                                     profileQueryId: 1,
+                                     type: .optOutRequested,
+                                     dates: [.nowMinus(hours: 39), .nowMinus(hours: 25)])
+
+        return [
+            queryData(brokerId: 1,
+                      brokerName: "CustomStats Broker 1",
+                      scanEvents: scanEventsOne,
+                      optOutEvents: optOutEventsOne),
+            queryData(brokerId: 2,
+                      brokerName: "CustomStats Broker 2",
+                      scanEvents: scanEventsTwo,
+                      optOutEvents: optOutEventsTwo)
+        ]
+    }
+
+    static func queryData(brokerId: Int64, brokerName: String, scanEvents: [HistoryEvent], optOutEvents: [HistoryEvent]) -> BrokerProfileQueryData {
+        let dataBroker = DataBroker(id: brokerId, name: brokerName, url: "", steps: [], version: "", schedulingConfig: .mock, mirrorSites: [])
+
+        let profileQuery = ProfileQuery(id: 1, firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50, deprecated: false)
+        let scanJobData = ScanJobData(brokerId: 1,
+                                      profileQueryId: 1,
+                                      preferredRunDate: nil,
+                                      historyEvents: scanEvents,
+                                      lastRunDate: nil)
+        let optOutJobData = OptOutJobData(brokerId: 1, profileQueryId: 1, historyEvents: optOutEvents, extractedProfile: ExtractedProfile())
+        return BrokerProfileQueryData(dataBroker: dataBroker,
+                                      profileQuery: profileQuery,
+                                      scanJobData: scanJobData,
+                                      optOutJobData: [optOutJobData])
+    }
+
+    static func events(brokerId: Int64, profileQueryId: Int64, type: HistoryEvent.EventType, dates: [Date]) -> [HistoryEvent] {
+        var result: [HistoryEvent] = []
+        for date in dates {
+            result.append(HistoryEvent(brokerId: brokerId,
+                                       profileQueryId: profileQueryId,
+                                       type: type,
+                                       date: date))
+        }
+        return result
     }
 }
 
@@ -1561,11 +1747,24 @@ extension SecureStorageError: Equatable {
 }
 
 final class MockDataBrokerProtectionStatsPixelsRepository: DataBrokerProtectionStatsPixelsRepository {
-    var customStatsPixelsLastSentTimestamp: Date?
+
     var wasMarkStatsWeeklyPixelDateCalled: Bool = false
     var wasMarkStatsMonthlyPixelDateCalled: Bool = false
     var latestStatsWeeklyPixelDate: Date?
     var latestStatsMonthlyPixelDate: Date?
+    var didSetCustomStatsPixelsLastSentTimestamp = false
+    var didGetCustomStatsPixelsLastSentTimestamp = false
+    var _customStatsPixelsLastSentTimestamp: Date?
+
+    var customStatsPixelsLastSentTimestamp: Date? {
+        get {
+            defer { didGetCustomStatsPixelsLastSentTimestamp = true }
+            return _customStatsPixelsLastSentTimestamp
+        } set {
+            didSetCustomStatsPixelsLastSentTimestamp = true
+            _customStatsPixelsLastSentTimestamp = newValue
+        }
+    }
 
     func markStatsWeeklyPixelDate() {
         wasMarkStatsWeeklyPixelDateCalled = true
@@ -1588,6 +1787,20 @@ final class MockDataBrokerProtectionStatsPixelsRepository: DataBrokerProtectionS
         wasMarkStatsMonthlyPixelDateCalled = false
         latestStatsWeeklyPixelDate = nil
         latestStatsMonthlyPixelDate = nil
+        didSetCustomStatsPixelsLastSentTimestamp = false
+        customStatsPixelsLastSentTimestamp = nil
+
+    }
+}
+
+final class MockDataBrokerProtectionCustomStatsProvider: DataBrokerProtectionCustomStatsProvider {
+
+    var customStatsWasCalled = false
+    var customStatsToReturn = CustomStats(customDataBrokerStats: [], customGlobalStat: CustomGlobalStat(optoutSubmitSuccessRate: 0))
+
+    func customStats(startDate: Date?, endDate: Date, andQueryData queryData: [BrokerProfileQueryData]) -> CustomStats {
+        customStatsWasCalled = true
+        return customStatsToReturn
     }
 }
 
