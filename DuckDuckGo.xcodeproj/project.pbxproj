@@ -2566,6 +2566,10 @@
 		EECE10E529DD77E60044D027 /* FeatureFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = EECE10E429DD77E60044D027 /* FeatureFlag.swift */; };
 		EECE10E629DD77E60044D027 /* FeatureFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = EECE10E429DD77E60044D027 /* FeatureFlag.swift */; };
 		EED735362BB46B6000F173D6 /* AutocompleteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED735352BB46B6000F173D6 /* AutocompleteTests.swift */; };
+		EED9A6752C37FE6900E0FAB9 /* login_deduplication_test_data.csv in Resources */ = {isa = PBXBuildFile; fileRef = EED9A6732C37FE6800E0FAB9 /* login_deduplication_test_data.csv */; };
+		EED9A6762C37FE6900E0FAB9 /* login_deduplication_test_data.csv in Resources */ = {isa = PBXBuildFile; fileRef = EED9A6732C37FE6800E0FAB9 /* login_deduplication_test_data.csv */; };
+		EED9A6772C37FE6900E0FAB9 /* login_deduplication_starting_data.csv in Resources */ = {isa = PBXBuildFile; fileRef = EED9A6742C37FE6900E0FAB9 /* login_deduplication_starting_data.csv */; };
+		EED9A6782C37FE6900E0FAB9 /* login_deduplication_starting_data.csv in Resources */ = {isa = PBXBuildFile; fileRef = EED9A6742C37FE6900E0FAB9 /* login_deduplication_starting_data.csv */; };
 		EEDE50112BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */; };
 		EEDE50122BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */; };
 		EEE0E1CD2C32F5690058E148 /* CSVImporterIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE0E1CC2C32F5690058E148 /* CSVImporterIntegrationTests.swift */; };
@@ -4125,6 +4129,8 @@
 		EEC7BE2D2BC6C09400F86835 /* AddressBarKeyboardShortcutsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBarKeyboardShortcutsTests.swift; sourceTree = "<group>"; };
 		EECE10E429DD77E60044D027 /* FeatureFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlag.swift; sourceTree = "<group>"; };
 		EED735352BB46B6000F173D6 /* AutocompleteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutocompleteTests.swift; sourceTree = "<group>"; };
+		EED9A6732C37FE6800E0FAB9 /* login_deduplication_test_data.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = login_deduplication_test_data.csv; sourceTree = "<group>"; };
+		EED9A6742C37FE6900E0FAB9 /* login_deduplication_starting_data.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = login_deduplication_starting_data.csv; sourceTree = "<group>"; };
 		EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtection+VPNAgentConvenienceInitializers.swift"; sourceTree = "<group>"; };
 		EEE0E1CC2C32F5690058E148 /* CSVImporterIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporterIntegrationTests.swift; sourceTree = "<group>"; };
 		EEE0E1CE2C32F6530058E148 /* mock_login_data_large.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mock_login_data_large.csv; sourceTree = "<group>"; };
@@ -8282,6 +8288,8 @@
 		EEE0E1CB2C32F53C0058E148 /* DataImport */ = {
 			isa = PBXGroup;
 			children = (
+				EED9A6742C37FE6900E0FAB9 /* login_deduplication_starting_data.csv */,
+				EED9A6732C37FE6800E0FAB9 /* login_deduplication_test_data.csv */,
 				EEE0E1CE2C32F6530058E148 /* mock_login_data_large.csv */,
 				EEE0E1CC2C32F5690058E148 /* CSVImporterIntegrationTests.swift */,
 			);
@@ -9058,8 +9066,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EED9A6782C37FE6900E0FAB9 /* login_deduplication_starting_data.csv in Resources */,
 				EEE0E1D02C32F6530058E148 /* mock_login_data_large.csv in Resources */,
 				B64E42AC2B909DC9006C1346 /* test.pdf in Resources */,
+				EED9A6762C37FE6900E0FAB9 /* login_deduplication_test_data.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9074,8 +9084,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EED9A6772C37FE6900E0FAB9 /* login_deduplication_starting_data.csv in Resources */,
 				EEE0E1CF2C32F6530058E148 /* mock_login_data_large.csv in Resources */,
 				B64E42AB2B909DC9006C1346 /* test.pdf in Resources */,
+				EED9A6752C37FE6900E0FAB9 /* login_deduplication_test_data.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

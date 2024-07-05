@@ -19,12 +19,30 @@
 import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
+import BrowserServicesKit
 
 final class CSVImporterIntegrationTests: XCTestCase {
 
-    override func setUp() {
+    override func setUpWithError() throws {
         super.setUp()
+        try clearDB()
         executionTimeAllowance = 10
+    }
+
+    override func tearDownWithError() throws {
+        try clearDB()
+        super.tearDown()
+    }
+
+    func clearDB() throws {
+        let vault = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
+
+        let accounts = try vault.accounts()
+        for accountID in accounts.compactMap(\.id) {
+            if let accountID = Int64(accountID) {
+                try vault.deleteWebsiteCredentialsFor(accountId: accountID)
+            }
+        }
     }
 
     func testImportPasswordsPerformance() async throws {
@@ -48,5 +66,28 @@ final class CSVImporterIntegrationTests: XCTestCase {
             }
             wait(for: [expectation])
         }
+    }
+
+    // Deduplication rules: https://app.asana.com/0/0/1207598052765977/f
+    func testImportingPasswords_deduplicatesAccordingToDefinedRules() async throws {
+        let startingDataURL = Bundle(for: Self.self).url(forResource: "login_deduplication_starting_data", withExtension: "csv")!
+        let startingDataImporter = CSVImporter(
+            fileURL: startingDataURL,
+            loginImporter: SecureVaultLoginImporter(),
+            defaultColumnPositions: nil
+        )
+        _ = await startingDataImporter.importData(types: [.passwords]).result
+
+        let testDataURL = Bundle(for: Self.self).url(forResource: "login_deduplication_test_data", withExtension: "csv")!
+        let testDataImporter = CSVImporter(
+            fileURL: testDataURL,
+            loginImporter: SecureVaultLoginImporter(),
+            defaultColumnPositions: nil
+        )
+        let importTask = testDataImporter.importData(types: [.passwords])
+        let result = await importTask.result
+        let summary = try result.get()[.passwords]?.get()
+
+        XCTAssertEqual(summary?.duplicate, 4)
     }
 }
