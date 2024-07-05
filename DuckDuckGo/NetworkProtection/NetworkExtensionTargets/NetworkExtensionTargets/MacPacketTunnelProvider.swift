@@ -167,7 +167,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     frequency: .dailyAndCount,
                     includeAppVersionParameter: true)
             }
-        case .connectionTesterLongStatusChange(let status):
+        case .connectionTesterExtendedStatusChange(let status):
             switch status {
             case .failed:
                 PixelKit.fire(
