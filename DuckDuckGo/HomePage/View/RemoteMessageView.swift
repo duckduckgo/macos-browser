@@ -1,5 +1,5 @@
 //
-//  HomeMessageView.swift
+//  RemoteMessageView.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -20,9 +20,9 @@ import SwiftUI
 import RemoteMessaging
 import SwiftUIExtensions
 
-struct HomeMessageView: View {
+struct RemoteMessageView: View {
 
-    let viewModel: HomeMessageViewModel
+    let viewModel: RemoteMessageViewModel
 
     var body: some View {
         ZStack {
@@ -32,16 +32,22 @@ struct HomeMessageView: View {
             VStack(spacing: 12) {
                 HStack(spacing: 12) {
                     image
+
                     VStack(alignment: .leading, spacing: 8) {
                         title
                         subtitle
                     }
+
                     Spacer(minLength: 0)
+
+                    // Display single button on the right
                     if case .bigSingleAction = viewModel.modelType {
                         button
                     }
                     closeButton
                 }
+
+                // Display two buttons on the bottom
                 if case .bigTwoAction = viewModel.modelType {
                     HStack(spacing: 10) {
                         buttons
@@ -108,7 +114,7 @@ struct HomeMessageView: View {
     }
 }
 
-extension HomeMessageButtonViewModel {
+extension RemoteMessageButtonViewModel {
     var button: some View {
         Group {
             if actionStyle == .default {
@@ -154,15 +160,22 @@ extension HomeMessageButtonViewModel {
 }
 
 #Preview("Small") {
-    let small = RemoteMessageModelType.small(titleText: "Title Goes Here", descriptionText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus mattis ut et leo. Curabitur ut dolor id est blandit rhoncus ac id metus.")
+    let small = RemoteMessageModelType.small(
+        titleText: "Title Goes Here",
+        descriptionText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus mattis ut et leo. Curabitur ut dolor id est blandit rhoncus ac id metus."
+    )
 
-    return HomeMessageView(viewModel: .init(messageId: "1", modelType: small, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
+    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: small, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
 }
 
 #Preview("Medium") {
-    let medium = RemoteMessageModelType.medium(titleText: "Update Available!", descriptionText: "A new version of DuckDuckGo Browser is available. Update now to enjoy improved privacy features and enhanced performance.", placeholder: .appUpdate)
+    let medium = RemoteMessageModelType.medium(
+        titleText: "Update Available!",
+        descriptionText: "A new version of DuckDuckGo Browser is available. Update now to enjoy improved privacy features and enhanced performance.",
+        placeholder: .appUpdate
+    )
 
-    return HomeMessageView(viewModel: .init(messageId: "1", modelType: medium, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
+    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: medium, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
 }
 
 #Preview("Big Single Action") {
@@ -174,7 +187,7 @@ extension HomeMessageButtonViewModel {
         primaryAction: .dismiss
     )
 
-    return HomeMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
+    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
 }
 
 #Preview("Big Single Action #2") {
@@ -186,17 +199,19 @@ extension HomeMessageButtonViewModel {
         primaryAction: .dismiss
     )
 
-    return HomeMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
+    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
 }
 
 #Preview("Big Two Action") {
-    let bigTwoAction = RemoteMessageModelType.bigTwoAction(titleText: "macOS Update Recommended",
-                                                           descriptionText: "Support for macOS Big Sur is ending soon. Update to macOS Monterey or newer <b>before July 8, 2024</b>, to keep getting the latest browser updates and improvements.",
-                                                           placeholder: .criticalUpdate,
-                                                           primaryActionText: "How To Update macOS",
-                                                           primaryAction: .appStore,
-                                                           secondaryActionText: "Remind Me Later",
-                                                           secondaryAction: .dismiss)
+    let bigTwoAction = RemoteMessageModelType.bigTwoAction(
+        titleText: "macOS Update Recommended",
+        descriptionText: "Support for macOS Big Sur is ending soon. Update to macOS Monterey or newer <b>before July 8, 2024</b>, to keep getting the latest browser updates and improvements.",
+        placeholder: .criticalUpdate,
+        primaryActionText: "How To Update macOS",
+        primaryAction: .appStore,
+        secondaryActionText: "Remind Me Later",
+        secondaryAction: .dismiss
+    )
 
-    return HomeMessageView(viewModel: .init(messageId: "1", modelType: bigTwoAction, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
+    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: bigTwoAction, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
 }

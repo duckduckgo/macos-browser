@@ -1,5 +1,5 @@
 //
-//  HomeMessageViewModel.swift
+//  RemoteMessageViewModel.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -31,7 +31,7 @@ extension RemoteMessageModelType {
     }
 }
 
-struct HomeMessageViewModel {
+struct RemoteMessageViewModel {
     enum ButtonAction {
         case close
         case action // a generic action that is specific to the type of message
@@ -54,25 +54,25 @@ struct HomeMessageViewModel {
         modelType.subtitle
     }
 
-    var buttons: [HomeMessageButtonViewModel] {
+    var buttons: [RemoteMessageButtonViewModel] {
         switch modelType {
         case .small, .medium, .promoSingleAction:
             return []
         case .bigSingleAction(_, _, _, let primaryActionText, let primaryAction):
             return [
-                HomeMessageButtonViewModel(title: primaryActionText,
+                RemoteMessageButtonViewModel(title: primaryActionText,
                                            actionStyle: primaryAction.actionStyle(),
                                            action: mapActionToViewModel(remoteAction: primaryAction, buttonAction:
                                                 .primaryAction, onDidClose: onDidClose))
             ]
         case .bigTwoAction(_, _, _, let primaryActionText, let primaryAction, let secondaryActionText, let secondaryAction):
             return [
-                HomeMessageButtonViewModel(title: secondaryActionText,
+                RemoteMessageButtonViewModel(title: secondaryActionText,
                                            actionStyle: secondaryAction.actionStyle(isSecondaryAction: true),
                                            action: mapActionToViewModel(remoteAction: secondaryAction, buttonAction:
                                                 .secondaryAction, onDidClose: onDidClose)),
 
-                HomeMessageButtonViewModel(title: primaryActionText,
+                RemoteMessageButtonViewModel(title: primaryActionText,
                                            actionStyle: primaryAction.actionStyle(),
                                            action: mapActionToViewModel(remoteAction: primaryAction, buttonAction:
                                                 .primaryAction, onDidClose: onDidClose))
@@ -85,8 +85,8 @@ struct HomeMessageViewModel {
     let openURLHandler: (URL) -> Void
 
     func mapActionToViewModel(remoteAction: RemoteAction,
-                              buttonAction: HomeMessageViewModel.ButtonAction,
-                              onDidClose: @escaping (HomeMessageViewModel.ButtonAction?) -> Void) -> () -> Void {
+                              buttonAction: RemoteMessageViewModel.ButtonAction,
+                              onDidClose: @escaping (RemoteMessageViewModel.ButtonAction?) -> Void) -> () -> Void {
 
         switch remoteAction {
         case .url(let value), .share(let value, _):
@@ -117,7 +117,7 @@ struct HomeMessageViewModel {
     }
 }
 
-struct HomeMessageButtonViewModel {
+struct RemoteMessageButtonViewModel {
     enum ActionStyle: Equatable {
         case `default`
         case cancel
@@ -130,7 +130,7 @@ struct HomeMessageButtonViewModel {
 
 extension RemoteAction {
 
-    func actionStyle(isSecondaryAction: Bool = false) -> HomeMessageButtonViewModel.ActionStyle {
+    func actionStyle(isSecondaryAction: Bool = false) -> RemoteMessageButtonViewModel.ActionStyle {
         switch self {
         case .appStore, .url, .survey, .share:
             if isSecondaryAction {

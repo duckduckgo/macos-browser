@@ -40,7 +40,7 @@ final class ActiveRemoteMessageModel: ObservableObject {
             }
     }
 
-    func dismissRemoteMessage(with action: HomeMessageViewModel.ButtonAction?) {
+    func dismissRemoteMessage(with action: RemoteMessageViewModel.ButtonAction?) {
         guard let remoteMessage else {
             return
         }
