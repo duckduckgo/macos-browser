@@ -97,23 +97,8 @@ final class SecureVaultLoginImporter: LoginImporter {
 }
 
 extension SecureVaultModels.WebsiteAccount {
-    /*
-     Rules
-     username: is a duplicate if:
-     it's an exact match
-     one entry has a value and the other entry doesn't, it's not a duplicate
-     password: is a duplicate if:
-     it's an exact match
-     one entry has a value and the other entry doesn't, it's not a duplicate
-     url: is a duplicate if:
-     if the cleaned* version of the URL is an exact match, it's a duplicate
-     notes: is a duplicate if:
-     it's an exact match
-     the stored entry has a value and the import entry doesn't
-     title: is a duplicate if:
-     it's an exact match
-     the stored entry has a value and the import entry doesn't
-     */
+
+    // Deduplication rules: https://app.asana.com/0/0/1207598052765977/f
     func isDuplicateOf(accountToBeImported: Self, signatureOfAccountToBeImported: String, passwordToBeImported: String?) -> Bool {
         guard signature == signatureOfAccountToBeImported || passwordToBeImported.isNilOrEmpty else {
             return false
