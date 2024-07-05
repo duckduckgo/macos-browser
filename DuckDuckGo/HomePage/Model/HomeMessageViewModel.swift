@@ -81,6 +81,7 @@ struct HomeMessageViewModel {
     }
 
     let onDidClose: (ButtonAction?) -> Void
+    let onDidAppear: () -> Void
     let openURLHandler: (URL) -> Void
 
     func mapActionToViewModel(remoteAction: RemoteAction,

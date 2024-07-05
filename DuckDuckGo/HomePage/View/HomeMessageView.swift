@@ -156,13 +156,13 @@ extension HomeMessageButtonViewModel {
 #Preview("Small") {
     let small = RemoteMessageModelType.small(titleText: "Title Goes Here", descriptionText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus mattis ut et leo. Curabitur ut dolor id est blandit rhoncus ac id metus.")
 
-    return HomeMessageView(viewModel: .init(messageId: "1", modelType: small, onDidClose: { _ in }, openURLHandler: { _ in }))
+    return HomeMessageView(viewModel: .init(messageId: "1", modelType: small, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
 }
 
 #Preview("Medium") {
     let medium = RemoteMessageModelType.medium(titleText: "Update Available!", descriptionText: "A new version of DuckDuckGo Browser is available. Update now to enjoy improved privacy features and enhanced performance.", placeholder: .appUpdate)
 
-    return HomeMessageView(viewModel: .init(messageId: "1", modelType: medium, onDidClose: { _ in }, openURLHandler: { _ in }))
+    return HomeMessageView(viewModel: .init(messageId: "1", modelType: medium, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
 }
 
 #Preview("Big Single Action") {
@@ -174,7 +174,7 @@ extension HomeMessageButtonViewModel {
         primaryAction: .dismiss
     )
 
-    return HomeMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, openURLHandler: { _ in }))
+    return HomeMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
 }
 
 #Preview("Big Single Action #2") {
@@ -186,7 +186,7 @@ extension HomeMessageButtonViewModel {
         primaryAction: .dismiss
     )
 
-    return HomeMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, openURLHandler: { _ in }))
+    return HomeMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
 }
 
 #Preview("Big Two Action") {
@@ -198,5 +198,5 @@ extension HomeMessageButtonViewModel {
                                                            secondaryActionText: "Remind Me Later",
                                                            secondaryAction: .dismiss)
 
-    return HomeMessageView(viewModel: .init(messageId: "1", modelType: bigTwoAction, onDidClose: { _ in }, openURLHandler: { _ in }))
+    return HomeMessageView(viewModel: .init(messageId: "1", modelType: bigTwoAction, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
 }

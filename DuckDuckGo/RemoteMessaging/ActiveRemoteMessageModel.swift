@@ -17,26 +17,19 @@
 //
 
 import Combine
+import Common
 import Foundation
+import PixelKit
 import RemoteMessaging
 
 final class ActiveRemoteMessageModel: ObservableObject {
 
     @Published var remoteMessage: RemoteMessageModel?
-    let fetchMessage: () -> RemoteMessageModel?
-    let onDismiss: (RemoteMessageModel) -> Void
+    let remoteMessagingClient: RemoteMessagingClient
 
-    convenience init(client: RemoteMessagingClient) {
-        self.init { [weak client] in
-            client?.store?.fetchScheduledRemoteMessage()
-        } onDismiss: { [weak client] message in
-            client?.store?.dismissRemoteMessage(withId: message.id)
-        }
-    }
+    init(client: RemoteMessagingClient) {
+        self.remoteMessagingClient = client
 
-    init(fetchMessage: @escaping () -> RemoteMessageModel?, onDismiss: @escaping (RemoteMessageModel) -> Void) {
-        self.fetchMessage = fetchMessage
-        self.onDismiss = onDismiss
         updateRemoteMessage()
 
         messagesDidChangeCancellable = NotificationCenter.default
@@ -47,15 +40,44 @@ final class ActiveRemoteMessageModel: ObservableObject {
             }
     }
 
-    func dismissRemoteMessage() {
-        if let remoteMessage {
-            onDismiss(remoteMessage)
-            self.remoteMessage = nil
+    func dismissRemoteMessage(with action: HomeMessageViewModel.ButtonAction?) {
+        guard let remoteMessage else {
+            return
+        }
+
+        remoteMessagingClient.store?.dismissRemoteMessage(withId: remoteMessage.id)
+        self.remoteMessage = nil
+
+        let pixelParameters = ["message": remoteMessage.id]
+        switch action {
+        case .close:
+            PixelKit.fire(GeneralPixel.remoteMessageDismissed, withAdditionalParameters: pixelParameters)
+        case .action:
+            PixelKit.fire(GeneralPixel.remoteMessageActionClicked, withAdditionalParameters: pixelParameters)
+        case .primaryAction:
+            PixelKit.fire(GeneralPixel.remoteMessagePrimaryActionClicked, withAdditionalParameters: pixelParameters)
+        case .secondaryAction:
+            PixelKit.fire(GeneralPixel.remoteMessageSecondaryActionClicked, withAdditionalParameters: pixelParameters)
+        default:
+            break
+        }
+    }
+
+    func markRemoteMessageAsShown() {
+        guard let remoteMessage, let store = remoteMessagingClient.store else {
+            return
+        }
+        os_log("Remote message shown: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
+        PixelKit.fire(GeneralPixel.remoteMessageShown, withAdditionalParameters: ["message": remoteMessage.id])
+        if !store.hasShownRemoteMessage(withId: remoteMessage.id) {
+            os_log("Remote message shown for first time: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
+            PixelKit.fire(GeneralPixel.remoteMessageShownUnique, withAdditionalParameters: ["mesage": remoteMessage.id])
+            store.updateRemoteMessage(withId: remoteMessage.id, asShown: true)
         }
     }
 
     private func updateRemoteMessage() {
-        remoteMessage = fetchMessage()
+        remoteMessage = remoteMessagingClient.store?.fetchScheduledRemoteMessage()
     }
 
     private var messagesDidChangeCancellable: AnyCancellable?

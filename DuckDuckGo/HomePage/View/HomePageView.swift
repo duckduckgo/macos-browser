@@ -18,6 +18,7 @@
 
 import SwiftUI
 import BrowserServicesKit
+import PixelKit
 import SwiftUIExtensions
 
 extension HomePage.Views {
@@ -110,8 +111,11 @@ extension HomePage.Views {
                 HomeMessageView(viewModel: .init(
                     messageId: remoteMessage.id,
                     modelType: modelType,
-                    onDidClose: { _ in
-                        activeRemoteMessageModel.dismissRemoteMessage()
+                    onDidClose: { action in
+                        activeRemoteMessageModel.dismissRemoteMessage(with: action)
+                    },
+                    onDidAppear: {
+                        activeRemoteMessageModel.markRemoteMessageAsShown()
                     },
                     openURLHandler: { url in
                         WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
