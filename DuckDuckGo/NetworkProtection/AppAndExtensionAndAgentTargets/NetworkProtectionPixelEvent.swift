@@ -58,7 +58,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
     case networkProtectionConnectionTesterFailureDetected
     case networkProtectionConnectionTesterFailureRecovered(failureCount: Int)
-
     case networkProtectionConnectionTesterExtendedFailureDetected
     case networkProtectionConnectionTesterExtendedFailureRecovered(failureCount: Int)
 

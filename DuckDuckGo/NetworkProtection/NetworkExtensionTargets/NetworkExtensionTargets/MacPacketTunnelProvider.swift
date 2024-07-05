@@ -155,28 +155,35 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 withAdditionalParameters: [PixelKit.Parameters.vpnCohort: PixelKit.cohort(from: defaults.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
         case .connectionTesterStatusChange(let status):
+            vpnLogger.log(status)
+
             switch status {
-            case .failed:
+            case .failed(let duration):
+                let pixel: NetworkProtectionPixelEvent = {
+                    switch duration {
+                    case .immediate:
+                        return .networkProtectionConnectionTesterFailureDetected
+                    case .extended:
+                        return .networkProtectionConnectionTesterExtendedFailureDetected
+                    }
+                }()
+
                 PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionConnectionTesterFailureDetected,
+                    pixel,
                     frequency: .dailyAndCount,
                     includeAppVersionParameter: true)
-            case .recovered(let failureCount):
+            case .recovered(let duration, let failureCount):
+                let pixel: NetworkProtectionPixelEvent = {
+                    switch duration {
+                    case .immediate:
+                        return .networkProtectionConnectionTesterFailureRecovered(failureCount: failureCount)
+                    case .extended:
+                        return .networkProtectionConnectionTesterExtendedFailureRecovered(failureCount: failureCount)
+                    }
+                }()
+
                 PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionConnectionTesterFailureRecovered(failureCount: failureCount),
-                    frequency: .dailyAndCount,
-                    includeAppVersionParameter: true)
-            }
-        case .connectionTesterExtendedStatusChange(let status):
-            switch status {
-            case .failed:
-                PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionConnectionTesterExtendedFailureDetected,
-                    frequency: .dailyAndCount,
-                    includeAppVersionParameter: true)
-            case .recovered(let failureCount):
-                PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionConnectionTesterExtendedFailureRecovered(failureCount: failureCount),
+                    pixel,
                     frequency: .dailyAndCount,
                     includeAppVersionParameter: true)
             }
