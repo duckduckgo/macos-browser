@@ -231,8 +231,8 @@ final class RoundedCornersScrollView: NSScrollView {
 
 }
 
-#Preview { {
-
+#if DEBUG
+extension EditableTextView {
     struct PreviewView: View {
         @State var text = """
         NSLayoutConstraint.activate([
@@ -259,6 +259,8 @@ final class RoundedCornersScrollView: NSScrollView {
         }
 
     }
-    return PreviewView()
-
-}() }
+}
+#Preview {
+    EditableTextView.PreviewView()
+}
+#endif

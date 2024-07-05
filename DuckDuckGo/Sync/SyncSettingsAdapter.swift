@@ -34,9 +34,11 @@ final class SyncSettingsAdapter {
     private(set) var provider: SettingsProvider?
     private(set) var emailManager: EmailManager?
     let syncDidCompletePublisher: AnyPublisher<Void, Never>
+    private let syncErrorHandler: SyncErrorHandling
 
-    init() {
+    init(syncErrorHandler: SyncErrorHandling) {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
+        self.syncErrorHandler = syncErrorHandler
     }
 
     func setUpProviderIfNeeded(
@@ -61,29 +63,8 @@ final class SyncSettingsAdapter {
         )
 
         syncErrorCancellable = provider.syncErrorPublisher
-            .sink { error in
-                switch error {
-                case SyncError.patchPayloadCompressionFailed(let errorCode):
-                    PixelKit.fire(
-                        DebugEvent(GeneralPixel.syncSettingsPatchCompressionFailed),
-                        withAdditionalParameters: ["error": "\(errorCode)"]
-                    )
-                case let syncError as SyncError:
-                    PixelKit.fire(DebugEvent(GeneralPixel.syncSettingsFailed, error: syncError))
-                case let settingsMetadataError as SettingsSyncMetadataSaveError:
-                    let underlyingError = settingsMetadataError.underlyingError
-                    let processedErrors = CoreDataErrorsParser.parse(error: underlyingError as NSError)
-                    let params = processedErrors.errorPixelParameters
-                    PixelKit.fire(DebugEvent(GeneralPixel.syncSettingsMetadataUpdateFailed, error: underlyingError), withAdditionalParameters: params)
-                default:
-                    let nsError = error as NSError
-                    if nsError.domain != NSURLErrorDomain {
-                        let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
-                        let params = processedErrors.errorPixelParameters
-                        PixelKit.fire(DebugEvent(GeneralPixel.syncSettingsFailed, error: error), withAdditionalParameters: params)
-                    }
-                }
-                os_log(.error, log: OSLog.sync, "Settings Sync error: %{public}s", String(reflecting: error))
+            .sink { [weak self] error in
+                self?.syncErrorHandler.handleSettingsError(error)
             }
 
         self.provider = provider

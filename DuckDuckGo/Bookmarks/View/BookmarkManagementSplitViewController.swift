@@ -86,7 +86,7 @@ extension BookmarkManagementSplitViewController: BookmarkManagementDetailViewCon
 #if DEBUG
 private let previewSize = NSSize(width: 700, height: 660)
 @available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: previewSize.width, height: previewSize.height)) { {
+#Preview(traits: previewSize.fixedLayout) { {
 
     let vc = BookmarkManagementSplitViewController(bookmarkManager: {
         let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [

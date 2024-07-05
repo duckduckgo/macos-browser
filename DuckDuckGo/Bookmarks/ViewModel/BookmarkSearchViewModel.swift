@@ -1,7 +1,7 @@
 //
-//  TimeIntervalExtension.swift
+//  BookmarkSearchViewModel.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,22 +18,24 @@
 
 import Foundation
 
-extension TimeInterval {
-    static let day = days(1)
+struct BookmarkSearchViewModel {
 
-    static func seconds(_ amount: Int) -> TimeInterval {
-        TimeInterval(amount)
+    enum BookmarkSearchResult: Equatable {
+        case emptyQuery
+        case results([BaseBookmarkEntity])
+
+        static let noResults = Self.results([])
     }
 
-    static func minutes(_ amount: Int) -> TimeInterval {
-        .seconds(60) * TimeInterval(amount)
-    }
+    let manager: BookmarkManager
 
-    static func hours(_ amount: Int) -> TimeInterval {
-        .minutes(60) * TimeInterval(amount)
-    }
+    func search(by query: String) -> BookmarkSearchResult {
+        if query.isBlank {
+            return .emptyQuery
+        }
 
-    static func days(_ amount: Int) -> TimeInterval {
-        .hours(24) * TimeInterval(amount)
+        let filteredBookmarks = manager.search(by: query)
+
+        return filteredBookmarks.isEmpty ? .noResults : .results(filteredBookmarks)
     }
 }

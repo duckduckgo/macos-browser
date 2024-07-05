@@ -20,7 +20,7 @@ import Foundation
 import BrowserServicesKit
 
 protocol JobRunnerProvider {
-    func getJobRunner() -> WebJobRunner
+    @MainActor func getJobRunner() -> WebJobRunner
 }
 
 struct DataBrokerJobRunnerProvider: JobRunnerProvider {

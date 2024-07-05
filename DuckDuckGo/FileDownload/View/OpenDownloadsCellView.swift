@@ -21,8 +21,7 @@ import AppKit
 final class OpenDownloadsCellView: NSTableCellView {
 
     fileprivate enum Constants {
-        static let width: CGFloat = 420
-        static let height: CGFloat = 60
+        static let viewSize = CGSize(width: 420, height: 60)
     }
 
     private let openFolderButton = LinkButton(title: UserText.downloadsOpenDownloadsFolder,
@@ -30,7 +29,7 @@ final class OpenDownloadsCellView: NSTableCellView {
                                               action: #selector(DownloadsViewController.openDownloadsFolderAction))
 
     init(identifier: NSUserInterfaceItemIdentifier) {
-        super.init(frame: CGRect(x: 0, y: 0, width: Constants.width, height: Constants.height))
+        super.init(frame: CGRect(origin: .zero, size: Constants.viewSize))
         self.identifier = identifier
 
         setupUI()
@@ -59,8 +58,7 @@ final class OpenDownloadsCellView: NSTableCellView {
 }
 
 @available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: OpenDownloadsCellView.Constants.width,
-                              height: OpenDownloadsCellView.Constants.height)) {
+#Preview(traits: OpenDownloadsCellView.Constants.viewSize.fixedLayout) {
     PreviewViewController(showWindowTitle: false) {
         OpenDownloadsCellView(identifier: .init(""))
     }

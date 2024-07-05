@@ -81,6 +81,10 @@ extension String {
         }
     }
 
+    var isBlank: Bool {
+        self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     // MARK: - URL
 
     var url: URL? {

@@ -708,12 +708,12 @@ extension MainViewController {
     }
 
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
-        UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
+        UserDefaultsWrapper.clear(.defaultBrowserDismissed)
     }
 
     @objc func resetDefaultGrammarChecks(_ sender: Any?) {
-        UserDefaultsWrapper<Bool>.clear(.spellingCheckEnabledOnce)
-        UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
+        UserDefaultsWrapper.clear(.spellingCheckEnabledOnce)
+        UserDefaultsWrapper.clear(.grammarCheckEnabledOnce)
     }
 
     @objc func triggerFatalError(_ sender: Any?) {

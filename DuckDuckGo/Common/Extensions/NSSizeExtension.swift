@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import DeveloperToolsSupport
 
 extension NSSize {
 
@@ -31,4 +32,14 @@ extension NSSize {
         NSSize(width: width * scaleFactor, height: height * scaleFactor)
     }
 
+}
+
+extension CGSize {
+    /// #Preview helper to convert CGSize to Preview Traits
+    @available(macOS 14.0, *)
+    var fixedLayout: PreviewTrait<Preview.ViewTraits> {
+        MainActor.assumeIsolated {
+            .fixedLayout(width: width, height: height)
+        }
+    }
 }
