@@ -21,11 +21,11 @@ import WebKit
 import BrowserServicesKit
 import UserScript
 
-@MainActor
 final class DBPUIUserContentController: WKUserContentController {
 
     let dbpUIUserScripts: DBPUIUserScript
 
+    @MainActor
     init(with privacyConfigurationManager: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          delegate: DBPUICommunicationDelegate,
@@ -48,6 +48,7 @@ final class DBPUIUserContentController: WKUserContentController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    @MainActor
     private func installUserScripts(_ wkUserScripts: [WKUserScript], handlers: [UserScript]) {
         handlers.forEach { self.addHandler($0) }
         wkUserScripts.forEach(self.addUserScript)

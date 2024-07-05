@@ -98,7 +98,7 @@ final class SyncDataProviders: DataProvidersSource {
         self.syncErrorHandler = syncErrorHandler
         bookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, syncErrorHandler: syncErrorHandler)
         credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory, syncErrorHandler: syncErrorHandler)
-        settingsAdapter = SyncSettingsAdapter()
+        settingsAdapter = SyncSettingsAdapter(syncErrorHandler: syncErrorHandler)
     }
 
     private func initializeMetadataDatabaseIfNeeded() {

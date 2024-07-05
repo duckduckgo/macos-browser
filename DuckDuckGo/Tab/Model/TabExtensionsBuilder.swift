@@ -249,7 +249,7 @@ struct TabExtensions {
 }
 
 extension TabExtensions: Sequence {
-    typealias Iterator = Dictionary<ObjectIdentifier, ExtensionType>.Values.Iterator
+    typealias Iterator = Dictionary<ObjectIdentifier, any ExtensionType>.Values.Iterator
 
     func makeIterator() -> Iterator {
         self.extensions.values.makeIterator()
