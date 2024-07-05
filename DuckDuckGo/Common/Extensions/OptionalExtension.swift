@@ -18,30 +18,6 @@
 
 import Foundation
 
-protocol OptionalProtocol {
-    associatedtype Wrapped
-
-    var isNil: Bool { get }
-
-    /// instantiate a Concrete-Typed `Optional<Wrapped>.none as T` from an `AnyOptionalType`
-    /// can be used to return nil value for a maybe-optional Generic Type
-    /// usage: `(T.self as? AnyOptionalType)?.none as? T`
-    static var none: Self { get }
-}
-typealias AnyOptional = any OptionalProtocol
-typealias AnyOptionalType = any OptionalProtocol.Type
-
-extension Optional: OptionalProtocol {
-
-    var isNil: Bool {
-        if case .none = self {
-            return true
-        }
-        return false
-    }
-
-}
-
 extension Optional where Wrapped == String {
     var isNilOrEmpty: Bool {
         if case .some(let wrapped) = self {

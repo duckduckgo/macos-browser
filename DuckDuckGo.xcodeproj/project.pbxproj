@@ -2609,6 +2609,8 @@
 		EEE0E1CF2C32F6530058E148 /* mock_login_data_large.csv in Resources */ = {isa = PBXBuildFile; fileRef = EEE0E1CE2C32F6530058E148 /* mock_login_data_large.csv */; };
 		EEE0E1D02C32F6530058E148 /* mock_login_data_large.csv in Resources */ = {isa = PBXBuildFile; fileRef = EEE0E1CE2C32F6530058E148 /* mock_login_data_large.csv */; };
 		EEE0E1D12C32F8620058E148 /* CSVImporterIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE0E1CC2C32F5690058E148 /* CSVImporterIntegrationTests.swift */; };
+		EEE50C292C38249C003DD7FF /* OptionalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE50C282C38249C003DD7FF /* OptionalExtension.swift */; };
+		EEE50C2A2C38249C003DD7FF /* OptionalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE50C282C38249C003DD7FF /* OptionalExtension.swift */; };
 		EEF12E6F2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */; };
 		EEF53E182950CED5002D78F4 /* JSAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */; };
 		F116A7C32BD1924B00F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C22BD1924B00F3FCF7 /* PixelKitTestingUtilities */; };
@@ -3892,6 +3894,7 @@
 		B634DBE4293C944700C3C99E /* NewWindowPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewWindowPolicy.swift; sourceTree = "<group>"; };
 		B634DBE6293C98C500C3C99E /* FutureExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureExtension.swift; sourceTree = "<group>"; };
 		B637273A26CBC8AF00C8CB02 /* AuthenticationAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationAlert.swift; sourceTree = "<group>"; };
+		B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionalExtension.swift; sourceTree = "<group>"; };
 		B63BDF7D27FDAA640072D75B /* PrivacyDashboardWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardWebView.swift; sourceTree = "<group>"; };
 		B63D466725BEB6C200874977 /* WKWebView+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WKWebView+Private.h"; sourceTree = "<group>"; };
 		B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WKWebView+SessionState.swift"; sourceTree = "<group>"; };
@@ -4197,6 +4200,7 @@
 		EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtection+VPNAgentConvenienceInitializers.swift"; sourceTree = "<group>"; };
 		EEE0E1CC2C32F5690058E148 /* CSVImporterIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporterIntegrationTests.swift; sourceTree = "<group>"; };
 		EEE0E1CE2C32F6530058E148 /* mock_login_data_large.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mock_login_data_large.csv; sourceTree = "<group>"; };
+		EEE50C282C38249C003DD7FF /* OptionalExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptionalExtension.swift; sourceTree = "<group>"; };
 		EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPacketTunnelProvider.swift; sourceTree = "<group>"; };
 		EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModelTests.swift; sourceTree = "<group>"; };
 		F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift"; sourceTree = "<group>"; };
@@ -7587,6 +7591,7 @@
 				B634DBE6293C98C500C3C99E /* FutureExtension.swift */,
 				1DA6D0FC2A1FF9A100540406 /* HTTPCookie.swift */,
 				AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */,
+				EEE50C282C38249C003DD7FF /* OptionalExtension.swift */,
 				0230C0A2272080090018F728 /* KeyedCodingExtension.swift */,
 				4B8D9061276D1D880078DB17 /* LocaleExtension.swift */,
 				B66B9C5B29A5EBAD0010E8F3 /* NavigationActionExtension.swift */,
@@ -7625,6 +7630,7 @@
 				AA9E9A5525A3AE8400D1959D /* NSWindowExtension.swift */,
 				B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */,
 				B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */,
+				B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */,
 				B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */,
 				B68C2FB127706E6A00BF2C7D /* ProcessExtension.swift */,
 				B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */,
@@ -10203,6 +10209,7 @@
 				3706FBDD293F65D500E42796 /* PaddedImageButton.swift in Sources */,
 				37CEFCAA2A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */,
 				3706FBDE293F65D500E42796 /* EncryptionKeyStoring.swift in Sources */,
+				EEE50C2A2C38249C003DD7FF /* OptionalExtension.swift in Sources */,
 				4B4D60E32A0C883A00BCD287 /* AppMain.swift in Sources */,
 				37197EA12942441700394917 /* Tab+UIDelegate.swift in Sources */,
 				56D6A3D729DB2BAB0055215A /* ContinueSetUpView.swift in Sources */,
@@ -11826,6 +11833,7 @@
 				B60C6F7729B0E286007BFAA8 /* SearchNonexistentDomainNavigationResponder.swift in Sources */,
 				B65E6B9E26D9EC0800095F96 /* CircularProgressView.swift in Sources */,
 				56A053FC2C19E8F7007D8FAB /* OnboardingActionsManager.swift in Sources */,
+				EEE50C292C38249C003DD7FF /* OptionalExtension.swift in Sources */,
 				AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */,
 				B6C00ECD292F89D9009C73A6 /* FindInPageTabExtension.swift in Sources */,
 				85589E8327BBB8630038AD11 /* HomePageViewController.swift in Sources */,
