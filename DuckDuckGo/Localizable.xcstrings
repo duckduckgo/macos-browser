@@ -32573,6 +32573,9 @@
         }
       }
     },
+    "No results" : {
+
+    },
     "no.access.to.downloads.folder.header" : {
       "comment" : "Header of the alert dialog warning the user they need to give the browser permission to access the Downloads folder",
       "extractionState" : "extracted_with_value",

@@ -409,17 +409,64 @@ final class BookmarkListViewController: NSViewController {
         guard sender.clickedRow != -1 else { return }
 
         let item = sender.item(atRow: sender.clickedRow)
+
         if let node = item as? BookmarkNode,
            let bookmark = node.representedObject as? Bookmark {
-            WindowControllersManager.shared.open(bookmark: bookmark)
-            delegate?.popoverShouldClose(self)
+            onBookmarkClick(bookmark)
+        } else if let node = item as? BookmarkNode, let folder = node.representedObject as? BookmarkFolder, dataSource.contentMode == .search {
+            showTreeView()
+            expandFoldersUntil(folder: folder)
+            scrollToItem(node)
         } else {
-            if outlineView.isItemExpanded(item) {
-                outlineView.animator().collapseItem(item)
-            } else {
-                outlineView.animator().expandItem(item)
+            handleFolderClickWhenNotInSearchMode(item: item)
+        }
+    }
+
+    private func onBookmarkClick(_ bookmark: Bookmark) {
+        WindowControllersManager.shared.open(bookmark: bookmark)
+        delegate?.popoverShouldClose(self)
+    }
+
+    private func handleFolderClickWhenNotInSearchMode(item: Any?) {
+        if outlineView.isItemExpanded(item) {
+            outlineView.animator().collapseItem(item)
+        } else {
+            outlineView.animator().expandItem(item)
+        }
+    }
+
+    private func expandFoldersUntil(folder: BookmarkFolder) {
+        var nodes: [BookmarkNode?] = []
+        let newNodePosition = dataSource.treeController.node(representing: folder)
+        var parent = newNodePosition?.parent
+        nodes.append(newNodePosition)
+
+        while parent != nil {
+            nodes.append(parent)
+            parent = parent?.parent
+        }
+
+        while !nodes.isEmpty {
+            if let current = nodes.removeLast() {
+                if !current.isRoot {
+                    outlineView.animator().expandItem(current)
+                }
             }
         }
+    }
+
+    private func scrollToItem(_ item: Any) {
+        let rowIndex = outlineView.row(forItem: item)
+
+        if rowIndex != -1 {
+            outlineView.scrollRowToVisible(rowIndex)
+        }
+    }
+
+    private func showTreeView() {
+        emptyState.isHidden = true
+        dataSource.reloadData()
+        outlineView.reloadData()
     }
 
     @objc func onImportClicked(_ sender: NSButton) {
@@ -694,9 +741,7 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
             let searchQuery = searchField.stringValue
 
             if searchQuery.isBlank {
-                emptyState.isHidden = true
-                dataSource.reloadData()
-                outlineView.reloadData()
+                showTreeView()
             } else {
                 let results = bookmarkManager.search(by: searchQuery)
 

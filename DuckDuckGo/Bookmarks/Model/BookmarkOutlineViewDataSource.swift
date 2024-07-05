@@ -31,9 +31,9 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     @Published var selectedFolders: [BookmarkFolder] = []
 
     let treeController: BookmarkTreeController
-    private(set) var expandedNodesIDs = Set<String>()
 
-    private var contentMode: ContentMode
+    private(set) var contentMode: ContentMode
+    private(set) var expandedNodesIDs = Set<String>()
     private let bookmarkManager: BookmarkManager
     private let showMenuButtonOnHover: Bool
     private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
