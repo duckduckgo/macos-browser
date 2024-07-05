@@ -32,10 +32,16 @@ public struct SubscriptionUIHandlerMock: SubscriptionUIHandling {
 
     let didPerformActionCallback: (_ action: UIHandlerMockPerformedAction) -> Void
 
+    public init(alertResponse: NSApplication.ModalResponse? = nil,
+                didPerformActionCallback: @escaping (UIHandlerMockPerformedAction) -> Void) {
+        self.didPerformActionCallback = didPerformActionCallback
+        self.alertResponse = alertResponse
+    }
+
     public var alertResponse: NSApplication.ModalResponse?
 
     public func presentProgressViewController(withTitle: String) {
-        didPerformActionCallback(.didDismissProgressViewController)
+        didPerformActionCallback(.didPresentProgressViewController)
     }
 
     public func dismissProgressViewController() {
