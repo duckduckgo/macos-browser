@@ -196,27 +196,23 @@ final class FaviconStore: FaviconStoring {
     private func remove(identifiers: [UUID], entityName: String) async throws {
         return try await withCheckedThrowingContinuation { [context] continuation in
             context.perform {
+                let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
+                deleteRequest.predicate = NSPredicate(format: "identifier IN %@", identifiers)
 
-                // To avoid long predicate, execute multiple times
-                let chunkedIdentifiers = identifiers.chunked(into: 100)
+                let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
+                batchDeleteRequest.resultType = .resultTypeObjectIDs
 
-                for identifiers in chunkedIdentifiers {
-                    let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
-                    let predicates = identifiers.map({ NSPredicate(format: "identifier == %@", argumentArray: [$0]) })
-                    deleteRequest.predicate = NSCompoundPredicate(type: .or, subpredicates: predicates)
-                    let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
-                    batchDeleteRequest.resultType = .resultTypeObjectIDs
-                    do {
-                        let result = try self.context.execute(batchDeleteRequest) as? NSBatchDeleteResult
-                        let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
-                        let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
-                        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self.context])
-                        os_log("%d entries of %s removed", log: .favicons, deletedObjects.count, entityName)
-                    } catch {
-                        continuation.resume(throwing: error)
-                    }
+                do {
+                    let result = try context.execute(batchDeleteRequest) as? NSBatchDeleteResult
+                    let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
+                    let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: deletedObjects]
+                    NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
+                    os_log("%d entries of %s removed", log: .favicons, deletedObjects.count, entityName)
+
+                    continuation.resume(returning: ())
+                } catch {
+                    continuation.resume(throwing: error)
                 }
-                continuation.resume()
             }
         }
     }

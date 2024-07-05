@@ -129,8 +129,20 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertFalse(vm.isMoreOrLessButtonNeeded)
     }
 
-    func testWhenInitializedForTheFirstTimeTheMatrixHasAllElementsInTheRightOrder() {
+    @MainActor func testWhenInitializedForTheFirstTimeTheMatrixHasAllElementsInTheRightOrder() {
+        let homePageIsFirstSession = UserDefaultsWrapper<Bool>(key: .homePageIsFirstSession, defaultValue: true)
+        homePageIsFirstSession.wrappedValue = true
         var expectedMatrix = [[HomePage.Models.FeatureType.duckplayer, .emailProtection]]
+        vm = HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: capturingDefaultBrowserProvider,
+            dockCustomizer: dockCustomizer,
+            dataImportProvider: capturingDataImportProvider,
+            tabCollectionViewModel: tabCollectionVM,
+            emailManager: emailManager,
+            duckPlayerPreferences: duckPlayerPreferences,
+            surveyRemoteMessaging: createMessaging(),
+            permanentSurveyManager: MockPermanentSurveyManager()
+        )
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
 
@@ -344,6 +356,18 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testDismissedItemsAreRemovedFromVisibleMatrixAndChoicesArePersisted() {
+        let homePageIsFirstSession = UserDefaultsWrapper<Bool>(key: .homePageIsFirstSession, defaultValue: true)
+        homePageIsFirstSession.wrappedValue = true
+        vm = HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: capturingDefaultBrowserProvider,
+            dockCustomizer: dockCustomizer,
+            dataImportProvider: capturingDataImportProvider,
+            tabCollectionViewModel: tabCollectionVM,
+            emailManager: emailManager,
+            duckPlayerPreferences: duckPlayerPreferences,
+            surveyRemoteMessaging: createMessaging(),
+            permanentSurveyManager: MockPermanentSurveyManager()
+        )
         vm.shouldShowAllFeatures = true
         let expectedMatrix = expectedFeatureMatrixWithout(types: [.permanentSurvey])
         XCTAssertEqual(expectedMatrix, vm.visibleFeaturesMatrix)

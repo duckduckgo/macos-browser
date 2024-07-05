@@ -1,7 +1,7 @@
 {
   "name": "USPhoneBook",
   "url": "usphonebook.com",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678082400000,
   "steps": [
@@ -17,7 +17,8 @@
         {
           "actionType": "extract",
           "id": "fd2f1b35-bf37-426f-b39b-f4b280513e53",
-          "selector": ".ls_contacts-people-finder-wrapper",
+          "selector": "//div[@class='success-wrapper-block' and @itemtype='https://schema.org/Person']",
+          "noResultsSelector": ".no-results-content-wrapper",
           "profile": {
             "name": {
               "selector": ".//span[@itemprop='name']"

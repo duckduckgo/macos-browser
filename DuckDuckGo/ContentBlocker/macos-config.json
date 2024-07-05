@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1718389872223,
+    "version": 1719853254811,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -301,6 +301,9 @@
                     "domain": "malmostadsteater.se"
                 },
                 {
+                    "domain": "hertz.co.uk"
+                },
+                {
                     "domain": "hertz.com"
                 },
                 {
@@ -326,11 +329,12 @@
                 "disabledCMPs": [
                     "generic-cosmetic",
                     "termsfeed3",
-                    "tarteaucitron.js"
+                    "healthline-media",
+                    "ketch"
                 ]
             },
             "state": "enabled",
-            "hash": "83e6459ca9323d451eef92c3f975f9f6"
+            "hash": "e5cf758c3a0af66a24bde8901315893e"
         },
         "autofill": {
             "exceptions": [
@@ -340,6 +344,11 @@
             ],
             "state": "enabled",
             "hash": "b1ae580a636957bcbe90d16aa92c40bd"
+        },
+        "brokenSiteReportExperiment": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "clickToLoad": {
             "exceptions": [
@@ -944,6 +953,72 @@
                     "domain": "pocketbook.digital"
                 },
                 {
+                    "domain": "vinted.at"
+                },
+                {
+                    "domain": "vinted.be"
+                },
+                {
+                    "domain": "vinted.com"
+                },
+                {
+                    "domain": "vinted.co.uk"
+                },
+                {
+                    "domain": "vinted.cz"
+                },
+                {
+                    "domain": "vinted.de"
+                },
+                {
+                    "domain": "vinted.dk"
+                },
+                {
+                    "domain": "vinted.es"
+                },
+                {
+                    "domain": "vinted.fi"
+                },
+                {
+                    "domain": "vinted.fr"
+                },
+                {
+                    "domain": "vinted.gr"
+                },
+                {
+                    "domain": "vinted.hr"
+                },
+                {
+                    "domain": "vinted.hu"
+                },
+                {
+                    "domain": "vinted.it"
+                },
+                {
+                    "domain": "vinted.lt"
+                },
+                {
+                    "domain": "vinted.lu"
+                },
+                {
+                    "domain": "vinted.nl"
+                },
+                {
+                    "domain": "vinted.pl"
+                },
+                {
+                    "domain": "vinted.pt"
+                },
+                {
+                    "domain": "vinted.ro"
+                },
+                {
+                    "domain": "vinted.se"
+                },
+                {
+                    "domain": "vinted.sk"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -969,7 +1044,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "1.93.0",
-            "hash": "9ce67c4f464cafb0976eb0dcdbc3aa05"
+            "hash": "de5445a7452409483eeef786759d392f"
         },
         "clickToPlay": {
             "exceptions": [
@@ -1061,7 +1136,13 @@
                 "firstPartyCookiePolicy": {
                     "threshold": 604800,
                     "maxAge": 604800
-                }
+                },
+                "thirdPartyCookieNames": [
+                    "user_id",
+                    "__Secure-3PAPISID",
+                    "SAPISID",
+                    "APISID"
+                ]
             },
             "exceptions": [
                 {
@@ -1087,7 +1168,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "8ea32fe77b484cffbbf3782cc0725008"
+            "hash": "e045fd25b82f8ac2cbd02877153bd9c2"
         },
         "customUserAgent": {
             "settings": {
@@ -1132,6 +1213,14 @@
                     {
                         "domain": "id.seb.se",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/2025"
+                    },
+                    {
+                        "domain": "xfinity.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2149"
+                    },
+                    {
+                        "domain": "manage.wix.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2166"
                     }
                 ],
                 "webViewDefault": [
@@ -1159,7 +1248,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "c52448ca8da413a93de9822cac039920"
+            "hash": "132d12636968cac6025e986bd8358ce2"
         },
         "dbp": {
             "state": "enabled",
@@ -1187,6 +1276,11 @@
         },
         "duckPlayer": {
             "exceptions": [],
+            "features": {
+                "pip": {
+                    "state": "enabled"
+                }
+            },
             "settings": {
                 "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c",
                 "overlays": {
@@ -1251,12 +1345,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "b685397a8317384bec3b8d7e8b7571bb"
-        },
-        "dummyWebMessageListener": {
-            "exceptions": [],
-            "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
+            "hash": "bacc01ec18acadc564c507f12bc01442"
         },
         "elementHiding": {
             "exceptions": [
@@ -2418,6 +2507,15 @@
                             {
                                 "selector": "[class*='mps-']",
                                 "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "eporner.com",
+                        "rules": [
+                            {
+                                "selector": "#admobiletop",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -4452,7 +4550,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "c24633690a4839ab81a20b4810482402"
+            "hash": "3cada5c612306aa43f10db2af34b4463"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4666,6 +4764,9 @@
                     "domain": "nordstrom.com"
                 },
                 {
+                    "domain": "xfinity.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4709,7 +4810,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "60450dfeaadcda674d04afb533108591"
+            "hash": "df0ff6af6c5ae7c141d275cd75f27ce7"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -4847,6 +4948,9 @@
                     "domain": "monstergear.monsterenergy.com"
                 },
                 {
+                    "domain": "npr.org"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4865,7 +4969,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "9f454f11b58ebabddbcf73068fc0c937"
+            "hash": "8d7152a7ac339ca9333a3dbb246a3d76"
         },
         "harmfulApis": {
             "settings": {
@@ -5290,6 +5394,11 @@
             "state": "disabled",
             "hash": "3c850040d1c9b3e06841b1491c5d2940"
         },
+        "remoteMessaging": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "requestFilterer": {
             "state": "disabled",
             "exceptions": [
@@ -5368,6 +5477,18 @@
             "exceptions": [],
             "minSupportedVersion": "1.70.0",
             "hash": "0a35f748d63fc61a777ea5e712728fa3"
+        },
+        "toggleReports": {
+            "state": "enabled",
+            "exceptions": [],
+            "settings": {
+                "dismissLogicEnabled": true,
+                "dismissInterval": 172800,
+                "promptLimitLogicEnabled": true,
+                "promptInterval": 172800,
+                "maxPromptCount": 3
+            },
+            "hash": "a05b4413a3745762c46ec89aa5037693"
         },
         "trackerAllowlist": {
             "state": "enabled",
@@ -6140,6 +6261,12 @@
                                 "domains": [
                                     "shapermint.com"
                                 ]
+                            },
+                            {
+                                "rule": "datadoghq-browser-agent.com",
+                                "domains": [
+                                    "indeed.com"
+                                ]
                             }
                         ]
                     },
@@ -6307,7 +6434,7 @@
                     "dynamicyield.com": {
                         "rules": [
                             {
-                                "rule": "cdn.dynamicyield.com/api/",
+                                "rule": "dynamicyield.com/api/",
                                 "domains": [
                                     "<all>"
                                 ]
@@ -7389,6 +7516,12 @@
                                 ]
                             },
                             {
+                                "rule": "digital-cloud-west.medallia.com/",
+                                "domains": [
+                                    "walgreens.com"
+                                ]
+                            },
+                            {
                                 "rule": "survey.medallia.com/",
                                 "domains": [
                                     "<all>"
@@ -8117,6 +8250,16 @@
                             }
                         ]
                     },
+                    "siteimproveanalytics.com": {
+                        "rules": [
+                            {
+                                "rule": "siteimproveanalytics.com",
+                                "domains": [
+                                    "codot.gov"
+                                ]
+                            }
+                        ]
+                    },
                     "skimresources.com": {
                         "rules": [
                             {
@@ -8669,7 +8812,7 @@
                     "domain": "noaprints.com"
                 }
             ],
-            "hash": "5afa59b15a6f7294ceda3b6996e96c35"
+            "hash": "182c58c5b1a32bc6c061b88bfbb044b0"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9056,7 +9199,22 @@
             },
             "hash": "62636b478aa50f4bc1e57e6b73fc1e0e"
         },
+        "webViewBlobDownload": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsExternalPreviewReleases": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
         "windowsPermissionUsage": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsPrecisionScroll": {
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"

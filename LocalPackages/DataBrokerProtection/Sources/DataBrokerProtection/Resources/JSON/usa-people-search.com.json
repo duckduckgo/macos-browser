@@ -1,7 +1,7 @@
 {
   "name": "USA People Search",
   "url": "usa-people-search.com",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678082400000,
   "steps": [
@@ -18,6 +18,7 @@
           "actionType": "extract",
           "id": "44e9b66c-c43c-4112-b51e-f7decd83049e",
           "selector": ".card-block",
+          "noResultsSelector": ".redirect-message",
           "profile": {
             "name": {
               "selector": ".card-title",

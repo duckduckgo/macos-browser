@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "4689746e42b24c40c18896d697ea02b854e90d35",
-        "version" : "5.21.0"
+        "revision" : "7ac68ae3bc052fa59adbc1ba8fd5cb5849a6bc99",
+        "version" : "5.25.0"
       }
     },
     {
@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "10aeff1ec7f533d1705233a9b14f9393a699b1c0",
-        "version" : "11.0.2"
+        "revision" : "2b81745565db09eee8c1cd44d38eefa1011a9f0a",
+        "version" : "12.0.1"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/airbnb/lottie-spm.git",
       "state" : {
-        "revision" : "3bd43e12d6fb54654366a61f7cfaca787318b8ce",
-        "version" : "4.4.1"
+        "revision" : "1d29eccc24cc8b75bff9f6804155112c0ffc9605",
+        "version" : "4.4.3"
       }
     },
     {

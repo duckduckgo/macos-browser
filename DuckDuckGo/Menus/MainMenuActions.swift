@@ -589,6 +589,7 @@ extension MainViewController {
                 burnerMode: tabCollectionViewModel.burnerMode)
         }
         tabCollectionViewModel.append(tabs: tabs)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     @objc func showManageBookmarks(_ sender: Any?) {
@@ -706,12 +707,12 @@ extension MainViewController {
     }
 
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
-        UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
+        UserDefaultsWrapper.clear(.defaultBrowserDismissed)
     }
 
     @objc func resetDefaultGrammarChecks(_ sender: Any?) {
-        UserDefaultsWrapper<Bool>.clear(.spellingCheckEnabledOnce)
-        UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
+        UserDefaultsWrapper.clear(.spellingCheckEnabledOnce)
+        UserDefaultsWrapper.clear(.grammarCheckEnabledOnce)
     }
 
     @objc func triggerFatalError(_ sender: Any?) {
@@ -809,6 +810,11 @@ extension MainViewController {
 
     @objc func inPermanentSurveyShareOff(_ sender: Any?) {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
+    }
+
+    @objc func changePixelExperimentInstalledDateToLessMoreThan5DayAgo(_ sender: Any?) {
+        let moreThanFiveDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())
+        UserDefaults.standard.set(moreThanFiveDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.pixelExperimentEnrollmentDate.rawValue)
     }
 
     @objc func changeInstallDateToToday(_ sender: Any?) {
