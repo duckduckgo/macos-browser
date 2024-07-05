@@ -153,10 +153,13 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncDuckAddressOverride
     case syncSuccessRateDaily
     case syncLocalTimestampResolutionTriggered(Feature)
-    case syncBookmarksCountLimitExceededDaily
-    case syncCredentialsCountLimitExceededDaily
+    case syncBookmarksObjectLimitExceededDaily
+    case syncCredentialsObjectLimitExceededDaily
     case syncBookmarksRequestSizeLimitExceededDaily
     case syncCredentialsRequestSizeLimitExceededDaily
+    case syncBookmarksTooManyRequestsDaily
+    case syncCredentialsTooManyRequestsDaily
+    case syncSettingsTooManyRequestsDaily
 
     // DataBroker Protection Waitlist
     case dataBrokerProtectionWaitlistUserActive
@@ -613,10 +616,13 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_sync_success_rate_daily"
         case .syncLocalTimestampResolutionTriggered(let feature):
             return "m_mac_sync_\(feature.name)_local_timestamp_resolution_triggered"
-        case .syncBookmarksCountLimitExceededDaily: return "m_mac_sync_bookmarks_object_limit_exceeded"
-        case .syncCredentialsCountLimitExceededDaily: return "m_mac_sync_credentials_object_limit_exceeded"
+        case .syncBookmarksObjectLimitExceededDaily: return "m_mac_sync_bookmarks_object_limit_exceeded_daily"
+        case .syncCredentialsObjectLimitExceededDaily: return "m_mac_sync_credentials_object_limit_exceeded_daily"
         case .syncBookmarksRequestSizeLimitExceededDaily: return "m_mac_sync_bookmarks_request_size_limit_exceeded_daily"
         case .syncCredentialsRequestSizeLimitExceededDaily: return "m_mac_sync_credentials_request_size_limit_exceeded_daily"
+        case .syncBookmarksTooManyRequestsDaily: return "m_mac_sync_bookmarks_too_many_requests_daily"
+        case .syncCredentialsTooManyRequestsDaily: return "m_mac_sync_credentials_too_many_requests_daily"
+        case .syncSettingsTooManyRequestsDaily: return "m_mac_sync_settings_too_many_requests_daily"
 
         case .dataBrokerProtectionWaitlistUserActive:
             return "m_mac_dbp_waitlist_user_active"

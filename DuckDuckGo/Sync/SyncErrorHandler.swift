@@ -290,6 +290,7 @@ extension SyncErrorHandler: SyncErrorHandling {
             syncIsPaused(errorType: .invalidLoginCredentials)
         case .unexpectedStatusCode(418), .unexpectedStatusCode(429):
             syncIsPaused(errorType: .tooManyRequests)
+            PixelKit.fire(modelType.tooManyRequestsPixel, frequency: .legacyDaily)
         default:
             break
         }
@@ -301,11 +302,11 @@ extension SyncErrorHandler: SyncErrorHandling {
         case .bookmarksCountLimitExceeded:
             currentSyncBookmarksPausedError = errorType.rawValue
             self.isSyncBookmarksPaused = true
-            PixelKit.fire(GeneralPixel.syncBookmarksCountLimitExceededDaily, frequency: .daily)
+            PixelKit.fire(GeneralPixel.syncBookmarksObjectLimitExceededDaily, frequency: .legacyDaily)
         case .credentialsCountLimitExceeded:
             currentSyncCredentialsPausedError = errorType.rawValue
             self.isSyncCredentialsPaused = true
-            PixelKit.fire(GeneralPixel.syncCredentialsCountLimitExceededDaily, frequency: .daily)
+            PixelKit.fire(GeneralPixel.syncCredentialsObjectLimitExceededDaily, frequency: .legacyDaily)
         case .bookmarksRequestSizeLimitExceeded:
             currentSyncBookmarksPausedError = errorType.rawValue
             self.isSyncBookmarksPaused = true
@@ -375,27 +376,38 @@ extension SyncErrorHandler: SyncErrorHandling {
         case credentials
         case settings
 
-         var syncFailedPixel: GeneralPixel {
-             switch self {
-             case .bookmarks:
-                     .syncBookmarksFailed
-             case .credentials:
-                     .syncCredentialsFailed
-             case .settings:
-                     .syncSettingsFailed
-             }
-         }
+        var syncFailedPixel: GeneralPixel {
+            switch self {
+            case .bookmarks:
+                    .syncBookmarksFailed
+            case .credentials:
+                    .syncCredentialsFailed
+            case .settings:
+                    .syncSettingsFailed
+            }
+        }
 
-         var patchPayloadCompressionFailedPixel: GeneralPixel {
-             switch self {
-             case .bookmarks:
-                     .syncBookmarksPatchCompressionFailed
-             case .credentials:
-                     .syncCredentialsPatchCompressionFailed
-             case .settings:
-                     .syncSettingsPatchCompressionFailed
-             }
-         }
+        var patchPayloadCompressionFailedPixel: GeneralPixel {
+            switch self {
+            case .bookmarks:
+                    .syncBookmarksPatchCompressionFailed
+            case .credentials:
+                    .syncCredentialsPatchCompressionFailed
+            case .settings:
+                    .syncSettingsPatchCompressionFailed
+            }
+        }
+
+        var tooManyRequestsPixel: GeneralPixel {
+            switch self {
+            case .bookmarks:
+                    .syncBookmarksTooManyRequestsDaily
+            case .credentials:
+                    .syncCredentialsTooManyRequestsDaily
+            case .settings:
+                    .syncSettingsTooManyRequestsDaily
+            }
+        }
     }
 
     @MainActor
