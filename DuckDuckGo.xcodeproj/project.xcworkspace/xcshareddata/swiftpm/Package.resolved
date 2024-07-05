@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "683424378092d5ca3c57df50d5676cf8c7d2d83c",
-        "version" : "164.2.2"
+        "branch" : "mgurgel/duckplayer-overlay-initial-setup",
+        "revision" : "410e03ac753fa224ca10fdbd031e0de0fa9b95c1"
       }
     },
     {
@@ -41,8 +41,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "7ac68ae3bc052fa59adbc1ba8fd5cb5849a6bc99",
-        "version" : "5.25.0"
+        "revision" : "1789742a000f0f0375f951b23dfa5cd5e0c289c4"
       }
     },
     {
