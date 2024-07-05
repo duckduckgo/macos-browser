@@ -152,6 +152,32 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 frequency: .legacyDaily,
                 withAdditionalParameters: [PixelKit.Parameters.vpnCohort: PixelKit.cohort(from: defaults.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
+        case .connectionTesterStatusChange(let status):
+            switch status {
+            case .failed:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionConnectionTesterFailureDetected,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .recovered(let failureCount):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionConnectionTesterFailureRecovered(failureCount: failureCount),
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            }
+        case .connectionTesterLongStatusChange(let status):
+            switch status {
+            case .failed:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionConnectionTesterExtendedFailureDetected,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .recovered(let failureCount):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionConnectionTesterExtendedFailureRecovered(failureCount: failureCount),
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            }
         case .reportConnectionAttempt(attempt: let attempt):
             switch attempt {
             case .connecting:

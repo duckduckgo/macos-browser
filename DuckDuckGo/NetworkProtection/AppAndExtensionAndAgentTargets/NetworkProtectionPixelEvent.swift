@@ -56,6 +56,12 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionEnableAttemptSuccess
     case networkProtectionEnableAttemptFailure
 
+    case networkProtectionConnectionTesterFailureDetected
+    case networkProtectionConnectionTesterFailureRecovered(failureCount: Int)
+
+    case networkProtectionConnectionTesterExtendedFailureDetected
+    case networkProtectionConnectionTesterExtendedFailureRecovered(failureCount: Int)
+
     case networkProtectionTunnelFailureDetected
     case networkProtectionTunnelFailureRecovered
 
@@ -179,6 +185,18 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
         case .networkProtectionEnableAttemptFailure:
             return "netp_ev_enable_attempt_failure"
+
+        case .networkProtectionConnectionTesterFailureDetected:
+            return "netp_connection_tester_failure"
+
+        case .networkProtectionConnectionTesterFailureRecovered:
+            return "netp_connection_tester_failure_recovered"
+
+        case .networkProtectionConnectionTesterExtendedFailureDetected:
+            return "netp_connection_tester_extended_failure"
+
+        case .networkProtectionConnectionTesterExtendedFailureRecovered:
+            return "netp_connection_tester_extended_failure_recovered"
 
         case .networkProtectionTunnelFailureDetected:
             return "netp_ev_tunnel_failure"
@@ -316,6 +334,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
     var parameters: [String: String]? {
         switch self {
+        case .networkProtectionConnectionTesterFailureRecovered(let failureCount),
+                .networkProtectionConnectionTesterExtendedFailureRecovered(let failureCount):
+            return [PixelKit.Parameters.count: String(failureCount)]
         case .networkProtectionKeychainErrorFailedToCastKeychainValueToData(let field):
             return [PixelKit.Parameters.keychainFieldName: field]
         case .networkProtectionKeychainReadError(let field, let status):
@@ -384,6 +405,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionEnableAttemptConnecting,
                 .networkProtectionEnableAttemptSuccess,
                 .networkProtectionEnableAttemptFailure,
+                .networkProtectionConnectionTesterFailureDetected,
+                .networkProtectionConnectionTesterExtendedFailureDetected,
                 .networkProtectionTunnelFailureDetected,
                 .networkProtectionTunnelFailureRecovered,
                 .networkProtectionLatency,
@@ -454,6 +477,10 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionEnableAttemptConnecting,
                 .networkProtectionEnableAttemptSuccess,
                 .networkProtectionEnableAttemptFailure,
+                .networkProtectionConnectionTesterFailureDetected,
+                .networkProtectionConnectionTesterFailureRecovered,
+                .networkProtectionConnectionTesterExtendedFailureDetected,
+                .networkProtectionConnectionTesterExtendedFailureRecovered,
                 .networkProtectionTunnelFailureDetected,
                 .networkProtectionTunnelFailureRecovered,
                 .networkProtectionLatency,
