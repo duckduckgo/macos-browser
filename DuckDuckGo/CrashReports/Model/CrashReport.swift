@@ -73,11 +73,9 @@ final class LegacyCrashReport: CrashReport {
         let timestamp = fileContents.firstMatch(of: Self.timestampRegex)?.range(at: 1, in: fileContents).flatMap {
             Self.dateFormatter.date(from: String(fileContents[$0]))
         }
-        let crashLogMessage = CrashLogMessageExtractor.crashLogMessage(for: timestamp, pid: pid).flatMap { message in
-            message.replacingOccurrences(of: "\n", with: "\\n") // escape newlines
-        }
-        if let crashLogMessage, !crashLogMessage.isEmpty {
-            fileContents = "Message: " + crashLogMessage + "\n" + fileContents
+        if let diagnostic = try? CrashLogMessageExtractor().crashDiagnostic(for: timestamp, pid: pid)?.diagnosticData(), !diagnostic.isEmpty,
+           let message = try? JSONEncoder().encode(diagnostic).utf8String()?.replacingOccurrences(of: "\n", with: "\\n") {
+            fileContents = "Message: " + message + "\n" + fileContents
         }
 
         return fileContents
@@ -123,17 +121,16 @@ final class JSONCrashReport: CrashReport {
             fileContents = fileContents.replacingOccurrences(of: patternToReplace, with: redactedKeyValuePair, options: .regularExpression)
         }
 
-        // append crash log message if loaded
+        // append crash log message and stack trace if loaded
         let pid = fileContents.firstMatch(of: Self.pidRegex)?.range(at: 1, in: fileContents).flatMap { pid_t(fileContents[$0]) }
         let timestamp = fileContents.firstMatch(of: Self.timestampRegex)?.range(at: 1, in: fileContents).flatMap {
             Self.dateFormatter.date(from: String(fileContents[$0]))
         }
-        let crashLogMessage = CrashLogMessageExtractor.crashLogMessage(for: timestamp, pid: pid).flatMap { message in
-            try? JSONSerialization.data(withJSONObject: message, options: .fragmentsAllowed).utf8String() // escape for json
-        }
-        if let openBraceIdx = fileContents.firstIndex(of: "{"), let crashLogMessage, !crashLogMessage.isEmpty {
-            let json = "\"message\": \(crashLogMessage),"
-            fileContents.insert(contentsOf: json, at: fileContents.index(after: openBraceIdx))
+        if let diagnostic = try? CrashLogMessageExtractor().crashDiagnostic(for: timestamp, pid: pid)?.diagnosticData(), !diagnostic.isEmpty,
+           let json = try? JSONEncoder().encode(diagnostic).utf8String()?.trimmingCharacters(in: CharacterSet(charactersIn: "{}")),
+           let openBraceIdx = fileContents.firstIndex(of: "{") {
+                // insert `"message": "…", "stackTrace": […],` json part after the first `{` in the report
+               fileContents.insert(contentsOf: json + ",", at: fileContents.index(after: openBraceIdx))
         }
 
         return fileContents
