@@ -44,6 +44,7 @@ struct RemoteMessageView: View {
                     if case .bigSingleAction = viewModel.modelType {
                         button
                     }
+
                     closeButton
                 }
 

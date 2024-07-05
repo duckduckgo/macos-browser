@@ -971,6 +971,8 @@
 		373A1AAA283ED86C00586521 /* BookmarksHTMLReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */; };
 		373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */; };
 		373A1AB228451ED400586521 /* BookmarksHTMLImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */; };
+		373B2F852C387B830013A94B /* ActiveRemoteMessageModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373B2F802C384DEB0013A94B /* ActiveRemoteMessageModelTests.swift */; };
+		373B2F862C387B840013A94B /* ActiveRemoteMessageModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373B2F802C384DEB0013A94B /* ActiveRemoteMessageModelTests.swift */; };
 		373D9B4829EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */; };
 		373D9B4929EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */; };
 		373FB4B32B4D6C4B004C88D6 /* PreferencesViews in Frameworks */ = {isa = PBXBuildFile; productRef = 373FB4B22B4D6C4B004C88D6 /* PreferencesViews */; };
@@ -2460,7 +2462,6 @@
 		B6E6BA052BA1FE09008AA7E1 /* URLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2324923E980071C2E8 /* URLExtension.swift */; };
 		B6E6BA062BA1FE10008AA7E1 /* NSApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */; };
 		B6E6BA082BA1FE24008AA7E1 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = B6E6BA072BA1FE24008AA7E1 /* Common */; };
-		B6E6BA0A2BA1FE28008AA7E1 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = B6E6BA092BA1FE28008AA7E1 /* BrowserServicesKit */; };
 		B6E6BA142BA2CDD6008AA7E1 /* SandboxTestToolNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E6BA132BA2CDD6008AA7E1 /* SandboxTestToolNotifications.swift */; };
 		B6E6BA162BA2CF5F008AA7E1 /* SandboxTestToolNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E6BA132BA2CDD6008AA7E1 /* SandboxTestToolNotifications.swift */; };
 		B6E6BA172BA2CF60008AA7E1 /* SandboxTestToolNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E6BA132BA2CDD6008AA7E1 /* SandboxTestToolNotifications.swift */; };
@@ -3044,6 +3045,7 @@
 		373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLImporter.swift; sourceTree = "<group>"; };
 		373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLImporterTests.swift; sourceTree = "<group>"; };
 		373A26962964CF0B0043FC57 /* TestsTargetsBase.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = TestsTargetsBase.xcconfig; sourceTree = "<group>"; };
+		373B2F802C384DEB0013A94B /* ActiveRemoteMessageModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRemoteMessageModelTests.swift; sourceTree = "<group>"; };
 		373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMetadataDatabase.swift; sourceTree = "<group>"; };
 		37445F982A1566420029F789 /* SyncDataProviders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDataProviders.swift; sourceTree = "<group>"; };
 		37445F9B2A1569F00029F789 /* SyncBookmarksAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncBookmarksAdapter.swift; sourceTree = "<group>"; };
@@ -4495,7 +4497,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B6E6BA0A2BA1FE28008AA7E1 /* BrowserServicesKit in Frameworks */,
 				B6E6BA082BA1FE24008AA7E1 /* Common in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4805,6 +4806,14 @@
 				373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */,
 			);
 			path = HTML;
+			sourceTree = "<group>";
+		};
+		373B2F7F2C384DD20013A94B /* RemoteMessaging */ = {
+			isa = PBXGroup;
+			children = (
+				373B2F802C384DEB0013A94B /* ActiveRemoteMessageModelTests.swift */,
+			);
+			path = RemoteMessaging;
 			sourceTree = "<group>";
 		};
 		37534CA128113277002621E7 /* TabLazyLoader */ = {
@@ -6853,6 +6862,7 @@
 				4B0511EE262CAEB300F6079C /* Preferences */,
 				31E163BB293A577200963C10 /* PrivacyReferenceTests */,
 				AA7E9174286DAFB700AB6B62 /* RecentlyClosed */,
+				373B2F7F2C384DD20013A94B /* RemoteMessaging */,
 				858A798626A99D9000A75A42 /* SecureVault */,
 				B6DA440F2616C0F200DD1EC2 /* Statistics */,
 				AA63744E24C9BB4A00AB2AC4 /* Suggestions */,
@@ -8954,7 +8964,6 @@
 			name = "sandbox-test-tool";
 			packageProductDependencies = (
 				B6E6BA072BA1FE24008AA7E1 /* Common */,
-				B6E6BA092BA1FE28008AA7E1 /* BrowserServicesKit */,
 			);
 			productName = "sandbox-test-tool";
 			productReference = B6E6B9F32BA1FD90008AA7E1 /* sandbox-test-tool.app */;
@@ -10805,6 +10814,7 @@
 				3706FE85293F661700E42796 /* BWRequestTests.swift in Sources */,
 				3706FE86293F661700E42796 /* FileDownloadManagerTests.swift in Sources */,
 				BDA7648E2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift in Sources */,
+				373B2F862C387B840013A94B /* ActiveRemoteMessageModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11943,6 +11953,7 @@
 				1DB9617A29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */,
 				9833913327AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift in Sources */,
 				3776583127F8325B009A6B35 /* AutofillPreferencesTests.swift in Sources */,
+				373B2F852C387B830013A94B /* ActiveRemoteMessageModelTests.swift in Sources */,
 				B67C6C472654C643006C872E /* FileManagerExtensionTests.swift in Sources */,
 				4BD57C042AC112DF00B580EE /* SurveyRemoteMessagingTests.swift in Sources */,
 				B69B50482726C5C200758A2B /* StatisticsLoaderTests.swift in Sources */,
@@ -13777,11 +13788,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Common;
-		};
-		B6E6BA092BA1FE28008AA7E1 /* BrowserServicesKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = BrowserServicesKit;
 		};
 		B6EC37F829B5DAD7001ACE79 /* Swifter */ = {
 			isa = XCSwiftPackageProductDependency;

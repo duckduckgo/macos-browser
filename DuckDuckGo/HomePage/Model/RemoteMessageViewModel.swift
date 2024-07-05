@@ -31,7 +31,7 @@ struct RemoteMessageViewModel {
     let messageId: String
     let modelType: RemoteMessageModelType
 
-    var image: String? {
+    var image: ImageResource? {
         modelType.image
     }
 
@@ -128,12 +128,25 @@ extension RemoteAction {
 
 private extension RemoteMessageModelType {
 
-    var image: String? {
+    var image: ImageResource? {
         switch self {
         case .small:
             return nil
         case .medium(_, _, let placeholder), .bigSingleAction(_, _, let placeholder, _, _), .bigTwoAction(_, _, let placeholder, _, _, _, _):
-            return placeholder.rawValue
+            switch placeholder {
+            case .announce:
+                return .remoteMessageAnnouncement
+            case .ddgAnnounce:
+                return .remoteMessageDDGAnnouncement
+            case .criticalUpdate:
+                return .remoteMessageCriticalAppUpdate
+            case .appUpdate:
+                return .remoteMessageAppUpdate
+            case .privacyShield:
+                return .remoteMessagePrivacyShield
+            case .macComputer, .newForMacAndWindows:
+                return nil
+            }
         case .promoSingleAction:
             assertionFailure("promoSingleAction is not supported on macOS")
             return nil

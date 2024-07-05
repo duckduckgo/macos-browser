@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Combine
 import Common
 import Foundation
@@ -25,19 +26,53 @@ import RemoteMessaging
 final class ActiveRemoteMessageModel: ObservableObject {
 
     @Published var remoteMessage: RemoteMessageModel?
-    let remoteMessagingClient: RemoteMessagingClient
 
-    init(client: RemoteMessagingClient) {
-        self.remoteMessagingClient = client
+    /**
+     * Store is initialized lazily, after the model that uses it. The closure
+     * ensures that a non-nil store will be retrieved when requested.
+     */
+    let store: () -> RemoteMessagingStoring?
+    let privacyConfigurationManager: PrivacyConfigurationManaging
+
+    convenience init(
+        remoteMessagingClient: RemoteMessagingClient,
+        privacyConfigurationManager: PrivacyConfigurationManaging
+    ) {
+        self.init(
+            remoteMessagingStore: remoteMessagingClient.store,
+            privacyConfigurationManager: privacyConfigurationManager
+        )
+    }
+
+    init(
+        remoteMessagingStore: @escaping @autoclosure () -> RemoteMessagingStoring?,
+        privacyConfigurationManager: PrivacyConfigurationManaging
+    ) {
+        self.store = remoteMessagingStore
+        self.privacyConfigurationManager = privacyConfigurationManager
 
         updateRemoteMessage()
 
-        messagesDidChangeCancellable = NotificationCenter.default
+        let messagesDidChangePublisher = NotificationCenter.default
             .publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
+            .asVoid()
+            .eraseToAnyPublisher()
+
+        let featureFlagDidChangePublisher = privacyConfigurationManager.updatesPublisher
+            .map { [weak privacyConfigurationManager] in
+                privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .remoteMessaging) == true
+            }
+            .removeDuplicates()
+            .asVoid()
+            .eraseToAnyPublisher()
+
+        Publishers.Merge(messagesDidChangePublisher, featureFlagDidChangePublisher)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.updateRemoteMessage()
             }
+            .store(in: &cancellables)
+
     }
 
     func dismissRemoteMessage(with action: RemoteMessageViewModel.ButtonAction?) {
@@ -45,7 +80,7 @@ final class ActiveRemoteMessageModel: ObservableObject {
             return
         }
 
-        remoteMessagingClient.store?.dismissRemoteMessage(withId: remoteMessage.id)
+        store()?.dismissRemoteMessage(withId: remoteMessage.id)
         self.remoteMessage = nil
 
         let pixelParameters = ["message": remoteMessage.id]
@@ -64,7 +99,7 @@ final class ActiveRemoteMessageModel: ObservableObject {
     }
 
     func markRemoteMessageAsShown() {
-        guard let remoteMessage, let store = remoteMessagingClient.store else {
+        guard let remoteMessage, let store = store() else {
             return
         }
         os_log("Remote message shown: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
@@ -77,8 +112,8 @@ final class ActiveRemoteMessageModel: ObservableObject {
     }
 
     private func updateRemoteMessage() {
-        remoteMessage = remoteMessagingClient.store?.fetchScheduledRemoteMessage()
+        remoteMessage = store()?.fetchScheduledRemoteMessage()
     }
 
-    private var messagesDidChangeCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 }

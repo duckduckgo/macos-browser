@@ -230,7 +230,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if NSApplication.runType.requiresEnvironment {
             remoteMessagingClient.initializeDatabaseIfNeeded()
         }
-        activeRemoteMessageModel = ActiveRemoteMessageModel(client: remoteMessagingClient)
+        activeRemoteMessageModel = ActiveRemoteMessageModel(
+            remoteMessagingClient: remoteMessagingClient,
+            privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
+        )
 
         featureFlagger = DefaultFeatureFlagger(
             internalUserDecider: internalUserDecider,
