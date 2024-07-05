@@ -69,11 +69,11 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         treeController.rebuild()
     }
 
-    func reloadData(with query: String) {
+    func reloadData(for searchResults: [BaseBookmarkEntity]) {
         contentMode = .search
         favoritesPseudoFolder.count = bookmarkManager.list?.favoriteBookmarks.count ?? 0
         bookmarksPseudoFolder.count = bookmarkManager.list?.totalBookmarks ?? 0
-        treeController.rebuild(with: query)
+        treeController.rebuild(for: searchResults)
     }
 
     // MARK: - Private

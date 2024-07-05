@@ -694,11 +694,24 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
             let searchQuery = searchField.stringValue
 
             if searchQuery.isBlank {
+                emptyState.isHidden = true
                 dataSource.reloadData()
                 outlineView.reloadData()
             } else {
-                dataSource.reloadData(with: searchQuery)
-                outlineView.reloadData()
+                let results = bookmarkManager.search(by: searchQuery)
+
+                if !results.isEmpty {
+                    dataSource.reloadData(for: results)
+                    outlineView.reloadData()
+                } else {
+                    emptyStateTitle.stringValue = "No search results found"
+                    emptyStateMessage.stringValue = "Try different search terms."
+                    emptyStateImageView.image = .bookmarkEmptySearch
+                    importButton.isHidden = true
+                }
+
+                emptyState.isHidden = !results.isEmpty
+                outlineView.isHidden = results.isEmpty
             }
         }
     }
