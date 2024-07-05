@@ -1,7 +1,7 @@
 {
   "name": "People Background Check",
   "url": "people-background-check.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "verecor.com",
   "addedDatetime": 1702965600000,
   "steps": [
