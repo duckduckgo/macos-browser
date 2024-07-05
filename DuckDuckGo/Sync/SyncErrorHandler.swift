@@ -413,11 +413,11 @@ extension SyncErrorHandler: SyncErrorHandling {
         var badRequestPixel: GeneralPixel {
             switch self {
             case .bookmarks:
-                    .syncBookmarksTooManyRequestsDaily
+                    .syncBookmarksValidationErrorDaily
             case .credentials:
-                    .syncCredentialsTooManyRequestsDaily
+                    .syncCredentialsValidationErrorDaily
             case .settings:
-                    .syncSettingsTooManyRequestsDaily
+                    .syncSettingsValidationErrorDaily
             }
         }
     }
