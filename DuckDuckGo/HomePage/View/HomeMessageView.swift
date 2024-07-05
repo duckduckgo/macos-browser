@@ -120,17 +120,36 @@ extension HomeMessageButtonViewModel {
     }
 
     var primaryButton: some View {
-        Button(action: action) {
-            Text(title)
+        Group {
+            if #available(macOS 12.0, *) {
+                Button(action: action) {
+                    Text(title)
+                }
+                .controlSize(.large)
+                .buttonStyle(.borderedProminent)
+            } else {
+                Button(action: action) {
+                    Text(title)
+                }
+                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+            }
         }
-        .buttonStyle(DefaultActionButtonStyle(enabled: true))
     }
 
     var secondaryButton: some View {
-        Button(action: action) {
-            Text(title)
+        Group {
+            if #available(macOS 12.0, *) {
+                Button(action: action) {
+                    Text(title)
+                }
+                .controlSize(.large)
+            } else {
+                Button(action: action) {
+                    Text(title)
+                }
+                .buttonStyle(DismissActionButtonStyle())
+            }
         }
-        .buttonStyle(DismissActionButtonStyle())
     }
 }
 
