@@ -368,4 +368,69 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         XCTAssertTrue(repository.wasMarkStatsMonthlyPixelDateCalled)
     }
 
+    func testWhen24HoursHaveNotPassed_thenWeDontFireCustomStatsPixels() {
+        // Given
+        let repository = MockDataBrokerProtectionStatsPixelsRepository()
+        repository._customStatsPixelsLastSentTimestamp = Date.nowMinus(hours: 23)
+        let database = MockDatabase()
+        database.brokerProfileQueryDataToReturn = [
+            .mock()
+        ]
+        let sut = DataBrokerProtectionStatsPixels(database: database,
+                                                  handler: handler,
+                                                  repository: repository)
+
+        // When
+        sut.fireCustomStatsPixelsIfNeeded()
+
+        // Then
+        XCTAssertTrue(repository.didGetCustomStatsPixelsLastSentTimestamp)
+        XCTAssertFalse(repository.didSetCustomStatsPixelsLastSentTimestamp)
+    }
+
+    func testWhen24HoursHavePassed_thenWeFireCustomStatsPixels() {
+        // Given
+        let repository = MockDataBrokerProtectionStatsPixelsRepository()
+        repository._customStatsPixelsLastSentTimestamp = Date.nowMinus(hours: 25)
+        let database = MockDatabase()
+        database.brokerProfileQueryDataToReturn = [
+            .mock()
+        ]
+        let sut = DataBrokerProtectionStatsPixels(database: database,
+                                                  handler: handler,
+                                                  repository: repository)
+
+        // When
+        sut.fireCustomStatsPixelsIfNeeded()
+
+        // Then
+        XCTAssertTrue(repository.didGetCustomStatsPixelsLastSentTimestamp)
+        XCTAssertTrue(repository.didSetCustomStatsPixelsLastSentTimestamp)
+    }
+
+    func testWhen24HoursHavePassed_andMatchesWereFound_thenWeFirePixelsWithExpectedValues() {
+        // Given
+        let repository = MockDataBrokerProtectionStatsPixelsRepository()
+        repository._customStatsPixelsLastSentTimestamp = Date.nowMinus(hours: 50)
+        let database = MockDatabase()
+        database.brokerProfileQueryDataToReturn = BrokerProfileQueryData.queryDataOverlappingDateRanges
+        let sut = DataBrokerProtectionStatsPixels(database: database,
+                                                  handler: handler,
+                                                  repository: repository)
+
+        // When
+        sut.fireCustomStatsPixelsIfNeeded()
+
+        // Then
+        MockDataBrokerProtectionPixelsHandler.lastPixelsFired.sort { $0.params!["optout_submit_success_rate"]! <  $1.params!["optout_submit_success_rate"]! }
+        let pixel1 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[0]
+        let pixel2 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[1]
+        let pixel3 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[2]
+        XCTAssertTrue(MockDataBrokerProtectionPixelsHandler.lastPixelsFired.count == 3)
+        XCTAssertEqual(pixel1.params!["optout_submit_success_rate"], "0.5")
+        XCTAssertEqual(pixel2.params!["optout_submit_success_rate"], "0.75")
+        XCTAssertEqual(pixel3.params!["optout_submit_success_rate"], "1.0")
+        XCTAssertTrue(repository.didGetCustomStatsPixelsLastSentTimestamp)
+        XCTAssertTrue(repository.didSetCustomStatsPixelsLastSentTimestamp)
+    }
 }

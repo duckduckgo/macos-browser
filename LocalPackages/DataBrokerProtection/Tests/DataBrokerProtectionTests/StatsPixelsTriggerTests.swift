@@ -24,7 +24,7 @@ final class StatsPixelsTriggerTests: XCTestCase {
     func testWhenFromDateIsNil_thenReturnsTrue() throws {
         // Given
         let fromDate: Date? = nil
-        let sut = DefaultStatsPixelsTrigger()
+        let sut = DefaultCustomStatsPixelsTrigger()
 
         // When
         let result = sut.shouldFireCustomStatsPixels(fromDate: fromDate)
@@ -37,7 +37,7 @@ final class StatsPixelsTriggerTests: XCTestCase {
         // Given
         let calendar = Calendar.current
         let fromDate = calendar.date(byAdding: .hour, value: -25, to: Date())
-        let sut = DefaultStatsPixelsTrigger()
+        let sut = DefaultCustomStatsPixelsTrigger()
 
         // When
         let result = sut.shouldFireCustomStatsPixels(fromDate: fromDate)
@@ -50,7 +50,7 @@ final class StatsPixelsTriggerTests: XCTestCase {
         // Given
         let calendar = Calendar.current
         let fromDate = calendar.date(byAdding: .hour, value: -23, to: Date())
-        let sut = DefaultStatsPixelsTrigger()
+        let sut = DefaultCustomStatsPixelsTrigger()
 
         // When
         let result = sut.shouldFireCustomStatsPixels(fromDate: fromDate)

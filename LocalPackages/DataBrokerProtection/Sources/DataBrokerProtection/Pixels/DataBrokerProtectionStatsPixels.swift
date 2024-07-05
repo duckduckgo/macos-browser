@@ -144,7 +144,7 @@ protocol StatsPixels {
 }
 
 /// Conforming types provide a method to check if we should fire custom stats based on an input date
-protocol StatsPixelsTrigger {
+protocol CustomStatsPixelsTrigger {
 
     /// This method determines whether custom stats pixels should be fired based on the time interval since the provided fromDate.
     /// - Parameter fromDate: An optional date parameter representing the start date. If nil, the method will return true.
@@ -152,7 +152,7 @@ protocol StatsPixelsTrigger {
     func shouldFireCustomStatsPixels(fromDate: Date?) -> Bool
 }
 
-struct DefaultStatsPixelsTrigger: StatsPixelsTrigger {
+struct DefaultCustomStatsPixelsTrigger: CustomStatsPixelsTrigger {
 
     func shouldFireCustomStatsPixels(fromDate: Date?) -> Bool {
         guard let fromDate = fromDate else { return true }
@@ -163,22 +163,36 @@ struct DefaultStatsPixelsTrigger: StatsPixelsTrigger {
     }
 }
 
+extension Date {
+
+    /// Returns the current date minus the specified number of hours
+    /// If the date calculate fails, returns the current date
+    /// - Parameter hours: Hours expressed as an integer
+    /// - Returns: The current time minus the specified number of hours
+    static func nowMinus(hours: Int) -> Date {
+        Calendar.current.date(byAdding: .hour, value: -hours, to: Date()) ?? Date()
+    }
+}
+
 final class DataBrokerProtectionStatsPixels: StatsPixels {
 
     private let database: DataBrokerProtectionRepository
     private let handler: EventMapping<DataBrokerProtectionPixels>
-    private let repository: DataBrokerProtectionStatsPixelsRepository
-    private let statsPixelTrigger: StatsPixelsTrigger
+    private var repository: DataBrokerProtectionStatsPixelsRepository
+    private let customStatsPixelsTrigger: CustomStatsPixelsTrigger
+    private let customStatsProvider: DataBrokerProtectionCustomStatsProvider
     private let calendar = Calendar.current
 
     init(database: DataBrokerProtectionRepository,
          handler: EventMapping<DataBrokerProtectionPixels>,
          repository: DataBrokerProtectionStatsPixelsRepository = DataBrokerProtectionStatsPixelsUserDefaults(),
-         statsPixelsTrigger: StatsPixelsTrigger = DefaultStatsPixelsTrigger()) {
+         customStatsPixelsTrigger: CustomStatsPixelsTrigger = DefaultCustomStatsPixelsTrigger(),
+         customStatsProvider: DataBrokerProtectionCustomStatsProvider = DefaultDataBrokerProtectionCustomStatsProvider()) {
         self.database = database
         self.handler = handler
         self.repository = repository
-        self.statsPixelTrigger = statsPixelsTrigger
+        self.customStatsPixelsTrigger = customStatsPixelsTrigger
+        self.customStatsProvider = customStatsProvider
     }
 
     func tryToFireStatsPixels() {
@@ -204,7 +218,21 @@ final class DataBrokerProtectionStatsPixels: StatsPixels {
     }
 
     func fireCustomStatsPixelsIfNeeded() {
-        guard statsPixelTrigger.shouldFireCustomStatsPixels(fromDate: repository.customStatsPixelsLastSentTimestamp) else { return }
+        let startDate = repository.customStatsPixelsLastSentTimestamp
+
+        guard customStatsPixelsTrigger.shouldFireCustomStatsPixels(fromDate: startDate),
+        let queryData = try? database.fetchAllBrokerProfileQueryData() else { return }
+
+        let endDate = Date.nowMinus(hours: 24)
+
+        let customStats = customStatsProvider.customStats(startDate: startDate,
+                                                          endDate: endDate,
+                                                          andQueryData: queryData)
+
+        fireCustomDataBrokerStatsPixels(customStats: customStats)
+        fireCustomGlobalStatsPixel(customStats: customStats)
+
+        repository.customStatsPixelsLastSentTimestamp = Date.nowMinus(hours: 24)
     }
 
     /// internal for testing purposes
@@ -421,5 +449,22 @@ private extension DataBrokerProtectionStatsPixels {
             default: ()
             }
         }
+    }
+
+    func fireCustomDataBrokerStatsPixels(customStats: CustomStats) {
+        customStats.customDataBrokerStats.forEach { handler.fire(pixel(for: $0)) }
+    }
+
+    func pixel(for dataBrokerStat: CustomDataBrokerStat) -> DataBrokerProtectionPixels {
+        .customDataBrokerStatsOptoutSubmit(dataBrokerName: dataBrokerStat.dataBrokerName,
+                                           optOutSubmitSuccessRate: dataBrokerStat.optoutSubmitSuccessRate)
+    }
+
+    func fireCustomGlobalStatsPixel(customStats: CustomStats) {
+        handler.fire(pixel(for: customStats.customGlobalStat))
+    }
+
+    func pixel(for globalStat: CustomGlobalStat) -> DataBrokerProtectionPixels {
+        .customGlobalStatsOptoutSubmit(optOutSubmitSuccessRate: globalStat.optoutSubmitSuccessRate)
     }
 }
