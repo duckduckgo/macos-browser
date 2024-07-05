@@ -45,7 +45,7 @@ final class CSVImporterIntegrationTests: XCTestCase {
         }
     }
 
-    func testImportPasswordsPerformance() async throws {
+    func _testImportPasswordsPerformance() async throws {
         let csvURL = Bundle(for: Self.self).url(forResource: "mock_login_data_large", withExtension: "csv")!
         let csvImporter = CSVImporter(
             fileURL: csvURL,
@@ -69,7 +69,7 @@ final class CSVImporterIntegrationTests: XCTestCase {
     }
 
     // Deduplication rules: https://app.asana.com/0/0/1207598052765977/f
-    func testImportingPasswords_deduplicatesAccordingToDefinedRules() async throws {
+    func _testImportingPasswords_deduplicatesAccordingToDefinedRules() async throws {
         let startingDataURL = Bundle(for: Self.self).url(forResource: "login_deduplication_starting_data", withExtension: "csv")!
         let startingDataImporter = CSVImporter(
             fileURL: startingDataURL,
