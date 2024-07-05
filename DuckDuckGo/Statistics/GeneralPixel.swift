@@ -158,6 +158,14 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncBookmarksRequestSizeLimitExceededDaily
     case syncCredentialsRequestSizeLimitExceededDaily
 
+    // Remote Messaging Framework
+    case remoteMessageShown
+    case remoteMessageShownUnique
+    case remoteMessageDismissed
+    case remoteMessageActionClicked
+    case remoteMessagePrimaryActionClicked
+    case remoteMessageSecondaryActionClicked
+
     // DataBroker Protection Waitlist
     case dataBrokerProtectionWaitlistUserActive
     case dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed
@@ -624,6 +632,13 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncCredentialsCountLimitExceededDaily: return "m_mac_sync_credentials_count_limit_exceeded_daily"
         case .syncBookmarksRequestSizeLimitExceededDaily: return "m_mac_sync_bookmarks_request_size_limit_exceeded_daily"
         case .syncCredentialsRequestSizeLimitExceededDaily: return "m_mac_sync_credentials_request_size_limit_exceeded_daily"
+
+        case .remoteMessageShown: return "m_mac_remote_message_shown"
+        case .remoteMessageShownUnique: return "m_mac_remote_message_shown_unique"
+        case .remoteMessageDismissed: return "m_mac_remote_message_dismissed"
+        case .remoteMessageActionClicked: return "m_mac_remote_message_action_clicked"
+        case .remoteMessagePrimaryActionClicked: return "m_mac_remote_message_primary_action_clicked"
+        case .remoteMessageSecondaryActionClicked: return "m_mac_remote_message_secondary_action_clicked"
 
         case .dataBrokerProtectionWaitlistUserActive:
             return "m_mac_dbp_waitlist_user_active"
