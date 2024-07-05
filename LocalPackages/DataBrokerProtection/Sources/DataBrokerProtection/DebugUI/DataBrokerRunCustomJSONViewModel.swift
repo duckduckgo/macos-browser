@@ -342,6 +342,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
         }
     }
 
+    @MainActor
     func runJSON(jsonString: String) {
         self.error = nil
         if let data = jsonString.data(using: .utf8) {
@@ -387,6 +388,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
         }
     }
 
+    @MainActor
     func runOptOut(scanResult: ScanResult) {
         let runner = runnerProvider.getJobRunner()
         let brokerProfileQueryData = BrokerProfileQueryData(

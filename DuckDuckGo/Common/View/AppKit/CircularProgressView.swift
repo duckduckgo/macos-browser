@@ -433,179 +433,156 @@ struct CircularProgress: NSViewRepresentable {
 
 }
 
-#Preview { {
+#if DEBUG
+struct ProgressPreview: View {
 
-    struct ProgressPreview: View {
+    @State var animate = true
+    @State var slowAnimations = true
+    @State var progress: Double?
 
-        @State var animate = true
-        @State var slowAnimations = true
-        @State var progress: Double?
+    private var mult: Double { slowAnimations ? 2 : 1 }
 
-        private var mult: Double { slowAnimations ? 2 : 1 }
-
-        func perform(_ change: @escaping () -> Void) {
-            if animate {
-                withAnimation(.default, change)
-            } else {
-                change()
-            }
+    func perform(_ change: @escaping () -> Void) {
+        if animate {
+            withAnimation(.default, change)
+        } else {
+            change()
         }
+    }
 
-        var body: some View {
-            HStack {
-                VStack {
-                    Toggle(isOn: $animate) {
-                        Text(verbatim: "Animate")
-                    }
-                    Toggle(isOn: $slowAnimations) {
-                        Text(verbatim: "Slow animations")
-                    }
-                    Divider()
+    var body: some View {
+        HStack {
+            VStack {
+                Toggle(isOn: $animate) {
+                    Text(verbatim: "Animate")
+                }
+                Toggle(isOn: $slowAnimations) {
+                    Text(verbatim: "Slow animations")
+                }
+                Divider()
 
-                    Button {
-                        perform {
-                            progress = nil
-                        }
-                    } label: {
-                        Text(verbatim: "Reset (nil)").frame(width: 120)
+                Button {
+                    perform {
+                        progress = nil
                     }
-                    Button {
-                        perform {
-                            progress = -1
-                        }
-                    } label: {
-                        Text(verbatim: "Indeterminate (-1)").frame(width: 120)
+                } label: {
+                    Text(verbatim: "Reset (nil)").frame(width: 120)
+                }
+                Button {
+                    perform {
+                        progress = -1
                     }
-                    Button {
+                } label: {
+                    Text(verbatim: "Indeterminate (-1)").frame(width: 120)
+                }
+                Button {
+                    perform {
+                        progress = 0
+                    }
+                } label: {
+                    Text(verbatim: "Zero").frame(width: 120)
+                }
+                Button {
+                    perform {
+                        progress = 0.1
+                    }
+                } label: {
+                    Text(verbatim: "10%").frame(width: 120)
+                }
+                Button {
+                    perform {
+                        progress = 0.2
+                    }
+                } label: {
+                    Text(verbatim: "20%").frame(width: 120)
+                }
+                Button {
+                    perform {
+                        progress = 0.5
+                    }
+                } label: {
+                    Text(verbatim: "50%").frame(width: 120)
+                }
+                Button {
+                    perform {
+                        progress = 0.8
+                    }
+                } label: {
+                    Text(verbatim: "80%").frame(width: 120)
+                }
+                Button {
+                    perform {
+                        progress = 1
+                    }
+                } label: {
+                    Text(verbatim: "100%").frame(width: 120)
+                }
+                Divider()
+
+                Button {
+                    Task {
+                        progress = nil
                         perform {
                             progress = 0
                         }
-                    } label: {
-                        Text(verbatim: "Zero").frame(width: 120)
-                    }
-                    Button {
+                        try await Task.sleep(interval: 0.1)
+
                         perform {
-                            progress = 0.1
+                            progress = nil
                         }
-                    } label: {
-                        Text(verbatim: "10%").frame(width: 120)
                     }
-                    Button {
+                } label: {
+                    Text(verbatim: "nil->0->nil").frame(width: 120)
+                }
+
+                Button {
+                    Task {
                         perform {
-                            progress = 0.2
+                            progress = 0
                         }
-                    } label: {
-                        Text(verbatim: "20%").frame(width: 120)
-                    }
-                    Button {
-                        perform {
-                            progress = 0.5
-                        }
-                    } label: {
-                        Text(verbatim: "50%").frame(width: 120)
-                    }
-                    Button {
-                        perform {
-                            progress = 0.8
-                        }
-                    } label: {
-                        Text(verbatim: "80%").frame(width: 120)
-                    }
-                    Button {
+                        try await Task.sleep(interval: 0.1)
                         perform {
                             progress = 1
                         }
-                    } label: {
-                        Text(verbatim: "100%").frame(width: 120)
-                    }
-                    Divider()
-
-                    Button {
                         Task {
-                            progress = nil
-                            perform {
-                                progress = 0
-                            }
-                            try await Task.sleep(interval: 0.1)
-
                             perform {
                                 progress = nil
                             }
                         }
-                    } label: {
-                        Text(verbatim: "nil->0->nil").frame(width: 120)
                     }
+                } label: {
+                    Text(verbatim: "0->1->nil").frame(width: 120)
+                }
 
-                    Button {
+                Button {
+                    Task {
+                        progress = nil
+                        perform {
+                            progress = 1
+                        }
                         Task {
                             perform {
-                                progress = 0
-                            }
-                            try await Task.sleep(interval: 0.1)
-                            perform {
-                                progress = 1
-                            }
-                            Task {
-                                perform {
-                                    progress = nil
-                                }
+                                progress = nil
                             }
                         }
-                    } label: {
-                        Text(verbatim: "0->1->nil").frame(width: 120)
                     }
+                } label: {
+                    Text(verbatim: "nil->1->nil").frame(width: 120)
+                }
 
-                    Button {
-                        Task {
-                            progress = nil
-                            perform {
-                                progress = 1
-                            }
-                            Task {
-                                perform {
-                                    progress = nil
-                                }
-                            }
+                Button {
+                    Task {
+                        progress = nil
+                        perform {
+                            progress = 1
                         }
-                    } label: {
-                        Text(verbatim: "nil->1->nil").frame(width: 120)
-                    }
-
-                    Button {
                         Task {
-                            progress = nil
                             perform {
-                                progress = 1
+                                progress = nil
                             }
                             Task {
                                 perform {
-                                    progress = nil
-                                }
-                                Task {
-                                    perform {
-                                        progress = 1
-                                    }
-                                    Task {
-                                        perform {
-                                            progress = nil
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } label: {
-                        Text(verbatim: "nil->1->nil->1->nil").frame(width: 120)
-                    }
-
-                    Button {
-                        Task {
-                            progress = nil
-                            perform {
-                                progress = 1
-                            }
-                            Task {
-                                perform {
-                                    progress = nil
+                                    progress = 1
                                 }
                                 Task {
                                     perform {
@@ -614,74 +591,98 @@ struct CircularProgress: NSViewRepresentable {
                                 }
                             }
                         }
-                    } label: {
-                        Text(verbatim: "nil->1->nil->nil").frame(width: 120)
                     }
+                } label: {
+                    Text(verbatim: "nil->1->nil->1->nil").frame(width: 120)
+                }
 
-                    Button {
-                        Task {
-                            progress = nil
-                            perform {
-                                progress = 0
-                            }
-                            try await Task.sleep(interval: 0.2)
-                            for p in [0.26, 0.64, 0.95, 1, nil] {
-                                perform {
-                                    progress = p
-                                }
-                                try await Task.sleep(interval: 0.001)
-                            }
+                Button {
+                    Task {
+                        progress = nil
+                        perform {
+                            progress = 1
                         }
-                    } label: {
-                        Text(verbatim: "nil->0.2…1->nil").frame(width: 120)
-                    }
-
-                    Button {
                         Task {
-                            perform {
-                                progress = -1
-                            }
-                            try await Task.sleep(interval: 0.8 * mult)
-                            perform {
-                                progress = 0
-                            }
-                            try await Task.sleep(interval: 0.2 * mult)
-                            perform {
-                                progress = 0.1
-                            }
-
-                            for i in 2...10 {
-                                try await Task.sleep(interval: 0.2 * mult)
-                                perform {
-                                    progress = Double(i) / 10
-                                }
-                            }
-                            try await Task.sleep(interval: 0.2 * mult)
                             perform {
                                 progress = nil
                             }
+                            Task {
+                                perform {
+                                    progress = nil
+                                }
+                            }
                         }
-                    } label: {
-                        Text(verbatim: "-1 -> 0 ... 1").frame(width: 120)
                     }
-
-                    Spacer()
+                } label: {
+                    Text(verbatim: "nil->1->nil->nil").frame(width: 120)
                 }
-                .frame(width: 150)
-                .padding()
 
-                Divider()
-
-                HStack {
-                    Spacer()
-                    CircularProgress(progress: $progress, lineWidth: 10, backgroundLineWidth: 8, slowAnimations: $slowAnimations)
-                        .frame(width: 150, height: 150)
-                        .background(Color.white)
-                    Spacer()
+                Button {
+                    Task {
+                        progress = nil
+                        perform {
+                            progress = 0
+                        }
+                        try await Task.sleep(interval: 0.2)
+                        for p in [0.26, 0.64, 0.95, 1, nil] {
+                            perform {
+                                progress = p
+                            }
+                            try await Task.sleep(interval: 0.001)
+                        }
+                    }
+                } label: {
+                    Text(verbatim: "nil->0.2…1->nil").frame(width: 120)
                 }
-            }.frame(width: 600, height: 500)
-        }
+
+                Button {
+                    Task {
+                        perform {
+                            progress = -1
+                        }
+                        try await Task.sleep(interval: 0.8 * mult)
+                        perform {
+                            progress = 0
+                        }
+                        try await Task.sleep(interval: 0.2 * mult)
+                        perform {
+                            progress = 0.1
+                        }
+
+                        for i in 2...10 {
+                            try await Task.sleep(interval: 0.2 * mult)
+                            perform {
+                                progress = Double(i) / 10
+                            }
+                        }
+                        try await Task.sleep(interval: 0.2 * mult)
+                        perform {
+                            progress = nil
+                        }
+                    }
+                } label: {
+                    Text(verbatim: "-1 -> 0 ... 1").frame(width: 120)
+                }
+
+                Spacer()
+            }
+            .frame(width: 150)
+            .padding()
+
+            Divider()
+
+            HStack {
+                Spacer()
+                CircularProgress(progress: $progress, lineWidth: 10, backgroundLineWidth: 8, slowAnimations: $slowAnimations)
+                    .frame(width: 150, height: 150)
+                    .background(Color.white)
+                Spacer()
+            }
+        }.frame(width: 600, height: 500)
     }
-    return ProgressPreview()
+}
 
-}() }
+#Preview {
+    ProgressPreview()
+}
+#endif
