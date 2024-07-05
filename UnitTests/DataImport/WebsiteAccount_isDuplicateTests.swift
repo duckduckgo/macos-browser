@@ -1,5 +1,5 @@
 //
-//  SecureVaultModels_WebsiteAccountTests.swift
+//  WebsiteAccount_isDuplicateTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import XCTest
 import GRDB
 import BrowserServicesKit
 
-final class SecureVaultModels_WebsiteAccountTests: XCTestCase {
+final class WebsiteAccount_isDuplicateTests: XCTestCase {
 
     func test_strictDuplicate_duplicate() {
         let original = SecureVaultModels.WebsiteAccount(title: "Blah", username: "blah123", domain: "blah.com", signature: "blah1blah2blah3", notes: "blah blah")
