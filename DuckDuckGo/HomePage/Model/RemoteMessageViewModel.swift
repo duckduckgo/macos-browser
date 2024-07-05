@@ -20,17 +20,6 @@ import Foundation
 import BrowserServicesKit
 import RemoteMessaging
 
-extension RemoteMessageModelType {
-    var isSupported: Bool {
-        switch self {
-        case .promoSingleAction:
-            return false
-        default:
-            return true
-        }
-    }
-}
-
 struct RemoteMessageViewModel {
     enum ButtonAction {
         case close
@@ -89,14 +78,7 @@ struct RemoteMessageViewModel {
                               onDidClose: @escaping (RemoteMessageViewModel.ButtonAction?) -> Void) -> () -> Void {
 
         switch remoteAction {
-        case .url(let value), .share(let value, _):
-            return {
-                if let url = URL.makeURL(from: value) {
-                    openURLHandler(url)
-                }
-                onDidClose(buttonAction)
-            }
-        case .survey(let value):
+        case .url(let value), .share(let value, _), .survey(let value):
             return {
                 if let url = URL.makeURL(from: value) {
                     openURLHandler(url)
@@ -145,6 +127,7 @@ extension RemoteAction {
 }
 
 private extension RemoteMessageModelType {
+
     var image: String? {
         switch self {
         case .small:

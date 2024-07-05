@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import SwiftUI
-import BrowserServicesKit
 import PixelKit
+import RemoteMessaging
+import SwiftUI
 import SwiftUIExtensions
 
 extension HomePage.Views {
@@ -211,6 +211,18 @@ extension HomePage.Views {
                 })
                 Spacer()
             }
+        }
+    }
+}
+
+private extension RemoteMessageModelType {
+
+    var isSupported: Bool {
+        switch self {
+        case .promoSingleAction:
+            return false
+        default:
+            return true
         }
     }
 }
