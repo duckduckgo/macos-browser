@@ -78,6 +78,7 @@ public enum DataBrokerProtectionPixels {
         static let durationOfFirstOptOut = "duration_firstoptout"
         static let numberOfNewRecordsFound = "num_new_found"
         static let numberOfReappereances = "num_reappeared"
+        static let optOutSubmitSuccessRate = "optout_submit_success_rate"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -190,6 +191,10 @@ public enum DataBrokerProtectionPixels {
     // Feature Gatekeeper
     case gatekeeperNotAuthenticated
     case gatekeeperEntitlementsInvalid
+
+    // Custom stats
+    case customDataBrokerStatsOptoutSubmit(dataBrokerName: String, optOutSubmitSuccessRate: Double)
+    case customGlobalStatsOptoutSubmit(optOutSubmitSuccessRate: Double)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -309,6 +314,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             // Feature Gatekeeper
         case .gatekeeperNotAuthenticated: return "m_mac_dbp_gatekeeper_not_authenticated"
         case .gatekeeperEntitlementsInvalid: return "m_mac_dbp_gatekeeper_entitlements_invalid"
+
+        case .customDataBrokerStatsOptoutSubmit: return "m_mac_dbp_databroker_custom_stats_optoutsubmit"
+        case .customGlobalStatsOptoutSubmit: return "m_mac_dbp_custom_stats_optoutsubmit"
         }
     }
 
@@ -467,6 +475,11 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                            Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
                            Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound),
                            Consts.numberOfReappereances: String(numberOfReappereances)]
+        case .customDataBrokerStatsOptoutSubmit(let dataBrokerName, let optOutSubmitSuccessRate):
+            return [Consts.dataBrokerParamKey: dataBrokerName,
+                    Consts.optOutSubmitSuccessRate: String(optOutSubmitSuccessRate)]
+        case .customGlobalStatsOptoutSubmit(let optOutSubmitSuccessRate):
+            return [Consts.optOutSubmitSuccessRate: String(optOutSubmitSuccessRate)]
         }
     }
 }
@@ -551,7 +564,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerMetricsWeeklyStats,
                     .dataBrokerMetricsMonthlyStats,
                     .gatekeeperNotAuthenticated,
-                    .gatekeeperEntitlementsInvalid:
+                    .gatekeeperEntitlementsInvalid,
+                    .customDataBrokerStatsOptoutSubmit,
+                    .customGlobalStatsOptoutSubmit:
 
                 PixelKit.fire(event)
 
