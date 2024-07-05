@@ -40,13 +40,7 @@ final class SecureVaultLoginImporter: LoginImporter {
         let encryptionKey = try vault.getEncryptionKey()
         let hashingSalt = try vault.getHashingSalt()
 
-        let accounts: [SecureVaultModels.WebsiteAccount]
-
-        if let results = try? vault.accounts() {
-            accounts = results
-        } else {
-            accounts = .init()
-        }
+        let accounts = (try? vault.accounts()) ?? .init()
 
         try vault.inDatabaseTransaction { database in
             for (idx, login) in logins.enumerated() {
@@ -93,7 +87,6 @@ final class SecureVaultLoginImporter: LoginImporter {
 
         return .init(successful: successful.count, duplicate: duplicates.count, failed: failed.count)
     }
-
 }
 
 extension SecureVaultModels.WebsiteAccount {
