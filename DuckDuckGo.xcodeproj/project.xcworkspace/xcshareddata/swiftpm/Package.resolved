@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "f665aae8e752f970b99c5d053e08c8e0752df2f4",
-        "version" : "164.2.0-2"
+        "revision" : "777e5ae1ab890d9ec22e069bc5dc0f0ada4b35af",
+        "version" : "165.0.0"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/airbnb/lottie-spm.git",
       "state" : {
-        "revision" : "3bd43e12d6fb54654366a61f7cfaca787318b8ce",
-        "version" : "4.4.1"
+        "revision" : "1d29eccc24cc8b75bff9f6804155112c0ffc9605",
+        "version" : "4.4.3"
       }
     },
     {

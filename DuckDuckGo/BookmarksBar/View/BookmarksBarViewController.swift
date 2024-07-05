@@ -23,12 +23,15 @@ import Foundation
 
 final class BookmarksBarViewController: NSViewController {
 
-    @IBOutlet weak var importBookmarksButton: NSButton!
+    @IBOutlet weak var importBookmarksButton: NSView!
+    @IBOutlet weak var importBookmarksMouseOverView: MouseOverView!
+    @IBOutlet weak var importBookmarksLabel: NSTextField!
+    @IBOutlet weak var importBookmarksIcon: NSImageView!
     @IBOutlet private var bookmarksBarCollectionView: NSCollectionView!
     @IBOutlet private var clippedItemsIndicator: NSButton!
     @IBOutlet private var promptAnchor: NSView!
 
-    private let bookmarkManager = LocalBookmarkManager.shared
+    private let bookmarkManager: BookmarkManager
     private let viewModel: BookmarksBarViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
 
@@ -48,7 +51,8 @@ final class BookmarksBarViewController: NSViewController {
         }!
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+        self.bookmarkManager = bookmarkManager
         self.tabCollectionViewModel = tabCollectionViewModel
         self.viewModel = BookmarksBarViewModel(bookmarkManager: bookmarkManager, tabCollectionViewModel: tabCollectionViewModel)
 
@@ -64,6 +68,8 @@ final class BookmarksBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        setUpImportBookmarksButton()
+
         addContextMenu()
 
         viewModel.delegate = self
@@ -77,7 +83,7 @@ final class BookmarksBarViewController: NSViewController {
             BookmarkPasteboardWriter.bookmarkUTIInternalType,
             FolderPasteboardWriter.folderUTIInternalType
         ])
-        importBookmarksButton.title = UserText.importBookmarks
+        importBookmarksLabel.stringValue = UserText.importBookmarks
 
         bookmarksBarCollectionView.delegate = viewModel
         bookmarksBarCollectionView.dataSource = viewModel
@@ -85,6 +91,11 @@ final class BookmarksBarViewController: NSViewController {
 
         view.postsFrameChangedNotifications = true
         bookmarksBarCollectionView.setAccessibilityIdentifier("BookmarksBarViewController.bookmarksBarCollectionView")
+    }
+
+    private func setUpImportBookmarksButton() {
+        importBookmarksIcon.image = NSImage(named: "Import-16D")
+        importBookmarksButton.isHidden = true
     }
 
     private func addContextMenu() {
@@ -155,7 +166,9 @@ final class BookmarksBarViewController: NSViewController {
         viewModel.$bookmarksBarItems
             .receive(on: DispatchQueue.main)
             .sink { [weak self] items in
-                self?.importBookmarksButton.isHidden = !items.isEmpty
+                if self?.bookmarkManager.list != nil {
+                    self?.importBookmarksButton.isHidden = !items.isEmpty
+                }
             }
             .store(in: &cancellables)
     }

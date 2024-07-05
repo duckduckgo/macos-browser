@@ -57,7 +57,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
         self.getLogger = log
     }
 
-    private (set) var downloads = Set<WebKitDownloadTask>()
+    private(set) var downloads = Set<WebKitDownloadTask>()
     private var downloadAddedSubject = PassthroughSubject<WebKitDownloadTask, Never>()
     var downloadsPublisher: AnyPublisher<WebKitDownloadTask, Never> {
         downloadAddedSubject.eraseToAnyPublisher()

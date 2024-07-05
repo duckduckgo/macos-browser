@@ -78,13 +78,37 @@ final class BookmarksBarViewControllerTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenThereAreNoBookmarks_ThenImportBookmarksButtonIsShown() {
+    func testWhenThereAreNoBookmarks_AndbookmarkListEmpty_ThenImportBookmarksButtonIsNotShown() {
         // Given
         let vc = BookmarksBarViewController.create(tabCollectionViewModel: TabCollectionViewModel(), bookmarkManager: bookmarksManager)
         let window = NSWindow(contentViewController: vc)
             window.makeKeyAndOrderFront(nil)
 
         // Then
+        XCTAssertTrue(vc.importBookmarksButton.isHidden)
+    }
+
+    @MainActor
+    func testWhenThereAreNoBookmarks_ThenImportBookmarksButtonIsShown() {
+        // Given
+        let boolmarkList = BookmarkList(topLevelEntities: [])
+        let vc = BookmarksBarViewController.create(tabCollectionViewModel: TabCollectionViewModel(), bookmarkManager: bookmarksManager)
+        let window = NSWindow(contentViewController: vc)
+        window.makeKeyAndOrderFront(nil)
+        let expectation = XCTestExpectation(description: "Wait for list update")
+        bookmarksManager.listPublisher
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { list in
+                expectation.fulfill()
+            }
+            .store(in: &cancellables)
+
+        // When
+        bookmarksManager.list = boolmarkList
+
+        // Then
+        wait(for: [expectation], timeout: 2.0)
         XCTAssertFalse(vc.importBookmarksButton.isHidden)
     }
 

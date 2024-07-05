@@ -48,7 +48,7 @@ protocol DataBrokerOperationErrorDelegate: AnyObject {
 }
 
 // swiftlint:disable explicit_non_final_class
-class DataBrokerOperation: Operation {
+class DataBrokerOperation: Operation, @unchecked Sendable {
 
     private let dataBrokerID: Int64
     private let operationType: OperationType
