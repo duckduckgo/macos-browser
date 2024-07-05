@@ -66,8 +66,6 @@ final class InternalUserDeciderStoreMock: InternalUserStoring {
 }
 
 final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
-    var toggleProtectionsCounter: ToggleProtectionsCounter = ToggleProtectionsCounter(eventReporting: nil)
-
     var currentConfig: Data = Data()
 
     var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
@@ -183,6 +181,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasExecuteCalledForSolveCaptcha = false
     var wasExecuteJavascriptCalled = false
     var wasSetCookiesCalled = false
+    var errorStatusCodeToThrow: Int?
 
     func initializeWebView(showWebView: Bool) async {
         wasInitializeWebViewCalled = true
@@ -190,6 +189,9 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
 
     func load(url: URL) async throws {
         wasLoadCalledWithURL = url
+
+        guard let statusCode = errorStatusCodeToThrow else { return }
+        throw DataBrokerProtectionError.httpError(code: statusCode)
     }
 
     func waitForWebViewLoad() async throws {
@@ -1584,5 +1586,25 @@ final class MockDataBrokerProtectionStatsPixelsRepository: DataBrokerProtectionS
         wasMarkStatsMonthlyPixelDateCalled = false
         latestStatsWeeklyPixelDate = nil
         latestStatsMonthlyPixelDate = nil
+    }
+}
+
+final class MockSleepObserver: SleepObserver {
+    func totalSleepTime() -> TimeInterval {
+        1
+    }
+}
+
+final class MockActionsHandler: ActionsHandler {
+
+    var didCallNextAction = false
+
+    init() {
+        super.init(step: Step(type: .scan, actions: []))
+    }
+
+    override func nextAction() -> (any Action)? {
+        didCallNextAction = true
+        return nil
     }
 }

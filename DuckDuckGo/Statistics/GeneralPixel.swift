@@ -197,9 +197,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case serpAddedToDock
 
     case protectionToggledOffBreakageReport
-    case toggleProtectionsDailyCount
-    case toggleReportDoNotSend
-    case toggleReportDismiss
 
     // Password Import Keychain Prompt
     case passwordImportKeychainPrompt
@@ -676,9 +673,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .serpAddedToDock: return "m_mac_serp_added_to_dock"
 
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
-        case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"
-        case .toggleReportDoNotSend: return "m_mac_toggle-report-do-not-send"
-        case .toggleReportDismiss: return "m_mac_toggle-report-dismiss"
 
             // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
