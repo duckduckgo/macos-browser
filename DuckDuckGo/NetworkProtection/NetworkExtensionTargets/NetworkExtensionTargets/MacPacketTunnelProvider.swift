@@ -154,17 +154,17 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 frequency: .legacyDaily,
                 withAdditionalParameters: [PixelKit.Parameters.vpnCohort: PixelKit.cohort(from: defaults.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
-        case .connectionTesterStatusChange(let status):
-            vpnLogger.log(status)
+        case .connectionTesterStatusChange(let status, let server):
+            vpnLogger.log(status, server: server)
 
             switch status {
             case .failed(let duration):
                 let pixel: NetworkProtectionPixelEvent = {
                     switch duration {
                     case .immediate:
-                        return .networkProtectionConnectionTesterFailureDetected
+                        return .networkProtectionConnectionTesterFailureDetected(server: server)
                     case .extended:
-                        return .networkProtectionConnectionTesterExtendedFailureDetected
+                        return .networkProtectionConnectionTesterExtendedFailureDetected(server: server)
                     }
                 }()
 
@@ -176,9 +176,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 let pixel: NetworkProtectionPixelEvent = {
                     switch duration {
                     case .immediate:
-                        return .networkProtectionConnectionTesterFailureRecovered(failureCount: failureCount)
+                        return .networkProtectionConnectionTesterFailureRecovered(server: server, failureCount: failureCount)
                     case .extended:
-                        return .networkProtectionConnectionTesterExtendedFailureRecovered(failureCount: failureCount)
+                        return .networkProtectionConnectionTesterExtendedFailureRecovered(server: server, failureCount: failureCount)
                     }
                 }()
 
