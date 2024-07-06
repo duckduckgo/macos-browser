@@ -167,7 +167,6 @@ private class PrivacyConfigurationDataBrokerProtectionConfigOverride: PrivacyCon
     var updatesPublisher: AnyPublisher<(), Never>
     var privacyConfig: PrivacyConfiguration
     var internalUserDecider: InternalUserDecider
-    var toggleProtectionsCounter: ToggleProtectionsCounter
 
     var currentConfig: Data {
         return updateConfigWithBrokerProtection()
@@ -182,7 +181,6 @@ private class PrivacyConfigurationDataBrokerProtectionConfigOverride: PrivacyCon
         updatesPublisher = manager.updatesPublisher
         privacyConfig = manager.privacyConfig
         internalUserDecider = manager.internalUserDecider
-        toggleProtectionsCounter = manager.toggleProtectionsCounter
     }
 
     private func updateConfigWithBrokerProtection() -> Data {
