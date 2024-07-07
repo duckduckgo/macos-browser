@@ -232,7 +232,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         activeRemoteMessageModel = ActiveRemoteMessageModel(
             remoteMessagingClient: remoteMessagingClient,
-            privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
+            remoteMessagingAvailabilityProvider: PrivacyConfigurationRemoteMessagingAvailabilityProvider(
+                privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
+            )
         )
 
         featureFlagger = DefaultFeatureFlagger(

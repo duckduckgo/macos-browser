@@ -32,36 +32,32 @@ final class ActiveRemoteMessageModel: ObservableObject {
      * ensures that a non-nil store will be retrieved when requested.
      */
     let store: () -> RemoteMessagingStoring?
-    let privacyConfigurationManager: PrivacyConfigurationManaging
+    let remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
 
     convenience init(
         remoteMessagingClient: RemoteMessagingClient,
-        privacyConfigurationManager: PrivacyConfigurationManaging
+        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
     ) {
         self.init(
             remoteMessagingStore: remoteMessagingClient.store,
-            privacyConfigurationManager: privacyConfigurationManager
+            remoteMessagingAvailabilityProvider: remoteMessagingAvailabilityProvider
         )
     }
 
     init(
         remoteMessagingStore: @escaping @autoclosure () -> RemoteMessagingStoring?,
-        privacyConfigurationManager: PrivacyConfigurationManaging
+        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
     ) {
         self.store = remoteMessagingStore
-        self.privacyConfigurationManager = privacyConfigurationManager
+        self.remoteMessagingAvailabilityProvider = remoteMessagingAvailabilityProvider
 
         updateRemoteMessage()
 
-        let messagesDidChangePublisher = NotificationCenter.default
-            .publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
+        let messagesDidChangePublisher = NotificationCenter.default.publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
             .asVoid()
             .eraseToAnyPublisher()
 
-        let featureFlagDidChangePublisher = privacyConfigurationManager.updatesPublisher
-            .map { [weak privacyConfigurationManager] in
-                privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .remoteMessaging) == true
-            }
+        let featureFlagDidChangePublisher = remoteMessagingAvailabilityProvider.isRemoteMessagingAvailablePublisher
             .removeDuplicates()
             .asVoid()
             .eraseToAnyPublisher()
