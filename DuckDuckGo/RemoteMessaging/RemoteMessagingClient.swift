@@ -32,7 +32,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
 #if DEBUG
             URL(string: "https://staticcdn.kapusta.cc/macos-desktop-browser/remote-messaging-config.json")!
 #else
-            URL(string: "https://staticcdn.duckduckgo.com/remotemessaging/config/v1/ios-config.json")!
+            URL(string: "https://staticcdn.duckduckgo.com/remotemessaging/config/v1/macos-config.json")!
 #endif
         }()
     }
@@ -75,69 +75,27 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         self.database = database
         self.internalUserDecider = internalUserDecider
         self.configurationFetcher = RemoteMessagingConfigFetcher(
-            configurationFetcher: ConfigurationFetcher(store: configurationStore, urlSession: .session(), log: .remoteMessaging, eventMapping: nil),
+            configurationFetcher: ConfigurationFetcher(
+                store: configurationStore,
+                urlSession: .session(),
+                log: .remoteMessaging,
+                eventMapping: ConfigurationManager.configurationDebugEvents
+            ),
             configurationStore: ConfigurationStore.shared
         )
         self.configMatcherProvider = configMatcherProvider
         self.remoteMessagingAvailabilityProvider = remoteMessagingAvailabilityProvider
 
-        subscribeToInternalUserFlagChangesIfNeeded()
-    }
-
-    private func subscribeToInternalUserFlagChangesIfNeeded() {
-        guard !internalUserDecider.isInternalUser else {
-            return
-        }
-
-        internalUserCancellable = internalUserDecider.isInternalUserPublisher
-            .filter { $0 }
-            .prefix(1)
-            .sink { [weak self] isInternalUser in
-                if isInternalUser {
-                    self?.initializeDatabaseIfNeeded()
-                    self?.startRefreshingRemoteMessages()
-                }
-            }
-    }
-
-    func initializeDatabaseIfNeeded() {
-        guard internalUserDecider.isInternalUser else {
-            return
-        }
-        guard !isRemoteMessagingDatabaseLoaded else {
-            return
-        }
-
-        database.db.loadStore { context, error in
-            guard context != nil else {
-                if let error = error {
-                    PixelKit.fire(DebugEvent(GeneralPixel.syncMetadataCouldNotLoadDatabase, error: error))
-                } else {
-                    PixelKit.fire(DebugEvent(GeneralPixel.syncMetadataCouldNotLoadDatabase))
-                }
-
-                Thread.sleep(forTimeInterval: 1)
-                fatalError("Could not create Remote Messaging database stack: \(error?.localizedDescription ?? "err")")
-            }
-        }
-        store = RemoteMessagingStore(
-            database: database.db,
-            errorEvents: RemoteMessagingStoreErrorHandling(),
-            remoteMessagingAvailabilityProvider: remoteMessagingAvailabilityProvider
-        )
-        isRemoteMessagingDatabaseLoaded = true
+        subscribeToFeatureFlagChanges()
+        initializeDatabaseIfNeeded()
     }
 
     func startRefreshingRemoteMessages() {
-        guard internalUserDecider.isInternalUser else {
-            timerCancellable?.cancel()
-            return
-        }
         guard remoteMessagingAvailabilityProvider.isRemoteMessagingAvailable else {
-            timerCancellable?.cancel()
+            stopRefreshingRemoteMessages()
             return
         }
-        timerCancellable = Timer.publish(every: Constants.minimumConfigurationRefreshInterval, on: .main, in: .default)
+        scheduledRefreshCancellable = Timer.publish(every: Constants.minimumConfigurationRefreshInterval, on: .main, in: .default)
             .autoconnect()
             .prepend(Date())
             .asVoid()
@@ -146,11 +104,56 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
             }
     }
 
+    private func stopRefreshingRemoteMessages() {
+        scheduledRefreshCancellable?.cancel()
+    }
+
+    private func subscribeToFeatureFlagChanges() {
+
+        featureFlagCancellable = remoteMessagingAvailabilityProvider.isRemoteMessagingAvailablePublisher
+            .sink { [weak self] isRemoteMessagingAvailable in
+                if isRemoteMessagingAvailable {
+                    self?.initializeDatabaseIfNeeded()
+                    self?.startRefreshingRemoteMessages()
+                } else {
+                    self?.stopRefreshingRemoteMessages()
+                }
+            }
+    }
+
+    private func initializeDatabaseIfNeeded() {
+        guard remoteMessagingAvailabilityProvider.isRemoteMessagingAvailable, !isRemoteMessagingDatabaseLoaded else {
+            return
+        }
+
+        if NSApplication.runType.requiresEnvironment {
+            database.db.loadStore { context, error in
+                guard context != nil else {
+                    if let error = error {
+                        PixelKit.fire(DebugEvent(GeneralPixel.syncMetadataCouldNotLoadDatabase, error: error))
+                    } else {
+                        PixelKit.fire(DebugEvent(GeneralPixel.syncMetadataCouldNotLoadDatabase))
+                    }
+
+                    Thread.sleep(forTimeInterval: 1)
+                    fatalError("Could not create Remote Messaging database stack: \(error?.localizedDescription ?? "err")")
+                }
+            }
+        }
+
+        store = RemoteMessagingStore(
+            database: database.db,
+            errorEvents: RemoteMessagingStoreErrorHandling(),
+            remoteMessagingAvailabilityProvider: remoteMessagingAvailabilityProvider
+        )
+        isRemoteMessagingDatabaseLoaded = true
+    }
+
     private let database: RemoteMessagingDatabase
     private let internalUserDecider: InternalUserDecider
     private var isRemoteMessagingDatabaseLoaded = false
-    private var timerCancellable: AnyCancellable?
-    private var internalUserCancellable: AnyCancellable?
+    private var scheduledRefreshCancellable: AnyCancellable?
+    private var featureFlagCancellable: AnyCancellable?
 
     @UserDefaultsWrapper(key: .lastRemoteMessagingRefreshDate, defaultValue: .distantPast)
     static private var lastRemoteMessagingRefreshDate: Date

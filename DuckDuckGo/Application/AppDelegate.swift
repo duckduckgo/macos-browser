@@ -227,9 +227,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
             )
         )
-        if NSApplication.runType.requiresEnvironment {
-            remoteMessagingClient.initializeDatabaseIfNeeded()
-        }
         activeRemoteMessageModel = ActiveRemoteMessageModel(
             remoteMessagingClient: remoteMessagingClient,
             remoteMessagingAvailabilityProvider: PrivacyConfigurationRemoteMessagingAvailabilityProvider(
