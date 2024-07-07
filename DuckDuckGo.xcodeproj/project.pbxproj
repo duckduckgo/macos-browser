@@ -1075,6 +1075,10 @@
 		37DB56ED2C3B314F0093D4DC /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 37DB56EC2C3B314F0093D4DC /* BrowserServicesKit */; };
 		37DB56EF2C3B31CD0093D4DC /* MockRemoteMessagingAvailabilityProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DB56EE2C3B31CD0093D4DC /* MockRemoteMessagingAvailabilityProvider.swift */; };
 		37DB56F02C3B31CD0093D4DC /* MockRemoteMessagingAvailabilityProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DB56EE2C3B31CD0093D4DC /* MockRemoteMessagingAvailabilityProvider.swift */; };
+		37DB56F22C3B36B80093D4DC /* RemoteMessagingClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DB56F12C3B36B80093D4DC /* RemoteMessagingClientTests.swift */; };
+		37DB56F32C3B36B80093D4DC /* RemoteMessagingClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DB56F12C3B36B80093D4DC /* RemoteMessagingClientTests.swift */; };
+		37DB56F52C3B3C420093D4DC /* MockRemoteMessagingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DB56F42C3B3C420093D4DC /* MockRemoteMessagingStore.swift */; };
+		37DB56F62C3B3C420093D4DC /* MockRemoteMessagingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DB56F42C3B3C420093D4DC /* MockRemoteMessagingStore.swift */; };
 		37DF000529F9C056002B7D3E /* SyncDataProviders in Frameworks */ = {isa = PBXBuildFile; productRef = 37DF000429F9C056002B7D3E /* SyncDataProviders */; };
 		37DF000729F9C061002B7D3E /* SyncDataProviders in Frameworks */ = {isa = PBXBuildFile; productRef = 37DF000629F9C061002B7D3E /* SyncDataProviders */; };
 		37F19A6528E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6428E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift */; };
@@ -3138,6 +3142,8 @@
 		37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAppearanceView.swift; sourceTree = "<group>"; };
 		37D9BBA329376EE8000B99F9 /* DuckDuckGoAppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoAppStore.entitlements; sourceTree = "<group>"; };
 		37DB56EE2C3B31CD0093D4DC /* MockRemoteMessagingAvailabilityProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockRemoteMessagingAvailabilityProvider.swift; sourceTree = "<group>"; };
+		37DB56F12C3B36B80093D4DC /* RemoteMessagingClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingClientTests.swift; sourceTree = "<group>"; };
+		37DB56F42C3B3C420093D4DC /* MockRemoteMessagingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockRemoteMessagingStore.swift; sourceTree = "<group>"; };
 		37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoAppStore.xcconfig; sourceTree = "<group>"; };
 		37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = UnitTestsAppStore.xcconfig; sourceTree = "<group>"; };
 		37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = IntegrationTestsAppStore.xcconfig; sourceTree = "<group>"; };
@@ -4818,6 +4824,8 @@
 			children = (
 				373B2F802C384DEB0013A94B /* ActiveRemoteMessageModelTests.swift */,
 				37DB56EE2C3B31CD0093D4DC /* MockRemoteMessagingAvailabilityProvider.swift */,
+				37DB56F12C3B36B80093D4DC /* RemoteMessagingClientTests.swift */,
+				37DB56F42C3B3C420093D4DC /* MockRemoteMessagingStore.swift */,
 			);
 			path = RemoteMessaging;
 			sourceTree = "<group>";
@@ -10568,6 +10576,7 @@
 				3706FDF8293F661700E42796 /* FileStoreTests.swift in Sources */,
 				5603D90729B7B746007F9F01 /* MockTabViewItemDelegate.swift in Sources */,
 				3706FDF9293F661700E42796 /* TabViewModelTests.swift in Sources */,
+				37DB56F62C3B3C420093D4DC /* MockRemoteMessagingStore.swift in Sources */,
 				9F872DA12B90644800138637 /* ContextualMenuTests.swift in Sources */,
 				3706FDFA293F661700E42796 /* DefaultBrowserPreferencesTests.swift in Sources */,
 				9FBD84782BB3E54200220859 /* InstallationAttributionPixelHandlerTests.swift in Sources */,
@@ -10640,6 +10649,7 @@
 				3706FE21293F661700E42796 /* DownloadsPreferencesTests.swift in Sources */,
 				3706FE22293F661700E42796 /* FireproofDomainsTests.swift in Sources */,
 				56A054172C1C37B0007D8FAB /* CapturingOnboardingNavigation.swift in Sources */,
+				37DB56F32C3B36B80093D4DC /* RemoteMessagingClientTests.swift in Sources */,
 				C17CA7AE2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift in Sources */,
 				3706FE23293F661700E42796 /* SuggestionLoadingMock.swift in Sources */,
 				3706FE24293F661700E42796 /* PasteboardFolderTests.swift in Sources */,
@@ -12072,6 +12082,7 @@
 				37DB56EF2C3B31CD0093D4DC /* MockRemoteMessagingAvailabilityProvider.swift in Sources */,
 				B6106BA026A7BE0B0013B453 /* PermissionManagerTests.swift in Sources */,
 				4B59CC8C290083240058F2F6 /* ConnectBitwardenViewModelTests.swift in Sources */,
+				37DB56F52C3B3C420093D4DC /* MockRemoteMessagingStore.swift in Sources */,
 				B68412202B6A30680092F66A /* StringExtensionTests.swift in Sources */,
 				B6106BB526A809E60013B453 /* GeolocationProviderTests.swift in Sources */,
 				BDA764912BC4E57200D0400C /* MockVPNLocationFormatter.swift in Sources */,
@@ -12176,6 +12187,7 @@
 				4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */,
 				B603971029B9D67E00902A34 /* PublishersExtensions.swift in Sources */,
 				9F26060E2B85E17D00819292 /* AddEditBookmarkDialogCoordinatorViewModelTests.swift in Sources */,
+				37DB56F22C3B36B80093D4DC /* RemoteMessagingClientTests.swift in Sources */,
 				4B9292C32667103100AD2C21 /* PasteboardBookmarkTests.swift in Sources */,
 				B610F2E427A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift in Sources */,
 				AABAF59C260A7D130085060C /* FaviconManagerMock.swift in Sources */,

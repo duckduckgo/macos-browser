@@ -89,7 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    let activeRemoteMessageModel: ActiveRemoteMessageModel
+    let activeRemoteMessageModel: ActiveRemoteMessageModel!
     private let remoteMessagingClient: RemoteMessagingClient
 
     public let subscriptionManager: SubscriptionManager
@@ -216,9 +216,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #else
         AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
 #endif
-
         remoteMessagingClient = RemoteMessagingClient(
-            database: RemoteMessagingDatabase(),
+            database: RemoteMessagingDatabase().db,
             bookmarksDatabase: BookmarkDatabase.shared.db,
             appearancePreferences: .shared,
             internalUserDecider: internalUserDecider,
@@ -227,12 +226,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
             )
         )
-        activeRemoteMessageModel = ActiveRemoteMessageModel(
-            remoteMessagingClient: remoteMessagingClient,
-            remoteMessagingAvailabilityProvider: PrivacyConfigurationRemoteMessagingAvailabilityProvider(
-                privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
-            )
-        )
+        if NSApplication.runType.requiresEnvironment {
+            activeRemoteMessageModel = ActiveRemoteMessageModel(remoteMessagingClient: remoteMessagingClient)
+        } else {
+            // As long activeRemoteMessageModel is used only by HomePage RootView as environment object,
+            // it's safe to not initialize it for unit tests to avoid side effects.
+            activeRemoteMessageModel = nil
+        }
 
         featureFlagger = DefaultFeatureFlagger(
             internalUserDecider: internalUserDecider,

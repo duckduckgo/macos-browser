@@ -34,13 +34,10 @@ final class ActiveRemoteMessageModel: ObservableObject {
     let store: () -> RemoteMessagingStoring?
     let remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
 
-    convenience init(
-        remoteMessagingClient: RemoteMessagingClient,
-        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
-    ) {
+    convenience init(remoteMessagingClient: RemoteMessagingClient) {
         self.init(
             remoteMessagingStore: remoteMessagingClient.store,
-            remoteMessagingAvailabilityProvider: remoteMessagingAvailabilityProvider
+            remoteMessagingAvailabilityProvider: remoteMessagingClient.remoteMessagingAvailabilityProvider
         )
     }
 

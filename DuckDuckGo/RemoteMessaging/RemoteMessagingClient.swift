@@ -18,12 +18,29 @@
 
 import AppKit
 import Combine
+import Common
 import Configuration
 import Foundation
 import BrowserServicesKit
 import Persistence
 import PixelKit
 import RemoteMessaging
+
+protocol RemoteMessagingStoreProviding {
+    func makeRemoteMessagingStore(database: CoreDataDatabase, availabilityProvider: RemoteMessagingAvailabilityProviding) -> RemoteMessagingStoring
+}
+
+struct DefaultRemoteMessagingStoreProvider: RemoteMessagingStoreProviding {
+    func makeRemoteMessagingStore(database: CoreDataDatabase, availabilityProvider: RemoteMessagingAvailabilityProviding) -> RemoteMessagingStoring {
+        RemoteMessagingStore(
+            database: database,
+            notificationCenter: .default,
+            errorEvents: RemoteMessagingStoreErrorHandling(),
+            remoteMessagingAvailabilityProvider: availabilityProvider,
+            log: .remoteMessaging
+        )
+    }
+}
 
 final class RemoteMessagingClient: RemoteMessagingProcessing {
 
@@ -42,15 +59,16 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
     let configurationFetcher: RemoteMessagingConfigFetching
     let configMatcherProvider: RemoteMessagingConfigMatcherProviding
     let remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
-    private(set) var store: RemoteMessagingStore?
+    private(set) var store: RemoteMessagingStoring?
 
     convenience init(
-        database: RemoteMessagingDatabase,
+        database: CoreDataDatabase,
         bookmarksDatabase: CoreDataDatabase,
         appearancePreferences: AppearancePreferences,
         internalUserDecider: InternalUserDecider,
         configurationStore: ConfigurationStoring,
-        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
+        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding,
+        remoteMessagingStoreProvider: RemoteMessagingStoreProviding = DefaultRemoteMessagingStoreProvider()
     ) {
         let provider = RemoteMessagingConfigMatcherProvider(
             bookmarksDatabase: bookmarksDatabase,
@@ -59,7 +77,6 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         )
         self.init(
             database: database,
-            internalUserDecider: internalUserDecider,
             configMatcherProvider: provider,
             configurationStore: configurationStore,
             remoteMessagingAvailabilityProvider: remoteMessagingAvailabilityProvider
@@ -67,14 +84,13 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
     }
 
     init(
-        database: RemoteMessagingDatabase,
-        internalUserDecider: InternalUserDecider,
+        database: CoreDataDatabase,
         configMatcherProvider: RemoteMessagingConfigMatcherProviding,
         configurationStore: ConfigurationStoring,
-        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
+        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding,
+        remoteMessagingStoreProvider: RemoteMessagingStoreProviding = DefaultRemoteMessagingStoreProvider()
     ) {
         self.database = database
-        self.internalUserDecider = internalUserDecider
         self.configurationFetcher = RemoteMessagingConfigFetcher(
             configurationFetcher: ConfigurationFetcher(
                 store: configurationStore,
@@ -86,6 +102,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         )
         self.configMatcherProvider = configMatcherProvider
         self.remoteMessagingAvailabilityProvider = remoteMessagingAvailabilityProvider
+        self.remoteMessagingStoreProvider = remoteMessagingStoreProvider
 
         subscribeToFeatureFlagChanges()
         initializeDatabaseIfNeeded()
@@ -128,7 +145,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         }
 
         if NSApplication.runType.requiresEnvironment {
-            database.db.loadStore { context, error in
+            database.loadStore { context, error in
                 guard context != nil else {
                     if let error = error {
                         PixelKit.fire(DebugEvent(GeneralPixel.syncMetadataCouldNotLoadDatabase, error: error))
@@ -140,25 +157,21 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
                     fatalError("Could not create Remote Messaging database stack: \(error?.localizedDescription ?? "err")")
                 }
             }
-
-            store = RemoteMessagingStore(
-                database: database.db,
-                errorEvents: RemoteMessagingStoreErrorHandling(),
-                remoteMessagingAvailabilityProvider: remoteMessagingAvailabilityProvider
-            )
         }
+
+        store = remoteMessagingStoreProvider.makeRemoteMessagingStore(
+            database: database,
+            availabilityProvider: remoteMessagingAvailabilityProvider
+        )
 
         isRemoteMessagingDatabaseLoaded = true
     }
 
-    private let database: RemoteMessagingDatabase
-    private let internalUserDecider: InternalUserDecider
+    private let database: CoreDataDatabase
     private var isRemoteMessagingDatabaseLoaded = false
+    private let remoteMessagingStoreProvider: RemoteMessagingStoreProviding
     private var scheduledRefreshCancellable: AnyCancellable?
     private var featureFlagCancellable: AnyCancellable?
-
-    @UserDefaultsWrapper(key: .lastRemoteMessagingRefreshDate, defaultValue: .distantPast)
-    static private var lastRemoteMessagingRefreshDate: Date
 
     private func refreshRemoteMessages() {
         guard let store else {
