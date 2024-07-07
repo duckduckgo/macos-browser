@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Combine
 import Configuration
 import Foundation
@@ -139,13 +140,14 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
                     fatalError("Could not create Remote Messaging database stack: \(error?.localizedDescription ?? "err")")
                 }
             }
+
+            store = RemoteMessagingStore(
+                database: database.db,
+                errorEvents: RemoteMessagingStoreErrorHandling(),
+                remoteMessagingAvailabilityProvider: remoteMessagingAvailabilityProvider
+            )
         }
 
-        store = RemoteMessagingStore(
-            database: database.db,
-            errorEvents: RemoteMessagingStoreErrorHandling(),
-            remoteMessagingAvailabilityProvider: remoteMessagingAvailabilityProvider
-        )
         isRemoteMessagingDatabaseLoaded = true
     }
 

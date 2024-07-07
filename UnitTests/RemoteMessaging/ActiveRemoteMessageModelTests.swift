@@ -37,21 +37,30 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
 
     func testWhenNoMessageIsScheduledThenRemoteMessageIsNil() throws {
         store.scheduledRemoteMessage = nil
-        model = ActiveRemoteMessageModel(remoteMessagingStore: self.store)
+        model = ActiveRemoteMessageModel(
+            remoteMessagingStore: self.store,
+            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider()
+        )
 
         XCTAssertNil(model.remoteMessage)
     }
 
     func testWhenMessageIsScheduledThenItIsLoadedToModel() throws {
         store.scheduledRemoteMessage = message
-        model = ActiveRemoteMessageModel(remoteMessagingStore: self.store)
+        model = ActiveRemoteMessageModel(
+            remoteMessagingStore: self.store,
+            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider()
+        )
 
         XCTAssertEqual(model.remoteMessage, message)
     }
 
     func testWhenMessageIsDismissedThenItIsClearedFromModel() throws {
         store.scheduledRemoteMessage = message
-        model = ActiveRemoteMessageModel(remoteMessagingStore: self.store)
+        model = ActiveRemoteMessageModel(
+            remoteMessagingStore: self.store,
+            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider()
+        )
         model.dismissRemoteMessage(with: .close)
 
         XCTAssertNil(model.remoteMessage)
@@ -59,7 +68,10 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
 
     func testWhenMessageIsMarkedAsShownThenShownFlagIsSavedInStore() throws {
         store.scheduledRemoteMessage = message
-        model = ActiveRemoteMessageModel(remoteMessagingStore: self.store)
+        model = ActiveRemoteMessageModel(
+            remoteMessagingStore: self.store,
+            remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider()
+        )
 
         XCTAssertFalse(store.hasShownRemoteMessage(withId: message.id))
         model.markRemoteMessageAsShown()
