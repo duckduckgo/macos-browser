@@ -105,7 +105,10 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         self.remoteMessagingStoreProvider = remoteMessagingStoreProvider
 
         subscribeToFeatureFlagChanges()
-        initializeDatabaseIfNeeded()
+
+        if remoteMessagingAvailabilityProvider.isRemoteMessagingAvailable {
+            initializeDatabaseIfNeeded()
+        }
     }
 
     func startRefreshingRemoteMessages() {
@@ -113,6 +116,13 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
             stopRefreshingRemoteMessages()
             return
         }
+        /// Put the actual timer start into a separate function to allow it to be called unconditionally from
+        /// `isRemoteMessagingAvailablePublisher` event handler, where the new value (true) is emitted but it's
+        /// not yet available from `remoteMessagingAvailabilityProvider.isRemoteMessagingAvailable` property getter.
+        startMessagesRefreshTimer()
+    }
+
+    private func startMessagesRefreshTimer() {
         scheduledRefreshCancellable = Timer.publish(every: Constants.minimumConfigurationRefreshInterval, on: .main, in: .default)
             .autoconnect()
             .prepend(Date())
@@ -132,7 +142,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
             .sink { [weak self] isRemoteMessagingAvailable in
                 if isRemoteMessagingAvailable {
                     self?.initializeDatabaseIfNeeded()
-                    self?.startRefreshingRemoteMessages()
+                    self?.startMessagesRefreshTimer()
                 } else {
                     self?.stopRefreshingRemoteMessages()
                 }
@@ -140,7 +150,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
     }
 
     private func initializeDatabaseIfNeeded() {
-        guard remoteMessagingAvailabilityProvider.isRemoteMessagingAvailable, !isRemoteMessagingDatabaseLoaded else {
+        guard !isRemoteMessagingDatabaseLoaded else {
             return
         }
 

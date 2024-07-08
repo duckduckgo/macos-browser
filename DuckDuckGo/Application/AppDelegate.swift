@@ -90,7 +90,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var privacyDashboardWindow: NSWindow?
 
     let activeRemoteMessageModel: ActiveRemoteMessageModel!
-    private let remoteMessagingClient: RemoteMessagingClient
+    private let remoteMessagingClient: RemoteMessagingClient!
 
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
@@ -216,21 +216,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #else
         AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
 #endif
-        remoteMessagingClient = RemoteMessagingClient(
-            database: RemoteMessagingDatabase().db,
-            bookmarksDatabase: BookmarkDatabase.shared.db,
-            appearancePreferences: .shared,
-            internalUserDecider: internalUserDecider,
-            configurationStore: ConfigurationStore.shared,
-            remoteMessagingAvailabilityProvider: PrivacyConfigurationRemoteMessagingAvailabilityProvider(
-                privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
-            )
-        )
         if NSApplication.runType.requiresEnvironment {
+            remoteMessagingClient = RemoteMessagingClient(
+                database: RemoteMessagingDatabase().db,
+                bookmarksDatabase: BookmarkDatabase.shared.db,
+                appearancePreferences: .shared,
+                internalUserDecider: internalUserDecider,
+                configurationStore: ConfigurationStore.shared,
+                remoteMessagingAvailabilityProvider: PrivacyConfigurationRemoteMessagingAvailabilityProvider(
+                    privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
+                )
+            )
             activeRemoteMessageModel = ActiveRemoteMessageModel(remoteMessagingClient: remoteMessagingClient)
         } else {
-            // As long activeRemoteMessageModel is used only by HomePage RootView as environment object,
-            // it's safe to not initialize it for unit tests to avoid side effects.
+            // As long as remoteMessagingClient is private to App Delegate and activeRemoteMessageModel
+            // is used only by HomePage RootView as environment object,
+            // it's safe to not initialize them for unit tests to avoid side effects.
+            remoteMessagingClient = nil
             activeRemoteMessageModel = nil
         }
 
@@ -375,7 +377,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         setUpAutofillPixelReporter()
 
-        remoteMessagingClient.startRefreshingRemoteMessages()
+        remoteMessagingClient?.startRefreshingRemoteMessages()
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {

@@ -29,16 +29,22 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
     init(
         bookmarksDatabase: CoreDataDatabase,
         appearancePreferences: AppearancePreferences,
-        internalUserDecider: InternalUserDecider
+        internalUserDecider: InternalUserDecider,
+        statisticsStore: StatisticsStore = LocalStatisticsStore(),
+        variantManager: VariantManager = DefaultVariantManager()
     ) {
         self.bookmarksDatabase = bookmarksDatabase
         self.appearancePreferences = appearancePreferences
         self.internalUserDecider = internalUserDecider
+        self.statisticsStore = statisticsStore
+        self.variantManager = variantManager
     }
 
     let bookmarksDatabase: CoreDataDatabase
     let appearancePreferences: AppearancePreferences
     let internalUserDecider: InternalUserDecider
+    let statisticsStore: StatisticsStore
+    let variantManager: VariantManager
 
     // swiftlint:disable:next function_body_length
     func refreshConfigMatcher(using store: RemoteMessagingStoring) async -> RemoteMessagingConfigMatcher {
@@ -51,8 +57,6 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
             favoritesCount = BookmarkUtils.numberOfFavorites(for: appearancePreferences.favoritesDisplayMode, in: context)
         }
 
-        let statisticsStore = LocalStatisticsStore()
-        let variantManager = DefaultVariantManager()
         let subscriptionManager = await Application.appDelegate.subscriptionManager
 
         let isPrivacyProSubscriber = subscriptionManager.accountManager.isUserAuthenticated

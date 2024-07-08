@@ -95,7 +95,9 @@ final class RemoteMessagingClientTests: XCTestCase {
             configMatcherProvider: RemoteMessagingConfigMatcherProvider(
                 bookmarksDatabase: bookmarksDatabase,
                 appearancePreferences: AppearancePreferences(persistor: AppearancePreferencesPersistorMock()),
-                internalUserDecider: InternalUserDeciderMock()
+                internalUserDecider: InternalUserDeciderMock(),
+                statisticsStore: MockStatisticsStore(),
+                variantManager: MockVariantManager()
             ),
             configurationStore: MockConfigurationStore(),
             remoteMessagingAvailabilityProvider: availabilityProvider
@@ -114,5 +116,15 @@ final class RemoteMessagingClientTests: XCTestCase {
         availabilityProvider.isRemoteMessagingAvailable = true
         makeClient()
         XCTAssertNotNil(client.store)
+    }
+
+    func testWhenFeatureFlagBecomesEnabledThenStoreIsCreated() {
+        availabilityProvider.isRemoteMessagingAvailable = false
+        makeClient()
+        XCTAssertNil(client.store)
+
+        availabilityProvider.isRemoteMessagingAvailable = true
+        XCTAssertNotNil(client.store)
+        XCTAssertNotNil(client.scheduledRefreshCancellable)
     }
 }
