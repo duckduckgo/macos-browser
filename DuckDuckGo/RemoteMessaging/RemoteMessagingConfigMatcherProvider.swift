@@ -24,6 +24,8 @@ import RemoteMessaging
 import NetworkProtection
 import Subscription
 
+extension DefaultWaitlistActivationDateStore: VPNActivationDateProviding {}
+
 final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherProviding {
 
     init(
@@ -93,12 +95,24 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
                     break // Not supported in RMF
                 }
 
-                surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: subscription)
+                surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(
+                    statisticsStore: statisticsStore,
+                    vpnActivationDateStore: DefaultWaitlistActivationDateStore(source: .netP),
+                    subscription: subscription
+                )
             } else {
-                surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: nil)
+                surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(
+                    statisticsStore: statisticsStore,
+                    vpnActivationDateStore: DefaultWaitlistActivationDateStore(source: .netP),
+                    subscription: nil
+                )
             }
         } else {
-            surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(statisticsStore: statisticsStore, subscription: nil)
+            surveyActionMapper = DefaultRemoteMessagingSurveyURLBuilder(
+                statisticsStore: statisticsStore,
+                vpnActivationDateStore: DefaultWaitlistActivationDateStore(source: .netP),
+                subscription: nil
+            )
         }
 
         let dismissedMessageIds = store.fetchDismissedRemoteMessageIDs()
