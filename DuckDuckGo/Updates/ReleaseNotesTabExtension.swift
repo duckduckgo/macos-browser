@@ -63,8 +63,7 @@ final class ReleaseNotesTabExtension: NavigationResponder {
             self?.releaseNotesUserScript?.webView = self?.webView
 
             DispatchQueue.main.async { [weak self] in
-                //TODO: - Only if URL is release notes
-                self?.setUpYoutubeScriptsIfNeeded(for: self?.webView?.url)
+                self?.setUpScript(for: self?.webView?.url)
             }
         }.store(in: &cancellables)
     }
@@ -78,13 +77,12 @@ final class ReleaseNotesTabExtension: NavigationResponder {
     }
 
     @MainActor
-    private func setUpYoutubeScriptsIfNeeded(for url: URL?) {
+    private func setUpScript(for url: URL?) {
         let updateController = Application.appDelegate.updateController!
         Publishers.CombineLatest(updateController.isUpdateBeingLoadedPublisher, updateController.latestUpdatePublisher)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self else { return }
-                //TODO: - if url is release notes
                 self.releaseNotesUserScript?.onUpdate()
             }
             .store(in: &cancellables)

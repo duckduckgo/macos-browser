@@ -57,9 +57,11 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     lazy var notificationPresenter = UpdateNotificationPresenter()
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
-    init(internalUserDecider: InternalUserDecider) {
+    init(internalUserDecider: InternalUserDecider, 
+         appRestarter: AppRestarting = AppRestarter()) {
         willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
         self.internalUserDecider = internalUserDecider
+        self.appRestarter = appRestarter
         super.init()
 
         configureUpdater()
@@ -110,6 +112,11 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     var shouldShowManualUpdateDialog = false
 
+    private(set) var updater: SPUStandardUpdaterController!
+    private var appRestarter: AppRestarting
+    private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
+    private var internalUserDecider: InternalUserDecider
+
     // MARK: - Public
 
     func checkNewApplicationVersion() {
@@ -133,20 +140,15 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     // MARK: - Private
 
-    private(set) var updater: SPUStandardUpdaterController!
-    private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
-    private var internalUserDecider: InternalUserDecider
-
     private func configureUpdater() {
         // The default configuration of Sparkle updates is in Info.plist
         updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
         shouldShowManualUpdateDialog = false
 
-    //TODO: Uncomment
-//#if DEBUG
-//        updater.updater.automaticallyChecksForUpdates = false
-//        updater.updater.updateCheckInterval = 0
-//#endif
+#if DEBUG
+        updater.updater.automaticallyChecksForUpdates = false
+        updater.updater.updateCheckInterval = 0
+#endif
 
         if updater.updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
             updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
@@ -161,45 +163,13 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
     @objc func runUpdate() {
         if areAutomaticUpdatesEnabled {
-            restartApp()
+            appRestarter.restart()
         } else {
             shouldShowManualUpdateDialog = true
             checkForUpdate()
         }
     }
 
-    //TODO: Refactor to AppRestarter
-
-    func restartApp() {
-        let pid = ProcessInfo.processInfo.processIdentifier
-        let destinationPath = Bundle.main.bundlePath
-        let quotedDestinationPath = shellQuotedString(destinationPath)
-
-        let preOpenCmd = "/usr/bin/xattr -d -r com.apple.quarantine \(quotedDestinationPath)"
-
-        let script = """
-        (while /bin/kill -0 \(pid) >&/dev/null; do /bin/sleep 0.1; done; \(preOpenCmd); /usr/bin/open \(quotedDestinationPath)) &
-        """
-
-        let task = Process()
-        task.launchPath = "/bin/sh"
-        task.arguments = ["-c", script]
-
-        do {
-            try task.run()
-        } catch {
-            print("Unable to launch the task: \(error)")
-            return
-        }
-
-        // Terminate the current app instance
-        exit(0)
-    }
-
-    func shellQuotedString(_ string: String) -> String {
-        let escapedString = string.replacingOccurrences(of: "'", with: "'\\''")
-        return "'\(escapedString)'"
-    }
 }
 
 extension UpdateController: SPUStandardUserDriverDelegate {
@@ -293,9 +263,7 @@ extension UpdateController: SPUUpdaterDelegate {
         isUpdateBeingLoaded = false
     }
 
-    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
-        print("")
-    }
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {}
 
 }
 

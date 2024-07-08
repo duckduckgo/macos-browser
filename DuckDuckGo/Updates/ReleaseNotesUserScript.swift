@@ -64,6 +64,10 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
             return assertionFailure("Could not access webView")
         }
 
+        guard webView.url?.isReleaseNotesScheme ?? false else {
+            return
+        }
+
         let updateController = Application.appDelegate.updateController
         let values = ReleaseNotesValues(from: updateController)
         broker?.push(method: "onUpdate", params: values, for: self, into: webView)

@@ -59,54 +59,19 @@ final class Update {
 }
 
 extension Update {
-
-    static func releaseNotes(from description: String?) -> [String] {
-        guard let description else { return [] }
-
-        var releaseNotes = [String]()
-
-        let pattern = "<li>(.*?)</li>"
-
-        do {
-            let regex = try NSRegularExpression(pattern: pattern, options: [])
-            let matches = regex.matches(in: description, options: [], range: NSRange(location: 0, length: description.utf16.count))
-
-            for match in matches {
-                if let range = Range(match.range(at: 1), in: description) {
-                    let item = String(description[range])
-
-                    // Convert HTML to plain text
-                    if let data = item.data(using: .utf8),
-                       let attributedString = try? NSAttributedString(data: data,
-                                                                      options: [.documentType: NSAttributedString.DocumentType.html,
-                                                                                .characterEncoding: String.Encoding.utf8.rawValue],
-                                                                      documentAttributes: nil) {
-                        releaseNotes.append(attributedString.string)
-                    }
-                }
-            }
-        } catch {
-            assertionFailure("Error creating regular expression: \(error)")
-        }
-
-        return releaseNotes
-    }
-
     convenience init(appcastItem: SUAppcastItem, isInstalled: Bool) {
         let isCritical = appcastItem.isCriticalUpdate
         let version = appcastItem.displayVersionString
         let build = appcastItem.versionString
         let date = appcastItem.date ?? Date()
-        let releaseNotes = Self.releaseNotes(from: appcastItem.itemDescription)
+        let (releaseNotes, releaseNotesPrivacyPro) = ReleaseNotesParser.parseReleaseNotes(from: appcastItem.itemDescription)
 
-        //TODO: - Release notes for PP
         self.init(isInstalled: isInstalled,
                   type: isCritical ? .critical : .regular,
                   version: version,
                   build: build,
                   date: date,
                   releaseNotes: releaseNotes,
-                  releaseNotesPrivacyPro: [])
+                  releaseNotesPrivacyPro: releaseNotesPrivacyPro)
     }
-
 }
