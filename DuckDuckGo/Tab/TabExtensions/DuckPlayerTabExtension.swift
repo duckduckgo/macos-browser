@@ -117,8 +117,15 @@ extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
         } else {
             PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaHoverButton)
         }
-        // to be standardised across the app
-        let isRequestingNewTab = NSApp.isCommandPressed || shouldOpenInNewTab
+
+        var shouldRequestNewTab = shouldOpenInNewTab
+
+        // PopUpWindows don't support tabs
+        if let window = webView.window, window is PopUpWindow {
+            shouldRequestNewTab = false
+        }
+
+        let isRequestingNewTab = NSApp.isCommandPressed || shouldRequestNewTab
         if isRequestingNewTab {
             shouldSelectNextNewTab = NSApp.isShiftPressed
             webView.loadInNewWindow(url)
@@ -214,8 +221,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
            let (videoID, timestamp) = navigationAction.url.youtubeVideoParams {
             // if webview.url is not empty, open new tab if settings is ON
             if shouldOpenInNewTab, let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
-                // Inject the WindowControllersManager here instead of using the singleton
-                WindowControllersManager.shared.show(url: navigationAction.url, source: .link, newTab: true)
+                webView?.loadInNewWindow(navigationAction.url)
                 return .cancel
             } else {
                 return decidePolicy(for: navigationAction, withYoutubeVideoID: videoID, timestamp: timestamp)
