@@ -64,31 +64,31 @@ class MockRemoteMessagingStore: RemoteMessagingStoring {
         return scheduledRemoteMessage
     }
 
-    func fetchRemoteMessage(withId id: String) -> RemoteMessageModel? {
+    func fetchRemoteMessage(withID id: String) -> RemoteMessageModel? {
         fetchRemoteMessageCalls += 1
         return remoteMessages[id]
     }
 
-    func hasShownRemoteMessage(withId id: String) -> Bool {
+    func hasShownRemoteMessage(withID id: String) -> Bool {
         hasShownRemoteMessageCalls += 1
         return shownRemoteMessagesIDs.contains(id)
     }
 
-    func hasDismissedRemoteMessage(withId id: String) -> Bool {
+    func hasDismissedRemoteMessage(withID id: String) -> Bool {
         hasDismissedRemoteMessageCalls += 1
         return dismissedRemoteMessagesIDs.contains(id)
     }
 
-    func dismissRemoteMessage(withId id: String) {
+    func dismissRemoteMessage(withID id: String) {
         dismissRemoteMessageCalls += 1
     }
 
-    func fetchDismissedRemoteMessageIds() -> [String] {
+    func fetchDismissedRemoteMessageIDs() -> [String] {
         fetchDismissedRemoteMessageIdsCalls += 1
         return dismissedRemoteMessagesIDs
     }
 
-    func updateRemoteMessage(withId id: String, asShown shown: Bool) {
+    func updateRemoteMessage(withID id: String, asShown shown: Bool) {
         updateRemoteMessageCalls += 1
         if shown {
             shownRemoteMessagesIDs.append(id)

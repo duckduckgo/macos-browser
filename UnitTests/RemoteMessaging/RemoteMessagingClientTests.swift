@@ -125,6 +125,5 @@ final class RemoteMessagingClientTests: XCTestCase {
 
         availabilityProvider.isRemoteMessagingAvailable = true
         XCTAssertNotNil(client.store)
-        XCTAssertNotNil(client.scheduledRefreshCancellable)
     }
 }

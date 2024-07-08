@@ -23,12 +23,24 @@ import Foundation
 import PixelKit
 import RemoteMessaging
 
+/**
+ * This is used to feed a remote message to the home page view.
+ *
+ * We keep a single instance of `ActiveRemoteMessageModel` in `AppDelegate`
+ * because interacting with a remote message on any new tab page in any of the
+ * application windows should dismiss the message on all new tab pages in all windows.
+ * Secondly, we don't want multiple fetches and data refreshes in response to data
+ * changed notifications.
+ */
 final class ActiveRemoteMessageModel: ObservableObject {
 
     @Published var remoteMessage: RemoteMessageModel?
 
     /**
-     * Store is initialized lazily, after the model that uses it. The closure
+     * A block that returns a remote messaging store, if it exists.
+     *
+     * Store is initialized lazily, after the model that uses it. The store may also
+     * remain nil as long as RMF is disabled by a feature flag. The use of a closure
      * ensures that a non-nil store will be retrieved when requested.
      */
     let store: () -> RemoteMessagingStoring?
@@ -73,7 +85,7 @@ final class ActiveRemoteMessageModel: ObservableObject {
             return
         }
 
-        store()?.dismissRemoteMessage(withId: remoteMessage.id)
+        store()?.dismissRemoteMessage(withID: remoteMessage.id)
         self.remoteMessage = nil
 
         let pixelParameters = ["message": remoteMessage.id]
@@ -97,10 +109,10 @@ final class ActiveRemoteMessageModel: ObservableObject {
         }
         os_log("Remote message shown: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
         PixelKit.fire(GeneralPixel.remoteMessageShown, withAdditionalParameters: ["message": remoteMessage.id])
-        if !store.hasShownRemoteMessage(withId: remoteMessage.id) {
+        if !store.hasShownRemoteMessage(withID: remoteMessage.id) {
             os_log("Remote message shown for first time: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
             PixelKit.fire(GeneralPixel.remoteMessageShownUnique, withAdditionalParameters: ["mesage": remoteMessage.id])
-            store.updateRemoteMessage(withId: remoteMessage.id, asShown: true)
+            store.updateRemoteMessage(withID: remoteMessage.id, asShown: true)
         }
     }
 

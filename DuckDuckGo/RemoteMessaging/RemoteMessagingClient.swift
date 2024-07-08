@@ -56,7 +56,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
     }
 
     let endpoint: URL = Constants.endpoint
-    let configurationFetcher: RemoteMessagingConfigFetching
+    let configFetcher: RemoteMessagingConfigFetching
     let configMatcherProvider: RemoteMessagingConfigMatcherProviding
     let remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
     private(set) var store: RemoteMessagingStoring?
@@ -91,7 +91,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         remoteMessagingStoreProvider: RemoteMessagingStoreProviding = DefaultRemoteMessagingStoreProvider()
     ) {
         self.database = database
-        self.configurationFetcher = RemoteMessagingConfigFetcher(
+        self.configFetcher = RemoteMessagingConfigFetcher(
             configurationFetcher: ConfigurationFetcher(
                 store: configurationStore,
                 urlSession: .session(),

@@ -73,8 +73,8 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
             remoteMessagingAvailabilityProvider: MockRemoteMessagingAvailabilityProvider()
         )
 
-        XCTAssertFalse(store.hasShownRemoteMessage(withId: message.id))
+        XCTAssertFalse(store.hasShownRemoteMessage(withID: message.id))
         model.markRemoteMessageAsShown()
-        XCTAssertTrue(store.hasShownRemoteMessage(withId: message.id))
+        XCTAssertTrue(store.hasShownRemoteMessage(withID: message.id))
     }
 }
