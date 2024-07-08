@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4B2D06682A13318400DE1F49"
-               BuildableName = "DuckDuckGo VPN.app"
+               BuildableName = "DuckDuckGo VPN App Store.app"
                BlueprintName = "DuckDuckGoVPNAppStore"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -44,7 +44,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4B2D06682A13318400DE1F49"
-            BuildableName = "DuckDuckGo VPN.app"
+            BuildableName = "DuckDuckGo VPN App Store.app"
             BlueprintName = "DuckDuckGoVPNAppStore"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
@@ -61,7 +61,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4B2D06682A13318400DE1F49"
-            BuildableName = "DuckDuckGo VPN.app"
+            BuildableName = "DuckDuckGo VPN App Store.app"
             BlueprintName = "DuckDuckGoVPNAppStore"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>

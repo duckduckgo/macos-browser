@@ -29,5 +29,7 @@
 // but in rare cases when the release has to be done manually from
 // Xcode, this additional setting is required.
 //
-// Uncomment the line below when making App Store Release manually from Xcode:
-//RELEASE_PRODUCT_NAME_OVERRIDE = DuckDuckGo
+// Uncomment the lines below when making App Store Release manually from Xcode:
+RELEASE_PRODUCT_NAME_OVERRIDE = DuckDuckGo
+AGENT_RELEASE_PRODUCT_NAME_OVERRIDE = DuckDuckGo VPN
+DBP_BACKGROUND_AGENT_RELEASE_PRODUCT_NAME_OVERRIDE = DuckDuckGo Personal Information Removal

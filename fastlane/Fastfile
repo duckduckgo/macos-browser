@@ -88,7 +88,7 @@ platform :mac do
   desc 'Makes App Store release build and uploads it to App Store Connect'
   lane :release_appstore do |options|
     build_release(options)
-
+    return
     deliver(common_deliver_arguments(options))
 
     begin
@@ -351,7 +351,7 @@ platform :mac do
       export_method: "app-store",
       scheme: "DuckDuckGo Privacy Browser App Store",
       export_options: "scripts/assets/AppStoreExportOptions.plist",
-      xcargs: "-skipPackagePluginValidation -skipMacroValidation RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo"
+      xcargs: "-skipPackagePluginValidation -skipMacroValidation RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo AGENT_PRODUCT_NAME_OVERRIDE='DuckDuckGo VPN' DBP_BACKGROUND_AGENT_PRODUCT_NAME_OVERRIDE='DuckDuckGo Personal Information Removal'"
     )
   end
 
