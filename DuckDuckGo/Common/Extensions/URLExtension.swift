@@ -365,6 +365,10 @@ extension URL {
         return URL(string: "https://duckduckgo.com/about")!
     }
 
+    static var updates: URL {
+        return URL(string: "https://duckduckgo.com/updates")!
+    }
+
     static var webTrackingProtection: URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/")!
     }

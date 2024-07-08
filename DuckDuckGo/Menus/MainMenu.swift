@@ -95,7 +95,8 @@ import SubscriptionUI
 
     let helpMenu = NSMenu(title: UserText.mainMenuHelp)
     let aboutMenuItem = NSMenuItem(title: UserText.about, action: #selector(AppDelegate.showAbout))
-    let updatesMenuItem = NSMenuItem(title: "Browser Updates", action: #selector(AppDelegate.showReleaseNotes))
+    let releaseNotesMenuItem = NSMenuItem(title: "Release Notes", action: #selector(AppDelegate.showReleaseNotes))
+    let whatIsNewMenuItem = NSMenuItem(title: "What's New", action: #selector(AppDelegate.showWhatIsNew))
     let sendFeedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
 
     // MARK: - Initialization
@@ -380,7 +381,8 @@ import SubscriptionUI
                 NSMenuItem.separator()
 
                 aboutMenuItem
-                updatesMenuItem
+                releaseNotesMenuItem
+                whatIsNewMenuItem
 #if FEEDBACK
                 sendFeedbackMenuItem
 #endif

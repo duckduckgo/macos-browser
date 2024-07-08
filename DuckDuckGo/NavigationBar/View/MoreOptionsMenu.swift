@@ -722,8 +722,11 @@ final class HelpSubMenu: NSMenu {
         let about = (NSApp.mainMenuTyped.aboutMenuItem.copy() as? NSMenuItem)!
         addItem(about)
 
-        let updates = (NSApp.mainMenuTyped.updatesMenuItem.copy() as? NSMenuItem)!
-        addItem(updates)
+        let releaseNotes = (NSApp.mainMenuTyped.releaseNotesMenuItem.copy() as? NSMenuItem)!
+        addItem(releaseNotes)
+
+        let whatIsNew = (NSApp.mainMenuTyped.whatIsNewMenuItem.copy() as? NSMenuItem)!
+        addItem(whatIsNew)
 
 #if FEEDBACK
         let feedback = (NSApp.mainMenuTyped.sendFeedbackMenuItem.copy() as? NSMenuItem)!
