@@ -21,7 +21,7 @@ import SwiftUI
 
 final class UpdateNotificationPresenter {
 
-    static let presentationTimeInterval: TimeInterval = 5
+    static let presentationTimeInterval: TimeInterval = 10
 
     private var notificationView: NSView?
     private var hideTimer: Timer?
