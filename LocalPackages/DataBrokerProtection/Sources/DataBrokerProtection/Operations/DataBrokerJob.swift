@@ -189,10 +189,29 @@ extension DataBrokerJob {
                     await webViewHandler?.setCookies(cookies)
                 }
             }
-            try await webViewHandler?.load(url: url)
-            fireSiteLoadingPixel(startTime: webSiteStartLoadingTime, hasError: false)
-            postLoadingSiteStartTime = Date()
-            await executeNextStep()
+
+            let successNextSteps = {
+                self.fireSiteLoadingPixel(startTime: webSiteStartLoadingTime, hasError: false)
+                self.postLoadingSiteStartTime = Date()
+                await self.executeNextStep()
+            }
+
+            /* When the job is a `ScanJob` and the error is `404`, we want to continue
+                executing steps and respect the C-S-S result
+             */
+            let error404 = DataBrokerProtectionError.httpError(code: 404)
+
+            do  {
+                try await webViewHandler?.load(url: url)
+                await successNextSteps()
+            } catch let error as DataBrokerProtectionError {
+                guard error == error404 && self is ScanJob else {
+                    throw error
+                }
+
+                await successNextSteps()
+            }
+
         } catch {
             fireSiteLoadingPixel(startTime: webSiteStartLoadingTime, hasError: true)
             await onError(error: error)

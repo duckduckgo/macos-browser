@@ -126,6 +126,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerSettingNeverSettings
     case duckPlayerSettingBackToDefault
     case duckPlayerWatchOnYoutube
+    case duckPlayerAutoplaySettingsOn
+    case duckPlayerAutoplaySettingsOff
 
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
@@ -197,9 +199,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case serpAddedToDock
 
     case protectionToggledOffBreakageReport
-    case toggleProtectionsDailyCount
-    case toggleReportDoNotSend
-    case toggleReportDismiss
 
     // Password Import Keychain Prompt
     case passwordImportKeychainPrompt
@@ -579,7 +578,10 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_duck-player_setting_back-to-default"
         case .duckPlayerWatchOnYoutube:
             return "m_mac_duck-player_watch_on_youtube"
-
+        case .duckPlayerAutoplaySettingsOn:
+            return "duckplayer_mac_autoplay_setting-on"
+        case .duckPlayerAutoplaySettingsOff:
+            return "duckplayer_mac_autoplay_setting-off"
         case .dashboardProtectionAllowlistAdd:
             return "m_mac_mp_wla"
         case .dashboardProtectionAllowlistRemove:
@@ -676,9 +678,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .serpAddedToDock: return "m_mac_serp_added_to_dock"
 
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
-        case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"
-        case .toggleReportDoNotSend: return "m_mac_toggle-report-do-not-send"
-        case .toggleReportDismiss: return "m_mac_toggle-report-dismiss"
 
             // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
