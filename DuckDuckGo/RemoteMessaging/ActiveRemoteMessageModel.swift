@@ -44,7 +44,6 @@ final class ActiveRemoteMessageModel: ObservableObject {
      * ensures that a non-nil store will be retrieved when requested.
      */
     let store: () -> RemoteMessagingStoring?
-    let remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
 
     convenience init(remoteMessagingClient: RemoteMessagingClient) {
         self.init(
@@ -53,12 +52,14 @@ final class ActiveRemoteMessageModel: ObservableObject {
         )
     }
 
+    /**
+     * We allow for nil availability provider in order to support running in unit tests.
+     */
     init(
         remoteMessagingStore: @escaping @autoclosure () -> RemoteMessagingStoring?,
-        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding
+        remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding?
     ) {
         self.store = remoteMessagingStore
-        self.remoteMessagingAvailabilityProvider = remoteMessagingAvailabilityProvider
 
         updateRemoteMessage()
 
@@ -66,7 +67,14 @@ final class ActiveRemoteMessageModel: ObservableObject {
             .asVoid()
             .eraseToAnyPublisher()
 
-        let featureFlagDidChangePublisher = remoteMessagingAvailabilityProvider.isRemoteMessagingAvailablePublisher
+        let isRemoteMessagingAvailablePublisher: AnyPublisher<Bool, Never> = {
+            guard let isRemoteMessagingAvailablePublisher = remoteMessagingAvailabilityProvider?.isRemoteMessagingAvailablePublisher else {
+                return Empty<Bool, Never>().eraseToAnyPublisher()
+            }
+            return isRemoteMessagingAvailablePublisher
+        }()
+
+        let featureFlagDidChangePublisher = isRemoteMessagingAvailablePublisher
             .removeDuplicates()
             .asVoid()
             .eraseToAnyPublisher()

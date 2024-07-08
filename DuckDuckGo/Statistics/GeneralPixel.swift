@@ -22,6 +22,7 @@ import BrowserServicesKit
 import DDGSync
 import Configuration
 
+// swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
 enum GeneralPixel: PixelKitEventV2 {
 
@@ -1200,3 +1201,4 @@ enum GeneralPixel: PixelKitEventV2 {
 
     }
 }
+// swiftlint:enable file_length

@@ -89,7 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    let activeRemoteMessageModel: ActiveRemoteMessageModel!
+    let activeRemoteMessageModel: ActiveRemoteMessageModel
     private let remoteMessagingClient: RemoteMessagingClient!
 
     public let subscriptionManager: SubscriptionManager
@@ -231,9 +231,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             // As long as remoteMessagingClient is private to App Delegate and activeRemoteMessageModel
             // is used only by HomePage RootView as environment object,
-            // it's safe to not initialize them for unit tests to avoid side effects.
+            // it's safe to not initialize the client for unit tests to avoid side effects.
             remoteMessagingClient = nil
-            activeRemoteMessageModel = nil
+            activeRemoteMessageModel = ActiveRemoteMessageModel(remoteMessagingStore: nil, remoteMessagingAvailabilityProvider: nil)
         }
 
         featureFlagger = DefaultFeatureFlagger(
