@@ -23,16 +23,25 @@ import enum StoreKit.StoreKitError
 import PixelKit
 
 @available(macOS 12.0, *)
-struct SubscriptionAppStoreRestorer {
+protocol SubscriptionAppStoreRestorer {
+    var uiHandler: SubscriptionUIHandling { get }
+    func restoreAppStoreSubscription() async
+}
 
+@available(macOS 12.0, *)
+struct DefaultSubscriptionAppStoreRestorer: SubscriptionAppStoreRestorer {
     private let subscriptionManager: SubscriptionManager
-    @MainActor var window: NSWindow? { WindowControllersManager.shared.lastKeyMainWindowController?.window }
-    let subscriptionErrorReporter = SubscriptionErrorReporter()
+    private let subscriptionErrorReporter: SubscriptionErrorReporter
+    private let appStoreRestoreFlow: AppStoreRestoreFlow
     let uiHandler: SubscriptionUIHandling
 
     public init(subscriptionManager: SubscriptionManager,
+                subscriptionErrorReporter: SubscriptionErrorReporter = DefaultSubscriptionErrorReporter(),
+                appStoreRestoreFlow: AppStoreRestoreFlow,
                 uiHandler: SubscriptionUIHandling) {
         self.subscriptionManager = subscriptionManager
+        self.subscriptionErrorReporter = subscriptionErrorReporter
+        self.appStoreRestoreFlow = appStoreRestoreFlow
         self.uiHandler = uiHandler
     }
 
@@ -59,7 +68,6 @@ struct SubscriptionAppStoreRestorer {
     }
 
     private func continueRestore() async {
-        let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager)
         let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
         await uiHandler.dismissProgressViewController()
         switch result {
@@ -87,12 +95,12 @@ struct SubscriptionAppStoreRestorer {
 
     // MARK: - UI interactions
 
-    func showSomethingWentWrongAlert() async {
+    private func showSomethingWentWrongAlert() async {
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
         await uiHandler.show(alertType: .somethingWentWrong)
     }
 
-    func showSubscriptionNotFoundAlert() async {
+    private func showSubscriptionNotFoundAlert() async {
         switch await uiHandler.show(alertType: .subscriptionNotFound) {
         case .alertFirstButtonReturn:
             let url = subscriptionManager.url(for: .purchase)
@@ -102,7 +110,7 @@ struct SubscriptionAppStoreRestorer {
         }
     }
 
-    func showSubscriptionInactiveAlert() async {
+    private func showSubscriptionInactiveAlert() async {
         switch await uiHandler.show(alertType: .subscriptionInactive) {
         case .alertFirstButtonReturn:
             let url = subscriptionManager.url(for: .purchase)

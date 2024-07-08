@@ -59,9 +59,7 @@ class WebsiteBreakageReportTests: XCTestCase {
             openerContext: nil,
             vpnOn: false,
             jsPerformance: nil,
-            userRefreshCount: 0,
-            didOpenReportInfo: false,
-            toggleReportCounter: nil
+            userRefreshCount: 0
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
@@ -108,9 +106,7 @@ class WebsiteBreakageReportTests: XCTestCase {
             openerContext: nil,
             vpnOn: false,
             jsPerformance: nil,
-            userRefreshCount: 0,
-            didOpenReportInfo: false,
-            toggleReportCounter: nil
+            userRefreshCount: 0
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)

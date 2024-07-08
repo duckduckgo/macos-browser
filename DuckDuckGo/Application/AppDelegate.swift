@@ -409,8 +409,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                                                         subscriptionManager.accountManager)).applicationDidBecomeActive()
 #endif
 
-        AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
-
         subscriptionManager.refreshCachedSubscriptionAndEntitlements { isSubscriptionActive in
             if isSubscriptionActive {
                 PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)

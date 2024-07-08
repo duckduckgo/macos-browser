@@ -126,6 +126,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerSettingNeverSettings
     case duckPlayerSettingBackToDefault
     case duckPlayerWatchOnYoutube
+    case duckPlayerAutoplaySettingsOn
+    case duckPlayerAutoplaySettingsOff
 
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
@@ -153,10 +155,16 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncDuckAddressOverride
     case syncSuccessRateDaily
     case syncLocalTimestampResolutionTriggered(Feature)
-    case syncBookmarksCountLimitExceededDaily
-    case syncCredentialsCountLimitExceededDaily
+    case syncBookmarksObjectLimitExceededDaily
+    case syncCredentialsObjectLimitExceededDaily
     case syncBookmarksRequestSizeLimitExceededDaily
     case syncCredentialsRequestSizeLimitExceededDaily
+    case syncBookmarksTooManyRequestsDaily
+    case syncCredentialsTooManyRequestsDaily
+    case syncSettingsTooManyRequestsDaily
+    case syncBookmarksValidationErrorDaily
+    case syncCredentialsValidationErrorDaily
+    case syncSettingsValidationErrorDaily
 
     // Remote Messaging Framework
     case remoteMessageShown
@@ -199,9 +207,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case serpAddedToDock
 
     case protectionToggledOffBreakageReport
-    case toggleProtectionsDailyCount
-    case toggleReportDoNotSend
-    case toggleReportDismiss
 
     // Password Import Keychain Prompt
     case passwordImportKeychainPrompt
@@ -588,7 +593,10 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_duck-player_setting_back-to-default"
         case .duckPlayerWatchOnYoutube:
             return "m_mac_duck-player_watch_on_youtube"
-
+        case .duckPlayerAutoplaySettingsOn:
+            return "duckplayer_mac_autoplay_setting-on"
+        case .duckPlayerAutoplaySettingsOff:
+            return "duckplayer_mac_autoplay_setting-off"
         case .dashboardProtectionAllowlistAdd:
             return "m_mac_mp_wla"
         case .dashboardProtectionAllowlistRemove:
@@ -628,10 +636,16 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_sync_success_rate_daily"
         case .syncLocalTimestampResolutionTriggered(let feature):
             return "m_mac_sync_\(feature.name)_local_timestamp_resolution_triggered"
-        case .syncBookmarksCountLimitExceededDaily: return "m_mac_sync_bookmarks_count_limit_exceeded_daily"
-        case .syncCredentialsCountLimitExceededDaily: return "m_mac_sync_credentials_count_limit_exceeded_daily"
+        case .syncBookmarksObjectLimitExceededDaily: return "m_mac_sync_bookmarks_object_limit_exceeded_daily"
+        case .syncCredentialsObjectLimitExceededDaily: return "m_mac_sync_credentials_object_limit_exceeded_daily"
         case .syncBookmarksRequestSizeLimitExceededDaily: return "m_mac_sync_bookmarks_request_size_limit_exceeded_daily"
         case .syncCredentialsRequestSizeLimitExceededDaily: return "m_mac_sync_credentials_request_size_limit_exceeded_daily"
+        case .syncBookmarksTooManyRequestsDaily: return "m_mac_sync_bookmarks_too_many_requests_daily"
+        case .syncCredentialsTooManyRequestsDaily: return "m_mac_sync_credentials_too_many_requests_daily"
+        case .syncSettingsTooManyRequestsDaily: return "m_mac_sync_settings_too_many_requests_daily"
+        case .syncBookmarksValidationErrorDaily: return "m_mac_sync_bookmarks_validation_error_daily"
+        case .syncCredentialsValidationErrorDaily: return "m_mac_sync_credentials_validation_error_daily"
+        case .syncSettingsValidationErrorDaily: return "m_mac_sync_settings_validation_error_daily"
 
         case .remoteMessageShown: return "m_mac_remote_message_shown"
         case .remoteMessageShownUnique: return "m_mac_remote_message_shown_unique"
@@ -686,9 +700,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .serpAddedToDock: return "m_mac_serp_added_to_dock"
 
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
-        case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"
-        case .toggleReportDoNotSend: return "m_mac_toggle-report-do-not-send"
-        case .toggleReportDismiss: return "m_mac_toggle-report-dismiss"
 
             // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
