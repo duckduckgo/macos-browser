@@ -25,11 +25,12 @@ struct UpdateNotificationView: View {
     let onTap: () -> Void
 
     var body: some View {
-        HStack {
+        HStack (alignment: .top) {
             Image(nsImage: icon)
                 .resizable()
                 .frame(width: 16, height: 16)
                 .padding(.leading, 10)
+                .padding(.top, 2)
 
             Text(text)
 
@@ -39,7 +40,7 @@ struct UpdateNotificationView: View {
                 onClose()
             }) {
                 Image(.updateNotificationClose)
-                    .frame(width: 20, height: 20)
+                    .frame(width: 16, height: 16)
             }
             .buttonStyle(PlainButtonStyle())
             .padding(.trailing, 10)
