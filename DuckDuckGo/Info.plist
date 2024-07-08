@@ -530,6 +530,12 @@
 	<string>Allows you to share your location</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allows you to share recordings</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>Allows you to save downloaded files in Downloads folder</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>Allows you to save downloaded files in Desktop folder</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>Allows you to save downloaded files in Documents folder</string>
 	<key>NSPrincipalClass</key>
 	<string>$(INFOPLIST_KEY_NSPrincipalClass)</string>
 	<key>NSSupportsAutomaticTermination</key>
