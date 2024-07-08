@@ -76,6 +76,11 @@ struct InitialSetupSettings: Codable {
     let settings: PlayerSettings
 }
 
+// Values that the YouTube Overlays can use to determine the current state
+struct OverlaysInitialSettings: Codable {
+    let userValues: UserValues
+}
+
 /// Values that the Frontend can use to determine user settings
 public struct UserValues: Codable {
     enum CodingKeys: String, CodingKey {
