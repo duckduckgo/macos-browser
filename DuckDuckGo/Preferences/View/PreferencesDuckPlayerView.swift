@@ -75,6 +75,14 @@ extension Preferences {
                         ToggleMenuItem(UserText.duckPlayerAutoplayPreference, isOn: $model.duckPlayerAutoplay)
                     }
                 }
+
+                // New Tab
+                if model.shouldDisplayNewTabSettings {
+                    PreferencePaneSection(UserText.duckPlayerNewTabTitle) {
+                        TextMenuItemCaption(UserText.duckPlayerNewTabPreferenceExtraInfo)
+                        ToggleMenuItem(UserText.duckPlayerNewTabPreference, isOn: $model.duckPlayerAutoplay)
+                    }
+                }
             }
         }
     }

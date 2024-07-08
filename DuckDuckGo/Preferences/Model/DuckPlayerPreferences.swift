@@ -69,6 +69,11 @@ final class DuckPlayerPreferences: ObservableObject {
         privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
     }
 
+    var shouldDisplayNewTabSettings: Bool {
+        #warning("Implement FF")
+        return true
+    }
+
     var youtubeOverlayInteracted: Bool {
         didSet {
             persistor.youtubeOverlayInteracted = youtubeOverlayInteracted
