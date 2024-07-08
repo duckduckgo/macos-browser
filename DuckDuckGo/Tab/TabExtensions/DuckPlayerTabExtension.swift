@@ -34,7 +34,10 @@ final class DuckPlayerTabExtension {
     private let isBurner: Bool
     private var cancellables = Set<AnyCancellable>()
     private var youtubePlayerCancellables = Set<AnyCancellable>()
-    private var shouldOpenInNewTab = true // Get this settings from preferences
+    private var shouldOpenInNewTab: Bool  {
+        preferences.duckPlayerOpenInNewTab && preferences.duckPlayerMode != .disabled
+    }
+    private let preferences: DuckPlayerPreferences
 
     private weak var webView: WKWebView? {
         didSet {
@@ -50,9 +53,11 @@ final class DuckPlayerTabExtension {
     init(duckPlayer: DuckPlayer,
          isBurner: Bool,
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
-         webViewPublisher: some Publisher<WKWebView, Never>) {
+         webViewPublisher: some Publisher<WKWebView, Never>,
+         preferences: DuckPlayerPreferences = .shared) {
         self.duckPlayer = duckPlayer
         self.isBurner = isBurner
+        self.preferences = preferences
 
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView

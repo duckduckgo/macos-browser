@@ -80,7 +80,8 @@ extension Preferences {
                 if model.shouldDisplayNewTabSettings {
                     PreferencePaneSection(UserText.duckPlayerNewTabTitle) {
                         TextMenuItemCaption(UserText.duckPlayerNewTabPreferenceExtraInfo)
-                        ToggleMenuItem(UserText.duckPlayerNewTabPreference, isOn: $model.duckPlayerAutoplay)
+                        ToggleMenuItem(UserText.duckPlayerNewTabPreference, isOn: $model.duckPlayerOpenInNewTab)
+                            .disabled(!model.isNewTabSettingsAvailable)
                     }
                 }
             }

@@ -28,6 +28,7 @@ protocol DuckPlayerPreferencesPersistor {
     var youtubeOverlayInteracted: Bool { get set }
     var youtubeOverlayAnyButtonPressed: Bool { get set }
     var duckPlayerAutoplay: Bool { get set }
+    var duckPlayerOpenInNewTab: Bool { get set }
 }
 
 struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersistor {
@@ -44,6 +45,8 @@ struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersisto
     @UserDefaultsWrapper(key: .duckPlayerAutoplay, defaultValue: true)
     var duckPlayerAutoplay: Bool
 
+    @UserDefaultsWrapper(key: .duckPlayerOpenInNewTab, defaultValue: true)
+    var duckPlayerOpenInNewTab: Bool
 }
 
 final class DuckPlayerPreferences: ObservableObject {
@@ -65,6 +68,13 @@ final class DuckPlayerPreferences: ObservableObject {
         }
     }
 
+    @Published
+    var duckPlayerOpenInNewTab: Bool {
+        didSet {
+            persistor.duckPlayerOpenInNewTab = duckPlayerOpenInNewTab
+        }
+    }
+
     var shouldDisplayAutoPlaySettings: Bool {
         privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
     }
@@ -72,6 +82,10 @@ final class DuckPlayerPreferences: ObservableObject {
     var shouldDisplayNewTabSettings: Bool {
         #warning("Implement FF")
         return true
+    }
+
+    var isNewTabSettingsAvailable: Bool {
+        duckPlayerMode != .disabled
     }
 
     var youtubeOverlayInteracted: Bool {
@@ -93,6 +107,7 @@ final class DuckPlayerPreferences: ObservableObject {
         youtubeOverlayInteracted = persistor.youtubeOverlayInteracted
         youtubeOverlayAnyButtonPressed = persistor.youtubeOverlayAnyButtonPressed
         duckPlayerAutoplay = persistor.duckPlayerAutoplay
+        duckPlayerOpenInNewTab = persistor.duckPlayerOpenInNewTab
         self.privacyConfigurationManager = privacyConfigurationManager
     }
 

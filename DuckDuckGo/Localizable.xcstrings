@@ -16887,6 +16887,42 @@
         }
       }
     },
+    "duck-player.newtab-preference" : {
+      "comment" : "New tab preference in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open Duck Player in a new tab whenever possible"
+          }
+        }
+      }
+    },
+    "duck-player.newtab-title" : {
+      "comment" : "New Tab title in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New Tab"
+          }
+        }
+      }
+    },
+    "duck-player.newtab.info-preference" : {
+      "comment" : "New tab preference extra info in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "When browsing YouTube on the web"
+          }
+        }
+      }
+    },
     "duck-player.off" : {
       "comment" : "Private YouTube Player option",
       "extractionState" : "extracted_with_value",
