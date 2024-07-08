@@ -111,18 +111,23 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         }
     }
 
-    func startRefreshingRemoteMessages() {
-        guard remoteMessagingAvailabilityProvider.isRemoteMessagingAvailable else {
+    /**
+     * Starts a periodical remote messages refresh.
+     *
+     * It checks for the feature flag (via `remoteMessagingAvailabilityProvider`) before starting a timer
+     * and if it finds the feature flag to be disabled, it actually ensures that timer is disabled and
+     * returns early.
+     *
+     * Starting the refresh timer can be forced – used when called from `isRemoteMessagingAvailablePublisher`
+     * event handler, where the new value (true) is emitted but it's not yet available from
+     * `remoteMessagingAvailabilityProvider.isRemoteMessagingAvailable` property getter.
+     */
+    func startRefreshingRemoteMessages(force: Bool = false) {
+        guard force || remoteMessagingAvailabilityProvider.isRemoteMessagingAvailable else {
             stopRefreshingRemoteMessages()
             return
         }
-        /// Put the actual timer start into a separate function to allow it to be called unconditionally from
-        /// `isRemoteMessagingAvailablePublisher` event handler, where the new value (true) is emitted but it's
-        /// not yet available from `remoteMessagingAvailabilityProvider.isRemoteMessagingAvailable` property getter.
-        startMessagesRefreshTimer()
-    }
 
-    private func startMessagesRefreshTimer() {
         scheduledRefreshCancellable = Timer.publish(every: Constants.minimumConfigurationRefreshInterval, on: .main, in: .default)
             .autoconnect()
             .prepend(Date())
@@ -137,12 +142,11 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
     }
 
     private func subscribeToFeatureFlagChanges() {
-
         featureFlagCancellable = remoteMessagingAvailabilityProvider.isRemoteMessagingAvailablePublisher
             .sink { [weak self] isRemoteMessagingAvailable in
                 if isRemoteMessagingAvailable {
                     self?.initializeDatabaseIfNeeded()
-                    self?.startMessagesRefreshTimer()
+                    self?.startRefreshingRemoteMessages(force: true)
                 } else {
                     self?.stopRefreshingRemoteMessages()
                 }

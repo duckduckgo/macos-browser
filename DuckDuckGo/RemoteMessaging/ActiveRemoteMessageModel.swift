@@ -96,18 +96,23 @@ final class ActiveRemoteMessageModel: ObservableObject {
         store()?.dismissRemoteMessage(withID: remoteMessage.id)
         self.remoteMessage = nil
 
-        let pixelParameters = ["message": remoteMessage.id]
-        switch action {
-        case .close:
-            PixelKit.fire(GeneralPixel.remoteMessageDismissed, withAdditionalParameters: pixelParameters)
-        case .action:
-            PixelKit.fire(GeneralPixel.remoteMessageActionClicked, withAdditionalParameters: pixelParameters)
-        case .primaryAction:
-            PixelKit.fire(GeneralPixel.remoteMessagePrimaryActionClicked, withAdditionalParameters: pixelParameters)
-        case .secondaryAction:
-            PixelKit.fire(GeneralPixel.remoteMessageSecondaryActionClicked, withAdditionalParameters: pixelParameters)
-        default:
-            break
+        let pixel: GeneralPixel? = {
+            switch action {
+            case .close:
+                return GeneralPixel.remoteMessageDismissed
+            case .action:
+                return GeneralPixel.remoteMessageActionClicked
+            case .primaryAction:
+                return GeneralPixel.remoteMessagePrimaryActionClicked
+            case .secondaryAction:
+                return GeneralPixel.remoteMessageSecondaryActionClicked
+            default:
+                return nil
+            }
+        }()
+
+        if let pixel {
+            PixelKit.fire(pixel, withAdditionalParameters: ["message": remoteMessage.id])
         }
     }
 
