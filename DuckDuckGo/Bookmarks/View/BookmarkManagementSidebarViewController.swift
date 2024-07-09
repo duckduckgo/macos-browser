@@ -372,7 +372,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 #if DEBUG
 private let previewSize = NSSize(width: 400, height: 660)
 @available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: previewSize.width, height: previewSize.height)) { {
+#Preview(traits: previewSize.fixedLayout) { {
 
     let vc = BookmarkManagementSidebarViewController(bookmarkManager: {
         let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [

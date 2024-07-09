@@ -44,7 +44,7 @@ CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 PRODUCT_NAME_PREFIX = $(AGENT_PRODUCT_NAME)
 PRODUCT_NAME = $(AGENT_PRODUCT_NAME)
 PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(AGENT_PRODUCT_NAME)
-PRODUCT_NAME[config=Release][arch=*][sdk=*] = $(AGENT_RELEASE_PRODUCT_NAME)
+PRODUCT_NAME[config=Release][arch=*][sdk=*] = $(AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.vpn.agent macos

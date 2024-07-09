@@ -259,6 +259,76 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertTrue(bookmarkStoreMock.loadAllCalled)
     }
 
+    // MARK: - Search
+
+    func testWhenBookmarkListIsNilThenSearchIsEmpty() {
+        let sut = LocalBookmarkManager()
+        let results = sut.search(by: "abc")
+
+        XCTAssertNil(sut.list)
+        XCTAssertTrue(results.isEmpty)
+    }
+
+    func testWhenQueryIsEmptyThenSearchResultsAreEmpty() {
+        let bookmarkStore = BookmarkStoreMock(bookmarks: topLevelBookmarks())
+        let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+
+        sut.loadBookmarks()
+
+        let results = sut.search(by: "")
+
+        XCTAssertTrue(results.isEmpty)
+    }
+
+    func testWhenQueryIsBlankThenSearchResultsAreEmpty() {
+        let bookmarkStore = BookmarkStoreMock(bookmarks: topLevelBookmarks())
+        let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+
+        sut.loadBookmarks()
+
+        let results = sut.search(by: "    ")
+
+        XCTAssertTrue(results.isEmpty)
+    }
+
+    func testWhenASearchIsDoneThenCorrectResultsAreReturnedAndIntheRightOrder() {
+        let bookmarkStore = BookmarkStoreMock(bookmarks: topLevelBookmarks())
+        let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+
+        sut.loadBookmarks()
+
+        let results = sut.search(by: "folder")
+
+        XCTAssertTrue(results.count == 3)
+        XCTAssertEqual(results[0].title, "This is a folder")
+        XCTAssertEqual(results[1].title, "Favorite folder")
+        XCTAssertEqual(results[2].title, "This is a sub-folder")
+    }
+
+    func testWhenASearchIsDoneThenFoldersAndBookmarksAreReturned() {
+        let bookmarkStore = BookmarkStoreMock(bookmarks: topLevelBookmarks())
+        let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+
+        sut.loadBookmarks()
+
+        let results = sut.search(by: "favorite")
+
+        XCTAssertTrue(results.count == 2)
+        XCTAssertEqual(results[0].title, "Favorite folder")
+        XCTAssertTrue(results[0].isFolder)
+        XCTAssertEqual(results[1].title, "Favorite bookmark")
+        XCTAssertFalse(results[1].isFolder)
+    }
+
+    private func topLevelBookmarks() -> [BaseBookmarkEntity] {
+        let topBookmark = Bookmark(id: "4", url: "www.favorite.com", title: "Favorite bookmark", isFavorite: true)
+        let favoriteFolder = BookmarkFolder(id: "5", title: "Favorite folder", children: [topBookmark])
+        let bookmark = Bookmark(id: "3", url: "www.ddg.com", title: "This is a bookmark", isFavorite: false)
+        let subFolder = BookmarkFolder(id: "1", title: "This is a sub-folder", children: [bookmark])
+        let parent = BookmarkFolder(id: "2", title: "This is a folder", children: [subFolder])
+
+        return [parent, favoriteFolder]
+    }
 }
 
 fileprivate extension LocalBookmarkManager {

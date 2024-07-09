@@ -111,7 +111,7 @@ func bookmarksSuccessSummary(_ summary: DataImport.DataTypeSummary) -> some View
         if summary.duplicate > 0 {
             lineSeparator()
             importSummaryRow(image: .failed,
-                             text: "Duplicate Bookmarks Skipped:",
+                             text: "Duplicates Skipped:",
                              comment: "Data import summary format of how many duplicate bookmarks (%lld) were skipped during import.",
                              count: summary.duplicate)
         }
@@ -137,6 +137,13 @@ private func passwordsSuccessSummary(_ summary: DataImport.DataTypeSummary) -> s
                              text: "Password import failed: ",
                              comment: "Data import summary format of how many passwords (%lld) failed to import.",
                              count: summary.failed)
+        }
+        if summary.duplicate > 0 {
+            lineSeparator()
+            importSummaryRow(image: .failed,
+                             text: "Duplicates Skipped: ",
+                             comment: "Data import summary format of how many passwords (%lld) were skipped due to being duplicates.",
+                             count: summary.duplicate)
         }
     }
 }

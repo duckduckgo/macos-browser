@@ -98,4 +98,30 @@ extension NSViewController {
         closure()
         CATransaction.commit()
     }
+
+    /// #Preview helper to hide Window controls on View Controller appearance
+    func _preview_hidingWindowControlsOnAppear() -> Self { // swiftlint:disable:this identifier_name
+        Preview_ViewControllerWindowObserver().attach(to: self)
+        return self
+    }
+
+}
+
+/// #Preview helper to hide Window controls on View Controller appearance
+final class Preview_ViewControllerWindowObserver: NSObject {
+    func attach(to viewController: NSViewController) {
+        // Start observing the view.window property
+        viewController.addObserver(self, forKeyPath: #keyPath(NSViewController.view.window), options: [.initial, .new], context: nil)
+        viewController.onDeinit {
+            withExtendedLifetime(self) {}
+        }
+    }
+
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        guard let window = change?[.newKey] as? NSWindow else { return }
+
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
+        window.styleMask = []
+    }
 }
