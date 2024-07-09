@@ -24,7 +24,6 @@ import Common
 import Networking
 import PixelKit
 
-@MainActor
 final class ConfigurationManager {
 
     enum Error: Swift.Error {
@@ -72,7 +71,7 @@ final class ConfigurationManager {
                                                     log: .config,
                                                     eventMapping: Self.configurationDebugEvents)
 
-    private static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
+    static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
         let domainEvent: GeneralPixel
         switch event {
         case .invalidPayload(let configuration):
