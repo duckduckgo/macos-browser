@@ -37,7 +37,6 @@ import Subscription
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
-// swiftlint:disable:next type_body_length
 final class NetworkProtectionTunnelController: TunnelController, TunnelSessionProvider {
 
     // MARK: - Settings

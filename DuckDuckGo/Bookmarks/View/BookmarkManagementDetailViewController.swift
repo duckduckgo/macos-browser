@@ -72,7 +72,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         fatalError("\(type(of: self)): Bad initializer")
     }
 
-    // swiftlint:disable:next function_body_length
     override func loadView() {
         view = ColorView(frame: .zero, backgroundColor: .bookmarkPageBackground)
         view.translatesAutoresizingMaskIntoConstraints = false

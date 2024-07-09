@@ -123,7 +123,7 @@ enum Preferences {
             .padding(.horizontal, Const.panePaddingHorizontal)
         }
 
-        // swiftlint:disable:next cyclomatic_complexity function_body_length
+        // swiftlint:disable:next cyclomatic_complexity
         private func makeSubscriptionViewModel() -> PreferencesSubscriptionModel {
             let openURL: (URL) -> Void = { url in
                 DispatchQueue.main.async {

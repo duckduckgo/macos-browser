@@ -52,7 +52,7 @@ final class DownloadsViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    override func loadView() { // swiftlint:disable:this function_body_length
+    override func loadView() {
         view = NSView()
 
         view.addSubview(titleLabel)

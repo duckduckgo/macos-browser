@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-// swiftlint:disable type_body_length
-
 import XCTest
 import BrowserServicesKit
 import Common
@@ -1088,5 +1086,3 @@ extension AttemptInformation {
                            startDate: Date())
     }
 }
-
-// swiftlint:enable type_body_length
