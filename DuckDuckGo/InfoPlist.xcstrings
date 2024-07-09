@@ -128,7 +128,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allows you to save downloaded files in Desktop folder"
+            "value" : "Allows you to save downloaded files to this folder."
           }
         }
       }
@@ -140,7 +140,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allows you to save downloaded files in Documents folder"
+            "value" : "Allows you to save downloaded files to this folder."
           }
         }
       }
@@ -152,7 +152,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Allows you to save downloaded files in Downloads folder"
+            "value" : "Allows you to save downloaded files to this folder."
           }
         }
       }
