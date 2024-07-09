@@ -33,95 +33,115 @@ extension Preferences {
 
         var body: some View {
             PreferencePane {
+                GeometryReader { geometry in
+                    VStack(alignment: .leading) {
+                        TextMenuTitle(UserText.aboutDuckDuckGo)
 
-                TextMenuTitle(UserText.aboutDuckDuckGo)
+                        if !SupportedOSChecker.isCurrentOSReceivingUpdates {
+                            UnsupportedDeviceInfoBox(wide: true)
+                                .padding(.top, 10)
+                                .padding(.leading, -20)
+                        }
 
-                if !SupportedOSChecker.isCurrentOSReceivingUpdates {
-                    UnsupportedDeviceInfoBox(wide: true)
-                        .padding(.top, 10)
-                        .padding(.leading, -20)
-                }
-
-                PreferencePaneSection {
-                    HStack(alignment: .top) {
-                        Image(.aboutPageLogo)
-                        VStack(alignment: .leading, spacing: 8) {
-#if APPSTORE
-                            Text(UserText.duckDuckGoForMacAppStore).font(.companyName)
-
-                            Text(UserText.privacySimplified).font(.privacySimplified)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .multilineTextAlignment(.leading)
-
-                            Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
-                                .contextMenu(ContextMenu(menuItems: {
-                                    Button(UserText.copy, action: {
-                                        model.copy(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
-                                    })
-                                }))
-#else
-                            Text(UserText.duckDuckGo).font(.companyName)
-
-                            Text(UserText.privacySimplified).font(.privacySimplified)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .multilineTextAlignment(.leading)
-                                .padding(.bottom, 4)
-
-                            HStack {
-                                statusIcon.frame(width: 16, height: 16)
+                        PreferencePaneSection {
+                            if geometry.size.width > 400 {
+                                HStack(alignment: .top) {
+                                    Image(.aboutPageLogo)
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        rightColumnContent
+                                    }
+                                    .padding(.top, 10)
+                                }
+                                .padding(.bottom, 8)
+                            } else {
                                 VStack(alignment: .leading) {
-                                    versionText
-                                    lastCheckedText
+                                    Image(.aboutPageLogo)
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        rightColumnContent
+                                    }
+                                    .padding(.top, 10)
+                                }
+                                .padding(.bottom, 8)
+                            }
+
+                            TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
+                                model.openNewTab(with: .aboutDuckDuckGo)
+                            }
+
+                            TextButton(UserText.privacyPolicy) {
+                                model.openNewTab(with: .privacyPolicy)
+                            }
+
+                            #if FEEDBACK
+                            Button(UserText.sendFeedback) {
+                                model.openFeedbackForm()
+                            }
+                            .padding(.top, 4)
+                            #endif
+                        }.onAppear {
+                            model.subscribeToUpdateInfoIfNeeded()
+                        }
+
+                        // Automatic/manual Updates
+                        PreferencePaneSection("Browser Updates") {
+
+                            PreferencePaneSubSection {
+                                Picker(selection: $areAutomaticUpdatesEnabled, content: {
+                                    Text("Automatically install updates (recommended)").tag(true)
+                                        .padding(.bottom, 4).accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.automatically")
+                                    Text("Check for updates but let you choose to install them").tag(false)
+                                        .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.manually")
+                                }, label: {})
+                                .pickerStyle(.radioGroup)
+                                .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                                .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker")
+                                .onChange(of: areAutomaticUpdatesEnabled) { newValue in
+                                    model.areAutomaticUpdatesEnabled = newValue
+                                }
+                                .onAppear {
+                                    areAutomaticUpdatesEnabled = model.areAutomaticUpdatesEnabled
                                 }
                             }
-                            .padding(.bottom, 4)
-
-                            updateButton
-#endif
-                        }
-                        .padding(.top, 10)
-                    }
-                    .padding(.bottom, 8)
-
-                    TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
-                        model.openNewTab(with: .aboutDuckDuckGo)
-                    }
-
-                    TextButton(UserText.privacyPolicy) {
-                        model.openNewTab(with: .privacyPolicy)
-                    }
-
-#if FEEDBACK
-                    Button(UserText.sendFeedback) {
-                        model.openFeedbackForm()
-                    }
-                    .padding(.top, 4)
-#endif
-                }.onAppear {
-                    model.subscribeToUpdateInfoIfNeeded()
-                }
-
-                // Automatic/manual Updates
-                PreferencePaneSection("Browser Updates") {
-
-                    PreferencePaneSubSection {
-                        Picker(selection: $areAutomaticUpdatesEnabled, content: {
-                            Text("Automatically install updates (recommended)").tag(true)
-                                .padding(.bottom, 4).accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.automatically")
-                            Text("Check for updates but let you choose to install them").tag(false)
-                                .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.manually")
-                        }, label: {})
-                        .pickerStyle(.radioGroup)
-                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
-                        .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker")
-                        .onChange(of: areAutomaticUpdatesEnabled) { newValue in
-                            model.areAutomaticUpdatesEnabled = newValue
-                        }
-                        .onAppear {
-                            areAutomaticUpdatesEnabled = model.areAutomaticUpdatesEnabled
                         }
                     }
                 }
+            }
+        }
+
+        private var rightColumnContent: some View {
+            Group {
+                #if APPSTORE
+                Text(UserText.duckDuckGoForMacAppStore).font(.companyName)
+
+                Text(UserText.privacySimplified).font(.privacySimplified)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.leading)
+
+                Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                    .contextMenu(ContextMenu(menuItems: {
+                        Button(UserText.copy, action: {
+                            model.copy(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                        })
+                    }))
+                #else
+                Text(UserText.duckDuckGo).font(.companyName)
+
+                Text(UserText.privacySimplified).font(.privacySimplified)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.leading)
+                    .padding(.bottom, 4)
+
+                HStack {
+                    statusIcon.frame(width: 16, height: 16)
+                    VStack(alignment: .leading) {
+                        versionText
+                        lastCheckedText
+                    }
+                }
+                .padding(.bottom, 4)
+
+                updateButton
+                #endif
             }
         }
 
