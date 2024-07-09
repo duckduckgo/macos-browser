@@ -100,16 +100,19 @@ struct RemoteMessageView: View {
         }
     }
 
+    /// Single button is always "standard" (i.e. not prominent/blue) and uses large control size.
     private var button: some View {
         Group {
             if let buttonModel = viewModel.buttons.first {
-                buttonModel.secondaryButton
+                buttonModel.standardButton
+                    .controlSize(.large)
             } else {
                 EmptyView()
             }
         }
     }
 
+    /// Two buttons are displayed on the bottom of the view and use regular control size.
     private var buttons: some View {
         ForEach(viewModel.buttons, id: \.title, content: \.button)
     }
@@ -121,7 +124,7 @@ extension RemoteMessageButtonViewModel {
             if actionStyle == .default {
                 primaryButton
             } else {
-                secondaryButton
+                standardButton
             }
         }
     }
@@ -129,33 +132,18 @@ extension RemoteMessageButtonViewModel {
     var primaryButton: some View {
         Group {
             if #available(macOS 12.0, *) {
-                Button(action: action) {
-                    Text(title)
-                }
-                .controlSize(.large)
-                .buttonStyle(.borderedProminent)
+                standardButton
+                    .buttonStyle(.borderedProminent)
             } else {
-                Button(action: action) {
-                    Text(title)
-                }
-                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                standardButton
+                    .buttonStyle(DefaultActionButtonStyle(enabled: true))
             }
         }
     }
 
-    var secondaryButton: some View {
-        Group {
-            if #available(macOS 12.0, *) {
-                Button(action: action) {
-                    Text(title)
-                }
-                .controlSize(.large)
-            } else {
-                Button(action: action) {
-                    Text(title)
-                }
-                .buttonStyle(DismissActionButtonStyle())
-            }
+    var standardButton: some View {
+        Button(action: action) {
+            Text(title)
         }
     }
 }
