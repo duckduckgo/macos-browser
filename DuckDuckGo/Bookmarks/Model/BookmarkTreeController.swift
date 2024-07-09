@@ -20,7 +20,7 @@ import Foundation
 
 protocol BookmarkTreeControllerDataSource: AnyObject {
 
-    func treeController(treeController: BookmarkTreeController, childNodesFor: BookmarkNode, for searchResults: [BaseBookmarkEntity]) -> [BookmarkNode]
+    func treeController(treeController: BookmarkTreeController, childNodesFor: BookmarkNode) -> [BookmarkNode]
 }
 
 final class BookmarkTreeController {
@@ -43,7 +43,11 @@ final class BookmarkTreeController {
     // MARK: - Public
 
     func rebuild(for searchResults: [BaseBookmarkEntity] = []) {
-        rebuildChildNodes(node: rootNode, for: searchResults)
+        if searchResults.isEmpty {
+            rebuildChildNodes(node: rootNode)
+        } else {
+            rebuildChildNodes(for: searchResults)
+        }
     }
 
     func visitNodes(with visitBlock: (BookmarkNode) -> Void) {
@@ -78,12 +82,12 @@ final class BookmarkTreeController {
     }
 
     @discardableResult
-    private func rebuildChildNodes(node: BookmarkNode, for searchResults: [BaseBookmarkEntity] = []) -> Bool {
+    private func rebuildChildNodes(node: BookmarkNode) -> Bool {
         guard node.canHaveChildNodes else {
             return false
         }
 
-        let childNodes: [BookmarkNode] = dataSource?.treeController(treeController: self, childNodesFor: node, for: searchResults) ?? []
+        let childNodes: [BookmarkNode] = dataSource?.treeController(treeController: self, childNodesFor: node) ?? []
         var childNodesDidChange = childNodes != node.childNodes
 
         if childNodesDidChange {
@@ -99,4 +103,13 @@ final class BookmarkTreeController {
         return childNodesDidChange
     }
 
+    private func rebuildChildNodes(for results: [BaseBookmarkEntity]) {
+        let nodes = results.compactMap { (item) -> BookmarkNode in
+            let itemNode = rootNode.createChildNode(item)
+            itemNode.canHaveChildNodes = false
+            return itemNode
+        }
+
+        rootNode.childNodes = nodes
+    }
 }

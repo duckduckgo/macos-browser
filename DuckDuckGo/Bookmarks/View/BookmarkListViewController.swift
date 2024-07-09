@@ -449,6 +449,7 @@ final class BookmarkListViewController: NSViewController {
 
     private func showTreeView() {
         emptyState.isHidden = true
+        outlineView.isHidden = false
         dataSource.reloadData()
         outlineView.reloadData()
     }

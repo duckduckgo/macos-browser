@@ -26,25 +26,11 @@ final class BookmarkListTreeControllerDataSource: BookmarkTreeControllerDataSour
         self.bookmarkManager = bookmarkManager
     }
 
-    func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode, for searchResults: [BaseBookmarkEntity] = []) -> [BookmarkNode] {
-        if searchResults.isEmpty {
-            return node.isRoot ? childNodesForRootNode(node) : childNodes(node)
-        } else {
-            return nodes(for: searchResults, root: node)
-        }
+    func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
+        return node.isRoot ? childNodesForRootNode(node) : childNodes(node)
     }
 
     // MARK: - Private
-
-    private func nodes(for results: [BaseBookmarkEntity], root: BookmarkNode) -> [BookmarkNode] {
-        let nodes = results.compactMap { (item) -> BookmarkNode in
-            let itemNode = root.createChildNode(item)
-            itemNode.canHaveChildNodes = false
-            return itemNode
-        }
-
-        return nodes
-    }
 
     private func childNodesForRootNode(_ node: BookmarkNode) -> [BookmarkNode] {
         let topLevelNodes = bookmarkManager.list?.topLevelEntities.compactMap { (item) -> BookmarkNode? in
