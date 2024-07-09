@@ -10614,6 +10614,30 @@
         }
       }
     },
+    "bookmarks.empty.search.resukt..state.title" : {
+      "comment" : "Title displayed in Bookmark Panel when there is no bookmarks that match the search query",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No search results found"
+          }
+        }
+      }
+    },
+    "bookmarks.empty.search.result.state.message" : {
+      "comment" : "Text displayed in Bookmark Panel when there is no bookmarks that match the search query",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try different search terms."
+          }
+        }
+      }
+    },
     "bookmarks.empty.state.message" : {
       "comment" : "Text displayed in Bookmark Manager when there is no bookmarks yet",
       "extractionState" : "extracted_with_value",

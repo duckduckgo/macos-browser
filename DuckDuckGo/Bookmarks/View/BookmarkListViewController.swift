@@ -371,8 +371,10 @@ final class BookmarkListViewController: NSViewController {
             let isEmpty = list?.topLevelEntities.isEmpty ?? true
 
             if isEmpty {
+                self?.searchBookmarksButton.isHidden = true
                 self?.showEmptyStateView(for: .noBookmarks)
             } else {
+                self?.searchBookmarksButton.isHidden = false
                 self?.outlineView.isHidden = false
             }
         }.store(in: &cancellables)
@@ -425,8 +427,10 @@ final class BookmarkListViewController: NSViewController {
     }
 
     private func hideSearchBar() {
+        searchBar.stringValue = ""
         searchBar.removeFromSuperview()
         boxDividerTopConstraint.isActive = true
+        showTreeView()
     }
 
     @objc func openManagementInterface(_ sender: NSButton) {
