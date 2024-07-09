@@ -253,6 +253,7 @@ final class BookmarkListViewController: NSViewController {
                                                                           kern: -0.08)
 
         importButton.translatesAutoresizingMaskIntoConstraints = false
+        importButton.isHidden = true
 
         setupLayout()
     }
@@ -337,6 +338,7 @@ final class BookmarkListViewController: NSViewController {
             self?.reloadData()
             let isEmpty = list?.topLevelEntities.isEmpty ?? true
             self?.emptyState.isHidden = !isEmpty
+            self?.importButton.isHidden = !isEmpty
             self?.outlineView.isHidden = isEmpty
         }.store(in: &cancellables)
     }
@@ -737,20 +739,28 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
             } else {
                 let results = bookmarkManager.search(by: searchQuery)
 
-                if !results.isEmpty {
-                    dataSource.reloadData(for: results)
-                    outlineView.reloadData()
+                if results.isEmpty {
+                    showEmptySearchResults()
                 } else {
-                    emptyStateTitle.stringValue = "No search results found"
-                    emptyStateMessage.stringValue = "Try different search terms."
-                    emptyStateImageView.image = .bookmarkEmptySearch
-                    importButton.isHidden = true
+                    showSearch(for: results)
                 }
-
-                emptyState.isHidden = !results.isEmpty
-                outlineView.isHidden = results.isEmpty
             }
         }
+    }
+
+    private func showEmptySearchResults() {
+        emptyState.isHidden = false
+        outlineView.isHidden = true
+        emptyStateTitle.stringValue = "No search results found" // TODO: Move to strings
+        emptyStateMessage.stringValue = "Try different search terms." // TODO: Move to strings
+        emptyStateImageView.image = .bookmarkEmptySearch
+    }
+
+    private func showSearch(for results: [BaseBookmarkEntity]) {
+        emptyState.isHidden = true
+        outlineView.isHidden = false
+        dataSource.reloadData(for: results)
+        outlineView.reloadData()
     }
 }
 
