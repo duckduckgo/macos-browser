@@ -18,7 +18,6 @@
 
 import AppKit
 import Combine
-import SwiftUI
 
 protocol BookmarkListViewControllerDelegate: AnyObject {
 
@@ -60,8 +59,6 @@ final class BookmarkListViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
     private let bookmarkManager: BookmarkManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
-    private let bookmarkSearchViewModel: BookmarkSearchViewModel
-    private let searchResultsView: NSHostingView<BookmarkSearchResultsView>
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource)
 
@@ -100,8 +97,6 @@ final class BookmarkListViewController: NSViewController {
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.bookmarkManager = bookmarkManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
-        self.bookmarkSearchViewModel = BookmarkSearchViewModel(manager: bookmarkManager)
-        self.searchResultsView = NSHostingView(rootView: BookmarkSearchResultsView(viewModel: bookmarkSearchViewModel))
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -116,7 +111,6 @@ final class BookmarkListViewController: NSViewController {
         view.addSubview(boxDivider)
         view.addSubview(stackView)
         view.addSubview(scrollView)
-        view.addSubview(searchResultsView)
         view.addSubview(emptyState)
 
         view.autoresizesSubviews = false
@@ -169,9 +163,6 @@ final class BookmarkListViewController: NSViewController {
 
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.delegate = self
-
-        searchResultsView.translatesAutoresizingMaskIntoConstraints = false
-        searchResultsView.isHidden = true
 
         buttonsDivider.boxType = .separator
         buttonsDivider.setContentHuggingPriority(.defaultHigh, for: .horizontal)
