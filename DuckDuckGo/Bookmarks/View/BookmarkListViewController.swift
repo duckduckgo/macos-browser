@@ -26,8 +26,40 @@ protocol BookmarkListViewControllerDelegate: AnyObject {
 
 }
 
-final class BookmarkListViewController: NSViewController {
+private enum EmptyStateContent {
+    case noBookmarks
+    case noSearchResults
 
+    var title: String {
+        switch self {
+        case .noBookmarks: return UserText.bookmarksEmptyStateTitle
+        case .noSearchResults: return UserText.bookmarksEmptySearchResultStateTitle
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .noBookmarks: return UserText.bookmarksEmptyStateMessage
+        case .noSearchResults: return UserText.bookmarksEmptySearchResultStateMessage
+        }
+    }
+
+    var image: NSImage {
+        switch self {
+        case .noBookmarks: return .bookmarksEmpty
+        case .noSearchResults: return .bookmarkEmptySearch
+        }
+    }
+
+    var shouldHideImportButton: Bool {
+        switch self {
+        case .noBookmarks: return false
+        case .noSearchResults: return true
+        }
+    }
+}
+
+final class BookmarkListViewController: NSViewController {
     static let preferredContentSize = CGSize(width: 420, height: 500)
 
     weak var delegate: BookmarkListViewControllerDelegate?
@@ -337,9 +369,12 @@ final class BookmarkListViewController: NSViewController {
         bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] list in
             self?.reloadData()
             let isEmpty = list?.topLevelEntities.isEmpty ?? true
-            self?.emptyState.isHidden = !isEmpty
-            self?.importButton.isHidden = !isEmpty
-            self?.outlineView.isHidden = isEmpty
+
+            if isEmpty {
+                self?.showEmptyStateView(for: .noBookmarks)
+            } else {
+                self?.outlineView.isHidden = false
+            }
         }.store(in: &cancellables)
     }
 
@@ -452,6 +487,15 @@ final class BookmarkListViewController: NSViewController {
         outlineView.isHidden = false
         dataSource.reloadData()
         outlineView.reloadData()
+    }
+
+    private func showEmptyStateView(for mode: EmptyStateContent) {
+        emptyState.isHidden = false
+        outlineView.isHidden = true
+        emptyStateTitle.stringValue = mode.title
+        emptyStateMessage.stringValue = mode.description
+        emptyStateImageView.image = mode.image
+        importButton.isHidden = mode.shouldHideImportButton
     }
 
     @objc func onImportClicked(_ sender: NSButton) {
@@ -731,20 +775,12 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
                 let results = bookmarkManager.search(by: searchQuery)
 
                 if results.isEmpty {
-                    showEmptySearchResults()
+                    showEmptyStateView(for: .noSearchResults)
                 } else {
                     showSearch(for: results)
                 }
             }
         }
-    }
-
-    private func showEmptySearchResults() {
-        emptyState.isHidden = false
-        outlineView.isHidden = true
-        emptyStateTitle.stringValue = "No search results found" // TODO: Move to strings
-        emptyStateMessage.stringValue = "Try different search terms." // TODO: Move to strings
-        emptyStateImageView.image = .bookmarkEmptySearch
     }
 
     private func showSearch(for results: [BaseBookmarkEntity]) {
