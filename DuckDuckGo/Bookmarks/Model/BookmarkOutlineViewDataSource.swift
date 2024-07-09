@@ -25,7 +25,6 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     enum ContentMode {
         case bookmarksAndFolders
         case foldersOnly
-        case search
     }
 
     @Published var selectedFolders: [BookmarkFolder] = []
@@ -34,6 +33,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     private(set) var contentMode: ContentMode
     private(set) var expandedNodesIDs = Set<String>()
+    private(set) var isSearching = false
     private let bookmarkManager: BookmarkManager
     private let showMenuButtonOnHover: Bool
     private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
@@ -63,17 +63,20 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func reloadData() {
-        contentMode = .bookmarksAndFolders
-        favoritesPseudoFolder.count = bookmarkManager.list?.favoriteBookmarks.count ?? 0
-        bookmarksPseudoFolder.count = bookmarkManager.list?.totalBookmarks ?? 0
+        isSearching = false
+        setFolderCount()
         treeController.rebuild()
     }
 
     func reloadData(for searchResults: [BaseBookmarkEntity]) {
-        contentMode = .search
+        isSearching = true
+        setFolderCount()
+        treeController.rebuild(for: searchResults)
+    }
+
+    private func setFolderCount() {
         favoritesPseudoFolder.count = bookmarkManager.list?.favoriteBookmarks.count ?? 0
         bookmarksPseudoFolder.count = bookmarkManager.list?.totalBookmarks ?? 0
-        treeController.rebuild(for: searchResults)
     }
 
     // MARK: - Private
@@ -142,7 +145,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         cell.delegate = self
 
         if let bookmark = node.representedObject as? Bookmark {
-            cell.update(from: bookmark, isSearch: contentMode == .search)
+            cell.update(from: bookmark, isSearch: isSearching)
 
             if bookmark.favicon(.small) == nil {
                 presentFaviconsFetcherOnboarding?()
@@ -151,7 +154,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
 
         if let folder = node.representedObject as? BookmarkFolder {
-            cell.update(from: folder, isSearch: contentMode == .search)
+            cell.update(from: folder, isSearch: isSearching)
             return cell
         }
 
@@ -190,7 +193,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             return .none
         }
 
-        if contentMode == .search {
+        if isSearching { // TODO: This needs some work
             if destinationNode.representedObject is BookmarkFolder {
                 return .move
             }
@@ -344,7 +347,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func outlineView(_ outlineView: NSOutlineView, shouldShowOutlineCellForItem item: Any) -> Bool {
-        return contentMode != .search
+        return !isSearching
     }
 
     // MARK: - NSTableViewDelegate

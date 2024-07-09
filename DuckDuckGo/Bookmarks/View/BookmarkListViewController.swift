@@ -405,9 +405,7 @@ final class BookmarkListViewController: NSViewController {
         if let node = item as? BookmarkNode,
            let bookmark = node.representedObject as? Bookmark {
             onBookmarkClick(bookmark)
-        } else if let node = item as? BookmarkNode,
-                    let folder = node.representedObject as? BookmarkFolder,
-                    dataSource.contentMode == .search {
+        } else if let node = item as? BookmarkNode, let folder = node.representedObject as? BookmarkFolder, dataSource.isSearching {
             showTreeView()
             expandFoldersUntil(folder: folder)
             scrollToItem(node)
