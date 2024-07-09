@@ -72,6 +72,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let crashReporter = CrashReporter()
 #endif
 
+    let pinnedTabsManager = PinnedTabsManager()
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     let internalUserDecider: InternalUserDecider
@@ -221,6 +222,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 database: RemoteMessagingDatabase().db,
                 bookmarksDatabase: BookmarkDatabase.shared.db,
                 appearancePreferences: .shared,
+                pinnedTabsManager: pinnedTabsManager,
                 internalUserDecider: internalUserDecider,
                 configurationStore: ConfigurationStore.shared,
                 remoteMessagingAvailabilityProvider: PrivacyConfigurationRemoteMessagingAvailabilityProvider(

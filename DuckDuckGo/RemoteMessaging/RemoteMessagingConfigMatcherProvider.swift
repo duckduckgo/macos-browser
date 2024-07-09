@@ -31,12 +31,16 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
     init(
         bookmarksDatabase: CoreDataDatabase,
         appearancePreferences: AppearancePreferences,
+        startupPreferencesPersistor: @escaping @autoclosure () -> StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(),
+        pinnedTabsManager: PinnedTabsManager,
         internalUserDecider: InternalUserDecider,
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
         variantManager: VariantManager = DefaultVariantManager()
     ) {
         self.bookmarksDatabase = bookmarksDatabase
         self.appearancePreferences = appearancePreferences
+        self.startupPreferencesPersistor = startupPreferencesPersistor
+        self.pinnedTabsManager = pinnedTabsManager
         self.internalUserDecider = internalUserDecider
         self.statisticsStore = statisticsStore
         self.variantManager = variantManager
@@ -44,6 +48,8 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
 
     let bookmarksDatabase: CoreDataDatabase
     let appearancePreferences: AppearancePreferences
+    let startupPreferencesPersistor: () -> StartupPreferencesPersistor
+    let pinnedTabsManager: PinnedTabsManager
     let internalUserDecider: InternalUserDecider
     let statisticsStore: StatisticsStore
     let variantManager: VariantManager
@@ -117,10 +123,17 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
 
         let dismissedMessageIds = store.fetchDismissedRemoteMessageIDs()
 
+#if APPSTORE
+        let isInstalledMacAppStore = true
+#else
+        let isInstalledMacAppStore = false
+#endif
+
         return RemoteMessagingConfigMatcher(
             appAttributeMatcher: AppAttributeMatcher(statisticsStore: statisticsStore,
                                                      variantManager: variantManager,
-                                                     isInternalUser: internalUserDecider.isInternalUser),
+                                                     isInternalUser: internalUserDecider.isInternalUser,
+                                                     isInstalledMacAppStore: isInstalledMacAppStore),
             userAttributeMatcher: UserAttributeMatcher(statisticsStore: statisticsStore,
                                                        variantManager: variantManager,
                                                        bookmarksCount: bookmarksCount,
@@ -135,7 +148,9 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
                                                        isPrivacyProSubscriptionActive: isPrivacyProSubscriptionActive,
                                                        isPrivacyProSubscriptionExpiring: isPrivacyProSubscriptionExpiring,
                                                        isPrivacyProSubscriptionExpired: isPrivacyProSubscriptionExpired,
-                                                       dismissedMessageIds: dismissedMessageIds),
+                                                       dismissedMessageIds: dismissedMessageIds,
+                                                       pinnedTabsCount: pinnedTabsManager.tabCollection.tabs.count,
+                                                       hasCustomHomePage: startupPreferencesPersistor().launchToCustomHomePage),
             percentileStore: RemoteMessagingPercentileUserDefaultsStore(keyValueStore: UserDefaults.standard),
             surveyActionMapper: surveyActionMapper,
             dismissedMessageIds: dismissedMessageIds

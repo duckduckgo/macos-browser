@@ -48,7 +48,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         static let minimumConfigurationRefreshInterval: TimeInterval = 60 * 30
         static let endpoint: URL = {
 #if DEBUG
-            URL(string: "https://raw.githubusercontent.com/duckduckgo/remote-messaging-config/main/samples/ios/sample1.json")!
+            URL(string: "https://www.jsonblob.com/api/1252947611702124544")!
 #else
             URL(string: "https://staticcdn.duckduckgo.com/remotemessaging/config/v1/macos-config.json")!
 #endif
@@ -65,6 +65,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         database: CoreDataDatabase,
         bookmarksDatabase: CoreDataDatabase,
         appearancePreferences: AppearancePreferences,
+        pinnedTabsManager: PinnedTabsManager,
         internalUserDecider: InternalUserDecider,
         configurationStore: ConfigurationStoring,
         remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding,
@@ -73,6 +74,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         let provider = RemoteMessagingConfigMatcherProvider(
             bookmarksDatabase: bookmarksDatabase,
             appearancePreferences: appearancePreferences,
+            pinnedTabsManager: pinnedTabsManager,
             internalUserDecider: internalUserDecider
         )
         self.init(

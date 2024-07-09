@@ -38,7 +38,7 @@ class OnboardingManagerTests: XCTestCase {
         defaultBrowserProvider = CapturingDefaultBrowserProvider()
         appearancePersistor = MockAppearancePreferencesPersistor()
         apperancePreferences = AppearancePreferences(persistor: appearancePersistor)
-        startupPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: apperancePreferences)
+        startupPersistor = StartupPreferencesUserDefaultsPersistor()
         startupPreferences = StartupPreferences(persistor: startupPersistor)
         manager = OnboardingActionsManager(navigationDelegate: navigationDelegate, dockCustomization: dockCustomization, defaultBrowserProvider: defaultBrowserProvider, appearancePreferences: apperancePreferences, startupPreferences: startupPreferences)
     }
