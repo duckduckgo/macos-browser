@@ -413,7 +413,7 @@ final class LocalBookmarkManager: BookmarkManager {
         while !queue.isEmpty {
             let current = queue.removeFirst()
 
-            if current.title.lowercased().contains(query) {
+            if current.title.lowercased().contains(query.lowercased()) {
                 result.append(current)
             }
 

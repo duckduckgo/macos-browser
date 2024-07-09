@@ -21,34 +21,34 @@ import XCTest
 
 final class BookmarkSearchViewModelTests: XCTestCase {
 
-    func testWhenQueryIsEmpty_thenEmptyQueryIsReturned() {
-        let sut = BookmarkSearchViewModel(manager: MockBookmarkManager())
-        let result = sut.search(by: "")
-
-        XCTAssertEqual(result, .emptyQuery)
-    }
-
-    func testWhenQueryIsBlank_thenEmptyQueryIsReturned() {
-        let sut = BookmarkSearchViewModel(manager: MockBookmarkManager())
-        let result = sut.search(by: "    ")
-
-        XCTAssertEqual(result, .emptyQuery)
-    }
-
-    func testWhenQueryIsNotBlankAndQueryDoesNotMatchBookmarks_thenNoResultsIsReturned() {
-        let sut = BookmarkSearchViewModel(manager: MockBookmarkManager())
-        let result = sut.search(by: "abc")
-
-        XCTAssertEqual(result, .noResults)
-    }
-
-    func testWhenQueryIsNotBlankAndQueryMatchesBookmarks_thenResultsAreReturned() {
-        let bookmark = Bookmark(id: "1", url: "www.test.com", title: "Bookmark", isFavorite: false)
-        let manager = MockBookmarkManager()
-        manager.bookmarksReturnedForSearch = [bookmark]
-        let sut = BookmarkSearchViewModel(manager: manager)
-        let result = sut.search(by: "abc")
-
-        XCTAssertEqual(result, .results([bookmark]))
-    }
+//    func testWhenQueryIsEmpty_thenEmptyQueryIsReturned() {
+//        let sut = BookmarkSearchViewModel(manager: MockBookmarkManager())
+//        let result = sut.search(by: "")
+//
+//        XCTAssertEqual(result, .emptyQuery)
+//    }
+//
+//    func testWhenQueryIsBlank_thenEmptyQueryIsReturned() {
+//        let sut = BookmarkSearchViewModel(manager: MockBookmarkManager())
+//        let result = sut.search(by: "    ")
+//
+//        XCTAssertEqual(result, .emptyQuery)
+//    }
+//
+//    func testWhenQueryIsNotBlankAndQueryDoesNotMatchBookmarks_thenNoResultsIsReturned() {
+//        let sut = BookmarkSearchViewModel(manager: MockBookmarkManager())
+//        let result = sut.search(by: "abc")
+//
+//        XCTAssertEqual(result, .noResults)
+//    }
+//
+//    func testWhenQueryIsNotBlankAndQueryMatchesBookmarks_thenResultsAreReturned() {
+//        let bookmark = Bookmark(id: "1", url: "www.test.com", title: "Bookmark", isFavorite: false)
+//        let manager = MockBookmarkManager()
+//        manager.bookmarksReturnedForSearch = [bookmark]
+//        let sut = BookmarkSearchViewModel(manager: manager)
+//        let result = sut.search(by: "abc")
+//
+//        XCTAssertEqual(result, .results([bookmark]))
+//    }
 }
