@@ -276,7 +276,6 @@ final class BWManager: BWManagement, ObservableObject {
         sendStatus()
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func handleEncryptedResponse(_ encryptedPayload: BWResponse.EncryptedPayload, messageId: MessageId) {
         guard let dataString = encryptedPayload.data,
               let data = Data(base64Encoded: dataString),

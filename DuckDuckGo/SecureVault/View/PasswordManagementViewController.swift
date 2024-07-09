@@ -724,7 +724,6 @@ final class PasswordManagementViewController: NSViewController {
 
     var passwordManagerSelectionCancellable: AnyCancellable?
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func createListView() {
         let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator, onItemSelected: { [weak self] previousValue, newValue in
             guard let newValue = newValue,

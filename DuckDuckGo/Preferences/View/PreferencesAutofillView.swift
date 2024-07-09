@@ -193,7 +193,6 @@ extension Preferences {
             .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
         }
 
-        // swiftlint:disable:next cyclomatic_complexity
         @ViewBuilder private func bitwardenStatusView(for status: BWStatus) -> some View {
             switch status {
             case .disabled:

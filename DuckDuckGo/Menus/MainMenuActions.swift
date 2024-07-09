@@ -963,7 +963,6 @@ extension MainViewController {
 
 extension MainViewController: NSMenuItemValidation {
 
-    // swiftlint:disable:next cyclomatic_complexity
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         guard fireViewController.fireViewModel.fire.burningData == nil else {
             return true

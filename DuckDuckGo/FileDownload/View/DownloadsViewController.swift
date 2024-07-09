@@ -373,7 +373,6 @@ final class DownloadsViewController: NSViewController {
 
 extension DownloadsViewController: NSMenuDelegate {
 
-    // swiftlint:disable cyclomatic_complexity
     func menuNeedsUpdate(_ menu: NSMenu) {
         guard let index = index(for: menu),
               let item = viewModel.items[safe: index]
@@ -412,8 +411,6 @@ extension DownloadsViewController: NSMenuDelegate {
             }
         }
     }
-    // swiftlint:enable cyclomatic_complexity
-
 }
 
 extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {

@@ -102,7 +102,6 @@ struct DataImportView: ModalView {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func viewBody() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             // body
