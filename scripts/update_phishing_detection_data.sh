@@ -56,7 +56,7 @@ updateRevision() {
 	old_revision=$(grep 'revision: Int' "${provider_path}" | awk -F '[=,]' '{print $2}' | xargs)
 
 	if [ "$old_revision" -lt "$new_revision" ]; then
-		sed -i '' -e "s/revision: Int =.*/public static let revision = $new_revision/" "${provider_path}"
+		sed -i '' -e "s/revision: Int =.*/revision: Int = $new_revision,/" "${provider_path}"
 		printf "Updated revision from %s to %s\n" "$old_revision" "$new_revision"
 	fi
 }
