@@ -24,7 +24,10 @@ final class MoreOptionsMenuButton: MouseOverButton {
     private static let notificationSize: CGFloat = 6
     private static let notificationOffset: CGFloat = 3
 
+#if SPARKLE
     private var updateController: UpdateControllerProtocol?
+#endif
+
     private var notificationLayer: CALayer?
     private var cancellable: AnyCancellable?
 
@@ -55,11 +58,13 @@ final class MoreOptionsMenuButton: MouseOverButton {
     }
 
     private func subscribeToUpdateInfo() {
+#if SPARKLE
         cancellable = updateController?.isUpdateAvailableToInstallPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isAvailable in
                 self?.isNotificationVisible = isAvailable
             }
+#endif
     }
 
     private func setupNotificationLayerIfNeeded() {

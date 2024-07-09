@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+#if SPARKLE
 import Foundation
 import Sparkle
 
@@ -75,3 +76,5 @@ extension Update {
                   releaseNotesPrivacyPro: releaseNotesPrivacyPro)
     }
 }
+
+#endif

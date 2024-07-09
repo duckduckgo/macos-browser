@@ -200,10 +200,15 @@ extension TabExtensionsBuilder {
             SSLErrorPageTabExtension(webViewPublisher: args.webViewFuture,
                                   scriptsPublisher: userScripts.compactMap { $0 })
         }
-
+#if SPARKLE
         add {
             ReleaseNotesTabExtension(scriptsPublisher: userScripts.compactMap { $0 }, webViewPublisher: args.webViewFuture)
         }
+#else
+        add {
+            ReleaseNotesTabExtension()
+        }
+#endif
 
         add {
             OnboardingTabExtension()

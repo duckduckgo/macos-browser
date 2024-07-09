@@ -21,6 +21,8 @@ import Navigation
 import Combine
 import Common
 
+#if SPARKLE
+
 protocol ReleaseNotesUserScriptProvider {
 
     var releaseNotesUserScript: ReleaseNotesUserScript? { get }
@@ -146,3 +148,20 @@ extension ReleaseNotesValues {
     }
 
 }
+
+#else
+
+protocol ReleaseNotesTabExtensionProtocol: AnyObject, NavigationResponder {}
+
+extension ReleaseNotesTabExtension: ReleaseNotesTabExtensionProtocol, TabExtension {
+    func getPublicProtocol() -> ReleaseNotesTabExtensionProtocol { self }
+}
+
+extension TabExtensions {
+    var releaseNotes: ReleaseNotesTabExtensionProtocol? { resolve(ReleaseNotesTabExtension.self) }
+}
+
+final class ReleaseNotesTabExtension: NavigationResponder {
+}
+
+#endif

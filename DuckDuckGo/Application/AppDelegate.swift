@@ -39,6 +39,8 @@ import Subscription
 import NetworkProtectionIPC
 import DataBrokerProtection
 
+// swiftlint:disable type_body_length
+
 // @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -352,7 +354,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setUpAutoClearHandler()
 
         setUpAutofillPixelReporter()
+#if SPARKLE
         updateController.checkNewApplicationVersion()
+#endif
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {
@@ -697,3 +701,5 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
 
 }
+
+// swiftlint:enable type_body_length

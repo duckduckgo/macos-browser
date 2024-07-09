@@ -78,10 +78,14 @@ extension Preferences {
                             }
                             .padding(.top, 4)
                             #endif
-                        }.onAppear {
+                        }
+#if SPARKLE
+                        .onAppear {
                             model.subscribeToUpdateInfoIfNeeded()
                         }
+#endif
 
+#if SPARKLE
                         // Automatic/manual Updates
                         PreferencePaneSection("Browser Updates") {
 
@@ -103,6 +107,7 @@ extension Preferences {
                                 }
                             }
                         }
+#endif
                     }
                 }
             }
@@ -152,6 +157,7 @@ extension Preferences {
             return "default"
         }
 
+#if SPARKLE
         @ViewBuilder
         private var statusIcon: some View {
             switch model.updateState {
@@ -166,6 +172,7 @@ extension Preferences {
                     .foregroundColor(.red)
             }
         }
+#endif
 
         @ViewBuilder
         private var versionText: some View {
@@ -176,6 +183,7 @@ extension Preferences {
                             model.copy(UserText .versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
                         })
                     }))
+#if SPARKLE
                 switch model.updateState {
                 case .loading:
                     Text(" — Checking for update")
@@ -184,9 +192,11 @@ extension Preferences {
                 case .newVersionAvailable:
                     Text(" — newer version available")
                 }
+#endif
             }
         }
 
+#if SPARKLE
         private var lastCheckedText: some View {
             let lastChecked = model.updateState != .loading ? "\(lastCheckedFormattedDate(model.lastUpdateCheckDate))" : "-"
             return Text("Last checked: \(lastChecked)")
@@ -228,8 +238,9 @@ extension Preferences {
                 .buttonStyle(UpdateButtonStyle(enabled: true))
             }
         }
-
+#endif
     }
+
 
     struct UnsupportedDeviceInfoBox: View {
 
@@ -328,6 +339,7 @@ extension Preferences {
     }
 }
 
+#if SPARKLE
 struct UpdateButtonStyle: ButtonStyle {
 
     public let enabled: Bool
@@ -352,3 +364,4 @@ struct UpdateButtonStyle: ButtonStyle {
     }
 
 }
+#endif

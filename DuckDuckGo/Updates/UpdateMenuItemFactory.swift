@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if SPARKLE
+
 import Cocoa
 
 final class UpdateMenuItemFactory {
@@ -29,3 +31,5 @@ final class UpdateMenuItemFactory {
     }
 
 }
+
+#endif

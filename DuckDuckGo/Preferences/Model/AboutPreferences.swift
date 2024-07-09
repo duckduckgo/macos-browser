@@ -24,6 +24,7 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
 
     static let shared = AboutPreferences()
 
+#if SPARKLE
     enum UpdateState {
 
         case loading
@@ -48,8 +49,11 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
             print("updateState: \(updateState)")
         }
     }
+#endif
+
     let appVersion = AppVersion()
 
+#if SPARKLE
     var updateController: UpdateControllerProtocol? {
         return Application.appDelegate.updateController
     }
@@ -64,14 +68,17 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         }
     }
 
+    var lastUpdateCheckDate: Date? {
+        updateController?.lastUpdateCheckDate
+    }
+#endif
+
     private var cancellable: AnyCancellable?
 
     let displayableAboutURL: String = URL.aboutDuckDuckGo
         .toString(decodePunycode: false, dropScheme: true, dropTrailingSlash: false)
 
-    var lastUpdateCheckDate: Date? {
-        updateController?.lastUpdateCheckDate
-    }
+
 
     @MainActor
     func openFeedbackForm() {
@@ -82,6 +89,7 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         NSPasteboard.general.copy(value)
     }
 
+#if SPARKLE
     func checkForUpdate() {
         updateController?.checkForUpdateInBackground()
     }
@@ -110,5 +118,5 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         guard let updateController else { return }
         updateState = UpdateState(from: updateController.latestUpdate, isLoading: updateController.isUpdateBeingLoaded)
     }
-
+#endif
 }

@@ -21,6 +21,8 @@ import UserScript
 import WebKit
 import Combine
 
+#if SPARKLE
+
 final class ReleaseNotesUserScript: NSObject, Subfeature {
 
     lazy var updateController: UpdateControllerProtocol = Application.appDelegate.updateController
@@ -122,3 +124,5 @@ extension ReleaseNotesUserScript {
     struct Result: Encodable {}
 
 }
+
+#endif
