@@ -408,9 +408,9 @@ final class BookmarkListViewController: NSViewController {
         } else if let node = item as? BookmarkNode, let folder = node.representedObject as? BookmarkFolder, dataSource.isSearching {
             showTreeView()
             expandFoldersUntil(folder: folder)
-            scrollToItem(node)
+            outlineView.scrollTo(node)
         } else {
-            handleFolderClickWhenNotInSearchMode(item: item)
+            handleItemClickWhenNotInSearchMode(item: item)
         }
     }
 
@@ -419,7 +419,7 @@ final class BookmarkListViewController: NSViewController {
         delegate?.popoverShouldClose(self)
     }
 
-    private func handleFolderClickWhenNotInSearchMode(item: Any?) {
+    private func handleItemClickWhenNotInSearchMode(item: Any?) {
         if outlineView.isItemExpanded(item) {
             outlineView.animator().collapseItem(item)
         } else {
@@ -444,14 +444,6 @@ final class BookmarkListViewController: NSViewController {
                     outlineView.animator().expandItem(current)
                 }
             }
-        }
-    }
-
-    private func scrollToItem(_ item: Any) {
-        let rowIndex = outlineView.row(forItem: item)
-
-        if rowIndex != -1 {
-            outlineView.scrollRowToVisible(rowIndex)
         }
     }
 
