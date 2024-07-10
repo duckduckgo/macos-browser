@@ -57,7 +57,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     lazy var notificationPresenter = UpdateNotificationPresenter()
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
-    init(internalUserDecider: InternalUserDecider, 
+    init(internalUserDecider: InternalUserDecider,
          appRestarter: AppRestarting = AppRestarter()) {
         willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
         self.internalUserDecider = internalUserDecider
@@ -75,9 +75,9 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
             if let latestUpdate, !latestUpdate.isInstalled {
                 switch latestUpdate.type {
                 case .critical:
-                    notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: "Critical update required. Restart to update.")
+                    notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: "Critical update required. Restart to update.", presentMultiline: true)
                 case .regular:
-                    notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Restart to update.")
+                    notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Restart to update.", presentMultiline: true)
                 }
                 isUpdateAvailableToInstall = !latestUpdate.isInstalled
             } else {
@@ -124,9 +124,9 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         switch updateStatus {
         case .noChange: break
         case .updated:
-            notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "Browser Updated")
+            notificationPresenter.showUpdateNotification(icon: NSImage.successCheckmark, text: "Browser Updated", buttonText: "View details")
         case .downgraded:
-            notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "Browser Downgraded")
+            notificationPresenter.showUpdateNotification(icon: NSImage.successCheckmark, text: "Browser Downgraded", buttonText: "View details")
         }
     }
 

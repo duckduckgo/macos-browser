@@ -39,6 +39,7 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
          buttonText: String? = nil,
          buttonAction: (() -> Void)? = nil,
          shouldShowCloseButton: Bool = false,
+         presentMultiline: Bool = false,
          autoDismissDuration: TimeInterval = Constants.autoDismissDuration,
          onDismiss: (() -> Void)? = nil,
          onClick: (() -> Void)? = nil) {
@@ -46,7 +47,8 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
                                                  image: image,
                                                  buttonText: buttonText,
                                                  buttonAction: buttonAction,
-                                                 shouldShowCloseButton: shouldShowCloseButton)
+                                                 shouldShowCloseButton: shouldShowCloseButton,
+                                                 shouldPresentMultiline: presentMultiline)
         self.onDismiss = onDismiss
         self.autoDismissDuration = autoDismissDuration
         self.onClick = onClick
@@ -131,7 +133,7 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
 
     override func mouseDown(with event: NSEvent) {
         onClick?()
-        presentingViewController?.dismiss(self)
+        dismissPopover()
     }
 
     private func dismissPopover() {

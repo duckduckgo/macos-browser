@@ -26,17 +26,20 @@ public final class PopoverMessageViewModel: ObservableObject {
     @Published var buttonText: String?
     @Published public var buttonAction: (() -> Void)?
     var shouldShowCloseButton: Bool
+    var shouldPresentMultiline: Bool
 
     public init(message: String,
                 image: NSImage? = nil,
                 buttonText: String? = nil,
                 buttonAction: (() -> Void)? = nil,
-                shouldShowCloseButton: Bool = false) {
+                shouldShowCloseButton: Bool = false,
+                shouldPresentMultiline: Bool = true) {
         self.message = message
         self.image = image
         self.buttonText = buttonText
         self.buttonAction = buttonAction
         self.shouldShowCloseButton = shouldShowCloseButton
+        self.shouldPresentMultiline = shouldPresentMultiline
     }
 }
 
@@ -60,21 +63,34 @@ public struct PopoverMessageView: View {
             HStack(alignment: .top) {
                 if let image = viewModel.image {
                     Image(nsImage: image)
-                        .padding(.top, 2)
+                        .padding(.top, 3)
                 }
 
-                Text(viewModel.message)
-                    .font(.body)
-                    .fontWeight(.bold)
-                    .padding(.leading, 4)
-                    .frame(width: 150)
-                    .lineLimit(nil)
+                if viewModel.shouldPresentMultiline {
+                    Text(viewModel.message)
+                        .font(.body)
+                        .fontWeight(.bold)
+                        .padding(.leading, 2)
+                        .frame(width: 150, alignment: .leading)
+                        .frame(minHeight: 22)
+                        .lineLimit(nil)
+                } else {
+                    Text(viewModel.message)
+                        .font(.body)
+                        .fontWeight(.bold)
+                        .padding(.leading, 2)
+                        .frame(minHeight: 22)
+                        .lineLimit(nil)
+                }
 
                 if let text = viewModel.buttonText,
                    let action = viewModel.buttonAction {
-                    Button(text, action: action)
-                        .padding(.top, 2)
-                        .padding(.leading, 7)
+                    Button(text, action: {
+                        action()
+                        onClose?()
+                    })
+                    .padding(.top, 2)
+                    .padding(.leading, 4)
                 }
 
                 if viewModel.shouldShowCloseButton {

@@ -26,7 +26,7 @@ final class UpdateNotificationPresenter {
     private var notificationView: NSView?
     private var hideTimer: Timer?
 
-    func showUpdateNotification(icon: NSImage, text: String, buttonText: String? = nil) {
+    func showUpdateNotification(icon: NSImage, text: String, buttonText: String? = nil, presentMultiline: Bool = false) {
         DispatchQueue.main.async {
             guard let mainWindow = NSApp.mainWindow as? MainWindow,
                   let windowController = mainWindow.windowController as? MainWindowController,
@@ -40,7 +40,8 @@ final class UpdateNotificationPresenter {
                                                               image: icon,
                                                               buttonText: buttonText,
                                                               buttonAction: buttonAction,
-                                                              shouldShowCloseButton: true,
+                                                              shouldShowCloseButton: buttonText == nil,
+                                                              presentMultiline: presentMultiline,
                                                               autoDismissDuration: 10,
                                                               onClick: { [weak self] in
                 self?.openUpdatesPage()
