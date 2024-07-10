@@ -35,7 +35,9 @@ final class DuckPlayerTabExtension {
     private var cancellables = Set<AnyCancellable>()
     private var youtubePlayerCancellables = Set<AnyCancellable>()
     private var shouldOpenInNewTab: Bool  {
-        preferences.duckPlayerOpenInNewTab && preferences.duckPlayerMode != .disabled
+        preferences.isOpenInNewTabSettingsAvailable &&
+        preferences.duckPlayerOpenInNewTab &&
+        preferences.duckPlayerMode != .disabled
     }
     private var shouldOpenDuckPlayerDirectly: Bool {
         preferences.duckPlayerMode == .enabled

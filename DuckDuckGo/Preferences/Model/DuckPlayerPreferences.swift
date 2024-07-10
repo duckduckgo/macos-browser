@@ -86,7 +86,7 @@ final class DuckPlayerPreferences: ObservableObject {
         privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay) || internalUserDecider.isInternalUser
     }
 
-    var shouldDisplayNewTabSettings: Bool {
+    var isOpenInNewTabSettingsAvailable: Bool {
         privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.openInNewTab) || internalUserDecider.isInternalUser
     }
 

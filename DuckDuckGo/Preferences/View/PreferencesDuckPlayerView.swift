@@ -77,7 +77,7 @@ extension Preferences {
                 }
 
                 // New Tab
-                if model.shouldDisplayNewTabSettings {
+                if model.isOpenInNewTabSettingsAvailable {
                     PreferencePaneSection(UserText.duckPlayerNewTabTitle) {
                         TextMenuItemCaption(UserText.duckPlayerNewTabPreferenceExtraInfo)
                         ToggleMenuItem(UserText.duckPlayerNewTabPreference, isOn: $model.duckPlayerOpenInNewTab)
