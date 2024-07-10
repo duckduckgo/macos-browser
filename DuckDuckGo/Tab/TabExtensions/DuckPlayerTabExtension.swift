@@ -37,6 +37,9 @@ final class DuckPlayerTabExtension {
     private var shouldOpenInNewTab: Bool  {
         preferences.duckPlayerOpenInNewTab && preferences.duckPlayerMode != .disabled
     }
+    private var shouldOpenDuckPlayerDirectly: Bool {
+        preferences.duckPlayerMode == .enabled
+    }
     private let preferences: DuckPlayerPreferences
 
     private weak var webView: WKWebView? {
@@ -220,17 +223,23 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
 
         // Navigating to a Youtube URL
-        if navigationAction.url.isYoutubeVideo,
-           let (videoID, timestamp) = navigationAction.url.youtubeVideoParams {
-            // if webview.url is not empty, open new tab if settings is ON
-            if shouldOpenInNewTab, let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
-                webView?.loadInNewWindow(navigationAction.url)
-                return .cancel
-            } else {
-                return decidePolicy(for: navigationAction, withYoutubeVideoID: videoID, timestamp: timestamp)
-            }
+        return handleYoutubeNavigation(for: navigationAction)
+    }
+
+    @MainActor
+    private func handleYoutubeNavigation(for navigationAction: NavigationAction) -> NavigationActionPolicy? {
+        guard navigationAction.url.isYoutubeVideo,
+              let (videoID, timestamp) = navigationAction.url.youtubeVideoParams else {
+            return .next
         }
-        return .next
+
+        if shouldOpenInNewTab, shouldOpenDuckPlayerDirectly,
+           let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
+            webView?.loadInNewWindow(navigationAction.url)
+            return .cancel
+        }
+
+        return decidePolicy(for: navigationAction, withYoutubeVideoID: videoID, timestamp: timestamp)
     }
 
     func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
