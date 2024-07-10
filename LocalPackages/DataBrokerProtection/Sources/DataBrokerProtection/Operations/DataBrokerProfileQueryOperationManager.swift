@@ -100,7 +100,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
+    // swiftlint:disable:next cyclomatic_complexity
     internal func runScanOperation(on runner: WebJobRunner,
                                    brokerProfileQueryData: BrokerProfileQueryData,
                                    database: DataBrokerProtectionRepository,
@@ -268,7 +268,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
     }
 
-    // swiftlint:disable:next function_body_length
     internal func runOptOutOperation(for extractedProfile: ExtractedProfile,
                                      on runner: WebJobRunner,
                                      brokerProfileQueryData: BrokerProfileQueryData,

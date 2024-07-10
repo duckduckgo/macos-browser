@@ -141,7 +141,6 @@ final class DuckPlayer {
 
     // MARK: - Common Message Handlers
 
-    // swiftlint:disable:next cyclomatic_complexity
     public func handleSetUserValuesMessage(
         from origin: YoutubeOverlayUserScript.MessageOrigin
     ) -> (_ params: Any, _ message: UserScriptMessage) -> Encodable? {

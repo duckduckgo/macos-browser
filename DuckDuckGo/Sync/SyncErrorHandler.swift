@@ -256,7 +256,6 @@ extension SyncErrorHandler: SyncErrorHandling {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func handleSyncError(_ syncError: SyncError, modelType: ModelType) {
         switch syncError {
         case .unexpectedStatusCode(409):
@@ -331,7 +330,6 @@ extension SyncErrorHandler: SyncErrorHandling {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func showSyncPausedAlertIfNeeded(for errorType: AsyncErrorType) {
         switch errorType {
         case .bookmarksCountLimitExceeded, .bookmarksRequestSizeLimitExceeded:

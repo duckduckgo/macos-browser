@@ -21,7 +21,6 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-// swiftlint:disable:next type_body_length
 @MainActor final class DataImportViewModelTests: XCTestCase {
 
     typealias Source = DataImport.Source

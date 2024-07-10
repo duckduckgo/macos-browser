@@ -59,7 +59,6 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         networkProtectionPopover?.isShown ?? false
     }
 
-    // swiftlint:disable:next function_body_length
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover {
         let popover = {
 
