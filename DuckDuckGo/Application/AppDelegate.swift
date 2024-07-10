@@ -38,10 +38,8 @@ import NetworkProtection
 import Subscription
 import NetworkProtectionIPC
 import DataBrokerProtection
+import RemoteMessaging
 
-// swiftlint:disable type_body_length
-
-// @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG
@@ -88,6 +86,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
+
+    let activeRemoteMessageModel: ActiveRemoteMessageModel
+    private let remoteMessagingClient: RemoteMessagingClient!
 
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
@@ -146,7 +147,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return firstLaunchDate >= Date.weekAgo
     }
 
-    // swiftlint:disable:next function_body_length
     override init() {
         do {
             let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
@@ -213,6 +213,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #else
         AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
 #endif
+        if NSApplication.runType.requiresEnvironment {
+            remoteMessagingClient = RemoteMessagingClient(
+                database: RemoteMessagingDatabase().db,
+                bookmarksDatabase: BookmarkDatabase.shared.db,
+                appearancePreferences: .shared,
+                internalUserDecider: internalUserDecider,
+                configurationStore: ConfigurationStore.shared,
+                remoteMessagingAvailabilityProvider: PrivacyConfigurationRemoteMessagingAvailabilityProvider(
+                    privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager
+                )
+            )
+            activeRemoteMessageModel = ActiveRemoteMessageModel(remoteMessagingClient: remoteMessagingClient)
+        } else {
+            // As long as remoteMessagingClient is private to App Delegate and activeRemoteMessageModel
+            // is used only by HomePage RootView as environment object,
+            // it's safe to not initialize the client for unit tests to avoid side effects.
+            remoteMessagingClient = nil
+            activeRemoteMessageModel = ActiveRemoteMessageModel(remoteMessagingStore: nil, remoteMessagingAvailabilityProvider: nil)
+        }
 
         featureFlagger = DefaultFeatureFlagger(
             internalUserDecider: internalUserDecider,
@@ -256,7 +275,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                                                               vpnUninstaller: vpnUninstaller)
     }
 
-    // swiftlint:disable:next function_body_length
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard NSApp.runType.requiresEnvironment else { return }
         defer {
@@ -354,9 +372,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setUpAutoClearHandler()
 
         setUpAutofillPixelReporter()
+
 #if SPARKLE
         updateController.checkNewApplicationVersion()
 #endif
+
+        remoteMessagingClient?.startRefreshingRemoteMessages()
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {
@@ -387,8 +408,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                         DefaultDataBrokerProtectionFeatureGatekeeper(accountManager:
                                                                                         subscriptionManager.accountManager)).applicationDidBecomeActive()
 #endif
-
-        AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
 
         subscriptionManager.refreshCachedSubscriptionAndEntitlements { isSubscriptionActive in
             if isSubscriptionActive {
@@ -701,5 +720,3 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
 
 }
-
-// swiftlint:enable type_body_length

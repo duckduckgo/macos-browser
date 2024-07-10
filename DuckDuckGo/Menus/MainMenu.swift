@@ -28,8 +28,8 @@ import NetworkProtection
 import Subscription
 import SubscriptionUI
 
-// swiftlint:disable:next type_body_length
-@MainActor final class MainMenu: NSMenu {
+@MainActor
+final class MainMenu: NSMenu {
 
     enum Constants {
         static let maxTitleLength = 55
@@ -561,7 +561,6 @@ import SubscriptionUI
 
     let internalUserItem = NSMenuItem(title: "Set Internal User State", action: #selector(MainViewController.internalUserState))
 
-    // swiftlint:disable:next function_body_length
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")

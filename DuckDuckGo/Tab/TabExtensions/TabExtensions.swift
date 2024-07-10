@@ -89,7 +89,6 @@ typealias TabExtensionsBuilderArguments = (
     webViewFuture: Future<WKWebView, Never>
 )
 
-// swiftlint:disable function_body_length
 extension TabExtensionsBuilder {
 
     /// Instantiate `TabExtension`-s for App builds here
@@ -222,7 +221,6 @@ extension TabExtensionsBuilder {
     }
 
 }
-// swiftlint:enable function_body_length
 
 #if DEBUG
 extension TestTabExtensionsBuilder {

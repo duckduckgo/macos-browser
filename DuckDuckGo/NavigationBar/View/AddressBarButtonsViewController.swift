@@ -29,7 +29,6 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
 }
 
-// swiftlint:disable:next type_body_length
 final class AddressBarButtonsViewController: NSViewController {
 
     weak var delegate: AddressBarButtonsViewControllerDelegate?

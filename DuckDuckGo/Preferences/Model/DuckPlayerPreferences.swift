@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import BrowserServicesKit
+import PixelKit
 
 protocol DuckPlayerPreferencesPersistor {
     /// The persistor hadles raw Bool values but each one translates into a DuckPlayerMode:
@@ -62,6 +63,11 @@ final class DuckPlayerPreferences: ObservableObject {
     var duckPlayerAutoplay: Bool {
         didSet {
             persistor.duckPlayerAutoplay = duckPlayerAutoplay
+            if duckPlayerAutoplay {
+                PixelKit.fire(GeneralPixel.duckPlayerAutoplaySettingsOn)
+            } else {
+                PixelKit.fire(GeneralPixel.duckPlayerAutoplaySettingsOff)
+            }
         }
     }
 

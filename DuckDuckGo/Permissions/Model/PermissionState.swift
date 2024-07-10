@@ -29,7 +29,6 @@ enum PermissionState: Equatable {
     case paused
     case inactive
 
-    // swiftlint:disable cyclomatic_complexity
     static func == (lhs: PermissionState, rhs: PermissionState) -> Bool {
         switch lhs {
         case .disabled(systemWide: let systemWide): if case .disabled(systemWide) = rhs { return true }
@@ -43,7 +42,6 @@ enum PermissionState: Equatable {
         }
         return false
     }
-    // swiftlint:enable cyclomatic_complexity
 
     var isRequested: Bool {
         if case .requested = self { return true }

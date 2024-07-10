@@ -33,7 +33,6 @@ protocol PasswordManagementDelegate: AnyObject {
 
 }
 
-// swiftlint:disable:next type_body_length
 final class PasswordManagementViewController: NSViewController {
 
     static func create() -> Self {
@@ -725,8 +724,6 @@ final class PasswordManagementViewController: NSViewController {
 
     var passwordManagerSelectionCancellable: AnyCancellable?
 
-    // swiftlint:disable function_body_length
-    // swiftlint:disable:next cyclomatic_complexity
     private func createListView() {
         let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator, onItemSelected: { [weak self] previousValue, newValue in
             guard let newValue = newValue,
@@ -820,8 +817,6 @@ final class PasswordManagementViewController: NSViewController {
         let view = NSHostingView(rootView: passwordManagerView)
         replaceItemContainerChildView(with: view)
     }
-
-    // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
         return NSMenu {

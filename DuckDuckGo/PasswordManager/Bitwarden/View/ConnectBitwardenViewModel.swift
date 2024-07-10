@@ -96,7 +96,6 @@ final class ConnectBitwardenViewModel: ObservableObject {
         }
     }
 
-    // swiftlint:disable cyclomatic_complexity
     func adjustViewState(status: BWStatus) {
         switch status {
         case .disabled:
@@ -131,7 +130,6 @@ final class ConnectBitwardenViewModel: ObservableObject {
             self.error = error
         }
     }
-    // swiftlint:enable cyclomatic_complexity
 
     func process(action: ViewAction) {
         switch action {

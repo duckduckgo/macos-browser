@@ -52,7 +52,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private let webUISettings = DataBrokerProtectionWebUIURLSettings(.dbp)
     private let settings = DataBrokerProtectionSettings(defaults: .dbp)
 
-    // swiftlint:disable:next function_body_length
     init() {
         super.init(title: "Personal Information Removal")
 

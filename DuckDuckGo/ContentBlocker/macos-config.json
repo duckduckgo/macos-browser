@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1719853254811,
+    "version": 1720185364708,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -111,6 +111,11 @@
             "hash": "b9baf40f82353fbfd4e1daa45f7a60e9"
         },
         "androidBrowserConfig": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "androidNewStateKillSwitch": {
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
@@ -343,7 +348,12 @@
                 }
             ],
             "state": "enabled",
-            "hash": "b1ae580a636957bcbe90d16aa92c40bd"
+            "features": {
+                "deduplicateLoginsOnImport": {
+                    "state": "enabled"
+                }
+            },
+            "hash": "1832dd4088cba6eaf3a9776a6fc9a1f5"
         },
         "brokenSiteReportExperiment": {
             "exceptions": [],
@@ -1100,6 +1110,9 @@
                     "domain": "soranews24.com"
                 },
                 {
+                    "domain": "pointstreaksites.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -1109,7 +1122,7 @@
                     "domain": "noaprints.com"
                 }
             ],
-            "hash": "ee9d383becfe28d8a5b575b51f5c9d11"
+            "hash": "477f58bcbc508d5ae1e73941407284b7"
         },
         "cookie": {
             "settings": {
@@ -1279,6 +1292,9 @@
             "features": {
                 "pip": {
                     "state": "enabled"
+                },
+                "autoplay": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -1345,7 +1361,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "bacc01ec18acadc564c507f12bc01442"
+            "hash": "7d9227bb703281b01ab4e53fb257198c"
         },
         "elementHiding": {
             "exceptions": [
@@ -5395,9 +5411,9 @@
             "hash": "3c850040d1c9b3e06841b1491c5d2940"
         },
         "remoteMessaging": {
-            "state": "disabled",
+            "state": "internal",
             "exceptions": [],
-            "hash": "c292bb627849854515cebbded288ef5a"
+            "hash": "f1daaefe788583c2a00d7d19a23864a7"
         },
         "requestFilterer": {
             "state": "disabled",
@@ -6326,7 +6342,8 @@
                                 "domains": [
                                     "ah.nl",
                                     "applesfera.com",
-                                    "rocketnews24.com"
+                                    "rocketnews24.com",
+                                    "servustv.com"
                                 ]
                             },
                             {
@@ -8812,7 +8829,7 @@
                     "domain": "noaprints.com"
                 }
             ],
-            "hash": "182c58c5b1a32bc6c061b88bfbb044b0"
+            "hash": "90ac50dc5a88bbd812d01aeae0ea6483"
         },
         "trackingCookies1p": {
             "settings": {

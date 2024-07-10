@@ -168,7 +168,7 @@ extension AppDelegate {
     }
 
     @objc func openReportBrokenSite(_ sender: Any?) {
-        let privacyDashboardViewController = PrivacyDashboardViewController(privacyInfo: nil, dashboardMode: .report)
+        let privacyDashboardViewController = PrivacyDashboardViewController(privacyInfo: nil, entryPoint: .report)
         privacyDashboardViewController.sizeDelegate = self
 
         let window = NSWindow(contentViewController: privacyDashboardViewController)
@@ -731,12 +731,12 @@ extension MainViewController {
     }
 
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
-        UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
+        UserDefaultsWrapper.clear(.defaultBrowserDismissed)
     }
 
     @objc func resetDefaultGrammarChecks(_ sender: Any?) {
-        UserDefaultsWrapper<Bool>.clear(.spellingCheckEnabledOnce)
-        UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
+        UserDefaultsWrapper.clear(.spellingCheckEnabledOnce)
+        UserDefaultsWrapper.clear(.grammarCheckEnabledOnce)
     }
 
     @objc func triggerFatalError(_ sender: Any?) {
@@ -987,8 +987,6 @@ extension MainViewController {
 
 extension MainViewController: NSMenuItemValidation {
 
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         guard fireViewController.fireViewModel.fire.burningData == nil else {
             return true
@@ -1092,9 +1090,6 @@ extension MainViewController: NSMenuItemValidation {
             return true
         }
     }
-
-    // swiftlint:enable function_body_length
-    // swiftlint:enable cyclomatic_complexity
 }
 
 extension AppDelegate: NSMenuItemValidation {

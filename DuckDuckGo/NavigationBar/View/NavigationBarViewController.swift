@@ -28,7 +28,6 @@ import NetworkProtectionUI
 import Subscription
 import SubscriptionUI
 
-// swiftlint:disable:next type_body_length
 final class NavigationBarViewController: NSViewController {
 
     enum Constants {

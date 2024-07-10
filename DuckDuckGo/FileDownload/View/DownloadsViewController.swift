@@ -52,7 +52,7 @@ final class DownloadsViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    override func loadView() { // swiftlint:disable:this function_body_length
+    override func loadView() {
         view = NSView()
 
         view.addSubview(titleLabel)
@@ -373,7 +373,6 @@ final class DownloadsViewController: NSViewController {
 
 extension DownloadsViewController: NSMenuDelegate {
 
-    // swiftlint:disable cyclomatic_complexity
     func menuNeedsUpdate(_ menu: NSMenu) {
         guard let index = index(for: menu),
               let item = viewModel.items[safe: index]
@@ -412,8 +411,6 @@ extension DownloadsViewController: NSMenuDelegate {
             }
         }
     }
-    // swiftlint:enable cyclomatic_complexity
-
 }
 
 extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
@@ -484,7 +481,7 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
 
 #if DEBUG
 @available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: DownloadsViewController.preferredContentSize.width, height: DownloadsViewController.preferredContentSize.height)) { {
+#Preview(traits: DownloadsViewController.preferredContentSize.fixedLayout) { {
 
     let store = DownloadListStoreMock()
     store.fetchBlock = { completion in

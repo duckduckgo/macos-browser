@@ -60,6 +60,15 @@ import WebKit
 
 final class WebViewMock: WKWebView {
 
+    override init(frame: CGRect, configuration: WKWebViewConfiguration) {
+        _=Self.swizzleCaptureStateHandlersOnce
+        super.init(frame: frame, configuration: configuration)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     var urlValue: URL?
     override var url: URL? {
         urlValue
@@ -91,6 +100,9 @@ final class WebViewMock: WKWebView {
         }
     }
 
+    var setCameraCaptureStateHandler: ((Bool?) -> Void)?
+    var setMicCaptureStateHandler: ((Bool?) -> Void)?
+
     var mediaCaptureState: _WKMediaCaptureStateDeprecated = [] {
         didSet {
             (self.uiDelegate as? WebViewPermissionsDelegate)!
@@ -119,26 +131,49 @@ final class WebViewMock: WKWebView {
         }
     }
 
-    var setCameraCaptureStateHandler: ((Bool?) -> Void)?
+    private static let swizzleCaptureStateHandlersOnce: Void = {
+        guard #available(macOS 12.0, *) else { return }
+
+        let originalSetCameraCaptureState = class_getInstanceMethod(WKWebView.self, #selector(WKWebView.setCameraCaptureState))!
+        let swizzledSetCameraCaptureState = class_getInstanceMethod(WKWebView.self, #selector(WKWebView.swizzled_setCameraCaptureState))!
+        method_exchangeImplementations(originalSetCameraCaptureState, swizzledSetCameraCaptureState)
+
+        let originalSetMicrophoneCaptureState = class_getInstanceMethod(WKWebView.self, #selector(WKWebView.setMicrophoneCaptureState))!
+        let swizzledSetMicrophoneCaptureState = class_getInstanceMethod(WKWebView.self, #selector(WKWebView.swizzled_setMicrophoneCaptureState))!
+        method_exchangeImplementations(originalSetMicrophoneCaptureState, swizzledSetMicrophoneCaptureState)
+    }()
+
+}
+
+extension WKWebView {
+
     @available(macOS 12.0, *)
-    override func setCameraCaptureState(_ state: WKMediaCaptureState, completionHandler: (() -> Void)?) {
-        cameraCaptureState = state
+    @objc dynamic func swizzled_setCameraCaptureState(_ state: WKMediaCaptureState, completionHandler: (() -> Void)?) {
+        guard let this = self as? WebViewMock, let setCameraCaptureStateHandler = this.setCameraCaptureStateHandler else {
+            self.swizzled_setCameraCaptureState(state, completionHandler: completionHandler) // call original
+            return
+        }
+        this.cameraCaptureState = state
+
         switch state {
-        case .none: setCameraCaptureStateHandler?(.none)
-        case .active: setCameraCaptureStateHandler?(true)
-        case .muted: setCameraCaptureStateHandler?(false)
+        case .none: setCameraCaptureStateHandler(.none)
+        case .active: setCameraCaptureStateHandler(true)
+        case .muted: setCameraCaptureStateHandler(false)
         @unknown default: fatalError()
         }
     }
 
-    var setMicCaptureStateHandler: ((Bool?) -> Void)?
     @available(macOS 12.0, *)
-    override func setMicrophoneCaptureState(_ state: WKMediaCaptureState, completionHandler: (() -> Void)?) {
-        microphoneCaptureState = state
+    @objc dynamic func swizzled_setMicrophoneCaptureState(_ state: WKMediaCaptureState, completionHandler: (() -> Void)?) {
+        guard let this = self as? WebViewMock, let setMicCaptureStateHandler = this.setMicCaptureStateHandler else {
+            self.swizzled_setMicrophoneCaptureState(state, completionHandler: completionHandler) // call original
+            return
+        }
+        this.microphoneCaptureState = state
         switch state {
-        case .none: setMicCaptureStateHandler?(.none)
-        case .active: setMicCaptureStateHandler?(true)
-        case .muted: setMicCaptureStateHandler?(false)
+        case .none: setMicCaptureStateHandler(.none)
+        case .active: setMicCaptureStateHandler(true)
+        case .muted: setMicCaptureStateHandler(false)
         @unknown default: fatalError()
         }
     }

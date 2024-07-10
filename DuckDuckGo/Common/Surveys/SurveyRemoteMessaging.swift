@@ -113,7 +113,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         }
     }
 
-    // swiftlint:disable cyclomatic_complexity function_body_length
+    // swiftlint:disable cyclomatic_complexity
 
     /// Processes the messages received from S3 and returns those which the user is eligible for. This is done by checking each of the attributes against the user's local state.
     /// Because the result of the message fetch is cached, it means that they won't be immediately updated if the user suddenly qualifies, but the refresh interval for remote messages is only 1 hour so it
@@ -239,7 +239,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         }
     }
 
-    // swiftlint:enable cyclomatic_complexity function_body_length
+    // swiftlint:enable cyclomatic_complexity
 
     func presentableRemoteMessages() -> [SurveyRemoteMessage] {
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()

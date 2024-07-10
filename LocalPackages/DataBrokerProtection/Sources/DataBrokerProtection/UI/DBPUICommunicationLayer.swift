@@ -83,7 +83,6 @@ struct DBPUICommunicationLayer: Subfeature {
         ])
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     func handler(forMethodNamed methodName: String) -> Handler? {
         guard let actionResult = DBPUIReceivedMethodName(rawValue: methodName) else {
             os_log("Cant parse method: %{public}@", log: .dataBrokerProtection, methodName)

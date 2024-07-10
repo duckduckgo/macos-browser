@@ -51,7 +51,10 @@ final class PreferencesViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let host = NSHostingView(rootView: Preferences.RootView(model: model))
+        let prefRootView = Preferences.RootView(model: model,
+                                                subscriptionManager: Application.appDelegate.subscriptionManager,
+                                                subscriptionUIHandler: Application.appDelegate.subscriptionUIHandler)
+        let host = NSHostingView(rootView: prefRootView)
         view.addAndLayout(host)
     }
 
