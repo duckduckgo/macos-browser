@@ -17273,6 +17273,7 @@
     },
     "Duplicate Bookmarks Skipped:" : {
       "comment" : "Data import summary format of how many duplicate bookmarks (%lld) were skipped during import.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -17383,6 +17384,12 @@
           }
         }
       }
+    },
+    "Duplicates Skipped:" : {
+
+    },
+    "Duplicates Skipped: " : {
+
     },
     "edit" : {
       "comment" : "Edit button",

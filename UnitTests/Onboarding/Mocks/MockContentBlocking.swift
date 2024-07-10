@@ -48,8 +48,6 @@ class MockPrivacyConfigurationManaging: PrivacyConfigurationManaging {
 
     var internalUserDecider: InternalUserDecider = InternalUserDeciderMock()
 
-    var toggleProtectionsCounter: ToggleProtectionsCounter = ToggleProtectionsCounter(eventReporting: nil)
-
     func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {
         return PrivacyConfigurationManager.ReloadResult.downloaded
     }

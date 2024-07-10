@@ -57,7 +57,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
         subscriptionManager = SubscriptionManagerMock(accountManager: AccountManagerMock(),
                                                       subscriptionEndpointService: SubscriptionEndpointServiceMock(),
-                                                      authEndpointService: AuthEndpointServiceMock(),
+                                                      authEndpointService: SubscriptionMockFactory.authEndpointService,
                                                       storePurchaseManager: storePurchaseManager,
                                                       currentEnvironment: SubscriptionEnvironment(serviceEnvironment: .production,
                                                                                                   purchasePlatform: .appStore),

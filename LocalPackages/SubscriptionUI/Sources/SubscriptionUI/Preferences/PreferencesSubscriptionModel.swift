@@ -257,7 +257,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         Task {
             if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
                 if #available(macOS 12.0, iOS 15.0, *) {
-                    let appStoreAccountManagementFlow = DefaultAppStoreAccountManagementFlow(subscriptionManager: subscriptionManager)
+                    let appStoreAccountManagementFlow = DefaultAppStoreAccountManagementFlow(authEndpointService: subscriptionManager.authEndpointService,
+                                                                                             storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                                             accountManager: subscriptionManager.accountManager)
                     await appStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
                 }
             }
@@ -285,7 +287,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if subscriptionManager.currentEnvironment.purchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
                 Task {
-                    let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(subscriptionManager: subscriptionManager)
+                    let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
+                                                                         storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                         subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                                         authEndpointService: subscriptionManager.authEndpointService)
                     await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                     fetchAndUpdateSubscriptionDetails()
                 }

@@ -47,6 +47,7 @@ final class UserScripts: UserScriptsProvider {
     let sslErrorPageUserScript: SSLErrorPageUserScript?
     let onboardingUserScript: OnboardingUserScript?
 
+    // swiftlint:disable:next function_body_length
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript()
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
@@ -102,8 +103,11 @@ final class UserScripts: UserScriptsProvider {
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             let subscriptionManager = Application.appDelegate.subscriptionManager
+            let stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                               authEndpointService: subscriptionManager.authEndpointService,
+                                                               accountManager: subscriptionManager.accountManager)
             let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
-                                                                   stripePurchaseFlow: DefaultStripePurchaseFlow(subscriptionManager: subscriptionManager),
+                                                                   stripePurchaseFlow: stripePurchaseFlow,
                                                                    uiHandler: Application.appDelegate.subscriptionUIHandler)
             subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
             userScripts.append(subscriptionPagesUserScript)
