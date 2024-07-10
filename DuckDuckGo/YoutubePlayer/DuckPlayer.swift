@@ -53,7 +53,7 @@ enum DuckPlayerMode: Equatable, Codable {
 }
 
 /// Values that the Frontend can use to determine the current state.
-struct InitialSetupSettings: Codable {
+struct InitialPlayerSettings: Codable {
     struct PlayerSettings: Codable {
         let pip: PIP
         let autoplay: Autoplay
@@ -61,6 +61,14 @@ struct InitialSetupSettings: Codable {
 
     struct PIP: Codable {
         let state: State
+    }
+    
+    struct Platform: Codable {
+        let name: String
+    }
+    
+    enum Locale: String, Codable {
+        case en
     }
 
     struct Autoplay: Codable {
@@ -71,9 +79,21 @@ struct InitialSetupSettings: Codable {
         case enabled
         case disabled
     }
+    
+    enum Environment: String, Codable {
+        case development
+        case production
+    }
 
     let userValues: UserValues
     let settings: PlayerSettings
+    let platform: Platform
+    let environment: Environment
+    let locale: Locale
+}
+
+struct InitialOverlaySettings: Codable {
+    let userValues: UserValues
 }
 
 // Values that the YouTube Overlays can use to determine the current state
@@ -199,9 +219,15 @@ final class DuckPlayer {
         encodeUserValues()
     }
 
-    public func initialSetup(with webView: WKWebView?) -> (_ params: Any, _ message: UserScriptMessage) async -> Encodable? {
+    public func initialPlayerSetup(with webView: WKWebView?) -> (_ params: Any, _ message: UserScriptMessage) async -> Encodable? {
         return { _, _ in
-            return await self.encodedSettings(with: webView)
+            return await self.encodedPlayerSettings(with: webView)
+        }
+    }
+
+    public func initialOverlaySetup(with webView: WKWebView?) -> (_ params: Any, _ message: UserScriptMessage) async -> Encodable? {
+        return { _, _ in
+            return await self.encodedOverlaySettings(with: webView)
         }
     }
 
@@ -213,7 +239,7 @@ final class DuckPlayer {
     }
 
     @MainActor
-    private func encodedSettings(with webView: WKWebView?) async -> InitialSetupSettings {
+    private func encodedPlayerSettings(with webView: WKWebView?) async -> InitialPlayerSettings {
         var isPiPEnabled = webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] == true
 
         let isAutoplayEnabled = isAutoplayFeatureEnabled && DuckPlayerPreferences.shared.duckPlayerAutoplay
@@ -224,13 +250,27 @@ final class DuckPlayer {
             isPiPEnabled = false
         }
 
-        let pip = InitialSetupSettings.PIP(state: isPiPEnabled ? .enabled : .disabled)
-        let autoplay = InitialSetupSettings.Autoplay(state: isAutoplayEnabled ? .enabled : .disabled)
-
-        let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip, autoplay: autoplay)
+        let pip = InitialPlayerSettings.PIP(state: isPiPEnabled ? .enabled : .disabled)
+        let autoplay = InitialPlayerSettings.Autoplay(state: isAutoplayEnabled ? .enabled : .disabled)
+        let platform = InitialPlayerSettings.Platform(name: "ios")
+        let environment = InitialPlayerSettings.Environment.development
+        let locale = InitialPlayerSettings.Locale.en
+        let playerSettings = InitialPlayerSettings.PlayerSettings(pip: pip, autoplay: autoplay)
         let userValues = encodeUserValues()
 
-        return InitialSetupSettings(userValues: userValues, settings: playerSettings)
+        return InitialPlayerSettings(userValues: userValues,
+                                     settings: playerSettings,
+                                     platform: platform,
+                                     environment: environment,
+                                     locale: locale)
+    }
+
+    @MainActor
+    private func encodedOverlaySettings(with webView: WKWebView?) async -> InitialOverlaySettings {
+        var isPiPEnabled = webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] == true
+        let userValues = encodeUserValues()
+        
+        return InitialOverlaySettings(userValues: userValues)
     }
 
     // MARK: - Private

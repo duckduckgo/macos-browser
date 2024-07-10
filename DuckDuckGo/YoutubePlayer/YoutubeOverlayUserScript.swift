@@ -84,7 +84,7 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
         case .getUserValues:
             return DuckPlayer.shared.handleGetUserValues
         case .initialSetup:
-            return handleInitialSetup
+            return DuckPlayer.shared.initialOverlaySetup(with: webView)
         case .openDuckPlayer:
             return handleOpenDuckPlayer
         case .sendDuckPlayerPixel:
@@ -117,21 +117,6 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
         }
         self.delegate?.youtubeOverlayUserScriptDidRequestDuckPlayer(with: url, in: webView)
         return nil
-    }
-
-    private func handleInitialSetup(params: Any, message: UserScriptMessage) -> Encodable? {
-        encodeInitialSetup()
-    }
-
-    private func encodeInitialSetup() -> OverlaysInitialSettings {
-        let userValues = UserValues(
-            duckPlayerMode: duckPlayerPreferences.duckPlayerMode,
-            overlayInteracted: duckPlayerPreferences.youtubeOverlayInteracted
-        )
-
-        return OverlaysInitialSettings(
-            userValues: userValues
-        )
     }
 
     // MARK: - UserValuesNotification
