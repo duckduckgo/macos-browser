@@ -345,7 +345,7 @@ final class TabViewModel {
         }
     }
 
-    private func updateTitle() { // swiftlint:disable:this cyclomatic_complexity
+    private func updateTitle() {
         var title: String
         switch tab.content {
             // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
@@ -388,7 +388,6 @@ final class TabViewModel {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func updateFavicon(_ tabFavicon: NSImage?? = .none /* provided from .sink or taken from tab.favicon (optional) if .none */) {
         guard !isShowingErrorPage else {
             favicon = errorFaviconToShow(error: tab.error)

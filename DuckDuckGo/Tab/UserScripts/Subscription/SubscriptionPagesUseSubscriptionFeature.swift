@@ -74,7 +74,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         static let getAccessToken = "getAccessToken"
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch methodName {
         case Handlers.getSubscription: return getSubscription
@@ -166,7 +165,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         return SubscriptionOptions.empty
     }
 
-    // swiftlint:disable:next function_body_length cyclomatic_complexity
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseAttempt, frequency: .dailyAndCount)
         struct SubscriptionSelection: Decodable {

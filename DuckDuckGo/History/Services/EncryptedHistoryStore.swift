@@ -156,7 +156,6 @@ final class EncryptedHistoryStore: HistoryStoring {
         }
     }
 
-    // swiftlint:disable:next function_body_length
     func save(entry: HistoryEntry) -> Future<[(id: Visit.ID, date: Date)], Error> {
         return Future { [weak self] promise in
             self?.context.perform { [weak self] in

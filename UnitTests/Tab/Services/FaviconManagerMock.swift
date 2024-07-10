@@ -53,7 +53,6 @@ final class FaviconManagerMock: FaviconManagement {
         completion()
     }
 
-    // swiftlint:disable:next function_parameter_count
     func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: any DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, exceptExistingHistory history: History.BrowsingHistory, tld: Common.TLD, completion: @escaping @MainActor () -> Void) {
         completion()
     }

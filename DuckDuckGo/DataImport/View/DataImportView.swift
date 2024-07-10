@@ -102,7 +102,6 @@ struct DataImportView: ModalView {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func viewBody() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             // body
@@ -452,7 +451,6 @@ extension DataImportViewModel {
             self.dataType = dataType
         }
 
-        // swiftlint:disable:next function_body_length
         func importData(types: Set<DataImport.DataType>) -> DataImportTask {
             .detachedWithProgress(.initial) { progressUpdate in
                 func makeProgress(_ op: (Double) throws -> Void) async throws {

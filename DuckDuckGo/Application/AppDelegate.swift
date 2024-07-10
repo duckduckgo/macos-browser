@@ -40,8 +40,6 @@ import NetworkProtectionIPC
 import DataBrokerProtection
 import RemoteMessaging
 
-// @MainActor
-// swiftlint:disable:next type_body_length
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG
@@ -149,7 +147,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return firstLaunchDate >= Date.weekAgo
     }
 
-    // swiftlint:disable:next function_body_length
     override init() {
         do {
             let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
@@ -278,7 +275,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                                                               vpnUninstaller: vpnUninstaller)
     }
 
-    // swiftlint:disable:next function_body_length
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard NSApp.runType.requiresEnvironment else { return }
         defer {
