@@ -25,25 +25,32 @@ public final class PopoverMessageViewModel: ObservableObject {
     @Published var image: NSImage?
     @Published var buttonText: String?
     @Published public var buttonAction: (() -> Void)?
+    var shouldShowCloseButton: Bool
 
     public init(message: String,
                 image: NSImage? = nil,
                 buttonText: String? = nil,
-                buttonAction: (() -> Void)? = nil) {
+                buttonAction: (() -> Void)? = nil,
+                shouldShowCloseButton: Bool = false) {
         self.message = message
         self.image = image
         self.buttonText = buttonText
         self.buttonAction = buttonAction
+        self.shouldShowCloseButton = shouldShowCloseButton
     }
 }
 
 public struct PopoverMessageView: View {
     @ObservedObject public var viewModel: PopoverMessageViewModel
-    var onClick: () -> Void
+    var onClick: (() -> Void)?
+    var onClose: (() -> Void)?
 
-    public init(viewModel: PopoverMessageViewModel, onClick: @escaping () -> Void) {
+    public init(viewModel: PopoverMessageViewModel,
+                onClick: (() -> Void)?,
+                onClose: (() -> Void)?) {
         self.viewModel = viewModel
         self.onClick = onClick
+        self.onClose = onClose
     }
 
     public var body: some View {
@@ -59,12 +66,23 @@ public struct PopoverMessageView: View {
                     .font(.body)
                     .fontWeight(.bold)
                     .padding(.leading, 4)
-                    .padding(.trailing, 7)
 
                 if let text = viewModel.buttonText,
                    let action = viewModel.buttonAction {
                     Button(text, action: action)
                         .padding(.top, 2)
+                        .padding(.leading, 7)
+                }
+
+                if viewModel.shouldShowCloseButton {
+                    Button(action: {
+                        onClose?()
+                    }) {
+                        Image(.updateNotificationClose)
+                            .frame(width: 16, height: 16)
+                    }
+                    .padding(.top, 2)
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
             .padding()
@@ -82,7 +100,7 @@ final class ClickableView: NSView {
 }
 
 struct ClickableViewRepresentable: NSViewRepresentable {
-    var onClick: () -> Void
+    var onClick: (() -> Void)?
 
     func makeNSView(context: Context) -> ClickableView {
         let view = ClickableView()

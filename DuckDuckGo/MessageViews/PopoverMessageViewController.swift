@@ -19,8 +19,7 @@
 import AppKit
 import SwiftUI
 import SwiftUIExtensions
-
-final class PopoverMessageViewController: NSHostingController<PopoverMessageView> {
+final class PopoverMessageViewController: NSHostingController<PopoverMessageView>, NSPopoverDelegate {
 
     enum Constants {
         static let storyboardName = "MessageViews"
@@ -39,14 +38,19 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
          image: NSImage? = nil,
          buttonText: String? = nil,
          buttonAction: (() -> Void)? = nil,
+         shouldShowCloseButton: Bool = false,
          autoDismissDuration: TimeInterval = Constants.autoDismissDuration,
          onDismiss: (() -> Void)? = nil,
          onClick: (() -> Void)? = nil) {
-        self.viewModel = PopoverMessageViewModel(message: message, image: image, buttonText: buttonText, buttonAction: buttonAction)
+        self.viewModel = PopoverMessageViewModel(message: message,
+                                                 image: image,
+                                                 buttonText: buttonText,
+                                                 buttonAction: buttonAction,
+                                                 shouldShowCloseButton: shouldShowCloseButton)
         self.onDismiss = onDismiss
         self.autoDismissDuration = autoDismissDuration
         self.onClick = onClick
-        let contentView = PopoverMessageView(viewModel: self.viewModel, onClick: { })
+        let contentView = PopoverMessageView(viewModel: self.viewModel, onClick: { }, onClose: { })
         super.init(rootView: contentView)
         self.rootView = createContentView()
     }
@@ -135,9 +139,10 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
     }
 
     private func createContentView() -> PopoverMessageView {
-        return PopoverMessageView(viewModel: self.viewModel) {
-            self.dismissPopover()
+        return PopoverMessageView(viewModel: self.viewModel, onClick: { [weak self] in
+            self?.onClick?()
+        }) { [weak self] in
+            self?.dismissPopover()
         }
     }
-
 }

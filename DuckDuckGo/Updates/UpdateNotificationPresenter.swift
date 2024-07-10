@@ -40,6 +40,7 @@ final class UpdateNotificationPresenter {
                                                               image: icon,
                                                               buttonText: buttonText,
                                                               buttonAction: buttonAction,
+                                                              shouldShowCloseButton: true,
                                                               autoDismissDuration: 10,
                                                               onClick: { [weak self] in
                 self?.openUpdatesPage()
