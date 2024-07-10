@@ -22,6 +22,7 @@ import ContentBlocking
 import TrackerRadarKit
 import WebKit
 import XCTest
+import Navigation
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -73,9 +74,16 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     var schemeHandler: TestSchemeHandler!
     var extensionsBuilder: TestTabExtensionsBuilder!
 
+    var navExtension: TestsClosureNavigationResponderTabExtension!
+    var decidePolicy: (NavigationAction) -> NavigationActionPolicy? = { _ in .next }
+
     override func setUp() {
         contentBlockingMock = ContentBlockingMock(adClickAttributionEnabled: true)
         privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
+
+        navExtension = TestsClosureNavigationResponderTabExtension(.init { navAction, _ in
+            self.decidePolicy(navAction)
+        })
 
         extensionsBuilder = TestTabExtensionsBuilder(load: [AdClickAttributionTabExtension.self]) { [unowned self] builder in { args, dependencies in
             builder.override {
@@ -87,6 +95,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
                                                dateTimeProvider: { self.now }) { _ in
                     (logic: self.logic, detection: self.detection)
                 }
+            }
+            builder.add {
+                self.navExtension
             }
         }}
 
@@ -306,6 +317,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         detection.onDidFinish = { _ in
             onDetectionDidFinish.fulfill()
         }
+        detection.onDidFail = {
+            XCTFail("Not expected")
+        }
         logic.onDidFinish = { [now, urls] host, date in
             XCTAssertEqual(host, urls.url2.host!)
             XCTAssertEqual(date, now)
@@ -314,6 +328,61 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
 
         tab.setContent(.url(urls.url1, source: .link))
         waitForExpectations(timeout: 5)
+    }
+
+    func testWhenDeveloperRedirects_didFailNotCalledForRedirectedNavigation() throws {
+        // disable waiting for CBR compilation on navigation
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
+            return false
+        }
+        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        DispatchQueue.main.async {
+            self.makeContentBlockerRulesUserScript()
+        }
+
+        decidePolicy = { navAction in
+            if navAction.request.url == self.urls.url1 {
+                return .redirect(navAction.mainFrameTarget!, { navigator in
+                    navigator.load(.init(url: self.urls.url2))
+                })
+            } else {
+                return .next
+            }
+        }
+
+        schemeHandler.middleware = [{ [data] request in
+            return .ok(.html(data.html.utf8String()!))
+        }]
+
+        var onDetectionDidStart = expectation(description: "detection.onDidStart")
+        detection.onDidStart = { _ in
+            onDetectionDidStart.fulfill()
+        }
+        var on2XXResponse = expectation(description: "on2XXResponse")
+        detection.on2XXResponse = { _ in
+            on2XXResponse.fulfill()
+        }
+        var onNavigation = expectation(description: "onNavigation")
+        logic.onNavigation = {
+            onNavigation.fulfill()
+        }
+
+        let onDetectionDidFinish = expectation(description: "detection.onDidFinish")
+        let onLogicDidFinish = expectation(description: "logic.onDidFinish")
+        detection.onDidFinish = { _ in
+            onDetectionDidFinish.fulfill()
+        }
+        detection.onDidFail = {
+            XCTFail("Not expected")
+        }
+        logic.onDidFinish = { [now, urls] host, date in
+            XCTAssertEqual(host, urls.url2.host!)
+            XCTAssertEqual(date, now)
+            onLogicDidFinish.fulfill()
+        }
+
+        tab.setContent(.url(urls.url1, source: .link))
+        waitForExpectations(timeout: 60)
     }
 
     func testWhenNavigationFails_eventsSent() {
