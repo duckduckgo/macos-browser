@@ -26,36 +26,28 @@ final class UpdateNotificationPresenter {
     private var notificationView: NSView?
     private var hideTimer: Timer?
 
-    func showUpdateNotification(icon: NSImage, text: String) {
-        // Close the current notification if it's still visible
-        closeUpdateNotification()
+    func showUpdateNotification(icon: NSImage, text: String, buttonText: String? = nil) {
+        DispatchQueue.main.async {
+            guard let mainWindow = NSApp.mainWindow as? MainWindow,
+                  let windowController = mainWindow.windowController as? MainWindowController,
+                  let button = windowController.mainViewController.navigationBarViewController.optionsButton else { return }
 
-        let notificationSize = CGRect(x: 0, y: 0, width: 300, height: 60)
+            let buttonAction: (() -> Void)? = { [weak self] in
+                self?.openUpdatesPage()
+            }
 
-        let updateNotificationView = UpdateNotificationView(icon: icon, text: text, onClose: { [weak self] in
-            self?.closeUpdateNotification()
-        }, onTap: { [weak self] in
-            self?.closeUpdateNotification()
-            self?.openUpdatesPage()
-        })
+            let viewController = PopoverMessageViewController(message: text,
+                                                              image: icon,
+                                                              buttonText: buttonText,
+                                                              buttonAction: buttonAction,
+                                                              autoDismissDuration: 10,
+                                                              onClick: { [weak self] in
+                self?.openUpdatesPage()
+            })
 
-        let hostingController = NSHostingController(rootView: updateNotificationView)
-        let notificationView = hostingController.view
-        notificationView.frame = notificationSize
-
-        guard let mainWindow = NSApp.mainWindow else { return }
-
-        // Add observer for window resize
-        NotificationCenter.default.addObserver(self, selector: #selector(windowDidResize(_:)), name: NSWindow.didResizeNotification, object: mainWindow)
-
-        updateNotificationPosition(in: mainWindow, with: notificationView, notificationSize: notificationSize.size)
-
-        mainWindow.contentView?.addSubview(notificationView)
-
-        self.notificationView = notificationView
-
-        // Set a timer to automatically hide the notification after the presentation time interval
-        hideTimer = Timer.scheduledTimer(timeInterval: Self.presentationTimeInterval, target: self, selector: #selector(fadeOutNotification), userInfo: nil, repeats: false)
+            viewController.show(onParent: windowController.mainViewController,
+                                relativeTo: button)
+        }
     }
 
     func closeUpdateNotification() {

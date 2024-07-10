@@ -80,10 +80,6 @@
 		1D69C553291302F200B75945 /* BWVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D69C552291302F200B75945 /* BWVault.swift */; };
 		1D6A492029CF7A490011DF74 /* NSPopoverExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */; };
 		1D6A492129CF7A490011DF74 /* NSPopoverExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */; };
-		1D72D5922BFF3DF000AEDE36 /* UpdateNotificationWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D72D5912BFF3DF000AEDE36 /* UpdateNotificationWindow.swift */; };
-		1D72D5942BFF3DF800AEDE36 /* UpdateNotificationWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D72D5912BFF3DF000AEDE36 /* UpdateNotificationWindow.swift */; };
-		1D72D5962BFF3FAF00AEDE36 /* UpdateNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D72D5952BFF3FAF00AEDE36 /* UpdateNotificationView.swift */; };
-		1D72D5972BFF3FAF00AEDE36 /* UpdateNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D72D5952BFF3FAF00AEDE36 /* UpdateNotificationView.swift */; };
 		1D72D59C2BFF61B200AEDE36 /* UpdateNotificationPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D72D59B2BFF61B200AEDE36 /* UpdateNotificationPresenter.swift */; };
 		1D72D59D2BFF61B200AEDE36 /* UpdateNotificationPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D72D59B2BFF61B200AEDE36 /* UpdateNotificationPresenter.swift */; };
 		1D7693FF2BE3A1AA0016A22B /* DockCustomizerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7693FE2BE3A1AA0016A22B /* DockCustomizerMock.swift */; };
@@ -2940,8 +2936,6 @@
 		1D6216B129069BBF00386B2C /* BWKeyStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWKeyStorage.swift; sourceTree = "<group>"; };
 		1D69C552291302F200B75945 /* BWVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWVault.swift; sourceTree = "<group>"; };
 		1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPopoverExtension.swift; sourceTree = "<group>"; };
-		1D72D5912BFF3DF000AEDE36 /* UpdateNotificationWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateNotificationWindow.swift; sourceTree = "<group>"; };
-		1D72D5952BFF3FAF00AEDE36 /* UpdateNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateNotificationView.swift; sourceTree = "<group>"; };
 		1D72D59B2BFF61B200AEDE36 /* UpdateNotificationPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateNotificationPresenter.swift; sourceTree = "<group>"; };
 		1D7693FE2BE3A1AA0016A22B /* DockCustomizerMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DockCustomizerMock.swift; sourceTree = "<group>"; };
 		1D77921728FDC54C00BE0210 /* FaviconReferenceCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconReferenceCacheTests.swift; sourceTree = "<group>"; };
@@ -4633,8 +4627,6 @@
 				AAD86E51267A0DFF005C11BE /* UpdateController.swift */,
 				1DA84D312C119AE70011C80F /* UpdateMenuItemFactory.swift */,
 				1D72D59B2BFF61B200AEDE36 /* UpdateNotificationPresenter.swift */,
-				1D72D5912BFF3DF000AEDE36 /* UpdateNotificationWindow.swift */,
-				1D72D5952BFF3FAF00AEDE36 /* UpdateNotificationView.swift */,
 				1D9297BE2C1B062900A38521 /* UpdateDetector.swift */,
 				1D0DE93D2C3BA9840037ABC2 /* AppRestarter.swift */,
 				1D39E5762C2BFD5700757339 /* ReleaseNotesTabExtension.swift */,
@@ -9816,7 +9808,6 @@
 				3706FAD1293F65D500E42796 /* VisitViewModel.swift in Sources */,
 				3706FAD2293F65D500E42796 /* Atb.swift in Sources */,
 				3706FAD3293F65D500E42796 /* DownloadsViewController.swift in Sources */,
-				1D72D5972BFF3FAF00AEDE36 /* UpdateNotificationView.swift in Sources */,
 				3706FAD4293F65D500E42796 /* DataExtension.swift in Sources */,
 				3706FAD6293F65D500E42796 /* ConfigurationStore.swift in Sources */,
 				3706FAD7293F65D500E42796 /* Feedback.swift in Sources */,
@@ -10106,7 +10097,6 @@
 				3706FB96293F65D500E42796 /* RecentlyClosedWindow.swift in Sources */,
 				4B9DB0242A983B24000927DB /* WaitlistRequest.swift in Sources */,
 				B690152D2ACBF4DA00AD0BAB /* MenuPreview.swift in Sources */,
-				1D72D5942BFF3DF800AEDE36 /* UpdateNotificationWindow.swift in Sources */,
 				1D36F4252A3B85C50052B527 /* TabCleanupPreparer.swift in Sources */,
 				3706FB97293F65D500E42796 /* ActionSpeech.swift in Sources */,
 				B6AFE6BD29A5D621002FF962 /* HTTPSUpgradeTabExtension.swift in Sources */,
@@ -11760,7 +11750,6 @@
 				8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */,
 				987799F32999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift in Sources */,
 				B6E3E5582BBFD51400A41922 /* PreviewViewController.swift in Sources */,
-				1D72D5962BFF3FAF00AEDE36 /* UpdateNotificationView.swift in Sources */,
 				4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */,
 				37F19A6728E1B43200740DC6 /* DuckPlayerPreferences.swift in Sources */,
 				1D01A3D42B88CF7700FE8150 /* AccessibilityPreferences.swift in Sources */,
@@ -11774,7 +11763,6 @@
 				1DDC84FF2B835BC000670238 /* SearchPreferences.swift in Sources */,
 				B693955726F04BEC0015B914 /* MouseOverButton.swift in Sources */,
 				AA61C0D02722159B00E6B681 /* FireInfoViewController.swift in Sources */,
-				1D72D5922BFF3DF000AEDE36 /* UpdateNotificationWindow.swift in Sources */,
 				9D9AE8692AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift in Sources */,
 				9F9C49F92BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */,
 				B64C85422694590B0048FEBE /* PermissionButton.swift in Sources */,

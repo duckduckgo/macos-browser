@@ -39,29 +39,58 @@ public final class PopoverMessageViewModel: ObservableObject {
 
 public struct PopoverMessageView: View {
     @ObservedObject public var viewModel: PopoverMessageViewModel
+    var onClick: () -> Void
 
-    public init(viewModel: PopoverMessageViewModel) {
+    public init(viewModel: PopoverMessageViewModel, onClick: @escaping () -> Void) {
         self.viewModel = viewModel
+        self.onClick = onClick
     }
 
     public var body: some View {
-        HStack {
-            if let image = viewModel.image {
-                Image(nsImage: image)
-            }
+        ZStack {
+            ClickableViewRepresentable(onClick: onClick)
+                .background(Color.clear)
+            HStack {
+                if let image = viewModel.image {
+                    Image(nsImage: image)
+                }
 
-            Text(viewModel.message)
-                .font(.body)
-                .fontWeight(.bold)
-                .padding(.leading, 4)
-                .padding(.trailing, 7)
+                Text(viewModel.message)
+                    .font(.body)
+                    .fontWeight(.bold)
+                    .padding(.leading, 4)
+                    .padding(.trailing, 7)
 
-            if let text = viewModel.buttonText,
-               let action = viewModel.buttonAction {
-                Button(text, action: action)
-                    .padding(.top, 2)
+                if let text = viewModel.buttonText,
+                   let action = viewModel.buttonAction {
+                    Button(text, action: action)
+                        .padding(.top, 2)
+                }
             }
+            .padding()
         }
-        .padding()
+    }
+}
+
+final class ClickableView: NSView {
+    var onClick: (() -> Void)?
+
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+        onClick?()
+    }
+}
+
+struct ClickableViewRepresentable: NSViewRepresentable {
+    var onClick: () -> Void
+
+    func makeNSView(context: Context) -> ClickableView {
+        let view = ClickableView()
+        view.onClick = onClick
+        return view
+    }
+
+    func updateNSView(_ nsView: ClickableView, context: Context) {
+        nsView.onClick = onClick
     }
 }

@@ -30,6 +30,8 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
 
     let viewModel: PopoverMessageViewModel
     let onDismiss: (() -> Void)?
+    let autoDismissDuration: TimeInterval
+    let onClick: (() -> Void)?
     private var timer: Timer?
     private var trackingArea: NSTrackingArea?
 
@@ -37,11 +39,16 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
          image: NSImage? = nil,
          buttonText: String? = nil,
          buttonAction: (() -> Void)? = nil,
-         onDismiss: (() -> Void)? = nil) {
+         autoDismissDuration: TimeInterval = Constants.autoDismissDuration,
+         onDismiss: (() -> Void)? = nil,
+         onClick: (() -> Void)? = nil) {
         self.viewModel = PopoverMessageViewModel(message: message, image: image, buttonText: buttonText, buttonAction: buttonAction)
         self.onDismiss = onDismiss
-        let contentView = PopoverMessageView(viewModel: self.viewModel)
+        self.autoDismissDuration = autoDismissDuration
+        self.onClick = onClick
+        let contentView = PopoverMessageView(viewModel: self.viewModel, onClick: { })
         super.init(rootView: contentView)
+        self.rootView = createContentView()
     }
 
     required init?(coder: NSCoder) {
@@ -95,7 +102,7 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
 
     private func scheduleAutoDismissTimer() {
         cancelAutoDismissTimer()
-        timer = Timer.scheduledTimer(withTimeInterval: Constants.autoDismissDuration, repeats: false) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: autoDismissDuration, repeats: false) { [weak self] _ in
             guard let self = self else { return }
             self.presentingViewController?.dismiss(self)
         }
@@ -116,6 +123,21 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
 
     override func mouseExited(with event: NSEvent) {
         scheduleAutoDismissTimer()
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        onClick?()
+        presentingViewController?.dismiss(self)
+    }
+
+    private func dismissPopover() {
+        presentingViewController?.dismiss(self)
+    }
+
+    private func createContentView() -> PopoverMessageView {
+        return PopoverMessageView(viewModel: self.viewModel) {
+            self.dismissPopover()
+        }
     }
 
 }
