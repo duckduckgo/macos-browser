@@ -51,6 +51,7 @@ struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersisto
 }
 
 final class DuckPlayerPreferences: ObservableObject {
+    private let internalUserDecider: InternalUserDecider
 
     static let shared = DuckPlayerPreferences()
     private let privacyConfigurationManager: PrivacyConfigurationManaging
@@ -82,12 +83,12 @@ final class DuckPlayerPreferences: ObservableObject {
     }
 
     var shouldDisplayAutoPlaySettings: Bool {
-        privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
+        privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay) || internalUserDecider.isInternalUser
     }
 
     var shouldDisplayNewTabSettings: Bool {
         #warning("Implement FF")
-        return true
+        return true || internalUserDecider.isInternalUser
     }
 
     var isNewTabSettingsAvailable: Bool {
@@ -107,7 +108,8 @@ final class DuckPlayerPreferences: ObservableObject {
     }
 
     init(persistor: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor(),
-         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+         internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider) {
         self.persistor = persistor
         duckPlayerMode = .init(persistor.duckPlayerModeBool)
         youtubeOverlayInteracted = persistor.youtubeOverlayInteracted
@@ -115,6 +117,7 @@ final class DuckPlayerPreferences: ObservableObject {
         duckPlayerAutoplay = persistor.duckPlayerAutoplay
         duckPlayerOpenInNewTab = persistor.duckPlayerOpenInNewTab
         self.privacyConfigurationManager = privacyConfigurationManager
+        self.internalUserDecider = internalUserDecider
     }
 
     private var persistor: DuckPlayerPreferencesPersistor
