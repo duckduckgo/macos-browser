@@ -46,7 +46,7 @@ struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersisto
     @UserDefaultsWrapper(key: .duckPlayerAutoplay, defaultValue: true)
     var duckPlayerAutoplay: Bool
 
-    @UserDefaultsWrapper(key: .duckPlayerOpenInNewTab, defaultValue: true)
+    @UserDefaultsWrapper(key: .duckPlayerOpenInNewTab, defaultValue: false)
     var duckPlayerOpenInNewTab: Bool
 }
 
