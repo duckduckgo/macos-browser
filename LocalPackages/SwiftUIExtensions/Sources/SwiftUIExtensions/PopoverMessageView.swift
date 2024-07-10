@@ -57,15 +57,18 @@ public struct PopoverMessageView: View {
         ZStack {
             ClickableViewRepresentable(onClick: onClick)
                 .background(Color.clear)
-            HStack {
+            HStack(alignment: .top) {
                 if let image = viewModel.image {
                     Image(nsImage: image)
+                        .padding(.top, 2)
                 }
 
                 Text(viewModel.message)
                     .font(.body)
                     .fontWeight(.bold)
                     .padding(.leading, 4)
+                    .frame(width: 150)
+                    .lineLimit(nil)
 
                 if let text = viewModel.buttonText,
                    let action = viewModel.buttonAction {
@@ -81,7 +84,6 @@ public struct PopoverMessageView: View {
                         Image(.updateNotificationClose)
                             .frame(width: 16, height: 16)
                     }
-                    .padding(.top, 2)
                     .buttonStyle(PlainButtonStyle())
                 }
             }
