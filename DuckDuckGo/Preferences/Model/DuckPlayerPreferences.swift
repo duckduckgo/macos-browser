@@ -87,8 +87,7 @@ final class DuckPlayerPreferences: ObservableObject {
     }
 
     var shouldDisplayNewTabSettings: Bool {
-        #warning("Implement FF")
-        return true || internalUserDecider.isInternalUser
+        privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.openInNewTab) || internalUserDecider.isInternalUser
     }
 
     var isNewTabSettingsAvailable: Bool {
