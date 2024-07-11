@@ -47,6 +47,7 @@ extension Preferences {
                             if geometry.size.width > 400 {
                                 HStack(alignment: .top) {
                                     Image(.aboutPageLogo)
+                                        .padding(.top, 2)
                                     VStack(alignment: .leading, spacing: 8) {
                                         rightColumnContent
                                     }
@@ -134,7 +135,6 @@ extension Preferences {
                 Text(UserText.privacySimplified).font(.privacySimplified)
                     .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(.leading)
-                    .padding(.bottom, 4)
 
                 HStack {
                     statusIcon.frame(width: 16, height: 16)
