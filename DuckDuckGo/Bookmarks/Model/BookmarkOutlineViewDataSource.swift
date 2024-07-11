@@ -34,6 +34,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     private(set) var contentMode: ContentMode
     private(set) var expandedNodesIDs = Set<String>()
     private(set) var isSearching = false
+    private(set) var destinationFolderOnSearch: BookmarkFolder?
     private let bookmarkManager: BookmarkManager
     private let showMenuButtonOnHover: Bool
     private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
@@ -64,6 +65,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     func reloadData() {
         isSearching = false
+        destinationFolderOnSearch = nil
         setFolderCount()
         treeController.rebuild()
     }
@@ -194,7 +196,8 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
 
         if isSearching {
-            if destinationNode.representedObject is BookmarkFolder {
+            if let destinationFolder = destinationNode.representedObject as? BookmarkFolder {
+                self.destinationFolderOnSearch = destinationFolder
                 return .move
             }
 

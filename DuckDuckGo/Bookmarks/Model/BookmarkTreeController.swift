@@ -64,20 +64,22 @@ final class BookmarkTreeController {
         visit(node: rootNode, visitor: visitBlock)
     }
 
-    func node(representing object: AnyObject) -> BookmarkNode? {
-        return nodeInArrayRepresentingObject(nodes: [rootNode], representedObject: object)
+    func node(representing object: AnyObject, forSearch: Bool = false) -> BookmarkNode? {
+        return nodeInArrayRepresentingObject(nodes: [rootNode], representedObject: object, forSearch: forSearch)
     }
 
     // MARK: - Private
 
-    private func nodeInArrayRepresentingObject(nodes: [BookmarkNode], representedObject: AnyObject) -> BookmarkNode? {
+    private func nodeInArrayRepresentingObject(nodes: [BookmarkNode], representedObject: AnyObject, forSearch: Bool = false) -> BookmarkNode? {
         for node in nodes {
-            if node.representedObjectEquals(representedObject) {
+            if node.representedObjectEquals(representedObject, forSearch: forSearch) {
                 return node
             }
 
             if node.canHaveChildNodes {
-                if let foundNode = nodeInArrayRepresentingObject(nodes: node.childNodes, representedObject: representedObject) {
+                if let foundNode = nodeInArrayRepresentingObject(nodes: node.childNodes,
+                                                                 representedObject: representedObject,
+                                                                 forSearch: forSearch) {
                     return foundNode
                 }
             }

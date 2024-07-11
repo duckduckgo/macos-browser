@@ -200,6 +200,15 @@ class BookmarkNodeTests: XCTestCase {
         XCTAssertFalse(node.representedObjectEquals(TestObject()))
     }
 
+    func testWhenCheckingRepresentedObjectEqualityForSearch_AndObjectsHaveSameId_ThenTrueIsReturned() {
+        let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true)
+        let firstFolder = BookmarkFolder(id: "2", title: "Folder", children: [])
+        let firstFolderWithDifferentChildren = BookmarkFolder(id: "2", title: "Folder", children: [bookmark])
+        let node = BookmarkNode(representedObject: firstFolder, parent: nil)
+
+        XCTAssertTrue(node.representedObjectEquals(firstFolderWithDifferentChildren, forSearch: true))
+    }
+
     func testWhenFindingOrCreatingChildNode_AndChildExists_ThenChildIsReturned() {
         let childObject = TestObject()
         let rootNode = BookmarkNode(representedObject: TestObject(), parent: nil)

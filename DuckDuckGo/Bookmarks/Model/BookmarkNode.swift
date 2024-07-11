@@ -88,14 +88,14 @@ final class BookmarkNode: Hashable {
         BookmarkNode.incrementingID += 1
     }
 
-    func representedObjectEquals(_ otherRepresentedObject: AnyObject) -> Bool {
+    func representedObjectEquals(_ otherRepresentedObject: AnyObject, forSearch: Bool = false) -> Bool {
         if let entity = otherRepresentedObject as? BaseBookmarkEntity,
            let nodeEntity = self.representedObject as? BaseBookmarkEntity,
-           entity == nodeEntity {
+           (forSearch ? entity.id == nodeEntity.id : entity == nodeEntity) {
             return true
         }
 
-        if let folder = otherRepresentedObject as? PseudoFolder, let nodeFolder = self.representedObject as? PseudoFolder, folder == nodeFolder {
+        if let folder = otherRepresentedObject as? PseudoFolder, let nodeFolder = self.representedObject as? PseudoFolder {
             return true
         }
 

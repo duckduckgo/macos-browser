@@ -370,15 +370,17 @@ final class BookmarkListViewController: NSViewController {
                                              FolderPasteboardWriter.folderUTIInternalType])
 
         bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] list in
-            self?.reloadData()
+            guard let self = self else { return }
+
+            self.reloadData()
             let isEmpty = list?.topLevelEntities.isEmpty ?? true
 
             if isEmpty {
-                self?.searchBookmarksButton.isHidden = true
-                self?.showEmptyStateView(for: .noBookmarks)
+                self.searchBookmarksButton.isHidden = true
+                self.showEmptyStateView(for: .noBookmarks)
             } else {
-                self?.searchBookmarksButton.isHidden = false
-                self?.outlineView.isHidden = false
+                self.searchBookmarksButton.isHidden = false
+                self.outlineView.isHidden = false
             }
         }.store(in: &cancellables)
     }
@@ -390,12 +392,28 @@ final class BookmarkListViewController: NSViewController {
     }
 
     private func reloadData() {
-        let selectedNodes = self.selectedNodes
+        if dataSource.isSearching {
+            if let destinationFolder = dataSource.destinationFolderOnSearch {
+                hideSearchBar()
+                updateSearchAndExpand(destinationFolder)
+            } else {
+                dataSource.reloadData(for: searchBar.stringValue)
+                outlineView.reloadData()
+            }
+        } else {
+            let selectedNodes = self.selectedNodes
 
-        dataSource.reloadData()
-        outlineView.reloadData()
+            dataSource.reloadData()
+            outlineView.reloadData()
 
-        expandAndRestore(selectedNodes: selectedNodes)
+            expandAndRestore(selectedNodes: selectedNodes)
+        }
+    }
+
+    private func updateSearchAndExpand(_ folder: BookmarkFolder) {
+        showTreeView()
+        expandFoldersAndScrollUntil(folder)
+        outlineView.scrollTo(folder)
     }
 
     @objc func newBookmarkButtonClicked(_ sender: AnyObject) {
@@ -416,6 +434,7 @@ final class BookmarkListViewController: NSViewController {
             showSearchBar()
         } else {
             hideSearchBar()
+            showTreeView()
         }
     }
 
@@ -433,7 +452,7 @@ final class BookmarkListViewController: NSViewController {
         searchBar.stringValue = ""
         searchBar.removeFromSuperview()
         boxDividerTopConstraint.isActive = true
-        showTreeView()
+        isSearchVisible = false
     }
 
     @objc func openManagementInterface(_ sender: NSButton) {
@@ -448,9 +467,8 @@ final class BookmarkListViewController: NSViewController {
            let bookmark = node.representedObject as? Bookmark {
             onBookmarkClick(bookmark)
         } else if let node = item as? BookmarkNode, let folder = node.representedObject as? BookmarkFolder, dataSource.isSearching {
-            showTreeView()
-            expandFoldersUntil(folder: folder)
-            outlineView.scrollTo(node)
+            hideSearchBar()
+            updateSearchAndExpand(folder)
         } else {
             handleItemClickWhenNotInSearchMode(item: item)
         }
@@ -469,11 +487,19 @@ final class BookmarkListViewController: NSViewController {
         }
     }
 
-    private func expandFoldersUntil(folder: BookmarkFolder) {
+    private func expandFoldersAndScrollUntil(_ folder: BookmarkFolder) {
+        guard let folderNode = treeController.node(representing: folder, forSearch: true) else {
+            return
+        }
+
+        expandFoldersUntil(node: folderNode)
+        outlineView.scrollTo(folderNode)
+    }
+
+    private func expandFoldersUntil(node: BookmarkNode?) {
         var nodes: [BookmarkNode?] = []
-        let newNodePosition = dataSource.treeController.node(representing: folder)
-        var parent = newNodePosition?.parent
-        nodes.append(newNodePosition)
+        var parent = node?.parent
+        nodes.append(node)
 
         while parent != nil {
             nodes.append(parent)
@@ -482,9 +508,7 @@ final class BookmarkListViewController: NSViewController {
 
         while !nodes.isEmpty {
             if let current = nodes.removeLast() {
-                if !current.isRoot {
-                    outlineView.animator().expandItem(current)
-                }
+                outlineView.animator().expandItem(current)
             }
         }
     }
@@ -805,7 +829,7 @@ final class BookmarkListPopover: NSPopover {
         super.init()
 
         self.animates = false
-        self.behavior = .transient
+        self.behavior = .applicationDefined // TODO: This should be transient, I'm chaning for debugging it
 
         setupContentController()
     }
