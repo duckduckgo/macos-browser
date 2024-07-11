@@ -100,7 +100,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     internal func runScanOperation(on runner: WebJobRunner,
                                    brokerProfileQueryData: BrokerProfileQueryData,
                                    database: DataBrokerProtectionRepository,
