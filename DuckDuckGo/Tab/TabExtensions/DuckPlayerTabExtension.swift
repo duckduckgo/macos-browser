@@ -342,7 +342,12 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
         if navigation.url.isDuckPlayer {
             let setting = duckPlayer.mode == .enabled ? "always" : "default"
-            PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView, frequency: .legacyDaily, withAdditionalParameters: ["setting": setting])
+            let newTabSettings = preferences.duckPlayerOpenInNewTab ? "true" : "false"
+
+            PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView,
+                          frequency: .legacyDaily,
+                          withAdditionalParameters: ["setting": setting,
+                                                     "newtab": newTabSettings])
         }
     }
 
