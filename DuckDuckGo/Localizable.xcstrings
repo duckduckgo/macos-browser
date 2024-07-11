@@ -53,15 +53,6 @@
         }
       }
     },
-    " — Checking for update" : {
-
-    },
-    " — DuckDuckGo is up to date" : {
-
-    },
-    " — newer version available" : {
-
-    },
     " %@" : {
       "localizations" : {
         "de" : {
@@ -216,6 +207,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Браузер %@ не позволяет хранить пароли"
+          }
+        }
+      }
+    },
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
           }
         }
       }
@@ -26827,9 +26828,6 @@
         }
       }
     },
-    "Last checked: %@" : {
-
-    },
     "learnmore.link" : {
       "comment" : "Learn More link",
       "extractionState" : "extracted_with_value",
@@ -32890,6 +32888,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Всплывающее окно скрыто"
+          }
+        }
+      }
+    },
+    "notification.browser.downgraded" : {
+      "comment" : "Notification informing user the app has been downgraded",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Browser Downgraded"
+          }
+        }
+      }
+    },
+    "notification.browser.updated" : {
+      "comment" : "Notification informing user the app has been updated",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Browser Updated"
+          }
+        }
+      }
+    },
+    "notification.critical.update" : {
+      "comment" : "Notification informing user a critical update is required.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Critical update required. Restart to update."
+          }
+        }
+      }
+    },
+    "notification.update.available" : {
+      "comment" : "Notification informing user the a version of app is available",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New version available. Restart to update."
           }
         }
       }
@@ -48797,6 +48843,18 @@
         }
       }
     },
+    "release.notes.menu.item" : {
+      "comment" : "Title of the dialog menu item that opens release notes",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Release Notes"
+          }
+        }
+      }
+    },
     "Reload Page" : {
       "comment" : "Main Menu View item",
       "localizations" : {
@@ -50607,6 +50665,102 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки..."
+          }
+        }
+      }
+    },
+    "settings.automatic.updates" : {
+      "comment" : "Title of the checkbox item to set up automatic updates of the browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Automatically install updates (recommended)"
+          }
+        }
+      }
+    },
+    "settings.browser.updates.title" : {
+      "comment" : "Title of the section in Settings where people set up automatic vs manual updates",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Browser Updates"
+          }
+        }
+      }
+    },
+    "settings.checking.for.update" : {
+      "comment" : "Label informing users the app is currently checking for new update",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Checking for update"
+          }
+        }
+      }
+    },
+    "settings.last.checked" : {
+      "comment" : "Label informing users what is the last time the app checked for the update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Last checked"
+          }
+        }
+      }
+    },
+    "settings.manual.updates" : {
+      "comment" : "Title of the checkbox item to set up manual updates of the browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Check for updates but let you choose to install them"
+          }
+        }
+      }
+    },
+    "settings.newer.version.available" : {
+      "comment" : "Label informing users the newer version of the app is available to install.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Newer version available"
+          }
+        }
+      }
+    },
+    "settings.restart.to.update" : {
+      "comment" : "Button label trigering restart and update of the application.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Restart to Update"
+          }
+        }
+      }
+    },
+    "settings.up.to.date" : {
+      "comment" : "Label informing users the app is currently up to date and no update is required.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo is up to date"
           }
         }
       }
@@ -55156,6 +55310,18 @@
         }
       }
     },
+    "update.available.menu.item" : {
+      "comment" : "Title of the menu item that informs user that a new update is available. Clicking on the menu item restarts the app and installs the update",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update Available - Restart Now"
+          }
+        }
+      }
+    },
     "Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn't secure or reliable." : {
 
     },
@@ -55268,6 +55434,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вид"
+          }
+        }
+      }
+    },
+    "view.details.button" : {
+      "comment" : "Button title to open more details about the update",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "View details"
           }
         }
       }
@@ -55840,6 +56018,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Защита от отслеживания онлайн"
+          }
+        }
+      }
+    },
+    "whats.new.menu.item" : {
+      "comment" : "Title of the dialog menu item that opens the 'What's New' page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "What's New"
           }
         }
       }
