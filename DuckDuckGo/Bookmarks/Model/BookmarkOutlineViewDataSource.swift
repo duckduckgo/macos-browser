@@ -68,10 +68,10 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         treeController.rebuild()
     }
 
-    func reloadData(for searchResults: [BaseBookmarkEntity]) {
+    func reloadData(for searchQuery: String) {
         isSearching = true
         setFolderCount()
-        treeController.rebuild(for: searchResults)
+        treeController.rebuild(for: searchQuery)
     }
 
     private func setFolderCount() {

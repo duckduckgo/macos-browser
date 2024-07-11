@@ -23,31 +23,41 @@ protocol BookmarkTreeControllerDataSource: AnyObject {
     func treeController(treeController: BookmarkTreeController, childNodesFor: BookmarkNode) -> [BookmarkNode]
 }
 
+protocol BookmarkTreeControllerSearchDataSource: AnyObject {
+
+    func treeController(treeController: BookmarkTreeController, searchQuery: String) -> [BookmarkNode]
+}
+
 final class BookmarkTreeController {
 
     let rootNode: BookmarkNode
 
     private weak var dataSource: BookmarkTreeControllerDataSource?
+    private weak var searchDataSource: BookmarkTreeControllerSearchDataSource?
 
-    init(dataSource: BookmarkTreeControllerDataSource, rootNode: BookmarkNode) {
+    init(dataSource: BookmarkTreeControllerDataSource,
+         searchDataSource: BookmarkTreeControllerSearchDataSource? = nil,
+         rootNode: BookmarkNode) {
         self.dataSource = dataSource
+        self.searchDataSource = searchDataSource
         self.rootNode = rootNode
 
         rebuild()
     }
 
-    convenience init(dataSource: BookmarkTreeControllerDataSource) {
-        self.init(dataSource: dataSource, rootNode: BookmarkNode.genericRootNode())
+    convenience init(dataSource: BookmarkTreeControllerDataSource,
+                     searchDataSource: BookmarkTreeControllerSearchDataSource? = nil) {
+        self.init(dataSource: dataSource, searchDataSource: searchDataSource, rootNode: BookmarkNode.genericRootNode())
     }
 
     // MARK: - Public
 
-    func rebuild(for searchResults: [BaseBookmarkEntity] = []) {
-        if searchResults.isEmpty {
-            rebuildChildNodes(node: rootNode)
-        } else {
-            rebuildChildNodes(for: searchResults)
-        }
+    func rebuild(for searchQuery: String) {
+        rootNode.childNodes = searchDataSource?.treeController(treeController: self, searchQuery: searchQuery) ?? []
+    }
+
+    func rebuild() {
+        rebuildChildNodes(node: rootNode)
     }
 
     func visitNodes(with visitBlock: (BookmarkNode) -> Void) {
@@ -101,15 +111,5 @@ final class BookmarkTreeController {
         }
 
         return childNodesDidChange
-    }
-
-    private func rebuildChildNodes(for results: [BaseBookmarkEntity]) {
-        let nodes = results.compactMap { (item) -> BookmarkNode in
-            let itemNode = rootNode.createChildNode(item)
-            itemNode.canHaveChildNodes = false
-            return itemNode
-        }
-
-        rootNode.childNodes = nodes
     }
 }

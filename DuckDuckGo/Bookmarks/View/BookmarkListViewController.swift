@@ -91,8 +91,10 @@ final class BookmarkListViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
     private let bookmarkManager: BookmarkManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
+    private let treeControllerSearchDataSource: BookmarkListTreeControllerSearchDataSource
 
-    private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource)
+    private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource,
+                                                             searchDataSource: treeControllerSearchDataSource)
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
         BookmarkOutlineViewDataSource(
@@ -129,6 +131,7 @@ final class BookmarkListViewController: NSViewController {
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.bookmarkManager = bookmarkManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
+        self.treeControllerSearchDataSource = BookmarkListTreeControllerSearchDataSource(bookmarkManager: bookmarkManager)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -776,22 +779,21 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
             if searchQuery.isBlank {
                 showTreeView()
             } else {
-                let results = bookmarkManager.search(by: searchQuery)
-
-                if results.isEmpty {
-                    showEmptyStateView(for: .noSearchResults)
-                } else {
-                    showSearch(for: results)
-                }
+                showSearch(for: searchQuery)
             }
         }
     }
 
-    private func showSearch(for results: [BaseBookmarkEntity]) {
-        emptyState.isHidden = true
-        outlineView.isHidden = false
-        dataSource.reloadData(for: results)
-        outlineView.reloadData()
+    private func showSearch(for searchQuery: String) {
+        dataSource.reloadData(for: searchQuery)
+
+        if dataSource.treeController.rootNode.childNodes.isEmpty {
+            showEmptyStateView(for: .noSearchResults)
+        } else {
+            emptyState.isHidden = true
+            outlineView.isHidden = false
+            outlineView.reloadData()
+        }
     }
 }
 
