@@ -101,7 +101,7 @@ struct DefaultDataBrokerProtectionCustomStatsProvider: DataBrokerProtectionCusto
 }
 
 private extension DefaultDataBrokerProtectionCustomStatsProvider {
-    
+
     func optOutJobsBetween(startDate: Date?, endDate: Date, queryData: [BrokerProfileQueryData]) -> [OptOutJobData] {
         let allOptOuts = queryData.flatMap { $0.optOutJobData }
         return allOptOuts.filter { optOutJob in
@@ -112,10 +112,10 @@ private extension DefaultDataBrokerProtectionCustomStatsProvider {
             }
         }
     }
-    
+
     func optOutRequestCountSince(startDate: Date?,
                                  for optOutJobData: [OptOutJobData]) -> Int {
-        
+
         return optOutJobData.reduce(0) { result, optOutJobData in
             let optOutRequested = optOutJobData.historyEvents.contains { historyEvent in
                 let matchDatePlus24 = Calendar.current.date(byAdding: .hour, value: 24, to: optOutJobData.createdDate) ?? Date()
