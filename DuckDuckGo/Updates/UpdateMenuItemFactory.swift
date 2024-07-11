@@ -23,7 +23,7 @@ import Cocoa
 final class UpdateMenuItemFactory {
 
     static func menuItem(for update: Update) -> NSMenuItem {
-        let item = NSMenuItem(title: "Update Available - Restart Now")
+        let item = NSMenuItem(title: UserText.updateAvailableMenuItem)
         item.target = Application.appDelegate.updateController
         item.action = #selector(UpdateController.runUpdate)
         item.image = NSImage.updateMenuItemIcon

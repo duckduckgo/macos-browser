@@ -88,13 +88,13 @@ extension Preferences {
 
 #if SPARKLE
                         // Automatic/manual Updates
-                        PreferencePaneSection("Browser Updates") {
+                        PreferencePaneSection(UserText.browserUpdatesTitle) {
 
                             PreferencePaneSubSection {
                                 Picker(selection: $areAutomaticUpdatesEnabled, content: {
-                                    Text("Automatically install updates (recommended)").tag(true)
+                                    Text(UserText.automaticUpdates).tag(true)
                                         .padding(.bottom, 4).accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.automatically")
-                                    Text("Check for updates but let you choose to install them").tag(false)
+                                    Text(UserText.manualUpdates).tag(false)
                                         .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.manually")
                                 }, label: {})
                                 .pickerStyle(.radioGroup)
@@ -186,11 +186,11 @@ extension Preferences {
 #if SPARKLE
                 switch model.updateState {
                 case .loading:
-                    Text(" — Checking for update")
+                    Text(" — " + UserText.checkingForUpdate)
                 case .upToDate:
-                    Text(" — DuckDuckGo is up to date")
+                    Text(" — " + UserText.upToDate)
                 case .newVersionAvailable:
-                    Text(" — newer version available")
+                    Text(" — " + UserText.newerVersionAvailable)
                 }
 #endif
             }
@@ -199,7 +199,7 @@ extension Preferences {
 #if SPARKLE
         private var lastCheckedText: some View {
             let lastChecked = model.updateState != .loading ? "\(lastCheckedFormattedDate(model.lastUpdateCheckDate))" : "-"
-            return Text("Last checked: \(lastChecked)")
+            return Text("\(UserText.lastChecked): \(lastChecked)")
                 .foregroundColor(.secondary)
         }
 
@@ -221,18 +221,18 @@ extension Preferences {
         private var updateButton: some View {
             switch model.updateState {
             case .loading:
-                Button("Check for Update") {
+                Button(UserText.checkForUpdate) {
                     model.checkForUpdate()
                 }
                 .buttonStyle(UpdateButtonStyle(enabled: false))
                 .disabled(true)
             case .upToDate:
-                Button("Check for Update") {
+                Button(UserText.checkForUpdate) {
                     model.checkForUpdate()
                 }
                 .buttonStyle(UpdateButtonStyle(enabled: true))
             case .newVersionAvailable:
-                Button("Restart to Update") {
+                Button(UserText.restartToUpdate) {
                     model.restartToUpdate()
                 }
                 .buttonStyle(UpdateButtonStyle(enabled: true))

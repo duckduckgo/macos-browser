@@ -75,9 +75,9 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
             if let latestUpdate, !latestUpdate.isInstalled {
                 switch latestUpdate.type {
                 case .critical:
-                    notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: "Critical update required. Restart to update.", presentMultiline: true)
+                    notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: UserText.criticalUpdateNotification, presentMultiline: true)
                 case .regular:
-                    notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: "New version available. Restart to update.", presentMultiline: true)
+                    notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
                 }
                 isUpdateAvailableToInstall = !latestUpdate.isInstalled
             } else {
@@ -124,9 +124,9 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         switch updateStatus {
         case .noChange: break
         case .updated:
-            notificationPresenter.showUpdateNotification(icon: NSImage.successCheckmark, text: "Browser Updated", buttonText: "View details")
+            notificationPresenter.showUpdateNotification(icon: NSImage.successCheckmark, text: UserText.browserUpdatedNotification, buttonText: UserText.viewDetails)
         case .downgraded:
-            notificationPresenter.showUpdateNotification(icon: NSImage.successCheckmark, text: "Browser Downgraded", buttonText: "View details")
+            notificationPresenter.showUpdateNotification(icon: NSImage.successCheckmark, text: UserText.browserDowngradedNotification, buttonText: UserText.viewDetails)
         }
     }
 
