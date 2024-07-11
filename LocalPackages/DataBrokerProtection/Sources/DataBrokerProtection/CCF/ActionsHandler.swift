@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-final class ActionsHandler {
+internal class ActionsHandler {
     private var lastExecutedActionIndex: Int?
 
     var captchaTransactionId: CaptchaTransactionId?

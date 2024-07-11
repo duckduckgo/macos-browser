@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -30,9 +31,9 @@ struct MockVariantManager: VariantManager {
 
     var isSupportedBlock: (FeatureName) -> Bool
 
-    var currentVariant: Variant?
+    var currentVariant: BrowserServicesKit.Variant?
 
-    init(isSupportedReturns: Bool = false, currentVariant: Variant? = nil) {
+    init(isSupportedReturns: Bool = false, currentVariant: BrowserServicesKit.Variant? = nil) {
         self.isSupportedReturns = isSupportedReturns
         self.isSupportedBlock = { _ in return isSupportedReturns }
         self.currentVariant = currentVariant

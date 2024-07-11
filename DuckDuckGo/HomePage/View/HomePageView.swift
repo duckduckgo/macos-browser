@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
+import PixelKit
+import RemoteMessaging
 import SwiftUI
-import BrowserServicesKit
 import SwiftUIExtensions
 
 extension HomePage.Views {
@@ -31,6 +32,7 @@ extension HomePage.Views {
         @EnvironmentObject var model: AppearancePreferences
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
+        @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
 
         @State private var isHomeContentPopoverVisible = false
 
@@ -59,6 +61,7 @@ extension HomePage.Views {
                 ScrollView {
                     VStack(spacing: 0) {
                         Group {
+                            remoteMessage()
                             if includingContinueSetUpCards {
                                 ContinueSetUpView()
                                     .padding(.top, 64)
@@ -94,12 +97,31 @@ extension HomePage.Views {
                             })
                     }
                 }
-
             }
             .frame(maxWidth: .infinity)
             .background(backgroundColor)
             .onAppear {
                 LocalBookmarkManager.shared.requestSync()
+            }
+        }
+
+        @ViewBuilder
+        func remoteMessage() -> some View {
+            if let remoteMessage = activeRemoteMessageModel.remoteMessage, let modelType = remoteMessage.content, modelType.isSupported {
+                RemoteMessageView(viewModel: .init(
+                    messageId: remoteMessage.id,
+                    modelType: modelType,
+                    onDidClose: { action in
+                        activeRemoteMessageModel.dismissRemoteMessage(with: action)
+                    },
+                    onDidAppear: {
+                        activeRemoteMessageModel.markRemoteMessageAsShown()
+                    },
+                    openURLHandler: { url in
+                        WindowControllersManager.shared.showTab(with: .contentFromURL(url, source: .appOpenUrl))
+                }))
+            } else {
+                EmptyView()
             }
         }
 
@@ -189,6 +211,18 @@ extension HomePage.Views {
                 })
                 Spacer()
             }
+        }
+    }
+}
+
+private extension RemoteMessageModelType {
+
+    var isSupported: Bool {
+        switch self {
+        case .promoSingleAction:
+            return false
+        default:
+            return true
         }
     }
 }

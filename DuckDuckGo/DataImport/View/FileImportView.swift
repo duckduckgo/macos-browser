@@ -20,7 +20,6 @@ import Common
 import SwiftUI
 import UniformTypeIdentifiers
 
-// swiftlint:disable function_body_length cyclomatic_complexity
 @InstructionsView.InstructionsBuilder
 func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImport.DataType, button: @escaping (String) -> AnyView) -> [InstructionsView.InstructionsItem] {
 
@@ -452,7 +451,6 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         assertionFailure("Invalid source/dataType")
     }
 }
-// swiftlint:enable function_body_length cyclomatic_complexity
 
 struct FileImportView: View {
 
@@ -592,7 +590,6 @@ struct InstructionsView: View {
     // View Model
     private let instructions: [[InstructionsViewItem]]
 
-    // swiftlint:disable:next function_body_length cyclomatic_complexity
     init(@InstructionsBuilder builder: () -> [InstructionsItem]) {
         var args = builder()
 

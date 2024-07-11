@@ -100,7 +100,7 @@ final class BookmarkListViewController: NSViewController {
         fatalError("\(type(of: self)): Bad initializer")
     }
 
-    override func loadView() { // swiftlint:disable:this function_body_length
+    override func loadView() {
         view = ColorView(frame: .zero, backgroundColor: .popoverBackground)
 
         view.addSubview(titleTextField)

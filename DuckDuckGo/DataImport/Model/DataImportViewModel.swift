@@ -223,7 +223,7 @@ struct DataImportViewModel {
 
     /// Called with data import task result to update the state by merging the summary with an existing summary
     @MainActor
-    private mutating func mergeImportSummary(with summary: DataImportSummary) { // swiftlint:disable:this cyclomatic_complexity
+    private mutating func mergeImportSummary(with summary: DataImportSummary) {
         self.importTask = nil
 
         log("merging summary \(summary)")

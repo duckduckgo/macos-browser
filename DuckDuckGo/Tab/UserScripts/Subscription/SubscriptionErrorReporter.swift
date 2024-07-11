@@ -43,7 +43,6 @@ protocol SubscriptionErrorReporter {
 
 struct DefaultSubscriptionErrorReporter: SubscriptionErrorReporter {
 
-    // swiftlint:disable:next cyclomatic_complexity
     func report(subscriptionActivationError: SubscriptionError) {
 
         os_log(.error, log: .subscription, "Subscription purchase error: %{public}s", subscriptionActivationError.localizedDescription)

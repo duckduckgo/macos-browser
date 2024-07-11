@@ -30,7 +30,8 @@ final class ConfigurationStore: ConfigurationStoring {
         .surrogates: "surrogates.txt",
         .privacyConfiguration: "macos-config.json",
         .trackerDataSet: "tracker-radar.json",
-        .FBConfig: "social_ctp_configuration.json"
+        .FBConfig: "social_ctp_configuration.json",
+        .remoteMessagingConfig: "remote-messaging-config.json"
     ]
 
     static let shared = ConfigurationStore()
@@ -56,6 +57,9 @@ final class ConfigurationStore: ConfigurationStoring {
     @UserDefaultsWrapper(key: .configFBConfigEtag, defaultValue: nil)
     private var FBConfigEtag: String?
 
+    @UserDefaultsWrapper(key: .configStorageRemoteMessagingConfigEtag, defaultValue: nil)
+    private var remoteMessagingConfigEtag: String?
+
     private init() { }
 
     func loadEtag(for configuration: Configuration) -> String? {
@@ -67,6 +71,7 @@ final class ConfigurationStore: ConfigurationStoring {
         case .trackerDataSet: return trackerRadarEtag
         case .privacyConfiguration: return privacyConfigurationEtag
         case .FBConfig: return FBConfigEtag
+        case .remoteMessagingConfig: return remoteMessagingConfigEtag
         }
     }
 
@@ -87,6 +92,7 @@ final class ConfigurationStore: ConfigurationStoring {
         case .trackerDataSet: trackerRadarEtag = etag
         case .privacyConfiguration: privacyConfigurationEtag = etag
         case .FBConfig: FBConfigEtag = etag
+        case .remoteMessagingConfig: remoteMessagingConfigEtag = etag
         }
     }
 
@@ -120,6 +126,7 @@ final class ConfigurationStore: ConfigurationStoring {
         os_log("trackerRadarEtag %{public}s", log: .config, type: .default, trackerRadarEtag ?? "")
         os_log("privacyConfigurationEtag %{public}s", log: .config, type: .default, privacyConfigurationEtag ?? "")
         os_log("FBConfigEtag %{public}s", log: .config, type: .default, FBConfigEtag ?? "")
+        os_log("remoteMessagingConfig %{public}s", log: .config, type: .default, remoteMessagingConfigEtag ?? "")
     }
 
     func fileUrl(for config: Configuration) -> URL {
