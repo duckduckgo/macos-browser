@@ -79,6 +79,11 @@ final class DuckPlayerPreferences: ObservableObject {
     var duckPlayerOpenInNewTab: Bool {
         didSet {
             persistor.duckPlayerOpenInNewTab = duckPlayerOpenInNewTab
+            if duckPlayerOpenInNewTab {
+                PixelKit.fire(GeneralPixel.duckPlayerNewTabSettingsOn)
+            } else {
+                PixelKit.fire(GeneralPixel.duckPlayerNewTabSettingsOff)
+            }
         }
     }
 
