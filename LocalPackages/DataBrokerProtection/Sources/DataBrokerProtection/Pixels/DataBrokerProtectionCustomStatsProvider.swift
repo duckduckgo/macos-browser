@@ -40,8 +40,8 @@ protocol DataBrokerProtectionCustomStatsProvider {
 
     /// This method calculates custom statistics for data brokers based on the provided query data within a specified date range.
     /// - Parameters:
-    ///   - startDate: An optional start date to filter matches and requests. If nil, the filtering starts from the earliest date available.
-    ///   - endDate: The end date to filter matches and requests. All matches and requests are considered up to this date.
+    ///   - startDate: An optional start date to filter optout creation and request events. If nil, the filtering starts from the earliest date available.
+    ///   - endDate: The end date to filter optout creation events. All optout creation events considered up to this date.
     ///   - queryData: An array of BrokerProfileQueryData objects containing data broker query information, scan job data, and opt-out job data.
     /// - Returns: A CustomStats object containing the statistics for each data broker and the global statistics.
     func customStats(startDate: Date?,
@@ -56,7 +56,7 @@ struct DefaultDataBrokerProtectionCustomStatsProvider: DataBrokerProtectionCusto
                      andQueryData queryData: [BrokerProfileQueryData]) -> CustomStats {
 
         var customDataBrokerStats: [CustomDataBrokerStat] = []
-        var totalGlobalMatches: Int = 0
+        var totalGlobalOptOuts: Int = 0
         var totalGlobalRequests: Int = 0
 
         // Group by broker
@@ -65,38 +65,35 @@ struct DefaultDataBrokerProtectionCustomStatsProvider: DataBrokerProtectionCusto
         // Loop over each group
         for (dataBroker, brokerQueryData) in groupedByBroker {
 
-            // Get matches within start - end dates
-            let matchesBetweenDates = matchesBetween(startDate: startDate, endDate: endDate, queryData: brokerQueryData)
+            // Get opt-out jobs between start - end dates
+            let optOutJobs = optOutJobsBetween(startDate: startDate, endDate: endDate, queryData: brokerQueryData)
 
-            let totalMatches = matchesBetweenDates.count
+            let optOutCount = optOutJobs.count
 
-            // If this data broker has no associated matches, skip to the next data broker
-            guard totalMatches != 0 else { continue }
+            // If optOutCount is zero, skip to the next data broker
+            guard optOutCount != 0 else { continue }
 
-            totalGlobalMatches += totalMatches
+            totalGlobalOptOuts += optOutCount
 
-            // Get opt-outs since start date
-            let requestsSinceStartDate = requestsSince(startDate: startDate, queryData: brokerQueryData)
+            // Get opt-out request count since start date
+            let requestsCountSinceStartDate = optOutRequestCountSince(startDate: startDate, for: optOutJobs)
 
-            // Calculate number of opt-out requests
-            let totalOptOutRequests = matchingOptOutCount(matches: matchesBetweenDates, optOuts: requestsSinceStartDate)
-
-            totalGlobalRequests += totalOptOutRequests
+            totalGlobalRequests += requestsCountSinceStartDate
 
             // Calculate opt-out success rate
-            let optOutSuccessRate = totalMatches > 0 ? Double(totalOptOutRequests) / Double(totalMatches) : 0
+            let optOutSuccessRate = optOutCount > 0 ? Double(requestsCountSinceStartDate) / Double(optOutCount) : 0
             let roundedOptOutSuccessRate = (optOutSuccessRate * 100).rounded() / 100
 
             let dataBrokerName = groupedByBroker[dataBroker]?.first?.dataBroker.name ?? ""
 
             let customDataBrokerStat = CustomDataBrokerStat(dataBrokerName: dataBrokerName,
-                                                             optoutSubmitSuccessRate: roundedOptOutSuccessRate)
+                                                            optoutSubmitSuccessRate: roundedOptOutSuccessRate)
 
             customDataBrokerStats.append(customDataBrokerStat)
 
         }
 
-        let globalSuccessRate = totalGlobalMatches > 0 ? Double(totalGlobalRequests) / Double(totalGlobalMatches) : 0
+        let globalSuccessRate = totalGlobalOptOuts > 0 ? Double(totalGlobalRequests) / Double(totalGlobalOptOuts) : 0
         let roundedGlobalSuccessRate = (globalSuccessRate * 100).rounded() / 100
         let globalStats = CustomGlobalStat(optoutSubmitSuccessRate: roundedGlobalSuccessRate)
         return CustomStats(customDataBrokerStats: customDataBrokerStats, customGlobalStat: globalStats)
@@ -104,40 +101,27 @@ struct DefaultDataBrokerProtectionCustomStatsProvider: DataBrokerProtectionCusto
 }
 
 private extension DefaultDataBrokerProtectionCustomStatsProvider {
-
-    func matchesBetween(startDate: Date?, endDate: Date, queryData: [BrokerProfileQueryData]) -> [HistoryEvent] {
-        let allMatches = queryData.flatMap { $0.scanJobData.matchEvents }
-        let betweenDatesMatches = allMatches.filter { match in
+    
+    func optOutJobsBetween(startDate: Date?, endDate: Date, queryData: [BrokerProfileQueryData]) -> [OptOutJobData] {
+        let allOptOuts = queryData.flatMap { $0.optOutJobData }
+        return allOptOuts.filter { optOutJob in
             if let startDate = startDate {
-                return match.date >= startDate && match.date <= endDate
+                return optOutJob.createdDate >= startDate && optOutJob.createdDate <= endDate
             } else {
-                return match.date <= endDate
+                return optOutJob.createdDate <= endDate
             }
         }
-        return betweenDatesMatches
     }
-
-    func requestsSince(startDate: Date?, queryData: [BrokerProfileQueryData]) -> [HistoryEvent] {
-        let allOptOutRequests = queryData.flatMap { $0.optOutJobData.flatMap { $0.optOutRequestedEvents } }
-        let requestsSinceStartDate: [HistoryEvent]
-        if let startDate = startDate {
-            requestsSinceStartDate = allOptOutRequests.filter { $0.date >= startDate }
-        } else {
-            requestsSinceStartDate = allOptOutRequests
-        }
-        return requestsSinceStartDate
-    }
-
-    func matchingOptOutCount(matches: [HistoryEvent], optOuts: [HistoryEvent]) -> Int {
-        let totalOptOutRequests = matches.reduce(0) { count, match in
-            let optOutRequested = optOuts.contains {
-                let matchDatePlus24 = Calendar.current.date(byAdding: .hour, value: 24, to: match.date) ?? Date()
-                return $0.profileQueryId == match.profileQueryId &&
-                $0.brokerId == match.brokerId &&
-                ($0.date < matchDatePlus24 && $0.date > match.date)
+    
+    func optOutRequestCountSince(startDate: Date?,
+                                 for optOutJobData: [OptOutJobData]) -> Int {
+        
+        return optOutJobData.reduce(0) { result, optOutJobData in
+            let optOutRequested = optOutJobData.historyEvents.contains { historyEvent in
+                let matchDatePlus24 = Calendar.current.date(byAdding: .hour, value: 24, to: optOutJobData.createdDate) ?? Date()
+                return historyEvent.type == .optOutRequested && (historyEvent.date < matchDatePlus24 && historyEvent.date > optOutJobData.createdDate)
             }
-            return count + (optOutRequested ? 1 : 0)
+            return result + (optOutRequested ? 1 : 0)
         }
-        return totalOptOutRequests
     }
 }

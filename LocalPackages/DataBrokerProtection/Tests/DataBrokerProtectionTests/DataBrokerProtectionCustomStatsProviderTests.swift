@@ -23,7 +23,7 @@ final class DataBrokerProtectionCustomStatsProviderTests: XCTestCase {
 
     private var sut = DefaultDataBrokerProtectionCustomStatsProvider()
 
-    func testWhenNoBrokers_thenCustomStatsAreEmpty() throws {
+    func testWhenNoBrokers() throws {
         // Given
         let queryData: [BrokerProfileQueryData] = []
         let startDate = Date.nowMinus(hours: 48)
@@ -38,94 +38,97 @@ final class DataBrokerProtectionCustomStatsProviderTests: XCTestCase {
         XCTAssertEqual(result.customGlobalStat, expectedGlobalStat)
     }
 
-    func testWhenOneBrokerWithMultipleMatchesAndOptOuts_thenCustomStatsAreCorrect() throws {
+    func testWithOneBrokerWithMultipleMatchesAndOptOuts() throws {
         // Given
-        let queryData = BrokerProfileQueryData.queryDataOneBrokerMultipleMatchesAndOptOuts
-        let startDate = Date.nowMinus(hours: 72)
+        let queryData = BrokerProfileQueryData.queryDataWithMultipleSuccessfulOptOutRequestsIn24Hours
+        let startDate = Date.nowMinus(hours: 26)
         let endDate = Date.nowMinus(hours: 24)
-        let expected = CustomDataBrokerStat(dataBrokerName: "CustomStats Broker 1", optoutSubmitSuccessRate: 0.67)
+        let expected = CustomDataBrokerStat(dataBrokerName: "Test broker", optoutSubmitSuccessRate: 1.0)
 
         // When
         let result = sut.customStats(startDate: startDate, endDate: endDate, andQueryData: queryData)
 
         // Then
-        let brokerOneResult = result.customDataBrokerStats.first { $0.dataBrokerName == "CustomStats Broker 1" }!
         XCTAssertEqual(result.customDataBrokerStats.count, 1)
-        XCTAssertEqual(result.customGlobalStat.optoutSubmitSuccessRate, 0.67)
-        XCTAssertEqual(expected, brokerOneResult)
+        let brokerResult = result.customDataBrokerStats.first!
+        XCTAssertEqual(brokerResult, expected)
+        XCTAssertEqual(result.customGlobalStat.optoutSubmitSuccessRate, 1.0)
     }
 
-    func testWhenTwoBrokers_andOneBrokerHasOneMatchFromOneProfile_thenCustomStatsAreCorrect() throws {
+    func testWithTwoBrokersEachWith50PercentSuccessRate() throws {
         // Given
-        let queryData = BrokerProfileQueryData.queryDataTwoBrokersOneBroker100PercentSuccess
-        let startDate = Date.nowMinus(hours: 28)
+        let queryData = BrokerProfileQueryData.queryDataTwoBrokers50PercentSuccessEach
+        let startDate = Date.nowMinus(hours: 26)
         let endDate = Date.nowMinus(hours: 24)
-        let expected = CustomDataBrokerStat(dataBrokerName: "CustomStats Broker 2", optoutSubmitSuccessRate: 1.0)
+        let expectedGlobalRate = 0.5
 
         // When
         let result = sut.customStats(startDate: startDate, endDate: endDate, andQueryData: queryData)
 
         // Then
-        let brokerOneResult = result.customDataBrokerStats.first { $0.dataBrokerName == "CustomStats Broker 2" }!
-        let brokersWithZeroSuccess = result.customDataBrokerStats.filter { $0.optoutSubmitSuccessRate == 0.0 }
-        XCTAssert(result.customDataBrokerStats.count == 2)
-        XCTAssert(brokersWithZeroSuccess.count == 1)
-        XCTAssertEqual(result.customGlobalStat.optoutSubmitSuccessRate, 0.5)
-        XCTAssertEqual(expected, brokerOneResult)
-    }
-
-    func testWhenManyBrokers_andOneBrokerHasOneMatchFromTwoProfiles_thenCustomStatsAreCorrect() throws {
-        // Given
-        let queryData = BrokerProfileQueryData.queryDataManyBrokersOneBroker50PercentSuccess
-        let startDate = Date.nowMinus(hours: 48)
-        let endDate = Date.nowMinus(hours: 24)
-        let expected = CustomDataBrokerStat(dataBrokerName: "CustomStats Broker 1", optoutSubmitSuccessRate: 0.50)
-
-        // When
-        let result = sut.customStats(startDate: startDate, endDate: endDate, andQueryData: queryData)
-
-        // Then
-        let brokerOneResult = result.customDataBrokerStats.first { $0.dataBrokerName == "CustomStats Broker 1" }!
-        let brokersWithZeroSuccess = result.customDataBrokerStats.filter { $0.optoutSubmitSuccessRate == 0.0 }
-        XCTAssert(result.customDataBrokerStats.count == 4)
-        XCTAssert(brokersWithZeroSuccess.count == 3)
-        XCTAssertEqual(result.customGlobalStat.optoutSubmitSuccessRate, 0.2)
-        XCTAssertEqual(expected, brokerOneResult)
-    }
-
-    func testWhenSomeBrokersHaveNoMatches_thenTheyAreExcludedFromStats() throws {
-        // Given
-        let queryData = BrokerProfileQueryData.queryDataTwoBrokersOneWithNoMatches
-        let startDate = Date.nowMinus(hours: 28)
-        let endDate = Date.nowMinus(hours: 24)
-        let expected = CustomDataBrokerStat(dataBrokerName: "CustomStats Broker 1", optoutSubmitSuccessRate: 1.0)
-
-        // When
-        let result = sut.customStats(startDate: startDate, endDate: endDate, andQueryData: queryData)
-
-        // Then
-        XCTAssert(result.customDataBrokerStats.count == 1)
-        XCTAssertEqual(result.customGlobalStat.optoutSubmitSuccessRate, 1)
-        XCTAssertEqual(expected, result.customDataBrokerStats.first!)
-    }
-
-    func testWhenBrokersWithOverlappingDateRanges_thenCustomStatsAreCorrect() throws {
-        // Given
-        let queryData = BrokerProfileQueryData.queryDataOverlappingDateRanges
-        let startDate = Date.nowMinus(hours: 48)
-        let endDate = Date.nowMinus(hours: 24)
-        let expectedBroker1 = CustomDataBrokerStat(dataBrokerName: "CustomStats Broker 1", optoutSubmitSuccessRate: 0.5)
-        let expectedBroker2 = CustomDataBrokerStat(dataBrokerName: "CustomStats Broker 2", optoutSubmitSuccessRate: 1.0)
-
-        // When
-        let result = sut.customStats(startDate: startDate, endDate: endDate, andQueryData: queryData)
-
-        // Then
-        let brokerOneResult = result.customDataBrokerStats.first { $0.dataBrokerName == "CustomStats Broker 1" }!
-        let brokerTwoResult = result.customDataBrokerStats.first { $0.dataBrokerName == "CustomStats Broker 2" }!
         XCTAssertEqual(result.customDataBrokerStats.count, 2)
-        XCTAssertEqual(result.customGlobalStat.optoutSubmitSuccessRate, 0.75)
-        XCTAssertEqual(expectedBroker1, brokerOneResult)
-        XCTAssertEqual(expectedBroker2, brokerTwoResult)
+        XCTAssertEqual(result.customGlobalStat.optoutSubmitSuccessRate, expectedGlobalRate)
+        XCTAssertEqual(result.customDataBrokerStats[0].optoutSubmitSuccessRate, 0.5)
+        XCTAssertEqual(result.customDataBrokerStats[1].optoutSubmitSuccessRate, 0.5)
+    }
+
+    func testWithNoBrokers() throws {
+        // Given
+        let queryData: [BrokerProfileQueryData] = []
+        let startDate = Date.nowMinus(hours: 26)
+        let endDate = Date.nowMinus(hours: 24)
+
+        // When
+        let result = sut.customStats(startDate: startDate, endDate: endDate, andQueryData: queryData)
+
+        // Then
+        XCTAssertTrue(result.customDataBrokerStats.isEmpty)
+        XCTAssertEqual(result.customGlobalStat.optoutSubmitSuccessRate, 0.0)
+    }
+
+    func testWithOneBrokerNoOptOutsWithinDateRange() throws {
+        // Given
+        let queryData = BrokerProfileQueryData.queryDataWithNoOptOutsInDateRange
+        let startDate = Date.nowMinus(hours: 26)
+        let endDate = Date.nowMinus(hours: 24)
+
+        // When
+        let result = sut.customStats(startDate: startDate, endDate: endDate, andQueryData: queryData)
+
+        // Then
+        XCTAssertTrue(result.customDataBrokerStats.isEmpty)
+        XCTAssertEqual(result.customGlobalStat.optoutSubmitSuccessRate, 0.0)
+    }
+
+    func testWithMultipleBrokersVaryingSuccessRates() throws {
+        // Given
+        let queryData = BrokerProfileQueryData.queryDataMultipleBrokersVaryingSuccessRates
+        let startDate = Date.nowMinus(hours: 26)
+        let endDate = Date.nowMinus(hours: 24)
+
+        // When
+        let result = sut.customStats(startDate: startDate, endDate: endDate, andQueryData: queryData)
+
+        // Then
+        XCTAssertEqual(result.customDataBrokerStats.count, 3)
+        let sortedBrokerStats = result.customDataBrokerStats.sorted { $0.optoutSubmitSuccessRate < $1.optoutSubmitSuccessRate }
+        XCTAssertEqual(sortedBrokerStats[0].optoutSubmitSuccessRate, 0.5)
+        XCTAssertEqual(sortedBrokerStats[1].optoutSubmitSuccessRate, 0.75)
+        XCTAssertEqual(sortedBrokerStats[2].optoutSubmitSuccessRate, 1.0)
+        XCTAssertEqual(result.customGlobalStat.optoutSubmitSuccessRate, 0.71)
+    }
+
+    func testWithStartDateLaterThanEndDate() throws {
+        // Given
+        let queryData = BrokerProfileQueryData.queryDataTwoBrokers50PercentSuccessEach
+        let startDate = Date.nowMinus(hours: 24)
+        let endDate = Date.nowMinus(hours: 26)
+
+        // When
+        let result = sut.customStats(startDate: startDate, endDate: endDate, andQueryData: queryData)
+
+        // Then
+        XCTAssertTrue(result.customDataBrokerStats.isEmpty)
+        XCTAssertEqual(result.customGlobalStat.optoutSubmitSuccessRate, 0.0)
     }
 }

@@ -411,9 +411,9 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
     func testWhen24HoursHavePassed_andMatchesWereFound_thenWeFirePixelsWithExpectedValues() {
         // Given
         let repository = MockDataBrokerProtectionStatsPixelsRepository()
-        repository._customStatsPixelsLastSentTimestamp = Date.nowMinus(hours: 50)
+        repository._customStatsPixelsLastSentTimestamp = Date.nowMinus(hours: 26)
         let database = MockDatabase()
-        database.brokerProfileQueryDataToReturn = BrokerProfileQueryData.queryDataOverlappingDateRanges
+        database.brokerProfileQueryDataToReturn = BrokerProfileQueryData.queryDataMultipleBrokersVaryingSuccessRates
         let sut = DataBrokerProtectionStatsPixels(database: database,
                                                   handler: handler,
                                                   repository: repository)
@@ -426,10 +426,12 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         let pixel1 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[0]
         let pixel2 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[1]
         let pixel3 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[2]
-        XCTAssertTrue(MockDataBrokerProtectionPixelsHandler.lastPixelsFired.count == 3)
+        let pixel4 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[3]
+        XCTAssertTrue(MockDataBrokerProtectionPixelsHandler.lastPixelsFired.count == 4)
         XCTAssertEqual(pixel1.params!["optout_submit_success_rate"], "0.5")
-        XCTAssertEqual(pixel2.params!["optout_submit_success_rate"], "0.75")
-        XCTAssertEqual(pixel3.params!["optout_submit_success_rate"], "1.0")
+        XCTAssertEqual(pixel2.params!["optout_submit_success_rate"], "0.71")
+        XCTAssertEqual(pixel3.params!["optout_submit_success_rate"], "0.75")
+        XCTAssertEqual(pixel4.params!["optout_submit_success_rate"], "1.0")
         XCTAssertTrue(repository.didGetCustomStatsPixelsLastSentTimestamp)
         XCTAssertTrue(repository.didSetCustomStatsPixelsLastSentTimestamp)
     }
