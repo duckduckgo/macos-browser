@@ -50,8 +50,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanDB?
     func fetchAllScans() throws -> [ScanDB]
 
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfileDB, lastRunDate: Date?, preferredRunDate: Date?) throws
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws
+    func save(createdDate: Date, brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfileDB, lastRunDate: Date?, preferredRunDate: Date?) throws
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> (optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)?
@@ -86,7 +85,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         try super.init(file: file, key: key, writerType: .pool) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
             migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
-
+            migrator.registerMigration("v3", migrate: Self.migrateV3(database:))
         }
     }
 
@@ -270,6 +269,13 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             """)
     }
 
+    static func migrateV3(database: Database) throws {
+        try database.alter(table: OptOutDB.databaseTableName) {
+            $0.add(column: OptOutDB.Columns.createdDate.name, .datetime).notNull().defaults(to: Date())
+        }
+    }
+
+    // swiftlint:enable function_body_length
     func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
         try db.write { db in
 
@@ -469,23 +475,12 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfileDB, lastRunDate: Date?, preferredRunDate: Date?) throws {
+    func save(createdDate: Date, brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfileDB, lastRunDate: Date?, preferredRunDate: Date?) throws {
         try db.write { db in
             try extractedProfile.insert(db)
             let extractedProfileId = db.lastInsertedRowID
             try OptOutDB(
-                brokerId: brokerId,
-                profileQueryId: profileQueryId,
-                extractedProfileId: extractedProfileId,
-                lastRunDate: lastRunDate,
-                preferredRunDate: preferredRunDate
-            ).insert(db)
-        }
-    }
-
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
-        try db.write { db in
-            try OptOutDB(
+                createdDate: createdDate,
                 brokerId: brokerId,
                 profileQueryId: profileQueryId,
                 extractedProfileId: extractedProfileId,

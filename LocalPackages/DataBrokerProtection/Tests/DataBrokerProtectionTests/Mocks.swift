@@ -223,7 +223,7 @@ extension BrokerProfileQueryData {
                                       preferredRunDate: nil,
                                       historyEvents: scanEvents,
                                       lastRunDate: nil)
-        let optOutJobData = OptOutJobData(brokerId: 1, profileQueryId: 1, historyEvents: optOutEvents, extractedProfile: ExtractedProfile())
+        let optOutJobData = OptOutJobData(createdDate: Date(), brokerId: 1, profileQueryId: 1, historyEvents: optOutEvents, extractedProfile: ExtractedProfile())
         return BrokerProfileQueryData(dataBroker: dataBroker,
                                       profileQuery: profileQuery,
                                       scanJobData: scanJobData,
@@ -762,10 +762,7 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
         return scanJobData
     }
 
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfile, lastRunDate: Date?, preferredRunDate: Date?) throws {
-    }
-
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
+    func save(createdDate: Date, brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfile, lastRunDate: Date?, preferredRunDate: Date?) throws {
     }
 
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
@@ -1200,7 +1197,7 @@ extension ScanJobData {
 extension OptOutJobData {
     static func mock(with extractedProfile: ExtractedProfile,
                      historyEvents: [HistoryEvent] = [HistoryEvent]()) -> OptOutJobData {
-        .init(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents, extractedProfile: extractedProfile)
+        .init(createdDate: Date(), brokerId: 1, profileQueryId: 1, historyEvents: historyEvents, extractedProfile: extractedProfile)
     }
 }
 

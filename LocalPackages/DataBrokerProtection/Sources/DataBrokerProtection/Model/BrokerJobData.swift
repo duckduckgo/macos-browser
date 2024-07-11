@@ -77,6 +77,7 @@ struct ScanJobData: BrokerJobData, Sendable {
 }
 
 struct OptOutJobData: BrokerJobData, Sendable {
+    let createdDate: Date
     let brokerId: Int64
     let profileQueryId: Int64
     let preferredRunDate: Date?
@@ -93,12 +94,14 @@ struct OptOutJobData: BrokerJobData, Sendable {
         }
     }
 
-    init(brokerId: Int64,
+    init(createdDate: Date,
+         brokerId: Int64,
          profileQueryId: Int64,
          preferredRunDate: Date? = nil,
          historyEvents: [HistoryEvent],
          lastRunDate: Date? = nil,
          extractedProfile: ExtractedProfile) {
+        self.createdDate = createdDate
         self.brokerId = brokerId
         self.profileQueryId = profileQueryId
         self.preferredRunDate = preferredRunDate

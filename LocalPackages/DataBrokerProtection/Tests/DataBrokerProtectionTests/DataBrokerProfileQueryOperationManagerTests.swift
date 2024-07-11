@@ -967,7 +967,7 @@ final class MockWebJobRunner: WebJobRunner {
 extension OptOutJobData {
 
     static func mock(with extractedProfile: ExtractedProfile) -> OptOutJobData {
-        .init(brokerId: 1, profileQueryId: 1, historyEvents: [HistoryEvent](), extractedProfile: extractedProfile)
+        .init(createdDate: Date(), brokerId: 1, profileQueryId: 1, historyEvents: [HistoryEvent](), extractedProfile: extractedProfile)
     }
 }
 

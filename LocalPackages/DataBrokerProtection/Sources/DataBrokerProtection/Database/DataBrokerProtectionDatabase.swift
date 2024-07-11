@@ -285,7 +285,8 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
 
-            try vault.save(brokerId: optOut.brokerId,
+            try vault.save(createdDate: optOut.createdDate,
+                           brokerId: optOut.brokerId,
                            profileQueryId: optOut.profileQueryId,
                            extractedProfile: extractedProfile,
                            lastRunDate: optOut.lastRunDate,

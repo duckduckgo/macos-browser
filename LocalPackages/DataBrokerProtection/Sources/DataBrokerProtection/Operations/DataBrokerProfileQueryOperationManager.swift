@@ -170,11 +170,12 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         // This is done inside a transaction on the database side. We insert the extracted profile and then
                         // we insert the opt-out operation, we do not want to do things separately in case creating an opt-out fails
                         // causing the extracted profile to be orphan.
-                        let optOutJobData = OptOutJobData(brokerId: brokerId,
-                                                                      profileQueryId: profileQueryId,
-                                                                      preferredRunDate: preferredRunOperation,
-                                                                      historyEvents: [HistoryEvent](),
-                                                                      extractedProfile: extractedProfile)
+                        let optOutJobData = OptOutJobData(createdDate: Date(),
+                                                          brokerId: brokerId,
+                                                          profileQueryId: profileQueryId,
+                                                          preferredRunDate: preferredRunOperation,
+                                                          historyEvents: [HistoryEvent](),
+                                                          extractedProfile: extractedProfile)
 
                         try database.saveOptOutJob(optOut: optOutJobData, extractedProfile: extractedProfile)
 

@@ -211,6 +211,7 @@ struct MapperToModel {
 
     func mapToModel(_ optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB, events: [OptOutHistoryEventDB]) throws -> OptOutJobData {
         .init(
+            createdDate: optOutDB.createdDate,
             brokerId: optOutDB.brokerId,
             profileQueryId: optOutDB.profileQueryId,
             preferredRunDate: optOutDB.preferredRunDate,

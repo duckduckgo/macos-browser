@@ -196,6 +196,7 @@ extension ScanHistoryEventDB: PersistableRecord, FetchableRecord {
 }
 
 struct OptOutDB: Codable {
+    let createdDate: Date
     let brokerId: Int64
     let profileQueryId: Int64
     let extractedProfileId: Int64
@@ -215,6 +216,7 @@ extension OptOutDB: PersistableRecord, FetchableRecord {
     }
 
     enum Columns: String, ColumnExpression {
+        case createdDate
         case brokerId
         case profileQueryId
         case extractedProfileId
@@ -223,6 +225,7 @@ extension OptOutDB: PersistableRecord, FetchableRecord {
     }
 
     init(row: Row) throws {
+        createdDate = row[Columns.createdDate]
         brokerId = row[Columns.brokerId]
         profileQueryId = row[Columns.profileQueryId]
         extractedProfileId = row[Columns.extractedProfileId]
@@ -231,6 +234,7 @@ extension OptOutDB: PersistableRecord, FetchableRecord {
     }
 
     func encode(to container: inout PersistenceContainer) throws {
+        container[Columns.createdDate] = createdDate
         container[Columns.brokerId] = brokerId
         container[Columns.profileQueryId] = profileQueryId
         container[Columns.extractedProfileId] = extractedProfileId
