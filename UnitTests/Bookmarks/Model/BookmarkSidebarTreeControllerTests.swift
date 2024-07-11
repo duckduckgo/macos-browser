@@ -110,4 +110,22 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         XCTAssert(childFolderNode.representedObjectEquals(childFolder))
     }
 
+    func testWhenWeRebuildForSearch_ThenTheTreeIsCreatedWithSearchResults() {
+        let bookmark = Bookmark(id: "3", url: "www.ddg.com", title: "This is a bookmark", isFavorite: false)
+        let folderOne = BookmarkFolder(id: "1", title: "This is a sub-folder", children: [])
+        let folderTwo = BookmarkFolder(id: "2", title: "This is a folder", children: [])
+        let sut = BookmarkTreeController(dataSource: FakeTreeControllerDataSource())
+
+        sut.rebuild(for: [bookmark, folderOne, folderTwo])
+
+        XCTAssertEqual(sut.rootNode.childNodes.count, 3)
+    }
+
+}
+
+final class FakeTreeControllerDataSource: BookmarkTreeControllerDataSource {
+
+    func treeController(treeController: BookmarkTreeController, childNodesFor: BookmarkNode) -> [BookmarkNode] {
+        return []
+    }
 }
