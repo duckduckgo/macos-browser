@@ -193,7 +193,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             return .none
         }
 
-        if isSearching { // TODO: This needs some work
+        if isSearching {
             if destinationNode.representedObject is BookmarkFolder {
                 return .move
             }
@@ -344,10 +344,6 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         view.insets = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
 
         return view
-    }
-
-    func outlineView(_ outlineView: NSOutlineView, shouldShowOutlineCellForItem item: Any) -> Bool {
-        return !isSearching
     }
 
     // MARK: - NSTableViewDelegate
