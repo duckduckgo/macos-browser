@@ -45,15 +45,6 @@ struct ScanJobData: BrokerJobData, Sendable {
         self.lastRunDate = lastRunDate
     }
 
-    var matchEvents: [HistoryEvent] {
-        historyEvents.filter { event in
-            if case .matchesFound = event.type {
-                return true
-            }
-            return false
-        }
-    }
-
     func closestMatchesFoundEvent() -> HistoryEvent? {
         return historyEvents.filter { event in
             if case .matchesFound = event.type {
@@ -84,15 +75,6 @@ struct OptOutJobData: BrokerJobData, Sendable {
     let historyEvents: [HistoryEvent]
     let lastRunDate: Date?
     let extractedProfile: ExtractedProfile
-
-    var optOutRequestedEvents: [HistoryEvent] {
-        historyEvents.filter { event in
-            if case .optOutRequested = event.type {
-                return true
-            }
-            return false
-        }
-    }
 
     init(createdDate: Date,
          brokerId: Int64,
