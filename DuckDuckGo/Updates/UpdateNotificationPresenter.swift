@@ -23,9 +23,6 @@ final class UpdateNotificationPresenter {
 
     static let presentationTimeInterval: TimeInterval = 10
 
-    private var notificationView: NSView?
-    private var hideTimer: Timer?
-
     func showUpdateNotification(icon: NSImage, text: String, buttonText: String? = nil, presentMultiline: Bool = false) {
         DispatchQueue.main.async {
             guard let mainWindow = NSApp.mainWindow as? MainWindow,
@@ -42,7 +39,7 @@ final class UpdateNotificationPresenter {
                                                               buttonAction: buttonAction,
                                                               shouldShowCloseButton: buttonText == nil,
                                                               presentMultiline: presentMultiline,
-                                                              autoDismissDuration: 10,
+                                                              autoDismissDuration: Self.presentationTimeInterval,
                                                               onClick: { [weak self] in
                 self?.openUpdatesPage()
             })
@@ -50,41 +47,6 @@ final class UpdateNotificationPresenter {
             viewController.show(onParent: windowController.mainViewController,
                                 relativeTo: button)
         }
-    }
-
-    func closeUpdateNotification() {
-        hideTimer?.invalidate()
-        hideTimer = nil
-
-        // Remove observer for window resize
-        NotificationCenter.default.removeObserver(self, name: NSWindow.didResizeNotification, object: nil)
-
-        notificationView?.removeFromSuperview()
-        notificationView = nil
-    }
-
-    @objc private func fadeOutNotification() {
-        guard let view = notificationView else { return }
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 1/3
-            view.animator().alphaValue = 0
-        } completionHandler: { [weak self] in
-            self?.closeUpdateNotification()
-        }
-    }
-
-    @objc private func windowDidResize(_ notification: Notification) {
-        guard let mainWindow = notification.object as? NSWindow,
-              let notificationView = notificationView else { return }
-
-        let notificationSize = notificationView.frame.size
-        updateNotificationPosition(in: mainWindow, with: notificationView, notificationSize: notificationSize)
-    }
-
-    private func updateNotificationPosition(in window: NSWindow, with notificationView: NSView, notificationSize: CGSize) {
-        let windowFrame = window.frame
-        let notificationOrigin = NSPoint(x: windowFrame.width - notificationSize.width, y: windowFrame.height - notificationSize.height - 80)
-        notificationView.setFrameOrigin(notificationOrigin)
     }
 
     func openUpdatesPage() {
