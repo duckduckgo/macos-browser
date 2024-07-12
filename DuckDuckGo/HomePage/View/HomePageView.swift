@@ -62,9 +62,11 @@ extension HomePage.Views {
                     VStack(spacing: 0) {
                         Group {
                             remoteMessage()
+                                .padding(.top, 64)
+
                             if includingContinueSetUpCards {
                                 ContinueSetUpView()
-                                    .padding(.top, 64)
+                                    .padding(.top, activeRemoteMessageModel.shouldShowRemoteMessage ? 18 : 64)
                                     .visibility(model.isContinueSetUpVisible ? .visible : .gone)
                             }
                             Favorites()
@@ -211,18 +213,6 @@ extension HomePage.Views {
                 })
                 Spacer()
             }
-        }
-    }
-}
-
-private extension RemoteMessageModelType {
-
-    var isSupported: Bool {
-        switch self {
-        case .promoSingleAction:
-            return false
-        default:
-            return true
         }
     }
 }
