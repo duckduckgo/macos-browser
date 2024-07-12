@@ -32,6 +32,7 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
         bookmarksDatabase: CoreDataDatabase,
         appearancePreferences: AppearancePreferences,
         startupPreferencesPersistor: @escaping @autoclosure () -> StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(),
+        duckPlayerPreferencesPersistor: @escaping @autoclosure () -> DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor(),
         pinnedTabsManager: PinnedTabsManager,
         internalUserDecider: InternalUserDecider,
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
@@ -40,6 +41,7 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
         self.bookmarksDatabase = bookmarksDatabase
         self.appearancePreferences = appearancePreferences
         self.startupPreferencesPersistor = startupPreferencesPersistor
+        self.duckPlayerPreferencesPersistor = duckPlayerPreferencesPersistor
         self.pinnedTabsManager = pinnedTabsManager
         self.internalUserDecider = internalUserDecider
         self.statisticsStore = statisticsStore
@@ -49,6 +51,7 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
     let bookmarksDatabase: CoreDataDatabase
     let appearancePreferences: AppearancePreferences
     let startupPreferencesPersistor: () -> StartupPreferencesPersistor
+    let duckPlayerPreferencesPersistor: () -> DuckPlayerPreferencesPersistor
     let pinnedTabsManager: PinnedTabsManager
     let internalUserDecider: InternalUserDecider
     let statisticsStore: StatisticsStore
@@ -129,6 +132,8 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
         let isInstalledMacAppStore = false
 #endif
 
+        let duckPlayerPreferencesPersistor = duckPlayerPreferencesPersistor()
+
         return RemoteMessagingConfigMatcher(
             appAttributeMatcher: AppAttributeMatcher(statisticsStore: statisticsStore,
                                                      variantManager: variantManager,
@@ -150,7 +155,10 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
                                                        isPrivacyProSubscriptionExpired: isPrivacyProSubscriptionExpired,
                                                        dismissedMessageIds: dismissedMessageIds,
                                                        pinnedTabsCount: pinnedTabsManager.tabCollection.tabs.count,
-                                                       hasCustomHomePage: startupPreferencesPersistor().launchToCustomHomePage),
+                                                       hasCustomHomePage: startupPreferencesPersistor().launchToCustomHomePage,
+                                                       isDuckPlayerOnboarded: duckPlayerPreferencesPersistor.youtubeOverlayAnyButtonPressed,
+                                                       isDuckPlayerEnabled: duckPlayerPreferencesPersistor.duckPlayerModeBool != false
+                                                      ),
             percentileStore: RemoteMessagingPercentileUserDefaultsStore(keyValueStore: UserDefaults.standard),
             surveyActionMapper: surveyActionMapper,
             dismissedMessageIds: dismissedMessageIds
