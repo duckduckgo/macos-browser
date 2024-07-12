@@ -346,6 +346,9 @@ struct UserText {
         return String(format: localized, sites)
     }
     static let fireDialogDetails = NSLocalizedString("fire.dialog.details", value: "Details", comment: "Button to show more details")
+    static let fireDialogSelectAll = NSLocalizedString("fire.dialog.select.all", value: "Select All", comment: "Context Menu item to select all domains to burn")
+    static let fireDialogDeselectAll = NSLocalizedString("fire.dialog.unselect.all", value: "Unselect All", comment: "Context Menu item to unselect all domains to burn")
+
     static let fireDialogWindowWillClose = NSLocalizedString("fire.dialog.window-will-close", value: "Current window will close", comment: "Warning label shown in an expanded view of the fire popover")
     static let fireDialogTabWillClose = NSLocalizedString("fire.dialog.tab-will-close", value: "Current tab will close", comment: "Warning label shown in an expanded view of the fire popover")
     static let fireDialogPinnedTabWillReload = NSLocalizedString("fire.dialog.tab-will-reload", value: "Pinned tab will reload", comment: "Warning label shown in an expanded view of the fire popover")
