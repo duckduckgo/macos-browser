@@ -67,6 +67,7 @@ public struct UserDefaultsWrapper<T> {
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
         case autoClearEnabled = "preferences.auto-clear-enabled"
         case warnBeforeClearingEnabled = "preferences.warn-before-clearing-enabled"
+        case oneClickFireButton = "preferences.one-click-fire-button"
         case gpcEnabled = "preferences.gpc-enabled"
         case selectedDownloadLocationKey = "preferences.download-location"
         case lastUsedCustomDownloadLocation = "preferences.custom-last-used-download-location"

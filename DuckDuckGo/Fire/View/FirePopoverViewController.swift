@@ -258,7 +258,6 @@ final class FirePopoverViewController: NSViewController {
     @IBAction func clearButtonAction(_ sender: Any) {
         delegate?.firePopoverViewControllerDidClear(self)
         firePopoverViewModel.burn()
-
     }
 
     @IBAction func cancelButtonAction(_ sender: Any) {
