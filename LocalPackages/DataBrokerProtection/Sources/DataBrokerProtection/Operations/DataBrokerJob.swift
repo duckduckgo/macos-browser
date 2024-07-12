@@ -71,7 +71,6 @@ extension DataBrokerJob {
 
     // MARK: - Shared functions
 
-    // swiftlint:disable:next cyclomatic_complexity
     func runNextAction(_ action: Action) async {
         switch action {
         case is GetCaptchaInfoAction:

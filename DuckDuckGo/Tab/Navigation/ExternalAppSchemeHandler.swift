@@ -53,7 +53,6 @@ final class ExternalAppSchemeHandler {
 
 extension ExternalAppSchemeHandler: NavigationResponder {
 
-    // swiftlint:disable:next function_body_length
     @MainActor func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let externalUrl = navigationAction.url
         // only proceed with non-external-scheme navigations

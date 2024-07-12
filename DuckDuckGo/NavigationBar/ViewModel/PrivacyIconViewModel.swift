@@ -126,7 +126,6 @@ struct PrivacyIconViewModel {
         }()?.cgImage(forProposedRect: nil, context: .current, hints: nil)
     }
 
-    // swiftlint:disable cyclomatic_complexity
     private static func aquaLogo(for trackerNetwork: TrackerNetwork) -> NSImage? {
         switch trackerNetwork {
         case .adform:            .adform
@@ -216,8 +215,6 @@ struct PrivacyIconViewModel {
         case .xaxis:             .xaxisDark
         }
     }
-    // swiftlint:enable cyclomatic_complexity
-
 }
 
 extension Character {

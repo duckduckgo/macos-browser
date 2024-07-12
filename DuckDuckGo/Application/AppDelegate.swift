@@ -40,8 +40,6 @@ import NetworkProtectionIPC
 import DataBrokerProtection
 import RemoteMessaging
 
-// @MainActor
-// swiftlint:disable:next type_body_length
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG
@@ -146,12 +144,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Date.monthAgo)
     static var firstLaunchDate: Date
 
+    @UserDefaultsWrapper
+    private var didCrashDuringCrashHandlersSetUp: Bool
+
     static var isNewUser: Bool {
         return firstLaunchDate >= Date.weekAgo
     }
 
-    // swiftlint:disable:next function_body_length
     override init() {
+        // will not add crash handlers and will fire pixel on applicationDidFinishLaunching if didCrashDuringCrashHandlersSetUp == true
+        let didCrashDuringCrashHandlersSetUp = UserDefaultsWrapper(key: .didCrashDuringCrashHandlersSetUp, defaultValue: false)
+        _didCrashDuringCrashHandlersSetUp = didCrashDuringCrashHandlersSetUp
+        if case .normal = NSApplication.runType,
+           !didCrashDuringCrashHandlersSetUp.wrappedValue {
+
+            didCrashDuringCrashHandlersSetUp.wrappedValue = true
+            CrashLogMessageExtractor.setUp()
+            didCrashDuringCrashHandlersSetUp.wrappedValue = false
+        }
+
         do {
             let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
@@ -280,7 +291,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                                                               vpnUninstaller: vpnUninstaller)
     }
 
-    // swiftlint:disable:next function_body_length
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard NSApp.runType.requiresEnvironment else { return }
         defer {
@@ -340,13 +350,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         applyPreferredTheme()
 
 #if APPSTORE
-        crashCollection.start { pixelParameters, payloads, completion in
+        crashCollection.startAttachingCrashLogMessages { pixelParameters, payloads, completion in
             pixelParameters.forEach { _ in PixelKit.fire(GeneralPixel.crash) }
             guard let lastPayload = payloads.last else {
                 return
             }
             DispatchQueue.main.async {
-                CrashReportPromptPresenter().showPrompt(for: lastPayload, userDidAllowToReport: completion)
+                CrashReportPromptPresenter().showPrompt(for: CrashDataPayload(data: lastPayload), userDidAllowToReport: completion)
             }
         }
 #else
@@ -380,6 +390,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setUpAutofillPixelReporter()
 
         remoteMessagingClient?.startRefreshingRemoteMessages()
+
+        if didCrashDuringCrashHandlersSetUp {
+            PixelKit.fire(GeneralPixel.crashOnCrashHandlersSetUp)
+            didCrashDuringCrashHandlersSetUp = false
+        }
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {

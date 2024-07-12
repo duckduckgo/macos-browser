@@ -25,8 +25,6 @@ import WebKit
 import Subscription
 import PixelKit
 
-// swiftlint:disable file_length
-// swiftlint:disable:next type_body_length
 final class BrowserTabViewController: NSViewController {
 
     private lazy var browserTabView = BrowserTabView(frame: .zero, backgroundColor: .browserTabBackground)
@@ -1270,5 +1268,3 @@ extension BrowserTabViewController {
 #Preview {
     BrowserTabViewController(tabCollectionViewModel: TabCollectionViewModel(tabCollection: TabCollection(tabs: [.init(content: .url(.duckDuckGo, source: .ui))])))
 }
-
-// swiftlint:enable file_length

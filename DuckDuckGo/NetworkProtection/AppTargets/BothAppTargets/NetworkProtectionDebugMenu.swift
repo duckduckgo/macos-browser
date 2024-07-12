@@ -53,7 +53,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private let excludeLocalNetworksMenuItem = NSMenuItem(title: "excludeLocalNetworks", action: #selector(NetworkProtectionDebugMenu.toggleShouldExcludeLocalRoutes))
 
-    // swiftlint:disable:next function_body_length
     init() {
         preferredServerMenu = NSMenu { [preferredServerAutomaticItem] in
             preferredServerAutomaticItem
