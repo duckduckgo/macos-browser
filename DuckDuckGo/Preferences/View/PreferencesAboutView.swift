@@ -43,75 +43,64 @@ extension Preferences {
                                 .padding(.leading, -20)
                         }
 
-                        PreferencePaneSection {
-                            if geometry.size.width > 400 {
-                                HStack(alignment: .top) {
-                                    Image(.aboutPageLogo)
-                                        .padding(.top, 2)
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        rightColumnContent
-                                    }
-                                    .padding(.top, 10)
-                                }
-                                .padding(.bottom, 8)
-                            } else {
-                                VStack(alignment: .leading) {
-                                    Image(.aboutPageLogo)
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        rightColumnContent
-                                    }
-                                    .padding(.top, 10)
-                                }
-                                .padding(.bottom, 8)
-                            }
-
-                            TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
-                                model.openNewTab(with: .aboutDuckDuckGo)
-                            }
-
-                            TextButton(UserText.privacyPolicy) {
-                                model.openNewTab(with: .privacyPolicy)
-                            }
-
-                            #if FEEDBACK
-                            Button(UserText.sendFeedback) {
-                                model.openFeedbackForm()
-                            }
-                            .padding(.top, 4)
-                            #endif
-                        }
-#if SPARKLE
-                        .onAppear {
-                            model.subscribeToUpdateInfoIfNeeded()
-                        }
-#endif
+                        AboutContentSection(geometry: geometry, model: model)
 
 #if SPARKLE
-                        // Automatic/manual Updates
-                        PreferencePaneSection(UserText.browserUpdatesTitle) {
-
-                            PreferencePaneSubSection {
-                                Picker(selection: $areAutomaticUpdatesEnabled, content: {
-                                    Text(UserText.automaticUpdates).tag(true)
-                                        .padding(.bottom, 4).accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.automatically")
-                                    Text(UserText.manualUpdates).tag(false)
-                                        .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.manually")
-                                }, label: {})
-                                .pickerStyle(.radioGroup)
-                                .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
-                                .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker")
-                                .onChange(of: areAutomaticUpdatesEnabled) { newValue in
-                                    model.areAutomaticUpdatesEnabled = newValue
-                                }
-                                .onAppear {
-                                    areAutomaticUpdatesEnabled = model.areAutomaticUpdatesEnabled
-                                }
-                            }
-                        }
+                        UpdatesSection(areAutomaticUpdatesEnabled: $areAutomaticUpdatesEnabled, model: model)
 #endif
                     }
                 }
             }
+        }
+    }
+
+    struct AboutContentSection: View {
+        var geometry: GeometryProxy
+        @ObservedObject var model: AboutPreferences
+
+        var body: some View {
+            PreferencePaneSection {
+                if geometry.size.width > 400 {
+                    HStack(alignment: .top) {
+                        Image(.aboutPageLogo)
+                            .padding(.top, 2)
+                        VStack(alignment: .leading, spacing: 8) {
+                            rightColumnContent
+                        }
+                        .padding(.top, 10)
+                    }
+                    .padding(.bottom, 8)
+                } else {
+                    VStack(alignment: .leading) {
+                        Image(.aboutPageLogo)
+                        VStack(alignment: .leading, spacing: 8) {
+                            rightColumnContent
+                        }
+                        .padding(.top, 10)
+                    }
+                    .padding(.bottom, 8)
+                }
+
+                TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
+                    model.openNewTab(with: .aboutDuckDuckGo)
+                }
+
+                TextButton(UserText.privacyPolicy) {
+                    model.openNewTab(with: .privacyPolicy)
+                }
+
+                #if FEEDBACK
+                Button(UserText.sendFeedback) {
+                    model.openFeedbackForm()
+                }
+                .padding(.top, 4)
+                #endif
+            }
+            #if SPARKLE
+            .onAppear {
+                model.subscribeToUpdateInfoIfNeeded()
+            }
+            #endif
         }
 
         private var rightColumnContent: some View {
@@ -150,30 +139,6 @@ extension Preferences {
             }
         }
 
-        var variant: String {
-            if let url = Bundle.main.url(forResource: "variant", withExtension: "txt"), let string = try? String(contentsOf: url) {
-                return string
-            }
-            return "default"
-        }
-
-#if SPARKLE
-        @ViewBuilder
-        private var statusIcon: some View {
-            switch model.updateState {
-            case .loading:
-                ProgressView()
-                    .scaleEffect(0.6)
-            case .upToDate:
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
-            case .newVersionAvailable:
-                Image(systemName: "exclamationmark.circle.fill")
-                    .foregroundColor(.red)
-            }
-        }
-#endif
-
         @ViewBuilder
         private var versionText: some View {
             HStack(spacing: 0) {
@@ -197,6 +162,21 @@ extension Preferences {
         }
 
 #if SPARKLE
+        @ViewBuilder
+        private var statusIcon: some View {
+            switch model.updateState {
+            case .loading:
+                ProgressView()
+                    .scaleEffect(0.6)
+            case .upToDate:
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+            case .newVersionAvailable:
+                Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundColor(.red)
+            }
+        }
+
         private var lastCheckedText: some View {
             let lastChecked = model.updateState != .loading ? "\(lastCheckedFormattedDate(model.lastUpdateCheckDate))" : "-"
             return Text("\(UserText.lastChecked): \(lastChecked)")
@@ -241,6 +221,34 @@ extension Preferences {
 #endif
     }
 
+#if SPARKLE
+    struct UpdatesSection: View {
+        @Binding var areAutomaticUpdatesEnabled: Bool
+        @ObservedObject var model: AboutPreferences
+
+        var body: some View {
+            PreferencePaneSection(UserText.browserUpdatesTitle) {
+                PreferencePaneSubSection {
+                    Picker(selection: $areAutomaticUpdatesEnabled, content: {
+                        Text(UserText.automaticUpdates).tag(true)
+                            .padding(.bottom, 4).accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.automatically")
+                        Text(UserText.manualUpdates).tag(false)
+                            .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker.manually")
+                    }, label: {})
+                    .pickerStyle(.radioGroup)
+                    .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                    .accessibilityIdentifier("PreferencesAboutView.automaticUpdatesPicker")
+                    .onChange(of: areAutomaticUpdatesEnabled) { newValue in
+                        model.areAutomaticUpdatesEnabled = newValue
+                    }
+                    .onAppear {
+                        areAutomaticUpdatesEnabled = model.areAutomaticUpdatesEnabled
+                    }
+                }
+            }
+        }
+    }
+#endif
 
     struct UnsupportedDeviceInfoBox: View {
 

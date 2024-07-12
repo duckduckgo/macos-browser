@@ -44,16 +44,8 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         }
     }
 
-    @Published var updateState = UpdateState.upToDate {
-        didSet {
-            print("updateState: \(updateState)")
-        }
-    }
-#endif
+    @Published var updateState = UpdateState.upToDate
 
-    let appVersion = AppVersion()
-
-#if SPARKLE
     var updateController: UpdateControllerProtocol? {
         return Application.appDelegate.updateController
     }
@@ -71,7 +63,12 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
     var lastUpdateCheckDate: Date? {
         updateController?.lastUpdateCheckDate
     }
+
+    private var subscribed = false
+
 #endif
+
+    let appVersion = AppVersion()
 
     private var cancellable: AnyCancellable?
 
@@ -98,7 +95,6 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         updateController?.runUpdate()
     }
 
-    private var subscribed = false
     func subscribeToUpdateInfoIfNeeded() {
         guard let updateController, !subscribed else { return }
 
@@ -119,4 +115,5 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
         updateState = UpdateState(from: updateController.latestUpdate, isLoading: updateController.isUpdateBeingLoaded)
     }
 #endif
+
 }
