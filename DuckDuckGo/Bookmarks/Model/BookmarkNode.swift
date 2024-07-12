@@ -95,7 +95,7 @@ final class BookmarkNode: Hashable {
             return true
         }
 
-        if let folder = otherRepresentedObject as? PseudoFolder, let nodeFolder = self.representedObject as? PseudoFolder {
+        if let folder = otherRepresentedObject as? PseudoFolder, let nodeFolder = self.representedObject as? PseudoFolder, folder == nodeFolder {
             return true
         }
 
