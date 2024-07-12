@@ -1198,7 +1198,7 @@ struct UserText {
     static let browserDowngradedNotification = NSLocalizedString("notification.browser.downgraded", value: "Browser Downgraded", comment: "Notification informing user the app has been downgraded")
     static let criticalUpdateNotification = NSLocalizedString("notification.critical.update", value: "Critical update required. Restart to update.", comment: "Notification informing user a critical update is required.")
     static let updateAvailableNotification = NSLocalizedString("notification.update.available", value: "New version available. Restart to update.", comment: "Notification informing user the a version of app is available")
-    static let viewDetails = NSLocalizedString("view.details.button", value: "View details", comment: "Button title to open more details about the update")
+    static let viewDetails = NSLocalizedString("view.details.button", value: "View Details", comment: "Button title to open more details about the update")
 
     enum Bookmarks {
         enum Dialog {
