@@ -362,9 +362,14 @@ protocol NewWindowPolicyDecisionMaker {
 
     /// Publishes currently active main frame Navigation state
     var navigationStatePublisher: some Publisher<NavigationState?, Never> {
-        navigationDelegate.$currentNavigation.map { currentNavigation -> AnyPublisher<NavigationState?, Never> in
+        navigationDelegate.$currentNavigation.compactMap { currentNavigation -> AnyPublisher<NavigationState?, Never> in
             MainActor.assumeIsolated {
-                currentNavigation?.$state.map { $0 }.eraseToAnyPublisher() ?? Just(nil).eraseToAnyPublisher()
+                guard let currentNavigation,
+                      // don‘t let same-document navigations through
+                      !(currentNavigation.redirectHistory.first ?? currentNavigation.navigationAction).navigationType.isSameDocumentNavigation else {
+                    return Just(nil).eraseToAnyPublisher()
+                }
+                return currentNavigation.$state.map { $0 }.eraseToAnyPublisher()
             }
         }.switchToLatest()
     }

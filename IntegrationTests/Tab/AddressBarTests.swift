@@ -55,7 +55,19 @@ class AddressBarTests: XCTestCase {
 
     var webViewConfiguration: WKWebViewConfiguration!
     var schemeHandler: TestSchemeHandler!
-    static let testHtml = "<html><head><title>Title</title></head><body>test</body></html>"
+    static let testHtml = """
+    <html>
+        <head><title>Title</title></head>
+        <body>
+            <a name="navlink1" />
+            <a id="link1" href="#navlink2">go down</a>
+            <a id="link_duck" href="https://duck.com">go duck</a>
+            <div style="height: 2000px; position: inline">&nbsp;</div>
+            <a id="link2" name="navlink2" />
+            <a href="#navlink1">go up</a>
+        </body>
+    </html>
+    """
 
     @MainActor
     override func setUp() async throws {
@@ -471,6 +483,29 @@ class AddressBarTests: XCTestCase {
 
         try await tab.goForward()?.result.get()
         XCTAssertEqual(window.firstResponder, mainViewController.browserTabViewController.bookmarksViewController!.view)
+    }
+
+    // TODO: add tests
+    @MainActor
+    func testWhenPerformingSameDocumentNavigation_addressBarIsDeactivated() async throws {
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+        window = WindowsManager.openNewWindow(with: viewModel)!
+
+        try await tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise().value
+
+        _=window.makeFirstResponder(addressBarTextField)
+        try await Task.sleep(interval: 0.01)
+
+//        try await tab.webView.evaluateJavaScript("document.getElementById('link1').click()") as Void?
+        try await tab.webView.evaluateJavaScript("document.getElementById('link_duck').click()") as Void?
+
+//        try await tab.setContent(.url(.makeSearchUrl(from: "cats")!, credential: nil, source: .bookmark))?.result.get()
+        XCTAssertEqual(window.firstResponder, tab.webView)
+
+//        try await tab.reload()?.result.get()
+//        XCTAssertEqual(window.firstResponder, tab.webView)
+        try await Task.sleep(interval: 50)
     }
 
     @MainActor
