@@ -89,7 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var privacyDashboardWindow: NSWindow?
 
     let activeRemoteMessageModel: ActiveRemoteMessageModel
-    private let remoteMessagingClient: RemoteMessagingClient!
+    let remoteMessagingClient: RemoteMessagingClient!
 
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
