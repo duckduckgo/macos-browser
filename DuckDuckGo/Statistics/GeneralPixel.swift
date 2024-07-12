@@ -29,7 +29,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
 
-    case serp(cohort: String)
+    case serp(cohort: String?)
     case serpInitial(cohort: String)
     case serpDay21to27(cohort: String)
 
@@ -1005,6 +1005,7 @@ enum GeneralPixel: PixelKitEventV2 {
             return [PixelKit.Parameters.experimentCohort: cohort]
 
         case .serp(let cohort):
+            guard let cohort else { return [:] }
             return [PixelKit.Parameters.experimentCohort: cohort]
 
         case .serpInitial(let cohort):
