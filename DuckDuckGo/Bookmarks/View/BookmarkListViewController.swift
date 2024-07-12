@@ -829,7 +829,7 @@ final class BookmarkListPopover: NSPopover {
         super.init()
 
         self.animates = false
-        self.behavior = .applicationDefined // TODO: This should be transient, I'm chaning for debugging it
+        self.behavior = .transient
 
         setupContentController()
     }
