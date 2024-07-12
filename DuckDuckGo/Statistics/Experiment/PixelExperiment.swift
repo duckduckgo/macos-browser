@@ -208,8 +208,7 @@ final internal class PixelExperimentLogic {
     }
 
     func fireSerpPixel() {
-        guard allocatedCohort != nil, let cohort else { return }
-        PixelKit.fire(GeneralPixel.serp(cohort: cohort.rawValue), frequency: .standard, includeAppVersionParameter: false)
+        PixelKit.fire(GeneralPixel.serp(cohort: cohort?.rawValue), frequency: .standard, includeAppVersionParameter: false)
     }
 
     func fireOnboardingHomeButtonEnabledPixel() {
