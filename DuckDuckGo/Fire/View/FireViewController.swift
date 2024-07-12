@@ -31,34 +31,107 @@ final class FireViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private var cancellables = Set<AnyCancellable>()
 
-    private lazy var fireDialogViewController: FirePopoverViewController = {
-        let storyboard = NSStoryboard(name: "Fire", bundle: nil)
-        return storyboard.instantiateController(identifier: "FirePopoverViewController")
-    }()
+    private lazy var deletingDataLabel = NSTextField(string: UserText.fireDialogDelitingData)
+    private lazy var fakeFireButton = NSButton(image: .burn, target: nil, action: nil)
+    private lazy var progressIndicatorWrapper = NSView()
+    private lazy var progressIndicator = NSProgressIndicator()
+    private lazy var progressIndicatorWrapperBG = ColorView(frame: .zero, backgroundColor: .fireBackground, cornerRadius: 8)
 
-    @IBOutlet weak var deletingDataLabel: NSTextField!
-    @IBOutlet weak var fakeFireButton: NSButton!
-    @IBOutlet weak var progressIndicatorWrapper: NSView!
-    @IBOutlet weak var progressIndicator: NSProgressIndicator!
-    @IBOutlet weak var progressIndicatorWrapperBG: NSView!
     private var fireAnimationView: LottieAnimationView?
     private var fireAnimationViewLoadingTask: Task<(), Never>?
 
-    static func create(tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel? = nil) -> FireViewController {
-        NSStoryboard(name: "Fire", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, fireViewModel: fireViewModel)
-        }!
+    init(tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel? = nil) {
+        self.tabCollectionViewModel = tabCollectionViewModel
+        self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
+
+        super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel? = nil) {
-        self.tabCollectionViewModel = tabCollectionViewModel
-        self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
+    override func loadView() {
+        view = ColorView(frame: .zero, backgroundColor: .fireBackground)
 
-        super.init(coder: coder)
+        fakeFireButton.translatesAutoresizingMaskIntoConstraints = false
+        fakeFireButton.contentTintColor = .button
+        fakeFireButton.alignment = .center
+        fakeFireButton.bezelStyle = .shadowlessSquare
+        fakeFireButton.isBordered = false
+        fakeFireButton.imagePosition = .imageOnly
+        fakeFireButton.imageScaling = .scaleProportionallyDown
+        fakeFireButton.wantsLayer = true
+        fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDown.cgColor
+        fakeFireButton.layer?.cornerRadius = 4
+        fakeFireButton.setAccessibilityIdentifier("FireViewController.fakeFireButton")
+
+        progressIndicatorWrapperBG.translatesAutoresizingMaskIntoConstraints = false
+
+        let imageView = NSImageView(image: .burnAlert)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.setContentHuggingPriority(NSLayoutConstraint.Priority(rawValue: 251), for: .horizontal)
+        imageView.setContentHuggingPriority(NSLayoutConstraint.Priority(rawValue: 251), for: .vertical)
+        imageView.imageScaling = .scaleProportionallyDown
+
+        deletingDataLabel.translatesAutoresizingMaskIntoConstraints = false
+        deletingDataLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        deletingDataLabel.setContentHuggingPriority(NSLayoutConstraint.Priority(rawValue: 251), for: .horizontal)
+        deletingDataLabel.isEditable = false
+        deletingDataLabel.isBordered = false
+        deletingDataLabel.isSelectable = false
+        deletingDataLabel.drawsBackground = false
+        deletingDataLabel.font = .systemFont(ofSize: NSFont.smallSystemFontSize, weight: .regular)
+        deletingDataLabel.lineBreakMode = .byClipping
+        deletingDataLabel.textColor = .labelColor
+
+        progressIndicator.isIndeterminate = true
+        progressIndicator.maxValue = 100
+        progressIndicator.style = .bar
+        progressIndicator.translatesAutoresizingMaskIntoConstraints = false
+
+        progressIndicatorWrapper.translatesAutoresizingMaskIntoConstraints = false
+        progressIndicatorWrapper.setCornerRadius(8)
+        progressIndicatorWrapper.addSubview(progressIndicatorWrapperBG)
+        progressIndicatorWrapper.addSubview(progressIndicator)
+        progressIndicatorWrapper.addSubview(imageView)
+        progressIndicatorWrapper.addSubview(deletingDataLabel)
+
+        view.addSubview(progressIndicatorWrapper)
+        view.addSubview(fakeFireButton)
+
+        setupLayout(imageView: imageView)
+    }
+
+    private func setupLayout(imageView: NSImageView) {
+        NSLayoutConstraint.activate([
+            fakeFireButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 6),
+            progressIndicatorWrapper.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            progressIndicatorWrapper.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            view.trailingAnchor.constraint(equalTo: fakeFireButton.trailingAnchor, constant: 12),
+
+            fakeFireButton.heightAnchor.constraint(equalToConstant: 28),
+            fakeFireButton.widthAnchor.constraint(equalToConstant: 28),
+
+            imageView.centerXAnchor.constraint(equalTo: progressIndicatorWrapper.centerXAnchor),
+            progressIndicator.centerYAnchor.constraint(equalTo: progressIndicatorWrapper.centerYAnchor, constant: 13),
+            deletingDataLabel.centerXAnchor.constraint(equalTo: progressIndicatorWrapper.centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: progressIndicatorWrapper.centerYAnchor, constant: -40),
+            progressIndicatorWrapper.bottomAnchor.constraint(equalTo: progressIndicatorWrapperBG.bottomAnchor, constant: 10),
+            progressIndicatorWrapper.heightAnchor.constraint(equalToConstant: 220),
+            progressIndicator.centerXAnchor.constraint(equalTo: progressIndicatorWrapper.centerXAnchor),
+            progressIndicatorWrapper.widthAnchor.constraint(equalToConstant: 320),
+            deletingDataLabel.centerYAnchor.constraint(equalTo: progressIndicatorWrapper.centerYAnchor, constant: 34),
+            progressIndicatorWrapperBG.leadingAnchor.constraint(equalTo: progressIndicatorWrapper.leadingAnchor, constant: 10),
+            progressIndicatorWrapperBG.topAnchor.constraint(equalTo: progressIndicatorWrapper.topAnchor, constant: 10),
+            progressIndicatorWrapper.trailingAnchor.constraint(equalTo: progressIndicatorWrapperBG.trailingAnchor, constant: 10),
+
+            imageView.widthAnchor.constraint(equalToConstant: 48),
+            imageView.heightAnchor.constraint(equalToConstant: 48),
+
+            progressIndicator.widthAnchor.constraint(equalToConstant: 210),
+            progressIndicator.heightAnchor.constraint(equalToConstant: 18),
+        ])
     }
 
     deinit {
@@ -67,7 +140,6 @@ final class FireViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        deletingDataLabel.stringValue = UserText.fireDialogDelitingData
         if case .normal = NSApp.runType {
             fireAnimationViewLoadingTask = Task.detached(priority: .userInitiated) {
                 await self.setupFireAnimationView()
@@ -116,10 +188,6 @@ final class FireViewController: NSViewController {
 
         animationView.animationSpeed = fireAnimationSpeed
 
-        fakeFireButton.wantsLayer = true
-        fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDown.cgColor
-
-        fakeFireButton.setAccessibilityIdentifier("FireViewController.fakeFireButton")
         subscribeToIsBurning()
     }
 
@@ -141,10 +209,6 @@ final class FireViewController: NSViewController {
                 }
             })
             .store(in: &cancellables)
-    }
-
-    func showDialog() {
-        presentAsModalWindow(fireDialogViewController)
     }
 
     private let fireAnimationSpeed = 1.2
@@ -245,3 +309,14 @@ private actor FireAnimationViewLoader {
         LottieAnimation.named(animationName, animationCache: LottieAnimationCache.shared)
     }
 }
+
+@available(macOS 14.0, *)
+#Preview { {
+    let tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab)]))
+    let vc = FireViewController(tabCollectionViewModel: tabCollectionViewModel, fireViewModel: FireViewModel())
+    vc.onDeinit {
+        withExtendedLifetime(tabCollectionViewModel) {}
+    }
+    return vc
+
+}() }
