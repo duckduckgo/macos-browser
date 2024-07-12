@@ -31,7 +31,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     let treeController: BookmarkTreeController
 
-    private(set) var contentMode: ContentMode
+    private let contentMode: ContentMode
     private(set) var expandedNodesIDs = Set<String>()
     private(set) var isSearching = false
     private(set) var destinationFolderOnSearch: BookmarkFolder?
