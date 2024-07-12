@@ -193,6 +193,10 @@ public struct UserDefaultsWrapper<T> {
         case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
         case campaignVariant = "campaign.variant"
 
+        // Updates
+        case previousAppVersion = "previous.app.version"
+        case previousBuild = "previous.build"
+
         // Sync
 
         case syncEnvironment = "sync.environment"

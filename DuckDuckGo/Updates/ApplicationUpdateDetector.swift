@@ -1,5 +1,5 @@
 //
-//  UpdateDetector.swift
+//  ApplicationUpdateDetector.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -24,12 +24,16 @@ enum AppUpdateStatus {
     case downgraded
 }
 
-final class UpdateDetector {
+final class ApplicationUpdateDetector {
 
-    private static let previousVersionKey = "previousAppVersion"
-    private static let previousBuildKey = "previousAppBuild"
     private static var hasCheckedForUpdate = false
     private static var updateStatus: AppUpdateStatus = .noChange
+
+    @UserDefaultsWrapper(key: .previousAppVersion, defaultValue: nil)
+    private static var previousAppVersion: String?
+
+    @UserDefaultsWrapper(key: .previousBuild, defaultValue: nil)
+    private static var previousAppBuild: String?
 
     static func isApplicationUpdated() -> AppUpdateStatus {
         // If the update check has already been performed, return the cached result
@@ -39,12 +43,12 @@ final class UpdateDetector {
 
         let currentVersion = getCurrentAppVersion()
         let currentBuild = getCurrentAppBuild()
-        let previousVersion = getPreviousAppVersion()
-        let previousBuild = getPreviousAppBuild()
+        let previousVersion = previousAppVersion
+        let previousBuild = previousAppBuild
 
         // Save the current version and build to user defaults for future comparisons
-        saveCurrentAppVersion(currentVersion)
-        saveCurrentAppBuild(currentBuild)
+        Self.previousAppVersion = currentVersion
+        Self.previousAppBuild = currentBuild
 
         // Determine the update status
         if currentVersion == previousVersion {
@@ -79,21 +83,5 @@ final class UpdateDetector {
 
     private static func getCurrentAppBuild() -> String? {
         return Bundle.main.infoDictionary?["CFBundleVersion"] as? String
-    }
-
-    private static func getPreviousAppVersion() -> String? {
-        return UserDefaults.standard.string(forKey: previousVersionKey)
-    }
-
-    private static func getPreviousAppBuild() -> String? {
-        return UserDefaults.standard.string(forKey: previousBuildKey)
-    }
-
-    private static func saveCurrentAppVersion(_ version: String?) {
-        UserDefaults.standard.set(version, forKey: previousVersionKey)
-    }
-
-    private static func saveCurrentAppBuild(_ build: String?) {
-        UserDefaults.standard.set(build, forKey: previousBuildKey)
     }
 }

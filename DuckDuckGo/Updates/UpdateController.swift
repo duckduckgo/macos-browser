@@ -120,7 +120,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     // MARK: - Public
 
     func checkNewApplicationVersion() {
-        let updateStatus = UpdateDetector.isApplicationUpdated()
+        let updateStatus = ApplicationUpdateDetector.isApplicationUpdated()
         switch updateStatus {
         case .noChange: break
         case .updated:

@@ -30,7 +30,7 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
 
         switch requestURL.type {
         case .onboarding, .releaseNotes:
-            handleOnboarding(urlSchemeTask: urlSchemeTask)
+            handleSpecialPages(urlSchemeTask: urlSchemeTask)
         case .duckPlayer:
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
         default:
@@ -106,18 +106,18 @@ private extension DuckURLSchemeHandler {
 
 // MARK: - Onboarding & Release Notes
 private extension DuckURLSchemeHandler {
-    func handleOnboarding(urlSchemeTask: WKURLSchemeTask) {
+    func handleSpecialPages(urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = urlSchemeTask.request.url else {
             assertionFailure("No URL for Onboarding scheme handler")
             return
         }
-        guard let (response, data) = onboardingResponse(for: requestURL) else { return }
+        guard let (response, data) = response(for: requestURL) else { return }
         urlSchemeTask.didReceive(response)
         urlSchemeTask.didReceive(data)
         urlSchemeTask.didFinish()
     }
 
-    func onboardingResponse(for url: URL) -> (URLResponse, Data)? {
+    func response(for url: URL) -> (URLResponse, Data)? {
         var fileName = "index"
         var fileExtension = "html"
         var directoryURL: URL
