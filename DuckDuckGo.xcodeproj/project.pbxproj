@@ -692,7 +692,6 @@
 		3706FCC6293F65D500E42796 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = AA68C3D62490F821001B8783 /* README.md */; };
 		3706FCC8293F65D500E42796 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA585D85248FD31400E9A3E2 /* Assets.xcassets */; };
 		3706FCC9293F65D500E42796 /* NavigationBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */; };
-		3706FCCA293F65D500E42796 /* FirePopoverCollectionViewHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAE246F5270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib */; };
 		3706FCCC293F65D500E42796 /* TabBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA80EC7B256C46AA007083E7 /* TabBar.storyboard */; };
 		3706FCCD293F65D500E42796 /* shield-dot.json in Resources */ = {isa = PBXBuildFile; fileRef = AA34396B2754D4E300B241FA /* shield-dot.json */; };
 		3706FCD0293F65D500E42796 /* BookmarksBarCollectionViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4BE53369286912D40019DBFD /* BookmarksBarCollectionViewItem.xib */; };
@@ -707,7 +706,6 @@
 		3706FCE1293F65D500E42796 /* PermissionAuthorization.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */; };
 		3706FCE2293F65D500E42796 /* dark-trackers-3.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439772754D55100B241FA /* dark-trackers-3.json */; };
 		3706FCE3293F65D500E42796 /* dark-trackers-2.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439722754D55100B241FA /* dark-trackers-2.json */; };
-		3706FCE4293F65D500E42796 /* Fire.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAB7320626DD0C37002FACF9 /* Fire.storyboard */; };
 		3706FCE6293F65D500E42796 /* social_images in Resources */ = {isa = PBXBuildFile; fileRef = EA18D1C9272F0DC8006DC101 /* social_images */; };
 		3706FCE7293F65D500E42796 /* shield-dot-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E827E880A600036718 /* shield-dot-mouse-over.json */; };
 		3706FCEA293F65D500E42796 /* PasswordManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85625993269C8F9600EE44BC /* PasswordManager.storyboard */; };
@@ -718,7 +716,6 @@
 		3706FCEF293F65D500E42796 /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
 		3706FCF0293F65D500E42796 /* httpsMobileV2BloomSpec.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */; };
 		3706FCF1293F65D500E42796 /* TabBarFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA2CB12C2587BB5600AA6FBE /* TabBarFooter.xib */; };
-		3706FCF3293F65D500E42796 /* FirePopoverCollectionViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAE246F22709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib */; };
 		3706FCF5293F65D500E42796 /* dark-shield-dot.json in Resources */ = {isa = PBXBuildFile; fileRef = AA34396E2754D4E900B241FA /* dark-shield-dot.json */; };
 		3706FCF6293F65D500E42796 /* trackers-2.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439742754D55100B241FA /* trackers-2.json */; };
 		3706FDDA293F661700E42796 /* EmbeddedTrackerDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9833913227AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift */; };
@@ -1993,7 +1990,6 @@
 		AAAB9114288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAB9113288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift */; };
 		AAAB9116288EB46B00A057A9 /* VisitMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAB9115288EB46B00A057A9 /* VisitMenuItem.swift */; };
 		AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB549DE25DAB8F80058460B /* BookmarkViewModel.swift */; };
-		AAB7320726DD0C37002FACF9 /* Fire.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAB7320626DD0C37002FACF9 /* Fire.storyboard */; };
 		AAB7320926DD0CD9002FACF9 /* FireViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB7320826DD0CD9002FACF9 /* FireViewController.swift */; };
 		AAB8203C26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB8203B26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift */; };
 		AABAF59C260A7D130085060C /* FaviconManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABAF59B260A7D130085060C /* FaviconManagerMock.swift */; };
@@ -2027,8 +2023,6 @@
 		AAD86E52267A0DFF005C11BE /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD86E51267A0DFF005C11BE /* UpdateController.swift */; };
 		AADCBF3A26F7C2CE00EF67A8 /* LottieAnimationCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = AADCBF3926F7C2CE00EF67A8 /* LottieAnimationCache.swift */; };
 		AAE246F32709EF3B00BEEAEE /* FirePopoverCollectionViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE246F12709EF3B00BEEAEE /* FirePopoverCollectionViewItem.swift */; };
-		AAE246F42709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAE246F22709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib */; };
-		AAE246F6270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAE246F5270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib */; };
 		AAE246F8270A406200BEEAEE /* FirePopoverCollectionViewHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE246F7270A406200BEEAEE /* FirePopoverCollectionViewHeader.swift */; };
 		AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE39D1A24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift */; };
 		AAE7527A263B046100B973F8 /* History.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AAE75278263B046100B973F8 /* History.xcdatamodeld */; };
@@ -3816,7 +3810,6 @@
 		AAAB9113288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanThisHistoryMenuItem.swift; sourceTree = "<group>"; };
 		AAAB9115288EB46B00A057A9 /* VisitMenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitMenuItem.swift; sourceTree = "<group>"; };
 		AAB549DE25DAB8F80058460B /* BookmarkViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkViewModel.swift; sourceTree = "<group>"; };
-		AAB7320626DD0C37002FACF9 /* Fire.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Fire.storyboard; sourceTree = "<group>"; };
 		AAB7320826DD0CD9002FACF9 /* FireViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireViewController.swift; sourceTree = "<group>"; };
 		AAB8203B26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionListCharacteristics.swift; sourceTree = "<group>"; };
 		AABAF59B260A7D130085060C /* FaviconManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconManagerMock.swift; sourceTree = "<group>"; };
@@ -3852,8 +3845,6 @@
 		AAD86E51267A0DFF005C11BE /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
 		AADCBF3926F7C2CE00EF67A8 /* LottieAnimationCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieAnimationCache.swift; sourceTree = "<group>"; };
 		AAE246F12709EF3B00BEEAEE /* FirePopoverCollectionViewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverCollectionViewItem.swift; sourceTree = "<group>"; };
-		AAE246F22709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FirePopoverCollectionViewItem.xib; sourceTree = "<group>"; };
-		AAE246F5270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FirePopoverCollectionViewHeader.xib; sourceTree = "<group>"; };
 		AAE246F7270A406200BEEAEE /* FirePopoverCollectionViewHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverCollectionViewHeader.swift; sourceTree = "<group>"; };
 		AAE39D1A24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCollectionViewModelDelegateMock.swift; sourceTree = "<group>"; };
 		AAE75279263B046100B973F8 /* History.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = History.xcdatamodel; sourceTree = "<group>"; };
@@ -7832,7 +7823,6 @@
 		AAFCB38325E546FF00859DD4 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				AAB7320626DD0C37002FACF9 /* Fire.storyboard */,
 				AAEEC6A827088ADB008445F7 /* FireCoordinator.swift */,
 				AAB7320826DD0CD9002FACF9 /* FireViewController.swift */,
 				AAE99B8827088A19008B6BD9 /* FirePopover.swift */,
@@ -7840,9 +7830,7 @@
 				AA61C0CF2722159B00E6B681 /* FireInfoViewController.swift */,
 				AA6AD95A2704B6DB00159F8A /* FirePopoverViewController.swift */,
 				AAE246F7270A406200BEEAEE /* FirePopoverCollectionViewHeader.swift */,
-				AAE246F5270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib */,
 				AAE246F12709EF3B00BEEAEE /* FirePopoverCollectionViewItem.swift */,
-				AAE246F22709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -9197,7 +9185,6 @@
 				3706FCC6293F65D500E42796 /* README.md in Resources */,
 				3706FCC8293F65D500E42796 /* Assets.xcassets in Resources */,
 				3706FCC9293F65D500E42796 /* NavigationBar.storyboard in Resources */,
-				3706FCCA293F65D500E42796 /* FirePopoverCollectionViewHeader.xib in Resources */,
 				3706FCCC293F65D500E42796 /* TabBar.storyboard in Resources */,
 				3706FCCD293F65D500E42796 /* shield-dot.json in Resources */,
 				3706FCD0293F65D500E42796 /* BookmarksBarCollectionViewItem.xib in Resources */,
@@ -9213,7 +9200,6 @@
 				3706FCE1293F65D500E42796 /* PermissionAuthorization.storyboard in Resources */,
 				3706FCE2293F65D500E42796 /* dark-trackers-3.json in Resources */,
 				3706FCE3293F65D500E42796 /* dark-trackers-2.json in Resources */,
-				3706FCE4293F65D500E42796 /* Fire.storyboard in Resources */,
 				3706FCE6293F65D500E42796 /* social_images in Resources */,
 				3706FCE7293F65D500E42796 /* shield-dot-mouse-over.json in Resources */,
 				BD384ACB2BBC821B00EF3735 /* vpn-dark-mode.json in Resources */,
@@ -9226,7 +9212,6 @@
 				3706FCEF293F65D500E42796 /* macos-config.json in Resources */,
 				3706FCF0293F65D500E42796 /* httpsMobileV2BloomSpec.json in Resources */,
 				3706FCF1293F65D500E42796 /* TabBarFooter.xib in Resources */,
-				3706FCF3293F65D500E42796 /* FirePopoverCollectionViewItem.xib in Resources */,
 				3706FCF5293F65D500E42796 /* dark-shield-dot.json in Resources */,
 				3706FCF6293F65D500E42796 /* trackers-2.json in Resources */,
 			);
@@ -9391,7 +9376,6 @@
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
 				85589E8D27BBBB870038AD11 /* NavigationBar.storyboard in Resources */,
-				AAE246F6270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib in Resources */,
 				AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */,
 				AA34396D2754D4E300B241FA /* shield-dot.json in Resources */,
 				4BE5336B286912D40019DBFD /* BookmarksBarCollectionViewItem.xib in Resources */,
@@ -9407,7 +9391,6 @@
 				B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */,
 				AA34397D2754D55100B241FA /* dark-trackers-3.json in Resources */,
 				AA3439782754D55100B241FA /* dark-trackers-2.json in Resources */,
-				AAB7320726DD0C37002FACF9 /* Fire.storyboard in Resources */,
 				EA18D1CA272F0DC8006DC101 /* social_images in Resources */,
 				AA7EB6E927E880A600036718 /* shield-dot-mouse-over.json in Resources */,
 				BD384AC92BBC821A00EF3735 /* vpn-dark-mode.json in Resources */,
@@ -9420,7 +9403,6 @@
 				026ADE1426C3010C002518EE /* macos-config.json in Resources */,
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
 				AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */,
-				AAE246F42709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib in Resources */,
 				AA3439702754D4E900B241FA /* dark-shield-dot.json in Resources */,
 				AA34397A2754D55100B241FA /* trackers-2.json in Resources */,
 			);

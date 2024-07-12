@@ -72,6 +72,22 @@ internal class MouseOverButton: NSButton, Hoverable {
         clipsToBounds = true
     }
 
+    init(title: String? = nil, target: AnyObject? = nil, action: Selector? = nil) {
+        super.init(frame: .zero)
+        self.title = title ?? ""
+        self.target = target
+        self.action = action
+        self.clipsToBounds = true
+    }
+
+    init(image: NSImage, target: AnyObject? = nil, action: Selector? = nil) {
+        super.init(frame: .zero)
+        self.image = image
+        self.target = target
+        self.action = action
+        self.clipsToBounds = true
+    }
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         clipsToBounds = true

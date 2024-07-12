@@ -43,29 +43,31 @@ final class FirePopoverViewController: NSViewController {
     private var firePopoverViewModel: FirePopoverViewModel
     private let historyCoordinating: HistoryCoordinating
 
-    @IBOutlet weak var closeTabsLabel: NSTextField!
-    @IBOutlet weak var openFireWindowsTitleLabel: NSTextField!
-    @IBOutlet weak var fireWindowDescriptionLabel: NSTextField!
-    @IBOutlet weak var headerWrapperView: NSView!
-    @IBOutlet weak var mainButtonsToBurnerWindowContraint: NSLayoutConstraint!
-    @IBOutlet weak var infoLabel: NSTextField!
-    @IBOutlet weak var optionsButton: NSPopUpButton!
-    @IBOutlet weak var optionsButtonWidthConstraint: NSLayoutConstraint!
-    @IBOutlet weak var openDetailsButton: NSButton!
-    @IBOutlet weak var openDetailsButtonImageView: NSImageView!
-    @IBOutlet weak var closeDetailsButton: NSButton!
-    @IBOutlet weak var detailsWrapperView: NSView!
-    @IBOutlet weak var contentHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var detailsWrapperViewHeightContraint: NSLayoutConstraint!
-    @IBOutlet weak var openWrapperView: NSView!
-    @IBOutlet weak var closeWrapperView: NSView!
-    @IBOutlet weak var collectionView: NSCollectionView!
-    @IBOutlet weak var collectionViewBottomConstraint: NSLayoutConstraint!
-    @IBOutlet weak var warningWrapperView: NSView!
-    @IBOutlet weak var warningButton: NSButton!
-    @IBOutlet weak var clearButton: NSButton!
-    @IBOutlet weak var cancelButton: NSButton!
-    @IBOutlet weak var closeBurnerWindowButton: NSButton!
+    private lazy var viewMainButtonsWrapperView = ColorView(frame: .zero, backgroundColor: .interfaceBackground)
+    private lazy var closeTabsLabel = NSTextField(string: UserText.fireDialogCloseTabs)
+    private lazy var openFireWindowsTitleLabel = NSTextField(string: UserText.fireDialogFireWindowTitle)
+    private lazy var fireWindowDescriptionLabel = NSTextField(string: UserText.fireDialogFireWindowDescription)
+    private lazy var headerWrapperView = NSView()
+    private lazy var infoLabel = NSTextField()
+    private lazy var optionsButton = NSPopUpButton(title: UserText.allData, target: self, action: #selector(optionsButtonAction))
+    private var optionsButtonWidthConstraint: NSLayoutConstraint!
+    private lazy var openDetailsButton = MouseOverButton(title: "        " + UserText.details, target: self, action: #selector(openDetailsButtonAction))
+    private lazy var openDetailsButtonImageView = NSImageView()
+    private lazy var closeDetailsButton = MouseOverButton(title: "     " + UserText.fireDialogCloseAllTabsAndClear, target: self, action: #selector(closeDetailsButtonAction))
+    private lazy var detailsWrapperView = NSView()
+    private var contentHeightConstraint: NSLayoutConstraint!
+    private var detailsWrapperViewHeightContraint: NSLayoutConstraint!
+    private lazy var openWrapperView = NSView()
+    private lazy var closeWrapperView = ColorView(frame: NSRect(x: 0, y: 0, width: 344, height: 42), backgroundColor: .firePopoverPanelBackground)
+    private lazy var scrollView = NSScrollView()
+    private lazy var collectionView = NSCollectionView()
+    private var collectionViewBottomConstraint: NSLayoutConstraint!
+    private lazy var warningWrapperView = ColorView(frame: NSRect(x: 0, y: 0, width: 344, height: 32), backgroundColor: .firePopoverPanelBackground)
+    private lazy var warningButton = NSButton(image: .warningTriangle, target: nil, action: nil)
+    private lazy var clearButton = NSButton(title: UserText.clear, target: self, action: #selector(clearButtonAction))
+    private lazy var cancelButton = NSButton(title: UserText.cancel, target: self, action: #selector(cancelButtonAction))
+    private var mainButtonsToBurnerWindowContraint: NSLayoutConstraint!
+    private lazy var closeBurnerWindowButton = NSButton(title: UserText.fireDialogBurnWindowButton, target: self, action: #selector(closeBurnerWindowButtonAction))
 
     private var viewModelCancellable: AnyCancellable?
     private var selectedCancellable: AnyCancellable?
@@ -74,12 +76,11 @@ final class FirePopoverViewController: NSViewController {
         fatalError("FirePopoverViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder,
-          fireViewModel: FireViewModel,
-          tabCollectionViewModel: TabCollectionViewModel,
-          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-          fireproofDomains: FireproofDomains = FireproofDomains.shared,
-          faviconManagement: FaviconManagement = FaviconManager.shared) {
+    init(fireViewModel: FireViewModel,
+         tabCollectionViewModel: TabCollectionViewModel,
+         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         fireproofDomains: FireproofDomains = FireproofDomains.shared,
+         faviconManagement: FaviconManagement = FaviconManager.shared) {
         self.fireViewModel = fireViewModel
         self.historyCoordinating = historyCoordinating
         self.firePopoverViewModel = FirePopoverViewModel(fireViewModel: fireViewModel,
@@ -89,14 +90,436 @@ final class FirePopoverViewController: NSViewController {
                                                          faviconManagement: faviconManagement,
                                                          tld: ContentBlocking.shared.tld)
 
-        super.init(coder: coder)
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    override func loadView() {
+        // MARK: Open New Fire Window (header)
+
+        let openFireWindowContainerView = NSView()
+        openFireWindowContainerView.translatesAutoresizingMaskIntoConstraints = false
+
+        let iconView = NSImageView(image: .burnerWindowButtonIcon)
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        iconView.contentTintColor = .labelColor
+        iconView.imageScaling = .scaleProportionallyDown
+        iconView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        iconView.setContentHuggingPriority(.init(rawValue: 251), for: .vertical)
+
+        openFireWindowsTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        openFireWindowsTitleLabel.isEditable = false
+        openFireWindowsTitleLabel.isBordered = false
+        openFireWindowsTitleLabel.isSelectable = false
+        openFireWindowsTitleLabel.drawsBackground = false
+        openFireWindowsTitleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        openFireWindowsTitleLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        openFireWindowsTitleLabel.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        openFireWindowsTitleLabel.font = .systemFont(ofSize: 13)
+        openFireWindowsTitleLabel.textColor = .labelColor
+
+        fireWindowDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        fireWindowDescriptionLabel.isEditable = false
+        fireWindowDescriptionLabel.isBordered = false
+        fireWindowDescriptionLabel.isSelectable = false
+        fireWindowDescriptionLabel.drawsBackground = false
+        fireWindowDescriptionLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        fireWindowDescriptionLabel.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        fireWindowDescriptionLabel.font = .systemFont(ofSize: NSFont.smallSystemFontSize, weight: .regular)
+        fireWindowDescriptionLabel.textColor = .secondaryLabelColor
+
+        let fireWindowMouseOverButton = MouseOverButton(target: self, action: #selector(openNewBurnerWindowAction))
+        fireWindowMouseOverButton.translatesAutoresizingMaskIntoConstraints = false
+        fireWindowMouseOverButton.cornerRadius = 4
+        fireWindowMouseOverButton.mouseDownColor = .buttonMouseDown
+        fireWindowMouseOverButton.mouseOverColor = .buttonMouseOver
+
+        openFireWindowContainerView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        openFireWindowContainerView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        openFireWindowContainerView.addSubview(iconView)
+        openFireWindowContainerView.addSubview(openFireWindowsTitleLabel)
+        openFireWindowContainerView.addSubview(fireWindowDescriptionLabel)
+        openFireWindowContainerView.addSubview(fireWindowMouseOverButton)
+
+        // MARK: Header Image, Options View
+
+        let headerSeparator = NSBox()
+        headerSeparator.translatesAutoresizingMaskIntoConstraints = false
+        headerSeparator.boxType = .separator
+        headerSeparator.setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        let fireHeaderImageView = NSImageView(image: .fireHeader)
+        fireHeaderImageView.translatesAutoresizingMaskIntoConstraints = false
+        fireHeaderImageView.imageScaling = .scaleProportionallyDown
+        fireHeaderImageView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        fireHeaderImageView.setContentHuggingPriority(.init(rawValue: 251), for: .vertical)
+
+        infoLabel.translatesAutoresizingMaskIntoConstraints = false
+        infoLabel.isEditable = false
+        infoLabel.isBordered = false
+        infoLabel.isSelectable = false
+        infoLabel.drawsBackground = false
+        infoLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        infoLabel.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        infoLabel.alignment = .center
+        infoLabel.font = .systemFont(ofSize: NSFont.smallSystemFontSize,
+                                     weight: .regular)
+        infoLabel.textColor = .secondaryLabelColor
+
+        optionsButton.translatesAutoresizingMaskIntoConstraints = false
+        optionsButton.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        optionsButton.setContentHuggingPriority(.required, for: .horizontal)
+        optionsButton.alignment = .center
+        optionsButton.bezelStyle = .regularSquare
+        optionsButton.font = .menuFont(ofSize: 13)
+        optionsButton.lineBreakMode = .byTruncatingTail
+        optionsButton.cell?.isBordered = true
+        optionsButton.cell?.state = .on
+        optionsButton.cell?.tag = 2
+
+        closeTabsLabel.translatesAutoresizingMaskIntoConstraints = false
+        closeTabsLabel.isEditable = false
+        closeTabsLabel.isBordered = false
+        closeTabsLabel.isSelectable = false
+        closeTabsLabel.drawsBackground = false
+        closeTabsLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        closeTabsLabel.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        closeTabsLabel.font = .systemFont(ofSize: 13)
+        closeTabsLabel.lineBreakMode = .byClipping
+        closeTabsLabel.textColor = .labelColor
+
+        headerWrapperView.translatesAutoresizingMaskIntoConstraints = false
+        headerWrapperView.addSubview(headerSeparator)
+        headerWrapperView.addSubview(fireHeaderImageView)
+        headerWrapperView.addSubview(closeTabsLabel)
+        headerWrapperView.addSubview(optionsButton)
+        headerWrapperView.addSubview(infoLabel)
+
+        // MARK: Open Details button
+
+        openDetailsButtonImageView.translatesAutoresizingMaskIntoConstraints = false
+        openDetailsButtonImageView.contentTintColor = .greyText
+        openDetailsButtonImageView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        openDetailsButtonImageView.setContentHuggingPriority(.init(rawValue: 251), for: .vertical)
+        openDetailsButtonImageView.alignment = .left
+        openDetailsButtonImageView.image = .expandDownPadding
+        openDetailsButtonImageView.imageScaling = .scaleProportionallyDown
+
+        openDetailsButton.translatesAutoresizingMaskIntoConstraints = false
+        openDetailsButton.normalTintColor = .greyText
+        openDetailsButton.alignment = .center
+        openDetailsButton.bezelStyle = .shadowlessSquare
+        openDetailsButton.font = .systemFont(ofSize: NSFont.smallSystemFontSize,
+                                             weight: .regular)
+        openDetailsButton.mouseDownColor = .buttonMouseDownColorLight
+        openDetailsButton.mouseOverColor = .buttonMouseOverColorLight
+
+        openWrapperView.translatesAutoresizingMaskIntoConstraints = false
+        openWrapperView.addSubview(openDetailsButtonImageView)
+        openWrapperView.addSubview(openDetailsButton)
+
+        // MARK: Details (Collection View)
+
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.autohidesScrollers = true
+        scrollView.borderType = .noBorder
+        scrollView.hasHorizontalScroller = false
+        scrollView.horizontalLineScroll = 10
+        scrollView.horizontalPageScroll = 10
+        scrollView.usesPredominantAxisScrolling = false
+        scrollView.verticalLineScroll = 10
+        scrollView.verticalPageScroll = 10
+        scrollView.wantsLayer = true
+
+        let clipView = NSClipView()
+        clipView.documentView = collectionView
+
+        clipView.autoresizingMask = [.width, .height]
+        clipView.backgroundColor = .interfaceBackground
+        clipView.drawsBackground = false
+        clipView.frame = CGRect(x: 0, y: 0, width: 344, height: 221)
+
+        let collectionViewLayout = NSCollectionViewFlowLayout()
+        collectionViewLayout.itemSize = CGSize(width: 318, height: 24)
+
+        collectionView.collectionViewLayout = collectionViewLayout
+        collectionView.allowsMultipleSelection = true
+        collectionView.autoresizingMask = [.width]
+        collectionView.backgroundColors = [.firePopoverListBackground]
+        collectionView.frame = CGRect(x: 0, y: 0, width: 344, height: 221)
+        collectionView.isSelectable = true
+
+        scrollView.contentView = clipView
+
+        detailsWrapperView.translatesAutoresizingMaskIntoConstraints = false
+        detailsWrapperView.addSubview(scrollView)
+
+        detailsWrapperView.isHidden = true
+
+        // MARK: Close Details button
+
+        let closeDetailsSeparator1 = NSBox(frame: CGRect(x: 0, y: 39, width: 344, height: 5))
+        closeDetailsSeparator1.autoresizingMask = [.maxXMargin, .minYMargin]
+        closeDetailsSeparator1.boxType = .separator
+        closeDetailsSeparator1.setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        let closeDetailsSeparator2 = NSBox(frame: CGRect(x: 0, y: -2, width: 344, height: 5))
+        closeDetailsSeparator2.autoresizingMask = [.maxXMargin, .minYMargin]
+        closeDetailsSeparator2.boxType = .separator
+        closeDetailsSeparator2.setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        closeDetailsButton.normalTintColor = .greyText
+        closeDetailsButton.translatesAutoresizingMaskIntoConstraints = false
+        closeDetailsButton.alignment = .left
+        closeDetailsButton.bezelStyle = .shadowlessSquare
+        closeDetailsButton.font = .systemFont(ofSize: NSFont.smallSystemFontSize,
+                                              weight: .regular)
+        closeDetailsButton.image = .condenseUpPadding
+        closeDetailsButton.imagePosition = .imageTrailing
+        closeDetailsButton.backgroundInset = CGPoint(x: -6, y: 0.0)
+        closeDetailsButton.mouseDownColor = .buttonMouseDownColorLight
+        closeDetailsButton.mouseOverColor = .buttonMouseOverColorLight
+
+        closeWrapperView.translatesAutoresizingMaskIntoConstraints = false
+        closeWrapperView.addSubview(closeDetailsSeparator1)
+        closeWrapperView.addSubview(closeDetailsSeparator2)
+        closeWrapperView.addSubview(closeDetailsButton)
+
+        detailsWrapperView.addSubview(closeWrapperView)
+
+        // MARK: Warning Wrapper View
+
+        let warningSeparator1 = NSBox(frame: CGRect(x: 0, y: 29, width: 320, height: 5))
+        warningSeparator1.autoresizingMask = [.maxXMargin, .minYMargin]
+        warningSeparator1.boxType = .separator
+        warningSeparator1.setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        let warningSeparator2 = NSBox(frame: CGRect(x: 0, y: -12, width: 320, height: 5))
+        warningSeparator2.autoresizingMask = [.maxXMargin, .minYMargin]
+        warningSeparator2.boxType = .separator
+        warningSeparator2.setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        warningButton.autoresizingMask = [.maxXMargin, .minYMargin]
+        warningButton.contentTintColor = .greyText
+        warningButton.frame = CGRect(x: 20, y: 0, width: 304, height: 32)
+        warningButton.alignment = .left
+        warningButton.bezelStyle = .shadowlessSquare
+        warningButton.isBordered = false
+        warningButton.font = .systemFont(ofSize: NSFont.smallSystemFontSize,
+                                         weight: .regular)
+        warningButton.image = .warningTriangle
+        warningButton.imagePosition = .imageLeading
+
+        warningWrapperView.translatesAutoresizingMaskIntoConstraints = false
+        warningWrapperView.addSubview(warningSeparator1)
+        warningWrapperView.addSubview(warningSeparator2)
+        warningWrapperView.addSubview(warningButton)
+
+        // MARK: View Main Buttons (footer)
+
+        let separator = NSBox()
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        separator.boxType = .separator
+        separator.setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        cancelButton.translatesAutoresizingMaskIntoConstraints = false
+        cancelButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        cancelButton.alignment = .center
+        cancelButton.bezelStyle = .rounded
+        cancelButton.controlSize = .large
+        cancelButton.font = .systemFont(ofSize: 13)
+        cancelButton.imageScaling = .scaleProportionallyDown
+        cancelButton.cell?.isBordered = true
+
+        clearButton.translatesAutoresizingMaskIntoConstraints = false
+        clearButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        clearButton.alignment = .center
+        clearButton.bezelStyle = .rounded
+        clearButton.controlSize = .large
+        clearButton.font = .systemFont(ofSize: 13)
+        clearButton.imageScaling = .scaleProportionallyDown
+        clearButton.cell?.isBordered = true
+
+        closeBurnerWindowButton.translatesAutoresizingMaskIntoConstraints = false
+        closeBurnerWindowButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        closeBurnerWindowButton.isHidden = true
+        closeBurnerWindowButton.alignment = .center
+        closeBurnerWindowButton.bezelStyle = .rounded
+        closeBurnerWindowButton.controlSize = .large
+        closeBurnerWindowButton.font = .systemFont(ofSize: 13)
+        closeBurnerWindowButton.imageScaling = .scaleProportionallyDown
+        closeBurnerWindowButton.cell?.isBordered = true
+
+        viewMainButtonsWrapperView.translatesAutoresizingMaskIntoConstraints = false
+        viewMainButtonsWrapperView.addSubview(separator)
+        viewMainButtonsWrapperView.addSubview(closeBurnerWindowButton)
+        viewMainButtonsWrapperView.addSubview(clearButton)
+        viewMainButtonsWrapperView.addSubview(cancelButton)
+
+        // MARK: Container View
+
+        view = ColorView(frame: NSRect(x: 0, y: 0, width: 344, height: 388),
+                         backgroundColor: .interfaceBackground)
+
+        view.addSubview(openFireWindowContainerView)
+        view.addSubview(headerWrapperView)
+        view.addSubview(openWrapperView)
+        view.addSubview(detailsWrapperView)
+        view.addSubview(warningWrapperView)
+        view.addSubview(viewMainButtonsWrapperView)
+
+        setupOpenFireWindowLayout(openFireWindowContainerView: openFireWindowContainerView, iconView: iconView, fireWindowMouseOverButton: fireWindowMouseOverButton)
+        setupHeaderLayout(openFireWindowContainerView: openFireWindowContainerView, fireHeaderImageView: fireHeaderImageView, headerSeparator: headerSeparator)
+        setupButtonsLayout(openFireWindowContainerView: openFireWindowContainerView, separator: separator)
+        setupDetailsLayout()
+    }
+
+    private func setupOpenFireWindowLayout(openFireWindowContainerView: NSView, iconView: NSImageView, fireWindowMouseOverButton: MouseOverButton) {
+        NSLayoutConstraint.activate([
+            openFireWindowContainerView.heightAnchor.constraint(greaterThanOrEqualToConstant: 84),
+            openFireWindowContainerView.topAnchor.constraint(equalTo: view.topAnchor),
+            openFireWindowContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: openFireWindowContainerView.trailingAnchor),
+
+            iconView.widthAnchor.constraint(equalToConstant: 32),
+            iconView.heightAnchor.constraint(equalToConstant: 32),
+            iconView.leadingAnchor.constraint(equalTo: openFireWindowContainerView.leadingAnchor, constant: 24),
+            iconView.topAnchor.constraint(equalTo: openFireWindowContainerView.topAnchor, constant: 26),
+
+            openFireWindowsTitleLabel.topAnchor.constraint(equalTo: openFireWindowContainerView.topAnchor, constant: 25),
+            openFireWindowsTitleLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 6),
+            openFireWindowContainerView.trailingAnchor.constraint(equalTo: openFireWindowsTitleLabel.trailingAnchor, constant: 20),
+
+            fireWindowDescriptionLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 6),
+            openFireWindowContainerView.bottomAnchor.constraint(greaterThanOrEqualTo: fireWindowDescriptionLabel.bottomAnchor, constant: 16),
+            fireWindowDescriptionLabel.topAnchor.constraint(equalTo: openFireWindowsTitleLabel.bottomAnchor, constant: 2),
+            openFireWindowContainerView.trailingAnchor.constraint(equalTo: fireWindowDescriptionLabel.trailingAnchor, constant: 20),
+
+            fireWindowMouseOverButton.topAnchor.constraint(equalTo: openFireWindowContainerView.topAnchor, constant: 16),
+            fireWindowMouseOverButton.leadingAnchor.constraint(equalTo: openFireWindowContainerView.leadingAnchor, constant: 20),
+            openFireWindowContainerView.trailingAnchor.constraint(equalTo: fireWindowMouseOverButton.trailingAnchor, constant: 20),
+            openFireWindowContainerView.bottomAnchor.constraint(equalTo: fireWindowMouseOverButton.bottomAnchor, constant: 8),
+            fireWindowMouseOverButton.heightAnchor.constraint(greaterThanOrEqualToConstant: 52),
+        ])
+    }
+
+    private func setupHeaderLayout(openFireWindowContainerView: NSView, fireHeaderImageView: NSImageView, headerSeparator: NSBox) {
+        contentHeightConstraint = viewMainButtonsWrapperView.topAnchor.constraint(equalTo: headerWrapperView.bottomAnchor, constant: 42)
+
+        NSLayoutConstraint.activate([
+            view.trailingAnchor.constraint(equalTo: headerWrapperView.trailingAnchor),
+            headerWrapperView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+
+            headerWrapperView.topAnchor.constraint(equalTo: openFireWindowContainerView.bottomAnchor),
+            optionsButton.leadingAnchor.constraint(equalTo: headerWrapperView.leadingAnchor, constant: 55),
+            optionsButton.topAnchor.constraint(equalTo: closeTabsLabel.bottomAnchor, constant: 8),
+            headerWrapperView.heightAnchor.constraint(equalToConstant: 202),
+            infoLabel.centerXAnchor.constraint(equalTo: headerWrapperView.centerXAnchor),
+            headerWrapperView.trailingAnchor.constraint(equalTo: optionsButton.trailingAnchor, constant: 54),
+            fireHeaderImageView.topAnchor.constraint(equalTo: headerWrapperView.topAnchor, constant: 20),
+            infoLabel.topAnchor.constraint(equalTo: optionsButton.bottomAnchor, constant: 8),
+            closeTabsLabel.topAnchor.constraint(equalTo: fireHeaderImageView.bottomAnchor, constant: 15),
+            headerWrapperView.trailingAnchor.constraint(equalTo: headerSeparator.trailingAnchor, constant: 20),
+            headerWrapperView.trailingAnchor.constraint(equalTo: infoLabel.trailingAnchor, constant: 20),
+            fireHeaderImageView.centerXAnchor.constraint(equalTo: headerWrapperView.centerXAnchor),
+            headerSeparator.leadingAnchor.constraint(equalTo: headerWrapperView.leadingAnchor, constant: 20),
+            headerSeparator.topAnchor.constraint(equalTo: headerWrapperView.topAnchor),
+            infoLabel.leadingAnchor.constraint(equalTo: headerWrapperView.leadingAnchor, constant: 20),
+            closeTabsLabel.centerXAnchor.constraint(equalTo: headerWrapperView.centerXAnchor),
+
+            infoLabel.widthAnchor.constraint(equalToConstant: 304),
+            infoLabel.heightAnchor.constraint(equalToConstant: 32),
+
+            optionsButton.heightAnchor.constraint(equalToConstant: 30),
+
+            fireHeaderImageView.widthAnchor.constraint(equalToConstant: 128),
+            fireHeaderImageView.heightAnchor.constraint(equalToConstant: 64),
+
+            contentHeightConstraint,
+        ])
+    }
+
+    private func setupButtonsLayout(openFireWindowContainerView: NSView, separator: NSBox) {
+        mainButtonsToBurnerWindowContraint = viewMainButtonsWrapperView.topAnchor.constraint(equalTo: openFireWindowContainerView.bottomAnchor).priority(250)
+
+        NSLayoutConstraint.activate([
+            view.trailingAnchor.constraint(equalTo: viewMainButtonsWrapperView.trailingAnchor),
+            viewMainButtonsWrapperView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            view.bottomAnchor.constraint(equalTo: viewMainButtonsWrapperView.bottomAnchor),
+
+            closeBurnerWindowButton.leadingAnchor.constraint(equalTo: viewMainButtonsWrapperView.leadingAnchor, constant: 20),
+            cancelButton.leadingAnchor.constraint(equalTo: viewMainButtonsWrapperView.leadingAnchor, constant: 20),
+            viewMainButtonsWrapperView.trailingAnchor.constraint(equalTo: closeBurnerWindowButton.trailingAnchor, constant: 20),
+            separator.topAnchor.constraint(equalTo: viewMainButtonsWrapperView.topAnchor),
+            cancelButton.centerYAnchor.constraint(equalTo: viewMainButtonsWrapperView.centerYAnchor),
+            viewMainButtonsWrapperView.trailingAnchor.constraint(equalTo: separator.trailingAnchor),
+            clearButton.centerYAnchor.constraint(equalTo: viewMainButtonsWrapperView.centerYAnchor),
+            clearButton.widthAnchor.constraint(equalTo: cancelButton.widthAnchor),
+            viewMainButtonsWrapperView.trailingAnchor.constraint(equalTo: clearButton.trailingAnchor, constant: 20),
+            viewMainButtonsWrapperView.bottomAnchor.constraint(equalTo: closeBurnerWindowButton.bottomAnchor, constant: 16),
+            clearButton.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 8),
+            separator.leadingAnchor.constraint(equalTo: viewMainButtonsWrapperView.leadingAnchor),
+            viewMainButtonsWrapperView.heightAnchor.constraint(equalToConstant: 60),
+
+            mainButtonsToBurnerWindowContraint,
+        ])
+    }
+
+    private func setupDetailsLayout() {
+        optionsButtonWidthConstraint = optionsButton.widthAnchor.constraint(equalToConstant: 235).priority(250)
+        detailsWrapperViewHeightContraint = detailsWrapperView.heightAnchor.constraint(equalToConstant: 263)
+        collectionViewBottomConstraint = detailsWrapperView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor)
+
+        NSLayoutConstraint.activate([
+            openWrapperView.topAnchor.constraint(equalTo: headerWrapperView.bottomAnchor),
+            detailsWrapperView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: detailsWrapperView.trailingAnchor),
+            detailsWrapperView.topAnchor.constraint(equalTo: headerWrapperView.bottomAnchor),
+            view.trailingAnchor.constraint(equalTo: openWrapperView.trailingAnchor),
+            openWrapperView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+
+            warningWrapperView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            viewMainButtonsWrapperView.topAnchor.constraint(equalTo: warningWrapperView.bottomAnchor),
+            view.trailingAnchor.constraint(equalTo: warningWrapperView.trailingAnchor),
+            warningWrapperView.heightAnchor.constraint(equalToConstant: 32),
+
+            closeWrapperView.leadingAnchor.constraint(equalTo: detailsWrapperView.leadingAnchor),
+            scrollView.topAnchor.constraint(equalTo: closeWrapperView.bottomAnchor),
+            closeWrapperView.topAnchor.constraint(equalTo: detailsWrapperView.topAnchor),
+            detailsWrapperView.trailingAnchor.constraint(equalTo: closeWrapperView.trailingAnchor),
+            detailsWrapperView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: detailsWrapperView.leadingAnchor),
+
+            closeDetailsButton.topAnchor.constraint(equalTo: closeWrapperView.topAnchor),
+            closeWrapperView.bottomAnchor.constraint(equalTo: closeDetailsButton.bottomAnchor),
+            closeDetailsButton.leadingAnchor.constraint(equalTo: closeWrapperView.leadingAnchor),
+            closeWrapperView.trailingAnchor.constraint(equalTo: closeDetailsButton.trailingAnchor),
+            closeWrapperView.heightAnchor.constraint(equalToConstant: 42),
+
+            openWrapperView.bottomAnchor.constraint(equalTo: openDetailsButton.bottomAnchor),
+            openWrapperView.heightAnchor.constraint(equalToConstant: 42),
+            openWrapperView.trailingAnchor.constraint(equalTo: openDetailsButtonImageView.trailingAnchor),
+            openDetailsButton.leadingAnchor.constraint(equalTo: openWrapperView.leadingAnchor),
+            openWrapperView.trailingAnchor.constraint(equalTo: openDetailsButton.trailingAnchor),
+            openDetailsButtonImageView.centerYAnchor.constraint(equalTo: openWrapperView.centerYAnchor),
+            openDetailsButton.topAnchor.constraint(equalTo: openWrapperView.topAnchor),
+
+            openDetailsButton.heightAnchor.constraint(equalToConstant: 42),
+
+            openDetailsButtonImageView.heightAnchor.constraint(equalToConstant: 16),
+            openDetailsButtonImageView.widthAnchor.constraint(equalToConstant: 38),
+
+            collectionViewBottomConstraint,
+            detailsWrapperViewHeightContraint,
+            optionsButtonWidthConstraint,
+        ])
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let nib = NSNib(nibNamed: "FirePopoverCollectionViewItem", bundle: nil)
-        collectionView.register(nib, forItemWithIdentifier: FirePopoverCollectionViewItem.identifier)
+        collectionView.register(FirePopoverCollectionViewItem.self, forItemWithIdentifier: FirePopoverCollectionViewItem.identifier)
+        collectionView.register(FirePopoverCollectionViewHeader.self, forSupplementaryViewOfKind: NSCollectionView.elementKindSectionHeader, withIdentifier: FirePopoverCollectionViewHeader.identifier)
         collectionView.delegate = self
         collectionView.dataSource = self
 
@@ -105,8 +528,8 @@ final class FirePopoverViewController: NSViewController {
             return
         }
 
-        setUpStrings()
         updateClearButtonAppearance()
+        closeDetailsButton.isHidden = true
         setupOptionsButton()
         setupOpenCloseDetailsButton()
         updateWarningWrapperView()
@@ -115,22 +538,19 @@ final class FirePopoverViewController: NSViewController {
         subscribeToSelected()
     }
 
+    override func viewDidLayout() {
+        super.viewDidLayout()
+        collectionView.nextKeyView = cancelButton
+
+    }
+
     override func viewWillAppear() {
         super.viewWillAppear()
 
         firePopoverViewModel.refreshItems()
     }
 
-    private func setUpStrings() {
-        openFireWindowsTitleLabel.stringValue = UserText.fireDialogFireWindowTitle
-        fireWindowDescriptionLabel.stringValue = UserText.fireDialogFireWindowDescription
-        closeTabsLabel.stringValue = UserText.fireDialogCloseTabs
-        closeBurnerWindowButton.title = UserText.fireDialogBurnWindowButton
-        clearButton.title = UserText.clear
-        cancelButton.title = UserText.cancel
-    }
-
-    @IBAction func optionsButtonAction(_ sender: NSPopUpButton) {
+    @objc func optionsButtonAction(_ sender: NSPopUpButton) {
         guard let tag = sender.selectedItem?.tag, let clearingOption = FirePopoverViewModel.ClearingOption(rawValue: tag) else {
             assertionFailure("Clearing option for not found for the selected menu item")
             return
@@ -139,19 +559,28 @@ final class FirePopoverViewController: NSViewController {
         updateWarningWrapperView()
     }
 
-    @IBAction func openNewBurnerWindowAction(_ sender: Any) {
+    @objc func openNewBurnerWindowAction(_ sender: Any) {
         NSApp.delegateTyped.newBurnerWindow(self)
     }
 
-    @IBAction func openDetailsButtonAction(_ sender: Any) {
+    @objc func openDetailsButtonAction(_ sender: NSButton) {
+        let isButtonFirstResponder = sender.isFirstResponder
         toggleDetails()
+        if isButtonFirstResponder {
+            closeDetailsButton.makeMeFirstResponder()
+        }
     }
 
-    @IBAction func closeDetailsButtonAction(_ sender: Any) {
+    @objc func closeDetailsButtonAction(_ sender: NSButton) {
+        let isButtonFirstResponder = sender.isFirstResponder
         toggleDetails()
+        collectionView.selectionIndexPaths = []
+        if isButtonFirstResponder {
+            openDetailsButton.makeMeFirstResponder()
+        }
     }
 
-    @IBAction func closeBurnerWindowButtonAction(_ sender: Any) {
+    @objc func closeBurnerWindowButtonAction(_ sender: Any) {
         let windowControllersManager = WindowControllersManager.shared
         guard let tabCollectionViewModel = firePopoverViewModel.tabCollectionViewModel,
               let windowController = windowControllersManager.windowController(for: tabCollectionViewModel) else {
@@ -255,13 +684,12 @@ final class FirePopoverViewController: NSViewController {
         collectionViewBottomConstraint.constant = warningWrapperView.isHidden ? 0 : 32
     }
 
-    @IBAction func clearButtonAction(_ sender: Any) {
+    @objc func clearButtonAction(_ sender: Any) {
         delegate?.firePopoverViewControllerDidClear(self)
         firePopoverViewModel.burn()
-
     }
 
-    @IBAction func cancelButtonAction(_ sender: Any) {
+    @objc func cancelButtonAction(_ sender: Any) {
         delegate?.firePopoverViewControllerDidCancel(self)
     }
 
@@ -295,6 +723,7 @@ final class FirePopoverViewController: NSViewController {
     private func toggleDetails() {
         let showDetails = detailsWrapperView.isHidden
         openWrapperView.isHidden = showDetails
+        closeDetailsButton.isHidden = !showDetails
         detailsWrapperView.isHidden = !showDetails
 
         updateWarningWrapperView()
@@ -302,6 +731,7 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func adjustContentHeight() {
+        // TODO: bug! when expanding and then selecting "current tab" with no history – layout breaks
         NSAnimationContext.runAnimationGroup { [self, contentHeight = contentHeight()] context in
             context.duration = 1/3
             context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
@@ -367,14 +797,18 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
         return section == firePopoverViewModel.selectableSectionIndex ? firePopoverViewModel.selectable.count: firePopoverViewModel.fireproofed.count
     }
 
+    private func modelItem(at indexPath: IndexPath) -> FirePopoverViewModel.Item {
+        let isSelectableSection = indexPath.section == firePopoverViewModel.selectableSectionIndex
+        let sectionList = isSelectableSection ? firePopoverViewModel.selectable : firePopoverViewModel.fireproofed
+        return sectionList[indexPath.item]
+    }
+
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
         let item = collectionView.makeItem(withIdentifier: FirePopoverCollectionViewItem.identifier, for: indexPath)
         guard let firePopoverItem = item as? FirePopoverCollectionViewItem else { return item }
 
         firePopoverItem.delegate = self
-        let isSelectableSection = indexPath.section == firePopoverViewModel.selectableSectionIndex
-        let sectionList = isSelectableSection ? firePopoverViewModel.selectable: firePopoverViewModel.fireproofed
-        let listItem = sectionList[indexPath.item]
+        let listItem = self.modelItem(at: indexPath)
         firePopoverItem.setItem(listItem, isFireproofed: indexPath.section == firePopoverViewModel.fireproofedSectionIndex)
         return firePopoverItem
     }
@@ -382,11 +816,8 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
     func collectionView(_ collectionView: NSCollectionView,
                         viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
                         at indexPath: IndexPath) -> NSView {
-        // swiftlint:disable force_cast
-        let view = collectionView.makeSupplementaryView(ofKind: NSCollectionView.elementKindSectionHeader,
-                                                        withIdentifier: FirePopoverCollectionViewHeader.identifier,
-                                                        for: indexPath) as! FirePopoverCollectionViewHeader
-        // swiftlint:enable force_cast
+        // swiftlint:disable:next force_cast
+        let view = collectionView.makeSupplementaryView(ofKind: NSCollectionView.elementKindSectionHeader, withIdentifier: FirePopoverCollectionViewHeader.identifier, for: indexPath) as! FirePopoverCollectionViewHeader
 
         if indexPath.section == firePopoverViewModel.selectableSectionIndex {
             view.title.stringValue = UserText.fireDialogClearSites
@@ -400,7 +831,6 @@ extension FirePopoverViewController: NSCollectionViewDataSource {
 }
 
 extension FirePopoverViewController: NSCollectionViewDelegate {
-
 }
 
 extension FirePopoverViewController: NSCollectionViewDelegateFlowLayout {
@@ -447,3 +877,86 @@ extension FirePopoverViewController: FirePopoverCollectionViewItemDelegate {
     }
 
 }
+#if DEBUG
+final class HistoryTabExtensionMock: TabExtension, HistoryExtensionProtocol {
+
+    var historyEntries: [HistoryEntry] {
+        [
+            .init(identifier: UUID(), url: .duckDuckGo, failedToLoad: false, numberOfTotalVisits: 1, lastVisit: .init(), visits: [], numberOfTrackersBlocked: 0, blockedTrackingEntities: [], trackersFound: false),
+            .init(identifier: UUID(), url: URL(string: "http://anothersearch.com")!, failedToLoad: false, numberOfTotalVisits: 1, lastVisit: .init(), visits: [], numberOfTrackersBlocked: 0, blockedTrackingEntities: [], trackersFound: false),
+            .init(identifier: UUID(), url: URL(string: "http://bit.li")!, failedToLoad: false, numberOfTotalVisits: 1, lastVisit: .init(), visits: [], numberOfTrackersBlocked: 0, blockedTrackingEntities: [], trackersFound: false),
+        ]
+    }
+    var localHistory: [Visit] {
+        historyEntries.map { Visit(date: .init(), identifier: nil, historyEntry: $0) }
+    }
+    func getPublicProtocol() -> HistoryExtensionProtocol { self }
+
+}
+
+@available(macOS 14.0, *)
+#Preview("With History", traits: .fixedLayout(width: 344, height: 650)) { {
+    let historyExtensionMock = HistoryTabExtensionMock()
+    let extensionBuilder = TestTabExtensionsBuilder(load: [HistoryTabExtensionMock.self]) { builder in { _, _ in
+        builder.override {
+            historyExtensionMock
+        }
+    }}
+
+    let tab = Tab(content: .newtab, extensionsBuilder: extensionBuilder)
+    let tabCollection = TabCollection(tabs: [tab])
+    let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+
+    let vc = FirePopoverViewController(fireViewModel: FireViewModel(), tabCollectionViewModel: tabCollectionViewModel)
+    vc.onDeinit {
+        withExtendedLifetime(tabCollectionViewModel) {}
+    }
+
+    return vc._preview_hidingWindowControlsOnAppear()
+
+}() }
+// TODO: adjust
+@available(macOS 14.0, *)
+#Preview("Empty", traits: .fixedLayout(width: 344, height: 650)) { {
+    let historyExtensionMock = HistoryTabExtensionMock()
+    let extensionBuilder = TestTabExtensionsBuilder(load: [HistoryTabExtensionMock.self]) { builder in { _, _ in
+        builder.override {
+            historyExtensionMock
+        }
+    }}
+
+    let tab = Tab(content: .newtab, extensionsBuilder: extensionBuilder)
+    let tabCollection = TabCollection(tabs: [tab])
+    let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+
+    let vc = FirePopoverViewController(fireViewModel: FireViewModel(), tabCollectionViewModel: tabCollectionViewModel)
+    vc.onDeinit {
+        withExtendedLifetime(tabCollectionViewModel) {}
+    }
+
+    return vc._preview_hidingWindowControlsOnAppear()
+
+}() }
+
+@available(macOS 14.0, *)
+#Preview("Burner", traits: .fixedLayout(width: 344, height: 650)) { {
+    let historyExtensionMock = HistoryTabExtensionMock()
+    let extensionBuilder = TestTabExtensionsBuilder(load: [HistoryTabExtensionMock.self]) { builder in { _, _ in
+        builder.override {
+            historyExtensionMock
+        }
+    }}
+
+    let tab = Tab(content: .newtab, extensionsBuilder: extensionBuilder)
+    let tabCollection = TabCollection(tabs: [tab])
+    let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+
+    let vc = FirePopoverViewController(fireViewModel: FireViewModel(), tabCollectionViewModel: tabCollectionViewModel)
+    vc.onDeinit {
+        withExtendedLifetime(tabCollectionViewModel) {}
+    }
+
+    return vc._preview_hidingWindowControlsOnAppear()
+
+}() }
+#endif

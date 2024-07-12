@@ -350,6 +350,7 @@ struct UserText {
     static let fireDialogTabWillClose = NSLocalizedString("fire.dialog.tab-will-close", value: "Current tab will close", comment: "Warning label shown in an expanded view of the fire popover")
     static let fireDialogPinnedTabWillReload = NSLocalizedString("fire.dialog.tab-will-reload", value: "Pinned tab will reload", comment: "Warning label shown in an expanded view of the fire popover")
     static let fireDialogAllWindowsWillClose = NSLocalizedString("fire.dialog.all-windows-will-close", value: "All windows will close", comment: "Warning label shown in an expanded view of the fire popover")
+    static let fireDialogCloseAllTabsAndClear = NSLocalizedString("fire.dialog.close-all-tabs-and-clear", value: "Close all tabs and clear site data", comment: "Title of the Clear button in the fire popover")
     static let fireproofSite = NSLocalizedString("options.menu.fireproof-site", value: "Fireproof This Site", comment: "Context menu item")
     static let removeFireproofing = NSLocalizedString("options.menu.remove-fireproofing", value: "Remove Fireproofing", comment: "Context menu item")
     static let fireproof = NSLocalizedString("fireproof", value: "Fireproof", comment: "Fireproof button")

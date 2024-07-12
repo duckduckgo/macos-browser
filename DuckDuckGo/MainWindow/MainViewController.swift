@@ -111,7 +111,7 @@ final class MainViewController: NSViewController {
 
         browserTabViewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
         findInPageViewController = FindInPageViewController.create()
-        fireViewController = FireViewController.create(tabCollectionViewModel: tabCollectionViewModel)
+        fireViewController = FireViewController(tabCollectionViewModel: tabCollectionViewModel)
         bookmarksBarViewController = BookmarksBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
 
         super.init(nibName: nil, bundle: nil)
@@ -586,14 +586,7 @@ extension MainViewController {
     ]))
     bkman.loadBookmarks()
 
-    let vc = MainViewController(bookmarkManager: bkman, autofillPopoverPresenter: DefaultAutofillPopoverPresenter())
-    var c: AnyCancellable!
-    c = vc.publisher(for: \.view.window).sink { window in
-        window?.titlebarAppearsTransparent = true
-        window?.titleVisibility = .hidden
-        withExtendedLifetime(c) {}
-    }
-
-    return vc
+    return MainViewController(bookmarkManager: bkman, autofillPopoverPresenter: DefaultAutofillPopoverPresenter())
+        ._preview_hidingWindowControlsOnAppear()
 }
 #endif

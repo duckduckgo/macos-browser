@@ -20,8 +20,21 @@ import Foundation
 
 final class FirePopoverWrapperViewController: NSViewController {
 
-    @IBOutlet weak var infoView: NSView!
-    @IBOutlet weak var popoverView: NSView!
+    private lazy var infoViewController: FireInfoViewController = {
+        let fireInfoViewController = FireInfoViewController()
+        fireInfoViewController.delegate = self
+        return fireInfoViewController
+    }()
+
+    private lazy var popoverViewController: FirePopoverViewController? = {
+        guard let tabCollectionViewModel = tabCollectionViewModel else {
+            assertionFailure("Attempted to display Fire Popover without an associated TabCollectionViewModel")
+            return nil
+        }
+        let firePopoverViewController = FirePopoverViewController(fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
+        firePopoverViewController.delegate = self
+        return firePopoverViewController
+    }()
 
     @UserDefaultsWrapper(key: .fireInfoPresentedOnce, defaultValue: false)
     var infoPresentedOnce: Bool
@@ -33,49 +46,24 @@ final class FirePopoverWrapperViewController: NSViewController {
         fatalError("FirePopoverWrapperViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder,
-          fireViewModel: FireViewModel,
-          tabCollectionViewModel: TabCollectionViewModel) {
+    init(fireViewModel: FireViewModel, tabCollectionViewModel: TabCollectionViewModel) {
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
 
-        super.init(coder: coder)
+        super.init(nibName: nil, bundle: nil)
     }
 
-    @IBSegueAction func createFirePopoverViewController(_ coder: NSCoder) -> FirePopoverViewController? {
-        guard let tabCollectionViewModel = tabCollectionViewModel else {
-            assertionFailure("Attempted to display Fire Popover without an associated TabCollectionViewModel")
-            return nil
-        }
-
-        let firePopoverViewController = FirePopoverViewController(coder: coder,
-                                                                  fireViewModel: fireViewModel,
-                                                                  tabCollectionViewModel: tabCollectionViewModel)
-        firePopoverViewController?.delegate = self
-        return firePopoverViewController
-    }
-
-    @IBSegueAction func createFireInfoViewController(_ coder: NSCoder) -> FireInfoViewController? {
-        let fireInfoViewController = FireInfoViewController(coder: coder)
-        fireInfoViewController?.delegate = self
-        return fireInfoViewController
-
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        hideInfoContainerViewIfNeeded()
-    }
-
-    private func hideInfoContainerViewIfNeeded() {
-        guard let tabCollectionViewModel else {
-            return
-        }
+    override func loadView() {
+        view = NSView()
+        guard let tabCollectionViewModel, let popoverViewController else { return }
 
         let infoIsVisible = !infoPresentedOnce && !tabCollectionViewModel.isBurner
-        infoView.isHidden = !infoIsVisible
-        popoverView.isHidden = infoIsVisible
+        self.addAndLayoutChild(popoverViewController)
+        popoverViewController.view.isHidden = infoIsVisible
+
+        if infoIsVisible {
+            self.addAndLayoutChild(infoViewController)
+        }
     }
 
 }
@@ -84,7 +72,11 @@ extension FirePopoverWrapperViewController: FireInfoViewControllerDelegate {
 
     func fireInfoViewControllerDidConfirm(_ fireInfoViewController: FireInfoViewController) {
         infoPresentedOnce = true
-        hideInfoContainerViewIfNeeded()
+
+        fireInfoViewController.removeFromParent()
+        fireInfoViewController.view.removeFromSuperview()
+
+        popoverViewController?.view.isHidden = false
     }
 
 }
@@ -100,3 +92,29 @@ extension FirePopoverWrapperViewController: FirePopoverViewControllerDelegate {
     }
 
 }
+
+@available(macOS 14.0, *)
+#Preview("First time", traits: .fixedLayout(width: 344, height: 650)) { {
+    let tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab)]))
+    let vc = FirePopoverWrapperViewController(fireViewModel: FireViewModel(), tabCollectionViewModel: tabCollectionViewModel)
+    vc.infoPresentedOnce = false
+
+    vc.onDeinit {
+        withExtendedLifetime(tabCollectionViewModel) {}
+    }
+
+    return vc._preview_hidingWindowControlsOnAppear()
+}() }
+
+@available(macOS 14.0, *)
+#Preview("Info presented once", traits: .fixedLayout(width: 344, height: 650)) { {
+    let tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab)]))
+    let vc = FirePopoverWrapperViewController(fireViewModel: FireViewModel(), tabCollectionViewModel: tabCollectionViewModel)
+    vc.infoPresentedOnce = true
+
+    vc.onDeinit {
+        withExtendedLifetime(tabCollectionViewModel) {}
+    }
+
+    return vc._preview_hidingWindowControlsOnAppear()
+}() }

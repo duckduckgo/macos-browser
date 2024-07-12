@@ -19614,6 +19614,18 @@
         }
       }
     },
+    "fire.dialog.close-all-tabs-and-clear" : {
+      "comment" : "Title of the Clear button in the fire popover",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close all tabs and clear site data"
+          }
+        }
+      }
+    },
     "fire.dialog.close-burner-window" : {
       "comment" : "Button that allows the user to close and burn the browser burner window",
       "extractionState" : "extracted_with_value",

@@ -100,8 +100,8 @@ extension NSViewController {
     }
 
     /// #Preview helper to hide Window controls on View Controller appearance
-    func _preview_hidingWindowControlsOnAppear() -> Self { // swiftlint:disable:this identifier_name
-        Preview_ViewControllerWindowObserver().attach(to: self)
+    func _preview_hidingWindowControlsOnAppear(sizeToFit: Bool = false) -> Self { // swiftlint:disable:this identifier_name
+        Preview_ViewControllerWindowObserver().attach(to: self, sizeToFit: sizeToFit)
         return self
     }
 
@@ -109,7 +109,14 @@ extension NSViewController {
 
 /// #Preview helper to hide Window controls on View Controller appearance
 final class Preview_ViewControllerWindowObserver: NSObject {
-    func attach(to viewController: NSViewController) {
+
+    weak var sizeToFitViewController: NSViewController?
+
+    func attach(to viewController: NSViewController, sizeToFit: Bool) {
+        if sizeToFit {
+            self.sizeToFitViewController = viewController
+        }
+
         // Start observing the view.window property
         viewController.addObserver(self, forKeyPath: #keyPath(NSViewController.view.window), options: [.initial, .new], context: nil)
         viewController.onDeinit {
@@ -123,5 +130,9 @@ final class Preview_ViewControllerWindowObserver: NSObject {
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
         window.styleMask = []
+
+        if let vc = sizeToFitViewController {
+            window.setFrame(NSRect(origin: .zero, size: vc.view.bounds.size), display: true)
+        }
     }
 }
