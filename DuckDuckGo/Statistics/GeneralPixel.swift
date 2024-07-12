@@ -25,6 +25,7 @@ import Configuration
 enum GeneralPixel: PixelKitEventV2 {
 
     case crash
+    case crashOnCrashHandlersSetUp
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
 
@@ -414,6 +415,9 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .crash:
             return "m_mac_crash"
+
+        case .crashOnCrashHandlersSetUp:
+            return "m_mac_crash_on_handlers_setup"
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"

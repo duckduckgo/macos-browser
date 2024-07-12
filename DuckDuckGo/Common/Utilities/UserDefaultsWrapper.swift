@@ -89,6 +89,7 @@ public struct UserDefaultsWrapper<T> {
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
         case lastCrashReportCheckDate = "last.crash.report.check.date"
+        case didCrashDuringCrashHandlersSetUp = "browser.didCrashDuringCrashHandlersSetUp"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
         case appTerminationHandledCorrectly = "app.termination.handled.correctly"
