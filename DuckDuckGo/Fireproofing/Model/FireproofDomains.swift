@@ -25,7 +25,9 @@ internal class FireproofDomains {
     enum Constants {
         static let allowedDomainsChangedNotification = Notification.Name("allowedDomainsChangedNotification")
         static let newFireproofDomainNotification = Notification.Name("newFireproofedDomainNotification")
+        static let removedFireproofDomainNotification = Notification.Name("removedFireproofedDomainNotification")
         static let newFireproofDomainKey = "newFireproofDomainKey"
+        static let removedFireproofDomainKey = "removedFireproofDomainKey"
     }
 
     static let shared = FireproofDomains(tld: ContentBlocking.shared.tld)
@@ -133,7 +135,7 @@ internal class FireproofDomains {
         }
     }
 
-    func remove(domain: String, changeToETLDPlus1: Bool = true) {
+    func remove(domain: String, changeToETLDPlus1: Bool = true, notify: Bool = true) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let newDomain: String
@@ -158,6 +160,12 @@ internal class FireproofDomains {
                 assertionFailure("FireproofDomainsStore: Failed to remove Fireproof Domain: \(error)")
                 return
             }
+        }
+
+        if notify {
+            NotificationCenter.default.post(name: Constants.removedFireproofDomainNotification, object: self, userInfo: [
+                Constants.removedFireproofDomainKey: newDomain
+            ])
         }
     }
 

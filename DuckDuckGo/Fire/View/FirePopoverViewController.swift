@@ -66,9 +66,13 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var clearButton: NSButton!
     @IBOutlet weak var cancelButton: NSButton!
     @IBOutlet weak var closeBurnerWindowButton: NSButton!
+    @IBOutlet var fireproofWrapperView: NSView!
+    @IBOutlet var fireproofImageView: NSImageView!
+    @IBOutlet var fireproofTitleLabel: NSTextField!
+    @IBOutlet var fireproofSubtitleLabel: NSTextField!
+    @IBOutlet var fireproofBottomConstraint: NSLayoutConstraint!
 
-    private var viewModelCancellable: AnyCancellable?
-    private var selectedCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
         fatalError("FirePopoverViewController: Bad initializer")
@@ -113,6 +117,7 @@ final class FirePopoverViewController: NSViewController {
 
         subscribeToViewModel()
         subscribeToSelected()
+        subscribeToSelectedTabContent()
     }
 
     override func viewWillAppear() {
@@ -141,6 +146,15 @@ final class FirePopoverViewController: NSViewController {
 
     @IBAction func openNewBurnerWindowAction(_ sender: Any) {
         NSApp.delegateTyped.newBurnerWindow(self)
+    }
+
+    @IBAction func fireproofButtonAction(_ sender: Any) {
+        guard let selectedTabViewModel = firePopoverViewModel.tabCollectionViewModel?.selectedTabViewModel else {
+            os_log("FirePopoverViewController: No tab view model selected", type: .error)
+            return
+        }
+
+        selectedTabViewModel.tab.requestFireproofToggle()
     }
 
     @IBAction func openDetailsButtonAction(_ sender: Any) {
@@ -255,6 +269,26 @@ final class FirePopoverViewController: NSViewController {
         collectionViewBottomConstraint.constant = warningWrapperView.isHidden ? 0 : 32
     }
 
+    private func updateFireproofView(with tabContent: Tab.TabContent?) {
+        guard case .url(let url, _, _)? = tabContent,
+              url.canFireproof,
+              let host = url.host else {
+            fireproofWrapperView.isHidden = true
+            fireproofBottomConstraint.isActive = false
+            return
+        }
+
+        let isFireproof = FireproofDomains.shared.isFireproof(fireproofDomain: host)
+        let title = isFireproof ? UserText.removeFireproofing : UserText.fireproofSite
+        let image: NSImage = isFireproof ? .burn : .fireproof
+
+        fireproofImageView.image = image
+        fireproofTitleLabel.stringValue = title
+        fireproofSubtitleLabel.stringValue = UserText.fireproofConfirmationMessage
+        fireproofWrapperView.isHidden = false
+        fireproofBottomConstraint.isActive = true
+    }
+
     @IBAction func clearButtonAction(_ sender: Any) {
         delegate?.firePopoverViewControllerDidClear(self)
         firePopoverViewModel.burn()
@@ -266,7 +300,7 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func subscribeToViewModel() {
-        viewModelCancellable = Publishers.Zip(
+        Publishers.Zip(
             firePopoverViewModel.$fireproofed,
             firePopoverViewModel.$selectable
         ).receive(on: DispatchQueue.main)
@@ -279,10 +313,11 @@ final class FirePopoverViewController: NSViewController {
                 self.updateInfoLabel()
                 self.adjustContentHeight()
             }
+            .store(in: &cancellables)
     }
 
     private func subscribeToSelected() {
-        selectedCancellable = firePopoverViewModel.$selected
+        firePopoverViewModel.$selected
             .receive(on: DispatchQueue.main)
             .sink { [weak self] selected in
                 guard let self = self else { return }
@@ -290,6 +325,31 @@ final class FirePopoverViewController: NSViewController {
                 self.collectionView.selectionIndexPaths = selectionIndexPaths
                 self.updateInfoLabel()
             }
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToSelectedTabContent() {
+        guard let tabCollectionViewModel = firePopoverViewModel.tabCollectionViewModel else {
+            updateFireproofView(with: nil)
+            return
+        }
+        // update fireproofing info on tab content change
+        let tabContentPublisher = tabCollectionViewModel.$selectedTabViewModel
+            .map { tabViewModel -> AnyPublisher<Tab.TabContent, Never> in
+                tabViewModel?.tab.$content.eraseToAnyPublisher() ?? Just(.none).eraseToAnyPublisher()
+            }
+            .switchToLatest()
+        // fireproof site added/removed
+        let fireproofStateToggled = Publishers.Merge(
+            NotificationCenter.default.publisher(for: FireproofDomains.Constants.newFireproofDomainNotification),
+            NotificationCenter.default.publisher(for: FireproofDomains.Constants.removedFireproofDomainNotification)
+        ).asVoid().prepend( () )
+
+        Publishers.CombineLatest(tabContentPublisher, fireproofStateToggled)
+            .sink { [weak self] tabContent, _ in
+                self?.updateFireproofView(with: tabContent)
+            }
+            .store(in: &cancellables)
     }
 
     private func toggleDetails() {
