@@ -271,7 +271,8 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     static func migrateV3(database: Database) throws {
         try database.alter(table: OptOutDB.databaseTableName) {
-            $0.add(column: OptOutDB.Columns.createdDate.name, .datetime).notNull().defaults(to: Date())
+            // We default `createdDate` values to unix epoch to avoid any existing data being treated as new data
+            $0.add(column: OptOutDB.Columns.createdDate.name, .datetime).notNull().defaults(to: Date(timeIntervalSince1970: 0))
         }
     }
 

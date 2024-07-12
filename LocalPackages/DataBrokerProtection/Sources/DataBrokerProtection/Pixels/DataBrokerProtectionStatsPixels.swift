@@ -452,7 +452,13 @@ private extension DataBrokerProtectionStatsPixels {
     }
 
     func fireCustomDataBrokerStatsPixels(customStats: CustomStats) {
-        customStats.customDataBrokerStats.forEach { handler.fire(pixel(for: $0)) }
+        Task {
+            for stat in customStats.customDataBrokerStats {
+                handler.fire(pixel(for: stat))
+                // Introduce a delay to prevent all databroker pixels from firing at (nearly) the same time
+                try? await Task.sleep(nanoseconds: 100_000_000)
+            }
+        }
     }
 
     func pixel(for dataBrokerStat: CustomDataBrokerStat) -> DataBrokerProtectionPixels {
