@@ -91,7 +91,7 @@ final class BookmarkNode: Hashable {
     func representedObjectEquals(_ otherRepresentedObject: AnyObject, forSearch: Bool = false) -> Bool {
         if let entity = otherRepresentedObject as? BaseBookmarkEntity,
            let nodeEntity = self.representedObject as? BaseBookmarkEntity,
-           (forSearch ? entity.id == nodeEntity.id : entity == nodeEntity) {
+           forSearch ? entity.id == nodeEntity.id : entity == nodeEntity {
             return true
         }
 
