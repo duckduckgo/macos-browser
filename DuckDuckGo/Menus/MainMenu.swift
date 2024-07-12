@@ -381,8 +381,11 @@ final class MainMenu: NSMenu {
                 NSMenuItem.separator()
 
                 aboutMenuItem
+#if SPARKLE
                 releaseNotesMenuItem
                 whatIsNewMenuItem
+#endif
+
 #if FEEDBACK
                 sendFeedbackMenuItem
 #endif
