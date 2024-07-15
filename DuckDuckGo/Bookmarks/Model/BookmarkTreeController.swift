@@ -64,24 +64,28 @@ final class BookmarkTreeController {
         visit(node: rootNode, visitor: visitBlock)
     }
 
-    func node(representing object: AnyObject, forSearch: Bool = false) -> BookmarkNode? {
-        return nodeInArrayRepresentingObject(nodes: [rootNode], representedObject: object, forSearch: forSearch)
+    func node(representing object: AnyObject) -> BookmarkNode? {
+        return nodeInArrayRepresentingObject(nodes: [rootNode]) { $0.representedObjectEquals(object) }
+    }
+
+    func findNodeInSearchMode(representing object: AnyObject) -> BookmarkNode? {
+        return nodeInArrayRepresentingObject(nodes: [rootNode]) { $0.representedObjectHasSameId(object) }
     }
 
     // MARK: - Private
 
-    private func nodeInArrayRepresentingObject(nodes: [BookmarkNode], representedObject: AnyObject, forSearch: Bool = false) -> BookmarkNode? {
-        for node in nodes {
-            if node.representedObjectEquals(representedObject, forSearch: forSearch) {
+    private func nodeInArrayRepresentingObject(nodes: [BookmarkNode], match: (BookmarkNode) -> Bool) -> BookmarkNode? {
+        var stack: [BookmarkNode] = nodes
+
+        while !stack.isEmpty {
+            let node = stack.removeLast()
+
+            if match(node) {
                 return node
             }
 
             if node.canHaveChildNodes {
-                if let foundNode = nodeInArrayRepresentingObject(nodes: node.childNodes,
-                                                                 representedObject: representedObject,
-                                                                 forSearch: forSearch) {
-                    return foundNode
-                }
+                stack.append(contentsOf: node.childNodes)
             }
         }
 

@@ -88,10 +88,10 @@ final class BookmarkNode: Hashable {
         BookmarkNode.incrementingID += 1
     }
 
-    func representedObjectEquals(_ otherRepresentedObject: AnyObject, forSearch: Bool = false) -> Bool {
+    func representedObjectEquals(_ otherRepresentedObject: AnyObject) -> Bool {
         if let entity = otherRepresentedObject as? BaseBookmarkEntity,
            let nodeEntity = self.representedObject as? BaseBookmarkEntity,
-           forSearch ? entity.id == nodeEntity.id : entity == nodeEntity {
+           entity == nodeEntity {
             return true
         }
 
@@ -100,6 +100,17 @@ final class BookmarkNode: Hashable {
         }
 
         if self.representedObject === otherRepresentedObject {
+            return true
+        }
+
+        return false
+    }
+
+    /// Checks if two nodes represent the same base bookmark entity based only on their ID
+    func representedObjectHasSameId(_ otherRepresentedObject: AnyObject) -> Bool {
+        if let entity = otherRepresentedObject as? BaseBookmarkEntity,
+           let nodeEntity = self.representedObject as? BaseBookmarkEntity,
+           entity.id == nodeEntity.id {
             return true
         }
 

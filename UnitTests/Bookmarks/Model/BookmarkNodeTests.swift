@@ -206,7 +206,7 @@ class BookmarkNodeTests: XCTestCase {
         let firstFolderWithDifferentChildren = BookmarkFolder(id: "2", title: "Folder", children: [bookmark])
         let node = BookmarkNode(representedObject: firstFolder, parent: nil)
 
-        XCTAssertTrue(node.representedObjectEquals(firstFolderWithDifferentChildren, forSearch: true))
+        XCTAssertTrue(node.representedObjectHasSameId(firstFolderWithDifferentChildren))
     }
 
     func testWhenFindingOrCreatingChildNode_AndChildExists_ThenChildIsReturned() {
