@@ -52,7 +52,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Error Reporting
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
     private static func networkProtectionDebugEvents(controllerErrorStore: NetworkProtectionTunnelErrorStore) -> EventMapping<NetworkProtectionError>? {
         return EventMapping { event, _, _, _ in
             let domainEvent: NetworkProtectionPixelEvent
@@ -154,6 +153,39 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 frequency: .legacyDaily,
                 withAdditionalParameters: [PixelKit.Parameters.vpnCohort: PixelKit.cohort(from: defaults.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
+        case .connectionTesterStatusChange(let status, let server):
+            vpnLogger.log(status, server: server)
+
+            switch status {
+            case .failed(let duration):
+                let pixel: NetworkProtectionPixelEvent = {
+                    switch duration {
+                    case .immediate:
+                        return .networkProtectionConnectionTesterFailureDetected(server: server)
+                    case .extended:
+                        return .networkProtectionConnectionTesterExtendedFailureDetected(server: server)
+                    }
+                }()
+
+                PixelKit.fire(
+                    pixel,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .recovered(let duration, let failureCount):
+                let pixel: NetworkProtectionPixelEvent = {
+                    switch duration {
+                    case .immediate:
+                        return .networkProtectionConnectionTesterFailureRecovered(server: server, failureCount: failureCount)
+                    case .extended:
+                        return .networkProtectionConnectionTesterExtendedFailureRecovered(server: server, failureCount: failureCount)
+                    }
+                }()
+
+                PixelKit.fire(
+                    pixel,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            }
         case .reportConnectionAttempt(attempt: let attempt):
             vpnLogger.log(attempt)
 
@@ -376,7 +408,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Initialization
 
-    // swiftlint:disable:next function_body_length
     @MainActor @objc public init() {
 #if NETP_SYSTEM_EXTENSION
         let defaults = UserDefaults.standard

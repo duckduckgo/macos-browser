@@ -1,7 +1,7 @@
 //
-//  RandomAccessCollectionExtension.swift
+//  MockRemoteMessagingAvailabilityProvider.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,17 +16,18 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Combine
+import RemoteMessaging
 
-extension RandomAccessCollection {
+public class MockRemoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding {
 
-    subscript(safe index: Index) -> Element? {
-        guard self.indices.contains(index) else { return nil }
-        return self[index]
+    public init(isRemoteMessagingAvailable: Bool = true) {
+        self.isRemoteMessagingAvailable = isRemoteMessagingAvailable
     }
 
-    subscript(_ index: Index, default value: Element) -> Element {
-        return self[safe: index] ?? value
+    public var isRemoteMessagingAvailablePublisher: AnyPublisher<Bool, Never> {
+        $isRemoteMessagingAvailable.dropFirst().eraseToAnyPublisher()
     }
 
+    @Published public var isRemoteMessagingAvailable: Bool
 }

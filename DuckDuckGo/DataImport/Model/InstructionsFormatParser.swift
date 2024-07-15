@@ -142,7 +142,6 @@ struct InstructionsFormatParser {
             currentEscapeSequence = ""
         }
 
-        // swiftlint:disable:next cyclomatic_complexity function_body_length
         mutating func accept(_ character: Character?) throws {
             switch (currentEscapeSequence, character) {
                 // beggining of %-escaped seq

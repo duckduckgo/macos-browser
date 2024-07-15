@@ -210,7 +210,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         invalidCredentialsTitles = invalidCredentialsObjects.map({ $0.truncated(length: 15) })
     }
 
-    // swiftlint:disable:next function_body_length
     private func setUpObservables() {
         syncService.featureFlagsPublisher
             .dropFirst()

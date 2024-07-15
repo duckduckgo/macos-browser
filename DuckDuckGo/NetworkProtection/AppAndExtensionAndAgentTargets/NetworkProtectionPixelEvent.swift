@@ -56,6 +56,11 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionEnableAttemptSuccess
     case networkProtectionEnableAttemptFailure
 
+    case networkProtectionConnectionTesterFailureDetected(server: String)
+    case networkProtectionConnectionTesterFailureRecovered(server: String, failureCount: Int)
+    case networkProtectionConnectionTesterExtendedFailureDetected(server: String)
+    case networkProtectionConnectionTesterExtendedFailureRecovered(server: String, failureCount: Int)
+
     case networkProtectionTunnelFailureDetected
     case networkProtectionTunnelFailureRecovered
 
@@ -179,6 +184,18 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
         case .networkProtectionEnableAttemptFailure:
             return "netp_ev_enable_attempt_failure"
+
+        case .networkProtectionConnectionTesterFailureDetected:
+            return "netp_connection_tester_failure"
+
+        case .networkProtectionConnectionTesterFailureRecovered:
+            return "netp_connection_tester_failure_recovered"
+
+        case .networkProtectionConnectionTesterExtendedFailureDetected:
+            return "netp_connection_tester_extended_failure"
+
+        case .networkProtectionConnectionTesterExtendedFailureRecovered:
+            return "netp_connection_tester_extended_failure_recovered"
 
         case .networkProtectionTunnelFailureDetected:
             return "netp_ev_tunnel_failure"
@@ -316,6 +333,15 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
     var parameters: [String: String]? {
         switch self {
+        case .networkProtectionConnectionTesterFailureDetected(let server),
+                .networkProtectionConnectionTesterExtendedFailureDetected(let server):
+            return [PixelKit.Parameters.server: server]
+        case .networkProtectionConnectionTesterFailureRecovered(let server, let failureCount),
+                .networkProtectionConnectionTesterExtendedFailureRecovered(let server, let failureCount):
+            return [
+                PixelKit.Parameters.server: server,
+                PixelKit.Parameters.count: String(failureCount)
+            ]
         case .networkProtectionKeychainErrorFailedToCastKeychainValueToData(let field):
             return [PixelKit.Parameters.keychainFieldName: field]
         case .networkProtectionKeychainReadError(let field, let status):
@@ -454,6 +480,10 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionEnableAttemptConnecting,
                 .networkProtectionEnableAttemptSuccess,
                 .networkProtectionEnableAttemptFailure,
+                .networkProtectionConnectionTesterFailureDetected,
+                .networkProtectionConnectionTesterFailureRecovered,
+                .networkProtectionConnectionTesterExtendedFailureDetected,
+                .networkProtectionConnectionTesterExtendedFailureRecovered,
                 .networkProtectionTunnelFailureDetected,
                 .networkProtectionTunnelFailureRecovered,
                 .networkProtectionLatency,

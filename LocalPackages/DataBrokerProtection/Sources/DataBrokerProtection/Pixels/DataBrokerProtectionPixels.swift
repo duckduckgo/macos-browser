@@ -473,7 +473,6 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
 public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
-    // swiftlint:disable:next function_body_length
     public init() {
         super.init { event, _, _, _ in
             switch event {

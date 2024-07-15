@@ -54,7 +54,7 @@ AGENT_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
 AGENT_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).review
 
 AGENT_PRODUCT_NAME = DuckDuckGo VPN App Store
-AGENT_RELEASE_PRODUCT_NAME = DuckDuckGo VPN
+AGENT_PRODUCT_NAME[config=Release][sdk=*] = DuckDuckGo VPN
 
 // Extensions
 

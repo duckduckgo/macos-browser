@@ -22,14 +22,14 @@ import BrowserServicesKit
 import DDGSync
 import Configuration
 
-// swiftlint:disable:next type_body_length
 enum GeneralPixel: PixelKitEventV2 {
 
     case crash
+    case crashOnCrashHandlersSetUp
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
 
-    case serp(cohort: String)
+    case serp(cohort: String?)
     case serpInitial(cohort: String)
     case serpDay21to27(cohort: String)
 
@@ -126,6 +126,10 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerSettingNeverSettings
     case duckPlayerSettingBackToDefault
     case duckPlayerWatchOnYoutube
+    case duckPlayerAutoplaySettingsOn
+    case duckPlayerAutoplaySettingsOff
+    case duckPlayerNewTabSettingsOn
+    case duckPlayerNewTabSettingsOff
 
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
@@ -163,6 +167,14 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncBookmarksValidationErrorDaily
     case syncCredentialsValidationErrorDaily
     case syncSettingsValidationErrorDaily
+
+    // Remote Messaging Framework
+    case remoteMessageShown
+    case remoteMessageShownUnique
+    case remoteMessageDismissed
+    case remoteMessageActionClicked
+    case remoteMessagePrimaryActionClicked
+    case remoteMessageSecondaryActionClicked
 
     // DataBroker Protection Waitlist
     case dataBrokerProtectionWaitlistUserActive
@@ -242,6 +254,13 @@ enum GeneralPixel: PixelKitEventV2 {
     case dbInitializationError(error: Error)
     case dbSaveExcludedHTTPSDomainsError(error: Error?)
     case dbSaveBloomFilterError(error: Error?)
+
+    case remoteMessagingSaveConfigError
+    case remoteMessagingInvalidateConfigError
+    case remoteMessagingSaveMessageError
+    case remoteMessagingUpdateMessageShownError
+    case remoteMessagingUpdateMessageStatusError
+    case remoteMessagingDeleteScheduledMessageError
 
     case configurationFetchError(error: Error)
 
@@ -398,6 +417,9 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .crash:
             return "m_mac_crash"
+
+        case .crashOnCrashHandlersSetUp:
+            return "m_mac_crash_on_handlers_setup"
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
@@ -576,7 +598,14 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_duck-player_setting_back-to-default"
         case .duckPlayerWatchOnYoutube:
             return "m_mac_duck-player_watch_on_youtube"
-
+        case .duckPlayerAutoplaySettingsOn:
+            return "duckplayer_mac_autoplay_setting-on"
+        case .duckPlayerAutoplaySettingsOff:
+            return "duckplayer_mac_autoplay_setting-off"
+        case .duckPlayerNewTabSettingsOn:
+            return "duckplayer_mac_newtab_setting-on"
+        case .duckPlayerNewTabSettingsOff:
+            return "duckplayer_mac_newtab_setting-off"
         case .dashboardProtectionAllowlistAdd:
             return "m_mac_mp_wla"
         case .dashboardProtectionAllowlistRemove:
@@ -626,6 +655,13 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncBookmarksValidationErrorDaily: return "m_mac_sync_bookmarks_validation_error_daily"
         case .syncCredentialsValidationErrorDaily: return "m_mac_sync_credentials_validation_error_daily"
         case .syncSettingsValidationErrorDaily: return "m_mac_sync_settings_validation_error_daily"
+
+        case .remoteMessageShown: return "m_mac_remote_message_shown"
+        case .remoteMessageShownUnique: return "m_mac_remote_message_shown_unique"
+        case .remoteMessageDismissed: return "m_mac_remote_message_dismissed"
+        case .remoteMessageActionClicked: return "m_mac_remote_message_action_clicked"
+        case .remoteMessagePrimaryActionClicked: return "m_mac_remote_message_primary_action_clicked"
+        case .remoteMessageSecondaryActionClicked: return "m_mac_remote_message_secondary_action_clicked"
 
         case .dataBrokerProtectionWaitlistUserActive:
             return "m_mac_dbp_waitlist_user_active"
@@ -724,6 +760,19 @@ enum GeneralPixel: PixelKitEventV2 {
             return "dbsw"
         case .dbSaveBloomFilterError:
             return "dbsb"
+
+        case .remoteMessagingSaveConfigError:
+            return "remote_messaging_save_config_error"
+        case .remoteMessagingInvalidateConfigError:
+            return "remote_messaging_invalidate_config_error"
+        case .remoteMessagingSaveMessageError:
+            return "remote_messaging_save_message_error"
+        case .remoteMessagingUpdateMessageShownError:
+            return "remote_messaging_update_message_shown_error"
+        case .remoteMessagingUpdateMessageStatusError:
+            return "remote_messaging_update_message_status_error"
+        case .remoteMessagingDeleteScheduledMessageError:
+            return "remote_messaging_delete_scheduled_message_error"
 
         case .configurationFetchError:
             return "cfgfetch"
@@ -1000,6 +1049,7 @@ enum GeneralPixel: PixelKitEventV2 {
             return [PixelKit.Parameters.experimentCohort: cohort]
 
         case .serp(let cohort):
+            guard let cohort else { return [:] }
             return [PixelKit.Parameters.experimentCohort: cohort]
 
         case .serpInitial(let cohort):
