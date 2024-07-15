@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "tom/automatic-updates",
-        "revision" : "ce13d7414e4bd0c420bb25bc52f4b25159b78e96"
+        "revision" : "3702841dd70fff5209763bc1e4a16a22d284656f"
       }
     },
     {
@@ -42,7 +42,7 @@
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
         "branch" : "pr-releases/pr-976",
-        "revision" : "bddc2c68e333ca7a7480e999059f59597475254b"
+        "revision" : "84714fa9de48dfd43d81a3a15b0c8941b606cc76"
       }
     },
     {
