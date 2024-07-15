@@ -295,6 +295,7 @@ struct UserText {
 
     static let openLinkInNewTab = NSLocalizedString("open.link.in.new.tab", value: "Open Link in New Tab", comment: "Context menu item")
     static let openLinkInNewBurnerTab = NSLocalizedString("open.link.in.new.burner.tab", value: "Open Link in New Fire Tab", comment: "Context menu item")
+    static let openLinkInNewBurnerWindow = NSLocalizedString("open.link.in.new.burner.window", value: "Open Link in New Fire Window", comment: "Context menu item")
     static let openImageInNewTab = NSLocalizedString("open.image.in.new.tab", value: "Open Image in New Tab", comment: "Context menu item")
     static let openImageInNewBurnerTab = NSLocalizedString("open.image.in.new.burner.tab", value: "Open Image in New Fire Tab", comment: "Context menu item")
     static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")

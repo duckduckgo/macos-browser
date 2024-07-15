@@ -34486,6 +34486,18 @@
         }
       }
     },
+    "open.link.in.new.burner.window" : {
+      "comment" : "Context menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open Link in New Fire Window"
+          }
+        }
+      }
+    },
     "open.link.in.new.tab" : {
       "comment" : "Context menu item",
       "extractionState" : "extracted_with_value",
