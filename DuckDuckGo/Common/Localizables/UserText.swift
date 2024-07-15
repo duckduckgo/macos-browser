@@ -384,11 +384,10 @@ struct UserText {
     static let duckPlayerShowPlayerButtons = NSLocalizedString("duck-player.show-buttons", value: "Show option to use Duck Player over YouTube previews on hover", comment: "Private YouTube Player option")
     static let duckPlayerOff = NSLocalizedString("duck-player.off", value: "Never use Duck Player", comment: "Private YouTube Player option")
     static let duckPlayerExplanation = NSLocalizedString("duck-player.explanation", value: "Duck Player provides a clean viewing experience without personalized ads and prevents viewing activity from influencing your YouTube recommendations.", comment: "Private YouTube Player explanation in settings")
-    static let duckPlayerAutoplayTitle = NSLocalizedString("duck-player.autoplay-title", value: "Autoplay", comment: "Autoplay title in settings")
-    static let duckPlayerAutoplayPreference = NSLocalizedString("duck-player.autoplay-preference", value: "Autoplay videos when opened in Duck Player", comment: "Autoplay preference in settings")
-    static let duckPlayerNewTabTitle = NSLocalizedString("duck-player.newtab-title", value: "New Tab", comment: "New Tab title in settings")
+    static let duckPlayerAutoplayPreference = NSLocalizedString("duck-player.autoplay-preference", value: "Autoplay videos opened in Duck Player", comment: "Autoplay preference in settings")
     static let duckPlayerNewTabPreference = NSLocalizedString("duck-player.newtab-preference", value: "Open Duck Player in a new tab whenever possible", comment: "New tab preference in settings")
     static let duckPlayerNewTabPreferenceExtraInfo = NSLocalizedString("duck-player.newtab.info-preference", value: "When browsing YouTube on the web", comment: "New tab preference extra info in settings")
+    static let duckPlayerVideoPreferencesTitle = NSLocalizedString("duck-player.video-preferences-title", value: "Video Preferences", comment: "Video Preferences title in settings")
 
 
     static let gpcCheckboxTitle = NSLocalizedString("gpc.checkbox.title", value: "Enable Global Privacy Control", comment: "GPC settings checkbox title")

@@ -16810,19 +16810,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Autoplay videos when opened in Duck Player"
-          }
-        }
-      }
-    },
-    "duck-player.autoplay-title" : {
-      "comment" : "Autoplay title in settings",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Autoplay"
+            "value" : "Autoplay videos opened in Duck Player"
           }
         }
       }
@@ -16895,18 +16883,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Open Duck Player in a new tab whenever possible"
-          }
-        }
-      }
-    },
-    "duck-player.newtab-title" : {
-      "comment" : "New Tab title in settings",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "New Tab"
           }
         }
       }
@@ -17099,6 +17075,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Проигрыватель Duck Player"
+          }
+        }
+      }
+    },
+    "duck-player.video-preferences-title" : {
+      "comment" : "Video Preferences title in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Video Preferences"
           }
         }
       }
