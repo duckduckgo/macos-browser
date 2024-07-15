@@ -34,6 +34,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     struct URLs {
         let url1 = URL(string: "https://my-host.com/")!
         let url2 = URL(string: "http://another-host.org/1")!
+        let url3 = URL(string: "http://another-host.org/2")!
     }
     struct DataSource {
         let empty = Data()
@@ -340,29 +341,35 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             self.makeContentBlockerRulesUserScript()
         }
 
+        // For first load, redirect from url1 to url2
+        schemeHandler.middleware = [{ request in
+            guard request.url!.path == "/" else { return nil}
+            return .redirect(to: self.urls.url2)
+        }, { [data] _ in
+            return .ok(.html(data.html.utf8String()!))
+        }]
+
+        // After redirect, issue developer redirect, that cancels url2 loading and navigates to url3
         decidePolicy = { navAction in
-            if navAction.request.url == self.urls.url1 {
+            if navAction.request.url == self.urls.url2 {
                 return .redirect(navAction.mainFrameTarget!, { navigator in
-                    navigator.load(.init(url: self.urls.url2))
+                    navigator.load(.init(url: self.urls.url3))
                 })
             } else {
                 return .next
             }
         }
 
-        schemeHandler.middleware = [{ [data] request in
-            return .ok(.html(data.html.utf8String()!))
-        }]
-
-        var onDetectionDidStart = expectation(description: "detection.onDidStart")
+        let onDetectionDidStart = expectation(description: "detection.onDidStart")
+        onDetectionDidStart.assertForOverFulfill = false
         detection.onDidStart = { _ in
             onDetectionDidStart.fulfill()
         }
-        var on2XXResponse = expectation(description: "on2XXResponse")
+        let on2XXResponse = expectation(description: "on2XXResponse")
         detection.on2XXResponse = { _ in
             on2XXResponse.fulfill()
         }
-        var onNavigation = expectation(description: "onNavigation")
+        let onNavigation = expectation(description: "onNavigation")
         logic.onNavigation = {
             onNavigation.fulfill()
         }
@@ -376,13 +383,13 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             XCTFail("Not expected")
         }
         logic.onDidFinish = { [now, urls] host, date in
-            XCTAssertEqual(host, urls.url2.host!)
+            XCTAssertEqual(host, urls.url3.host!)
             XCTAssertEqual(date, now)
             onLogicDidFinish.fulfill()
         }
 
         tab.setContent(.url(urls.url1, source: .link))
-        waitForExpectations(timeout: 60)
+        waitForExpectations(timeout: 5)
     }
 
     func testWhenNavigationFails_eventsSent() {
