@@ -44,3 +44,8 @@ import AppKit
     func openAllInNewWindow(_ sender: NSMenuItem)
 
 }
+
+@objc protocol BookmarkSearchMenuItemSelectors {
+
+    func showInFolder(_ sender: NSMenuItem)
+}

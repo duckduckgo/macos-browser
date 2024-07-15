@@ -606,7 +606,7 @@ final class BookmarkListViewController: NSViewController {
         let row = outlineView.row(for: cell)
         guard
             let item = outlineView.item(atRow: row),
-            let contextMenu = ContextualMenu.menu(for: [item], target: self)
+            let contextMenu = ContextualMenu.menu(for: [item], target: self, forSearch: dataSource.isSearching)
         else {
             return
         }
@@ -649,7 +649,7 @@ extension BookmarkListViewController: NSMenuDelegate {
         }
 
         if let item = outlineView.item(atRow: row) {
-            return ContextualMenu.menu(for: [item])
+            return ContextualMenu.menu(for: [item], forSearch: dataSource.isSearching)
         } else {
             return nil
         }
@@ -808,6 +808,19 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
         PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
+}
+
+extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
+    func showInFolder(_ sender: NSMenuItem) {
+        guard let baseBookmark = sender.representedObject as? BaseBookmarkEntity else {
+            assertionFailure("Failed to retrieve Bookmark from Show in Folder context menu item")
+            return
+        }
+
+        showTreeView()
+        let node = dataSource.treeController.node(representing: baseBookmark)
+        expandFoldersUntil(node: node)
+    }
 }
 
 // MARK: - Search field delegate

@@ -30374,6 +30374,18 @@
         }
       }
     },
+    "menu.show.in.folder" : {
+      "comment" : "Menu item to show where a bookmark is located",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show in Folder"
+          }
+        }
+      }
+    },
     "Merge All Windows" : {
       "comment" : "Main Menu Window item",
       "localizations" : {
