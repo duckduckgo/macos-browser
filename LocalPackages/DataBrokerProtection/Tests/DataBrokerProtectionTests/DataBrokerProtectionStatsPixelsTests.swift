@@ -408,7 +408,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         XCTAssertTrue(repository.didSetCustomStatsPixelsLastSentTimestamp)
     }
 
-    func testWhen24HoursHavePassed_andMatchesWereFound_thenWeFirePixelsWithExpectedValues() {
+    func testWhen24HoursHavePassed_andOptOutsWereRequestedWereFound_thenWeFirePixelsWithExpectedValues() {
         // Given
         let repository = MockDataBrokerProtectionStatsPixelsRepository()
         repository._customStatsPixelsLastSentTimestamp = Date.nowMinus(hours: 26)
@@ -417,22 +417,34 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         let sut = DataBrokerProtectionStatsPixels(database: database,
                                                   handler: handler,
                                                   repository: repository)
+        let expectation = self.expectation(description: "Async task completion")
 
         // When
         sut.fireCustomStatsPixelsIfNeeded()
+        
+        // There is a 100ms delay between pixels firing, so we need a delay
+        DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) {
+            expectation.fulfill()
+        }
 
-        // Then
-        MockDataBrokerProtectionPixelsHandler.lastPixelsFired.sort { $0.params!["optout_submit_success_rate"]! <  $1.params!["optout_submit_success_rate"]! }
-        let pixel1 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[0]
-        let pixel2 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[1]
-        let pixel3 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[2]
-        let pixel4 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[3]
-        XCTAssertTrue(MockDataBrokerProtectionPixelsHandler.lastPixelsFired.count == 4)
-        XCTAssertEqual(pixel1.params!["optout_submit_success_rate"], "0.5")
-        XCTAssertEqual(pixel2.params!["optout_submit_success_rate"], "0.71")
-        XCTAssertEqual(pixel3.params!["optout_submit_success_rate"], "0.75")
-        XCTAssertEqual(pixel4.params!["optout_submit_success_rate"], "1.0")
-        XCTAssertTrue(repository.didGetCustomStatsPixelsLastSentTimestamp)
-        XCTAssertTrue(repository.didSetCustomStatsPixelsLastSentTimestamp)
+        waitForExpectations(timeout: 2.0) { error in
+            if let error = error {
+                XCTFail("Expectation failed with error: \(error)")
+            }
+
+            // Then
+            MockDataBrokerProtectionPixelsHandler.lastPixelsFired.sort { $0.params!["optout_submit_success_rate"]! <  $1.params!["optout_submit_success_rate"]! }
+            let pixel1 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[0]
+            let pixel2 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[1]
+            let pixel3 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[2]
+            let pixel4 = MockDataBrokerProtectionPixelsHandler.lastPixelsFired[3]
+            XCTAssertTrue(MockDataBrokerProtectionPixelsHandler.lastPixelsFired.count == 4)
+            XCTAssertEqual(pixel1.params!["optout_submit_success_rate"], "0.5")
+            XCTAssertEqual(pixel2.params!["optout_submit_success_rate"], "0.71")
+            XCTAssertEqual(pixel3.params!["optout_submit_success_rate"], "0.75")
+            XCTAssertEqual(pixel4.params!["optout_submit_success_rate"], "1.0")
+            XCTAssertTrue(repository.didGetCustomStatsPixelsLastSentTimestamp)
+            XCTAssertTrue(repository.didSetCustomStatsPixelsLastSentTimestamp)
+        }
     }
 }
