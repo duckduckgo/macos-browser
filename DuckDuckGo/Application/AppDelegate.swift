@@ -316,11 +316,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
-        PixelExperiment.install()
-
         if LocalStatisticsStore().atb == nil {
             AppDelegate.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
+            PixelExperiment.install()
         }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
