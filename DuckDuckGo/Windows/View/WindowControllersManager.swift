@@ -36,14 +36,18 @@ protocol WindowControllersManagerProtocol {
 @MainActor
 final class WindowControllersManager: WindowControllersManagerProtocol {
 
-    static let shared = WindowControllersManager()
+    static let shared = WindowControllersManager(pinnedTabsManager: Application.appDelegate.pinnedTabsManager)
+
+    init(pinnedTabsManager: PinnedTabsManager) {
+        self.pinnedTabsManager = pinnedTabsManager
+    }
 
     /**
      * _Initial_ meaning a single window with a single home page tab.
      */
     @Published private(set) var isInInitialState: Bool = true
     @Published private(set) var mainWindowControllers = [MainWindowController]()
-    private(set) var pinnedTabsManager = PinnedTabsManager()
+    private(set) var pinnedTabsManager: PinnedTabsManager
 
     weak var lastKeyMainWindowController: MainWindowController? {
         didSet {

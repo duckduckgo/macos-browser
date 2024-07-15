@@ -129,9 +129,25 @@ final class ActiveRemoteMessageModel: ObservableObject {
         }
     }
 
+    var shouldShowRemoteMessage: Bool {
+        remoteMessage?.content?.isSupported == true
+    }
+
     private func updateRemoteMessage() {
         remoteMessage = store()?.fetchScheduledRemoteMessage()
     }
 
     private var cancellables = Set<AnyCancellable>()
+}
+
+extension RemoteMessageModelType {
+
+    var isSupported: Bool {
+        switch self {
+        case .promoSingleAction:
+            return false
+        default:
+            return true
+        }
+    }
 }

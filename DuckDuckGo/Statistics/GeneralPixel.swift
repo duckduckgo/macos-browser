@@ -25,10 +25,11 @@ import Configuration
 enum GeneralPixel: PixelKitEventV2 {
 
     case crash
+    case crashOnCrashHandlersSetUp
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
 
-    case serp(cohort: String)
+    case serp(cohort: String?)
     case serpInitial(cohort: String)
     case serpDay21to27(cohort: String)
 
@@ -416,6 +417,9 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .crash:
             return "m_mac_crash"
+
+        case .crashOnCrashHandlersSetUp:
+            return "m_mac_crash_on_handlers_setup"
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
@@ -1045,6 +1049,7 @@ enum GeneralPixel: PixelKitEventV2 {
             return [PixelKit.Parameters.experimentCohort: cohort]
 
         case .serp(let cohort):
+            guard let cohort else { return [:] }
             return [PixelKit.Parameters.experimentCohort: cohort]
 
         case .serpInitial(let cohort):

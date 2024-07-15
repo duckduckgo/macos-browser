@@ -65,6 +65,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         database: CoreDataDatabase,
         bookmarksDatabase: CoreDataDatabase,
         appearancePreferences: AppearancePreferences,
+        pinnedTabsManager: PinnedTabsManager,
         internalUserDecider: InternalUserDecider,
         configurationStore: ConfigurationStoring,
         remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding,
@@ -73,6 +74,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         let provider = RemoteMessagingConfigMatcherProvider(
             bookmarksDatabase: bookmarksDatabase,
             appearancePreferences: appearancePreferences,
+            pinnedTabsManager: pinnedTabsManager,
             internalUserDecider: internalUserDecider
         )
         self.init(
