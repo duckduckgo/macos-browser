@@ -13309,7 +13309,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "bartek/explicit-dev-redirects";
+				branch = main;
 				kind = branch;
 			};
 		};
