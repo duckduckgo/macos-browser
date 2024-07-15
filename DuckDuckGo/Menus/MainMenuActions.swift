@@ -296,6 +296,9 @@ extension AppDelegate {
         }
     }
 
+    @objc func resetRemoteMessages(_ sender: Any?) {
+        remoteMessagingClient.store?.resetRemoteMessages()
+    }
 }
 
 extension MainViewController {
