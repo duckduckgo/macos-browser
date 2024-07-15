@@ -391,6 +391,19 @@ final class BookmarkListViewController: NSViewController {
         reloadData()
     }
 
+    override func keyDown(with event: NSEvent) {
+        let commandKeyDown = event.modifierFlags.contains(.command)
+        if commandKeyDown && event.keyCode == 3 { // CMD + F
+            if isSearchVisible {
+                searchBar.makeMeFirstResponder()
+            } else {
+                showSearchBar()
+            }
+        } else {
+            super.keyDown(with: event)
+        }
+    }
+
     private func reloadData() {
         if dataSource.isSearching {
             if let destinationFolder = dataSource.destinationFolderOnSearch {
