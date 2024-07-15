@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "tom/automatic-updates",
-        "revision" : "3702841dd70fff5209763bc1e4a16a22d284656f"
+        "revision" : "6f8cd8c19d6189f5fb109eded4efd5a168243827"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "branch" : "pr-releases/pr-976",
-        "revision" : "84714fa9de48dfd43d81a3a15b0c8941b606cc76"
+        "revision" : "a09f3935ad4e1208405eaed22cb67c2a9215124d",
+        "version" : "6.2.0"
       }
     },
     {
