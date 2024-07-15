@@ -35,16 +35,19 @@ final class ApplicationUpdateDetector {
     @UserDefaultsWrapper(key: .previousBuild, defaultValue: nil)
     private static var previousAppBuild: String?
 
-    static func isApplicationUpdated() -> AppUpdateStatus {
+    static func isApplicationUpdated(currentVersion: String? = nil,
+                                     currentBuild: String? = nil,
+                                     previousVersion: String? = nil,
+                                     previousBuild: String? = nil) -> AppUpdateStatus {
         // If the update check has already been performed, return the cached result
         if hasCheckedForUpdate {
             return updateStatus
         }
 
-        let currentVersion = getCurrentAppVersion()
-        let currentBuild = getCurrentAppBuild()
-        let previousVersion = previousAppVersion
-        let previousBuild = previousAppBuild
+        let currentVersion = currentVersion ?? getCurrentAppVersion()
+        let currentBuild = currentBuild ?? getCurrentAppBuild()
+        let previousVersion = previousVersion ?? self.previousAppVersion
+        let previousBuild = previousBuild ?? self.previousAppBuild
 
         // Save the current version and build to user defaults for future comparisons
         Self.previousAppVersion = currentVersion
@@ -84,4 +87,11 @@ final class ApplicationUpdateDetector {
     private static func getCurrentAppBuild() -> String? {
         return Bundle.main.infoDictionary?["CFBundleVersion"] as? String
     }
+
+#if DEBUG
+    static func resetState() {
+        hasCheckedForUpdate = false
+    }
+#endif
+
 }

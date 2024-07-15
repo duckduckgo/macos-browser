@@ -77,6 +77,8 @@
 		1D43EB3A292B63B00065E5D6 /* BWRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB39292B63B00065E5D6 /* BWRequest.swift */; };
 		1D43EB3C292B664A0065E5D6 /* BWMessageIdGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB3B292B664A0065E5D6 /* BWMessageIdGenerator.swift */; };
 		1D6216B229069BBF00386B2C /* BWKeyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6216B129069BBF00386B2C /* BWKeyStorage.swift */; };
+		1D638D612C44F2BA00530DD5 /* ApplicationUpdateDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D638D602C44F2BA00530DD5 /* ApplicationUpdateDetectorTests.swift */; };
+		1D638D622C44F2BA00530DD5 /* ApplicationUpdateDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D638D602C44F2BA00530DD5 /* ApplicationUpdateDetectorTests.swift */; };
 		1D69C553291302F200B75945 /* BWVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D69C552291302F200B75945 /* BWVault.swift */; };
 		1D6A492029CF7A490011DF74 /* NSPopoverExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */; };
 		1D6A492129CF7A490011DF74 /* NSPopoverExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */; };
@@ -88,6 +90,8 @@
 		1D77921A28FDC79800BE0210 /* FaviconStoringMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */; };
 		1D8057C82A83CAEE00F4FED6 /* SupportedOsChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8057C72A83CAEE00F4FED6 /* SupportedOsChecker.swift */; };
 		1D8057C92A83CB3C00F4FED6 /* SupportedOsChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8057C72A83CAEE00F4FED6 /* SupportedOsChecker.swift */; };
+		1D838A332C44F0310078373F /* ReleaseNotesParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D838A312C44F0180078373F /* ReleaseNotesParserTests.swift */; };
+		1D838A342C44F0320078373F /* ReleaseNotesParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D838A312C44F0180078373F /* ReleaseNotesParserTests.swift */; };
 		1D85BCCA2BA982FC0065BA04 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1D85BCC92BA982FC0065BA04 /* InfoPlist.xcstrings */; };
 		1D8B7D6A2A38BF050045C6F6 /* FireproofDomainsStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */; };
 		1D8B7D6B2A38BF060045C6F6 /* FireproofDomainsStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */; };
@@ -2970,6 +2974,7 @@
 		1D43EB39292B63B00065E5D6 /* BWRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWRequest.swift; sourceTree = "<group>"; };
 		1D43EB3B292B664A0065E5D6 /* BWMessageIdGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWMessageIdGenerator.swift; sourceTree = "<group>"; };
 		1D6216B129069BBF00386B2C /* BWKeyStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWKeyStorage.swift; sourceTree = "<group>"; };
+		1D638D602C44F2BA00530DD5 /* ApplicationUpdateDetectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationUpdateDetectorTests.swift; sourceTree = "<group>"; };
 		1D69C552291302F200B75945 /* BWVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWVault.swift; sourceTree = "<group>"; };
 		1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPopoverExtension.swift; sourceTree = "<group>"; };
 		1D72D59B2BFF61B200AEDE36 /* UpdateNotificationPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateNotificationPresenter.swift; sourceTree = "<group>"; };
@@ -2978,6 +2983,7 @@
 		1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconStoringMock.swift; sourceTree = "<group>"; };
 		1D77921C28FFF27C00BE0210 /* RunningApplicationCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationCheck.swift; sourceTree = "<group>"; };
 		1D8057C72A83CAEE00F4FED6 /* SupportedOsChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedOsChecker.swift; sourceTree = "<group>"; };
+		1D838A312C44F0180078373F /* ReleaseNotesParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReleaseNotesParserTests.swift; sourceTree = "<group>"; };
 		1D85BCC92BA982FC0065BA04 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		1D8C2FE42B70F4C4005E4BBD /* TabSnapshotExtensionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabSnapshotExtensionTests.swift; sourceTree = "<group>"; };
 		1D8C2FE92B70F5A7005E4BBD /* MockWebViewSnapshotRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockWebViewSnapshotRenderer.swift; sourceTree = "<group>"; };
@@ -4722,6 +4728,15 @@
 				1D8057C72A83CAEE00F4FED6 /* SupportedOsChecker.swift */,
 			);
 			path = OsVersion;
+			sourceTree = "<group>";
+		};
+		1D838A302C44EFF20078373F /* Updates */ = {
+			isa = PBXGroup;
+			children = (
+				1D838A312C44F0180078373F /* ReleaseNotesParserTests.swift */,
+				1D638D602C44F2BA00530DD5 /* ApplicationUpdateDetectorTests.swift */,
+			);
+			path = Updates;
 			sourceTree = "<group>";
 		};
 		1D8C2FE72B70F51A005E4BBD /* TabPreview */ = {
@@ -6954,6 +6969,7 @@
 				AAC9C01224CAFBB700AD1325 /* TabBar */,
 				B6CA4822298CDC0B0067ECCE /* TabExtensionsTests */,
 				1D8C2FE72B70F51A005E4BBD /* TabPreview */,
+				1D838A302C44EFF20078373F /* Updates */,
 				AA0877B626D515EE00B05660 /* UserAgent */,
 				4B9DB04D2A983B55000927DB /* Waitlist */,
 				3776582B27F7163B009A6B35 /* WebsiteBreakageReport */,
@@ -10682,6 +10698,7 @@
 				56534DEE29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */,
 				561D29C32BDA745B007B91D0 /* MockSyncPausedStateManaging.swift in Sources */,
 				3706FDF8293F661700E42796 /* FileStoreTests.swift in Sources */,
+				1D838A342C44F0320078373F /* ReleaseNotesParserTests.swift in Sources */,
 				5603D90729B7B746007F9F01 /* MockTabViewItemDelegate.swift in Sources */,
 				3706FDF9293F661700E42796 /* TabViewModelTests.swift in Sources */,
 				37DB56F62C3B3C420093D4DC /* MockRemoteMessagingStore.swift in Sources */,
@@ -10877,6 +10894,7 @@
 				3706FE62293F661700E42796 /* PasswordManagementListSectionTests.swift in Sources */,
 				3706FE63293F661700E42796 /* RecentlyClosedCoordinatorMock.swift in Sources */,
 				857E5AFB2A79628A00FC0FB4 /* PixelExperimentTests.swift in Sources */,
+				1D638D622C44F2BA00530DD5 /* ApplicationUpdateDetectorTests.swift in Sources */,
 				56A054142C1C3796007D8FAB /* CapturingDockCustomizer.swift in Sources */,
 				3706FE64293F661700E42796 /* DownloadListStoreTests.swift in Sources */,
 				3706FE65293F661700E42796 /* ContentBlockingUpdatingTests.swift in Sources */,
@@ -12098,6 +12116,7 @@
 				37D2377C287EBDA300BCE03B /* TabIndexTests.swift in Sources */,
 				37534CA52811987D002621E7 /* AdjacentItemEnumeratorTests.swift in Sources */,
 				56B234BF2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift in Sources */,
+				1D838A332C44F0310078373F /* ReleaseNotesParserTests.swift in Sources */,
 				56A0542D2C201DA8007D8FAB /* MockContentBlocking.swift in Sources */,
 				56A054442C2252CE007D8FAB /* OnboardingUserScriptTests.swift in Sources */,
 				9FAD623A2BCFDB32007F3A65 /* WebsiteInfoHelpers.swift in Sources */,
@@ -12349,6 +12368,7 @@
 				021EA0842BD6E01A00772C9A /* TabsPreferencesTests.swift in Sources */,
 				1D12F2E2298BC660009A65FD /* InternalUserDeciderStoreMock.swift in Sources */,
 				4BB99D1026FE1A84001E4761 /* FirefoxBookmarksReaderTests.swift in Sources */,
+				1D638D612C44F2BA00530DD5 /* ApplicationUpdateDetectorTests.swift in Sources */,
 				9FBD84702BB3DD8400220859 /* MockAttributionsPixelHandler.swift in Sources */,
 				4B117F7D276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift in Sources */,
 				378205F62837CBA800D1D4AA /* SavedStateMock.swift in Sources */,
