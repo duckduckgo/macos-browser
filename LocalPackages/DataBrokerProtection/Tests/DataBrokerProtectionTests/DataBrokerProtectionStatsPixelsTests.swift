@@ -421,7 +421,7 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
 
         // When
         sut.fireCustomStatsPixelsIfNeeded()
-        
+
         // There is a 100ms delay between pixels firing, so we need a delay
         DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) {
             expectation.fulfill()
