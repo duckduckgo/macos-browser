@@ -460,6 +460,8 @@ final class BookmarkListViewController: NSViewController {
         view.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor, constant: 16).isActive = true
         boxDivider.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 10).isActive = true
         searchBar.makeMeFirstResponder()
+        searchBookmarksButton.backgroundColor = .buttonMouseDown
+        searchBookmarksButton.mouseOverColor = .buttonMouseDown
     }
 
     private func hideSearchBar() {
@@ -467,6 +469,8 @@ final class BookmarkListViewController: NSViewController {
         searchBar.removeFromSuperview()
         boxDividerTopConstraint.isActive = true
         isSearchVisible = false
+        searchBookmarksButton.backgroundColor = .clear
+        searchBookmarksButton.mouseOverColor = .buttonMouseOver
     }
 
     @objc func openManagementInterface(_ sender: NSButton) {
