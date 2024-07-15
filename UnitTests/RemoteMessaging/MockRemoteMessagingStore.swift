@@ -96,4 +96,6 @@ class MockRemoteMessagingStore: RemoteMessagingStoring {
             shownRemoteMessagesIDs.removeAll(where: { $0 == id })
         }
     }
+
+    func resetRemoteMessages() {}
 }
