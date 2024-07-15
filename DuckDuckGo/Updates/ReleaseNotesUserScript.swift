@@ -27,7 +27,7 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
 
     lazy var updateController: UpdateControllerProtocol = Application.appDelegate.updateController
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "release-notes")])
-    let featureName: String = "releaseNotes"
+    let featureName: String = "release-notes"
     weak var broker: UserScriptMessageBroker?
     weak var webView: WKWebView?
     private var cancellables = Set<AnyCancellable>()
