@@ -19,7 +19,6 @@
 import Foundation
 import WebKit
 import ContentScopeScripts
-import Common
 
 final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
 
@@ -140,7 +139,7 @@ private extension DuckURLSchemeHandler {
         }
 
         guard let file = ContentScopeScripts.Bundle.path(forResource: fileName, ofType: fileExtension, inDirectory: directoryURL.path) else {
-            os_log("DuckURLScheme file not found in bundle: %{public}@ %{public}@ %{public}@", log: .userScripts, directoryURL.path, fileName, fileExtension)
+            assertionFailure("\(fileExtension) template not found")
             return nil
         }
 
