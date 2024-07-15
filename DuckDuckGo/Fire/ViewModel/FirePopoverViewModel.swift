@@ -143,7 +143,7 @@ final class FirePopoverViewModel {
         Set(0..<selectable.count) == selected
     }
 
-    private func selectAll() {
+    func selectAll() {
         self.selected = Set(0..<selectable.count)
     }
 
@@ -155,12 +155,24 @@ final class FirePopoverViewModel {
         selected.insert(index)
     }
 
+    func select(_ indices: Set<Int>) {
+        self.selected.formUnion(indices)
+    }
+
     func deselect(index: Int) {
         guard index < selectable.count, index >= 0 else {
             assertionFailure("Index out of range")
             return
         }
         selected.remove(index)
+    }
+
+    func deselect(_ indices: Set<Int>) {
+        self.selected.subtract(indices)
+    }
+
+    func deselectAll() {
+        self.selected = Set()
     }
 
     private var selectedDomains: Set<String> {

@@ -103,6 +103,10 @@ final class FirePopoverViewController: NSViewController {
         collectionView.register(nib, forItemWithIdentifier: FirePopoverCollectionViewItem.identifier)
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.menu = NSMenu {
+            NSMenuItem(title: UserText.fireDialogSelectAll, action: #selector(selectAll), target: self)
+            NSMenuItem(title: UserText.fireDialogDeselectAll, action: #selector(deselectAll), target: self)
+        }
 
         if firePopoverViewModel.tabCollectionViewModel?.isBurner ?? false {
             adjustViewForBurnerWindow()
@@ -133,6 +137,14 @@ final class FirePopoverViewController: NSViewController {
         closeBurnerWindowButton.title = UserText.fireDialogBurnWindowButton
         clearButton.title = UserText.clear
         cancelButton.title = UserText.cancel
+    }
+
+    @objc override func selectAll(_ sender: Any?) {
+        firePopoverViewModel.selectAll()
+    }
+
+    @objc func deselectAll(_ sender: Any?) {
+        firePopoverViewModel.deselectAll()
     }
 
     @IBAction func optionsButtonAction(_ sender: NSPopUpButton) {
