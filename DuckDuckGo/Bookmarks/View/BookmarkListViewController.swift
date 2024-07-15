@@ -446,6 +446,7 @@ final class BookmarkListViewController: NSViewController {
         searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
         view.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor, constant: 16).isActive = true
         boxDivider.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 10).isActive = true
+        searchBar.makeMeFirstResponder()
     }
 
     private func hideSearchBar() {
