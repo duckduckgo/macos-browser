@@ -113,8 +113,6 @@ extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL, in webView: WKWebView) {
         if duckPlayer.mode == .enabled {
             PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeAutomatic)
-        } else {
-            PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaHoverButton)
         }
         // to be standardised across the app
         let isRequestingNewTab = NSApp.isCommandPressed

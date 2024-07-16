@@ -157,6 +157,12 @@ extension YoutubeOverlayUserScript {
             if AppDelegate.isNewUser {
                 PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .legacyInitial)
             }
+        case "play.use.thumbnail":
+              PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaHoverButton)
+              // Temporary pixel for first time user uses Duck Player
+              if AppDelegate.isNewUser {
+                  PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .legacyInitial)
+              }
         case "play.do_not_use":
             duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
             PixelKit.fire(GeneralPixel.duckPlayerOverlayYoutubeWatchHere)
