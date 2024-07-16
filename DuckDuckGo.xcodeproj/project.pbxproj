@@ -2527,6 +2527,10 @@
 		BDA7648E2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA7648C2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift */; };
 		BDA764912BC4E57200D0400C /* MockVPNLocationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA764902BC4E57200D0400C /* MockVPNLocationFormatter.swift */; };
 		BDA764922BC4E57200D0400C /* MockVPNLocationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA764902BC4E57200D0400C /* MockVPNLocationFormatter.swift */; };
+		BDABC6DA2C4721A4004CB0D1 /* SecureStorageTestsUtils in Frameworks */ = {isa = PBXBuildFile; productRef = BDABC6D92C4721A4004CB0D1 /* SecureStorageTestsUtils */; };
+		BDABC6DC2C4721A8004CB0D1 /* DDGSyncTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = BDABC6DB2C4721A8004CB0D1 /* DDGSyncTestingUtilities */; };
+		BDABC6DE2C4721AD004CB0D1 /* DDGSyncTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = BDABC6DD2C4721AD004CB0D1 /* DDGSyncTestingUtilities */; };
+		BDABC6E02C4721B8004CB0D1 /* SecureStorageTestsUtils in Frameworks */ = {isa = PBXBuildFile; productRef = BDABC6DF2C4721B8004CB0D1 /* SecureStorageTestsUtils */; };
 		BDADBDC92BD2BC2200421B9B /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = BDADBDC82BD2BC2200421B9B /* Lottie */; };
 		BDADBDCB2BD2BC2800421B9B /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = BDADBDCA2BD2BC2800421B9B /* Lottie */; };
 		BDADBDCC2BD2BC4D00421B9B /* vpn-dark-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */; };
@@ -4309,12 +4313,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDABC6DE2C4721AD004CB0D1 /* DDGSyncTestingUtilities in Frameworks */,
 				3706FE88293F661700E42796 /* OHHTTPStubs in Frameworks */,
 				F19547AB2C33FA650041ACC9 /* Subscription in Frameworks */,
 				F116A7C72BD1925500F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CF2B316E0200A595BB /* SnapshotTesting in Frameworks */,
 				F1DA51A52BF6114200CF29FA /* SubscriptionTestingUtilities in Frameworks */,
 				3706FE89293F661700E42796 /* OHHTTPStubsSwift in Frameworks */,
+				BDABC6E02C4721B8004CB0D1 /* SecureStorageTestsUtils in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4512,10 +4518,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDABC6DA2C4721A4004CB0D1 /* SecureStorageTestsUtils in Frameworks */,
 				B6DA44172616C13800DD1EC2 /* OHHTTPStubs in Frameworks */,
 				F19547A92C33FA4C0041ACC9 /* Subscription in Frameworks */,
 				F116A7C32BD1924B00F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CB2B316DF100A595BB /* SnapshotTesting in Frameworks */,
+				BDABC6DC2C4721A8004CB0D1 /* DDGSyncTestingUtilities in Frameworks */,
 				F1DA51A92BF6114C00CF29FA /* SubscriptionTestingUtilities in Frameworks */,
 				B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */,
 			);
@@ -8597,6 +8605,8 @@
 				F116A7C62BD1925500F3FCF7 /* PixelKitTestingUtilities */,
 				F1DA51A42BF6114200CF29FA /* SubscriptionTestingUtilities */,
 				F19547AA2C33FA650041ACC9 /* Subscription */,
+				BDABC6DD2C4721AD004CB0D1 /* DDGSyncTestingUtilities */,
+				BDABC6DF2C4721B8004CB0D1 /* SecureStorageTestsUtils */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = 3706FE99293F661700E42796 /* Unit Tests App Store.xctest */;
@@ -9001,6 +9011,8 @@
 				F116A7C22BD1924B00F3FCF7 /* PixelKitTestingUtilities */,
 				F1DA51A82BF6114C00CF29FA /* SubscriptionTestingUtilities */,
 				F19547A82C33FA4C0041ACC9 /* Subscription */,
+				BDABC6D92C4721A4004CB0D1 /* SecureStorageTestsUtils */,
+				BDABC6DB2C4721A8004CB0D1 /* DDGSyncTestingUtilities */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */;
@@ -13309,8 +13321,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 171.2.1;
+				branch = anh/ppro/pixels;
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -13876,6 +13888,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Configuration;
+		};
+		BDABC6D92C4721A4004CB0D1 /* SecureStorageTestsUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = SecureStorageTestsUtils;
+		};
+		BDABC6DB2C4721A8004CB0D1 /* DDGSyncTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = DDGSyncTestingUtilities;
+		};
+		BDABC6DD2C4721AD004CB0D1 /* DDGSyncTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = DDGSyncTestingUtilities;
+		};
+		BDABC6DF2C4721B8004CB0D1 /* SecureStorageTestsUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = SecureStorageTestsUtils;
 		};
 		BDADBDC82BD2BC2200421B9B /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;
