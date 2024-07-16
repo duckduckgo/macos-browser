@@ -220,6 +220,12 @@ extension DuckPlayerTabExtension: NavigationResponder {
         if navigationAction.url.isDuckURLScheme || navigationAction.url.isDuckPlayer {
             if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
                 PixelKit.fire(GeneralPixel.duckPlayerViewFromSERP)
+
+                if shouldOpenInNewTab,
+                   let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
+                    webView?.loadInNewWindow(navigationAction.url)
+                    return .cancel
+                }
             }
             return .allow
         }
