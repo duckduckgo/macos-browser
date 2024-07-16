@@ -189,11 +189,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
     }
 
     private func updateConstraints(isSearch: Bool) {
-        if isSearch {
-            leadingConstraint.constant = -8
-        } else {
-            leadingConstraint.constant = 5
-        }
+        leadingConstraint.constant = isSearch ? -8 : 5
     }
 
     func update(from pseudoFolder: PseudoFolder) {

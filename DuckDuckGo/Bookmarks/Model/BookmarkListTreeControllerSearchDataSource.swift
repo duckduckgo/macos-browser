@@ -19,14 +19,13 @@
 import Foundation
 
 final class BookmarkListTreeControllerSearchDataSource: BookmarkTreeControllerSearchDataSource {
-
     private let bookmarkManager: BookmarkManager
 
     init(bookmarkManager: BookmarkManager) {
         self.bookmarkManager = bookmarkManager
     }
 
-    func treeController(treeController: BookmarkTreeController, searchQuery: String) -> [BookmarkNode] {
+    func nodes(for searchQuery: String) -> [BookmarkNode] {
         let searchResults = bookmarkManager.search(by: searchQuery)
 
         return rebuildChildNodes(for: searchResults)

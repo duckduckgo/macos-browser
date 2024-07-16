@@ -20,12 +20,12 @@ import Foundation
 
 protocol BookmarkTreeControllerDataSource: AnyObject {
 
-    func treeController(treeController: BookmarkTreeController, childNodesFor: BookmarkNode) -> [BookmarkNode]
+    func treeController(childNodesFor: BookmarkNode) -> [BookmarkNode]
 }
 
 protocol BookmarkTreeControllerSearchDataSource: AnyObject {
 
-    func treeController(treeController: BookmarkTreeController, searchQuery: String) -> [BookmarkNode]
+    func nodes(for searchQuery: String) -> [BookmarkNode]
 }
 
 final class BookmarkTreeController {
@@ -53,7 +53,7 @@ final class BookmarkTreeController {
     // MARK: - Public
 
     func rebuild(for searchQuery: String) {
-        rootNode.childNodes = searchDataSource?.treeController(treeController: self, searchQuery: searchQuery) ?? []
+        rootNode.childNodes = searchDataSource?.nodes(for: searchQuery) ?? []
     }
 
     func rebuild() {
@@ -103,7 +103,7 @@ final class BookmarkTreeController {
             return false
         }
 
-        let childNodes: [BookmarkNode] = dataSource?.treeController(treeController: self, childNodesFor: node) ?? []
+        let childNodes: [BookmarkNode] = dataSource?.treeController(childNodesFor: node) ?? []
         var childNodesDidChange = childNodes != node.childNodes
 
         if childNodesDidChange {

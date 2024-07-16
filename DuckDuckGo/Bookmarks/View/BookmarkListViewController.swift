@@ -370,7 +370,7 @@ final class BookmarkListViewController: NSViewController {
                                              FolderPasteboardWriter.folderUTIInternalType])
 
         bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] list in
-            guard let self = self else { return }
+            guard let self else { return }
 
             self.reloadData()
             let isEmpty = list?.topLevelEntities.isEmpty ?? true
@@ -406,7 +406,7 @@ final class BookmarkListViewController: NSViewController {
 
     private func reloadData() {
         if dataSource.isSearching {
-            if let destinationFolder = dataSource.destinationFolderOnSearch {
+            if let destinationFolder = dataSource.dragDestinationFolderInSearchMode {
                 hideSearchBar()
                 updateSearchAndExpand(destinationFolder)
             } else {

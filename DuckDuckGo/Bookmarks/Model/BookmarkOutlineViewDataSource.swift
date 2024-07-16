@@ -34,7 +34,11 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     private let contentMode: ContentMode
     private(set) var expandedNodesIDs = Set<String>()
     private(set) var isSearching = false
-    private(set) var destinationFolderOnSearch: BookmarkFolder?
+
+    /// When a drag and drop to a folder happens while in search, we need to stor the destination folder
+    /// so we can expand the tree to the destination folder once the drop finishes.
+    private(set) var dragDestinationFolderInSearchMode: BookmarkFolder?
+
     private let bookmarkManager: BookmarkManager
     private let showMenuButtonOnHover: Bool
     private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
@@ -65,7 +69,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     func reloadData() {
         isSearching = false
-        destinationFolderOnSearch = nil
+        dragDestinationFolderInSearchMode = nil
         setFolderCount()
         treeController.rebuild()
     }
@@ -197,7 +201,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
         if isSearching {
             if let destinationFolder = destinationNode.representedObject as? BookmarkFolder {
-                self.destinationFolderOnSearch = destinationFolder
+                self.dragDestinationFolderInSearchMode = destinationFolder
                 return .move
             }
 
