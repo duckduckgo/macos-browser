@@ -46,6 +46,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private let excludeDDGBrowserTrafficFromVPN = NSMenuItem(title: "DDG Browser", action: #selector(toggleExcludeDDGBrowser))
     private let excludeDBPTrafficFromVPN = NSMenuItem(title: "DBP Background Agent", action: #selector(toggleExcludeDBPBackgroundAgent))
 
+    private let excludeDDGFromVPN = NSMenuItem(title: "duckduckgo.com", action: #selector(toggleExcludeDDGCom))
+    private let excludeRedditFromVPN = NSMenuItem(title: "reddit.com", action: #selector(toggleExcludeReddit))
+
     private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "Kill Switch (enforceRoutes)", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
     private let shouldIncludeAllNetworksMenuItem = NSMenuItem(title: "includeAllNetworks", action: #selector(NetworkProtectionDebugMenu.toggleIncludeAllNetworks))
     private let connectOnLogInMenuItem = NSMenuItem(title: "Connect on Log In", action: #selector(NetworkProtectionDebugMenu.toggleConnectOnLogInAction))
@@ -101,6 +104,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 NSMenuItem(title: "Excluded Apps") {
                     excludeDDGBrowserTrafficFromVPN.targetting(self)
                     excludeDBPTrafficFromVPN.targetting(self)
+                }
+                NSMenuItem(title: "Excluded Domains") {
+                    excludeDDGFromVPN.targetting(self)
+                    excludeRedditFromVPN.targetting(self)
                 }
                 NSMenuItem(title: "Excluded Routes").submenu(excludedRoutesMenu)
             }
@@ -516,6 +523,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private func updateExclusionsMenu() {
         excludeDBPTrafficFromVPN.state = transparentProxySettings.isExcluding(dbpBackgroundAppIdentifier) ? .on : .off
         excludeDDGBrowserTrafficFromVPN.state = transparentProxySettings.isExcluding(ddgBrowserAppIdentifier) ? .on : .off
+        excludeDDGFromVPN.state = transparentProxySettings.isExcluding(domain: "duckduckgo.com") ? .on : .off
+        excludeRedditFromVPN.state = transparentProxySettings.isExcluding(domain: "reddit.com") ? .on : .off
     }
 
     @objc private func toggleExcludeDBPBackgroundAgent() {
@@ -524,6 +533,14 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @objc private func toggleExcludeDDGBrowser() {
         transparentProxySettings.toggleExclusion(for: ddgBrowserAppIdentifier)
+    }
+
+    @objc private func toggleExcludeDDGCom() {
+        transparentProxySettings.toggleExclusion(domain: "duckduckgo.com")
+    }
+
+    @objc private func toggleExcludeReddit() {
+        transparentProxySettings.toggleExclusion(domain: "reddit.com")
     }
 }
 

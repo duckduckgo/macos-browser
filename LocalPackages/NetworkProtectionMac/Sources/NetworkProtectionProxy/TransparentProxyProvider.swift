@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import NetworkExtension
 import NetworkProtection
@@ -35,16 +36,18 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     static let dnsPort = 53
 
     @TCPFlowActor
-    var tcpFlowManagers = Set<TCPFlowManager>()
+    private var tcpFlowManagers = Set<TCPFlowManager>()
 
     @UDPFlowActor
-    var udpFlowManagers = Set<UDPFlowManager>()
+    private var udpFlowManagers = Set<UDPFlowManager>()
 
     private let monitor = nw_path_monitor_create()
     var directInterface: nw_interface_t?
 
     private let bMonitor = NWPathMonitor()
     var interface: NWInterface?
+
+    private var cancellables = Set<AnyCancellable>()
 
     public let configuration: Configuration
     public let settings: TransparentProxySettings
@@ -54,8 +57,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     public var eventHandler: EventCallback?
     private let logger: Logger
-
-    private lazy var appMessageHandler = TransparentProxyAppMessageHandler(settings: settings)
+    private let appMessageHandler: TransparentProxyAppMessageHandler
 
     // MARK: - Init
 
@@ -63,15 +65,35 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
                 configuration: Configuration,
                 logger: Logger) {
 
+        appMessageHandler = TransparentProxyAppMessageHandler(settings: settings, logger: logger)
         self.configuration = configuration
         self.logger = logger
         self.settings = settings
+
+        super.init()
+
+        subscribeToSettings()
 
         logger.debug("[+] \(String(describing: Self.self), privacy: .public)")
     }
 
     deinit {
         logger.debug("[-] \(String(describing: Self.self), privacy: .public)")
+    }
+
+    private func subscribeToSettings() {
+        settings.changePublisher.sink { change in
+            switch change {
+            case .appRoutingRules:
+                // TBD
+                break
+            case .excludedDomains(let domains):
+                Task {
+                    try await self.updateNetworkSettings()
+                }
+                break
+            }
+        }.store(in: &cancellables)
     }
 
     private func loadProviderConfiguration() throws {
@@ -105,7 +127,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
                         return
                     }
 
-                    logger.log("Successfully Updated network settings: \(String(describing: error), privacy: .public))")
+                    logger.log("Successfully Updated network settings: \(networkSettings.description, privacy: .public)")
                     continuation.resume()
                 }
             }
@@ -116,7 +138,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         let networkSettings = NETransparentProxyNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
 
         networkSettings.includedNetworkRules = [
-            NENetworkRule(remoteNetwork: NWHostEndpoint(hostname: "127.0.0.1", port: ""), remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .any, direction: .outbound)
+            NENetworkRule(remoteNetwork: nil, remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .any, direction: .outbound)
         ]
 
         return networkSettings
@@ -187,26 +209,49 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         }
     }
 
-    override public func handleNewFlow(_ flow: NEAppProxyFlow) -> Bool {
-        guard let flow = flow as? NEAppProxyTCPFlow else {
-            logger.info("Expected a TCP flow, but got something else.  We're ignoring it.")
-            return false
-        }
-
-        guard let remoteEndpoint = flow.remoteEndpoint as? NWHostEndpoint,
-              !isDnsServer(remoteEndpoint) else {
-            return false
-        }
-
-        let printableRemote = flow.remoteHostname ?? (flow.remoteEndpoint as? NWHostEndpoint)?.hostname ?? "unknown"
-
-        logger.debug(
+    private func logFlowMessage(_ flow: NEAppProxyFlow, level: OSLogType, message: String) {
+        logger.log(
+            level: level,
             """
-            [TCP] New flow: \(String(describing: flow), privacy: .public)
-            - remote: \(printableRemote, privacy: .public)
-            - flowID: \(String(describing: flow.metaData.filterFlowIdentifier?.uuidString), privacy: .public)
-            - appID: \(String(describing: flow.metaData.sourceAppSigningIdentifier), privacy: .public)
-            """)
+            \(message, privacy: .public)
+            - remote: \(String(reflecting: flow.remoteHostname), privacy: .public)
+            - flowID: \(String(reflecting: flow.metaData.filterFlowIdentifier?.uuidString), privacy: .public)
+            - appID: \(String(reflecting: flow.metaData.sourceAppSigningIdentifier), privacy: .public)
+            """
+        )
+    }
+
+    private func logNewTCPFlow(_ flow: NEAppProxyFlow) {
+        logFlowMessage(
+            flow,
+            level: .default,
+            message: "[TCP] New flow: \(String(reflecting: flow))")
+    }
+
+    private func logFlowHandlingFailure(_ flow: NEAppProxyFlow, message: String) {
+        logFlowMessage(
+            flow,
+            level: .error,
+            message: "[TCP] Failure handling flow: \(message)")
+    }
+
+    override public func handleNewFlow(_ flow: NEAppProxyFlow) -> Bool {
+        logNewTCPFlow(flow)
+
+        guard let flow = flow as? NEAppProxyTCPFlow else {
+            logFlowHandlingFailure(flow, message: "Expected a TCP flow, but got something else.  We're ignoring the flow.")
+            return false
+        }
+
+        guard let remoteEndpoint = flow.remoteEndpoint as? NWHostEndpoint else {
+            logFlowHandlingFailure(flow, message: "No remote endpoint.  We're ignoring the flow.")
+            return false
+        }
+
+        guard !isDnsServer(remoteEndpoint) else {
+            logFlowHandlingFailure(flow, message: "DNS resolver endpoint.  We're ignoring the flow.")
+            return false
+        }
 
         guard let interface else {
             logger.error("[TCP: \(String(describing: flow), privacy: .public)] Expected an interface to exclude traffic through")
@@ -235,11 +280,13 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         flow.networkInterface = directInterface
 
         Task { @TCPFlowActor in
-            let flowManager = TCPFlowManager(flow: flow)
+            let flowManager = TCPFlowManager(flow: flow, logger: logger)
             tcpFlowManagers.insert(flowManager)
 
             try? await flowManager.start(interface: interface)
             tcpFlowManagers.remove(flowManager)
+
+            logFlowMessage(flow, level: .default, message: "[TCP] Flow completed")
         }
 
         return true

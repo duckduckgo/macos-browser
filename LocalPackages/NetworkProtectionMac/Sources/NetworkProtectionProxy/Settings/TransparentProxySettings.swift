@@ -103,6 +103,20 @@ public final class TransparentProxySettings {
         }
     }
 
+    // MARK: - Domain Exclusions
+
+    public func isExcluding(domain: String) -> Bool {
+        excludedDomains.contains(domain)
+    }
+
+    public func toggleExclusion(domain: String) {
+        if isExcluding(domain: domain) {
+            excludedDomains.removeAll { $0 == domain }
+        } else {
+            excludedDomains.append(domain)
+        }
+    }
+
     // MARK: - Snapshot support
 
     public func snapshot() -> TransparentProxySettingsSnapshot {
