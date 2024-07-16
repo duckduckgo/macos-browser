@@ -24,6 +24,8 @@ struct RemoteMessageView: View {
 
     let viewModel: RemoteMessageViewModel
 
+    @State var isHovering = false
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12)
@@ -62,16 +64,17 @@ struct RemoteMessageView: View {
             .padding(.vertical, 14)
         }
         .padding(.bottom, 32)
+        .onHover { isHovering in
+            self.isHovering = isHovering
+        }
     }
 
     private var closeButton: some View {
-        Button {
+        HomePage.Views.ContinueSetUpView.CloseButton(icon: .close) {
             viewModel.onDidClose(.close)
-        } label: {
-            Image(.close)
-                .padding(12)
         }
-        .buttonStyle(.plain)
+        .visibility(isHovering ? .visible : .invisible)
+        .padding(12)
     }
 
     private var image: some View {

@@ -110,7 +110,7 @@ extension HomePage.Views {
                     HStack {
                         Spacer()
                         VStack {
-                            RemoveIemButton(icon: .close) {
+                            CloseButton(icon: .close) {
                                 model.removeItem(for: featureType)
                             }
                             .visibility(isHovering ? .visible : .gone)
@@ -259,7 +259,7 @@ extension HomePage.Views {
             }
         }
 
-        struct RemoveIemButton: View {
+        struct CloseButton: View {
             let icon: NSImage
             let action: () -> Void
             let foreGroundColor: Color = .homeFavoritesBackground
