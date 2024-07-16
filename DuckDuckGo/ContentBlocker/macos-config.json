@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1720185364708,
+    "version": 1720796469387,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -321,6 +321,9 @@
                     "domain": "lotusbakeries.com"
                 },
                 {
+                    "domain": "harley-davidson.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -339,7 +342,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "e5cf758c3a0af66a24bde8901315893e"
+            "hash": "568bcdbfe8d7611496de889d20c033fb"
         },
         "autofill": {
             "exceptions": [
@@ -1110,9 +1113,6 @@
                     "domain": "soranews24.com"
                 },
                 {
-                    "domain": "pointstreaksites.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -1122,7 +1122,7 @@
                     "domain": "noaprints.com"
                 }
             ],
-            "hash": "477f58bcbc508d5ae1e73941407284b7"
+            "hash": "ee9d383becfe28d8a5b575b51f5c9d11"
         },
         "cookie": {
             "settings": {
@@ -1295,6 +1295,9 @@
                 },
                 "autoplay": {
                     "state": "disabled"
+                },
+                "openInNewTab": {
+                    "state": "disabled"
                 }
             },
             "settings": {
@@ -1361,7 +1364,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "7d9227bb703281b01ab4e53fb257198c"
+            "hash": "5ccb9e0379c691ea67bb2e73ba0ac194"
         },
         "elementHiding": {
             "exceptions": [
@@ -3789,7 +3792,7 @@
                                 "type": "hide"
                             },
                             {
-                                "selector": "[devicetype=\"desktop\"] .grid:not([style='filter: blur(4px);']) ~ shreddit-experience-tree",
+                                "selector": "[devicetype=\"desktop\"] .grid:not([style='filter: blur(4px);']) ~ shreddit-experience-tree:not([active-experiences='[\"nsfw_bypassable\"]'])",
                                 "type": "hide"
                             }
                         ]
@@ -4007,6 +4010,14 @@
                         "rules": [
                             {
                                 "selector": "[class^='styles__PubAdWrapper']",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[data-test='sponsored-text']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id^='btf-']",
                                 "type": "closest-empty"
                             }
                         ]
@@ -4566,7 +4577,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "3cada5c612306aa43f10db2af34b4463"
+            "hash": "001ab18a7e0381b9824c0e8df68e12e7"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -7109,6 +7120,7 @@
                                     "newschannel20.com",
                                     "newschannel9.com",
                                     "okcfox.com",
+                                    "pointstreaksites.com",
                                     "post-gazette.com",
                                     "raleighcw.com",
                                     "siouxlandnews.com",
@@ -8829,7 +8841,7 @@
                     "domain": "noaprints.com"
                 }
             ],
-            "hash": "90ac50dc5a88bbd812d01aeae0ea6483"
+            "hash": "7430556251f5289f7e70edafd0e4cd0c"
         },
         "trackingCookies1p": {
             "settings": {

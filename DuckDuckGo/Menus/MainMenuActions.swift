@@ -19,11 +19,12 @@
 import BrowserServicesKit
 import Cocoa
 import Common
-import WebKit
 import Configuration
+import Crashes
 import History
 import PixelKit
 import Subscription
+import WebKit
 
 // Actions are sent to objects of responder chain
 
@@ -295,6 +296,9 @@ extension AppDelegate {
         }
     }
 
+    @objc func resetRemoteMessages(_ sender: Any?) {
+        remoteMessagingClient.store?.resetRemoteMessages()
+    }
 }
 
 extension MainViewController {
@@ -717,6 +721,16 @@ extension MainViewController {
 
     @objc func triggerFatalError(_ sender: Any?) {
         fatalError("Fatal error triggered from the Debug menu")
+    }
+
+    @objc func crashOnException(_ sender: Any?) {
+        DispatchQueue.main.async {
+            self.navigationBarViewController.addressBarViewController?.addressBarTextField.suggestionViewController.tableView.view(atColumn: 1, row: .max, makeIfNecessary: false)
+        }
+    }
+
+    @objc func crashOnCxxException(_ sender: Any?) {
+        throwTestCppExteption()
     }
 
     @objc func resetSecureVaultData(_ sender: Any?) {

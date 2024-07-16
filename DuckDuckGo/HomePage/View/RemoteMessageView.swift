@@ -61,7 +61,6 @@ struct RemoteMessageView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
         }
-        .padding(.top, 64)
         .padding(.bottom, 32)
     }
 
