@@ -55844,6 +55844,9 @@
         }
       }
     },
+    "Websites you selected to be excluded even when the VPN is connected." : {
+
+    },
     "Window" : {
       "comment" : "Main Menu ",
       "localizations" : {

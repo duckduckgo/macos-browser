@@ -182,6 +182,22 @@ final class VPNPreferencesModel: ObservableObject {
 
         return alert
     }
+
+    // MARK: - Excluded Sites
+
+    @MainActor
+    func manageExcludedSites() {
+        let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
+
+        guard let fireproofDomainsWindow = fireproofDomainsWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("DataClearingPreferences: Failed to present FireproofDomainsViewController")
+            return
+        }
+
+        parentWindowController.window?.beginSheet(fireproofDomainsWindow)
+    }
 }
 
 extension NetworkProtectionDNSSettings {
