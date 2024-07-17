@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Common
 import Combine
 import Sparkle
 import BrowserServicesKit
@@ -98,6 +99,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     @UserDefaultsWrapper(key: .automaticUpdates, defaultValue: true)
     var areAutomaticUpdatesEnabled: Bool {
         didSet {
+            os_log("areAutomaticUpdatesEnabled: \(areAutomaticUpdatesEnabled)", log: .updates)
             if updater.updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
                 updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
 
@@ -131,10 +133,14 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     }
 
     func checkForUpdate() {
+        os_log("Checking for updates", log: .updates)
+
         updater.updater.checkForUpdates()
     }
 
     func checkForUpdateInBackground() {
+        os_log("Checking for updates in background", log: .updates)
+
         updater.updater.checkForUpdatesInBackground()
     }
 
@@ -185,6 +191,8 @@ extension UpdateController: SPUStandardUserDriverDelegate {
 extension UpdateController: SPUUpdaterDelegate {
 
     func updater(_ updater: SPUUpdater, mayPerform updateCheck: SPUUpdateCheck) throws {
+        os_log("Updater started performing the update check. (isInternalUser: \(internalUserDecider.isInternalUser)", log: .updates)
+
         onUpdateCheckStart()
     }
 
@@ -205,6 +213,8 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
+        os_log("Updater did abort with error: \(error.localizedDescription)", log: .updates)
+
         let errorCode = (error as NSError).code
         guard ![Int(Sparkle.SUError.noUpdateError.rawValue),
                 Int(Sparkle.SUError.installationCanceledError.rawValue),
@@ -232,6 +242,8 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
+        os_log("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))", log: .updates)
+
         guard !areAutomaticUpdatesEnabled else {
             // If automatic updates are enabled, we are waiting until the update is downloaded
             return
@@ -242,10 +254,14 @@ extension UpdateController: SPUUpdaterDelegate {
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
         let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem
+        os_log("Updater did not find update: \(String(describing: item?.displayVersionString))(\(String(describing: item?.versionString)))", log: .updates)
+
         onUpdateCheckEnd(item: item, isInstalled: true)
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
+        os_log("Updater did download update: \(item.displayVersionString)(\(item.versionString))", log: .updates)
+
         guard areAutomaticUpdatesEnabled else {
             // If manual are enabled, we don't download
             return
@@ -263,7 +279,9 @@ extension UpdateController: SPUUpdaterDelegate {
         isUpdateBeingLoaded = false
     }
 
-    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {}
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
+        os_log("Updater did finish update cycle", log: .updates)
+    }
 
 }
 
