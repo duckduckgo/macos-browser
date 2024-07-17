@@ -354,75 +354,127 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             os_log("recreateOptOutAttemptTable, error: %{public}@", log: .error, error.localizedDescription)
             throw error
         }
+
+        let sql = SQL(sql: """
+                            SELECT *
+                            FROM \(OptOutAttemptDB.databaseTableName)
+                            WHERE extractedProfileId = \(4)
+                            AND extractedProfileId NOT IN (
+                                SELECT id
+                                FROM \(ExtractedProfileDB.databaseTableName)
+                            )
+                            """)
+
+        print(try database.dumpSQL(sql))
+
+        let sql2 = SQL(sql: """
+                            SELECT *
+                            FROM \(ExtractedProfileDB.databaseTableName)
+                            WHERE id = \(4)
+                            """)
+
+        print(try database.dumpSQL(sql2))
+
+        let sql3 = SQL(sql: """
+                            SELECT id FROM \(ExtractedProfileDB.databaseTableName)
+                            """)
+
+        print(try database.dumpSQL(sql3))
+
+        try print(database.checkForeignKeys())
     }
 
     static func deleteOrphanedRecords(database: Database) throws {
 
-        let missingProfileIdDelete: (String) -> String = { tableName in
-                            """
-                            DELETE FROM \(tableName)
-                            WHERE profileId NOT IN (
-                                SELECT id FROM \(ProfileDB.databaseTableName)
-                            )
-                            """
-        }
-
-        let missingProfileAndBrokerIdDelete: (String) -> String = { tableName in
-                                         """
-                                         DELETE FROM \(tableName)
-                                         WHERE profileQueryId NOT IN (
-                                             SELECT id FROM \(ProfileQueryDB.databaseTableName)
-                                         ) OR brokerId NOT IN (
-                                             SELECT id FROM \(BrokerDB.databaseTableName)
-                                         )
-                                         """
-        }
-
         let deleteStatements = [
-                """
-                DELETE FROM \(OptOutHistoryEventDB.databaseTableName)
-                WHERE (profileQueryId, brokerId, extractedProfileId) NOT IN (
-                    SELECT profileQueryId, brokerId, extractedProfileId FROM \(OptOutDB.databaseTableName)
-                )
-                """,
-                """
-                DELETE FROM \(OptOutDB.databaseTableName)
-                WHERE profileQueryId NOT IN (
-                    SELECT id FROM \(ProfileQueryDB.databaseTableName)
-                ) OR brokerId NOT IN (
-                    SELECT id FROM \(BrokerDB.databaseTableName)
-                ) OR extractedProfileId NOT IN (
-                    SELECT id FROM \(ExtractedProfileDB.databaseTableName)
-                )
-                """,
-                """
-                \(missingProfileAndBrokerIdDelete(ScanHistoryEventDB.databaseTableName))
-                """,
-                """
-                \(missingProfileAndBrokerIdDelete(ScanDB.databaseTableName))
-                """,
-                """
-                DELETE FROM \(OptOutAttemptDB.databaseTableName)
-                WHERE extractedProfileId NOT IN (
-                    SELECT id FROM \(ExtractedProfileDB.databaseTableName)
-                )
-                """,
-                """
-                \(missingProfileAndBrokerIdDelete(ExtractedProfileDB.databaseTableName))
-                """,
-                """
-                \(missingProfileIdDelete(ProfileQueryDB.databaseTableName))
-                """,
-                """
-                \(missingProfileIdDelete(NameDB.databaseTableName))
-                """,
-                """
-                \(missingProfileIdDelete(AddressDB.databaseTableName))
-                """,
-                """
-                \(missingProfileIdDelete(PhoneDB.databaseTableName))
-                """
-        ]
+                    """
+                    DELETE FROM \(OptOutHistoryEventDB.databaseTableName)
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM \(OptOutDB.databaseTableName)
+                        WHERE \(OptOutDB.databaseTableName).profileQueryId = \(OptOutHistoryEventDB.databaseTableName).profileQueryId
+                        AND \(OptOutDB.databaseTableName).brokerId = \(OptOutHistoryEventDB.databaseTableName).brokerId
+                        AND \(OptOutDB.databaseTableName).extractedProfileId = \(OptOutHistoryEventDB.databaseTableName).extractedProfileId
+                    )
+                    """,
+                    """
+                    DELETE FROM \(OptOutDB.databaseTableName)
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM \(ProfileQueryDB.databaseTableName)
+                        WHERE \(ProfileQueryDB.databaseTableName).id = \(OptOutDB.databaseTableName).profileQueryId
+                    ) OR NOT EXISTS (
+                        SELECT 1 FROM \(BrokerDB.databaseTableName)
+                        WHERE \(BrokerDB.databaseTableName).id = \(OptOutDB.databaseTableName).brokerId
+                    ) OR NOT EXISTS (
+                        SELECT 1 FROM \(ExtractedProfileDB.databaseTableName)
+                        WHERE \(ExtractedProfileDB.databaseTableName).id = \(OptOutDB.databaseTableName).extractedProfileId
+                    )
+                    """,
+                    """
+                    DELETE FROM \(ScanHistoryEventDB.databaseTableName)
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM \(ProfileQueryDB.databaseTableName)
+                        WHERE \(ProfileQueryDB.databaseTableName).id = \(ScanHistoryEventDB.databaseTableName).profileQueryId
+                    ) OR NOT EXISTS (
+                        SELECT 1 FROM \(BrokerDB.databaseTableName)
+                        WHERE \(BrokerDB.databaseTableName).id = \(ScanHistoryEventDB.databaseTableName).brokerId
+                    )
+                    """,
+                    """
+                    DELETE FROM \(ScanDB.databaseTableName)
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM \(ProfileQueryDB.databaseTableName)
+                        WHERE \(ProfileQueryDB.databaseTableName).id = \(ScanDB.databaseTableName).profileQueryId
+                    ) OR NOT EXISTS (
+                        SELECT 1 FROM \(BrokerDB.databaseTableName)
+                        WHERE \(BrokerDB.databaseTableName).id = \(ScanDB.databaseTableName).brokerId
+                    )
+                    """,
+                    """
+                    DELETE FROM \(ExtractedProfileDB.databaseTableName)
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM \(ProfileQueryDB.databaseTableName)
+                        WHERE \(ProfileQueryDB.databaseTableName).id = \(ExtractedProfileDB.databaseTableName).profileQueryId
+                    ) OR NOT EXISTS (
+                        SELECT 1 FROM \(BrokerDB.databaseTableName)
+                        WHERE \(BrokerDB.databaseTableName).id = \(ExtractedProfileDB.databaseTableName).brokerId
+                    )
+                    """,
+                    """
+                    DELETE FROM \(OptOutAttemptDB.databaseTableName)
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM \(ExtractedProfileDB.databaseTableName)
+                        WHERE \(ExtractedProfileDB.databaseTableName).id = \(OptOutAttemptDB.databaseTableName).extractedProfileId
+                    )
+                    """,
+                    """
+                    DELETE FROM \(ProfileQueryDB.databaseTableName)
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM \(ProfileDB.databaseTableName)
+                        WHERE \(ProfileDB.databaseTableName).id = \(ProfileQueryDB.databaseTableName).profileId
+                    )
+                    """,
+                    """
+                    DELETE FROM \(NameDB.databaseTableName)
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM \(ProfileDB.databaseTableName)
+                        WHERE \(ProfileDB.databaseTableName).id = \(NameDB.databaseTableName).profileId
+                    )
+                    """,
+                    """
+                    DELETE FROM \(AddressDB.databaseTableName)
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM \(ProfileDB.databaseTableName)
+                        WHERE \(ProfileDB.databaseTableName).id = \(AddressDB.databaseTableName).profileId
+                    )
+                    """,
+                    """
+                    DELETE FROM \(PhoneDB.databaseTableName)
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM \(ProfileDB.databaseTableName)
+                        WHERE \(ProfileDB.databaseTableName).id = \(PhoneDB.databaseTableName).profileId
+                    )
+                    """
+                ]
 
         for sql in deleteStatements {
             try database.execute(sql: sql)
@@ -628,7 +680,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             try database.create(table: OptOutAttemptDB.databaseTableName) {
                 $0.primaryKey([OptOutAttemptDB.Columns.extractedProfileId.name])
 
-                $0.foreignKey([OptOutAttemptDB.Columns.extractedProfileId.name], 
+                $0.foreignKey([OptOutAttemptDB.Columns.extractedProfileId.name],
                               references: ExtractedProfileDB.databaseTableName,
                               onDelete: .cascade)
 
