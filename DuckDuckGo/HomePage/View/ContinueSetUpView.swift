@@ -35,7 +35,6 @@ extension HomePage.Views {
                     }
                     Spacer()
                 }
-                .padding(.vertical, -25)
                 .padding(.leading, 1)
                 VStack(spacing: 20) {
                     if #available(macOS 12.0, *) {
@@ -47,6 +46,7 @@ extension HomePage.Views {
                         FeaturesGrid()
                     }
                 }
+                .padding(.top, 25)
             }
             .visibility(model.hasContent ? .visible : .gone)
         }

@@ -71,7 +71,6 @@ struct RemoteMessageView: View {
             }
 
         }
-        .padding(.bottom, 32)
         .onHover { isHovering in
             self.isHovering = isHovering
         }
