@@ -18,6 +18,20 @@
 
 import Foundation
 
-final class ExcludedSitesModel {
+struct Domain {
+    let domain: String
+}
+
+protocol ExcludedSitesViewModel {
+    var sites: [String] { get }
+}
+
+final class DefaultExcludedSitesViewModel: ExcludedSitesViewModel {
     var sites: [String]
+
+    init(sites: [String] = []) {
+        self.sites = sites
+    }
+
+    
 }

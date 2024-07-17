@@ -27,23 +27,37 @@ final class ExcludedSitesViewController: NSViewController {
     }
 
     static func create() -> ExcludedSitesViewController {
-        let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        return storyboard.instantiateController(identifier: Constants.identifier)
+        let storyboard = loadStoryboard()
+
+        return storyboard.instantiateController(identifier: Constants.identifier) { coder -> ExcludedSitesViewController in
+
+            return ExcludedSitesViewController(model: DefaultExcludedSitesViewModel())
+        }
+    }
+
+    static func loadStoryboard() -> NSStoryboard {
+        NSStoryboard(name: Constants.storyboardName, bundle: nil)
     }
 
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var removeDomainButton: NSButton!
-    @IBOutlet var removeAllDomainsButton: NSButton!
+    @IBOutlet var addSiteButton: NSButton!
     @IBOutlet var doneButton: NSButton!
     @IBOutlet var fireproofSitesLabel: NSTextField!
-
-    private let faviconManagement: FaviconManagement = FaviconManager.shared
 
     private var allFireproofDomains = [String]()
     private var filteredFireproofDomains: [String]?
 
     private var fireproofDomains: [String] {
         return filteredFireproofDomains ?? allFireproofDomains
+    }
+
+    private let model: ExcludedSitesViewModel
+
+    init(model: ExcludedSitesViewModel) {
+        self.model = model
+
+        super.init()
     }
 
     override func viewDidLoad() {
