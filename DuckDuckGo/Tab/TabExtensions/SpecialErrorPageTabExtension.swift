@@ -23,6 +23,7 @@ import Combine
 import ContentScopeScripts
 import BrowserServicesKit
 import PhishingDetection
+import PixelKit
 
 protocol SpecialErrorPageScriptProvider {
     var specialErrorPageUserScript: SpecialErrorPageUserScript? { get }
@@ -176,6 +177,7 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
     func visitSite() {
         if errorPageType == .phishing {
             if let urlString = webView?.url?.absoluteString {
+                PixelKit.fire(PhishingDetectionPixels.visitSite)
                 phishingUrlExemptions.insert(urlString)
                 self.phishingStateManager.didBypassError = true
                 self.phishingStateManager.isShowingPhishingError = false
