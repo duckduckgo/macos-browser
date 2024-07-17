@@ -21,10 +21,18 @@ import XCTest
 
 private class MockTreeControllerDataSource: BookmarkTreeControllerDataSource {
 
-    func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
+    func treeController(childNodesFor node: BookmarkNode) -> [BookmarkNode] {
         return node.childNodes
     }
+}
 
+private final class MockTreeControllerSearchDataSource: BookmarkTreeControllerSearchDataSource {
+
+    var returnNodes: [BookmarkNode] = []
+
+    func nodes(for searchQuery: String) -> [BookmarkNode] {
+        return returnNodes
+    }
 }
 
 class TreeControllerTests: XCTestCase {
@@ -96,6 +104,20 @@ class TreeControllerTests: XCTestCase {
         }
 
         XCTAssertEqual(visitedNodes, [rootNode.uniqueID, firstChildNode.uniqueID, secondChildNode.uniqueID])
+    }
+
+    func testWhenWeRebuildForSearch_ThenTheTreeIsCreatedWithNodesReturnedFromSearchDataSource() {
+        let firstNode = BookmarkNode(representedObject: TestObject(), parent: nil)
+        let secondNode = BookmarkNode(representedObject: TestObject(), parent: nil)
+        let thirdNode = BookmarkNode(representedObject: TestObject(), parent: nil)
+        let dataSource = MockTreeControllerDataSource()
+        let searchDataSource = MockTreeControllerSearchDataSource()
+        searchDataSource.returnNodes = [firstNode, secondNode, thirdNode]
+        let sut = BookmarkTreeController(dataSource: dataSource, searchDataSource: searchDataSource)
+
+        sut.rebuild(for: "some search query")
+
+        XCTAssertEqual(sut.rootNode.childNodes.count, 3)
     }
 
 }

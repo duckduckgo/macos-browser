@@ -26,7 +26,7 @@ final class BookmarkListTreeControllerDataSource: BookmarkTreeControllerDataSour
         self.bookmarkManager = bookmarkManager
     }
 
-    func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
+    func treeController(childNodesFor node: BookmarkNode) -> [BookmarkNode] {
         return node.isRoot ? childNodesForRootNode(node) : childNodes(node)
     }
 
