@@ -135,7 +135,7 @@ extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
 
         let isRequestingNewTab = NSApp.isCommandPressed || shouldRequestNewTab
         if isRequestingNewTab {
-            shouldSelectNextNewTab = NSApp.isShiftPressed
+            shouldSelectNextNewTab = NSApp.isShiftPressed || shouldOpenInNewTab
             webView.loadInNewWindow(url)
         } else {
             shouldSelectNextNewTab = nil
@@ -223,6 +223,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
                 if shouldOpenInNewTab,
                    let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
+                    shouldSelectNextNewTab = true
                     webView?.loadInNewWindow(navigationAction.url)
                     return .cancel
                 }
