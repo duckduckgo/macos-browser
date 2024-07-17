@@ -818,8 +818,13 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
         }
 
         showTreeView()
-        let node = dataSource.treeController.node(representing: baseBookmark)
+
+        guard let node = dataSource.treeController.node(representing: baseBookmark) else {
+            return
+        }
+
         expandFoldersUntil(node: node)
+        outlineView.scrollTo(node)
     }
 }
 
