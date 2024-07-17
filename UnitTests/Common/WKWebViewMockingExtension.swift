@@ -110,11 +110,21 @@ struct WKURLSchemeTaskHandler {
                                                mime: nil,
                                                headerFields: ["Location": url.absoluteString])!
 
-            task.perform(NSSelectorFromString("_didPerformRedirection:newRequest:"),
-                         with: response,
-                         with: NSURLRequest(url: url))
+            task._didPerformRedirection(response, newRequest: URLRequest(url: url))
             task.didReceive(response)
             task.didFinish()
+        }
+    }
+
+    static func redirect(to url: URL, with error: NSError) -> WKURLSchemeTaskHandler {
+        .init { task in
+            let response = MockHTTPURLResponse(url: task.request.url!,
+                                               statusCode: 301,
+                                               mime: nil,
+                                               headerFields: ["Location": url.absoluteString])!
+
+            task._didPerformRedirection(response, newRequest: URLRequest(url: url))
+            task.didFailWithError(error)
         }
     }
 
