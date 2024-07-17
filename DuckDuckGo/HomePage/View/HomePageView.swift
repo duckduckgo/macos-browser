@@ -26,7 +26,7 @@ extension HomePage.Views {
     struct RootView: View {
 
         let backgroundColor: Color = .newTabPageBackground
-        static let targetWidth: CGFloat = 508
+        static let targetWidth: CGFloat = 504
         let isBurner: Bool
 
         @EnvironmentObject var model: AppearancePreferences
