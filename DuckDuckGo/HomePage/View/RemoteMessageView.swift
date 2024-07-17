@@ -46,9 +46,8 @@ struct RemoteMessageView: View {
                     if case .bigSingleAction = viewModel.modelType {
                         button
                     }
-
-                    closeButton
                 }
+                .padding(.trailing, 16)
 
                 // Display two buttons on the bottom
                 if case .bigTwoAction = viewModel.modelType {
@@ -62,6 +61,15 @@ struct RemoteMessageView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
+
+            HStack {
+                Spacer()
+                VStack {
+                    closeButton
+                    Spacer()
+                }
+            }
+
         }
         .padding(.bottom, 32)
         .onHover { isHovering in
@@ -74,7 +82,7 @@ struct RemoteMessageView: View {
             viewModel.onDidClose(.close)
         }
         .visibility(isHovering ? .visible : .invisible)
-        .padding(12)
+        .padding(6)
     }
 
     private var image: some View {
