@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import SecureStorage
 import GRDB
+import Common
 
 enum DataBrokerProtectionDatabaseErrors: Error {
     case elementNotFound
@@ -273,20 +274,86 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     static func migrateV3(database: Database) throws {
 
+        os_log("🚀 Starting migrateV3, error: %{public}@", log: .error)
+
         // Clean up data
-        try deleteOrphanedRecords(database: database)
+        do {
+            try deleteOrphanedRecords(database: database)
+        } catch {
+            os_log("deleteOrphanedRecords, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
 
         // Recreate Tables
-        try recreateNameTable(database: database)
-        try recreateAddressTable(database: database)
-        try recreatePhoneTable(database: database)
-        try recreateProfileQueryTable(database: database)
-        try recreateScanTable(database: database)
-        try recreateScanHistoryTable(database: database)
-        try recreateExtractedProfileTable(database: database)
-        try recreateOptOutTable(database: database)
-        try recreateOptOutHistoryTable(database: database)
-        try recreateOptOutAttemptTable(database: database)
+        do {
+            try recreateNameTable(database: database)
+        } catch {
+            os_log("recreateNameTable, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+
+        do {
+            try recreateAddressTable(database: database)
+        } catch {
+            os_log("recreateAddressTable, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+
+        do {
+            try recreatePhoneTable(database: database)
+        } catch {
+            os_log("recreatePhoneTable, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+
+        do {
+            try recreateProfileQueryTable(database: database)
+        } catch {
+            os_log("recreateProfileQueryTable, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+
+        do {
+            try recreateScanTable(database: database)
+        } catch {
+            os_log("recreateScanTable, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+
+        do {
+            try recreateScanHistoryTable(database: database)
+        } catch {
+            os_log("recreateScanHistoryTable, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+
+        do {
+            try recreateExtractedProfileTable(database: database)
+        } catch {
+            os_log("recreateExtractedProfileTable, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+
+        do {
+            try recreateOptOutTable(database: database)
+        } catch {
+            os_log("recreateOptOutTable, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+
+        do {
+            try recreateOptOutHistoryTable(database: database)
+        } catch {
+            os_log("recreateOptOutHistoryTable, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+
+        do {
+            try recreateOptOutAttemptTable(database: database)
+        } catch {
+            os_log("recreateOptOutAttemptTable, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     static func deleteOrphanedRecords(database: Database) throws {
