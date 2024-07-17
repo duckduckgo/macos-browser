@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "0e7f13b24876a28934320ebf0ec14f644a211869",
-        "version" : "171.2.2"
+        "branch" : "sam/reduce-vpn-manager-instances",
+        "revision" : "44965d389213c5e454950ee7284b6eb081cfecc9"
       }
     },
     {
