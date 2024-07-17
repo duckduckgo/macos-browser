@@ -87,6 +87,9 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         do {
             let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             return try vault.fetchProfile(with: Self.profileId)
+        } catch SecureStorageError.failedToOpenDatabase(cause: let cause) {
+            os_log("Database error: fetchProfile, error: %{public}@", log: .error, cause.localizedDescription)
+            throw SecureStorageError.failedToOpenDatabase(cause: cause)
         } catch {
             os_log("Database error: fetchProfile, error: %{public}@", log: .error, error.localizedDescription)
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchProfile"))

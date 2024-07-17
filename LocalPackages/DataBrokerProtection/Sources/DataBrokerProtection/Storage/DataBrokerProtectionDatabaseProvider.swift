@@ -86,6 +86,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         try super.init(file: file, key: key, writerType: .pool) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
             migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
+            migrator.registerMigration("v3", migrate: Self.migrateV3(database:))
 
         }
     }
@@ -270,6 +271,324 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             """)
     }
 
+    static func migrateV3(database: Database) throws {
+
+        // Clean up data
+        try deleteOrphanedRecords(database: database)
+
+        // Recreate Tables
+        try recreateNameTable(database: database)
+        try recreateAddressTable(database: database)
+        try recreatePhoneTable(database: database)
+        try recreateProfileQueryTable(database: database)
+        try recreateScanTable(database: database)
+        try recreateScanHistoryTable(database: database)
+        try recreateExtractedProfileTable(database: database)
+        try recreateOptOutTable(database: database)
+        try recreateOptOutHistoryTable(database: database)
+        try recreateOptOutAttemptTable(database: database)
+    }
+
+    static func deleteOrphanedRecords(database: Database) throws {
+
+        let missingProfileIdDelete: (String) -> String = { tableName in
+                            """
+                            DELETE FROM \(tableName)
+                            WHERE profileId NOT IN (
+                                SELECT id FROM \(ProfileDB.databaseTableName)
+                            )
+                            """
+        }
+
+        let missingProfileAndBrokerIdDelete: (String) -> String = { tableName in
+                                         """
+                                         DELETE FROM \(tableName)
+                                         WHERE profileQueryId NOT IN (
+                                             SELECT id FROM \(ProfileQueryDB.databaseTableName)
+                                         ) OR brokerId NOT IN (
+                                             SELECT id FROM \(BrokerDB.databaseTableName)
+                                         )
+                                         """
+        }
+
+        let deleteStatements = [
+                """
+                DELETE FROM \(OptOutHistoryEventDB.databaseTableName)
+                WHERE (profileQueryId, brokerId, extractedProfileId) NOT IN (
+                    SELECT profileQueryId, brokerId, extractedProfileId FROM \(OptOutDB.databaseTableName)
+                )
+                """,
+                """
+                DELETE FROM \(OptOutDB.databaseTableName)
+                WHERE profileQueryId NOT IN (
+                    SELECT id FROM \(ProfileQueryDB.databaseTableName)
+                ) OR brokerId NOT IN (
+                    SELECT id FROM \(BrokerDB.databaseTableName)
+                ) OR extractedProfileId NOT IN (
+                    SELECT id FROM \(ExtractedProfileDB.databaseTableName)
+                )
+                """,
+                """
+                \(missingProfileAndBrokerIdDelete(ScanHistoryEventDB.databaseTableName))
+                """,
+                """
+                \(missingProfileAndBrokerIdDelete(ScanDB.databaseTableName))
+                """,
+                """
+                DELETE FROM \(OptOutAttemptDB.databaseTableName)
+                WHERE extractedProfileId NOT IN (
+                    SELECT id FROM \(ExtractedProfileDB.databaseTableName)
+                )
+                """,
+                """
+                \(missingProfileAndBrokerIdDelete(ScanDB.databaseTableName))
+                """,
+                """
+                \(missingProfileIdDelete(ProfileQueryDB.databaseTableName))
+                """,
+                """
+                \(missingProfileIdDelete(NameDB.databaseTableName))
+                """,
+                """
+                \(missingProfileIdDelete(AddressDB.databaseTableName))
+                """,
+                """
+                \(missingProfileIdDelete(PhoneDB.databaseTableName))
+                """
+        ]
+
+        for sql in deleteStatements {
+            try database.execute(sql: sql)
+        }
+
+    }
+
+    static func recreateNameTable(database: Database) throws {
+        try recreateTable(name: NameDB.databaseTableName, database: database) {
+            try database.create(table: NameDB.databaseTableName) {
+                $0.primaryKey([NameDB.Columns.first.name, NameDB.Columns.last.name, NameDB.Columns.middle.name, NameDB.Columns.profileId.name])
+                $0.foreignKey([NameDB.Columns.profileId.name],
+                              references: ProfileDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(NameDB.Columns.first.name, .text).notNull()
+                $0.column(NameDB.Columns.last.name, .text).notNull()
+                $0.column(NameDB.Columns.profileId.name, .integer).notNull()
+                $0.column(NameDB.Columns.middle.name, .text)
+                $0.column(NameDB.Columns.suffix.name, .text)
+            }
+        }
+    }
+
+    static func recreateAddressTable(database: Database) throws {
+        try recreateTable(name: AddressDB.databaseTableName, database: database) {
+            try database.create(table: AddressDB.databaseTableName) {
+                $0.primaryKey([AddressDB.Columns.city.name, AddressDB.Columns.state.name, AddressDB.Columns.street.name, AddressDB.Columns.profileId.name])
+                $0.foreignKey([AddressDB.Columns.profileId.name],
+                              references: ProfileDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(AddressDB.Columns.city.name, .text).notNull()
+                $0.column(AddressDB.Columns.state.name, .text).notNull()
+                $0.column(AddressDB.Columns.profileId.name, .integer).notNull()
+                $0.column(AddressDB.Columns.street.name, .text)
+                $0.column(AddressDB.Columns.zipCode.name, .text)
+            }
+        }
+    }
+
+    static func recreatePhoneTable(database: Database) throws {
+        try recreateTable(name: PhoneDB.databaseTableName, database: database) {
+            try database.create(table: PhoneDB.databaseTableName) {
+                $0.primaryKey([PhoneDB.Columns.phoneNumber.name, PhoneDB.Columns.profileId.name])
+                $0.foreignKey([PhoneDB.Columns.profileId.name], references: ProfileDB.databaseTableName)
+
+                $0.column(PhoneDB.Columns.phoneNumber.name, .text).notNull()
+                $0.column(PhoneDB.Columns.profileId.name, .integer).notNull()
+            }
+        }
+    }
+
+    static func recreateProfileQueryTable(database: Database) throws {
+        try recreateTable(name: ProfileQueryDB.databaseTableName, database: database) {
+            try database.create(table: ProfileQueryDB.databaseTableName) {
+                $0.autoIncrementedPrimaryKey(ProfileQueryDB.Columns.id.name)
+                $0.foreignKey([ProfileQueryDB.Columns.profileId.name],
+                              references: ProfileDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(ProfileQueryDB.Columns.profileId.name, .integer).notNull()
+                $0.column(ProfileQueryDB.Columns.first.name, .text).notNull()
+                $0.column(ProfileQueryDB.Columns.last.name, .text).notNull()
+                $0.column(ProfileQueryDB.Columns.middle.name, .text)
+                $0.column(ProfileQueryDB.Columns.suffix.name, .text)
+
+                $0.column(ProfileQueryDB.Columns.city.name, .text).notNull()
+                $0.column(ProfileQueryDB.Columns.state.name, .text).notNull()
+                $0.column(ProfileQueryDB.Columns.street.name, .text)
+                $0.column(ProfileQueryDB.Columns.zipCode.name, .text)
+
+                $0.column(ProfileQueryDB.Columns.phone.name, .text)
+                $0.column(ProfileQueryDB.Columns.birthYear.name, .integer)
+
+                $0.column(ProfileQueryDB.Columns.deprecated.name, .boolean).notNull().defaults(to: false)
+            }
+        }
+    }
+
+    static func recreateScanTable(database: Database) throws {
+        try recreateTable(name: ScanDB.databaseTableName, database: database) {
+            try database.create(table: ScanDB.databaseTableName) {
+                $0.primaryKey([ScanDB.Columns.brokerId.name, ScanDB.Columns.profileQueryId.name])
+
+                $0.foreignKey([ScanDB.Columns.brokerId.name],
+                              references: BrokerDB.databaseTableName,
+                              onDelete: .cascade)
+                $0.foreignKey([ScanDB.Columns.profileQueryId.name],
+                              references: ProfileQueryDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(ScanDB.Columns.profileQueryId.name, .integer).notNull()
+                $0.column(ScanDB.Columns.brokerId.name, .integer).notNull()
+                $0.column(ScanDB.Columns.lastRunDate.name, .datetime)
+                $0.column(ScanDB.Columns.preferredRunDate.name, .datetime)
+            }
+        }
+    }
+
+    static func recreateScanHistoryTable(database: Database) throws {
+        try recreateTable(name: ScanHistoryEventDB.databaseTableName, database: database) {
+            try database.create(table: ScanHistoryEventDB.databaseTableName) {
+                $0.primaryKey([
+                    ScanHistoryEventDB.Columns.brokerId.name,
+                    ScanHistoryEventDB.Columns.profileQueryId.name,
+                    ScanHistoryEventDB.Columns.event.name,
+                    ScanHistoryEventDB.Columns.timestamp.name
+                ])
+
+                $0.foreignKey([ScanDB.Columns.brokerId.name],
+                              references: BrokerDB.databaseTableName,
+                              onDelete: .cascade)
+                $0.foreignKey([ScanDB.Columns.profileQueryId.name],
+                              references: ProfileQueryDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(ScanDB.Columns.profileQueryId.name, .integer).notNull()
+                $0.column(ScanDB.Columns.brokerId.name, .integer).notNull()
+                $0.column(ScanHistoryEventDB.Columns.event.name, .text).notNull()
+                $0.column(ScanHistoryEventDB.Columns.timestamp.name, .datetime).notNull()
+            }
+        }
+    }
+
+    static func recreateExtractedProfileTable(database: Database) throws {
+        try recreateTable(name: ExtractedProfileDB.databaseTableName, database: database) {
+            try database.create(table: ExtractedProfileDB.databaseTableName) {
+                $0.autoIncrementedPrimaryKey(ExtractedProfileDB.Columns.id.name)
+
+                $0.foreignKey([ExtractedProfileDB.Columns.brokerId.name],
+                              references: BrokerDB.databaseTableName,
+                              onDelete: .cascade)
+                $0.foreignKey([ExtractedProfileDB.Columns.profileQueryId.name],
+                              references: ProfileQueryDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(ExtractedProfileDB.Columns.profileQueryId.name, .integer).notNull()
+                $0.column(ExtractedProfileDB.Columns.brokerId.name, .integer).notNull()
+                $0.column(ExtractedProfileDB.Columns.profile.name, .text).notNull()
+                $0.column(ExtractedProfileDB.Columns.removedDate.name, .datetime)
+            }
+        }
+    }
+
+    static func recreateOptOutTable(database: Database) throws {
+        try recreateTable(name: OptOutDB.databaseTableName, database: database) {
+            try database.create(table: OptOutDB.databaseTableName) {
+                $0.primaryKey([
+                    OptOutDB.Columns.profileQueryId.name,
+                    OptOutDB.Columns.brokerId.name,
+                    OptOutDB.Columns.extractedProfileId.name
+                ])
+
+                $0.foreignKey([OptOutDB.Columns.brokerId.name],
+                              references: BrokerDB.databaseTableName,
+                              onDelete: .cascade)
+                $0.foreignKey([OptOutDB.Columns.profileQueryId.name],
+                              references: ProfileQueryDB.databaseTableName,
+                              onDelete: .cascade)
+                $0.foreignKey([OptOutDB.Columns.extractedProfileId.name],
+                              references: ExtractedProfileDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(OptOutDB.Columns.profileQueryId.name, .integer).notNull()
+                $0.column(OptOutDB.Columns.brokerId.name, .integer).notNull()
+                $0.column(OptOutDB.Columns.extractedProfileId.name, .integer).notNull()
+                $0.column(OptOutDB.Columns.lastRunDate.name, .datetime)
+                $0.column(OptOutDB.Columns.preferredRunDate.name, .datetime)
+            }
+        }
+    }
+
+    static func recreateOptOutHistoryTable(database: Database) throws {
+        try recreateTable(name: OptOutHistoryEventDB.databaseTableName, database: database) {
+            try database.create(table: OptOutHistoryEventDB.databaseTableName) {
+                $0.primaryKey([
+                    OptOutHistoryEventDB.Columns.profileQueryId.name,
+                    OptOutHistoryEventDB.Columns.brokerId.name,
+                    OptOutHistoryEventDB.Columns.extractedProfileId.name,
+                    OptOutHistoryEventDB.Columns.event.name,
+                    OptOutHistoryEventDB.Columns.timestamp.name
+                ])
+
+                $0.foreignKey([OptOutHistoryEventDB.Columns.brokerId.name],
+                              references: BrokerDB.databaseTableName,
+                              onDelete: .cascade)
+                $0.foreignKey([OptOutHistoryEventDB.Columns.profileQueryId.name],
+                              references: ProfileQueryDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(OptOutHistoryEventDB.Columns.profileQueryId.name, .integer).notNull()
+                $0.column(OptOutHistoryEventDB.Columns.brokerId.name, .integer).notNull()
+                $0.column(OptOutHistoryEventDB.Columns.extractedProfileId.name, .integer).notNull()
+                $0.column(OptOutHistoryEventDB.Columns.event.name, .text).notNull()
+                $0.column(OptOutHistoryEventDB.Columns.timestamp.name, .datetime).notNull()
+            }
+        }
+    }
+
+    static func recreateOptOutAttemptTable(database: Database) throws {
+        try recreateTable(name: OptOutAttemptDB.databaseTableName, database: database) {
+            try database.create(table: OptOutAttemptDB.databaseTableName) {
+                $0.primaryKey([OptOutAttemptDB.Columns.extractedProfileId.name])
+
+                $0.foreignKey([OptOutAttemptDB.Columns.extractedProfileId.name], 
+                              references: ExtractedProfileDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(OptOutAttemptDB.Columns.extractedProfileId.name, .integer).notNull()
+                $0.column(OptOutAttemptDB.Columns.dataBroker.name, .text).notNull()
+                $0.column(OptOutAttemptDB.Columns.attemptId.name, .text).notNull()
+                $0.column(OptOutAttemptDB.Columns.lastStageDate.name, .date).notNull()
+                $0.column(OptOutAttemptDB.Columns.startDate.name, .date).notNull()
+            }
+        }
+    }
+
+    static func recreateTable(name: String,
+                              database: Database,
+                              creationActions: () throws -> Void) throws {
+        try database.rename(table: name,
+                            to: name + "Old")
+
+        try creationActions()
+
+        try database.execute(sql: """
+            INSERT INTO \(name) SELECT * FROM \(name + "Old")
+            """)
+
+        try database.drop(table: name + "Old")
+    }
+
     func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
         try db.write { db in
 
@@ -329,11 +648,20 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     }
 
     func deleteProfileData() throws {
-        try db.writeWithoutTransaction { db in
-            try db.execute(sql: "PRAGMA foreign_keys = OFF;")
+        try db.write { db in
+            try OptOutHistoryEventDB
+                .deleteAll(db)
             try OptOutDB
                 .deleteAll(db)
+            try ScanHistoryEventDB
+                .deleteAll(db)
             try ScanDB
+                .deleteAll(db)
+            try OptOutAttemptDB
+                .deleteAll(db)
+            try ExtractedProfileDB
+                .deleteAll(db)
+            try ProfileQueryDB
                 .deleteAll(db)
             try NameDB
                 .deleteAll(db)
@@ -341,11 +669,10 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                 .deleteAll(db)
             try PhoneDB
                 .deleteAll(db)
-            try ProfileDB
-                .deleteAll(db)
             try BrokerDB
                 .deleteAll(db)
-            try db.execute(sql: "PRAGMA foreign_keys = ON;")
+            try ProfileDB
+                .deleteAll(db)
         }
     }
 
