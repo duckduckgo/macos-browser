@@ -209,9 +209,9 @@ final internal class PixelExperimentLogic {
 
     func fireSerpPixel() {
         if allocatedCohort != nil {
-            PixelKit.fire(GeneralPixel.serp(cohort: cohort?.rawValue), frequency: .standard, includeAppVersionParameter: false)
+            PixelKit.fire(GeneralPixel.serp(cohort: cohort?.rawValue), frequency: .standard)
         } else {
-            PixelKit.fire(GeneralPixel.serp(cohort: nil), frequency: .standard, includeAppVersionParameter: false)
+            PixelKit.fire(GeneralPixel.serp(cohort: nil), frequency: .standard)
         }
     }
 
