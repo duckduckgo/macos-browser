@@ -71,6 +71,7 @@ final class BookmarkListViewController: NSViewController {
     private lazy var newBookmarkButton = MouseOverButton(image: .addBookmark, target: self, action: #selector(newBookmarkButtonClicked))
     private lazy var newFolderButton = MouseOverButton(image: .addFolder, target: self, action: #selector(newFolderButtonClicked))
     private lazy var searchBookmarksButton = MouseOverButton(image: .searchBookmarks, target: self, action: #selector(searchBookmarkButtonClicked))
+    private lazy var sortBookmarksButton = MouseOverButton(image: .bookmarkSortAsc, target: self, action: #selector(sortBookmarksButtonClicked))
     private var isSearchVisible = false
 
     private lazy var buttonsDivider = NSBox()
@@ -168,6 +169,7 @@ final class BookmarkListViewController: NSViewController {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.addArrangedSubview(newBookmarkButton)
         stackView.addArrangedSubview(newFolderButton)
+        stackView.addArrangedSubview(sortBookmarksButton)
         stackView.addArrangedSubview(searchBookmarksButton)
         stackView.addArrangedSubview(buttonsDivider)
         stackView.addArrangedSubview(manageBookmarksButton)
@@ -195,6 +197,14 @@ final class BookmarkListViewController: NSViewController {
         searchBookmarksButton.mouseOverColor = .buttonMouseOver
         searchBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
         searchBookmarksButton.toolTip = UserText.bookmarksSearch
+
+        sortBookmarksButton.bezelStyle = .shadowlessSquare
+        sortBookmarksButton.cornerRadius = 4
+        sortBookmarksButton.normalTintColor = .button
+        sortBookmarksButton.mouseDownColor = .buttonMouseDown
+        sortBookmarksButton.mouseOverColor = .buttonMouseOver
+        sortBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
+        sortBookmarksButton.toolTip = "Sort bookmarks" // TODO: Move to UserText
 
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.delegate = self
@@ -307,6 +317,9 @@ final class BookmarkListViewController: NSViewController {
 
         searchBookmarksButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
         searchBookmarksButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
+
+        sortBookmarksButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
+        sortBookmarksButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
 
         buttonsDivider.widthAnchor.constraint(equalToConstant: 13).isActive = true
         buttonsDivider.heightAnchor.constraint(equalToConstant: 18).isActive = true
@@ -449,6 +462,10 @@ final class BookmarkListViewController: NSViewController {
             hideSearchBar()
             showTreeView()
         }
+    }
+
+    @objc func sortBookmarksButtonClicked(_ sender: NSButton) {
+
     }
 
     private func showSearchBar() {
