@@ -341,7 +341,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                 )
                 """,
                 """
-                \(missingProfileAndBrokerIdDelete(ScanDB.databaseTableName))
+                \(missingProfileAndBrokerIdDelete(ExtractedProfileDB.databaseTableName))
                 """,
                 """
                 \(missingProfileIdDelete(ProfileQueryDB.databaseTableName))
