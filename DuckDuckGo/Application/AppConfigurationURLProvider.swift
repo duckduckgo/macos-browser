@@ -54,10 +54,20 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
         case .bloomFilterBinary: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")!
         case .bloomFilterSpec: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")!
         case .bloomFilterExcludedDomains: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")!
-        case .privacyConfiguration: return customPrivacyConfigurationUrl ?? URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
+        
+//        case .privacyConfiguration: return customPrivacyConfigurationUrl ?? URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
+/*
+ https://x.zok.pw/ddg-config-test/macos-config-filterlist-off.json
+ https://x.zok.pw/ddg-config-test/macos-config-filterlist-on.json
+ */
+        case .privacyConfiguration: return customPrivacyConfigurationUrl ?? URL(string: "https://x.zok.pw/ddg-config-test/macos-config-filterlist-on.json")!
+
         case .surrogates: return URL(string: "https://staticcdn.duckduckgo.com/surrogates.txt")!
-        case .trackerDataSet: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")!
-        // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
+
+//        case .trackerDataSet: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v6/current/macos-tds.json")!
+        case .trackerDataSet: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v7/current/macos-tds.json")! // PCM PoC new URLs
+
+            // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
         case .FBConfig: return URL(string: "https://staticcdn.duckduckgo.com/useragents/")!
         case .remoteMessagingConfig: return RemoteMessagingClient.Constants.endpoint
         }

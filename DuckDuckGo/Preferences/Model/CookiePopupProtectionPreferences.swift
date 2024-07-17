@@ -23,6 +23,7 @@ import Common
 
 protocol CookiePopupProtectionPreferencesPersistor {
     var autoconsentEnabled: Bool { get set }
+    var autoconsentFilterListEnabled: Bool { get set }
 }
 
 struct CookiePopupProtectionPreferencesUserDefaultsPersistor: CookiePopupProtectionPreferencesPersistor {
@@ -30,6 +31,8 @@ struct CookiePopupProtectionPreferencesUserDefaultsPersistor: CookiePopupProtect
     @UserDefaultsWrapper(key: .autoconsentEnabled, defaultValue: true)
     var autoconsentEnabled: Bool
 
+    @UserDefaultsWrapper(key: .autoconsentFilterListEnabled, defaultValue: false)
+    var autoconsentFilterListEnabled: Bool
 }
 
 final class CookiePopupProtectionPreferences: ObservableObject, PreferencesTabOpening {
@@ -43,9 +46,17 @@ final class CookiePopupProtectionPreferences: ObservableObject, PreferencesTabOp
         }
     }
 
+    @Published
+    var isAutoconsentFilterListEnabled: Bool {
+        didSet {
+            persistor.autoconsentFilterListEnabled = isAutoconsentFilterListEnabled
+        }
+    }
+
     init(persistor: CookiePopupProtectionPreferencesPersistor = CookiePopupProtectionPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
         isAutoconsentEnabled = persistor.autoconsentEnabled
+        isAutoconsentFilterListEnabled = persistor.autoconsentFilterListEnabled
     }
 
     private var persistor: CookiePopupProtectionPreferencesPersistor

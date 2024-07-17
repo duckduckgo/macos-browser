@@ -63,7 +63,9 @@ final class UserScripts: UserScriptsProvider {
 
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
 
-        autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
+        autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, 
+                                                      config: sourceProvider.privacyConfigurationManager.privacyConfig,
+                                                      cpmFilterList: sourceProvider.contentBlockerRulesConfig?.trackerData?.cpm?.filterList)
 
         sslErrorPageUserScript = SSLErrorPageUserScript()
 

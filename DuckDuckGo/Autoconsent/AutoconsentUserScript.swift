@@ -43,16 +43,20 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     private var topUrl: URL?
     private let preferences = CookiePopupProtectionPreferences.shared
     private let management = AutoconsentManagement.shared
+    let cpmFilterList: String?
 
     public var messageNames: [String] { MessageName.allCases.map(\.rawValue) }
     let source: String
     private let config: PrivacyConfiguration
     weak var delegate: AutoconsentUserScriptDelegate?
 
-    init(scriptSource: ScriptSourceProviding, config: PrivacyConfiguration) {
+    init(scriptSource: ScriptSourceProviding, 
+         config: PrivacyConfiguration,
+         cpmFilterList: String?) {
         os_log("Initialising autoconsent userscript", log: .autoconsent, type: .debug)
         source = Self.loadJS("autoconsent-bundle", from: .main, withReplacements: [:])
         self.config = config
+        self.cpmFilterList = cpmFilterList
     }
 
     func userContentController(_ userContentController: WKUserContentController,
@@ -235,9 +239,11 @@ extension AutoconsentUserScript {
         let remoteConfig = self.config.settings(for: .autoconsent)
         let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
 
-        replyHandler([
+        let replyObject = [
             "type": "initResp",
-            "rules": nil, // rules are bundled with the content script atm
+            "rules": [ // Other rules are bundled with the content script atm
+                "filterList": preferences.isAutoconsentFilterListEnabled ? cpmFilterList : nil,
+                     ] as [String: Any?],
             "config": [
                 "enabled": true,
                 "autoAction": preferences.isAutoconsentEnabled == true ? "optOut" : nil,
@@ -247,7 +253,8 @@ extension AutoconsentUserScript {
                 "detectRetries": 20,
                 "isMainWorld": false
             ] as [String: Any?]
-        ] as [String: Any?], nil)
+        ] as [String: Any?]
+        replyHandler(replyObject, nil)
     }
 
     @MainActor

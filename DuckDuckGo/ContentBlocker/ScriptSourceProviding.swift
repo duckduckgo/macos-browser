@@ -171,9 +171,10 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         }
 
         let combinedTrackerData = TrackerData(trackers: combinedTrackers,
-                            entities: combinedEntities,
-                            domains: combinedDomains,
-                            cnames: cnames)
+                                              entities: combinedEntities,
+                                              domains: combinedDomains,
+                                              cnames: cnames,
+                                              cpm: nil)
 
         let surrogateTDS = ContentBlockerRulesManager.extractSurrogates(from: combinedTrackerData)
         let encodedTrackerData = encodeTrackerData(surrogateTDS)
