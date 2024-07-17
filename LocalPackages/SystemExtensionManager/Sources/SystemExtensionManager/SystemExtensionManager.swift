@@ -44,9 +44,9 @@ public struct SystemExtensionManager {
         self.workspace = workspace
     }
 
-    /// - Returns: The system extension version.
-    /// 
-    public func activate(waitingForUserApproval: @escaping () -> Void) async throws -> String {
+    /// - Returns: The system extension version when it's updated, otherwise `nil`.
+    ///
+    public func activate(waitingForUserApproval: @escaping () -> Void) async throws -> String? {
         /// Documenting a workaround for the issue discussed in https://app.asana.com/0/0/1205275221447702/f
         ///     Background: For a lot of users, the system won't show the system-extension-blocked alert if there's a previous request
         ///         to activate the extension.  You can see active requests in your console using command `systemextensionsctl list`.
@@ -71,7 +71,7 @@ public struct SystemExtensionManager {
 
         try await activationRequest.submit()
 
-        return activationRequest.version ?? "unknown"
+        return activationRequest.version
     }
 
     public func deactivate() async throws {
