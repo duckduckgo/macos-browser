@@ -62,6 +62,7 @@ struct RemoteMessageView: View {
             .padding(.vertical, 14)
         }
         .padding(.bottom, 32)
+        .onAppear(perform: viewModel.onDidAppear)
     }
 
     private var closeButton: some View {
