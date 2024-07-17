@@ -69,4 +69,12 @@ final class BookmarksOutlineView: NSOutlineView {
         lastRow = rowView
     }
 
+    func scrollTo(_ item: Any) {
+        let rowIndex = row(forItem: item)
+
+        if rowIndex != -1 {
+            scrollRowToVisible(rowIndex)
+        }
+    }
+
 }
