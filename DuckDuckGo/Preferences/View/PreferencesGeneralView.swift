@@ -35,6 +35,7 @@ extension Preferences {
         @State private var showingCustomHomePageSheet = false
         @State private var isAddedToDock = false
         var dockCustomizer: DockCustomizer
+        let featureFlagger = NSApp.delegateTyped.featureFlagger
 
         var body: some View {
             PreferencePane(UserText.general) {
@@ -192,15 +193,17 @@ extension Preferences {
                     }
 
                     // SECTION 7: Phishing Detection
-                    PreferencePaneSection(UserText.phishingDetectionHeader) {
-                        PreferencePaneSubSection {
-                            ToggleMenuItem(UserText.phishingDetectionIsEnabled,
-                                           isOn: $phishingDetectionModel.isEnabled)
-                        }.padding(.bottom, 5)
-                        Text(UserText.phishingDetectionEnabledWarning)
-                            .font(.footnote)
-                            .foregroundColor(.red)
-                            .padding(.top, 5)
+                    if featureFlagger.isFeatureOn(.phishingDetectionPreferences) {
+                        PreferencePaneSection(UserText.phishingDetectionHeader) {
+                            PreferencePaneSubSection {
+                                ToggleMenuItem(UserText.phishingDetectionIsEnabled,
+                                               isOn: $phishingDetectionModel.isEnabled)
+                            }.padding(.bottom, 5)
+                            Text(UserText.phishingDetectionEnabledWarning)
+                                .font(.footnote)
+                                .foregroundColor(.red)
+                                .padding(.top, 5)
+                        }
                     }
                 }
 
