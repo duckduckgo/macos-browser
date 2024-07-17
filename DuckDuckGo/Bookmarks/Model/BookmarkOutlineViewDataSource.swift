@@ -30,9 +30,15 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     @Published var selectedFolders: [BookmarkFolder] = []
 
     let treeController: BookmarkTreeController
-    private(set) var expandedNodesIDs = Set<String>()
 
     private let contentMode: ContentMode
+    private(set) var expandedNodesIDs = Set<String>()
+    private(set) var isSearching = false
+
+    /// When a drag and drop to a folder happens while in search, we need to stor the destination folder
+    /// so we can expand the tree to the destination folder once the drop finishes.
+    private(set) var dragDestinationFolderInSearchMode: BookmarkFolder?
+
     private let bookmarkManager: BookmarkManager
     private let showMenuButtonOnHover: Bool
     private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
@@ -62,9 +68,21 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func reloadData() {
+        isSearching = false
+        dragDestinationFolderInSearchMode = nil
+        setFolderCount()
+        treeController.rebuild()
+    }
+
+    func reloadData(for searchQuery: String) {
+        isSearching = true
+        setFolderCount()
+        treeController.rebuild(for: searchQuery)
+    }
+
+    private func setFolderCount() {
         favoritesPseudoFolder.count = bookmarkManager.list?.favoriteBookmarks.count ?? 0
         bookmarksPseudoFolder.count = bookmarkManager.list?.totalBookmarks ?? 0
-        treeController.rebuild()
     }
 
     // MARK: - Private
@@ -133,7 +151,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         cell.delegate = self
 
         if let bookmark = node.representedObject as? Bookmark {
-            cell.update(from: bookmark)
+            cell.update(from: bookmark, isSearch: isSearching)
 
             if bookmark.favicon(.small) == nil {
                 presentFaviconsFetcherOnboarding?()
@@ -142,7 +160,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
 
         if let folder = node.representedObject as? BookmarkFolder {
-            cell.update(from: folder)
+            cell.update(from: folder, isSearch: isSearching)
             return cell
         }
 
@@ -178,6 +196,15 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                 || (destinationNode.representedObject as? PseudoFolder == .bookmarks) {
                 return .move
             }
+            return .none
+        }
+
+        if isSearching {
+            if let destinationFolder = destinationNode.representedObject as? BookmarkFolder {
+                self.dragDestinationFolderInSearchMode = destinationFolder
+                return .move
+            }
+
             return .none
         }
 

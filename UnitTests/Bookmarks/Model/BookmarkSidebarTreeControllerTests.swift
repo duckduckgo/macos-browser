@@ -109,5 +109,4 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         XCTAssertFalse(childFolderNode.canHaveChildNodes)
         XCTAssert(childFolderNode.representedObjectEquals(childFolder))
     }
-
 }
