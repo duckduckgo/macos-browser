@@ -79,7 +79,7 @@ extension HomePage.Views {
 
                 MoreOrLess(isExpanded: $model.shouldShowAllFeatures)
                     .padding(.top, -3)
-                    .visibility(model.isMoreOrLessButtonNeeded ? .visible : .invisible)
+                    .visibility(model.isMoreOrLessButtonNeeded ? .visible : .gone)
             }
         }
 
