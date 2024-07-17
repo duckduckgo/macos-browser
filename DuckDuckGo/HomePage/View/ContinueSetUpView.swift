@@ -259,28 +259,6 @@ extension HomePage.Views {
             }
         }
 
-        struct CloseButton: View {
-            let icon: NSImage
-            let action: () -> Void
-            let foreGroundColor: Color = .homeFavoritesBackground
-            let foregroundColorOnHover: Color = .homeFavoritesHover
-
-            @State var isHovering = false
-
-            var body: some View {
-                ZStack {
-                    Circle()
-                        .fill(isHovering ? foregroundColorOnHover : foreGroundColor)
-                        .frame(width: 16, height: 16)
-                    IconButton(icon: icon, action: action)
-                        .foregroundColor(.gray)
-                }
-                .onHover { isHovering in
-                    self.isHovering = isHovering
-                }
-            }
-        }
-
         struct NextStepsView: View {
             let text = UserText.newTabSetUpSectionTitle
             let textWidth: CGFloat

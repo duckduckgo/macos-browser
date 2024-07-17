@@ -77,7 +77,7 @@ struct RemoteMessageView: View {
     }
 
     private var closeButton: some View {
-        HomePage.Views.ContinueSetUpView.CloseButton(icon: .close) {
+        HomePage.Views.CloseButton(icon: .close) {
             viewModel.onDidClose(.close)
         }
         .visibility(isHovering ? .visible : .invisible)
