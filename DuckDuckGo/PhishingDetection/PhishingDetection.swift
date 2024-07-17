@@ -19,6 +19,7 @@
 import Foundation
 import PhishingDetection
 import Combine
+import BrowserServicesKit
 
 /// PhishingDetection is implemented using two datasets that are embedded into the client as a Bundle in `DataProvider`,
 /// and kept up to date by `DataActivities` and `UpdateManager`. If the feature is disabled in `Preferences`,
@@ -34,6 +35,7 @@ public class PhishingDetection: PhishingSiteDetecting {
     private var dataActivities: PhishingDetectionDataActivityHandling
     private var detectionPreferences: PhishingDetectionPreferences
     private var dataStore: PhishingDetectionDataStoring
+    private var featureFlagger: FeatureFlagger
     private var cancellable: AnyCancellable?
     private let revision: Int
     private let filterSetURL: URL
@@ -42,18 +44,19 @@ public class PhishingDetection: PhishingSiteDetecting {
     private let hashPrefixDataSHA: String
 
     private init(
-        revision: Int = 1645643,
+        revision: Int = 1653367,
         filterSetURL: URL = Bundle.main.url(forResource: "filterSet", withExtension: "json")!,
-        filterSetDataSHA: String = "c3127eb62e5655e46c177ebad399a4d7a616d4e6b655e71e6c336a9572a71dee",
+        filterSetDataSHA: String = "edd913cb0a579c2b163a01347531ed78976bfaf1d14b96a658c4a39d34a70ffc",
         hashPrefixURL: URL = Bundle.main.url(forResource: "hashPrefixes", withExtension: "json")!,
-        hashPrefixDataSHA: String = "fc376b9c5345ad46b1c7eadfaa55a1d11167a2b10ee5457cb761a681388fe411",
+        hashPrefixDataSHA: String = "c61349d196c46db9155ca654a0d33368ee0f33766fcd63e5a20f1d5c92026dc5",
         detectionClient: PhishingDetectionAPIClient = PhishingDetectionAPIClient(),
         dataProvider: PhishingDetectionDataProvider? = nil,
         dataStore: PhishingDetectionDataStoring? = nil,
         detector: PhishingDetecting? = nil,
         updateManager: PhishingDetectionUpdateManaging? = nil,
         dataActivities: PhishingDetectionDataActivityHandling? = nil,
-        detectionPreferences: PhishingDetectionPreferences = PhishingDetectionPreferences.shared
+        detectionPreferences: PhishingDetectionPreferences = PhishingDetectionPreferences.shared,
+        featureFlagger: FeatureFlagger? = nil
     ) {
         self.revision = revision
         self.filterSetURL = filterSetURL
@@ -73,7 +76,10 @@ public class PhishingDetection: PhishingSiteDetecting {
         self.updateManager = updateManager ?? PhishingDetectionUpdateManager(client: detectionClient, dataStore: self.dataStore)
         self.dataActivities = dataActivities ?? PhishingDetectionDataActivities(detectionService: self.detector, phishingDetectionDataProvider: resolvedDataProvider, updateManager: self.updateManager)
         self.detectionPreferences = detectionPreferences
-        if self.detectionPreferences.isEnabled {
+        self.featureFlagger = NSApp.delegateTyped.featureFlagger
+        if let featureFlagger = featureFlagger,
+           featureFlagger.isFeatureOn(.phishingDetection),
+           self.detectionPreferences.isEnabled {
             startUpdateTasks()
         }
         self.setupBindings()
@@ -98,7 +104,10 @@ public class PhishingDetection: PhishingSiteDetecting {
     }
 
     public func checkIsMaliciousIfEnabled(url: URL) async -> Bool {
-        if detectionPreferences.isEnabled {
+        print("[+] featureFlagger: ", featureFlagger)
+        print("[+] isFeatureOn: ", featureFlagger.isFeatureOn(.phishingDetection))
+        if featureFlagger.isFeatureOn(.phishingDetection),
+           detectionPreferences.isEnabled {
             return await detector.isMalicious(url: url)
         } else {
             return false
