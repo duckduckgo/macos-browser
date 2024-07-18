@@ -29,7 +29,7 @@ final class AppRestarter: AppRestarting {
     func restart() {
         let pid = ProcessInfo.processInfo.processIdentifier
         let destinationPath = Bundle.main.bundlePath
-        
+
         guard isValidApplicationBundle(at: destinationPath) else {
             print("Invalid destination path")
             return
@@ -78,38 +78,6 @@ final class AppRestarter: AppRestarting {
         // Perform validation to ensure the path is a valid and safe file path
         let fileManager = FileManager.default
         return fileManager.fileExists(atPath: path)
-    }
-}
-
-    func restart() {
-        let pid = ProcessInfo.processInfo.processIdentifier
-        let destinationPath = Bundle.main.bundlePath
-        let quotedDestinationPath = shellQuotedString(destinationPath)
-
-        let preOpenCmd = "/usr/bin/xattr -d -r com.apple.quarantine \(quotedDestinationPath)"
-
-        let script = """
-        (while /bin/kill -0 \(pid) >&/dev/null; do /bin/sleep 0.1; done; \(preOpenCmd); /usr/bin/open \(quotedDestinationPath)) &
-        """
-
-        let task = Process()
-        task.launchPath = "/bin/sh"
-        task.arguments = ["-c", script]
-
-        do {
-            try task.run()
-        } catch {
-            print("Unable to launch the task: \(error)")
-            return
-        }
-
-        // Terminate the current app instance
-        exit(0)
-    }
-
-    private func shellQuotedString(_ string: String) -> String {
-        let escapedString = string.replacingOccurrences(of: "'", with: "'\\''")
-        return "'\(escapedString)'"
     }
 
 }
