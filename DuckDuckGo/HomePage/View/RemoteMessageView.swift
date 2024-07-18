@@ -76,6 +76,7 @@ struct RemoteMessageView: View {
         .onHover { isHovering in
             self.isHovering = isHovering
         }
+        .onAppear(perform: viewModel.onDidAppear)
     }
 
     private var closeButton: some View {
