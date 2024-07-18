@@ -69,8 +69,8 @@ struct RemoteMessageView: View {
                     Spacer()
                 }
             }
-
         }
+        .padding(.horizontal, 2)
         .onHover { isHovering in
             self.isHovering = isHovering
         }

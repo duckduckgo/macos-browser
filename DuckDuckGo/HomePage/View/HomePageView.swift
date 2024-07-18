@@ -26,7 +26,7 @@ extension HomePage.Views {
     struct RootView: View {
 
         let backgroundColor: Color = .newTabPageBackground
-        static let targetWidth: CGFloat = 504
+        static let targetWidth: CGFloat = 508
         let isBurner: Bool
 
         @EnvironmentObject var model: AppearancePreferences
@@ -68,6 +68,7 @@ extension HomePage.Views {
                             if includingContinueSetUpCards {
                                 ContinueSetUpView()
                                     .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                                    .padding(.top, activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0)
                             }
 
                             Favorites()

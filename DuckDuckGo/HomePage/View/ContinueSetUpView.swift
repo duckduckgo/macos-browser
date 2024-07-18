@@ -35,7 +35,8 @@ extension HomePage.Views {
                     }
                     Spacer()
                 }
-                .padding(.leading, 1)
+                .padding(.top, -24)
+                .padding(.leading, 2)
                 VStack(spacing: 20) {
                     if #available(macOS 12.0, *) {
                         LazyVStack(spacing: 4) {
@@ -46,7 +47,6 @@ extension HomePage.Views {
                         FeaturesGrid()
                     }
                 }
-                .padding(.top, 25)
             }
             .visibility(model.hasContent ? .visible : .gone)
         }
