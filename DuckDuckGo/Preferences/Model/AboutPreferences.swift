@@ -75,7 +75,9 @@ final class AboutPreferences: ObservableObject, PreferencesTabOpening {
     let displayableAboutURL: String = URL.aboutDuckDuckGo
         .toString(decodePunycode: false, dropScheme: true, dropTrailingSlash: false)
 
-
+    var isCurrentOsReceivingUpdates: Bool {
+        return SupportedOSChecker.isCurrentOSReceivingUpdates
+    }
 
     @MainActor
     func openFeedbackForm() {

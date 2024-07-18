@@ -37,7 +37,7 @@ extension Preferences {
                     VStack(alignment: .leading) {
                         TextMenuTitle(UserText.aboutDuckDuckGo)
 
-                        if !SupportedOSChecker.isCurrentOSReceivingUpdates {
+                        if !model.isCurrentOsReceivingUpdates {
                             UnsupportedDeviceInfoBox(wide: true)
                                 .padding(.top, 10)
                                 .padding(.leading, -20)
