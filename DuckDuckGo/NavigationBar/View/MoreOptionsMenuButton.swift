@@ -72,13 +72,7 @@ final class MoreOptionsMenuButton: MouseOverButton {
 
         let notificationLayer = CALayer()
         notificationLayer.backgroundColor = notificationColor.cgColor
-        notificationLayer.cornerRadius = MoreOptionsMenuButton.notificationSize / 2
-        notificationLayer.frame = CGRect(
-            x: self.bounds.width - MoreOptionsMenuButton.notificationSize - MoreOptionsMenuButton.notificationOffset,
-            y: MoreOptionsMenuButton.notificationOffset,
-            width: MoreOptionsMenuButton.notificationSize,
-            height: MoreOptionsMenuButton.notificationSize
-        )
+        layoutNotification(notificationLayer: notificationLayer)
         notificationLayer.isHidden = !isNotificationVisible
         layer.addSublayer(notificationLayer)
         self.notificationLayer = notificationLayer
@@ -94,6 +88,11 @@ final class MoreOptionsMenuButton: MouseOverButton {
 
     override func layout() {
         super.layout()
+        layoutNotification(notificationLayer: notificationLayer)
+    }
+
+    private func layoutNotification(notificationLayer: CALayer?) {
+        // Position the dot notification indicator to upper right corner of the button
         notificationLayer?.frame = CGRect(
             x: self.bounds.width - MoreOptionsMenuButton.notificationSize - MoreOptionsMenuButton.notificationOffset,
             y: MoreOptionsMenuButton.notificationOffset,
