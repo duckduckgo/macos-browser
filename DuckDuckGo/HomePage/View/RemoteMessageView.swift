@@ -32,15 +32,16 @@ struct RemoteMessageView: View {
                 .foregroundColor(Color.blackWhite3)
                 .cornerRadius(8)
             VStack(spacing: 12) {
-                HStack(spacing: 12) {
+                HStack(spacing: 8) {
                     image
 
                     VStack(alignment: .leading, spacing: 8) {
                         title
                         subtitle
                     }
+                    .padding(.leading, viewModel.image == nil ? 8 : 0)
 
-                    Spacer(minLength: 0)
+                    Spacer(minLength: 4)
 
                     // Display single button on the right
                     if case .bigSingleAction = viewModel.modelType {
@@ -59,8 +60,9 @@ struct RemoteMessageView: View {
                     .padding(.leading, 60)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .padding(.leading, 8)
+            .padding(.trailing, 16)
+            .padding(.vertical, 16)
 
             HStack {
                 Spacer()
