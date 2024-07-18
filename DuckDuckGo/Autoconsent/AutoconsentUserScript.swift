@@ -238,11 +238,12 @@ extension AutoconsentUserScript {
         }
         let remoteConfig = self.config.settings(for: .autoconsent)
         let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
+        let isFilterListEnabled = config.isSubfeatureEnabled(AutoconsentSubfeature.filterList)
 
         let replyObject = [
             "type": "initResp",
             "rules": [ // Other rules are bundled with the content script atm
-                "filterList": preferences.isAutoconsentFilterListEnabled ? cpmFilterList : nil,
+                "filterList": isFilterListEnabled ? cpmFilterList : nil,
                      ] as [String: Any?],
             "config": [
                 "enabled": true,
