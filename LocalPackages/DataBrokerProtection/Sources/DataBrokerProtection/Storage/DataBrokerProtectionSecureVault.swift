@@ -19,6 +19,7 @@
 import Foundation
 import BrowserServicesKit
 import SecureStorage
+import GRDB
 
 typealias DataBrokerProtectionVaultFactory = SecureVaultFactory<DefaultDataBrokerProtectionSecureVault<DefaultDataBrokerProtectionDatabaseProvider>>
 
@@ -28,8 +29,15 @@ let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = S
         return DataBrokerProtectionCryptoProvider()
     }, makeKeyStoreProvider: { _ in
         return DataBrokerProtectionKeyStoreProvider()
-    }, makeDatabaseProvider: { key in
-        return try DefaultDataBrokerProtectionDatabaseProvider(key: key)
+    }, makeDatabaseProvider: { key, reporter in
+        var databaseProvider: DefaultDataBrokerProtectionDatabaseProvider
+        do {
+            databaseProvider = try DefaultDataBrokerProtectionDatabaseProvider(key: key)
+        } catch {
+            reporter?.secureVaultError(.databaseError(cause: error))
+            databaseProvider = try DefaultDataBrokerProtectionDatabaseProvider(key: key, withV3Migration: false)
+        }
+        return databaseProvider
     }
 )
 // swiftlint:enable identifier_name

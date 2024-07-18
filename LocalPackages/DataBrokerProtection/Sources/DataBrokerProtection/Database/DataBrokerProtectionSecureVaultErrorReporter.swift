@@ -41,8 +41,8 @@ final class DataBrokerProtectionSecureVaultErrorReporter: SecureVaultReporting {
             default:
                 pixelHandler.fire(.secureVaultInitError(error: error))
             }
-        case .initFailed, .failedToOpenDatabase:
-            pixelHandler.fire(.secureVaultInitError(error: error))
+        case .initFailed(let cause), .failedToOpenDatabase(let cause), .databaseError(let cause):
+            pixelHandler.fire(.secureVaultInitError(error: cause))
         default:
             pixelHandler.fire(.secureVaultError(error: error))
         }

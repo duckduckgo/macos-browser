@@ -24,6 +24,8 @@ import Common
 
 enum DataBrokerProtectionDatabaseErrors: Error {
     case elementNotFound
+    case migrationFailed
+    case foreignKeyConstraintViolation
 }
 
 protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
@@ -75,7 +77,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
 
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> OptOutAttemptDB?
     func save(_ optOutAttemptDB: OptOutAttemptDB) throws
- }
+}
 
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
 
@@ -83,12 +85,15 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         return DefaultDataBrokerProtectionDatabaseProvider.databaseFilePath(directoryName: "DBP", fileName: "Vault.db", appGroupIdentifier: Bundle.main.appGroupName)
     }
 
-    public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(), key: Data) throws {
+    public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(), key: Data, withV3Migration: Bool = true) throws {
         try super.init(file: file, key: key, writerType: .pool) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
             migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
-            migrator.registerMigration("v3", migrate: Self.migrateV3(database:))
 
+            // High-risk migration, so guarded
+            if withV3Migration {
+                migrator.registerMigration("v3", migrate: Self.migrateV3(database:))
+            }
         }
     }
 
@@ -273,216 +278,129 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     }
 
     static func migrateV3(database: Database) throws {
-
-        os_log("🚀 Starting migrateV3, error: %{public}@", log: .error)
-
-        // Clean up data
         do {
             try deleteOrphanedRecords(database: database)
-        } catch {
-            os_log("deleteOrphanedRecords, error: %{public}@", log: .error, error.localizedDescription)
-            throw error
-        }
 
-        // Recreate Tables
-        do {
             try recreateNameTable(database: database)
-        } catch {
-            os_log("recreateNameTable, error: %{public}@", log: .error, error.localizedDescription)
-            throw error
-        }
-
-        do {
             try recreateAddressTable(database: database)
-        } catch {
-            os_log("recreateAddressTable, error: %{public}@", log: .error, error.localizedDescription)
-            throw error
-        }
-
-        do {
             try recreatePhoneTable(database: database)
-        } catch {
-            os_log("recreatePhoneTable, error: %{public}@", log: .error, error.localizedDescription)
-            throw error
-        }
-
-        do {
             try recreateProfileQueryTable(database: database)
-        } catch {
-            os_log("recreateProfileQueryTable, error: %{public}@", log: .error, error.localizedDescription)
-            throw error
-        }
 
-        do {
             try recreateScanTable(database: database)
-        } catch {
-            os_log("recreateScanTable, error: %{public}@", log: .error, error.localizedDescription)
-            throw error
-        }
-
-        do {
             try recreateScanHistoryTable(database: database)
-        } catch {
-            os_log("recreateScanHistoryTable, error: %{public}@", log: .error, error.localizedDescription)
-            throw error
-        }
-
-        do {
             try recreateExtractedProfileTable(database: database)
-        } catch {
-            os_log("recreateExtractedProfileTable, error: %{public}@", log: .error, error.localizedDescription)
-            throw error
-        }
 
-        do {
             try recreateOptOutTable(database: database)
-        } catch {
-            os_log("recreateOptOutTable, error: %{public}@", log: .error, error.localizedDescription)
-            throw error
-        }
-
-        do {
             try recreateOptOutHistoryTable(database: database)
-        } catch {
-            os_log("recreateOptOutHistoryTable, error: %{public}@", log: .error, error.localizedDescription)
-            throw error
-        }
-
-        do {
             try recreateOptOutAttemptTable(database: database)
+
+            try database.checkForeignKeys()
+
         } catch {
-            os_log("recreateOptOutAttemptTable, error: %{public}@", log: .error, error.localizedDescription)
-            throw error
+            switch error {
+            case DatabaseError.SQLITE_CONSTRAINT_FOREIGNKEY:
+                throw DataBrokerProtectionDatabaseErrors.foreignKeyConstraintViolation
+            default:
+                throw DataBrokerProtectionDatabaseErrors.migrationFailed
+            }
         }
-
-        let sql = SQL(sql: """
-                            SELECT *
-                            FROM \(OptOutAttemptDB.databaseTableName)
-                            WHERE extractedProfileId = \(4)
-                            AND extractedProfileId NOT IN (
-                                SELECT id
-                                FROM \(ExtractedProfileDB.databaseTableName)
-                            )
-                            """)
-
-        print(try database.dumpSQL(sql))
-
-        let sql2 = SQL(sql: """
-                            SELECT *
-                            FROM \(ExtractedProfileDB.databaseTableName)
-                            WHERE id = \(4)
-                            """)
-
-        print(try database.dumpSQL(sql2))
-
-        let sql3 = SQL(sql: """
-                            SELECT id FROM \(ExtractedProfileDB.databaseTableName)
-                            """)
-
-        print(try database.dumpSQL(sql3))
-
-        try print(database.checkForeignKeys())
     }
 
-    static func deleteOrphanedRecords(database: Database) throws {
+    private static func deleteOrphanedRecords(database: Database) throws {
 
-        let deleteStatements = [
-                    """
-                    DELETE FROM \(OptOutHistoryEventDB.databaseTableName)
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM \(OptOutDB.databaseTableName)
-                        WHERE \(OptOutDB.databaseTableName).profileQueryId = \(OptOutHistoryEventDB.databaseTableName).profileQueryId
-                        AND \(OptOutDB.databaseTableName).brokerId = \(OptOutHistoryEventDB.databaseTableName).brokerId
-                        AND \(OptOutDB.databaseTableName).extractedProfileId = \(OptOutHistoryEventDB.databaseTableName).extractedProfileId
-                    )
-                    """,
-                    """
-                    DELETE FROM \(OptOutDB.databaseTableName)
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM \(ProfileQueryDB.databaseTableName)
-                        WHERE \(ProfileQueryDB.databaseTableName).id = \(OptOutDB.databaseTableName).profileQueryId
-                    ) OR NOT EXISTS (
-                        SELECT 1 FROM \(BrokerDB.databaseTableName)
-                        WHERE \(BrokerDB.databaseTableName).id = \(OptOutDB.databaseTableName).brokerId
-                    ) OR NOT EXISTS (
-                        SELECT 1 FROM \(ExtractedProfileDB.databaseTableName)
-                        WHERE \(ExtractedProfileDB.databaseTableName).id = \(OptOutDB.databaseTableName).extractedProfileId
-                    )
-                    """,
-                    """
-                    DELETE FROM \(ScanHistoryEventDB.databaseTableName)
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM \(ProfileQueryDB.databaseTableName)
-                        WHERE \(ProfileQueryDB.databaseTableName).id = \(ScanHistoryEventDB.databaseTableName).profileQueryId
-                    ) OR NOT EXISTS (
-                        SELECT 1 FROM \(BrokerDB.databaseTableName)
-                        WHERE \(BrokerDB.databaseTableName).id = \(ScanHistoryEventDB.databaseTableName).brokerId
-                    )
-                    """,
-                    """
-                    DELETE FROM \(ScanDB.databaseTableName)
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM \(ProfileQueryDB.databaseTableName)
-                        WHERE \(ProfileQueryDB.databaseTableName).id = \(ScanDB.databaseTableName).profileQueryId
-                    ) OR NOT EXISTS (
-                        SELECT 1 FROM \(BrokerDB.databaseTableName)
-                        WHERE \(BrokerDB.databaseTableName).id = \(ScanDB.databaseTableName).brokerId
-                    )
-                    """,
-                    """
-                    DELETE FROM \(ExtractedProfileDB.databaseTableName)
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM \(ProfileQueryDB.databaseTableName)
-                        WHERE \(ProfileQueryDB.databaseTableName).id = \(ExtractedProfileDB.databaseTableName).profileQueryId
-                    ) OR NOT EXISTS (
-                        SELECT 1 FROM \(BrokerDB.databaseTableName)
-                        WHERE \(BrokerDB.databaseTableName).id = \(ExtractedProfileDB.databaseTableName).brokerId
-                    )
-                    """,
-                    """
-                    DELETE FROM \(OptOutAttemptDB.databaseTableName)
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM \(ExtractedProfileDB.databaseTableName)
-                        WHERE \(ExtractedProfileDB.databaseTableName).id = \(OptOutAttemptDB.databaseTableName).extractedProfileId
-                    )
-                    """,
-                    """
-                    DELETE FROM \(ProfileQueryDB.databaseTableName)
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM \(ProfileDB.databaseTableName)
-                        WHERE \(ProfileDB.databaseTableName).id = \(ProfileQueryDB.databaseTableName).profileId
-                    )
-                    """,
-                    """
-                    DELETE FROM \(NameDB.databaseTableName)
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM \(ProfileDB.databaseTableName)
-                        WHERE \(ProfileDB.databaseTableName).id = \(NameDB.databaseTableName).profileId
-                    )
-                    """,
-                    """
-                    DELETE FROM \(AddressDB.databaseTableName)
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM \(ProfileDB.databaseTableName)
-                        WHERE \(ProfileDB.databaseTableName).id = \(AddressDB.databaseTableName).profileId
-                    )
-                    """,
-                    """
-                    DELETE FROM \(PhoneDB.databaseTableName)
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM \(ProfileDB.databaseTableName)
-                        WHERE \(ProfileDB.databaseTableName).id = \(PhoneDB.databaseTableName).profileId
-                    )
-                    """
-                ]
+        /*
+         Cleanup strategy:
+             1.    Root Nodes: Clean the tables that do not depend on any other tables but have dependencies.
+             2.    Intermediate Nodes: Clean the tables that depend on root tables and have their own dependencies.
+             3.    Leaf Nodes: Finally, clean the tables that do not have any other dependent tables.
+         Cleanup order:
+             1.    ProfileQueryDB
+             2.    ExtractedProfileDB
+             3.    ScanDB
+             4.    OptOutDB
+             5.    OptOutHistoryEventDB
+             6.    ScanHistoryEventDB
+             7.    OptOutAttemptDB
+             8.    NameDB
+             9.   AddressDB
+             10.   PhoneDB
+         */
+
+        var deleteStatements: [String] = []
+
+        deleteStatements.append(sqlOrphanedCleanupFromProfile(of: ProfileQueryDB.databaseTableName))
+        deleteStatements.append(sqlOrphanedCleanupFromBrokerAndQuery(of: ExtractedProfileDB.databaseTableName))
+
+        deleteStatements.append(sqlOrphanedCleanupFromBrokerAndQuery(of: ScanDB.databaseTableName))
+        deleteStatements.append(sqlOrphanedCleanupFromBrokerAndQueryAndExtracted(of: OptOutDB.databaseTableName))
+
+        deleteStatements.append(sqlOrphanedCleanupFromBrokerAndQueryAndExtracted(of: OptOutHistoryEventDB.databaseTableName))
+        deleteStatements.append(sqlOrphanedCleanupFromBrokerAndQuery(of: ScanHistoryEventDB.databaseTableName))
+        deleteStatements.append(sqlOrphanedCleanupFromExtracted(of: OptOutAttemptDB.databaseTableName))
+
+
+        deleteStatements.append(sqlOrphanedCleanupFromProfile(of: NameDB.databaseTableName))
+        deleteStatements.append(sqlOrphanedCleanupFromProfile(of: AddressDB.databaseTableName))
+        deleteStatements.append(sqlOrphanedCleanupFromProfile(of: PhoneDB.databaseTableName))
 
         for sql in deleteStatements {
             try database.execute(sql: sql)
         }
-
     }
 
-    static func recreateNameTable(database: Database) throws {
+    private static func sqlOrphanedCleanupFromBrokerAndQueryAndExtracted(of table: String) -> String {
+        """
+        DELETE FROM \(table)
+        WHERE NOT EXISTS (
+            SELECT 1 FROM \(BrokerDB.databaseTableName)
+            WHERE \(BrokerDB.databaseTableName).id = \(table).brokerId
+        )
+        OR NOT EXISTS (
+            SELECT 1 FROM \(ProfileQueryDB.databaseTableName)
+            WHERE \(ProfileQueryDB.databaseTableName).id = \(table).profileQueryId
+        )
+        OR NOT EXISTS (
+            SELECT 1 FROM \(ExtractedProfileDB.databaseTableName)
+            WHERE \(ExtractedProfileDB.databaseTableName).id = \(table).extractedProfileId
+        )
+        """
+    }
+
+    private static func sqlOrphanedCleanupFromBrokerAndQuery(of table: String) -> String {
+        """
+        DELETE FROM \(table)
+        WHERE NOT EXISTS (
+            SELECT 1 FROM \(BrokerDB.databaseTableName)
+            WHERE \(BrokerDB.databaseTableName).id = \(table).brokerId
+        )
+        OR NOT EXISTS (
+            SELECT 1 FROM \(ProfileQueryDB.databaseTableName)
+            WHERE \(ProfileQueryDB.databaseTableName).id = \(table).profileQueryId
+        )
+        """
+    }
+
+    private static func sqlOrphanedCleanupFromExtracted(of table: String) -> String {
+        """
+        DELETE FROM \(table)
+        WHERE NOT EXISTS (
+            SELECT 1 FROM \(ExtractedProfileDB.databaseTableName)
+            WHERE \(ExtractedProfileDB.databaseTableName).id = \(table).extractedProfileId
+        )
+        """
+    }
+
+    private static func sqlOrphanedCleanupFromProfile(of table: String) -> String {
+        """
+        DELETE FROM \(table)
+        WHERE NOT EXISTS (
+            SELECT 1 FROM \(ProfileDB.databaseTableName)
+            WHERE \(ProfileDB.databaseTableName).id = \(table).profileId
+        )
+        """
+    }
+
+    private static func recreateNameTable(database: Database) throws {
         try recreateTable(name: NameDB.databaseTableName, database: database) {
             try database.create(table: NameDB.databaseTableName) {
                 $0.primaryKey([NameDB.Columns.first.name, NameDB.Columns.last.name, NameDB.Columns.middle.name, NameDB.Columns.profileId.name])
@@ -499,7 +417,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    static func recreateAddressTable(database: Database) throws {
+    private static func recreateAddressTable(database: Database) throws {
         try recreateTable(name: AddressDB.databaseTableName, database: database) {
             try database.create(table: AddressDB.databaseTableName) {
                 $0.primaryKey([AddressDB.Columns.city.name, AddressDB.Columns.state.name, AddressDB.Columns.street.name, AddressDB.Columns.profileId.name])
@@ -516,7 +434,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    static func recreatePhoneTable(database: Database) throws {
+    private static func recreatePhoneTable(database: Database) throws {
         try recreateTable(name: PhoneDB.databaseTableName, database: database) {
             try database.create(table: PhoneDB.databaseTableName) {
                 $0.primaryKey([PhoneDB.Columns.phoneNumber.name, PhoneDB.Columns.profileId.name])
@@ -528,7 +446,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    static func recreateProfileQueryTable(database: Database) throws {
+    private static func recreateProfileQueryTable(database: Database) throws {
         try recreateTable(name: ProfileQueryDB.databaseTableName, database: database) {
             try database.create(table: ProfileQueryDB.databaseTableName) {
                 $0.autoIncrementedPrimaryKey(ProfileQueryDB.Columns.id.name)
@@ -555,7 +473,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    static func recreateScanTable(database: Database) throws {
+    private static func recreateScanTable(database: Database) throws {
         try recreateTable(name: ScanDB.databaseTableName, database: database) {
             try database.create(table: ScanDB.databaseTableName) {
                 $0.primaryKey([ScanDB.Columns.brokerId.name, ScanDB.Columns.profileQueryId.name])
@@ -575,7 +493,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    static func recreateScanHistoryTable(database: Database) throws {
+    private static func recreateScanHistoryTable(database: Database) throws {
         try recreateTable(name: ScanHistoryEventDB.databaseTableName, database: database) {
             try database.create(table: ScanHistoryEventDB.databaseTableName) {
                 $0.primaryKey([
@@ -600,7 +518,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    static func recreateExtractedProfileTable(database: Database) throws {
+    private static func recreateExtractedProfileTable(database: Database) throws {
         try recreateTable(name: ExtractedProfileDB.databaseTableName, database: database) {
             try database.create(table: ExtractedProfileDB.databaseTableName) {
                 $0.autoIncrementedPrimaryKey(ExtractedProfileDB.Columns.id.name)
@@ -620,7 +538,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    static func recreateOptOutTable(database: Database) throws {
+    private static func recreateOptOutTable(database: Database) throws {
         try recreateTable(name: OptOutDB.databaseTableName, database: database) {
             try database.create(table: OptOutDB.databaseTableName) {
                 $0.primaryKey([
@@ -648,7 +566,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    static func recreateOptOutHistoryTable(database: Database) throws {
+    private static func recreateOptOutHistoryTable(database: Database) throws {
         try recreateTable(name: OptOutHistoryEventDB.databaseTableName, database: database) {
             try database.create(table: OptOutHistoryEventDB.databaseTableName) {
                 $0.primaryKey([
@@ -675,7 +593,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    static func recreateOptOutAttemptTable(database: Database) throws {
+    private static func recreateOptOutAttemptTable(database: Database) throws {
         try recreateTable(name: OptOutAttemptDB.databaseTableName, database: database) {
             try database.create(table: OptOutAttemptDB.databaseTableName) {
                 $0.primaryKey([OptOutAttemptDB.Columns.extractedProfileId.name])
@@ -693,7 +611,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    static func recreateTable(name: String,
+    private static func recreateTable(name: String,
                               database: Database,
                               creationActions: () throws -> Void) throws {
         try database.rename(table: name,
