@@ -817,6 +817,7 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
             return
         }
 
+        hideSearchBar()
         showTreeView()
 
         guard let node = dataSource.treeController.node(representing: baseBookmark) else {
@@ -825,6 +826,7 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
 
         expandFoldersUntil(node: node)
         outlineView.scrollTo(node)
+        outlineView.highlight(node)
     }
 }
 

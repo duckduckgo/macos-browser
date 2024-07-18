@@ -34,6 +34,13 @@ final class BookmarkOutlineCellView: NSTableCellView {
         NSTrackingArea(rect: .zero, options: [.inVisibleRect, .activeAlways, .mouseEnteredAndExited], owner: self, userInfo: nil)
     }()
     private var leadingConstraint = NSLayoutConstraint()
+    private var isHighlighted: Bool = false {
+        didSet {
+            updateHighlightAppearance()
+        }
+    }
+    private var flashTimer: Timer?
+    private var flashDuration: TimeInterval = 0
 
     var shouldShowMenuButton = false
 
@@ -69,6 +76,32 @@ final class BookmarkOutlineCellView: NSTableCellView {
         menuButton.isHidden = true
         countLabel.isHidden = false
         favoriteImageView.isHidden = false
+    }
+
+    func setHighlighted(_ highlighted: Bool) {
+        isHighlighted = highlighted
+    }
+
+    // Method to start the flash highlight effect
+    func startFlashHighlighting(duration: TimeInterval, interval: TimeInterval) {
+        self.flashDuration = duration
+        self.flashTimer?.invalidate()
+        self.flashTimer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(toggleHighlight), userInfo: nil, repeats: true)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+            self.stopFlashHighlighting()
+        }
+    }
+
+    // Method to stop the flash highlight effect
+    func stopFlashHighlighting() {
+        self.flashTimer?.invalidate()
+        self.flashTimer = nil
+        self.setHighlighted(false) // Ensure the cell is not highlighted when stopping the flash
+    }
+
+    @objc private func toggleHighlight() {
+        self.setHighlighted(!isHighlighted)
     }
 
     // MARK: - Private
@@ -157,6 +190,14 @@ final class BookmarkOutlineCellView: NSTableCellView {
 
         countLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
         countLabel.setContentHuggingPriority(.required, for: .horizontal)
+    }
+
+    private func updateHighlightAppearance() {
+        if isHighlighted {
+            self.layer?.backgroundColor = NSColor.selectedControlColor.cgColor
+        } else {
+            self.layer?.backgroundColor = NSColor.clear.cgColor
+        }
     }
 
     @objc private func cellMenuButtonClicked() {
