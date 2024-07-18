@@ -171,6 +171,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         if areAutomaticUpdatesEnabled {
             appRestarter.restart()
         } else {
+            updater.userDriver.activeUpdateAlert?.hideUnnecessaryUpdateButtons()
             shouldShowManualUpdateDialog = true
             checkForUpdate()
         }
@@ -223,22 +224,6 @@ extension UpdateController: SPUUpdaterDelegate {
         }
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterAborted, error: error))
-    }
-
-    func updater(_ updater: SPUUpdater,
-                 userDidMake choice: SPUUserUpdateChoice,
-                 forUpdate updateItem: SUAppcastItem,
-                 state: SPUUserUpdateState) {
-        switch choice {
-        case .skip:
-            PixelKit.fire(DebugEvent(GeneralPixel.userSelectedToSkipUpdate))
-        case .install:
-            PixelKit.fire(DebugEvent(GeneralPixel.userSelectedToInstallUpdate))
-        case .dismiss:
-            PixelKit.fire(DebugEvent(GeneralPixel.userSelectedToDismissUpdate))
-        @unknown default:
-            break
-        }
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
