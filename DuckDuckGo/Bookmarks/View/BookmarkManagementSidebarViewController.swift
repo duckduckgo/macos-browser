@@ -52,7 +52,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource, sortMode: .manual)
     private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly,
-                                                                bookmarkManager: bookmarkManager, 
+                                                                bookmarkManager: bookmarkManager,
                                                                 treeController: treeController,
                                                                 sortMode: .manual,
                                                                 showMenuButtonOnHover: false)

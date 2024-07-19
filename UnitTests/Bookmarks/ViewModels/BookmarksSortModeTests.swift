@@ -1,5 +1,5 @@
 //
-//  SortBookmarksViewModelTests.swift
+//  BookmarksSortModeTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
