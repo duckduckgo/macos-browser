@@ -20,12 +20,12 @@ import Foundation
 
 protocol BookmarkTreeControllerDataSource: AnyObject {
 
-    func treeController(childNodesFor: BookmarkNode) -> [BookmarkNode]
+    func treeController(childNodesFor: BookmarkNode, sortMode: BookmarksSortMode) -> [BookmarkNode]
 }
 
 protocol BookmarkTreeControllerSearchDataSource: AnyObject {
 
-    func nodes(for searchQuery: String) -> [BookmarkNode]
+    func nodes(for searchQuery: String, sortMode: BookmarksSortMode) -> [BookmarkNode]
 }
 
 final class BookmarkTreeController {
@@ -42,7 +42,7 @@ final class BookmarkTreeController {
         self.searchDataSource = searchDataSource
         self.rootNode = rootNode
 
-        rebuild()
+        rebuild(for: .manual) // TODO: Initalize with correct value
     }
 
     convenience init(dataSource: BookmarkTreeControllerDataSource,
@@ -52,12 +52,12 @@ final class BookmarkTreeController {
 
     // MARK: - Public
 
-    func rebuild(for searchQuery: String) {
-        rootNode.childNodes = searchDataSource?.nodes(for: searchQuery) ?? []
+    func rebuild(for searchQuery: String, sortMode: BookmarksSortMode) {
+        rootNode.childNodes = searchDataSource?.nodes(for: searchQuery, sortMode: sortMode) ?? []
     }
 
-    func rebuild() {
-        rebuildChildNodes(node: rootNode)
+    func rebuild(for sortMode: BookmarksSortMode) {
+        rebuildChildNodes(node: rootNode, sortMode: sortMode)
     }
 
     func visitNodes(with visitBlock: (BookmarkNode) -> Void) {
@@ -98,12 +98,12 @@ final class BookmarkTreeController {
     }
 
     @discardableResult
-    private func rebuildChildNodes(node: BookmarkNode) -> Bool {
+    private func rebuildChildNodes(node: BookmarkNode, sortMode: BookmarksSortMode = .manual) -> Bool {
         guard node.canHaveChildNodes else {
             return false
         }
 
-        let childNodes: [BookmarkNode] = dataSource?.treeController(childNodesFor: node) ?? []
+        let childNodes: [BookmarkNode] = dataSource?.treeController(childNodesFor: node, sortMode: sortMode) ?? []
         var childNodesDidChange = childNodes != node.childNodes
 
         if childNodesDidChange {
@@ -111,7 +111,7 @@ final class BookmarkTreeController {
         }
 
         childNodes.forEach { childNode in
-            if rebuildChildNodes(node: childNode) {
+            if rebuildChildNodes(node: childNode, sortMode: sortMode) {
                 childNodesDidChange = true
             }
         }

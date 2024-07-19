@@ -67,17 +67,17 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         reloadData()
     }
 
-    func reloadData() {
+    func reloadData(with sortMode: BookmarksSortMode = .manual) {
         isSearching = false
         dragDestinationFolderInSearchMode = nil
         setFolderCount()
-        treeController.rebuild()
+        treeController.rebuild(for: sortMode)
     }
 
-    func reloadData(for searchQuery: String) {
+    func reloadData(for searchQuery: String, and sortMode: BookmarksSortMode = .manual) {
         isSearching = true
         setFolderCount()
-        treeController.rebuild(for: searchQuery)
+        treeController.rebuild(for: searchQuery, sortMode: sortMode)
     }
 
     private func setFolderCount() {

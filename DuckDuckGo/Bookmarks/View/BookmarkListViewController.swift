@@ -93,6 +93,7 @@ final class BookmarkListViewController: NSViewController {
     private let bookmarkManager: BookmarkManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
     private let treeControllerSearchDataSource: BookmarkListTreeControllerSearchDataSource
+    private let sortBookmarksViewModel = SortBookmarksViewModel()
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource,
                                                              searchDataSource: treeControllerSearchDataSource)
@@ -204,7 +205,7 @@ final class BookmarkListViewController: NSViewController {
         sortBookmarksButton.mouseDownColor = .buttonMouseDown
         sortBookmarksButton.mouseOverColor = .buttonMouseOver
         sortBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
-        sortBookmarksButton.toolTip = "Sort bookmarks" // TODO: Move to UserText
+        sortBookmarksButton.toolTip = UserText.bookmarksSort
 
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.delegate = self
@@ -396,6 +397,17 @@ final class BookmarkListViewController: NSViewController {
                 self.outlineView.isHidden = false
             }
         }.store(in: &cancellables)
+
+        sortBookmarksViewModel.$selectedSortMode.sink { [weak self] newSortMode in
+            guard let self else { return }
+
+            switch newSortMode {
+            case .nameDescending:
+                self.sortBookmarksButton.image = .bookmarkSortDesc
+            default:
+                self.sortBookmarksButton.image = .bookmarkSortAsc
+            }
+        }.store(in: &cancellables)
     }
 
     override func viewWillAppear() {
@@ -465,7 +477,8 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @objc func sortBookmarksButtonClicked(_ sender: NSButton) {
-
+        let menu = sortBookmarksViewModel.selectedSortMode.menu
+        menu.popUpAtMouseLocation(in: sortBookmarksButton)
     }
 
     private func showSearchBar() {
@@ -847,6 +860,28 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
     }
 }
 
+extension BookmarkListViewController: BookmarkSortMenuItemSelectors {
+
+    func manualSort(_ sender: NSMenuItem) {
+        setupSort(mode: .manual)
+    }
+
+    func sortByNameAscending(_ sender: NSMenuItem) {
+        setupSort(mode: .nameAscending)
+    }
+
+    func sortByNameDescending(_ sender: NSMenuItem) {
+        setupSort(mode: .nameDescending)
+    }
+
+    private func setupSort(mode: BookmarksSortMode) {
+        hideSearchBar()
+        sortBookmarksViewModel.selectedSortMode = mode
+        dataSource.reloadData(with: mode)
+        outlineView.reloadData()
+    }
+}
+
 // MARK: - Search field delegate
 
 extension BookmarkListViewController: NSSearchFieldDelegate {
@@ -864,7 +899,7 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
     }
 
     private func showSearch(for searchQuery: String) {
-        dataSource.reloadData(for: searchQuery)
+        dataSource.reloadData(for: searchQuery, and: sortBookmarksViewModel.selectedSortMode)
 
         if dataSource.treeController.rootNode.childNodes.isEmpty {
             showEmptyStateView(for: .noSearchResults)
