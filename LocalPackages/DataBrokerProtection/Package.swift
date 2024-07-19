@@ -52,6 +52,9 @@ let package = Package(
             dependencies: [
                 "DataBrokerProtection",
                 "BrowserServicesKit",
+            ],
+            resources: [
+                .process("Resources")
             ]
         )
     ]

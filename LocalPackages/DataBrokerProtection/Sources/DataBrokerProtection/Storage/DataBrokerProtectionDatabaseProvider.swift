@@ -74,7 +74,82 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
 
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> OptOutAttemptDB?
     func save(_ optOutAttemptDB: OptOutAttemptDB) throws
+
+    // Test Helper Methods
+    func dumpDatabase(to url: URL) throws
+    func restoreDatabase(from url: URL) throws
  }
+
+extension DataBrokerProtectionDatabaseProvider {
+
+    func dumpDatabase(to url: URL) throws {
+        try db.read { db in
+            var sqlDump = ""
+
+            // Get the list of tables
+            let tables = try String.fetchAll(db, sql: "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")
+
+            // Dump data for each table
+            for table in tables {
+                let rows = try Row.fetchAll(db, sql: "SELECT * FROM \(table)")
+                for row in rows {
+                    let columns = row.columnNames.joined(separator: ", ")
+                    let values = row.map { $0.1.sqlExpression }.joined(separator: ", ")
+                    sqlDump += "INSERT INTO \(table) (\(columns)) VALUES (\(values));\n"
+                }
+                sqlDump += "\n"
+            }
+
+            // Save to file
+            try sqlDump.write(to: url, atomically: true, encoding: .utf8)
+        }
+    }
+
+    func restoreDatabase(from url: URL) throws {
+        let data = try Data(contentsOf: url)
+        guard let sqlDump = String(data: data, encoding: .utf8) else {
+            throw NSError(domain: "Invalid SQL dump file", code: 1, userInfo: nil)
+        }
+
+        // Filter SQL statements to exclude GRDB migrations table data
+        let sqlStatements = sqlDump.components(separatedBy: ";\n")
+            .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            .filter { !$0.contains("INSERT INTO grdb_migrations") }
+
+        try db.writeWithoutTransaction { db in
+
+            // Disable & enable foreign keys to ignore constraint violations
+            try db.execute(sql: "PRAGMA foreign_keys = OFF")
+            for statement in sqlStatements {
+                try db.execute(sql: statement)
+            }
+            try db.execute(sql: "PRAGMA foreign_keys = ON")
+        }
+    }
+}
+
+extension DatabaseValue {
+    var sqlExpression: String {
+        switch storage {
+        case .null:
+            return "NULL"
+        case .int64(let int64):
+            return "\(int64)"
+        case .double(let double):
+            return "\(double)"
+        case .string(let string):
+            return "'\(string.replacingOccurrences(of: "'", with: "''"))'"
+        case .blob(let data):
+            return "X'\(data.hexEncodedString())'"
+        }
+    }
+}
+
+extension Data {
+    func hexEncodedString() -> String {
+        return map { String(format: "%02hhx", $0) }.joined()
+    }
+}
 
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
 
@@ -82,194 +157,24 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         return DefaultDataBrokerProtectionDatabaseProvider.databaseFilePath(directoryName: "DBP", fileName: "Vault.db", appGroupIdentifier: Bundle.main.appGroupName)
     }
 
-    public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(), key: Data) throws {
-        try super.init(file: file, key: key, writerType: .pool) { migrator in
-            migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
-            migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
-
-        }
+    public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
+                key: Data,
+                registerMigrationsHandler: (inout DatabaseMigrator) throws -> Void = Migrations.v2Migrations) throws {
+        try super.init(file: file, key: key, writerType: .pool, registerMigrationsHandler: registerMigrationsHandler)
     }
 
-    static func migrateV1(database: Database) throws {
-        // User profile
-        try database.create(table: ProfileDB.databaseTableName) {
-            $0.autoIncrementedPrimaryKey(ProfileDB.Columns.id.name)
-            $0.column(ProfileDB.Columns.birthYear.name, .integer).notNull()
-        }
-
-        try database.create(table: NameDB.databaseTableName) {
-            $0.primaryKey([NameDB.Columns.first.name, NameDB.Columns.last.name, NameDB.Columns.middle.name, NameDB.Columns.profileId.name])
-            $0.foreignKey([NameDB.Columns.profileId.name], references: ProfileDB.databaseTableName)
-
-            $0.column(NameDB.Columns.first.name, .text).notNull()
-            $0.column(NameDB.Columns.last.name, .text).notNull()
-            $0.column(NameDB.Columns.profileId.name, .integer).notNull()
-            $0.column(NameDB.Columns.middle.name, .text)
-            $0.column(NameDB.Columns.suffix.name, .text)
-        }
-
-        try database.create(table: AddressDB.databaseTableName) {
-            $0.primaryKey([AddressDB.Columns.city.name, AddressDB.Columns.state.name, AddressDB.Columns.street.name, AddressDB.Columns.profileId.name])
-            $0.foreignKey([AddressDB.Columns.profileId.name], references: ProfileDB.databaseTableName)
-
-            $0.column(AddressDB.Columns.city.name, .text).notNull()
-            $0.column(AddressDB.Columns.state.name, .text).notNull()
-            $0.column(AddressDB.Columns.profileId.name, .integer).notNull()
-            $0.column(AddressDB.Columns.street.name, .text)
-            $0.column(AddressDB.Columns.zipCode.name, .text)
-        }
-
-        try database.create(table: PhoneDB.databaseTableName) {
-            $0.primaryKey([PhoneDB.Columns.phoneNumber.name, PhoneDB.Columns.profileId.name])
-            $0.foreignKey([PhoneDB.Columns.profileId.name], references: ProfileDB.databaseTableName)
-
-            $0.column(PhoneDB.Columns.phoneNumber.name, .text).notNull()
-            $0.column(PhoneDB.Columns.profileId.name, .integer).notNull()
-        }
-
-        // Operation and query related
-        try database.create(table: ProfileQueryDB.databaseTableName) {
-            $0.autoIncrementedPrimaryKey(ProfileQueryDB.Columns.id.name)
-            $0.foreignKey([ProfileQueryDB.Columns.profileId.name], references: ProfileDB.databaseTableName)
-
-            $0.column(ProfileQueryDB.Columns.profileId.name, .integer).notNull()
-            $0.column(ProfileQueryDB.Columns.first.name, .text).notNull()
-            $0.column(ProfileQueryDB.Columns.last.name, .text).notNull()
-            $0.column(ProfileQueryDB.Columns.middle.name, .text)
-            $0.column(ProfileQueryDB.Columns.suffix.name, .text)
-
-            $0.column(ProfileQueryDB.Columns.city.name, .text).notNull()
-            $0.column(ProfileQueryDB.Columns.state.name, .text).notNull()
-            $0.column(ProfileQueryDB.Columns.street.name, .text)
-            $0.column(ProfileQueryDB.Columns.zipCode.name, .text)
-
-            $0.column(ProfileQueryDB.Columns.phone.name, .text)
-            $0.column(ProfileQueryDB.Columns.birthYear.name, .integer)
-
-            $0.column(ProfileQueryDB.Columns.deprecated.name, .boolean).notNull().defaults(to: false)
-        }
-
-        try database.create(table: BrokerDB.databaseTableName) {
-            $0.autoIncrementedPrimaryKey(BrokerDB.Columns.id.name)
-
-            $0.column(BrokerDB.Columns.name.name, .text).unique().notNull()
-            $0.column(BrokerDB.Columns.json.name, .text).notNull()
-            $0.column(BrokerDB.Columns.version.name, .text).notNull()
-        }
-
-        try database.create(table: ScanDB.databaseTableName) {
-            $0.primaryKey([ScanDB.Columns.brokerId.name, ScanDB.Columns.profileQueryId.name])
-
-            $0.foreignKey([ScanDB.Columns.brokerId.name], references: BrokerDB.databaseTableName)
-            $0.foreignKey([ScanDB.Columns.profileQueryId.name],
-                          references: ProfileQueryDB.databaseTableName,
-                          onDelete: .cascade)
-
-            $0.column(ScanDB.Columns.profileQueryId.name, .integer).notNull()
-            $0.column(ScanDB.Columns.brokerId.name, .integer).notNull()
-            $0.column(ScanDB.Columns.lastRunDate.name, .datetime)
-            $0.column(ScanDB.Columns.preferredRunDate.name, .datetime)
-        }
-
-        try database.create(table: ScanHistoryEventDB.databaseTableName) {
-            $0.primaryKey([
-                ScanHistoryEventDB.Columns.brokerId.name,
-                ScanHistoryEventDB.Columns.profileQueryId.name,
-                ScanHistoryEventDB.Columns.event.name,
-                ScanHistoryEventDB.Columns.timestamp.name
-            ])
-
-            $0.foreignKey([ScanDB.Columns.brokerId.name], references: BrokerDB.databaseTableName)
-            $0.foreignKey([ScanDB.Columns.profileQueryId.name],
-                          references: ProfileQueryDB.databaseTableName,
-                          onDelete: .cascade)
-
-            $0.column(ScanDB.Columns.profileQueryId.name, .integer).notNull()
-            $0.column(ScanDB.Columns.brokerId.name, .integer).notNull()
-            $0.column(ScanHistoryEventDB.Columns.event.name, .text).notNull()
-            $0.column(ScanHistoryEventDB.Columns.timestamp.name, .datetime).notNull()
-        }
-
-        try database.create(table: ExtractedProfileDB.databaseTableName) {
-            $0.autoIncrementedPrimaryKey(ExtractedProfileDB.Columns.id.name)
-
-            $0.foreignKey([ExtractedProfileDB.Columns.brokerId.name], references: BrokerDB.databaseTableName)
-            $0.foreignKey([ExtractedProfileDB.Columns.profileQueryId.name],
-                          references: ProfileQueryDB.databaseTableName,
-                          onDelete: .cascade)
-
-            $0.column(ExtractedProfileDB.Columns.profileQueryId.name, .integer).notNull()
-            $0.column(ExtractedProfileDB.Columns.brokerId.name, .integer).notNull()
-            $0.column(ExtractedProfileDB.Columns.profile.name, .text).notNull()
-            $0.column(ExtractedProfileDB.Columns.removedDate.name, .datetime)
-        }
-
-        try database.create(table: OptOutDB.databaseTableName) {
-            $0.primaryKey([
-                OptOutDB.Columns.profileQueryId.name,
-                OptOutDB.Columns.brokerId.name,
-                OptOutDB.Columns.extractedProfileId.name
-            ])
-
-            $0.foreignKey([OptOutDB.Columns.brokerId.name], references: BrokerDB.databaseTableName)
-            $0.foreignKey([OptOutDB.Columns.profileQueryId.name],
-                          references: ProfileQueryDB.databaseTableName,
-                          onDelete: .cascade)
-
-            $0.foreignKey([OptOutDB.Columns.extractedProfileId.name],
-                          references: ExtractedProfileDB.databaseTableName,
-                          onDelete: .cascade)
-
-            $0.column(OptOutDB.Columns.profileQueryId.name, .integer).notNull()
-            $0.column(OptOutDB.Columns.brokerId.name, .integer).notNull()
-            $0.column(OptOutDB.Columns.extractedProfileId.name, .integer).notNull()
-            $0.column(OptOutDB.Columns.lastRunDate.name, .datetime)
-            $0.column(OptOutDB.Columns.preferredRunDate.name, .datetime)
-        }
-
-        try database.create(table: OptOutHistoryEventDB.databaseTableName) {
-            $0.primaryKey([
-                OptOutHistoryEventDB.Columns.profileQueryId.name,
-                OptOutHistoryEventDB.Columns.brokerId.name,
-                OptOutHistoryEventDB.Columns.extractedProfileId.name,
-                OptOutHistoryEventDB.Columns.event.name,
-                OptOutHistoryEventDB.Columns.timestamp.name
-            ])
-
-            $0.foreignKey([OptOutHistoryEventDB.Columns.brokerId.name], references: BrokerDB.databaseTableName)
-            $0.foreignKey([OptOutHistoryEventDB.Columns.profileQueryId.name],
-                          references: ProfileQueryDB.databaseTableName,
-                          onDelete: .cascade)
-
-            $0.column(OptOutHistoryEventDB.Columns.profileQueryId.name, .integer).notNull()
-            $0.column(OptOutHistoryEventDB.Columns.brokerId.name, .integer).notNull()
-            $0.column(OptOutHistoryEventDB.Columns.extractedProfileId.name, .integer).notNull()
-            $0.column(OptOutHistoryEventDB.Columns.event.name, .text).notNull()
-            $0.column(OptOutHistoryEventDB.Columns.timestamp.name, .datetime).notNull()
-        }
-
-        try database.create(table: OptOutAttemptDB.databaseTableName) {
-            $0.primaryKey([OptOutAttemptDB.Columns.extractedProfileId.name])
-
-            $0.foreignKey([OptOutAttemptDB.Columns.extractedProfileId.name], references: ExtractedProfileDB.databaseTableName)
-
-            $0.column(OptOutAttemptDB.Columns.extractedProfileId.name, .integer).notNull()
-            $0.column(OptOutAttemptDB.Columns.dataBroker.name, .text).notNull()
-            $0.column(OptOutAttemptDB.Columns.attemptId.name, .text).notNull()
-            $0.column(OptOutAttemptDB.Columns.lastStageDate.name, .date).notNull()
-            $0.column(OptOutAttemptDB.Columns.startDate.name, .date).notNull()
+    func createFileURLInDocumentsDirectory(fileName: String) -> URL? {
+        let fileManager = FileManager.default
+        do {
+            let documentsDirectory = try fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            let fileURL = documentsDirectory.appendingPathComponent(fileName)
+            return fileURL
+        } catch {
+            print("Error getting documents directory: \(error.localizedDescription)")
+            return nil
         }
     }
-
-    static func migrateV2(database: Database) throws {
-        try database.alter(table: BrokerDB.databaseTableName) {
-            $0.add(column: BrokerDB.Columns.url.name, .text)
-        }
-        try database.execute(sql: """
-                UPDATE \(BrokerDB.databaseTableName) SET \(BrokerDB.Columns.url.name) = \(BrokerDB.Columns.name.name)
-            """)
-    }
-
+    
     func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
         try db.write { db in
 
