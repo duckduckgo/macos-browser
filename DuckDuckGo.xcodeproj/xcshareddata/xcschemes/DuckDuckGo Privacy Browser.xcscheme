@@ -271,12 +271,12 @@
          </EnvironmentVariable>
          <EnvironmentVariable
             key = "DYLD_LIBRARY_PATH"
-            value = "$(SRCROOT)/../../WebKit/WebKitBuild/Release"
+            value = "$(SRCROOT)/../WebKit/WebKitBuild/Release"
             isEnabled = "YES">
          </EnvironmentVariable>
          <EnvironmentVariable
             key = "DYLD_FRAMEWORK_PATH"
-            value = "$(SRCROOT)/../../WebKit/WebKitBuild/Release"
+            value = "$(SRCROOT)/../WebKit/WebKitBuild/Release"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>

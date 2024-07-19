@@ -75,7 +75,8 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 //        let adBlock = WebExtensionManager.loadWebExtension(path: "/Applications/NordPass® Password Manager & Digital Vault.app/Contents/PlugIns/NordPass® Password Manager & Digital Vault Extension.appex/Contents/Resources/")
 //        let nightEye = WebExtensionManager.loadWebExtension(path: "/Applications/Night Eye.app/Contents/PlugIns/Night Eye Extension.appex/Contents/Resources/")
 
-        return [bitwarden!]
+//        return [bitwarden!]
+        return [emoji!]
     }()
 
     // Context manages the extension's permissions and allows it to inject content, run background logic, show popovers, and display other web-based UI to the user.

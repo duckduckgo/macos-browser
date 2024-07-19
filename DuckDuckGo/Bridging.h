@@ -8,7 +8,7 @@
 #import "WebExtensions.h"
 #import "NSException+Catch.h"
 #import "NSObject+performSelector.h"
-#import "WKGeolocationProvider.h"
+//#import "WKGeolocationProvider.h"
 #import <WebKit/_WKWebExtensionController.h>
 
 #ifndef APPSTORE

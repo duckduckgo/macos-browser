@@ -76,6 +76,16 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
         os_log("Message received: %s", log: .autoconsent, type: .debug, String(describing: message.body))
         return handleMessage(replyHandler: replyHandler, message: message)
     }
+
+    @MainActor
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
+        return await withCheckedContinuation { continuation in
+            os_log("Message received: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+            return handleMessage(replyHandler: { arg0, arg1 in
+                continuation.resume(with: .success((arg0, arg1)))
+            }, message: message)
+        }
+    }
 }
 
 extension AutoconsentUserScript {
