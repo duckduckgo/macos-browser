@@ -595,6 +595,7 @@ final class MainMenu: NSMenu {
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
+                NSMenuItem(title: "Reset Remote Messages", action: #selector(AppDelegate.resetRemoteMessages))
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
@@ -629,7 +630,11 @@ final class MainMenu: NSMenu {
                     .submenu(NetworkProtectionDebugMenu())
             }
 
-            NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
+            NSMenuItem(title: "Simulate crash") {
+                NSMenuItem(title: "fatalError", action: #selector(MainViewController.triggerFatalError))
+                NSMenuItem(title: "NSException", action: #selector(MainViewController.crashOnException))
+                NSMenuItem(title: "C++ exception", action: #selector(MainViewController.crashOnCxxException))
+            }
 
             let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
             let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)

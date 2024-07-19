@@ -24,29 +24,31 @@ struct RemoteMessageView: View {
 
     let viewModel: RemoteMessageViewModel
 
+    @State var isHovering = false
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12)
                 .foregroundColor(Color.blackWhite3)
                 .cornerRadius(8)
             VStack(spacing: 12) {
-                HStack(spacing: 12) {
+                HStack(spacing: 8) {
                     image
 
                     VStack(alignment: .leading, spacing: 8) {
                         title
                         subtitle
                     }
+                    .padding(.leading, viewModel.image == nil ? 8 : 0)
 
-                    Spacer(minLength: 0)
+                    Spacer(minLength: 4)
 
                     // Display single button on the right
                     if case .bigSingleAction = viewModel.modelType {
                         button
                     }
-
-                    closeButton
                 }
+                .padding(.trailing, 16)
 
                 // Display two buttons on the bottom
                 if case .bigTwoAction = viewModel.modelType {
@@ -58,21 +60,31 @@ struct RemoteMessageView: View {
                     .padding(.leading, 60)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .padding(.leading, 8)
+            .padding(.trailing, 16)
+            .padding(.vertical, 16)
+
+            HStack {
+                Spacer()
+                VStack {
+                    closeButton
+                    Spacer()
+                }
+            }
         }
-        .padding(.top, 64)
-        .padding(.bottom, 32)
+        .padding(.horizontal, 2)
+        .onHover { isHovering in
+            self.isHovering = isHovering
+        }
+        .onAppear(perform: viewModel.onDidAppear)
     }
 
     private var closeButton: some View {
-        Button {
+        HomePage.Views.CloseButton(icon: .close) {
             viewModel.onDidClose(.close)
-        } label: {
-            Image(.close)
-                .padding(12)
         }
-        .buttonStyle(.plain)
+        .visibility(isHovering ? .visible : .invisible)
+        .padding(6)
     }
 
     private var image: some View {

@@ -97,6 +97,9 @@ final class ActiveRemoteMessageModel: ObservableObject {
         self.remoteMessage = nil
 
         let pixel: GeneralPixel? = {
+            guard remoteMessage.isMetricsEnabled else {
+                return nil
+            }
             switch action {
             case .close:
                 return GeneralPixel.remoteMessageDismissed
@@ -121,12 +124,20 @@ final class ActiveRemoteMessageModel: ObservableObject {
             return
         }
         os_log("Remote message shown: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
-        PixelKit.fire(GeneralPixel.remoteMessageShown, withAdditionalParameters: ["message": remoteMessage.id])
+        if remoteMessage.isMetricsEnabled {
+            PixelKit.fire(GeneralPixel.remoteMessageShown, withAdditionalParameters: ["message": remoteMessage.id])
+        }
         if !store.hasShownRemoteMessage(withID: remoteMessage.id) {
             os_log("Remote message shown for first time: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
-            PixelKit.fire(GeneralPixel.remoteMessageShownUnique, withAdditionalParameters: ["mesage": remoteMessage.id])
+            if remoteMessage.isMetricsEnabled {
+                PixelKit.fire(GeneralPixel.remoteMessageShownUnique, withAdditionalParameters: ["message": remoteMessage.id])
+            }
             store.updateRemoteMessage(withID: remoteMessage.id, asShown: true)
         }
+    }
+
+    var shouldShowRemoteMessage: Bool {
+        remoteMessage?.content?.isSupported == true
     }
 
     private func updateRemoteMessage() {
@@ -134,4 +145,16 @@ final class ActiveRemoteMessageModel: ObservableObject {
     }
 
     private var cancellables = Set<AnyCancellable>()
+}
+
+extension RemoteMessageModelType {
+
+    var isSupported: Bool {
+        switch self {
+        case .promoSingleAction:
+            return false
+        default:
+            return true
+        }
+    }
 }

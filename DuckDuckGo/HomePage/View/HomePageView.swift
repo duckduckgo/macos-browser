@@ -59,20 +59,22 @@ extension HomePage.Views {
             ZStack(alignment: .top) {
 
                 ScrollView {
-                    VStack(spacing: 0) {
+                    VStack(spacing: 32) {
+                        Spacer(minLength: 32)
+
                         Group {
                             remoteMessage()
+
                             if includingContinueSetUpCards {
                                 ContinueSetUpView()
-                                    .padding(.top, 64)
                                     .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                                    .padding(.top, activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0)
                             }
+
                             Favorites()
-                                .padding(.top, 24)
                                 .visibility(model.isFavoriteVisible ? .visible : .gone)
 
                             RecentlyVisited()
-                                .padding(.top, 24)
                                 .padding(.bottom, 16)
                                 .visibility(model.isRecentActivityVisible ? .visible : .gone)
 
@@ -211,18 +213,6 @@ extension HomePage.Views {
                 })
                 Spacer()
             }
-        }
-    }
-}
-
-private extension RemoteMessageModelType {
-
-    var isSupported: Bool {
-        switch self {
-        case .promoSingleAction:
-            return false
-        default:
-            return true
         }
     }
 }

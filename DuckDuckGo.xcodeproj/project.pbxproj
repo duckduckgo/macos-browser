@@ -638,7 +638,6 @@
 		3706FC57293F65D500E42796 /* TabPreviewWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC82C5F258B6CB5009B6B42 /* TabPreviewWindowController.swift */; };
 		3706FC58293F65D500E42796 /* NSSizeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4E325D6BA9C007F5990 /* NSSizeExtension.swift */; };
 		3706FC59293F65D500E42796 /* Fire.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6820EA25503D6A005ED0D5 /* Fire.swift */; };
-		3706FC5A293F65D500E42796 /* RandomAccessCollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */; };
 		3706FC5B293F65D500E42796 /* NSOutlineViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292AE26670F5300AD2C21 /* NSOutlineViewExtensions.swift */; };
 		3706FC5C293F65D500E42796 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D81248FD31100E9A3E2 /* AppDelegate.swift */; };
 		3706FC5D293F65D500E42796 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
@@ -949,6 +948,8 @@
 		3707C72A294B5D2900682A9F /* URLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2324923E980071C2E8 /* URLExtension.swift */; };
 		3707C72D294B5D4100682A9F /* EmptyAttributionRulesProver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AE39F029373AF200C37AA4 /* EmptyAttributionRulesProver.swift */; };
 		3707C72F294B5D4F00682A9F /* WebViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783F92229432E1800BCA897 /* WebViewTests.swift */; };
+		3707EC4A2C47E36A00B67CBE /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3707EC492C47E36A00B67CBE /* CloseButton.swift */; };
+		3707EC4B2C47E36A00B67CBE /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3707EC492C47E36A00B67CBE /* CloseButton.swift */; };
 		370A34B12AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */; };
 		370A34B22AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */; };
 		371209212C232E3F003ADF3D /* RemoteMessagingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371209202C232E3F003ADF3D /* RemoteMessagingClient.swift */; };
@@ -2368,7 +2369,6 @@
 		B6AA64732994B43300D99CD6 /* FutureExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AA64722994B43300D99CD6 /* FutureExtensionTests.swift */; };
 		B6AA64742994B43300D99CD6 /* FutureExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AA64722994B43300D99CD6 /* FutureExtensionTests.swift */; };
 		B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC2C260330580029438D /* PublishedAfter.swift */; };
-		B6AAAC3E26048F690029438D /* RandomAccessCollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */; };
 		B6ABC5962B4861D4008343B9 /* FocusableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6ABC5952B4861D4008343B9 /* FocusableTextField.swift */; };
 		B6ABC5972B4861D4008343B9 /* FocusableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6ABC5952B4861D4008343B9 /* FocusableTextField.swift */; };
 		B6ABD0CA2BC03F610000EB69 /* SecurityScopedFileURLController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6ABD0C92BC03F610000EB69 /* SecurityScopedFileURLController.swift */; };
@@ -3083,6 +3083,7 @@
 		3706FE99293F661700E42796 /* Unit Tests App Store.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Tests App Store.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3706FEB2293F662100E42796 /* Integration Tests App Store.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Integration Tests App Store.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3706FEC7293F6F7500E42796 /* BWManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWManagement.swift; sourceTree = "<group>"; };
+		3707EC492C47E36A00B67CBE /* CloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
 		370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDebugMenu.swift; sourceTree = "<group>"; };
 		371209202C232E3F003ADF3D /* RemoteMessagingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingClient.swift; sourceTree = "<group>"; };
 		371209292C2333A0003ADF3D /* RemoteMessagingDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingDatabase.swift; sourceTree = "<group>"; };
@@ -4109,7 +4110,6 @@
 		B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatingSystemVersionExtension.swift; sourceTree = "<group>"; };
 		B6AA64722994B43300D99CD6 /* FutureExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureExtensionTests.swift; sourceTree = "<group>"; };
 		B6AAAC2C260330580029438D /* PublishedAfter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishedAfter.swift; sourceTree = "<group>"; };
-		B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomAccessCollectionExtension.swift; sourceTree = "<group>"; };
 		B6ABC5952B4861D4008343B9 /* FocusableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusableTextField.swift; sourceTree = "<group>"; };
 		B6ABD0C92BC03F610000EB69 /* SecurityScopedFileURLController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityScopedFileURLController.swift; sourceTree = "<group>"; };
 		B6ABD0CD2BC042CE0000EB69 /* NSURL+sandboxExtensionRetainCount.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSURL+sandboxExtensionRetainCount.m"; sourceTree = "<group>"; };
@@ -7761,7 +7761,6 @@
 				B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */,
 				B68C2FB127706E6A00BF2C7D /* ProcessExtension.swift */,
 				B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */,
-				B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */,
 				4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */,
 				1DFAB51C2A8982A600A0F7F6 /* SetExtension.swift */,
 				B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */,
@@ -7816,6 +7815,7 @@
 				85589E9F27BFE60E0038AD11 /* MoreOrLessView.swift */,
 				85F0FF1227CFAB04001C7C6E /* RecentlyVisitedView.swift */,
 				3768D8372C24BFF5004120AE /* RemoteMessageView.swift */,
+				3707EC492C47E36A00B67CBE /* CloseButton.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -10540,11 +10540,11 @@
 				3706FC56293F65D500E42796 /* Permissions.swift in Sources */,
 				9F872D992B8DA9F800138637 /* Bookmarks+Tab.swift in Sources */,
 				B6B4D1D02B0E0DD000C26286 /* DataImportNoDataView.swift in Sources */,
+				3707EC4B2C47E36A00B67CBE /* CloseButton.swift in Sources */,
 				3706FC57293F65D500E42796 /* TabPreviewWindowController.swift in Sources */,
 				1D9A37682BD8EA8800EBC58D /* DockPositionProvider.swift in Sources */,
 				3706FC58293F65D500E42796 /* NSSizeExtension.swift in Sources */,
 				3706FC59293F65D500E42796 /* Fire.swift in Sources */,
-				3706FC5A293F65D500E42796 /* RandomAccessCollectionExtension.swift in Sources */,
 				7BEC20432B0F505F00243D3E /* AddBookmarkPopoverView.swift in Sources */,
 				3706FC5B293F65D500E42796 /* NSOutlineViewExtensions.swift in Sources */,
 				3706FC5C293F65D500E42796 /* AppDelegate.swift in Sources */,
@@ -11326,6 +11326,7 @@
 				37CD54CE27F2FDD100F1F7B9 /* PreferencesSidebarModel.swift in Sources */,
 				3767190328E724D8003A2A15 /* DuckPlayerURLExtension.swift in Sources */,
 				1D43EB32292788C70065E5D6 /* BWEncryptionOutput.m in Sources */,
+				3707EC4A2C47E36A00B67CBE /* CloseButton.swift in Sources */,
 				B6106BAD26A7BF390013B453 /* PermissionState.swift in Sources */,
 				371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */,
 				B66260DD29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift in Sources */,
@@ -11980,7 +11981,6 @@
 				9F56CFA92B82DC4300BB7F11 /* AddEditBookmarkFolderView.swift in Sources */,
 				37445F9C2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */,
 				C1E961EF2B87AA29001760E1 /* AutofillActionBuilder.swift in Sources */,
-				B6AAAC3E26048F690029438D /* RandomAccessCollectionExtension.swift in Sources */,
 				4B9292AF26670F5300AD2C21 /* NSOutlineViewExtensions.swift in Sources */,
 				9F56CFAD2B84326C00BB7F11 /* AddEditBookmarkDialogViewModel.swift in Sources */,
 				1D4071AE2BD64267002D4537 /* DockCustomizer.swift in Sources */,
@@ -13404,7 +13404,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 169.0.0;
+				version = 172.0.0;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -13452,7 +13452,7 @@
 			repositoryURL = "https://github.com/duckduckgo/apple-toolbox.git";
 			requirement = {
 				kind = exactVersion;
-				version = 3.1.1;
+				version = 3.1.2;
 			};
 		};
 		F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */ = {

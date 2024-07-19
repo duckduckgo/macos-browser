@@ -77,6 +77,7 @@ public struct UserDefaultsWrapper<T> {
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
         case youtubeOverlayButtonsUsed = "preferences.youtube-overlay-user-used-buttons"
         case duckPlayerAutoplay = "preferences.duckplayer.autoplay"
+        case duckPlayerOpenInNewTab = "preferences.duckplayer.open-new-tab"
 
         case selectedPasswordManager = "preferences.autofill.selected-password-manager"
 
@@ -89,6 +90,7 @@ public struct UserDefaultsWrapper<T> {
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
         case lastCrashReportCheckDate = "last.crash.report.check.date"
+        case didCrashDuringCrashHandlersSetUp = "browser.didCrashDuringCrashHandlersSetUp"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
         case appTerminationHandledCorrectly = "app.termination.handled.correctly"

@@ -70,6 +70,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let crashReporter = CrashReporter()
 #endif
 
+    let pinnedTabsManager = PinnedTabsManager()
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     let internalUserDecider: InternalUserDecider
@@ -88,7 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var privacyDashboardWindow: NSWindow?
 
     let activeRemoteMessageModel: ActiveRemoteMessageModel
-    private let remoteMessagingClient: RemoteMessagingClient!
+    let remoteMessagingClient: RemoteMessagingClient!
 
     public let subscriptionManager: SubscriptionManager
     public let subscriptionUIHandler: SubscriptionUIHandling
@@ -143,11 +144,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Date.monthAgo)
     static var firstLaunchDate: Date
 
+    @UserDefaultsWrapper
+    private var didCrashDuringCrashHandlersSetUp: Bool
+
     static var isNewUser: Bool {
         return firstLaunchDate >= Date.weekAgo
     }
 
     override init() {
+        // will not add crash handlers and will fire pixel on applicationDidFinishLaunching if didCrashDuringCrashHandlersSetUp == true
+        let didCrashDuringCrashHandlersSetUp = UserDefaultsWrapper(key: .didCrashDuringCrashHandlersSetUp, defaultValue: false)
+        _didCrashDuringCrashHandlersSetUp = didCrashDuringCrashHandlersSetUp
+        if case .normal = NSApplication.runType,
+           !didCrashDuringCrashHandlersSetUp.wrappedValue {
+
+            didCrashDuringCrashHandlersSetUp.wrappedValue = true
+            CrashLogMessageExtractor.setUp()
+            didCrashDuringCrashHandlersSetUp.wrappedValue = false
+        }
+
         do {
             let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
@@ -218,6 +233,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 database: RemoteMessagingDatabase().db,
                 bookmarksDatabase: BookmarkDatabase.shared.db,
                 appearancePreferences: .shared,
+                pinnedTabsManager: pinnedTabsManager,
                 internalUserDecider: internalUserDecider,
                 configurationStore: ConfigurationStore.shared,
                 remoteMessagingAvailabilityProvider: PrivacyConfigurationRemoteMessagingAvailabilityProvider(
@@ -300,11 +316,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
-        PixelExperiment.install()
-
         if LocalStatisticsStore().atb == nil {
             AppDelegate.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
+            PixelExperiment.install()
         }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
@@ -334,13 +349,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         applyPreferredTheme()
 
 #if APPSTORE
-        crashCollection.start { pixelParameters, payloads, completion in
+        crashCollection.startAttachingCrashLogMessages { pixelParameters, payloads, completion in
             pixelParameters.forEach { _ in PixelKit.fire(GeneralPixel.crash) }
             guard let lastPayload = payloads.last else {
                 return
             }
             DispatchQueue.main.async {
-                CrashReportPromptPresenter().showPrompt(for: lastPayload, userDidAllowToReport: completion)
+                CrashReportPromptPresenter().showPrompt(for: CrashDataPayload(data: lastPayload), userDidAllowToReport: completion)
             }
         }
 #else
@@ -378,6 +393,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
         remoteMessagingClient?.startRefreshingRemoteMessages()
+
+        if didCrashDuringCrashHandlersSetUp {
+            PixelKit.fire(GeneralPixel.crashOnCrashHandlersSetUp)
+            didCrashDuringCrashHandlersSetUp = false
+        }
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {

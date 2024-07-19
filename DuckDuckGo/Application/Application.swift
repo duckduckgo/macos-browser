@@ -49,4 +49,9 @@ final class Application: NSApplication {
         fatalError("\(Self.self): Bad initializer")
     }
 
+    @objc(_crashOnException:)
+    func crash(on exception: NSException) {
+        NSGetUncaughtExceptionHandler()?(exception)
+    }
+
 }
