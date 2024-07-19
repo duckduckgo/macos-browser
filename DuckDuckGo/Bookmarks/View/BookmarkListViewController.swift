@@ -511,6 +511,8 @@ final class BookmarkListViewController: NSViewController {
         hideSearchBar()
         dataSource.reloadData(with: mode)
         outlineView.reloadData()
+        sortBookmarksButton.backgroundColor = mode.shouldHighlightButton ? .buttonMouseDown : .clear
+        sortBookmarksButton.mouseOverColor = mode.shouldHighlightButton ? .buttonMouseDown : .buttonMouseOver
     }
 
     @objc func openManagementInterface(_ sender: NSButton) {

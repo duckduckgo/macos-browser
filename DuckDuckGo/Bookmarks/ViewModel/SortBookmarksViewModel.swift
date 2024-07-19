@@ -47,6 +47,10 @@ enum BookmarksSortMode: Codable {
         }
     }
 
+    var shouldHighlightButton: Bool {
+        return self != .manual
+    }
+
     var menu: NSMenu {
         switch self {
         case .manual:
