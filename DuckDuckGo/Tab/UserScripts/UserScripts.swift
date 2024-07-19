@@ -86,7 +86,7 @@ final class UserScripts: UserScriptsProvider {
         releaseNotesUserScript = ReleaseNotesUserScript()
 #endif
 
-//        userScripts.append(autoconsentUserScript)
+        userScripts.append(autoconsentUserScript)
 
         contentScopeUserScriptIsolated.registerSubfeature(delegate: clickToLoadScript)
 
@@ -109,7 +109,7 @@ final class UserScripts: UserScriptsProvider {
             if let onboardingUserScript {
                 specialPages.registerSubfeature(delegate: onboardingUserScript)
             }
-//            userScripts.append(specialPages)
+            userScripts.append(specialPages)
         }
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
@@ -121,25 +121,25 @@ final class UserScripts: UserScriptsProvider {
                                                                    stripePurchaseFlow: stripePurchaseFlow,
                                                                    uiHandler: Application.appDelegate.subscriptionUIHandler)
             subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
-//            userScripts.append(subscriptionPagesUserScript)
+            userScripts.append(subscriptionPagesUserScript)
 
             identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())
-//            userScripts.append(identityTheftRestorationPagesUserScript)
+            userScripts.append(identityTheftRestorationPagesUserScript)
         }
     }
 
     lazy var userScripts: [UserScript] = [
-//        debugScript,
-//        faviconScript,
-//        contextMenuScript,
-//        surrogatesScript,
-//        contentBlockerRulesScript,
-//        pageObserverScript,
-//        printingUserScript,
-//        hoverUserScript,
-//        contentScopeUserScript,
-//        contentScopeUserScriptIsolated,
-//        autofillScript
+        debugScript,
+        faviconScript,
+        contextMenuScript,
+        surrogatesScript,
+        contentBlockerRulesScript,
+        pageObserverScript,
+        printingUserScript,
+        hoverUserScript,
+        contentScopeUserScript,
+        contentScopeUserScriptIsolated,
+        autofillScript
     ]
 
     @MainActor
@@ -152,7 +152,7 @@ final class UserScripts: UserScriptsProvider {
                 }
             }
             for await result in group {
-//                wkUserScripts.append(result.wkUserScript)
+                wkUserScripts.append(result.wkUserScript)
             }
 
             return wkUserScripts

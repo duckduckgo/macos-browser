@@ -114,7 +114,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         }
     }
 
-    @MainActor 
+    @MainActor
     @objc func toolbarButtonClicked(sender: NSButton) {
         let index = sender.tag
         let context = contexts[index]
@@ -126,8 +126,8 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
 //        showBackgroundConsole(context: context)
     }
 
-    @MainActor 
-    func buttonForContext(_ context:_WKWebExtensionContext) -> NSButton? {
+    @MainActor
+    func buttonForContext(_ context: _WKWebExtensionContext) -> NSButton? {
         guard let index = contexts.firstIndex(of: context) else {
             assertionFailure("Unknown context")
             return nil
@@ -138,10 +138,10 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
             return nil
         }
 
-        //!TODO UNCOMMENT
-//        let button = mainWindowController.mainViewController.navigationBarViewController.rightButtons.arrangedSubviews[index] as? NSButton
-//        return button
-        return nil
+        // !TODO UNCOMMENT
+        let button = mainWindowController.mainViewController.navigationBarViewController.rightButtons.arrangedSubviews[index] as? NSButton
+        return button
+//        return nil
     }
 
     @MainActor
@@ -161,7 +161,7 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
     }
 
-    @MainActor 
+    @MainActor
     func showBackgroundConsole(context: _WKWebExtensionContext) {
         guard let backgroundWebView = context._backgroundWebView else {
             return
@@ -210,7 +210,6 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
         extensionController.didActivate(tab, previousActiveTab: previousActiveTab)
     }
 
-    // swiftlint:disable force_cast
     func didSelectTabs(_ tabs: [_WKWebExtensionTab]) {
 //        extensionController.didSelect(NSSet(array: tabs))
     }
@@ -218,7 +217,6 @@ final class WebExtensionManager: NSObject, WebExtensionManaging {
     func didDeselectTabs(_ tabs: [_WKWebExtensionTab]) {
 //        extensionController.didDeselect(NSSet(array: tabs))
     }
-    // swiftlint:enable force_cast
 
     func didMoveTab(_ tab: _WKWebExtensionTab, from oldIndex: Int, in oldWindow: _WKWebExtensionWindow) {
         extensionController.didMoveTab(tab, from: oldIndex, in: oldWindow)
