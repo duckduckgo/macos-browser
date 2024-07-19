@@ -34,9 +34,18 @@ extension AppDelegate {
 
     // MARK: - DuckDuckGo
 
+    @MainActor
     @objc func checkForUpdates(_ sender: Any?) {
 #if SPARKLE
-        updateController.checkForUpdates(sender)
+        if !SupportedOSChecker.isCurrentOSReceivingUpdates {
+            // Show not supported info
+            if NSAlert.osNotSupported().runModal() != .cancel {
+                let url = Preferences.UnsupportedDeviceInfoBox.softwareUpdateURL
+                NSWorkspace.shared.open(url)
+            }
+        }
+
+        showAbout(sender)
 #endif
     }
 
@@ -135,6 +144,21 @@ extension AppDelegate {
     }
 
     // MARK: - Help
+
+    @MainActor
+    @objc func showAbout(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .settings(pane: .about))
+    }
+
+    @MainActor
+    @objc func showReleaseNotes(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .releaseNotes)
+    }
+
+    @MainActor
+    @objc func showWhatIsNew(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .url(.updates, source: .appOpenUrl))
+    }
 
     #if FEEDBACK
 

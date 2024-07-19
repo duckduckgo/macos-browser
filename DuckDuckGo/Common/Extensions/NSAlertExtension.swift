@@ -117,6 +117,16 @@ extension NSAlert {
         return alert
     }
 
+    static func removeVPNConfigurationAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Remove VPN Configuration?"
+        alert.informativeText = "This will remove the VPN configuration from System Settings > VPN."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Remove")
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
     static func removeAllDBPStateAndDataAlert() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = "Uninstall Personal Information Removal Login Item?"
