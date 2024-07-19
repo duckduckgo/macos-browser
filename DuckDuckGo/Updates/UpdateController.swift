@@ -168,6 +168,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     }
 
     @objc func runUpdate() {
+        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidRunUpdate))
+
         if areAutomaticUpdatesEnabled {
             appRestarter.restart()
         } else {
@@ -235,6 +237,8 @@ extension UpdateController: SPUUpdaterDelegate {
         }
         // For manual updates, show the available update without downloading
         onUpdateCheckEnd(item: item, isInstalled: false)
+
+        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
     }
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
@@ -242,6 +246,8 @@ extension UpdateController: SPUUpdaterDelegate {
         os_log("Updater did not find update: \(String(describing: item?.displayVersionString))(\(String(describing: item?.versionString)))", log: .updates)
 
         onUpdateCheckEnd(item: item, isInstalled: true)
+
+        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
@@ -253,6 +259,8 @@ extension UpdateController: SPUUpdaterDelegate {
         }
         // Automatic updates present the available update after it's downloaded
         onUpdateCheckEnd(item: item, isInstalled: false)
+
+        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidDownloadUpdate))
     }
 
     private func onUpdateCheckEnd(item: SUAppcastItem?, isInstalled: Bool) {
