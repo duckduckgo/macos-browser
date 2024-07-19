@@ -49,6 +49,16 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
+    @Published var showInBrowserToolbar: Bool {
+        didSet {
+            if showInBrowserToolbar {
+                pinningManager.pin(.networkProtection)
+            } else {
+                pinningManager.unpin(.networkProtection)
+            }
+        }
+    }
+
     @Published var notifyStatusChanges: Bool {
         didSet {
             settings.notifyStatusChanges = notifyStatusChanges
@@ -59,28 +69,39 @@ final class VPNPreferencesModel: ObservableObject {
 
     private var onboardingStatus: OnboardingStatus {
         didSet {
-            showUninstallVPN = DefaultNetworkProtectionVisibility().isInstalled
+            showUninstallVPN = DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager).isInstalled
         }
     }
 
+    @Published public var dnsSettings: NetworkProtectionDNSSettings = .default
+
+    @Published public var isCustomDNSSelected = false
+    @Published public var customDNSServers: String?
+
     private let settings: VPNSettings
+    private let pinningManager: PinningManager
     private var cancellables = Set<AnyCancellable>()
 
     init(settings: VPNSettings = .init(defaults: .netP),
+         pinningManager: PinningManager = LocalPinningManager.shared,
          defaults: UserDefaults = .netP) {
         self.settings = settings
+        self.pinningManager = pinningManager
 
         connectOnLogin = settings.connectOnLogin
         excludeLocalNetworks = settings.excludeLocalNetworks
         notifyStatusChanges = settings.notifyStatusChanges
         showInMenuBar = settings.showInMenuBar
+        showInBrowserToolbar = pinningManager.isPinned(.networkProtection)
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
 
         subscribeToOnboardingStatusChanges(defaults: defaults)
         subscribeToShowInMenuBarSettingChanges()
+        subscribeToShowInBrowserToolbarSettingsChanges()
         subscribeToLocationSettingChanges()
+        subscribeToDNSSettingsChanges()
     }
 
     func subscribeToOnboardingStatusChanges(defaults: UserDefaults) {
@@ -96,11 +117,41 @@ final class VPNPreferencesModel: ObservableObject {
             .store(in: &cancellables)
     }
 
+    func subscribeToShowInBrowserToolbarSettingsChanges() {
+        NotificationCenter.default.publisher(for: .PinnedViewsChanged).sink { [weak self] notification in
+            guard let self = self else {
+                return
+            }
+
+            if let userInfo = notification.userInfo as? [String: Any],
+               let viewType = userInfo[LocalPinningManager.pinnedViewChangedNotificationViewTypeKey] as? String,
+               let view = PinnableView(rawValue: viewType) {
+                switch view {
+                case .networkProtection: self.showInBrowserToolbar = self.pinningManager.isPinned(.networkProtection)
+                default: break
+                }
+            }
+        }
+        .store(in: &cancellables)
+    }
+
     func subscribeToLocationSettingChanges() {
         settings.selectedLocationPublisher
             .map(VPNLocationPreferenceItemModel.init(selectedLocation:))
             .assign(to: \.locationItem, onWeaklyHeld: self)
             .store(in: &cancellables)
+    }
+
+    func subscribeToDNSSettingsChanges() {
+        settings.dnsSettingsPublisher
+            .assign(to: \.dnsSettings, onWeaklyHeld: self)
+            .store(in: &cancellables)
+        isCustomDNSSelected = settings.dnsSettings.usesCustomDNS
+        customDNSServers = settings.dnsSettings.dnsServersText
+    }
+
+    func resetDNSSettings() {
+        settings.dnsSettings = .default
     }
 
     @MainActor
@@ -109,7 +160,7 @@ final class VPNPreferencesModel: ObservableObject {
 
         switch response {
         case .OK:
-            await NetworkProtectionFeatureDisabler().disable(uninstallSystemExtension: true)
+            try? await VPNUninstaller().uninstall(removeSystemExtension: true)
         default:
             // intentional no-op
             break
@@ -130,5 +181,14 @@ final class VPNPreferencesModel: ObservableObject {
         cancelButton.keyEquivalent = "\r"
 
         return alert
+    }
+}
+
+extension NetworkProtectionDNSSettings {
+    var dnsServersText: String? {
+        switch self {
+        case .default: return nil
+        case .custom(let servers): return servers.joined(separator: ", ")
+        }
     }
 }

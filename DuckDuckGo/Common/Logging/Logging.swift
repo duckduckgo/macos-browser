@@ -41,8 +41,8 @@ extension OSLog {
         case navigation = "Navigation"
         case duckPlayer = "Duck Player"
         case tabSnapshots = "Tab Snapshots"
+        case updates = "Updates"
         case sync = "Sync"
-        case networkProtection = "VPN"
         case dbp = "dbp"
         case extensions = "extensions"
     }
@@ -53,27 +53,27 @@ extension OSLog {
         }
     }
 
-    @OSLogWrapper(.atb) static var atb
-    @OSLogWrapper(.config) static var config
-    @OSLogWrapper(.downloads) static var downloads
-    @OSLogWrapper(.fire) static var fire
-    @OSLogWrapper(.dataImportExport) static var dataImportExport
-    @OSLogWrapper(.pixel) static var pixel
-    @OSLogWrapper(.httpsUpgrade) static var httpsUpgrade
-    @OSLogWrapper(.favicons) static var favicons
-    @OSLogWrapper(.autoLock) static var autoLock
-    @OSLogWrapper(.tabLazyLoading) static var tabLazyLoading
-    @OSLogWrapper(.autoconsent) static var autoconsent
-    @OSLogWrapper(.bookmarks) static var bookmarks
-    @OSLogWrapper(.attribution) static var attribution
-    @OSLogWrapper(.bitwarden) static var bitwarden
-    @OSLogWrapper(.navigation) static var navigation
-    @OSLogWrapper(.duckPlayer) static var duckPlayer
-    @OSLogWrapper(.tabSnapshots) static var tabSnapshots
-    @OSLogWrapper(.sync) static var sync
-    @OSLogWrapper(.networkProtection) static var networkProtection
-    @OSLogWrapper(.dbp) static var dbp
-    @OSLogWrapper(.extensions) static var extensions
+    @OSLogWrapper(AppCategories.atb) static var atb
+    @OSLogWrapper(AppCategories.config) static var config
+    @OSLogWrapper(AppCategories.downloads) static var downloads
+    @OSLogWrapper(AppCategories.fire) static var fire
+    @OSLogWrapper(AppCategories.dataImportExport) static var dataImportExport
+    @OSLogWrapper(AppCategories.pixel) static var pixel
+    @OSLogWrapper(AppCategories.httpsUpgrade) static var httpsUpgrade
+    @OSLogWrapper(AppCategories.favicons) static var favicons
+    @OSLogWrapper(AppCategories.autoLock) static var autoLock
+    @OSLogWrapper(AppCategories.tabLazyLoading) static var tabLazyLoading
+    @OSLogWrapper(AppCategories.autoconsent) static var autoconsent
+    @OSLogWrapper(AppCategories.bookmarks) static var bookmarks
+    @OSLogWrapper(AppCategories.attribution) static var attribution
+    @OSLogWrapper(AppCategories.bitwarden) static var bitwarden
+    @OSLogWrapper(AppCategories.navigation) static var navigation
+    @OSLogWrapper(AppCategories.duckPlayer) static var duckPlayer
+    @OSLogWrapper(AppCategories.tabSnapshots) static var tabSnapshots
+    @OSLogWrapper(AppCategories.updates) static var updates
+    @OSLogWrapper(AppCategories.sync) static var sync
+    @OSLogWrapper(AppCategories.dbp) static var dbp
+    @OSLogWrapper(AppCategories.extensions) static var extensions
 
     // Debug->Logging categories will only be enabled for one day
     @UserDefaultsWrapper(key: .loggingEnabledDate, defaultValue: .distantPast)

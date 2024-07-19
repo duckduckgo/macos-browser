@@ -1,13 +1,13 @@
-name: Sync-End-to-End tests
+name: Sync End-to-End tests
 
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '0 5 * * *' # run at 5 AM UTC
+  schedule:
+    - cron: '0 5 * * *' # run at 5 AM UTC
 
 jobs:
   sync-end-to-end-tests:
-    name: Sync End to end Tests
+    name: Sync End-to-End Tests
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -33,7 +33,7 @@ jobs:
 
     - name: Cache SPM
       if: env.cache_key_hash
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: DerivedData/SourcePackages
         key: ${{ runner.os }}-spm-${{ env.cache_key_hash }}
@@ -66,14 +66,24 @@ jobs:
       with:
         debug: true
 
-    - name: Build and run Sync e2e tests
+    - name: Build Sync e2e tests
+      run: |
+        set -o pipefail && xcodebuild build-for-testing \
+          -scheme "Sync End-to-End UI Tests" \
+          -configuration Review \
+          -derivedDataPath DerivedData \
+          -skipPackagePluginValidation \
+          -skipMacroValidation \
+        | tee xcodebuild.log \
+        | xcbeautify
+
+    - name: Run UI Tests
       env:
         CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
       run: |
-        defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         defaults write com.duckduckgo.macos.browser.review sync.environment Development
-        defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
-        set -o pipefail && xcodebuild test \
+        defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
+        set -o pipefail && xcodebuild test-without-building \
           -scheme "Sync End-to-End UI Tests" \
           -configuration Review \
           -derivedDataPath DerivedData \
@@ -81,20 +91,16 @@ jobs:
           -skipMacroValidation \
           -test-iterations 2 \
           -retry-tests-on-failure \
-        | tee xcodebuild.log \
-        | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml \
-    
-    # - name: Create Asana task when workflow failed
-    #   if: ${{ failure() }}
-    #   run: |
-    #     curl -s "https://app.asana.com/api/1.0/tasks" \
-    #       --header "Accept: application/json" \
-    #       --header "Authorization: Bearer ${{ secrets.ASANA_ACCESS_TOKEN }}" \
-    #       --header "Content-Type: application/json" \
-    #       --data ' { "data": { "name": "GH Workflow Failure - Sync End to end tests", "projects": [ "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}" ], "notes" : "The end to end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" } }'
-    
+        | tee -a xcodebuild.log \
+        | tee ui-tests.log
+
+    - name: Prepare test report
+      if: always()
+      run: |
+        xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml < ui-tests.log
+
     - name: Publish tests report
-      uses: mikepenz/action-junit-report@v3
+      uses: mikepenz/action-junit-report@v4
       if: always() # always run even if the previous step fails
       with:
         check_name: "Test Report ${{ matrix.runner }}"
@@ -102,7 +108,7 @@ jobs:
 
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4
-      if: failure()
+      if: failure() || cancelled()
       with:
         name: "BuildLogs ${{ matrix.runner }}"
         path: |
@@ -111,3 +117,18 @@ jobs:
           ~/Library/Logs/DiagnosticReports/*
         retention-days: 7
 
+  notify-failure:
+    name: Notify on failure
+    if: ${{ always() && github.event_name == 'schedule' && (needs.sync-end-to-end-tests.result == 'failure' || needs.sync-end-to-end-tests.result == 'cancelled') }}
+    needs: [sync-end-to-end-tests]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Create Asana task when workflow failed
+      uses: duckduckgo/native-github-asana-sync@v1.1
+      with:
+        action: create-asana-task
+        asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        asana-project: ${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}
+        asana-task-name: GH Workflow Failure - Sync End-to-End Tests
+        asana-task-description: The Sync end-to-end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

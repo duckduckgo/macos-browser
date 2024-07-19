@@ -22,23 +22,24 @@ import SwiftUI
 
 public final class SubscriptionAccessViewController: NSViewController {
 
-    private let accountManager: AccountManager
+    private let subscriptionManager: SubscriptionManager
     private var actionHandlers: SubscriptionAccessActionHandlers
-    private let subscriptionAppGroup: String
 
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(accountManager: AccountManager, actionHandlers: SubscriptionAccessActionHandlers, subscriptionAppGroup: String) {
-        self.accountManager = accountManager
+    public init(subscriptionManager: SubscriptionManager,
+                actionHandlers: SubscriptionAccessActionHandlers) {
+        self.subscriptionManager = subscriptionManager
         self.actionHandlers = actionHandlers
-        self.subscriptionAppGroup = subscriptionAppGroup
         super.init(nibName: nil, bundle: nil)
     }
 
     public override func loadView() {
-        let subscriptionAccessView = SubscriptionAccessView(model: makeSubscriptionAccessModel(),
+        lazy var sheetModel = SubscriptionAccessViewModel(actionHandlers: actionHandlers,
+                                                          purchasePlatform: subscriptionManager.currentEnvironment.purchasePlatform)
+        let subscriptionAccessView = SubscriptionAccessView(model: sheetModel,
                                                             dismiss: { [weak self] in
                 guard let self = self else { return }
                 self.presentingViewController?.dismiss(self)
@@ -53,13 +54,5 @@ public final class SubscriptionAccessViewController: NSViewController {
         hostingView.translatesAutoresizingMaskIntoConstraints = true
 
         view.addSubview(hostingView)
-    }
-
-    private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
-        if accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: actionHandlers, email: accountManager.email, subscriptionAppGroup: subscriptionAppGroup)
-        } else {
-            ActivateSubscriptionAccessModel(actionHandlers: actionHandlers, shouldShowRestorePurchase: SubscriptionPurchaseEnvironment.current == .appStore)
-        }
     }
 }

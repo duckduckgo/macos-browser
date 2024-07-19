@@ -26,7 +26,6 @@ import Combine
 
 final public class DataBrokerProtectionViewController: NSViewController {
     private let dataManager: DataBrokerProtectionDataManaging
-    private let scheduler: DataBrokerProtectionScheduler
     private var webView: WKWebView?
     private var loader: NSProgressIndicator!
     private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
@@ -37,20 +36,19 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let openURLHandler: (URL?) -> Void
     private var reloadObserver: NSObjectProtocol?
 
-    public init(scheduler: DataBrokerProtectionScheduler,
+    public init(agentInterface: DataBrokerProtectionAppToAgentInterface,
                 dataManager: DataBrokerProtectionDataManaging,
                 privacyConfig: PrivacyConfigurationManaging? = nil,
                 prefs: ContentScopeProperties? = nil,
                 webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
                 openURLHandler: @escaping (URL?) -> Void) {
-        self.scheduler = scheduler
         self.dataManager = dataManager
         self.openURLHandler = openURLHandler
         self.webUISettings = webUISettings
         self.pixelHandler = DataBrokerProtectionPixelsHandler()
         self.webUIPixel = DataBrokerProtectionWebUIPixels(pixelHandler: pixelHandler)
         self.webUIViewModel = DBPUIViewModel(dataManager: dataManager,
-                                             scheduler: scheduler,
+                                             agentInterface: agentInterface,
                                              webUISettings: webUISettings,
                                              privacyConfig: privacyConfig,
                                              prefs: prefs,

@@ -21,7 +21,6 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-// swiftlint:disable:next type_body_length
 @MainActor final class DataImportViewModelTests: XCTestCase {
 
     typealias Source = DataImport.Source
@@ -1142,7 +1141,7 @@ import XCTest
                             xctDescr = "\(source): " + xctDescr
 
                             XCTAssertEqual(model.description, expectation.description, xctDescr)
-                            XCTAssertEqual(model.actionButton, .done, xctDescr)
+                            XCTAssertEqual(model.actionButton, .next(.shortcuts([.bookmarks])), xctDescr)
                             XCTAssertNil(model.secondaryButton, xctDescr)
                         }
                     }
@@ -1181,7 +1180,7 @@ import XCTest
                     // expect Final Summary
                     let expectation = DataImportViewModel(importSource: source, screen: .summary([.bookmarks], isFileImport: true), summary: [bookmarksSummary, result.map { .init(.bookmarks, $0) }].compactMap { $0 })
                     XCTAssertEqual(model.description, expectation.description, xctDescr)
-                    XCTAssertEqual(model.actionButton, .done, xctDescr)
+                    XCTAssertEqual(model.actionButton, .next(.shortcuts([.bookmarks])), xctDescr)
                     XCTAssertNil(model.secondaryButton, xctDescr)
                 }
             }
@@ -1231,7 +1230,7 @@ import XCTest
         }
     }
 
-    func testWhenBrowsersBookmarksImportFailsNoDataAndFileImportSkippedAndNoPasswordsFileImportNeeded_dialogDismissed() throws {
+    func testWhenBrowsersBookmarksImportFailsNoDataAndFileImportSkippedAndNoPasswordsFileImportNeeded_shortcutsShown() throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
 
             let bookmarksSummary = bookmarkSummaryNoData
@@ -1246,12 +1245,9 @@ import XCTest
                            screen: .fileImport(dataType: .bookmarks, summary: []),
                            summary: [bookmarksSummary, passwordsSummary].compactMap { $0 })
 
-                let expectation = expectation(description: "dismissed")
-                model.performAction(for: .skip) {
-                    expectation.fulfill()
-                }
+                model.performAction(for: .skip) {}
 
-                waitForExpectations(timeout: 0)
+                XCTAssertEqual(model.screen, .shortcuts([.passwords]))
             }
         }
     }
@@ -1410,7 +1406,7 @@ import XCTest
                             // expect Final Summary
                             let expectation = DataImportViewModel(importSource: source, screen: .summary([.passwords], isFileImport: true), summary: [bookmarksSummary, passwordsSummary, bookmarksFileImportSummary, result.map { .init(.passwords, $0) }].compactMap { $0 })
                             XCTAssertEqual(model.description, expectation.description, xctDescr)
-                            XCTAssertEqual(model.actionButton, .done, xctDescr)
+                            XCTAssertEqual(model.actionButton, .next(.shortcuts([.passwords])), xctDescr)
                             XCTAssertNil(model.secondaryButton, xctDescr)
                         }
                     }
@@ -1447,7 +1443,7 @@ import XCTest
                     // expect Final Summary
                     let expectation = DataImportViewModel(importSource: source, screen: .summary([.passwords], isFileImport: true), summary: [passwordsSummary, result.map { .init(.passwords, $0) }].compactMap { $0 })
                     XCTAssertEqual(model.description, expectation.description, xctDescr)
-                    XCTAssertEqual(model.actionButton, .done, xctDescr)
+                    XCTAssertEqual(model.actionButton, .next(.shortcuts([.passwords])), xctDescr)
                     XCTAssertNil(model.secondaryButton, xctDescr)
                 }
             }
@@ -1503,7 +1499,7 @@ import XCTest
         }
     }
 
-    func testWhenBrowsersPasswordsImportFailNoDataAndFileImportSkipped_dialogDismissed() throws {
+    func testWhenBrowsersPasswordsImportFailNoDataAndFileImportSkipped_dialogDismissedOrShortcutsShown() throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
             for bookmarksSummary in bookmarksSummaries {
 
@@ -1522,12 +1518,19 @@ import XCTest
                                screen: .fileImport(dataType: .passwords, summary: []),
                                summary: [bookmarksSummary, passwordsSummary, bookmarksFileImportSummary].compactMap { $0 })
 
-                    let expectation = expectation(description: "dismissed")
-                    model.performAction(for: .skip) {
-                        expectation.fulfill()
+                    if let result = bookmarksSummary?.result as? DataImportResult<DataTypeSummary>, result.isSuccess, let successful = try? result.get().successful, successful > 0 {
+                        model.performAction(for: .skip) {}
+                        XCTAssertEqual(model.screen, .shortcuts([.bookmarks]))
+                    } else if let result = bookmarksFileImportSummary?.result as? DataImportResult<DataTypeSummary>, result.isSuccess, let successful = try? result.get().successful, successful > 0 {
+                        model.performAction(for: .skip) {}
+                        XCTAssertEqual(model.screen, .shortcuts([.bookmarks]))
+                    } else {
+                        let expectation = expectation(description: "dismissed")
+                        model.performAction(for: .skip) {
+                            expectation.fulfill()
+                        }
+                        waitForExpectations(timeout: 0)
                     }
-
-                    waitForExpectations(timeout: 0)
                 }
             }
         }
@@ -1828,6 +1831,7 @@ extension DataImportViewModel.Screen: CustomStringConvertible {
         case .summary(let dataTypes, isFileImport: true):
             ".summary([\(dataTypes.map { "." + $0.rawValue }.sorted().joined(separator: ", "))], isFileImport: true)"
         case .feedback: ".feedback"
+        case .shortcuts: ".shortcuts"
         }
     }
 }

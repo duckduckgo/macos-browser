@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import XCTest
+import Common
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -89,6 +90,19 @@ final class DuckPlayerTests: XCTestCase {
         XCTAssertNil(duckPlayer.title(for: feedItem))
     }
 
+    @MainActor
+    func testEnabledPiPFlag() async {
+        let configuration = WKWebViewConfiguration()
+
+        configuration.applyStandardConfiguration(contentBlocking: ContentBlockingMock(),
+                                                 burnerMode: .regular)
+#if APPSTORE
+        XCTAssertFalse(configuration.allowsPictureInPictureMediaPlayback)
+#else
+        XCTAssertTrue(configuration.allowsPictureInPictureMediaPlayback)
+#endif
+    }
+
     func testThatTitleForRecentlyVisitedPageIsNotAdjustedForNonDuckPlayerFeedItems() {
         let feedItem = HomePage.Models.RecentlyVisitedPageModel(
             actualTitle: "Duck Player - A sample video title",
@@ -106,5 +120,12 @@ final class DuckPlayerTests: XCTestCase {
         } else {
             return .duckPlayer("12345678")
         }
+    }
+}
+
+extension WKWebViewConfiguration {
+    var allowsPictureInPictureMediaPlayback: Bool {
+        get { preferences[.allowsPictureInPictureMediaPlayback] }
+        set { preferences[.allowsPictureInPictureMediaPlayback] = newValue }
     }
 }

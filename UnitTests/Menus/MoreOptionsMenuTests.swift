@@ -21,6 +21,8 @@ import NetworkProtection
 import NetworkProtectionUI
 import XCTest
 import Subscription
+import SubscriptionTestingUtilities
+import BrowserServicesKit
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -28,31 +30,39 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     var tabCollectionViewModel: TabCollectionViewModel!
     var passwordManagerCoordinator: PasswordManagerCoordinator!
+    var networkProtectionVisibilityMock: NetworkProtectionVisibilityMock!
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
-    @MainActor
-    lazy var moreOptionMenu: MoreOptionsMenu! = {
-        let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                   passwordManagerCoordinator: passwordManagerCoordinator,
-                                   networkProtectionFeatureVisibility: networkProtectionVisibilityMock,
-                                   sharingMenu: NSMenu(),
-                                   internalUserDecider: internalUserDecider)
-        menu.actionDelegate = capturingActionDelegate
-        return menu
-    }()
-
     var internalUserDecider: InternalUserDeciderMock!
 
-    var networkProtectionVisibilityMock: NetworkProtectionVisibilityMock!
+    var storePurchaseManager: StorePurchaseManager!
+
+    var subscriptionManager: SubscriptionManagerMock!
+
+    var moreOptionsMenu: MoreOptionsMenu!
 
     @MainActor
     override func setUp() {
         super.setUp()
         tabCollectionViewModel = TabCollectionViewModel()
         passwordManagerCoordinator = PasswordManagerCoordinator()
+        networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(isInstalled: false, visible: false)
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
         internalUserDecider = InternalUserDeciderMock()
 
-        networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(isInstalled: false, visible: false)
+        storePurchaseManager = StorePurchaseManagerMock(purchasedProductIDs: ["a", "b"],
+                                                        purchaseQueue: [],
+                                                        areProductsAvailable: true,
+                                                        hasActiveSubscriptionResult: false,
+                                                        purchaseSubscriptionResult: .success(""))
+
+        subscriptionManager = SubscriptionManagerMock(accountManager: AccountManagerMock(),
+                                                      subscriptionEndpointService: SubscriptionEndpointServiceMock(),
+                                                      authEndpointService: SubscriptionMockFactory.authEndpointService,
+                                                      storePurchaseManager: storePurchaseManager,
+                                                      currentEnvironment: SubscriptionEnvironment(serviceEnvironment: .production,
+                                                                                                  purchasePlatform: .appStore),
+                                                      canPurchase: false)
+
     }
 
     @MainActor
@@ -60,51 +70,137 @@ final class MoreOptionsMenuTests: XCTestCase {
         tabCollectionViewModel = nil
         passwordManagerCoordinator = nil
         capturingActionDelegate = nil
-        moreOptionMenu = nil
+        subscriptionManager = nil
+        moreOptionsMenu = nil
         super.tearDown()
     }
 
     @MainActor
-    func testThatMoreOptionMenuHasTheExpectedItems() {
-        moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                         passwordManagerCoordinator: passwordManagerCoordinator,
-                                         networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
-                                         sharingMenu: NSMenu(),
-                                         internalUserDecider: internalUserDecider)
+    private func setupMoreOptionsMenu() {
+        moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                          passwordManagerCoordinator: passwordManagerCoordinator,
+                                          vpnFeatureGatekeeper: networkProtectionVisibilityMock,
+                                          subscriptionFeatureAvailability: SubscriptionFeatureAvailabilityMock(isFeatureAvailable: true,
+                                                                                                               isSubscriptionPurchaseAllowed: true),
+                                          sharingMenu: NSMenu(),
+                                          internalUserDecider: internalUserDecider,
+                                          subscriptionManager: subscriptionManager)
 
-        XCTAssertEqual(moreOptionMenu.items[0].title, UserText.sendFeedback)
-        XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
-        XCTAssertEqual(moreOptionMenu.items[3].title, UserText.newWindowMenuItem)
-        XCTAssertEqual(moreOptionMenu.items[4].title, UserText.newBurnerWindowMenuItem)
-        XCTAssertTrue(moreOptionMenu.items[5].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[6].title, UserText.zoom)
-        XCTAssertTrue(moreOptionMenu.items[7].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[8].title, UserText.bookmarks)
-        XCTAssertEqual(moreOptionMenu.items[9].title, UserText.downloads)
-        XCTAssertEqual(moreOptionMenu.items[10].title, UserText.passwordManagement)
-        XCTAssertTrue(moreOptionMenu.items[11].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
+        moreOptionsMenu.actionDelegate = capturingActionDelegate
+    }
 
-        if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
-            XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
-            XCTAssertTrue(moreOptionMenu.items[14].title.hasPrefix(UserText.networkProtection))
-            XCTAssertTrue(moreOptionMenu.items[15].title.hasPrefix(UserText.identityTheftRestorationOptionsMenuItem))
-            XCTAssertTrue(moreOptionMenu.items[16].isSeparatorItem)
-            XCTAssertEqual(moreOptionMenu.items[17].title, UserText.settings)
-        } else {
-            XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
-            XCTAssertTrue(moreOptionMenu.items[14].title.hasPrefix(UserText.networkProtection))
-            XCTAssertTrue(moreOptionMenu.items[15].isSeparatorItem)
-            XCTAssertEqual(moreOptionMenu.items[16].title, UserText.settings)
-        }
+    private func mockAuthentication() {
+        subscriptionManager.accountManager.storeAuthToken(token: "")
+        subscriptionManager.accountManager.storeAccount(token: "", email: "", externalID: "")
+    }
+
+    @MainActor
+    func testThatPrivacyProIsNotPresentWhenUnauthenticatedAndPurchaseNotAllowedOnAppStore () {
+        subscriptionManager.canPurchase = false
+        subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .appStore)
+
+        setupMoreOptionsMenu()
+
+        XCTAssertFalse(subscriptionManager.accountManager.isUserAuthenticated)
+        XCTAssertFalse(moreOptionsMenu.items.map { $0.title }.contains(UserText.subscriptionOptionsMenuItem))
+    }
+
+    @MainActor
+    func testThatPrivacyProIsPresentWhenUnauthenticatedAndPurchaseAllowedOnAppStore () {
+        subscriptionManager.canPurchase = true
+        subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .appStore)
+
+        setupMoreOptionsMenu()
+
+        XCTAssertFalse(subscriptionManager.accountManager.isUserAuthenticated)
+        XCTAssertTrue(moreOptionsMenu.items.map { $0.title }.contains(UserText.subscriptionOptionsMenuItem))
+    }
+
+    @MainActor
+    func testThatPrivacyProIsPresentDespiteCanPurchaseFlagOnStripe () {
+        subscriptionManager.canPurchase = false
+        subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
+
+        setupMoreOptionsMenu()
+
+        XCTAssertFalse(subscriptionManager.accountManager.isUserAuthenticated)
+        XCTAssertTrue(moreOptionsMenu.items.map { $0.title }.contains(UserText.subscriptionOptionsMenuItem))
+    }
+
+    @MainActor
+    func testThatMoreOptionMenuHasTheExpectedItemsWhenUnauthenticatedAndCanPurchaseSubscription() {
+        subscriptionManager.canPurchase = true
+        subscriptionManager.currentEnvironment = SubscriptionEnvironment(serviceEnvironment: .production, purchasePlatform: .stripe)
+
+        setupMoreOptionsMenu()
+
+        XCTAssertFalse(subscriptionManager.accountManager.isUserAuthenticated)
+        XCTAssertTrue(subscriptionManager.canPurchase)
+
+        XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)
+        XCTAssertTrue(moreOptionsMenu.items[1].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[3].title, UserText.newWindowMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[4].title, UserText.newBurnerWindowMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[5].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[6].title, UserText.zoom)
+        XCTAssertTrue(moreOptionsMenu.items[7].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[8].title, UserText.bookmarks)
+        XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.downloads)
+        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagementTitle)
+        XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[13].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[14].title, UserText.subscriptionOptionsMenuItem)
+        XCTAssertFalse(moreOptionsMenu.items[14].hasSubmenu)
+        XCTAssertTrue(moreOptionsMenu.items[15].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.mainMenuHelp)
+        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.settings)
+    }
+
+    @MainActor
+    func testThatMoreOptionMenuHasTheExpectedItemsWhenSubscriptionIsActive() {
+        mockAuthentication()
+
+        setupMoreOptionsMenu()
+
+        XCTAssertTrue(subscriptionManager.accountManager.isUserAuthenticated)
+
+        XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)
+        XCTAssertTrue(moreOptionsMenu.items[1].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[3].title, UserText.newWindowMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[4].title, UserText.newBurnerWindowMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[5].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[6].title, UserText.zoom)
+        XCTAssertTrue(moreOptionsMenu.items[7].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[8].title, UserText.bookmarks)
+        XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.downloads)
+        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagementTitle)
+        XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[13].isSeparatorItem)
+
+        XCTAssertEqual(moreOptionsMenu.items[14].title, UserText.subscriptionOptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[14].hasSubmenu)
+        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[0].title, UserText.networkProtection)
+        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[1].title, UserText.dataBrokerProtectionOptionsMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[2].title, UserText.identityTheftRestorationOptionsMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[14].submenu!.items[3].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[4].title, UserText.subscriptionSettingsOptionsMenuItem)
+
+        XCTAssertTrue(moreOptionsMenu.items[15].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.mainMenuHelp)
+        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.settings)
     }
 
     // MARK: Zoom
 
     @MainActor
     func testWhenClickingDefaultZoomInZoomSubmenuThenTheActionDelegateIsAlerted() {
-        guard let zoomSubmenu = moreOptionMenu.zoomMenuItem.submenu else {
+        setupMoreOptionsMenu()
+
+        guard let zoomSubmenu = moreOptionsMenu.zoomMenuItem.submenu else {
             XCTFail("No zoom submenu available")
             return
         }
@@ -112,14 +208,15 @@ final class MoreOptionsMenuTests: XCTestCase {
 
         zoomSubmenu.performActionForItem(at: defaultZoomItemIndex)
 
-        XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedAppearancePreferencesCalled)
+        XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedAccessibilityPreferencesCalled)
     }
 
     // MARK: Preferences
-
     @MainActor
     func testWhenClickingOnPreferenceMenuItemThenTheActionDelegateIsAlerted() {
-        moreOptionMenu.performActionForItem(at: moreOptionMenu.items.count - 1)
+        setupMoreOptionsMenu()
+
+        moreOptionsMenu.performActionForItem(at: moreOptionsMenu.items.count - 1)
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedPreferencesCalled)
     }
 
@@ -127,8 +224,10 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     @MainActor
     func testWhenClickingOnBookmarkAllTabsMenuItemThenTheActionDelegateIsAlerted() throws {
+        setupMoreOptionsMenu()
+
         // GIVEN
-        let bookmarksMenu = try XCTUnwrap(moreOptionMenu.item(at: 8)?.submenu)
+        let bookmarksMenu = try XCTUnwrap(moreOptionsMenu.item(at: 8)?.submenu)
         let bookmarkAllTabsIndex = try XCTUnwrap(bookmarksMenu.indexOfItem(withTitle: UserText.bookmarkAllTabs))
         let bookmarkAllTabsMenuItem = try XCTUnwrap(bookmarksMenu.items[bookmarkAllTabsIndex])
         bookmarkAllTabsMenuItem.isEnabled = true
@@ -142,7 +241,8 @@ final class MoreOptionsMenuTests: XCTestCase {
 
 }
 
-final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
+final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
+
     var onboardStatusPublisher: AnyPublisher<NetworkProtectionUI.OnboardingStatus, Never> {
         Just(.default).eraseToAnyPublisher()
     }
@@ -175,7 +275,7 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         false
     }
 
-    func disableIfUserHasNoAccess() async -> Bool {
-        return false
+    func disableIfUserHasNoAccess() async {
+        // Intentional no-op
     }
 }

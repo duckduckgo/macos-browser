@@ -22,7 +22,12 @@ import LoginItems
 import PixelKit
 
 protocol LoginItemsManaging {
+    func enableLoginItems(_ items: Set<LoginItem>, log: OSLog)
     func throwingEnableLoginItems(_ items: Set<LoginItem>, log: OSLog) throws
+    func disableLoginItems(_ items: Set<LoginItem>)
+    func restartLoginItems(_ items: Set<LoginItem>, log: OSLog)
+
+    func isAnyEnabled(_ items: Set<LoginItem>) -> Bool
 }
 
 /// Class to manage the login items for the VPN and DBP

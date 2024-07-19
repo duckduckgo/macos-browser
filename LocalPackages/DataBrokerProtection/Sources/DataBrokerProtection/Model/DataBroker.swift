@@ -67,6 +67,23 @@ struct MirrorSite: Codable, Sendable {
         removedAt = try? container.decode(Date.self, forKey: .removedAt)
 
     }
+
+    func wasRemoved(since: Date = Date()) -> Bool {
+        guard let removedAt = self.removedAt else {
+            return false
+        }
+
+        return removedAt < since
+    }
+}
+
+extension MirrorSite {
+
+    typealias ScannedBroker = DBPUIScanProgress.ScannedBroker
+
+    func scannedBroker(withStatus status: ScannedBroker.Status) -> ScannedBroker {
+        ScannedBroker(name: name, url: url, status: status)
+    }
 }
 
 public enum DataBrokerHierarchy: Int {

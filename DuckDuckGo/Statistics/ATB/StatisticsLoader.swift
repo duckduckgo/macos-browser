@@ -30,14 +30,14 @@ final class StatisticsLoader {
 
     private let statisticsStore: StatisticsStore
     private let emailManager: EmailManager
-    private let attributionPixelHandler: AttributionsPixelHandler
+    private let attributionPixelHandler: InstallationAttributionsPixelHandler
     private let parser = AtbParser()
     private var isAppRetentionRequestInProgress = false
 
     init(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
         emailManager: EmailManager = EmailManager(),
-        attributionPixelHandler: AttributionsPixelHandler = InstallationAttributionPixelHandler()
+        attributionPixelHandler: InstallationAttributionsPixelHandler = AppInstallationAttributionPixelHandler()
     ) {
         self.statisticsStore = statisticsStore
         self.emailManager = emailManager
@@ -60,8 +60,10 @@ final class StatisticsLoader {
                         completion()
                     }
                 }
-                PixelKit.fire(GeneralPixel.serp)
+                PixelExperiment.fireSerpPixel()
+                PixelExperiment.fireOnboardingSearchPerformed5to7Pixel()
                 self.fireDailyOsVersionCounterPixel()
+                self.fireDockPixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)
             } else {
@@ -166,6 +168,7 @@ final class StatisticsLoader {
             if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
                 self.statisticsStore.searchRetentionAtb = atb.version
                 self.storeUpdateVersionIfPresent(atb)
+                NotificationCenter.default.post(name: .searchDAU, object: nil, userInfo: nil)
             }
 
             completion()
@@ -228,6 +231,15 @@ final class StatisticsLoader {
             PixelKit.fire(GeneralPixel.dailyOsVersionCounter,
                           frequency: .legacyDaily,
                           includeAppVersionParameter: false)
+        }
+    }
+
+    private func fireDockPixel() {
+        DispatchQueue.global().asyncAfter(deadline: .now() + Double.random(in: 0.5...5)) {
+            if DockCustomizer().isAddedToDock {
+                PixelKit.fire(GeneralPixel.serpAddedToDock,
+                              includeAppVersionParameter: false)
+            }
         }
     }
 

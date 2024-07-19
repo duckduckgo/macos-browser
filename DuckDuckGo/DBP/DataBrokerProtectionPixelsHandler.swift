@@ -23,7 +23,6 @@ import Common
 
 public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
-    // swiftlint:disable:next function_body_length
     public init() {
         super.init { event, _, _, _ in
             switch event {
@@ -31,28 +30,24 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                 PixelKit.fire(DebugEvent(event, error: error))
             case .generalError(let error, _),
                     .secureVaultInitError(let error),
-                    .secureVaultError(let error):
+                    .secureVaultError(let error),
+                    .secureVaultKeyStoreReadError(let error),
+                    .secureVaultKeyStoreUpdateError(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
-            case .ipcServerStartSchedulerXPCError(error: let error),
-                    .ipcServerStopSchedulerXPCError(error: let error),
-                    .ipcServerScanAllBrokersXPCError(error: let error),
-                    .ipcServerScanAllBrokersCompletedOnAgentWithError(error: let error),
-                    .ipcServerScanAllBrokersCompletionCalledOnAppWithError(error: let error),
-                    .ipcServerOptOutAllBrokersCompletion(error: let error),
-                    .ipcServerRunQueuedOperationsCompletion(error: let error):
+            case .ipcServerProfileSavedXPCError(error: let error),
+                    .ipcServerImmediateScansFinishedWithError(error: let error),
+                    .ipcServerAppLaunchedXPCError(error: let error),
+                    .ipcServerAppLaunchedScheduledScansFinishedWithError(error: let error):
                 PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
-            case .ipcServerStartSchedulerCalledByApp,
-                    .ipcServerStartSchedulerReceivedByAgent,
-                    .ipcServerStopSchedulerCalledByApp,
-                    .ipcServerStopSchedulerReceivedByAgent,
-                    .ipcServerScanAllBrokersAttemptedToCallWithoutLoginItemPermissions,
-                    .ipcServerScanAllBrokersAttemptedToCallInWrongDirectory,
-                    .ipcServerScanAllBrokersCalledByApp,
-                    .ipcServerScanAllBrokersReceivedByAgent,
-                    .ipcServerScanAllBrokersCompletedOnAgentWithoutError,
-                    .ipcServerScanAllBrokersCompletionCalledOnAppWithoutError,
-                    .ipcServerScanAllBrokersInterruptedOnAgent,
-                    .ipcServerScanAllBrokersCompletionCalledOnAppAfterInterruption:
+            case .ipcServerProfileSavedCalledByApp,
+                    .ipcServerProfileSavedReceivedByAgent,
+                    .ipcServerImmediateScansInterrupted,
+                    .ipcServerImmediateScansFinishedWithoutError,
+                    .ipcServerAppLaunchedCalledByApp,
+                    .ipcServerAppLaunchedReceivedByAgent,
+                    .ipcServerAppLaunchedScheduledScansBlocked,
+                    .ipcServerAppLaunchedScheduledScansInterrupted,
+                    .ipcServerAppLaunchedScheduledScansFinishedWithoutError:
                 PixelKit.fire(event, frequency: .dailyAndCount, includeAppVersionParameter: true)
             case .parentChildMatches,
                     .optOutStart,
@@ -70,13 +65,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .optOutSuccess,
                     .optOutFailure,
                     .backgroundAgentStarted,
-                    .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
-                    .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
-                    .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
                     .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
-                    .ipcServerOptOutAllBrokers,
-                    .ipcServerRunQueuedOperations,
-                    .ipcServerRunAllOperations,
                     .scanSuccess,
                     .scanFailed,
                     .scanError,
@@ -103,14 +92,25 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .initialScanTotalDuration,
                     .initialScanSiteLoadDuration,
                     .initialScanPostLoadingDuration,
-                    .initialScanPreStartDuration:
+                    .initialScanPreStartDuration,
+                    .globalMetricsWeeklyStats,
+                    .globalMetricsMonthlyStats,
+                    .dataBrokerMetricsWeeklyStats,
+                    .dataBrokerMetricsMonthlyStats,
+                    .gatekeeperNotAuthenticated,
+                    .gatekeeperEntitlementsInvalid:
+
                 PixelKit.fire(event)
 
             case .homeViewShowNoPermissionError,
                     .homeViewShowWebUI,
                     .homeViewShowBadPathError,
                     .homeViewCTAMoveApplicationClicked,
-                    .homeViewCTAGrantPermissionClicked:
+                    .homeViewCTAGrantPermissionClicked,
+
+                    .entitlementCheckValid,
+                    .entitlementCheckInvalid,
+                    .entitlementCheckError:
                 PixelKit.fire(event, frequency: .dailyAndCount)
             }
         }

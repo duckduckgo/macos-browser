@@ -37,7 +37,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private let waitlistTimestampItem = NSMenuItem(title: "Waitlist Timestamp:")
     private let waitlistInviteCodeItem = NSMenuItem(title: "Waitlist Invite Code:")
     private let waitlistTermsAndConditionsAcceptedItem = NSMenuItem(title: "T&C Accepted:")
-    private let waitlistBypassItem = NSMenuItem(title: "Bypass Waitlist", action: #selector(DataBrokerProtectionDebugMenu.toggleBypassWaitlist))
 
     private let productionURLMenuItem = NSMenuItem(title: "Use Production URL", action: #selector(DataBrokerProtectionDebugMenu.useWebUIProductionURL))
 
@@ -53,7 +52,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private let webUISettings = DataBrokerProtectionWebUIURLSettings(.dbp)
     private let settings = DataBrokerProtectionSettings(defaults: .dbp)
 
-    // swiftlint:disable:next function_body_length
     init() {
         super.init(title: "Personal Information Removal")
 
@@ -67,13 +65,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 NSMenuItem(title: "Send Notification", action: #selector(DataBrokerProtectionDebugMenu.sendWaitlistAvailableNotification))
                     .targetting(self)
 
-                NSMenuItem(title: "Fetch Invite Code", action: #selector(DataBrokerProtectionDebugMenu.fetchInviteCode))
-                    .targetting(self)
-
                 NSMenuItem.separator()
-
-                waitlistBypassItem
-                    .targetting(self)
 
                 NSMenuItem.separator()
 
@@ -105,7 +97,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Operations") {
                 NSMenuItem(title: "Hidden WebView") {
                     menuItem(withTitle: "Run queued operations",
-                             action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations(_:)),
+                             action: #selector(DataBrokerProtectionDebugMenu.startScheduledOperations(_:)),
                              representedObject: false)
 
                     menuItem(withTitle: "Run scan operations",
@@ -119,7 +111,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
                 NSMenuItem(title: "Visible WebView") {
                     menuItem(withTitle: "Run queued operations",
-                             action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations(_:)),
+                             action: #selector(DataBrokerProtectionDebugMenu.startScheduledOperations(_:)),
                              representedObject: true)
 
                     menuItem(withTitle: "Run scan operations",
@@ -172,7 +164,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     // MARK: - Menu State Update
 
     override func update() {
-        updateWaitlistItems()
         updateWebUIMenuItemsState()
         updateEnvironmentMenu()
         updateShowStatusMenuIconMenu()
@@ -204,61 +195,25 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         }
     }
 
-    @objc private func runQueuedOperations(_ sender: NSMenuItem) {
+    @objc private func startScheduledOperations(_ sender: NSMenuItem) {
         os_log("Running queued operations...", log: .dataBrokerProtection)
         let showWebView = sender.representedObject as? Bool ?? false
 
-        DataBrokerProtectionManager.shared.scheduler.runQueuedOperations(showWebView: showWebView) { errors in
-            if let errors = errors {
-                if let oneTimeError = errors.oneTimeError {
-                    os_log("Queued operations finished,  error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                }
-                if let operationErrors = errors.operationErrors,
-                          operationErrors.count != 0 {
-                    os_log("Queued operations finished, operation errors count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
-                }
-            } else {
-                os_log("Queued operations finished", log: .dataBrokerProtection)
-            }
-        }
+        DataBrokerProtectionManager.shared.loginItemInterface.startScheduledOperations(showWebView: showWebView)
     }
 
     @objc private func runScanOperations(_ sender: NSMenuItem) {
         os_log("Running scan operations...", log: .dataBrokerProtection)
         let showWebView = sender.representedObject as? Bool ?? false
 
-        DataBrokerProtectionManager.shared.scheduler.startManualScan(showWebView: showWebView, startTime: Date()) { errors in
-            if let errors = errors {
-                if let oneTimeError = errors.oneTimeError {
-                    os_log("scan operations finished, error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                }
-                if let operationErrors = errors.operationErrors,
-                          operationErrors.count != 0 {
-                    os_log("scan operations finished, operation errors count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
-                }
-            } else {
-                os_log("Scan operations finished", log: .dataBrokerProtection)
-            }
-        }
+        DataBrokerProtectionManager.shared.loginItemInterface.startImmediateOperations(showWebView: showWebView)
     }
 
     @objc private func runOptoutOperations(_ sender: NSMenuItem) {
         os_log("Running Optout operations...", log: .dataBrokerProtection)
         let showWebView = sender.representedObject as? Bool ?? false
 
-        DataBrokerProtectionManager.shared.scheduler.optOutAllBrokers(showWebView: showWebView) { errors in
-            if let errors = errors {
-                if let oneTimeError = errors.oneTimeError {
-                    os_log("Optout operations finished,  error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                }
-                if let operationErrors = errors.operationErrors,
-                          operationErrors.count != 0 {
-                    os_log("Optout operations finished, operation errors count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
-                }
-            } else {
-                os_log("Optout operations finished", log: .dataBrokerProtection)
-            }
-        }
+        DataBrokerProtectionManager.shared.loginItemInterface.runAllOptOuts(showWebView: showWebView)
     }
 
     @objc private func backgroundAgentRestart() {
@@ -316,7 +271,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func runCustomJSON() {
-        let viewController = DataBrokerRunCustomJSONViewController()
+        let authenticationManager = DataBrokerAuthenticationManagerBuilder.buildAuthenticationManager(subscriptionManager: Application.appDelegate.subscriptionManager)
+        let viewController = DataBrokerRunCustomJSONViewController(authenticationManager: authenticationManager)
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable],
                               backing: .buffered,
@@ -331,7 +287,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func forceBrokerJSONFilesUpdate() {
-        if let updater = DataBrokerProtectionBrokerUpdater.provide() {
+        if let updater = DefaultDataBrokerProtectionBrokerUpdater.provideForDebug() {
             updater.updateBrokers()
         }
     }
@@ -346,10 +302,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         os_log("DBP waitlist state cleaned", log: .dataBrokerProtection)
     }
 
-    @objc private func toggleBypassWaitlist() {
-        DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist.toggle()
-    }
-
     @objc private func resetTermsAndConditionsAcceptance() {
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
@@ -362,37 +314,17 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         os_log("DBP waitlist notification sent", log: .dataBrokerProtection)
     }
 
-    @objc private func fetchInviteCode() {
-        os_log("Fetching invite code...", log: .dataBrokerProtection)
-
-        Task {
-            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
-        }
-    }
-
     @objc private func toggleShowStatusMenuItem() {
         settings.showInMenuBar.toggle()
-    }
-
-    @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
-        let title = menuItem.title
-        let selectedEnvironment: DataBrokerProtectionSettings.SelectedEnvironment
-
-        if title == EnvironmentTitle.staging.rawValue {
-            selectedEnvironment = .staging
-        } else {
-            selectedEnvironment = .production
-        }
-
-        settings.selectedEnvironment = selectedEnvironment
     }
 
     // MARK: - Utility Functions
 
     private func populateDataBrokerProtectionEnvironmentListMenuItems() {
         environmentMenu.items = [
-            NSMenuItem(title: EnvironmentTitle.production.rawValue, action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
-            NSMenuItem(title: EnvironmentTitle.staging.rawValue, action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+            NSMenuItem(title: "⚠️ The environment can be set in the Subscription > Environment menu", action: nil, target: nil),
+            NSMenuItem(title: EnvironmentTitle.production.rawValue, action: nil, target: nil, keyEquivalent: ""),
+            NSMenuItem(title: EnvironmentTitle.staging.rawValue, action: nil, target: nil, keyEquivalent: ""),
         ]
     }
 
@@ -433,28 +365,12 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         return menuItem
     }
 
-    private func updateWaitlistItems() {
-        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: DataBrokerProtectionWaitlist.identifier, keychainAppGroup: Bundle.main.appGroup(bundle: .dbp))
-        waitlistTokenItem.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
-        waitlistInviteCodeItem.title = "Waitlist Invite Code: \(waitlistStorage.getWaitlistInviteCode() ?? "N/A")"
-
-        if let timestamp = waitlistStorage.getWaitlistTimestamp() {
-            waitlistTimestampItem.title = "Waitlist Timestamp: \(String(describing: timestamp))"
-        } else {
-            waitlistTimestampItem.title = "Waitlist Timestamp: N/A"
-        }
-
-        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
-        waitlistTermsAndConditionsAcceptedItem.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
-
-        waitlistBypassItem.state = DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist ? .on : .off
-    }
-
     private func updateEnvironmentMenu() {
         let selectedEnvironment = settings.selectedEnvironment
+        guard environmentMenu.items.count == 3 else { return }
 
-        environmentMenu.items.first?.state = selectedEnvironment == .production ? .on: .off
-        environmentMenu.items.last?.state = selectedEnvironment == .staging ? .on: .off
+        environmentMenu.items[1].state = selectedEnvironment == .production ? .on: .off
+        environmentMenu.items[2].state = selectedEnvironment == .staging ? .on: .off
     }
 
     private func updateShowStatusMenuIconMenu() {

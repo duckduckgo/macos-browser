@@ -21,12 +21,15 @@ import Foundation
 
 class MockBookmarkManager: BookmarkManager {
 
+    var bookmarksReturnedForSearch = [BaseBookmarkEntity]()
+
     func isUrlFavorited(url: URL) -> Bool {
         return false
     }
 
+    var isUrlBookmarked = false
     func isUrlBookmarked(url: URL) -> Bool {
-        return false
+        return isUrlBookmarked
     }
 
     func allHosts() -> Set<String> {
@@ -100,6 +103,10 @@ class MockBookmarkManager: BookmarkManager {
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
     func requestSync() {
+    }
+
+    func search(by query: String) -> [BaseBookmarkEntity] {
+        return bookmarksReturnedForSearch
     }
 
 }

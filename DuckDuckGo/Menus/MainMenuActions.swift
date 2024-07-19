@@ -19,11 +19,12 @@
 import BrowserServicesKit
 import Cocoa
 import Common
-import WebKit
 import Configuration
+import Crashes
 import History
 import PixelKit
 import Subscription
+import WebKit
 
 // Actions are sent to objects of responder chain
 
@@ -33,38 +34,59 @@ extension AppDelegate {
 
     // MARK: - DuckDuckGo
 
+    @MainActor
     @objc func checkForUpdates(_ sender: Any?) {
 #if SPARKLE
-        updateController.checkForUpdates(sender)
+        if !SupportedOSChecker.isCurrentOSReceivingUpdates {
+            // Show not supported info
+            if NSAlert.osNotSupported().runModal() != .cancel {
+                let url = Preferences.UnsupportedDeviceInfoBox.softwareUpdateURL
+                NSWorkspace.shared.open(url)
+            }
+        }
+
+        showAbout(sender)
 #endif
     }
 
     // MARK: - File
 
     @objc func newWindow(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        DispatchQueue.main.async {
+            WindowsManager.openNewWindow()
+        }
     }
 
     @objc func newBurnerWindow(_ sender: Any?) {
-        WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
+        DispatchQueue.main.async {
+            WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
+        }
     }
 
     @objc func newTab(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        DispatchQueue.main.async {
+            WindowsManager.openNewWindow()
+        }
     }
 
     @objc func openLocation(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        DispatchQueue.main.async {
+            WindowsManager.openNewWindow()
+        }
     }
 
     @objc func closeAllWindows(_ sender: Any?) {
-        WindowsManager.closeWindows()
+        DispatchQueue.main.async {
+            WindowsManager.closeWindows()
+        }
     }
 
     // MARK: - History
 
     @objc func reopenLastClosedTab(_ sender: Any?) {
-        RecentlyClosedCoordinator.shared.reopenItem()
+        DispatchQueue.main.async {
+            RecentlyClosedCoordinator.shared.reopenItem()
+        }
     }
 
     @objc func recentlyClosedAction(_ sender: Any?) {
@@ -73,8 +95,9 @@ extension AppDelegate {
                   assertionFailure("Wrong represented object for recentlyClosedAction()")
                   return
               }
-
-        RecentlyClosedCoordinator.shared.reopenItem(cacheItem)
+        DispatchQueue.main.async {
+            RecentlyClosedCoordinator.shared.reopenItem(cacheItem)
+        }
     }
 
     @objc func openVisit(_ sender: NSMenuItem) {
@@ -83,50 +106,70 @@ extension AppDelegate {
             assertionFailure("Wrong represented object")
             return
         }
-
-        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url, source: .historyEntry), shouldLoadInBackground: true))
+        DispatchQueue.main.async {
+            WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url, source: .historyEntry), shouldLoadInBackground: true))
+        }
     }
 
     @objc func clearAllHistory(_ sender: NSMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .newtab)),
-              let windowController = window.windowController as? MainWindowController else {
-            assertionFailure("No reference to main window controller")
-            return
-        }
+        DispatchQueue.main.async {
+            guard let window = WindowsManager.openNewWindow(with: Tab(content: .newtab)),
+                  let windowController = window.windowController as? MainWindowController else {
+                assertionFailure("No reference to main window controller")
+                return
+            }
 
-        windowController.mainViewController.clearAllHistory(sender)
+            windowController.mainViewController.clearAllHistory(sender)
+        }
     }
 
     @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .newtab)),
-              let windowController = window.windowController as? MainWindowController else {
-            assertionFailure("No reference to main window controller")
-            return
-        }
+        DispatchQueue.main.async {
+            guard let window = WindowsManager.openNewWindow(with: Tab(content: .newtab)),
+                  let windowController = window.windowController as? MainWindowController else {
+                assertionFailure("No reference to main window controller")
+                return
+            }
 
-        windowController.mainViewController.clearThisHistory(sender)
+            windowController.mainViewController.clearThisHistory(sender)
+        }
     }
 
     // MARK: - Window
 
     @objc func reopenAllWindowsFromLastSession(_ sender: Any?) {
-        _=stateRestorationManager.restoreLastSessionState(interactive: true)
+        DispatchQueue.main.async {
+            self.stateRestorationManager.restoreLastSessionState(interactive: true)
+        }
     }
 
     // MARK: - Help
 
+    @MainActor
+    @objc func showAbout(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .settings(pane: .about))
+    }
+
+    @MainActor
+    @objc func showReleaseNotes(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .releaseNotes)
+    }
+
+    @MainActor
+    @objc func showWhatIsNew(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .url(.updates, source: .appOpenUrl))
+    }
+
     #if FEEDBACK
 
     @objc func openFeedback(_ sender: Any?) {
-        FeedbackPresenter.presentFeedbackForm()
+        DispatchQueue.main.async {
+            FeedbackPresenter.presentFeedbackForm()
+        }
     }
 
     @objc func openReportBrokenSite(_ sender: Any?) {
-        let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
-        let privacyDashboardViewController = storyboard.instantiateController(identifier: "PrivacyDashboardViewController") { coder in
-            PrivacyDashboardViewController(coder: coder, privacyInfo: nil, dashboardMode: .report)
-        }
-
+        let privacyDashboardViewController = PrivacyDashboardViewController(privacyInfo: nil, entryPoint: .report)
         privacyDashboardViewController.sizeDelegate = self
 
         let window = NSWindow(contentViewController: privacyDashboardViewController)
@@ -136,13 +179,15 @@ extension AppDelegate {
                         display: true)
         privacyDashboardWindow = window
 
-        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              let tabModel = parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel else {
-            assertionFailure("AppDelegate: Failed to present PrivacyDashboard")
-            return
+        DispatchQueue.main.async {
+            guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
+                  let tabModel = parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel else {
+                assertionFailure("AppDelegate: Failed to present PrivacyDashboard")
+                return
+            }
+            privacyDashboardViewController.updateTabViewModel(tabModel)
+            parentWindowController.window?.beginSheet(window) { _ in }
         }
-        privacyDashboardViewController.updateTabViewModel(tabModel)
-        parentWindowController.window?.beginSheet(window) { _ in }
     }
 
     #endif
@@ -158,22 +203,27 @@ extension AppDelegate {
             assertionFailure("Unexpected type of menuItem.representedObject: \(type(of: menuItem.representedObject))")
             return
         }
-
-        let tab = Tab(content: .url(url, source: .bookmark), shouldLoadInBackground: true)
-        WindowsManager.openNewWindow(with: tab)
+        DispatchQueue.main.async {
+            let tab = Tab(content: .url(url, source: .bookmark), shouldLoadInBackground: true)
+            WindowsManager.openNewWindow(with: tab)
+        }
     }
 
     @objc func showManageBookmarks(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks)])
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        DispatchQueue.main.async {
+            let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks)])
+            let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
 
-        WindowsManager.openNewWindow(with: tabCollectionViewModel)
+            WindowsManager.openNewWindow(with: tabCollectionViewModel)
+        }
     }
 
     @objc func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .anySettingsPane)])
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        WindowsManager.openNewWindow(with: tabCollectionViewModel)
+        DispatchQueue.main.async {
+            let tabCollection = TabCollection(tabs: [Tab(content: .anySettingsPane)])
+            let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+            WindowsManager.openNewWindow(with: tabCollectionViewModel)
+        }
     }
 
     @objc func openAbout(_ sender: Any?) {
@@ -186,9 +236,12 @@ extension AppDelegate {
     }
 
     @objc func openImportBrowserDataWindow(_ sender: Any?) {
-        DataImportView().show()
+        DispatchQueue.main.async {
+            DataImportView().show()
+        }
     }
 
+    @MainActor
     @objc func openExportLogins(_ sender: Any?) {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               let window = windowController.window else { return }
@@ -227,6 +280,7 @@ extension AppDelegate {
         }
     }
 
+    @MainActor
     @objc func openExportBookmarks(_ sender: Any?) {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               let window = windowController.window,
@@ -250,18 +304,25 @@ extension AppDelegate {
     }
 
     @objc func fireButtonAction(_ sender: NSButton) {
-        FireCoordinator.fireButtonAction()
+        DispatchQueue.main.async {
+            FireCoordinator.fireButtonAction()
+        }
     }
 
     @objc func navigateToPrivateEmail(_ sender: Any?) {
-        guard let window = NSApplication.shared.keyWindow,
-              let windowController = window.windowController as? MainWindowController else {
-            assertionFailure("No reference to main window controller")
-            return
+        DispatchQueue.main.async {
+            guard let window = NSApplication.shared.keyWindow,
+                  let windowController = window.windowController as? MainWindowController else {
+                assertionFailure("No reference to main window controller")
+                return
+            }
+            windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin, source: .ui))
         }
-        windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin, source: .ui))
     }
 
+    @objc func resetRemoteMessages(_ sender: Any?) {
+        remoteMessagingClient.store?.resetRemoteMessages()
+    }
 }
 
 extension MainViewController {
@@ -556,6 +617,7 @@ extension MainViewController {
                 burnerMode: tabCollectionViewModel.burnerMode)
         }
         tabCollectionViewModel.append(tabs: tabs)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     @objc func showManageBookmarks(_ sender: Any?) {
@@ -673,16 +735,26 @@ extension MainViewController {
     }
 
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
-        UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
+        UserDefaultsWrapper.clear(.defaultBrowserDismissed)
     }
 
     @objc func resetDefaultGrammarChecks(_ sender: Any?) {
-        UserDefaultsWrapper<Bool>.clear(.spellingCheckEnabledOnce)
-        UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
+        UserDefaultsWrapper.clear(.spellingCheckEnabledOnce)
+        UserDefaultsWrapper.clear(.grammarCheckEnabledOnce)
     }
 
     @objc func triggerFatalError(_ sender: Any?) {
         fatalError("Fatal error triggered from the Debug menu")
+    }
+
+    @objc func crashOnException(_ sender: Any?) {
+        DispatchQueue.main.async {
+            self.navigationBarViewController.addressBarViewController?.addressBarTextField.suggestionViewController.tableView.view(atColumn: 1, row: .max, makeIfNecessary: false)
+        }
+    }
+
+    @objc func crashOnCxxException(_ sender: Any?) {
+        throwTestCppExteption()
     }
 
     @objc func resetSecureVaultData(_ sender: Any?) {
@@ -710,6 +782,12 @@ extension MainViewController {
             try? vault?.deleteNoteFor(noteId: noteID)
         }
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
+
+        let autofillPixelReporter = AutofillPixelReporter(userDefaults: .standard,
+                                                          autofillEnabled: AutofillPreferences().askToSaveUsernamesAndPasswords,
+                                                          eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
+                                                          installDate: nil)
+        autofillPixelReporter.resetStoreDefaults()
     }
 
     @objc func resetBookmarks(_ sender: Any?) {
@@ -755,14 +833,9 @@ extension MainViewController {
     /// Clears the PrivacyPro state to make testing easier.
     ///
     private func clearPrivacyProState() {
-        AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).signOut()
+        Application.appDelegate.subscriptionManager.accountManager.signOut()
         resetThankYouModalChecks(nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
-
-        // Clear pixel data
-        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProFeatureEnabled)
-        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProBetaUserThankYouDBP)
-        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProBetaUserThankYouVPN)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
@@ -775,6 +848,11 @@ extension MainViewController {
 
     @objc func inPermanentSurveyShareOff(_ sender: Any?) {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
+    }
+
+    @objc func changePixelExperimentInstalledDateToLessMoreThan5DayAgo(_ sender: Any?) {
+        let moreThanFiveDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())
+        UserDefaults.standard.set(moreThanFiveDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.pixelExperimentEnrollmentDate.rawValue)
     }
 
     @objc func changeInstallDateToToday(_ sender: Any?) {
@@ -891,6 +969,11 @@ extension MainViewController {
         setConfigurationUrl(nil)
     }
 
+    @objc func resetSurveyRemoteMessages(_ sender: Any?) {
+        DefaultSurveyRemoteMessagingStorage.surveys().removeStoredAndDismissedMessages()
+        DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager).resetLastRefreshTimestamp()
+    }
+
     // MARK: - Developer Tools
 
     @objc func toggleDeveloperTools(_ sender: Any?) {
@@ -918,8 +1001,6 @@ extension MainViewController {
 
 extension MainViewController: NSMenuItemValidation {
 
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         guard fireViewController.fireViewModel.fire.burningData == nil else {
             return true
@@ -1023,9 +1104,6 @@ extension MainViewController: NSMenuItemValidation {
             return true
         }
     }
-
-    // swiftlint:enable function_body_length
-    // swiftlint:enable cyclomatic_complexity
 }
 
 extension AppDelegate: NSMenuItemValidation {

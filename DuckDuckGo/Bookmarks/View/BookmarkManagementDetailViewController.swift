@@ -34,8 +34,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     private let toolbarButtonsStackView = NSStackView()
     private lazy var newBookmarkButton = MouseOverButton(title: "  " + UserText.newBookmark, target: self, action: #selector(presentAddBookmarkModal))
+        .withAccessibilityIdentifier("BookmarkManagementDetailViewController.newBookmarkButton")
     private lazy var newFolderButton = MouseOverButton(title: "  " + UserText.newFolder, target: self, action: #selector(presentAddFolderModal))
+        .withAccessibilityIdentifier("BookmarkManagementDetailViewController.newFolderButton")
     private lazy var deleteItemsButton = MouseOverButton(title: "  " + UserText.bookmarksBarContextMenuDelete, target: self, action: #selector(delete))
+        .withAccessibilityIdentifier("BookmarkManagementDetailViewController.deleteItemsButton")
 
     private lazy var separator = NSBox()
     private lazy var scrollView = NSScrollView()
@@ -69,7 +72,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         fatalError("\(type(of: self)): Bad initializer")
     }
 
-    // swiftlint:disable:next function_body_length
     override func loadView() {
         view = ColorView(frame: .zero, backgroundColor: .bookmarkPageBackground)
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -536,6 +538,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
                 burnerMode: tabCollection.burnerMode)
         }
         tabCollection.append(tabs: tabs)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 }
 
@@ -680,6 +683,7 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
         } else {
             assertionFailure("Failed to open entity in new tabs")
         }
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func openAllInNewWindow(_ sender: NSMenuItem) {
@@ -692,6 +696,7 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
 
         let newTabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
         WindowsManager.openNewWindow(with: newTabCollection, isBurner: tabCollection.isBurner)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
 }
@@ -706,6 +711,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
         }
 
         WindowControllersManager.shared.show(url: url, source: .bookmark, newTab: true)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func openBookmarkInNewWindow(_ sender: NSMenuItem) {
@@ -716,6 +722,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
         }
 
         WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {

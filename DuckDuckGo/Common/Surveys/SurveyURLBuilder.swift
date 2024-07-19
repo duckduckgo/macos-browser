@@ -18,39 +18,57 @@
 
 import Foundation
 import Common
-import BrowserServicesKit
+import Subscription
 
 final class SurveyURLBuilder {
 
     enum SurveyURLParameters: String, CaseIterable {
         case atb = "atb"
         case atbVariant = "var"
-        case daysSinceActivated = "delta"
-        case macOSVersion = "mv"
+        case macOSVersion = "osv"
         case appVersion = "ddgv"
         case hardwareModel = "mo"
-        case lastDayActive = "da"
+
+        case privacyProStatus = "ppro_status"
+        case privacyProPurchasePlatform = "ppro_platform"
+        case privacyProBillingPeriod = "ppro_billing"
+        case privacyProDaysSincePurchase = "ppro_days_since_purchase"
+        case privacyProDaysUntilExpiration = "ppro_days_until_exp"
+
+        case vpnFirstUsed = "vpn_first_used"
+        case vpnLastUsed = "vpn_last_used"
+        case pirFirstUsed = "pir_first_used"
+        case pirLastUsed = "pir_last_used"
     }
 
     private let statisticsStore: StatisticsStore
     private let operatingSystemVersion: String
     private let appVersion: String
     private let hardwareModel: String?
-    private let daysSinceActivation: Int?
-    private let daysSinceLastActive: Int?
+    private let subscription: Subscription?
+    private let daysSinceVPNActivated: Int?
+    private let daysSinceVPNLastActive: Int?
+    private let daysSincePIRActivated: Int?
+    private let daysSincePIRLastActive: Int?
 
     init(statisticsStore: StatisticsStore,
          operatingSystemVersion: String,
          appVersion: String,
          hardwareModel: String?,
-         daysSinceActivation: Int?,
-         daysSinceLastActive: Int?) {
+         subscription: Subscription?,
+         daysSinceVPNActivated: Int?,
+         daysSinceVPNLastActive: Int?,
+         daysSincePIRActivated: Int?,
+         daysSincePIRLastActive: Int?) {
         self.statisticsStore = statisticsStore
         self.operatingSystemVersion = operatingSystemVersion
         self.appVersion = appVersion
         self.hardwareModel = hardwareModel
-        self.daysSinceActivation = daysSinceActivation
-        self.daysSinceLastActive = daysSinceLastActive
+        self.subscription = subscription
+        self.daysSinceVPNActivated = daysSinceVPNActivated
+        self.daysSinceVPNLastActive = daysSinceVPNLastActive
+        self.daysSincePIRActivated = daysSincePIRActivated
+        self.daysSincePIRLastActive = daysSincePIRLastActive
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -72,10 +90,6 @@ final class SurveyURLBuilder {
                 if let variant = statisticsStore.variant {
                     queryItems.append(queryItem(parameter: parameter, value: variant))
                 }
-            case .daysSinceActivated:
-                if let daysSinceActivation {
-                    queryItems.append(queryItem(parameter: parameter, value: daysSinceActivation))
-                }
             case .macOSVersion:
                 queryItems.append(queryItem(parameter: parameter, value: operatingSystemVersion))
             case .appVersion:
@@ -84,29 +98,60 @@ final class SurveyURLBuilder {
                 if let hardwareModel = hardwareModel {
                     queryItems.append(queryItem(parameter: parameter, value: hardwareModel))
                 }
-            case .lastDayActive:
-                if let daysSinceLastActive {
-                    queryItems.append(queryItem(parameter: parameter, value: daysSinceLastActive))
+            case .vpnFirstUsed:
+                if let daysSinceVPNActivated {
+                    queryItems.append(queryItem(parameter: parameter, value: daysSinceVPNActivated))
+                }
+            case .vpnLastUsed:
+                if let daysSinceVPNLastActive {
+                    queryItems.append(queryItem(parameter: parameter, value: daysSinceVPNLastActive))
+                }
+            case .pirFirstUsed:
+                if let daysSincePIRActivated {
+                    queryItems.append(queryItem(parameter: parameter, value: daysSincePIRActivated))
+                }
+            case .pirLastUsed:
+                if let daysSincePIRLastActive {
+                    queryItems.append(queryItem(parameter: parameter, value: daysSincePIRLastActive))
+                }
+            case .privacyProStatus:
+                if let privacyProStatus = subscription?.status {
+                    switch privacyProStatus {
+                    case .autoRenewable: queryItems.append(queryItem(parameter: parameter, value: "auto_renewable"))
+                    case .notAutoRenewable: queryItems.append(queryItem(parameter: parameter, value: "not_auto_renewable"))
+                    case .gracePeriod: queryItems.append(queryItem(parameter: parameter, value: "grace_period"))
+                    case .inactive: queryItems.append(queryItem(parameter: parameter, value: "inactive"))
+                    case .expired: queryItems.append(queryItem(parameter: parameter, value: "expired"))
+                    case .unknown: queryItems.append(queryItem(parameter: parameter, value: "unknown"))
+                    }
+                }
+            case .privacyProPurchasePlatform:
+                if let privacyProPurchasePlatform = subscription?.platform {
+                    switch privacyProPurchasePlatform {
+                    case .apple: queryItems.append(queryItem(parameter: parameter, value: "apple"))
+                    case .google: queryItems.append(queryItem(parameter: parameter, value: "google"))
+                    case .stripe: queryItems.append(queryItem(parameter: parameter, value: "stripe"))
+                    case .unknown: queryItems.append(queryItem(parameter: parameter, value: "unknown"))
+                    }
+                }
+            case .privacyProBillingPeriod:
+                if let privacyProBillingPeriod = subscription?.billingPeriod {
+                    switch privacyProBillingPeriod {
+                    case .monthly: queryItems.append(queryItem(parameter: parameter, value: "monthly"))
+                    case .yearly: queryItems.append(queryItem(parameter: parameter, value: "yearly"))
+                    case .unknown: queryItems.append(queryItem(parameter: parameter, value: "unknown"))
+                    }
+                }
+            case .privacyProDaysSincePurchase:
+                if let startedAt = subscription?.startedAt, let daysSincePurchase = daysSince(date: startedAt) {
+                    queryItems.append(queryItem(parameter: parameter, value: daysSincePurchase))
+                }
+            case .privacyProDaysUntilExpiration:
+                if let expiresOrRenewsAt = subscription?.expiresOrRenewsAt, let daysUntilExpiry = daysSince(date: expiresOrRenewsAt) {
+                    queryItems.append(queryItem(parameter: parameter, value: daysUntilExpiry))
                 }
             }
         }
-
-        components.queryItems = queryItems
-
-        return components.url
-    }
-
-    func buildSurveyURLWithPasswordsCountSurveyParameter(from originalURLString: String) -> URL? {
-        let surveyURLWithParameters = buildSurveyURL(from: originalURLString)
-
-        guard let surveyURLWithParametersString = surveyURLWithParameters?.absoluteString,
-                var components = URLComponents(string: surveyURLWithParametersString),
-                let bucket = passwordsCountBucket() else {
-            return surveyURLWithParameters
-        }
-
-        var queryItems = components.queryItems ?? []
-        queryItems.append(URLQueryItem(name: "saved_passwords", value: bucket))
 
         components.queryItems = queryItems
 
@@ -123,13 +168,12 @@ final class SurveyURLBuilder {
         return URLQueryItem(name: parameter.rawValue, value: String(describing: value))
     }
 
-    private func passwordsCountBucket() -> String? {
-        guard let secureVault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared),
-              let bucket = try? secureVault.accountsCountBucket() else {
-            return nil
+    private func daysSince(date storedDate: Date) -> Int? {
+        if let days = Calendar.current.dateComponents([.day], from: storedDate, to: Date()).day {
+            return abs(days)
         }
 
-        return bucket
+        return nil
     }
 
 }

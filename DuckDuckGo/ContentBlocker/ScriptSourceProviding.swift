@@ -21,6 +21,7 @@ import Combine
 import Common
 import BrowserServicesKit
 import Configuration
+import TrackerRadarKit
 
 protocol ScriptSourceProviding {
 
@@ -29,7 +30,7 @@ protocol ScriptSourceProviding {
     var privacyConfigurationManager: PrivacyConfigurationManaging { get }
     var autofillSourceProvider: AutofillUserScriptSourceProvider? { get }
     var sessionKey: String? { get }
-    var clickToLoadSource: String { get }
+    var onboardingActionsManager: OnboardingActionsManaging? { get }
     func buildAutofillSource() -> AutofillUserScriptSourceProvider
 
 }
@@ -41,12 +42,11 @@ func DefaultScriptSourceProvider() -> ScriptSourceProviding {
 }
 
 struct ScriptSourceProvider: ScriptSourceProviding {
-
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
+    private(set) var onboardingActionsManager: OnboardingActionsManaging?
     private(set) var autofillSourceProvider: AutofillUserScriptSourceProvider?
     private(set) var sessionKey: String?
-    private(set) var clickToLoadSource: String = ""
 
     let configStorage: ConfigurationStoring
     let privacyConfigurationManager: PrivacyConfigurationManaging
@@ -72,8 +72,8 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         self.contentBlockerRulesConfig = buildContentBlockerRulesConfig()
         self.surrogatesConfig = buildSurrogatesConfig()
         self.sessionKey = generateSessionKey()
-        self.clickToLoadSource = buildClickToLoadSource()
         self.autofillSourceProvider = buildAutofillSource()
+        self.onboardingActionsManager = buildOnboardingActionsManager()
     }
 
     private func generateSessionKey() -> String {
@@ -97,8 +97,8 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         let trackerData = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})?.trackerData
 
         let ctlTrackerData = (contentBlockingManager.currentRules.first(where: {
-            $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
-        })?.trackerData) ?? ContentBlockerRulesLists.fbTrackerDataSet
+            $0.name == DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName
+        })?.trackerData)
 
         return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
                                                      trackerData: trackerData,
@@ -117,15 +117,23 @@ struct ScriptSourceProvider: ScriptSourceProviding {
 #endif
 
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
-        let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
-        let rules = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})
+        let allTrackers = mergeTrackerDataSets(rules: contentBlockingManager.currentRules)
         return DefaultSurrogatesUserScriptConfig(privacyConfig: privacyConfigurationManager.privacyConfig,
                                                  surrogates: surrogates,
-                                                 trackerData: rules?.trackerData,
-                                                 encodedSurrogateTrackerData: rules?.encodedTrackerData,
+                                                 trackerData: allTrackers.trackerData,
+                                                 encodedSurrogateTrackerData: allTrackers.encodedTrackerData,
                                                  trackerDataManager: trackerDataManager,
                                                  tld: tld,
                                                  isDebugBuild: isDebugBuild)
+    }
+
+    private func buildOnboardingActionsManager() -> OnboardingActionsManaging {
+        return OnboardingActionsManager(
+            navigationDelegate: WindowControllersManager.shared,
+            dockCustomization: DockCustomizer(),
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            appearancePreferences: AppearancePreferences.shared,
+            startupPreferences: StartupPreferences.shared)
     }
 
     private func loadTextFile(_ fileName: String, _ fileExt: String) -> String? {
@@ -141,35 +149,40 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         return data
     }
 
-    private func loadFont(_ fileName: String, _ fileExt: String) -> String? {
-        let url = Bundle.main.url(
-            forResource: fileName,
-            withExtension: fileExt
-        )
-        guard let base64String = try? Data(contentsOf: url!).base64EncodedString() else {
-            assertionFailure("Failed to load font")
-            return nil
+    private func mergeTrackerDataSets(rules: [ContentBlockerRulesManager.Rules]) -> (trackerData: TrackerData, encodedTrackerData: String) {
+        var combinedTrackers: [String: KnownTracker] = [:]
+        var combinedEntities: [String: Entity] = [:]
+        var combinedDomains: [String: String] = [:]
+        var cnames: [TrackerData.CnameDomain: TrackerData.TrackerDomain]? = [:]
+
+        let setsToCombine = [ DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName, DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName ]
+
+        for setName in setsToCombine {
+            if let ruleSetIndex = contentBlockingManager.currentRules.firstIndex(where: { $0.name == setName }) {
+                let ruleSet = rules[ruleSetIndex]
+
+                combinedTrackers = combinedTrackers.merging(ruleSet.trackerData.trackers) { (_, new) in new }
+                combinedEntities = combinedEntities.merging(ruleSet.trackerData.entities) { (_, new) in new }
+                combinedDomains = combinedDomains.merging(ruleSet.trackerData.domains) { (_, new) in new }
+                if setName == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
+                    cnames = ruleSet.trackerData.cnames
+                }
+            }
         }
 
-        let font = "data:application/octet-stream;base64," + base64String
-        return font
+        let combinedTrackerData = TrackerData(trackers: combinedTrackers,
+                            entities: combinedEntities,
+                            domains: combinedDomains,
+                            cnames: cnames)
+
+        let surrogateTDS = ContentBlockerRulesManager.extractSurrogates(from: combinedTrackerData)
+        let encodedTrackerData = encodeTrackerData(surrogateTDS)
+
+        return (trackerData: combinedTrackerData, encodedTrackerData: encodedTrackerData)
     }
 
-    private func buildClickToLoadSource() -> String {
-        // For now bundle FB SDK and associated config, as they diverged from the extension
-        let fbSDK = loadTextFile("fb-sdk", "js")
-        var config = loadTextFile("clickToLoadConfig", "json")!
-        if #unavailable(OSX 11) {  // disable CTL for Catalina and earlier
-            config = "{}"
-        }
-        let proximaRegFont = loadFont("ProximaNova-Reg-webfont", "woff2")
-        let proximaBoldFont = loadFont("ProximaNova-Bold-webfont", "woff2")
-        return ContentBlockerRulesUserScript.loadJS("clickToLoad", from: .main, withReplacements: [
-            "${fb-sdk.js}": fbSDK!,
-            "${clickToLoadConfig.json}": config,
-            "${proximaRegFont}": proximaRegFont!,
-            "${proximaBoldFont}": proximaBoldFont!
-        ])
+    private func encodeTrackerData(_ trackerData: TrackerData) -> String {
+        let encodedData = try? JSONEncoder().encode(trackerData)
+        return String(data: encodedData!, encoding: .utf8)!
     }
-
 }

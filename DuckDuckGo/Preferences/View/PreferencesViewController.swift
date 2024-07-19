@@ -34,7 +34,9 @@ final class PreferencesViewController: NSViewController {
     private var bitwardenManager: BWManagement = BWManager.shared
 
     init(syncService: DDGSyncing, duckPlayer: DuckPlayer = DuckPlayer.shared) {
-        model = PreferencesSidebarModel(syncService: syncService, includeDuckPlayer: duckPlayer.isAvailable)
+        model = PreferencesSidebarModel(syncService: syncService,
+                                        vpnGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager),
+                                        includeDuckPlayer: duckPlayer.isAvailable)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -49,7 +51,10 @@ final class PreferencesViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let host = NSHostingView(rootView: Preferences.RootView(model: model))
+        let prefRootView = Preferences.RootView(model: model,
+                                                subscriptionManager: Application.appDelegate.subscriptionManager,
+                                                subscriptionUIHandler: Application.appDelegate.subscriptionUIHandler)
+        let host = NSHostingView(rootView: prefRootView)
         view.addAndLayout(host)
     }
 

@@ -15,6 +15,10 @@ If it's pending Product Review/PFR, please add the `Pending Product Review` labe
 If at any point it isn't actively being worked on/ready for review/otherwise moving forward (besides the above PR/PFR exception) strongly consider closing it (or not opening it in the first place). If you decide not to close it, make sure it's labelled to make it clear the PRs state and comment with more information.
 -->
 
+**Definition of Done**:
+
+* [ ] Does this PR satisfy our [Definition of Done](https://app.asana.com/0/1202500774821704/1207634633537039/f)?
+
 ---
 ###### Internal references:
 [Pull Request Review Checklist](https://app.asana.com/0/1202500774821704/1203764234894239/f)

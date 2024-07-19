@@ -22,6 +22,14 @@ import SecureStorage
 
 final class SecureVaultLoginImporter: LoginImporter {
 
+    static var featureFlagger: FeatureFlagger {
+        NSApp.delegateTyped.featureFlagger
+    }
+
+    private enum ImporterError: Error {
+        case duplicate
+    }
+
     func importLogins(_ logins: [ImportedLoginCredential], progressCallback: @escaping (Int) throws -> Void) throws -> DataImport.DataTypeSummary {
         let vault = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
 
@@ -31,6 +39,8 @@ final class SecureVaultLoginImporter: LoginImporter {
 
         let encryptionKey = try vault.getEncryptionKey()
         let hashingSalt = try vault.getHashingSalt()
+
+        let accounts = (try? vault.accounts()) ?? .init()
 
         try vault.inDatabaseTransaction { database in
             for (idx, login) in logins.enumerated() {
@@ -46,10 +56,21 @@ final class SecureVaultLoginImporter: LoginImporter {
                 }
 
                 do {
+                    if Self.featureFlagger.isFeatureOn(.deduplicateLoginsOnImport),
+                        let signature = try vault.encryptPassword(for: credentials, key: encryptionKey, salt: hashingSalt).account.signature {
+                        let isDuplicate = accounts.contains {
+                            $0.isDuplicateOf(accountToBeImported: account, signatureOfAccountToBeImported: signature, passwordToBeImported: login.password)
+                        }
+                        if isDuplicate {
+                            throw ImporterError.duplicate
+                        }
+                    }
                     _ = try vault.storeWebsiteCredentials(credentials, in: database, encryptedUsing: encryptionKey, hashedUsing: hashingSalt)
                     successful.append(importSummaryValue)
                 } catch {
                     if case .duplicateRecord = error as? SecureStorageError {
+                        duplicates.append(importSummaryValue)
+                    } else if case .duplicate = error as? ImporterError {
                         duplicates.append(importSummaryValue)
                     } else {
                         failed.append(importSummaryValue)
@@ -60,7 +81,33 @@ final class SecureVaultLoginImporter: LoginImporter {
             }
         }
 
+        if successful.count > 0 {
+            NotificationCenter.default.post(name: .autofillSaveEvent, object: nil, userInfo: nil)
+        }
+
         return .init(successful: successful.count, duplicate: duplicates.count, failed: failed.count)
     }
+}
 
+extension SecureVaultModels.WebsiteAccount {
+
+    // Deduplication rules: https://app.asana.com/0/0/1207598052765977/f
+    func isDuplicateOf(accountToBeImported: Self, signatureOfAccountToBeImported: String, passwordToBeImported: String?) -> Bool {
+        guard signature == signatureOfAccountToBeImported || passwordToBeImported.isNilOrEmpty else {
+            return false
+        }
+        guard username == accountToBeImported.username || accountToBeImported.username.isNilOrEmpty else {
+            return false
+        }
+        guard domain == accountToBeImported.domain || accountToBeImported.domain.isNilOrEmpty else {
+            return false
+        }
+        guard notes == accountToBeImported.notes || accountToBeImported.notes.isNilOrEmpty else {
+            return false
+        }
+        guard patternMatchedTitle() == accountToBeImported.patternMatchedTitle() || accountToBeImported.patternMatchedTitle().isEmpty else {
+            return false
+        }
+        return true
+    }
 }

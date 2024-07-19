@@ -55,7 +55,11 @@ final class MainViewController: NSViewController {
         fatalError("MainViewController: Bad initializer")
     }
 
-    init(tabCollectionViewModel: TabCollectionViewModel? = nil, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, autofillPopoverPresenter: AutofillPopoverPresenter) {
+    init(tabCollectionViewModel: TabCollectionViewModel? = nil,
+         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         autofillPopoverPresenter: AutofillPopoverPresenter,
+         vpnXPCClient: VPNControllerXPCClient = .shared) {
+
         let tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = tabCollectionViewModel.isBurner
@@ -70,10 +74,15 @@ final class MainViewController: NSViewController {
             }
 #endif
 
-            let ipcClient = TunnelControllerIPCClient()
-            ipcClient.register()
+            vpnXPCClient.register { error in
+                NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
+            }
 
-            return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient, networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler())
+            let vpnUninstaller = VPNUninstaller(ipcClient: vpnXPCClient)
+
+            return NetworkProtectionNavBarPopoverManager(
+                ipcClient: vpnXPCClient,
+                vpnUninstaller: vpnUninstaller)
         }()
         let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
             var connectivityIssuesObserver: ConnectivityIssueObserver!
@@ -87,14 +96,14 @@ final class MainViewController: NSViewController {
             connectivityIssuesObserver = connectivityIssuesObserver ?? DisabledConnectivityIssueObserver()
             controllerErrorMessageObserver = controllerErrorMessageObserver ?? ControllerErrorMesssageObserverThroughDistributedNotifications()
 
-            let ipcClient = networkProtectionPopoverManager.ipcClient
             return DefaultNetworkProtectionStatusReporter(
-                statusObserver: ipcClient.ipcStatusObserver,
-                serverInfoObserver: ipcClient.ipcServerInfoObserver,
-                connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
+                statusObserver: vpnXPCClient.ipcStatusObserver,
+                serverInfoObserver: vpnXPCClient.ipcServerInfoObserver,
+                connectionErrorObserver: vpnXPCClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: connectivityIssuesObserver,
                 controllerErrorMessageObserver: controllerErrorMessageObserver,
-                dataVolumeObserver: ipcClient.ipcDataVolumeObserver
+                dataVolumeObserver: vpnXPCClient.ipcDataVolumeObserver,
+                knownFailureObserver: KnownFailureObserverThroughDistributedNotifications()
             )
         }()
 
@@ -189,13 +198,7 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
-
-        refreshNetworkProtectionMessages()
-
-#if DBP
-        DataBrokerProtectionAppEvents().windowDidBecomeMain()
-        refreshDataBrokerProtectionMessages()
-#endif
+        refreshSurveyMessages()
     }
 
     func windowDidResignKey() {
@@ -203,7 +206,7 @@ final class MainViewController: NSViewController {
     }
 
     func showBookmarkPromptIfNeeded() {
-        guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
+        guard !bookmarksBarViewController.bookmarksBarPromptShown, OnboardingActionsManager.isOnboardingFinished else { return }
         if bookmarksBarIsVisible {
             // Don't show this to users who obviously know about the bookmarks bar already
             bookmarksBarViewController.bookmarksBarPromptShown = true
@@ -217,19 +220,15 @@ final class MainViewController: NSViewController {
         }
     }
 
-    private let networkProtectionMessaging = DefaultNetworkProtectionRemoteMessaging()
+    private lazy var surveyMessaging: DefaultSurveyRemoteMessaging = {
+        return DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager)
+    }()
 
-    func refreshNetworkProtectionMessages() {
-        networkProtectionMessaging.fetchRemoteMessages()
+    func refreshSurveyMessages() {
+        Task {
+            await surveyMessaging.fetchRemoteMessages()
+        }
     }
-
-#if DBP
-    private let dataBrokerProtectionMessaging = DefaultDataBrokerProtectionRemoteMessaging()
-
-    func refreshDataBrokerProtectionMessages() {
-        dataBrokerProtectionMessaging.fetchRemoteMessages()
-    }
-#endif
 
     override func encodeRestorableState(with coder: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")
@@ -315,7 +314,14 @@ final class MainViewController: NSViewController {
             }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] title in
-                self?.view.window?.title = title
+                guard let self else { return }
+                guard !isBurner else {
+                    // Fire Window: don‘t display active Tab title as the Window title
+                    view.window?.title = UserText.burnerWindowHeader
+                    return
+                }
+
+                view.window?.title = title
             }
             .store(in: &tabViewModelCancellables)
     }

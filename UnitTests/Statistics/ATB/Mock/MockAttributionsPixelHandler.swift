@@ -19,7 +19,7 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-final class MockAttributionsPixelHandler: AttributionsPixelHandler {
+final class MockAttributionsPixelHandler: InstallationAttributionsPixelHandler {
     private(set) var fireInstallationAttributionPixelCount = 0
     private(set) var didCallFireInstallationAttributionPixel = false
 

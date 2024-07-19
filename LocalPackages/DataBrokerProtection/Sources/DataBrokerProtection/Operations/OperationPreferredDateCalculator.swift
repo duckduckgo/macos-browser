@@ -35,7 +35,6 @@ struct OperationPreferredDateCalculator {
                               extractedProfileID: Int64?,
                               schedulingConfig: DataBrokerScheduleConfig,
                               isDeprecated: Bool = false) throws -> Date? {
-
         guard let lastEvent = historyEvents.last else {
             throw DataBrokerProtectionError.cantCalculatePreferredRunDate
         }
@@ -63,7 +62,6 @@ struct OperationPreferredDateCalculator {
                                 extractedProfileID: Int64?,
                                 schedulingConfig: DataBrokerScheduleConfig,
                                 date: DateProtocol = SystemDate()) throws -> Date? {
-
         guard let lastEvent = historyEvents.last else {
             throw DataBrokerProtectionError.cantCalculatePreferredRunDate
         }
@@ -78,7 +76,7 @@ struct OperationPreferredDateCalculator {
                 return currentPreferredRunDate
             }
         case .error:
-            return date.now.addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
+            return date.now.addingTimeInterval(calculateNextRunDateOnError(schedulingConfig: schedulingConfig, historyEvents: historyEvents))
         case .optOutStarted, .scanStarted, .noMatchFound:
             return currentPreferredRunDate
         case .optOutConfirmed, .optOutRequested:
@@ -96,5 +94,18 @@ struct OperationPreferredDateCalculator {
 
         let lastRemovalEventDate = lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
         return lastRemovalEventDate < Date()
+    }
+
+    private func calculateNextRunDateOnError(schedulingConfig: DataBrokerScheduleConfig,
+                                             historyEvents: [HistoryEvent]) -> TimeInterval {
+        let pastTries = historyEvents.filter { $0.isError }.count
+        let doubleValue = pow(2.0, Double(pastTries))
+
+        if doubleValue > Double(schedulingConfig.retryError) {
+            return schedulingConfig.retryError.hoursToSeconds
+        } else {
+            let intValue = Int(doubleValue)
+            return intValue.hoursToSeconds
+        }
     }
 }

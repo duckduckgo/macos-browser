@@ -81,8 +81,8 @@ extension String {
         }
     }
 
-    var utf8data: Data {
-        data(using: .utf8)!
+    var isBlank: Bool {
+        self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     // MARK: - URL
@@ -107,19 +107,6 @@ extension String {
         }
 
         return fileName
-    }
-
-    var pathExtension: String {
-        (self as NSString).pathExtension
-    }
-
-    func appendingPathComponent(_ component: String) -> String {
-        (self as NSString).appendingPathComponent(component)
-    }
-
-    func appendingPathExtension(_ pathExtension: String?) -> String {
-        guard let pathExtension, !pathExtension.isEmpty else { return self }
-        return self + "." + pathExtension
     }
 
     // MARK: - Mutating

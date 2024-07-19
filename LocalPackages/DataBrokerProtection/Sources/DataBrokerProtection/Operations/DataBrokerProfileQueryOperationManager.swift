@@ -28,24 +28,24 @@ protocol OperationsManager {
     // We want to refactor this to return a NSOperation in the future
     // so we have more control of stopping/starting the queue
     // for the time being, shouldRunNextStep: @escaping () -> Bool is being used
-    func runOperation(operationData: BrokerOperationData,
+    func runOperation(operationData: BrokerJobData,
                       brokerProfileQueryData: BrokerProfileQueryData,
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
-                      runner: WebOperationRunner,
+                      runner: WebJobRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       showWebView: Bool,
-                      isManualScan: Bool,
+                      isImmediateOperation: Bool,
                       userNotificationService: DataBrokerProtectionUserNotificationService,
                       shouldRunNextStep: @escaping () -> Bool) async throws
 }
 
 extension OperationsManager {
-    func runOperation(operationData: BrokerOperationData,
+    func runOperation(operationData: BrokerJobData,
                       brokerProfileQueryData: BrokerProfileQueryData,
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
-                      runner: WebOperationRunner,
+                      runner: WebJobRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       userNotificationService: DataBrokerProtectionUserNotificationService,
                       isManual: Bool,
@@ -58,7 +58,7 @@ extension OperationsManager {
                                runner: runner,
                                pixelHandler: pixelHandler,
                                showWebView: false,
-                               isManualScan: isManual,
+                               isImmediateOperation: isManual,
                                userNotificationService: userNotificationService,
                                shouldRunNextStep: shouldRunNextStep)
     }
@@ -66,29 +66,29 @@ extension OperationsManager {
 
 struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
-    internal func runOperation(operationData: BrokerOperationData,
+    internal func runOperation(operationData: BrokerJobData,
                                brokerProfileQueryData: BrokerProfileQueryData,
                                database: DataBrokerProtectionRepository,
                                notificationCenter: NotificationCenter = NotificationCenter.default,
-                               runner: WebOperationRunner,
+                               runner: WebJobRunner,
                                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                showWebView: Bool = false,
-                               isManualScan: Bool = false,
+                               isImmediateOperation: Bool = false,
                                userNotificationService: DataBrokerProtectionUserNotificationService,
                                shouldRunNextStep: @escaping () -> Bool) async throws {
 
-        if operationData as? ScanOperationData != nil {
+        if operationData as? ScanJobData != nil {
             try await runScanOperation(on: runner,
                                        brokerProfileQueryData: brokerProfileQueryData,
                                        database: database,
                                        notificationCenter: notificationCenter,
                                        pixelHandler: pixelHandler,
                                        showWebView: showWebView,
-                                       isManual: isManualScan,
+                                       isManual: isImmediateOperation,
                                        userNotificationService: userNotificationService,
                                        shouldRunNextStep: shouldRunNextStep)
-        } else if let optOutOperationData = operationData as? OptOutOperationData {
-            try await runOptOutOperation(for: optOutOperationData.extractedProfile,
+        } else if let optOutJobData = operationData as? OptOutJobData {
+            try await runOptOutOperation(for: optOutJobData.extractedProfile,
                                          on: runner,
                                          brokerProfileQueryData: brokerProfileQueryData,
                                          database: database,
@@ -100,8 +100,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
-    internal func runScanOperation(on runner: WebOperationRunner,
+    // swiftlint:disable:next cyclomatic_complexity
+    internal func runScanOperation(on runner: WebJobRunner,
                                    brokerProfileQueryData: BrokerProfileQueryData,
                                    database: DataBrokerProtectionRepository,
                                    notificationCenter: NotificationCenter,
@@ -125,8 +125,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
         let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
         let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name,
+                                                                          dataBrokerVersion: brokerProfileQueryData.dataBroker.version,
                                                                           handler: pixelHandler,
-                                                                          isManualScan: isManual)
+                                                                          isImmediateOperation: isManual)
 
         do {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
@@ -139,11 +140,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                 stageCalculator.fireScanSuccess(matchesFound: extractedProfiles.count)
                 let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound(count: extractedProfiles.count))
                 try database.add(event)
+                let extractedProfilesForBroker = try database.fetchExtractedProfiles(for: brokerId)
 
                 for extractedProfile in extractedProfiles {
 
                     // We check if the profile exists in the database.
-                    let extractedProfilesForBroker = try database.fetchExtractedProfiles(for: brokerId)
                     let doesProfileExistsInDatabase = extractedProfilesForBroker.contains { $0.identifier == extractedProfile.identifier }
 
                     // If the profile exists we do not create a new opt-out operation
@@ -169,13 +170,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         // This is done inside a transaction on the database side. We insert the extracted profile and then
                         // we insert the opt-out operation, we do not want to do things separately in case creating an opt-out fails
                         // causing the extracted profile to be orphan.
-                        let optOutOperationData = OptOutOperationData(brokerId: brokerId,
+                        let optOutJobData = OptOutJobData(brokerId: brokerId,
                                                                       profileQueryId: profileQueryId,
                                                                       preferredRunDate: preferredRunOperation,
                                                                       historyEvents: [HistoryEvent](),
                                                                       extractedProfile: extractedProfile)
 
-                        try database.saveOptOutOperation(optOut: optOutOperationData, extractedProfile: extractedProfile)
+                        try database.saveOptOutJob(optOut: optOutJobData, extractedProfile: extractedProfile)
 
                         os_log("Creating new opt-out operation data for: %@", log: .dataBrokerProtection, String(describing: extractedProfile.name))
                     }
@@ -267,9 +268,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
     }
 
-    // swiftlint:disable:next function_body_length
     internal func runOptOutOperation(for extractedProfile: ExtractedProfile,
-                                     on runner: WebOperationRunner,
+                                     on runner: WebJobRunner,
                                      brokerProfileQueryData: BrokerProfileQueryData,
                                      database: DataBrokerProtectionRepository,
                                      notificationCenter: NotificationCenter,
@@ -293,7 +293,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         let retriesCalculatorUseCase = OperationRetriesCalculatorUseCase()
-        let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.url, handler: pixelHandler)
+        let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.url,
+                                                                                  dataBrokerVersion: brokerProfileQueryData.dataBroker.version,
+                                                                                  handler: pixelHandler)
         stageDurationCalculator.fireOptOutStart()
         os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 

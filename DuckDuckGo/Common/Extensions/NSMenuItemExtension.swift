@@ -105,17 +105,6 @@ extension NSMenuItem {
     }
 
     @discardableResult
-    func withAccessibilityIdentifier(_ accessibilityIdentifier: String) -> NSMenuItem {
-        self.setAccessibilityIdentifier(accessibilityIdentifier)
-        return self
-    }
-
-    func withAccessibilityValue(_ accessibilityValue: String) -> NSMenuItem {
-        self.setAccessibilityValue(accessibilityValue)
-        return self
-    }
-
-    @discardableResult
     func withImage(_ image: NSImage?) -> NSMenuItem {
         self.image = image
         return self

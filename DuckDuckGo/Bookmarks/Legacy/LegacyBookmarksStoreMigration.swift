@@ -44,8 +44,7 @@ public class LegacyBookmarksStoreMigration {
         return results
     }
 
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
+    // swiftlint:disable:next cyclomatic_complexity
     public static func setupAndMigrate(from source: NSManagedObjectContext,
                                        to destination: NSManagedObjectContext) {
 
@@ -173,8 +172,6 @@ public class LegacyBookmarksStoreMigration {
             }
         }
     }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
 
     private static func cleanupOldData(in context: NSManagedObjectContext) {
         let allObjects = (try? context.fetch(BookmarkManagedObject.fetchRequest())) ?? []

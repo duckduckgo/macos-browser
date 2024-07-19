@@ -31,6 +31,7 @@ final class BookmarksBarVisibilityManagerTests: XCTestCase {
         .url(URL.duckDuckGo, credential: nil, source: .link),
         .settings(pane: nil),
         .bookmarks,
+        .onboardingDeprecated,
         .onboarding,
         .dataBrokerProtection,
         .subscription(URL.duckDuckGo),

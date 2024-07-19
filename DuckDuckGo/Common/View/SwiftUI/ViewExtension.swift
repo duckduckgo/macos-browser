@@ -106,8 +106,8 @@ extension View {
 
     @available(macOS, obsoleted: 12.0, message: "This extension needs to be removed as it‘s no longer necessary.")
     @_disfavoredOverload
-    @inlinable func task(priority: TaskPriority = .userInitiated, @_inheritActorContext _ action: @escaping @Sendable () async -> Void) -> some View {
-        modifier(ViewAsyncTaskModifier(priority: priority, action: action))
+    @inlinable func task(@_inheritActorContext _ action: @escaping @Sendable () async -> Void) -> some View {
+        modifier(ViewAsyncTaskModifier(priority: .userInitiated, action: action))
     }
 
 }

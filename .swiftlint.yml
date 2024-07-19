@@ -9,10 +9,15 @@ disabled_rules:
   - line_length
   - type_name
   - implicit_getter
-  - function_parameter_count
   - trailing_comma
   - nesting
   - opening_brace
+  - function_parameter_count
+  - function_body_length
+  - file_length
+  - type_body_length
+  - non_optional_string_data_conversion
+  - static_over_final_class
 
 opt_in_rules:
   - file_header
@@ -37,15 +42,11 @@ custom_rules:
     severity: error
 
 # Rule Config
+cyclomatic_complexity:
+  ignores_case_statements: true
 identifier_name:
   min_length: 1
   max_length: 1000
-file_length:
-  warning: 1200
-  error: 1200
-type_body_length:
-  warning: 500
-  error: 500
 large_tuple:
   warning: 4
   error: 5

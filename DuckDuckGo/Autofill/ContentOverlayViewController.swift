@@ -296,6 +296,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
     public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         PixelKit.fire(GeneralPixel.formAutofilled(kind: type.formAutofillKind))
+        NotificationCenter.default.post(name: .autofillFillEvent, object: nil)
 
         if type.formAutofillKind == .password &&
             passwordManagerCoordinator.isEnabled {
@@ -325,18 +326,22 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
             self.emailManager.updateLastUseDate()
 
-            PixelKit.fire(GeneralPixel.jsPixel(pixel), withAdditionalParameters: pixelParameters)
+            PixelKit.fire(NonStandardEvent(GeneralPixel.jsPixel(pixel)), withAdditionalParameters: pixelParameters)
+            NotificationCenter.default.post(name: .autofillFillEvent, object: nil)
         } else {
+            if pixel.isIdentityPixel {
+                NotificationCenter.default.post(name: .autofillFillEvent, object: nil)
+            }
             PixelKit.fire(GeneralPixel.jsPixel(pixel), withAdditionalParameters: pixel.pixelParameters)
         }
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
-        autofillPreferencesModel.showAutofillPopover(.cards)
+        autofillPreferencesModel.showAutofillPopover(.cards, source: .manage)
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestIdentitiesManagerForDomain domain: String) {
-        autofillPreferencesModel.showAutofillPopover(.identities)
+        autofillPreferencesModel.showAutofillPopover(.identities, source: .manage)
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
@@ -344,7 +349,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         if mngr.isEnabled {
             mngr.bitwardenManagement.openBitwarden()
         } else {
-            autofillPreferencesModel.showAutofillPopover(.logins)
+            autofillPreferencesModel.showAutofillPopover(.logins, source: .manage)
         }
     }
 

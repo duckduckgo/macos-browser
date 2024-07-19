@@ -78,7 +78,7 @@ jobs:
       run: bats --formatter junit scripts/tests/* > bats-tests.xml
 
     - name: Publish unit tests report
-      uses: mikepenz/action-junit-report@v3
+      uses: mikepenz/action-junit-report@v4
       if: always() # always run even if the previous step fails
       with:
         check_name: "Test Report: Shell Scripts"
@@ -140,7 +140,7 @@ jobs:
 
     - name: Cache SPM
       if: env.cache_key_hash
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: DerivedData/SourcePackages
         key: ${{ runner.os }}-spm-${{ matrix.cache-key }}${{ env.cache_key_hash }}
@@ -209,7 +209,7 @@ jobs:
         fi
 
     - name: Publish unit tests report
-      uses: mikepenz/action-junit-report@v3
+      uses: mikepenz/action-junit-report@v4
       if: always() # always run even if the previous step fails
       with:
         check_name: "Test Report: ${{ matrix.flavor }}"
@@ -223,10 +223,12 @@ jobs:
       run: |
         # Extract failed tests from the junit report
         # Only keep failures unique by classname and name (column 1 and 2 of the yq output)
-        yq < ${{ matrix.flavor }}.xml -p xml -o json -r \
-          $'[.testsuites.testsuite[].testcase] | flatten | map(select(.failure) | .+@classname + " " + .+@name + " \'" + .failure.+@message + "\' ${{ env.WORKFLOW_URL }}") | .[]' \
-          | sort -u -k 1,2 \
-          | xargs -L 1 ./scripts/report-failed-unit-test.sh
+        for file in "${{ matrix.flavor }}-unittests.xml" "${{ matrix.flavor }}-integrationtests.xml"; do
+          yq < "$file" -p xml -o json -r \
+            $'[.testsuites.testsuite[].testcase] | flatten | map(select(.failure) | .+@classname + " " + .+@name + " \'" + .failure.+@message + "\' ${{ env.WORKFLOW_URL }}") | .[]' \
+            | sort -u -k 1,2 \
+            | xargs -L 1 ./scripts/report-failed-unit-test.sh
+        done
 
     - name: Upload failed unit tests log
       uses: actions/upload-artifact@v4
@@ -323,7 +325,7 @@ jobs:
 
     - name: Cache SPM
       if: env.cache_key_hash
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: DerivedData/SourcePackages
         key: ${{ runner.os }}-spm-test-release-${{ env.cache_key_hash }}

@@ -26,8 +26,6 @@ import WebKit
 import History
 import PixelKit
 
-// swiftlint:disable file_length
-
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
@@ -35,14 +33,12 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
-
 }
 
 protocol NewWindowPolicyDecisionMaker {
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
 }
 
-// swiftlint:disable:next type_body_length
 @dynamicMemberLookup final class Tab: NSObject, Identifiable, ObservableObject {
 
     private struct ExtensionDependencies: TabExtensionDependencies {
@@ -71,6 +67,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     let startupPreferences: StartupPreferences
     let tabsPreferences: TabsPreferences
+    let navigationDidEndPublisher = PassthroughSubject<Tab, Never>()
 
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
@@ -157,7 +154,6 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     @MainActor
-    // swiftlint:disable:next function_body_length
     init(content: TabContent,
          faviconManagement: FaviconManagement,
          webCacheManager: WebCacheManager,
@@ -338,36 +334,18 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     deinit {
-        cleanUpBeforeClosing(onDeinit: true, webView: webView, userContentController: userContentController)
-    }
-
-    func cleanUpBeforeClosing() {
-        cleanUpBeforeClosing(onDeinit: false, webView: webView, userContentController: userContentController)
-    }
-
-    @MainActor(unsafe)
-    private func cleanUpBeforeClosing(onDeinit: Bool, webView: WebView, userContentController: UserContentController?) {
-        let job = { [webView, userContentController] in
+        DispatchQueue.main.asyncOrNow { [webView, userContentController] in
+            // WebKit objects must be deallocated on the main thread
             webView.stopAllMedia(shouldStopLoading: true)
 
             userContentController?.cleanUpBeforeClosing()
+
 #if DEBUG
             if case .normal = NSApp.runType {
                 webView.assertObjectDeallocated(after: 4.0)
             }
 #endif
         }
-#if DEBUG
-        if !onDeinit, case .normal = NSApp.runType {
-            // Tab should be deallocated shortly after burning
-            self.assertObjectDeallocated(after: 4.0)
-        }
-#endif
-        guard Thread.isMainThread else {
-            DispatchQueue.main.async { job() }
-            return
-        }
-        job()
     }
 
     func stopAllMediaAndLoading() {
@@ -641,7 +619,7 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor
     @discardableResult
     func goBack() -> ExpectedNavigation? {
-        guard canGoBack else {
+        guard canGoBack, let backItem = webView.backForwardList.backItem else {
             if canBeClosedWithBack {
                 delegate?.closeTab(self)
             }
@@ -649,7 +627,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         userInteractionDialog = nil
-        let navigation = webView.navigator()?.goBack(withExpectedNavigationType: .backForward(distance: -1))
+        let navigation = webView.navigator()?.go(to: backItem, withExpectedNavigationType: .backForward(distance: -1))
         // update TabContent source to .historyEntry on navigation
         navigation?.appendResponder(willStart: { [weak self] navigation in
             guard let self,
@@ -663,10 +641,10 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor
     @discardableResult
     func goForward() -> ExpectedNavigation? {
-        guard canGoForward else { return nil }
+        guard canGoForward, let forwardItem = webView.backForwardList.forwardItem else { return nil }
 
         userInteractionDialog = nil
-        let navigation = webView.navigator()?.goForward(withExpectedNavigationType: .backForward(distance: 1))
+        let navigation = webView.navigator()?.go(to: forwardItem, withExpectedNavigationType: .backForward(distance: 1))
         // update TabContent source to .historyEntry on navigation
         navigation?.appendResponder(willStart: { [weak self] navigation in
             guard let self,
@@ -747,7 +725,18 @@ protocol NewWindowPolicyDecisionMaker {
     func startOnboarding() {
         userInteractionDialog = nil
 
-        setContent(.onboarding)
+#if DEBUG || REVIEW
+        if Application.runType == .uiTestsOnboarding {
+            setContent(.onboarding)
+            return
+        }
+#endif
+
+        if PixelExperiment.cohort == .newOnboarding {
+            setContent(.onboarding)
+        } else {
+            setContent(.onboardingDeprecated)
+        }
     }
 
     @MainActor(unsafe)
@@ -1163,6 +1152,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func navigationDidFinish(_ navigation: Navigation) {
         invalidateInteractionStateData()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
+        navigationDidEndPublisher.send(self)
     }
 
     @MainActor
@@ -1269,5 +1259,3 @@ extension Tab {
     }
 
 }
-
-// swiftlint:enable file_length

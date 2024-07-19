@@ -16,16 +16,11 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Common
 import Foundation
 
-enum FeatureName: String {
-    // Used for unit tests
-    case dummy
-
-}
-
-struct Variant {
+struct Variant: BrowserServicesKit.Variant {
 
     struct When {
         static let always = { return true }
@@ -42,10 +37,10 @@ struct Variant {
     static let defaultVariants: [Variant] = [
     ]
 
-    let name: String
-    let weight: Int
-    let isIncluded: () -> Bool
-    let features: [FeatureName]
+    var name: String
+    var weight: Int
+    var isIncluded: () -> Bool
+    var features: [FeatureName]
 
 }
 
@@ -55,17 +50,9 @@ protocol VariantRNG {
 
 }
 
-protocol VariantManager {
-
-    var currentVariant: Variant? { get }
-    func assignVariantIfNeeded(_ newInstallCompletion: (VariantManager) -> Void)
-    func isSupported(feature: FeatureName) -> Bool
-
-}
-
 final class DefaultVariantManager: VariantManager {
 
-    var currentVariant: Variant? {
+    var currentVariant: BrowserServicesKit.Variant? {
         let variantName = ProcessInfo.processInfo.environment["VARIANT", default: storage.variant ?? "" ]
         return variants.first(where: { $0.name == variantName })
     }

@@ -97,8 +97,6 @@ final class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManag
     var updatesPublisher: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
     var privacyConfig: PrivacyConfiguration = MockPrivacyConfiguration()
     var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider()
-    var toggleProtectionsCounter: ToggleProtectionsCounter = ToggleProtectionsCounter(eventReporting: EventMapping<ToggleProtectionsCounterEvent> { _, _, _, _ in
-    })
 }
 
 #endif

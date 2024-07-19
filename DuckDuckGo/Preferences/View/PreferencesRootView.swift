@@ -37,7 +37,7 @@ enum Preferences {
                 return 355
             }
         }
-        static let paneContentWidth: CGFloat = 524
+        static let paneContentWidth: CGFloat = 544
         static let panePaddingHorizontal: CGFloat = 40
         static let panePaddingVertical: CGFloat = 40
     }
@@ -47,9 +47,13 @@ enum Preferences {
         @ObservedObject var model: PreferencesSidebarModel
 
         var subscriptionModel: PreferencesSubscriptionModel?
+        let subscriptionManager: SubscriptionManager
+        let subscriptionUIHandler: SubscriptionUIHandling
 
-        init(model: PreferencesSidebarModel) {
+        init(model: PreferencesSidebarModel, subscriptionManager: SubscriptionManager, subscriptionUIHandler: SubscriptionUIHandling) {
             self.model = model
+            self.subscriptionManager = subscriptionManager
+            self.subscriptionUIHandler = subscriptionUIHandler
             self.subscriptionModel = makeSubscriptionViewModel()
         }
 
@@ -89,7 +93,8 @@ enum Preferences {
                                 downloadsModel: DownloadsPreferences.shared,
                                 searchModel: SearchPreferences.shared,
                                 tabsModel: TabsPreferences.shared,
-                                dataClearingModel: DataClearingPreferences.shared)
+                                dataClearingModel: DataClearingPreferences.shared,
+                                dockCustomizer: DockCustomizer())
                 case .sync:
                     SyncView()
                 case .appearance:
@@ -97,7 +102,7 @@ enum Preferences {
                 case .dataClearing:
                     DataClearingView(model: DataClearingPreferences.shared)
                 case .vpn:
-                    VPNView(model: VPNPreferencesModel())
+                    VPNView(model: VPNPreferencesModel(), status: model.vpnProtectionStatus())
                 case .subscription:
                     SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
                 case .autofill:
@@ -110,7 +115,7 @@ enum Preferences {
                     // Opens a new tab
                     Spacer()
                 case .about:
-                    AboutView(model: AboutModel())
+                    AboutView(model: AboutPreferences.shared)
                 }
             }
             .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
@@ -118,7 +123,6 @@ enum Preferences {
             .padding(.horizontal, Const.panePaddingHorizontal)
         }
 
-        // swiftlint:disable:next cyclomatic_complexity function_body_length
         private func makeSubscriptionViewModel() -> PreferencesSubscriptionModel {
             let openURL: (URL) -> Void = { url in
                 DispatchQueue.main.async {
@@ -137,7 +141,8 @@ enum Preferences {
                         WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
                     case .openITR:
                         PixelKit.fire(PrivacyProPixel.privacyProIdentityRestorationSettings)
-                        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+                        let url = subscriptionManager.url(for: .identityTheftRestoration)
+                        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(url))
                     case .iHaveASubscriptionClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseClick)
                     case .activateAddEmailClick:
@@ -146,8 +151,6 @@ enum Preferences {
                         PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .unique)
                     case .restorePurchaseStoreClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
-                    case .addToAnotherDeviceClick:
-                        PixelKit.fire(PrivacyProPixel.privacyProSettingsAddDevice)
                     case .addDeviceEnterEmail:
                         PixelKit.fire(PrivacyProPixel.privacyProAddDeviceEnterEmail)
                     case .activeSubscriptionSettingsClick:
@@ -160,25 +163,30 @@ enum Preferences {
                 }
             }
 
-            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
-                if #available(macOS 12.0, *) {
-                    Task {
-                        guard let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
-                              let windowControllerManager = WindowControllersManager.shared.lastKeyMainWindowController else {
-                            return
+            let sheetActionHandler = SubscriptionAccessActionHandlers(
+                openActivateViaEmailURL: {
+                    let url = subscriptionManager.url(for: .activateViaEmail)
+                    WindowControllersManager.shared.showTab(with: .subscription(url))
+                }, restorePurchases: {
+                    if #available(macOS 12.0, *) {
+                        Task {
+                            let appStoreRestoreFlow = DefaultAppStoreRestoreFlow(accountManager: subscriptionManager.accountManager,
+                                                                                 storePurchaseManager: subscriptionManager.storePurchaseManager(),
+                                                                                 subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                                                 authEndpointService: subscriptionManager.authEndpointService)
+                            let subscriptionAppStoreRestorer = DefaultSubscriptionAppStoreRestorer(
+                                subscriptionManager: subscriptionManager,
+                                appStoreRestoreFlow: appStoreRestoreFlow,
+                                uiHandler: subscriptionUIHandler)
+                            await subscriptionAppStoreRestorer.restoreAppStoreSubscription()
                         }
-
-                        await SubscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
                     }
-                }
-            },
-                                                                      openURLHandler: openURL,
-                                                                      uiActionHandler: handleUIEvent)
+                }, uiActionHandler: handleUIEvent)
 
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,
                                                 sheetActionHandler: sheetActionHandler,
-                                                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+                                                subscriptionManager: subscriptionManager)
         }
     }
 }

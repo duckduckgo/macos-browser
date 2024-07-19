@@ -23,7 +23,7 @@ import XCTest
 final class OperationPreferredDateCalculatorTests: XCTestCase {
 
     private let schedulingConfig = DataBrokerScheduleConfig(
-        retryError: 1000,
+        retryError: 48,
         confirmOptOutScan: 2000,
         maintenanceScan: 3000
     )
@@ -322,17 +322,142 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testError_thenOptOutDateIsRetry() throws {
-        let expectedOptOutDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
-
+    func testWhenOptOutFailedOnce_thenWeRetryInTwoHours() throws {
+        let expectedOptOutDate = Calendar.current.date(byAdding: .hour, value: 2, to: Date())!
         let historyEvents = [
             HistoryEvent(extractedProfileId: 1,
                          brokerId: 1,
                          profileQueryId: 1,
                          type: .error(error: DataBrokerProtectionError.malformedURL))]
-
         let calculator = OperationPreferredDateCalculator()
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+                                                                     historyEvents: historyEvents,
+                                                                     extractedProfileID: nil,
+                                                                     schedulingConfig: schedulingConfig)
 
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+
+    func testWhenOptOutFailedTwice_thenWeRetryInFourHours() throws {
+        let expectedOptOutDate = Calendar.current.date(byAdding: .hour, value: 4, to: Date())!
+        let historyEvents: [HistoryEvent] = [
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL))
+        ]
+        let calculator = OperationPreferredDateCalculator()
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+                                                                     historyEvents: historyEvents,
+                                                                     extractedProfileID: nil,
+                                                                     schedulingConfig: schedulingConfig)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+
+    func testWhenOptOutFailedThreeTimes_thenWeRetryInEightHours() throws {
+        let expectedOptOutDate = Calendar.current.date(byAdding: .hour, value: 8, to: Date())!
+        let historyEvents: [HistoryEvent] = [
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL))
+        ]
+        let calculator = OperationPreferredDateCalculator()
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+                                                                     historyEvents: historyEvents,
+                                                                     extractedProfileID: nil,
+                                                                     schedulingConfig: schedulingConfig)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+
+    func testWhenOptOutFailedThreeTimes_thenWeRetryInSixteenHours() throws {
+        let expectedOptOutDate = Calendar.current.date(byAdding: .hour, value: 16, to: Date())!
+        let historyEvents: [HistoryEvent] = [
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL))
+        ]
+        let calculator = OperationPreferredDateCalculator()
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+                                                                     historyEvents: historyEvents,
+                                                                     extractedProfileID: nil,
+                                                                     schedulingConfig: schedulingConfig)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+
+    func testWhenOptOutFailedThreeTimes_thenWeRetryInThirtyTwoHours() throws {
+        let expectedOptOutDate = Calendar.current.date(byAdding: .hour, value: 32, to: Date())!
+        let historyEvents: [HistoryEvent] = [
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL))
+        ]
+        let calculator = OperationPreferredDateCalculator()
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+                                                                     historyEvents: historyEvents,
+                                                                     extractedProfileID: nil,
+                                                                     schedulingConfig: schedulingConfig)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+
+    func testWhenOptOutFailedSixTimes_thenWeRetryInTwoDays() throws {
+        let expectedOptOutDate = Calendar.current.date(byAdding: .day, value: 2, to: Date())!
+        let historyEvents: [HistoryEvent] = [
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL))
+        ]
+        let calculator = OperationPreferredDateCalculator()
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+                                                                     historyEvents: historyEvents,
+                                                                     extractedProfileID: nil,
+                                                                     schedulingConfig: schedulingConfig)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+
+    func testWhenOptOutFailedMoreThanTheThreshold_thenWeRetryAtTheSchedulingRetry() throws {
+        let expectedOptOutDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
+        let historyEvents: [HistoryEvent] = [
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)),
+            .init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL))
+        ]
+        let calculator = OperationPreferredDateCalculator()
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+                                                                     historyEvents: historyEvents,
+                                                                     extractedProfileID: nil,
+                                                                     schedulingConfig: schedulingConfig)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+
+    /// https://app.asana.com/0/1204006570077678/1207642874812352/f
+    /// We had a crash where the Int.max was exceeded when calculating the backoff. This checks that we are not passings that max.
+    func testWhenOptOutFailedMoreThanTheThresholdAndExceedsTheMaxInt_thenWeRetryAtTheSchedulingRetryAndNotCrash() throws {
+        let expectedOptOutDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
+
+        var historyEvents = [HistoryEvent]()
+        for _ in 0...1074 {
+            historyEvents.append(.init(brokerId: 1, profileQueryId: 1, type: .error(error: .malformedURL)))
+        }
+        let calculator = OperationPreferredDateCalculator()
         let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                      historyEvents: historyEvents,
                                                                      extractedProfileID: nil,

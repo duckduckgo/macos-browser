@@ -1,7 +1,7 @@
 {
   "name": "OfficialUSA",
   "url": "officialusa.com",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "parent": "neighbor.report",
   "addedDatetime": 1692594000000,
   "steps": [
@@ -18,6 +18,7 @@
           "actionType": "extract",
           "id": "fd803889-7f13-4955-8cec-eac551f5c5f2",
           "selector": ".person",
+          "noResultsSelector": "//h1[contains(text(), '404')]",
           "profile": {
             "name": {
               "selector": ".//span[@itemprop='name']"

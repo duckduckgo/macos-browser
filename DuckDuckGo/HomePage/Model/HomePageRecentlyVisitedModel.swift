@@ -284,7 +284,6 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         return Self.feedImage(for: trackerNetwork)
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     static func feedImage(for trackerNetwork: TrackerNetwork) -> NSImage? {
         switch trackerNetwork {
         case .adform:            .feedAdform

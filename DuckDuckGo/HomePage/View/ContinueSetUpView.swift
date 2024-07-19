@@ -18,6 +18,7 @@
 
 import SwiftUI
 import SwiftUIExtensions
+import PixelKit
 
 extension HomePage.Views {
 
@@ -34,8 +35,8 @@ extension HomePage.Views {
                     }
                     Spacer()
                 }
-                .padding(.vertical, -25)
-                .padding(.leading, 1)
+                .padding(.top, -24)
+                .padding(.leading, 2)
                 VStack(spacing: 20) {
                     if #available(macOS 12.0, *) {
                         LazyVStack(spacing: 4) {
@@ -78,7 +79,7 @@ extension HomePage.Views {
 
                 MoreOrLess(isExpanded: $model.shouldShowAllFeatures)
                     .padding(.top, -3)
-                    .visibility(model.isMoreOrLessButtonNeeded ? .visible : .invisible)
+                    .visibility(model.isMoreOrLessButtonNeeded ? .visible : .gone)
             }
         }
 
@@ -100,7 +101,7 @@ extension HomePage.Views {
                         .frame(width: 24, height: 24)
                 }
                 ZStack {
-                    CardTemplate(title: featureType.title, summary: featureType.summary, actionText: featureType.action, icon: icon, width: model.itemWidth, height: model.itemHeight, action: { model.performAction(for: featureType) })
+                    CardTemplate(title: featureType.title, summary: featureType.summary, actionText: featureType.action, confirmationText: featureType.confirmation, icon: icon, width: model.itemWidth, height: model.itemHeight, action: { model.performAction(for: featureType) })
                         .contextMenu(ContextMenu(menuItems: {
                             Button(featureType.action, action: { model.performAction(for: featureType) })
                             Divider()
@@ -109,7 +110,7 @@ extension HomePage.Views {
                     HStack {
                         Spacer()
                         VStack {
-                            RemoveIemButton(icon: .close) {
+                            CloseButton(icon: .close) {
                                 model.removeItem(for: featureType)
                             }
                             .visibility(isHovering ? .visible : .gone)
@@ -121,6 +122,13 @@ extension HomePage.Views {
                 .onHover { isHovering in
                     self.isHovering = isHovering
                 }
+                .onAppear {
+                    if featureType == .dock {
+                        PixelKit.fire(GeneralPixel.addToDockNewTabPageCardPresented,
+                                      frequency: .unique,
+                                      includeAppVersionParameter: false)
+                    }
+                }
             }
         }
 
@@ -129,12 +137,14 @@ extension HomePage.Views {
             var title: String
             var summary: String
             var actionText: String
+            var confirmationText: String?
             @ViewBuilder var icon: Content
             let width: CGFloat
             let height: CGFloat
             let action: () -> Void
 
             @State var isHovering = false
+            @State var isClicked = false
 
             var body: some View {
                 ZStack(alignment: .center) {
@@ -166,7 +176,23 @@ extension HomePage.Views {
                         .frame(width: 208, height: 130)
                         VStack {
                             Spacer()
-                            ActionButton(title: actionText, isHoveringOnCard: $isHovering, action: action)
+                            if let confirmationText, isClicked {
+                                HStack {
+                                    Image(.successCheckmark)
+                                    Text(confirmationText)
+                                        .bold()
+                                        .multilineTextAlignment(.center)
+                                        .lineLimit(1)
+                                        .font(.system(size: 11))
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                .offset(y: -3)
+                            } else {
+                                ActionButton(title: actionText,
+                                             isHoveringOnCard: $isHovering,
+                                             isClicked: $isClicked,
+                                             action: action)
+                            }
                         }
                         .padding(8)
                     }
@@ -188,11 +214,13 @@ extension HomePage.Views {
 
             @State var isHovering = false
             @Binding var isHoveringOnCard: Bool
+            @Binding var isClicked: Bool
 
-            init(title: String, isHoveringOnCard: Binding<Bool>, action: @escaping () -> Void) {
+            init(title: String, isHoveringOnCard: Binding<Bool>, isClicked: Binding<Bool>, action: @escaping () -> Void) {
                 self.title = title
                 self.action = action
                 self._isHoveringOnCard = isHoveringOnCard
+                self._isClicked = isClicked
                 self.titleWidth = (title as NSString).size(withAttributes: [.font: NSFont.systemFont(ofSize: 11) as Any]).width + 14
             }
 
@@ -217,6 +245,7 @@ extension HomePage.Views {
                         .foregroundColor(Color(.linkBlue))
                 }
                 .onTapGesture {
+                    isClicked = true
                     action()
                 }
                 .onHover { isHovering in
@@ -226,28 +255,6 @@ extension HomePage.Views {
                     } else {
                         NSCursor.pointingHand.pop()
                     }
-                }
-            }
-        }
-
-        struct RemoveIemButton: View {
-            let icon: NSImage
-            let action: () -> Void
-            let foreGroundColor: Color = .homeFavoritesBackground
-            let foregroundColorOnHover: Color = .homeFavoritesHover
-
-            @State var isHovering = false
-
-            var body: some View {
-                ZStack {
-                    Circle()
-                        .fill(isHovering ? foregroundColorOnHover : foreGroundColor)
-                        .frame(width: 16, height: 16)
-                    IconButton(icon: icon, action: action)
-                        .foregroundColor(.gray)
-                }
-                .onHover { isHovering in
-                    self.isHovering = isHovering
                 }
             }
         }

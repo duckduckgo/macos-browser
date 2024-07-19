@@ -105,6 +105,7 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
             connectionState: "connected",
             lastStartErrorDescription: "none",
             lastTunnelErrorDescription: "none",
+            lastKnownFailureDescription: "none",
             connectedServer: "Paoli, PA",
             connectedServerIP: "123.123.123.123"
         )
@@ -117,7 +118,8 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
             notifyStatusChangesEnabled: true,
             showInMenuBarEnabled: true,
             selectedServer: "server",
-            selectedEnvironment: "production"
+            selectedEnvironment: "production",
+            customDNS: false
         )
 
         let loginItemState = VPNMetadata.LoginItemState(

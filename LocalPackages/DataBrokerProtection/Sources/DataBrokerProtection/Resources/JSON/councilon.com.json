@@ -1,7 +1,7 @@
 {
   "name": "Councilon",
   "url": "councilon.com",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "parent": "verecor.com",
   "addedDatetime": 1702965600000,
   "steps": [
@@ -12,7 +12,7 @@
         {
           "actionType": "navigate",
           "id": "ac6caadd-7930-4776-8473-9403b568611e",
-          "url": "https://councilon.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age}",
+          "url": "https://councilon.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
             "31-40",
@@ -27,6 +27,7 @@
           "actionType": "extract",
           "id": "5629ad0b-1f33-480f-a6ec-5add91b2dce8",
           "selector": ".card",
+          "noResultsSelector": "//div[@class='page-404' and h1[starts-with(text(), 'Sorry')]]",
           "profile": {
             "name": {
               "selector": ".card-title",

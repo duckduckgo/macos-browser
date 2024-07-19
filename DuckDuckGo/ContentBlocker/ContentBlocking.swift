@@ -65,7 +65,6 @@ final class AppContentBlocking {
                                                                   embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
                                                                   localProtection: LocalUnprotectedDomains.shared,
                                                                   errorReporting: Self.debugEvents,
-                                                                  toggleProtectionsCounterEventReporting: toggleProtectionsEvents,
                                                                   internalUserDecider: internalUserDecider)
 
         trackerDataManager = TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
@@ -98,15 +97,6 @@ final class AppContentBlocking {
                                                                           log: .attribution)
     }
 
-    private let toggleProtectionsEvents = EventMapping<ToggleProtectionsCounterEvent> { event, _, parameters, _ in
-        let domainEvent: GeneralPixel
-        switch event {
-        case .toggleProtectionsCounterDaily:
-            domainEvent = .toggleProtectionsDailyCount
-        }
-        PixelKit.fire(domainEvent, withAdditionalParameters: parameters ?? [:])
-    }
-
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in
         guard NSApp.runType.requiresEnvironment else { return }
 
@@ -137,7 +127,7 @@ final class AppContentBlocking {
             switch listName {
             case defaultTDSListName:
                 listType = .tds
-            case ContentBlockerRulesLists.Constants.clickToLoadRulesListName:
+            case DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName:
                 listType = .clickToLoad
             case AdClickAttributionRulesSplitter.blockingAttributionRuleListName(forListNamed: defaultTDSListName):
                 listType = .blockingAttribution

@@ -47,7 +47,14 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var burnerWindowBackgroundView: NSImageView!
 
     @IBOutlet weak var addTabButton: MouseOverButton!
+
+    var footerAddButton: MouseOverButton?
     let tabCollectionViewModel: TabCollectionViewModel
+    var isInteractionPrevented: Bool = false {
+        didSet {
+            footerAddButton?.isEnabled = !isInteractionPrevented
+        }
+    }
 
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     private let pinnedTabsViewModel: PinnedTabsViewModel?
@@ -309,6 +316,12 @@ final class TabBarViewController: NSViewController {
                 return
             }
             bookmarkTab(with: url, title: tabViewModel.title)
+        case let .removeBookmark(tab):
+            guard let url = tab.url else {
+                os_log("TabBarViewController: Failed to get url from tab")
+                return
+            }
+            deleteBookmark(with: url)
         case let .fireproof(tab):
             fireproof(tab)
         case let .removeFireproofing(tab):
@@ -773,6 +786,14 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         }
     }
 
+    private func deleteBookmark(with url: URL) {
+        guard let bookmark = bookmarkManager.getBookmark(for: url) else {
+            os_log("TabBarViewController: Failed to fetch bookmark for url \(url)", type: .error)
+            return
+        }
+        bookmarkManager.remove(bookmark: bookmark)
+    }
+
     private func fireproof(_ tab: Tab) {
         guard let url = tab.url, let host = url.host else {
             os_log("TabBarViewController: Failed to get url of tab bar view item", type: .error)
@@ -790,7 +811,24 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
         FireproofDomains.shared.remove(domain: host)
     }
+
+    // MARK: - TabViewItem
+
+    func urlAndTitle(for tabBarViewItem: TabBarViewItem) -> (url: URL, title: String)? {
+        guard
+            let indexPath = collectionView.indexPath(for: tabBarViewItem),
+            let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
+            let url = tabViewModel.tab.content.userEditableUrl
+        else {
+            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            return nil
+        }
+
+        return (url, tabViewModel.title)
+    }
 }
+
+// MARK: - NSCollectionViewDelegateFlowLayout
 
 extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
 
@@ -800,6 +838,8 @@ extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
     }
 
 }
+
+// MARK: - NSCollectionViewDataSource
 
 extension TabBarViewController: NSCollectionViewDataSource {
 
@@ -840,6 +880,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
             footer.toolTip = UserText.newTabTooltip
+            self.footerAddButton = footer.addButton
         }
 
         return view
@@ -853,6 +894,8 @@ extension TabBarViewController: NSCollectionViewDataSource {
         (item as? TabBarViewItem)?.clear()
     }
 }
+
+// MARK: - NSCollectionViewDelegate
 
 extension TabBarViewController: NSCollectionViewDelegate {
 
@@ -978,6 +1021,8 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
 }
 
+// MARK: - TabBarViewItemDelegate
+
 extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool) {
@@ -1038,15 +1083,22 @@ extension TabBarViewController: TabBarViewItemDelegate {
         return tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.content.canBeBookmarked ?? false
     }
 
-    func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
-        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.content.userEditableUrl else {
-            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
-            return
-        }
+    func tabBarViewItemIsAlreadyBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool {
+        guard let url = urlAndTitle(for: tabBarViewItem)?.url else { return false }
 
-        bookmarkTab(with: url, title: tabViewModel.title)
+        return bookmarkManager.isUrlBookmarked(url: url)
+    }
+
+    func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let (url, title) = urlAndTitle(for: tabBarViewItem) else { return }
+
+        bookmarkTab(with: url, title: title)
+    }
+
+    func tabBarViewItemRemoveBookmarkAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let url = urlAndTitle(for: tabBarViewItem)?.url else { return }
+
+        deleteBookmark(with: url)
     }
 
     func tabBarViewAllItemsCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool {
@@ -1179,6 +1231,8 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
 }
+
+// MARK: - TabBarViewItemPasteboardWriter
 
 final class TabBarViewItemPasteboardWriter: NSObject, NSPasteboardWriting {
 

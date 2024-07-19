@@ -36,14 +36,18 @@ protocol WindowControllersManagerProtocol {
 @MainActor
 final class WindowControllersManager: WindowControllersManagerProtocol {
 
-    static let shared = WindowControllersManager()
+    static let shared = WindowControllersManager(pinnedTabsManager: Application.appDelegate.pinnedTabsManager)
+
+    init(pinnedTabsManager: PinnedTabsManager) {
+        self.pinnedTabsManager = pinnedTabsManager
+    }
 
     /**
      * _Initial_ meaning a single window with a single home page tab.
      */
     @Published private(set) var isInInitialState: Bool = true
     @Published private(set) var mainWindowControllers = [MainWindowController]()
-    private(set) var pinnedTabsManager = PinnedTabsManager()
+    private(set) var pinnedTabsManager: PinnedTabsManager
 
     weak var lastKeyMainWindowController: MainWindowController? {
         didSet {
@@ -57,7 +61,6 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
         return mainWindowControllers.first(where: {
             let isMain = $0.window?.isMainWindow ?? false
             let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
-
             return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
         })
     }
@@ -137,11 +140,14 @@ extension WindowControllersManager {
         } else {
             show(url: url, source: .bookmark)
         }
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func show(url: URL?, source: Tab.TabContent.URLSource, newTab: Bool = false) {
         let nonPopupMainWindowControllers = mainWindowControllers.filter { $0.window?.isPopUpWindow == false }
-
+        if source == .bookmark {
+            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
+        }
         // If there is a main window, open the URL in it
         if let windowController = nonPopupMainWindowControllers.first(where: { $0.window?.isMainWindow == true })
             // If a last key window is available, open the URL in it
@@ -286,4 +292,37 @@ extension WindowControllersManager {
         })
     }
 
+}
+
+extension WindowControllersManager: OnboardingNavigating {
+    @MainActor
+    func updatePreventUserInteraction(prevent: Bool) {
+        mainWindowController?.userInteraction(prevented: prevent)
+    }
+
+    @MainActor
+    func showImportDataView() {
+        DataImportView().show()
+    }
+
+    @MainActor
+    func replaceTabWith(_ tab: Tab) {
+        guard let tabToRemove = selectedTab else { return }
+        guard let mainWindowController else { return }
+        guard let index = mainWindowController.mainViewController.tabCollectionViewModel.indexInAllTabs(of: tabToRemove) else { return }
+        var tabToAppend = tab
+        if mainWindowController.mainViewController.isBurner {
+            let burnerMode = mainWindowController.mainViewController.tabCollectionViewModel.burnerMode
+            tabToAppend = Tab(content: tab.content, burnerMode: burnerMode)
+        }
+        mainWindowController.mainViewController.tabCollectionViewModel.append(tab: tabToAppend)
+        mainWindowController.mainViewController.tabCollectionViewModel.remove(at: index)
+    }
+
+    @MainActor
+    func focusOnAddressBar() {
+        guard let mainVC = lastKeyMainWindowController?.mainViewController else { return }
+        mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.stringValue = ""
+        mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+    }
 }

@@ -38,7 +38,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     // MARK: - VPN
 
-    private let vpnVisibility: NetworkProtectionFeatureVisibility
+    private let vpnGatekeeper: VPNFeatureGatekeeper
     private let iconPublisher: NetworkProtectionIconPublisher
     private var iconPublisherCancellable: AnyCancellable?
 
@@ -71,12 +71,12 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     init(popoverManager: NetPPopoverManager,
          pinningManager: PinningManager = LocalPinningManager.shared,
-         vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         vpnGatekeeper: VPNFeatureGatekeeper = DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager),
          statusReporter: NetworkProtectionStatusReporter,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
         self.popoverManager = popoverManager
-        self.vpnVisibility = vpnVisibility
+        self.vpnGatekeeper = vpnGatekeeper
         self.networkProtectionStatusReporter = statusReporter
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
         self.pinningManager = pinningManager

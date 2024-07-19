@@ -25,7 +25,7 @@ import Subscription
 @available(macOS 12.0, *)
 public final class DebugPurchaseViewController: NSViewController {
 
-    private let manager: PurchaseManager
+    private let manager: DefaultStorePurchaseManager
     private let model: DebugPurchaseModel
 
     private var cancellables = Set<AnyCancellable>()
@@ -34,9 +34,9 @@ public final class DebugPurchaseViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(subscriptionAppGroup: String) {
-        manager = PurchaseManager.shared
-        model = DebugPurchaseModel(manager: manager, subscriptionAppGroup: subscriptionAppGroup)
+    public init(storePurchaseManager: DefaultStorePurchaseManager, appStorePurchaseFlow: DefaultAppStorePurchaseFlow) {
+        manager = storePurchaseManager
+        model = DebugPurchaseModel(manager: manager, appStorePurchaseFlow: appStorePurchaseFlow)
 
         super.init(nibName: nil, bundle: nil)
     }

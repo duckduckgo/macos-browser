@@ -25,7 +25,6 @@ import PixelKit
 import Suggestions
 import Subscription
 
-// swiftlint:disable:next type_body_length
 final class AddressBarTextField: NSTextField {
 
     var tabCollectionViewModel: TabCollectionViewModel! {
@@ -51,10 +50,6 @@ final class AddressBarTextField: NSTextField {
         tabCollectionViewModel.isBurner
     }
 
-    var isFirstResponder: Bool {
-        window?.firstResponder == currentEditor()
-    }
-
     private var suggestionResultCancellable: AnyCancellable?
     private var selectedSuggestionViewModelCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
@@ -70,6 +65,10 @@ final class AddressBarTextField: NSTextField {
     }
     // flag when updating the Value from `handleTextDidChange()`
     private var currentTextDidChangeEvent: TextDidChangeEventType = .none
+
+//    var subscriptionEnvironment: SubscriptionEnvironment {
+//        Application.appDelegate.subscriptionManager.currentEnvironment
+//    }
 
     // MARK: - Lifecycle
 
@@ -349,7 +348,7 @@ final class AddressBarTextField: NSTextField {
 
     private func updateTabUrlWithUrl(_ providedUrl: URL, userEnteredValue: String, downloadRequested: Bool, suggestion: Suggestion?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            os_log("AddressBarTextField: Selected tab view model is nil", type: .error)
             return
         }
 
@@ -372,7 +371,9 @@ final class AddressBarTextField: NSTextField {
 #endif
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            if providedUrl.isChild(of: URL.subscriptionBaseURL) || providedUrl.isChild(of: URL.identityTheftRestoration) {
+            let baseURL = Application.appDelegate.subscriptionManager.url(for: .baseURL)
+            let identityTheftRestorationURL = Application.appDelegate.subscriptionManager.url(for: .identityTheftRestoration)
+            if providedUrl.isChild(of: baseURL) || providedUrl.isChild(of: identityTheftRestorationURL) {
                 self.updateValue(selectedTabViewModel: nil, addressBarString: nil) // reset
                 self.window?.makeFirstResponder(nil)
                 return
@@ -409,7 +410,7 @@ final class AddressBarTextField: NSTextField {
         makeUrl(suggestion: suggestion,
                 stringValueWithoutSuffix: stringValueWithoutSuffix) { [weak self] url, userEnteredValue, isUpgraded in
             guard let self, let url else {
-                os_log("%s: Making url from address bar string failed", type: .error)
+                os_log("AddressBarTextField: Making url from address bar string failed", type: .error)
                 return
             }
             let tab = Tab(content: .url(url, source: .userEntered(userEnteredValue)),

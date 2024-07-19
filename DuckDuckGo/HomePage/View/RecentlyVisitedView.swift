@@ -52,7 +52,8 @@ struct RecentlyVisited: View {
             }
             .visibility(model.showRecentlyVisited ? .visible : .gone)
 
-        }.padding(.bottom, 24)
+        }
+        .padding(.bottom, 24)
 
     }
 
@@ -317,7 +318,6 @@ struct RecentlyVisitedTitle: View {
                     model.showPagesOnHover.toggle()
                 }
                 .padding(.leading, isExpanded ? 5 : 0)
-                .padding(.top, 4)
 
             VStack(alignment: isExpanded ? .leading : .center, spacing: 6) {
                 Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
@@ -330,7 +330,6 @@ struct RecentlyVisitedTitle: View {
             }
             .visibility(model.recentSites.count > 0 ? .visible : .gone)
             .padding(.leading, 4)
-            .padding(.top, 4)
 
             Text(UserText.homePageProtectionSummaryInfo)
                 .font(.system(size: 17, weight: .bold, design: .default))
@@ -347,7 +346,7 @@ struct RecentlyVisitedTitle: View {
             }.rotationEffect(.degrees(isExpanded ? 0 : 180))
 
         }
-        .padding([.leading, .trailing], 12)
+        .padding(.horizontal, 12)
     }
 
 }

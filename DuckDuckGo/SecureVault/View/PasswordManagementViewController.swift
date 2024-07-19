@@ -33,7 +33,6 @@ protocol PasswordManagementDelegate: AnyObject {
 
 }
 
-// swiftlint:disable:next type_body_length
 final class PasswordManagementViewController: NSViewController {
 
     static func create() -> Self {
@@ -203,10 +202,10 @@ final class PasswordManagementViewController: NSViewController {
         deleteAllPasswordsMenuItem.title = UserText.deleteAllPasswords
         settingsMenuItem.title = UserText.settingsSuspended
         unlockYourAutofillLabel.title = UserText.passwordManagerUnlockAutofill
-        autofillTitleLabel.stringValue = UserText.autofill
+        autofillTitleLabel.stringValue = UserText.passwordManagementTitle
         emptyStateTitle.stringValue = UserText.pmEmptyStateDefaultTitle
         emptyStateMessage.stringValue = UserText.pmEmptyStateDefaultDescription
-        emptyStateButton.title = UserText.importData
+        emptyStateButton.title = UserText.pmEmptyStateDefaultButtonTitle
     }
 
     private func bindSyncDidFinish() -> AnyCancellable? {
@@ -323,6 +322,7 @@ final class PasswordManagementViewController: NSViewController {
             self.refreshData {
                 self.select(category: .logins)
             }
+            PixelKit.fire(GeneralPixel.autofillManagementDeleteAllLogins)
         }
     }
 
@@ -539,8 +539,11 @@ final class PasswordManagementViewController: NSViewController {
                 refetchWithText(searchField.stringValue) { [weak self] in
                     self?.syncModelsOnCredentials(savedCredentials, select: true)
                 }
+                NotificationCenter.default.post(name: .autofillSaveEvent, object: nil, userInfo: nil)
+                PixelKit.fire(GeneralPixel.autofillManagementSaveLogin)
             } else {
                 syncModelsOnCredentials(savedCredentials)
+                PixelKit.fire(GeneralPixel.autofillManagementUpdateLogin)
             }
             postChange()
             requestSync()
@@ -634,6 +637,7 @@ final class PasswordManagementViewController: NSViewController {
                     try self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
                     self.requestSync()
                     self.refreshData()
+                    PixelKit.fire(GeneralPixel.autofillManagementDeleteLogin)
                 } catch {
                     PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
@@ -720,8 +724,6 @@ final class PasswordManagementViewController: NSViewController {
 
     var passwordManagerSelectionCancellable: AnyCancellable?
 
-    // swiftlint:disable function_body_length
-    // swiftlint:disable:next cyclomatic_complexity
     private func createListView() {
         let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator, onItemSelected: { [weak self] previousValue, newValue in
             guard let newValue = newValue,
@@ -815,8 +817,6 @@ final class PasswordManagementViewController: NSViewController {
         let view = NSHostingView(rootView: passwordManagerView)
         replaceItemContainerChildView(with: view)
     }
-
-    // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
         return NSMenu {
@@ -986,10 +986,10 @@ final class PasswordManagementViewController: NSViewController {
 
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
-        case .allItems: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
-        case .logins: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
-        case .identities: showEmptyState(image: .identitiesEmpty, title: UserText.pmEmptyStateIdentitiesTitle)
-        case .cards: showEmptyState(image: .creditCardsEmpty, title: UserText.pmEmptyStateCardsTitle)
+        case .allItems: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
+        case .logins: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
+        case .identities: showEmptyState(image: .identityAdd128, title: UserText.pmEmptyStateIdentitiesTitle)
+        case .cards: showEmptyState(image: .creditCardsAdd128, title: UserText.pmEmptyStateCardsTitle)
         }
     }
 

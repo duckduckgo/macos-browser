@@ -223,7 +223,7 @@ class AddressBarTests: XCTestCase {
 
     @MainActor
     func testWhenRestoringToOnboarding_addressBarIsNotActive() async throws {
-        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .onboarding, privacyFeatures: privacyFeaturesMock)]))
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .onboardingDeprecated, privacyFeatures: privacyFeaturesMock)]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         XCTAssertEqual(window.firstResponder, mainViewController.browserTabViewController.transientTabContentViewController!.view)
     }
@@ -531,7 +531,7 @@ class AddressBarTests: XCTestCase {
         _=window.makeFirstResponder(addressBarTextField)
         type("some-text")
 
-        try await Task.sleep(interval: 0.01)
+        try await Task.sleep(interval: 1.0)
         try await didFinishNavigation.value
         XCTAssertTrue(isAddressBarFirstResponder)
         XCTAssertEqual(addressBarValue, "some-text")
@@ -860,6 +860,41 @@ class AddressBarTests: XCTestCase {
         // THEN
         let shieldImage = mainViewController.navigationBarViewController.addressBarViewController!.addressBarButtonsViewController!.privacyEntryPointButton.image!
         XCTAssertTrue(shieldImage.isEqualToImage(expectedImage))
+    }
+
+    @MainActor
+    func test_ZoomLevelNonDefault_ThenZoomButtonIsVisible() async throws {
+        // GIVEN
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")))
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+        viewModel.selectedTabViewModel?.zoomWasSet(to: .percent150)
+        let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+
+        // WHEN
+        window = WindowsManager.openNewWindow(with: viewModel)!
+        _=try await tabLoadedPromise.value
+
+        // THEN
+        let zoomButton = mainViewController.navigationBarViewController.addressBarViewController!.addressBarButtonsViewController!.zoomButton!
+        XCTAssertFalse(zoomButton.isHidden)
+    }
+
+    @MainActor
+    func test_ZoomLevelDefault_ThenZoomButtonIsNotVisible() async throws {
+        // GIVEN
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")))
+        tab.webView.zoomLevel = AccessibilityPreferences.shared.defaultPageZoom
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+        viewModel.selectedTabViewModel?.zoomWasSet(to: .percent100)
+        let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+
+        // WHEN
+        window = WindowsManager.openNewWindow(with: viewModel)!
+        _=try await tabLoadedPromise.value
+
+        // THEN
+        let zoomButton = mainViewController.navigationBarViewController.addressBarViewController!.addressBarButtonsViewController!.zoomButton!
+        XCTAssertTrue(zoomButton.isHidden)
     }
 }
 

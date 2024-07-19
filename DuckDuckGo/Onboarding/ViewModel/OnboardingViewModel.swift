@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import PixelKit
 
 protocol OnboardingDelegate: NSObjectProtocol {
 
@@ -25,6 +26,9 @@ protocol OnboardingDelegate: NSObjectProtocol {
 
     /// Request set default should be launched.  Whatever happens, call the completion to move on to the next screen.
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void)
+
+    /// Adding to the Dock should be launched.  Whatever happens, call the completion to move on to the next screen.
+    func onboardingDidRequestAddToDock(completion: @escaping () -> Void)
 
     /// Has finished, but still showing a screen.  This is when to re-enable the UI.
     func onboardingHasFinished()
@@ -39,16 +43,27 @@ final class OnboardingViewModel: ObservableObject {
         case welcome
         case importData
         case setDefault
+        case addToDock
         case startBrowsing
 
     }
 
     var typingDisabled = false
+    var addToDockPressed = false
 
     @Published var skipTypingRequested = false
     @Published var state: OnboardingPhase = .startFlow {
         didSet {
             skipTypingRequested = false
+
+            if state == .addToDock {
+                PixelKit.fire(GeneralPixel.addToDockOnboardingStepPresented,
+                              includeAppVersionParameter: false)
+            }
+            if state == .startBrowsing {
+                PixelKit.fire(GeneralPixel.startBrowsingOnboardingStepPresented,
+                              includeAppVersionParameter: false)
+            }
         }
     }
 
@@ -65,12 +80,7 @@ final class OnboardingViewModel: ObservableObject {
                 OnboardingViewModel.isOnboardingFinished = true
                 return true
             }
-            guard let tabsContent = (WindowsManager.mainWindows.first?.contentViewController as? MainViewController)?.tabCollectionViewModel.tabs.map(\.content) else { return false }
-            if !tabsContent.isEmpty, tabsContent != [.newtab] {
-                // there‘s some tabs content not equal to the new tab page: it means there‘s a session restored
-                OnboardingViewModel.isOnboardingFinished = true
-                return true
-            }
+
             return false
         }
         set {
@@ -105,6 +115,33 @@ final class OnboardingViewModel: ObservableObject {
     @MainActor
     func onSetDefaultPressed() {
         delegate?.onboardingDidRequestSetDefault { [weak self] in
+#if !APPSTORE
+            self?.state = .addToDock
+#else
+            self?.state = .startBrowsing
+            Self.isOnboardingFinished = true
+            self?.delegate?.onboardingHasFinished()
+#endif
+        }
+    }
+
+    @MainActor
+    func onSetDefaultSkipped() {
+#if !APPSTORE
+        state = .addToDock
+#else
+        state = .startBrowsing
+        Self.isOnboardingFinished = true
+        delegate?.onboardingHasFinished()
+#endif
+    }
+
+    @MainActor
+    func onAddToDockPressed() {
+        PixelKit.fire(GeneralPixel.userAddedToDockDuringOnboarding,
+                      includeAppVersionParameter: false)
+        addToDockPressed = true
+        delegate?.onboardingDidRequestAddToDock { [weak self] in
             self?.state = .startBrowsing
             Self.isOnboardingFinished = true
             self?.delegate?.onboardingHasFinished()
@@ -112,7 +149,9 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     @MainActor
-    func onSetDefaultSkipped() {
+    func onAddToDockSkipped() {
+        PixelKit.fire(GeneralPixel.userSkippedAddingToDockFromOnboarding,
+                      includeAppVersionParameter: false)
         state = .startBrowsing
         Self.isOnboardingFinished = true
         delegate?.onboardingHasFinished()

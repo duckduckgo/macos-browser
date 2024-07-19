@@ -28,8 +28,8 @@ import NetworkProtection
 import Subscription
 import SubscriptionUI
 
-// swiftlint:disable:next type_body_length
-@MainActor final class MainMenu: NSMenu {
+@MainActor
+final class MainMenu: NSMenu {
 
     enum Constants {
         static let maxTitleLength = 55
@@ -93,15 +93,11 @@ import SubscriptionUI
 
     // MARK: Help
 
-    let helpMenu = NSMenu(title: UserText.mainMenuHelp) {
-        NSMenuItem(title: UserText.mainMenuHelpDuckDuckGoHelp, action: #selector(NSApplication.showHelp), keyEquivalent: "?")
-            .hidden()
-
-#if FEEDBACK
-        NSMenuItem.separator()
-        NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
-#endif
-    }
+    let helpMenu = NSMenu(title: UserText.mainMenuHelp)
+    let aboutMenuItem = NSMenuItem(title: UserText.about, action: #selector(AppDelegate.showAbout))
+    let releaseNotesMenuItem = NSMenuItem(title: UserText.releaseNotesMenuItem, action: #selector(AppDelegate.showReleaseNotes))
+    let whatIsNewMenuItem = NSMenuItem(title: UserText.whatsNewMenuItem, action: #selector(AppDelegate.showWhatIsNew))
+    let sendFeedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
 
     // MARK: - Initialization
 
@@ -378,7 +374,22 @@ import SubscriptionUI
 
     func buildHelpMenu() -> NSMenuItem {
         NSMenuItem(title: UserText.mainMenuHelp)
-            .submenu(helpMenu)
+            .submenu(helpMenu.buildItems {
+                NSMenuItem(title: UserText.mainMenuHelpDuckDuckGoHelp, action: #selector(NSApplication.showHelp), keyEquivalent: "?")
+                    .hidden()
+
+                NSMenuItem.separator()
+
+                aboutMenuItem
+#if SPARKLE
+                releaseNotesMenuItem
+                whatIsNewMenuItem
+#endif
+
+#if FEEDBACK
+                sendFeedbackMenuItem
+#endif
+            })
     }
 
     required init(coder: NSCoder) {
@@ -540,7 +551,7 @@ import SubscriptionUI
             toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
             toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
-            if DefaultNetworkProtectionVisibility().isVPNVisible() {
+            if DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager).isVPNVisible() {
                 toggleNetworkProtectionShortcutMenuItem.isHidden = false
                 toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             } else {
@@ -553,7 +564,6 @@ import SubscriptionUI
 
     let internalUserItem = NSMenuItem(title: "Set Internal User State", action: #selector(MainViewController.internalUserState))
 
-    // swiftlint:disable:next function_body_length
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
@@ -576,6 +586,7 @@ import SubscriptionUI
                 NSMenuItem(title: "Reset MakeDuckDuckYours user settings", action: #selector(MainViewController.resetMakeDuckDuckGoYoursUserSettings))
                 NSMenuItem(title: "Permanent Survey share on", action: #selector(MainViewController.inPermanentSurveyShareOn(_:)))
                 NSMenuItem(title: "Permanent Survey share off", action: #selector(MainViewController.inPermanentSurveyShareOff(_:)))
+                NSMenuItem(title: "Experiment Install Date more than 5 days ago", action: #selector(MainViewController.changePixelExperimentInstalledDateToLessMoreThan5DayAgo(_:)))
                 NSMenuItem(title: "Change Activation Date") {
                     NSMenuItem(title: "Today", action: #selector(MainViewController.changeInstallDateToToday), keyEquivalent: "N")
                     NSMenuItem(title: "Less Than a 5 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan5DayAgo(_:)))
@@ -584,7 +595,7 @@ import SubscriptionUI
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
-                NSMenuItem(title: "Reset Passwords Survey", action: #selector(enablePasswordsSurveyAction), target: self)
+                NSMenuItem(title: "Reset Remote Messages", action: #selector(AppDelegate.resetRemoteMessages))
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
@@ -607,6 +618,7 @@ import SubscriptionUI
             }
             NSMenuItem(title: "Sync & Backup")
                 .submenu(SyncDebugMenu())
+                .withAccessibilityIdentifier("MainMenu.syncAndBackup")
 
 #if DBP
             NSMenuItem(title: "Personal Information Removal")
@@ -618,26 +630,37 @@ import SubscriptionUI
                     .submenu(NetworkProtectionDebugMenu())
             }
 
-            NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
+            NSMenuItem(title: "Simulate crash") {
+                NSMenuItem(title: "fatalError", action: #selector(MainViewController.triggerFatalError))
+                NSMenuItem(title: "NSException", action: #selector(MainViewController.crashOnException))
+                NSMenuItem(title: "C++ exception", action: #selector(MainViewController.crashOnCxxException))
+            }
 
-            let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
             let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
+            let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+            let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
 
-            SubscriptionDebugMenu(
-                currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
-                updateEnvironment: {
-                    guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
-                    currentEnvironmentWrapper.wrappedValue = newEnvironment
-                    SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment
-                    VPNSettings(defaults: .netP).selectedEnvironment = newEnvironment == .staging ? .staging : .production
-                },
-                isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
-                updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
-                currentViewController: {
-                    WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            },
-                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)
-            )
+            var currentEnvironment = DefaultSubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+            let updateServiceEnvironment: (SubscriptionEnvironment.ServiceEnvironment) -> Void = { env in
+                currentEnvironment.serviceEnvironment = env
+                DefaultSubscriptionManager.save(subscriptionEnvironment: currentEnvironment, userDefaults: subscriptionUserDefaults)
+            }
+            let updatePurchasingPlatform: (SubscriptionEnvironment.PurchasePlatform) -> Void = { platform in
+                currentEnvironment.purchasePlatform = platform
+                DefaultSubscriptionManager.save(subscriptionEnvironment: currentEnvironment, userDefaults: subscriptionUserDefaults)
+            }
+
+            SubscriptionDebugMenu(currentEnvironment: currentEnvironment,
+                                  updateServiceEnvironment: updateServiceEnvironment,
+                                  updatePurchasingPlatform: updatePurchasingPlatform,
+                                  isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
+                                  updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
+                                  currentViewController: { WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController },
+                                  subscriptionManager: Application.appDelegate.subscriptionManager)
+
+            NSMenuItem(title: "Privacy Pro Survey") {
+                NSMenuItem(title: "Reset Remote Message Cache", action: #selector(MainViewController.resetSurveyRemoteMessages))
+            }
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }
@@ -728,10 +751,6 @@ import SubscriptionUI
         AutofillPreferences().debugScriptEnabled = !AutofillPreferences().debugScriptEnabled
         NotificationCenter.default.post(name: .autofillScriptDebugSettingsDidChange, object: nil)
         updateAutofillDebugScriptMenuItem()
-    }
-
-    @objc private func enablePasswordsSurveyAction(_ sender: NSMenuItem) {
-        AutofillPreferences().autofillSurveyEnabled = true
     }
 
     @objc private func debugLoggingMenuItemAction(_ sender: NSMenuItem) {

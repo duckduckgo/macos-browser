@@ -21,12 +21,32 @@ import TrackerRadarKit
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
+private extension KnownTracker {
+
+    var countCTLActions: Int { rules?.filter { $0.action == .blockCTLFB }.count ?? 0 }
+
+}
+
 class ClickToLoadTDSTests: XCTestCase {
 
     func testEnsureClickToLoadTDSCompiles() throws {
 
-        let tds = ContentBlockerRulesLists.fbTrackerDataSet
-        let builder = ContentBlockerRulesBuilder(trackerData: tds)
+        let provider = AppTrackerDataSetProvider()
+        let trackerData = provider.embeddedData
+        let etag = provider.embeddedDataEtag
+        let trackerManager = TrackerDataManager(etag: etag,
+                                         data: trackerData,
+                                         embeddedDataProvider: provider)
+
+        let cbrLists = ContentBlockerRulesLists(trackerDataManager: trackerManager, adClickAttribution: MockAttributing())
+        let ruleSets = cbrLists.contentBlockerRulesLists
+        let tdsName = DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName
+
+        let ctlRules = ruleSets.first(where: { $0.name == tdsName})
+        let ctlTrackerData = ctlRules?.trackerData
+        let ctlTds = ctlTrackerData?.tds
+
+        let builder = ContentBlockerRulesBuilder(trackerData: ctlTds!)
 
         let rules = builder.buildRules(withExceptions: [],
                                        andTemporaryUnprotectedDomains: [],
@@ -44,7 +64,7 @@ class ClickToLoadTDSTests: XCTestCase {
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             compiled.fulfill()
-                    }
+        }
 
         wait(for: [compiled], timeout: 30.0)
 
@@ -56,4 +76,44 @@ class ClickToLoadTDSTests: XCTestCase {
 
         wait(for: [removed], timeout: 5.0)
     }
+
+    func testClickToLoadTDSSplit() throws {
+
+        let provider = AppTrackerDataSetProvider()
+
+        let trackerManager = TrackerDataManager(
+                                    etag: provider.embeddedDataEtag,
+                                    data: provider.embeddedData,
+                                    embeddedDataProvider: provider
+        )
+
+        let cbrLists = ContentBlockerRulesLists(trackerDataManager: trackerManager, adClickAttribution: MockAttributing())
+        let ruleSets = cbrLists.contentBlockerRulesLists
+
+        let mainTdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
+        let ctlTdsName = DefaultContentBlockerRulesListsSource.Constants.clickToLoadRulesListName
+
+        let (fbMainRules, mainCTLRuleCount) = getFBTrackerRules(for: mainTdsName, ruleSets: ruleSets)
+        let (fbCTLRules, ctlCTLRuleCount) = getFBTrackerRules(for: ctlTdsName, ruleSets: ruleSets)
+
+        let fbMainRuleCount = fbMainRules!.count
+        let fbCTLRuleCount = fbCTLRules!.count
+
+        // ensure both rulesets contains facebook.net rules
+        XCTAssert(fbMainRuleCount > 0)
+        XCTAssert(fbCTLRuleCount > 0)
+
+        // ensure FB CTL rules include CTL custom actions, and main rules FB do not
+        XCTAssert(mainCTLRuleCount == 0)
+        XCTAssert(ctlCTLRuleCount > 0)
+
+        // ensure FB CTL rules are the sum of the main rules + CTL custom action rules
+        XCTAssert(fbMainRuleCount + ctlCTLRuleCount == fbCTLRuleCount)
+
+    }
+}
+
+func getFBTrackerRules(for name: String, ruleSets: [ContentBlockerRulesList]) -> (rules: [KnownTracker.Rule]?, countCTLActions: Int) {
+    let tracker = ruleSets.first { $0.name == name }?.trackerData?.tds.trackers["facebook.net"]
+    return (tracker?.rules, tracker?.countCTLActions ?? 0)
 }

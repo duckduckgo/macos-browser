@@ -74,10 +74,10 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         let e = expectation(description: "download added")
         var id: UUID!
-        let c = coordinator.updates.sink { kind, item in
-            if case .added = kind {
+        let c = coordinator.updates.sink { update in
+            if case .added = update.kind {
                 e.fulfill()
-                id = item.identifier
+                id = update.item.identifier
             }
         }
         downloadManager.downloadAddedSubject.send(task)
@@ -152,12 +152,12 @@ final class DownloadListCoordinatorTests: XCTestCase {
             }
         }
 
-        let c = coordinator.updates.sink { (kind, item) in
-            if case .added = kind {
-                expectations[item.identifier]!.fulfill()
-            } else if case .updated = kind {
+        let c = coordinator.updates.sink { update in
+            if case .added = update.kind {
+                expectations[update.item.identifier]!.fulfill()
+            } else if case .updated = update.kind {
             } else {
-                XCTFail("unexpected \(kind) \(item.fileName)")
+                XCTFail("unexpected \(update.kind) \(update.item.fileName)")
             }
         }
 
@@ -183,17 +183,17 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         let e1 = expectation(description: "download added")
         let e2 = expectation(description: "download updated")
-        let c = coordinator.updates.sink { [coordinator] (kind, item) in
-            switch kind {
+        let c = coordinator.updates.sink { [coordinator] update in
+            switch update.kind {
             case .added:
-                XCTAssertEqual(item.progress, task.progress)
+                XCTAssertEqual(update.item.progress, task.progress)
                 XCTAssertTrue(coordinator!.hasActiveDownloads)
                 e1.fulfill()
             case .updated:
-                guard let tempUrlValue = item.tempURL else { return }
-                XCTAssertEqual(item.destinationURL, destURL)
+                guard let tempUrlValue = update.item.tempURL else { return }
+                XCTAssertEqual(update.item.destinationURL, destURL)
                 XCTAssertEqual(tempUrlValue, tempURL)
-                XCTAssertEqual(item.fileName, destURL.lastPathComponent)
+                XCTAssertEqual(update.item.fileName, destURL.lastPathComponent)
                 e2.fulfill()
             case .removed:
                 XCTFail("unexpected .removed")
@@ -206,7 +206,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         XCTAssertNotNil(url)
         XCTAssertTrue(FileManager().createFile(atPath: url?.path ?? "", contents: nil))
 
-        await fulfillment(of: [e1, e2], timeout: 1)
+        await fulfillment(of: [e1, e2], timeout: 5.0)
         withExtendedLifetime(c) {}
         XCTAssertTrue(coordinator.hasActiveDownloads)
     }
@@ -217,14 +217,14 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         let taskCompleted = expectation(description: "item updated")
         var c: AnyCancellable!
-        c = coordinator.updates.sink { (kind, item) in
-            guard case .updated = kind, item.progress == nil else { return }
+        c = coordinator.updates.sink { update in
+            guard case .updated = update.kind, update.item.progress == nil else { return }
 
             taskCompleted.fulfill()
 
-            XCTAssertEqual(item.destinationURL, self.destURL)
-            XCTAssertNil(item.tempURL)
-            XCTAssertNil(item.progress)
+            XCTAssertEqual(update.item.destinationURL, self.destURL)
+            XCTAssertNil(update.item.tempURL)
+            XCTAssertNil(update.item.progress)
             c?.cancel()
         }
 
@@ -245,10 +245,10 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let (download, task, _) = setUpCoordinatorAndAddDownload(isBurner: true)
 
         let taskRemoved = expectation(description: "Task removed")
-        let c = coordinator.updates.sink { (kind, item) in
-            XCTAssertTrue(item.isBurner)
+        let c = coordinator.updates.sink { update in
+            XCTAssertTrue(update.item.isBurner)
 
-            if case .removed = kind {
+            if case .removed = update.kind {
                 taskRemoved.fulfill()
             }
         }
@@ -267,17 +267,17 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         let taskCompleted = expectation(description: "location updated")
         var c: AnyCancellable!
-        c = coordinator.updates.sink { (kind, item) in
-            if case .updated = kind { } else {
-                XCTFail("\(kind) is not .updated")
+        c = coordinator.updates.sink { update in
+            if case .updated = update.kind { } else {
+                XCTFail("\(update.kind) is not .updated")
             }
-            guard item.destinationURL != nil, item.tempURL != nil else { return }
+            guard update.item.destinationURL != nil, update.item.tempURL != nil else { return }
 
-            XCTAssertEqual(item.destinationURL, self.destURL)
-            XCTAssertEqual(item.tempURL, self.tempURL)
-            XCTAssertNil(item.progress)
-            XCTAssertEqual(item.error, FileDownloadError.failedToCompleteDownloadTask(underlyingError: TestError(), resumeData: .resumeData, isRetryable: true))
-            XCTAssertEqual(item.error?.resumeData, .resumeData)
+            XCTAssertEqual(update.item.destinationURL, self.destURL)
+            XCTAssertEqual(update.item.tempURL, self.tempURL)
+            XCTAssertNil(update.item.progress)
+            XCTAssertEqual(update.item.error, FileDownloadError.failedToCompleteDownloadTask(underlyingError: TestError(), resumeData: .resumeData, isRetryable: true))
+            XCTAssertEqual(update.item.error?.resumeData, .resumeData)
             taskCompleted.fulfill()
             c.cancel()
         }
@@ -330,16 +330,16 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         let itemUpdated = expectation(description: "item updated")
-        let c = coordinator.updates.sink { (kind, item) in
-            if case .updated = kind { } else {
-                XCTFail("\(kind) is not .updated")
+        let c = coordinator.updates.sink { update in
+            if case .updated = update.kind { } else {
+                XCTFail("\(update.kind) is not .updated")
             }
             itemUpdated.fulfill()
 
-            XCTAssertEqual(item.destinationURL, item.destinationURL)
-            XCTAssertEqual(item.tempURL, item.tempURL)
-            XCTAssertNotNil(item.progress)
-            XCTAssertNil(item.error)
+            XCTAssertEqual(update.item.destinationURL, item.destinationURL)
+            XCTAssertEqual(update.item.tempURL, item.tempURL)
+            XCTAssertNotNil(update.item.progress)
+            XCTAssertNil(update.item.error)
         }
 
         coordinator.restart(downloadWithIdentifier: DownloadListItem.testFailedItem.identifier)
@@ -354,7 +354,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
     func testWhenAddedDownloadRestartedWithResumeDataThenResumeIsCalled() throws {
         let (download, task, id) = setUpCoordinatorAndAddDownload()
         let taskFailed = expectation(description: "task failed")
-        let c1 = coordinator.updates.sink { _, _ in
+        let c1 = coordinator.updates.sink { _ in
             taskFailed.fulfill()
         }
         task.download(download.asWKDownload(), didFailWithError: TestError(), resumeData: .resumeData)
@@ -390,16 +390,16 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         let itemUpdated = expectation(description: "item updated")
-        let c = coordinator.updates.sink { (kind, item) in
-            if case .updated = kind { } else {
-                XCTFail("\(kind) is not .updated")
+        let c = coordinator.updates.sink { update in
+            if case .updated = update.kind { } else {
+                XCTFail("\(update.kind) is not .updated")
             }
             itemUpdated.fulfill()
 
-            XCTAssertEqual(item.destinationURL, item.destinationURL)
-            XCTAssertEqual(item.tempURL, item.tempURL)
-            XCTAssertNotNil(item.progress)
-            XCTAssertNil(item.error)
+            XCTAssertEqual(update.item.destinationURL, update.item.destinationURL)
+            XCTAssertEqual(update.item.tempURL, update.item.tempURL)
+            XCTAssertNotNil(update.item.progress)
+            XCTAssertNil(update.item.error)
         }
 
         coordinator.restart(downloadWithIdentifier: id)
@@ -450,16 +450,16 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         let itemUpdated = expectation(description: "item updated")
-        let c = coordinator.updates.sink { (kind, item) in
-            if case .updated = kind { } else {
-                XCTFail("\(kind) is not .updated")
+        let c = coordinator.updates.sink { update in
+            if case .updated = update.kind { } else {
+                XCTFail("\(update.kind) is not .updated")
             }
             itemUpdated.fulfill()
 
-            XCTAssertEqual(item.destinationURL, item.destinationURL)
-            XCTAssertEqual(item.tempURL, item.tempURL)
-            XCTAssertNotNil(item.progress)
-            XCTAssertNil(item.error)
+            XCTAssertEqual(update.item.destinationURL, item.destinationURL)
+            XCTAssertEqual(update.item.tempURL, item.tempURL)
+            XCTAssertNotNil(update.item.progress)
+            XCTAssertNil(update.item.error)
         }
 
         coordinator.restart(downloadWithIdentifier: DownloadListItem.testFailedItem.identifier)
@@ -475,13 +475,13 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let (download, _, id) = setUpCoordinatorAndAddDownload()
 
         let itemRemoved = expectation(description: "item removed")
-        let c = coordinator.updates.sink { (kind, item) in
-            if case .removed = kind { } else {
-                XCTFail("\(kind) is not .updated")
+        let c = coordinator.updates.sink { update in
+            if case .removed = update.kind { } else {
+                XCTFail("\(update.kind) is not .updated")
             }
             itemRemoved.fulfill()
 
-            XCTAssertEqual(item.identifier, id)
+            XCTAssertEqual(update.item.identifier, id)
         }
         let cancelCalled = expectation(description: "download cancelled")
         download.cancelBlock = {
@@ -509,20 +509,20 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         let e1 = expectation(description: "download stopped")
         e1.expectedFulfillmentCount = 2
-        var c = coordinator.updates.sink { (kind, item) in
-            guard case .updated = kind, item.progress == nil else { return }
+        var c = coordinator.updates.sink { update in
+            guard case .updated = update.kind, update.item.progress == nil else { return }
             e1.fulfill()
-            XCTAssertNotEqual(item.identifier, keptId)
+            XCTAssertNotEqual(update.item.identifier, keptId)
         }
 
         waitForExpectations(timeout: 1)
 
         let e2 = expectation(description: "item removed")
         e2.expectedFulfillmentCount = 2
-        c = coordinator.updates.sink { (kind, item) in
-            guard case .removed = kind else { return }
+        c = coordinator.updates.sink { update in
+            guard case .removed = update.kind else { return }
             e2.fulfill()
-            XCTAssertNotEqual(item.identifier, keptId)
+            XCTAssertNotEqual(update.item.identifier, keptId)
         }
 
         coordinator.cleanupInactiveDownloads()

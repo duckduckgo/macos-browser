@@ -39,6 +39,7 @@ final class SaveCredentialsViewController: NSViewController {
         return controller
     }
 
+    @IBOutlet var ddgPasswordManagerTitle: NSView!
     @IBOutlet var titleLabel: NSTextField!
     @IBOutlet var passwordManagerTitle: NSView!
     @IBOutlet var passwordManagerAccountLabel: NSTextField!
@@ -63,6 +64,12 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var fireproofCheck: NSButton!
     @IBOutlet weak var fireproofCheckDescription: NSTextFieldCell!
 
+    private enum Action {
+        case displayed
+        case confirmed
+        case dismissed
+    }
+
     weak var delegate: SaveCredentialsDelegate?
 
     private var credentials: SecureVaultModels.WebsiteCredentials?
@@ -74,6 +81,8 @@ final class SaveCredentialsViewController: NSViewController {
     private var passwordManagerStateCancellable: AnyCancellable?
 
     private var saveButtonAction: (() -> Void)?
+
+    private var shouldFirePinPromptNotification = false
 
     var passwordData: Data {
         let string = hiddenPasswordField.isHidden ? visiblePasswordField.stringValue : hiddenPasswordField.stringValue
@@ -98,6 +107,9 @@ final class SaveCredentialsViewController: NSViewController {
 
     override func viewWillDisappear() {
         passwordManagerStateCancellable = nil
+        if shouldFirePinPromptNotification {
+            NotificationCenter.default.post(name: .passwordsPinningPrompt, object: nil)
+        }
     }
 
     private func setUpStrings() {
@@ -139,6 +151,9 @@ final class SaveCredentialsViewController: NSViewController {
         // Only use the non-editable state if a credential was automatically saved and it didn't already exist.
         let condition = credentials.account.id != nil && !(credentials.account.username?.isEmpty ?? true) && automaticallySaved
         updateViewState(editable: !condition)
+
+        let existingCredentials = getExistingCredentialsFrom(credentials)
+        evaluateCredentialsAndFirePixels(for: .displayed, credentials: existingCredentials)
     }
 
     private func updateViewState(editable: Bool) {
@@ -157,11 +172,11 @@ final class SaveCredentialsViewController: NSViewController {
             editButton.isHidden = true
             doneButton.isHidden = true
 
-            titleLabel.isHidden = passwordManagerCoordinator.isEnabled
+            ddgPasswordManagerTitle.isHidden = passwordManagerCoordinator.isEnabled
             passwordManagerTitle.isHidden = !passwordManagerCoordinator.isEnabled || passwordManagerCoordinator.isLocked
             passwordManagerAccountLabel.stringValue = UserText.passwordManagementSaveCredentialsAccountLabel(activeVault: passwordManagerCoordinator.activeVaultEmail ?? "")
             unlockPasswordManagerTitle.isHidden = !passwordManagerCoordinator.isEnabled || !passwordManagerCoordinator.isLocked
-            titleLabel.stringValue = UserText.pmSaveCredentialsEditableTitle
+            titleLabel.stringValue = credentials?.account.id == nil ? UserText.pmSaveCredentialsEditableTitle : UserText.pmUpdateCredentialsTitle
             usernameField.makeMeFirstResponder()
         } else {
             notNowSegmentedControl.isHidden = true
@@ -208,6 +223,7 @@ final class SaveCredentialsViewController: NSViewController {
                                                        domain: domainLabel.stringValue)
         account.id = credentials?.account.id
         let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: passwordData)
+        let existingCredentials = getExistingCredentialsFrom(credentials)
 
         do {
             if passwordManagerCoordinator.isEnabled {
@@ -222,14 +238,23 @@ final class SaveCredentialsViewController: NSViewController {
                     }
                 }
             } else {
-                _ = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared).storeWebsiteCredentials(credentials)
+                let vault = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
+                _ = try vault.storeWebsiteCredentials(credentials)
                 NSApp.delegateTyped.syncService?.scheduler.notifyDataChanged()
                 os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+
+                if existingCredentials?.account.id == nil, !LocalPinningManager.shared.isPinned(.autofill), let count = try? vault.accountsCount(), count == 1 {
+                    shouldFirePinPromptNotification = true
+                }
             }
         } catch {
             os_log("%s:%s: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
             PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
+
+        NotificationCenter.default.post(name: .autofillSaveEvent, object: nil, userInfo: nil)
+
+        evaluateCredentialsAndFirePixels(for: .confirmed, credentials: existingCredentials)
 
         PixelKit.fire(GeneralPixel.autofillItemSaved(kind: .password))
 
@@ -250,6 +275,9 @@ final class SaveCredentialsViewController: NSViewController {
 
     @IBAction func onDontUpdateClicked(_ sender: Any) {
         delegate?.shouldCloseSaveCredentialsViewController(self)
+
+        let existingCredentials = getExistingCredentialsFrom(credentials)
+        evaluateCredentialsAndFirePixels(for: .dismissed, credentials: existingCredentials)
     }
 
     @IBAction func onNotNowSegmentedControlClicked(_ sender: Any) {
@@ -279,6 +307,9 @@ final class SaveCredentialsViewController: NSViewController {
         func notifyDelegate() {
             delegate?.shouldCloseSaveCredentialsViewController(self)
         }
+
+        let existingCredentials = getExistingCredentialsFrom(credentials)
+        evaluateCredentialsAndFirePixels(for: .dismissed, credentials: existingCredentials)
 
         guard DataClearingPreferences.shared.isLoginDetectionEnabled else {
             notifyDelegate()
@@ -363,6 +394,92 @@ final class SaveCredentialsViewController: NSViewController {
             .sink { [weak self] _ in
                 self?.updateViewState(editable: true)
             }
+    }
+
+    private func getExistingCredentialsFrom(_ credentials: SecureVaultModels.WebsiteCredentials?) -> SecureVaultModels.WebsiteCredentials? {
+        guard let credentials = credentials, let id = credentials.account.id else {
+            return nil
+        }
+
+        var existingCredentials: SecureVaultModels.WebsiteCredentials?
+
+        if passwordManagerCoordinator.isEnabled {
+            guard !passwordManagerCoordinator.isLocked else {
+                os_log("Failed to access credentials: Password manager is locked")
+                return existingCredentials
+            }
+
+            passwordManagerCoordinator.websiteCredentialsFor(accountId: id) { credentials, _ in
+                existingCredentials = credentials
+            }
+        } else {
+            if let idInt = Int64(id) {
+                existingCredentials = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared).websiteCredentialsFor(accountId: idInt)
+            }
+        }
+
+        return existingCredentials
+    }
+
+    private func isUsernameUpdated(credentials: SecureVaultModels.WebsiteCredentials) -> Bool {
+        if credentials.account.username != self.usernameField.stringValue.trimmingWhitespace() {
+            return true
+        }
+        return false
+    }
+
+    private func isPasswordUpdated(credentials: SecureVaultModels.WebsiteCredentials) -> Bool {
+        if credentials.password != self.passwordData {
+            return true
+        }
+        return false
+    }
+
+    private func evaluateCredentialsAndFirePixels(for action: Action, credentials: SecureVaultModels.WebsiteCredentials?) {
+        switch action {
+        case .displayed:
+            if let credentials = credentials {
+                if isPasswordUpdated(credentials: credentials) {
+                    PixelKit.fire(GeneralPixel.autofillLoginsUpdatePasswordInlineDisplayed)
+                } else {
+                    PixelKit.fire(GeneralPixel.autofillLoginsUpdateUsernameInlineDisplayed)
+                }
+            } else {
+                if usernameField.stringValue.trimmingWhitespace().isEmpty {
+                    PixelKit.fire(GeneralPixel.autofillLoginsSavePasswordInlineDisplayed)
+                } else {
+                    PixelKit.fire(GeneralPixel.autofillLoginsSaveLoginInlineDisplayed)
+                }
+            }
+        case .confirmed, .dismissed:
+            if let credentials = credentials {
+                if isUsernameUpdated(credentials: credentials) {
+                    firePixel(for: action,
+                              confirmedPixel: GeneralPixel.autofillLoginsUpdateUsernameInlineConfirmed,
+                              dismissedPixel: GeneralPixel.autofillLoginsUpdateUsernameInlineDismissed)
+                }
+                if isPasswordUpdated(credentials: credentials) {
+                    firePixel(for: action,
+                              confirmedPixel: GeneralPixel.autofillLoginsUpdatePasswordInlineConfirmed,
+                              dismissedPixel: GeneralPixel.autofillLoginsUpdatePasswordInlineDismissed)
+                }
+            } else {
+                if usernameField.stringValue.trimmingWhitespace().isEmpty {
+                    firePixel(for: action,
+                              confirmedPixel: GeneralPixel.autofillLoginsSavePasswordInlineConfirmed,
+                              dismissedPixel: GeneralPixel.autofillLoginsSavePasswordInlineDismissed)
+                } else {
+                    firePixel(for: action,
+                              confirmedPixel: GeneralPixel.autofillLoginsSaveLoginInlineConfirmed,
+                              dismissedPixel: GeneralPixel.autofillLoginsSaveLoginInlineDismissed)
+                }
+            }
+        }
+    }
+
+    private func firePixel(for action: Action, confirmedPixel: PixelKitEventV2, dismissedPixel: PixelKitEventV2) {
+        let pixel = action == .confirmed ? confirmedPixel : dismissedPixel
+        PixelKit.fire(pixel)
     }
 
 }

@@ -42,6 +42,7 @@ extension Tab: NavigationResponder {
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
             .weak(nullable: self.navigationHotkeyHandler),
+            .weak(nullable: self.onboarding),
             .weak(nullable: self.brokenSiteInfo),
 
             // redirect to SERP for non-valid domains entered by user
@@ -71,7 +72,7 @@ extension Tab: NavigationResponder {
             // add extra headers to SERP requests
             .struct(SerpHeadersNavigationResponder()),
 
-            .struct(RedirectNavigationResponder()),
+            .struct(redirectNavigationResponder),
 
             // ensure Content Blocking Rules are applied before navigation
             .weak(nullable: self.contentBlockingAndSurrogates),
@@ -89,6 +90,9 @@ extension Tab: NavigationResponder {
             // Error Page
             .weak(nullable: self.errorPage),
 
+            // Release Notes
+            .weak(nullable: self.releaseNotes),
+
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder),
 
@@ -105,6 +109,16 @@ extension Tab: NavigationResponder {
             navigationDelegate
                 .registerCustomDelegateMethodHandler(.weak(downloadsExtension), forSelectorNamed: "_webView:contextMenuDidCreateDownload:")
         }
+    }
+
+    var redirectNavigationResponder: RedirectNavigationResponder {
+        let subscriptionManager = Application.appDelegate.subscriptionManager
+        let redirectManager = PrivacyProSubscriptionRedirectManager(subscriptionEnvironment: subscriptionManager.currentEnvironment,
+                                                                    baseURL: subscriptionManager.url(for: .baseURL),
+                                                                    canPurchase: {
+            subscriptionManager.canPurchase
+        })
+        return RedirectNavigationResponder(redirectManager: redirectManager)
     }
 
 }

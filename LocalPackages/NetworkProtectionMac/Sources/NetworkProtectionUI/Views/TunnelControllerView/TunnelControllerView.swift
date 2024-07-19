@@ -223,7 +223,7 @@ public struct TunnelControllerView: View {
                     loopStartFrame: 130,
                     loopEndFrame: 370
                 ), isAnimating: $model.isVPNEnabled)
-}
+    }
 
     @ViewBuilder
     private func statusBadge(isConnected: Bool) -> some View {
@@ -297,8 +297,13 @@ public struct TunnelControllerView: View {
                 .applySectionHeaderAttributes(colorScheme: colorScheme)
                 .padding(EdgeInsets(top: 6, leading: 9, bottom: 6, trailing: 9))
 
-            connectionStatusRow(title: UserText.networkProtectionStatusViewIPAddress,
+            connectionDetailRow(title: UserText.networkProtectionStatusViewIPAddress,
                                 details: model.serverAddress)
+
+            if model.dnsSettings.usesCustomDNS {
+                connectionDetailRow(title: UserText.vpnDnsServer,
+                                    details: String(describing: model.dnsSettings))
+            }
 
             dataVolumeRow(title: UserText.vpnDataVolume, dataVolume: model.formattedDataVolume)
 
@@ -340,7 +345,7 @@ public struct TunnelControllerView: View {
         .padding(EdgeInsets(top: 3, leading: 9, bottom: 3, trailing: 9))
     }
 
-    private func connectionStatusRow(title: String, details: String) -> some View {
+    private func connectionDetailRow(title: String, details: String) -> some View {
         HStack(spacing: 0) {
             Text(title)
                 .applyLabelAttributes(colorScheme: colorScheme)

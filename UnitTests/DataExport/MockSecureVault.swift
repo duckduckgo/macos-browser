@@ -36,6 +36,18 @@ let MockSecureVaultFactory = SecureVaultFactory<MockSecureVault>(
 )
 
 final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
+    enum MockError: Error {
+        case noStubSet
+    }
+
+    var stubEncryptPassword: ((BrowserServicesKit.SecureVaultModels.WebsiteCredentials, Data?, Data?) -> SecureVaultModels.WebsiteCredentials)?
+
+    func encryptPassword(for credentials: BrowserServicesKit.SecureVaultModels.WebsiteCredentials, key l2Key: Data?, salt: Data?) throws -> BrowserServicesKit.SecureVaultModels.WebsiteCredentials {
+        guard let stubEncryptPassword = stubEncryptPassword?(credentials, l2Key, salt) else {
+            throw MockError.noStubSet
+        }
+        return stubEncryptPassword
+    }
 
     public typealias MockSecureVaultDatabaseProviders = SecureStorageProviders<T>
 
@@ -144,6 +156,10 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         return storedIdentities
     }
 
+    func identitiesCount() throws -> Int {
+        return storedIdentities.count
+    }
+
     func identityFor(id: Int64) throws -> SecureVaultModels.Identity? {
         return storedIdentities.first { $0.id == id }
     }
@@ -159,6 +175,10 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
     func creditCards() throws -> [SecureVaultModels.CreditCard] {
         return storedCards
+    }
+
+    func creditCardsCount() throws -> Int {
+        return storedCards.count
     }
 
     func creditCardFor(id: Int64) throws -> SecureVaultModels.CreditCard? {
@@ -182,7 +202,11 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         return nil
     }
 
-    func inDatabaseTransaction(_ block: @escaping (Database) throws -> Void) throws {}
+    var spyInDatabaseTransactionBlock: ((Database) throws -> Void)?
+
+    func inDatabaseTransaction(_ block: @escaping (Database) throws -> Void) throws {
+        spyInDatabaseTransactionBlock = block
+    }
 
     func modifiedSyncableCredentials() throws -> [SecureVaultModels.SyncableCredentials] {
         []
@@ -387,6 +411,10 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
         return Array(_identities.values)
     }
 
+    func identitiesCount() throws -> Int {
+        return _identities.count
+    }
+
     func identityForIdentityId(_ identityId: Int64) throws -> SecureVaultModels.Identity? {
         return _identities[identityId]
     }
@@ -406,6 +434,10 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
 
     func creditCards() throws -> [SecureVaultModels.CreditCard] {
         return Array(_creditCards.values)
+    }
+
+    func creditCardsCount() throws -> Int {
+        return _creditCards.count
     }
 
     func creditCardForCardId(_ cardId: Int64) throws -> SecureVaultModels.CreditCard? {

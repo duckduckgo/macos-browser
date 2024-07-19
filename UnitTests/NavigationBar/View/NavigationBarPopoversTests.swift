@@ -79,7 +79,7 @@ final class NavigationBarPopoversTests: XCTestCase {
 
     func testShowsPasswordPopoverWithCategory() throws {
         // When
-        sut.showPasswordManagementPopover(selectedCategory: nil, usingView: NSView(), withDelegate: MockNSPopoverDelegate())
+        sut.showPasswordManagementPopover(selectedCategory: nil, from: MouseOverButton(), withDelegate: MockNSPopoverDelegate(), source: nil)
 
         // Then
         XCTAssertTrue(autofillPopoverPresenter.didShowWithCategory)
@@ -90,7 +90,7 @@ final class NavigationBarPopoversTests: XCTestCase {
         let account = SecureVaultModels.WebsiteAccount(id: "")
 
         // When
-        sut.showPasswordManagerPopover(selectedWebsiteAccount: account, usingView: NSView(), withDelegate: MockNSPopoverDelegate())
+        sut.showPasswordManagerPopover(selectedWebsiteAccount: account, from: MouseOverButton(), withDelegate: MockNSPopoverDelegate())
 
         // Then
         XCTAssertTrue(autofillPopoverPresenter.didShowWithSelectedAccount)

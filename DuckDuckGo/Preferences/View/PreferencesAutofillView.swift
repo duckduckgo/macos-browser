@@ -63,49 +63,18 @@ extension Preferences {
         }
 
         var body: some View {
-            PreferencePane(UserText.autofill) {
+            PreferencePane(UserText.passwordManagementTitle) {
 
                 // Autofill Content  Button
                 PreferencePaneSection {
-
-                    // New section
-                    if model.autofillSurveyEnabled {
-                        HStack(alignment: .top, spacing: 20) {
-                            Image(.passwordsDDG128)
-                                .frame(width: 64, height: 48)
-
-                            VStack(alignment: .leading) {
-                                Text(verbatim: "Help us improve!")
-                                    .bold()
-                                Text(verbatim: "We want to make using passwords in DuckDuckGo better.")
-                                    .foregroundColor(.greyText)
-                                    .padding(.top, 1)
-
-                                HStack {
-                                    Button(action: {
-                                        model.disableAutofillSurvey()
-                                    }, label: {
-                                        Text(verbatim: "No Thanks")
-                                    })
-                                    Button(action: {
-                                        model.launchSurvey()
-                                    }, label: {
-                                        Text(verbatim: "Take Survey")
-                                    })
-                                    .buttonStyle(DefaultActionButtonStyle(enabled: true))
-                                }
-                                .padding(.top, 12)
-                            }
-
-                            Spacer()
-                        }
-                        .padding()
-                        .roundedBorder()
-                        .padding(.bottom, 24)
+                    Button(UserText.autofillViewContentButtonPasswords) {
+                        model.showAutofillPopover(.logins, source: .settings)
                     }
-
-                    Button(UserText.autofillViewContentButton) {
-                        model.showAutofillPopover()
+                    Button(UserText.autofillViewContentButtonIdentities) {
+                        model.showAutofillPopover(.identities, source: .settings)
+                    }
+                    Button(UserText.autofillViewContentButtonPaymentMethods) {
+                        model.showAutofillPopover(.cards, source: .settings)
                     }
 #if APPSTORE
                     Button(UserText.importPasswords) {
@@ -154,7 +123,7 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(UserText.autofillAskToSave)
                     VStack(alignment: .leading, spacing: 6) {
-                        ToggleMenuItem(UserText.autofillUsernamesAndPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
+                        ToggleMenuItem(UserText.autofillPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
                         ToggleMenuItem(UserText.autofillAddresses, isOn: $model.askToSaveAddresses)
                         ToggleMenuItem(UserText.autofillPaymentMethods, isOn: $model.askToSavePaymentMethods)
                     }
@@ -224,8 +193,6 @@ extension Preferences {
             .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
         }
 
-        // swiftlint:disable cyclomatic_complexity
-        // swiftlint:disable function_body_length
         @ViewBuilder private func bitwardenStatusView(for status: BWStatus) -> some View {
             switch status {
             case .disabled:
@@ -308,8 +275,6 @@ extension Preferences {
                 .offset(x: Preferences.Const.autoLockWarningOffset)
             }
         }
-        // swiftlint:enable cyclomatic_complexity
-        // swiftlint:enable function_body_length
     }
 }
 

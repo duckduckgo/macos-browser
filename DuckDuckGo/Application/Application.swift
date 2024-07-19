@@ -23,16 +23,18 @@ import Foundation
 final class Application: NSApplication {
 
     private let copyHandler = CopyHandler()
-    private var _delegate: AppDelegate!
+//    private var _delegate: AppDelegate!
+    public static var appDelegate: AppDelegate!
 
     override init() {
         super.init()
 
-        _delegate = AppDelegate()
-        self.delegate = _delegate
+        let delegate = AppDelegate()
+        self.delegate = delegate
+        Application.appDelegate = delegate
 
-        let mainMenu = MainMenu(featureFlagger: _delegate.featureFlagger,
-                                bookmarkManager: _delegate.bookmarksManager,
+        let mainMenu = MainMenu(featureFlagger: delegate.featureFlagger,
+                                bookmarkManager: delegate.bookmarksManager,
                                 faviconManager: FaviconManager.shared,
                                 copyHandler: copyHandler)
         self.mainMenu = mainMenu
@@ -45,6 +47,11 @@ final class Application: NSApplication {
 
     required init?(coder: NSCoder) {
         fatalError("\(Self.self): Bad initializer")
+    }
+
+    @objc(_crashOnException:)
+    func crash(on exception: NSException) {
+        NSGetUncaughtExceptionHandler()?(exception)
     }
 
 }

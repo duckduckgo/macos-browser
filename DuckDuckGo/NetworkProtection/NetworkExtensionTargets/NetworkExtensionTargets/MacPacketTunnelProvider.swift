@@ -52,7 +52,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Error Reporting
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
     private static func networkProtectionDebugEvents(controllerErrorStore: NetworkProtectionTunnelErrorStore) -> EventMapping<NetworkProtectionError>? {
         return EventMapping { event, _, _, _ in
             let domainEvent: NetworkProtectionPixelEvent
@@ -115,6 +114,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionWireguardErrorCannotStartWireguardBackend(code: code)
             case .noAuthTokenFound:
                 domainEvent = .networkProtectionNoAuthTokenFoundError
+            case .failedToFetchServerStatus(let error):
+                domainEvent = .networkProtectionClientFailedToFetchServerStatus(error)
+            case .failedToParseServerStatusResponse(let error):
+                domainEvent = .networkProtectionClientFailedToParseServerStatusResponse(error)
             case .unhandledError(function: let function, line: let line, error: let error):
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             case .failedToRetrieveAuthToken,
@@ -134,6 +137,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - PacketTunnelProvider.Event reporting
 
+    private static var vpnLogger = VPNLogger()
+
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
 
 #if NETP_SYSTEM_EXTENSION
@@ -141,8 +146,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #else
         let defaults = UserDefaults.netP
 #endif
-        let settings = VPNSettings(defaults: defaults)
-
         switch event {
         case .userBecameActive:
             PixelKit.fire(
@@ -150,7 +153,42 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 frequency: .legacyDaily,
                 withAdditionalParameters: [PixelKit.Parameters.vpnCohort: PixelKit.cohort(from: defaults.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
+        case .connectionTesterStatusChange(let status, let server):
+            vpnLogger.log(status, server: server)
+
+            switch status {
+            case .failed(let duration):
+                let pixel: NetworkProtectionPixelEvent = {
+                    switch duration {
+                    case .immediate:
+                        return .networkProtectionConnectionTesterFailureDetected(server: server)
+                    case .extended:
+                        return .networkProtectionConnectionTesterExtendedFailureDetected(server: server)
+                    }
+                }()
+
+                PixelKit.fire(
+                    pixel,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .recovered(let duration, let failureCount):
+                let pixel: NetworkProtectionPixelEvent = {
+                    switch duration {
+                    case .immediate:
+                        return .networkProtectionConnectionTesterFailureRecovered(server: server, failureCount: failureCount)
+                    case .extended:
+                        return .networkProtectionConnectionTesterExtendedFailureRecovered(server: server, failureCount: failureCount)
+                    }
+                }()
+
+                PixelKit.fire(
+                    pixel,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            }
         case .reportConnectionAttempt(attempt: let attempt):
+            vpnLogger.log(attempt)
+
             switch attempt {
             case .connecting:
                 PixelKit.fire(
@@ -169,6 +207,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .reportTunnelFailure(result: let result):
+            vpnLogger.log(result)
+
             switch result {
             case .failureDetected:
                 PixelKit.fire(
@@ -184,6 +224,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 break
             }
         case .reportLatency(let result):
+            vpnLogger.log(result)
+
             switch result {
             case .error:
                 PixelKit.fire(
@@ -198,6 +240,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .rekeyAttempt(let step):
+            vpnLogger.log(step, named: "Rekey")
+
             switch step {
             case .begin:
                 PixelKit.fire(
@@ -216,6 +260,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelStartAttempt(let step):
+            vpnLogger.log(step, named: "Tunnel Start")
+
             switch step {
             case .begin:
                 PixelKit.fire(
@@ -234,6 +280,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelStopAttempt(let step):
+            vpnLogger.log(step, named: "Tunnel Stop")
+
             switch step {
             case .begin:
                 PixelKit.fire(
@@ -252,6 +300,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelUpdateAttempt(let step):
+            vpnLogger.log(step, named: "Tunnel Update")
+
             switch step {
             case .begin:
                 PixelKit.fire(
@@ -270,6 +320,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .tunnelWakeAttempt(let step):
+            vpnLogger.log(step, named: "Tunnel Wake")
+
             switch step {
             case .begin:
                 PixelKit.fire(
@@ -288,6 +340,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             }
         case .failureRecoveryAttempt(let step):
+            vpnLogger.log(step)
+
             switch step {
             case .started:
                 PixelKit.fire(
@@ -314,6 +368,33 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true
                 )
             }
+        case .serverMigrationAttempt(let step):
+            vpnLogger.log(step, named: "Server Migration")
+
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionServerMigrationAttempt,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionServerMigrationFailure(error),
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionServerMigrationSuccess,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            }
+        case .tunnelStartOnDemandWithoutAccessToken:
+            vpnLogger.logStartingWithoutAuthToken()
+
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken,
+                frequency: .dailyAndCount,
+                includeAppVersionParameter: true)
         }
     }
 
@@ -327,10 +408,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Initialization
 
-    @MainActor
-    @objc public init() {
-        let isSubscriptionEnabled = false
-
+    @MainActor @objc public init() {
 #if NETP_SYSTEM_EXTENSION
         let defaults = UserDefaults.standard
 #else
@@ -338,25 +416,44 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #endif
 
         NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = AppVersion.shared.versionAndBuildNumber
-
         let settings = VPNSettings(defaults: defaults)
-        let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
+
+        // MARK: - Configure Subscription
+        let subscriptionUserDefaults = UserDefaults(suiteName: MacPacketTunnelProvider.subscriptionsAppGroup)!
+        let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
-        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                                            serviceName: Self.tokenServiceName,
                                                                            errorEvents: debugEvents,
-                                                                           isSubscriptionEnabled: isSubscriptionEnabled,
+                                                                           isSubscriptionEnabled: false,
                                                                            accessTokenProvider: { nil }
         )
-
-        let accountManager = AccountManager(subscriptionAppGroup: Self.subscriptionsAppGroup, accessTokenStorage: tokenStore)
-
-        SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
-        let entitlementsCheck = {
-            await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
+                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
+                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
+        // Align Subscription environment to the VPN environment
+        var subscriptionEnvironment = SubscriptionEnvironment.default
+        switch settings.selectedEnvironment {
+        case .production:
+            subscriptionEnvironment.serviceEnvironment = .production
+        case .staging:
+            subscriptionEnvironment.serviceEnvironment = .staging
         }
+
+        let subscriptionEndpointService = DefaultSubscriptionEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authEndpointService = DefaultAuthEndpointService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let accountManager = DefaultAccountManager(accessTokenStorage: tokenStore,
+                                            entitlementsCache: entitlementsCache,
+                                            subscriptionEndpointService: subscriptionEndpointService,
+                                            authEndpointService: authEndpointService)
+
+        let entitlementsCheck = {
+            await accountManager.hasEntitlement(forProductName: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+        }
+
+        let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
+        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
 
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,
@@ -367,7 +464,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
                    defaults: defaults,
-                   isSubscriptionEnabled: isSubscriptionEnabled,
+                   isSubscriptionEnabled: true,
                    entitlementCheck: entitlementsCheck)
 
         setupPixels()

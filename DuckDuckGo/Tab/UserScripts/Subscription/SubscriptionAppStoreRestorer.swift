@@ -16,55 +16,60 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import Subscription
 import SubscriptionUI
 import enum StoreKit.StoreKitError
 import PixelKit
 
 @available(macOS 12.0, *)
-struct SubscriptionAppStoreRestorer {
+protocol SubscriptionAppStoreRestorer {
+    var uiHandler: SubscriptionUIHandling { get }
+    func restoreAppStoreSubscription() async
+}
 
-    // swiftlint:disable:next cyclomatic_complexity
-    static func restoreAppStoreSubscription(mainViewController: MainViewController, windowController: MainWindowController) async {
+@available(macOS 12.0, *)
+struct DefaultSubscriptionAppStoreRestorer: SubscriptionAppStoreRestorer {
+    private let subscriptionManager: SubscriptionManager
+    private let subscriptionErrorReporter: SubscriptionErrorReporter
+    private let appStoreRestoreFlow: AppStoreRestoreFlow
+    let uiHandler: SubscriptionUIHandling
 
-        let progressViewController = await ProgressViewController(title: UserText.restoringSubscriptionTitle)
-        defer {
-            DispatchQueue.main.async {
-                mainViewController.dismiss(progressViewController)
-            }
-        }
+    public init(subscriptionManager: SubscriptionManager,
+                subscriptionErrorReporter: SubscriptionErrorReporter = DefaultSubscriptionErrorReporter(),
+                appStoreRestoreFlow: AppStoreRestoreFlow,
+                uiHandler: SubscriptionUIHandling) {
+        self.subscriptionManager = subscriptionManager
+        self.subscriptionErrorReporter = subscriptionErrorReporter
+        self.appStoreRestoreFlow = appStoreRestoreFlow
+        self.uiHandler = uiHandler
+    }
 
-        DispatchQueue.main.async {
-            mainViewController.presentAsSheet(progressViewController)
-        }
+    func restoreAppStoreSubscription() async {
+        await uiHandler.presentProgressViewController(withTitle: UserText.restoringSubscriptionTitle)
 
-        let syncResult = await PurchaseManager.shared.syncAppleIDAccount()
+        do {
+            try await subscriptionManager.storePurchaseManager().syncAppleIDAccount()
+            await continueRestore()
+        } catch {
+            await uiHandler.dismissProgressViewController()
 
-        switch syncResult {
-        case .success:
-            break
-        case .failure(let error):
             switch error as? StoreKitError {
             case .some(.userCancelled):
-                return
-            default:
-                break
-            }
-
-            let alert = await NSAlert.appleIDSyncFailedAlert(text: error.localizedDescription)
-
-            switch await alert.runModal() {
-            case .alertFirstButtonReturn:
-                // Continue button
                 break
             default:
-                return
+                let alertResponse = await uiHandler.show(alertType: .appleIDSyncFailed, text: error.localizedDescription)
+                if alertResponse == .alertFirstButtonReturn {
+                    await uiHandler.presentProgressViewController(withTitle: UserText.restoringSubscriptionTitle)
+                    await continueRestore()
+                }
             }
         }
+    }
 
-        let result = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-
+    private func continueRestore() async {
+        let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
+        await uiHandler.dismissProgressViewController()
         switch result {
         case .success:
             PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
@@ -74,18 +79,44 @@ struct SubscriptionAppStoreRestorer {
             default:
                 PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreFailureOther, frequency: .dailyAndCount)
             }
-
             switch error {
             case .missingAccountOrTransactions:
-                SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
-                await windowController.showSubscriptionNotFoundAlert()
+                subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
+                await showSubscriptionNotFoundAlert()
             case .subscriptionExpired:
-                SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionExpired)
-                await windowController.showSubscriptionInactiveAlert()
+                subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionExpired)
+                await showSubscriptionInactiveAlert()
             case .pastTransactionAuthenticationError, .failedToObtainAccessToken, .failedToFetchAccountDetails, .failedToFetchSubscriptionDetails:
-                SubscriptionErrorReporter.report(subscriptionActivationError: .generalError)
-                await windowController.showSomethingWentWrongAlert()
+                subscriptionErrorReporter.report(subscriptionActivationError: .generalError)
+                await showSomethingWentWrongAlert()
             }
+        }
+    }
+
+    // MARK: - UI interactions
+
+    private func showSomethingWentWrongAlert() async {
+        PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
+        await uiHandler.show(alertType: .somethingWentWrong)
+    }
+
+    private func showSubscriptionNotFoundAlert() async {
+        switch await uiHandler.show(alertType: .subscriptionNotFound) {
+        case .alertFirstButtonReturn:
+            let url = subscriptionManager.url(for: .purchase)
+            await uiHandler.showTab(with: .subscription(url))
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+        default: return
+        }
+    }
+
+    private func showSubscriptionInactiveAlert() async {
+        switch await uiHandler.show(alertType: .subscriptionInactive) {
+        case .alertFirstButtonReturn:
+            let url = subscriptionManager.url(for: .purchase)
+            await uiHandler.showTab(with: .subscription(url))
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+        default: return
         }
     }
 }

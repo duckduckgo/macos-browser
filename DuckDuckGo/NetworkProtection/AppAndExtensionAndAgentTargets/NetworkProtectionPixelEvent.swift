@@ -32,6 +32,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionControllerStartFailure(_ error: Error)
 
     case networkProtectionTunnelStartAttempt
+    case networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken
     case networkProtectionTunnelStartSuccess
     case networkProtectionTunnelStartFailure(_ error: Error)
 
@@ -47,9 +48,18 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionTunnelWakeSuccess
     case networkProtectionTunnelWakeFailure(_ error: Error)
 
+    case networkProtectionServerMigrationAttempt
+    case networkProtectionServerMigrationSuccess
+    case networkProtectionServerMigrationFailure(_ error: Error)
+
     case networkProtectionEnableAttemptConnecting
     case networkProtectionEnableAttemptSuccess
     case networkProtectionEnableAttemptFailure
+
+    case networkProtectionConnectionTesterFailureDetected(server: String)
+    case networkProtectionConnectionTesterFailureRecovered(server: String, failureCount: Int)
+    case networkProtectionConnectionTesterExtendedFailureDetected(server: String)
+    case networkProtectionConnectionTesterExtendedFailureRecovered(server: String, failureCount: Int)
 
     case networkProtectionTunnelFailureDetected
     case networkProtectionTunnelFailureRecovered
@@ -74,6 +84,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionClientFailedToParseRedeemResponse(_ error: Error)
     case networkProtectionClientFailedToFetchLocations(_ error: Error?)
     case networkProtectionClientFailedToParseLocationsResponse(_ error: Error?)
+    case networkProtectionClientFailedToFetchServerStatus(_ error: Error?)
+    case networkProtectionClientFailedToParseServerStatusResponse(_ error: Error?)
     case networkProtectionClientInvalidAuthToken
 
     case networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: String)
@@ -94,16 +106,12 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionRekeyCompleted
     case networkProtectionRekeyFailure(_ error: Error)
 
+    case networkProtectionDNSUpdateCustom
+    case networkProtectionDNSUpdateDefault
+
     case networkProtectionSystemExtensionActivationFailure(_ error: Error)
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
-
-    // Temporary pixels added to verify notification delivery rates:
-    case networkProtectionConnectedNotificationDisplayed
-    case networkProtectionDisconnectedNotificationDisplayed
-    case networkProtectionReconnectingNotificationDisplayed
-    case networkProtectionSupersededNotificationDisplayed
-    case networkProtectionExpiredEntitlementNotificationDisplayed
 
     /// Name of the pixel event
     /// - Unique pixels must end with `_u`
@@ -131,6 +139,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
         case .networkProtectionTunnelStartAttempt:
             return "netp_tunnel_start_attempt"
+
+        case .networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken:
+            return "netp_tunnel_start_attempt_on_demand_without_access_token"
 
         case .networkProtectionTunnelStartSuccess:
             return "netp_tunnel_start_success"
@@ -173,6 +184,18 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
         case .networkProtectionEnableAttemptFailure:
             return "netp_ev_enable_attempt_failure"
+
+        case .networkProtectionConnectionTesterFailureDetected:
+            return "netp_connection_tester_failure"
+
+        case .networkProtectionConnectionTesterFailureRecovered:
+            return "netp_connection_tester_failure_recovered"
+
+        case .networkProtectionConnectionTesterExtendedFailureDetected:
+            return "netp_connection_tester_extended_failure"
+
+        case .networkProtectionConnectionTesterExtendedFailureRecovered:
+            return "netp_connection_tester_extended_failure_recovered"
 
         case .networkProtectionTunnelFailureDetected:
             return "netp_ev_tunnel_failure"
@@ -282,28 +305,43 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionSystemExtensionActivationFailure:
             return "netp_system_extension_activation_failure"
 
+        case .networkProtectionClientFailedToFetchServerStatus:
+            return "netp_server_migration_failed_to_fetch_status"
+
+        case .networkProtectionClientFailedToParseServerStatusResponse:
+            return "netp_server_migration_failed_to_parse_response"
+
+        case .networkProtectionServerMigrationAttempt:
+            return "netp_ev_server_migration_attempt"
+
+        case .networkProtectionServerMigrationFailure:
+            return "netp_ev_server_migration_attempt_failure"
+
+        case .networkProtectionServerMigrationSuccess:
+            return "netp_ev_server_migration_attempt_success"
+
+        case .networkProtectionDNSUpdateCustom:
+            return "netp_ev_update_dns_custom"
+
+        case .networkProtectionDNSUpdateDefault:
+            return "netp_ev_update_dns_default"
+
         case .networkProtectionUnhandledError:
             return "netp_unhandled_error"
-
-        case .networkProtectionConnectedNotificationDisplayed:
-            return "netp_connected_notification_displayed"
-
-        case .networkProtectionDisconnectedNotificationDisplayed:
-            return "netp_disconnected_notification_displayed"
-
-        case .networkProtectionReconnectingNotificationDisplayed:
-            return "netp_reconnecting_notification_displayed"
-
-        case .networkProtectionSupersededNotificationDisplayed:
-            return "netp_superseded_notification_displayed"
-
-        case .networkProtectionExpiredEntitlementNotificationDisplayed:
-            return "netp_expired_entitlement_notification_displayed"
         }
     }
 
     var parameters: [String: String]? {
         switch self {
+        case .networkProtectionConnectionTesterFailureDetected(let server),
+                .networkProtectionConnectionTesterExtendedFailureDetected(let server):
+            return [PixelKit.Parameters.server: server]
+        case .networkProtectionConnectionTesterFailureRecovered(let server, let failureCount),
+                .networkProtectionConnectionTesterExtendedFailureRecovered(let server, let failureCount):
+            return [
+                PixelKit.Parameters.server: server,
+                PixelKit.Parameters.count: String(failureCount)
+            ]
         case .networkProtectionKeychainErrorFailedToCastKeychainValueToData(let field):
             return [PixelKit.Parameters.keychainFieldName: field]
         case .networkProtectionKeychainReadError(let field, let status):
@@ -342,8 +380,14 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
             return error.pixelParameters
         case .networkProtectionWireguardErrorCannotStartWireguardBackend(code: let code):
             return [PixelKit.Parameters.errorCode: String(code)]
+        case .networkProtectionClientFailedToFetchServerStatus(let error):
+            return error?.pixelParameters
+        case .networkProtectionClientFailedToParseServerStatusResponse(let error):
+            return error?.pixelParameters
         case .networkProtectionWireguardErrorInvalidState(reason: let reason):
             return [PixelKit.Parameters.reason: reason]
+        case .networkProtectionServerMigrationFailure:
+            return error?.pixelParameters
         case .networkProtectionActiveUser,
                 .networkProtectionNewUser,
                 .networkProtectionControllerStartAttempt,
@@ -351,6 +395,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionControllerStartCancelled,
                 .networkProtectionControllerStartFailure,
                 .networkProtectionTunnelStartAttempt,
+                .networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken,
                 .networkProtectionTunnelStartSuccess,
                 .networkProtectionTunnelStartFailure,
                 .networkProtectionTunnelStopAttempt,
@@ -388,11 +433,10 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionRekeyCompleted,
                 .networkProtectionRekeyFailure,
                 .networkProtectionSystemExtensionActivationFailure,
-                .networkProtectionConnectedNotificationDisplayed,
-                .networkProtectionDisconnectedNotificationDisplayed,
-                .networkProtectionReconnectingNotificationDisplayed,
-                .networkProtectionSupersededNotificationDisplayed,
-                .networkProtectionExpiredEntitlementNotificationDisplayed:
+                .networkProtectionServerMigrationAttempt,
+                .networkProtectionServerMigrationSuccess,
+                .networkProtectionDNSUpdateCustom,
+                .networkProtectionDNSUpdateDefault:
             return nil
         }
     }
@@ -403,7 +447,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionClientFailedToFetchLocations(let error),
                 .networkProtectionClientFailedToParseLocationsResponse(let error),
                 .networkProtectionClientFailedToFetchServerList(let error),
-                .networkProtectionClientFailedToFetchRegisteredServers(let error):
+                .networkProtectionClientFailedToFetchRegisteredServers(let error),
+                .networkProtectionClientFailedToFetchServerStatus(let error),
+                .networkProtectionClientFailedToParseServerStatusResponse(let error):
             return error
         case .networkProtectionControllerStartFailure(let error),
                 .networkProtectionTunnelStartFailure(let error),
@@ -414,7 +460,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionWireguardErrorCannotSetNetworkSettings(let error),
                 .networkProtectionRekeyFailure(let error),
                 .networkProtectionUnhandledError(_, _, let error),
-                .networkProtectionSystemExtensionActivationFailure(let error):
+                .networkProtectionSystemExtensionActivationFailure(let error),
+                .networkProtectionServerMigrationFailure(let error):
             return error
         case .networkProtectionActiveUser,
                 .networkProtectionNewUser,
@@ -422,6 +469,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionControllerStartSuccess,
                 .networkProtectionControllerStartCancelled,
                 .networkProtectionTunnelStartAttempt,
+                .networkProtectionTunnelStartAttemptOnDemandWithoutAccessToken,
                 .networkProtectionTunnelStartSuccess,
                 .networkProtectionTunnelStopAttempt,
                 .networkProtectionTunnelStopSuccess,
@@ -432,6 +480,10 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionEnableAttemptConnecting,
                 .networkProtectionEnableAttemptSuccess,
                 .networkProtectionEnableAttemptFailure,
+                .networkProtectionConnectionTesterFailureDetected,
+                .networkProtectionConnectionTesterFailureRecovered,
+                .networkProtectionConnectionTesterExtendedFailureDetected,
+                .networkProtectionConnectionTesterExtendedFailureRecovered,
                 .networkProtectionTunnelFailureDetected,
                 .networkProtectionTunnelFailureRecovered,
                 .networkProtectionLatency,
@@ -459,11 +511,10 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionNoAuthTokenFoundError,
                 .networkProtectionRekeyAttempt,
                 .networkProtectionRekeyCompleted,
-                .networkProtectionConnectedNotificationDisplayed,
-                .networkProtectionDisconnectedNotificationDisplayed,
-                .networkProtectionReconnectingNotificationDisplayed,
-                .networkProtectionSupersededNotificationDisplayed,
-                .networkProtectionExpiredEntitlementNotificationDisplayed:
+                .networkProtectionServerMigrationAttempt,
+                .networkProtectionServerMigrationSuccess,
+                .networkProtectionDNSUpdateCustom,
+                .networkProtectionDNSUpdateDefault:
             return nil
         }
     }

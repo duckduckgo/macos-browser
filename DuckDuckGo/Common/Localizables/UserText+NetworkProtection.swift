@@ -47,7 +47,7 @@ extension UserText {
     // "network.protection.status.menu.vpn.settings" - The status menu 'VPN Settings' menu item
     static let networkProtectionNavBarStatusMenuVPNSettings = "VPN Settings…"
     // "network.protection.status.menu.faq" - The status menu 'FAQ' menu item
-    static let networkProtectionNavBarStatusMenuFAQ = "Frequently Asked Questions…"
+    static let networkProtectionNavBarStatusMenuFAQ = "FAQs and Support…"
 
     // MARK: - System Extension Installation Messages
     // "network.protection.configuration.system-settings.legacy" - Text for a label in the VPN popover, displayed after attempting to enable the VPN for the first time while using macOS 12 and below
@@ -65,7 +65,7 @@ extension UserText {
     }
 
     // "network.protection.system.extension.unknown.activation.error" - Message shown to users when they try to enable NetP and there is an unexpected activation error.
-    static let networkProtectionUnknownActivationError = "There as an unexpected error. Please try again."
+    static let networkProtectionUnknownActivationError = "There was an unexpected error. Please try again."
     // "network.protection.system.extension.please.reboot" - Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation
     static let networkProtectionPleaseReboot = "VPN update available. Restart your Mac to reconnect."
 }
@@ -126,10 +126,14 @@ extension UserText {
     static let vpnLocationTitle = "Location"
     // "vpn.general.title" - General section title in VPN settings
     static let vpnGeneralTitle = "General"
+    // "vpn.shortcuts.settings.title" - Shortcuts section title in VPN settings
+    static let vpnShortcutsSettingsTitle = "Shortcuts"
     // "vpn.notifications.settings.title" - Notifications section title in VPN settings
     static let vpnNotificationsSettingsTitle = "Notifications"
     // "vpn.advanced.settings.title" - VPN Advanced section title in VPN settings
     static let vpnAdvancedSettingsTitle = "Advanced"
+    // "vpn.notifications.connection.drops.or.status.changes.title" - Title of the VPN notification option
+    static let vpnNotificationsConnectionDropsOrStatusChangesTitle = "VPN connection drops or status changes"
 
     // MARK: - Location
     // "vpn.location.change.button.title" - Title of the VPN location preference change button
@@ -157,21 +161,43 @@ extension UserText {
         return String(format: message, count)
     }
 
+    // MARK: - DNS
+    // "vpn.dns.server.title" - Title of the DNS Server section
+    static let vpnDnsServerTitle = "DNS Server"
+    // "vpn.dns.server.picker.default.title" - Title of the default DNS server option
+    static let vpnDnsServerPickerDefaultTitle = "DuckDuckGo (Recommended)"
+    // "vpn.dns.server.picker.custom.title" = Title of the custom DNS server option
+    static let vpnDnsServerPickerCustomTitle = "Custom"
+    // "vpn.dns.server.picker.custom.button.title" = Button title of the custom DNS server option
+    static let vpnDnsServerPickerCustomButtonTitle = "Change…"
+    // "vpn.setting.description.secure.dns" - Secure DNS description
+    static let vpnSecureDNSSettingDescription = "DuckDuckGo routes DNS queries through our DNS servers so your internet provider can't see what websites you visit."
+
+    // "vpn.dns.server.sheet.title" - Title of the DNS Server sheet
+    static let vpnDnsServerSheetTitle = "Custom DNS Server"
+    // "vpn.dns.server.ipv4.description" - Description of the IPv4 text field
+    static let vpnDnsServerIPv4Description = "IPv4 Address:"
+    // "vpn.dns.server.disclaimer" - Disclaimer for the custom DNS server option
+    static let vpnDnsServerIPv4Disclaimer = "Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn't secure or reliable."
+    // "vpn.dns.server.apply.button.title" - Title for the Apply custom DNS server button
+    static let vpnDnsServerApplyButtonTitle = "Apply"
+
     // MARK: - Settings
     // "vpn.setting.title.connect.on.login" - Connect on Login setting title
-    static let vpnConnectOnLoginSettingTitle = "Connect on login"
-    // "vpn.setting.title.connect.on.login" - Display VPN status in the menu bar.
+    static let vpnConnectOnLoginSettingTitle = "Connect to VPN when logging in to your computer"
+    // "vpn.setting.title.show.in.menu.bar" - Display VPN status in the menu bar
     static let vpnShowInMenuBarSettingTitle = "Show VPN in menu bar"
+    // "vpn.setting.title.show.in.browser.toolbar" - Display VPN status in the browser toolbar
+    static let vpnShowInBrowserToolbarSettingTitle = "Show VPN in browser toolbar"
     // "vpn.setting.description.always.on" - Always ON setting description
     static let vpnAlwaysOnSettingDescription = "Automatically restores the VPN connection after interruption. For your security, this setting cannot be disabled."
     // "vpn.setting.title.exclude.local.networks" - Exclude Local Networks setting title
     static let vpnExcludeLocalNetworksSettingTitle = "Exclude local networks"
     // "vpn.setting.description.exclude.local.networks" - Exclude Local Networks setting description
     static let vpnExcludeLocalNetworksSettingDescription = "Bypass the VPN for local network connections, like to a printer."
-    // "vpn.setting.description.secure.dns" - Secure DNS setting description
-    static let vpnSecureDNSSettingDescription = "Our VPN uses Secure DNS to keep your online activity private, so that your Internet provider can't see what websites you visit."
     // "vpn.button.title.uninstall.vpn" - Uninstall VPN button title
-    static let uninstallVPNButtonTitle = "Uninstall DuckDuckGo VPN..."
+    static let openVPNButtonTitle = "Open VPN…"
+    static let uninstallVPNButtonTitle = "Uninstall DuckDuckGo VPN…"
 
     // MARK: - VPN Settings Alerts
     // "vpn.uninstall.alert.title" - Alert title when the user selects to uninstall our VPN
