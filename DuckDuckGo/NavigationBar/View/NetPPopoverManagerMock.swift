@@ -47,6 +47,7 @@ final class IPCClientMock: NetworkProtectionIPCClient {
     final class ConnectionServerInfoObserverMock: NetworkProtection.ConnectionServerInfoObserver {
         var publisher: AnyPublisher<NetworkProtection.NetworkProtectionStatusServerInfo, Never> = PassthroughSubject().eraseToAnyPublisher()
         var recentValue: NetworkProtection.NetworkProtectionStatusServerInfo = .unknown
+        func refreshServerInfo() {}
     }
     var ipcServerInfoObserver: any NetworkProtection.ConnectionServerInfoObserver = ConnectionServerInfoObserverMock()
 

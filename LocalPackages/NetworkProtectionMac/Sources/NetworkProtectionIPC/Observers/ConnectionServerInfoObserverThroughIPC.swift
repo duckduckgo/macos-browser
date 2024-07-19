@@ -31,6 +31,10 @@ public final class ConnectionServerInfoObserverThroughIPC: ConnectionServerInfoO
         subject.value
     }
 
+    public func refreshServerInfo() {
+        // no-op
+    }
+
     // MARK: - Publishing Updates
 
     func publish(_ status: NetworkProtectionStatusServerInfo) {
