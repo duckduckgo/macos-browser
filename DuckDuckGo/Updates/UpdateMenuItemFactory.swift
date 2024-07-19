@@ -1,7 +1,7 @@
 //
-//  AboutModel.swift
+//  UpdateMenuItemFactory.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,21 +16,20 @@
 //  limitations under the License.
 //
 
-import SwiftUI
-import Common
+#if SPARKLE
 
-final class AboutModel: ObservableObject, PreferencesTabOpening {
-    let appVersion = AppVersion()
+import Cocoa
 
-    let displayableAboutURL: String = URL.aboutDuckDuckGo
-        .toString(decodePunycode: false, dropScheme: true, dropTrailingSlash: false)
+final class UpdateMenuItemFactory {
 
-    @MainActor
-    func openFeedbackForm() {
-        FeedbackPresenter.presentFeedbackForm()
+    static func menuItem(for update: Update) -> NSMenuItem {
+        let item = NSMenuItem(title: UserText.updateAvailableMenuItem)
+        item.target = Application.appDelegate.updateController
+        item.action = #selector(UpdateController.runUpdate)
+        item.image = NSImage.updateMenuItemIcon
+        return item
     }
 
-    func copy(_ value: String) {
-        NSPasteboard.general.copy(value)
-    }
 }
+
+#endif
