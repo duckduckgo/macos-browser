@@ -41,6 +41,7 @@ extension OSLog {
         case navigation = "Navigation"
         case duckPlayer = "Duck Player"
         case tabSnapshots = "Tab Snapshots"
+        case updates = "Updates"
         case sync = "Sync"
         case dbp = "dbp"
     }
@@ -68,6 +69,7 @@ extension OSLog {
     @OSLogWrapper(AppCategories.navigation) static var navigation
     @OSLogWrapper(AppCategories.duckPlayer) static var duckPlayer
     @OSLogWrapper(AppCategories.tabSnapshots) static var tabSnapshots
+    @OSLogWrapper(AppCategories.updates) static var updates
     @OSLogWrapper(AppCategories.sync) static var sync
     @OSLogWrapper(AppCategories.dbp) static var dbp
 

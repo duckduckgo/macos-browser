@@ -69,6 +69,10 @@ final class NetworkProtectionDebugUtilities {
         vpnUninstaller.removeAgents()
     }
 
+    func removeVPNConfiguration() async throws {
+        try await vpnUninstaller.removeVPNConfiguration()
+    }
+
     func sendTestNotificationRequest() async throws {
         try await ipcClient.command(.sendTestNotification)
     }

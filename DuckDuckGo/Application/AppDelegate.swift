@@ -388,6 +388,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         setUpAutofillPixelReporter()
 
+#if SPARKLE
+        updateController.checkNewApplicationVersion()
+#endif
+
         remoteMessagingClient?.startRefreshingRemoteMessages()
 
         if didCrashDuringCrashHandlersSetUp {
