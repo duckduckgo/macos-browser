@@ -77,4 +77,13 @@ final class BookmarksOutlineView: NSOutlineView {
         }
     }
 
+    func highlight(_ item: Any) {
+        let row = row(forItem: item)
+
+        guard row != -1, let cellView = view(atColumn: 0, row: row, makeIfNecessary: false) as? BookmarkOutlineCellView else {
+            return
+        }
+
+        cellView.startFlashHighlighting(duration: 2.0, interval: 0.5)
+    }
 }
