@@ -115,7 +115,7 @@ enum Preferences {
                     // Opens a new tab
                     Spacer()
                 case .about:
-                    AboutView(model: AboutModel())
+                    AboutView(model: AboutPreferences.shared)
                 }
             }
             .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
