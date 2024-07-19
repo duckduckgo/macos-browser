@@ -93,15 +93,11 @@ final class MainMenu: NSMenu {
 
     // MARK: Help
 
-    let helpMenu = NSMenu(title: UserText.mainMenuHelp) {
-        NSMenuItem(title: UserText.mainMenuHelpDuckDuckGoHelp, action: #selector(NSApplication.showHelp), keyEquivalent: "?")
-            .hidden()
-
-#if FEEDBACK
-        NSMenuItem.separator()
-        NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
-#endif
-    }
+    let helpMenu = NSMenu(title: UserText.mainMenuHelp)
+    let aboutMenuItem = NSMenuItem(title: UserText.about, action: #selector(AppDelegate.showAbout))
+    let releaseNotesMenuItem = NSMenuItem(title: UserText.releaseNotesMenuItem, action: #selector(AppDelegate.showReleaseNotes))
+    let whatIsNewMenuItem = NSMenuItem(title: UserText.whatsNewMenuItem, action: #selector(AppDelegate.showWhatIsNew))
+    let sendFeedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
 
     // MARK: - Initialization
 
@@ -378,7 +374,22 @@ final class MainMenu: NSMenu {
 
     func buildHelpMenu() -> NSMenuItem {
         NSMenuItem(title: UserText.mainMenuHelp)
-            .submenu(helpMenu)
+            .submenu(helpMenu.buildItems {
+                NSMenuItem(title: UserText.mainMenuHelpDuckDuckGoHelp, action: #selector(NSApplication.showHelp), keyEquivalent: "?")
+                    .hidden()
+
+                NSMenuItem.separator()
+
+                aboutMenuItem
+#if SPARKLE
+                releaseNotesMenuItem
+                whatIsNewMenuItem
+#endif
+
+#if FEEDBACK
+                sendFeedbackMenuItem
+#endif
+            })
     }
 
     required init(coder: NSCoder) {

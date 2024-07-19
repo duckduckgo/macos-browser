@@ -25,43 +25,108 @@ public final class PopoverMessageViewModel: ObservableObject {
     @Published var image: NSImage?
     @Published var buttonText: String?
     @Published public var buttonAction: (() -> Void)?
+    var shouldShowCloseButton: Bool
+    var shouldPresentMultiline: Bool
 
     public init(message: String,
                 image: NSImage? = nil,
                 buttonText: String? = nil,
-                buttonAction: (() -> Void)? = nil) {
+                buttonAction: (() -> Void)? = nil,
+                shouldShowCloseButton: Bool = false,
+                shouldPresentMultiline: Bool = true) {
         self.message = message
         self.image = image
         self.buttonText = buttonText
         self.buttonAction = buttonAction
+        self.shouldShowCloseButton = shouldShowCloseButton
+        self.shouldPresentMultiline = shouldPresentMultiline
     }
 }
 
 public struct PopoverMessageView: View {
     @ObservedObject public var viewModel: PopoverMessageViewModel
+    var onClick: (() -> Void)?
+    var onClose: (() -> Void)?
 
-    public init(viewModel: PopoverMessageViewModel) {
+    public init(viewModel: PopoverMessageViewModel,
+                onClick: (() -> Void)?,
+                onClose: (() -> Void)?) {
         self.viewModel = viewModel
+        self.onClick = onClick
+        self.onClose = onClose
     }
 
     public var body: some View {
-        HStack {
-            if let image = viewModel.image {
-                Image(nsImage: image)
-            }
+        ZStack {
+            ClickableViewRepresentable(onClick: onClick)
+                .background(Color.clear)
+            HStack(alignment: .top) {
+                if let image = viewModel.image {
+                    Image(nsImage: image)
+                        .padding(.top, 3)
+                }
 
-            Text(viewModel.message)
-                .font(.body)
-                .fontWeight(.bold)
-                .padding(.leading, 4)
-                .padding(.trailing, 7)
+                if viewModel.shouldPresentMultiline {
+                    Text(viewModel.message)
+                        .font(.body)
+                        .fontWeight(.bold)
+                        .padding(.leading, 2)
+                        .frame(width: 150, alignment: .leading)
+                        .frame(minHeight: 22)
+                        .lineLimit(nil)
+                } else {
+                    Text(viewModel.message)
+                        .font(.body)
+                        .fontWeight(.bold)
+                        .padding(.leading, 2)
+                        .frame(minHeight: 22)
+                        .lineLimit(nil)
+                }
 
-            if let text = viewModel.buttonText,
-               let action = viewModel.buttonAction {
-                Button(text, action: action)
+                if let text = viewModel.buttonText,
+                   let action = viewModel.buttonAction {
+                    Button(text, action: {
+                        action()
+                        onClose?()
+                    })
                     .padding(.top, 2)
+                    .padding(.leading, 4)
+                }
+
+                if viewModel.shouldShowCloseButton {
+                    Button(action: {
+                        onClose?()
+                    }) {
+                        Image(.updateNotificationClose)
+                            .frame(width: 16, height: 16)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
             }
+            .padding()
         }
-        .padding()
+    }
+}
+
+final class ClickableView: NSView {
+    var onClick: (() -> Void)?
+
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+        onClick?()
+    }
+}
+
+struct ClickableViewRepresentable: NSViewRepresentable {
+    var onClick: (() -> Void)?
+
+    func makeNSView(context: Context) -> ClickableView {
+        let view = ClickableView()
+        view.onClick = onClick
+        return view
+    }
+
+    func updateNSView(_ nsView: ClickableView, context: Context) {
+        nsView.onClick = onClick
     }
 }

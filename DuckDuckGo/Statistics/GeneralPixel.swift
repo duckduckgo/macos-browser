@@ -343,9 +343,10 @@ enum GeneralPixel: PixelKitEventV2 {
     case bitwardenSharedKeyInjectionFailed
 
     case updaterAborted
-    case userSelectedToSkipUpdate
-    case userSelectedToInstallUpdate
-    case userSelectedToDismissUpdate
+    case updaterDidFindUpdate
+    case updaterDidNotFindUpdate
+    case updaterDidDownloadUpdate
+    case updaterDidRunUpdate
 
     case faviconDecryptionFailedUnique
     case downloadListItemDecryptionFailedUnique
@@ -931,12 +932,14 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .updaterAborted:
             return "updater_aborted"
-        case .userSelectedToSkipUpdate:
-            return "user_selected_to_skip_update"
-        case .userSelectedToInstallUpdate:
-            return "user_selected_to_install_update"
-        case .userSelectedToDismissUpdate:
-            return "user_selected_to_dismiss_update"
+        case .updaterDidFindUpdate:
+            return "updater_did_find_update"
+        case .updaterDidNotFindUpdate:
+            return "updater_did_not_find_update"
+        case .updaterDidDownloadUpdate:
+            return "updater_did_download_update"
+        case .updaterDidRunUpdate:
+            return "updater_did_run_update"
 
         case .faviconDecryptionFailedUnique:
             return "favicon_decryption_failed_unique"

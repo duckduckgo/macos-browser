@@ -29,8 +29,8 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
         }
 
         switch requestURL.type {
-        case .onboarding:
-            handleOnboarding(urlSchemeTask: urlSchemeTask)
+        case .onboarding, .releaseNotes:
+            handleSpecialPages(urlSchemeTask: urlSchemeTask)
         case .duckPlayer:
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
         default:
@@ -104,23 +104,31 @@ private extension DuckURLSchemeHandler {
     }
 }
 
-// MARK: - Onboarding
+// MARK: - Onboarding & Release Notes
 private extension DuckURLSchemeHandler {
-    func handleOnboarding(urlSchemeTask: WKURLSchemeTask) {
+    func handleSpecialPages(urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = urlSchemeTask.request.url else {
             assertionFailure("No URL for Onboarding scheme handler")
             return
         }
-        guard let (response, data) = onboardingResponse(for: requestURL) else { return }
+        guard let (response, data) = response(for: requestURL) else { return }
         urlSchemeTask.didReceive(response)
         urlSchemeTask.didReceive(data)
         urlSchemeTask.didFinish()
     }
 
-    func onboardingResponse(for url: URL) -> (URLResponse, Data)? {
+    func response(for url: URL) -> (URLResponse, Data)? {
         var fileName = "index"
         var fileExtension = "html"
-        var directoryURL = URL(fileURLWithPath: "/pages/onboarding")
+        var directoryURL: URL
+        if url.isOnboarding {
+            directoryURL = URL(fileURLWithPath: "/pages/onboarding")
+        } else if url.isReleaseNotesScheme {
+            directoryURL = URL(fileURLWithPath: "/pages/release-notes")
+        } else {
+            assertionFailure("Unknown scheme")
+            return nil
+        }
         directoryURL.appendPathComponent(url.path)
 
         if !directoryURL.pathExtension.isEmpty {
@@ -163,6 +171,7 @@ extension URL {
     enum URLType {
         case onboarding
         case duckPlayer
+        case releaseNotes
     }
 
     var type: URLType? {
@@ -170,7 +179,9 @@ extension URL {
             return .duckPlayer
         } else if self.isOnboarding {
             return .onboarding
-        } else  {
+        } else if self.isReleaseNotesScheme {
+            return .releaseNotes
+        } else {
             return nil
         }
     }
@@ -182,4 +193,9 @@ extension URL {
     var isDuckURLScheme: Bool {
         navigationalScheme == .duck
     }
+
+    var isReleaseNotesScheme: Bool {
+        return isDuckURLScheme && host == "release-notes"
+    }
+
 }
