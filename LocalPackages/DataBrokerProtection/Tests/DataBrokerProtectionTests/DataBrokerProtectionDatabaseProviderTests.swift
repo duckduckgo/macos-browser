@@ -17,6 +17,7 @@
 //
 
 import XCTest
+import GRDB
 @testable import DataBrokerProtection
 
 final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
@@ -26,35 +27,38 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
     private let key = "9CA59EDC-5CE8-4F53-AAC6-286A7378F384".data(using: .utf8)!
 
     override func setUpWithError() throws {
-
         do {
             sut = try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key)
             let fileURL = Bundle.module.url(forResource: "test-vault", withExtension: "sql")!
             try sut.restoreDatabase(from: fileURL)
         } catch {
-            XCTFail("Failed to create vault and insert data")
+            XCTFail("Failed to create test-vault and insert data")
         }
     }
 
     override func tearDownWithError() throws {
         let fileManager = FileManager.default
-
-            // Check if file exists
-            if fileManager.fileExists(atPath: vaultURL.path) {
-                do {
-                    // Delete the file
-                    try fileManager.removeItem(at: vaultURL)
-                    print("File deleted successfully.")
-                } catch let error as NSError {
-                    // Handle error
-                    print("Error deleting file: \(error.localizedDescription)")
-                }
-            } else {
-                print("File does not exist at \(vaultURL.path)")
+        if fileManager.fileExists(atPath: vaultURL.path) {
+            do {
+                try fileManager.removeItem(at: vaultURL)
+            } catch {
+                XCTFail("Failed to delete test-vault")
             }
+        }
     }
 
-    func testExample() throws {
-        sut = try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations)
+    func testV3MigrationCleansUpOrphanedRecordsAndSucceeds() throws {
+        // Given
+        let failingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
+            migrator.registerMigration("v3") { database in
+                try database.checkForeignKeys()
+            }
+        }
+
+        // Then
+        XCTAssertThrowsError(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: failingMigration))
+
+        // When
+        XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
     }
 }

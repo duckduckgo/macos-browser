@@ -217,10 +217,10 @@ final class DataBrokerProtectionDatabaseMigrations {
     static func migrateV3(database: Database) throws {
         // Delete orphaned records
 
-        try database.checkForeignKeys()
+        try deleteOrphanedRecords(database: database)
 
         /*
-         TODO: Ideas - Run violation check then...
+         Ideas - Run violation check then...
 
          - Run deletion again if explicit violation check fails
          - Explicitly handle constraint violation by parsing it and taking appropriate action
@@ -258,7 +258,6 @@ final class DataBrokerProtectionDatabaseMigrations {
         deleteStatements.append(sqlOrphanedCleanupFromBrokerAndQueryAndExtracted(of: OptOutHistoryEventDB.databaseTableName))
         deleteStatements.append(sqlOrphanedCleanupFromBrokerAndQuery(of: ScanHistoryEventDB.databaseTableName))
         deleteStatements.append(sqlOrphanedCleanupFromExtracted(of: OptOutAttemptDB.databaseTableName))
-
 
         deleteStatements.append(sqlOrphanedCleanupFromProfile(of: NameDB.databaseTableName))
         deleteStatements.append(sqlOrphanedCleanupFromProfile(of: AddressDB.databaseTableName))
