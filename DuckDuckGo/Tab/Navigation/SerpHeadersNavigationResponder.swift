@@ -18,13 +18,11 @@
 
 import Navigation
 import Foundation
-import Common
 
 struct SerpHeadersNavigationResponder: NavigationResponder {
 
     static let headers = [
-        "X-DuckDuckGo-Client": "macOS",
-        "X-Version": "\(AppVersion().versionAndBuildNumber)"
+        "X-DuckDuckGo-Client": "macOS"
     ]
 
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
