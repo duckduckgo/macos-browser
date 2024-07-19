@@ -407,6 +407,8 @@ final class BookmarkListViewController: NSViewController {
             default:
                 self.sortBookmarksButton.image = .bookmarkSortAsc
             }
+
+            self.setupSort(mode: newSortMode)
         }.store(in: &cancellables)
     }
 
@@ -501,6 +503,12 @@ final class BookmarkListViewController: NSViewController {
         isSearchVisible = false
         searchBookmarksButton.backgroundColor = .clear
         searchBookmarksButton.mouseOverColor = .buttonMouseOver
+    }
+
+    private func setupSort(mode: BookmarksSortMode) {
+        hideSearchBar()
+        dataSource.reloadData(with: mode)
+        outlineView.reloadData()
     }
 
     @objc func openManagementInterface(_ sender: NSButton) {
@@ -863,22 +871,16 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
 extension BookmarkListViewController: BookmarkSortMenuItemSelectors {
 
     func manualSort(_ sender: NSMenuItem) {
+        sortBookmarksViewModel.selectedSortMode = .manual
         setupSort(mode: .manual)
     }
 
     func sortByNameAscending(_ sender: NSMenuItem) {
-        setupSort(mode: .nameAscending)
+        sortBookmarksViewModel.selectedSortMode = .nameAscending
     }
 
     func sortByNameDescending(_ sender: NSMenuItem) {
-        setupSort(mode: .nameDescending)
-    }
-
-    private func setupSort(mode: BookmarksSortMode) {
-        hideSearchBar()
-        sortBookmarksViewModel.selectedSortMode = mode
-        dataSource.reloadData(with: mode)
-        outlineView.reloadData()
+        sortBookmarksViewModel.selectedSortMode = .nameDescending
     }
 }
 
