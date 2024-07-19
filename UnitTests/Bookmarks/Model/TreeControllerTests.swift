@@ -41,14 +41,14 @@ class TreeControllerTests: XCTestCase {
     func testWhenInitializingTreeControllerWithRootNode_ThenRootNodeIsSet() {
         let dataSource = MockTreeControllerDataSource()
         let node = BookmarkNode(representedObject: TestObject(), parent: nil)
-        let treeController = BookmarkTreeController(dataSource: dataSource, rootNode: node)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual, rootNode: node)
 
         XCTAssertEqual(treeController.rootNode, node)
     }
 
     func testWhenInitializingTreeControllerWithoutRootNode_ThenGenericRootNodeIsCreated() {
         let dataSource = MockTreeControllerDataSource()
-        let treeController = BookmarkTreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual)
 
         XCTAssertTrue(treeController.rootNode.canHaveChildNodes)
     }
@@ -64,7 +64,7 @@ class TreeControllerTests: XCTestCase {
         rootNode.childNodes = [firstChildNode, secondChildNode]
 
         let dataSource = MockTreeControllerDataSource()
-        let treeController = BookmarkTreeController(dataSource: dataSource, rootNode: rootNode)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual, rootNode: rootNode)
 
         let foundNode = treeController.node(representing: desiredObject)
         XCTAssertEqual(foundNode, secondChildNode)
@@ -79,7 +79,7 @@ class TreeControllerTests: XCTestCase {
         rootNode.childNodes = [firstChildNode, secondChildNode]
 
         let dataSource = MockTreeControllerDataSource()
-        let treeController = BookmarkTreeController(dataSource: dataSource, rootNode: rootNode)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual, rootNode: rootNode)
 
         let foundNode = treeController.node(representing: TestObject())
         XCTAssertNil(foundNode)
@@ -94,7 +94,7 @@ class TreeControllerTests: XCTestCase {
         rootNode.childNodes = [firstChildNode, secondChildNode]
 
         let dataSource = MockTreeControllerDataSource()
-        let treeController = BookmarkTreeController(dataSource: dataSource, rootNode: rootNode)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual, rootNode: rootNode)
 
         var visitedNodes = Set<Int>()
 
@@ -112,7 +112,7 @@ class TreeControllerTests: XCTestCase {
         let dataSource = MockTreeControllerDataSource()
         let searchDataSource = MockTreeControllerSearchDataSource()
         searchDataSource.returnNodes = [firstNode, secondNode, thirdNode]
-        let sut = BookmarkTreeController(dataSource: dataSource, searchDataSource: searchDataSource)
+        let sut = BookmarkTreeController(dataSource: dataSource, sortMode: .manual, searchDataSource: searchDataSource)
 
         sut.rebuild(for: "some search query", sortMode: .manual)
 
