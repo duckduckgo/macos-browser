@@ -51,6 +51,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         contentMode: ContentMode,
         bookmarkManager: BookmarkManager,
         treeController: BookmarkTreeController,
+        sortMode: BookmarksSortMode,
         showMenuButtonOnHover: Bool = true,
         onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)? = nil,
         presentFaviconsFetcherOnboarding: (() -> Void)? = nil
@@ -64,17 +65,17 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
         super.init()
 
-        reloadData()
+        reloadData(with: sortMode)
     }
 
-    func reloadData(with sortMode: BookmarksSortMode = .manual) {
+    func reloadData(with sortMode: BookmarksSortMode) {
         isSearching = false
         dragDestinationFolderInSearchMode = nil
         setFolderCount()
         treeController.rebuild(for: sortMode)
     }
 
-    func reloadData(for searchQuery: String, and sortMode: BookmarksSortMode = .manual) {
+    func reloadData(for searchQuery: String, and sortMode: BookmarksSortMode) {
         isSearching = true
         setFolderCount()
         treeController.rebuild(for: searchQuery, sortMode: sortMode)

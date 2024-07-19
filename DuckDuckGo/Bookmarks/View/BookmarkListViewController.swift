@@ -96,6 +96,7 @@ final class BookmarkListViewController: NSViewController {
     private let sortBookmarksViewModel = SortBookmarksViewModel()
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource,
+                                                             sortMode: sortBookmarksViewModel.selectedSortMode,
                                                              searchDataSource: treeControllerSearchDataSource)
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
@@ -103,6 +104,7 @@ final class BookmarkListViewController: NSViewController {
             contentMode: .bookmarksAndFolders,
             bookmarkManager: bookmarkManager,
             treeController: treeController,
+            sortMode: sortBookmarksViewModel.selectedSortMode,
             onMenuRequestedAction: { [weak self] cell in
                 self?.showContextMenu(for: cell)
             },
@@ -437,13 +439,13 @@ final class BookmarkListViewController: NSViewController {
                 hideSearchBar()
                 updateSearchAndExpand(destinationFolder)
             } else {
-                dataSource.reloadData(for: searchBar.stringValue)
+                dataSource.reloadData(for: searchBar.stringValue, and: sortBookmarksViewModel.selectedSortMode)
                 outlineView.reloadData()
             }
         } else {
             let selectedNodes = self.selectedNodes
 
-            dataSource.reloadData()
+            dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode)
             outlineView.reloadData()
 
             expandAndRestore(selectedNodes: selectedNodes)
@@ -572,7 +574,7 @@ final class BookmarkListViewController: NSViewController {
     private func showTreeView() {
         emptyState.isHidden = true
         outlineView.isHidden = false
-        dataSource.reloadData()
+        dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode)
         outlineView.reloadData()
     }
 

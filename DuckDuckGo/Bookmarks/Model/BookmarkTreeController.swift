@@ -36,18 +36,20 @@ final class BookmarkTreeController {
     private weak var searchDataSource: BookmarkTreeControllerSearchDataSource?
 
     init(dataSource: BookmarkTreeControllerDataSource,
+         sortMode: BookmarksSortMode,
          searchDataSource: BookmarkTreeControllerSearchDataSource? = nil,
          rootNode: BookmarkNode) {
         self.dataSource = dataSource
         self.searchDataSource = searchDataSource
         self.rootNode = rootNode
 
-        rebuild(for: .manual) // TODO: Initalize with correct value
+        rebuild(for: sortMode)
     }
 
     convenience init(dataSource: BookmarkTreeControllerDataSource,
+                     sortMode: BookmarksSortMode,
                      searchDataSource: BookmarkTreeControllerSearchDataSource? = nil) {
-        self.init(dataSource: dataSource, searchDataSource: searchDataSource, rootNode: BookmarkNode.genericRootNode())
+        self.init(dataSource: dataSource, sortMode: sortMode, searchDataSource: searchDataSource, rootNode: BookmarkNode.genericRootNode())
     }
 
     // MARK: - Public
