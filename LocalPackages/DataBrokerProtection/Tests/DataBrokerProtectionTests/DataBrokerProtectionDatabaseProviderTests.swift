@@ -61,4 +61,34 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
         // When - Then
         XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
     }
+
+    func testDeleteAllDataSucceedsInRemovingAllData() throws {
+        XCTAssertFalse(try sut.db.allTablesAreEmpty())
+        XCTAssertNoThrow(try sut.deleteProfileData())
+        XCTAssertTrue(try sut.db.allTablesAreEmpty())
+    }
+}
+
+extension DatabaseWriter {
+
+    func allTablesAreEmpty() throws -> Bool {
+        return try self.read { db in
+            // Get the list of all tables
+            let tableNames = try String.fetchAll(db, sql: """
+                SELECT name
+                FROM sqlite_master
+                WHERE type = 'table'
+                  AND name NOT LIKE 'sqlite_%';
+            """)
+
+            // Check if all tables are empty, ignoring our migrations table
+            for tableName in tableNames where tableName != "grdb_migrations" {
+                let rowCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM \(tableName)") ?? 0
+                if rowCount > 0 {
+                    return false
+                }
+            }
+            return true
+        }
+    }
 }

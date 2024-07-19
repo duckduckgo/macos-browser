@@ -128,29 +128,6 @@ extension DataBrokerProtectionDatabaseProvider {
     }
 }
 
-extension DatabaseValue {
-    var sqlExpression: String {
-        switch storage {
-        case .null:
-            return "NULL"
-        case .int64(let int64):
-            return "\(int64)"
-        case .double(let double):
-            return "\(double)"
-        case .string(let string):
-            return "'\(string.replacingOccurrences(of: "'", with: "''"))'"
-        case .blob(let data):
-            return "X'\(data.hexEncodedString())'"
-        }
-    }
-}
-
-extension Data {
-    func hexEncodedString() -> String {
-        return map { String(format: "%02hhx", $0) }.joined()
-    }
-}
-
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
 
     public static func defaultDatabaseURL() -> URL {
@@ -234,11 +211,20 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     }
 
     func deleteProfileData() throws {
-        try db.writeWithoutTransaction { db in
-            try db.execute(sql: "PRAGMA foreign_keys = OFF;")
+        try db.write { db in
+            try OptOutHistoryEventDB
+                .deleteAll(db)
             try OptOutDB
                 .deleteAll(db)
+            try ScanHistoryEventDB
+                .deleteAll(db)
             try ScanDB
+                .deleteAll(db)
+            try OptOutAttemptDB
+                .deleteAll(db)
+            try ExtractedProfileDB
+                .deleteAll(db)
+            try ProfileQueryDB
                 .deleteAll(db)
             try NameDB
                 .deleteAll(db)
@@ -246,11 +232,10 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                 .deleteAll(db)
             try PhoneDB
                 .deleteAll(db)
-            try ProfileDB
-                .deleteAll(db)
             try BrokerDB
                 .deleteAll(db)
-            try db.execute(sql: "PRAGMA foreign_keys = ON;")
+            try ProfileDB
+                .deleteAll(db)
         }
     }
 
@@ -571,5 +556,28 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         try db.write { db in
             try optOutAttemptDB.insert(db)
         }
+    }
+}
+
+extension DatabaseValue {
+    var sqlExpression: String {
+        switch storage {
+        case .null:
+            return "NULL"
+        case .int64(let int64):
+            return "\(int64)"
+        case .double(let double):
+            return "\(double)"
+        case .string(let string):
+            return "'\(string.replacingOccurrences(of: "'", with: "''"))'"
+        case .blob(let data):
+            return "X'\(data.hexEncodedString())'"
+        }
+    }
+}
+
+extension Data {
+    func hexEncodedString() -> String {
+        return map { String(format: "%02hhx", $0) }.joined()
     }
 }
