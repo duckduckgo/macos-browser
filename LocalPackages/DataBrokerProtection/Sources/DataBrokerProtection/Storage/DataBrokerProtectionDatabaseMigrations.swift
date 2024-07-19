@@ -18,6 +18,7 @@
 
 import Foundation
 import GRDB
+import Common
 
 typealias Migrations = DataBrokerProtectionDatabaseMigrations
 
@@ -221,9 +222,7 @@ final class DataBrokerProtectionDatabaseMigrations {
 
         /*
          Ideas - Run violation check then...
-
          - Run deletion again if explicit violation check fails
-         - Explicitly handle constraint violation by parsing it and taking appropriate action
          */
     }
 
@@ -249,6 +248,7 @@ final class DataBrokerProtectionDatabaseMigrations {
 
         var deleteStatements: [String] = []
 
+        // This deletion order should ensure that no foreign key violations remain
         deleteStatements.append(sqlOrphanedCleanupFromProfile(of: ProfileQueryDB.databaseTableName))
         deleteStatements.append(sqlOrphanedCleanupFromBrokerAndQuery(of: ExtractedProfileDB.databaseTableName))
 
@@ -265,6 +265,18 @@ final class DataBrokerProtectionDatabaseMigrations {
 
         for sql in deleteStatements {
             try database.execute(sql: sql)
+        }
+
+        // As a precaution, explicitly check for any foreign key violations which were missed
+        do {
+            let recordCursor = try database.foreignKeyViolations()
+            try recordCursor.forEach { violation in
+                guard let originRowId = violation.originRowID else { return }
+                let sql = sqlDelete(from: violation.originTable, id: String(originRowId))
+                try database.execute(sql: sql, arguments: [violation.originRowID])
+            }
+        } catch {
+            os_log("Database error: error cleaning up foreign key violations, error: %{public}@", log: .error, error.localizedDescription)
         }
     }
 
@@ -317,6 +329,13 @@ final class DataBrokerProtectionDatabaseMigrations {
             SELECT 1 FROM \(ProfileDB.databaseTableName)
             WHERE \(ProfileDB.databaseTableName).id = \(table).profileId
         )
+        """
+    }
+
+    private static func sqlDelete(from table: String, id: String) -> String {
+        """
+        DELETE FROM \(table)
+        WHERE rowid = ?
         """
     }
 }

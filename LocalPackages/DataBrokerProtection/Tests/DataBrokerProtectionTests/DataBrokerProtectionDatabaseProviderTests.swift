@@ -28,6 +28,7 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
 
     override func setUpWithError() throws {
         do {
+            // Sets up a test vault and restores data (with violations) from a `test-vault.sql` file
             sut = try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key)
             let fileURL = Bundle.module.url(forResource: "test-vault", withExtension: "sql")!
             try sut.restoreDatabase(from: fileURL)
@@ -51,14 +52,13 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
         // Given
         let failingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
             migrator.registerMigration("v3") { database in
+                // This failing migration is used to ensure the database contains violations
                 try database.checkForeignKeys()
             }
         }
-
-        // Then
         XCTAssertThrowsError(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: failingMigration))
 
-        // When
+        // When - Then
         XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
     }
 }
