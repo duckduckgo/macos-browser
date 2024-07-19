@@ -3176,6 +3176,7 @@
 		37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsManager.swift; sourceTree = "<group>"; };
 		37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsViewModel.swift; sourceTree = "<group>"; };
 		37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsView.swift; sourceTree = "<group>"; };
+		37C970832C4AB06C00F8FED4 /* CustomWebKitBuild.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CustomWebKitBuild.xcconfig; sourceTree = "<group>"; };
 		37CBCA992A8966E60050218F /* SyncSettingsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSettingsAdapter.swift; sourceTree = "<group>"; };
 		37CC53EB27E8A4D10028713D /* PreferencesDataClearingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDataClearingView.swift; sourceTree = "<group>"; };
 		37CC53F327E8D4620028713D /* NSPathControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPathControlView.swift; sourceTree = "<group>"; };
@@ -5011,6 +5012,7 @@
 			children = (
 				37717E66296B5A20002FAEDF /* Global.xcconfig */,
 				378B5888295CF2A4002C0CC0 /* Common.xcconfig */,
+				37C970832C4AB06C00F8FED4 /* CustomWebKitBuild.xcconfig */,
 				378B5887295CF2A4002C0CC0 /* Version.xcconfig */,
 				376CC8B5296EBA8F006B63A7 /* BuildNumber.xcconfig */,
 				376CC8B4296EB630006B63A7 /* AppStore.xcconfig */,
@@ -12725,7 +12727,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37717E66296B5A20002FAEDF /* Global.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../WebKit/WebKitBuild/Release";
 			};
 			name = CI;
 		};
@@ -12733,7 +12734,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../WebKit/WebKitBuild/Release";
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = CI;
@@ -13041,7 +13041,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37717E66296B5A20002FAEDF /* Global.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../WebKit/WebKitBuild/Release";
 			};
 			name = Debug;
 		};
@@ -13049,7 +13048,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37717E66296B5A20002FAEDF /* Global.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../WebKit/WebKitBuild/Release";
 			};
 			name = Release;
 		};
@@ -13057,7 +13055,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../WebKit/WebKitBuild/Release";
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = Debug;
@@ -13066,7 +13063,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../WebKit/WebKitBuild/Release";
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = Release;
@@ -13089,7 +13085,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37717E66296B5A20002FAEDF /* Global.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../WebKit/WebKitBuild/Release";
 			};
 			name = Review;
 		};
@@ -13097,7 +13092,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../WebKit/WebKitBuild/Release";
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = Review;

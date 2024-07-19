@@ -15,6 +15,7 @@
 
 #include "Version.xcconfig"
 #include "BuildNumber.xcconfig"
+#include "CustomWebKitBuild.xcconfig"
 
 COMBINE_HIDPI_IMAGES = YES
 

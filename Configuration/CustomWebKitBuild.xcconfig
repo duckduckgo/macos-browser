@@ -1,0 +1,33 @@
+//
+//  CustomWebKitBuild.xcconfig
+//
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+//
+// Uncomment the definitions in this file when running the app against a custom WebKit built from source.
+//
+
+// Update this as needed with the path to the root folder of WebKit repository.
+// The current value assumes that WebKit repository is in a sibling folder to
+// macos-browser repository.
+WEBKIT_REPO_PATH=$(SRCROOT)/../WebKit
+
+// This value assumes that you've built WebKit from the command line using the following command:
+// $ GEM_HOME= GEM_PATH= ./Tools/Scripts/build-webkit --release
+WEBKIT_FRAMEWORK_SEARCH_PATH=$(WEBKIT_REPO_PATH)/WebKitBuild/Release
