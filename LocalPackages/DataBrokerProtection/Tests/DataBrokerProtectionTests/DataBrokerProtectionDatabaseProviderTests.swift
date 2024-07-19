@@ -48,7 +48,7 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
         }
     }
 
-    func testV3MigrationCleansUpOrphanedRecordsAndSucceeds() throws {
+    func testV3MigrationCleansUpOrphanedRecords() throws {
         // Given
         let failingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
             migrator.registerMigration("v3") { database in
@@ -60,6 +60,52 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
 
         // When - Then
         XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
+    }
+
+    func testV3MigrationResultsInNoDataIntegrityIssues() throws {
+        // Given
+        let failingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
+            migrator.registerMigration("v3") { database in
+                try database.checkForeignKeys()
+            }
+        }
+
+        let passingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
+            migrator.registerMigration("v4") { database in
+                try database.checkForeignKeys()
+            }
+        }
+
+        XCTAssertThrowsError(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: failingMigration))
+
+        // When - Then
+        XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
+
+        // When - Then
+        XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: passingMigration))
+    }
+
+    func testV3MigrationRecreatesTablesAsExpectedwWithCascadingDeletes() throws {
+        // Given
+        let failingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
+            migrator.registerMigration("v3") { database in
+                try database.checkForeignKeys()
+            }
+        }
+
+        let passingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
+            migrator.registerMigration("v4") { database in
+                try database.checkForeignKeys()
+            }
+        }
+
+        XCTAssertThrowsError(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: failingMigration))
+
+        // When - Then
+        XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
+
+        // When - Then
+        // TODO: Delete data here and ensure cascading deletes work as expected
     }
 
     func testDeleteAllDataSucceedsInRemovingAllData() throws {

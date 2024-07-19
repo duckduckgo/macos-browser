@@ -217,9 +217,9 @@ final class DataBrokerProtectionDatabaseMigrations {
 
     static func migrateV3(database: Database) throws {
         // Delete orphaned records
-
         try deleteOrphanedRecords(database: database)
-
+        // Recreate tables to add correct foreign key constraints
+        try recreateTablesV3(database: database)
         /*
          Ideas - Run violation check then...
          - Run deletion again if explicit violation check fails
@@ -337,5 +337,244 @@ final class DataBrokerProtectionDatabaseMigrations {
         DELETE FROM \(table)
         WHERE rowid = ?
         """
+    }
+
+    private static func recreateTablesV3(database: Database) throws {
+        try recreateNameTable(database: database)
+        try recreateAddressTable(database: database)
+        try recreatePhoneTable(database: database)
+        try recreateProfileQueryTable(database: database)
+        try recreateScanTable(database: database)
+        try recreateScanHistoryTable(database: database)
+        try recreateExtractedProfileTable(database: database)
+        try recreateOptOutTable(database: database)
+        try recreateOptOutHistoryTable(database: database)
+        try recreateOptOutAttemptTable(database: database)
+    }
+
+    private static func recreateNameTable(database: Database) throws {
+        try recreateTable(name: NameDB.databaseTableName, database: database) {
+            try database.create(table: NameDB.databaseTableName) {
+                $0.primaryKey([NameDB.Columns.first.name, NameDB.Columns.last.name, NameDB.Columns.middle.name, NameDB.Columns.profileId.name])
+                $0.foreignKey([NameDB.Columns.profileId.name],
+                              references: ProfileDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(NameDB.Columns.first.name, .text).notNull()
+                $0.column(NameDB.Columns.last.name, .text).notNull()
+                $0.column(NameDB.Columns.profileId.name, .integer).notNull()
+                $0.column(NameDB.Columns.middle.name, .text)
+                $0.column(NameDB.Columns.suffix.name, .text)
+            }
+        }
+    }
+
+    private static func recreateAddressTable(database: Database) throws {
+        try recreateTable(name: AddressDB.databaseTableName, database: database) {
+            try database.create(table: AddressDB.databaseTableName) {
+                $0.primaryKey([AddressDB.Columns.city.name, AddressDB.Columns.state.name, AddressDB.Columns.street.name, AddressDB.Columns.profileId.name])
+                $0.foreignKey([AddressDB.Columns.profileId.name],
+                              references: ProfileDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(AddressDB.Columns.city.name, .text).notNull()
+                $0.column(AddressDB.Columns.state.name, .text).notNull()
+                $0.column(AddressDB.Columns.profileId.name, .integer).notNull()
+                $0.column(AddressDB.Columns.street.name, .text)
+                $0.column(AddressDB.Columns.zipCode.name, .text)
+            }
+        }
+    }
+
+    private static func recreatePhoneTable(database: Database) throws {
+        try recreateTable(name: PhoneDB.databaseTableName, database: database) {
+            try database.create(table: PhoneDB.databaseTableName) {
+                $0.primaryKey([PhoneDB.Columns.phoneNumber.name, PhoneDB.Columns.profileId.name])
+                $0.foreignKey([PhoneDB.Columns.profileId.name], references: ProfileDB.databaseTableName)
+
+                $0.column(PhoneDB.Columns.phoneNumber.name, .text).notNull()
+                $0.column(PhoneDB.Columns.profileId.name, .integer).notNull()
+            }
+        }
+    }
+
+    private static func recreateProfileQueryTable(database: Database) throws {
+        try recreateTable(name: ProfileQueryDB.databaseTableName, database: database) {
+            try database.create(table: ProfileQueryDB.databaseTableName) {
+                $0.autoIncrementedPrimaryKey(ProfileQueryDB.Columns.id.name)
+                $0.foreignKey([ProfileQueryDB.Columns.profileId.name],
+                              references: ProfileDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(ProfileQueryDB.Columns.profileId.name, .integer).notNull()
+                $0.column(ProfileQueryDB.Columns.first.name, .text).notNull()
+                $0.column(ProfileQueryDB.Columns.last.name, .text).notNull()
+                $0.column(ProfileQueryDB.Columns.middle.name, .text)
+                $0.column(ProfileQueryDB.Columns.suffix.name, .text)
+
+                $0.column(ProfileQueryDB.Columns.city.name, .text).notNull()
+                $0.column(ProfileQueryDB.Columns.state.name, .text).notNull()
+                $0.column(ProfileQueryDB.Columns.street.name, .text)
+                $0.column(ProfileQueryDB.Columns.zipCode.name, .text)
+
+                $0.column(ProfileQueryDB.Columns.phone.name, .text)
+                $0.column(ProfileQueryDB.Columns.birthYear.name, .integer)
+
+                $0.column(ProfileQueryDB.Columns.deprecated.name, .boolean).notNull().defaults(to: false)
+            }
+        }
+    }
+
+    private static func recreateScanTable(database: Database) throws {
+        try recreateTable(name: ScanDB.databaseTableName, database: database) {
+            try database.create(table: ScanDB.databaseTableName) {
+                $0.primaryKey([ScanDB.Columns.brokerId.name, ScanDB.Columns.profileQueryId.name])
+
+                $0.foreignKey([ScanDB.Columns.brokerId.name],
+                              references: BrokerDB.databaseTableName,
+                              onDelete: .cascade)
+                $0.foreignKey([ScanDB.Columns.profileQueryId.name],
+                              references: ProfileQueryDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(ScanDB.Columns.profileQueryId.name, .integer).notNull()
+                $0.column(ScanDB.Columns.brokerId.name, .integer).notNull()
+                $0.column(ScanDB.Columns.lastRunDate.name, .datetime)
+                $0.column(ScanDB.Columns.preferredRunDate.name, .datetime)
+            }
+        }
+    }
+
+    private static func recreateScanHistoryTable(database: Database) throws {
+        try recreateTable(name: ScanHistoryEventDB.databaseTableName, database: database) {
+            try database.create(table: ScanHistoryEventDB.databaseTableName) {
+                $0.primaryKey([
+                    ScanHistoryEventDB.Columns.brokerId.name,
+                    ScanHistoryEventDB.Columns.profileQueryId.name,
+                    ScanHistoryEventDB.Columns.event.name,
+                    ScanHistoryEventDB.Columns.timestamp.name
+                ])
+
+                $0.foreignKey([ScanDB.Columns.brokerId.name],
+                              references: BrokerDB.databaseTableName,
+                              onDelete: .cascade)
+                $0.foreignKey([ScanDB.Columns.profileQueryId.name],
+                              references: ProfileQueryDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(ScanDB.Columns.profileQueryId.name, .integer).notNull()
+                $0.column(ScanDB.Columns.brokerId.name, .integer).notNull()
+                $0.column(ScanHistoryEventDB.Columns.event.name, .text).notNull()
+                $0.column(ScanHistoryEventDB.Columns.timestamp.name, .datetime).notNull()
+            }
+        }
+    }
+
+    private static func recreateExtractedProfileTable(database: Database) throws {
+        try recreateTable(name: ExtractedProfileDB.databaseTableName, database: database) {
+            try database.create(table: ExtractedProfileDB.databaseTableName) {
+                $0.autoIncrementedPrimaryKey(ExtractedProfileDB.Columns.id.name)
+
+                $0.foreignKey([ExtractedProfileDB.Columns.brokerId.name],
+                              references: BrokerDB.databaseTableName,
+                              onDelete: .cascade)
+                $0.foreignKey([ExtractedProfileDB.Columns.profileQueryId.name],
+                              references: ProfileQueryDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(ExtractedProfileDB.Columns.profileQueryId.name, .integer).notNull()
+                $0.column(ExtractedProfileDB.Columns.brokerId.name, .integer).notNull()
+                $0.column(ExtractedProfileDB.Columns.profile.name, .text).notNull()
+                $0.column(ExtractedProfileDB.Columns.removedDate.name, .datetime)
+            }
+        }
+    }
+
+    private static func recreateOptOutTable(database: Database) throws {
+        try recreateTable(name: OptOutDB.databaseTableName, database: database) {
+            try database.create(table: OptOutDB.databaseTableName) {
+                $0.primaryKey([
+                    OptOutDB.Columns.profileQueryId.name,
+                    OptOutDB.Columns.brokerId.name,
+                    OptOutDB.Columns.extractedProfileId.name
+                ])
+
+                $0.foreignKey([OptOutDB.Columns.brokerId.name],
+                              references: BrokerDB.databaseTableName,
+                              onDelete: .cascade)
+                $0.foreignKey([OptOutDB.Columns.profileQueryId.name],
+                              references: ProfileQueryDB.databaseTableName,
+                              onDelete: .cascade)
+                $0.foreignKey([OptOutDB.Columns.extractedProfileId.name],
+                              references: ExtractedProfileDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(OptOutDB.Columns.profileQueryId.name, .integer).notNull()
+                $0.column(OptOutDB.Columns.brokerId.name, .integer).notNull()
+                $0.column(OptOutDB.Columns.extractedProfileId.name, .integer).notNull()
+                $0.column(OptOutDB.Columns.lastRunDate.name, .datetime)
+                $0.column(OptOutDB.Columns.preferredRunDate.name, .datetime)
+            }
+        }
+    }
+
+    private static func recreateOptOutHistoryTable(database: Database) throws {
+        try recreateTable(name: OptOutHistoryEventDB.databaseTableName, database: database) {
+            try database.create(table: OptOutHistoryEventDB.databaseTableName) {
+                $0.primaryKey([
+                    OptOutHistoryEventDB.Columns.profileQueryId.name,
+                    OptOutHistoryEventDB.Columns.brokerId.name,
+                    OptOutHistoryEventDB.Columns.extractedProfileId.name,
+                    OptOutHistoryEventDB.Columns.event.name,
+                    OptOutHistoryEventDB.Columns.timestamp.name
+                ])
+
+                $0.foreignKey([OptOutHistoryEventDB.Columns.brokerId.name],
+                              references: BrokerDB.databaseTableName,
+                              onDelete: .cascade)
+                $0.foreignKey([OptOutHistoryEventDB.Columns.profileQueryId.name],
+                              references: ProfileQueryDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(OptOutHistoryEventDB.Columns.profileQueryId.name, .integer).notNull()
+                $0.column(OptOutHistoryEventDB.Columns.brokerId.name, .integer).notNull()
+                $0.column(OptOutHistoryEventDB.Columns.extractedProfileId.name, .integer).notNull()
+                $0.column(OptOutHistoryEventDB.Columns.event.name, .text).notNull()
+                $0.column(OptOutHistoryEventDB.Columns.timestamp.name, .datetime).notNull()
+            }
+        }
+    }
+
+    private static func recreateOptOutAttemptTable(database: Database) throws {
+        try recreateTable(name: OptOutAttemptDB.databaseTableName, database: database) {
+            try database.create(table: OptOutAttemptDB.databaseTableName) {
+                $0.primaryKey([OptOutAttemptDB.Columns.extractedProfileId.name])
+
+                $0.foreignKey([OptOutAttemptDB.Columns.extractedProfileId.name],
+                              references: ExtractedProfileDB.databaseTableName,
+                              onDelete: .cascade)
+
+                $0.column(OptOutAttemptDB.Columns.extractedProfileId.name, .integer).notNull()
+                $0.column(OptOutAttemptDB.Columns.dataBroker.name, .text).notNull()
+                $0.column(OptOutAttemptDB.Columns.attemptId.name, .text).notNull()
+                $0.column(OptOutAttemptDB.Columns.lastStageDate.name, .date).notNull()
+                $0.column(OptOutAttemptDB.Columns.startDate.name, .date).notNull()
+            }
+        }
+    }
+
+    private static func recreateTable(name: String,
+                              database: Database,
+                              creationActions: () throws -> Void) throws {
+        try database.rename(table: name,
+                            to: name + "Old")
+
+        try creationActions()
+
+        try database.execute(sql: """
+            INSERT INTO \(name) SELECT * FROM \(name + "Old")
+            """)
+
+        try database.drop(table: name + "Old")
     }
 }
