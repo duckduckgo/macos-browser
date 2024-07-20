@@ -656,6 +656,7 @@ final class MainMenu: NSMenu {
                                   isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
                                   updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
                                   currentViewController: { WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController },
+                                  openSubscriptionTab: { WindowControllersManager.shared.showTab(with: .subscription($0)) },
                                   subscriptionManager: Application.appDelegate.subscriptionManager)
 
             NSMenuItem(title: "Privacy Pro Survey") {

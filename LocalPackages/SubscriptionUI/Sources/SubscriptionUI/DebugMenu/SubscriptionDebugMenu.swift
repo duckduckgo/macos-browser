@@ -27,6 +27,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     var isInternalTestingEnabled: () -> Bool
     var updateInternalTestingFlag: (Bool) -> Void
+    var openSubscriptionTab: (URL) -> Void
 
     private var purchasePlatformItem: NSMenuItem?
 
@@ -56,6 +57,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                 isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
+                openSubscriptionTab: @escaping (URL) -> Void,
                 subscriptionManager: SubscriptionManager) {
         self.currentEnvironment = currentEnvironment
         self.updateServiceEnvironment = updateServiceEnvironment
@@ -63,6 +65,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         self.isInternalTestingEnabled = isInternalTestingEnabled
         self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
+        self.openSubscriptionTab = openSubscriptionTab
         self.subscriptionManager = subscriptionManager
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
         self.submenu = makeSubmenu()
@@ -71,6 +74,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private func makeSubmenu() -> NSMenu {
         let menu = NSMenu(title: "")
 
+        menu.addItem(NSMenuItem(title: "I Have a Subscription", action: #selector(activateSubscription), target: self))
         menu.addItem(NSMenuItem(title: "Simulate Subscription Active State (fake token)", action: #selector(simulateSubscriptionActiveState), target: self))
         menu.addItem(NSMenuItem(title: "Clear Subscription Authorization Data", action: #selector(signOut), target: self))
         menu.addItem(NSMenuItem(title: "Show account details", action: #selector(showAccountDetails), target: self))
@@ -167,6 +171,12 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     private func refreshSubmenu() {
         self.submenu = makeSubmenu()
+    }
+
+    @objc
+    func activateSubscription() {
+        let url = subscriptionManager.url(for: .activateViaEmail)
+        openSubscriptionTab(url)
     }
 
     @objc
