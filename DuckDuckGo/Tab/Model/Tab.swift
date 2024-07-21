@@ -289,7 +289,12 @@ protocol NewWindowPolicyDecisionMaker {
                 self?.onDuckDuckGoEmailSignOut(notification)
             }
 
-        self.audioState = webView.audioState
+        webView.isPlayingAudioPublisher
+            .sink { [weak self] value in
+                self?.isPlayingAudio = value ?? false
+            }
+            .store(in: &webViewCancellables)
+
         addDeallocationChecks(for: webView)
     }
 
@@ -422,6 +427,8 @@ protocol NewWindowPolicyDecisionMaker {
     // MARK: - Properties
 
     let webView: WebView
+
+    @Published var isPlayingAudio: Bool = false
 
     var contentChangeEnabled = true
 
@@ -810,11 +817,9 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
-    @Published private(set) var audioState: WKWebView.AudioState?
-
     func muteUnmuteTab() {
         webView.audioState.toggle()
-        audioState = webView.audioState
+        objectWillChange.send()
     }
 
     private enum ReloadIfNeededSource {

@@ -1253,7 +1253,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item] else { return nil }
 
-        return tab.audioState
+        return tab.webView.audioState
     }
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, replaceContentWithDroppedStringValue stringValue: String) {

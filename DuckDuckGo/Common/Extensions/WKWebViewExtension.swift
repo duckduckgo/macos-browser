@@ -20,6 +20,7 @@ import Common
 import Navigation
 import WebKit
 import os.log
+import Combine
 
 extension WKWebView {
 
@@ -31,17 +32,26 @@ extension WKWebView {
     }
 
     enum AudioState {
-        case muted
-        case unmuted
+        case muted(isPlayingAudio: Bool)
+        case unmuted(isPlayingAudio: Bool)
 
-        init(wkMediaMutedState: _WKMediaMutedState) {
-            self = wkMediaMutedState.contains(.audioMuted) ? .muted : .unmuted
+        init(wkMediaMutedState: _WKMediaMutedState, isPlayingAudio: Bool) {
+            self = wkMediaMutedState.contains(.audioMuted) ? .muted(isPlayingAudio: isPlayingAudio) : .unmuted(isPlayingAudio: isPlayingAudio)
+        }
+
+        var isMuted: Bool {
+            switch self {
+            case .muted:
+                return true
+            case .unmuted:
+                return false
+            }
         }
 
         mutating func toggle() {
             self = switch self {
-            case .muted: .unmuted
-            case .unmuted: .muted
+            case let .muted(isPlayingAudio): .unmuted(isPlayingAudio: isPlayingAudio)
+            case let .unmuted(isPlayingAudio): .muted(isPlayingAudio: isPlayingAudio)
             }
         }
     }
@@ -164,7 +174,7 @@ extension WKWebView {
     ///            `unmuted` if the web view is unmuted
     var audioState: AudioState {
         get {
-            AudioState(wkMediaMutedState: mediaMutedState)
+            AudioState(wkMediaMutedState: mediaMutedState, isPlayingAudio: isPlayingAudio ?? false)
         }
         set {
             switch newValue {
@@ -174,6 +184,15 @@ extension WKWebView {
                 self.mediaMutedState.remove(.audioMuted)
             }
         }
+    }
+
+    var isPlayingAudioPublisher: AnyPublisher<Bool?, Never> {
+        KVOListener(object: self, keyPath: "_isPlayingAudio")
+            .eraseToAnyPublisher()
+    }
+
+    private var isPlayingAudio: Bool? {
+        return self.value(forKey: "_isPlayingAudio") as? Bool
     }
 
     func stopMediaCapture() {

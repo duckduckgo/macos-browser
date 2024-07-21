@@ -58,6 +58,15 @@ protocol TabBarViewItemDelegate: AnyObject {
 
 }
 
+final class TappableImageView: NSImageView {
+    var onClick: (() -> Void)?
+
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+        onClick?() // Call the onClick closure when the image is clicked
+    }
+}
+
 final class TabBarViewItem: NSCollectionViewItem {
 
     enum Constants {
@@ -114,7 +123,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet var permissionCloseButtonTrailingConstraint: NSLayoutConstraint!
     @IBOutlet var tabLoadingPermissionLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var closeButtonTrailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var mutedTabIcon: NSImageView!
+    @IBOutlet weak var mutedTabIcon: TappableImageView!
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
     private var currentURL: URL?
@@ -275,6 +284,15 @@ final class TabBarViewItem: NSCollectionViewItem {
         }.store(in: &cancellables)
 
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
+
+        tabViewModel.tab.webView.isPlayingAudioPublisher
+            .sink { isPlaying in
+                if let isPlaying = isPlaying {
+                    self.updateAudioPlayState(isPlaying: isPlaying)
+                } else {
+                    print("Could not retrieve audio playing status")
+                }
+            }.store(in: &cancellables)
     }
 
     func clear() {
@@ -362,6 +380,11 @@ final class TabBarViewItem: NSCollectionViewItem {
             let backgroundColor: NSColor = isSelected || isDragged ? .navigationBarBackground : .clear
             view.layer?.backgroundColor = backgroundColor.cgColor
             mouseOverView.mouseOverColor = isSelected || isDragged ? .clear : .tabMouseOver
+        }
+
+        mutedTabIcon.onClick = {
+            self.delegate?.tabBarViewItemMuteUnmuteSite(self)
+            self.setupMuteOrUnmutedIcon()
         }
 
         let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
@@ -458,23 +481,22 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func setupMuteOrUnmutedIcon() {
-        setupMutedTabIconVisibility()
-        setupMutedTabIconColor()
-        setupMutedTabIconPosition()
-    }
-
-    private func setupMutedTabIconVisibility() {
-        switch delegate?.tabBarViewItemAudioState(self) {
-        case .muted:
-            mutedTabIcon.isHidden = false
-        case .unmuted, .none:
-            mutedTabIcon.isHidden = true
+        guard let audioState = delegate?.tabBarViewItemAudioState(self) else {
+            return
         }
-    }
 
-    private func setupMutedTabIconColor() {
-        mutedTabIcon.image?.isTemplate = true
-        mutedTabIcon.contentTintColor = .mutedTabIcon
+        switch audioState {
+        case .muted:
+            showMutedTabIcon()
+        case .unmuted(let isPlayingAudio):
+            if isPlayingAudio {
+                showAudioPlayingIcon()
+            } else {
+                hideAudioIcon()
+            }
+        }
+
+        setupMutedTabIconPosition()
     }
 
     private func setupMutedTabIconPosition() {
@@ -491,6 +513,44 @@ final class TabBarViewItem: NSCollectionViewItem {
                 titleTextFieldLeadingConstraint.priority = .defaultLow
             }
         }
+    }
+
+    private func updateAudioPlayState(isPlaying: Bool) {
+        // TODO: This should probably not return but update the thing anyway
+        guard let audioState = delegate?.tabBarViewItemAudioState(self) else { return }
+
+        if audioState.isMuted {
+            showMutedTabIcon()
+            setupMutedTabIconPosition()
+            return
+        }
+
+        if isPlaying {
+            showAudioPlayingIcon()
+        } else {
+            hideAudioIcon()
+        }
+
+        setupMutedTabIconPosition()
+    }
+
+    private func showMutedTabIcon() {
+        showAudioIcon(image: .audioMute)
+    }
+
+    private func showAudioPlayingIcon() {
+        showAudioIcon(image: .audio)
+    }
+
+    private func showAudioIcon(image: NSImage?, tintColor: NSColor = .mutedTabIcon) {
+        mutedTabIcon.image = image
+        mutedTabIcon.isHidden = false
+        mutedTabIcon.image?.isTemplate = true
+        mutedTabIcon.contentTintColor = tintColor
+    }
+
+    private func hideAudioIcon() {
+        self.mutedTabIcon.isHidden = true
     }
 }
 
@@ -582,7 +642,7 @@ extension TabBarViewItem: NSMenuDelegate {
     private func addMuteUnmuteMenuItem(to menu: NSMenu) {
         guard let audioState = delegate?.tabBarViewItemAudioState(self) else { return }
 
-        let menuItemTitle = audioState == .muted ? UserText.unmuteTab : UserText.muteTab
+        let menuItemTitle = audioState.isMuted ? UserText.unmuteTab : UserText.muteTab
         let muteUnmuteMenuItem = NSMenuItem(title: menuItemTitle, action: #selector(muteUnmuteSiteAction(_:)), keyEquivalent: "")
         muteUnmuteMenuItem.target = self
         menu.addItem(muteUnmuteMenuItem)

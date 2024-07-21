@@ -230,19 +230,40 @@ struct PinnedTabInnerView: View {
 
     @ViewBuilder
     var mutedTabIndicator: some View {
-        switch model.audioState {
-        case .muted:
-            ZStack {
-                Circle()
-                    .stroke(Color.gray.opacity(0.5), lineWidth: 0.5)
-                    .background(Circle().foregroundColor(.pinnedTabMuteStateCircle))
-                    .frame(width: 16, height: 16)
+        switch model.webView.audioState {
+        case .muted(let isPlayingAudio):
+            audioIndicator(isPlayingAudio: isPlayingAudio, isMuted: true)
+        case .unmuted(let isPlayingAudio):
+            if isPlayingAudio {
+                audioIndicator(isPlayingAudio: isPlayingAudio, isMuted: false)
+            } else {
+                EmptyView()
+            }
+        }
+    }
+
+    private func audioIndicator(isPlayingAudio: Bool, isMuted: Bool) -> some View {
+        ZStack {
+            Circle()
+                .stroke(Color.gray.opacity(0.5), lineWidth: 0.5)
+                .background(Circle().foregroundColor(.pinnedTabMuteStateCircle))
+                .frame(width: 16, height: 16)
+
+            if isMuted {
                 Image(.audioMute)
                     .resizable()
                     .renderingMode(.template)
                     .frame(width: 12, height: 12)
-            }.offset(x: 8, y: -8)
-        case .unmuted, .none: EmptyView()
+            } else {
+                Image(.audio)
+                    .resizable()
+                    .renderingMode(.template)
+                    .frame(width: 12, height: 12)
+            }
+        }
+        .offset(x: 8, y: -8)
+        .onTapGesture {
+            model.muteUnmuteTab()
         }
     }
 
