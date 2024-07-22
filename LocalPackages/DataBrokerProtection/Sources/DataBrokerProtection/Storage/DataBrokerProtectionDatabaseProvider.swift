@@ -75,8 +75,14 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> OptOutAttemptDB?
     func save(_ optOutAttemptDB: OptOutAttemptDB) throws
 
-    // Test Helper Methods
+    // MARK: Debug & Test Helper Methods
+
+    /// Dumps the database contents to a  file specified by the provided URL
+    /// - Parameter url: URL of file to write to
     func dumpDatabase(to url: URL) throws
+
+    /// Restores a database from a file
+    /// - Parameter url: URL of the source file
     func restoreDatabase(from url: URL) throws
  }
 
@@ -560,6 +566,14 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 }
 
 extension DatabaseValue {
+
+    /// Returns the SQL representation of the `DatabaseValue`.
+    ///
+    /// This property converts the database value to a string that can be used in an SQL statement.
+    /// The conversion handles different storage types, ensuring that the value is properly formatted
+    /// and escaped for SQL.
+    ///
+    /// - Returns: A `String` representing the SQL expression of the `DatabaseValue`.
     var sqlExpression: String {
         switch storage {
         case .null:
@@ -577,6 +591,12 @@ extension DatabaseValue {
 }
 
 extension Data {
+
+    /// Converts `Data` to a hexadecimal string representation.
+    ///
+    /// This extension is used to format data so it can be inserted into SQL statements.
+    ///
+    /// - Returns: A `String` representing the hexadecimal encoding of the data.
     func hexEncodedString() -> String {
         return map { String(format: "%02hhx", $0) }.joined()
     }

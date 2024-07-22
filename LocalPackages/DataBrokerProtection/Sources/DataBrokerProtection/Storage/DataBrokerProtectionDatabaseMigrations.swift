@@ -220,10 +220,14 @@ final class DataBrokerProtectionDatabaseMigrations {
         try deleteOrphanedRecords(database: database)
         // Recreate tables to add correct foreign key constraints
         try recreateTablesV3(database: database)
-        /*
-         Ideas - Run violation check then...
-         - Run deletion again if explicit violation check fails
-         */
+
+        // As a precaution, re-run orphan deletion if necessary
+        do {
+            // Throws an error if a foreign key violation exists in the database.
+            try database.checkForeignKeys()
+        } catch {
+            try deleteOrphanedRecords(database: database)
+        }
     }
 
     private static func deleteOrphanedRecords(database: Database) throws {

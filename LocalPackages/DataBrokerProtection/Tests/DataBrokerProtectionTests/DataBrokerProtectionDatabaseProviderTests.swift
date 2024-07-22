@@ -48,21 +48,7 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
         }
     }
 
-    func testV3MigrationCleansUpOrphanedRecords() throws {
-        // Given
-        let failingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
-            migrator.registerMigration("v3") { database in
-                // This failing migration is used to ensure the database contains violations
-                try database.checkForeignKeys()
-            }
-        }
-        XCTAssertThrowsError(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: failingMigration))
-
-        // When - Then
-        XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
-    }
-
-    func testV3MigrationResultsInNoDataIntegrityIssues() throws {
+    func testV3MigrationCleansUpOrphanedRecords_andResultsInNoDataIntegrityIssues() throws {
         // Given
         let failingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
             migrator.registerMigration("v3") { database in
@@ -78,40 +64,61 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
 
         XCTAssertThrowsError(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: failingMigration))
 
-        // When - Then
+        // When
         XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
 
-        // When - Then
+        // Then
         XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: passingMigration))
     }
 
-    func testV3MigrationRecreatesTablesAsExpectedwWithCascadingDeletes() throws {
+    func testV3MigrationRecreatesTablesWithCascadingDeletes_andDeletingProfileQueryDeletesDependentRecords() throws {
         // Given
-        let failingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
-            migrator.registerMigration("v3") { database in
-                try database.checkForeignKeys()
-            }
-        }
-
-        let passingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
-            migrator.registerMigration("v4") { database in
-                try database.checkForeignKeys()
-            }
-        }
-
-        XCTAssertThrowsError(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: failingMigration))
-
-        // When - Then
         XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
+        XCTAssertEqual(try sut.fetchAllScans().filter { $0.profileQueryId == 43 }.count, 50)
+        let allBrokerIds = try sut.fetchAllBrokers().map { $0.id! }
+        var allExtractedProfiles = try allBrokerIds.flatMap { try sut.fetchExtractedProfiles(for: $0, with:43) }
+        let extractedProfileId = allExtractedProfiles.first!.id
+        var optOutAttempt = try sut.fetchAttemptInformation(for: extractedProfileId!)
+        var allOptOuts = try allBrokerIds.flatMap { try sut.fetchOptOuts(brokerId: $0, profileQueryId:43) }
+        var allScanHistoryEvents = try allBrokerIds.flatMap { try sut.fetchScanEvents(brokerId: $0, profileQueryId:43) }
+        var allOptOutHistoryEvents = try allBrokerIds.flatMap { try sut.fetchOptOutEvents(brokerId: $0, profileQueryId:43) }
+        XCTAssertNotNil(optOutAttempt)
+        XCTAssertEqual(allExtractedProfiles.count, 1)
+        XCTAssertEqual(allOptOuts.count, 1)
+        XCTAssertEqual(allScanHistoryEvents.count, 656)
+        XCTAssertEqual(allOptOutHistoryEvents.count, 4)
+        let profileQuery = try sut.fetchProfileQuery(with: 43)!
 
-        // When - Then
-        // TODO: Delete data here and ensure cascading deletes work as expected
+        // When
+        try sut.delete(profileQuery)
+
+        // Then
+        XCTAssertEqual(try sut.fetchAllScans().filter { $0.profileQueryId == 43 }.count, 0)
+        allExtractedProfiles = try allBrokerIds.flatMap { try sut.fetchExtractedProfiles(for: $0, with:43) }
+        optOutAttempt = try sut.fetchAttemptInformation(for: extractedProfileId!)
+        allOptOuts = try allBrokerIds.flatMap { try sut.fetchOptOuts(brokerId: $0, profileQueryId:43) }
+        allScanHistoryEvents = try allBrokerIds.flatMap { try sut.fetchScanEvents(brokerId: $0, profileQueryId:43) }
+        allOptOutHistoryEvents = try allBrokerIds.flatMap { try sut.fetchOptOutEvents(brokerId: $0, profileQueryId:43) }
+        XCTAssertNil(optOutAttempt)
+        XCTAssertEqual(allExtractedProfiles.count, 0)
+        XCTAssertEqual(allOptOuts.count, 0)
+        XCTAssertEqual(allScanHistoryEvents.count, 0)
+        XCTAssertEqual(allOptOutHistoryEvents.count, 0)
     }
 
     func testDeleteAllDataSucceedsInRemovingAllData() throws {
         XCTAssertFalse(try sut.db.allTablesAreEmpty())
         XCTAssertNoThrow(try sut.deleteProfileData())
         XCTAssertTrue(try sut.db.allTablesAreEmpty())
+    }
+}
+
+extension DataBrokerProtectionDatabaseProvider {
+    func fetchAllProfiles() throws -> [ProfileDB] {
+        return try db.read { db in
+            let profiles = try ProfileDB.fetchAll(db, sql: "SELECT * FROM profile")
+            return profiles
+        }
     }
 }
 
