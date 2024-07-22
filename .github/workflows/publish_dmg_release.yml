@@ -30,19 +30,55 @@ on:
         required: false
         type: string
     secrets:
+      APPLE_API_KEY_BASE64:
+        required: false
+      APPLE_API_KEY_ID:
+        required: false
+      APPLE_API_KEY_ISSUER:
+        required: false
       ASANA_ACCESS_TOKEN:
         required: true
       AWS_ACCESS_KEY_ID_RELEASE_S3:
         required: true
       AWS_SECRET_ACCESS_KEY_RELEASE_S3:
         required: true
+      BUILD_CERTIFICATE_BASE64:
+        required: false
+      DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
+        required: false
+      DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
+        required: false
       GHA_ELEVATED_PERMISSIONS_TOKEN:
         required: true
-      SPARKLE_PRIVATE_KEY:
-        required: true
+      KEYCHAIN_PASSWORD:
+        required: false
+      MM_HANDLES_BASE64:
+        required: false
+      MM_WEBHOOK_URL:
+        required: false
+      NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2:
+        required: false
+      NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64_V2:
+        required: false
+      NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64:
+        required: false
+      NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64:
+        required: false
+      NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2:
+        required: false
+      NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2:
+        required: false
+      P12_PASSWORD:
+        required: false
+      RELEASE_PROVISION_PROFILE_BASE64:
+        required: false
       RELEASE_BUCKET_NAME:
         required: true
       RELEASE_BUCKET_PREFIX:
+        required: true
+      REVIEW_PROVISION_PROFILE_BASE64:
+        required: false
+      SPARKLE_PRIVATE_KEY:
         required: true
 
 jobs:

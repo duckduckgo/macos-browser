@@ -26,8 +26,6 @@ on:
         required: true
       APPLE_API_KEY_ISSUER:
         required: true
-      ASANA_ACCESS_TOKEN:
-        required: true
       AWS_ACCESS_KEY_ID_RELEASE_S3:
         required: true
       AWS_SECRET_ACCESS_KEY_RELEASE_S3:
@@ -43,10 +41,6 @@ on:
       RELEASE_BUCKET_PREFIX:
         required: true
       KEYCHAIN_PASSWORD:
-        required: true
-      MM_HANDLES_BASE64:
-        required: true
-      MM_WEBHOOK_URL:
         required: true
       NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2:
         required: true

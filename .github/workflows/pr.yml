@@ -13,6 +13,32 @@ on:
     secrets:
       ASANA_ACCESS_TOKEN:
         required: true
+      BUILD_CERTIFICATE_BASE64:
+        required: false
+      DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
+        required: false
+      DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
+        required: false
+      KEYCHAIN_PASSWORD:
+        required: false
+      NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2:
+        required: false
+      NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64_V2:
+        required: false
+      NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64:
+        required: false
+      NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64:
+        required: false
+      NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2:
+        required: false
+      NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2:
+        required: false
+      P12_PASSWORD:
+        required: false
+      RELEASE_PROVISION_PROFILE_BASE64:
+        required: false
+      REVIEW_PROVISION_PROFILE_BASE64:
+        required: false
 
 jobs:
   swiftlint:
