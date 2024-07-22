@@ -38,19 +38,19 @@ struct BookmarksMetrics: BookmarksMetricsProtocol {
     func fireSortButtonClicked(origin: BookmarkOperationOrigin) {
         pixelKit?.fire(GeneralPixel.bookmarksSortButtonClicked(origin: origin.rawValue))
     }
-    
+
     func fireSortButtonDismissed(origin: BookmarkOperationOrigin) {
         pixelKit?.fire(GeneralPixel.bookmarksSortButtonDismissed(origin: origin.rawValue))
     }
-    
+
     func fireSortByName(origin: BookmarkOperationOrigin) {
         pixelKit?.fire(GeneralPixel.bookmarksSortByName(origin: origin.rawValue))
     }
-    
+
     func fireSearchExecuted(origin: BookmarkOperationOrigin) {
-        pixelKit?.fire(GeneralPixel.bookmarksSearchExecuted(origin: origin.rawValue))
+        pixelKit?.fire(GeneralPixel.bookmarksSearchExecuted(origin: origin.rawValue), frequency: .daily)
     }
-    
+
     func fireSearchResultClicked(origin: BookmarkOperationOrigin) {
         pixelKit?.fire(GeneralPixel.bookmarksSearchResultClicked(origin: origin.rawValue))
     }
