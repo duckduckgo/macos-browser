@@ -876,7 +876,6 @@ extension BookmarkListViewController: BookmarkSortMenuItemSelectors {
 
     func manualSort(_ sender: NSMenuItem) {
         sortBookmarksViewModel.selectedSortMode = .manual
-        setupSort(mode: .manual)
     }
 
     func sortByNameAscending(_ sender: NSMenuItem) {
