@@ -75,8 +75,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         let menu = NSMenu(title: "")
 
         menu.addItem(NSMenuItem(title: "I Have a Subscription", action: #selector(activateSubscription), target: self))
-        menu.addItem(NSMenuItem(title: "Simulate Subscription Active State (fake token)", action: #selector(simulateSubscriptionActiveState), target: self))
-        menu.addItem(NSMenuItem(title: "Clear Subscription Authorization Data", action: #selector(signOut), target: self))
+        menu.addItem(NSMenuItem(title: "Remove Subscription From This Device", action: #selector(signOut), target: self))
         menu.addItem(NSMenuItem(title: "Show account details", action: #selector(showAccountDetails), target: self))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Validate Token", action: #selector(validateToken), target: self))
@@ -177,11 +176,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func activateSubscription() {
         let url = subscriptionManager.url(for: .activateViaEmail)
         openSubscriptionTab(url)
-    }
-
-    @objc
-    func simulateSubscriptionActiveState() {
-        accountManager.storeAccount(token: "fake-token", email: "fake@email.com", externalID: "123")
     }
 
     @objc
