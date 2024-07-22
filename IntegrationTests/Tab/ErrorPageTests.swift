@@ -897,13 +897,7 @@ class ErrorPageTests: XCTestCase {
 
         // navigate to alt url, redirect to test url, fail with error
         schemeHandler.middleware = [{ request in
-            .init { task in
-                let response = URLResponse(url: request.url!, mimeType: nil, expectedContentLength: 0, textEncodingName: nil)
-                let newRequest = URLRequest(url: .test)
-                task._didPerformRedirection(response, newRequest: newRequest)
-
-                task.didFailWithError(NSError.hostNotFound)
-            }
+            .redirect(to: .test, with: NSError.hostNotFound)
         }]
         tab.setContent(.url(.test, source: .userEntered(URL.alternative.absoluteString)))
 

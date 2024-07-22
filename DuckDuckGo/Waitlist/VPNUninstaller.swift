@@ -297,7 +297,7 @@ final class VPNUninstaller: VPNUninstalling {
         pinningManager.unpin(.networkProtection)
     }
 
-    private func removeVPNConfiguration() async throws {
+    func removeVPNConfiguration() async throws {
         // Remove the agent VPN configuration
         do {
             try await ipcClient.uninstall(.configuration)
