@@ -389,7 +389,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setUpAutofillPixelReporter()
 
 #if SPARKLE
-        updateController.checkNewApplicationVersion()
+        if NSApp.runType != .uiTests {
+            updateController.checkNewApplicationVersion()
+        }
 #endif
 
         remoteMessagingClient?.startRefreshingRemoteMessages()

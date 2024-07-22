@@ -259,11 +259,14 @@ final class MoreOptionsMenu: NSMenu {
 
     private func addUpdateItem() {
 #if SPARKLE
-        if let update = Application.appDelegate.updateController.latestUpdate,
-           !update.isInstalled {
-            addItem(UpdateMenuItemFactory.menuItem(for: update))
-            addItem(NSMenuItem.separator())
+        guard NSApp.runType != .uiTests,
+            let update = Application.appDelegate.updateController.latestUpdate,
+            !update.isInstalled
+        else {
+            return
         }
+        addItem(UpdateMenuItemFactory.menuItem(for: update))
+        addItem(NSMenuItem.separator())
 #endif
     }
 
