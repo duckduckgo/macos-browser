@@ -104,7 +104,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         VPNControllerXPCClient.shared
     }
 
-    // MARK: - DBP
+    // MARK: - DBPd
 
 #if DBP
     private lazy var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler = {
