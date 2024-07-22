@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "graeme/passwords-tooltip-logic-bug",
-        "revision" : "164d487b026d108eb211d3a1a815f5684d842f6b"
+        "revision" : "a088eb3ca863f9ed8a6f67c5cbe9664a628a0506"
       }
     },
     {
