@@ -36,6 +36,7 @@ let MockSecureVaultFactory = SecureVaultFactory<MockSecureVault>(
 )
 
 final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
+
     enum MockError: Error {
         case noStubSet
     }
@@ -93,6 +94,10 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
     func websiteCredentialsFor(domain: String) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteCredentials] {
         return storedCredentialsForDomain[domain] ?? []
+    }
+
+    func websiteCredentialsWithPartialMatchesFor(eTLDplus1: String) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteCredentials] {
+        return storedCredentialsForDomain[eTLDplus1] ?? []
     }
 
     func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) throws -> Int64 {
@@ -337,6 +342,10 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
     }
 
     func websiteCredentialsForDomain(_ domain: String) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteCredentials] {
+        return _credentialsForDomain[domain] ?? []
+    }
+
+    func websiteCredentialsForTopLevelDomain(_ domain: String) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteCredentials] {
         return _credentialsForDomain[domain] ?? []
     }
 
