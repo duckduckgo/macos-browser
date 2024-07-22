@@ -327,6 +327,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         for buttonName in buttonNames {
             alert.addButton(withTitle: buttonName)
         }
+        alert.accessoryView = NSView(frame: NSRect(x: 0, y: 0, width: 300, height: 0))
         return alert
     }
 }
