@@ -20,23 +20,33 @@ on:
         required: false
         type: string
     secrets:
+      APPLE_API_KEY_BASE64:
+        required: true
+      APPLE_API_KEY_ID:
+        required: true
+      APPLE_API_KEY_ISSUER:
+        required: true
+      ASANA_ACCESS_TOKEN:
+        required: true
+      AWS_ACCESS_KEY_ID_RELEASE_S3:
+        required: true
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3:
+        required: true
       BUILD_CERTIFICATE_BASE64:
-        required: true
-      P12_PASSWORD:
-        required: true
-      KEYCHAIN_PASSWORD:
-        required: true
-      REVIEW_PROVISION_PROFILE_BASE64:
-        required: true
-      RELEASE_PROVISION_PROFILE_BASE64:
         required: true
       DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
         required: true
       DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
         required: true
-      NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2:
+      RELEASE_BUCKET_NAME:
         required: true
-      NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2:
+      RELEASE_BUCKET_PREFIX:
+        required: true
+      KEYCHAIN_PASSWORD:
+        required: true
+      MM_HANDLES_BASE64:
+        required: true
+      MM_WEBHOOK_URL:
         required: true
       NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2:
         required: true
@@ -46,22 +56,17 @@ on:
         required: true
       NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64:
         required: true
-      APPLE_API_KEY_BASE64:
+      NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2:
         required: true
-      APPLE_API_KEY_ID:
+      NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2:
         required: true
-      APPLE_API_KEY_ISSUER:
+      P12_PASSWORD:
         required: true
-      ASANA_ACCESS_TOKEN:
+      RELEASE_PROVISION_PROFILE_BASE64:
         required: true
-      MM_HANDLES_BASE64:
+      REVIEW_PROVISION_PROFILE_BASE64:
         required: true
-      MM_WEBHOOK_URL:
-        required: true
-      AWS_ACCESS_KEY_ID_RELEASE_S3:
-        required: true
-      AWS_SECRET_ACCESS_KEY_RELEASE_S3:
-        required: true
+
 
 jobs:
 
@@ -211,5 +216,5 @@ jobs:
         AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
       run: |
         aws s3 cp duckduckgo.dmg \
-          s3://${{ vars.RELEASE_BUCKET_NAME }}/${{ vars.RELEASE_BUCKET_PREFIX }}/${{ steps.set-variant-name.outputs.variant-name }}/duckduckgo.dmg \
+          s3://${{ secrets.RELEASE_BUCKET_NAME }}/${{ secrets.RELEASE_BUCKET_PREFIX }}/${{ steps.set-variant-name.outputs.variant-name }}/duckduckgo.dmg \
           --acl public-read

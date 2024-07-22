@@ -40,6 +40,10 @@ on:
         required: true
       SPARKLE_PRIVATE_KEY:
         required: true
+      RELEASE_BUCKET_NAME:
+        required: true
+      RELEASE_BUCKET_PREFIX:
+        required: true
 
 jobs:
 
@@ -279,8 +283,8 @@ jobs:
           echo "APPCAST_PATCH_NAME=${{ steps.appcast.outputs.appcast-patch-name }}" >> $GITHUB_ENV
           echo "DMG_NAME=${DMG_NAME}" >> $GITHUB_ENV
           echo "DMG_URL=${{ vars.DMG_URL_ROOT }}${DMG_NAME}" >> $GITHUB_ENV
-          echo "RELEASE_BUCKET_NAME=${{ vars.RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
-          echo "RELEASE_BUCKET_PREFIX=${{ vars.RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
+          echo "RELEASE_BUCKET_NAME=${{ secrets.RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
+          echo "RELEASE_BUCKET_PREFIX=${{ secrets.RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
           echo "RELEASE_TASK_ID=${{ steps.task-id.outputs.task-id }}" >> $GITHUB_ENV
           echo "TASKS_SINCE_LAST_INTERNAL_RELEASE=${{ steps.get-tasks-since-last-internal-release.outputs.tasks }}" >> $GITHUB_ENV
           echo "VERSION=${{ steps.verify-tag.outputs.release-version }}" >> $GITHUB_ENV
