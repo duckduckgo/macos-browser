@@ -62,6 +62,9 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
     }
 
     public func onUpdate() {
+        guard NSApp.runType != .uiTests else {
+            return
+        }
         guard let webView = webView else {
             return assertionFailure("Could not access webView")
         }

@@ -223,7 +223,6 @@ public struct UserDefaultsWrapper<T> {
 
         // Subscription
 
-        case subscriptionInternalTesting = "subscription.internal-testing-enabled"
         case subscriptionEnvironment = "subscription.environment"
     }
 
