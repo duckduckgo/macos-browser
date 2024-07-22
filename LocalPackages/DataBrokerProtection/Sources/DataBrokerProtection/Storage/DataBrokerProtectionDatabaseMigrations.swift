@@ -568,8 +568,8 @@ final class DataBrokerProtectionDatabaseMigrations {
     }
 
     private static func recreateTable(name: String,
-                              database: Database,
-                              creationActions: () throws -> Void) throws {
+                                      database: Database,
+                                      creationActions: () throws -> Void) throws {
         try database.rename(table: name,
                             to: name + "Old")
 

@@ -76,12 +76,12 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
         XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
         XCTAssertEqual(try sut.fetchAllScans().filter { $0.profileQueryId == 43 }.count, 50)
         let allBrokerIds = try sut.fetchAllBrokers().map { $0.id! }
-        var allExtractedProfiles = try allBrokerIds.flatMap { try sut.fetchExtractedProfiles(for: $0, with:43) }
+        var allExtractedProfiles = try allBrokerIds.flatMap { try sut.fetchExtractedProfiles(for: $0, with: 43) }
         let extractedProfileId = allExtractedProfiles.first!.id
         var optOutAttempt = try sut.fetchAttemptInformation(for: extractedProfileId!)
-        var allOptOuts = try allBrokerIds.flatMap { try sut.fetchOptOuts(brokerId: $0, profileQueryId:43) }
-        var allScanHistoryEvents = try allBrokerIds.flatMap { try sut.fetchScanEvents(brokerId: $0, profileQueryId:43) }
-        var allOptOutHistoryEvents = try allBrokerIds.flatMap { try sut.fetchOptOutEvents(brokerId: $0, profileQueryId:43) }
+        var allOptOuts = try allBrokerIds.flatMap { try sut.fetchOptOuts(brokerId: $0, profileQueryId: 43) }
+        var allScanHistoryEvents = try allBrokerIds.flatMap { try sut.fetchScanEvents(brokerId: $0, profileQueryId: 43) }
+        var allOptOutHistoryEvents = try allBrokerIds.flatMap { try sut.fetchOptOutEvents(brokerId: $0, profileQueryId: 43) }
         XCTAssertNotNil(optOutAttempt)
         XCTAssertEqual(allExtractedProfiles.count, 1)
         XCTAssertEqual(allOptOuts.count, 1)
@@ -94,16 +94,77 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
 
         // Then
         XCTAssertEqual(try sut.fetchAllScans().filter { $0.profileQueryId == 43 }.count, 0)
-        allExtractedProfiles = try allBrokerIds.flatMap { try sut.fetchExtractedProfiles(for: $0, with:43) }
+        allExtractedProfiles = try allBrokerIds.flatMap { try sut.fetchExtractedProfiles(for: $0, with: 43) }
         optOutAttempt = try sut.fetchAttemptInformation(for: extractedProfileId!)
-        allOptOuts = try allBrokerIds.flatMap { try sut.fetchOptOuts(brokerId: $0, profileQueryId:43) }
-        allScanHistoryEvents = try allBrokerIds.flatMap { try sut.fetchScanEvents(brokerId: $0, profileQueryId:43) }
-        allOptOutHistoryEvents = try allBrokerIds.flatMap { try sut.fetchOptOutEvents(brokerId: $0, profileQueryId:43) }
+        allOptOuts = try allBrokerIds.flatMap { try sut.fetchOptOuts(brokerId: $0, profileQueryId: 43) }
+        allScanHistoryEvents = try allBrokerIds.flatMap { try sut.fetchScanEvents(brokerId: $0, profileQueryId: 43) }
+        allOptOutHistoryEvents = try allBrokerIds.flatMap { try sut.fetchOptOutEvents(brokerId: $0, profileQueryId: 43) }
         XCTAssertNil(optOutAttempt)
         XCTAssertEqual(allExtractedProfiles.count, 0)
         XCTAssertEqual(allOptOuts.count, 0)
         XCTAssertEqual(allScanHistoryEvents.count, 0)
         XCTAssertEqual(allOptOutHistoryEvents.count, 0)
+    }
+
+    func testV3MigrationOfDatabaseWithLotsOfIntegrityIssues() throws {
+        // Given
+        do {
+            try sut.db.writeWithoutTransaction { db in
+                try db.execute(sql: "PRAGMA foreign_keys = OFF")
+            }
+
+            let profileQueries = ProfileQueryDB.random(withProfileIds: Int64.randomValues())
+            for query in profileQueries {
+                _ = try sut.save(query)
+            }
+
+            for broker in BrokerDB.random(count: 10) {
+                _ = try sut.save(broker)
+            }
+
+            let brokerIds = Int64.randomValues()
+            let profileQueryIds = Int64.randomValues()
+            let extractedProfileIds = Int64.randomValues()
+
+            for scanHistoryEvent in ScanHistoryEventDB.random(withBrokerIds: brokerIds, profileQueryIds: profileQueryIds) {
+                _ = try sut.save(scanHistoryEvent)
+            }
+
+            for optOutHistoryEvent in OptOutHistoryEventDB.random(withBrokerIds: brokerIds, profileQueryIds: profileQueryIds, extractedProfileIds: extractedProfileIds) {
+                _ = try sut.save(optOutHistoryEvent)
+            }
+
+            for extractedProfile in ExtractedProfileDB.random(withBrokerIds: brokerIds, profileQueryIds: profileQueryIds) {
+                _ = try sut.save(extractedProfile)
+            }
+
+            try sut.db.writeWithoutTransaction { db in
+                try db.execute(sql: "PRAGMA foreign_keys = ON")
+            }
+
+        } catch {
+            XCTFail("Failed to setup invalid data")
+        }
+
+        let failingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
+            migrator.registerMigration("v3") { database in
+                try database.checkForeignKeys()
+            }
+        }
+
+        let passingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
+            migrator.registerMigration("v4") { database in
+                try database.checkForeignKeys()
+            }
+        }
+
+        XCTAssertThrowsError(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: failingMigration))
+
+        // When
+        XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
+
+        // Then
+        XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: passingMigration))
     }
 
     func testDeleteAllDataSucceedsInRemovingAllData() throws {
@@ -113,16 +174,7 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
     }
 }
 
-extension DataBrokerProtectionDatabaseProvider {
-    func fetchAllProfiles() throws -> [ProfileDB] {
-        return try db.read { db in
-            let profiles = try ProfileDB.fetchAll(db, sql: "SELECT * FROM profile")
-            return profiles
-        }
-    }
-}
-
-extension DatabaseWriter {
+private extension DatabaseWriter {
 
     func allTablesAreEmpty() throws -> Bool {
         return try self.read { db in
