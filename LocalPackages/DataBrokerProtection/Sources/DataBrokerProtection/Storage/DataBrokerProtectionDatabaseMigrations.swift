@@ -228,6 +228,15 @@ final class DataBrokerProtectionDatabaseMigrations {
         } catch {
             try deleteOrphanedRecords(database: database)
         }
+
+        // Finally, if there are still integrity issues, throw a specific error
+        // As a precaution, re-run orphan deletion if necessary
+        do {
+            // Throws an error if a foreign key violation exists in the database.
+            try database.checkForeignKeys()
+        } catch {
+            throw DataBrokerProtectionDatabaseErrors.migrationFailureIntegrityCheck
+        }
     }
 
     private static func deleteOrphanedRecords(database: Database) throws {

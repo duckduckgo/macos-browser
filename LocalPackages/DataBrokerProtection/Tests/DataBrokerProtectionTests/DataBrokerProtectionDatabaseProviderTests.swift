@@ -29,7 +29,7 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
     override func setUpWithError() throws {
         do {
             // Sets up a test vault and restores data (with violations) from a `test-vault.sql` file
-            sut = try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key)
+            sut = try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v2Migrations)
             let fileURL = Bundle.module.url(forResource: "test-vault", withExtension: "sql")!
             try sut.restoreDatabase(from: fileURL)
         } catch {

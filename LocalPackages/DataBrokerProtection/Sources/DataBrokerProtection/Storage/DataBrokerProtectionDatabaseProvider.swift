@@ -23,6 +23,7 @@ import GRDB
 
 enum DataBrokerProtectionDatabaseErrors: Error {
     case elementNotFound
+    case migrationFailureIntegrityCheck
 }
 
 protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
@@ -142,7 +143,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
                 key: Data,
-                registerMigrationsHandler: (inout DatabaseMigrator) throws -> Void = Migrations.v2Migrations) throws {
+                registerMigrationsHandler: (inout DatabaseMigrator) throws -> Void = Migrations.v3Migrations) throws {
         try super.init(file: file, key: key, writerType: .pool, registerMigrationsHandler: registerMigrationsHandler)
     }
 
