@@ -69,17 +69,16 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
         menu.addItem(NSMenuItem(title: "I Have a Subscription", action: #selector(activateSubscription), target: self))
         menu.addItem(NSMenuItem(title: "Remove Subscription From This Device", action: #selector(signOut), target: self))
-        menu.addItem(NSMenuItem(title: "Show account details", action: #selector(showAccountDetails), target: self))
+        menu.addItem(NSMenuItem(title: "Show Account Details", action: #selector(showAccountDetails), target: self))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Validate Token", action: #selector(validateToken), target: self))
         menu.addItem(NSMenuItem(title: "Check Entitlements", action: #selector(checkEntitlements), target: self))
-        menu.addItem(NSMenuItem(title: "Get Subscription Info", action: #selector(getSubscriptionDetails), target: self))
-        menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
-        menu.addItem(NSMenuItem(title: "Post didSignIn notification", action: #selector(postDidSignInNotification), target: self))
-        menu.addItem(NSMenuItem(title: "Post subscriptionDidChange notification", action: #selector(postSubscriptionDidChangeNotification), target: self))
-        menu.addItem(.separator())
+        menu.addItem(NSMenuItem(title: "Get Subscription Details", action: #selector(getSubscriptionDetails), target: self))
+
         if #available(macOS 12.0, *) {
+            menu.addItem(.separator())
             menu.addItem(NSMenuItem(title: "Sync App Store AppleID Account (re- sign-in)", action: #selector(syncAppleIDAccount), target: self))
+            menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
             menu.addItem(NSMenuItem(title: "Purchase Subscription from App Store", action: #selector(showPurchaseView), target: self))
         }
 
@@ -297,16 +296,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     }
 
     // MARK: -
-
-    @objc
-    func postDidSignInNotification(_ sender: Any?) {
-        NotificationCenter.default.post(name: .accountDidSignIn, object: self, userInfo: nil)
-    }
-
-    @objc
-    func postSubscriptionDidChangeNotification(_ sender: Any?) {
-        NotificationCenter.default.post(name: .subscriptionDidChange, object: self, userInfo: nil)
-    }
 
     @objc
     func restorePurchases(_ sender: Any?) {
