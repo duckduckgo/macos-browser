@@ -24,9 +24,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     var currentEnvironment: SubscriptionEnvironment
     var updateServiceEnvironment: (SubscriptionEnvironment.ServiceEnvironment) -> Void
     var updatePurchasingPlatform: (SubscriptionEnvironment.PurchasePlatform) -> Void
-
-    var isInternalTestingEnabled: () -> Bool
-    var updateInternalTestingFlag: (Bool) -> Void
     var openSubscriptionTab: (URL) -> Void
 
     private var purchasePlatformItem: NSMenuItem?
@@ -54,16 +51,12 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     public init(currentEnvironment: SubscriptionEnvironment,
                 updateServiceEnvironment: @escaping (SubscriptionEnvironment.ServiceEnvironment) -> Void,
                 updatePurchasingPlatform: @escaping (SubscriptionEnvironment.PurchasePlatform) -> Void,
-                isInternalTestingEnabled: @escaping () -> Bool,
-                updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
                 openSubscriptionTab: @escaping (URL) -> Void,
                 subscriptionManager: SubscriptionManager) {
         self.currentEnvironment = currentEnvironment
         self.updateServiceEnvironment = updateServiceEnvironment
         self.updatePurchasingPlatform = updatePurchasingPlatform
-        self.isInternalTestingEnabled = isInternalTestingEnabled
-        self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
         self.openSubscriptionTab = openSubscriptionTab
         self.subscriptionManager = subscriptionManager
@@ -99,12 +92,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         let environmentItem = NSMenuItem(title: "Environment", action: nil, target: nil)
         environmentItem.submenu = makeEnvironmentSubmenu()
         menu.addItem(environmentItem)
-
-        menu.addItem(.separator())
-
-        let internalTestingItem = NSMenuItem(title: "Internal testing", action: #selector(toggleInternalTesting), target: self)
-        internalTestingItem.state = isInternalTestingEnabled() ? .on : .off
-        menu.addItem(internalTestingItem)
 
         menu.delegate = self
 
@@ -331,26 +318,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                                                                      authEndpointService: subscriptionManager.authEndpointService)
                 await appStoreRestoreFlow.restoreAccountFromPastPurchase()
             }
-        }
-    }
-
-    @objc
-    func toggleInternalTesting(_ sender: Any?) {
-        Task { @MainActor in
-            let currentValue = isInternalTestingEnabled()
-            let shouldShowAlert = currentValue == false
-
-            if shouldShowAlert {
-                let alert = makeAlert(title: "Are you sure you want to enable internal testing",
-                                      message: "Only enable this option if you are participating in internal testing and have been requested to do so.",
-                                      buttonNames: ["Yes", "No"])
-                let response = alert.runModal()
-
-                guard case .alertFirstButtonReturn = response else { return }
-            }
-
-            updateInternalTestingFlag(!currentValue)
-            self.refreshSubmenu()
         }
     }
 
