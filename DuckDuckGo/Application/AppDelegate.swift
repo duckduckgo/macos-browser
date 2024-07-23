@@ -144,25 +144,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Date.monthAgo)
     static var firstLaunchDate: Date
 
-    @UserDefaultsWrapper
-    private var didCrashDuringCrashHandlersSetUp: Bool
-
     static var isNewUser: Bool {
         return firstLaunchDate >= Date.weekAgo
     }
 
     override init() {
-        // will not add crash handlers and will fire pixel on applicationDidFinishLaunching if didCrashDuringCrashHandlersSetUp == true
-        let didCrashDuringCrashHandlersSetUp = UserDefaultsWrapper(key: .didCrashDuringCrashHandlersSetUp, defaultValue: false)
-        _didCrashDuringCrashHandlersSetUp = didCrashDuringCrashHandlersSetUp
-        if case .normal = NSApplication.runType,
-           !didCrashDuringCrashHandlersSetUp.wrappedValue {
-
-            didCrashDuringCrashHandlersSetUp.wrappedValue = true
-            CrashLogMessageExtractor.setUp()
-            didCrashDuringCrashHandlersSetUp.wrappedValue = false
-        }
-
         do {
             let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
@@ -390,10 +376,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         remoteMessagingClient?.startRefreshingRemoteMessages()
 
-        if didCrashDuringCrashHandlersSetUp {
-            PixelKit.fire(GeneralPixel.crashOnCrashHandlersSetUp)
-            didCrashDuringCrashHandlersSetUp = false
-        }
     }
 
     private func fireFailedCompilationsPixelIfNeeded() {
