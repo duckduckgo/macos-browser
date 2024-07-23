@@ -236,7 +236,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         bookmarksMenu.performActionForItem(at: bookmarkAllTabsIndex)
 
         // THEN
-        XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedBookmarkAllOpenTabsCalled) 
+        XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedBookmarkAllOpenTabsCalled)
     }
 
 }
