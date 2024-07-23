@@ -27,8 +27,6 @@ import History
 import PixelKit
 import PhishingDetection
 
-// swiftlint:disable file_length
-
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
@@ -42,7 +40,6 @@ protocol NewWindowPolicyDecisionMaker {
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
 }
 
-// swiftlint:disable:next type_body_length
 @dynamicMemberLookup final class Tab: NSObject, Identifiable, ObservableObject {
 
     private struct ExtensionDependencies: TabExtensionDependencies {
@@ -163,7 +160,6 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     @MainActor
-    // swiftlint:disable:next function_body_length
     init(content: TabContent,
          faviconManagement: FaviconManagement,
          webCacheManager: WebCacheManager,
@@ -1267,5 +1263,3 @@ extension Tab {
     }
 
 }
-
-// swiftlint:enable file_length

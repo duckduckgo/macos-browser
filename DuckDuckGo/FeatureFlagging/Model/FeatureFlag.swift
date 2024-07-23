@@ -28,6 +28,9 @@ public enum FeatureFlag: String {
     /// Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
     /// https://app.asana.com/0/1199230911884351/1205979030848528/f
     case appendAtbToSerpQueries
+
+    // https://app.asana.com/0/72649045549333/1207597760316574/f
+    case deduplicateLoginsOnImport
 }
 
 extension FeatureFlag: FeatureFlagSourceProviding {
@@ -43,6 +46,8 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .remoteReleasable(.subfeature(phishingDetectionSubfeature.allowErrorPage))
         case .phishingDetectionPreferences:
             return .remoteReleasable(.subfeature(phishingDetectionSubfeature.allowPreferencesToggle))
+        case .deduplicateLoginsOnImport:
+            return .remoteReleasable(.subfeature(AutofillSubfeature.deduplicateLoginsOnImport))
         }
     }
 }

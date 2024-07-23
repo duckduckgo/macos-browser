@@ -23,8 +23,6 @@ import Lottie
 import SwiftUI
 import WebKit
 
-// swiftlint:disable file_length
-
 final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
@@ -1249,5 +1247,3 @@ final class TabBarViewItemPasteboardWriter: NSObject, NSPasteboardWriting {
     }
 
 }
-
-// swiftlint:enable file_length

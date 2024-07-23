@@ -1,7 +1,7 @@
 //
-//  TimeIntervalExtension.swift
+//  MockRemoteMessagingAvailabilityProvider.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,24 +16,18 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Combine
+import RemoteMessaging
 
-extension TimeInterval {
-    static let day = days(1)
+public class MockRemoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding {
 
-    static func seconds(_ amount: Int) -> TimeInterval {
-        TimeInterval(amount)
+    public init(isRemoteMessagingAvailable: Bool = true) {
+        self.isRemoteMessagingAvailable = isRemoteMessagingAvailable
     }
 
-    static func minutes(_ amount: Int) -> TimeInterval {
-        .seconds(60) * TimeInterval(amount)
+    public var isRemoteMessagingAvailablePublisher: AnyPublisher<Bool, Never> {
+        $isRemoteMessagingAvailable.dropFirst().eraseToAnyPublisher()
     }
 
-    static func hours(_ amount: Int) -> TimeInterval {
-        .minutes(60) * TimeInterval(amount)
-    }
-
-    static func days(_ amount: Int) -> TimeInterval {
-        .hours(24) * TimeInterval(amount)
-    }
+    @Published public var isRemoteMessagingAvailable: Bool
 }

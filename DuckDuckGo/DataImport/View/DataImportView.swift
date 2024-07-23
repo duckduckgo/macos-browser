@@ -102,7 +102,6 @@ struct DataImportView: ModalView {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func viewBody() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             // body
@@ -386,13 +385,32 @@ extension DataImportViewModel.ButtonType {
 
 }
 
-#Preview { {
+// MARK: - Preview
+#if DEBUG
+private final class PreviewPreferences: ObservableObject {
+    @Published var shouldDisplayProgress = false
+    static let shared = PreviewPreferences()
+}
+extension DataImportView {
 
-    final class PreviewPreferences: ObservableObject {
-        @Published var shouldDisplayProgress = false
-        static let shared = PreviewPreferences()
+    struct PreviewPreferencesView: View {
+        @ObservedObject fileprivate var prefs = PreviewPreferences.shared
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Toggle("Display progress", isOn: $prefs.shouldDisplayProgress)
+                        .padding(.leading, 20)
+                        .padding(.bottom, 20)
+                    Spacer()
+                }
+            }
+            .frame(width: 512)
+            .background(Color(NSColor(red: 1, green: 0, blue: 0, alpha: 0.2)))
+        }
     }
-
+}
+extension DataImportViewModel {
     final class MockDataImporter: DataImporter {
 
         struct MockError: Error { }
@@ -433,7 +451,6 @@ extension DataImportViewModel.ButtonType {
             self.dataType = dataType
         }
 
-        // swiftlint:disable:next function_body_length
         func importData(types: Set<DataImport.DataType>) -> DataImportTask {
             .detachedWithProgress(.initial) { progressUpdate in
                 func makeProgress(_ op: (Double) throws -> Void) async throws {
@@ -505,63 +522,50 @@ extension DataImportViewModel.ButtonType {
             }
         }
     }
-
-    let viewModel = DataImportViewModel(importSource: .bookmarksHTML, availableImportSources: DataImport.Source.allCases) { browser in
-        guard case .chrome = browser else {
-            print("empty profiles")
-            return .init(browser: browser, profiles: [])
-        }
-        print("chrome profiles")
-        return .init(browser: browser, profiles: [
-            .init(browser: .chrome,
-                  profileURL: URL(fileURLWithPath: "/test/Default Profile")),
-            .init(browser: .chrome,
-                  profileURL: URL(fileURLWithPath: "/test/Profile 1")),
-            .init(browser: .chrome,
-                  profileURL: URL(fileURLWithPath: "/test/Profile 2")),
-        ], validateProfileData: { _ in { .init(logins: .available, bookmarks: .available) } // swiftlint:disable:this opening_brace
-        })
-    } dataImporterFactory: { source, type, _, _ in
-        return MockDataImporter(source: source, dataType: type)
-    } requestPrimaryPasswordCallback: { _ in
-        print("primary password requested")
-        return "password"
-    } openPanelCallback: { _ in
-        URL(fileURLWithPath: "/test/path")
-    } reportSenderFactory: {
-        { feedback in
-            print("send feedback:", feedback)
-        }
-    }
-
-    struct PreviewPreferencesView: View {
-        @ObservedObject var prefs = PreviewPreferences.shared
-
-        var body: some View {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Toggle("Display progress", isOn: $prefs.shouldDisplayProgress)
-                        .padding(.leading, 20)
-                        .padding(.bottom, 20)
-                    Spacer()
-                }
+    // swiftlint:disable:next identifier_name
+    static func _mockPreviewViewModel() -> DataImportViewModel {
+        DataImportViewModel(importSource: .bookmarksHTML, availableImportSources: DataImport.Source.allCases) { browser in
+            guard case .chrome = browser else {
+                print("empty profiles")
+                return .init(browser: browser, profiles: [])
             }
-            .frame(width: 512)
-            .background(Color(NSColor(red: 1, green: 0, blue: 0, alpha: 0.2)))
+            print("chrome profiles")
+            return .init(browser: browser, profiles: [
+                .init(browser: .chrome,
+                      profileURL: URL(fileURLWithPath: "/test/Default Profile")),
+                .init(browser: .chrome,
+                      profileURL: URL(fileURLWithPath: "/test/Profile 1")),
+                .init(browser: .chrome,
+                      profileURL: URL(fileURLWithPath: "/test/Profile 2")),
+            ], validateProfileData: { _ in { .init(logins: .available, bookmarks: .available) } // swiftlint:disable:this opening_brace
+            })
+        } dataImporterFactory: { source, type, _, _ in
+            return MockDataImporter(source: source, dataType: type)
+        } requestPrimaryPasswordCallback: { _ in
+            print("primary password requested")
+            return "password"
+        } openPanelCallback: { _ in
+            URL(fileURLWithPath: "/test/path")
+        } reportSenderFactory: {
+            { feedback in
+                print("send feedback:", feedback)
+            }
         }
     }
+}
 
-    return VStack(alignment: .leading, spacing: 0) {
-        DataImportView(model: viewModel)
+#Preview {
+    VStack(alignment: .leading, spacing: 0) { @MainActor in
+        DataImportView(model: ._mockPreviewViewModel())
             // swiftlint:disable:next force_cast
             .environment(\EnvironmentValues.presentationMode as! WritableKeyPath,
                           Binding<PresentationMode> {
                 print("DISMISS!")
             })
 
-        PreviewPreferencesView()
+        DataImportView.PreviewPreferencesView()
         Spacer()
     }
     .frame(minHeight: 666)
-
-}() }
+}
+#endif

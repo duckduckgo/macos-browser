@@ -1,7 +1,7 @@
 //
-//  RandomAccessCollectionExtension.swift
+//  BookmarkSearchViewModel.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,15 +18,24 @@
 
 import Foundation
 
-extension RandomAccessCollection {
+struct BookmarkSearchViewModel {
 
-    subscript(safe index: Index) -> Element? {
-        guard self.indices.contains(index) else { return nil }
-        return self[index]
+    enum BookmarkSearchResult: Equatable {
+        case emptyQuery
+        case results([BaseBookmarkEntity])
+
+        static let noResults = Self.results([])
     }
 
-    subscript(_ index: Index, default value: Element) -> Element {
-        return self[safe: index] ?? value
-    }
+    let manager: BookmarkManager
 
+    func search(by query: String) -> BookmarkSearchResult {
+        if query.isBlank {
+            return .emptyQuery
+        }
+
+        let filteredBookmarks = manager.search(by: query)
+
+        return filteredBookmarks.isEmpty ? .noResults : .results(filteredBookmarks)
+    }
 }

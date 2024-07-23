@@ -26,7 +26,6 @@ import Cocoa
 import Persistence
 import PixelKit
 
-// swiftlint:disable:next type_body_length
 final class LocalBookmarkStore: BookmarkStore {
 
     convenience init(bookmarkDatabase: BookmarkDatabase) {
@@ -685,7 +684,6 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    // swiftlint:disable:next function_body_length
     func moveFavorites(with objectUUIDs: [String], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
 
         applyChangesAndSave(changes: { [weak self] context in

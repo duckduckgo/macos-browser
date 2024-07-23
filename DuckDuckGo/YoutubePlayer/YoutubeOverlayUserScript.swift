@@ -66,6 +66,7 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
     // MARK: - MessageNames
 
     enum MessageNames: String, CaseIterable {
+        case initialSetup
         case setUserValues
         case getUserValues
         case openDuckPlayer
@@ -82,6 +83,8 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
             return DuckPlayer.shared.handleSetUserValuesMessage(from: origin)
         case .getUserValues:
             return DuckPlayer.shared.handleGetUserValues
+        case .initialSetup:
+            return handleInitialSetup
         case .openDuckPlayer:
             return handleOpenDuckPlayer
         case .sendDuckPlayerPixel:
@@ -116,6 +119,21 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
         return nil
     }
 
+    private func handleInitialSetup(params: Any, message: UserScriptMessage) -> Encodable? {
+        encodeInitialSetup()
+    }
+
+    private func encodeInitialSetup() -> OverlaysInitialSettings {
+        let userValues = UserValues(
+            duckPlayerMode: duckPlayerPreferences.duckPlayerMode,
+            overlayInteracted: duckPlayerPreferences.youtubeOverlayInteracted
+        )
+
+        return OverlaysInitialSettings(
+            userValues: userValues
+        )
+    }
+
     // MARK: - UserValuesNotification
 
     struct UserValuesNotification: Encodable {
@@ -135,6 +153,12 @@ extension YoutubeOverlayUserScript {
         case "play.use":
             duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
             PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaMainOverlay)
+            // Temporary pixel for first time user uses Duck Player
+            if AppDelegate.isNewUser {
+                PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .legacyInitial)
+            }
+        case "play.use.thumbnail":
+            PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaHoverButton)
             // Temporary pixel for first time user uses Duck Player
             if AppDelegate.isNewUser {
                 PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .legacyInitial)

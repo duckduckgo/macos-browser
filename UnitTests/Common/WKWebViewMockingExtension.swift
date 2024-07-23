@@ -103,6 +103,31 @@ struct WKURLSchemeTaskHandler {
         }
     }
 
+    static func redirect(to url: URL) -> WKURLSchemeTaskHandler {
+        .init { task in
+            let response = MockHTTPURLResponse(url: task.request.url!,
+                                               statusCode: 301,
+                                               mime: nil,
+                                               headerFields: ["Location": url.absoluteString])!
+
+            task._didPerformRedirection(response, newRequest: URLRequest(url: url))
+            task.didReceive(response)
+            task.didFinish()
+        }
+    }
+
+    static func redirect(to url: URL, with error: NSError) -> WKURLSchemeTaskHandler {
+        .init { task in
+            let response = MockHTTPURLResponse(url: task.request.url!,
+                                               statusCode: 301,
+                                               mime: nil,
+                                               headerFields: ["Location": url.absoluteString])!
+
+            task._didPerformRedirection(response, newRequest: URLRequest(url: url))
+            task.didFailWithError(error)
+        }
+    }
+
     let handler: (WKURLSchemeTaskPrivate) -> Void
     init(handler: @escaping (WKURLSchemeTaskPrivate) -> Void) {
         self.handler = handler

@@ -76,6 +76,11 @@ struct InitialSetupSettings: Codable {
     let settings: PlayerSettings
 }
 
+// Values that the YouTube Overlays can use to determine the current state
+struct OverlaysInitialSettings: Codable {
+    let userValues: UserValues
+}
+
 /// Values that the Frontend can use to determine user settings
 public struct UserValues: Codable {
     enum CodingKeys: String, CodingKey {
@@ -136,7 +141,6 @@ final class DuckPlayer {
 
     // MARK: - Common Message Handlers
 
-    // swiftlint:disable:next cyclomatic_complexity
     public func handleSetUserValuesMessage(
         from origin: YoutubeOverlayUserScript.MessageOrigin
     ) -> (_ params: Any, _ message: UserScriptMessage) -> Encodable? {
@@ -319,15 +323,18 @@ final class DuckPlayerPreferencesPersistorMock: DuckPlayerPreferencesPersistor {
     var youtubeOverlayInteracted: Bool
     var youtubeOverlayAnyButtonPressed: Bool
     var duckPlayerAutoplay: Bool
+    var duckPlayerOpenInNewTab: Bool
 
     init(duckPlayerMode: DuckPlayerMode = .alwaysAsk,
          youtubeOverlayInteracted: Bool = false,
          youtubeOverlayAnyButtonPressed: Bool = false,
-         duckPlayerAutoplay: Bool = false) {
+         duckPlayerAutoplay: Bool = false,
+         duckPlayerOpenInNewTab: Bool = false) {
         self.duckPlayerModeBool = duckPlayerMode.boolValue
         self.youtubeOverlayInteracted = youtubeOverlayInteracted
         self.youtubeOverlayAnyButtonPressed = youtubeOverlayAnyButtonPressed
         self.duckPlayerAutoplay = duckPlayerAutoplay
+        self.duckPlayerOpenInNewTab = duckPlayerOpenInNewTab
     }
 }
 

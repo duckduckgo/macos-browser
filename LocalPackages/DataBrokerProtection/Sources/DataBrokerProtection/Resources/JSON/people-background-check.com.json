@@ -1,7 +1,7 @@
 {
   "name": "People Background Check",
   "url": "people-background-check.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "verecor.com",
   "addedDatetime": 1702965600000,
   "steps": [
@@ -18,7 +18,7 @@
           "actionType": "extract",
           "id": "06e575b5-ac64-4bf5-b5e7-6e39e5a474fb",
           "selector": ".b-pfl-list",
-          "noResultsSelector": "//h3[contains(text(), 'No people found'] | //div[@id='results_container' and contains(text(), 'Not found')]",
+          "noResultsSelector": "//h3[contains(text(), 'No people found')] | //div[@id='results_container' and contains(text(), 'Not found')]",
           "profile": {
             "name": {
               "selector": ".name"

@@ -22,6 +22,7 @@ import ContentBlocking
 import TrackerRadarKit
 import WebKit
 import XCTest
+import Navigation
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -33,6 +34,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     struct URLs {
         let url1 = URL(string: "https://my-host.com/")!
         let url2 = URL(string: "http://another-host.org/1")!
+        let url3 = URL(string: "http://another-host.org/2")!
     }
     struct DataSource {
         let empty = Data()
@@ -73,9 +75,16 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     var schemeHandler: TestSchemeHandler!
     var extensionsBuilder: TestTabExtensionsBuilder!
 
+    var navExtension: TestsClosureNavigationResponderTabExtension!
+    var decidePolicy: (NavigationAction) -> NavigationActionPolicy? = { _ in .next }
+
     override func setUp() {
         contentBlockingMock = ContentBlockingMock(adClickAttributionEnabled: true)
         privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
+
+        navExtension = TestsClosureNavigationResponderTabExtension(.init { navAction, _ in
+            self.decidePolicy(navAction)
+        })
 
         extensionsBuilder = TestTabExtensionsBuilder(load: [AdClickAttributionTabExtension.self]) { [unowned self] builder in { args, dependencies in
             builder.override {
@@ -87,6 +96,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
                                                dateTimeProvider: { self.now }) { _ in
                     (logic: self.logic, detection: self.detection)
                 }
+            }
+            builder.add {
+                self.navExtension
             }
         }}
 
@@ -306,8 +318,72 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         detection.onDidFinish = { _ in
             onDetectionDidFinish.fulfill()
         }
+        detection.onDidFail = {
+            XCTFail("Not expected")
+        }
         logic.onDidFinish = { [now, urls] host, date in
             XCTAssertEqual(host, urls.url2.host!)
+            XCTAssertEqual(date, now)
+            onLogicDidFinish.fulfill()
+        }
+
+        tab.setContent(.url(urls.url1, source: .link))
+        waitForExpectations(timeout: 5)
+    }
+
+    func testWhenDeveloperRedirects_didFailNotCalledForRedirectedNavigation() throws {
+        // disable waiting for CBR compilation on navigation
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
+            return false
+        }
+        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        DispatchQueue.main.async {
+            self.makeContentBlockerRulesUserScript()
+        }
+
+        // For first load, redirect from url1 to url2
+        schemeHandler.middleware = [{ request in
+            guard request.url!.path == "/" else { return nil}
+            return .redirect(to: self.urls.url2)
+        }, { [data] _ in
+            return .ok(.html(data.html.utf8String()!))
+        }]
+
+        // After redirect, issue developer redirect, that cancels url2 loading and navigates to url3
+        decidePolicy = { navAction in
+            if navAction.request.url == self.urls.url2 {
+                return .redirect(navAction.mainFrameTarget!, { navigator in
+                    navigator.load(.init(url: self.urls.url3))
+                })
+            } else {
+                return .next
+            }
+        }
+
+        let onDetectionDidStart = expectation(description: "detection.onDidStart")
+        onDetectionDidStart.assertForOverFulfill = false
+        detection.onDidStart = { _ in
+            onDetectionDidStart.fulfill()
+        }
+        let on2XXResponse = expectation(description: "on2XXResponse")
+        detection.on2XXResponse = { _ in
+            on2XXResponse.fulfill()
+        }
+        let onNavigation = expectation(description: "onNavigation")
+        logic.onNavigation = {
+            onNavigation.fulfill()
+        }
+
+        let onDetectionDidFinish = expectation(description: "detection.onDidFinish")
+        let onLogicDidFinish = expectation(description: "logic.onDidFinish")
+        detection.onDidFinish = { _ in
+            onDetectionDidFinish.fulfill()
+        }
+        detection.onDidFail = {
+            XCTFail("Not expected")
+        }
+        logic.onDidFinish = { [now, urls] host, date in
+            XCTAssertEqual(host, urls.url3.host!)
             XCTAssertEqual(date, now)
             onLogicDidFinish.fulfill()
         }
