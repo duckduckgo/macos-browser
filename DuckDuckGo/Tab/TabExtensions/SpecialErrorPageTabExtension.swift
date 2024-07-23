@@ -53,7 +53,7 @@ final class SpecialErrorPageTabExtension {
     private var phishingDetector: PhishingSiteDetecting
     private var phishingStateManager: PhishingTabStateManager
     private var errorPageType: ErrorType?
-    private var phishingUrlExemptions: Set<String> = []
+    private var phishingDomainExemptions: Set<String> = []
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -106,10 +106,18 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let url = navigationAction.url
-        self.phishingStateManager.didBypassError = phishingUrlExemptions.contains(url.absoluteString)
+
+        // Extract the host (domain) from the URL
+        if let host = url.host {
+            self.phishingStateManager.didBypassError = phishingDomainExemptions.contains(host)
+        } else {
+            self.phishingStateManager.didBypassError = false
+        }
+
         if self.phishingStateManager.didBypassError || url.isDuckDuckGo || url.isDuckURLScheme {
             return .next
         }
+
         // Check the URL
         let isMalicious = await phishingDetector.checkIsMaliciousIfEnabled(url: url)
         self.phishingStateManager.isShowingPhishingError = isMalicious
@@ -118,7 +126,8 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
             errorPageType = .phishing
             specialErrorPageUserScript?.failingURL = navigationAction.url
             if let mainFrameTarget = navigationAction.mainFrameTarget {
-                return .redirect(mainFrameTarget) { navigator in navigator.load(URLRequest(url: URL(string: "duck://error?reason=phishing&url=\(navigationAction.url.absoluteString)&token=\(token)")!))
+                return .redirect(mainFrameTarget) { navigator in
+                    navigator.load(URLRequest(url: URL(string: "duck://error?reason=phishing&url=\(navigationAction.url.absoluteString)&token=\(token)")!))
                 }
             } else {
                 // log error
@@ -176,9 +185,9 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
 
     func visitSite() {
         if errorPageType == .phishing {
-            if let urlString = webView?.url?.absoluteString {
+            if let url = webView?.url, let host = url.host {
                 PixelKit.fire(PhishingDetectionPixels.visitSite)
-                phishingUrlExemptions.insert(urlString)
+                phishingDomainExemptions.insert(host)
                 self.phishingStateManager.didBypassError = true
                 self.phishingStateManager.isShowingPhishingError = false
             }
