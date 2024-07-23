@@ -104,8 +104,6 @@ public class PhishingDetection: PhishingSiteDetecting {
     }
 
     public func checkIsMaliciousIfEnabled(url: URL) async -> Bool {
-        print("[+] featureFlagger: ", featureFlagger)
-        print("[+] isFeatureOn: ", featureFlagger.isFeatureOn(.phishingDetection))
         if featureFlagger.isFeatureOn(.phishingDetection),
            detectionPreferences.isEnabled {
             return await detector.isMalicious(url: url)
