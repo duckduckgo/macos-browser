@@ -90,6 +90,9 @@ extension Tab: NavigationResponder {
             // Special Error Page
             .weak(nullable: self.specialErrorPage),
 
+            // Release Notes
+            .weak(nullable: self.releaseNotes),
+
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder),
 

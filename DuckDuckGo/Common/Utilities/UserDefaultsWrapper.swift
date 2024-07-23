@@ -187,12 +187,19 @@ public struct UserDefaultsWrapper<T> {
         case networkProtectionWaitlistActiveOverrideRawValue = "networkProtectionWaitlistActiveOverrideRawValue"
         case networkProtectionWaitlistEnabledOverrideRawValue = "networkProtectionWaitlistEnabledOverrideRawValue"
 
+        // Updates
+        case automaticUpdates = "updates.automatic"
+
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"
         case pixelExperimentCohort = "pixel.experiment.cohort"
         case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
         case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
         case campaignVariant = "campaign.variant"
+
+        // Updates
+        case previousAppVersion = "previous.app.version"
+        case previousBuild = "previous.build"
 
         // Sync
 
@@ -218,7 +225,6 @@ public struct UserDefaultsWrapper<T> {
 
         // Subscription
 
-        case subscriptionInternalTesting = "subscription.internal-testing-enabled"
         case subscriptionEnvironment = "subscription.environment"
     }
 

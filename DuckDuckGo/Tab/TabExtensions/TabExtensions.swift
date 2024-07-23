@@ -205,6 +205,15 @@ extension TabExtensionsBuilder {
                                   phishingDetector: dependencies.phishingDetector,
                                   phishingStateManager: dependencies.phishingStateManager)
         }
+#if SPARKLE
+        add {
+            ReleaseNotesTabExtension(scriptsPublisher: userScripts.compactMap { $0 }, webViewPublisher: args.webViewFuture)
+        }
+#else
+        add {
+            ReleaseNotesTabExtension()
+        }
+#endif
 
         add {
             OnboardingTabExtension()

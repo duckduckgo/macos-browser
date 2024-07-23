@@ -31,7 +31,7 @@ final class ActiveRemoteMessageModelTests: XCTestCase {
         store = MockRemoteMessagingStore()
         message = RemoteMessageModel(
             id: "1",
-            content: .small(titleText: "test", descriptionText: "desc"), matchingRules: [], exclusionRules: []
+            content: .small(titleText: "test", descriptionText: "desc"), matchingRules: [], exclusionRules: [], isMetricsEnabled: false
         )
     }
 
