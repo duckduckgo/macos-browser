@@ -1,5 +1,5 @@
 //
-//  BookmarksMetrics.swift
+//  BookmarksSearchAndSortMetrics.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -24,7 +24,7 @@ enum BookmarkOperationOrigin: String {
     case manager
 }
 
-struct BookmarksMetrics {
+struct BookmarksSearchAndSortMetrics {
     func fireSortButtonClicked(origin: BookmarkOperationOrigin) {
         PixelKit.fire(GeneralPixel.bookmarksSortButtonClicked(origin: origin.rawValue))
     }

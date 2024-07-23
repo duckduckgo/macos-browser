@@ -32,7 +32,7 @@ final class MockSortBookmarksRepository: SortBookmarksRepository {
 class SortBookmarksViewModelTests: XCTestCase {
     let testUserDefault = UserDefaults(suiteName: #function)!
     let repository = MockSortBookmarksRepository()
-    let metrics = BookmarksMetrics()
+    let metrics = BookmarksSearchAndSortMetrics()
 
     func testWhenSortingIsNameAscending_thenSortByNameMetricIsFired() async throws {
         let sut = SortBookmarksViewModel(repository: repository, metrics: metrics, origin: .panel)

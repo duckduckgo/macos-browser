@@ -2533,8 +2533,8 @@
 		B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */; };
 		B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */; };
 		BB5789722B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */; };
-		BB7B5F982C4ED73800BA4AF8 /* BookmarksMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7B5F972C4ED73800BA4AF8 /* BookmarksMetrics.swift */; };
-		BB7B5F992C4ED73800BA4AF8 /* BookmarksMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7B5F972C4ED73800BA4AF8 /* BookmarksMetrics.swift */; };
+		BB7B5F982C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7B5F972C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift */; };
+		BB7B5F992C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7B5F972C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift */; };
 		BBB881882C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */; };
 		BBB881892C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */; };
 		BBBEE1BF2C4FF63600035ABA /* SortBookmarksViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBEE1BE2C4FF63600035ABA /* SortBookmarksViewModelTests.swift */; };
@@ -4219,7 +4219,7 @@
 		B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardViewController.swift; sourceTree = "<group>"; };
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
 		BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionSubscriptionEventHandler.swift; sourceTree = "<group>"; };
-		BB7B5F972C4ED73800BA4AF8 /* BookmarksMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksMetrics.swift; sourceTree = "<group>"; };
+		BB7B5F972C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksSearchAndSortMetrics.swift; sourceTree = "<group>"; };
 		BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeControllerSearchDataSource.swift; sourceTree = "<group>"; };
 		BBBEE1BE2C4FF63600035ABA /* SortBookmarksViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortBookmarksViewModelTests.swift; sourceTree = "<group>"; };
 		BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionExternalWaitlistPixels.swift; sourceTree = "<group>"; };
@@ -7604,7 +7604,7 @@
 				B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */,
 				9F872DA22B90920F00138637 /* BookmarkFolderInfo.swift */,
 				BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */,
-				BB7B5F972C4ED73800BA4AF8 /* BookmarksMetrics.swift */,
+				BB7B5F972C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -9886,7 +9886,7 @@
 				3706FA93293F65D500E42796 /* WKWebView+Download.swift in Sources */,
 				3706FA94293F65D500E42796 /* TabShadowConfig.swift in Sources */,
 				3706FA97293F65D500E42796 /* WindowDraggingView.swift in Sources */,
-				BB7B5F992C4ED73800BA4AF8 /* BookmarksMetrics.swift in Sources */,
+				BB7B5F992C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift in Sources */,
 				B60D644A2AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift in Sources */,
 				1D01A3D52B88CF7700FE8150 /* AccessibilityPreferences.swift in Sources */,
 				3706FA98293F65D500E42796 /* SecureVaultSorting.swift in Sources */,
@@ -11333,7 +11333,7 @@
 				AA80EC54256BE3BC007083E7 /* UserText.swift in Sources */,
 				B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */,
 				311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */,
-				BB7B5F982C4ED73800BA4AF8 /* BookmarksMetrics.swift in Sources */,
+				BB7B5F982C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift in Sources */,
 				B6BCC54A2AFDF24B002C5499 /* TaskWithProgress.swift in Sources */,
 				B6DB3AEF278D5C370024C5C4 /* URLSessionExtension.swift in Sources */,
 				4B7A60A1273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift in Sources */,

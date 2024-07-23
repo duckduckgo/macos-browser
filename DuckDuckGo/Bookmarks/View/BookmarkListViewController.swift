@@ -94,7 +94,7 @@ final class BookmarkListViewController: NSViewController {
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
     private let treeControllerSearchDataSource: BookmarkListTreeControllerSearchDataSource
     private let sortBookmarksViewModel: SortBookmarksViewModel
-    private let bookmarkMetrics: BookmarksMetrics
+    private let bookmarkMetrics: BookmarksSearchAndSortMetrics
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource,
                                                              sortMode: sortBookmarksViewModel.selectedSortMode,
@@ -134,7 +134,7 @@ final class BookmarkListViewController: NSViewController {
     }()
 
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-         metrics: BookmarksMetrics = BookmarksMetrics()) {
+         metrics: BookmarksSearchAndSortMetrics = BookmarksSearchAndSortMetrics()) {
         self.bookmarkManager = bookmarkManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
         self.treeControllerSearchDataSource = BookmarkListTreeControllerSearchDataSource(bookmarkManager: bookmarkManager)
