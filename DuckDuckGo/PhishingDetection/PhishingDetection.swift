@@ -36,6 +36,7 @@ public class PhishingDetection: PhishingSiteDetecting {
     private var detectionPreferences: PhishingDetectionPreferences
     private var dataStore: PhishingDetectionDataStoring
     private var featureFlagger: FeatureFlagger
+    private var config: PrivacyConfiguration
     private var cancellable: AnyCancellable?
     private let revision: Int
     private let filterSetURL: URL
@@ -77,6 +78,7 @@ public class PhishingDetection: PhishingSiteDetecting {
         self.dataActivities = dataActivities ?? PhishingDetectionDataActivities(detectionService: self.detector, phishingDetectionDataProvider: resolvedDataProvider, updateManager: self.updateManager)
         self.detectionPreferences = detectionPreferences
         self.featureFlagger = NSApp.delegateTyped.featureFlagger
+        self.config = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
         if let featureFlagger = featureFlagger,
            featureFlagger.isFeatureOn(.phishingDetection),
            self.detectionPreferences.isEnabled {
@@ -104,7 +106,7 @@ public class PhishingDetection: PhishingSiteDetecting {
     }
 
     public func checkIsMaliciousIfEnabled(url: URL) async -> Bool {
-        if featureFlagger.isFeatureOn(.phishingDetection),
+        if config.isFeature(.phishingDetection, enabledForDomain: url.host),
            detectionPreferences.isEnabled {
             return await detector.isMalicious(url: url)
         } else {
