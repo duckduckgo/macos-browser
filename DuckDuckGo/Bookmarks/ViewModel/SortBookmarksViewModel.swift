@@ -129,7 +129,7 @@ final class SortBookmarksUserDefaults: SortBookmarksRepository {
 
 final class SortBookmarksViewModel: NSObject {
 
-    private let metrics: BookmarksMetricsProtocol
+    private let metrics: BookmarksMetrics
     private let origin: BookmarkOperationOrigin
     private var repository: SortBookmarksRepository
 
@@ -138,7 +138,7 @@ final class SortBookmarksViewModel: NSObject {
     private var wasSortOptionSelected = false
 
     init(repository: SortBookmarksRepository = SortBookmarksUserDefaults(),
-         metrics: BookmarksMetricsProtocol,
+         metrics: BookmarksMetrics,
          origin: BookmarkOperationOrigin) {
         self.metrics = metrics
         self.origin = origin

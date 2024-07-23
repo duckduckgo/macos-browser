@@ -19,39 +19,29 @@
 import Foundation
 import PixelKit
 
-protocol BookmarksMetricsProtocol {
-    func fireSortButtonClicked(origin: BookmarkOperationOrigin)
-    func fireSortButtonDismissed(origin: BookmarkOperationOrigin)
-    func fireSortByName(origin: BookmarkOperationOrigin)
-    func fireSearchExecuted(origin: BookmarkOperationOrigin)
-    func fireSearchResultClicked(origin: BookmarkOperationOrigin)
-}
-
 enum BookmarkOperationOrigin: String {
     case panel
     case manager
 }
 
-struct BookmarksMetrics: BookmarksMetricsProtocol {
-    private let pixelKit = PixelKit.shared
-
+struct BookmarksMetrics {
     func fireSortButtonClicked(origin: BookmarkOperationOrigin) {
-        pixelKit?.fire(GeneralPixel.bookmarksSortButtonClicked(origin: origin.rawValue))
+        PixelKit.fire(GeneralPixel.bookmarksSortButtonClicked(origin: origin.rawValue))
     }
 
     func fireSortButtonDismissed(origin: BookmarkOperationOrigin) {
-        pixelKit?.fire(GeneralPixel.bookmarksSortButtonDismissed(origin: origin.rawValue))
+        PixelKit.fire(GeneralPixel.bookmarksSortButtonDismissed(origin: origin.rawValue))
     }
 
     func fireSortByName(origin: BookmarkOperationOrigin) {
-        pixelKit?.fire(GeneralPixel.bookmarksSortByName(origin: origin.rawValue))
+        PixelKit.fire(GeneralPixel.bookmarksSortByName(origin: origin.rawValue))
     }
 
     func fireSearchExecuted(origin: BookmarkOperationOrigin) {
-        pixelKit?.fire(GeneralPixel.bookmarksSearchExecuted(origin: origin.rawValue), frequency: .daily)
+        PixelKit.fire(GeneralPixel.bookmarksSearchExecuted(origin: origin.rawValue), frequency: .daily)
     }
 
     func fireSearchResultClicked(origin: BookmarkOperationOrigin) {
-        pixelKit?.fire(GeneralPixel.bookmarksSearchResultClicked(origin: origin.rawValue))
+        PixelKit.fire(GeneralPixel.bookmarksSearchResultClicked(origin: origin.rawValue))
     }
 }
