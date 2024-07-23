@@ -29,6 +29,9 @@ public enum FeatureFlag: String {
 
     // https://app.asana.com/0/72649045549333/1207597760316574/f
     case deduplicateLoginsOnImport
+    
+    // https://app.asana.com/0/1206488453854252/1207806240565841/f
+    case pirDatabaseV3Migration
 }
 
 extension FeatureFlag: FeatureFlagSourceProviding {
@@ -42,6 +45,8 @@ extension FeatureFlag: FeatureFlagSourceProviding {
             return .remoteReleasable(.subfeature(sslCertificatesSubfeature.allowBypass))
         case .deduplicateLoginsOnImport:
             return .remoteReleasable(.subfeature(AutofillSubfeature.deduplicateLoginsOnImport))
+        case .pirDatabaseV3Migration:
+            return .remoteReleasable(.feature(.macPirDatabaseV3Migration))
         }
     }
 }
