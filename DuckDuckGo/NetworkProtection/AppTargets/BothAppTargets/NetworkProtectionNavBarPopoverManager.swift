@@ -26,6 +26,7 @@ import NetworkProtectionIPC
 import NetworkProtectionUI
 import Subscription
 import VPNAppLauncher
+import SwiftUI
 
 protocol NetworkProtectionIPCClient {
     var ipcStatusObserver: ConnectionStatusObserver { get }
@@ -59,9 +60,37 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         networkProtectionPopover?.isShown ?? false
     }
 
-    func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover {
-        let popover = {
+    @MainActor
+    func currentSitePublisher() -> Published<CurrentSite?>.Publisher {
+        let domain: String?
 
+        if case .url(let url, _, _) = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.activeTabViewModel?.tabContent {
+
+            domain = url.host
+        } else {
+            domain = nil
+        }
+
+        let icon: NSImage?
+        let currentSite: NetworkProtectionUI.CurrentSite?
+
+        if let domain {
+            icon = FaviconManager.shared.getCachedFavicon(for: domain, sizeCategory: .small)?.image
+            currentSite = NetworkProtectionUI.CurrentSite(icon: icon,
+                                                          domain: domain,
+                                                          excluded: false)
+        } else {
+            icon = nil
+            currentSite = nil
+        }
+
+        var currentSitePublisher = Published<CurrentSite?>(initialValue: currentSite)
+        return currentSitePublisher.projectedValue
+    }
+
+    @MainActor
+    func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover {
+        let popover: NSPopover = {
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
             let statusReporter = DefaultNetworkProtectionStatusReporter(
@@ -77,10 +106,12 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
             _ = VPNSettings(defaults: .netP)
             let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+            let currentSitePublisher = currentSitePublisher()
 
             let popover = NetworkProtectionPopover(controller: controller,
                                                    onboardingStatusPublisher: onboardingStatusPublisher,
                                                    statusReporter: statusReporter,
+                                                   currentSitePublisher: currentSitePublisher,
                                                    uiActionHandler: appLauncher,
                                                    menuItems: {
                 if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
@@ -136,6 +167,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         popover.show(positionedBelow: view.bounds.insetFromLineOfDeath(flipped: view.isFlipped), in: view)
     }
 
+    @MainActor
     func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover? {
         if let networkProtectionPopover, networkProtectionPopover.isShown {
             networkProtectionPopover.close()

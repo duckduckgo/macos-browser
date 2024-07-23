@@ -163,9 +163,15 @@ extension UserText {
         return String(format: message, count)
     }
 
-    // MARK: - Excluded Sites
-    // "vpn.setting.excluded.sites.description" - Excluded Sites description
-    static let vpnExcludedSitesDescription = "Websites you selected to be excluded even when the VPN is connected."
+    // MARK: - Excluded Domains
+    // "vpn.setting.excluded.domains.description" - Excluded Sites description
+    static let vpnExcludedDomainsDescription = "Websites you selected to be excluded even when the VPN is connected."
+    // "vpn.setting.excluded.domains.manage.button.title" - Excluded Sites management button title
+    static let vpnExcludedDomainsManageButtonTitle = "Manage Excluded Sites…"
+    // "vpn.excluded.domains.add.domain" - Add Domain button for the excluded sites view
+    static let vpnExcludedDomainsAddDomain = "Add Website"
+    // "vpn.excluded.domains.title" - Title for the excluded sites view
+    static let vpnExcludedDomainsTitle = "Excluded Websites"
 
     // MARK: - DNS
     // "vpn.dns.server.title" - Title of the DNS Server section

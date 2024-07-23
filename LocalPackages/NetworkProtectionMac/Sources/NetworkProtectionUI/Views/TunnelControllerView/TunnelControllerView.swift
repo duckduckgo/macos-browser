@@ -32,6 +32,10 @@ fileprivate extension Font {
             .system(size: 13, weight: .regular, design: .default)
         }
 
+        static var currentSite: Font {
+            .system(size: 13, weight: .regular, design: .default)
+        }
+
         static var location: Font {
             .system(size: 13, weight: .regular, design: .default)
         }
@@ -100,6 +104,10 @@ fileprivate extension View {
         opacity(Opacity.dataVolume(colorScheme: colorScheme))
             .font(.NetworkProtection.dataVolume)
             .foregroundColor(Color(.defaultText))
+    }
+
+    func applyCurrentSiteAttributes() -> some View {
+        font(.NetworkProtection.currentSite)
     }
 
     func applyLocationAttributes() -> some View {
@@ -172,6 +180,10 @@ public struct TunnelControllerView: View {
             Divider()
                 .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
 
+            if let currentSite = model.currentSite {
+                currentSiteView(currentSite)
+            }
+
             locationView()
 
             if model.showServerDetails {
@@ -230,6 +242,52 @@ public struct TunnelControllerView: View {
         Circle()
             .fill(isConnected ? .green : .yellow)
             .frame(width: 8, height: 8)
+    }
+
+    private func currentSiteView(_ currentSite: CurrentSite) -> some View {
+        Group {
+            AccordionView {
+                // TBD
+            } label: { isHovering in
+                Image(nsImage: currentSite.icon)
+                    .resizable()
+                    .frame(width: 16, height: 16)
+                Text("\(currentSite.domain) Troubleshooting")
+                    .applyCurrentSiteAttributes()
+            } submenu: {
+                VStack {
+                    MenuItemCustomButton {
+                        // TBD
+                    } label: { isHovering in
+                        HStack {
+                            Image(.accordionViewCheckmark)
+                                .resizable()
+                                .font(.system(size: 13))
+                                .frame(width: 16, height: 16)
+                            Text("Turn ON")
+                        }
+                    }
+
+                    MenuItemCustomButton {
+                        // TBD
+                    } label: { isHovering in
+                        Rectangle()
+                            .fill(Color.clear)
+                            .frame(width: 16, height: 16)
+
+                        Text("Turn OFF")
+                    }
+                }
+            }
+
+            /*MenuItemView(title: "Hulu.com Troubleshooting", textColor: Color(.defaultText)) {
+             //await menuItem.action()
+             dismiss()
+             }.applyMenuAttributes()*/
+
+            Divider()
+                .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+        }
     }
 
     /// Connected/Selected location

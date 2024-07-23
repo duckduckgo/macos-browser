@@ -5,10 +5,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Excluded Sites View Controller-->
+        <!--Excluded Domains View Controller-->
         <scene sceneID="YwQ-9C-eXK">
             <objects>
-                <viewController storyboardIdentifier="FireproofDomainsViewController" id="Clu-Bo-JRW" userLabel="Excluded Sites View Controller" customClass="ExcludedSitesViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ExcludedDomainsViewController" id="Clu-Bo-JRW" customClass="ExcludedDomainsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="fBT-ND-Nbh">
                         <rect key="frame" x="0.0" y="0.0" width="475" height="307"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -30,7 +30,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="removeAllDomains:" target="Clu-Bo-JRW" id="xPH-8I-h5n"/>
+                                    <action selector="addDomain:" target="Clu-Bo-JRW" id="DcY-dR-cTx"/>
                                 </connections>
                             </button>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aPG-Pg-rGL">
@@ -58,7 +58,7 @@
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
-                                                        <tableCellView identifier="FireproofDomainCell" id="SIf-3r-xTz">
+                                                        <tableCellView identifier="ExcludedDomainCell" id="SIf-3r-xTz">
                                                             <rect key="frame" x="8" y="0.0" width="416" height="24"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
@@ -115,7 +115,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
-                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aur-0h-QzR">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aur-0h-QzR" userLabel="Excluded Sites Label">
                                 <rect key="frame" x="18" y="271" width="95" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Excluded Sites" id="s7t-C5-auR">
                                     <font key="font" metaFont="systemMedium" size="13"/>
@@ -169,9 +169,9 @@ DQ
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="addDomainButton" destination="KAc-ZW-ZAV" id="24L-wi-b08"/>
                         <outlet property="doneButton" destination="goL-jl-7Gp" id="8Yb-2X-umJ"/>
-                        <outlet property="fireproofSitesLabel" destination="aur-0h-QzR" id="B5V-iN-MUj"/>
-                        <outlet property="removeAllDomainsButton" destination="KAc-ZW-ZAV" id="g8n-OJ-q2k"/>
+                        <outlet property="excludedDomainsLabel" destination="aur-0h-QzR" id="B5V-iN-MUj"/>
                         <outlet property="removeDomainButton" destination="DEQ-Uh-Y7p" id="Zne-M8-g88"/>
                         <outlet property="tableView" destination="pIp-Qw-5G1" id="kNl-PR-zGb"/>
                     </connections>

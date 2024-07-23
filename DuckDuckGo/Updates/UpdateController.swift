@@ -153,6 +153,7 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
 
 #if DEBUG
         updater.updater.automaticallyChecksForUpdates = false
+        updater.updater.automaticallyDownloadsUpdates = false
         updater.updater.updateCheckInterval = 0
 #endif
 

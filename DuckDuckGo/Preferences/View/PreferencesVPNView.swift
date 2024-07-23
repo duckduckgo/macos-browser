@@ -58,12 +58,12 @@ extension Preferences {
                 // SECTION: Excluded Sites
 
                 PreferencePaneSection(UserText.vpnExcludedSitesTitle, spacing: 4) {
-                    Text(UserText.vpnExcludedSitesDescription)
+                    Text(UserText.vpnExcludedDomainsDescription)
                         .foregroundColor(.secondary)
                         .padding(.bottom, 18)
 
                     PreferencePaneSubSection {
-                        Button(UserText.manageFireproofSites) {
+                        Button(UserText.vpnExcludedDomainsManageButtonTitle) {
                             model.manageExcludedSites()
                         }
                     }

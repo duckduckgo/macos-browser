@@ -51,4 +51,7 @@ public enum NetworkProtectionAsset: String, CaseIterable {
     // Images:
     case allowSysexScreenshot = "allow-sysex-screenshot"
     case allowSysexScreenshotBigSur = "allow-sysex-screenshot-bigsur"
+
+    // Accordion View
+    case accordionViewCheckmark = "Check-16D"
 }

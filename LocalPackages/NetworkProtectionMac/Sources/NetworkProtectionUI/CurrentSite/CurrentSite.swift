@@ -1,5 +1,5 @@
 //
-//  ExcludedSitesModel.swift
+//  CurrentSite.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,22 +16,17 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 
-struct Domain {
+public struct CurrentSite {
+    let icon: NSImage
     let domain: String
-}
+    let excluded: Bool
 
-protocol ExcludedSitesViewModel {
-    var sites: [String] { get }
-}
-
-final class DefaultExcludedSitesViewModel: ExcludedSitesViewModel {
-    var sites: [String]
-
-    init(sites: [String] = []) {
-        self.sites = sites
+    public init(icon: NSImage?, domain: String, excluded: Bool) {
+        self.icon = icon ?? NSImage(systemSymbolName: "globe", accessibilityDescription: nil)!
+        self.domain = domain
+        self.excluded = excluded
     }
-
-    
 }

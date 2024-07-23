@@ -56,8 +56,10 @@ public final class TunnelControllerViewModel: ObservableObject {
     ///
     private let statusReporter: NetworkProtectionStatusReporter
 
-    private let vpnSettings: VPNSettings
+    @Published
+    private(set) var currentSite: CurrentSite?
 
+    private let vpnSettings: VPNSettings
     private let locationFormatter: VPNLocationFormatting
 
     private static let byteCountFormatter: ByteCountFormatter = {
@@ -88,6 +90,7 @@ public final class TunnelControllerViewModel: ObservableObject {
     public init(controller: TunnelController,
                 onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter,
+                currentSitePublisher: Published<CurrentSite?>.Publisher,
                 runLoopMode: RunLoop.Mode? = nil,
                 vpnSettings: VPNSettings,
                 locationFormatter: VPNLocationFormatting,
@@ -109,6 +112,10 @@ public final class TunnelControllerViewModel: ObservableObject {
 
         // Particularly useful when unit testing with an initial status of our choosing.
         refreshInternalIsRunning()
+
+        currentSitePublisher
+            .assign(to: \.currentSite, onWeaklyHeld: self)
+            .store(in: &cancellables)
 
         subscribeToOnboardingStatusChanges()
         subscribeToStatusChanges()

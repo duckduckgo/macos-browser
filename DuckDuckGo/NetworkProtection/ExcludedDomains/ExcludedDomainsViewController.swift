@@ -1,5 +1,5 @@
 //
-//  ExcludedSitesViewController.swift
+//  ExcludedDomainsViewController.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,20 +18,20 @@
 
 import AppKit
 
-final class ExcludedSitesViewController: NSViewController {
+final class ExcludedDomainsViewController: NSViewController {
+    typealias Model = ExcludedDomainsViewModel
 
     enum Constants {
-        static let storyboardName = "ExcludedSites"
-        static let identifier = "ExcludedSitesViewController"
-        static let cellIdentifier = NSUserInterfaceItemIdentifier(rawValue: "ExcludedSiteCell")
+        static let storyboardName = "ExcludedDomains"
+        static let identifier = "ExcludedDomainsViewController"
+        static let cellIdentifier = NSUserInterfaceItemIdentifier(rawValue: "ExcludedDomainCell")
     }
 
-    static func create() -> ExcludedSitesViewController {
+    static func create(model: Model = DefaultExcludedDomainsViewModel()) -> ExcludedDomainsViewController {
         let storyboard = loadStoryboard()
 
-        return storyboard.instantiateController(identifier: Constants.identifier) { coder -> ExcludedSitesViewController in
-
-            return ExcludedSitesViewController(model: DefaultExcludedSitesViewModel())
+        return storyboard.instantiateController(identifier: Constants.identifier) { coder in
+            ExcludedDomainsViewController(model: model, coder: coder)
         }
     }
 
@@ -40,24 +40,30 @@ final class ExcludedSitesViewController: NSViewController {
     }
 
     @IBOutlet var tableView: NSTableView!
+    @IBOutlet var addDomainButton: NSButton!
     @IBOutlet var removeDomainButton: NSButton!
-    @IBOutlet var addSiteButton: NSButton!
     @IBOutlet var doneButton: NSButton!
-    @IBOutlet var fireproofSitesLabel: NSTextField!
+    @IBOutlet var excludedDomainsLabel: NSTextField!
 
-    private var allFireproofDomains = [String]()
-    private var filteredFireproofDomains: [String]?
+    private let faviconManagement: FaviconManagement = FaviconManager.shared
 
-    private var fireproofDomains: [String] {
-        return filteredFireproofDomains ?? allFireproofDomains
+    private var allDomains = [String]()
+    private var filteredDomains: [String]?
+
+    private var visibleDomains: [String] {
+        return filteredDomains ?? allDomains
     }
 
-    private let model: ExcludedSitesViewModel
+    private let model: Model
 
-    init(model: ExcludedSitesViewModel) {
+    init?(model: Model, coder: NSCoder) {
         self.model = model
 
-        super.init()
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func viewDidLoad() {
@@ -69,10 +75,10 @@ final class ExcludedSitesViewController: NSViewController {
     }
 
     private func setUpStrings() {
+        addDomainButton.title = UserText.vpnExcludedDomainsAddDomain
         removeDomainButton.title = UserText.remove
-        removeAllDomainsButton.title = UserText.fireproofRemoveAllButton
         doneButton.title = UserText.done
-        fireproofSitesLabel.stringValue = UserText.fireproofSites
+        excludedDomainsLabel.stringValue = UserText.vpnExcludedDomainsTitle
     }
 
     private func updateRemoveButtonState() {
@@ -80,7 +86,7 @@ final class ExcludedSitesViewController: NSViewController {
     }
 
     fileprivate func reloadData() {
-        allFireproofDomains = FireproofDomains.shared.fireproofDomains.sorted { (lhs, rhs) -> Bool in
+        allDomains = model.domains.sorted { (lhs, rhs) -> Bool in
             return lhs < rhs
         }
 
@@ -92,62 +98,61 @@ final class ExcludedSitesViewController: NSViewController {
         dismiss()
     }
 
+    @IBAction func addDomain(_ sender: NSButton) {
+        // TBD
+    }
+
     @IBAction func removeSelectedDomain(_ sender: NSButton) {
         guard tableView.selectedRow > -1 else {
             updateRemoveButtonState()
             return
         }
 
-        let selectedDomain = fireproofDomains[tableView.selectedRow]
-        FireproofDomains.shared.remove(domain: selectedDomain)
+        let selectedDomain = visibleDomains[tableView.selectedRow]
+        model.remove(domain: selectedDomain)
         reloadData()
     }
-
-    @IBAction func removeAllDomains(_ sender: NSButton) {
-        FireproofDomains.shared.clearAll()
-        reloadData()
-    }
-
 }
 
-extension ExcludedSitesViewController: NSTableViewDataSource, NSTableViewDelegate {
+extension ExcludedDomainsViewController: NSTableViewDataSource, NSTableViewDelegate {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return fireproofDomains.count
+        return visibleDomains.count
     }
 
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
-        return fireproofDomains[row]
+        return visibleDomains[row]
     }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        if let cell = tableView.makeView(withIdentifier: Constants.cellIdentifier, owner: nil) as? NSTableCellView {
-            let domain = fireproofDomains[row]
-            cell.textField?.stringValue = domain
-            cell.imageView?.image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
-            cell.imageView?.applyFaviconStyle()
+        guard let cell = tableView.makeView(withIdentifier: Constants.cellIdentifier, owner: nil) as? NSTableCellView else {
 
-            return cell
+            return nil
         }
 
-        return nil
+        let domain = visibleDomains[row]
+
+        cell.textField?.stringValue = domain
+        cell.imageView?.image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
+        cell.imageView?.applyFaviconStyle()
+
+        return cell
     }
 
     func tableViewSelectionDidChange(_ notification: Notification) {
         updateRemoveButtonState()
     }
-
 }
 
-extension ExcludedSitesViewController: NSTextFieldDelegate {
+extension ExcludedDomainsViewController: NSTextFieldDelegate {
 
     func controlTextDidChange(_ notification: Notification) {
         guard let field = notification.object as? NSSearchField else { return }
 
         if field.stringValue.isEmpty {
-            filteredFireproofDomains = nil
+            filteredDomains = nil
         } else {
-            filteredFireproofDomains = allFireproofDomains.filter { $0.contains(field.stringValue) }
+            filteredDomains = allDomains.filter { $0.contains(field.stringValue) }
         }
 
         reloadData()
