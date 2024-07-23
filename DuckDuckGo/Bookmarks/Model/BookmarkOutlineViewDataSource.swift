@@ -271,7 +271,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         let containsDescendantOfDestination = draggedFolders.contains { draggedFolder in
             let folder = BookmarkFolder(id: draggedFolder.id, title: draggedFolder.name, parentFolderUUID: draggedFolder.parentFolderUUID, children: draggedFolder.children)
 
-            guard let draggedNode = treeController.node(representing: folder) else {
+            guard let draggedNode = treeController.findNodeWithId(representing: folder) else {
                 return false
             }
 

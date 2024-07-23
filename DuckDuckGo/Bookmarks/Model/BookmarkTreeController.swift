@@ -70,7 +70,7 @@ final class BookmarkTreeController {
         return nodeInArrayRepresentingObject(nodes: [rootNode]) { $0.representedObjectEquals(object) }
     }
 
-    func findNodeInSearchMode(representing object: AnyObject) -> BookmarkNode? {
+    func findNodeWithId(representing object: AnyObject) -> BookmarkNode? {
         return nodeInArrayRepresentingObject(nodes: [rootNode]) { $0.representedObjectHasSameId(object) }
     }
 

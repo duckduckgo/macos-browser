@@ -548,7 +548,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     private func expandFoldersAndScrollUntil(_ folder: BookmarkFolder) {
-        guard let folderNode = treeController.findNodeInSearchMode(representing: folder) else {
+        guard let folderNode = treeController.findNodeWithId(representing: folder) else {
             return
         }
 
