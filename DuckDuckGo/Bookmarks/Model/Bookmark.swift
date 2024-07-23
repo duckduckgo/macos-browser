@@ -282,9 +282,9 @@ extension Array where Element == BaseBookmarkEntity {
         case .manual:
             return self
         case .nameAscending:
-            return self.sorted { $0.title.lowercased() < $1.title.lowercased() }
+            return self.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
         case .nameDescending:
-            return self.sorted { $0.title.lowercased() > $1.title.lowercased() }
+            return self.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedDescending }
         }
     }
 }
