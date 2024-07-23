@@ -77,6 +77,7 @@ struct RemoteMessageView: View {
             self.isHovering = isHovering
         }
         .onAppear(perform: viewModel.onDidAppear)
+        .onDisappear(perform: viewModel.onDidDisappear)
     }
 
     private var closeButton: some View {
@@ -166,7 +167,7 @@ extension RemoteMessageButtonViewModel {
         descriptionText: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget elit vel ex dapibus mattis ut et leo. Curabitur ut dolor id est blandit rhoncus ac id metus."
     )
 
-    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: small, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
+    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: small, onDidClose: { _ in }, onDidAppear: {}, onDidDisappear: {}, openURLHandler: { _ in }))
 }
 
 #Preview("Medium") {
@@ -176,7 +177,7 @@ extension RemoteMessageButtonViewModel {
         placeholder: .appUpdate
     )
 
-    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: medium, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
+    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: medium, onDidClose: { _ in }, onDidAppear: {}, onDidDisappear: {}, openURLHandler: { _ in }))
 }
 
 #Preview("Big Single Action") {
@@ -188,7 +189,7 @@ extension RemoteMessageButtonViewModel {
         primaryAction: .dismiss
     )
 
-    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
+    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, onDidAppear: {}, onDidDisappear: {}, openURLHandler: { _ in }))
 }
 
 #Preview("Big Single Action #2") {
@@ -200,7 +201,7 @@ extension RemoteMessageButtonViewModel {
         primaryAction: .dismiss
     )
 
-    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
+    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: bigSingleAction, onDidClose: { _ in }, onDidAppear: {}, onDidDisappear: {}, openURLHandler: { _ in }))
 }
 
 #Preview("Big Two Action") {
@@ -214,5 +215,5 @@ extension RemoteMessageButtonViewModel {
         secondaryAction: .dismiss
     )
 
-    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: bigTwoAction, onDidClose: { _ in }, onDidAppear: {}, openURLHandler: { _ in }))
+    return RemoteMessageView(viewModel: .init(messageId: "1", modelType: bigTwoAction, onDidClose: { _ in }, onDidAppear: {}, onDidDisappear: {}, openURLHandler: { _ in }))
 }
