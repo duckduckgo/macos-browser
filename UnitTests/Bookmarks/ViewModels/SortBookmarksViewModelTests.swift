@@ -122,7 +122,10 @@ class SortBookmarksViewModelTests: XCTestCase {
         }
     }
 
-    private func verify(pixel: GeneralPixel, for code: () -> Void, expectation: XCTestExpectation, verification: () async -> Void) async throws {
+    private func verify(pixel: GeneralPixel, 
+                        for code: () -> Void,
+                        expectation: XCTestExpectation,
+                        verification: () async -> Void) async throws {
         let pixelKit = createPixelKit(pixelNamePrefix: pixel.name, pixelExpectation: expectation)
 
         PixelKit.setSharedForTesting(pixelKit: pixelKit)
