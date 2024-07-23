@@ -97,7 +97,7 @@ struct FavoritesGrid: View {
         static let itemWidth: CGFloat = 64
         static let itemHeight: CGFloat = 101
         static let verticalSpacing: CGFloat = 10
-        static let horizontalSpacing: CGFloat = 20
+        static let horizontalSpacing: CGFloat = 24
 
         static let width: CGFloat = (itemWidth + horizontalSpacing) * CGFloat(HomePage.favoritesPerRow) - horizontalSpacing
 
