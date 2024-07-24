@@ -80,6 +80,10 @@ enum BookmarksSortMode: Codable {
         }
     }
 
+    var isNameSorting: Bool {
+        return self == .nameAscending || self == .nameDescending
+    }
+
     private func menuItem(for mode: BookmarksSortMode, state: NSControl.StateValue, disabled: Bool = false) -> NSMenuItem {
         return NSMenuItem(title: mode.title, action: disabled ? nil : mode.action, state: state)
     }
@@ -123,20 +127,44 @@ final class SortBookmarksUserDefaults: SortBookmarksRepository {
     }
 }
 
-final class SortBookmarksViewModel {
+final class SortBookmarksViewModel: NSObject {
 
+    private let metrics: BookmarksSearchAndSortMetrics
+    private let origin: BookmarkOperationOrigin
     private var repository: SortBookmarksRepository
 
     @Published
-    var selectedSortMode: BookmarksSortMode = .manual {
-        didSet {
-            repository.storedSortMode = selectedSortMode
-        }
-    }
+    private(set) var selectedSortMode: BookmarksSortMode = .manual
+    private var wasSortOptionSelected = false
 
-    init(repository: SortBookmarksRepository = SortBookmarksUserDefaults()) {
+    init(repository: SortBookmarksRepository = SortBookmarksUserDefaults(),
+         metrics: BookmarksSearchAndSortMetrics,
+         origin: BookmarkOperationOrigin) {
+        self.metrics = metrics
+        self.origin = origin
         self.repository = repository
 
         selectedSortMode = repository.storedSortMode
+    }
+
+    func setSort(mode: BookmarksSortMode) {
+        wasSortOptionSelected = true
+        selectedSortMode = mode
+        repository.storedSortMode = selectedSortMode
+
+        if mode.isNameSorting {
+            metrics.fireSortByName(origin: origin)
+        }
+    }
+}
+
+extension SortBookmarksViewModel: NSMenuDelegate {
+
+    func menuDidClose(_ menu: NSMenu) {
+        if !wasSortOptionSelected {
+            metrics.fireSortButtonDismissed(origin: origin)
+        }
+
+        wasSortOptionSelected = false
     }
 }

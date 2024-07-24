@@ -93,7 +93,8 @@ final class BookmarkListViewController: NSViewController {
     private let bookmarkManager: BookmarkManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
     private let treeControllerSearchDataSource: BookmarkListTreeControllerSearchDataSource
-    private let sortBookmarksViewModel = SortBookmarksViewModel()
+    private let sortBookmarksViewModel: SortBookmarksViewModel
+    private let bookmarkMetrics: BookmarksSearchAndSortMetrics
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource,
                                                              sortMode: sortBookmarksViewModel.selectedSortMode,
@@ -132,10 +133,13 @@ final class BookmarkListViewController: NSViewController {
         return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
     }()
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         metrics: BookmarksSearchAndSortMetrics = BookmarksSearchAndSortMetrics()) {
         self.bookmarkManager = bookmarkManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
         self.treeControllerSearchDataSource = BookmarkListTreeControllerSearchDataSource(bookmarkManager: bookmarkManager)
+        self.bookmarkMetrics = metrics
+        self.sortBookmarksViewModel = SortBookmarksViewModel(metrics: metrics, origin: .panel)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -488,6 +492,8 @@ final class BookmarkListViewController: NSViewController {
 
     @objc func sortBookmarksButtonClicked(_ sender: NSButton) {
         let menu = sortBookmarksViewModel.selectedSortMode.menu
+        bookmarkMetrics.fireSortButtonClicked(origin: .panel)
+        menu.delegate = sortBookmarksViewModel
         menu.popUpAtMouseLocation(in: sortBookmarksButton)
     }
 
@@ -533,6 +539,7 @@ final class BookmarkListViewController: NSViewController {
            let bookmark = node.representedObject as? Bookmark {
             onBookmarkClick(bookmark)
         } else if let node = item as? BookmarkNode, let folder = node.representedObject as? BookmarkFolder, dataSource.isSearching {
+            bookmarkMetrics.fireSearchResultClicked(origin: .panel)
             hideSearchBar()
             updateSearchAndExpand(folder)
         } else {
@@ -541,6 +548,10 @@ final class BookmarkListViewController: NSViewController {
     }
 
     private func onBookmarkClick(_ bookmark: Bookmark) {
+        if dataSource.isSearching {
+            bookmarkMetrics.fireSearchResultClicked(origin: .panel)
+        }
+
         WindowControllersManager.shared.open(bookmark: bookmark)
         delegate?.popoverShouldClose(self)
     }
@@ -881,15 +892,15 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
 extension BookmarkListViewController: BookmarkSortMenuItemSelectors {
 
     func manualSort(_ sender: NSMenuItem) {
-        sortBookmarksViewModel.selectedSortMode = .manual
+        sortBookmarksViewModel.setSort(mode: .manual)
     }
 
     func sortByNameAscending(_ sender: NSMenuItem) {
-        sortBookmarksViewModel.selectedSortMode = .nameAscending
+        sortBookmarksViewModel.setSort(mode: .nameAscending)
     }
 
     func sortByNameDescending(_ sender: NSMenuItem) {
-        sortBookmarksViewModel.selectedSortMode = .nameDescending
+        sortBookmarksViewModel.setSort(mode: .nameDescending)
     }
 }
 
@@ -906,6 +917,8 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
             } else {
                 showSearch(for: searchQuery)
             }
+
+            bookmarkMetrics.fireSearchExecuted(origin: .panel)
         }
     }
 
