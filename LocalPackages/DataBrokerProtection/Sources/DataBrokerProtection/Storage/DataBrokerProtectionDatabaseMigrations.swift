@@ -20,9 +20,12 @@ import Foundation
 import GRDB
 import Common
 
-typealias Migrations = DataBrokerProtectionDatabaseMigrations
+protocol DataBrokerProtectionDatabaseMigrationsProvider {
+    static var v2Migrations: (inout DatabaseMigrator) throws -> Void { get }
+    static var v3Migrations: (inout DatabaseMigrator) throws -> Void { get }
+}
 
-final class DataBrokerProtectionDatabaseMigrations {
+final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
 
     static var v2Migrations: (inout DatabaseMigrator) throws -> Void = { migrator in
         migrator.registerMigration("v1", migrate: migrateV1(database:))

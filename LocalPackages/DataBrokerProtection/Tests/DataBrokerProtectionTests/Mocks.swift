@@ -1729,3 +1729,26 @@ extension ExtractedProfileDB {
         }
     }
 }
+
+struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
+    static var didCallV2Migrations = false
+    static var didCallV3Migrations = false
+
+    static var v2Migrations: (inout GRDB.DatabaseMigrator) throws -> Void {
+        didCallV2Migrations = true
+        return { _ in }
+    }
+
+    static var v3Migrations: (inout GRDB.DatabaseMigrator) throws -> Void {
+        didCallV3Migrations = true
+        return { _ in }
+    }
+}
+
+struct MockFeatureFlagger: DataBrokerProtectionMigrationsFeatureFlagger {
+    var isUserIn = false
+
+    func isUserIn(percent: Int) -> Bool {
+        isUserIn
+    }
+}

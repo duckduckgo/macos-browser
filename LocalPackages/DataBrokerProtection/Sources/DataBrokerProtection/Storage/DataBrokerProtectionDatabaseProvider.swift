@@ -137,13 +137,28 @@ extension DataBrokerProtectionDatabaseProvider {
 
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
 
+    typealias FeatureFlagger = DataBrokerProtectionMigrationsFeatureFlagger
+    typealias MigrationsProvider = DataBrokerProtectionDatabaseMigrationsProvider
+
     public static func defaultDatabaseURL() -> URL {
         return DefaultDataBrokerProtectionDatabaseProvider.databaseFilePath(directoryName: "DBP", fileName: "Vault.db", appGroupIdentifier: Bundle.main.appGroupName)
     }
 
+    public static func create<T: MigrationsProvider>(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
+                                                     key: Data,
+                                                     featureFlagger: FeatureFlagger = DefaultDataBrokerProtectionMigrationsFeatureFlagger(),
+                                                     migrationProvider: T.Type = DefaultDataBrokerProtectionDatabaseMigrationsProvider.self) throws -> DefaultDataBrokerProtectionDatabaseProvider {
+
+        if featureFlagger.isUserIn(percent: 10) {
+            return try DefaultDataBrokerProtectionDatabaseProvider(file: file, key: key, registerMigrationsHandler: migrationProvider.v3Migrations)
+        } else {
+            return try DefaultDataBrokerProtectionDatabaseProvider(file: file, key: key, registerMigrationsHandler: migrationProvider.v2Migrations)
+        }
+    }
+
     public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
                 key: Data,
-                registerMigrationsHandler: (inout DatabaseMigrator) throws -> Void = Migrations.v3Migrations) throws {
+                registerMigrationsHandler: (inout DatabaseMigrator) throws -> Void) throws {
         try super.init(file: file, key: key, writerType: .pool, registerMigrationsHandler: registerMigrationsHandler)
     }
 

@@ -22,6 +22,8 @@ import GRDB
 
 final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
 
+    typealias Migrations = DefaultDataBrokerProtectionDatabaseMigrationsProvider
+
     private var sut: DataBrokerProtectionDatabaseProvider!
     private let vaultURL = DefaultDataBrokerProtectionDatabaseProvider.databaseFilePath(directoryName: "DBP", fileName: "Test-Vault.db")
     private let key = "9CA59EDC-5CE8-4F53-AAC6-286A7378F384".data(using: .utf8)!
@@ -46,6 +48,8 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
                 XCTFail("Failed to delete test-vault")
             }
         }
+        MockMigrationsProvider.didCallV2Migrations = false
+        MockMigrationsProvider.didCallV3Migrations = false
     }
 
     func testV3MigrationCleansUpOrphanedRecords_andResultsInNoDataIntegrityIssues() throws {
@@ -171,6 +175,30 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
         XCTAssertFalse(try sut.db.allTablesAreEmpty())
         XCTAssertNoThrow(try sut.deleteProfileData())
         XCTAssertTrue(try sut.db.allTablesAreEmpty())
+    }
+
+    func testCreationWithUserNotIn10PercentUsesV2Migrations() throws {
+        // Given
+        let mockFeatureFlagger = MockFeatureFlagger(isUserIn: false)
+
+        // When
+        _ = try DefaultDataBrokerProtectionDatabaseProvider.create(file: vaultURL, key: key, featureFlagger: mockFeatureFlagger, migrationProvider: MockMigrationsProvider.self)
+
+        // Then
+        XCTAssertTrue(MockMigrationsProvider.didCallV2Migrations)
+        XCTAssertFalse(MockMigrationsProvider.didCallV3Migrations)
+    }
+
+    func testCreationWithUserIn10PercentUsesV3Migrations() throws {
+        // Given
+        let mockFeatureFlagger = MockFeatureFlagger(isUserIn: true)
+
+        // When
+        _ = try DefaultDataBrokerProtectionDatabaseProvider.create(file: vaultURL, key: key, featureFlagger: mockFeatureFlagger, migrationProvider: MockMigrationsProvider.self)
+
+        // Then
+        XCTAssertFalse(MockMigrationsProvider.didCallV2Migrations)
+        XCTAssertTrue(MockMigrationsProvider.didCallV3Migrations)
     }
 }
 
