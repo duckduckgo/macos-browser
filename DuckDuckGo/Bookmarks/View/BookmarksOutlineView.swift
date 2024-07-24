@@ -74,6 +74,14 @@ final class BookmarksOutlineView: NSOutlineView {
 
         if rowIndex != -1 {
             scrollRowToVisible(rowIndex)
+        }
+    }
+
+    func scrollToAdjustedPositionInOutlineView(_ item: Any) {
+        let rowIndex = row(forItem: item)
+
+        if rowIndex != -1 {
+            scrollRowToVisible(rowIndex)
 
             if let enclosingScrollView = self.enclosingScrollView {
                 let rowRect = rect(ofRow: rowIndex)
