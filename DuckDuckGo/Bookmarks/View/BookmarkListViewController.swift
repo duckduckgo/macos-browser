@@ -459,7 +459,7 @@ final class BookmarkListViewController: NSViewController {
     private func updateSearchAndExpand(_ folder: BookmarkFolder) {
         showTreeView()
         expandFoldersAndScrollUntil(folder)
-        outlineView.scrollTo(folder)
+        outlineView.scrollToAdjustedPositionInOutlineView(folder)
 
         guard let node = dataSource.treeController.node(representing: folder) else {
             return
@@ -570,7 +570,7 @@ final class BookmarkListViewController: NSViewController {
         }
 
         expandFoldersUntil(node: folderNode)
-        outlineView.scrollTo(folderNode)
+        outlineView.scrollToAdjustedPositionInOutlineView(folderNode)
     }
 
     private func expandFoldersUntil(node: BookmarkNode?) {
@@ -884,7 +884,7 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
         }
 
         expandFoldersUntil(node: node)
-        outlineView.scrollTo(node)
+        outlineView.scrollToAdjustedPositionInOutlineView(node)
         outlineView.highlight(node)
     }
 }
@@ -931,6 +931,10 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
             emptyState.isHidden = true
             outlineView.isHidden = false
             outlineView.reloadData()
+
+            if let firstNode = dataSource.treeController.rootNode.childNodes.first {
+                outlineView.scrollTo(firstNode)
+            }
         }
     }
 }
