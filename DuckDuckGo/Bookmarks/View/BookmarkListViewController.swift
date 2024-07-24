@@ -456,6 +456,12 @@ final class BookmarkListViewController: NSViewController {
         showTreeView()
         expandFoldersAndScrollUntil(folder)
         outlineView.scrollTo(folder)
+
+        guard let node = dataSource.treeController.node(representing: folder) else {
+            return
+        }
+
+        outlineView.highlight(node)
     }
 
     @objc func newBookmarkButtonClicked(_ sender: AnyObject) {
