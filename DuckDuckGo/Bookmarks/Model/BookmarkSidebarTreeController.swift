@@ -20,7 +20,7 @@ import Foundation
 
 final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
 
-    func treeController(childNodesFor node: BookmarkNode) -> [BookmarkNode] {
+    func treeController(childNodesFor node: BookmarkNode, sortMode: BookmarksSortMode) -> [BookmarkNode] {
         return node.isRoot ? childNodesForRootNode(node) : childNodes(for: node)
     }
 

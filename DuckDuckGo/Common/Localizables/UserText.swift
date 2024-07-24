@@ -998,6 +998,11 @@ struct UserText {
     static let manageBookmarksTooltip = NSLocalizedString("tooltip.bookmarks.manage-bookmarks", value: "Manage bookmarks", comment: "Tooltip for the Manage Bookmarks button")
     static let bookmarksManage = NSLocalizedString("bookmarks.manage", value: "Manage", comment: "Button for opening the bookmarks management interface")
     static let bookmarksSearch = NSLocalizedString("tooltip.bookmarks.search", value: "Search bookmarks", comment: "Tooltip to activate the bookmark search")
+    static let bookmarksSort = NSLocalizedString("tooltip.bookmarks.sort", value: "Sort bookmarks", comment: "Tooltip to activate the bookmark sort")
+    static let bookmarksSortManual = NSLocalizedString("bookmarks.sort.manual", value: "Manual", comment: "Button to sort bookmarks by manual")
+    static let bookmarksSortByName = NSLocalizedString("bookmarks.sort.name", value: "Name", comment: "Button to sort bookmarks by name ascending")
+    static let bookmarksSortByNameAscending = NSLocalizedString("bookmarks.sort.name.asc", value: "Ascending", comment: "Button to sort bookmarks by name ascending")
+    static let bookmarksSortByNameDescending = NSLocalizedString("bookmarks.sort.name.desc", value: "Descending", comment: "Button to sort bookmarks by name descending")
 
     static let bookmarksEmptyStateTitle = NSLocalizedString("bookmarks.empty.state.title", value: "No bookmarks yet", comment: "Title displayed in Bookmark Manager when there is no bookmarks yet")
     static let bookmarksEmptyStateMessage = NSLocalizedString("bookmarks.empty.state.message", value: "If your bookmarks are saved in another browser, you can import them into DuckDuckGo.", comment: "Text displayed in Bookmark Manager when there is no bookmarks yet")
