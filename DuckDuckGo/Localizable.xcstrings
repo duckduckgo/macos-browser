@@ -11342,6 +11342,54 @@
         }
       }
     },
+    "bookmarks.sort.manual" : {
+      "comment" : "Button to sort bookmarks by manual",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manual"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.name" : {
+      "comment" : "Button to sort bookmarks by name ascending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.name.asc" : {
+      "comment" : "Button to sort bookmarks by name ascending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Ascending"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.name.desc" : {
+      "comment" : "Button to sort bookmarks by name descending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Descending"
+          }
+        }
+      }
+    },
     "Bring All to Front" : {
       "comment" : "Main Menu Window item",
       "localizations" : {
@@ -55013,6 +55061,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закладки"
+          }
+        }
+      }
+    },
+    "tooltip.bookmarks.sort" : {
+      "comment" : "Tooltip to activate the bookmark sort",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sort bookmarks"
           }
         }
       }

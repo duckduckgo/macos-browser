@@ -71,6 +71,7 @@ final class BookmarkListViewController: NSViewController {
     private lazy var newBookmarkButton = MouseOverButton(image: .addBookmark, target: self, action: #selector(newBookmarkButtonClicked))
     private lazy var newFolderButton = MouseOverButton(image: .addFolder, target: self, action: #selector(newFolderButtonClicked))
     private lazy var searchBookmarksButton = MouseOverButton(image: .searchBookmarks, target: self, action: #selector(searchBookmarkButtonClicked))
+    private lazy var sortBookmarksButton = MouseOverButton(image: .bookmarkSortAsc, target: self, action: #selector(sortBookmarksButtonClicked))
     private var isSearchVisible = false
 
     private lazy var buttonsDivider = NSBox()
@@ -92,8 +93,10 @@ final class BookmarkListViewController: NSViewController {
     private let bookmarkManager: BookmarkManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
     private let treeControllerSearchDataSource: BookmarkListTreeControllerSearchDataSource
+    private let sortBookmarksViewModel = SortBookmarksViewModel()
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource,
+                                                             sortMode: sortBookmarksViewModel.selectedSortMode,
                                                              searchDataSource: treeControllerSearchDataSource)
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
@@ -101,6 +104,7 @@ final class BookmarkListViewController: NSViewController {
             contentMode: .bookmarksAndFolders,
             bookmarkManager: bookmarkManager,
             treeController: treeController,
+            sortMode: sortBookmarksViewModel.selectedSortMode,
             onMenuRequestedAction: { [weak self] cell in
                 self?.showContextMenu(for: cell)
             },
@@ -168,6 +172,7 @@ final class BookmarkListViewController: NSViewController {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.addArrangedSubview(newBookmarkButton)
         stackView.addArrangedSubview(newFolderButton)
+        stackView.addArrangedSubview(sortBookmarksButton)
         stackView.addArrangedSubview(searchBookmarksButton)
         stackView.addArrangedSubview(buttonsDivider)
         stackView.addArrangedSubview(manageBookmarksButton)
@@ -195,6 +200,14 @@ final class BookmarkListViewController: NSViewController {
         searchBookmarksButton.mouseOverColor = .buttonMouseOver
         searchBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
         searchBookmarksButton.toolTip = UserText.bookmarksSearch
+
+        sortBookmarksButton.bezelStyle = .shadowlessSquare
+        sortBookmarksButton.cornerRadius = 4
+        sortBookmarksButton.normalTintColor = .button
+        sortBookmarksButton.mouseDownColor = .buttonMouseDown
+        sortBookmarksButton.mouseOverColor = .buttonMouseOver
+        sortBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
+        sortBookmarksButton.toolTip = UserText.bookmarksSort
 
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.delegate = self
@@ -308,6 +321,9 @@ final class BookmarkListViewController: NSViewController {
         searchBookmarksButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
         searchBookmarksButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
 
+        sortBookmarksButton.heightAnchor.constraint(equalToConstant: 28).isActive = true
+        sortBookmarksButton.widthAnchor.constraint(equalToConstant: 28).isActive = true
+
         buttonsDivider.widthAnchor.constraint(equalToConstant: 13).isActive = true
         buttonsDivider.heightAnchor.constraint(equalToConstant: 18).isActive = true
 
@@ -383,6 +399,19 @@ final class BookmarkListViewController: NSViewController {
                 self.outlineView.isHidden = false
             }
         }.store(in: &cancellables)
+
+        sortBookmarksViewModel.$selectedSortMode.sink { [weak self] newSortMode in
+            guard let self else { return }
+
+            switch newSortMode {
+            case .nameDescending:
+                self.sortBookmarksButton.image = .bookmarkSortDesc
+            default:
+                self.sortBookmarksButton.image = .bookmarkSortAsc
+            }
+
+            self.setupSort(mode: newSortMode)
+        }.store(in: &cancellables)
     }
 
     override func viewWillAppear() {
@@ -410,13 +439,13 @@ final class BookmarkListViewController: NSViewController {
                 hideSearchBar()
                 updateSearchAndExpand(destinationFolder)
             } else {
-                dataSource.reloadData(for: searchBar.stringValue)
+                dataSource.reloadData(for: searchBar.stringValue, and: sortBookmarksViewModel.selectedSortMode)
                 outlineView.reloadData()
             }
         } else {
             let selectedNodes = self.selectedNodes
 
-            dataSource.reloadData()
+            dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode)
             outlineView.reloadData()
 
             expandAndRestore(selectedNodes: selectedNodes)
@@ -451,6 +480,11 @@ final class BookmarkListViewController: NSViewController {
         }
     }
 
+    @objc func sortBookmarksButtonClicked(_ sender: NSButton) {
+        let menu = sortBookmarksViewModel.selectedSortMode.menu
+        menu.popUpAtMouseLocation(in: sortBookmarksButton)
+    }
+
     private func showSearchBar() {
         view.addSubview(searchBar)
 
@@ -471,6 +505,14 @@ final class BookmarkListViewController: NSViewController {
         isSearchVisible = false
         searchBookmarksButton.backgroundColor = .clear
         searchBookmarksButton.mouseOverColor = .buttonMouseOver
+    }
+
+    private func setupSort(mode: BookmarksSortMode) {
+        hideSearchBar()
+        dataSource.reloadData(with: mode)
+        outlineView.reloadData()
+        sortBookmarksButton.backgroundColor = mode.shouldHighlightButton ? .buttonMouseDown : .clear
+        sortBookmarksButton.mouseOverColor = mode.shouldHighlightButton ? .buttonMouseDown : .buttonMouseOver
     }
 
     @objc func openManagementInterface(_ sender: NSButton) {
@@ -506,7 +548,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     private func expandFoldersAndScrollUntil(_ folder: BookmarkFolder) {
-        guard let folderNode = treeController.findNodeInSearchMode(representing: folder) else {
+        guard let folderNode = treeController.findNodeWithId(representing: folder) else {
             return
         }
 
@@ -534,7 +576,7 @@ final class BookmarkListViewController: NSViewController {
     private func showTreeView() {
         emptyState.isHidden = true
         outlineView.isHidden = false
-        dataSource.reloadData()
+        dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode)
         outlineView.reloadData()
     }
 
@@ -830,6 +872,21 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
     }
 }
 
+extension BookmarkListViewController: BookmarkSortMenuItemSelectors {
+
+    func manualSort(_ sender: NSMenuItem) {
+        sortBookmarksViewModel.selectedSortMode = .manual
+    }
+
+    func sortByNameAscending(_ sender: NSMenuItem) {
+        sortBookmarksViewModel.selectedSortMode = .nameAscending
+    }
+
+    func sortByNameDescending(_ sender: NSMenuItem) {
+        sortBookmarksViewModel.selectedSortMode = .nameDescending
+    }
+}
+
 // MARK: - Search field delegate
 
 extension BookmarkListViewController: NSSearchFieldDelegate {
@@ -847,7 +904,7 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
     }
 
     private func showSearch(for searchQuery: String) {
-        dataSource.reloadData(for: searchQuery)
+        dataSource.reloadData(for: searchQuery, and: sortBookmarksViewModel.selectedSortMode)
 
         if dataSource.treeController.rootNode.childNodes.isEmpty {
             showEmptyStateView(for: .noSearchResults)
