@@ -365,7 +365,7 @@ final class AddressBarViewController: NSViewController {
         case .suggestion(let suggestionViewModel):
             switch suggestionViewModel.suggestion {
             case .phrase, .unknown: self.mode = .editing(isUrl: false)
-            case .website, .bookmark, .historyEntry, .internalPage: self.mode = .editing(isUrl: true)
+            case .website, .bookmark, .historyEntry, .internalPage, .weatherIA: self.mode = .editing(isUrl: true)
             }
         }
     }

@@ -68,18 +68,51 @@ struct SuggestionViewModel: Equatable {
     }
 
     var tableCellViewAttributedString: NSAttributedString {
-        var firstPart = ""
-        var boldPart = string
-        if string.hasPrefix(userStringValue) {
-            firstPart = String(string.prefix(userStringValue.count))
-            boldPart = String(string.dropFirst(userStringValue.count))
+        switch suggestion {
+        case .weatherIA(icon: _,
+                        currentTemperature: let currentTemperature,
+                        description: let description,
+                        highTemperature: _,
+                        lowTemperature: _,
+                        location: _,
+                        url: _):
+            var firstPart = "\(currentTemperature)°"
+            var secondPart = " \(description)"
+            let attributedString = NSMutableAttributedString(string: firstPart, attributes: tableRowViewBoldAttributes)
+            let secondAttributedString = NSAttributedString(string: secondPart, attributes: tableRowViewStandardAttributes)
+            attributedString.append(secondAttributedString)
+
+            return attributedString
+        default:
+            var firstPart = ""
+            var boldPart = string
+            if string.hasPrefix(userStringValue) {
+                firstPart = String(string.prefix(userStringValue.count))
+                boldPart = String(string.dropFirst(userStringValue.count))
+            }
+
+            let attributedString = NSMutableAttributedString(string: firstPart, attributes: tableRowViewStandardAttributes)
+            let boldAttributedString = NSAttributedString(string: boldPart, attributes: tableRowViewBoldAttributes)
+            attributedString.append(boldAttributedString)
+
+            return attributedString
+        }
+    }
+
+    var secondaryString: String {
+        switch suggestion {
+        case .weatherIA(icon: _,
+                        currentTemperature: _,
+                        description: _,
+                        highTemperature: let highTemperature,
+                        lowTemperature: let lowTemperature,
+                        location: let location,
+                        url: _):
+            return "High \(highTemperature)° / Low \(lowTemperature)° - \(location)"
+        default:
+            return ""
         }
 
-        let attributedString = NSMutableAttributedString(string: firstPart, attributes: tableRowViewStandardAttributes)
-        let boldAttributedString = NSAttributedString(string: boldPart, attributes: tableRowViewBoldAttributes)
-        attributedString.append(boldAttributedString)
-
-        return attributedString
     }
 
     var string: String {
@@ -99,6 +132,8 @@ struct SuggestionViewModel: Equatable {
             return title
         case .unknown(value: let value):
             return value
+        case .weatherIA:
+            return userStringValue
         }
     }
 
@@ -106,7 +141,8 @@ struct SuggestionViewModel: Equatable {
         switch suggestion {
         case .phrase,
              .website,
-             .unknown:
+             .unknown,
+             .weatherIA:
             return nil
         case .historyEntry(title: let title, url: let url, allowedInTopHits: _):
             if url.isDuckDuckGoSearch {
@@ -159,6 +195,8 @@ struct SuggestionViewModel: Equatable {
             }
         case .internalPage:
             return " – " + UserText.duckDuckGo
+        case .weatherIA:
+            return " – See More"
         }
     }
 
@@ -185,6 +223,8 @@ struct SuggestionViewModel: Equatable {
         case .internalPage(title: _, url: let url):
             guard url == URL(string: StartupPreferences.shared.formattedCustomHomePageURL) else { return nil }
             return .home16
+        case .weatherIA:
+            return nil
         }
     }
 

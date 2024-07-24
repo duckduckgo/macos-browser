@@ -75,7 +75,6 @@ final class SuggestionViewController: NSViewController {
         self.view.window!.backgroundColor = .clear
 
         addEventMonitors()
-        tableView.rowHeight = suggestionContainerViewModel.isHomePage ? 34 : 28
     }
 
     override func viewWillDisappear() {
@@ -143,8 +142,8 @@ final class SuggestionViewController: NSViewController {
 
         // Remove the second reload that causes visual glitch in the beginning of typing
         if suggestionContainerViewModel.suggestionContainer.result != nil {
-            updateHeight()
             tableView.reloadData()
+            updateHeight()
             self.selectRow(at: self.suggestionContainerViewModel.selectionIndex)
         }
     }
@@ -209,11 +208,18 @@ final class SuggestionViewController: NSViewController {
             return
         }
 
-        let rowHeight = tableView.rowHeight
-
-        tableViewHeightConstraint.constant = CGFloat(suggestionContainerViewModel.numberOfSuggestions) * rowHeight
+        tableViewHeightConstraint.constant = totalHeight()
             + (tableView.enclosingScrollView?.contentInsets.top ?? 0)
             + (tableView.enclosingScrollView?.contentInsets.bottom ?? 0)
+    }
+
+    func totalHeight() -> CGFloat {
+        var totalHeight: CGFloat = 0
+        for row in 0..<self.tableView.numberOfRows {
+            totalHeight += tableView(tableView, heightOfRow: row)
+        }
+
+        return totalHeight
     }
 
     private func closeWindow() {
@@ -237,22 +243,43 @@ extension SuggestionViewController: NSTableViewDataSource {
 
 extension SuggestionViewController: NSTableViewDelegate {
 
-    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        guard let suggestionTableCellView = tableView.makeView(
-                withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableCellView.identifier), owner: self)
-                as? SuggestionTableCellView else {
-            assertionFailure("SuggestionViewController: Making of table cell view failed")
-            return nil
+    func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
+        if let _ = suggestionContainerViewModel.suggestionContainer.result?.instantAnswer, row == 0 {
+            return 48
+        } else {
+            return suggestionContainerViewModel.isHomePage ? 34 : 28
         }
+    }
 
+    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         guard let suggestionViewModel = suggestionContainerViewModel.suggestionViewModel(at: row) else {
             assertionFailure("SuggestionViewController: Failed to get suggestion")
             return nil
         }
 
-        suggestionTableCellView.isBurner = self.isBurner
-        suggestionTableCellView.display(suggestionViewModel)
-        return suggestionTableCellView
+        if suggestionViewModel.suggestion.isWeatherInstantAnswer {
+            guard let suggestionTableCellView = tableView.makeView(
+                withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionWeatherIATableCellView.identifier), owner: self)
+                    as? SuggestionWeatherIATableCellView else {
+                assertionFailure("SuggestionViewController: Making of table cell view failed")
+                return nil
+            }
+
+            suggestionTableCellView.isBurner = self.isBurner
+            suggestionTableCellView.display(suggestionViewModel)
+            return suggestionTableCellView
+        } else {
+            guard let suggestionTableCellView = tableView.makeView(
+                withIdentifier: NSUserInterfaceItemIdentifier(rawValue: SuggestionTableCellView.identifier), owner: self)
+                    as? SuggestionTableCellView else {
+                assertionFailure("SuggestionViewController: Making of table cell view failed")
+                return nil
+            }
+
+            suggestionTableCellView.isBurner = self.isBurner
+            suggestionTableCellView.display(suggestionViewModel)
+            return suggestionTableCellView
+        }
     }
 
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {

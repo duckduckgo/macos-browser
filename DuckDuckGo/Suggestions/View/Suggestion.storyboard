@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22689"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -109,13 +108,13 @@
                                                         </userDefinedRuntimeAttributes>
                                                     </customView>
                                                     <scrollView borderType="none" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
-                                                        <rect key="frame" x="4" y="0.0" width="608" height="87"/>
+                                                        <rect key="frame" x="4" y="0.0" width="608" height="150"/>
                                                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="pb8-sX-fSc">
-                                                            <rect key="frame" x="0.0" y="0.0" width="608" height="87"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="608" height="150"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" id="4Z2-d8-NA2">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="608" height="74"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="608" height="150"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <color key="backgroundColor" name="ClearColor"/>
                                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -136,8 +135,64 @@
                                                                                     <rect key="frame" x="10" y="0.0" width="584" height="22"/>
                                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                 </customView>
+                                                                                <tableCellView identifier="SuggestionWeatherIATableCellView" id="QSr-7b-5GM" customClass="SuggestionWeatherIATableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                                                    <rect key="frame" x="10" y="22" width="584" height="48"/>
+                                                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                                    <subviews>
+                                                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Fdz-bm-Ynm">
+                                                                                            <rect key="frame" x="6" y="4" width="40" height="40"/>
+                                                                                            <constraints>
+                                                                                                <constraint firstAttribute="height" constant="40" id="XdH-Wp-KgC"/>
+                                                                                                <constraint firstAttribute="width" constant="40" id="qz3-VA-4SW"/>
+                                                                                            </constraints>
+                                                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="WeatherSun" id="2tj-eB-v6v"/>
+                                                                                        </imageView>
+                                                                                        <textField horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="sdG-pL-WHu">
+                                                                                            <rect key="frame" x="48" y="23" width="119" height="16"/>
+                                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Search Suggestion" id="ILU-ky-cD5">
+                                                                                                <font key="font" usesAppearanceFont="YES"/>
+                                                                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                                            </textFieldCell>
+                                                                                        </textField>
+                                                                                        <textField horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="dew-ps-kUd">
+                                                                                            <rect key="frame" x="48" y="9" width="103" height="14"/>
+                                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Search Suggestion" id="JKv-KW-gDe">
+                                                                                                <font key="font" metaFont="smallSystem"/>
+                                                                                                <color key="textColor" name="SecondaryColor"/>
+                                                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                                            </textFieldCell>
+                                                                                        </textField>
+                                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="31F-iY-bsC">
+                                                                                            <rect key="frame" x="147" y="9" width="431" height="14"/>
+                                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title=" – See more" id="m5m-PW-Oqj">
+                                                                                                <font key="font" metaFont="smallSystem"/>
+                                                                                                <color key="textColor" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
+                                                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                                            </textFieldCell>
+                                                                                        </textField>
+                                                                                    </subviews>
+                                                                                    <constraints>
+                                                                                        <constraint firstItem="dew-ps-kUd" firstAttribute="centerY" secondItem="QSr-7b-5GM" secondAttribute="centerY" constant="8" id="4Kc-D5-8lM"/>
+                                                                                        <constraint firstItem="Fdz-bm-Ynm" firstAttribute="centerY" secondItem="QSr-7b-5GM" secondAttribute="centerY" id="5Iu-aI-6ow"/>
+                                                                                        <constraint firstItem="31F-iY-bsC" firstAttribute="centerY" secondItem="dew-ps-kUd" secondAttribute="centerY" id="Ikx-ms-7dO"/>
+                                                                                        <constraint firstItem="sdG-pL-WHu" firstAttribute="centerY" secondItem="QSr-7b-5GM" secondAttribute="centerY" constant="-7" id="JTP-lb-Lb2"/>
+                                                                                        <constraint firstItem="sdG-pL-WHu" firstAttribute="leading" secondItem="Fdz-bm-Ynm" secondAttribute="trailing" constant="4" id="PJY-2z-nqK"/>
+                                                                                        <constraint firstItem="dew-ps-kUd" firstAttribute="leading" secondItem="Fdz-bm-Ynm" secondAttribute="trailing" constant="4" id="PzM-er-P8m"/>
+                                                                                        <constraint firstItem="31F-iY-bsC" firstAttribute="width" secondItem="sdG-pL-WHu" secondAttribute="width" multiplier="0.55" priority="250" id="Sn6-lE-QX0"/>
+                                                                                        <constraint firstItem="31F-iY-bsC" firstAttribute="leading" secondItem="dew-ps-kUd" secondAttribute="trailing" id="bYg-1c-oKj"/>
+                                                                                        <constraint firstAttribute="trailing" secondItem="31F-iY-bsC" secondAttribute="trailing" constant="8" id="iRk-n7-neR"/>
+                                                                                        <constraint firstItem="Fdz-bm-Ynm" firstAttribute="leading" secondItem="QSr-7b-5GM" secondAttribute="leading" constant="6" id="xyt-u1-UQA"/>
+                                                                                    </constraints>
+                                                                                    <connections>
+                                                                                        <outlet property="iconImageView" destination="Fdz-bm-Ynm" id="g8L-OL-KWG"/>
+                                                                                        <outlet property="secondaryTextField" destination="dew-ps-kUd" id="IAm-04-kC6"/>
+                                                                                        <outlet property="suffixTextField" destination="31F-iY-bsC" id="FPm-Rw-g5R"/>
+                                                                                        <outlet property="textField" destination="sdG-pL-WHu" id="b0G-2K-UKB"/>
+                                                                                    </connections>
+                                                                                </tableCellView>
                                                                                 <tableCellView identifier="SuggestionTableCellView" id="kX2-C1-38Y" customClass="SuggestionTableCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                                    <rect key="frame" x="10" y="22" width="584" height="80"/>
+                                                                                    <rect key="frame" x="10" y="70" width="584" height="80"/>
                                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                     <subviews>
                                                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vli-IP-Nr8">
@@ -176,7 +231,7 @@
                                                                                         <constraint firstItem="vli-IP-Nr8" firstAttribute="leading" secondItem="kX2-C1-38Y" secondAttribute="leading" constant="13" id="zgq-le-RHJ"/>
                                                                                     </constraints>
                                                                                     <connections>
-                                                                                        <outlet property="iconImageView" destination="vli-IP-Nr8" id="5lX-7Q-4Cw"/>
+                                                                                        <outlet property="iconImageView" destination="vli-IP-Nr8" id="4gB-ZY-VLS"/>
                                                                                         <outlet property="suffixTextField" destination="efo-Vy-aEh" id="vDH-Af-pkR"/>
                                                                                         <outlet property="textField" destination="bOr-Go-gyW" id="wxi-1N-Bc4"/>
                                                                                     </connections>
@@ -225,7 +280,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="1" y="100" width="614" height="1"/>
+                                                <rect key="frame" x="1" y="150" width="614" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>
@@ -280,6 +335,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="WeatherSun" width="40" height="40"/>
         <namedColor name="AddressBarBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
@@ -294,6 +350,9 @@
         </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="SecondaryColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.60000002384185791" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="SuggestionsShadowColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.25" colorSpace="custom" customColorSpace="displayP3"/>

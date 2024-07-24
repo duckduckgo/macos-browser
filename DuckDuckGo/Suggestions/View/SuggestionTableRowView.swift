@@ -60,6 +60,10 @@ final class SuggestionTableRowView: NSTableRowView {
                 cellView.isSelected = isSelected
                 isBurner = cellView.isBurner
             }
+            if let cellView = subview as? SuggestionWeatherIATableCellView {
+                cellView.isSelected = isSelected
+                isBurner = cellView.isBurner
+            }
         }
     }
 

@@ -235,7 +235,7 @@ final class AddressBarTextField: NSTextField {
         case .suggestion(let suggestionViewModel):
             let suggestion = suggestionViewModel.suggestion
             switch suggestion {
-            case .website, .bookmark, .historyEntry, .internalPage:
+            case .website, .bookmark, .historyEntry, .internalPage, .weatherIA:
                 restoreValue(Value(stringValue: suggestionViewModel.autocompletionString, userTyped: true))
             case .phrase(phrase: let phase):
                 restoreValue(Value.text(phase, userTyped: false))
@@ -261,7 +261,7 @@ final class AddressBarTextField: NSTextField {
             switch self.value {
             case .suggestion(let suggestionViewModel):
                 switch suggestionViewModel.suggestion {
-                case .phrase, .website, .bookmark, .historyEntry, .internalPage: return false
+                case .phrase, .website, .bookmark, .historyEntry, .internalPage, .weatherIA: return false
                 case .unknown: return true
                 }
             case .text(_, userTyped: true), .url(_, _, userTyped: true): return false
@@ -442,7 +442,8 @@ final class AddressBarTextField: NSTextField {
         case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
              .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .website(url: let url),
-             .internalPage(title: _, url: let url):
+             .internalPage(title: _, url: let url),
+             .weatherIA(icon: _, currentTemperature: _, description: _, highTemperature: _, lowTemperature: _, location: _, url: let url):
             finalUrl = url
             userEnteredValue = url.absoluteString
         case .phrase(phrase: let phrase),
@@ -827,7 +828,8 @@ extension AddressBarTextField {
 
             case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
                  .historyEntry(title: _, url: let url, allowedInTopHits: _),
-                 .internalPage(title: _, url: let url):
+                 .internalPage(title: _, url: let url),
+                 .weatherIA(icon: _, currentTemperature: _, description: _, highTemperature: _, lowTemperature: _, location: _, url: let url):
                 if let title = suggestionViewModel.title,
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {
