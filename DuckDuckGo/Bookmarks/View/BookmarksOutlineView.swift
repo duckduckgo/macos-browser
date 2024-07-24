@@ -69,15 +69,21 @@ final class BookmarksOutlineView: NSOutlineView {
         lastRow = rowView
     }
 
-    func scrollTo(_ item: Any) {
+    func scrollTo(_ item: Any, code: ((Int) -> Void)? = nil) {
         let rowIndex = row(forItem: item)
 
         if rowIndex != -1 {
             scrollRowToVisible(rowIndex)
+            code?(rowIndex)
+        }
+    }
 
+    /// Scrolls to the passed node and tries to position it in the second row.
+    func scrollToAdjustedPositionInOutlineView(_ item: Any) {
+        scrollTo(item) { rowIndex in
             if let enclosingScrollView = self.enclosingScrollView {
-                let rowRect = rect(ofRow: rowIndex)
-                let desiredTopPosition = rowRect.origin.y - rowHeight // Adjusted position one row height from the top.
+                let rowRect = self.rect(ofRow: rowIndex)
+                let desiredTopPosition = rowRect.origin.y - self.rowHeight // Adjusted position one row height from the top.
                 let scrollPoint = NSPoint(x: 0, y: desiredTopPosition - enclosingScrollView.contentInsets.top)
                 enclosingScrollView.contentView.scroll(to: scrollPoint)
             }
