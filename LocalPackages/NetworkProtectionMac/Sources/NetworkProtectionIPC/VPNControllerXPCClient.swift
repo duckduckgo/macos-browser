@@ -37,7 +37,7 @@ protocol XPCClientInterfaceObjC {
     func serverInfoChanged(payload: Data)
     func statusChanged(payload: Data)
     func dataVolumeUpdated(payload: Data)
-    func knownFailureUpdated(failure: KnownFailure?)
+    func knownFailureUpdated(payload: Data)
 }
 
 public final class VPNControllerXPCClient {
@@ -168,6 +168,14 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterfaceObjC {
         clientDelegate?.dataVolumeUpdated(dataVolume)
     }
 
+    func knownFailureUpdated(payload: Data) {
+        guard let failure = try? JSONDecoder().decode(KnownFailure?.self, from: payload) else {
+            return
+        }
+
+        knownFailureUpdated(failure: failure)
+    }
+
     func knownFailureUpdated(failure: KnownFailure?) {
         knownFailureObserver.publish(failure)
         clientDelegate?.knownFailureUpdated(failure)
@@ -247,6 +255,9 @@ extension VPNControllerXPCClient: VPNControllerIPCClient {
         case .systemExtension:
             try await self.command(.removeSystemExtension)
         }
+    }
 
+    public func quit() async throws {
+        try await self.command(.removeSystemExtension)
     }
 }

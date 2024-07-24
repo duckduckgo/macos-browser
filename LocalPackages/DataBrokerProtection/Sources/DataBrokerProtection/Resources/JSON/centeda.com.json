@@ -1,7 +1,7 @@
 {
   "name": "Centeda",
   "url": "centeda.com",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
   "steps": [
@@ -27,6 +27,7 @@
           "actionType": "extract",
           "id": "e779b827-702d-402d-ae79-f3681ad50008",
           "selector": ".search-result > a",
+          "noResultsSelector": "//div[@class='no-phone-info'] | //h1[contains(text(), 'Oops')]",
           "profile": {
             "name": {
               "selector": ".title",

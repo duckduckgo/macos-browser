@@ -37,7 +37,6 @@ import Subscription
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
-// swiftlint:disable:next type_body_length
 final class NetworkProtectionTunnelController: TunnelController, TunnelSessionProvider {
 
     // MARK: - Settings
@@ -284,6 +283,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 .setSelectedServer,
                 .setSelectedEnvironment,
                 .setSelectedLocation,
+                .setDNSSettings,
                 .setShowInMenuBar,
                 .setDisableRekeying:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
@@ -638,6 +638,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             options[NetworkProtectionOptionKey.selectedLocation] = NSData(data: data)
         }
 #endif
+
+        if let data = try? JSONEncoder().encode(settings.dnsSettings) {
+            options[NetworkProtectionOptionKey.dnsSettings] = NSData(data: data)
+        }
 
         if case .custom(let keyValidity) = settings.registrationKeyValidity {
             options[NetworkProtectionOptionKey.keyValidity] = String(describing: keyValidity) as NSString

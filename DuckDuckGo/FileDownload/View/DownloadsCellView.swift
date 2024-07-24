@@ -108,7 +108,6 @@ final class DownloadsCellView: NSTableCellView {
         fatalError("\(Self.self): Bad initializer")
     }
 
-    // swiftlint:disable:next function_body_length
     private func setupUI() {
         self.imageView = fileIconView
         self.wantsLayer = true

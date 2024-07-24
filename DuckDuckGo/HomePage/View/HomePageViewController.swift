@@ -21,6 +21,7 @@ import Combine
 import SwiftUI
 import History
 import PixelKit
+import RemoteMessaging
 
 @MainActor
 final class HomePageViewController: NSViewController {
@@ -91,6 +92,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(featuresModel)
             .environmentObject(accessibilityPreferences)
             .environmentObject(appearancePreferences)
+            .environmentObject(Application.appDelegate.activeRemoteMessageModel)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()
@@ -180,6 +182,7 @@ final class HomePageViewController: NSViewController {
         return .init(open: { [weak self] bookmark, target in
             guard let urlObject = bookmark.urlObject else { return }
             self?.openUrl(urlObject, target: target)
+            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
         }, removeFavorite: { [weak self] bookmark in
             bookmark.isFavorite = !bookmark.isFavorite
             self?.bookmarkManager.update(bookmark: bookmark)

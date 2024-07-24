@@ -210,7 +210,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         invalidCredentialsTitles = invalidCredentialsObjects.map({ $0.truncated(length: 15) })
     }
 
-    // swiftlint:disable:next function_body_length
     private func setUpObservables() {
         syncService.featureFlagsPublisher
             .dropFirst()
@@ -311,7 +310,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     func manageLogins() {
         guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
         let navigationViewController = parentWindowController.mainViewController.navigationBarViewController
-        navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
+        navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems, source: .sync)
     }
 
     private func setUpSyncOptionsObservables(apperancePreferences: AppearancePreferences) {

@@ -73,7 +73,7 @@ struct DBPUICommunicationLayer: Subfeature {
     weak var delegate: DBPUICommunicationDelegate?
 
     private enum Constants {
-        static let version = 3
+        static let version = 4
     }
 
     internal init(webURLSettings: DataBrokerProtectionWebUIURLSettingsRepresentable) {
@@ -83,7 +83,6 @@ struct DBPUICommunicationLayer: Subfeature {
         ])
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     func handler(forMethodNamed methodName: String) -> Handler? {
         guard let actionResult = DBPUIReceivedMethodName(rawValue: methodName) else {
             os_log("Cant parse method: %{public}@", log: .dataBrokerProtection, methodName)

@@ -70,9 +70,9 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     let dataBrokerVersion: String
     let startTime: Date
     var lastStateTime: Date
-    private (set) var actionID: String?
-    private (set) var stage: Stage = .other
-    private (set) var emailPattern: String?
+    private(set) var actionID: String?
+    private(set) var stage: Stage = .other
+    private(set) var emailPattern: String?
 
     init(attemptId: UUID = UUID(),
          startTime: Date = Date(),

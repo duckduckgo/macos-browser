@@ -68,13 +68,13 @@ extension Preferences {
                 // Autofill Content  Button
                 PreferencePaneSection {
                     Button(UserText.autofillViewContentButtonPasswords) {
-                        model.showAutofillPopover(.logins)
+                        model.showAutofillPopover(.logins, source: .settings)
                     }
                     Button(UserText.autofillViewContentButtonIdentities) {
-                        model.showAutofillPopover(.identities)
+                        model.showAutofillPopover(.identities, source: .settings)
                     }
                     Button(UserText.autofillViewContentButtonPaymentMethods) {
-                        model.showAutofillPopover(.cards)
+                        model.showAutofillPopover(.cards, source: .settings)
                     }
 #if APPSTORE
                     Button(UserText.importPasswords) {
@@ -193,8 +193,6 @@ extension Preferences {
             .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
         }
 
-        // swiftlint:disable cyclomatic_complexity
-        // swiftlint:disable function_body_length
         @ViewBuilder private func bitwardenStatusView(for status: BWStatus) -> some View {
             switch status {
             case .disabled:
@@ -277,8 +275,6 @@ extension Preferences {
                 .offset(x: Preferences.Const.autoLockWarningOffset)
             }
         }
-        // swiftlint:enable cyclomatic_complexity
-        // swiftlint:enable function_body_length
     }
 }
 

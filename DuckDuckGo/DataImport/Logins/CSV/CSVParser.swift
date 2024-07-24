@@ -67,7 +67,6 @@ struct CSVParser {
             hasPrecedingQuote = false
         }
 
-        // swiftlint:disable:next cyclomatic_complexity
         mutating func accept(_ character: Character) throws {
             switch (state, character.kind(delimiter: delimiter), precedingQuote: hasPrecedingQuote) {
             case (_, .unsupported, _):

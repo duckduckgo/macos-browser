@@ -134,7 +134,7 @@ final class TabPreviewViewController: NSViewController {
         switch tabViewModel.tabContent {
         case .url:
             urlTextField.stringValue = tabViewModel.addressBarString
-        case .bookmarks, .dataBrokerProtection, .newtab, .onboarding, .settings:
+        case .bookmarks, .dataBrokerProtection, .newtab, .onboarding, .settings, .releaseNotes:
             urlTextField.stringValue = "DuckDuckGo Browser"
         default:
             urlTextField.stringValue = ""
@@ -202,10 +202,9 @@ extension TabPreviewViewController {
 }
 
 import Combine
-private let previewSize = NSSize(width: 280, height: 220)
 
 @available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: previewSize.width, height: previewSize.height)) { {
+#Preview(traits: .fixedLayout(width: 280, height: 220)) { {
 
     let vc = TabPreviewViewController()
     vc.displayMockPreview(of: NSSize(width: 1280, height: 560),

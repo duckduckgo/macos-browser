@@ -1,7 +1,7 @@
 {
   "name": "SmartBackgroundChecks",
   "url": "smartbackgroundchecks.com",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678082400000,
   "steps": [
@@ -18,6 +18,7 @@
           "actionType": "extract",
           "id": "2e04c4da-5f4b-4ab3-bd9e-4d4300d51f63",
           "selector": ".card-block",
+          "noResultsFound": "//h1[contains(text(), '0 Results')]",
           "profile": {
             "name": {
               "selector": ".name-list-title",

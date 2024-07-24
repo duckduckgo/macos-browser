@@ -31,8 +31,7 @@ protocol SurveyRemoteMessaging {
 
 protocol SurveyRemoteMessageSubscriptionFetching {
 
-    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionService.SubscriptionServiceError>
-
+    func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionServiceError>
 }
 
 final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
@@ -43,24 +42,25 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
     private let messageRequest: HomePageRemoteMessagingRequest
     private let messageStorage: SurveyRemoteMessagingStorage
-    private let accountManager: AccountManaging
+    private let accountManager: AccountManager
     private let subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching
     private let vpnActivationDateStore: WaitlistActivationDateStore
     private let pirActivationDateStore: WaitlistActivationDateStore
     private let minimumRefreshInterval: TimeInterval
     private let userDefaults: UserDefaults
 
-    convenience init(subscriptionManager: SubscriptionManaging) {
+    convenience init(subscriptionManager: SubscriptionManager) {
+        let subscriptionFetcher = SurveyRemoteMessageSubscriptionFetcher(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService)
         #if DEBUG || REVIEW
         self.init(
             accountManager: subscriptionManager.accountManager,
-            subscriptionFetcher: subscriptionManager.subscriptionService,
+            subscriptionFetcher: subscriptionFetcher,
             minimumRefreshInterval: .seconds(30)
         )
         #else
         self.init(
             accountManager: subscriptionManager.accountManager,
-            subscriptionFetcher: subscriptionManager.subscriptionService,
+            subscriptionFetcher: subscriptionFetcher,
             minimumRefreshInterval: .hours(1)
         )
         #endif
@@ -69,7 +69,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
     init(
         messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.surveysRequest(),
         messageStorage: SurveyRemoteMessagingStorage = DefaultSurveyRemoteMessagingStorage.surveys(),
-        accountManager: AccountManaging,
+        accountManager: AccountManager,
         subscriptionFetcher: SurveyRemoteMessageSubscriptionFetching,
         vpnActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
         pirActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp),
@@ -113,7 +113,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         }
     }
 
-    // swiftlint:disable cyclomatic_complexity function_body_length
+    // swiftlint:disable cyclomatic_complexity
 
     /// Processes the messages received from S3 and returns those which the user is eligible for. This is done by checking each of the attributes against the user's local state.
     /// Because the result of the message fetch is cached, it means that they won't be immediately updated if the user suddenly qualifies, but the refresh interval for remote messages is only 1 hour so it
@@ -130,6 +130,13 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         return messages.filter { message in
 
             var attributeMatchStatus = false
+
+            if let interactedMessagesToCheck = message.attributes.hideIfInteractedWithMessage {
+                let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
+                for interactedMessage in interactedMessagesToCheck where dismissedMessageIDs.contains(interactedMessage) {
+                    return false
+                }
+            }
 
             // Check subscription status:
             if let messageSubscriptionStatus = message.attributes.subscriptionStatus {
@@ -232,7 +239,7 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
         }
     }
 
-    // swiftlint:enable cyclomatic_complexity function_body_length
+    // swiftlint:enable cyclomatic_complexity
 
     func presentableRemoteMessages() -> [SurveyRemoteMessage] {
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
@@ -280,10 +287,10 @@ final class DefaultSurveyRemoteMessaging: SurveyRemoteMessaging {
 
 }
 
-extension SubscriptionService: SurveyRemoteMessageSubscriptionFetching {
+struct SurveyRemoteMessageSubscriptionFetcher: SurveyRemoteMessageSubscriptionFetching {
+    let subscriptionEndpointService: SubscriptionEndpointService
 
     func getSubscription(accessToken: String) async -> Result<Subscription, SubscriptionServiceError> {
-        return await self.getSubscription(accessToken: accessToken, cachePolicy: .returnCacheDataElseLoad)
+        return await subscriptionEndpointService.getSubscription(accessToken: accessToken, cachePolicy: .returnCacheDataElseLoad)
     }
-
 }

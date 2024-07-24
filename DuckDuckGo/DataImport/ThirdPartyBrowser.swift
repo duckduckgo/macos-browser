@@ -49,7 +49,6 @@ enum ThirdPartyBrowser: CaseIterable {
     case onePassword7
     case onePassword8
 
-    // swiftlint:disable:next cyclomatic_complexity
     static func browser(for source: DataImport.Source) -> ThirdPartyBrowser? {
         switch source {
         case .brave: return .brave
@@ -254,7 +253,6 @@ enum ThirdPartyBrowser: CaseIterable {
     }
 
     // Returns the URL to the profiles for a given browser. This directory will contain a list of directories, each representing a profile.
-    // swiftlint:disable:next cyclomatic_complexity
     func profilesDirectories(applicationSupportURL: URL? = nil) -> [URL] {
         let applicationSupportURL = applicationSupportURL ?? URL.nonSandboxApplicationSupportDirectoryURL
         return switch self {

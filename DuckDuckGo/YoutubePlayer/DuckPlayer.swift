@@ -56,19 +56,29 @@ enum DuckPlayerMode: Equatable, Codable {
 struct InitialSetupSettings: Codable {
     struct PlayerSettings: Codable {
         let pip: PIP
+        let autoplay: Autoplay
     }
 
     struct PIP: Codable {
-        let status: Status
+        let state: State
     }
 
-    enum Status: String, Codable {
+    struct Autoplay: Codable {
+        let state: State
+    }
+
+    enum State: String, Codable {
         case enabled
         case disabled
     }
 
     let userValues: UserValues
     let settings: PlayerSettings
+}
+
+// Values that the YouTube Overlays can use to determine the current state
+struct OverlaysInitialSettings: Codable {
+    let userValues: UserValues
 }
 
 /// Values that the Frontend can use to determine user settings
@@ -115,6 +125,9 @@ final class DuckPlayer {
     ) {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
+        isPiPFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
+        isAutoplayFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
+
         mode = preferences.duckPlayerMode
         bindDuckPlayerModeIfNeeded()
 
@@ -128,7 +141,6 @@ final class DuckPlayer {
 
     // MARK: - Common Message Handlers
 
-    // swiftlint:disable:next cyclomatic_complexity
     public func handleSetUserValuesMessage(
         from origin: YoutubeOverlayUserScript.MessageOrigin
     ) -> (_ params: Any, _ message: UserScriptMessage) -> Encodable? {
@@ -202,10 +214,20 @@ final class DuckPlayer {
 
     @MainActor
     private func encodedSettings(with webView: WKWebView?) async -> InitialSetupSettings {
-        let isPiPEnabled = webView?.configuration.allowsPictureInPictureMediaPlayback == true
-        let pip = InitialSetupSettings.PIP(status: isPiPEnabled ? .enabled : .disabled)
+        var isPiPEnabled = webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] == true
 
-        let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip)
+        let isAutoplayEnabled = isAutoplayFeatureEnabled && DuckPlayerPreferences.shared.duckPlayerAutoplay
+
+        // Disable WebView PiP if if the subFeature is off
+        if !isPiPFeatureEnabled {
+            webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] = false
+            isPiPEnabled = false
+        }
+
+        let pip = InitialSetupSettings.PIP(state: isPiPEnabled ? .enabled : .disabled)
+        let autoplay = InitialSetupSettings.Autoplay(state: isAutoplayEnabled ? .enabled : .disabled)
+
+        let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip, autoplay: autoplay)
         let userValues = encodeUserValues()
 
         return InitialSetupSettings(userValues: userValues, settings: playerSettings)
@@ -223,6 +245,8 @@ final class DuckPlayer {
     }
     private var modeCancellable: AnyCancellable?
     private var isFeatureEnabledCancellable: AnyCancellable?
+    private var isPiPFeatureEnabled: Bool
+    private var isAutoplayFeatureEnabled: Bool
 
     private func bindDuckPlayerModeIfNeeded() {
         if isFeatureEnabled {
@@ -295,15 +319,22 @@ extension DuckPlayer {
 #if DEBUG
 
 final class DuckPlayerPreferencesPersistorMock: DuckPlayerPreferencesPersistor {
-
     var duckPlayerModeBool: Bool?
     var youtubeOverlayInteracted: Bool
     var youtubeOverlayAnyButtonPressed: Bool
+    var duckPlayerAutoplay: Bool
+    var duckPlayerOpenInNewTab: Bool
 
-    init(duckPlayerMode: DuckPlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false, youtubeOverlayAnyButtonPressed: Bool = false) {
+    init(duckPlayerMode: DuckPlayerMode = .alwaysAsk,
+         youtubeOverlayInteracted: Bool = false,
+         youtubeOverlayAnyButtonPressed: Bool = false,
+         duckPlayerAutoplay: Bool = false,
+         duckPlayerOpenInNewTab: Bool = false) {
         self.duckPlayerModeBool = duckPlayerMode.boolValue
         self.youtubeOverlayInteracted = youtubeOverlayInteracted
         self.youtubeOverlayAnyButtonPressed = youtubeOverlayAnyButtonPressed
+        self.duckPlayerAutoplay = duckPlayerAutoplay
+        self.duckPlayerOpenInNewTab = duckPlayerOpenInNewTab
     }
 }
 

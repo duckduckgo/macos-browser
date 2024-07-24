@@ -118,7 +118,8 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
             notifyStatusChangesEnabled: true,
             showInMenuBarEnabled: true,
             selectedServer: "server",
-            selectedEnvironment: "production"
+            selectedEnvironment: "production",
+            customDNS: false
         )
 
         let loginItemState = VPNMetadata.LoginItemState(

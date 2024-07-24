@@ -90,7 +90,6 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    // swiftlint:disable function_body_length
     static func migrateV1(database: Database) throws {
         // User profile
         try database.create(table: ProfileDB.databaseTableName) {
@@ -270,8 +269,6 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                 UPDATE \(BrokerDB.databaseTableName) SET \(BrokerDB.Columns.url.name) = \(BrokerDB.Columns.name.name)
             """)
     }
-
-    // swiftlint:enable function_body_length
 
     func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
         try db.write { db in

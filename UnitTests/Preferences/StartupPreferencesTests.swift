@@ -20,16 +20,14 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 struct StartupPreferencesPersistorMock: StartupPreferencesPersistor {
-    var appearancePrefs: AppearancePreferences
     var launchToCustomHomePage: Bool
     var customHomePageURL: String
     var restorePreviousSession: Bool
 
-    init(launchToCustomHomePage: Bool, customHomePageURL: String, restorePreviousSession: Bool = false, appearancePrefs: AppearancePreferences = AppearancePreferences(persistor: AppearancePreferencesPersistorMock())) {
+    init(launchToCustomHomePage: Bool, customHomePageURL: String, restorePreviousSession: Bool = false) {
         self.customHomePageURL = customHomePageURL
         self.launchToCustomHomePage = launchToCustomHomePage
         self.restorePreviousSession = restorePreviousSession
-        self.appearancePrefs = appearancePrefs
     }
 }
 

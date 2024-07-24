@@ -19,11 +19,12 @@
 import BrowserServicesKit
 import Cocoa
 import Common
-import WebKit
 import Configuration
+import Crashes
 import History
 import PixelKit
 import Subscription
+import WebKit
 
 // Actions are sent to objects of responder chain
 
@@ -33,9 +34,18 @@ extension AppDelegate {
 
     // MARK: - DuckDuckGo
 
+    @MainActor
     @objc func checkForUpdates(_ sender: Any?) {
 #if SPARKLE
-        updateController.checkForUpdates(sender)
+        if !SupportedOSChecker.isCurrentOSReceivingUpdates {
+            // Show not supported info
+            if NSAlert.osNotSupported().runModal() != .cancel {
+                let url = Preferences.UnsupportedDeviceInfoBox.softwareUpdateURL
+                NSWorkspace.shared.open(url)
+            }
+        }
+
+        showAbout(sender)
 #endif
     }
 
@@ -135,6 +145,21 @@ extension AppDelegate {
 
     // MARK: - Help
 
+    @MainActor
+    @objc func showAbout(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .settings(pane: .about))
+    }
+
+    @MainActor
+    @objc func showReleaseNotes(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .releaseNotes)
+    }
+
+    @MainActor
+    @objc func showWhatIsNew(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .url(.updates, source: .appOpenUrl))
+    }
+
     #if FEEDBACK
 
     @objc func openFeedback(_ sender: Any?) {
@@ -144,7 +169,7 @@ extension AppDelegate {
     }
 
     @objc func openReportBrokenSite(_ sender: Any?) {
-        let privacyDashboardViewController = PrivacyDashboardViewController(privacyInfo: nil, dashboardMode: .report)
+        let privacyDashboardViewController = PrivacyDashboardViewController(privacyInfo: nil, entryPoint: .report)
         privacyDashboardViewController.sizeDelegate = self
 
         let window = NSWindow(contentViewController: privacyDashboardViewController)
@@ -295,6 +320,9 @@ extension AppDelegate {
         }
     }
 
+    @objc func resetRemoteMessages(_ sender: Any?) {
+        remoteMessagingClient.store?.resetRemoteMessages()
+    }
 }
 
 extension MainViewController {
@@ -589,6 +617,7 @@ extension MainViewController {
                 burnerMode: tabCollectionViewModel.burnerMode)
         }
         tabCollectionViewModel.append(tabs: tabs)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     @objc func showManageBookmarks(_ sender: Any?) {
@@ -706,16 +735,26 @@ extension MainViewController {
     }
 
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
-        UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
+        UserDefaultsWrapper.clear(.defaultBrowserDismissed)
     }
 
     @objc func resetDefaultGrammarChecks(_ sender: Any?) {
-        UserDefaultsWrapper<Bool>.clear(.spellingCheckEnabledOnce)
-        UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
+        UserDefaultsWrapper.clear(.spellingCheckEnabledOnce)
+        UserDefaultsWrapper.clear(.grammarCheckEnabledOnce)
     }
 
     @objc func triggerFatalError(_ sender: Any?) {
         fatalError("Fatal error triggered from the Debug menu")
+    }
+
+    @objc func crashOnException(_ sender: Any?) {
+        DispatchQueue.main.async {
+            self.navigationBarViewController.addressBarViewController?.addressBarTextField.suggestionViewController.tableView.view(atColumn: 1, row: .max, makeIfNecessary: false)
+        }
+    }
+
+    @objc func crashOnCxxException(_ sender: Any?) {
+        throwTestCppExteption()
     }
 
     @objc func resetSecureVaultData(_ sender: Any?) {
@@ -744,7 +783,10 @@ extension MainViewController {
         }
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
 
-        let autofillPixelReporter = AutofillPixelReporter(userDefaults: .standard, eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in }, installDate: nil)
+        let autofillPixelReporter = AutofillPixelReporter(userDefaults: .standard,
+                                                          autofillEnabled: AutofillPreferences().askToSaveUsernamesAndPasswords,
+                                                          eventMapping: EventMapping<AutofillPixelEvent> { _, _, _, _ in },
+                                                          installDate: nil)
         autofillPixelReporter.resetStoreDefaults()
     }
 
@@ -806,6 +848,11 @@ extension MainViewController {
 
     @objc func inPermanentSurveyShareOff(_ sender: Any?) {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
+    }
+
+    @objc func changePixelExperimentInstalledDateToLessMoreThan5DayAgo(_ sender: Any?) {
+        let moreThanFiveDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())
+        UserDefaults.standard.set(moreThanFiveDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.pixelExperimentEnrollmentDate.rawValue)
     }
 
     @objc func changeInstallDateToToday(_ sender: Any?) {
@@ -954,8 +1001,6 @@ extension MainViewController {
 
 extension MainViewController: NSMenuItemValidation {
 
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         guard fireViewController.fireViewModel.fire.burningData == nil else {
             return true
@@ -1059,9 +1104,6 @@ extension MainViewController: NSMenuItemValidation {
             return true
         }
     }
-
-    // swiftlint:enable function_body_length
-    // swiftlint:enable cyclomatic_complexity
 }
 
 extension AppDelegate: NSMenuItemValidation {

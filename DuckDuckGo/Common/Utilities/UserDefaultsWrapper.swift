@@ -26,8 +26,17 @@ extension UserDefaults {
     static let subs = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .subs))!
 }
 
+public struct UserDefaultsWrapperKey: RawRepresentable {
+    public let rawValue: String
+    public init(rawValue: String) {
+        self.rawValue = rawValue
+    }
+}
+
 @propertyWrapper
 public struct UserDefaultsWrapper<T> {
+
+    public typealias DefaultsKey = UserDefaultsWrapperKey
 
     public enum Key: String, CaseIterable {
         /// system setting defining window title double-click action
@@ -41,6 +50,7 @@ public struct UserDefaultsWrapper<T> {
         case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
         case configFBConfigEtag = "config.storage.fbconfig.etag"
+        case configStorageRemoteMessagingConfigEtag = "config.storage.remotemessagingconfig.etag"
 
         case configLastInstalled = "config.last.installed"
 
@@ -66,6 +76,8 @@ public struct UserDefaultsWrapper<T> {
         case duckPlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
         case youtubeOverlayButtonsUsed = "preferences.youtube-overlay-user-used-buttons"
+        case duckPlayerAutoplay = "preferences.duckplayer.autoplay"
+        case duckPlayerOpenInNewTab = "preferences.duckplayer.open-new-tab"
 
         case selectedPasswordManager = "preferences.autofill.selected-password-manager"
 
@@ -78,6 +90,7 @@ public struct UserDefaultsWrapper<T> {
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
         case lastCrashReportCheckDate = "last.crash.report.check.date"
+        case didCrashDuringCrashHandlersSetUp = "browser.didCrashDuringCrashHandlersSetUp"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
         case appTerminationHandledCorrectly = "app.termination.handled.correctly"
@@ -150,6 +163,8 @@ public struct UserDefaultsWrapper<T> {
         case firstLaunchDate = "first.app.launch.date"
         case customConfigurationUrl = "custom.configuration.url"
 
+        case lastRemoteMessagingRefreshDate = "last.remote.messaging.refresh.date"
+
         // Data Broker Protection
 
         case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
@@ -170,12 +185,19 @@ public struct UserDefaultsWrapper<T> {
         case networkProtectionWaitlistActiveOverrideRawValue = "networkProtectionWaitlistActiveOverrideRawValue"
         case networkProtectionWaitlistEnabledOverrideRawValue = "networkProtectionWaitlistEnabledOverrideRawValue"
 
+        // Updates
+        case automaticUpdates = "updates.automatic"
+
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"
         case pixelExperimentCohort = "pixel.experiment.cohort"
         case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
         case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
         case campaignVariant = "campaign.variant"
+
+        // Updates
+        case previousAppVersion = "previous.app.version"
+        case previousBuild = "previous.build"
 
         // Sync
 
@@ -201,7 +223,6 @@ public struct UserDefaultsWrapper<T> {
 
         // Subscription
 
-        case subscriptionInternalTesting = "subscription.internal-testing-enabled"
         case subscriptionEnvironment = "subscription.environment"
     }
 
@@ -219,9 +240,9 @@ public struct UserDefaultsWrapper<T> {
         case shouldShowNetworkProtectionSystemExtensionUpgradePrompt = "network-protection.show-system-extension-upgrade-prompt"
     }
 
-    private let key: Key
-    private let defaultValue: T
-    private let setIfEmpty: Bool
+    private let key: DefaultsKey
+    private let getter: (Any?) -> T
+    private let setter: (UserDefaultsWrapper, T) -> Void
 
     private let customUserDefaults: UserDefaults?
 
@@ -241,58 +262,112 @@ public struct UserDefaultsWrapper<T> {
 #endif
     }
 
-    public init(key: Key, defaultValue: T, setIfEmpty: Bool = false, defaults: UserDefaults? = nil) {
+    public init(key: DefaultsKey, defaults: UserDefaults? = nil, getter: @escaping (Any?) -> T, setter: @escaping (UserDefaultsWrapper, T) -> Void) {
         self.key = key
-        self.defaultValue = defaultValue
-        self.setIfEmpty = setIfEmpty
+        self.getter = getter
+        self.setter = setter
         self.customUserDefaults = defaults
+    }
+
+    @_disfavoredOverload
+    public init(key: DefaultsKey, defaultValue: T, defaults: UserDefaults? = nil) {
+        @inline(__always) func isNil(_ value: T) -> Bool {
+            @inline(__always) func cast<V, R>(_ value: V, to _: R.Type) -> R? {
+                value as? R // perform `value as? Any?` suppressing `casting to Any? always succeeds` warning
+            }
+            return if case .some(.none) = cast(value, to: Any?.self) { true } else { false }
+        }
+
+        self.init(key: key, defaults: defaults) {
+            guard let value = $0 as? T, !isNil(value) else { return defaultValue }
+            return value
+        } setter: { this, newValue in
+            guard PropertyListSerialization.propertyList(newValue, isValidFor: .binary) else {
+                if isNil(newValue) {
+                    this.defaults.removeObject(forKey: key.rawValue)
+                    return
+                }
+                assertionFailure("\(newValue) cannot be stored in UserDefaults")
+                return
+            }
+            this.defaults.set(newValue, forKey: key.rawValue)
+        }
+    }
+
+    public init<Wrapped>(key: DefaultsKey, defaults: UserDefaults? = nil) where T == Wrapped? {
+        self.init(key: key, defaults: defaults) {
+            $0 as? Wrapped
+        } setter: { this, newValue in
+            guard let newValue else {
+                this.defaults.removeObject(forKey: key.rawValue) // newValue is nil
+                return
+            }
+            guard PropertyListSerialization.propertyList(newValue, isValidFor: .binary) else {
+                assertionFailure("\(newValue) cannot be stored in UserDefaults")
+                return
+            }
+            this.defaults.set(newValue, forKey: key.rawValue)
+        }
+    }
+
+    @available(*, unavailable, message: "Cannot use overload with `defaultValue` for an Optional Value")
+    public init<Wrapped>(key: DefaultsKey, defaultValue: Wrapped, defaults: UserDefaults? = nil) where T == Wrapped? {
+        fatalError()
+    }
+
+    public init<RawValue>(key: DefaultsKey, defaultValue: T, defaults: UserDefaults? = nil) where T: RawRepresentable<RawValue> {
+        self.init(key: key, defaults: defaults) {
+            ($0 as? RawValue).flatMap(T.init(rawValue:)) ?? defaultValue
+        } setter: { this, newValue in
+            guard PropertyListSerialization.propertyList(newValue.rawValue, isValidFor: .binary) else {
+                assertionFailure("\(newValue.rawValue) cannot be stored in UserDefaults")
+                return
+            }
+            this.defaults.set(newValue.rawValue, forKey: key.rawValue)
+        }
+    }
+
+    public init<Wrapped, RawValue>(key: DefaultsKey, defaults: UserDefaults? = nil) where T == Wrapped?, Wrapped: RawRepresentable<RawValue> {
+        self.init(key: key, defaults: defaults) {
+            ($0 as? RawValue).flatMap(Wrapped.init(rawValue:))
+        } setter: { this, newValue in
+            guard let newValue else {
+                this.defaults.removeObject(forKey: key.rawValue) // newValue is nil
+                return
+            }
+            guard PropertyListSerialization.propertyList(newValue.rawValue, isValidFor: .binary) else {
+                assertionFailure("\(newValue.rawValue) cannot be stored in UserDefaults")
+                return
+            }
+            this.defaults.set(newValue.rawValue, forKey: key.rawValue)
+        }
+    }
+
+    @_disfavoredOverload
+    public init(key: Key, defaultValue: T, defaults: UserDefaults? = nil) {
+        self.init(key: .init(rawValue: key.rawValue), defaultValue: defaultValue, defaults: defaults)
+    }
+
+    public init<Wrapped>(key: Key, defaults: UserDefaults? = nil) where T == Wrapped? {
+        self.init(key: .init(rawValue: key.rawValue), defaults: defaults)
+    }
+
+    public init<RawValue>(key: Key, defaultValue: T, defaults: UserDefaults? = nil) where T: RawRepresentable<RawValue> {
+        self.init(key: .init(rawValue: key.rawValue), defaultValue: defaultValue, defaults: defaults)
+    }
+
+    public init<Wrapped, RawValue>(key: Key, defaults: UserDefaults? = nil) where T == Wrapped?, Wrapped: RawRepresentable<RawValue> {
+        self.init(key: .init(rawValue: key.rawValue), defaults: defaults)
     }
 
     public var wrappedValue: T {
         get {
-            guard let storedValue = defaults.object(forKey: key.rawValue) else {
-                if setIfEmpty {
-                    setValue(defaultValue)
-                }
-
-                return defaultValue
-            }
-
-            if let typedValue = storedValue as? T {
-                return typedValue
-            }
-
-            guard let rawRepresentableType = T.self as? any RawRepresentable.Type,
-                  let value = rawRepresentableType.init(anyRawValue: storedValue) as? T else {
-                return defaultValue
-            }
-
-            return value
+            let storedValue = defaults.object(forKey: key.rawValue)
+            return getter(storedValue)
         }
         nonmutating set {
-            setValue(newValue)
+            setter(self, newValue)
         }
-    }
-
-    private func setValue(_ value: T) {
-        guard (value as? AnyOptional)?.isNil != true else {
-            defaults.removeObject(forKey: key.rawValue)
-            return
-        }
-
-        if PropertyListSerialization.propertyList(value, isValidFor: .binary) {
-            defaults.set(value, forKey: key.rawValue)
-            return
-        }
-
-        guard let rawRepresentable = value as? any RawRepresentable,
-              PropertyListSerialization.propertyList(rawRepresentable.rawValue, isValidFor: .binary) else {
-            assertionFailure("\(value) cannot be stored in UserDefaults")
-            return
-        }
-
-        defaults.set(rawRepresentable.rawValue, forKey: key.rawValue)
-
     }
 
     static func clearAll() {
@@ -309,32 +384,17 @@ public struct UserDefaultsWrapper<T> {
         }
     }
 
-    static func clear(_ key: Key) {
-        sharedDefaults.removeObject(forKey: key.rawValue)
-    }
-
     func clear() {
         defaults.removeObject(forKey: key.rawValue)
     }
 
 }
 
-extension UserDefaultsWrapper where T: OptionalProtocol {
-
-    init(key: Key, defaults: UserDefaults? = nil) {
-        self.init(key: key, defaultValue: .none, defaults: defaults)
+extension UserDefaultsWrapper where T == Any {
+    static func clear(_ key: Key) {
+        sharedDefaults.removeObject(forKey: key.rawValue)
     }
-
-}
-
-private extension RawRepresentable {
-
-    init?(anyRawValue: Any) {
-        guard let rawValue = anyRawValue as? RawValue else {
-            assertionFailure("\(anyRawValue) is not \(RawValue.self)")
-            return nil
-        }
-        self.init(rawValue: rawValue)
+    static func clear(_ key: DefaultsKey) {
+        sharedDefaults.removeObject(forKey: key.rawValue)
     }
-
 }

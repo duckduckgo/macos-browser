@@ -36,7 +36,7 @@ struct DataImportShortcutsView: ModalView {
 
         VStack(alignment: .leading, spacing: 8) {
             VStack(spacing: 0) {
-                if let dataTypes = model.dataTypes, dataTypes.contains(.bookmarks) {
+                if let dataTypes = model.dataTypes, dataTypes.contains(.bookmarks), OnboardingActionsManager.isOnboardingFinished {
                     importShortcutsRow(image: Image(.bookmarksFavoritesColor24),
                                        title: UserText.importShortcutsBookmarksTitle,
                                        subtitle: UserText.importShortcutsBookmarksSubtitle,
