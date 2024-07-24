@@ -74,6 +74,13 @@ final class BookmarksOutlineView: NSOutlineView {
 
         if rowIndex != -1 {
             scrollRowToVisible(rowIndex)
+
+            if let enclosingScrollView = self.enclosingScrollView {
+                let rowRect = rect(ofRow: rowIndex)
+                let desiredTopPosition = rowRect.origin.y - rowHeight // Adjusted position one row height from the top.
+                let scrollPoint = NSPoint(x: 0, y: desiredTopPosition - enclosingScrollView.contentInsets.top)
+                enclosingScrollView.contentView.scroll(to: scrollPoint)
+            }
         }
     }
 
