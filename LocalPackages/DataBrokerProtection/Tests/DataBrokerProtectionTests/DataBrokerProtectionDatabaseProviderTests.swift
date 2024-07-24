@@ -111,64 +111,80 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
     }
 
     func testV3MigrationOfDatabaseWithLotsOfIntegrityIssues() throws {
-        // Given
-        do {
-            try sut.db.writeWithoutTransaction { db in
-                try db.execute(sql: "PRAGMA foreign_keys = OFF")
+
+        var length = 10
+        var start: Int64 = 1000
+        var end: Int64 = 2000
+
+        repeat {
+
+            // Given
+            do {
+                try sut.db.writeWithoutTransaction { db in
+                    try db.execute(sql: "PRAGMA foreign_keys = OFF")
+                }
+
+                let profileQueries = ProfileQueryDB.random(withProfileIds: Int64.randomValues(ofLength: length, start: start, end: end))
+                for query in profileQueries {
+                    _ = try sut.save(query)
+                }
+
+                for broker in BrokerDB.random(count: length) {
+                    _ = try sut.save(broker)
+                }
+
+                let brokerIds = Int64.randomValues(ofLength: length, start: start, end: end)
+                let profileQueryIds = Int64.randomValues(ofLength: length, start: start, end: end)
+                let extractedProfileIds = Int64.randomValues(ofLength: length, start: start, end: end)
+
+                for scanHistoryEvent in ScanHistoryEventDB.random(withBrokerIds: brokerIds, profileQueryIds: profileQueryIds) {
+                    _ = try sut.save(scanHistoryEvent)
+                }
+
+                for optOutHistoryEvent in OptOutHistoryEventDB.random(withBrokerIds: brokerIds, profileQueryIds: profileQueryIds, extractedProfileIds: extractedProfileIds) {
+                    _ = try sut.save(optOutHistoryEvent)
+                }
+
+                for extractedProfile in ExtractedProfileDB.random(withBrokerIds: brokerIds, profileQueryIds: profileQueryIds) {
+                    _ = try sut.save(extractedProfile)
+                }
+
+                try sut.db.writeWithoutTransaction { db in
+                    try db.execute(sql: "PRAGMA foreign_keys = ON")
+                }
+
+            } catch {
+                XCTFail("Failed to setup invalid data")
             }
 
-            let profileQueries = ProfileQueryDB.random(withProfileIds: Int64.randomValues())
-            for query in profileQueries {
-                _ = try sut.save(query)
+            let failingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
+                migrator.registerMigration("v3") { database in
+                    try database.checkForeignKeys()
+                }
             }
 
-            for broker in BrokerDB.random(count: 10) {
-                _ = try sut.save(broker)
+            let passingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
+                migrator.registerMigration("v4") { database in
+                    try database.checkForeignKeys()
+                }
             }
 
-            let brokerIds = Int64.randomValues()
-            let profileQueryIds = Int64.randomValues()
-            let extractedProfileIds = Int64.randomValues()
+            XCTAssertThrowsError(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: failingMigration))
 
-            for scanHistoryEvent in ScanHistoryEventDB.random(withBrokerIds: brokerIds, profileQueryIds: profileQueryIds) {
-                _ = try sut.save(scanHistoryEvent)
-            }
+            // When
+            XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
 
-            for optOutHistoryEvent in OptOutHistoryEventDB.random(withBrokerIds: brokerIds, profileQueryIds: profileQueryIds, extractedProfileIds: extractedProfileIds) {
-                _ = try sut.save(optOutHistoryEvent)
-            }
+            // Then
+            XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: passingMigration))
 
-            for extractedProfile in ExtractedProfileDB.random(withBrokerIds: brokerIds, profileQueryIds: profileQueryIds) {
-                _ = try sut.save(extractedProfile)
-            }
+            length += 1
+            start += (start/2)
+            end += (end/2)
 
-            try sut.db.writeWithoutTransaction { db in
-                try db.execute(sql: "PRAGMA foreign_keys = ON")
-            }
+            try tearDownWithError()
+            try setUpWithError()
 
-        } catch {
-            XCTFail("Failed to setup invalid data")
-        }
-
-        let failingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
-            migrator.registerMigration("v3") { database in
-                try database.checkForeignKeys()
-            }
-        }
-
-        let passingMigration: (inout DatabaseMigrator) throws -> Void = { migrator in
-            migrator.registerMigration("v4") { database in
-                try database.checkForeignKeys()
-            }
-        }
-
-        XCTAssertThrowsError(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: failingMigration))
-
-        // When
-        XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
-
-        // Then
-        XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: passingMigration))
+        } while length < 20
     }
 
     func testDeleteAllDataSucceedsInRemovingAllData() throws {

@@ -18,6 +18,7 @@
 
 import Foundation
 
+/// Conforming types provide a `isUserIn` method to check if a user is part of the specified % feature rollout
 protocol DataBrokerProtectionMigrationsFeatureFlagger {
     func isUserIn(percent: Int) -> Bool
 }
@@ -34,7 +35,16 @@ final class DefaultDataBrokerProtectionMigrationsFeatureFlagger: DataBrokerProte
         self.userDefaults = userDefaults
     }
 
+    /// Checks if a user is part of the specified % feature rollout
+    /// - Parameter percent: Percentage
+    /// - Returns: True or false
     func isUserIn(percent: Int) -> Bool {
+        /*
+         Note this is here to ensure internal users & testers get migrated.
+         It will be removed via a PR to the release branch before the end of the internal testing week
+         See: https://app.asana.com/0/0/1207876679488680/f
+         */
+        return true
 
         guard let storedNumber = storedRandomNumber else {
 
@@ -50,6 +60,7 @@ final class DefaultDataBrokerProtectionMigrationsFeatureFlagger: DataBrokerProte
 
 private extension DefaultDataBrokerProtectionMigrationsFeatureFlagger {
 
+    /// Retrieves its value from, and stores it to, `UserDefaults`
     var storedRandomNumber: Int? {
         get {
             userDefaults.object(forKey: Constants.v3MigrationFeatureFlagValue) as? Int
@@ -61,6 +72,10 @@ private extension DefaultDataBrokerProtectionMigrationsFeatureFlagger {
 }
 
 private extension Int {
+
+    /// Checks if a number is less than or equal to a % value
+    /// - Parameter percent: Percentage
+    /// - Returns: True or false
     func isIn(percent: Int) -> Bool {
         self <= percent
     }

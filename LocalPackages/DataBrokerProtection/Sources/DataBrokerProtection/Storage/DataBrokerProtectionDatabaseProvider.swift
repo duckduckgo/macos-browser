@@ -144,6 +144,13 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         return DefaultDataBrokerProtectionDatabaseProvider.databaseFilePath(directoryName: "DBP", fileName: "Vault.db", appGroupIdentifier: Bundle.main.appGroupName)
     }
 
+    /// Creates a DefaultDataBrokerProtectionDatabaseProvider instance
+    /// - Parameters:
+    ///   - file: File URL of the database
+    ///   - key: Key used in encryption
+    ///   - featureFlagger: Migrations feature flagger
+    ///   - migrationProvider: Migrations provider
+    /// - Returns: DefaultDataBrokerProtectionDatabaseProvider instance
     public static func create<T: MigrationsProvider>(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
                                                      key: Data,
                                                      featureFlagger: FeatureFlagger = DefaultDataBrokerProtectionMigrationsFeatureFlagger(),
@@ -585,9 +592,7 @@ extension DatabaseValue {
 
     /// Returns the SQL representation of the `DatabaseValue`.
     ///
-    /// This property converts the database value to a string that can be used in an SQL statement.
-    /// The conversion handles different storage types, ensuring that the value is properly formatted
-    /// and escaped for SQL.
+    /// This converts the database value to a string that can be used in an SQL statement.
     ///
     /// - Returns: A `String` representing the SQL expression of the `DatabaseValue`.
     var sqlExpression: String {
@@ -610,7 +615,7 @@ extension Data {
 
     /// Converts `Data` to a hexadecimal string representation.
     ///
-    /// This extension is used to format data so it can be inserted into SQL statements.
+    /// Used to format data so it can be inserted into SQL statements.
     ///
     /// - Returns: A `String` representing the hexadecimal encoding of the data.
     func hexEncodedString() -> String {

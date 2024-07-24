@@ -20,6 +20,7 @@ import Foundation
 import GRDB
 import Common
 
+/// Conforming types provide migrations for the PIR database. Mostly utilized for testing.
 protocol DataBrokerProtectionDatabaseMigrationsProvider {
     static var v2Migrations: (inout DatabaseMigrator) throws -> Void { get }
     static var v3Migrations: (inout DatabaseMigrator) throws -> Void { get }
@@ -579,6 +580,11 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
         }
     }
 
+    /// Recreates the specified table
+    /// - Parameters:
+    ///   - name: Table to recreate
+    ///   - database: Database to use
+    ///   - creationActions: Actions to perform as first step in the table creation process
     private static func recreateTable(name: String,
                                       database: Database,
                                       creationActions: () throws -> Void) throws {
