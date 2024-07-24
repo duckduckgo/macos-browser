@@ -122,7 +122,7 @@ class SortBookmarksViewModelTests: XCTestCase {
         }
     }
 
-    private func verify(pixel: GeneralPixel, 
+    private func verify(pixel: GeneralPixel,
                         for code: () -> Void,
                         expectation: XCTestExpectation,
                         verification: () async -> Void) async throws {
