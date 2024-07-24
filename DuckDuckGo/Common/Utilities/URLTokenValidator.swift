@@ -63,7 +63,7 @@ public class URLTokenValidator {
         let data = dataToSign.data(using: .utf8)!
 
         let hmacData = hmacSHA256(data: data, key: secretKey)
-        let signature = base64URLEncode(data: hmacData)
+        let signature = URLTokenValidator.base64URLEncode(data: hmacData)
         return "\(signature):\(timestamp)"
     }
 
@@ -95,7 +95,7 @@ public class URLTokenValidator {
         let data = dataToSign.data(using: .utf8)!
 
         let expectedHmacData = hmacSHA256(data: data, key: secretKey)
-        let expectedSignature = base64URLEncode(data: expectedHmacData)
+        let expectedSignature = URLTokenValidator.base64URLEncode(data: expectedHmacData)
 
         return expectedSignature == signature
     }
@@ -124,12 +124,34 @@ public class URLTokenValidator {
      - Parameter data: The data to be encoded.
      - Returns: A URL-safe base64-encoded string.
      */
-    private func base64URLEncode(data: Data) -> String {
+    public static func base64URLEncode(data: Data) -> String {
         let base64String = data.base64EncodedString()
         let base64URLString = base64String
             .replacingOccurrences(of: "+", with: "-")
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: "=", with: "")
         return base64URLString
+    }
+
+    /**
+     Decodes a URL-safe base64-encoded string to data.
+
+     - Parameter base64URLString: The URL-safe base64-encoded string to be decoded.
+     - Returns: The decoded data, or nil if the string is not a valid base64-encoded string.
+     */
+    public static func base64URLDecode(base64URLString: String) -> Data? {
+        // Convert Base64URL string to Base64 string
+        var base64String = base64URLString
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        
+        // Add padding if necessary
+        let paddingLength = 4 - (base64String.count % 4)
+        if paddingLength < 4 {
+            base64String.append(contentsOf: repeatElement("=", count: paddingLength))
+        }
+        
+        // Decode the Base64 string to data
+        return Data(base64Encoded: base64String)
     }
 }

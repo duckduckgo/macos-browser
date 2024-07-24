@@ -174,12 +174,17 @@ private extension DuckURLSchemeHandler {
 private extension DuckURLSchemeHandler {
     func handleErrorPage(urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = urlSchemeTask.request.url else {
-            assertionFailure("No URL for Onboarding scheme handler")
+            assertionFailure("No URL for error page scheme handler")
             return
         }
-        guard requestURL.isPhishingErrorPage else { return }
-        guard let urlString = requestURL.getParameter(named: "url"), let url = URL(string: urlString) else { return }
-        guard let token = requestURL.getParameter(named: "token"), URLTokenValidator.shared.validateToken(token, for: url) else {
+
+        guard requestURL.isPhishingErrorPage,
+              let urlString = requestURL.getParameter(named: "url"),
+              let decodedData = URLTokenValidator.base64URLDecode(base64URLString: urlString),
+              let decodedString = String(data: decodedData, encoding: .utf8),
+              let url = URL(string: decodedString),
+              let token = requestURL.getParameter(named: "token"),
+              URLTokenValidator.shared.validateToken(token, for: url) else {
             let error = WKError.unknown
             let nsError = NSError(domain: "Unexpected Error", code: error.rawValue, userInfo: [
                 NSURLErrorFailingURLErrorKey: "about:blank",

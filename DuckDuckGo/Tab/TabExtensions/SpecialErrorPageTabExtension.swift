@@ -20,6 +20,7 @@ import Foundation
 import Navigation
 import WebKit
 import Combine
+import Common
 import ContentScopeScripts
 import BrowserServicesKit
 import PhishingDetection
@@ -53,7 +54,7 @@ final class SpecialErrorPageTabExtension {
     private var phishingDetector: PhishingSiteDetecting
     private var phishingStateManager: PhishingTabStateManager
     private var errorPageType: ErrorType?
-    private var phishingDomainExemptions: Set<String> = []
+    private var phishingURLExemptions: Set<URL> = []
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -107,12 +108,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let url = navigationAction.url
 
-        // Extract the host (domain) from the URL
-        if let host = url.host {
-            self.phishingStateManager.didBypassError = phishingDomainExemptions.contains(host)
-        } else {
-            self.phishingStateManager.didBypassError = false
-        }
+        self.phishingStateManager.didBypassError = phishingURLExemptions.contains(url)
 
         if self.phishingStateManager.didBypassError || url.isDuckDuckGo || url.isDuckURLScheme {
             return .next
@@ -127,11 +123,20 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
             specialErrorPageUserScript?.failingURL = navigationAction.url
             if let mainFrameTarget = navigationAction.mainFrameTarget {
                 return .redirect(mainFrameTarget) { navigator in
-                    navigator.load(URLRequest(url: URL(string: "duck://error?reason=phishing&url=\(navigationAction.url.absoluteString)&token=\(token)")!))
+                    guard let urlString = navigationAction.url.absoluteString.data(using: .utf8) else {
+                        os_log(.debug, log: .phishingDetection, "Failed to convert URL string to data.")
+                        return
+                    }
+                    let encodedURL = URLTokenValidator.base64URLEncode(data: urlString)
+                    let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
+                    guard let errorURL = URL(string: errorURLString) else {
+                        os_log(.debug, log: .phishingDetection, "Failed to create error URL.")
+                        return
+                    }
+                    navigator.load(URLRequest(url: errorURL))
                 }
-            } else {
-                // log error
             }
+            os_log(.debug, log: .phishingDetection, "Failed to navigate to phishing detection error page. Current navigation target is not main frame.")
         }
         errorPageType = nil
         return .next
@@ -185,9 +190,9 @@ extension SpecialErrorPageTabExtension: SpecialErrorPageUserScriptDelegate {
 
     func visitSite() {
         if errorPageType == .phishing {
-            if let url = webView?.url, let host = url.host {
+            if let url = webView?.url {
                 PixelKit.fire(PhishingDetectionPixels.visitSite)
-                phishingDomainExemptions.insert(host)
+                phishingURLExemptions.insert(url)
                 self.phishingStateManager.didBypassError = true
                 self.phishingStateManager.isShowingPhishingError = false
             }
