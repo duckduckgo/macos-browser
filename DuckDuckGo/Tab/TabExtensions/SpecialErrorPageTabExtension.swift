@@ -107,7 +107,11 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let url = navigationAction.url
-
+        guard url != URL(string: "about:blank")! else { return .next }
+        // Add all non-user-initiated navigations after accepting the risk to our exemptions list
+        if phishingStateManager.didBypassError && !(navigationAction.isUserInitiated || navigationAction.isUserEnteredUrl) {
+            phishingURLExemptions.insert(url)
+        }
         self.phishingStateManager.didBypassError = phishingURLExemptions.contains(url)
 
         if self.phishingStateManager.didBypassError || url.isDuckDuckGo || url.isDuckURLScheme {
