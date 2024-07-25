@@ -22,7 +22,7 @@ protocol DateRangeChecker {
     func isWithinRange(date: Date) -> Bool
 }
 
-struct DefaultDateRangeChecker: DateRangeChecker {
+private struct DefaultDateRangeChecker: DateRangeChecker {
 
     func isWithinRange(date: Date) -> Bool {
         let calendar = Calendar.current
