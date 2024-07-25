@@ -39,12 +39,6 @@ final class DefaultDataBrokerProtectionMigrationsFeatureFlagger: DataBrokerProte
     /// - Parameter percent: Percentage
     /// - Returns: True or false
     func isUserIn(percent: Int) -> Bool {
-        /*
-         Note this is here to ensure internal users & testers get migrated.
-         It will be removed via a PR to the release branch before the end of the internal testing week
-         See: https://app.asana.com/0/0/1207876679488680/f
-         */
-        return true
 
         guard let storedNumber = storedRandomNumber else {
 

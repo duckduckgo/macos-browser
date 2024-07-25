@@ -20,6 +20,30 @@ import XCTest
 import GRDB
 @testable import DataBrokerProtection
 
+private extension DataBrokerProtectionDatabaseProvider {
+    func restoreDatabase(from url: URL) throws {
+        let data = try Data(contentsOf: url)
+        guard let sqlDump = String(data: data, encoding: .utf8) else {
+            throw NSError(domain: "Invalid SQL dump file", code: 1, userInfo: nil)
+        }
+
+        // Filter SQL statements to exclude GRDB migrations table data
+        let sqlStatements = sqlDump.components(separatedBy: ";\n")
+            .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            .filter { !$0.contains("INSERT INTO grdb_migrations") }
+
+        try db.writeWithoutTransaction { db in
+
+            // Disable & enable foreign keys to ignore constraint violations
+            try db.execute(sql: "PRAGMA foreign_keys = OFF")
+            for statement in sqlStatements {
+                try db.execute(sql: statement)
+            }
+            try db.execute(sql: "PRAGMA foreign_keys = ON")
+        }
+    }
+}
+
 final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
 
     typealias Migrations = DefaultDataBrokerProtectionDatabaseMigrationsProvider

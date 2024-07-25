@@ -214,11 +214,6 @@
                BlueprintName = "DataBrokerProtectionTests"
                ReferencedContainer = "container:LocalPackages/DataBrokerProtection">
             </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "DataBrokerProtectionMigrationsFeatureFlaggerTests">
-               </Test>
-            </SkippedTests>
          </TestableReference>
          <TestableReference
             skipped = "NO">

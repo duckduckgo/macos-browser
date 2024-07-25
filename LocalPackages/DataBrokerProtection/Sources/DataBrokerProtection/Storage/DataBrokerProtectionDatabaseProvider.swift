@@ -75,65 +75,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
 
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> OptOutAttemptDB?
     func save(_ optOutAttemptDB: OptOutAttemptDB) throws
-
-    // MARK: Debug & Test Helper Methods
-
-    /// Dumps the database contents to a  file specified by the provided URL
-    /// - Parameter url: URL of file to write to
-    func dumpDatabase(to url: URL) throws
-
-    /// Restores a database from a file
-    /// - Parameter url: URL of the source file
-    func restoreDatabase(from url: URL) throws
  }
-
-extension DataBrokerProtectionDatabaseProvider {
-
-    func dumpDatabase(to url: URL) throws {
-        try db.read { db in
-            var sqlDump = ""
-
-            // Get the list of tables
-            let tables = try String.fetchAll(db, sql: "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")
-
-            // Dump data for each table
-            for table in tables {
-                let rows = try Row.fetchAll(db, sql: "SELECT * FROM \(table)")
-                for row in rows {
-                    let columns = row.columnNames.joined(separator: ", ")
-                    let values = row.map { $0.1.sqlExpression }.joined(separator: ", ")
-                    sqlDump += "INSERT INTO \(table) (\(columns)) VALUES (\(values));\n"
-                }
-                sqlDump += "\n"
-            }
-
-            // Save to file
-            try sqlDump.write(to: url, atomically: true, encoding: .utf8)
-        }
-    }
-
-    func restoreDatabase(from url: URL) throws {
-        let data = try Data(contentsOf: url)
-        guard let sqlDump = String(data: data, encoding: .utf8) else {
-            throw NSError(domain: "Invalid SQL dump file", code: 1, userInfo: nil)
-        }
-
-        // Filter SQL statements to exclude GRDB migrations table data
-        let sqlStatements = sqlDump.components(separatedBy: ";\n")
-            .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-            .filter { !$0.contains("INSERT INTO grdb_migrations") }
-
-        try db.writeWithoutTransaction { db in
-
-            // Disable & enable foreign keys to ignore constraint violations
-            try db.execute(sql: "PRAGMA foreign_keys = OFF")
-            for statement in sqlStatements {
-                try db.execute(sql: statement)
-            }
-            try db.execute(sql: "PRAGMA foreign_keys = ON")
-        }
-    }
-}
 
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
 
@@ -588,7 +530,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     }
 }
 
-extension DatabaseValue {
+private extension DatabaseValue {
 
     /// Returns the SQL representation of the `DatabaseValue`.
     ///
@@ -611,7 +553,7 @@ extension DatabaseValue {
     }
 }
 
-extension Data {
+private extension Data {
 
     /// Converts `Data` to a hexadecimal string representation.
     ///
