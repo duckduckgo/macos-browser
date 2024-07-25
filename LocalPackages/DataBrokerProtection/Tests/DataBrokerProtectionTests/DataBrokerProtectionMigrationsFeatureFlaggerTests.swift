@@ -19,6 +19,45 @@
 import XCTest
 @testable import DataBrokerProtection
 
+private final class MockDateRangeChecker: DateRangeChecker {
+
+    private let startDateComponents: DateComponents
+    private let endDateComponents: DateComponents
+
+    init(startDateComponents: DateComponents, endDateComponents: DateComponents) {
+        self.startDateComponents = startDateComponents
+        self.endDateComponents = endDateComponents
+    }
+
+    func isWithinRange(date: Date) -> Bool {
+        let calendar = Calendar.current
+
+        guard let startDate = calendar.date(from: startDateComponents),
+              let endDate = calendar.date(from: endDateComponents) else {
+            return false
+        }
+
+        return (startDate...endDate).contains(date)
+    }
+}
+
+extension MockDateRangeChecker {
+    static var inthePast: MockDateRangeChecker {
+
+        var startDateComponents = DateComponents()
+        startDateComponents.year = 2020
+        startDateComponents.month = 7
+        startDateComponents.day = 25
+
+        var endDateComponents = DateComponents()
+        endDateComponents.year = 2020
+        endDateComponents.month = 8
+        endDateComponents.day = 2
+
+        return MockDateRangeChecker(startDateComponents: startDateComponents, endDateComponents: endDateComponents)
+    }
+}
+
 final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
 
     private var userDefaults: UserDefaults!
@@ -38,7 +77,8 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
 
     func testRandomNumberGeneration() {
         // Given
-        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults)
+        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults,
+                                                                      dateRangeChecker: MockDateRangeChecker.inthePast)
         XCTAssertNil(userDefaults.object(forKey: key))
 
         // When
@@ -50,7 +90,8 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
 
     func testRandomNumberGenerationAndReuse() {
         // Given
-        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults)
+        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults,
+                                                                      dateRangeChecker: MockDateRangeChecker.inthePast)
         XCTAssertNil(userDefaults.object(forKey: key))
 
         // When
@@ -69,7 +110,8 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
     func testInPercentLogicForInputValue0AndPercent0() {
         // Given
         userDefaults.set(0, forKey: key)
-        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults)
+        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults,
+                                                                      dateRangeChecker: MockDateRangeChecker.inthePast)
 
         // When
         let result = sut.isUserIn(percent: 0)
@@ -82,7 +124,8 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
     func testInPercentLogicForInputValue0AndPercent1() {
         // Given
         userDefaults.set(0, forKey: key)
-        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults)
+        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults,
+                                                                      dateRangeChecker: MockDateRangeChecker.inthePast)
 
         // When
         let result = sut.isUserIn(percent: 1)
@@ -95,7 +138,8 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
     func testInPercentLogicForInputValue10AndPercent10() {
         // Given
         userDefaults.set(10, forKey: key)
-        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults)
+        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults,
+                                                                      dateRangeChecker: MockDateRangeChecker.inthePast)
 
         // When
         let result = sut.isUserIn(percent: 10)
@@ -108,7 +152,8 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
     func testInPercentLogicForInputValue15AndPercent10() {
         // Given
         userDefaults.set(15, forKey: key)
-        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults)
+        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults,
+                                                                      dateRangeChecker: MockDateRangeChecker.inthePast)
 
         // When
         let result = sut.isUserIn(percent: 10)
@@ -121,7 +166,8 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
     func testInPercentLogicForInputValue99AndPercent100() {
         // Given
         userDefaults.set(99, forKey: key)
-        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults)
+        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults,
+                                                                      dateRangeChecker: MockDateRangeChecker.inthePast)
 
         // When
         let result = sut.isUserIn(percent: 100)
@@ -134,7 +180,8 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
     func testInPercentLogicForInputValue100AndPercent99() {
         // Given
         userDefaults.set(100, forKey: key)
-        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults)
+        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults,
+                                                                      dateRangeChecker: MockDateRangeChecker.inthePast)
 
         // When
         let result = sut.isUserIn(percent: 99)
@@ -147,7 +194,8 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
     func testInPercentLogicForInputValue100AndPercent100() {
         // Given
         userDefaults.set(100, forKey: key)
-        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults)
+        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults,
+                                                                      dateRangeChecker: MockDateRangeChecker.inthePast)
 
         // When
         let result = sut.isUserIn(percent: 100)
@@ -167,7 +215,8 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
 
             repeat {
                 userDefaults.set(nil, forKey: key)
-                let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults)
+                let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults,
+                                                                              dateRangeChecker: MockDateRangeChecker.inthePast)
                 let result = sut.isUserIn(percent: 10)
                 results.append(result)
             } while results.count < 100
@@ -185,5 +234,32 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
         let sum = percentages.reduce(0, +)
         let average = sum / Double(percentages.count)
         XCTAssert(average > 9.0 && average < 11.0)
+    }
+
+    func testDateWithinDefaultTemporaryWindowReturnsTrue() {
+        // Given
+        userDefaults.set(100, forKey: key)
+        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults)
+
+        // When
+        let result = sut.isUserIn(percent: 99)
+
+        // Then
+        XCTAssertEqual(userDefaults.object(forKey: key) as? Int, 100)
+        XCTAssertTrue(result)
+    }
+
+    func testDateWithinPastWindowReturnsFalse() {
+        // Given
+        userDefaults.set(100, forKey: key)
+        let sut = DefaultDataBrokerProtectionMigrationsFeatureFlagger(userDefaults: userDefaults,
+                                                                      dateRangeChecker: MockDateRangeChecker.inthePast)
+
+        // When
+        let result = sut.isUserIn(percent: 99)
+
+        // Then
+        XCTAssertEqual(userDefaults.object(forKey: key) as? Int, 100)
+        XCTAssertFalse(result)
     }
 }

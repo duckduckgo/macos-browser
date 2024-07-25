@@ -18,6 +18,34 @@
 
 import Foundation
 
+protocol DateRangeChecker {
+    func isWithinRange(date: Date) -> Bool
+}
+
+struct DefaultDateRangeChecker: DateRangeChecker {
+
+    func isWithinRange(date: Date) -> Bool {
+        let calendar = Calendar.current
+
+        var startDateComponents = DateComponents()
+        startDateComponents.year = 2024
+        startDateComponents.month = 7
+        startDateComponents.day = 25
+
+        var endDateComponents = DateComponents()
+        endDateComponents.year = 2024
+        endDateComponents.month = 8
+        endDateComponents.day = 2
+
+        guard let startDate = calendar.date(from: startDateComponents),
+              let endDate = calendar.date(from: endDateComponents) else {
+            return false
+        }
+
+        return (startDate...endDate).contains(date)
+    }
+}
+
 /// Conforming types provide a `isUserIn` method to check if a user is part of the specified % feature rollout
 protocol DataBrokerProtectionMigrationsFeatureFlagger {
     func isUserIn(percent: Int) -> Bool
@@ -30,15 +58,32 @@ final class DefaultDataBrokerProtectionMigrationsFeatureFlagger: DataBrokerProte
     }
 
     private var userDefaults: UserDefaults
+    private var dateRangeChecker: DateRangeChecker
 
-    init(userDefaults: UserDefaults = .dbp) {
+    init(userDefaults: UserDefaults = .dbp,
+         dateRangeChecker: DateRangeChecker = DefaultDateRangeChecker()) {
         self.userDefaults = userDefaults
+        self.dateRangeChecker = dateRangeChecker
     }
 
     /// Checks if a user is part of the specified % feature rollout
     /// - Parameter percent: Percentage
     /// - Returns: True or false
     func isUserIn(percent: Int) -> Bool {
+
+        /*
+         START
+         Note: The following is temporary code intended to enable the feature flag for all users
+         prior to public release. This is to enable internal testing.
+
+         Asana to Remove this code: https://app.asana.com/0/1206488453854252/1207876679488680/f
+         */
+        if dateRangeChecker.isWithinRange(date: Date()) {
+            return true
+        }
+        /*
+         END
+         */
 
         guard let storedNumber = storedRandomNumber else {
 
