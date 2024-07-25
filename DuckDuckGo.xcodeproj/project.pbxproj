@@ -1049,6 +1049,8 @@
 		379DE4BD27EA31AC002CC3DE /* PreferencesAutofillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */; };
 		379E877629E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E877529E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift */; };
 		379E877729E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E877529E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift */; };
+		37A089FB2C510FE0003BB417 /* RemoteMessagingDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A089FA2C510FE0003BB417 /* RemoteMessagingDebugMenu.swift */; };
+		37A089FC2C510FE0003BB417 /* RemoteMessagingDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A089FA2C510FE0003BB417 /* RemoteMessagingDebugMenu.swift */; };
 		37A4CEBA282E992F00D75B89 /* StartupPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */; };
 		37A5E2F0298AA1B20047046B /* Persistence in Frameworks */ = {isa = PBXBuildFile; productRef = 37A5E2EF298AA1B20047046B /* Persistence */; };
 		37A6A8F12AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F02AFCC988008580A3 /* FaviconsFetcherOnboarding.swift */; };
@@ -3148,6 +3150,7 @@
 		378F44EA29B4C73E00899924 /* ViewExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAutofillView.swift; sourceTree = "<group>"; };
 		379E877529E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksCleanupErrorHandling.swift; sourceTree = "<group>"; };
+		37A089FA2C510FE0003BB417 /* RemoteMessagingDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingDebugMenu.swift; sourceTree = "<group>"; };
 		37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartupPreferences.swift; sourceTree = "<group>"; };
 		37A6A8F02AFCC988008580A3 /* FaviconsFetcherOnboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconsFetcherOnboarding.swift; sourceTree = "<group>"; };
 		37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconsFetcherOnboardingViewController.swift; sourceTree = "<group>"; };
@@ -4887,6 +4890,7 @@
 				3768D83F2C29C1F1004120AE /* ActiveRemoteMessageModel.swift */,
 				371209292C2333A0003ADF3D /* RemoteMessagingDatabase.swift */,
 				3712092B2C23383C003ADF3D /* RemoteMessagingStoreErrorHandling.swift */,
+				37A089FA2C510FE0003BB417 /* RemoteMessagingDebugMenu.swift */,
 			);
 			path = RemoteMessaging;
 			sourceTree = "<group>";
@@ -9947,6 +9951,7 @@
 				3706FACA293F65D500E42796 /* TabLazyLoader.swift in Sources */,
 				3706FACC293F65D500E42796 /* SaveCredentialsViewController.swift in Sources */,
 				3706FACD293F65D500E42796 /* PopUpButton.swift in Sources */,
+				37A089FC2C510FE0003BB417 /* RemoteMessagingDebugMenu.swift in Sources */,
 				B6BCC54B2AFDF24B002C5499 /* TaskWithProgress.swift in Sources */,
 				3706FACE293F65D500E42796 /* SuggestionViewController.swift in Sources */,
 				B6F9BDDD2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */,
@@ -11592,6 +11597,7 @@
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
 				B6F9BDDC2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */,
 				4B67854A2AA8DE75008A5004 /* VPNFeatureGatekeeper.swift in Sources */,
+				37A089FB2C510FE0003BB417 /* RemoteMessagingDebugMenu.swift in Sources */,
 				B64C852A26942AC90048FEBE /* PermissionContextMenu.swift in Sources */,
 				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
 				B693955526F04BEC0015B914 /* NSSavePanelExtension.swift in Sources */,
@@ -13404,7 +13410,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 175.0.1;
+				version = 176.0.0;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {

@@ -256,11 +256,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case dbSaveBloomFilterError(error: Error?)
 
     case remoteMessagingSaveConfigError
-    case remoteMessagingInvalidateConfigError
-    case remoteMessagingSaveMessageError
     case remoteMessagingUpdateMessageShownError
     case remoteMessagingUpdateMessageStatusError
-    case remoteMessagingDeleteScheduledMessageError
 
     case configurationFetchError(error: Error)
 
@@ -764,16 +761,10 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .remoteMessagingSaveConfigError:
             return "remote_messaging_save_config_error"
-        case .remoteMessagingInvalidateConfigError:
-            return "remote_messaging_invalidate_config_error"
-        case .remoteMessagingSaveMessageError:
-            return "remote_messaging_save_message_error"
         case .remoteMessagingUpdateMessageShownError:
             return "remote_messaging_update_message_shown_error"
         case .remoteMessagingUpdateMessageStatusError:
             return "remote_messaging_update_message_status_error"
-        case .remoteMessagingDeleteScheduledMessageError:
-            return "remote_messaging_delete_scheduled_message_error"
 
         case .configurationFetchError:
             return "cfgfetch"
