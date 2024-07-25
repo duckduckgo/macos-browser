@@ -541,8 +541,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private let ddgBrowserAppIdentifier = Bundle.main.bundleIdentifier!
 
     private func updateExclusionsMenu() {
-        excludeDBPTrafficFromVPN.state = transparentProxySettings.isExcluding(dbpBackgroundAppIdentifier) ? .on : .off
-        excludeDDGBrowserTrafficFromVPN.state = transparentProxySettings.isExcluding(ddgBrowserAppIdentifier) ? .on : .off
+        excludeDBPTrafficFromVPN.state = transparentProxySettings.isExcluding(appIdentifier: dbpBackgroundAppIdentifier) ? .on : .off
+        excludeDDGBrowserTrafficFromVPN.state = transparentProxySettings.isExcluding(appIdentifier: ddgBrowserAppIdentifier) ? .on : .off
         excludeDDGFromVPN.state = transparentProxySettings.isExcluding(domain: "duckduckgo.com") ? .on : .off
         excludeRedditFromVPN.state = transparentProxySettings.isExcluding(domain: "reddit.com") ? .on : .off
     }

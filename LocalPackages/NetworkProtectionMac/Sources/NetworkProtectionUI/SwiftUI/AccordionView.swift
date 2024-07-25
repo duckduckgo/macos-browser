@@ -30,7 +30,6 @@ struct SideMenuStyle: MenuStyle {
 struct AccordionView<Label: View, Submenu: View>: View {
     @Environment(\.colorScheme) private var colorScheme
     private var label: (Bool) -> Label
-    private let action: () async -> Void
     private let submenu: () -> Submenu
 
     private var highlightAnimationStepSpeed = AnimationConstants.highlightAnimationStepSpeed
@@ -39,11 +38,9 @@ struct AccordionView<Label: View, Submenu: View>: View {
     @State private var animatingTap = false
     @State private var showSubmenu = false
 
-    init(action: @escaping () async -> Void,
-         @ViewBuilder label: @escaping (Bool) -> Label,
+    init(@ViewBuilder label: @escaping (Bool) -> Label,
          @ViewBuilder submenu: @escaping () -> Submenu) {
 
-        self.action = action
         self.label = label
         self.submenu = submenu
     }

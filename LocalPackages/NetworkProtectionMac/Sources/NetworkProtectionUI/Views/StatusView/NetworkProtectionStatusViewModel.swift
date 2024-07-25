@@ -95,7 +95,7 @@ extension NetworkProtectionStatusView {
         ///
         private let runLoopMode: RunLoop.Mode?
 
-        private let uiActionHandler: VPNUIActionHandler
+        private let uiActionHandler: VPNUIActionHandling
 
         private let uninstallHandler: () async -> Void
 
@@ -116,7 +116,7 @@ extension NetworkProtectionStatusView {
                     statusReporter: NetworkProtectionStatusReporter,
                     currentSitePublisher: Published<CurrentSite?>.Publisher,
                     debugInformationPublisher: AnyPublisher<Bool, Never>,
-                    uiActionHandler: VPNUIActionHandler,
+                    uiActionHandler: VPNUIActionHandling,
                     menuItems: @escaping () -> [MenuItem],
                     agentLoginItem: LoginItem?,
                     isMenuBarStatusView: Bool,

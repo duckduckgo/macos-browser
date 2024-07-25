@@ -1,5 +1,5 @@
 //
-//  AppLauncher+VPNUIActionHandler.swift
+//  VPNUIActionHandler.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,23 +18,39 @@
 
 import AppLauncher
 import Foundation
+import NetworkProtectionProxy
 import NetworkProtectionUI
-/*
-extension AppLauncher: VPNUIActionHandler {
+import VPNAppLauncher
+
+/// Main App's VPN UI action handler
+///
+final class VPNUIActionHandler: VPNUIActionHandling {
+
+    private let proxySettings: TransparentProxySettings
+    private let vpnURLEventHandler: VPNURLEventHandler
+
+    init(vpnURLEventHandler: VPNURLEventHandler, proxySettings: TransparentProxySettings) {
+        self.vpnURLEventHandler = vpnURLEventHandler
+        self.proxySettings = proxySettings
+    }
 
     public func moveAppToApplications() async {
-        try? await launchApp(withCommand: VPNAppLaunchCommand.moveAppToApplications)
+        await vpnURLEventHandler.moveAppToApplicationsFolder()
+    }
+
+    func setExclusion(_ exclude: Bool, forDomain domain: String) async {
+        proxySettings.setExclusion(exclude, forDomain: domain)
     }
 
     public func shareFeedback() async {
-        try? await launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
+        await vpnURLEventHandler.showShareFeedback()
     }
 
     public func showVPNLocations() async {
-        try? await launchApp(withCommand: VPNAppLaunchCommand.showVPNLocations)
+        await vpnURLEventHandler.showLocations()
     }
 
     public func showPrivacyPro() async {
-        try? await launchApp(withCommand: VPNAppLaunchCommand.showPrivacyPro)
+        await vpnURLEventHandler.showPrivacyPro()
     }
-}*/
+}

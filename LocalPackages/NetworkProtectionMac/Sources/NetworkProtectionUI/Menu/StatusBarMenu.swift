@@ -37,7 +37,7 @@ public final class StatusBarMenu: NSObject {
     private let controller: TunnelController
     private let statusReporter: NetworkProtectionStatusReporter
     private let onboardingStatusPublisher: OnboardingStatusPublisher
-    private let uiActionHandler: VPNUIActionHandler
+    private let uiActionHandler: VPNUIActionHandling
     private let menuItems: () -> [MenuItem]
     private let agentLoginItem: LoginItem?
     private let isMenuBarStatusView: Bool
@@ -64,7 +64,7 @@ public final class StatusBarMenu: NSObject {
                 statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,
                 iconProvider: IconProvider,
-                uiActionHandler: VPNUIActionHandler,
+                uiActionHandler: VPNUIActionHandling,
                 menuItems: @escaping () -> [MenuItem],
                 agentLoginItem: LoginItem?,
                 isMenuBarStatusView: Bool,

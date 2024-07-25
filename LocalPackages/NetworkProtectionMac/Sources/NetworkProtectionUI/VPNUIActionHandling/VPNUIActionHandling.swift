@@ -1,5 +1,5 @@
 //
-//  VPNUIActionHandler.swift
+//  VPNUIActionHandling.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,8 +18,9 @@
 
 import Foundation
 
-public protocol VPNUIActionHandler {
+public protocol VPNUIActionHandling {
     func moveAppToApplications() async
+    func setExclusion(_ exclude: Bool, forDomain domain: String) async
     func shareFeedback() async
     func showPrivacyPro() async
     func showVPNLocations() async

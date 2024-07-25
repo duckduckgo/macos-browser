@@ -180,7 +180,9 @@ public struct TunnelControllerView: View {
             Divider()
                 .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
 
-            if let currentSite = model.currentSite {
+            if model.showExclusionOptions,
+               let currentSite = model.currentSite {
+
                 currentSiteView(currentSite)
             }
 
@@ -246,9 +248,7 @@ public struct TunnelControllerView: View {
 
     private func currentSiteView(_ currentSite: CurrentSite) -> some View {
         Group {
-            AccordionView {
-                // TBD
-            } label: { isHovering in
+            AccordionView { _ in
                 Image(nsImage: currentSite.icon)
                     .resizable()
                     .frame(width: 16, height: 16)
@@ -257,33 +257,42 @@ public struct TunnelControllerView: View {
             } submenu: {
                 VStack {
                     MenuItemCustomButton {
-                        // TBD
-                    } label: { isHovering in
+                        model.setExclusion(true, forDomain: currentSite.domain)
+                    } label: { _ in
                         HStack {
-                            Image(.accordionViewCheckmark)
-                                .resizable()
-                                .font(.system(size: 13))
-                                .frame(width: 16, height: 16)
-                            Text("Turn ON")
+                            if currentSite.excluded {
+                                Image(.accordionViewCheckmark)
+                                    .resizable()
+                                    .font(.system(size: 13))
+                                    .frame(width: 16, height: 16)
+                                    .applyCurrentSiteAttributes()
+                            } else {
+                                Rectangle()
+                                    .fill(Color.clear)
+                                    .frame(width: 16, height: 16)
+                            }
+                            Text("Exclude from VPN")
                         }
                     }
 
                     MenuItemCustomButton {
-                        // TBD
-                    } label: { isHovering in
-                        Rectangle()
-                            .fill(Color.clear)
-                            .frame(width: 16, height: 16)
+                        model.setExclusion(false, forDomain: currentSite.domain)
+                    } label: { _ in
+                        if !currentSite.excluded {
+                            Image(.accordionViewCheckmark)
+                                .resizable()
+                                .font(.system(size: 13))
+                                .frame(width: 16, height: 16)
+                        } else {
+                            Rectangle()
+                                .fill(Color.clear)
+                                .frame(width: 16, height: 16)
+                        }
 
-                        Text("Turn OFF")
+                        Text("Route through VPN")
                     }
                 }
             }
-
-            /*MenuItemView(title: "Hulu.com Troubleshooting", textColor: Color(.defaultText)) {
-             //await menuItem.action()
-             dismiss()
-             }.applyMenuAttributes()*/
 
             Divider()
                 .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))

@@ -54,7 +54,7 @@ public final class NetworkProtectionPopover: NSPopover {
                          onboardingStatusPublisher: OnboardingStatusPublisher,
                          statusReporter: NetworkProtectionStatusReporter,
                          currentSitePublisher: Published<CurrentSite?>.Publisher,
-                         uiActionHandler: VPNUIActionHandler,
+                         uiActionHandler: VPNUIActionHandling,
                          menuItems: @escaping () -> [MenuItem],
                          agentLoginItem: LoginItem?,
                          isMenuBarStatusView: Bool,

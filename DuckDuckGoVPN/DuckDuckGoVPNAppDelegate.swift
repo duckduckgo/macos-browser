@@ -314,6 +314,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         }.eraseToAnyPublisher()
 
         let model = StatusBarMenuModel(vpnSettings: .init(defaults: .netP))
+        let uiActionHandler = VPNUIActionHandler(
+            appLauncher: appLauncher,
+            proxySettings: proxySettings)
 
         return StatusBarMenu(
             model: model,
@@ -321,7 +324,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             statusReporter: statusReporter,
             controller: tunnelController,
             iconProvider: iconProvider,
-            uiActionHandler: appLauncher,
+            uiActionHandler: uiActionHandler,
             menuItems: {
                 [
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in

@@ -27,6 +27,7 @@ import NetworkProtectionUI
 import Subscription
 import VPNAppLauncher
 import SwiftUI
+import NetworkProtectionProxy
 
 protocol NetworkProtectionIPCClient {
     var ipcStatusObserver: ConnectionStatusObserver { get }
@@ -45,50 +46,148 @@ extension VPNControllerXPCClient: NetworkProtectionIPCClient {
     public var ipcDataVolumeObserver: any NetworkProtection.DataVolumeObserver { dataVolumeObserver }
 }
 
+@MainActor
+final class ActiveSiteRetriever {
+
+    private let windowControllerManager: WindowControllersManager
+
+    init (windowControllerManager: WindowControllersManager) {
+        self.windowControllerManager = windowControllerManager
+    }
+
+    // MARK: - Active Site
+
+    var activeSite: CurrentSite? {
+        guard let activeDomain else {
+            return nil
+        }
+
+        return site(forDomain: activeDomain)
+    }
+
+    private func site(forDomain domain: String) -> CurrentSite? {
+        let icon: NSImage?
+        let currentSite: NetworkProtectionUI.CurrentSite?
+
+        icon = FaviconManager.shared.getCachedFavicon(for: domain, sizeCategory: .small)?.image
+        let proxySettings = TransparentProxySettings(defaults: .netP)
+        currentSite = NetworkProtectionUI.CurrentSite(icon: icon,
+                                                      domain: domain,
+                                                      excluded: proxySettings.isExcluding(domain: domain))
+
+        return currentSite
+    }
+
+    // MARK: - Domain
+
+    private var activeDomain: String? {
+        guard let currentTabContent else {
+            return nil
+        }
+
+        return domain(from: currentTabContent)
+    }
+
+    private func domain(from tabContent: Tab.TabContent) -> String? {
+        if case .url(let url, _, _) = tabContent {
+
+            return url.host
+        } else {
+            return nil
+        }
+    }
+
+    // MARK: - TabContent
+
+    private var currentTabContent: Tab.TabContent? {
+        windowControllerManager.lastKeyMainWindowController?.mainViewController.activeTabViewModel?.tabContent
+    }
+}
+
+@MainActor
+final class CurrentSitePublisher: Publisher {
+    typealias Output = CurrentSite?
+    typealias Failure = Never
+
+    private let retriever: ActiveSiteRetriever
+    private let subject: CurrentValueSubject<CurrentSite?, Never>
+    private let windowControllerManager: WindowControllersManager
+
+    private let proxySettings: TransparentProxySettings
+    private var cancellables = Set<AnyCancellable>()
+
+    init(windowControllerManager: WindowControllersManager, proxySettings: TransparentProxySettings) {
+
+        retriever = ActiveSiteRetriever(windowControllerManager: windowControllerManager)
+        subject = CurrentValueSubject<CurrentSite?, Never>(retriever.activeSite)
+        self.windowControllerManager = windowControllerManager
+        self.proxySettings = proxySettings
+
+        subscribeToExclusionChanges()
+    }
+
+    private func subscribeToExclusionChanges() {
+        proxySettings.changePublisher.sink { [weak self] change in
+            guard let self else { return }
+
+            switch change {
+            case .excludedDomains(let excludedDomains):
+                refreshCurrentSite()
+            default:
+                break
+            }
+        }.store(in: &cancellables)
+    }
+
+    func refreshCurrentSite() {
+        let activeSite = retriever.activeSite
+
+        if activeSite != subject.value {
+            subject.send(retriever.activeSite)
+        }
+    }
+
+    // MARK: - Publisher
+
+    nonisolated
+    func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, NetworkProtectionUI.CurrentSite? == S.Input {
+
+        subject.receive(subscriber: subscriber)
+    }
+}
+
+@MainActor
 final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var networkProtectionPopover: NetworkProtectionPopover?
     let ipcClient: NetworkProtectionIPCClient
     let vpnUninstaller: VPNUninstalling
 
+    @Published
+    private var currentSite: CurrentSite?
+    private let currentSitePublisher: CurrentSitePublisher
+    private var cancellables = Set<AnyCancellable>()
+
     init(ipcClient: VPNControllerXPCClient,
          vpnUninstaller: VPNUninstalling) {
+
         self.ipcClient = ipcClient
         self.vpnUninstaller = vpnUninstaller
+
+        currentSitePublisher = CurrentSitePublisher(windowControllerManager: .shared,
+                                                    proxySettings: TransparentProxySettings(defaults: .netP))
+        subscribeToCurrentSitePublisher()
+    }
+
+    private func subscribeToCurrentSitePublisher() {
+        currentSitePublisher
+            .assign(to: \.currentSite, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     var isShown: Bool {
         networkProtectionPopover?.isShown ?? false
     }
 
-    @MainActor
-    func currentSitePublisher() -> Published<CurrentSite?>.Publisher {
-        let domain: String?
-
-        if case .url(let url, _, _) = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.activeTabViewModel?.tabContent {
-
-            domain = url.host
-        } else {
-            domain = nil
-        }
-
-        let icon: NSImage?
-        let currentSite: NetworkProtectionUI.CurrentSite?
-
-        if let domain {
-            icon = FaviconManager.shared.getCachedFavicon(for: domain, sizeCategory: .small)?.image
-            currentSite = NetworkProtectionUI.CurrentSite(icon: icon,
-                                                          domain: domain,
-                                                          excluded: false)
-        } else {
-            icon = nil
-            currentSite = nil
-        }
-
-        var currentSitePublisher = Published<CurrentSite?>(initialValue: currentSite)
-        return currentSitePublisher.projectedValue
-    }
-
-    @MainActor
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover {
         let popover: NSPopover = {
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
@@ -106,13 +205,19 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
             _ = VPNSettings(defaults: .netP)
             let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-            let currentSitePublisher = currentSitePublisher()
+            let vpnURLEventHandler = VPNURLEventHandler()
+            let proxySettings = TransparentProxySettings(defaults: .netP)
+            let uiActionHandler = VPNUIActionHandler(vpnURLEventHandler: vpnURLEventHandler, proxySettings: proxySettings)
+
+            // We need to force-refresh the current site as there's currently no easy mechanism
+            // to observe active-tab changes.  We just force-refresh when the popover is shown.
+            currentSitePublisher.refreshCurrentSite()
 
             let popover = NetworkProtectionPopover(controller: controller,
                                                    onboardingStatusPublisher: onboardingStatusPublisher,
                                                    statusReporter: statusReporter,
-                                                   currentSitePublisher: currentSitePublisher,
-                                                   uiActionHandler: appLauncher,
+                                                   currentSitePublisher: $currentSite,
+                                                   uiActionHandler: uiActionHandler,
                                                    menuItems: {
                 if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
                     return [
@@ -167,7 +272,6 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         popover.show(positionedBelow: view.bounds.insetFromLineOfDeath(flipped: view.isFlipped), in: view)
     }
 
-    @MainActor
     func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover? {
         if let networkProtectionPopover, networkProtectionPopover.isShown {
             networkProtectionPopover.close()

@@ -69,7 +69,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         return formatter
     }()
 
-    private let uiActionHandler: VPNUIActionHandler
+    private let uiActionHandler: VPNUIActionHandling
 
     // MARK: - Misc
 
@@ -94,7 +94,7 @@ public final class TunnelControllerViewModel: ObservableObject {
                 runLoopMode: RunLoop.Mode? = nil,
                 vpnSettings: VPNSettings,
                 locationFormatter: VPNLocationFormatting,
-                uiActionHandler: VPNUIActionHandler) {
+                uiActionHandler: VPNUIActionHandling) {
 
         self.tunnelController = controller
         self.onboardingStatusPublisher = onboardingStatusPublisher
@@ -541,6 +541,23 @@ public final class TunnelControllerViewModel: ObservableObject {
     func moveToApplications() {
         Task { @MainActor in
             await uiActionHandler.moveAppToApplications()
+        }
+    }
+
+    // MARK: - Domain Exclusions
+
+    var showExclusionOptions: Bool {
+        switch connectionStatus {
+        case .connected:
+            return true
+        default:
+            return false
+        }
+    }
+
+    func setExclusion(_ exclude: Bool, forDomain domain: String) {
+        Task { @MainActor in
+            await uiActionHandler.setExclusion(exclude, forDomain: domain)
         }
     }
 }

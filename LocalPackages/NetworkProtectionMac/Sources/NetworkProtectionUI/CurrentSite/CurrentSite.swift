@@ -20,13 +20,17 @@ import AppKit
 import Foundation
 
 public struct CurrentSite {
-    let icon: NSImage
-    let domain: String
-    let excluded: Bool
+    public let icon: NSImage
+    public let domain: String
+    public let excluded: Bool
 
     public init(icon: NSImage?, domain: String, excluded: Bool) {
         self.icon = icon ?? NSImage(systemSymbolName: "globe", accessibilityDescription: nil)!
         self.domain = domain
         self.excluded = excluded
     }
+}
+
+extension CurrentSite: Equatable {
+
 }

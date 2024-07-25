@@ -1599,6 +1599,12 @@
 		7B5A23702C46A116007213AC /* ExcludedDomainsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B5A236E2C46A116007213AC /* ExcludedDomainsModel.swift */; };
 		7B5A23752C46A4A8007213AC /* ExcludedDomains.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B5A23742C46A4A8007213AC /* ExcludedDomains.storyboard */; };
 		7B5A23762C46A4A8007213AC /* ExcludedDomains.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B5A23742C46A4A8007213AC /* ExcludedDomains.storyboard */; };
+		7B60AFFA2C511B65008E32A3 /* VPNUIActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B60AFF92C511B65008E32A3 /* VPNUIActionHandler.swift */; };
+		7B60AFFB2C511C68008E32A3 /* VPNUIActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B60AFF92C511B65008E32A3 /* VPNUIActionHandler.swift */; };
+		7B60AFFE2C514269008E32A3 /* VPNURLEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B60AFFC2C514260008E32A3 /* VPNURLEventHandler.swift */; };
+		7B60AFFF2C51426A008E32A3 /* VPNURLEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B60AFFC2C514260008E32A3 /* VPNURLEventHandler.swift */; };
+		7B60B0022C5145EC008E32A3 /* VPNUIActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B60B0002C514541008E32A3 /* VPNUIActionHandler.swift */; };
+		7B60B0032C5145ED008E32A3 /* VPNUIActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B60B0002C514541008E32A3 /* VPNUIActionHandler.swift */; };
 		7B624F172BA25C1F00A6C544 /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7B624F162BA25C1F00A6C544 /* NetworkProtectionUI */; };
 		7B6545ED2C0778BB00115BEA /* VPNControllerUDSClient+ConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6545EC2C0778BB00115BEA /* VPNControllerUDSClient+ConvenienceInitializers.swift */; };
 		7B6545EE2C0779D500115BEA /* VPNControllerUDSClient+ConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6545EC2C0778BB00115BEA /* VPNControllerUDSClient+ConvenienceInitializers.swift */; };
@@ -3540,6 +3546,9 @@
 		7B5A23672C468233007213AC /* ExcludedDomainsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExcludedDomainsViewController.swift; sourceTree = "<group>"; };
 		7B5A236E2C46A116007213AC /* ExcludedDomainsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExcludedDomainsModel.swift; sourceTree = "<group>"; };
 		7B5A23742C46A4A8007213AC /* ExcludedDomains.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ExcludedDomains.storyboard; sourceTree = "<group>"; };
+		7B60AFF92C511B65008E32A3 /* VPNUIActionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNUIActionHandler.swift; sourceTree = "<group>"; };
+		7B60AFFC2C514260008E32A3 /* VPNURLEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNURLEventHandler.swift; sourceTree = "<group>"; };
+		7B60B0002C514541008E32A3 /* VPNUIActionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNUIActionHandler.swift; sourceTree = "<group>"; };
 		7B6545EC2C0778BB00115BEA /* VPNControllerUDSClient+ConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VPNControllerUDSClient+ConvenienceInitializers.swift"; sourceTree = "<group>"; };
 		7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBPAgentAppStore.xcconfig; sourceTree = "<group>"; };
 		7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBPAgent.xcconfig; sourceTree = "<group>"; };
@@ -5418,6 +5427,8 @@
 				7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */,
 				B6F1B02D2BCE6B47005E863C /* TunnelControllerProvider.swift */,
 				4BE3A6C02C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift */,
+				7B60B0002C514541008E32A3 /* VPNUIActionHandler.swift */,
+				7B60AFFC2C514260008E32A3 /* VPNURLEventHandler.swift */,
 			);
 			path = BothAppTargets;
 			sourceTree = "<group>";
@@ -6180,6 +6191,7 @@
 			isa = PBXGroup;
 			children = (
 				7BA7CC132AD11DC80042E5CE /* AppLauncher+DefaultInitializer.swift */,
+				7B60AFF92C511B65008E32A3 /* VPNUIActionHandler.swift */,
 				7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */,
 				7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */,
 				EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */,
@@ -10260,6 +10272,7 @@
 				3706FB93293F65D500E42796 /* PasteboardFolder.swift in Sources */,
 				3706FB94293F65D500E42796 /* CookieManagedNotificationView.swift in Sources */,
 				EEC4A65F2B277EE100F7C0AA /* VPNLocationViewModel.swift in Sources */,
+				7B60B0032C5145ED008E32A3 /* VPNUIActionHandler.swift in Sources */,
 				370A34B22AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */,
 				4B4D60BE2A0C848A00BCD287 /* NetworkProtection+ConvenienceInitializers.swift in Sources */,
 				3706FB95293F65D500E42796 /* PermissionType.swift in Sources */,
@@ -10591,6 +10604,7 @@
 				7B6545EE2C0779D500115BEA /* VPNControllerUDSClient+ConvenienceInitializers.swift in Sources */,
 				B6F9BDE52B45CD1900677B33 /* ModalView.swift in Sources */,
 				9F872DA42B90920F00138637 /* BookmarkFolderInfo.swift in Sources */,
+				7B60AFFE2C514269008E32A3 /* VPNURLEventHandler.swift in Sources */,
 				B677FC502B06376B0099EB04 /* ReportFeedbackView.swift in Sources */,
 				3706FC68293F65D500E42796 /* ToggleableScrollView.swift in Sources */,
 				3706FC69293F65D500E42796 /* UserScripts.swift in Sources */,
@@ -11134,6 +11148,7 @@
 				7BA7CC402AD11E3D0042E5CE /* AppLauncher+DefaultInitializer.swift in Sources */,
 				7B0694982B6E980F00FA4DBA /* VPNProxyLauncher.swift in Sources */,
 				BDA764842BC49E3F00D0400C /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */,
+				7B60AFFA2C511B65008E32A3 /* VPNUIActionHandler.swift in Sources */,
 				B65DA5EF2A77CC3A00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				BDA7647F2BC4998900D0400C /* DefaultVPNLocationFormatter.swift in Sources */,
 				4BF0E5072AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
@@ -11175,6 +11190,7 @@
 				B65DA5F02A77CC3C00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				BDA764852BC49E4000D0400C /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */,
 				7BAF9E4D2A8A3CCB002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */,
+				7B60AFFB2C511C68008E32A3 /* VPNUIActionHandler.swift in Sources */,
 				7BA7CC392AD11E2D0042E5CE /* DuckDuckGoVPNAppDelegate.swift in Sources */,
 				BDA764802BC4998A00D0400C /* DefaultVPNLocationFormatter.swift in Sources */,
 				7BA7CC552AD11FFB0042E5CE /* NetworkProtectionOptionKeyExtension.swift in Sources */,
@@ -11516,6 +11532,7 @@
 				1D0DE93E2C3BA9840037ABC2 /* AppRestarter.swift in Sources */,
 				7BCB90C22C18626E008E3543 /* VPNControllerXPCClient+ConvenienceInitializers.swift in Sources */,
 				4B9DB0202A983B24000927DB /* ProductWaitlistRequest.swift in Sources */,
+				7B60B0022C5145EC008E32A3 /* VPNUIActionHandler.swift in Sources */,
 				98779A0029999B64005D8EB6 /* Bookmark.xcdatamodeld in Sources */,
 				85589E9E27BFE4500038AD11 /* DefaultBrowserPromptView.swift in Sources */,
 				4B4032842AAAC24400CCA602 /* WaitlistActivationDateStore.swift in Sources */,
@@ -11887,6 +11904,7 @@
 				C168B9AC2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */,
 				9FA173E72B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift in Sources */,
 				F1C70D7C2BFF510000599292 /* SubscriptionEnvironment+Default.swift in Sources */,
+				7B60AFFF2C51426A008E32A3 /* VPNURLEventHandler.swift in Sources */,
 				D64A5FF82AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */,
 				37A6A8F62AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
