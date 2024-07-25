@@ -1532,7 +1532,6 @@
 		56A054472C22536A007D8FAB /* CapturingOnboardingActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054462C22536A007D8FAB /* CapturingOnboardingActionsManager.swift */; };
 		56A054482C22536A007D8FAB /* CapturingOnboardingActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054462C22536A007D8FAB /* CapturingOnboardingActionsManager.swift */; };
 		56A054532C2592CE007D8FAB /* OnboardingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A054522C2592CE007D8FAB /* OnboardingUITests.swift */; };
-		56A51CE82BE65B340098722D /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56A51CE72BE65B340098722D /* InfoPlist.xcstrings */; };
 		56AC09C72C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */; };
 		56AC09C82C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */; };
 		56B234BF2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */; };
@@ -9387,7 +9386,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				56A51CE82BE65B340098722D /* InfoPlist.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
