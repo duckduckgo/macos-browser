@@ -200,7 +200,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         var supportedFeatures = ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfigurationManager.privacyConfig)
 
         if !passwordManagerCoordinator.isEnabled,
-           AutofillNeverPromptWebsitesManager.shared.hasNeverPromptWebsitesFor(domain: domain) {
+           AutofillNeverPromptWebsitesManager.shared.hasNeverPromptWebsitesFor(domain: domain) || isBurner {
             supportedFeatures.passwordGeneration = false
         }
 
