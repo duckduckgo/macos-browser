@@ -118,6 +118,22 @@ class OnboardingManagerTests: XCTestCase {
         XCTAssertTrue(navigationDelegate.focusOnAddressBarCalled)
     }
 
+    func test_WhenFireNavigationDidEndTwice_FocusOnBarIsCalledOnlyOnce() {
+        // Given
+        let isOnboardingFinished = UserDefaultsWrapper(key: .onboardingFinished, defaultValue: true)
+        isOnboardingFinished.wrappedValue = false
+        manager.goToAddressBar()
+        navigationDelegate.fireNavigationDidEnd()
+        XCTAssertTrue(navigationDelegate.focusOnAddressBarCalled)
+        navigationDelegate.focusOnAddressBarCalled = false
+
+        // When
+        navigationDelegate.fireNavigationDidEnd()
+
+        // Then
+        XCTAssertFalse(navigationDelegate.focusOnAddressBarCalled)
+    }
+
     func testGoToAddressBar_NavigatesToSettings() {
         // When
         manager.goToSettings()
