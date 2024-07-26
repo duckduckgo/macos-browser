@@ -89,6 +89,9 @@ jobs:
       env:
         CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
       run: |
+        # Set CODE environment variable in the scheme definition, since Xcode 15.4 doesn't
+        # seem to recognize global environment variables otherwise.
+        # We use xmlstarlet to edit the scheme XML file.
         brew install xmlstarlet
         xmlstarlet ed -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t elem -n "EnvironmentVariable" \
           -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "key" -v "CODE" \
