@@ -22,6 +22,7 @@ import NetworkProtectionProxy
 protocol ExcludedDomainsViewModel {
     var domains: [String] { get }
 
+    func add(domain: String)
     func remove(domain: String)
 }
 
@@ -35,6 +36,14 @@ final class DefaultExcludedDomainsViewModel {
 extension DefaultExcludedDomainsViewModel: ExcludedDomainsViewModel {
     var domains: [String] {
         proxySettings.excludedDomains
+    }
+
+    func add(domain: String) {
+        guard !proxySettings.excludedDomains.contains(domain) else {
+            return
+        }
+
+        proxySettings.excludedDomains.append(domain)
     }
 
     func remove(domain: String) {

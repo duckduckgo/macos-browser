@@ -99,7 +99,24 @@ final class ExcludedDomainsViewController: NSViewController {
     }
 
     @IBAction func addDomain(_ sender: NSButton) {
-        // TBD
+        AddExcludedDomainView(title: "Add Website Exclusion", buttonsState: .expanded, cancelActionTitle: "Cancel", cancelAction: { dismiss in
+
+            dismiss()
+        }, defaultActionTitle: "Add") { [weak self] domain, dismiss in
+            guard let self else { return }
+
+            addDomain(domain)
+            dismiss()
+        }.show(in: view.window)
+    }
+
+    private func addDomain(_ domain: String) {
+        model.add(domain: domain)
+        reloadData()
+
+        if let newRowIndex = allDomains.firstIndex(of: domain) {
+            tableView.scrollRowToVisible(newRowIndex)
+        }
     }
 
     @IBAction func removeSelectedDomain(_ sender: NSButton) {

@@ -1610,6 +1610,10 @@
 		7B6545EE2C0779D500115BEA /* VPNControllerUDSClient+ConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6545EC2C0778BB00115BEA /* VPNControllerUDSClient+ConvenienceInitializers.swift */; };
 		7B7DFB202B7E736B009EA1A3 /* MacPacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */; };
 		7B7DFB222B7E7473009EA1A3 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 7B7DFB212B7E7473009EA1A3 /* Networking */; };
+		7B7F5D212C526CE600826256 /* AddExcludedDomainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7F5D202C526CE600826256 /* AddExcludedDomainView.swift */; };
+		7B7F5D222C526CE600826256 /* AddExcludedDomainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7F5D202C526CE600826256 /* AddExcludedDomainView.swift */; };
+		7B7F5D242C52725A00826256 /* AddExcludedDomainButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7F5D232C52725A00826256 /* AddExcludedDomainButtonsView.swift */; };
+		7B7F5D252C52725A00826256 /* AddExcludedDomainButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7F5D232C52725A00826256 /* AddExcludedDomainButtonsView.swift */; };
 		7B7FCD0F2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */; };
 		7B7FCD102BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */; };
 		7B8594192B5B26230007EB3E /* UDSHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 7B8594182B5B26230007EB3E /* UDSHelper */; };
@@ -3553,6 +3557,8 @@
 		7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBPAgentAppStore.xcconfig; sourceTree = "<group>"; };
 		7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBPAgent.xcconfig; sourceTree = "<group>"; };
 		7B76E6852AD5D77600186A84 /* XPCHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = XPCHelper; sourceTree = "<group>"; };
+		7B7F5D202C526CE600826256 /* AddExcludedDomainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExcludedDomainView.swift; sourceTree = "<group>"; };
+		7B7F5D232C52725A00826256 /* AddExcludedDomainButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExcludedDomainButtonsView.swift; sourceTree = "<group>"; };
 		7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+vpnLegacyUser.swift"; sourceTree = "<group>"; };
 		7B8594172B5B25FB0007EB3E /* UDSHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = UDSHelper; sourceTree = "<group>"; };
 		7B8DB3192B504D7500EC16DA /* VPNAppEventsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNAppEventsHandler.swift; sourceTree = "<group>"; };
@@ -6166,6 +6172,8 @@
 				7B5A23742C46A4A8007213AC /* ExcludedDomains.storyboard */,
 				7B5A23672C468233007213AC /* ExcludedDomainsViewController.swift */,
 				7B5A236E2C46A116007213AC /* ExcludedDomainsModel.swift */,
+				7B7F5D202C526CE600826256 /* AddExcludedDomainView.swift */,
+				7B7F5D232C52725A00826256 /* AddExcludedDomainButtonsView.swift */,
 			);
 			path = ExcludedDomains;
 			sourceTree = "<group>";
@@ -10421,6 +10429,7 @@
 				9F56CFAE2B84326C00BB7F11 /* AddEditBookmarkDialogViewModel.swift in Sources */,
 				3706FBF3293F65D500E42796 /* PseudoFolder.swift in Sources */,
 				1D26EBAD2B74BECB0002A93F /* NSImageSendable.swift in Sources */,
+				7B7F5D252C52725A00826256 /* AddExcludedDomainButtonsView.swift in Sources */,
 				1D220BFD2B87AACF00F8BBC6 /* PrivacyProtectionStatus.swift in Sources */,
 				3706FBF8293F65D500E42796 /* TabBarFooter.swift in Sources */,
 				B626A7612992407D00053070 /* CancellableExtension.swift in Sources */,
@@ -10572,6 +10581,7 @@
 				3706FC53293F65D500E42796 /* TabBarScrollView.swift in Sources */,
 				B6104E9C2BA9C173008636B2 /* DownloadResumeData.swift in Sources */,
 				3706FC54293F65D500E42796 /* BookmarkListTreeControllerDataSource.swift in Sources */,
+				7B7F5D222C526CE600826256 /* AddExcludedDomainView.swift in Sources */,
 				3706FC55293F65D500E42796 /* AddressBarViewController.swift in Sources */,
 				3706FC56293F65D500E42796 /* Permissions.swift in Sources */,
 				9F872D992B8DA9F800138637 /* Bookmarks+Tab.swift in Sources */,
@@ -11465,6 +11475,7 @@
 				F18826912BC0105800D9AC4F /* PixelDataStore.swift in Sources */,
 				B69B503E2726A12500758A2B /* AtbParser.swift in Sources */,
 				37F19A6528E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift in Sources */,
+				7B7F5D212C526CE600826256 /* AddExcludedDomainView.swift in Sources */,
 				4B92929E26670D2A00AD2C21 /* BookmarkSidebarTreeController.swift in Sources */,
 				EEC4A6712B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift in Sources */,
 				85589E8727BBB8F20038AD11 /* HomePageFavoritesModel.swift in Sources */,
@@ -11511,6 +11522,7 @@
 				85774AFF2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift in Sources */,
 				4B9292A026670D2A00AD2C21 /* SpacerNode.swift in Sources */,
 				3775913629AB9A1C00E26367 /* SyncManagementDialogViewController.swift in Sources */,
+				7B7F5D242C52725A00826256 /* AddExcludedDomainButtonsView.swift in Sources */,
 				B6C0BB6729AEFF8100AE8E3C /* BookmarkExtension.swift in Sources */,
 				4BE6547F271FCD4D008D1D63 /* PasswordManagementCreditCardModel.swift in Sources */,
 				31B4AF532901A4F20013585E /* NSEventExtension.swift in Sources */,
