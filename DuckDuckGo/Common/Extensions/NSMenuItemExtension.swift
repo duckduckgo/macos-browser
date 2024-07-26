@@ -57,7 +57,7 @@ extension NSMenuItem {
         representedObject = bookmarkViewModel.entity
         action = bookmarkViewModel.entity.isFolder ? nil : #selector(MainViewController.openBookmark(_:))
     }
-
+// TODO: drop
     convenience init(bookmarkViewModels: [BookmarkViewModel]) {
         self.init()
 

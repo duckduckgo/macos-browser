@@ -20,7 +20,7 @@ import Foundation
 
 final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
 
-    func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
+    func treeController(_ treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
         return node.isRoot ? childNodesForRootNode(node) : childNodes(for: node)
     }
 
@@ -34,6 +34,8 @@ final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
 
     private func childNodesForRootNode(_ node: BookmarkNode) -> [BookmarkNode] {
         let bookmarks = PseudoFolder.bookmarks
+        bookmarks.count = bookmarkManager.list?.totalBookmarks ?? 0
+
         let bookmarksNode = BookmarkNode(representedObject: bookmarks, parent: node)
         bookmarksNode.canHaveChildNodes = true
 

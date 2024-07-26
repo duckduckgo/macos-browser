@@ -40,7 +40,7 @@ import AppKit
 
     func editFolder(_ sender: NSMenuItem)
     func deleteFolder(_ sender: NSMenuItem)
-    func openInNewTabs(_ sender: NSMenuItem)
+    func openInNewTabs(_ sender: Any)
     func openAllInNewWindow(_ sender: NSMenuItem)
 
 }

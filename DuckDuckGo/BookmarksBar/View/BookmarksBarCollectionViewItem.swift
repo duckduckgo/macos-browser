@@ -32,6 +32,8 @@ protocol BookmarksBarCollectionViewItemDelegate: AnyObject {
     func bookmarksBarCollectionViewItemAddEntityAction(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarCollectionViewItemManageBookmarksAction(_ item: BookmarksBarCollectionViewItem)
 
+    func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, isMouseOver: Bool)
+
 }
 
 final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
@@ -71,6 +73,7 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     }
 
     func updateItem(from entity: BaseBookmarkEntity, isInteractionPrevented: Bool) {
+        self.representedObject = entity
         self.title = entity.title
 
         if let bookmark = entity as? Bookmark {
@@ -143,6 +146,14 @@ extension BookmarksBarCollectionViewItem: NSMenuDelegate {
 
 }
 
+extension BookmarksBarCollectionViewItem: MouseOverViewDelegate {
+
+    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
+        delegate?.bookmarksBarCollectionViewItem(self, isMouseOver: isMouseOver)
+    }
+
+}
+
 extension BookmarksBarCollectionViewItem: BookmarkMenuItemSelectors {
 
     func openBookmarkInNewTab(_ sender: NSMenuItem) {
@@ -195,7 +206,7 @@ extension BookmarksBarCollectionViewItem: FolderMenuItemSelectors {
         delegate?.bookmarksBarCollectionViewItemDeleteEntityAction(self)
     }
 
-    func openInNewTabs(_ sender: NSMenuItem) {
+    func openInNewTabs(_ sender: Any) {
         delegate?.bookmarksBarCollectionViewItemOpenInNewTabAction(self)
     }
 

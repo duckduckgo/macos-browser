@@ -21,7 +21,7 @@ import XCTest
 
 private class MockTreeControllerDataSource: BookmarkTreeControllerDataSource {
 
-    func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
+    func treeController(_ treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
         return node.childNodes
     }
 

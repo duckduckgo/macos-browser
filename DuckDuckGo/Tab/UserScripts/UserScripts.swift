@@ -74,13 +74,13 @@ final class UserScripts: UserScriptsProvider {
 
         specialPages = SpecialPagesUserScript()
 
-        if DuckPlayer.shared.isAvailable {
-            youtubeOverlayScript = YoutubeOverlayUserScript()
-            youtubePlayerUserScript = YoutubePlayerUserScript()
-        } else {
+//        if DuckPlayer.shared.isAvailable {
+//            youtubeOverlayScript = YoutubeOverlayUserScript()
+//            youtubePlayerUserScript = YoutubePlayerUserScript()
+//        } else {
             youtubeOverlayScript = nil
             youtubePlayerUserScript = nil
-        }
+//        }
 
 #if SPARKLE
         releaseNotesUserScript = ReleaseNotesUserScript()

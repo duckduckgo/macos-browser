@@ -17,6 +17,8 @@
 //
 
 import AppKit
+import Carbon
+import Combine
 
 extension NSDragOperation {
 
@@ -26,7 +28,42 @@ extension NSDragOperation {
 
 final class BookmarksOutlineView: NSOutlineView {
 
-    var lastRow: RoundedSelectionRowView?
+    private var highlightedRowView: RoundedSelectionRowView?
+    private var highlightedCellView: BookmarkOutlineCellView?
+
+    @Published var highlightedRow: Int? {
+        didSet {
+            highlightedRowView?.highlight = false
+            highlightedCellView?.highlight = false
+            guard let row = highlightedRow else { return }
+            if case .keyDown = NSApp.currentEvent?.type {
+                scrollRowToVisible(row)
+            }
+
+            let item = item(atRow: row) as? BookmarkNode
+
+            let rowView = rowView(atRow: row, makeIfNecessary: false) as? RoundedSelectionRowView
+            rowView?.isInKeyWindow = true
+            rowView?.highlight = !(item?.representedObject is SpacerNode)
+            highlightedRowView = rowView
+
+            let cellView = self.view(atColumn: 0, row: row, makeIfNecessary: false) as? BookmarkOutlineCellView
+            cellView?.isInKeyWindow = true
+            cellView?.highlight = !(item?.representedObject is SpacerNode)
+            highlightedCellView = cellView
+        }
+    }
+
+    override var clickedRow: Int {
+        let clickedRow = super.clickedRow
+        // on Enter/Space key down: click event is sent to the OutlineView target with highlightedRow
+        if [-1, NSNotFound].contains(clickedRow), let highlightedRow,
+           NSApp.currentEvent?.type == .keyDown {
+
+            return highlightedRow
+        }
+        return clickedRow
+    }
 
     override func frameOfOutlineCell(atRow row: Int) -> NSRect {
         let frame = super.frameOfOutlineCell(atRow: row)
@@ -51,22 +88,146 @@ final class BookmarksOutlineView: NSOutlineView {
     }
 
     override func viewDidMoveToWindow() {
+        highlightedRow = nil
+
         super.viewDidMoveToWindow()
         guard let scrollView = enclosingScrollView else { return }
 
-        let trackingArea = NSTrackingArea(rect: .zero, options: [.mouseMoved, .activeInKeyWindow, .inVisibleRect], owner: self, userInfo: nil)
+        let trackingArea = NSTrackingArea(rect: .zero, options: [.mouseMoved, .mouseEnteredAndExited, .activeInKeyWindow, .inVisibleRect], owner: self, userInfo: nil)
 
         scrollView.addTrackingArea(trackingArea)
     }
 
     override func mouseMoved(with event: NSEvent) {
-        lastRow?.highlight = false
-        let point = convert(event.locationInWindow, to: nil)
-        let row = row(at: point)
-        guard row >= 0, let rowView = rowView(atRow: row, makeIfNecessary: false) as? RoundedSelectionRowView else { return }
-        let item = item(atRow: row) as? BookmarkNode
-        rowView.highlight = !(item?.representedObject is SpacerNode)
-        lastRow = rowView
+        let point = convert(event.locationInWindow, from: nil)
+        let row = row(at: NSPoint(x: self.bounds.midX, y: point.y))
+        guard row >= 0, row < NSNotFound else {
+            // TODO: don‘t highlight but mark as non-active when mouse exit to
+            highlightedRow = nil
+            return
+        }
+        if highlightedRow != row {
+            highlightedRow = row
+        } else {
+            highlightedRowView?.isInKeyWindow = true
+            highlightedCellView?.isInKeyWindow = true
+        }
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        let windowNumber = NSWindow.windowNumber(at: NSEvent.mouseLocation, belowWindowWithWindowNumber: 0)
+        if let window = NSApp.window(withWindowNumber: windowNumber),
+           window.contentViewController?.nextResponder is NSPopover {
+
+            highlightedRowView?.isInKeyWindow = false
+            highlightedCellView?.isInKeyWindow = false
+        } else {
+            highlightedRow = nil
+        }
+    }
+
+    override func keyDown(with event: NSEvent) {
+        switch Int(event.keyCode) {
+        case kVK_DownArrow:
+            print("highlightedRow", highlightedRow)
+            if let highlightedRow {
+                guard highlightedRow < numberOfRows - 1 else { return }
+                if event.modifierFlags.contains(.command) || event.modifierFlags.contains(.option) {
+                    self.highlightedRow = numberOfRows - 1
+                } else {
+                    self.highlightedRow = highlightedRow + 1
+                }
+
+            } else if numberOfRows > 0 /* && highlightedRow == nil */ {
+                if let window, let windowParent = window.parent,
+                   type(of: windowParent) == type(of: window) /* _NSPopoverWindow */,
+                    let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
+                    let collectionView = scrollView.documentView as? Self {
+                    
+                    // when no highlighted row in child menu popover: send event to parent menu
+                    collectionView.keyDown(with: event)
+
+                } else if event.modifierFlags.contains(.option) {
+                    self.highlightedRow = numberOfRows - 1
+                } else {
+                    self.highlightedRow = 0
+                }
+            }
+        case kVK_UpArrow: // TODO: pgUp/Down, modifiers
+            print("highlightedRow", highlightedRow)
+            if let highlightedRow {
+                guard highlightedRow > 0 else { return }
+                if event.modifierFlags.contains(.command) || event.modifierFlags.contains(.option) {
+                    self.highlightedRow = 0
+                } else {
+                    self.highlightedRow = highlightedRow - 1
+                }
+
+            } else if numberOfRows > 0 /* && highlightedRow == nil */ {
+                if let window, let windowParent = window.parent,
+                   type(of: windowParent) == type(of: window) /* _NSPopoverWindow */,
+                   let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
+                   let collectionView = scrollView.documentView as? Self {
+
+                    // when no highlighted row in child menu popover: send event to parent menu
+                    collectionView.keyDown(with: event)
+
+                } else if event.modifierFlags.contains(.option) {
+                    self.highlightedRow = 0
+                } else {
+                    self.highlightedRow = numberOfRows - 1
+                }
+            }
+        case kVK_RightArrow:
+            if let window, let windowParent = window.parent,
+               type(of: windowParent) == type(of: window) /* _NSPopoverWindow */,
+               let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
+               let collectionView = scrollView.documentView as? Self {
+                if highlightedRow == nil {
+                    highlightedRow = 0
+                }
+
+                collectionView.highlightedRowView?.isInKeyWindow = false
+                collectionView.highlightedCellView?.isInKeyWindow = false
+            }
+
+            // TODO: when in root: open next menu, left arrow: prev menu
+        case kVK_LeftArrow:
+            if let window, let windowParent = window.parent,
+               type(of: windowParent) == type(of: window) /* _NSPopoverWindow */,
+               let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
+               let collectionView = scrollView.documentView as? Self,
+               let popover = window.contentViewController?.nextResponder as? NSPopover {
+
+                // close child menu
+                popover.close()
+                collectionView.highlightedRowView?.isInKeyWindow = true
+                collectionView.highlightedCellView?.isInKeyWindow = true
+            }
+        case kVK_Return, kVK_ANSI_KeypadEnter, kVK_Space:
+            if let highlightedRow {
+                guard let action else {
+                    assertionFailure("BookmarksOutlineView.action not set")
+                    return
+                }
+                // select highlighted item
+                NSApp.sendAction(action, to: target, from: self)
+
+            } else if let window, let windowParent = window.parent,
+                      type(of: windowParent) == type(of: window) /* _NSPopoverWindow */,
+                      let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
+                      let collectionView = scrollView.documentView as? Self {
+
+                // when in child menu popover without selection: highlight first row
+                highlightedRow = 0
+
+                collectionView.highlightedRowView?.isInKeyWindow = false
+                collectionView.highlightedCellView?.isInKeyWindow = false
+            }
+
+        default:
+            super.keyDown(with: event)
+        }
     }
 
 }

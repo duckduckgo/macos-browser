@@ -39,7 +39,7 @@ final class BookmarkNode: Hashable {
     var childNodes = [BookmarkNode]()
 
     var isRoot: Bool {
-        return parent == nil
+        return representedObject is RootNode
     }
 
     var numberOfChildNodes: Int {

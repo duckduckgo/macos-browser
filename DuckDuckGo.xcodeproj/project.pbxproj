@@ -1668,6 +1668,10 @@
 		7BFF35732C10D75000F89673 /* IPCServiceLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFF35722C10D75000F89673 /* IPCServiceLauncher.swift */; };
 		7BFF35742C10D75000F89673 /* IPCServiceLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFF35722C10D75000F89673 /* IPCServiceLauncher.swift */; };
 		7BFF850F2B0C09DA00ECACA2 /* DuckDuckGo Personal Information Removal.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGo Personal Information Removal.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		841211362C4631E900088FBC /* BookmarkListPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841211352C4631E900088FBC /* BookmarkListPopover.swift */; };
+		841211372C4631E900088FBC /* BookmarkListPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841211352C4631E900088FBC /* BookmarkListPopover.swift */; };
+		844683082C537F5200A15F93 /* MenuItemNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844683072C537F5200A15F93 /* MenuItemNode.swift */; };
+		844683092C537F5200A15F93 /* MenuItemNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844683072C537F5200A15F93 /* MenuItemNode.swift */; };
 		84DC715A2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DC715B2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
@@ -3575,6 +3579,8 @@
 		7BEC20412B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddBookmarkFolderPopoverView.swift; sourceTree = "<group>"; };
 		7BF1A9D72AE054D300FCA683 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7BFF35722C10D75000F89673 /* IPCServiceLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCServiceLauncher.swift; sourceTree = "<group>"; };
+		841211352C4631E900088FBC /* BookmarkListPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListPopover.swift; sourceTree = "<group>"; };
+		844683072C537F5200A15F93 /* MenuItemNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuItemNode.swift; sourceTree = "<group>"; };
 		84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperTests.swift; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
 		850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarAppearance.swift; sourceTree = "<group>"; };
@@ -7561,14 +7567,15 @@
 				AAC5E4C425D6A6E8007F5990 /* AddBookmarkPopover.swift */,
 				7BEC20402B0F505F00243D3E /* AddBookmarkPopoverView.swift */,
 				B69A14F92B4D705D00B9417D /* BookmarkFolderPicker.swift */,
+				841211352C4631E900088FBC /* BookmarkListPopover.swift */,
 				4B9292CC2667123700AD2C21 /* BookmarkListViewController.swift */,
 				4B9292CD2667123700AD2C21 /* BookmarkManagementDetailViewController.swift */,
 				4B9292C72667123700AD2C21 /* BookmarkManagementSidebarViewController.swift */,
 				4B9292C82667123700AD2C21 /* BookmarkManagementSplitViewController.swift */,
-				4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */,
 				4B92928726670D1600AD2C21 /* BookmarkOutlineCellView.swift */,
 				4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */,
 				4B92928926670D1700AD2C21 /* BookmarkTableCellView.swift */,
+				4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */,
 				4B9292C62667123700AD2C21 /* BrowserTabSelectionDelegate.swift */,
 				4B92928626670D1600AD2C21 /* OutlineSeparatorViewCell.swift */,
 				4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */,
@@ -7589,6 +7596,7 @@
 				4B92929A26670D2A00AD2C21 /* PasteboardWriting.swift */,
 				4B92929826670D2A00AD2C21 /* PseudoFolder.swift */,
 				4B92929626670D2A00AD2C21 /* SpacerNode.swift */,
+				844683072C537F5200A15F93 /* MenuItemNode.swift */,
 				4B92929726670D2A00AD2C21 /* BookmarkTreeController.swift */,
 				AAC5E4CD25D6A709007F5990 /* Bookmark.swift */,
 				AAC5E4CF25D6A709007F5990 /* BookmarkList.swift */,
@@ -9914,6 +9922,7 @@
 				85393C872A6FF1B600F11EB3 /* BookmarksBarAppearance.swift in Sources */,
 				3706FAB2293F65D500E42796 /* TabInstrumentation.swift in Sources */,
 				3706FAB5293F65D500E42796 /* ConfigurationManager.swift in Sources */,
+				844683092C537F5200A15F93 /* MenuItemNode.swift in Sources */,
 				3706FAB6293F65D500E42796 /* YoutubePlayerUserScript.swift in Sources */,
 				1D8057C92A83CB3C00F4FED6 /* SupportedOsChecker.swift in Sources */,
 				373D9B4929EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */,
@@ -10363,6 +10372,7 @@
 				EEC4A6722B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift in Sources */,
 				3706FBE0293F65D500E42796 /* NSException+Catch.m in Sources */,
 				3706FBE1293F65D500E42796 /* AppStateRestorationManager.swift in Sources */,
+				841211372C4631E900088FBC /* BookmarkListPopover.swift in Sources */,
 				9FA173EC2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift in Sources */,
 				3706FBE2293F65D500E42796 /* ClickToLoadUserScript.swift in Sources */,
 				3706FBE3293F65D500E42796 /* WindowControllersManager.swift in Sources */,
@@ -11718,6 +11728,7 @@
 				3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */,
 				1D43EB3C292B664A0065E5D6 /* BWMessageIdGenerator.swift in Sources */,
 				B6E6B9E32BA1F5F1008AA7E1 /* FilePresenter.swift in Sources */,
+				841211362C4631E900088FBC /* BookmarkListPopover.swift in Sources */,
 				B6CC266C2BAD9CD800F53F8D /* FileProgressPresenter.swift in Sources */,
 				3158B14D2B0BF74D00AF130C /* DataBrokerProtectionManager.swift in Sources */,
 				4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */,
@@ -11957,6 +11968,7 @@
 				37BF3F21286F0A7A00BD9014 /* PinnedTabsViewModel.swift in Sources */,
 				EEC4A6692B2C87D300F7C0AA /* VPNLocationView.swift in Sources */,
 				AAC5E4D225D6A709007F5990 /* BookmarkList.swift in Sources */,
+				844683082C537F5200A15F93 /* MenuItemNode.swift in Sources */,
 				B602E81D2A1E25B1006D261F /* NEOnDemandRuleExtension.swift in Sources */,
 				56A0543E2C215FB3007D8FAB /* OnboardingUserScript.swift in Sources */,
 				C1372EF42BBC5BAD003F8793 /* SecureTextField.swift in Sources */,

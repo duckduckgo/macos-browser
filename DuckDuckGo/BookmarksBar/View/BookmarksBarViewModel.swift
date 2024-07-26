@@ -25,6 +25,7 @@ protocol BookmarksBarViewModelDelegate: AnyObject {
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem)
     func bookmarksBarViewModelWidthForContainer() -> CGFloat
     func bookmarksBarViewModelReloadedData()
+    func mouseDidHover(over item: Any)
 }
 
 final class BookmarksBarViewModel: NSObject {
@@ -262,41 +263,6 @@ final class BookmarksBarViewModel: NSObject {
         return true
     }
 
-    func buildClippedItemsMenu() -> NSMenu {
-        let menu = NSMenu()
-        menu.items = bookmarksTreeMenuItems(from: clippedItems)
-        return menu
-    }
-
-    func bookmarksTreeMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {
-        var menuItems = [NSMenuItem]()
-
-        for viewModel in bookmarkViewModels {
-            let menuItem = NSMenuItem(bookmarkViewModel: viewModel)
-
-            if let folder = viewModel.entity as? BookmarkFolder {
-                let subMenu = NSMenu(title: folder.title)
-                let childViewModels = folder.children.map(BookmarkViewModel.init)
-                let childMenuItems = bookmarksTreeMenuItems(from: childViewModels, topLevel: false)
-                subMenu.items = childMenuItems
-
-                if !subMenu.items.isEmpty {
-                    menuItem.submenu = subMenu
-                }
-            }
-
-            menuItems.append(menuItem)
-        }
-
-        let showOpenInTabsItem = bookmarkViewModels.compactMap { $0.entity as? Bookmark }.count > 1
-        if showOpenInTabsItem {
-            menuItems.append(.separator())
-            menuItems.append(NSMenuItem(bookmarkViewModels: bookmarkViewModels))
-        }
-
-        return menuItems
-    }
-
 }
 
 extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataSource {
@@ -511,6 +477,12 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
 
     func bookmarksBarCollectionViewItemManageBookmarksAction(_ item: BookmarksBarCollectionViewItem) {
         delegate?.bookmarksBarViewModelReceived(action: .manageBookmarks, for: item)
+    }
+
+    func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, isMouseOver: Bool) {
+        if isMouseOver {
+            delegate?.mouseDidHover(over: item)
+        }
     }
 
 }

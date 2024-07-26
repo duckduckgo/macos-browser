@@ -28,8 +28,10 @@ final class BookmarksBarViewController: NSViewController {
     @IBOutlet weak var importBookmarksLabel: NSTextField!
     @IBOutlet weak var importBookmarksIcon: NSImageView!
     @IBOutlet private var bookmarksBarCollectionView: NSCollectionView!
-    @IBOutlet private var clippedItemsIndicator: NSButton!
+    @IBOutlet private var clippedItemsIndicator: MouseOverButton!
     @IBOutlet private var promptAnchor: NSView!
+
+    private var bookmarkListPopover: BookmarkListPopover?
 
     private let bookmarkManager: BookmarkManager
     private let viewModel: BookmarksBarViewModel
@@ -171,6 +173,13 @@ final class BookmarksBarViewController: NSViewController {
                 }
             }
             .store(in: &cancellables)
+
+        clippedItemsIndicator.$isMouseOver
+            .sink { [weak self] isMouseOver in
+                guard isMouseOver, let self, let clippedItemsIndicator else { return }
+                mouseDidHover(over: clippedItemsIndicator)
+            }
+            .store(in: &cancellables)
     }
 
     private func unsubscribeFromEvents() {
@@ -202,12 +211,12 @@ final class BookmarksBarViewController: NSViewController {
         DataImportView().show()
     }
 
-    @IBAction
-    private func clippedItemsIndicatorClicked(_ sender: NSButton) {
-        let menu = viewModel.buildClippedItemsMenu()
-        let location = NSPoint(x: 0, y: sender.frame.height + 5)
+    @IBAction private func clippedItemsIndicatorClicked(_ sender: NSButton) {
+        showSubmenu(for: clippedItemsBookmarkFolder(), fromView: sender)
+    }
 
-        menu.popUp(positioning: nil, at: location, in: sender)
+    private func clippedItemsBookmarkFolder() -> BookmarkFolder {
+        BookmarkFolder(id: PseudoFolder.bookmarks.id, title: PseudoFolder.bookmarks.name, children: viewModel.clippedItems.map(\.entity))
     }
 
     @IBAction func mouseClickViewMouseUp(_ sender: MouseClickView) {
@@ -256,6 +265,25 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         bookmarksBarCollectionView.reloadData()
     }
 
+    func mouseDidHover(over sender: Any) {
+        guard let bookmarkListPopover, bookmarkListPopover.isShown else { return }
+        var bookmarkFolder: BookmarkFolder?
+        var view: NSView?
+        if let item = sender as? BookmarksBarCollectionViewItem {
+            bookmarkFolder = item.representedObject as? BookmarkFolder
+            view = item.view
+        } else if let button = sender as? NSButton, button === clippedItemsIndicator {
+            bookmarkFolder = clippedItemsBookmarkFolder()
+            view = button
+        }
+        if let bookmarkFolder, let view {
+            guard (bookmarkListPopover.viewController.representedObject as? BookmarkFolder)?.id != bookmarkFolder.id else { return }
+            showSubmenu(for: bookmarkFolder, fromView: view)
+        } else {
+            bookmarkListPopover.close()
+        }
+    }
+
 }
 
 // MARK: - Private
@@ -292,7 +320,7 @@ private extension BookmarksBarViewController {
     func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for folder: BookmarkFolder, item: BookmarksBarCollectionViewItem) {
         switch action {
         case .clickItem:
-            showSubmenuFor(folder: folder, fromView: item.view)
+            showSubmenu(for: folder, fromView: item.view)
         case .edit:
             showDialog(view: BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: nil))
         case .moveToEnd:
@@ -343,13 +371,32 @@ private extension BookmarksBarViewController {
         PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
-    func showSubmenuFor(folder: BookmarkFolder, fromView view: NSView) {
-        let childEntities = folder.children
-        let viewModels = childEntities.map { BookmarkViewModel(entity: $0) }
-        let menuItems = viewModel.bookmarksTreeMenuItems(from: viewModels, topLevel: true)
-        let menu = bookmarkFolderMenu(items: menuItems)
+    private func showSubmenu(for folder: BookmarkFolder, fromView view: NSView) {
+        let bookmarkListPopover: BookmarkListPopover
+        if let popover = self.bookmarkListPopover {
+            bookmarkListPopover = popover
+            if bookmarkListPopover.isShown {
+                bookmarkListPopover.close()
+                if (bookmarkListPopover.viewController.representedObject as? BookmarkFolder)?.id == folder.id {
+                    return // close popover on 2nd click on the same folder
+                }
+            }
+            bookmarkListPopover.reloadData(withRootFolder: folder)
+        } else {
+            bookmarkListPopover = BookmarkListPopover(mode: .bookmarkBarMenu, rootFolder: folder)
+            bookmarkListPopover.delegate = self
+            self.bookmarkListPopover = bookmarkListPopover
+        }
 
-        menu.popUp(positioning: nil, at: CGPoint(x: 0, y: view.frame.minY - 7), in: view)
+        bookmarkListPopover.show(positionedBelow: view)
+
+//        let childEntities = folder.children
+//        let viewModels = childEntities.map { BookmarkViewModel(entity: $0) }
+//        let menuItems = viewModel.bookmarksTreeMenuItems(from: viewModels, topLevel: true)
+//        let menu = bookmarkFolderMenu(items: menuItems)
+
+//        menu.popUp(positioning: nil, at: CGPoint(x: 0, y: view.frame.minY - 7), in: view)
+
     }
 
     func addFolder(inParent parent: BookmarkFolder?) {
@@ -382,6 +429,30 @@ extension BookmarksBarViewController: NSMenuDelegate {
             addFolderSelector: #selector(addFolder(sender:)),
             manageBookmarksSelector: #selector(manageBookmarks)
         )
+    }
+
+}
+
+extension BookmarksBarViewController: NSPopoverDelegate {
+
+    func popoverShouldClose(_ popover: NSPopover) -> Bool {
+        if NSApp.currentEvent?.type == .leftMouseUp {
+           if let point = bookmarksBarCollectionView.mouseLocationInsideBounds(),
+              let indexPath = bookmarksBarCollectionView.indexPathForItem(at: point),
+              let _ = bookmarkManager.list?.topLevelEntities[safe: indexPath.item] as? BookmarkFolder {
+               // we‘ll close the popover inside the click handler calling `showSubmenu`
+               return false
+           } else if clippedItemsIndicator.mouseLocationInsideBounds() != nil {
+               // same
+               return false
+           }
+        }
+
+        return true
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+
     }
 
 }

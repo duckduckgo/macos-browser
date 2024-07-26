@@ -25,11 +25,19 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     enum ContentMode {
         case bookmarksAndFolders
         case foldersOnly
+        case bookmarksMenu
+
+        var separatorVisible: Bool {
+            switch self {
+            case .bookmarksAndFolders, .bookmarksMenu: true
+            case .foldersOnly: false
+            }
+        }
     }
 
     @Published var selectedFolders: [BookmarkFolder] = []
 
-    let treeController: BookmarkTreeController
+    private let treeController: BookmarkTreeController
     private(set) var expandedNodesIDs = Set<String>()
 
     private let contentMode: ContentMode
@@ -37,9 +45,6 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     private let showMenuButtonOnHover: Bool
     private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
     private let presentFaviconsFetcherOnboarding: (() -> Void)?
-
-    private var favoritesPseudoFolder = PseudoFolder.favorites
-    private var bookmarksPseudoFolder = PseudoFolder.bookmarks
 
     init(
         contentMode: ContentMode,
@@ -58,12 +63,10 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
         super.init()
 
-        reloadData()
+        reloadData(rebuild: true)
     }
 
-    func reloadData() {
-        favoritesPseudoFolder.count = bookmarkManager.list?.favoriteBookmarks.count ?? 0
-        bookmarksPseudoFolder.count = bookmarkManager.list?.totalBookmarks ?? 0
+    func reloadData(rebuild: Bool = true) {
         treeController.rebuild()
     }
 
@@ -102,7 +105,8 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-        return nodeForItem(item).canHaveChildNodes
+        // don‘t display disclosure indicator for “empty” nodes when no indentation level
+        contentMode == .bookmarksMenu ? false : nodeForItem(item).canHaveChildNodes
     }
 
     func outlineViewSelectionDidChange(_ notification: Notification) {
@@ -127,38 +131,32 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             assertionFailure("\(#file): Failed to cast item to Node")
             return nil
         }
+        if node.representedObject is SpacerNode {
+            return outlineView.makeView(withIdentifier: contentMode.separatorVisible
+                                        ? OutlineSeparatorViewCell.separatorIdentifier
+                                        : OutlineSeparatorViewCell.blankIdentifier, owner: self) as? OutlineSeparatorViewCell
+                ?? OutlineSeparatorViewCell(separatorVisible: contentMode.separatorVisible)
+        }
+
+        // TODO: sometimes multiple items get highlighted
         let cell = outlineView.makeView(withIdentifier: .init(BookmarkOutlineCellView.className()), owner: self) as? BookmarkOutlineCellView
             ?? BookmarkOutlineCellView(identifier: .init(BookmarkOutlineCellView.className()))
         cell.shouldShowMenuButton = showMenuButtonOnHover
         cell.delegate = self
+        cell.update(from: node, isMenuPopover: contentMode == .bookmarksMenu)
 
-        if let bookmark = node.representedObject as? Bookmark {
-            cell.update(from: bookmark)
-
-            if bookmark.favicon(.small) == nil {
-                presentFaviconsFetcherOnboarding?()
-            }
-            return cell
+        if let bookmark = node.representedObject as? Bookmark, bookmark.favicon(.small) == nil {
+            presentFaviconsFetcherOnboarding?()
         }
 
-        if let folder = node.representedObject as? BookmarkFolder {
-            cell.update(from: folder)
-            return cell
+        return cell
+    }
+
+    func outlineView(_ outlineView: NSOutlineView, heightOfRowByItem item: Any) -> CGFloat {
+        if let node = item as? BookmarkNode, node.representedObject is SpacerNode {
+            return OutlineSeparatorViewCell.rowHeight(for: contentMode == .bookmarksMenu ? .bookmarkBarMenu : .popover)
         }
-
-        if let folder = node.representedObject as? PseudoFolder {
-            if folder == .bookmarks {
-                cell.update(from: bookmarksPseudoFolder)
-            } else if folder == .favorites {
-                cell.update(from: favoritesPseudoFolder)
-            } else {
-                assertionFailure("\(#file): Tried to update PseudoFolder cell with invalid type")
-            }
-
-            return cell
-        }
-
-        return OutlineSeparatorViewCell(separatorVisible: contentMode == .bookmarksAndFolders)
+        return BookmarkOutlineCellView.rowHeight
     }
 
     func outlineView(_ outlineView: NSOutlineView, pasteboardWriterForItem item: Any) -> NSPasteboardWriting? {
@@ -265,12 +263,14 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             return false
         }
 
-        let representedObject = (item as? BookmarkNode)?.representedObject
+        let representedObject = (item as? BookmarkNode)?.representedObject ?? (treeController.rootNode.isRoot ? nil : treeController.rootNode.representedObject)
 
         // Handle the nil destination case:
 
-        if contentMode == .bookmarksAndFolders,
-           let pseudoFolder = representedObject as? PseudoFolder {
+        switch contentMode {
+        case .foldersOnly: break
+        case .bookmarksAndFolders, .bookmarksMenu:
+            guard let pseudoFolder = representedObject as? PseudoFolder else { break }
             if pseudoFolder == .favorites {
                 bookmarkManager.update(objectsWithUUIDs: draggedObjectIdentifiers, update: { entity in
                     let bookmark = entity as? Bookmark
@@ -309,7 +309,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             index = 0
         }
 
-        let parent: ParentFolderType = (representedObject as? BookmarkFolder).map { .parent(uuid: $0.id) } ?? .root
+        let parent: ParentFolderType = (representedObject as? BookmarkFolder).map { $0.id == PseudoFolder.bookmarks.id ? .root : .parent(uuid: $0.id) } ?? .root
         bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: parent) { error in
             if let error = error {
                 os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)

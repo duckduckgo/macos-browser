@@ -35,8 +35,8 @@ final class DuckPlayerTabExtension {
     private var cancellables = Set<AnyCancellable>()
     private var youtubePlayerCancellables = Set<AnyCancellable>()
     private var shouldOpenInNewTab: Bool  {
-        preferences.isOpenInNewTabSettingsAvailable &&
-        preferences.duckPlayerOpenInNewTab &&
+//        preferences.isOpenInNewTabSettingsAvailable &&
+//        preferences.duckPlayerOpenInNewTab &&
         preferences.duckPlayerMode != .disabled
     }
     private var shouldOpenDuckPlayerDirectly: Bool {
@@ -135,7 +135,7 @@ extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
 
         let isRequestingNewTab = NSApp.isCommandPressed || shouldRequestNewTab
         if isRequestingNewTab {
-            shouldSelectNextNewTab = NSApp.isShiftPressed
+            shouldSelectNextNewTab = NSApp.isShiftPressed || shouldOpenInNewTab
             webView.loadInNewWindow(url)
         } else {
             shouldSelectNextNewTab = nil
@@ -220,26 +220,34 @@ extension DuckPlayerTabExtension: NavigationResponder {
         if navigationAction.url.isDuckURLScheme || navigationAction.url.isDuckPlayer {
             if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
                 PixelKit.fire(GeneralPixel.duckPlayerViewFromSERP)
+
+                if shouldOpenInNewTab,
+                   let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
+                    shouldSelectNextNewTab = true
+                    webView?.loadInNewWindow(navigationAction.url)
+                    return .cancel
+                }
             }
             return .allow
         }
 
         // Navigating to a Youtube URL
-        return handleYoutubeNavigation(for: navigationAction)
+        return await handleYoutubeNavigation(for: navigationAction)
     }
 
     @MainActor
-    private func handleYoutubeNavigation(for navigationAction: NavigationAction) -> NavigationActionPolicy? {
+    private func handleYoutubeNavigation(for navigationAction: NavigationAction) async -> NavigationActionPolicy? {
         guard navigationAction.url.isYoutubeVideo,
               let (videoID, timestamp) = navigationAction.url.youtubeVideoParams else {
             return .next
         }
 
-        if shouldOpenInNewTab, shouldOpenDuckPlayerDirectly,
-           let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
-            webView?.loadInNewWindow(navigationAction.url)
-            return .cancel
-        }
+//        if shouldOpenInNewTab, shouldOpenDuckPlayerDirectly,
+//           let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
+//            try? await Task.sleep(interval: 0.3)
+//            webView?.loadInNewWindow(navigationAction.url)
+//            return .cancel
+//        }
 
         return decidePolicy(for: navigationAction, withYoutubeVideoID: videoID, timestamp: timestamp)
     }
