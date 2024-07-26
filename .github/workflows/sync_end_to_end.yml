@@ -89,6 +89,14 @@ jobs:
       env:
         CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
       run: |
+        brew install xmlstarlet
+        xmlstarlet ed -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t elem -n "EnvironmentVariable" \
+          -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "key" -v "CODE" \
+          -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "value" -v "$CODE" \
+          -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "isEnabled" -v "YES" \
+          "DuckDuckGo.xcodeproj/xcshareddata/xcschemes/Sync End-to-End UI Tests.xcscheme" > updated.xcscheme
+        mv -f updated.xcscheme "DuckDuckGo.xcodeproj/xcshareddata/xcschemes/Sync End-to-End UI Tests.xcscheme"
+
         defaults write com.duckduckgo.macos.browser.review sync.environment Development
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         set -o pipefail && xcodebuild test-without-building \
