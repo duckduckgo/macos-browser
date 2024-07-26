@@ -159,7 +159,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
            !didCrashDuringCrashHandlersSetUp.wrappedValue {
 
             didCrashDuringCrashHandlersSetUp.wrappedValue = true
-            CrashLogMessageExtractor.setUp()
+            CrashLogMessageExtractor.setUp(swapCxaThrow: false)
             didCrashDuringCrashHandlersSetUp.wrappedValue = false
         }
 
