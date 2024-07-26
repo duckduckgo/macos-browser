@@ -613,6 +613,8 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Set custom configuration URL…", action: #selector(MainViewController.setCustomConfigurationURL))
                 NSMenuItem(title: "Reset configuration to default", action: #selector(MainViewController.resetConfigurationToDefault))
             }
+            NSMenuItem(title: "Remote Messaging Framework")
+                .submenu(RemoteMessagingDebugMenu())
             NSMenuItem(title: "User Scripts") {
                 NSMenuItem(title: "Remove user scripts from selected tab", action: #selector(MainViewController.removeUserScripts))
             }

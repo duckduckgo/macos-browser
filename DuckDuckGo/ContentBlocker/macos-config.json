@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1720796469387,
+    "version": 1721748106575,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -343,6 +343,14 @@
             },
             "state": "enabled",
             "hash": "568bcdbfe8d7611496de889d20c033fb"
+        },
+        "autofillBreakageReporter": {
+            "state": "disabled",
+            "settings": {
+                "monitorIntervalDays": 42
+            },
+            "exceptions": [],
+            "hash": "ebf35854bdf33091c165b35d418d5707"
         },
         "autofill": {
             "exceptions": [
@@ -1039,6 +1047,9 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "tinder.com"
                 }
             ],
             "settings": {
@@ -1057,7 +1068,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "1.93.0",
-            "hash": "de5445a7452409483eeef786759d392f"
+            "hash": "08e30d1e6f6105ec1698b55a0aca317a"
         },
         "clickToPlay": {
             "exceptions": [
@@ -1520,6 +1531,10 @@
                         "type": "closest-empty"
                     },
                     {
+                        "selector": "#leaderboard-container",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": ".leaderboard_wrapper",
                         "type": "hide-empty"
                     },
@@ -1545,6 +1560,10 @@
                     },
                     {
                         "selector": "#topAd",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#topad",
                         "type": "hide-empty"
                     },
                     {
@@ -2843,6 +2862,27 @@
                             {
                                 "selector": "[id^='ghacks_ad_code']",
                                 "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "gizmodo.com",
+                        "rules": [
+                            {
+                                "selector": ".banner-top",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": ".od-wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".widget_keleops-ad",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id^='optidigital-adslot-Billboard']",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -4577,7 +4617,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "001ab18a7e0381b9824c0e8df68e12e7"
+            "hash": "a27afdd4dfee7a8dcd74a8745d3306ed"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5285,6 +5325,29 @@
             ],
             "hash": "1a1a4652687f25da9f351df157c5e051"
         },
+        "phishingDetection": {
+            "state": "internal",
+            "exceptions": [
+                {
+                    "domain": "marvel.com"
+                },
+                {
+                    "domain": "sundancecatalog.com"
+                },
+                {
+                    "domain": "noaprints.com"
+                }
+            ],
+            "features": {
+                "allowErrorPage": {
+                    "state": "internal"
+                },
+                "allowPreferencesToggle": {
+                    "state": "internal"
+                }
+            },
+            "hash": "2caa9ff12e48c6e51980b2788b242f88"
+        },
         "pluginPointFocusedViewPlugin": {
             "state": "disabled",
             "exceptions": [],
@@ -5422,9 +5485,9 @@
             "hash": "3c850040d1c9b3e06841b1491c5d2940"
         },
         "remoteMessaging": {
-            "state": "internal",
+            "state": "enabled",
             "exceptions": [],
-            "hash": "f1daaefe788583c2a00d7d19a23864a7"
+            "hash": "697382e31649d84b01166f1dc6f790d6"
         },
         "requestFilterer": {
             "state": "disabled",
@@ -8956,6 +9019,9 @@
         "webCompat": {
             "exceptions": [
                 {
+                    "domain": "crocs.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -9226,7 +9292,7 @@
                     }
                 ]
             },
-            "hash": "62636b478aa50f4bc1e57e6b73fc1e0e"
+            "hash": "a8ea63aef4af72c462736bf28db907b8"
         },
         "webViewBlobDownload": {
             "exceptions": [],
