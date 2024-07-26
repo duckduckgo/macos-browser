@@ -14,10 +14,10 @@ jobs:
       matrix:
         runner: [macos-13-xlarge, macos-14-xlarge]
         include:
-          - xcode-version: 15.2
+          - xcode-version: "15.2"
             runner: macos-13-xlarge
-          - xcode-version: 15.4
-            flavor: macos-14-xlarge
+          - xcode-version: "15.4"
+            runner: macos-14-xlarge
 
     timeout-minutes: 60
 
