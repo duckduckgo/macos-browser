@@ -88,7 +88,7 @@ public final class KeychainAuthenticationData: AuthenticationRepository {
         case waitlistTimestamp = "databrokerprotection.timestamp"
     }
 
-    /// Hack to stop the bleeding on https://app.asana.com/0/1203581873609357/1206097441142301/f
+    /// Hack to prevent further damage on https://app.asana.com/0/1203581873609357/1206097441142301/f
     lazy var keychainPrefix: String = {
         let originalString = Bundle.main.bundleIdentifier ?? "com.duckduckgo"
         let replacedString = originalString.replacingOccurrences(of: "DBP.backgroundAgent", with: "browser")
