@@ -138,35 +138,34 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         let networkSettings = NETransparentProxyNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
 
         networkSettings.includedNetworkRules = [
-            NENetworkRule(remoteNetwork: nil, remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .any, direction: .outbound)
+            NENetworkRule(remoteNetwork: nil, remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .TCP, direction: .outbound),
+            NENetworkRule(remoteNetwork: nil, remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .UDP, direction: .outbound)
         ]
 
         return networkSettings
     }
 
-    override public func startProxy(options: [String: Any]?,
-                                    completionHandler: @escaping (Error?) -> Void) {
+    @MainActor
+    override open func startProxy(options: [String : Any]? = nil) async throws {
 
         eventHandler?(.startInitiated)
 
-        logger.log(
-            """
-            Starting proxy\n
-            > configuration: \(String(describing: self.configuration), privacy: .public)\n
-            > settings: \(String(describing: self.settings), privacy: .public)\n
-            > options: \(String(describing: options), privacy: .public)
-            """)
-
         do {
-            try loadProviderConfiguration()
-        } catch {
-            logger.error("Failed to load provider configuration, bailing out")
-            eventHandler?(.startFailure(error))
-            completionHandler(error)
-            return
-        }
+            logger.log(
+                """
+                Starting proxy\n
+                > configuration: \(String(describing: self.configuration), privacy: .public)\n
+                > settings: \(String(describing: self.settings), privacy: .public)\n
+                > options: \(String(describing: options), privacy: .public)
+                """)
 
-        Task { @MainActor in
+            do {
+                try loadProviderConfiguration()
+            } catch {
+                logger.error("Failed to load provider configuration, bailing out")
+                throw error
+            }
+
             do {
                 startMonitoringNetworkInterfaces()
 
@@ -174,39 +173,37 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
                 logger.log("Proxy started successfully")
                 isRunning = true
                 eventHandler?(.startSuccess)
-                completionHandler(nil)
             } catch {
                 let error = StartError.failedToUpdateNetworkSettings(underlyingError: error)
                 logger.error("Proxy failed to start \(String(reflecting: error), privacy: .public)")
-                eventHandler?(.startFailure(error))
-                completionHandler(error)
+                throw error
             }
+        } catch {
+            eventHandler?(.startFailure(error))
+            throw error
         }
     }
 
-    override public func stopProxy(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
+    @MainActor
+    open override func stopProxy(with reason: NEProviderStopReason) async {
+
         logger.log("Stopping proxy with reason: \(String(reflecting: reason), privacy: .public)")
 
-        Task { @MainActor in
-            stopMonitoringNetworkInterfaces()
-            isRunning = false
-            completionHandler()
-        }
+        stopMonitoringNetworkInterfaces()
+        isRunning = false
     }
 
+    @MainActor
     override public func sleep(completionHandler: @escaping () -> Void) {
-        Task { @MainActor in
-            stopMonitoringNetworkInterfaces()
-            logger.log("The proxy is now sleeping")
-            completionHandler()
-        }
+        stopMonitoringNetworkInterfaces()
+        logger.log("The proxy is now sleeping")
+        completionHandler()
     }
 
+    @MainActor
     override public func wake() {
-        Task { @MainActor in
-            logger.log("The proxy is now awake")
-            startMonitoringNetworkInterfaces()
-        }
+        logger.log("The proxy is now awake")
+        startMonitoringNetworkInterfaces()
     }
 
     private func logFlowMessage(_ flow: NEAppProxyFlow, level: OSLogType, message: String) {

@@ -130,7 +130,7 @@ final class VPNProxyLauncher {
             // is stable enough to be running at all times.
             return proxyIsDisconnected
                 && tunnelIsConnected
-                && true //proxyController.isRequiredForActiveFeatures
+                && proxyController.isRequiredForActiveFeatures
         }
     }
 
@@ -143,7 +143,7 @@ final class VPNProxyLauncher {
             // is a product decision.  It may change once we decide the proxy
             // is stable enough to be running at all times.
             return proxyIsConnected
-                && (tunnelIsDisconnected || false)// !proxyController.isRequiredForActiveFeatures)
+                && (tunnelIsDisconnected || !proxyController.isRequiredForActiveFeatures)
         }
     }
 }
