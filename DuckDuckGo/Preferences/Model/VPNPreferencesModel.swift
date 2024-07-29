@@ -20,6 +20,7 @@ import AppKit
 import Combine
 import Foundation
 import NetworkProtection
+import NetworkProtectionIPC
 import NetworkProtectionUI
 import BrowserServicesKit
 
@@ -38,6 +39,12 @@ final class VPNPreferencesModel: ObservableObject {
     @Published var excludeLocalNetworks: Bool {
         didSet {
             settings.excludeLocalNetworks = excludeLocalNetworks
+            Task {
+                try await vpnXPCClient.command(.restartAdapter)
+            }
+            /*vpnXPCClient.restart { error in
+                // TBD
+            }*/
         }
     }
 
@@ -78,13 +85,17 @@ final class VPNPreferencesModel: ObservableObject {
     @Published public var isCustomDNSSelected = false
     @Published public var customDNSServers: String?
 
+    private let vpnXPCClient: VPNControllerXPCClient
     private let settings: VPNSettings
     private let pinningManager: PinningManager
     private var cancellables = Set<AnyCancellable>()
 
-    init(settings: VPNSettings = .init(defaults: .netP),
+    init(vpnXPCClient: VPNControllerXPCClient = .shared,
+         settings: VPNSettings = .init(defaults: .netP),
          pinningManager: PinningManager = LocalPinningManager.shared,
          defaults: UserDefaults = .netP) {
+
+        self.vpnXPCClient = vpnXPCClient
         self.settings = settings
         self.pinningManager = pinningManager
 

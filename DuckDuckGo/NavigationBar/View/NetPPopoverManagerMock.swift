@@ -88,6 +88,9 @@ final class IPCClientMock: NetworkProtectionIPCClient {
         completion(nil)
     }
 
+    func restart(completion: @escaping (Error?) -> Void) {
+        completion(nil)
+    }
 }
 
 final class ConnectivityIssueObserverMock: ConnectivityIssueObserver {

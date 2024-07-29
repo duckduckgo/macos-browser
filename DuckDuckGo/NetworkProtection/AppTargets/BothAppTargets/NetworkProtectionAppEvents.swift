@@ -66,8 +66,7 @@ final class NetworkProtectionAppEvents {
 
         Task { @MainActor in
             await featureGatekeeper.disableIfUserHasNoAccess()
-            // TODO: Need to roll this back before merging... this is for testing review builds
-            //restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
+            restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
         }
     }
 

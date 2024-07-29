@@ -18,6 +18,7 @@
 
 import AppLauncher
 import Foundation
+import NetworkProtectionIPC
 import NetworkProtectionProxy
 import NetworkProtectionUI
 import VPNAppLauncher
@@ -26,10 +27,15 @@ import VPNAppLauncher
 ///
 final class VPNUIActionHandler: VPNUIActionHandling {
 
+    private let vpnIPCClient: VPNControllerXPCClient
     private let proxySettings: TransparentProxySettings
     private let vpnURLEventHandler: VPNURLEventHandler
 
-    init(vpnURLEventHandler: VPNURLEventHandler, proxySettings: TransparentProxySettings) {
+    init(vpnIPCClient: VPNControllerXPCClient = .shared,
+         vpnURLEventHandler: VPNURLEventHandler,
+         proxySettings: TransparentProxySettings) {
+
+        self.vpnIPCClient = vpnIPCClient
         self.vpnURLEventHandler = vpnURLEventHandler
         self.proxySettings = proxySettings
     }
@@ -40,6 +46,7 @@ final class VPNUIActionHandler: VPNUIActionHandling {
 
     func setExclusion(_ exclude: Bool, forDomain domain: String) async {
         proxySettings.setExclusion(exclude, forDomain: domain)
+        try? await vpnIPCClient.command(.restartAdapter)
     }
 
     public func shareFeedback() async {

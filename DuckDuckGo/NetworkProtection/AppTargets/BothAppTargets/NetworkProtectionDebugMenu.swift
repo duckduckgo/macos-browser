@@ -66,6 +66,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
         super.init(title: "VPN")
 
         buildItems {
+
+            NSMenuItem(title: "Restart Adapter", action: #selector(NetworkProtectionDebugMenu.restartAdatper(_:)))
+                .targetting(self)
+
             NSMenuItem(title: "Reset") {
 
                 NSMenuItem(title: "Reset All State Keeping Invite", action: #selector(NetworkProtectionDebugMenu.resetAllKeepingInvite))
@@ -240,6 +244,18 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             do {
                 try await debugUtilities.removeVPNConfiguration()
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
+    }
+
+    /// Removes the system extension and agents for DuckDuckGo VPN.
+    ///
+    @objc func restartAdatper(_ sender: Any?) {
+        Task { @MainActor in
+            do {
+                try await debugUtilities.restartAdapter()
             } catch {
                 await NSAlert(error: error).runModal()
             }
