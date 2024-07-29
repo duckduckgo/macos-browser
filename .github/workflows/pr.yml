@@ -4,6 +4,7 @@ on:
   push:
     branches: [ main, "release/**" ]
   pull_request:
+  workflow_dispatch:
   workflow_call:
     inputs:
       branch:
@@ -281,102 +282,9 @@ jobs:
     with:
       report: ${{ needs.tests.outputs.private-api-check-report }}
 
-  release-build:
-
-    name: Make Release Build
-
-    # Dependabot doesn't have access to all secrets, so we skip this job
-    # workflow_call is used by bump_internal_release and is followed by a proper release job
-    if: github.actor != 'dependabot[bot]' && (github.event_name == 'push' || github.event_name == 'pull_request')
-
-    runs-on: macos-14-xlarge
-    timeout-minutes: 30
-
-    steps:
-    - name: Check out the code
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-
-    - name: Install Apple Developer ID Application certificate
-      uses: ./.github/actions/install-certs-and-profiles
-      with:
-        BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-        P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-        REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.REVIEW_PROVISION_PROFILE_BASE64 }}
-        RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.RELEASE_PROVISION_PROFILE_BASE64 }}
-        DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}
-        DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}
-        NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2 }}
-        NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2 }}
-        NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2 }}
-        NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64_V2 }}
-        NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}
-        NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}
-
-    - name: Set cache key hash
-      run: |
-        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
-        if [[ "$has_only_tags" == "true" ]]; then
-          echo "cache_key_hash=${{ hashFiles('DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
-        else
-          echo "Package.resolved contains dependencies specified by branch or commit, skipping cache."
-        fi
-
-    - name: Cache SPM
-      if: env.cache_key_hash
-      uses: actions/cache@v4
-      with:
-        path: DerivedData/SourcePackages
-        key: ${{ runner.os }}-spm-test-release-${{ env.cache_key_hash }}
-        restore-keys: |
-          ${{ runner.os }}-spm-test-release-${{ matrix.cache-key }}
-
-    - name: Select Xcode
-      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
-
-    - name: Build the app
-      run: |
-        export OS_ACTIVITY_MODE=debug
-        set -o pipefail && xcodebuild \
-          -scheme "DuckDuckGo Privacy Browser" \
-          -derivedDataPath "DerivedData" \
-          -configuration "Release" \
-          -skipPackagePluginValidation -skipMacroValidation \
-          | tee release-xcodebuild.log \
-          | xcbeautify
-
-    - name: Upload failed test log
-      uses: actions/upload-artifact@v4
-      if: failure()
-      with:
-        name: release-xcodebuild.log
-        path: release-xcodebuild.log
-        retention-days: 7
-
-  verify-autoconsent-bundle:
-    name: 'Verify autoconsent bundle'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'npm'
-      - name: Build bundle
-        run: |
-          npm ci
-          npm run rebuild-autoconsent
-      - name: Verify clean tree
-        run: |
-          git update-index --refresh 
-          git diff-index --quiet HEAD --
-
   create-asana-task:
     name: Create Asana Task
-    needs: [swiftlint, bats, tests, release-build, verify-autoconsent-bundle, private-api]
+    needs: [swiftlint, bats, tests, private-api]
 
     if: failure() && github.ref_name == 'main' && github.run_attempt == 1
 
@@ -393,7 +301,7 @@ jobs:
 
   close-asana-task:
     name: Close Asana Task
-    needs: [swiftlint, bats, tests, release-build, verify-autoconsent-bundle, private-api]
+    needs: [swiftlint, bats, tests, private-api]
 
     if: success() && github.ref_name == 'main' && github.run_attempt > 1
 
