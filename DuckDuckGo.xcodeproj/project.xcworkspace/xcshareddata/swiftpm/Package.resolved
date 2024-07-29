@@ -40,8 +40,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "dc26bfc6e33ad9c79a719b7f21d5ca0564db1859",
-        "version" : "6.3.0"
+        "revision" : "097e545c737db78cb1d253a87a9acd6dd8ad8497",
+        "version" : "6.4.0"
       }
     },
     {
@@ -94,8 +94,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "b75ab2c0405860bb2616db71b9a456acb118c21a",
-        "version" : "3.1.4000"
+        "revision" : "71d303cbfa150e1fac99ffc7b4f67aad9c7a5002",
+        "version" : "3.1.5004"
       }
     },
     {

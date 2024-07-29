@@ -29,7 +29,7 @@ let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = S
     }, makeKeyStoreProvider: { _ in
         return DataBrokerProtectionKeyStoreProvider()
     }, makeDatabaseProvider: { key in
-        return try DefaultDataBrokerProtectionDatabaseProvider(key: key)
+        try DefaultDataBrokerProtectionDatabaseProvider.create(key: key)
     }
 )
 // swiftlint:enable identifier_name

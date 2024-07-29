@@ -151,14 +151,15 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
         shouldShowManualUpdateDialog = false
 
-#if DEBUG
-        updater.updater.automaticallyChecksForUpdates = false
-        updater.updater.updateCheckInterval = 0
-#endif
-
         if updater.updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
             updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
         }
+
+#if DEBUG
+        updater.updater.automaticallyChecksForUpdates = false
+        updater.updater.automaticallyDownloadsUpdates = false
+        updater.updater.updateCheckInterval = 0
+#endif
 
         checkForUpdateInBackground()
     }

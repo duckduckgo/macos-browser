@@ -9,7 +9,7 @@ jobs:
 
     name: Create Release Branch
 
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
     timeout-minutes: 10
 
     outputs:
@@ -108,7 +108,7 @@ jobs:
     name: Increment Build Number
 
     needs: [ create_release_branch, run_tests ]
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
     timeout-minutes: 10
 
     steps:

@@ -613,6 +613,8 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Set custom configuration URL…", action: #selector(MainViewController.setCustomConfigurationURL))
                 NSMenuItem(title: "Reset configuration to default", action: #selector(MainViewController.resetConfigurationToDefault))
             }
+            NSMenuItem(title: "Remote Messaging Framework")
+                .submenu(RemoteMessagingDebugMenu())
             NSMenuItem(title: "User Scripts") {
                 NSMenuItem(title: "Remove user scripts from selected tab", action: #selector(MainViewController.removeUserScripts))
             }
@@ -636,7 +638,6 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "C++ exception", action: #selector(MainViewController.crashOnCxxException))
             }
 
-            let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
             let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
             let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
 
@@ -653,9 +654,8 @@ final class MainMenu: NSMenu {
             SubscriptionDebugMenu(currentEnvironment: currentEnvironment,
                                   updateServiceEnvironment: updateServiceEnvironment,
                                   updatePurchasingPlatform: updatePurchasingPlatform,
-                                  isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
-                                  updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
                                   currentViewController: { WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController },
+                                  openSubscriptionTab: { WindowControllersManager.shared.showTab(with: .subscription($0)) },
                                   subscriptionManager: Application.appDelegate.subscriptionManager)
 
             NSMenuItem(title: "Privacy Pro Survey") {
