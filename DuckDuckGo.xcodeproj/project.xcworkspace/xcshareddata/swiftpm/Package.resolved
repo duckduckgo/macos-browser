@@ -1,24 +1,6 @@
 {
   "pins" : [
     {
-      "identity" : "apple-toolbox",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/apple-toolbox.git",
-      "state" : {
-        "revision" : "0c13c5f056805f2d403618ccc3bfb833c303c68d",
-        "version" : "3.1.2"
-      }
-    },
-    {
-      "identity" : "barebonesbrowser",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/BareBonesBrowser.git",
-      "state" : {
-        "revision" : "31e5bfedc3c2ca005640c4bf2b6959d69b0e18b9",
-        "version" : "0.1.0"
-      }
-    },
-    {
       "identity" : "bloom_cpp",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/bloom_cpp.git",
@@ -32,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "a3e62d6c295063f757ef7dc2f96b6a57a503f0f5",
-        "version" : "176.1.1"
+        "revision" : "fc03a7c3bf6cd25cf286f8f5a6cfe9ec3d35305a",
+        "version" : "176.0.0"
       }
     },
     {
@@ -50,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "9fea1c6762db726328b14bb9ebfd6508849eae28",
-        "version" : "12.1.0"
+        "revision" : "2b81745565db09eee8c1cd44d38eefa1011a9f0a",
+        "version" : "12.0.1"
       }
     },
     {
@@ -59,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/GRDB.swift.git",
       "state" : {
-        "revision" : "4225b85c9a0c50544e413a1ea1e502c802b44b35",
-        "version" : "2.4.0"
+        "revision" : "9f049d7b97b1e68ffd86744b500660d34a9e79b8",
+        "version" : "2.3.0"
       }
     },
     {
@@ -82,24 +64,6 @@
       }
     },
     {
-      "identity" : "ohhttpstubs",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AliSoftware/OHHTTPStubs.git",
-      "state" : {
-        "revision" : "12f19662426d0434d6c330c6974d53e2eb10ecd9",
-        "version" : "9.1.0"
-      }
-    },
-    {
-      "identity" : "openssl-xcframework",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
-      "state" : {
-        "revision" : "71d303cbfa150e1fac99ffc7b4f67aad9c7a5002",
-        "version" : "3.1.5004"
-      }
-    },
-    {
       "identity" : "privacy-dashboard",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
@@ -115,51 +79,6 @@
       "state" : {
         "revision" : "4356ec54e073741449640d3d50a1fd24fd1e1b8b",
         "version" : "2.1.0"
-      }
-    },
-    {
-      "identity" : "sparkle",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sparkle-project/Sparkle.git",
-      "state" : {
-        "revision" : "b456fd404954a9e13f55aa0c88cd5a40b8399638",
-        "version" : "2.6.3"
-      }
-    },
-    {
-      "identity" : "swift-argument-parser",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-argument-parser.git",
-      "state" : {
-        "revision" : "0fbc8848e389af3bb55c182bc19ca9d5dc2f255b",
-        "version" : "1.4.0"
-      }
-    },
-    {
-      "identity" : "swift-snapshot-testing",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-snapshot-testing",
-      "state" : {
-        "revision" : "5b0c434778f2c1a4c9b5ebdb8682b28e84dd69bd",
-        "version" : "1.15.4"
-      }
-    },
-    {
-      "identity" : "swift-syntax",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-syntax.git",
-      "state" : {
-        "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
-        "version" : "509.1.1"
-      }
-    },
-    {
-      "identity" : "swifter",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/httpswift/swifter.git",
-      "state" : {
-        "revision" : "9483a5d459b45c3ffd059f7b55f9638e268632fd",
-        "version" : "1.5.0"
       }
     },
     {
