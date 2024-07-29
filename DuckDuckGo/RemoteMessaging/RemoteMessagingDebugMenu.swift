@@ -47,7 +47,7 @@ final class RemoteMessagingDebugMenu: NSMenu {
             removeItem(at: 3)
         }
 
-        guard NSApplication.runType.requiresEnvironment else {
+        guard NSApplication.runType == .normal else {
             return
         }
 
