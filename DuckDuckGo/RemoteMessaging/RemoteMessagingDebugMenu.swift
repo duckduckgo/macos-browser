@@ -47,6 +47,10 @@ final class RemoteMessagingDebugMenu: NSMenu {
             removeItem(at: 3)
         }
 
+        guard NSApplication.runType.requiresEnvironment else {
+            return
+        }
+
         let database = NSApp.delegateTyped.remoteMessagingClient.database
         let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
         let fetchRequest = RemoteMessageManagedObject.fetchRequest()

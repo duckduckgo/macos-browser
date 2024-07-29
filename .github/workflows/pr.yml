@@ -58,7 +58,7 @@ jobs:
 
     name: Test Shell Scripts
 
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
     - name: Check out the code
@@ -108,7 +108,7 @@ jobs:
           - cache-key: sandbox-
             flavor: Sandbox
 
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
     timeout-minutes: 30
 
     outputs:
@@ -288,7 +288,7 @@ jobs:
     # workflow_call is used by bump_internal_release and is followed by a proper release job
     if: github.actor != 'dependabot[bot]' && (github.event_name == 'push' || github.event_name == 'pull_request')
 
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
     timeout-minutes: 30
 
     steps:

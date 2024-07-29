@@ -343,11 +343,13 @@ extension DuckPlayerTabExtension: NavigationResponder {
         if navigation.url.isDuckPlayer {
             let setting = duckPlayer.mode == .enabled ? "always" : "default"
             let newTabSettings = preferences.duckPlayerOpenInNewTab ? "true" : "false"
+            let autoplay = preferences.duckPlayerAutoplay ? "true" : "false"
 
             PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView,
                           frequency: .legacyDaily,
                           withAdditionalParameters: ["setting": setting,
-                                                     "newtab": newTabSettings])
+                                                     "newtab": newTabSettings,
+                                                     "autoplay": autoplay])
         }
     }
 

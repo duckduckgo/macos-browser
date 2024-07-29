@@ -48,7 +48,7 @@ jobs:
     name: Update Asana tasks
 
     needs: run_tests
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
     timeout-minutes: 10
 
     steps:
