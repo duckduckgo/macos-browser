@@ -3193,6 +3193,7 @@
 		37DB56F12C3B36B80093D4DC /* RemoteMessagingClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingClientTests.swift; sourceTree = "<group>"; };
 		37DB56F42C3B3C420093D4DC /* MockRemoteMessagingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockRemoteMessagingStore.swift; sourceTree = "<group>"; };
 		37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoAppStore.xcconfig; sourceTree = "<group>"; };
+		37E1116C2C578F1B00583C19 /* DuckDuckGoAppStoreDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoAppStoreDebug.entitlements; sourceTree = "<group>"; };
 		37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = UnitTestsAppStore.xcconfig; sourceTree = "<group>"; };
 		37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = IntegrationTestsAppStore.xcconfig; sourceTree = "<group>"; };
 		37F19A6428E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDuckPlayerView.swift; sourceTree = "<group>"; };
@@ -6871,6 +6872,7 @@
 				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
 				37D9BBA329376EE8000B99F9 /* DuckDuckGoAppStore.entitlements */,
 				377E54382937B7C400780A0A /* DuckDuckGoAppStoreCI.entitlements */,
+				37E1116C2C578F1B00583C19 /* DuckDuckGoAppStoreDebug.entitlements */,
 				AAD86E502678D104005C11BE /* DuckDuckGoCI.entitlements */,
 				4B5F15032A1570F10060320F /* DuckDuckGoDebug.entitlements */,
 				4B65143C26392483005B46EB /* Email */,
