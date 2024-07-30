@@ -140,7 +140,18 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
                     navigator.load(URLRequest(url: errorURL))
                 }
             }
-            os_log(.debug, log: .phishingDetection, "Failed to navigate to phishing detection error page. Current navigation target is not main frame.")
+            // We're probably in an iframe, let's navigate the parent frame
+            guard let urlString = navigationAction.url.absoluteString.data(using: .utf8) else {
+                os_log(.debug, log: .phishingDetection, "Failed to convert URL string to data.")
+                return .next
+            }
+            let encodedURL = URLTokenValidator.base64URLEncode(data: urlString)
+            let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
+            guard let errorURL = URL(string: errorURLString) else {
+                os_log(.debug, log: .phishingDetection, "Failed to create error URL.")
+                return .next
+            }
+            self.webView?.load(URLRequest(url: errorURL))
         }
         errorPageType = nil
         return .next
@@ -225,6 +236,7 @@ protocol ErrorPageTabExtensionNavigationDelegate: AnyObject {
     var canGoBack: Bool { get }
     func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL)
     func setDocumentHtml(_ html: String)
+    func load(_ request: URLRequest) -> WKNavigation?
     func goBack() -> WKNavigation?
     func close()
     func reloadPage() -> WKNavigation?
