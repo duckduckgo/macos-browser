@@ -33,7 +33,8 @@ public struct SiteTroubleshootingView: View {
     // MARK: - View Contents
 
     public var body: some View {
-        if let currentSite = model.currentSite {
+        if model.isFeatureEnabled,
+           let currentSite = model.currentSite {
             siteTroubleshootingView(currentSite)
         } else {
             EmptyView()
