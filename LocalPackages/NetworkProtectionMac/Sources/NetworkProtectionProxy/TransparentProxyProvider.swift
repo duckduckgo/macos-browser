@@ -142,11 +142,16 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             NENetworkRule(remoteNetwork: nil, remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .UDP, direction: .outbound)
         ]
 
+        if isExcludedDomain("duckduckgo.com") {
+            networkSettings.includedNetworkRules?.append(
+                NENetworkRule(destinationHost: NWHostEndpoint(hostname: "duckduckgo.com", port: "443"), protocol: .any))
+        }
+
         return networkSettings
     }
 
     @MainActor
-    override open func startProxy(options: [String : Any]? = nil) async throws {
+    override open func startProxy(options: [String: Any]? = nil) async throws {
 
         eventHandler?(.startInitiated)
 
