@@ -98,6 +98,7 @@ final class MoreOptionsMenu: NSMenu {
     let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "").withImage(.optionsButtonMenuZoom)
 
     private func setupMenuItems() {
+        addUpdateItem()
 
 #if FEEDBACK
         let feedbackString: String = {
@@ -134,6 +135,10 @@ final class MoreOptionsMenu: NSMenu {
         addSubscriptionItems()
 
         addPageItems()
+
+        let helpItem = NSMenuItem(title: UserText.mainMenuHelp, action: nil, keyEquivalent: "").withImage(.helpMenuItemIcon)
+        helpItem.submenu = HelpSubMenu(targetting: self)
+        addItem(helpItem)
 
         let preferencesItem = NSMenuItem(title: UserText.settings, action: #selector(openPreferences(_:)), keyEquivalent: "")
             .targetting(self)
@@ -250,6 +255,19 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func doPrint(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedPrint(self)
+    }
+
+    private func addUpdateItem() {
+#if SPARKLE
+        guard NSApp.runType != .uiTests,
+            let update = Application.appDelegate.updateController.latestUpdate,
+            !update.isInstalled
+        else {
+            return
+        }
+        addItem(UpdateMenuItemFactory.menuItem(for: update))
+        addItem(NSMenuItem.separator())
+#endif
     }
 
     private func addWindowItems() {
@@ -686,6 +704,39 @@ final class LoginsSubMenu: NSMenu {
             .withImage(.creditCardGlyph)
     }
 
+}
+
+@MainActor
+final class HelpSubMenu: NSMenu {
+
+    init(targetting target: AnyObject) {
+        super.init(title: UserText.mainMenuHelp)
+
+        updateMenuItems(targetting: target)
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func updateMenuItems(targetting target: AnyObject) {
+        removeAllItems()
+
+        let about = (NSApp.mainMenuTyped.aboutMenuItem.copy() as? NSMenuItem)!
+        addItem(about)
+#if SPARKLE
+        let releaseNotes = (NSApp.mainMenuTyped.releaseNotesMenuItem.copy() as? NSMenuItem)!
+        addItem(releaseNotes)
+
+        let whatIsNew = (NSApp.mainMenuTyped.whatIsNewMenuItem.copy() as? NSMenuItem)!
+        addItem(whatIsNew)
+#endif
+
+#if FEEDBACK
+        let feedback = (NSApp.mainMenuTyped.sendFeedbackMenuItem.copy() as? NSMenuItem)!
+        addItem(feedback)
+#endif
+    }
 }
 
 @MainActor

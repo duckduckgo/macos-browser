@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1720796469387,
+    "version": 1722257174026,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -82,6 +82,9 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "settings": {
@@ -108,7 +111,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "b9baf40f82353fbfd4e1daa45f7a60e9"
+            "hash": "4efd0ce3e46f0b52aa919a6f80edcd00"
         },
         "androidBrowserConfig": {
             "exceptions": [],
@@ -324,6 +327,9 @@
                     "domain": "harley-davidson.com"
                 },
                 {
+                    "domain": "dailymail.co.uk"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -331,6 +337,9 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "settings": {
@@ -342,7 +351,15 @@
                 ]
             },
             "state": "enabled",
-            "hash": "568bcdbfe8d7611496de889d20c033fb"
+            "hash": "16ae53feb54606dee484b0ed4da3e7e8"
+        },
+        "autofillBreakageReporter": {
+            "state": "disabled",
+            "settings": {
+                "monitorIntervalDays": 42
+            },
+            "exceptions": [],
+            "hash": "ebf35854bdf33091c165b35d418d5707"
         },
         "autofill": {
             "exceptions": [
@@ -1039,6 +1056,12 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "tinder.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "settings": {
@@ -1057,7 +1080,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "1.93.0",
-            "hash": "de5445a7452409483eeef786759d392f"
+            "hash": "242071b6df63a9285e4519b3e29e34c1"
         },
         "clickToPlay": {
             "exceptions": [
@@ -1069,6 +1092,9 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "settings": {
@@ -1081,7 +1107,7 @@
                 }
             },
             "state": "enabled",
-            "hash": "4abcb8a33a72b7fe696a343c0dcd85af"
+            "hash": "daa147e3f277083d492964c68a9f5caf"
         },
         "clientBrandHint": {
             "exceptions": [],
@@ -1120,9 +1146,12 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
-            "hash": "ee9d383becfe28d8a5b575b51f5c9d11"
+            "hash": "42da678c1cc61b0d52986f536e05f416"
         },
         "cookie": {
             "settings": {
@@ -1171,6 +1200,9 @@
                     "domain": "news.ti.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -1178,10 +1210,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "e045fd25b82f8ac2cbd02877153bd9c2"
+            "hash": "d23565fe73c051c53bff8a40396f705d"
         },
         "customUserAgent": {
             "settings": {
@@ -1234,6 +1269,10 @@
                     {
                         "domain": "manage.wix.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/pull/2166"
+                    },
+                    {
+                        "domain": "beta.maps.apple.com",
+                        "reason": "Unsupported browser warning"
                     }
                 ],
                 "webViewDefault": [
@@ -1261,7 +1300,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "132d12636968cac6025e986bd8358ce2"
+            "hash": "93b410d9c0c7c1cb954d3be40b0247f6"
         },
         "dbp": {
             "state": "enabled",
@@ -1382,6 +1421,9 @@
                 },
                 {
                     "domain": "wunderground.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "settings": {
@@ -1520,6 +1562,10 @@
                         "type": "closest-empty"
                     },
                     {
+                        "selector": "#leaderboard-container",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": ".leaderboard_wrapper",
                         "type": "hide-empty"
                     },
@@ -1545,6 +1591,10 @@
                     },
                     {
                         "selector": "#topAd",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#topad",
                         "type": "hide-empty"
                     },
                     {
@@ -2843,6 +2893,27 @@
                             {
                                 "selector": "[id^='ghacks_ad_code']",
                                 "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "gizmodo.com",
+                        "rules": [
+                            {
+                                "selector": ".banner-top",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": ".od-wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".widget_keleops-ad",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id^='optidigital-adslot-Billboard']",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -4577,7 +4648,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "001ab18a7e0381b9824c0e8df68e12e7"
+            "hash": "4689e9dd3357db39d086b254fb00507f"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4589,10 +4660,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "cd2dbf279bf4eb19171c6d79bf5df183"
+            "hash": "139d551fb343ef36567a2d35e7c4457a"
         },
         "extendedOnboarding": {
             "exceptions": [],
@@ -4613,9 +4687,12 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
-            "hash": "d4ffa55e08a4e062a0c0f1a9e1e8275b"
+            "hash": "a05e98b812061f4362468b51c4951937"
         },
         "fingerprintingBattery": {
             "exceptions": [
@@ -4630,10 +4707,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "68af061e3b8c78b06a0b8e6667d40aff"
+            "hash": "0b7239752bdfb9fd3e1eeaff733fe613"
         },
         "fingerprintingCanvas": {
             "settings": {
@@ -4732,10 +4812,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "211fff4a5ceb8e61a12f26f2ff4f1e04"
+            "hash": "5a29a3dee399844c40b4b759b5fc524c"
         },
         "fingerprintingHardware": {
             "settings": {
@@ -4834,10 +4917,13 @@
                 },
                 {
                     "domain": "zoom.us"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "enabled",
-            "hash": "df0ff6af6c5ae7c141d275cd75f27ce7"
+            "hash": "895f01c838574b034e405f4e506ebe94"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -4885,10 +4971,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "319faddf90e233710e5a254e25988c87"
+            "hash": "e316926668f68f7288c1c09c7158834f"
         },
         "fingerprintingTemporaryStorage": {
             "exceptions": [
@@ -4909,10 +4998,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "bcb9e995c193bccf72622010f87185af"
+            "hash": "318229ab4611a2cd34b23aae9135122b"
         },
         "googleRejected": {
             "exceptions": [
@@ -4924,10 +5016,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "cd2dbf279bf4eb19171c6d79bf5df183"
+            "hash": "139d551fb343ef36567a2d35e7c4457a"
         },
         "gpc": {
             "state": "enabled",
@@ -4985,6 +5080,9 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "settings": {
@@ -4996,7 +5094,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "8d7152a7ac339ca9333a3dbb246a3d76"
+            "hash": "f1edc5fb05afdac69084326add51da45"
         },
         "harmfulApis": {
             "settings": {
@@ -5106,10 +5204,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "aa8430d25bbd499d1f8bed22caf34943"
+            "hash": "d12818afbee58693fc60fd0be7cc90db"
         },
         "history": {
             "state": "disabled",
@@ -5136,9 +5237,12 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
-            "hash": "bf47b6ce76c34dd70bc0678fa23c7c52"
+            "hash": "fd20e89d32343cf42c4b7f5101d5b900"
         },
         "incontextSignup": {
             "exceptions": [],
@@ -5183,6 +5287,9 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "settings": {
@@ -5193,7 +5300,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "79aac7de322d705ec237c688b7e60d6c"
+            "hash": "68732c967df2ff5beb2d851378395cfd"
         },
         "networkProtection": {
             "state": "enabled",
@@ -5265,10 +5372,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "5dba15e93b648ef9de8be7ef3b4def33"
+            "hash": "4977063ee77c043c5ad51e3daeb188ca"
         },
         "performanceMetrics": {
             "state": "enabled",
@@ -5281,9 +5391,38 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
-            "hash": "1a1a4652687f25da9f351df157c5e051"
+            "hash": "94113375ad83c83f79c508e5a6b4d204"
+        },
+        "phishingDetection": {
+            "state": "internal",
+            "exceptions": [
+                {
+                    "domain": "marvel.com"
+                },
+                {
+                    "domain": "sundancecatalog.com"
+                },
+                {
+                    "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
+                }
+            ],
+            "features": {
+                "allowErrorPage": {
+                    "state": "internal"
+                },
+                "allowPreferencesToggle": {
+                    "state": "internal"
+                }
+            },
+            "hash": "ca33e2c8e25f0502cbf45bedb02dddf4"
         },
         "pluginPointFocusedViewPlugin": {
             "state": "disabled",
@@ -5416,15 +5555,18 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "3c850040d1c9b3e06841b1491c5d2940"
+            "hash": "f2d162b61ce76263251dbea36b528cfe"
         },
         "remoteMessaging": {
-            "state": "internal",
+            "state": "enabled",
             "exceptions": [],
-            "hash": "f1daaefe788583c2a00d7d19a23864a7"
+            "hash": "697382e31649d84b01166f1dc6f790d6"
         },
         "requestFilterer": {
             "state": "disabled",
@@ -5437,12 +5579,15 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "settings": {
                 "windowInMs": 0
             },
-            "hash": "38f912d4dc34772ba00e207217eb2e86"
+            "hash": "d424b3a064dd4abfccbd145270b121cf"
         },
         "runtimeChecks": {
             "state": "disabled",
@@ -5455,10 +5600,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "settings": {},
-            "hash": "5ff34abb3d8cf7087d3ca570e89cefc2"
+            "hash": "7dd7a12bfb6c39e9fe94cc24a81c56fc"
         },
         "serviceworkerInitiatedRequests": {
             "exceptions": [
@@ -5470,10 +5618,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "cd2dbf279bf4eb19171c6d79bf5df183"
+            "hash": "139d551fb343ef36567a2d35e7c4457a"
         },
         "sslCertificates": {
             "state": "enabled",
@@ -8839,9 +8990,12 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
-            "hash": "7430556251f5289f7e70edafd0e4cd0c"
+            "hash": "2760d1d1407d43cb407a3954b693bbc8"
         },
         "trackingCookies1p": {
             "settings": {
@@ -8859,10 +9013,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "cc77dc124b0b2985b15360217ed313a9"
+            "hash": "4e5efbd74ddcc8849735bfe590ed0d78"
         },
         "trackingCookies3p": {
             "settings": {
@@ -8877,10 +9034,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "5dba15e93b648ef9de8be7ef3b4def33"
+            "hash": "4977063ee77c043c5ad51e3daeb188ca"
         },
         "trackingParameters": {
             "exceptions": [
@@ -8895,6 +9055,9 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "settings": {
@@ -8928,7 +9091,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "0.22.3",
-            "hash": "642e6568ba8e37894d91d68e86258fbf"
+            "hash": "ae9d3a7642a97199783380b145748b15"
         },
         "userAgentRotation": {
             "settings": {
@@ -8943,10 +9106,13 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "5d0a0094113c803aa7c57edffd28e2f9"
+            "hash": "8e86f07f09dcca5d1f327c31f8da38a6"
         },
         "voiceSearch": {
             "exceptions": [],
@@ -8955,6 +9121,9 @@
         },
         "webCompat": {
             "exceptions": [
+                {
+                    "domain": "crocs.com"
+                },
                 {
                     "domain": "marvel.com"
                 },
@@ -9182,6 +9351,9 @@
                 },
                 {
                     "domain": "community.bitwarden.com"
+                },
+                {
+                    "domain": "instructure.com"
                 }
             ],
             "state": "enabled",
@@ -9226,7 +9398,7 @@
                     }
                 ]
             },
-            "hash": "62636b478aa50f4bc1e57e6b73fc1e0e"
+            "hash": "5fbe07453e4502170f302049c96f8b1b"
         },
         "webViewBlobDownload": {
             "exceptions": [],

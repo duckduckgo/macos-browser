@@ -35,6 +35,7 @@ import RemoteMessaging
 final class ActiveRemoteMessageModel: ObservableObject {
 
     @Published var remoteMessage: RemoteMessageModel?
+    @Published var isViewOnScreen: Bool = false
 
     /**
      * A block that returns a remote messaging store, if it exists.
@@ -61,8 +62,6 @@ final class ActiveRemoteMessageModel: ObservableObject {
     ) {
         self.store = remoteMessagingStore
 
-        updateRemoteMessage()
-
         let messagesDidChangePublisher = NotificationCenter.default.publisher(for: RemoteMessagingStore.Notifications.remoteMessagesDidChange)
             .asVoid()
             .eraseToAnyPublisher()
@@ -86,6 +85,21 @@ final class ActiveRemoteMessageModel: ObservableObject {
             }
             .store(in: &cancellables)
 
+        let remoteMessagePublisher = $remoteMessage.compactMap({ $0 }).asVoid()
+        let isViewOnScreenPublisher = $isViewOnScreen.removeDuplicates().filter({ $0 }).asVoid()
+        Publishers.Merge(remoteMessagePublisher, isViewOnScreenPublisher)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                guard let self else {
+                    return
+                }
+                if isViewOnScreen {
+                    markRemoteMessageAsShown()
+                }
+            }
+            .store(in: &cancellables)
+
+        updateRemoteMessage()
     }
 
     func dismissRemoteMessage(with action: RemoteMessageViewModel.ButtonAction?) {
@@ -97,6 +111,9 @@ final class ActiveRemoteMessageModel: ObservableObject {
         self.remoteMessage = nil
 
         let pixel: GeneralPixel? = {
+            guard remoteMessage.isMetricsEnabled else {
+                return nil
+            }
             switch action {
             case .close:
                 return GeneralPixel.remoteMessageDismissed
@@ -121,10 +138,14 @@ final class ActiveRemoteMessageModel: ObservableObject {
             return
         }
         os_log("Remote message shown: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
-        PixelKit.fire(GeneralPixel.remoteMessageShown, withAdditionalParameters: ["message": remoteMessage.id])
+        if remoteMessage.isMetricsEnabled {
+            PixelKit.fire(GeneralPixel.remoteMessageShown, withAdditionalParameters: ["message": remoteMessage.id])
+        }
         if !store.hasShownRemoteMessage(withID: remoteMessage.id) {
             os_log("Remote message shown for first time: %s", log: .remoteMessaging, type: .info, remoteMessage.id)
-            PixelKit.fire(GeneralPixel.remoteMessageShownUnique, withAdditionalParameters: ["mesage": remoteMessage.id])
+            if remoteMessage.isMetricsEnabled {
+                PixelKit.fire(GeneralPixel.remoteMessageShownUnique, withAdditionalParameters: ["message": remoteMessage.id])
+            }
             store.updateRemoteMessage(withID: remoteMessage.id, asShown: true)
         }
     }
