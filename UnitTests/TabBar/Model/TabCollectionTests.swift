@@ -20,7 +20,6 @@ import XCTest
 import History
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class TabCollectionTests: XCTestCase {
 
     override func setUp() {
@@ -35,6 +34,7 @@ final class TabCollectionTests: XCTestCase {
 
     // MARK: - Append
 
+    @MainActor
     func testWhenTabIsAppendedThenItsIndexIsLast() {
         let tabCollection = TabCollection()
 
@@ -49,6 +49,7 @@ final class TabCollectionTests: XCTestCase {
 
     // MARK: - Insert
 
+    @MainActor
     func testWhenInsertIsCalledWithIndexOutOfBoundsThenItemIsNotInserted() {
         let tabCollection = TabCollection()
         let tab = Tab()
@@ -58,6 +59,7 @@ final class TabCollectionTests: XCTestCase {
         XCTAssertFalse(tabCollection.tabs.contains(tab))
     }
 
+    @MainActor
     func testWhenTabIsInsertedAtIndexThenItemsWithEqualOrHigherIndexesAreMoved() {
         let tabCollection = TabCollection()
 
@@ -74,6 +76,7 @@ final class TabCollectionTests: XCTestCase {
 
     // MARK: - Remove
 
+    @MainActor
     func testWhenRemoveIsCalledWithIndexOutOfBoundsThenNoItemIsRemoved() {
         let tabCollection = TabCollection()
 
@@ -87,6 +90,7 @@ final class TabCollectionTests: XCTestCase {
         XCTAssert(tabCollection.tabs.contains(tab))
     }
 
+    @MainActor
     func testWhenTabIsRemovedAtIndexThenItemsWithHigherIndexesAreMoved() {
         let tabCollection = TabCollection()
 
@@ -103,6 +107,7 @@ final class TabCollectionTests: XCTestCase {
         XCTAssertEqual(tabCollection.tabs[1], tab3)
     }
 
+    @MainActor
     func testWhenTabIsRemoved_ThenItsLocalHistoryIsKeptInTabCollection() {
         let tabCollection = TabCollection()
         let historyExtensionMock = HistoryTabExtensionMock()
@@ -126,6 +131,7 @@ final class TabCollectionTests: XCTestCase {
 
     // MARK: - Move
 
+    @MainActor
     func testWhenMoveIsCalledWithIndexesOutOfBoundsThenNoItemIsMoved() {
         let tabCollection = TabCollection()
 
@@ -142,6 +148,7 @@ final class TabCollectionTests: XCTestCase {
         XCTAssertEqual(tabCollection.tabs[1], tab2)
     }
 
+    @MainActor
     func testWhenMoveIsCalledWithSameIndexesThenNoItemIsMoved() {
         let tabCollection = TabCollection()
 
@@ -156,6 +163,7 @@ final class TabCollectionTests: XCTestCase {
         XCTAssertEqual(tabCollection.tabs[1], tab2)
     }
 
+    @MainActor
     func testWhenTabIsMovedThenOtherItemsAreReorganizedProperly() {
         let tabCollection = TabCollection()
 
