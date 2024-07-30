@@ -152,6 +152,19 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
+    - name: Set up keychain
+      run: |
+        KEYCHAIN_PATH=$RUNNER_TEMP/temp.keychain-db
+        KEYCHAIN_PASSWORD="$(openssl rand -base64 16)"
+
+        # create temporary keychain
+        security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+        security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+        security list-keychain -d user -s $KEYCHAIN_PATH
+        security default-keychain -s $KEYCHAIN_PATH
+
     - name: Build and run unit tests
       run: |
         echo "Runner ${RUNNER_NAME} (${RUNNER_TRACKING_ID})"
