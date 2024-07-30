@@ -66,7 +66,7 @@ final class DataBrokerProtectionSubscriptionEventHandler {
         }
 
         let hasEntitlements = entitlements.contains { entitlement in
-            entitlement.product == .networkProtection
+            entitlement.product == .dataBrokerProtection
         }
 
         Task {
