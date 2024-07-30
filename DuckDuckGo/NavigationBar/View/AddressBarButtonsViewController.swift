@@ -755,19 +755,23 @@ final class AddressBarButtonsViewController: NSViewController {
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
             let isCertificateValid = tabViewModel.tab.isCertificateValid ?? true
             let isFlaggedPhishing = tabViewModel.tab.phishingState.didBypassError
+            let isUnprotected = ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isUserUnprotected(domain: host)
 
-            let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-            let isUnprotected = configuration.isUserUnprotected(domain: host)
+            let isShieldDotVisible = isNotSecure || isUnprotected || !isCertificateValid
 
-            let isShieldDotVisible = isNotSecure || isUnprotected || !isCertificateValid || isFlaggedPhishing
-
-            privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
-
-            let shieldDotMouseOverAnimationNames = MouseOverAnimationButton.AnimationNames(aqua: "shield-dot-mouse-over",
-                                                                                           dark: "dark-shield-dot-mouse-over")
-            let shieldMouseOverAnimationNames = MouseOverAnimationButton.AnimationNames(aqua: "shield-mouse-over",
-                                                                                        dark: "dark-shield-mouse-over")
-            privacyEntryPointButton.animationNames = isShieldDotVisible ? shieldDotMouseOverAnimationNames: shieldMouseOverAnimationNames
+            if isFlaggedPhishing {
+                privacyEntryPointButton.image = .exclamation
+                privacyEntryPointButton.isAnimationEnabled = false
+            } else {
+                privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
+                privacyEntryPointButton.isAnimationEnabled = true
+                
+                let animationNames = MouseOverAnimationButton.AnimationNames(
+                    aqua: isShieldDotVisible ? "shield-dot-mouse-over" : "shield-mouse-over",
+                    dark: isShieldDotVisible ? "dark-shield-dot-mouse-over" : "dark-shield-mouse-over"
+                )
+                privacyEntryPointButton.animationNames = animationNames
+            }
         default:
             break
         }
