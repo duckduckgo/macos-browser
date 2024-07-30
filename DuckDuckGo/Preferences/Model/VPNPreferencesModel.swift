@@ -42,9 +42,6 @@ final class VPNPreferencesModel: ObservableObject {
             Task {
                 try await vpnXPCClient.command(.restartAdapter)
             }
-            /*vpnXPCClient.restart { error in
-                // TBD
-            }*/
         }
     }
 
@@ -81,7 +78,6 @@ final class VPNPreferencesModel: ObservableObject {
     }
 
     @Published public var dnsSettings: NetworkProtectionDNSSettings = .default
-
     @Published public var isCustomDNSSelected = false
     @Published public var customDNSServers: String?
 

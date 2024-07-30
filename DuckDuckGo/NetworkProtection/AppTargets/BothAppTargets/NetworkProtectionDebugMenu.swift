@@ -46,12 +46,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private let excludeDDGBrowserTrafficFromVPN = NSMenuItem(title: "DDG Browser", action: #selector(toggleExcludeDDGBrowser))
     private let excludeDBPTrafficFromVPN = NSMenuItem(title: "DBP Background Agent", action: #selector(toggleExcludeDBPBackgroundAgent))
 
-    private let excludeDDGFromVPN = NSMenuItem(title: "duckduckgo.com", action: #selector(toggleExcludeDDGCom))
-    private let excludeRedditFromVPN = NSMenuItem(title: "reddit.com", action: #selector(toggleExcludeReddit))
-
     private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "Kill Switch (enforceRoutes)", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
     private let shouldIncludeAllNetworksMenuItem = NSMenuItem(title: "includeAllNetworks", action: #selector(NetworkProtectionDebugMenu.toggleIncludeAllNetworks))
-    private let connectOnLogInMenuItem = NSMenuItem(title: "Connect on Log In", action: #selector(NetworkProtectionDebugMenu.toggleConnectOnLogInAction))
     private let disableRekeyingMenuItem = NSMenuItem(title: "Disable Rekeying", action: #selector(NetworkProtectionDebugMenu.toggleRekeyingDisabled))
 
     private let excludeLocalNetworksMenuItem = NSMenuItem(title: "excludeLocalNetworks", action: #selector(NetworkProtectionDebugMenu.toggleShouldExcludeLocalRoutes))
@@ -92,8 +88,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem.separator()
 
-            connectOnLogInMenuItem
-                .targetting(self)
             shouldEnforceRoutesMenuItem
                 .targetting(self)
             NSMenuItem.separator()
@@ -115,10 +109,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
                     excludeDDGBrowserTrafficFromVPN.targetting(self)
                     excludeDBPTrafficFromVPN.targetting(self)
                 }
-                NSMenuItem(title: "Excluded Domains") {
-                    excludeDDGFromVPN.targetting(self)
-                    excludeRedditFromVPN.targetting(self)
-                }
+
                 NSMenuItem(title: "Excluded Routes").submenu(excludedRoutesMenu)
             }
 
@@ -172,7 +163,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
         excludedRoutesMenu.delegate = self
         excludedRoutesMenu.autoenablesItems = false
-        populateExclusionsMenuItems()
     }
 
     required init(coder: NSCoder) {
@@ -336,21 +326,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
         settings.excludeLocalNetworks.toggle()
     }
 
-    @objc func toggleConnectOnLogInAction(_ sender: Any?) {
-        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
-    }
-
-    @objc func toggleExclusionAction(_ sender: NSMenuItem) {
-        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
-        /*
-        guard let addressRange = sender.representedObject as? String else {
-            assertionFailure("Unexpected representedObject")
-            return
-        }
-
-        NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)*/
-    }
-
     @objc func openAppContainerInFinder(_ sender: Any?) {
         let containerURL = URL.sandboxApplicationSupportURL
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: containerURL.path)
@@ -424,27 +399,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
             }
         }
 #endif
-    }
-
-    private func populateExclusionsMenuItems() {
-        excludedRoutesMenu.removeAllItems()
-
-        for item in settings.excludedRoutes {
-            let menuItem: NSMenuItem
-            switch item {
-            case .section(let title):
-                menuItem = NSMenuItem(title: title, action: nil, target: nil)
-                menuItem.isEnabled = false
-
-            case .range(let range, let description):
-                menuItem = NSMenuItem(title: "\(range)\(description != nil ? " (\(description!))" : "")",
-                                      action: #selector(toggleExclusionAction),
-                                      target: self,
-                                      representedObject: range.stringRepresentation)
-            }
-            excludedRoutesMenu.addItem(menuItem)
-        }
-
     }
 
     func menuItem(title: String, action: Selector, representedObject: Any?) -> NSMenuItem {
@@ -559,8 +513,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private func updateExclusionsMenu() {
         excludeDBPTrafficFromVPN.state = transparentProxySettings.isExcluding(appIdentifier: dbpBackgroundAppIdentifier) ? .on : .off
         excludeDDGBrowserTrafficFromVPN.state = transparentProxySettings.isExcluding(appIdentifier: ddgBrowserAppIdentifier) ? .on : .off
-        excludeDDGFromVPN.state = transparentProxySettings.isExcluding(domain: "duckduckgo.com") ? .on : .off
-        excludeRedditFromVPN.state = transparentProxySettings.isExcluding(domain: "reddit.com") ? .on : .off
     }
 
     @objc private func toggleExcludeDBPBackgroundAgent() {
