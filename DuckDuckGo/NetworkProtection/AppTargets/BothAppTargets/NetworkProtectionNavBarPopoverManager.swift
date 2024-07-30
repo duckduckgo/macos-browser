@@ -19,6 +19,7 @@
 import AppLauncher
 import AppKit
 import Combine
+import Common
 import Foundation
 import LoginItems
 import NetworkProtection
@@ -63,7 +64,7 @@ final class ActiveSiteRetriever {
             return nil
         }
 
-        return site(forDomain: activeDomain)
+        return site(forDomain: activeDomain.droppingWwwPrefix())
     }
 
     private func site(forDomain domain: String) -> CurrentSite? {
