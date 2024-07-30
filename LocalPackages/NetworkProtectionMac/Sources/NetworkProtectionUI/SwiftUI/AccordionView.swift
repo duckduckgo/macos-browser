@@ -50,14 +50,15 @@ struct AccordionView<Label: View, Submenu: View>: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             .cornerRadius(4)
-            .onTapGesture {
-                buttonTapped()
-            }
-            .onHover { hovering in
-                if !animatingTap {
-                    isHovered = hovering
-                }
-            }
+    }
+
+    private func buttonBackground(highlighted: Bool) -> some View {
+        if highlighted {
+            return AnyView(
+                VisualEffectView(material: .selection, blendingMode: .withinWindow, state: .active, isEmphasized: true))
+        } else {
+            return AnyView(Color.clear)
+        }
     }
 
     private var content: some View {
@@ -65,25 +66,32 @@ struct AccordionView<Label: View, Submenu: View>: View {
             Button(action: {
                 buttonTapped()
             }) {
-                ZStack {
-                    HStack {
-                        HStack {
-                            label(isHovered)
-                            Spacer()
+                HStack {
+                    label(isHovered)
+                    Spacer()
 
-                            if showSubmenu {
-                                Image(systemName: "chevron.down") // Chevron pointing right
-                                    .foregroundColor(.gray)
-                            } else {
-                                Image(systemName: "chevron.right") // Chevron pointing right
-                                    .foregroundColor(.gray)
-                            }
-                        }
-                    }.padding([.top, .bottom], 3)
-                        .padding([.leading, .trailing], 9)
-                }
+                    if showSubmenu {
+                        Image(systemName: "chevron.down") // Chevron pointing right
+                            .foregroundColor(.gray)
+                    } else {
+                        Image(systemName: "chevron.right") // Chevron pointing right
+                            .foregroundColor(.gray)
+                    }
+                }.padding([.top, .bottom], 3)
+                    .padding([.leading, .trailing], 9)
             }.buttonStyle(PlainButtonStyle())
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    buttonBackground(highlighted: isHovered)
+                )
+                .onTapGesture {
+                    buttonTapped()
+                }
+                .onHover { hovering in
+                    if !animatingTap {
+                        isHovered = hovering
+                    }
+                }
 
             if showSubmenu {
                 VStack {
@@ -95,6 +103,16 @@ struct AccordionView<Label: View, Submenu: View>: View {
     }
 
     private func buttonTapped() {
-        showSubmenu.toggle()
+        animatingTap = true
+        isHovered = false
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + highlightAnimationStepSpeed) {
+            isHovered = true
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + highlightAnimationStepSpeed) {
+                animatingTap = false
+                showSubmenu.toggle()
+            }
+        }
     }
 }
