@@ -761,11 +761,12 @@ final class AddressBarButtonsViewController: NSViewController {
 
             if isFlaggedPhishing {
                 privacyEntryPointButton.image = .exclamation
+                privacyEntryPointButton.mouseOverTintColor = .systemPink
                 privacyEntryPointButton.isAnimationEnabled = false
             } else {
                 privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
                 privacyEntryPointButton.isAnimationEnabled = true
-                
+
                 let animationNames = MouseOverAnimationButton.AnimationNames(
                     aqua: isShieldDotVisible ? "shield-dot-mouse-over" : "shield-mouse-over",
                     dark: isShieldDotVisible ? "dark-shield-dot-mouse-over" : "dark-shield-mouse-over"
