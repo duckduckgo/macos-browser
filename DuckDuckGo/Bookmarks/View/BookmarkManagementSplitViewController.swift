@@ -81,6 +81,10 @@ extension BookmarkManagementSplitViewController: BookmarkManagementDetailViewCon
         sidebarViewController.select(folder: folder)
     }
 
+    func bookmarkManagementDetailViewControllerDidStartSearching() {
+        sidebarViewController.selectBookmarksFolder()
+    }
+
 }
 
 #if DEBUG
