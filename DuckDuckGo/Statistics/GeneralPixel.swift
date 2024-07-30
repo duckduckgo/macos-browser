@@ -364,6 +364,13 @@ enum GeneralPixel: PixelKitEventV2 {
     case bookmarksMigrationCouldNotRemoveOldStore
     case bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders
 
+    // Bookmarks search and sort feature metrics
+    case bookmarksSortButtonClicked(origin: String)
+    case bookmarksSortButtonDismissed(origin: String)
+    case bookmarksSortByName(origin: String)
+    case bookmarksSearchExecuted(origin: String)
+    case bookmarksSearchResultClicked(origin: String)
+
     case syncSentUnauthenticatedRequest
     case syncMetadataCouldNotLoadDatabase
     case syncBookmarksProviderInitializationFailed
@@ -1000,6 +1007,13 @@ enum GeneralPixel: PixelKitEventV2 {
         case .secureVaultKeystoreEventL2KeyPasswordMigration: return "m_mac_secure_vault_keystore_event_l2-key-password-migration"
 
         case .compilationFailed: return "compilation_failed"
+
+            // Bookmarks search and sort feature
+        case .bookmarksSortButtonClicked: return "m_mac_sort_bookmarks_button_clicked"
+        case .bookmarksSortButtonDismissed: return "m_mac_sort_bookmarks_button_dismissed"
+        case .bookmarksSortByName: return "m_mac_sort_bookmarks_by_name"
+        case .bookmarksSearchExecuted: return "m_mac_search_bookmarks_executed"
+        case .bookmarksSearchResultClicked: return "m_mac_search_result_clicked"
         }
     }
 
@@ -1101,6 +1115,13 @@ enum GeneralPixel: PixelKitEventV2 {
             return [PixelKit.Parameters.experimentCohort: cohort]
         case .onboardingDuckplayerUsed5to7(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
+
+        case .bookmarksSortButtonClicked(let origin),
+                .bookmarksSortButtonDismissed(let origin),
+                .bookmarksSortByName(let origin),
+                .bookmarksSearchExecuted(let origin),
+                .bookmarksSearchResultClicked(let origin):
+            return ["origin": origin]
 
         default: return nil
         }

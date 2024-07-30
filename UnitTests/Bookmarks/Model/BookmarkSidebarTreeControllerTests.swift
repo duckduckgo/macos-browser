@@ -24,7 +24,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     func testWhenBookmarkStoreHasNoFolders_ThenOnlyDefaultNodesAreReturned() {
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: LocalBookmarkManager())
-        let treeController = BookmarkTreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual)
         let defaultNodes = treeController.rootNode.childNodes
         let representedObjects = defaultNodes.representedObjects()
 
@@ -48,7 +48,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = BookmarkTreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual)
         let defaultNodes = treeController.rootNode.childNodes
         XCTAssertEqual(defaultNodes.count, 1)
 
@@ -69,7 +69,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = BookmarkTreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual)
         let defaultNodes = treeController.rootNode.childNodes
         XCTAssertEqual(defaultNodes.count, 1)
 
@@ -92,7 +92,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         bookmarkManager.loadBookmarks()
 
         let dataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-        let treeController = BookmarkTreeController(dataSource: dataSource)
+        let treeController = BookmarkTreeController(dataSource: dataSource, sortMode: .manual)
         let defaultNodes = treeController.rootNode.childNodes
         XCTAssertEqual(defaultNodes.count, 1)
 
@@ -109,5 +109,4 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         XCTAssertFalse(childFolderNode.canHaveChildNodes)
         XCTAssert(childFolderNode.representedObjectEquals(childFolder))
     }
-
 }

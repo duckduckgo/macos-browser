@@ -320,6 +320,22 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertFalse(results[1].isFolder)
     }
 
+    func testWhenASearchIsDoneThenItMatchesWithLowercaseResults() {
+        let bookmarkCapitalized = Bookmark(id: "1", url: "www.favorite.com", title: "Favorite bookmark", isFavorite: true)
+        let bookmarkNonCapitalized = Bookmark(id: "2", url: "www.favoritetwo.com", title: "favorite bookmark", isFavorite: true)
+
+        let bookmarkStore = BookmarkStoreMock(bookmarks: [bookmarkCapitalized, bookmarkNonCapitalized])
+        let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+
+        sut.loadBookmarks()
+
+        let resultsWhtCapitalizedQuery = sut.search(by: "Favorite")
+        let resultsWithNotCapitalizedQuery = sut.search(by: "favorite")
+
+        XCTAssertTrue(resultsWhtCapitalizedQuery.count == 2)
+        XCTAssertTrue(resultsWithNotCapitalizedQuery.count == 2)
+    }
+
     private func topLevelBookmarks() -> [BaseBookmarkEntity] {
         let topBookmark = Bookmark(id: "4", url: "www.favorite.com", title: "Favorite bookmark", isFavorite: true)
         let favoriteFolder = BookmarkFolder(id: "5", title: "Favorite folder", children: [topBookmark])
