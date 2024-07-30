@@ -30,41 +30,6 @@ final class BookmarkListPopover: NSPopover {
 
     private static let popoverInsets = NSEdgeInsets(top: 13, left: 13, bottom: 13, right: 13)
 
-    @objc override func adjustFrame(_ frame: NSRect) -> NSRect {
-        guard case .bookmarkBarMenu = mode else { return super.adjustFrame(frame) }
-        var frame = frame
-//        let boundingFrame = self.boundingFrame
-//        guard !boundingFrame.isInfinite else { return frame }
-//        if boundingFrame.width > frame.width {
-//            frame.origin.x = min(max(frame.minX, boundingFrame.minX), boundingFrame.maxX - frame.width)
-//        }
-////        if boundingFrame.height > frame.height {
-////            let y = min(max(frame.minY, boundingFrame.minY), boundingFrame.maxY - frame.height)
-//            frame.size.height -= 400
-//            frame.origin.y -= 400
-////        }
-//        return frame
-
-        guard let positioningView, let mainWindow, let screenFrame = mainWindow.screen?.visibleFrame else { return frame }
-        let offset = viewController.preferredContentOffset
-
-        let windowPoint = positioningView.convert(NSPoint(x: offset.x, y: (positioningView.isFlipped ? positioningView.bounds.minY : positioningView.bounds.maxY) + offset.y), to: nil)
-        let screenPoint = mainWindow.convertPoint(toScreen: windowPoint)
-        if case .maxX = preferredEdge {
-            // adjust the menu popover Y 16pt above the positioning view bottom edge
-            frame.origin.y = min(max(screenFrame.minY, screenPoint.y - frame.size.height + 16), screenFrame.maxY)
-            // align the popover height
-//            frame.size.height = screenPoint.y - frame.origin.y
-            //        let frame = NSRect(x: screenFrame.minX, y: screenFrame.minY, width: screenFrame.width, height: screenPoint.y - screenFrame.minY)
-        } else {
-            // align the menu popover content by the left edge of the positioning view but keeping the popover frame inside the screen bounds
-            frame.origin.x = min(max(screenFrame.minX, screenPoint.x - Self.popoverInsets.left), screenFrame.maxX - frame.width)
-            // aling the menu popover content top edge by the bottom edge of the positioning view but keeping the popover frame inside the screen bounds
-            frame.origin.y = min(max(screenFrame.minY, screenPoint.y - frame.size.height - Self.popoverInsets.top), screenFrame.maxY)
-        }
-        return frame
-    }
-
     init(mode: BookmarkListViewController.Mode = .popover, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, rootFolder: BookmarkFolder? = nil) {
         self.mode = mode
         self.bookmarkManager = bookmarkManager
@@ -104,6 +69,29 @@ final class BookmarkListPopover: NSPopover {
         self.preferredEdge = preferredEdge
         viewController.adjustPreferredContentSize(positionedAt: preferredEdge, of: positioningView, contentInsets: Self.popoverInsets)
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+    }
+
+    /// Adjust bookmarks bar menu popover frame
+    @objc override func adjustFrame(_ frame: NSRect) -> NSRect {
+        guard case .bookmarkBarMenu = mode else { return super.adjustFrame(frame) }
+        guard let positioningView, let mainWindow, let screenFrame = mainWindow.screen?.visibleFrame else { return frame }
+        let offset = viewController.preferredContentOffset
+        var frame = frame
+
+        let windowPoint = positioningView.convert(NSPoint(x: offset.x, y: (positioningView.isFlipped ? positioningView.bounds.minY : positioningView.bounds.maxY) + offset.y), to: nil)
+        let screenPoint = mainWindow.convertPoint(toScreen: windowPoint)
+
+        if case .maxX = preferredEdge { // submenu
+            // adjust the menu popover Y 16pt above the positioning view bottom edge
+            frame.origin.y = min(max(screenFrame.minY, screenPoint.y - frame.size.height + 16), screenFrame.maxY)
+
+        } else { // context menu
+            // align the menu popover content by the left edge of the positioning view but keeping the popover frame inside the screen bounds
+            frame.origin.x = min(max(screenFrame.minX, screenPoint.x - Self.popoverInsets.left), screenFrame.maxX - frame.width)
+            // aling the menu popover content top edge by the bottom edge of the positioning view but keeping the popover frame inside the screen bounds
+            frame.origin.y = min(max(screenFrame.minY, screenPoint.y - frame.size.height - Self.popoverInsets.top), screenFrame.maxY)
+        }
+        return frame
     }
 
 }

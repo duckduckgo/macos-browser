@@ -35,7 +35,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     fileprivate enum Constants {
-        static let preferredContentSize = CGSize(width: 420, height: 300)
+        static let preferredContentSize = CGSize(width: 420, height: 500)
         static let noContentMenuSize = CGSize(width: 240, height: 0)
         static let maxMenuPopoverContentWidth: CGFloat = 500 - 13 * 2
         static let minVisibleRows = 4
@@ -117,7 +117,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     override func loadView() {
-        view = NSView() // ColorView(frame: .zero, backgroundColor: .popoverBackground)
+        view = NSView()
         view.autoresizesSubviews = false
 
         let titleTextField = (mode == .bookmarkBarMenu) ? nil : {
@@ -212,8 +212,6 @@ final class BookmarkListViewController: NSViewController {
             return stackView
         }()
 
-//        scrollView.setValue(self, forKey: "contextMenuDelegate")
-//        scrollView.setValue(1, forKey: "scrollingBehavior")
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.drawsBackground = false
         scrollView.hasHorizontalScroller = false
@@ -228,14 +226,10 @@ final class BookmarkListViewController: NSViewController {
             scrollView.borderType = .noBorder
             scrollView.scrollerInsets = NSEdgeInsetsZero
             scrollView.contentInsets = NSEdgeInsetsZero
-//            scrollView.autohidesScrollers = false
             scrollView.hasVerticalScroller = false
-            scrollView.perform("setAutoforwardsScrollWheelEvents:", with: 1)
             scrollView.scrollerStyle = .overlay
             scrollView.verticalScrollElasticity = .none
             scrollView.horizontalScrollElasticity = .none
-//            scrollView.scrollerInsets = NSEdgeInsets(top: 5, left: 0, bottom: 5, right: 0)
-//            scrollView.contentInsets = NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 12)
         }
 
         let column = NSTableColumn()
@@ -261,7 +255,7 @@ final class BookmarkListViewController: NSViewController {
         } else {
             outlineView.indentationPerLevel = 0
         }
-// TODO: fix cell line wrapping into 2nd line
+
         let clipView = NSClipView(frame: scrollView.frame)
         clipView.setValue(0, forKey: "canAnimateScrolls")
         clipView.translatesAutoresizingMaskIntoConstraints = true
@@ -269,24 +263,23 @@ final class BookmarkListViewController: NSViewController {
         clipView.documentView = outlineView
         clipView.drawsBackground = false
         scrollView.contentView = clipView
-// TODO: buttons scrolling is broken now: multiple items get highlighted and scroll is instant to the top
+
         scrollUpButton = mode == .popover ? nil : {
             let scrollUpButton = MouseOverButton(image: .condenseUp, target: nil, action: nil)
             scrollUpButton.translatesAutoresizingMaskIntoConstraints = false
             scrollUpButton.bezelStyle = .shadowlessSquare
             scrollUpButton.normalTintColor = .labelColor
             scrollUpButton.backgroundColor = .clear
-            // TODO: remove
             scrollUpButton.mouseOverColor = .blackWhite10
             return scrollUpButton
         }()
+
         scrollDownButton = mode == .popover ? nil : {
             let scrollDownButton = MouseOverButton(image: .expandDown, target: nil, action: nil)
             scrollDownButton.translatesAutoresizingMaskIntoConstraints = false
             scrollDownButton.bezelStyle = .shadowlessSquare
             scrollDownButton.normalTintColor = .labelColor
             scrollDownButton.backgroundColor = .clear
-            // TODO: remove
             scrollDownButton.mouseOverColor = .blackWhite10
             return scrollDownButton
         }()
@@ -551,7 +544,6 @@ final class BookmarkListViewController: NSViewController {
                     return
                 }
 
-                // TODO: don‘t show submenu while scrolling
                 let bookmarkListPopover: BookmarkListPopover
                 if let popover = self.bookmarkListPopover {
                     bookmarkListPopover = popover
@@ -563,8 +555,7 @@ final class BookmarkListViewController: NSViewController {
                     bookmarkListPopover = BookmarkListPopover(mode: .bookmarkBarMenu, rootFolder: folder)
                     self.bookmarkListPopover = bookmarkListPopover
                 }
-// TODO: sometimes when opening Imported->Other->Books -> nested popover is shown, hidden, shown again
-// TODO: Don‘t expand instantly to the next level when expanded and the first item in the submenu is another folder
+
                 bookmarkListPopover.show(positionedAsSubmenuAgainst: cell)
                 if let currentEvent = NSApp.currentEvent,
                    currentEvent.type == .keyDown, currentEvent.keyCode == kVK_RightArrow,
@@ -653,7 +644,7 @@ final class BookmarkListViewController: NSViewController {
         let availableHeight = screen.visibleFrame.maxY - window.frame.maxY
         let scrollDeltaY = visibleRect.minY - oldVisibleRect.minY
         if scrollDeltaY > 0, availableHeight > 0 {
-            let contentHeight = outlineView.bounds.height // CGFloat(outlineView.numberOfRows) * Constants.rowHeight
+            let contentHeight = outlineView.bounds.height
             // shift bookmarks menu popover up incrementing height if screen space is available
             var popoverHeightIncrement = min(availableHeight, scrollDeltaY)
             if preferredContentSize.height + popoverHeightIncrement > contentHeight {
@@ -695,7 +686,7 @@ final class BookmarkListViewController: NSViewController {
     private func reloadData() {
         let selectedNodes = self.selectedNodes
 
-        dataSource.reloadData(rebuild: true)
+        dataSource.reloadData()
         outlineView.reloadData()
 
         expandAndRestore(selectedNodes: selectedNodes)
@@ -704,7 +695,7 @@ final class BookmarkListViewController: NSViewController {
     func reloadData(withRootFolder rootFolder: BookmarkFolder) {
         self.representedObject = rootFolder
         treeController.rebuild(withRootFolder: rootFolder)
-        dataSource.reloadData(rebuild: false)
+        dataSource.reloadData()
         outlineView.reloadData()
     }
 

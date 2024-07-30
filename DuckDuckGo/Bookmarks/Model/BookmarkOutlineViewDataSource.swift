@@ -62,11 +62,9 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         self.presentFaviconsFetcherOnboarding = presentFaviconsFetcherOnboarding
 
         super.init()
-
-        reloadData(rebuild: true)
     }
 
-    func reloadData(rebuild: Bool = true) {
+    func reloadData() {
         treeController.rebuild()
     }
 
