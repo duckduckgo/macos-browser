@@ -1672,6 +1672,8 @@
 		841211372C4631E900088FBC /* BookmarkListPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841211352C4631E900088FBC /* BookmarkListPopover.swift */; };
 		844683082C537F5200A15F93 /* MenuItemNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844683072C537F5200A15F93 /* MenuItemNode.swift */; };
 		844683092C537F5200A15F93 /* MenuItemNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844683072C537F5200A15F93 /* MenuItemNode.swift */; };
+		8446830B2C59015200A15F93 /* SteppedScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8446830A2C59015200A15F93 /* SteppedScrollView.swift */; };
+		8446830C2C59015200A15F93 /* SteppedScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8446830A2C59015200A15F93 /* SteppedScrollView.swift */; };
 		84DC715A2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DC715B2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
@@ -3581,6 +3583,7 @@
 		7BFF35722C10D75000F89673 /* IPCServiceLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCServiceLauncher.swift; sourceTree = "<group>"; };
 		841211352C4631E900088FBC /* BookmarkListPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListPopover.swift; sourceTree = "<group>"; };
 		844683072C537F5200A15F93 /* MenuItemNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuItemNode.swift; sourceTree = "<group>"; };
+		8446830A2C59015200A15F93 /* SteppedScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SteppedScrollView.swift; sourceTree = "<group>"; };
 		84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperTests.swift; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
 		850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarAppearance.swift; sourceTree = "<group>"; };
@@ -6359,6 +6362,7 @@
 				B693954226F04BE90015B914 /* ShadowView.swift */,
 				4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */,
 				B693954526F04BEA0015B914 /* WindowDraggingView.swift */,
+				8446830A2C59015200A15F93 /* SteppedScrollView.swift */,
 			);
 			path = AppKit;
 			sourceTree = "<group>";
@@ -10258,6 +10262,7 @@
 				1D36F4252A3B85C50052B527 /* TabCleanupPreparer.swift in Sources */,
 				3706FB97293F65D500E42796 /* ActionSpeech.swift in Sources */,
 				B6AFE6BD29A5D621002FF962 /* HTTPSUpgradeTabExtension.swift in Sources */,
+				8446830C2C59015200A15F93 /* SteppedScrollView.swift in Sources */,
 				3706FB9A293F65D500E42796 /* FireproofDomainsStore.swift in Sources */,
 				3706FB9B293F65D500E42796 /* PrivacyDashboardPermissionHandler.swift in Sources */,
 				3706FB9C293F65D500E42796 /* TabCollectionViewModel.swift in Sources */,
@@ -11461,6 +11466,7 @@
 				37AFCE9227DB8CAD00471A10 /* PreferencesAboutView.swift in Sources */,
 				F1D042A12BFBB4DD00A31506 /* DataBrokerProtectionSettings+Environment.swift in Sources */,
 				4B2F565C2B38F93E001214C0 /* NetworkProtectionSubscriptionEventHandler.swift in Sources */,
+				8446830B2C59015200A15F93 /* SteppedScrollView.swift in Sources */,
 				9826B0A02747DF3D0092F683 /* ContentBlocking.swift in Sources */,
 				4B379C2227BDBA29008A968E /* LocalAuthenticationService.swift in Sources */,
 				37CEFCA92A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */,

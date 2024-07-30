@@ -70,13 +70,11 @@ final class RoundedSelectionRowView: NSTableRowView {
         selectionRect.size.height -= (insets.top + insets.bottom)
 
         let path = NSBezierPath(roundedRect: selectionRect, xRadius: 6, yRadius: 6)
-        // TODO: keep default highlight for non-menu
+
         if isInKeyWindow {
             NSColor.controlAccentColor.setFill()
         } else {
-            // TODO: use correct color to grey out the highlight when mouse is out of the popover
-//            NSColor.buttonMouseOver.setFill()
-            NSColor.secondarySelectedControlColor.setFill()
+            NSColor.buttonMouseOver.setFill()
         }
         path.fill()
     }

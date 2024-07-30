@@ -77,13 +77,12 @@ extension Preferences {
                 }
 
                 // New Tab
-                if model.shouldDisplayAutoPlaySettings {
-                    ToggleMenuItem(UserText.duckPlayerAutoplayPreference, isOn: $model.duckPlayerAutoplay)
-                }
-
                 if model.isOpenInNewTabSettingsAvailable {
-                    ToggleMenuItem(UserText.duckPlayerNewTabPreference, isOn: $model.duckPlayerOpenInNewTab)
-                        .disabled(!model.isNewTabSettingsAvailable)
+                    PreferencePaneSection(UserText.duckPlayerNewTabTitle) {
+                        TextMenuItemCaption(UserText.duckPlayerNewTabPreferenceExtraInfo)
+                        ToggleMenuItem(UserText.duckPlayerNewTabPreference, isOn: $model.duckPlayerOpenInNewTab)
+                            .disabled(!model.isNewTabSettingsAvailable)
+                    }
                 }
             }
         }

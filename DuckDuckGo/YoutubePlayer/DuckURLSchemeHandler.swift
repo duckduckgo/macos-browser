@@ -87,10 +87,7 @@ private extension DuckURLSchemeHandler {
 
         if #available(macOS 12.0, *) {
             let newRequest = youtubeHandler.makeDuckPlayerRequest(from: URLRequest(url: requestURL))
-            _=MainActor.assumeIsolated {
-                (webView as? WebView)?.navigator()?.loadSimulatedRequest(newRequest, responseHTML: html, withExpectedNavigationType: .alternateHtmlLoad)
-            }
-//            webView.loadSimulatedRequest()
+            webView.loadSimulatedRequest(newRequest, responseHTML: html)
         } else {
             let data = html.utf8data
 

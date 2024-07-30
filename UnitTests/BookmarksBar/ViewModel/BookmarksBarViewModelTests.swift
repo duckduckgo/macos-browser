@@ -320,6 +320,6 @@ final class BookmarksBarViewModelDelegateMock: BookmarksBarViewModelDelegate {
     }
 
     func bookmarksBarViewModelReloadedData() {}
-    func mouseDidHover(over item: DuckDuckGo_Privacy_Browser.BookmarksBarCollectionViewItem) {}
+    func mouseDidHover(over item: Any) {}
 
 }

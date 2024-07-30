@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Carbon
 import Combine
 
 protocol BookmarkListViewControllerDelegate: AnyObject {
@@ -25,43 +26,7 @@ protocol BookmarkListViewControllerDelegate: AnyObject {
     func popover(shouldPreventClosure: Bool)
 
 }
-final class SteppedScrollView: NSScrollView {
 
-    private var accumulatedDelta: CGFloat = 0
-    private let stepSize: CGFloat
-
-    init(frame: NSRect, stepSize: CGFloat) {
-        self.stepSize = stepSize
-        super.init(frame: frame)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("\(type(of: self)): Bad initializer")
-    }
-
-    override func scrollWheel(with event: NSEvent) {
-//        guard event.phase == .changed else { return }
-        guard let documentView = self.documentView else { return }
-
-        // Update the accumulated delta with the scroll event's deltaY
-        accumulatedDelta += event.scrollingDeltaY * 2
-//        print("scroll", event.phase.rawValue, event.momentumPhase.rawValue, event.scrollingDeltaY, "->", accumulatedDelta)
-
-        // Determine how many steps we need to scroll
-
-        if abs(accumulatedDelta) >= stepSize {
-            // Calculate the scroll amount
-            let scrollAmount = CGFloat(Int(accumulatedDelta / stepSize)) * stepSize
-
-            // Adjust the document view's scroll position
-            let newScrollOrigin = NSPoint(x: documentView.visibleRect.origin.x, y: documentView.visibleRect.origin.y - scrollAmount)
-            documentView.scroll(newScrollOrigin)
-
-            // Reset the accumulated delta
-            accumulatedDelta -= scrollAmount
-        }
-    }
-}
 final class BookmarkListViewController: NSViewController {
 
     enum Mode {
@@ -71,6 +36,7 @@ final class BookmarkListViewController: NSViewController {
 
     fileprivate enum Constants {
         static let preferredContentSize = CGSize(width: 420, height: 300)
+        static let noContentMenuSize = CGSize(width: 240, height: 0)
         static let maxMenuPopoverContentWidth: CGFloat = 500 - 13 * 2
         static let minVisibleRows = 4
     }
@@ -600,6 +566,13 @@ final class BookmarkListViewController: NSViewController {
 // TODO: sometimes when opening Imported->Other->Books -> nested popover is shown, hidden, shown again
 // TODO: Don‘t expand instantly to the next level when expanded and the first item in the submenu is another folder
                 bookmarkListPopover.show(positionedAsSubmenuAgainst: cell)
+                if let currentEvent = NSApp.currentEvent,
+                   currentEvent.type == .keyDown, currentEvent.keyCode == kVK_RightArrow,
+                   bookmarkListPopover.viewController.outlineView.numberOfRows > 0 {
+                    DispatchQueue.main.async {
+                        bookmarkListPopover.viewController.outlineView.highlightedRow = 0
+                    }
+                }
             }
             .store(in: &cancellables)
     }
@@ -621,6 +594,10 @@ final class BookmarkListViewController: NSViewController {
             preferredContentSize = Constants.preferredContentSize
             return
         }
+        guard outlineView.numberOfRows > 0 else {
+            preferredContentSize = Constants.noContentMenuSize
+            return
+        }
 
         // available screen space at the bottom
         let windowRect = positioningView.convert(positioningView.bounds, to: nil)
@@ -628,12 +605,12 @@ final class BookmarkListViewController: NSViewController {
         var availableHeight = positioningRect.minY - screenFrame.minY - contentInsets.bottom
 
         var preferredContentSize = NSSize.zero
-        var contentHeight: CGFloat = 18
+        var contentHeight: CGFloat = 20
         for row in 0..<outlineView.numberOfRows {
             let node = outlineView.item(atRow: row) as? BookmarkNode
 
             if preferredContentSize.width < Constants.maxMenuPopoverContentWidth {
-                let cellWidth = BookmarkOutlineCellView.sizingCell.preferredContentWidth(for: node)
+                let cellWidth = BookmarkOutlineCellView.preferredContentWidth(for: node) + contentInsets.left + contentInsets.right
                 if cellWidth > preferredContentSize.width {
                     preferredContentSize.width = min(Constants.maxMenuPopoverContentWidth, cellWidth)
                 }
@@ -1043,7 +1020,7 @@ func _mockPreviewBookmarkManager(previewEmptyState: Bool) -> BookmarkManager {
     if previewEmptyState {
         bookmarks = []
     } else {
-        bookmarks = (1..<100).map { i in [
+        bookmarks = (1..<100).map { _ in [
             BookmarkFolder(id: "1", title: "Folder 1", children: [
                 BookmarkFolder(id: "2", title: "Nested Folder", children: [
                     Bookmark(id: "b1", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "2")

@@ -51,6 +51,17 @@ final class BookmarksOutlineView: NSOutlineView {
             cellView?.isInKeyWindow = true
             cellView?.highlight = !(item?.representedObject is SpacerNode)
             highlightedCellView = cellView
+
+            var window = window
+            while let windowParent = window?.parent,
+                  type(of: windowParent) == type(of: window!),
+                  let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
+                  let outlineView = scrollView.documentView as? Self {
+                window = windowParent
+
+                outlineView.highlightedRowView?.isInKeyWindow = false
+                outlineView.highlightedCellView?.isInKeyWindow = false
+            }
         }
     }
 
@@ -129,7 +140,6 @@ final class BookmarksOutlineView: NSOutlineView {
     override func keyDown(with event: NSEvent) {
         switch Int(event.keyCode) {
         case kVK_DownArrow:
-            print("highlightedRow", highlightedRow)
             if let highlightedRow {
                 guard highlightedRow < numberOfRows - 1 else { return }
                 if event.modifierFlags.contains(.command) || event.modifierFlags.contains(.option) {
@@ -142,10 +152,10 @@ final class BookmarksOutlineView: NSOutlineView {
                 if let window, let windowParent = window.parent,
                    type(of: windowParent) == type(of: window) /* _NSPopoverWindow */,
                     let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
-                    let collectionView = scrollView.documentView as? Self {
-                    
+                    let outlineView = scrollView.documentView as? Self {
+
                     // when no highlighted row in child menu popover: send event to parent menu
-                    collectionView.keyDown(with: event)
+                    outlineView.keyDown(with: event)
 
                 } else if event.modifierFlags.contains(.option) {
                     self.highlightedRow = numberOfRows - 1
@@ -154,7 +164,6 @@ final class BookmarksOutlineView: NSOutlineView {
                 }
             }
         case kVK_UpArrow: // TODO: pgUp/Down, modifiers
-            print("highlightedRow", highlightedRow)
             if let highlightedRow {
                 guard highlightedRow > 0 else { return }
                 if event.modifierFlags.contains(.command) || event.modifierFlags.contains(.option) {
@@ -167,10 +176,10 @@ final class BookmarksOutlineView: NSOutlineView {
                 if let window, let windowParent = window.parent,
                    type(of: windowParent) == type(of: window) /* _NSPopoverWindow */,
                    let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
-                   let collectionView = scrollView.documentView as? Self {
+                   let outlineView = scrollView.documentView as? Self {
 
                     // when no highlighted row in child menu popover: send event to parent menu
-                    collectionView.keyDown(with: event)
+                    outlineView.keyDown(with: event)
 
                 } else if event.modifierFlags.contains(.option) {
                     self.highlightedRow = 0
@@ -182,13 +191,21 @@ final class BookmarksOutlineView: NSOutlineView {
             if let window, let windowParent = window.parent,
                type(of: windowParent) == type(of: window) /* _NSPopoverWindow */,
                let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
-               let collectionView = scrollView.documentView as? Self {
-                if highlightedRow == nil {
+               let outlineView = scrollView.documentView as? Self {
+                outlineView.highlightedRowView?.isInKeyWindow = false
+                outlineView.highlightedCellView?.isInKeyWindow = false
+                if highlightedRow == nil, numberOfRows > 0 {
                     highlightedRow = 0
+                    break
                 }
-
-                collectionView.highlightedRowView?.isInKeyWindow = false
-                collectionView.highlightedCellView?.isInKeyWindow = false
+            }
+            if let highlightedRow, let item = self.item(atRow: highlightedRow),
+               isExpandable(item) {
+                if !isItemExpanded(item) {
+                    animator().expandItem(item)
+                }
+            } else if numberOfRows > 0 {
+                self.highlightedRow = highlightedRow
             }
 
             // TODO: when in root: open next menu, left arrow: prev menu
@@ -196,16 +213,24 @@ final class BookmarksOutlineView: NSOutlineView {
             if let window, let windowParent = window.parent,
                type(of: windowParent) == type(of: window) /* _NSPopoverWindow */,
                let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
-               let collectionView = scrollView.documentView as? Self,
+               let outlineView = scrollView.documentView as? Self,
                let popover = window.contentViewController?.nextResponder as? NSPopover {
 
                 // close child menu
                 popover.close()
-                collectionView.highlightedRowView?.isInKeyWindow = true
-                collectionView.highlightedCellView?.isInKeyWindow = true
+                outlineView.highlightedRowView?.isInKeyWindow = true
+                outlineView.highlightedCellView?.isInKeyWindow = true
+
+            } else if let highlightedRow,
+                      let item = self.item(atRow: highlightedRow),
+                      isExpandable(item), isItemExpanded(item) {
+                animator().collapseItem(item)
+            } else {
+//                super.keyDown(with: event)
             }
+
         case kVK_Return, kVK_ANSI_KeypadEnter, kVK_Space:
-            if let highlightedRow {
+            if highlightedRow != nil {
                 guard let action else {
                     assertionFailure("BookmarksOutlineView.action not set")
                     return
@@ -216,13 +241,25 @@ final class BookmarksOutlineView: NSOutlineView {
             } else if let window, let windowParent = window.parent,
                       type(of: windowParent) == type(of: window) /* _NSPopoverWindow */,
                       let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
-                      let collectionView = scrollView.documentView as? Self {
+                      let outlineView = scrollView.documentView as? Self,
+                      numberOfRows > 0 {
 
                 // when in child menu popover without selection: highlight first row
                 highlightedRow = 0
 
-                collectionView.highlightedRowView?.isInKeyWindow = false
-                collectionView.highlightedCellView?.isInKeyWindow = false
+                outlineView.highlightedRowView?.isInKeyWindow = false
+                outlineView.highlightedCellView?.isInKeyWindow = false
+            }
+
+        case kVK_Escape:
+            var window = window
+            while let windowParent = window?.parent,
+                  type(of: windowParent) == type(of: window!) {
+                window = windowParent
+            }
+            // close root popover on Esc
+            if let popover = window?.contentViewController?.nextResponder as? NSPopover {
+                popover.close()
             }
 
         default:

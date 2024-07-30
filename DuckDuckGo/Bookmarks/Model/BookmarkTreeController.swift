@@ -130,7 +130,7 @@ final class BookmarkTreeController {
             }
 
         } else {
-            for childNode in childNodes {
+            childNodes.forEach { childNode in
                 if rebuildChildNodes(node: childNode) {
                     childNodesDidChange = true
                 }

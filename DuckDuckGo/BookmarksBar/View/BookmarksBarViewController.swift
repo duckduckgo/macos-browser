@@ -389,14 +389,6 @@ private extension BookmarksBarViewController {
         }
 
         bookmarkListPopover.show(positionedBelow: view)
-
-//        let childEntities = folder.children
-//        let viewModels = childEntities.map { BookmarkViewModel(entity: $0) }
-//        let menuItems = viewModel.bookmarksTreeMenuItems(from: viewModels, topLevel: true)
-//        let menu = bookmarkFolderMenu(items: menuItems)
-
-//        menu.popUp(positioning: nil, at: CGPoint(x: 0, y: view.frame.minY - 7), in: view)
-
     }
 
     func addFolder(inParent parent: BookmarkFolder?) {
@@ -449,10 +441,6 @@ extension BookmarksBarViewController: NSPopoverDelegate {
         }
 
         return true
-    }
-
-    func popoverDidClose(_ notification: Notification) {
-
     }
 
 }

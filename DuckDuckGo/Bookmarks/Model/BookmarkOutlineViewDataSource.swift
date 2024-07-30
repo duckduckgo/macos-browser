@@ -138,7 +138,6 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                 ?? OutlineSeparatorViewCell(separatorVisible: contentMode.separatorVisible)
         }
 
-        // TODO: sometimes multiple items get highlighted
         let cell = outlineView.makeView(withIdentifier: .init(BookmarkOutlineCellView.className()), owner: self) as? BookmarkOutlineCellView
             ?? BookmarkOutlineCellView(identifier: .init(BookmarkOutlineCellView.className()))
         cell.shouldShowMenuButton = showMenuButtonOnHover

@@ -26,13 +26,11 @@ extension NSLayoutConstraint {
         return self
     }
 
+    @discardableResult
     func autoDeactivatedWhenViewIsHidden(_ view: NSView) -> Self {
         let c = view.publisher(for: \.isHidden).sink { [self /* bind the constraint lifetime to the view */] isHidden in
             if self.isActive != !isHidden {
-//                print("isHidden:", isHidden, isHidden ? "deactivating" : "activating", "priority", self.priority.rawValue)
                 self.isActive = !isHidden
-            } else {
-//                print("ignoring", "isHidden", isHidden, "isActive", self.isActive)
             }
         }
         view.onDeinit {

@@ -57,9 +57,9 @@ extension NavigationHotkeyHandler: NavigationResponder {
         }()
 
         // to be modularized later on, see https://app.asana.com/0/1201037661562251/1203487090719153/f
-        let isRequestingNewTab = (isLinkActivated && NSApp.isShiftPressed) || navigationAction.navigationType.isMiddleButtonClick || isNavigatingAwayFromPinnedTab
+        let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || navigationAction.navigationType.isMiddleButtonClick || isNavigatingAwayFromPinnedTab
         if isRequestingNewTab {
-            let shouldSelectNewTab = /*NSApp.isShiftPressed ||*/ (isNavigatingAwayFromPinnedTab && !navigationAction.navigationType.isMiddleButtonClick && !NSApp.isCommandPressed)
+            let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !navigationAction.navigationType.isMiddleButtonClick && !NSApp.isCommandPressed)
             let isBurner = isBurner
 
             self.onNewWindow = { _ in
