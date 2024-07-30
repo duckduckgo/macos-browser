@@ -353,7 +353,7 @@ extension URL {
     }
 
     static var duckDuckGo: URL {
-        let duckDuckGoUrlString = "https://duckduckgo.com/"
+        let duckDuckGoUrlString = "https://mgurgel.duckduckgo.com/"
         return URL(string: duckDuckGoUrlString)!
     }
 

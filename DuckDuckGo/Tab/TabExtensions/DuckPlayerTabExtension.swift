@@ -218,7 +218,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
         // Always allow loading Private Player URLs (local HTML)
         if navigationAction.url.isDuckURLScheme || navigationAction.url.isDuckPlayer {
-            if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
+            if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString || navigationAction.request.allHTTPHeaderFields?["Referer"] == "https://mgurgel.duckduckgo.com/" {
                 PixelKit.fire(GeneralPixel.duckPlayerViewFromSERP)
 
                 if shouldOpenInNewTab,

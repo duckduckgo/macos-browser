@@ -33,6 +33,8 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
 
         init?(url: URL) {
             switch url.host {
+            case "mgurgel.duckduckgo.com":
+                self = .serpOverlay
             case "duckduckgo.com":
                 self = .serpOverlay
             case "www.youtube.com":
