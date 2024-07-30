@@ -388,6 +388,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         setUpAutofillPixelReporter()
 
+#if SPARKLE
+        if NSApp.runType != .uiTests {
+            updateController.checkNewApplicationVersion()
+        }
+#endif
+
         remoteMessagingClient?.startRefreshingRemoteMessages()
 
         if didCrashDuringCrashHandlersSetUp {
