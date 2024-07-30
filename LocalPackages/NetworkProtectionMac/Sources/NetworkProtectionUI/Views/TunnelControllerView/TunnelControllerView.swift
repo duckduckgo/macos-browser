@@ -252,7 +252,8 @@ public struct TunnelControllerView: View {
                 Image(nsImage: currentSite.icon)
                     .resizable()
                     .frame(width: 16, height: 16)
-                Text("\(currentSite.domain) Troubleshooting")
+                    .clipShape(RoundedRectangle(cornerRadius: 3.0))
+                Text("\(currentSite.domain) issues?")
                     .applyCurrentSiteAttributes()
             } submenu: {
                 VStack {

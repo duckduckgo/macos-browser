@@ -35,8 +35,12 @@ struct AccordionView<Label: View, Submenu: View>: View {
     private var highlightAnimationStepSpeed = AnimationConstants.highlightAnimationStepSpeed
 
     @State private var isHovered = false
-    @State private var animatingTap = false
+    @State private var highlightOverride: Bool?
     @State private var showSubmenu = false
+
+    private var isHighlighted: Bool {
+        highlightOverride ?? isHovered
+    }
 
     init(@ViewBuilder label: @escaping (Bool) -> Label,
          @ViewBuilder submenu: @escaping () -> Submenu) {
@@ -82,15 +86,13 @@ struct AccordionView<Label: View, Submenu: View>: View {
             }.buttonStyle(PlainButtonStyle())
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(
-                    buttonBackground(highlighted: isHovered)
+                    buttonBackground(highlighted: isHighlighted)
                 )
                 .onTapGesture {
                     buttonTapped()
                 }
                 .onHover { hovering in
-                    if !animatingTap {
-                        isHovered = hovering
-                    }
+                    isHovered = hovering
                 }
 
             if showSubmenu {
@@ -103,14 +105,13 @@ struct AccordionView<Label: View, Submenu: View>: View {
     }
 
     private func buttonTapped() {
-        animatingTap = true
-        isHovered = false
+        highlightOverride = false
 
         DispatchQueue.main.asyncAfter(deadline: .now() + highlightAnimationStepSpeed) {
-            isHovered = true
+            highlightOverride = true
 
             DispatchQueue.main.asyncAfter(deadline: .now() + highlightAnimationStepSpeed) {
-                animatingTap = false
+                highlightOverride = nil
                 showSubmenu.toggle()
             }
         }
