@@ -50,8 +50,12 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     private lazy var scrollView = NSScrollView(frame: NSRect(x: 0, y: 0, width: 232, height: 410))
     private lazy var outlineView = BookmarksOutlineView(frame: scrollView.frame)
 
-    private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource)
-    private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: bookmarkManager, treeController: treeController, showMenuButtonOnHover: false)
+    private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource, sortMode: .manual)
+    private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly,
+                                                                bookmarkManager: bookmarkManager,
+                                                                treeController: treeController,
+                                                                sortMode: .manual,
+                                                                showMenuButtonOnHover: false)
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -184,7 +188,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
 
     private func reloadData() {
         let selectedNodes = self.selectedNodes
-        dataSource.reloadData()
+        dataSource.reloadData(with: .manual)
         outlineView.reloadData()
 
         expandAndRestore(selectedNodes: selectedNodes)

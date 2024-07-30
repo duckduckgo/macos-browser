@@ -30,9 +30,15 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     @Published var selectedFolders: [BookmarkFolder] = []
 
     let treeController: BookmarkTreeController
-    private(set) var expandedNodesIDs = Set<String>()
 
     private let contentMode: ContentMode
+    private(set) var expandedNodesIDs = Set<String>()
+    private(set) var isSearching = false
+
+    /// When a drag and drop to a folder happens while in search, we need to stor the destination folder
+    /// so we can expand the tree to the destination folder once the drop finishes.
+    private(set) var dragDestinationFolderInSearchMode: BookmarkFolder?
+
     private let bookmarkManager: BookmarkManager
     private let showMenuButtonOnHover: Bool
     private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
@@ -45,6 +51,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         contentMode: ContentMode,
         bookmarkManager: BookmarkManager,
         treeController: BookmarkTreeController,
+        sortMode: BookmarksSortMode,
         showMenuButtonOnHover: Bool = true,
         onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)? = nil,
         presentFaviconsFetcherOnboarding: (() -> Void)? = nil
@@ -58,13 +65,25 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
         super.init()
 
-        reloadData()
+        reloadData(with: sortMode)
     }
 
-    func reloadData() {
+    func reloadData(with sortMode: BookmarksSortMode) {
+        isSearching = false
+        dragDestinationFolderInSearchMode = nil
+        setFolderCount()
+        treeController.rebuild(for: sortMode)
+    }
+
+    func reloadData(for searchQuery: String, and sortMode: BookmarksSortMode) {
+        isSearching = true
+        setFolderCount()
+        treeController.rebuild(for: searchQuery, sortMode: sortMode)
+    }
+
+    private func setFolderCount() {
         favoritesPseudoFolder.count = bookmarkManager.list?.favoriteBookmarks.count ?? 0
         bookmarksPseudoFolder.count = bookmarkManager.list?.totalBookmarks ?? 0
-        treeController.rebuild()
     }
 
     // MARK: - Private
@@ -133,7 +152,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         cell.delegate = self
 
         if let bookmark = node.representedObject as? Bookmark {
-            cell.update(from: bookmark)
+            cell.update(from: bookmark, isSearch: isSearching)
 
             if bookmark.favicon(.small) == nil {
                 presentFaviconsFetcherOnboarding?()
@@ -142,7 +161,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
 
         if let folder = node.representedObject as? BookmarkFolder {
-            cell.update(from: folder)
+            cell.update(from: folder, isSearch: isSearching)
             return cell
         }
 
@@ -178,6 +197,15 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                 || (destinationNode.representedObject as? PseudoFolder == .bookmarks) {
                 return .move
             }
+            return .none
+        }
+
+        if isSearching {
+            if let destinationFolder = destinationNode.representedObject as? BookmarkFolder {
+                self.dragDestinationFolderInSearchMode = destinationFolder
+                return .move
+            }
+
             return .none
         }
 
@@ -243,7 +271,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         let containsDescendantOfDestination = draggedFolders.contains { draggedFolder in
             let folder = BookmarkFolder(id: draggedFolder.id, title: draggedFolder.name, parentFolderUUID: draggedFolder.parentFolderUUID, children: draggedFolder.children)
 
-            guard let draggedNode = treeController.node(representing: folder) else {
+            guard let draggedNode = treeController.findNodeWithId(representing: folder) else {
                 return false
             }
 

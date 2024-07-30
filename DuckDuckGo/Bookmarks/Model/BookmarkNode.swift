@@ -106,6 +106,17 @@ final class BookmarkNode: Hashable {
         return false
     }
 
+    /// Checks if two nodes represent the same base bookmark entity based only on their ID
+    func representedObjectHasSameId(_ otherRepresentedObject: AnyObject) -> Bool {
+        if let entity = otherRepresentedObject as? BaseBookmarkEntity,
+           let nodeEntity = self.representedObject as? BaseBookmarkEntity,
+           entity.id == nodeEntity.id {
+            return true
+        }
+
+        return false
+    }
+
     func findOrCreateChildNode(with representedObject: AnyObject) -> BookmarkNode {
         if let node = childNodeRepresenting(object: representedObject) {
             return node
