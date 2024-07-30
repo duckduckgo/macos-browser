@@ -39239,7 +39239,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers. <a href=\"https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/\">Learn more</a>"
+            "value" : "This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers. <a  href=\"https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/\" target=\"_blank\">Learn more</a>"
           }
         }
       }
@@ -39275,7 +39275,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "See our <a href=\"https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/\">Phishing and Malware Protection help page</a> for more information."
+            "value" : "See our <a href=\"https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/\" target=\"_blank\">Phishing and Malware Protection help page</a> for more information."
           }
         }
       }
