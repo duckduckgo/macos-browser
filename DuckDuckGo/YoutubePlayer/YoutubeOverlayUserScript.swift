@@ -33,6 +33,8 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
 
         init?(url: URL) {
             switch url.host {
+            case "mgurgel.duckduckgo.com":
+                self = .serpOverlay
             case "duckduckgo.com":
                 self = .serpOverlay
             case "www.youtube.com":
@@ -49,7 +51,8 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
     weak var webView: WKWebView?
     let messageOriginPolicy: MessageOriginPolicy = .only(rules: [
         .exact(hostname: "www.youtube.com"),
-        .exact(hostname: "duckduckgo.com")
+        .exact(hostname: "duckduckgo.com"),
+        .exact(hostname: "mgurgel.duckduckgo.com"),
     ])
     public var featureName: String = "duckPlayer"
 
