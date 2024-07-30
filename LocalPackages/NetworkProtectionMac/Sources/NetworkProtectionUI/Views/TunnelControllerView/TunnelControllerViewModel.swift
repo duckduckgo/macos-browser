@@ -56,9 +56,6 @@ public final class TunnelControllerViewModel: ObservableObject {
     ///
     private let statusReporter: NetworkProtectionStatusReporter
 
-    @Published
-    private(set) var currentSite: CurrentSite?
-
     private let vpnSettings: VPNSettings
     private let locationFormatter: VPNLocationFormatting
 
@@ -70,6 +67,11 @@ public final class TunnelControllerViewModel: ObservableObject {
     }()
 
     private let uiActionHandler: VPNUIActionHandling
+
+    // MARK: - Environment
+
+    @EnvironmentObject
+    private var siteTroubleshootingViewModel: SiteTroubleshootingView.Model
 
     // MARK: - Misc
 
@@ -90,7 +92,6 @@ public final class TunnelControllerViewModel: ObservableObject {
     public init(controller: TunnelController,
                 onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter,
-                currentSitePublisher: Published<CurrentSite?>.Publisher,
                 runLoopMode: RunLoop.Mode? = nil,
                 vpnSettings: VPNSettings,
                 locationFormatter: VPNLocationFormatting,
@@ -112,10 +113,6 @@ public final class TunnelControllerViewModel: ObservableObject {
 
         // Particularly useful when unit testing with an initial status of our choosing.
         refreshInternalIsRunning()
-
-        currentSitePublisher
-            .assign(to: \.currentSite, onWeaklyHeld: self)
-            .store(in: &cancellables)
 
         subscribeToOnboardingStatusChanges()
         subscribeToStatusChanges()
@@ -544,20 +541,19 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Domain Exclusions
+    // MARK: - Site Troubleshooting
 
-    var showExclusionOptions: Bool {
+    var showSiteTroubleshooting: Bool {
+        guard siteTroubleshootingViewModel.isFeatureEnabled,
+              siteTroubleshootingViewModel.currentSite != nil else {
+            return false
+        }
+
         switch connectionStatus {
         case .connected:
             return true
         default:
             return false
-        }
-    }
-
-    func setExclusion(_ exclude: Bool, forDomain domain: String) {
-        Task { @MainActor in
-            await uiActionHandler.setExclusion(exclude, forDomain: domain)
         }
     }
 }

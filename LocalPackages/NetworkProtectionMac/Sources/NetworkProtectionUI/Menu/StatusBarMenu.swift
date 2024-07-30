@@ -131,13 +131,15 @@ public final class StatusBarMenu: NSObject {
                 return
             }
 
-            // TO BE DONE: we want to get this value from IPC
-            var currentSite = Published<CurrentSite?>(initialValue: CurrentSite?(nil))
+            let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
+                featureFlagPublisher: Just(false).eraseToAnyPublisher(),
+                currentSitePublisher: Just(CurrentSite?(nil)).eraseToAnyPublisher(),
+                uiActionHandler: uiActionHandler)
 
             popover = NetworkProtectionPopover(controller: controller,
                                                onboardingStatusPublisher: onboardingStatusPublisher,
                                                statusReporter: statusReporter,
-                                               currentSitePublisher: currentSite.projectedValue,
+                                               siteTroubleshootingViewModel: siteTroubleshootingViewModel,
                                                uiActionHandler: uiActionHandler,
                                                menuItems: menuItems,
                                                agentLoginItem: agentLoginItem,

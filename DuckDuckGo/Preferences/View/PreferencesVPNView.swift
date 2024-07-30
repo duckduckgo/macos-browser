@@ -57,18 +57,20 @@ extension Preferences {
 
                 // SECTION: Excluded Sites
 
-                PreferencePaneSection(UserText.vpnExcludedSitesTitle, spacing: 4) {
-                    Text(UserText.vpnExcludedDomainsDescription)
-                        .foregroundColor(.secondary)
-                        .padding(.bottom, 18)
+                if model.showExcludedSites {
+                    PreferencePaneSection(UserText.vpnExcludedSitesTitle, spacing: 4) {
+                        Text(UserText.vpnExcludedDomainsDescription)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 18)
 
-                    PreferencePaneSubSection {
-                        Button(UserText.vpnExcludedDomainsManageButtonTitle) {
-                            model.manageExcludedSites()
+                        PreferencePaneSubSection {
+                            Button(UserText.vpnExcludedDomainsManageButtonTitle) {
+                                model.manageExcludedSites()
+                            }
                         }
                     }
+                    .padding(.bottom, 12)
                 }
-                .padding(.bottom, 12)
 
                 // SECTION: General
 

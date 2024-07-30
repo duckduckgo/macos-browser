@@ -215,10 +215,17 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             // to observe active-tab changes.  We just force-refresh when the popover is shown.
             currentSitePublisher.refreshCurrentSite()
 
+            let siteTroubleshootingFeatureFlagPublisher = NSApp.delegateTyped.internalUserDecider.isInternalUserPublisher.eraseToAnyPublisher()
+
+            let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
+                featureFlagPublisher: siteTroubleshootingFeatureFlagPublisher,
+                currentSitePublisher: $currentSite.eraseToAnyPublisher(),
+                uiActionHandler: uiActionHandler)
+
             let popover = NetworkProtectionPopover(controller: controller,
                                                    onboardingStatusPublisher: onboardingStatusPublisher,
                                                    statusReporter: statusReporter,
-                                                   currentSitePublisher: $currentSite,
+                                                   siteTroubleshootingViewModel: siteTroubleshootingViewModel,
                                                    uiActionHandler: uiActionHandler,
                                                    menuItems: {
                 if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {

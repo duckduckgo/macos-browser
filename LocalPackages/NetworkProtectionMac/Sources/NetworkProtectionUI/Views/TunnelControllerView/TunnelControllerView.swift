@@ -180,11 +180,7 @@ public struct TunnelControllerView: View {
             Divider()
                 .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
 
-            if model.showExclusionOptions,
-               let currentSite = model.currentSite {
-
-                currentSiteView(currentSite)
-            }
+            SiteTroubleshootingView()
 
             locationView()
 
@@ -244,60 +240,6 @@ public struct TunnelControllerView: View {
         Circle()
             .fill(isConnected ? .green : .yellow)
             .frame(width: 8, height: 8)
-    }
-
-    private func currentSiteView(_ currentSite: CurrentSite) -> some View {
-        Group {
-            AccordionView { _ in
-                Image(nsImage: currentSite.icon)
-                    .resizable()
-                    .frame(width: 16, height: 16)
-                    .clipShape(RoundedRectangle(cornerRadius: 3.0))
-                Text("\(currentSite.domain) issues?")
-                    .applyCurrentSiteAttributes()
-            } submenu: {
-                VStack {
-                    MenuItemCustomButton {
-                        model.setExclusion(true, forDomain: currentSite.domain)
-                    } label: { _ in
-                        HStack {
-                            if currentSite.excluded {
-                                Image(.accordionViewCheckmark)
-                                    .resizable()
-                                    .font(.system(size: 13))
-                                    .frame(width: 16, height: 16)
-                                    .applyCurrentSiteAttributes()
-                            } else {
-                                Rectangle()
-                                    .fill(Color.clear)
-                                    .frame(width: 16, height: 16)
-                            }
-                            Text("Exclude from VPN")
-                        }
-                    }
-
-                    MenuItemCustomButton {
-                        model.setExclusion(false, forDomain: currentSite.domain)
-                    } label: { _ in
-                        if !currentSite.excluded {
-                            Image(.accordionViewCheckmark)
-                                .resizable()
-                                .font(.system(size: 13))
-                                .frame(width: 16, height: 16)
-                        } else {
-                            Rectangle()
-                                .fill(Color.clear)
-                                .frame(width: 16, height: 16)
-                        }
-
-                        Text("Route through VPN")
-                    }
-                }
-            }
-
-            Divider()
-                .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
-        }
     }
 
     /// Connected/Selected location

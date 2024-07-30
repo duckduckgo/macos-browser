@@ -114,7 +114,6 @@ extension NetworkProtectionStatusView {
         public init(controller: TunnelController,
                     onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
-                    currentSitePublisher: Published<CurrentSite?>.Publisher,
                     debugInformationPublisher: AnyPublisher<Bool, Never>,
                     uiActionHandler: VPNUIActionHandling,
                     menuItems: @escaping () -> [MenuItem],
@@ -139,7 +138,6 @@ extension NetworkProtectionStatusView {
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
                                                                   statusReporter: statusReporter,
-                                                                  currentSitePublisher: currentSitePublisher,
                                                                   vpnSettings: .init(defaults: userDefaults),
                                                                   locationFormatter: locationFormatter,
                                                                   uiActionHandler: uiActionHandler)

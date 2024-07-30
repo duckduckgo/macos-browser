@@ -47,13 +47,14 @@ public final class NetworkProtectionPopover: NSPopover {
 
     private let debugInformationPublisher = CurrentValueSubject<Bool, Never>(false)
     private let statusReporter: NetworkProtectionStatusReporter
+    private let siteTroubleshootingViewModel: SiteTroubleshootingView.Model
     private let model: NetworkProtectionStatusView.Model
     private var appLifecycleCancellables = Set<AnyCancellable>()
 
     public required init(controller: TunnelController,
                          onboardingStatusPublisher: OnboardingStatusPublisher,
                          statusReporter: NetworkProtectionStatusReporter,
-                         currentSitePublisher: Published<CurrentSite?>.Publisher,
+                         siteTroubleshootingViewModel: SiteTroubleshootingView.Model,
                          uiActionHandler: VPNUIActionHandling,
                          menuItems: @escaping () -> [MenuItem],
                          agentLoginItem: LoginItem?,
@@ -63,10 +64,10 @@ public final class NetworkProtectionPopover: NSPopover {
                          uninstallHandler: @escaping () async -> Void) {
 
         self.statusReporter = statusReporter
+        self.siteTroubleshootingViewModel = siteTroubleshootingViewModel
         self.model = NetworkProtectionStatusView.Model(controller: controller,
                                                        onboardingStatusPublisher: onboardingStatusPublisher,
                                                        statusReporter: statusReporter,
-                                                       currentSitePublisher: currentSitePublisher,
                                                        debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
                                                        uiActionHandler: uiActionHandler,
                                                        menuItems: menuItems,
@@ -93,6 +94,7 @@ public final class NetworkProtectionPopover: NSPopover {
         let view = NetworkProtectionStatusView(model: self.model).environment(\.dismiss, { [weak self] in
             self?.close()
         }).fixedSize()
+            .environmentObject(siteTroubleshootingViewModel)
 
         let controller = NSHostingController(rootView: view)
         contentViewController = controller
