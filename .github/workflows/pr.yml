@@ -1,6 +1,6 @@
 name: PR Checks
 
-on: 
+on:
   push:
     branches: [ main, "release/**" ]
   pull_request:
@@ -170,6 +170,14 @@ jobs:
 
     - name: Run integration tests
       run: |
+        brew install xmlstarlet
+        xmlstarlet ed -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t elem -n "EnvironmentVariable" \
+          -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "key" -v "CI" \
+          -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "value" -v "1" \
+          -i '/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[1]' -t attr -n "isEnabled" -v "YES" \
+          "DuckDuckGo.xcodeproj/xcshareddata/xcschemes/Integration Tests.xcscheme" > updated-integration-tests.xcscheme
+        mv -f updated-integration-tests.xcscheme "DuckDuckGo.xcodeproj/xcshareddata/xcschemes/Integration Tests.xcscheme"
+
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
@@ -371,7 +379,7 @@ jobs:
           npm run rebuild-autoconsent
       - name: Verify clean tree
         run: |
-          git update-index --refresh 
+          git update-index --refresh
           git diff-index --quiet HEAD --
 
   create-asana-task:

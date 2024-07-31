@@ -76,6 +76,10 @@ class TabContentTests: XCTestCase {
 
     @MainActor
     func testWhenPDFContextMenuPrintChosen_printDialogOpens() async throws {
+        try disableInCI()
+
+        XCTFail("Testing that this is really disabled in CI")
+
         let pdfUrl = Bundle(for: Self.self).url(forResource: "test", withExtension: "pdf")!
         // open Tab with PDF
         let tab = Tab(content: .url(pdfUrl, credential: nil, source: .userEntered("")))
