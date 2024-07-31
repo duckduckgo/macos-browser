@@ -310,15 +310,15 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
 
         // Handle the existing destination case:
-
+        let parent: ParentFolderType = (representedObject as? BookmarkFolder).map { $0.id == PseudoFolder.bookmarks.id ? .root : .parent(uuid: $0.id) } ?? .root
         var index = index
         // for folders-only calculate new real index based on the nearest folder index
-        if contentMode == .foldersOnly,
+        if contentMode == .foldersOnly || parent == .root,
            index > -1,
            // get folder before the insertion point (or the first one)
            let nearestObject = (outlineView.child(max(0, index - 1), ofItem: item) as? BookmarkNode)?.representedObject as? BookmarkFolder,
-           // get all the children of a new parent folder
-           let siblings = (representedObject as? BookmarkFolder)?.children ?? bookmarkManager.list?.topLevelEntities {
+           // get all the children of a new parent folder (take actual bookmark list for the root)
+           let siblings = ((parent == .root ? nil : representedObject) as? BookmarkFolder)?.children ?? bookmarkManager.list?.topLevelEntities {
 
             // insert after the nearest item (or in place of the nearest item for index == 0)
             index = (siblings.firstIndex(of: nearestObject) ?? 0) + (index == 0 ? 0 : 1)
@@ -327,7 +327,6 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             index = 0
         }
 
-        let parent: ParentFolderType = (representedObject as? BookmarkFolder).map { $0.id == PseudoFolder.bookmarks.id ? .root : .parent(uuid: $0.id) } ?? .root
         bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: parent) { error in
             if let error = error {
                 os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
