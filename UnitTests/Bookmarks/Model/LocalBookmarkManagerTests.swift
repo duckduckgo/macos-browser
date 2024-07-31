@@ -328,6 +328,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertFalse(results[1].isFolder)
     }
 
+    @MainActor
     func testWhenASearchIsDoneThenItMatchesWithLowercaseResults() {
         let bookmarkCapitalized = Bookmark(id: "1", url: "www.favorite.com", title: "Favorite bookmark", isFavorite: true)
         let bookmarkNonCapitalized = Bookmark(id: "2", url: "www.favoritetwo.com", title: "favorite bookmark", isFavorite: true)
