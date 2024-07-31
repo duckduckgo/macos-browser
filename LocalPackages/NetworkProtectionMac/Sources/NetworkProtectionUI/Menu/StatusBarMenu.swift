@@ -108,7 +108,9 @@ public final class StatusBarMenu: NSObject {
             return
         }
 
-        togglePopover(isOptionKeyPressed: isOptionKeyPressed)
+        Task { @MainActor in
+            togglePopover(isOptionKeyPressed: isOptionKeyPressed)
+        }
     }
 
     private func subscribeToIconUpdates() {
@@ -122,6 +124,7 @@ public final class StatusBarMenu: NSObject {
 
     // MARK: - Popover
 
+    @MainActor
     private func togglePopover(isOptionKeyPressed: Bool) {
         if let popover, popover.isShown {
             popover.close()
@@ -136,20 +139,27 @@ public final class StatusBarMenu: NSObject {
                 currentSitePublisher: Just(CurrentSite?(nil)).eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)
 
-            popover = NetworkProtectionPopover(controller: controller,
-                                               onboardingStatusPublisher: onboardingStatusPublisher,
-                                               statusReporter: statusReporter,
-                                               siteTroubleshootingViewModel: siteTroubleshootingViewModel,
-                                               uiActionHandler: uiActionHandler,
-                                               menuItems: menuItems,
-                                               agentLoginItem: agentLoginItem,
-                                               isMenuBarStatusView: isMenuBarStatusView,
-                                               userDefaults: userDefaults,
-                                               locationFormatter: locationFormatter,
-                                               uninstallHandler: uninstallHandler)
+            let debugInformationViewModel = DebugInformationViewModel(showDebugInformation: isOptionKeyPressed)
+
+            let statusViewModel = NetworkProtectionStatusView.Model(
+                controller: controller,
+                onboardingStatusPublisher: onboardingStatusPublisher,
+                statusReporter: statusReporter,
+                uiActionHandler: uiActionHandler,
+                menuItems: menuItems,
+                agentLoginItem: agentLoginItem,
+                isMenuBarStatusView: isMenuBarStatusView,
+                userDefaults: userDefaults,
+                locationFormatter: locationFormatter,
+                uninstallHandler: uninstallHandler)
+
+            popover = NetworkProtectionPopover(
+                statusViewModel: statusViewModel,
+                statusReporter: statusReporter,
+                siteTroubleshootingViewModel: siteTroubleshootingViewModel,
+                debugInformationViewModel: debugInformationViewModel)
             popover?.behavior = .transient
 
-            popover?.setShowsDebugInformation(isOptionKeyPressed)
             popover?.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         }
     }

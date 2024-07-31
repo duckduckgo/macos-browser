@@ -22,6 +22,7 @@ import Foundation
 extension SiteTroubleshootingView {
 
     public final class Model: ObservableObject {
+
         @Published
         private(set) var isFeatureEnabled = false
 
@@ -43,6 +44,7 @@ extension SiteTroubleshootingView {
 
         private func subscribeToFeatureFlagChanges(_ publisher: AnyPublisher<Bool, Never>) {
             publisher
+                .receive(on: DispatchQueue.main)
                 .assign(to: \.isFeatureEnabled, onWeaklyHeld: self)
                 .store(in: &cancellables)
         }
@@ -50,6 +52,7 @@ extension SiteTroubleshootingView {
         private func subscribeToCurrentSiteChanges(_ currentSitePublisher: AnyPublisher<CurrentSite?, Never>) {
 
             currentSitePublisher
+                .receive(on: DispatchQueue.main)
                 .assign(to: \.currentSite, onWeaklyHeld: self)
                 .store(in: &cancellables)
         }

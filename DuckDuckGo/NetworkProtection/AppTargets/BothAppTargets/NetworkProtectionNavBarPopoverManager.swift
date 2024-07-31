@@ -222,12 +222,11 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                 currentSitePublisher: $currentSite.eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)
 
-            let popover = NetworkProtectionPopover(controller: controller,
-                                                   onboardingStatusPublisher: onboardingStatusPublisher,
-                                                   statusReporter: statusReporter,
-                                                   siteTroubleshootingViewModel: siteTroubleshootingViewModel,
-                                                   uiActionHandler: uiActionHandler,
-                                                   menuItems: {
+            let statusViewModel = NetworkProtectionStatusView.Model(controller: controller,
+                                              onboardingStatusPublisher: onboardingStatusPublisher,
+                                              statusReporter: statusReporter,
+                                              uiActionHandler: uiActionHandler,
+                                              menuItems: {
                 if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
                     return [
                         NetworkProtectionStatusView.Model.MenuItem(
@@ -258,13 +257,19 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                     ]
                 }
             },
-                                                   agentLoginItem: LoginItem.vpnMenu,
-                                                   isMenuBarStatusView: false,
-                                                   userDefaults: .netP,
-                                                   locationFormatter: DefaultVPNLocationFormatter(),
-                                                   uninstallHandler: { [weak self] in
+                                              agentLoginItem: LoginItem.vpnMenu,
+                                              isMenuBarStatusView: false,
+                                              userDefaults: .netP,
+                                              locationFormatter: DefaultVPNLocationFormatter(),
+                                              uninstallHandler: { [weak self] in
                 _ = try? await self?.vpnUninstaller.uninstall(removeSystemExtension: true)
             })
+
+            let popover = NetworkProtectionPopover(
+                statusViewModel: statusViewModel,
+                statusReporter: statusReporter,
+                siteTroubleshootingViewModel: siteTroubleshootingViewModel,
+                debugInformationViewModel: DebugInformationViewModel(showDebugInformation: false))
             popover.delegate = delegate
 
             networkProtectionPopover = popover

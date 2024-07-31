@@ -73,15 +73,6 @@ extension NetworkProtectionStatusView {
         ///
         private let statusReporter: NetworkProtectionStatusReporter
 
-        /// The debug information publisher
-        ///
-        private let debugInformationPublisher: AnyPublisher<Bool, Never>
-
-        /// Whether we're showing debug information
-        ///
-        @Published
-        var showDebugInformation: Bool
-
         public let agentLoginItem: LoginItem?
         private let isMenuBarStatusView: Bool
 
@@ -114,7 +105,6 @@ extension NetworkProtectionStatusView {
         public init(controller: TunnelController,
                     onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
-                    debugInformationPublisher: AnyPublisher<Bool, Never>,
                     uiActionHandler: VPNUIActionHandling,
                     menuItems: @escaping () -> [MenuItem],
                     agentLoginItem: LoginItem?,
@@ -127,7 +117,6 @@ extension NetworkProtectionStatusView {
             self.tunnelController = controller
             self.onboardingStatusPublisher = onboardingStatusPublisher
             self.statusReporter = statusReporter
-            self.debugInformationPublisher = debugInformationPublisher
             self.menuItems = menuItems
             self.agentLoginItem = agentLoginItem
             self.isMenuBarStatusView = isMenuBarStatusView
@@ -147,7 +136,6 @@ extension NetworkProtectionStatusView {
             lastTunnelErrorMessage = statusReporter.connectionErrorObserver.recentValue
             lastControllerErrorMessage = statusReporter.controllerErrorMessageObserver.recentValue
             knownFailure = statusReporter.knownFailureObserver.recentValue
-            showDebugInformation = false
 
             // Particularly useful when unit testing with an initial status of our choosing.
             subscribeToStatusChanges()
@@ -155,7 +143,6 @@ extension NetworkProtectionStatusView {
             subscribeToTunnelErrorMessages()
             subscribeToControllerErrorMessages()
             subscribeToKnownFailures()
-            subscribeToDebugInformationChanges()
             refreshLoginItemStatus()
 
             onboardingStatusPublisher
@@ -252,14 +239,6 @@ extension NetworkProtectionStatusView {
                 .removeDuplicates()
                 .subscribe(on: Self.knownFailureDispatchQueue)
                 .assign(to: \.knownFailure, onWeaklyHeld: self)
-                .store(in: &cancellables)
-        }
-
-        private func subscribeToDebugInformationChanges() {
-            debugInformationPublisher
-                .removeDuplicates()
-                .receive(on: DispatchQueue.main)
-                .assign(to: \.showDebugInformation, onWeaklyHeld: self)
                 .store(in: &cancellables)
         }
 
