@@ -20,14 +20,15 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class DeallocationTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
+    @MainActor
     override func setUp() {
         assert(WindowControllersManager.shared.mainWindowControllers.isEmpty)
     }
 
+    @MainActor
     override func tearDown() {
         WindowsManager.closeWindows()
         for controller in WindowControllersManager.shared.mainWindowControllers {
@@ -53,6 +54,7 @@ final class DeallocationTests: XCTestCase {
 
     // MARK: -
 
+    @MainActor
     func testWindowsDeallocation() {
         autoreleasepool {
 

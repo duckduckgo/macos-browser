@@ -22,11 +22,11 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class FireTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
 
+    @MainActor
     override func tearDown() {
         WindowsManager.closeWindows()
         for controller in WindowControllersManager.shared.mainWindowControllers {
@@ -34,6 +34,7 @@ final class FireTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testWhenBurnAll_ThenAllWindowsAreClosed() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
@@ -63,6 +64,7 @@ final class FireTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
     }
 
+    @MainActor
     func testWhenBurnAll_ThenPinnedTabsArePersisted() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
@@ -97,6 +99,7 @@ final class FireTests: XCTestCase {
         XCTAssertEqual(pinnedTabsManager.tabCollection.tabs.map(\.content.userEditableUrl), pinnedTabs.map(\.content.userEditableUrl))
     }
 
+    @MainActor
     func testWhenBurnAll_ThenAllWebsiteDataAreRemoved() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
@@ -129,6 +132,7 @@ final class FireTests: XCTestCase {
         XCTAssert(zoomLevelsCoordinator.burnAllZoomLevelsCalled)
     }
 
+    @MainActor
     func testWhenBurnAllThenBurningFlagToggles() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
@@ -159,6 +163,7 @@ final class FireTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
     }
 
+    @MainActor
     func testWhenBurnAllIsCalledThenLastSessionStateIsCleared() {
         let fileName = "testStateFileForBurningAllData"
         let fileStore = preparePersistedState(withFileName: fileName)
@@ -177,6 +182,7 @@ final class FireTests: XCTestCase {
         XCTAssertFalse(appStateRestorationManager.canRestoreLastSessionState)
     }
 
+    @MainActor
     func testWhenBurnDomainsIsCalledThenLastSessionStateIsCleared() {
         let fileName = "testStateFileForBurningAllData"
         let fileStore = preparePersistedState(withFileName: fileName)
@@ -195,6 +201,7 @@ final class FireTests: XCTestCase {
         XCTAssertFalse(appStateRestorationManager.canRestoreLastSessionState)
     }
 
+    @MainActor
     func testWhenBurnDomainsIsCalledThenSelectedDomainsZoomLevelsAreBurned() {
         let domainsToBurn: Set<String> = ["test.com", "provola.co.uk"]
         let zoomLevelsCoordinator = MockSavedZoomCoordinator()
@@ -207,6 +214,7 @@ final class FireTests: XCTestCase {
         XCTAssertEqual(zoomLevelsCoordinator.domainsBurned, domainsToBurn)
     }
 
+    @MainActor
     func testWhenBurnVisitIsCalledForTodayThenAllExistingTabsAreCleared() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
@@ -243,6 +251,7 @@ final class FireTests: XCTestCase {
         XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
     }
 
+    @MainActor
     func testWhenBurnVisitIsCalledForOtherDayThenExistingTabsRemainOpen() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
@@ -280,6 +289,7 @@ final class FireTests: XCTestCase {
         XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
     }
 
+    @MainActor
     func preparePersistedState(withFileName fileName: String) -> FileStore {
         let fileStore = FileStoreMock()
         let state = SavedStateMock()

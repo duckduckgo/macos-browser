@@ -216,7 +216,13 @@ final class DuckPlayer {
     private func encodedSettings(with webView: WKWebView?) async -> InitialSetupSettings {
         var isPiPEnabled = webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] == true
 
-        let isAutoplayEnabled = isAutoplayFeatureEnabled && DuckPlayerPreferences.shared.duckPlayerAutoplay
+        var isAutoplayEnabled = DuckPlayerPreferences.shared.duckPlayerAutoplay
+
+        /// If the feature flag is disabled, we want to turn autoPlay to true since this was the default
+        /// https://app.asana.com/0/1204167627774280/1207906550241281/f
+        if !isAutoplayFeatureEnabled {
+            isAutoplayEnabled = true
+        }
 
         // Disable WebView PiP if if the subFeature is off
         if !isPiPFeatureEnabled {
