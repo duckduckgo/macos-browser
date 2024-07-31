@@ -1379,8 +1379,6 @@
 		4BBDEE9328FC14760092FAA6 /* ConnectBitwardenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDEE8F28FC14760092FAA6 /* ConnectBitwardenViewModel.swift */; };
 		4BBDEE9428FC14760092FAA6 /* ConnectBitwardenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDEE9028FC14760092FAA6 /* ConnectBitwardenViewController.swift */; };
 		4BBE0AA727B9B027003B37A8 /* PopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBE0AA627B9B027003B37A8 /* PopUpButton.swift */; };
-		4BBEE8DE2BFEDE3E00E5E111 /* SurveyRemoteMessageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15E42ABB98990083F6DF /* SurveyRemoteMessageTests.swift */; };
-		4BBEE8DF2BFEE07D00E5E111 /* survey-messages.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BCF15E92ABB99470083F6DF /* survey-messages.json */; };
 		4BBF0915282DD40100EE1418 /* TemporaryFileHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF0914282DD40100EE1418 /* TemporaryFileHandler.swift */; };
 		4BBF0917282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF0916282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift */; };
 		4BBF09232830812900EE1418 /* FileSystemDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF09222830812900EE1418 /* FileSystemDSL.swift */; };
@@ -1390,12 +1388,8 @@
 		4BCBE4582BA7E17800FC75A1 /* SubscriptionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4BCBE4572BA7E17800FC75A1 /* SubscriptionUI */; };
 		4BCBE45A2BA7E17800FC75A1 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = 4BCBE4592BA7E17800FC75A1 /* Subscription */; };
 		4BCBE45C2BA7E18500FC75A1 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = 4BCBE45B2BA7E18500FC75A1 /* Subscription */; };
-		4BCF15EC2ABB9AF80083F6DF /* SurveyRemoteMessageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15E42ABB98990083F6DF /* SurveyRemoteMessageTests.swift */; };
-		4BCF15ED2ABB9B180083F6DF /* survey-messages.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BCF15E92ABB99470083F6DF /* survey-messages.json */; };
 		4BD18F01283F0BC500058124 /* BookmarksBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */; };
 		4BD18F05283F151F00058124 /* BookmarksBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BD18F04283F151F00058124 /* BookmarksBar.storyboard */; };
-		4BD57C042AC112DF00B580EE /* SurveyRemoteMessagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57C032AC112DF00B580EE /* SurveyRemoteMessagingTests.swift */; };
-		4BD57C052AC112DF00B580EE /* SurveyRemoteMessagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57C032AC112DF00B580EE /* SurveyRemoteMessagingTests.swift */; };
 		4BDFA4AE27BF19E500648192 /* ToggleableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */; };
 		4BE344EE2B2376DF003FC223 /* VPNFeedbackFormViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE344ED2B2376DF003FC223 /* VPNFeedbackFormViewModelTests.swift */; };
 		4BE344EF2B23786F003FC223 /* VPNFeedbackFormViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE344ED2B2376DF003FC223 /* VPNFeedbackFormViewModelTests.swift */; };
@@ -3421,11 +3415,8 @@
 		4BBF0916282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryFileHandlerTests.swift; sourceTree = "<group>"; };
 		4BBF09222830812900EE1418 /* FileSystemDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemDSL.swift; sourceTree = "<group>"; };
 		4BBF0924283083EC00EE1418 /* FileSystemDSLTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemDSLTests.swift; sourceTree = "<group>"; };
-		4BCF15E42ABB98990083F6DF /* SurveyRemoteMessageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyRemoteMessageTests.swift; sourceTree = "<group>"; };
-		4BCF15E92ABB99470083F6DF /* survey-messages.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "survey-messages.json"; sourceTree = "<group>"; };
 		4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewController.swift; sourceTree = "<group>"; };
 		4BD18F04283F151F00058124 /* BookmarksBar.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BookmarksBar.storyboard; sourceTree = "<group>"; };
-		4BD57C032AC112DF00B580EE /* SurveyRemoteMessagingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyRemoteMessagingTests.swift; sourceTree = "<group>"; };
 		4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleableScrollView.swift; sourceTree = "<group>"; };
 		4BE344ED2B2376DF003FC223 /* VPNFeedbackFormViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNFeedbackFormViewModelTests.swift; sourceTree = "<group>"; };
 		4BE3A6C02C16BEB1003FC378 /* VPNRedditSessionWorkaround.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNRedditSessionWorkaround.swift; sourceTree = "<group>"; };
@@ -5936,14 +5927,6 @@
 			path = View;
 			sourceTree = "<group>";
 		};
-		4BBEE8E12BFEE54100E5E111 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				4BCF15E92ABB99470083F6DF /* survey-messages.json */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
 		4BCF15E32ABB987F0083F6DF /* NetworkProtection */ = {
 			isa = PBXGroup;
 			children = (
@@ -5981,14 +5964,11 @@
 		4BF6961B28BE90E800D402D4 /* HomePage */ = {
 			isa = PBXGroup;
 			children = (
-				4BBEE8E12BFEE54100E5E111 /* Resources */,
 				56534DEB29DF251C00121467 /* Mocks */,
 				4BF6961C28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift */,
 				569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */,
 				56D145ED29E6DAD900E3488A /* DataImportProviderTests.swift */,
 				560C3FFB2BC9911000F589CE /* PermanentSurveyManagerTests.swift */,
-				4BD57C032AC112DF00B580EE /* SurveyRemoteMessagingTests.swift */,
-				4BCF15E42ABB98990083F6DF /* SurveyRemoteMessageTests.swift */,
 			);
 			path = HomePage;
 			sourceTree = "<group>";
@@ -9310,7 +9290,6 @@
 				3706FE8C293F661700E42796 /* atb-with-update.json in Resources */,
 				9FBD84622BB3BC6400220859 /* Origin-empty.txt in Resources */,
 				3706FE8D293F661700E42796 /* DataImportResources in Resources */,
-				4BBEE8DF2BFEE07D00E5E111 /* survey-messages.json in Resources */,
 				3706FE8E293F661700E42796 /* atb.json in Resources */,
 				9FBD845E2BB3B80300220859 /* Origin.txt in Resources */,
 				3706FE8F293F661700E42796 /* DuckDuckGo-ExampleCrash.ips in Resources */,
@@ -9506,7 +9485,6 @@
 				B65CD8D52B316FCA00A595BB /* __Snapshots__ in Resources */,
 				B69B50522726CD8100758A2B /* atb.json in Resources */,
 				4B70C00127B0793D000386ED /* DuckDuckGo-ExampleCrash.ips in Resources */,
-				4BCF15ED2ABB9B180083F6DF /* survey-messages.json in Resources */,
 				B67C6C422654BF49006C872E /* DuckDuckGo-Symbol.jpg in Resources */,
 				B69B50552726CD8100758A2B /* invalid.json in Resources */,
 				9FBD84612BB3BC6400220859 /* Origin-empty.txt in Resources */,
@@ -10795,7 +10773,6 @@
 				B626A7652992506A00053070 /* SerpHeadersNavigationResponderTests.swift in Sources */,
 				9F6434712BECBA2800D2D8A0 /* SubscriptionRedirectManagerTests.swift in Sources */,
 				9F26060C2B85C20B00819292 /* AddEditBookmarkDialogViewModelTests.swift in Sources */,
-				4BBEE8DE2BFEDE3E00E5E111 /* SurveyRemoteMessageTests.swift in Sources */,
 				562532A12BC069190034D316 /* ZoomPopoverViewModelTests.swift in Sources */,
 				3706FE28293F661700E42796 /* BookmarkTests.swift in Sources */,
 				3706FE29293F661700E42796 /* SuggestionContainerViewModelTests.swift in Sources */,
@@ -10926,7 +10903,6 @@
 				3706FE71293F661700E42796 /* SavedStateMock.swift in Sources */,
 				3706FE72293F661700E42796 /* ClickToLoadTDSTests.swift in Sources */,
 				3706FE73293F661700E42796 /* PermissionManagerMock.swift in Sources */,
-				4BD57C052AC112DF00B580EE /* SurveyRemoteMessagingTests.swift in Sources */,
 				3706FE74293F661700E42796 /* WebsiteDataStoreMock.swift in Sources */,
 				3706FE75293F661700E42796 /* WebsiteBreakageReportTests.swift in Sources */,
 				56D145EF29E6DAD900E3488A /* DataImportProviderTests.swift in Sources */,
@@ -12115,7 +12091,6 @@
 				3776583127F8325B009A6B35 /* AutofillPreferencesTests.swift in Sources */,
 				373B2F852C387B830013A94B /* ActiveRemoteMessageModelTests.swift in Sources */,
 				B67C6C472654C643006C872E /* FileManagerExtensionTests.swift in Sources */,
-				4BD57C042AC112DF00B580EE /* SurveyRemoteMessagingTests.swift in Sources */,
 				B69B50482726C5C200758A2B /* StatisticsLoaderTests.swift in Sources */,
 				9F6434702BECBA2800D2D8A0 /* SubscriptionRedirectManagerTests.swift in Sources */,
 				56BA1E872BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift in Sources */,
@@ -12220,7 +12195,6 @@
 				AA91F83927076F1900771A0D /* PrivacyIconViewModelTests.swift in Sources */,
 				9F9C49F62BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift in Sources */,
 				4B723E0726B0003E00E14D75 /* CSVImporterTests.swift in Sources */,
-				4BCF15EC2ABB9AF80083F6DF /* SurveyRemoteMessageTests.swift in Sources */,
 				B62EB47C25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift in Sources */,
 				9F0FFFBB2BCCAEC2007C87DD /* AddEditBookmarkFolderDialogViewModelMock.swift in Sources */,
 				4BBC16A527C488C900E00A38 /* DeviceAuthenticatorTests.swift in Sources */,
