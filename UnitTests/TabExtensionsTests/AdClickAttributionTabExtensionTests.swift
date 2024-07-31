@@ -29,7 +29,6 @@ import Navigation
 // swiftlint:disable opening_brace
 
 @available(macOS 12.0, *)
-@MainActor
 class AdClickAttributionTabExtensionTests: XCTestCase {
     struct URLs {
         let url1 = URL(string: "https://my-host.com/")!
@@ -78,6 +77,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     var navExtension: TestsClosureNavigationResponderTabExtension!
     var decidePolicy: (NavigationAction) -> NavigationActionPolicy? = { _ in .next }
 
+    @MainActor
     override func setUp() {
         contentBlockingMock = ContentBlockingMock(adClickAttributionEnabled: true)
         privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
@@ -132,6 +132,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
 
     // MARK: - Tests
 
+    @MainActor
     func testWhenChildTabCreated_AdClickAttributionStateIsSet() {
 
         class MockAttribution: TabExtension, AdClickAttributionProtocol {
@@ -185,6 +186,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         XCTAssertEqual(childTab.adClickAttribution?.currentAttributionState, mockAttribution.currentAttributionState)
     }
 
+    @MainActor
     func testWhenChildTabCreatedAndScriptsAlreadyLoaded_AdClickAttributionStateIsSet() {
 
         class MockAttribution: TabExtension, AdClickAttributionProtocol {
@@ -236,6 +238,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         XCTAssertEqual(childTab.adClickAttribution?.currentAttributionState, mockAttribution.currentAttributionState)
     }
 
+    @MainActor
     func testWhenNavigationSucceeds_eventsSent() throws {
         // disable waiting for CBR compilation on navigation
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
@@ -277,6 +280,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    @MainActor
     func testWhenNavigationRedirects_didFinishNotCalledForRedirectedNavigation() throws {
         // disable waiting for CBR compilation on navigation
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
@@ -331,6 +335,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    @MainActor
     func testWhenDeveloperRedirects_didFailNotCalledForRedirectedNavigation() throws {
         // disable waiting for CBR compilation on navigation
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
@@ -392,6 +397,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    @MainActor
     func testWhenNavigationFails_eventsSent() {
         // disable waiting for CBR compilation on navigation
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
@@ -474,6 +480,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    @MainActor
     func testOnLogicDidRequestRulesApplication_localContentRuleListIsInstalled() {
         privacyConfiguration.isFeatureKeyEnabled = { feature, _ in
             return feature == .contentBlocking
@@ -517,6 +524,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         withExtendedLifetime(tab) {}
     }
 
+    @MainActor
     func testOnNilRulesApplication_supplementaryTrackerDataIsCleared() {
         privacyConfiguration.isFeatureKeyEnabled = { feature, _ in
             return feature == .contentBlocking
@@ -544,6 +552,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         withExtendedLifetime(tab) {}
     }
 
+    @MainActor
     func testOnRulesApplicationWithContentBlockingDisabled_localContentRuleListIsRemoved() {
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
@@ -575,6 +584,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         withExtendedLifetime(tab) {}
     }
 
+    @MainActor
     func testOnRulesApplicationWithNilVendor_localContentRuleListIsRemoved() {
         privacyConfiguration.isFeatureKeyEnabled = { feature, _ in
             return feature == .contentBlocking
@@ -616,6 +626,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         withExtendedLifetime(tab) {}
     }
 
+    @MainActor
     func testOnTrackerDataupdated_onRequestDetectedIsCalled() {
         let tab = Tab(content: .none, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
         DispatchQueue.main.async {

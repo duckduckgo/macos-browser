@@ -19,9 +19,9 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 class BookmarkOutlineViewDataSourceTests: XCTestCase {
 
+    @MainActor
     func testWhenOutlineViewExpandsItem_ThenTheObjectIDIsAddedToExpandedItems() {
         let mockFolder = BookmarkFolder.mock
         let treeController = createTreeController(with: [mockFolder])
@@ -34,6 +34,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertEqual(dataSource.expandedNodesIDs, [mockFolder.id])
     }
 
+    @MainActor
     func testWhenOutlineViewCollapsesItem_ThenTheObjectIDIsRemovedFromExpandedItems() {
         let mockFolder = BookmarkFolder.mock
         let treeController = createTreeController(with: [mockFolder])
@@ -51,6 +52,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertEqual(dataSource.expandedNodesIDs, [])
     }
 
+    @MainActor
     func testWhenGettingPasteboardWriterForItem_AndItemIsBookmarkEntity_ThenWriterIsReturned() {
         let mockFolder = BookmarkFolder.mock
         let mockOutlineView = NSOutlineView(frame: .zero)
@@ -65,6 +67,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertEqual(writerDictionary?["id"], mockFolder.id)
     }
 
+    @MainActor
     func testWhenGettingPasteboardWriterForItem_AndItemIsNotBookmarkEntity_ThenNilIsReturned() {
         let mockFolder = BookmarkFolder.mock
         let mockOutlineView = NSOutlineView(frame: .zero)
@@ -76,6 +79,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertNil(writer)
     }
 
+    @MainActor
     func testWhenValidatingBookmarkDrop_AndDestinationIsFolder_ThenMoveDragOperationIsReturned() {
         let mockDestinationFolder = BookmarkFolder.mock
         let bookmarkStoreMock = BookmarkStoreMock()
@@ -96,6 +100,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertEqual(result, .move)
     }
 
+    @MainActor
     func testWhenValidatingFolderDrop_AndDestinationIsFolder_ThenMoveDragOperationIsReturned() {
         let mockDestinationFolder = BookmarkFolder.mock
         let bookmarkStoreMock = BookmarkStoreMock()
@@ -116,6 +121,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertEqual(result, .move)
     }
 
+    @MainActor
     func testWhenValidatingFolderDrop_AndDestinationIsSameFolder_ThenNoDragOperationIsReturned() {
         let mockDestinationFolder = BookmarkFolder.mock
         let bookmarkStoreMock = BookmarkStoreMock()
@@ -136,6 +142,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertEqual(result, .none)
     }
 
+    @MainActor
     func testWhenValidatingFolderDrop_AndDestinationIsAncestor_ThenNoneIsReturned() {
         let childFolder = BookmarkFolder(id: UUID().uuidString, title: "Child")
         let rootFolder = BookmarkFolder(id: UUID().uuidString, title: "Root", children: [childFolder])
@@ -159,6 +166,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertEqual(result, .none)
     }
 
+    @MainActor
     func testWhenCellFiresDelegate_ThenOnMenuRequestedActionShouldFire() throws {
         // GIVEN
         let mockFolder = BookmarkFolder.mock
@@ -181,6 +189,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertEqual(cell, capturedCell)
     }
 
+    @MainActor
     func testWhenShowMenuButtonOnHoverIsTrue_ThenCellShouldHaveShouldMenuButtonFlagTrue() throws {
         // GIVEN
         let mockFolder = BookmarkFolder.mock
@@ -196,6 +205,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertTrue(cell.shouldShowMenuButton)
     }
 
+    @MainActor
     func testWhenShowMenuButtonOnHoverIsFalse_ThenCellShouldHaveShouldMenuButtonFlagFalse() throws {
         // GIVEN
         let mockFolder = BookmarkFolder.mock
@@ -213,6 +223,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
 
     // MARK: - Private
 
+    @MainActor
     private func createTreeController(with bookmarks: [BaseBookmarkEntity]) -> BookmarkTreeController {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
