@@ -28,9 +28,10 @@ final class UpdateNotificationPresenter {
         os_log("Notification presented: \(text)", log: .updates)
 
         DispatchQueue.main.async {
-            guard let mainWindow = NSApp.mainWindow as? MainWindow,
-                  let windowController = mainWindow.windowController as? MainWindowController,
-                  let button = windowController.mainViewController.navigationBarViewController.optionsButton else { return }
+            guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController ?? WindowControllersManager.shared.mainWindowControllers.last,
+                  let button = windowController.mainViewController.navigationBarViewController.optionsButton else {
+                return
+            }
 
             let buttonAction: (() -> Void)? = { [weak self] in
                 self?.openUpdatesPage()
