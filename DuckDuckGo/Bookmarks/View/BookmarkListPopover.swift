@@ -23,7 +23,7 @@ final class BookmarkListPopover: NSPopover {
 
     private let mode: BookmarkListViewController.Mode
     private let bookmarkManager: BookmarkManager
-    private var rootFolder: BookmarkFolder?
+    private(set) var rootFolder: BookmarkFolder?
 
     private var preferredEdge: NSRectEdge?
     private weak var positioningView: NSView?

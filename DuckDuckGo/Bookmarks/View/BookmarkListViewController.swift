@@ -726,7 +726,7 @@ final class BookmarkListViewController: NSViewController {
         guard let mainWindow = positioningView.window,
               let screenFrame = mainWindow.screen?.visibleFrame else { return }
 
-        reloadData()
+        reloadData(withRootFolder: representedObject as? BookmarkFolder)
         outlineView.highlightedRow = nil
         scrollView.contentView.bounds.origin = .zero // scroll to top
 
@@ -859,6 +859,11 @@ final class BookmarkListViewController: NSViewController {
         // bookmark hierarchy.
         var rootFolder = rootFolder
         if rootFolder == nil, let oldRootFolder = self.representedObject as? BookmarkFolder {
+            if oldRootFolder.id == PseudoFolder.bookmarks.id {
+                // reloadData for clipped Bookmarks will be triggered with updated rootFolder
+                // from BookmarksBarViewController.bookmarksBarViewModelReloadedData
+                return
+            }
             rootFolder = bookmarkManager.getBookmarkFolder(withId: oldRootFolder.id)
         }
 

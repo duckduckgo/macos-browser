@@ -263,6 +263,11 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
 
     func bookmarksBarViewModelReloadedData() {
         bookmarksBarCollectionView.reloadData()
+
+        if let bookmarkListPopover, bookmarkListPopover.isShown,
+           bookmarkListPopover.rootFolder?.id == PseudoFolder.bookmarks.id {
+            bookmarkListPopover.reloadData(withRootFolder: clippedItemsBookmarkFolder())
+        }
     }
 
     func mouseDidHover(over sender: Any) {
