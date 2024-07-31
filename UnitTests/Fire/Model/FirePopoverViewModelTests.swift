@@ -19,9 +19,9 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class FirePopoverViewModelTests: XCTestCase {
 
+    @MainActor
     private func makeViewModel(with tabCollectionViewModel: TabCollectionViewModel) -> FirePopoverViewModel {
         FirePopoverViewModel(
             fireViewModel: .init(),
