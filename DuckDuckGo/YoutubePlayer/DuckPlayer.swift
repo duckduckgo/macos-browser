@@ -62,11 +62,11 @@ struct InitialPlayerSettings: Codable {
     struct PIP: Codable {
         let state: State
     }
-    
+
     struct Platform: Codable {
         let name: String
     }
-    
+
     enum Locale: String, Codable {
         case en
     }
@@ -79,7 +79,7 @@ struct InitialPlayerSettings: Codable {
         case enabled
         case disabled
     }
-    
+
     enum Environment: String, Codable {
         case development
         case production
@@ -275,7 +275,7 @@ final class DuckPlayer {
     private func encodedOverlaySettings(with webView: WKWebView?) async -> InitialOverlaySettings {
         var isPiPEnabled = webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] == true
         let userValues = encodeUserValues()
-        
+
         return InitialOverlaySettings(userValues: userValues)
     }
 
