@@ -80,6 +80,7 @@ final class BookmarksBarViewModel: NSObject {
     private var existingItemDraggingIndexPath: IndexPath?
     private var preventClicks = false
 
+    private var collectionViewItemCache = [IndexPath: BookmarksBarCollectionViewItem]()
     private var collectionViewItemSizeCache: [String: CGFloat] = [:]
     private var bookmarksBarItemsTotalWidth: CGFloat = 0
 
@@ -285,16 +286,33 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
         return bookmarksBarItems.count
     }
 
-    func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
-        let genericCollectionViewItem = collectionView.makeItem(withIdentifier: BookmarksBarCollectionViewItem.identifier, for: indexPath)
-
-        guard let bookmarksCollectionViewItem = genericCollectionViewItem as? BookmarksBarCollectionViewItem else {
-            return genericCollectionViewItem
+    /// try to reuse an item at the same IndexPath that is requested to keep the same view position
+    /// when an item with another IndexPath is used, the Bookmarks Menu popover changes its placement as it‘s tied to the original view
+    /// or items hovered state is blinking under mouse cursor when bookmarks are reloaded
+    private func collectionView(_ collectionView: NSCollectionView, dequeueReusableItemFor indexPath: IndexPath) -> BookmarksBarCollectionViewItem {
+        if let item = collectionViewItemCache.removeValue(forKey: indexPath) {
+            return item
         }
+
+        repeat {
+            let item = collectionView.makeItem(withIdentifier: BookmarksBarCollectionViewItem.identifier, for: indexPath) as! BookmarksBarCollectionViewItem // swiftlint:disable:this force_cast
+            // if the returned item is being reused but doesn‘t match our IndexPath – cache it for the future use
+            if let itemIndexPath = item.indexPath, itemIndexPath != indexPath {
+                // cache items for other IndexPaths
+                collectionViewItemCache[itemIndexPath] = item
+            } else /* if item.indexPath == nil || item.indexPath == indexPath */ {
+                return item // that‘s either our item or a newly created one
+            }
+        } while true
+    }
+
+    func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
+        let bookmarksCollectionViewItem = self.collectionView(collectionView, dequeueReusableItemFor: indexPath)
 
         let bookmarksBarItem = bookmarksBarItems[indexPath.item]
         bookmarksCollectionViewItem.delegate = self
         bookmarksCollectionViewItem.updateItem(from: bookmarksBarItem.entity, isInteractionPrevented: isInteractionPrevented)
+        bookmarksCollectionViewItem.indexPath = indexPath
 
         return bookmarksCollectionViewItem
     }
