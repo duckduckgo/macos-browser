@@ -399,8 +399,6 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case burnerTabMisplaced
 
-    case surveyRemoteMessageFetchingFailed
-    case surveyRemoteMessageStorageFailed
     case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
 
     // Tracks installation without tracking retention.
@@ -984,8 +982,6 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .burnerTabMisplaced: return "burner_tab_misplaced"
 
-        case .surveyRemoteMessageFetchingFailed: return "survey_remote_message_fetching_failed"
-        case .surveyRemoteMessageStorageFailed: return "survey_remote_message_storage_failed"
         case .loginItemUpdateError: return "login-item_update-error"
 
             // Installation Attribution
