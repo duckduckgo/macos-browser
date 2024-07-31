@@ -135,11 +135,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
 
-    // Survey
-    case surveyRemoteMessageDisplayed(messageID: String)
-    case surveyRemoteMessageDismissed(messageID: String)
-    case surveyRemoteMessageOpened(messageID: String)
-
     // VPN
     case vpnBreakageReport(category: String, description: String, metadata: String)
 
@@ -626,12 +621,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .vpnBreakageReport:
             return "m_mac_vpn_breakage_report"
 
-        case .surveyRemoteMessageDisplayed(let messageID):
-            return "m_mac_survey_remote_message_displayed_\(messageID)"
-        case .surveyRemoteMessageDismissed(let messageID):
-            return "m_mac_survey_remote_message_dismissed_\(messageID)"
-        case .surveyRemoteMessageOpened(let messageID):
-            return "m_mac_survey_remote_message_opened_\(messageID)"
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
 
