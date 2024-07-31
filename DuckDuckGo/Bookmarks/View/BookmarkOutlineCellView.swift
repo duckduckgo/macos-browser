@@ -41,6 +41,8 @@ final class BookmarkOutlineCellView: NSTableCellView {
     private lazy var menuButton = NSButton(title: "", image: .settings, target: self, action: #selector(cellMenuButtonClicked))
     private lazy var favoriteImageView = NSImageView()
 
+    private var leadingConstraint = NSLayoutConstraint()
+
     var highlight = false {
         didSet {
             updateUI()
@@ -124,10 +126,12 @@ final class BookmarkOutlineCellView: NSTableCellView {
     }
 
     private func setupLayout() {
+        leadingConstraint = faviconImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5)
+
         NSLayoutConstraint.activate([
             faviconImageView.heightAnchor.constraint(equalToConstant: 16),
             faviconImageView.widthAnchor.constraint(equalToConstant: 16),
-            faviconImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            leadingConstraint,
             faviconImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
 
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor)
@@ -236,7 +240,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
         return sizingCell.frame.width + 6
     }
 
-    func update(from object: Any, isMenuPopover: Bool) {
+    func update(from object: Any, isSearch: Bool = false, isMenuPopover: Bool) {
         let representedObject = (object as? BookmarkNode)?.representedObject ?? object
         switch representedObject {
         case let bookmark as Bookmark:
@@ -252,7 +256,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
         }
     }
 
-    func update(from bookmark: Bookmark, showURL: Bool) {
+    func update(from bookmark: Bookmark, isSearch: Bool = false, showURL: Bool) {
         faviconImageView.image = bookmark.favicon(.small) ?? .bookmarkDefaultFavicon
         faviconImageView.isHidden = false
         titleLabel.stringValue = bookmark.title
@@ -272,9 +276,10 @@ final class BookmarkOutlineCellView: NSTableCellView {
         favoriteImageView.isHidden = favoriteImageView.image == nil
 
         highlight = false
+        updateConstraints(isSearch: isSearch)
     }
 
-    func update(from folder: BookmarkFolder, showChevron: Bool) {
+    func update(from folder: BookmarkFolder, isSearch: Bool = false, showChevron: Bool) {
         faviconImageView.image = .folder
         faviconImageView.isHidden = false
         titleLabel.stringValue = folder.title
@@ -294,6 +299,11 @@ final class BookmarkOutlineCellView: NSTableCellView {
         }
 
         highlight = false
+        updateConstraints(isSearch: isSearch)
+    }
+
+    private func updateConstraints(isSearch: Bool) {
+        leadingConstraint.constant = isSearch ? -8 : 5
     }
 
     func update(from pseudoFolder: PseudoFolder) {

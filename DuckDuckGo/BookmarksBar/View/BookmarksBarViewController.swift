@@ -277,6 +277,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             view = button
         }
         if let bookmarkFolder, let view {
+            // already shown?
             guard (bookmarkListPopover.viewController.representedObject as? BookmarkFolder)?.id != bookmarkFolder.id else { return }
             showSubmenu(for: bookmarkFolder, fromView: view)
         } else {

@@ -19,9 +19,11 @@
 import Foundation
 
 protocol BookmarkTreeControllerDataSource: AnyObject {
+    func treeController(childNodesFor: BookmarkNode, sortMode: BookmarksSortMode) -> [BookmarkNode]
+}
 
-    func treeController(_ treeController: BookmarkTreeController, childNodesFor: BookmarkNode) -> [BookmarkNode]
-
+protocol BookmarkTreeControllerSearchDataSource: AnyObject {
+    func nodes(forSearchQuery searchQuery: String, sortMode: BookmarksSortMode) -> [BookmarkNode]
 }
 
 final class BookmarkTreeController {
@@ -31,17 +33,27 @@ final class BookmarkTreeController {
     private(set) var rootNode: BookmarkNode
     private let isBookmarksBarMenu: Bool
     private weak var dataSource: BookmarkTreeControllerDataSource?
+    private weak var searchDataSource: BookmarkTreeControllerSearchDataSource?
 
-    init(dataSource: BookmarkTreeControllerDataSource, rootNode: BookmarkNode? = nil, isBookmarksBarMenu: Bool = false) {
+    init(dataSource: BookmarkTreeControllerDataSource,
+         sortMode: BookmarksSortMode,
+         searchDataSource: BookmarkTreeControllerSearchDataSource? = nil,
+         rootNode: BookmarkNode? = nil,
+         isBookmarksBarMenu: Bool = false) {
         self.dataSource = dataSource
+        self.searchDataSource = searchDataSource
         self.rootNode = rootNode ?? BookmarkNode.genericRootNode()
         self.isBookmarksBarMenu = isBookmarksBarMenu
 
-        rebuild()
+        rebuild(for: sortMode)
     }
 
-    convenience init(dataSource: BookmarkTreeControllerDataSource, rootFolder: BookmarkFolder?, isBookmarksBarMenu: Bool) {
-        self.init(dataSource: dataSource, rootNode: rootFolder.map(Self.rootNode(from:)), isBookmarksBarMenu: isBookmarksBarMenu)
+    convenience init(dataSource: BookmarkTreeControllerDataSource,
+                     sortMode: BookmarksSortMode,
+                     searchDataSource: BookmarkTreeControllerSearchDataSource? = nil,
+                     rootFolder: BookmarkFolder?,
+                     isBookmarksBarMenu: Bool) {
+        self.init(dataSource: dataSource, sortMode: sortMode, searchDataSource: searchDataSource, rootNode: rootFolder.map(Self.rootNode(from:)), isBookmarksBarMenu: isBookmarksBarMenu)
     }
 
     private static func rootNode(from rootFolder: BookmarkFolder) -> BookmarkNode {
@@ -65,13 +77,15 @@ final class BookmarkTreeController {
 
     // MARK: - Public
 
-    func rebuild(withRootFolder rootFolder: BookmarkFolder) {
-        self.rootNode = Self.rootNode(from: rootFolder)
-        rebuild()
+    func rebuild(forSearchQuery searchQuery: String, sortMode: BookmarksSortMode) {
+        rootNode.childNodes = searchDataSource?.nodes(forSearchQuery: searchQuery, sortMode: sortMode) ?? []
     }
 
-    func rebuild() {
-        rebuildChildNodes(node: rootNode)
+    func rebuild(for sortMode: BookmarksSortMode, withRootFolder rootFolder: BookmarkFolder? = nil) {
+        if let rootFolder {
+            self.rootNode = Self.rootNode(from: rootFolder)
+        }
+        rebuildChildNodes(node: rootNode, sortMode: sortMode)
     }
 
     func visitNodes(with visitBlock: (BookmarkNode) -> Void) {
@@ -79,21 +93,27 @@ final class BookmarkTreeController {
     }
 
     func node(representing object: AnyObject) -> BookmarkNode? {
-        return nodeInArrayRepresentingObject(nodes: [rootNode], representedObject: object)
+        return nodeInArrayRepresentingObject(nodes: [rootNode]) { $0.representedObjectEquals(object) }
+    }
+
+    func findNodeWithId(representing object: AnyObject) -> BookmarkNode? {
+        return nodeInArrayRepresentingObject(nodes: [rootNode]) { $0.representedObjectHasSameId(object) }
     }
 
     // MARK: - Private
 
-    private func nodeInArrayRepresentingObject(nodes: [BookmarkNode], representedObject: AnyObject) -> BookmarkNode? {
-        for node in nodes {
-            if node.representedObjectEquals(representedObject) {
+    private func nodeInArrayRepresentingObject(nodes: [BookmarkNode], match: (BookmarkNode) -> Bool) -> BookmarkNode? {
+        var stack: [BookmarkNode] = nodes
+
+        while !stack.isEmpty {
+            let node = stack.removeLast()
+
+            if match(node) {
                 return node
             }
 
             if node.canHaveChildNodes {
-                if let foundNode = nodeInArrayRepresentingObject(nodes: node.childNodes, representedObject: representedObject) {
-                    return foundNode
-                }
+                stack.append(contentsOf: node.childNodes)
             }
         }
 
@@ -106,10 +126,10 @@ final class BookmarkTreeController {
     }
 
     @discardableResult
-    private func rebuildChildNodes(node: BookmarkNode) -> Bool {
+    private func rebuildChildNodes(node: BookmarkNode, sortMode: BookmarksSortMode = .manual) -> Bool {
         guard node.canHaveChildNodes else { return false }
 
-        let childNodes: [BookmarkNode] = dataSource?.treeController(self, childNodesFor: node) ?? []
+        let childNodes: [BookmarkNode] = dataSource?.treeController(childNodesFor: node, sortMode: sortMode) ?? []
         var childNodesDidChange = childNodes != node.childNodes
 
         if childNodesDidChange {
@@ -131,7 +151,7 @@ final class BookmarkTreeController {
 
         } else {
             childNodes.forEach { childNode in
-                if rebuildChildNodes(node: childNode) {
+                if rebuildChildNodes(node: childNode, sortMode: sortMode) {
                     childNodesDidChange = true
                 }
             }

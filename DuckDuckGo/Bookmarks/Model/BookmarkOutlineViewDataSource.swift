@@ -37,10 +37,16 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     @Published var selectedFolders: [BookmarkFolder] = []
 
-    private let treeController: BookmarkTreeController
-    private(set) var expandedNodesIDs = Set<String>()
+    let treeController: BookmarkTreeController
 
     private let contentMode: ContentMode
+    private(set) var expandedNodesIDs = Set<String>()
+    private(set) var isSearching = false
+
+    /// When a drag and drop to a folder happens while in search, we need to stor the destination folder
+    /// so we can expand the tree to the destination folder once the drop finishes.
+    private(set) var dragDestinationFolderInSearchMode: BookmarkFolder?
+
     private let bookmarkManager: BookmarkManager
     private let showMenuButtonOnHover: Bool
     private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
@@ -50,6 +56,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         contentMode: ContentMode,
         bookmarkManager: BookmarkManager,
         treeController: BookmarkTreeController,
+        sortMode: BookmarksSortMode,
         showMenuButtonOnHover: Bool = true,
         onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)? = nil,
         presentFaviconsFetcherOnboarding: (() -> Void)? = nil
@@ -64,8 +71,15 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         super.init()
     }
 
-    func reloadData() {
-        treeController.rebuild()
+    func reloadData(with sortMode: BookmarksSortMode, withRootFolder rootFolder: BookmarkFolder? = nil) {
+        isSearching = false
+        dragDestinationFolderInSearchMode = nil
+        treeController.rebuild(for: sortMode, withRootFolder: rootFolder)
+    }
+
+    func reloadData(forSearchQuery searchQuery: String, sortMode: BookmarksSortMode) {
+        isSearching = true
+        treeController.rebuild(forSearchQuery: searchQuery, sortMode: sortMode)
     }
 
     // MARK: - Private
@@ -140,7 +154,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             ?? BookmarkOutlineCellView(identifier: .init(BookmarkOutlineCellView.className()))
         cell.shouldShowMenuButton = showMenuButtonOnHover
         cell.delegate = self
-        cell.update(from: node, isMenuPopover: contentMode == .bookmarksMenu)
+        cell.update(from: node, isSearch: isSearching, isMenuPopover: contentMode == .bookmarksMenu)
 
         if let bookmark = node.representedObject as? Bookmark, bookmark.favicon(.small) == nil {
             presentFaviconsFetcherOnboarding?()
@@ -173,6 +187,15 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                 || (destinationNode.representedObject as? PseudoFolder == .bookmarks) {
                 return .move
             }
+            return .none
+        }
+
+        if isSearching {
+            if let destinationFolder = destinationNode.representedObject as? BookmarkFolder {
+                self.dragDestinationFolderInSearchMode = destinationFolder
+                return .move
+            }
+
             return .none
         }
 
@@ -238,9 +261,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         let containsDescendantOfDestination = draggedFolders.contains { draggedFolder in
             let folder = BookmarkFolder(id: draggedFolder.id, title: draggedFolder.name, parentFolderUUID: draggedFolder.parentFolderUUID, children: draggedFolder.children)
 
-            guard let draggedNode = treeController.node(representing: folder) else {
-                return false
-            }
+            guard let draggedNode = treeController.findNodeWithId(representing: folder) else { return false }
 
             let descendant = draggedNode.descendantNodeRepresenting(object: destination.representedObject)
 

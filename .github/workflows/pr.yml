@@ -58,7 +58,7 @@ jobs:
 
     name: Test Shell Scripts
 
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
     - name: Check out the code
