@@ -647,12 +647,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .pproFeedbackSubmitScreenShow:
             return "m_mac_ppro_feedback_submit-screen_show"
 
-        case .surveyRemoteMessageDisplayed(let messageID):
-            return "m_mac_survey_remote_message_displayed_\(messageID)"
-        case .surveyRemoteMessageDismissed(let messageID):
-            return "m_mac_survey_remote_message_dismissed_\(messageID)"
-        case .surveyRemoteMessageOpened(let messageID):
-            return "m_mac_survey_remote_message_opened_\(messageID)"
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
 
