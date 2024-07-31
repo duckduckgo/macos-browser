@@ -152,7 +152,7 @@ final class URLEventHandler {
             case VPNAppLaunchCommand.showSettings.launchURL:
                 WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
             case VPNAppLaunchCommand.shareFeedback.launchURL:
-                WindowControllersManager.shared.showShareFeedbackModal()
+                WindowControllersManager.shared.showShareFeedbackModal(source: .vpn)
             case VPNAppLaunchCommand.justOpen.launchURL:
                 WindowControllersManager.shared.showMainWindow()
             case VPNAppLaunchCommand.showVPNLocations.launchURL:

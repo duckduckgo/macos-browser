@@ -42,8 +42,8 @@ extension UserText {
     static let networkProtectionInviteSuccessMessage = "DuckDuckGo's VPN secures all of your device's Internet traffic anytime, anywhere."
 
     // MARK: - Navigation Bar Status View
-    // "network.protection.navbar.status.view.share.feedback" - Menu item for 'Share VPN Feedback' in the VPN status view that's shown in the navigation bar
-    static let networkProtectionNavBarStatusViewShareFeedback = "Share VPN Feedback…"
+    // "network.protection.navbar.status.view.share.feedback" - Menu item for 'Share Feedback' in the VPN status view that's shown in the navigation bar
+    static let networkProtectionNavBarStatusViewShareFeedback = "Share Feedback…"
     // "network.protection.status.menu.vpn.settings" - The status menu 'VPN Settings' menu item
     static let networkProtectionNavBarStatusMenuVPNSettings = "VPN Settings…"
     // "network.protection.status.menu.faq" - The status menu 'FAQ' menu item
@@ -73,8 +73,24 @@ extension UserText {
 extension UserText {
 
     // MARK: - Feedback Form
-    // "vpn.feedback-form.title" - Title for each screen of the VPN feedback form
-    static let vpnFeedbackFormTitle = "Help Improve the DuckDuckGo VPN"
+    // "feedback-form.title" - Title for each screen of the feedback form
+    static let feedbackFormTitle = "Help Improve Privacy Pro"
+    // "general.feedback-form.category.select-feature" - Title for the feature selection state of the general feedback form
+    static let generalFeedbackFormCategorySelect = "Select a category"
+    // "general.feedback-form.category.ppro" - Description for the feedback form when the issue is related to subscription and payments
+    static let generalFeedbackFormCategoryPPro = "Subscription and Payments"
+    // "general.feedback-form.category.vpn" - Description for the feedback form when the issue is related to VPN
+    static let generalFeedbackFormCategoryVPN = "VPN"
+    // "general.feedback-form.category.pir" - Description for the feedback form when the issue is related to Personal Info Removal (PIR)
+    static let generalFeedbackFormCategoryPIR = "Personal Info Removal"
+    // "general.feedback-form.category.itr" - Description for the feedback form when the issue is related to Identity Theft Restoration (ITR)
+    static let generalFeedbackFormCategoryITR = "Identity Theft Restoration"
+    // "ppro.feedback-form.category.select-category" - Title for the category selection state of the feedback form
+    static let pproFeedbackFormCategorySelect = "Select a category"
+    // "ppro.feedback-form.category.otp" - Description for the feedback form when there is an issue with the one-time password
+    static let pproFeedbackFormCategoryOTP = "Issue with one-time password"
+    // "ppro.feedback-form.category.something-else" - Description for the feedback form when the user has an issue not categorized in other options
+    static let pproFeedbackFormCategoryOther = "Something else"
     // "vpn.feedback-form.category.select-category" - Title for the category selection state of the VPN feedback form
     static let vpnFeedbackFormCategorySelect = "Select a category"
     // "vpn.feedback-form.category.unable-to-install" - Title for the 'unable to install' category of the VPN feedback form
@@ -89,11 +105,31 @@ extension UserText {
     static let vpnFeedbackFormCategoryLocalDeviceConnectivity = "VPN won't let me connect to local device"
     // "vpn.feedback-form.category.browser-crash-or-freeze" - Title for the browser crash/freeze category of the VPN feedback form
     static let vpnFeedbackFormCategoryBrowserCrashOrFreeze = "VPN causes browser to crash or freeze"
-    // "vpn.feedback-form.category.feature-request" - Title for the 'VPN feature request' category of the VPN feedback form
-    static let vpnFeedbackFormCategoryFeatureRequest = "VPN feature request"
     // "vpn.feedback-form.category.other" - Title for the 'other VPN feedback' category of the VPN feedback form
-    static let vpnFeedbackFormCategoryOther = "Other VPN feedback"
+    static let vpnFeedbackFormCategoryOther = "Something else"
+    // "pir.feedback-form.category.select-category" - Title for the category selection state of the PIR feedback form
+    static let pirFeedbackFormCategorySelect = "Select a category"
+    // "pir.feedback-form.category.no-info-on-specific-site" - Description for the feedback form when the scan didn't find user's info on a specific site
+    static let pirFeedbackFormCategoryNothingOnSpecificSite = "The scan didn't find my info on a specific site"
+    // "pir.feedback-form.category.not-me" - Description for the feedback form when the scan found records that don’t belong to the user
+    static let pirFeedbackFormCategoryNotMe = "The scan found records which aren't me"
+    // "pir.feedback-form.category.scan-stuck" - Description for the feedback form when the scan process is stuck
+    static let pirFeedbackFormCategoryScanStuck = "The scan for records is stuck"
+    // "pir.feedback-form.category.removal-stuck" - Description for the feedback form when the removal process is stuck
+    static let pirFeedbackFormCategoryRemovalStuck = "The removal process is stuck"
+    // "itr.feedback-form.category.select-category" - Title for the category selection state of the ITR feedback form
+    static let itrFeedbackFormCategorySelect = "Select a category"
+    // "itr.feedback-form.category.access-code" - Description for the feedback form when there is an issue with the access code
+    static let itrFeedbackFormCategoryAccessCode = "Issue with access code"
+    // "itr.feedback-form.category.contact-advisor" - Description for the feedback form when the user is unable to contact an advisor
+    static let itrFeedbackFormCategoryCantContactAdvisor = "Unable to contact advisor"
+    // "itr.feedback-form.category.unhelpful" - Description for the feedback form when the call to an advisor was unhelpful
+    static let itrFeedbackFormCategoryUnhelpful = "Call to Advisor was unhelpful"
+    // "itr.feedback-form.category.something-else" - Description for the feedback form when the user has an issue not categorized in other options
+    static let itrFeedbackFormCategorySomethingElse = "Something else"
 
+    // "pir.feedback-form.category.other" - Description for the feedback form when the user has an issue not categorized in other options
+    static let pirFeedbackFormCategoryOther = "Something else"
     // "vpn.feedback-form.text-1" - Text for the body of the VPN feedback form
     static let vpnFeedbackFormText1 = "Please describe what's happening, what you expected to happen, and the steps that led to the issue:"
     // "vpn.feedback-form.text-2" - Text for the body of the VPN feedback form

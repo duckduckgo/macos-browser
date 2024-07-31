@@ -96,6 +96,9 @@ public struct PreferencesSubscriptionView: View {
 
             // Help section
             helpSection
+
+            // Feedback section
+            feedbackSection
         }
         .onAppear(perform: {
             if model.isUserAuthenticated {
@@ -273,6 +276,17 @@ public struct PreferencesSubscriptionView: View {
             HStack(alignment: .top, spacing: 6) {
                 TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
                 Button(UserText.viewFaqsButton) { model.openFAQ() }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var feedbackSection: some View {
+        PreferencePaneSection {
+            TextMenuItemHeader(UserText.preferencesSubscriptionFeedbackTitle, bottomPadding: 0)
+            HStack(alignment: .top, spacing: 6) {
+                TextMenuItemCaption(UserText.preferencesSubscriptionFeedbackCaption)
+                Button(UserText.preferencesSubscriptionFeedbackButton) { model.openUnifiedFeedbackForm() }
             }
         }
     }

@@ -40264,6 +40264,12 @@
         }
       }
     },
+    "Please check [faq url](https://duckduckgo.com) first for a solution. If you couldn't find a solution there, please describe the issue, what you expected, and the steps you took that led to the problem." : {
+
+    },
+    "Please give us your feedback:" : {
+
+    },
     "Please submit a report to help us fix the issue." : {
       "comment" : "Data import failure Report dialog title.",
       "localizations" : {
@@ -50428,6 +50434,9 @@
         }
       }
     },
+    "Reports are anonymous and sent to DuckDuckGo to help improve our service" : {
+
+    },
     "reset-zoom" : {
       "comment" : "Button that allows the user to reset the zoom level of the browser page",
       "extractionState" : "extracted_with_value",
@@ -51656,6 +51665,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Помогите улучшить браузер DuckDuckGo"
+          }
+        }
+      }
+    },
+    "send.ppro.feedback" : {
+      "comment" : "Menu with feedback commands",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Privacy Pro Feedback"
           }
         }
       }
@@ -57770,6 +57791,9 @@
           }
         }
       }
+    },
+    "What feature would you like to see?" : {
+
     },
     "whats.new.menu.item" : {
       "comment" : "Title of the dialog menu item that opens the 'What's New' page",

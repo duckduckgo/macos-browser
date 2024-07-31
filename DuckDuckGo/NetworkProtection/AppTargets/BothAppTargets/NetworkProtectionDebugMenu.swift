@@ -258,7 +258,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             let collector = DefaultVPNMetadataCollector(accountManager: Application.appDelegate.subscriptionManager.accountManager)
             let metadata = await collector.collectMetadata()
 
-            print(metadata.toPrettyPrintedJSON()!)
+//            print(metadata.toPrettyPrintedJSON()!)
         }
     }
 

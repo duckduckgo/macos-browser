@@ -26,7 +26,7 @@ import NetworkProtectionIPC
 import NetworkProtectionUI
 import Subscription
 
-struct VPNMetadata: Encodable {
+struct VPNMetadata: UnifiedFeedbackMetadata {
 
     struct AppInfo: Encodable {
         let appVersion: String
@@ -100,25 +100,9 @@ struct VPNMetadata: Encodable {
 
         return String(data: encodedMetadata, encoding: .utf8)
     }
-
-    func toBase64() -> String {
-        let encoder = JSONEncoder()
-
-        do {
-            let encodedMetadata = try encoder.encode(self)
-            return encodedMetadata.base64EncodedString()
-        } catch {
-            return "Failed to encode metadata to JSON, error message: \(error.localizedDescription)"
-        }
-    }
-
 }
 
-protocol VPNMetadataCollector {
-    func collectMetadata() async -> VPNMetadata
-}
-
-final class DefaultVPNMetadataCollector: VPNMetadataCollector {
+final class DefaultVPNMetadataCollector: UnifiedMetadataCollector {
 
     private let statusReporter: NetworkProtectionStatusReporter
     private let ipcClient: VPNControllerXPCClient
@@ -162,7 +146,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
     @MainActor
-    func collectMetadata() async -> VPNMetadata {
+    func collectMetadata() async -> VPNMetadata? {
         let appInfoMetadata = collectAppInfoMetadata()
         let deviceInfoMetadata = collectDeviceInfoMetadata()
         let networkInfoMetadata = await collectNetworkInformation()

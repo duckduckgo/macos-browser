@@ -224,8 +224,8 @@ extension WindowControllersManager {
         windowController.mainViewController.navigationBarViewController.showNetworkProtectionStatus()
     }
 
-    func showShareFeedbackModal() {
-        let feedbackFormViewController = VPNFeedbackFormViewController()
+    func showShareFeedbackModal(source: UnifiedFeedbackFormViewModel.Source = .unknown) {
+        let feedbackFormViewController = UnifiedFeedbackFormViewController(source: source)
         let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
 
         guard let feedbackFormWindow = feedbackFormWindowController.window else {

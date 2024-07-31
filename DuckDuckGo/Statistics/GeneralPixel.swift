@@ -138,6 +138,17 @@ enum GeneralPixel: PixelKitEventV2 {
     // VPN
     case vpnBreakageReport(category: String, description: String, metadata: String)
 
+    // Unified Feedback
+    case pproFeedbackFeatureRequest(description: String, source: String)
+    case pproFeedbackGeneralFeedback(description: String, source: String)
+    case pproFeedbackReportIssue(source: String, category: String, subcategory: String, description: String, metadata: String)
+
+    case pproFeedbackGeneralScreenShow
+    case pproFeedbackActionsScreenShow(source: String)
+    case pproFeedbackCategoryScreenShow(source: String, reportType: String)
+    case pproFeedbackSubcategoryScreenShow(source: String, reportType: String, category: String)
+    case pproFeedbackSubmitScreenShow(source: String, reportType: String, category: String, subcategory: String)
+
     case networkProtectionEnabledOnSearch
     case networkProtectionGeoswitchingOpened
     case networkProtectionGeoswitchingSetNearest
@@ -619,6 +630,30 @@ enum GeneralPixel: PixelKitEventV2 {
         case .vpnBreakageReport:
             return "m_mac_vpn_breakage_report"
 
+        case .pproFeedbackFeatureRequest:
+            return "m_mac_ppro_feedback_feature-request"
+        case .pproFeedbackGeneralFeedback:
+            return "m_mac_ppro_feedback_general-feedback"
+        case .pproFeedbackReportIssue:
+            return "m_mac_ppro_feedback_report-issue"
+        case .pproFeedbackGeneralScreenShow:
+            return "m_mac_ppro_feedback_general-screen_show"
+        case .pproFeedbackActionsScreenShow:
+            return "m_mac_ppro_feedback_actions-screen_show"
+        case .pproFeedbackCategoryScreenShow:
+            return "m_mac_ppro_feedback_category-screen_show"
+        case .pproFeedbackSubcategoryScreenShow:
+            return "m_mac_ppro_feedback_subcategory-screen_show"
+        case .pproFeedbackSubmitScreenShow:
+            return "m_mac_ppro_feedback_submit-screen_show"
+
+
+        case .surveyRemoteMessageDisplayed(let messageID):
+            return "m_mac_survey_remote_message_displayed_\(messageID)"
+        case .surveyRemoteMessageDismissed(let messageID):
+            return "m_mac_survey_remote_message_dismissed_\(messageID)"
+        case .surveyRemoteMessageOpened(let messageID):
+            return "m_mac_survey_remote_message_opened_\(messageID)"
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
 
@@ -1070,6 +1105,47 @@ enum GeneralPixel: PixelKitEventV2 {
                 PixelKit.Parameters.vpnBreakageCategory: category,
                 PixelKit.Parameters.vpnBreakageDescription: description,
                 PixelKit.Parameters.vpnBreakageMetadata: metadata
+            ]
+
+        case .pproFeedbackFeatureRequest(let description, let source):
+            return [
+                PixelKit.Parameters.pproIssueDescription: description,
+                PixelKit.Parameters.pproIssueSource: source,
+            ]
+        case .pproFeedbackGeneralFeedback(let description, let source):
+            return [
+                PixelKit.Parameters.pproIssueDescription: description,
+                PixelKit.Parameters.pproIssueSource: source,
+            ]
+        case .pproFeedbackReportIssue(let source, let category, let subcategory, let description, let metadata):
+            return [
+                PixelKit.Parameters.pproIssueSource: source,
+                PixelKit.Parameters.pproIssueCategory: category,
+                PixelKit.Parameters.pproIssueSubcategory: subcategory,
+                PixelKit.Parameters.pproIssueDescription: description,
+                PixelKit.Parameters.pproIssueMetadata: metadata,
+            ]
+        case .pproFeedbackActionsScreenShow(let source):
+            return [
+                PixelKit.Parameters.pproIssueSource: source,
+            ]
+        case .pproFeedbackCategoryScreenShow(let source, let reportType):
+            return [
+                PixelKit.Parameters.pproIssueSource: source,
+                PixelKit.Parameters.pproIssueReportType: reportType,
+            ]
+        case .pproFeedbackSubcategoryScreenShow(let source, let reportType, let category):
+            return [
+                PixelKit.Parameters.pproIssueSource: source,
+                PixelKit.Parameters.pproIssueReportType: reportType,
+                PixelKit.Parameters.pproIssueCategory: category,
+            ]
+        case .pproFeedbackSubmitScreenShow(let source, let reportType, let category, let subcategory):
+            return [
+                PixelKit.Parameters.pproIssueSource: source,
+                PixelKit.Parameters.pproIssueReportType: reportType,
+                PixelKit.Parameters.pproIssueCategory: category,
+                PixelKit.Parameters.pproIssueSubcategory: subcategory,
             ]
 
         case .onboardingCohortAssigned(let cohort):

@@ -1,7 +1,7 @@
 //
-//  UserText.swift
+//  DefaultMetadataCollector.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,9 +18,12 @@
 
 import Foundation
 
-final class UserText {
-    // MARK: - Status Menu
+struct DefaultFeedbackMetadata: UnifiedFeedbackMetadata {
 
-    static let networkProtectionStatusMenuShareFeedback = NSLocalizedString("network.protection.status.menu.share.feedback", value: "Share Feedback…", comment: "The status menu 'Share Feedback' menu item")
-    static let networkProtectionStatusMenuOpenDuckDuckGo = NSLocalizedString("network.protection.status.menu.open.duckduckgo", value: "Open DuckDuckGo…", comment: "The status menu 'Open DuckDuckGo' menu item")
+}
+
+final class DefaultMetadataCollector: UnifiedMetadataCollector {
+    func collectMetadata() async -> DefaultFeedbackMetadata? {
+        nil
+    }
 }

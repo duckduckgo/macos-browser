@@ -516,6 +516,14 @@ final class FeedbackSubMenu: NSMenu {
                                               keyEquivalent: "")
             .withImage(.siteBreakage)
         addItem(reportBrokenSiteItem)
+
+        addItem(.separator())
+
+        let sendPProFeedbackItem = NSMenuItem(title: UserText.sendPProFeedback,
+                                              action: #selector(AppDelegate.openPProFeedback(_:)),
+                                              keyEquivalent: "")
+            .withImage(.pProFeedback)
+        addItem(sendPProFeedbackItem)
     }
 }
 
