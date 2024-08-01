@@ -212,17 +212,6 @@ extension TunnelControllerIPCService: XPCServerInterface {
         completion(nil)
     }
 
-    func restart(completion: @escaping (Error?) -> Void) {
-        Task {
-            await tunnelController.restart()
-        }
-
-        // For IPC requests, completion means the IPC request was processed, and NOT
-        // that the requested operation was executed fully.  Failure to complete the
-        // operation will be handled entirely within the tunnel controller.
-        completion(nil)
-    }
-
     func fetchLastError(completion: @escaping (Error?) -> Void) {
         Task {
             guard #available(macOS 13.0, *),

@@ -50,14 +50,6 @@ public protocol XPCServerInterface: AnyObject {
     ///
     func stop(completion: @escaping (Error?) -> Void)
 
-    /// Restart the VPN tunnel.
-    ///
-    /// - Parameters:
-    ///     - completion: the completion closure.  This will be called as soon as the IPC request has been processed, and won't
-    ///         signal successful completion of the request.
-    ///
-    func restart(completion: @escaping (Error?) -> Void)
-
     /// Fetches the last error directly from the tunnel manager.
     ///
     func fetchLastError(completion: @escaping (Error?) -> Void)
@@ -94,10 +86,6 @@ protocol XPCServerInterfaceObjC {
     /// Stop the VPN tunnel.
     ///
     func stop(completion: @escaping (Error?) -> Void)
-
-    /// Restart the VPN tunnel.
-    ///
-    func restart(completion: @escaping (Error?) -> Void)
 
     /// Fetches the last error directly from the tunnel manager.
     ///
@@ -223,10 +211,6 @@ extension VPNControllerXPCServer: XPCServerInterfaceObjC {
 
     func stop(completion: @escaping (Error?) -> Void) {
         serverDelegate?.stop(completion: completion)
-    }
-
-    func restart(completion: @escaping ((any Error)?) -> Void) {
-        serverDelegate?.restart(completion: completion)
     }
 
     func fetchLastError(completion: @escaping (Error?) -> Void) {

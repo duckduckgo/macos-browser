@@ -215,12 +215,6 @@ extension VPNControllerXPCClient: XPCServerInterface {
         }, xpcReplyErrorHandler: self.onComplete(completion))
     }
 
-    public func restart(completion: @escaping (Error?) -> Void) {
-        xpc.execute(call: { server in
-            server.restart(completion: self.onComplete(completion))
-        }, xpcReplyErrorHandler: self.onComplete(completion))
-    }
-
     public func fetchLastError(completion: @escaping (Error?) -> Void) {
         xpc.execute(call: { server in
             server.fetchLastError(completion: completion)

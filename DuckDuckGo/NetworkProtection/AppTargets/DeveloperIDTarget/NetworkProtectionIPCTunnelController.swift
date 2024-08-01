@@ -143,30 +143,6 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
         }
     }
 
-    @MainActor
-    func restart() async {
-        pixelKit?.fire(RestartAttempt.begin)
-
-        func handleFailure(_ error: Error) {
-            log(error)
-            pixelKit?.fire(RestartAttempt.failure(error), frequency: .dailyAndCount)
-        }
-
-        do {
-            try await enableLoginItems()
-
-            ipcClient.restart { [pixelKit] error in
-                if let error {
-                    handleFailure(error)
-                } else {
-                    pixelKit?.fire(RestartAttempt.success, frequency: .dailyAndCount)
-                }
-            }
-        } catch {
-            handleFailure(error)
-        }
-    }
-
     /// Queries VPN to know if it's connected.
     ///
     /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
@@ -229,8 +205,11 @@ extension NetworkProtectionIPCTunnelController {
             }
         }
     }
+}
 
-    // MARK: - Stop Attempts
+// MARK: - Stop Attempts
+
+extension NetworkProtectionIPCTunnelController {
 
     enum StopAttempt: PixelKitEventV2 {
         case begin
@@ -247,41 +226,6 @@ extension NetworkProtectionIPCTunnelController {
 
             case .failure:
                 return "netp_browser_stop_failure"
-            }
-        }
-
-        var parameters: [String: String]? {
-            return nil
-        }
-
-        var error: Error? {
-            switch self {
-            case .begin,
-                    .success:
-                return nil
-            case .failure(let error):
-                return error
-            }
-        }
-    }
-
-    // MARK: - Restart Attempts
-
-    enum RestartAttempt: PixelKitEventV2 {
-        case begin
-        case success
-        case failure(_ error: Error)
-
-        var name: String {
-            switch self {
-            case .begin:
-                return "netp_browser_restart_attempt"
-
-            case .success:
-                return "netp_browser_restart_success"
-
-            case .failure:
-                return "netp_browser_restart_failure"
             }
         }
 

@@ -38,7 +38,6 @@ protocol NetworkProtectionIPCClient {
 
     func start(completion: @escaping (Error?) -> Void)
     func stop(completion: @escaping (Error?) -> Void)
-    func restart(completion: @escaping (Error?) -> Void)
 }
 
 extension VPNControllerXPCClient: NetworkProtectionIPCClient {    
