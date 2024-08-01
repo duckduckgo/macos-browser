@@ -132,7 +132,7 @@ final class CurrentSitePublisher: Publisher {
             guard let self else { return }
 
             switch change {
-            case .excludedDomains(let excludedDomains):
+            case .excludedDomains:
                 refreshCurrentSite()
             default:
                 break
@@ -218,6 +218,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
             let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
                 featureFlagPublisher: siteTroubleshootingFeatureFlagPublisher,
+                connectionStatusPublisher: statusReporter.statusObserver.publisher,
                 currentSitePublisher: $currentSite.eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)
 

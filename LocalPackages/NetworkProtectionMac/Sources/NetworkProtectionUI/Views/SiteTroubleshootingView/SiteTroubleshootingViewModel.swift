@@ -18,6 +18,7 @@
 
 import Combine
 import Foundation
+import NetworkProtection
 
 extension SiteTroubleshootingView {
 
@@ -27,33 +28,54 @@ extension SiteTroubleshootingView {
         private(set) var isFeatureEnabled = false
 
         @Published
-        private(set) var currentSite: CurrentSite?
+        private(set) var connectionStatus: ConnectionStatus = .disconnected
+
+        @Published
+        private var internalCurrentSite: CurrentSite?
+
+        var currentSite: CurrentSite? {
+            guard case .connected = connectionStatus else {
+                return nil
+            }
+
+            return internalCurrentSite
+        }
 
         private let uiActionHandler: VPNUIActionHandling
         private var cancellables = Set<AnyCancellable>()
 
         public init(featureFlagPublisher: AnyPublisher<Bool, Never>,
+                    connectionStatusPublisher: AnyPublisher<ConnectionStatus, Never>,
                     currentSitePublisher: AnyPublisher<CurrentSite?, Never>,
                     uiActionHandler: VPNUIActionHandling) {
 
             self.uiActionHandler = uiActionHandler
 
-            subscribeToFeatureFlagChanges(featureFlagPublisher)
+            subscribeToConnectionStatusChanges(connectionStatusPublisher)
             subscribeToCurrentSiteChanges(currentSitePublisher)
+            subscribeToFeatureFlagChanges(featureFlagPublisher)
+        }
+
+        private func subscribeToConnectionStatusChanges(_ publisher: AnyPublisher<ConnectionStatus, Never>) {
+
+            publisher
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.connectionStatus, onWeaklyHeld: self)
+                .store(in: &cancellables)
+        }
+
+        private func subscribeToCurrentSiteChanges(_ publisher: AnyPublisher<CurrentSite?, Never>) {
+
+            publisher
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.internalCurrentSite, onWeaklyHeld: self)
+                .store(in: &cancellables)
         }
 
         private func subscribeToFeatureFlagChanges(_ publisher: AnyPublisher<Bool, Never>) {
             publisher
                 .receive(on: DispatchQueue.main)
                 .assign(to: \.isFeatureEnabled, onWeaklyHeld: self)
-                .store(in: &cancellables)
-        }
-
-        private func subscribeToCurrentSiteChanges(_ currentSitePublisher: AnyPublisher<CurrentSite?, Never>) {
-
-            currentSitePublisher
-                .receive(on: DispatchQueue.main)
-                .assign(to: \.currentSite, onWeaklyHeld: self)
                 .store(in: &cancellables)
         }
 
