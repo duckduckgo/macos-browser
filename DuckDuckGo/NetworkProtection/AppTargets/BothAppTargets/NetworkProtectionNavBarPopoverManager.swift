@@ -40,7 +40,7 @@ protocol NetworkProtectionIPCClient {
     func stop(completion: @escaping (Error?) -> Void)
 }
 
-extension VPNControllerXPCClient: NetworkProtectionIPCClient {    
+extension VPNControllerXPCClient: NetworkProtectionIPCClient {
     public var ipcStatusObserver: any NetworkProtection.ConnectionStatusObserver { connectionStatusObserver }
     public var ipcServerInfoObserver: any NetworkProtection.ConnectionServerInfoObserver { serverInfoObserver }
     public var ipcConnectionErrorObserver: any NetworkProtection.ConnectionErrorObserver { connectionErrorObserver }
