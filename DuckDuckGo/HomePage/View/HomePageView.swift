@@ -152,20 +152,29 @@ extension HomePage.Views {
 
             var body: some View {
                 ZStack {
-                    Rectangle()
-                        .fill(buttonBackgroundColor)
-                        .frame(width: targetSize, height: targetSize, alignment: .bottomTrailing)
-                        .cornerRadius(3)
-                    Image(.optionsMainView)
-                        .resizable()
-                        .frame(width: iconSize, height: iconSize)
-                        .scaledToFit()
-                        .link(onHoverChanged: nil) {
-                            isHomeContentPopoverVisible.toggle()
-                        }
-                    .onHover { isHovering in
-                        self.isHovering = isHovering
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                        .background(Color.homeFavoritesBackground)
+                        .cornerRadius(6)
+
+                    HStack(spacing: 6) {
+                        Image(.optionsMainView)
+                            .resizable()
+                            .frame(width: iconSize, height: iconSize)
+                            .scaledToFit()
+
+                        Text("Customize")
+                            .font(.system(size: 13))
                     }
+                    .frame(height: targetSize)
+                    .padding(.horizontal, 12)
+                }
+                .fixedSize()
+                .link(onHoverChanged: nil) {
+                    isHomeContentPopoverVisible.toggle()
+                }
+                .onHover { isHovering in
+                    self.isHovering = isHovering
                 }
             }
         }
