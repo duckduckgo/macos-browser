@@ -48,124 +48,14 @@ extension VPNControllerXPCClient: NetworkProtectionIPCClient {
 }
 
 @MainActor
-final class ActiveSiteRetriever {
-
-    private let windowControllerManager: WindowControllersManager
-
-    init (windowControllerManager: WindowControllersManager) {
-        self.windowControllerManager = windowControllerManager
-    }
-
-    // MARK: - Active Site
-
-    var activeSite: CurrentSite? {
-        guard let activeDomain else {
-            return nil
-        }
-
-        return site(forDomain: activeDomain.droppingWwwPrefix())
-    }
-
-    private func site(forDomain domain: String) -> CurrentSite? {
-        let icon: NSImage?
-        let currentSite: NetworkProtectionUI.CurrentSite?
-
-        icon = FaviconManager.shared.getCachedFavicon(for: domain, sizeCategory: .small)?.image
-        let proxySettings = TransparentProxySettings(defaults: .netP)
-        currentSite = NetworkProtectionUI.CurrentSite(icon: icon,
-                                                      domain: domain,
-                                                      excluded: proxySettings.isExcluding(domain: domain))
-
-        return currentSite
-    }
-
-    // MARK: - Domain
-
-    private var activeDomain: String? {
-        guard let currentTabContent else {
-            return nil
-        }
-
-        return domain(from: currentTabContent)
-    }
-
-    private func domain(from tabContent: Tab.TabContent) -> String? {
-        if case .url(let url, _, _) = tabContent {
-
-            return url.host
-        } else {
-            return nil
-        }
-    }
-
-    // MARK: - TabContent
-
-    private var currentTabContent: Tab.TabContent? {
-        windowControllerManager.lastKeyMainWindowController?.mainViewController.activeTabViewModel?.tabContent
-    }
-}
-
-@MainActor
-final class CurrentSitePublisher: Publisher {
-    typealias Output = CurrentSite?
-    typealias Failure = Never
-
-    private let retriever: ActiveSiteRetriever
-    private let subject: CurrentValueSubject<CurrentSite?, Never>
-    private let windowControllerManager: WindowControllersManager
-
-    private let proxySettings: TransparentProxySettings
-    private var cancellables = Set<AnyCancellable>()
-
-    init(windowControllerManager: WindowControllersManager, proxySettings: TransparentProxySettings) {
-
-        retriever = ActiveSiteRetriever(windowControllerManager: windowControllerManager)
-        subject = CurrentValueSubject<CurrentSite?, Never>(retriever.activeSite)
-        self.windowControllerManager = windowControllerManager
-        self.proxySettings = proxySettings
-
-        subscribeToExclusionChanges()
-    }
-
-    private func subscribeToExclusionChanges() {
-        proxySettings.changePublisher.sink { [weak self] change in
-            guard let self else { return }
-
-            switch change {
-            case .excludedDomains:
-                refreshCurrentSite()
-            default:
-                break
-            }
-        }.store(in: &cancellables)
-    }
-
-    func refreshCurrentSite() {
-        let activeSite = retriever.activeSite
-
-        if activeSite != subject.value {
-            subject.send(retriever.activeSite)
-        }
-    }
-
-    // MARK: - Publisher
-
-    nonisolated
-    func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, NetworkProtectionUI.CurrentSite? == S.Input {
-
-        subject.receive(subscriber: subscriber)
-    }
-}
-
-@MainActor
 final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var networkProtectionPopover: NetworkProtectionPopover?
     let ipcClient: NetworkProtectionIPCClient
     let vpnUninstaller: VPNUninstalling
 
     @Published
-    private var currentSite: CurrentSite?
-    private let currentSitePublisher: CurrentSitePublisher
+    private var siteInfo: SiteTroubleshootingInfo?
+    private let siteTroubleshootingInfoPublisher: SiteTroubleshootingInfoPublisher
     private var cancellables = Set<AnyCancellable>()
 
     init(ipcClient: VPNControllerXPCClient,
@@ -174,14 +64,16 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         self.ipcClient = ipcClient
         self.vpnUninstaller = vpnUninstaller
 
-        currentSitePublisher = CurrentSitePublisher(windowControllerManager: .shared,
-                                                    proxySettings: TransparentProxySettings(defaults: .netP))
+        siteTroubleshootingInfoPublisher = SiteTroubleshootingInfoPublisher(
+            windowControllerManager: .shared,
+            proxySettings: TransparentProxySettings(defaults: .netP))
+
         subscribeToCurrentSitePublisher()
     }
 
     private func subscribeToCurrentSitePublisher() {
-        currentSitePublisher
-            .assign(to: \.currentSite, onWeaklyHeld: self)
+        siteTroubleshootingInfoPublisher
+            .assign(to: \.siteInfo, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
@@ -212,14 +104,14 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
             // We need to force-refresh the current site as there's currently no easy mechanism
             // to observe active-tab changes.  We just force-refresh when the popover is shown.
-            currentSitePublisher.refreshCurrentSite()
+            siteTroubleshootingInfoPublisher.refresh()
 
             let siteTroubleshootingFeatureFlagPublisher = NSApp.delegateTyped.internalUserDecider.isInternalUserPublisher.eraseToAnyPublisher()
 
             let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
                 featureFlagPublisher: siteTroubleshootingFeatureFlagPublisher,
                 connectionStatusPublisher: statusReporter.statusObserver.publisher,
-                currentSitePublisher: $currentSite.eraseToAnyPublisher(),
+                siteTroubleshootingInfoPublisher: $siteInfo.eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)
 
             let statusViewModel = NetworkProtectionStatusView.Model(controller: controller,

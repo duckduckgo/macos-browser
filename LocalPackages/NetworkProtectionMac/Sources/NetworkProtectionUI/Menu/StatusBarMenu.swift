@@ -137,7 +137,7 @@ public final class StatusBarMenu: NSObject {
             let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
                 featureFlagPublisher: Just(false).eraseToAnyPublisher(),
                 connectionStatusPublisher: Just(NetworkProtection.ConnectionStatus.disconnected).eraseToAnyPublisher(),
-                currentSitePublisher: Just(CurrentSite?(nil)).eraseToAnyPublisher(),
+                siteTroubleshootingInfoPublisher: Just(SiteTroubleshootingInfo?(nil)).eraseToAnyPublisher(),
                 uiActionHandler: uiActionHandler)
 
             let debugInformationViewModel = DebugInformationViewModel(showDebugInformation: isOptionKeyPressed)

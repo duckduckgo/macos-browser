@@ -540,22 +540,6 @@ public final class TunnelControllerViewModel: ObservableObject {
             await uiActionHandler.moveAppToApplications()
         }
     }
-
-    // MARK: - Site Troubleshooting
-
-    var showSiteTroubleshooting: Bool {
-        guard siteTroubleshootingViewModel.isFeatureEnabled,
-              siteTroubleshootingViewModel.currentSite != nil else {
-            return false
-        }
-
-        switch connectionStatus {
-        case .connected:
-            return true
-        default:
-            return false
-        }
-    }
 }
 
 extension DataVolume {

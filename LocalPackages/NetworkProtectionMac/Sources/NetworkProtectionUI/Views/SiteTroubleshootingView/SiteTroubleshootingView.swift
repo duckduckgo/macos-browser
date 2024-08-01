@@ -34,29 +34,29 @@ public struct SiteTroubleshootingView: View {
 
     public var body: some View {
         if model.isFeatureEnabled,
-           let currentSite = model.currentSite {
-            siteTroubleshootingView(currentSite)
+           let siteInfo = model.siteInfo {
+            siteTroubleshootingView(siteInfo)
         } else {
             EmptyView()
         }
     }
 
-    private func siteTroubleshootingView(_ currentSite: CurrentSite) -> some View {
+    private func siteTroubleshootingView(_ siteInfo: SiteTroubleshootingInfo) -> some View {
         Group {
             AccordionView { _ in
-                Image(nsImage: currentSite.icon)
+                Image(nsImage: siteInfo.icon)
                     .resizable()
                     .frame(width: 16, height: 16)
                     .clipShape(RoundedRectangle(cornerRadius: 3.0))
-                Text("\(currentSite.domain) issues?")
+                Text("\(siteInfo.domain) issues?")
                     .applyCurrentSiteAttributes()
             } submenu: {
                 VStack {
                     MenuItemCustomButton {
-                        model.setExclusion(true, forDomain: currentSite.domain)
+                        model.setExclusion(true, forDomain: siteInfo.domain)
                     } label: { _ in
                         HStack {
-                            if currentSite.excluded {
+                            if siteInfo.excluded {
                                 Image(.accordionViewCheckmark)
                                     .resizable()
                                     .font(.system(size: 13))
@@ -72,9 +72,9 @@ public struct SiteTroubleshootingView: View {
                     }
 
                     MenuItemCustomButton {
-                        model.setExclusion(false, forDomain: currentSite.domain)
+                        model.setExclusion(false, forDomain: siteInfo.domain)
                     } label: { _ in
-                        if !currentSite.excluded {
+                        if !siteInfo.excluded {
                             Image(.accordionViewCheckmark)
                                 .resizable()
                                 .font(.system(size: 13))

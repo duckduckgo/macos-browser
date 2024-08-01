@@ -31,14 +31,14 @@ extension SiteTroubleshootingView {
         private(set) var connectionStatus: ConnectionStatus = .disconnected
 
         @Published
-        private var internalCurrentSite: CurrentSite?
+        private var internalSiteInfo: SiteTroubleshootingInfo?
 
-        var currentSite: CurrentSite? {
+        var siteInfo: SiteTroubleshootingInfo? {
             guard case .connected = connectionStatus else {
                 return nil
             }
 
-            return internalCurrentSite
+            return internalSiteInfo
         }
 
         private let uiActionHandler: VPNUIActionHandling
@@ -46,13 +46,13 @@ extension SiteTroubleshootingView {
 
         public init(featureFlagPublisher: AnyPublisher<Bool, Never>,
                     connectionStatusPublisher: AnyPublisher<ConnectionStatus, Never>,
-                    currentSitePublisher: AnyPublisher<CurrentSite?, Never>,
+                    siteTroubleshootingInfoPublisher: AnyPublisher<SiteTroubleshootingInfo?, Never>,
                     uiActionHandler: VPNUIActionHandling) {
 
             self.uiActionHandler = uiActionHandler
 
             subscribeToConnectionStatusChanges(connectionStatusPublisher)
-            subscribeToCurrentSiteChanges(currentSitePublisher)
+            subscribeToSiteTroubleshootingInfoChanges(siteTroubleshootingInfoPublisher)
             subscribeToFeatureFlagChanges(featureFlagPublisher)
         }
 
@@ -64,11 +64,11 @@ extension SiteTroubleshootingView {
                 .store(in: &cancellables)
         }
 
-        private func subscribeToCurrentSiteChanges(_ publisher: AnyPublisher<CurrentSite?, Never>) {
+        private func subscribeToSiteTroubleshootingInfoChanges(_ publisher: AnyPublisher<SiteTroubleshootingInfo?, Never>) {
 
             publisher
                 .receive(on: DispatchQueue.main)
-                .assign(to: \.internalCurrentSite, onWeaklyHeld: self)
+                .assign(to: \.internalSiteInfo, onWeaklyHeld: self)
                 .store(in: &cancellables)
         }
 
