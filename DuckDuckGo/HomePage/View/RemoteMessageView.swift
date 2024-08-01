@@ -29,8 +29,10 @@ struct RemoteMessageView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12)
-                .foregroundColor(Color.blackWhite3)
-                .cornerRadius(8)
+                .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                .background(Color.homeFavoritesBackground)
+                .cornerRadius(12)
+
             VStack(spacing: 12) {
                 HStack(spacing: 8) {
                     image
