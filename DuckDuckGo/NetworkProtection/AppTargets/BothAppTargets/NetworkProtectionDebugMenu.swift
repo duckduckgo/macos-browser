@@ -480,14 +480,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @objc private func toggleExcludeDDGBrowser() {
         transparentProxySettings.toggleExclusion(for: ddgBrowserAppIdentifier)
     }
-
-    @objc private func toggleExcludeDDGCom() {
-        transparentProxySettings.toggleExclusion(domain: "duckduckgo.com")
-    }
-
-    @objc private func toggleExcludeReddit() {
-        transparentProxySettings.toggleExclusion(domain: "reddit.com")
-    }
 }
 
 #if DEBUG
