@@ -42,11 +42,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private let resetToDefaults = NSMenuItem(title: "Reset Settings to defaults", action: #selector(NetworkProtectionDebugMenu.resetSettings))
 
-    private let excludedRoutesMenu = NSMenu()
     private let excludeDDGBrowserTrafficFromVPN = NSMenuItem(title: "DDG Browser", action: #selector(toggleExcludeDDGBrowser))
     private let excludeDBPTrafficFromVPN = NSMenuItem(title: "DBP Background Agent", action: #selector(toggleExcludeDBPBackgroundAgent))
 
-    private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "Kill Switch (enforceRoutes)", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
+    private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "enforceRoutes", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
     private let shouldIncludeAllNetworksMenuItem = NSMenuItem(title: "includeAllNetworks", action: #selector(NetworkProtectionDebugMenu.toggleIncludeAllNetworks))
     private let disableRekeyingMenuItem = NSMenuItem(title: "Disable Rekeying", action: #selector(NetworkProtectionDebugMenu.toggleRekeyingDisabled))
 
@@ -62,10 +61,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
         super.init(title: "VPN")
 
         buildItems {
-
-            NSMenuItem(title: "Restart Adapter", action: #selector(NetworkProtectionDebugMenu.restartAdatper(_:)))
-                .targetting(self)
-
             NSMenuItem(title: "Reset") {
 
                 NSMenuItem(title: "Reset All State Keeping Invite", action: #selector(NetworkProtectionDebugMenu.resetAllKeepingInvite))
@@ -88,8 +83,25 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem.separator()
 
-            shouldEnforceRoutesMenuItem
-                .targetting(self)
+            NSMenuItem(title: "Adapter") {
+                NSMenuItem(title: "Restart Adapter", action: #selector(NetworkProtectionDebugMenu.restartAdapter(_:)))
+                    .targetting(self)
+
+                NSMenuItem(title: "Re-create Adapter", action: #selector(NetworkProtectionDebugMenu.restartAdapter(_:)))
+                    .targetting(self)
+            }
+
+            NSMenuItem(title: "Tunnel Settings") {
+                shouldIncludeAllNetworksMenuItem
+                    .targetting(self)
+
+                excludeLocalNetworksMenuItem
+                    .targetting(self)
+
+                shouldEnforceRoutesMenuItem
+                    .targetting(self)
+            }
+
             NSMenuItem.separator()
 
             NSMenuItem(title: "Send Test Notification", action: #selector(NetworkProtectionDebugMenu.sendTestNotification))
@@ -104,13 +116,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Environment")
                 .submenu(environmentMenu)
 
-            NSMenuItem(title: "Exclusions") {
-                NSMenuItem(title: "Excluded Apps") {
-                    excludeDDGBrowserTrafficFromVPN.targetting(self)
-                    excludeDBPTrafficFromVPN.targetting(self)
-                }
-
-                NSMenuItem(title: "Excluded Routes").submenu(excludedRoutesMenu)
+            NSMenuItem(title: "Excluded Apps") {
+                excludeDDGBrowserTrafficFromVPN.targetting(self)
+                excludeDBPTrafficFromVPN.targetting(self)
             }
 
             NSMenuItem(title: "Preferred Server").submenu(preferredServerMenu)
@@ -143,13 +151,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem.separator()
 
-            NSMenuItem(title: "Kill Switch (alternative approach)") {
-                shouldIncludeAllNetworksMenuItem
-                    .targetting(self)
-                excludeLocalNetworksMenuItem
-                    .targetting(self)
-            }
-
             NSMenuItem(title: "Open App Container in Finder", action: #selector(NetworkProtectionDebugMenu.openAppContainerInFinder))
                 .targetting(self)
         }
@@ -160,9 +161,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
             try? await populateNetworkProtectionServerListMenuItems()
         }
         populateNetworkProtectionRegistrationKeyValidityMenuItems()
-
-        excludedRoutesMenu.delegate = self
-        excludedRoutesMenu.autoenablesItems = false
     }
 
     required init(coder: NSCoder) {
@@ -242,7 +240,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     /// Removes the system extension and agents for DuckDuckGo VPN.
     ///
-    @objc func restartAdatper(_ sender: Any?) {
+    @objc func restartAdapter(_ sender: Any?) {
         Task { @MainActor in
             do {
                 try await debugUtilities.restartAdapter()
