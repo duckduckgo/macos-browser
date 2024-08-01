@@ -25,7 +25,6 @@ import SwiftUI
 
 /// Controller for the VPN debug menu.
 ///
-@MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
 
     private let transparentProxySettings = TransparentProxySettings(defaults: .netP)
@@ -137,17 +136,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem(title: "Simulate Failure")
                 .submenu(NetworkProtectionSimulateFailureMenu())
-
-            NSMenuItem(title: "Override NetP Activation Date") {
-                NSMenuItem(title: "Reset Activation Date", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionActivationDate))
-                    .targetting(self)
-                NSMenuItem(title: "Set Activation Date to Now", action: #selector(NetworkProtectionDebugMenu.overrideNetworkProtectionActivationDateToNow))
-                    .targetting(self)
-                NSMenuItem(title: "Set Activation Date to 5 Days Ago", action: #selector(NetworkProtectionDebugMenu.overrideNetworkProtectionActivationDateTo5DaysAgo))
-                    .targetting(self)
-                NSMenuItem(title: "Set Activation Date to 10 Days Ago", action: #selector(NetworkProtectionDebugMenu.overrideNetworkProtectionActivationDateTo10DaysAgo))
-                    .targetting(self)
-            }
 
             NSMenuItem.separator()
 
@@ -475,34 +463,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
         disableRekeyingMenuItem.state = settings.disableRekeying ? .on : .off
     }
 
-    // MARK: Waitlist
-
-    @objc func resetNetworkProtectionActivationDate(_ sender: Any?) {
-        overrideNetworkProtectionActivationDate(to: nil)
-    }
-
-    @objc func overrideNetworkProtectionActivationDateToNow(_ sender: Any?) {
-        overrideNetworkProtectionActivationDate(to: Date())
-    }
-
-    @objc func overrideNetworkProtectionActivationDateTo5DaysAgo(_ sender: Any?) {
-        overrideNetworkProtectionActivationDate(to: Date.daysAgo(5))
-    }
-
-    @objc func overrideNetworkProtectionActivationDateTo10DaysAgo(_ sender: Any?) {
-        overrideNetworkProtectionActivationDate(to: Date.daysAgo(10))
-    }
-
-    private func overrideNetworkProtectionActivationDate(to date: Date?) {
-        let store = DefaultWaitlistActivationDateStore(source: .netP)
-
-        if let date {
-            store.updateActivationDate(date)
-        } else {
-            store.removeDates()
-        }
-    }
-
     // MARK: - Exclusions
 
     private let dbpBackgroundAppIdentifier = Bundle.main.dbpBackgroundAgentBundleId
@@ -527,24 +487,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @objc private func toggleExcludeReddit() {
         transparentProxySettings.toggleExclusion(domain: "reddit.com")
-    }
-}
-
-extension NetworkProtectionDebugMenu: NSMenuDelegate {
-
-    func menuNeedsUpdate(_ menu: NSMenu) {
-        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
-        /*
-        if menu === exclusionsMenu {
-            let controller = NetworkProtectionTunnelController()
-            for item in menu.items {
-                guard let route = item.representedObject as? String else { continue }
-                item.state = controller.isExcludedRouteEnabled(route) ? .on : .off
-                // TO BE fixed: see NetworkProtectionTunnelController.excludedRoutes()
-                item.isEnabled = !(controller.shouldEnforceRoutes && route == "10.0.0.0/8")
-            }
-        }
-         */
     }
 }
 
