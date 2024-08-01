@@ -69,21 +69,20 @@ extension Preferences {
                     TextMenuItemCaption(UserText.duckPlayerExplanation)
                 }
 
-                // Auto Play
-                if model.shouldDisplayAutoPlaySettings {
-                    PreferencePaneSection(UserText.duckPlayerAutoplayTitle) {
-                        ToggleMenuItem(UserText.duckPlayerAutoplayPreference, isOn: $model.duckPlayerAutoplay)
+                if model.shouldDisplayAutoPlaySettings || model.isOpenInNewTabSettingsAvailable {
+                    PreferencePaneSection(UserText.duckPlayerVideoPreferencesTitle) {
+
+                        if model.shouldDisplayAutoPlaySettings {
+                            ToggleMenuItem(UserText.duckPlayerAutoplayPreference, isOn: $model.duckPlayerAutoplay)
+                        }
+
+                        if model.isOpenInNewTabSettingsAvailable {
+                            ToggleMenuItem(UserText.duckPlayerNewTabPreference, isOn: $model.duckPlayerOpenInNewTab)
+                                .disabled(!model.isNewTabSettingsAvailable)
+                        }
                     }
                 }
 
-                // New Tab
-                if model.isOpenInNewTabSettingsAvailable {
-                    PreferencePaneSection(UserText.duckPlayerNewTabTitle) {
-                        TextMenuItemCaption(UserText.duckPlayerNewTabPreferenceExtraInfo)
-                        ToggleMenuItem(UserText.duckPlayerNewTabPreference, isOn: $model.duckPlayerOpenInNewTab)
-                            .disabled(!model.isNewTabSettingsAvailable)
-                    }
-                }
             }
         }
     }
