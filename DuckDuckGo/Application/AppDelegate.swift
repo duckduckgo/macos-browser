@@ -396,6 +396,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         remoteMessagingClient?.startRefreshingRemoteMessages()
 
+        // This messaging system has been replaced by RMF, but we need to clean up the message manifest for any users who had it stored.
+        let deprecatedRemoteMessagingStorage = DefaultSurveyRemoteMessagingStorage.surveys()
+        deprecatedRemoteMessagingStorage.removeStoredMessagesIfNecessary()
+
         if didCrashDuringCrashHandlersSetUp {
             PixelKit.fire(GeneralPixel.crashOnCrashHandlersSetUp)
             didCrashDuringCrashHandlersSetUp = false

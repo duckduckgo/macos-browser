@@ -20,7 +20,6 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class StateRestorationManagerTests: XCTestCase {
     private var fileStore: FileStoreMock!
     private let testFileName = "TestFile"
@@ -37,6 +36,7 @@ final class StateRestorationManagerTests: XCTestCase {
         srm = nil
     }
 
+    @MainActor
     func changeState(_ val1: String?, _ val2: Int?, sync: Bool = false) {
         state.val1 = val1
         state.val2 = val2
@@ -45,6 +45,7 @@ final class StateRestorationManagerTests: XCTestCase {
 
     // MARK: -
 
+    @MainActor
     func testStatePersistence() {
         changeState(nil, nil)
         srm.flush()
@@ -53,6 +54,7 @@ final class StateRestorationManagerTests: XCTestCase {
         XCTAssertNil(srm.error)
     }
 
+    @MainActor
     func testStatePersistenceError() {
         fileStore.failWithError = CocoaError(.fileWriteNoPermission)
         changeState("val1", 1)
@@ -64,6 +66,7 @@ final class StateRestorationManagerTests: XCTestCase {
         XCTAssertNil(fileStore.storage[testFileName])
     }
 
+    @MainActor
     func testNoPersistentStateAtStartup() {
         srm.flush()
 
@@ -76,6 +79,7 @@ final class StateRestorationManagerTests: XCTestCase {
         XCTAssertNil(state.val2)
     }
 
+    @MainActor
     func testStatePersistenceAndRestoration() {
         changeState("val1", 1)
         changeState("val2", 2)
@@ -88,6 +92,7 @@ final class StateRestorationManagerTests: XCTestCase {
         XCTAssertEqual(state.val2, 3)
     }
 
+    @MainActor
     func testWhenLastSessionStateIsLoadedThenServiceCanRestoreLastSession() {
         changeState("val1", 1, sync: true)
 
@@ -98,6 +103,7 @@ final class StateRestorationManagerTests: XCTestCase {
         XCTAssertTrue(srm.canRestoreLastSessionState)
     }
 
+    @MainActor
     func testWhenLastSessionStateIsRemovedManuallyThenLastSessionCannotBeRestored() {
         changeState("val1", 1, sync: true)
 
@@ -109,6 +115,7 @@ final class StateRestorationManagerTests: XCTestCase {
         XCTAssertFalse(srm.canRestoreLastSessionState)
     }
 
+    @MainActor
     func testWhenLastSessionStateIsLoadedThenChangesToStatePreserveLoadedLastSessionState() {
         changeState("lastSessionValue", 42, sync: true)
 
@@ -122,6 +129,7 @@ final class StateRestorationManagerTests: XCTestCase {
         XCTAssertEqual(state.val2, 42)
     }
 
+    @MainActor
     func testWhenLastSessionStateIsLoadedThenItIsNotDecrypted() {
         let decryptExpectation = expectation(description: "decrypt")
         decryptExpectation.isInverted = true
@@ -139,6 +147,7 @@ final class StateRestorationManagerTests: XCTestCase {
         waitForExpectations(timeout: 0.1)
     }
 
+    @MainActor
     func testStatePersistenceThrottlesWrites() {
         fileStore.delay = 0.1 // write operations will sleep for 100ms
         var counter = 0
@@ -158,6 +167,7 @@ final class StateRestorationManagerTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testStatePersistenceSync() {
         fileStore.delay = 0.01 // write operations will sleep for 100ms
 
@@ -182,6 +192,7 @@ final class StateRestorationManagerTests: XCTestCase {
         XCTAssertEqual(state.val2, 5)
     }
 
+    @MainActor
     func testStatePersistenceClear() {
         changeState("val1", 1)
         changeState("val2", 2)

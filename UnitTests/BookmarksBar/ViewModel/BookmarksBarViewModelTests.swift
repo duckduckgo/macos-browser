@@ -19,9 +19,9 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 class BookmarksBarViewModelTests: XCTestCase {
 
+    @MainActor
     func testWhenClippingTheLastBarItem_AndNoItemsCanBeClipped_ThenNoItemsAreClipped() {
         let manager = createMockBookmarksManager()
         let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager, tabCollectionViewModel: .mock())
@@ -32,6 +32,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssert(bookmarksBarViewModel.clippedItems.isEmpty)
     }
 
+    @MainActor
     func testWhenClippingTheLastBarItem_AndItemsCanBeClipped_ThenItemsAreClipped() {
         let bookmarks = [Bookmark.mock]
         let storeMock = BookmarkStoreMock()
@@ -47,6 +48,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(bookmarksBarViewModel.clippedItems.count, 1)
     }
 
+    @MainActor
     func testWhenTheBarHasClippedItems_ThenClippedItemsCanBeRestored() {
         let bookmarks = [Bookmark.mock]
         let storeMock = BookmarkStoreMock()
@@ -67,6 +69,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssert(bookmarksBarViewModel.clippedItems.isEmpty)
     }
 
+    @MainActor
     func testWhenUpdatingFromBookmarkEntities_AndTheContainerCannotFitAnyBookmarks_ThenBookmarksAreImmediatelyClipped() {
         let bookmarks = [Bookmark.mock]
         let storeMock = BookmarkStoreMock()
@@ -79,6 +82,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(bookmarksBarViewModel.clippedItems.count, 1)
     }
 
+    @MainActor
     func testWhenUpdatingFromBookmarkEntities_AndTheContainerCanFitAllBookmarks_ThenNoBookmarksAreClipped() {
         let bookmarks = [Bookmark.mock]
         let storeMock = BookmarkStoreMock()
@@ -93,6 +97,7 @@ class BookmarksBarViewModelTests: XCTestCase {
 
     // MARK: - Bookmarks Delegate
 
+    @MainActor
     func testWhenItemFiresClickedActionThenDelegateReceivesClickItemActionAndPreventClickIsFalse() {
         // GIVEN
         let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
@@ -113,6 +118,7 @@ class BookmarksBarViewModelTests: XCTestCase {
 
     }
 
+    @MainActor
     func testWhenItemFiresOpenInNewTabActionThenDelegateReceivesOpenInNewTabAction() {
         // GIVEN
         let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
@@ -132,6 +138,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
     }
 
+    @MainActor
     func testWhenItemFiresOpenInNewWindowActionThenDelegateReceivesOpenInNewWindowAction() {
         // GIVEN
         let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
@@ -151,6 +158,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
     }
 
+    @MainActor
     func testWhenItemFiresToggleFavoritesActionThenDelegateReceivesToggleFavoritesAction() {
         // GIVEN
         let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
@@ -170,6 +178,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
     }
 
+    @MainActor
     func testWhenItemFiresEditActionThenDelegateReceivesEditAction() {
         // GIVEN
         let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
@@ -189,6 +198,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
     }
 
+    @MainActor
     func testWhenItemFiresMoveToEndActionThenDelegateReceivesMoveToEndAction() {
         // GIVEN
         let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
@@ -208,6 +218,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
     }
 
+    @MainActor
     func testWhenItemFiresCopyBookmarkURLActionThenDelegateReceivesCopyBookmarkURLAction() {
         // GIVEN
         let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
@@ -227,6 +238,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
     }
 
+    @MainActor
     func testWhenItemFiresDeleteEntityActionThenDelegateReceivesDeleteEntityAction() {
         // GIVEN
         let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
@@ -246,6 +258,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
     }
 
+    @MainActor
     func testWhenItemFiresAddEntityActionThenDelegateReceivesAddEntityAction() {
         // GIVEN
         let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
@@ -265,6 +278,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
     }
 
+    @MainActor
     func testWhenItemFiresManageBookmarksActionThenDelegateReceivesManageBookmarksAction() {
         // GIVEN
         let sut = BookmarksBarViewModel(bookmarkManager: createMockBookmarksManager(), tabCollectionViewModel: .mock())
@@ -284,6 +298,7 @@ class BookmarksBarViewModelTests: XCTestCase {
         XCTAssertEqual(delegateMock.capturedItem, collectionViewItem)
     }
 
+    @MainActor
     private func createMockBookmarksManager(mockBookmarkStore: BookmarkStoreMock = BookmarkStoreMock()) -> BookmarkManager {
         let mockFaviconManager = FaviconManagerMock()
         return LocalBookmarkManager(bookmarkStore: mockBookmarkStore, faviconManagement: mockFaviconManager)

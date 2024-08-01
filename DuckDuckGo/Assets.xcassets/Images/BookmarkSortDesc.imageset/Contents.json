@@ -1,12 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "Privacy-Pro-128.pdf",
+      "filename" : "sort-desc.svg",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
+  },
+  "properties" : {
+    "template-rendering-intent" : "template"
   }
 }

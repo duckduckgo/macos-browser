@@ -19,9 +19,9 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class Bookmarks_TabTests: XCTestCase {
 
+    @MainActor
     func testWhenBuildTabsWithContentOfFolderThenItShouldReturnAsManyTabsAsBookmarksWithinTheFolder() {
         // GIVEN
         let bookmark1 = Bookmark(id: "A", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: false)
@@ -40,6 +40,7 @@ final class Bookmarks_TabTests: XCTestCase {
         XCTAssertEqual(tab.last?.burnerMode, .regular)
     }
 
+    @MainActor
     func testWhenBuildTabCollectionWithContentOfFolderThenItShouldReturnACollectionWithAsManyTabsAsBookmarksWithinTheFolder() {
         // GIVEN
         let bookmark1 = Bookmark(id: "A", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: false)
