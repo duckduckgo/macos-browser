@@ -38,6 +38,7 @@ import NetworkProtection
 import Subscription
 import NetworkProtectionIPC
 import DataBrokerProtection
+import MacOSCommon
 
 // @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {

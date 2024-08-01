@@ -19,6 +19,7 @@
 import AppKit
 import BrowserServicesKit
 import Common
+import MacOSCommon
 import Foundation
 
 extension URL.NavigationalScheme {

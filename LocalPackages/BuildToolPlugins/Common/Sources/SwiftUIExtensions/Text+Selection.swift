@@ -1,7 +1,7 @@
 //
-//  NSApplicationExtension.swift
+//  Text+Selection.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,17 +16,19 @@
 //  limitations under the License.
 //
 
-import Cocoa
-import Combine
+import SwiftUI
 
-extension NSApplication {
-    #if !NETWORK_EXTENSION && !SANDBOX_TEST_TOOL
-        var mainMenuTyped: MainMenu {
-            return mainMenu as! MainMenu // swiftlint:disable:this force_cast
-        }
+public extension Text {
 
-        var delegateTyped: AppDelegate {
-            return delegate as! AppDelegate // swiftlint:disable:this force_cast
+    /// We only support text selection in `Text` views iOS 15+ and macOS 12+ right now
+    /// as there's no simple way to offer this in lower versions.
+    ///
+    @ViewBuilder
+    func makeSelectable() -> some View {
+        if #available(iOS 15.0, macOS 12.0, *) {
+            textSelection(.enabled)
+        } else {
+            self
         }
-    #endif
+    }
 }

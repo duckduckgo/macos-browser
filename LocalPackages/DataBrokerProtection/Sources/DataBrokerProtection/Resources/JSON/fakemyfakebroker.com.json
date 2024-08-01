@@ -1,0 +1,100 @@
+{
+  "name": "My Fake Broker",
+  "url": "myfakebroker.com",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "file:///Users/ellesullivanwork/Desktop/fakeBroker/results.html",
+          "id": "a867e7de-91e1-434e-925a-a3caeb11764b"
+        },
+        {
+          "actionType": "extract",
+          "selector": ".single-column-list-item",
+          "noResultsSelector": ".no_results_container",
+          "profile": {
+            "name": {
+              "selector": ".title",
+              "beforeText": ","
+            },
+            "age": {
+              "selector": ".title",
+              "afterText": ","
+            },
+            "addressCityState": {
+              "selector": ".//div[@type='display']",
+              "afterText": "RESIDES IN"
+            },
+            "relativesList": {
+              "selector": ".//a[contains(@id, 'relative')]",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".title",
+              "identifierType": "path",
+              "identifier": "file://${firstName}-${lastName}/${state|stateFull}/${city|hyphenated}/${id}"
+            }
+          },
+          "id": "5d414152-05d9-4e80-b5c2-8243ea77bdb4"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "file:///Users/ellesullivanwork/Desktop/fakeBroker/optout.html",
+          "id": "da262c67-7de3-4696-8eee-756397db89e3"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".optout_container",
+          "elements": [
+            {
+              "type": "email",
+              "selector": ".//input[@name='email']"
+            },
+            {
+              "type": "profileUrl",
+              "selector": ".//input[@name='url']"
+            }
+          ],
+          "id": "3d9c64ed-10c6-4ab4-8c33-2fdf1d8680f5"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".responsive-button"
+            }
+          ],
+          "id": "c29394aa-a953-4813-8a50-fe48dab532e7"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Please check your inbox for a confirmation email"
+            }
+          ],
+          "id": "dca4be32-3fe5-49af-8fd3-7918135ab5b5"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  },
+  "addedDatetime": 1721679265585,
+  "version": "0.0.1"
+}

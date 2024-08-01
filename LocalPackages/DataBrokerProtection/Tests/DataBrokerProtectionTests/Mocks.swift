@@ -430,6 +430,9 @@ final class ResourcesRepositoryMock: ResourcesRepository {
         brokersList?.removeAll()
         brokersList = nil
     }
+
+    func removeExistingBrokersAndReplaceWithDebugBrokers() throws {
+    }
 }
 
 final class EmptySecureStorageKeyStoreProviderMock: SecureStorageKeyStoreProvider {
@@ -1358,6 +1361,9 @@ final class MockMismatchCalculator: MismatchCalculator {
 }
 
 final class MockDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrokerUpdater {
+    func replaceAllBrokersWithDebugBrokers() {
+
+    }
 
     private(set) var didCallUpdateBrokers = false
     private(set) var didCallCheckForUpdates = false

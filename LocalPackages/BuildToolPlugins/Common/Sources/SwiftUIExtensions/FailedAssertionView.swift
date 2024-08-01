@@ -1,7 +1,7 @@
 //
-//  NSApplicationExtension.swift
+//  FailedAssertionView.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,17 +16,16 @@
 //  limitations under the License.
 //
 
-import Cocoa
-import Combine
+import SwiftUI
 
-extension NSApplication {
-    #if !NETWORK_EXTENSION && !SANDBOX_TEST_TOOL
-        var mainMenuTyped: MainMenu {
-            return mainMenu as! MainMenu // swiftlint:disable:this force_cast
-        }
+public struct FailedAssertionView: View {
 
-        var delegateTyped: AppDelegate {
-            return delegate as! AppDelegate // swiftlint:disable:this force_cast
-        }
-    #endif
+    public var body: some View {
+        EmptyView()
+    }
+
+    public init(_ message: String) {
+        assertionFailure(message)
+    }
+
 }

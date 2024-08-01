@@ -21,6 +21,7 @@ import Combine
 import SwiftUI
 import History
 import PixelKit
+import MacOSCommon
 
 @MainActor
 final class HomePageViewController: NSViewController {

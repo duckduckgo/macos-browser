@@ -18,10 +18,13 @@
 
 import Foundation
 import Common
+import MacOSCommon
+import Cocoa
 import SecureStorage
 
 protocol ResourcesRepository {
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]?
+    func removeExistingBrokersAndReplaceWithDebugBrokers() throws
 }
 
 final class FileResources: ResourcesRepository {
@@ -43,6 +46,8 @@ final class FileResources: ResourcesRepository {
             throw FileResourcesError.bundleResourceURLNil
         }
 
+        let shouldUseFakeBrokers = (NSApp.runType == .integrationTests)
+
         do {
             let fileURLs = try fileManager.contentsOfDirectory(
                 at: resourceURL,
@@ -51,10 +56,72 @@ final class FileResources: ResourcesRepository {
             )
 
             let brokerJSONFiles = fileURLs.filter {
-                $0.isJSON && !$0.hasFakePrefix
+                $0.isJSON && (
+                (shouldUseFakeBrokers && $0.hasFakePrefix) ||
+                (!shouldUseFakeBrokers && !$0.hasFakePrefix))
             }
 
             return try brokerJSONFiles.map(DataBroker.initFromResource(_:))
+        } catch {
+            os_log("DataBrokerProtectionUpdater: error FileResources error: fetchBrokerFromResourceFiles, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+    }
+
+    func removeExistingBrokersAndReplaceWithDebugBrokers() throws {
+        /*
+        hmm if we go with this approach it needs to be strictly for running the tests
+        cos otherwise the bundle singiture will change
+        the alternative would be to make this point at a different directory
+        I prefer that, but kinda wildly it gets _all_ json files in resources, so that would need to change
+        I think...yeah? Just change that? Although I'm worried it's used elsewhere
+         I'm not sure how we pull this in from FE, I might need to align there
+        that settles it, keep it as is for now and do the easier thing
+
+        I suppose another approach is having a more global "Debug mode" and then changing the fetchBrokerFromResourceFiles function itself to take that into account
+
+        for now fuck the signiture. yeet the files except for the debug ones
+
+        hmm now it's not ui tests, deleting them works, but, it'll fuck any other tests?
+        I think they run sepertly so is fine
+        gonna run with it for now
+
+        is this enough, do we need to yeet the DB somewhere?
+         in fact, the app is still gonna use fetchBrokerFromResourceFiles, so what is the point?
+
+        okay, we could rename the debug ones so the other thing doens't pick them up
+        or we could jsut do "IF INTEGRATION TEST" above
+        I think I might actually prefer the former, even though it's a lot more complicateda
+         */
+
+        guard let resourceURL = Bundle.module.resourceURL else {
+            assertionFailure()
+            os_log("DataBrokerProtectionUpdater: error FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil", log: .error)
+            throw FileResourcesError.bundleResourceURLNil
+        }
+
+        do {
+            let fileURLs = try fileManager.contentsOfDirectory(
+                at: resourceURL,
+                includingPropertiesForKeys: nil,
+                options: [.skipsHiddenFiles]
+            )
+
+            // Delete the non debug brokers
+            let brokerJSONFileURLsToDelete = fileURLs.filter {
+                $0.isJSON && !$0.isDebugBroker
+            }
+
+            for fileURL in brokerJSONFileURLsToDelete {
+                try fileManager.removeItem(at: fileURL)
+            }
+
+            // Rename the fake brokers so they will no longer be ignored by fetchBrokerFromResourceFiles()
+            for fileURL in fileURLs.filter({ $0.isDebugBroker }) {
+                let newName = fileURL.lastPathComponent.dropping(prefix: "fake")
+                let newURL = fileURL.deletingLastPathComponent().appendingPathComponent(newName)
+                try fileManager.moveItem(at: fileURL, to: newURL)
+            }
         } catch {
             os_log("DataBrokerProtectionUpdater: error FileResources error: fetchBrokerFromResourceFiles, error: %{public}@", log: .error, error.localizedDescription)
             throw error
@@ -98,10 +165,17 @@ final class AppVersionNumber: AppVersionNumberProvider {
     var versionNumber: String = AppVersion.shared.versionNumber
 }
 
-protocol DataBrokerProtectionBrokerUpdater {
-    static func provideForDebug() -> DefaultDataBrokerProtectionBrokerUpdater?
+protocol DataBrokerProtectionBrokerUpdaterProductionInterface {
     func updateBrokers()
     func checkForUpdatesInBrokerJSONFiles()
+}
+
+protocol DataBrokerProtectionBrokerUpdaterDebugInterface {
+    static func provideForDebug() -> DefaultDataBrokerProtectionBrokerUpdater?
+    func replaceAllBrokersWithDebugBrokers() throws
+}
+
+protocol DataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrokerUpdaterProductionInterface, DataBrokerProtectionBrokerUpdaterDebugInterface {
 }
 
 public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrokerUpdater {
@@ -122,15 +196,6 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
         self.vault = vault
         self.appVersion = appVersion
         self.pixelHandler = pixelHandler
-    }
-
-    public static func provideForDebug() -> DefaultDataBrokerProtectionBrokerUpdater? {
-        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: DataBrokerProtectionSecureVaultErrorReporter.shared) {
-            return DefaultDataBrokerProtectionBrokerUpdater(vault: vault)
-        }
-
-        os_log("Error when trying to create vault for data broker protection updater debug menu item", log: .dataBrokerProtection)
-        return nil
     }
 
     public func updateBrokers() {
@@ -210,6 +275,24 @@ public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrok
     }
 }
 
+// MARK: - Testing and debug methods
+
+extension DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrokerUpdaterDebugInterface {
+
+    public static func provideForDebug() -> DefaultDataBrokerProtectionBrokerUpdater? {
+        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: DataBrokerProtectionSecureVaultErrorReporter.shared) {
+            return DefaultDataBrokerProtectionBrokerUpdater(vault: vault)
+        }
+
+        os_log("Error when trying to create vault for data broker protection updater debug menu item", log: .dataBrokerProtection)
+        return nil
+    }
+
+    public func replaceAllBrokersWithDebugBrokers() throws {
+        try resources.removeExistingBrokersAndReplaceWithDebugBrokers()
+    }
+}
+
 fileprivate extension URL {
 
     var isJSON: Bool {
@@ -218,5 +301,9 @@ fileprivate extension URL {
 
     var hasFakePrefix: Bool {
         self.lastPathComponent.lowercased().hasPrefix("fake")
+    }
+
+    var isDebugBroker: Bool {
+        self.lastPathComponent.lowercased() == "fakemyfakebroker.com.json"
     }
 }

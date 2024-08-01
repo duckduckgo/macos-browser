@@ -33,7 +33,7 @@ public struct DataBrokerExecutionConfig {
         }
     }
 
-    let activitySchedulerTriggerInterval: TimeInterval = 20 * 60 // 20 minutes
-    let activitySchedulerIntervalTolerance: TimeInterval = 10 * 60 // 10 minutes
-    let activitySchedulerQOS: QualityOfService = .background
+    let activitySchedulerTriggerInterval: TimeInterval = 2 * 60 // 20 minutes
+    let activitySchedulerIntervalTolerance: TimeInterval = 1 * 60 // 10 minutes
+    let activitySchedulerQOS: QualityOfService = .userInitiated
 }
