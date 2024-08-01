@@ -122,36 +122,24 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         let isMalicious = await phishingDetector.checkIsMaliciousIfEnabled(url: url)
         self.phishingStateManager.isShowingPhishingError = isMalicious
         if isMalicious {
-            let token = URLTokenValidator.shared.generateToken(for: url)
             errorPageType = .phishing
-            specialErrorPageUserScript?.failingURL = navigationAction.url
             if let mainFrameTarget = navigationAction.mainFrameTarget {
+                specialErrorPageUserScript?.failingURL = navigationAction.url
                 return .redirect(mainFrameTarget) { navigator in
-                    guard let urlString = navigationAction.url.absoluteString.data(using: .utf8) else {
-                        os_log(.debug, log: .phishingDetection, "Failed to convert URL string to data.")
-                        return
+                    if let errorURL = self.generateErrorPageURL(url) {
+                        navigator.load(URLRequest(url: errorURL))
                     }
-                    let encodedURL = URLTokenValidator.base64URLEncode(data: urlString)
-                    let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
-                    guard let errorURL = URL(string: errorURLString) else {
-                        os_log(.debug, log: .phishingDetection, "Failed to create error URL.")
-                        return
-                    }
-                    navigator.load(URLRequest(url: errorURL))
                 }
-            }
-            // We're probably in an iframe, let's navigate the parent frame
-            guard let urlString = navigationAction.url.absoluteString.data(using: .utf8) else {
-                os_log(.debug, log: .phishingDetection, "Failed to convert URL string to data.")
+            } else {
+                // Malicious iFrame Detected
+                let iframeTopUrl = navigationAction.sourceFrame.url
+                specialErrorPageUserScript?.failingURL = iframeTopUrl
+                if let errorURL = self.generateErrorPageURL(iframeTopUrl) {
+                    _ = webView?.load(URLRequest(url: errorURL))
+                    return .cancel
+                }
                 return .next
             }
-            let encodedURL = URLTokenValidator.base64URLEncode(data: urlString)
-            let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
-            guard let errorURL = URL(string: errorURLString) else {
-                os_log(.debug, log: .phishingDetection, "Failed to create error URL.")
-                return .next
-            }
-            self.webView?.load(URLRequest(url: errorURL))
         }
         errorPageType = nil
         return .next
@@ -191,6 +179,18 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
 
         shouldBypassSSLError = false
         return .credential(credential)
+    }
+    
+    @MainActor
+    func generateErrorPageURL(_ url: URL) -> URL? {
+        guard let urlString = url.absoluteString.data(using: .utf8) else {
+            os_log(.debug, log: .phishingDetection, "Failed to convert URL string to data.")
+            return nil
+        }
+        let encodedURL = URLTokenValidator.base64URLEncode(data: urlString)
+        let token = URLTokenValidator.shared.generateToken(for: url)
+        let errorURLString = "duck://error?reason=phishing&url=\(encodedURL)&token=\(token)"
+        return URL(string: errorURLString)
     }
 }
 
