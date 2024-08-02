@@ -272,7 +272,7 @@ final class DuckPlayer {
     }
 
     @MainActor
-    private func encodedOverlaySettings(with webView: WKWebView?) async -> InitialOverlaySettings {        
+    private func encodedOverlaySettings(with webView: WKWebView?) async -> InitialOverlaySettings {
         let userValues = encodeUserValues()
 
         return InitialOverlaySettings(userValues: userValues)
