@@ -71,7 +71,15 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     @Published private(set) var submitButtonEnabled: Bool = false
     @Published var selectedReportType: String = UnifiedFeedbackReportType.prompt.rawValue {
         didSet {
-            selectedCategory = UnifiedFeedbackCategory.prompt.rawValue
+            let defaultCategory: UnifiedFeedbackCategory
+            switch Source(rawValue: source) {
+            case .ppro: defaultCategory = .subscription
+            case .vpn: defaultCategory = .vpn
+            case .pir: defaultCategory = .pir
+            case .itr: defaultCategory = .itr
+            default: defaultCategory = .prompt
+            }
+            selectedCategory = defaultCategory.rawValue
 
             Task {
                 await feedbackSender.sendCategoryScreenShowPixel(source: source,
