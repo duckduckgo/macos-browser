@@ -111,6 +111,17 @@ final class DuckPlayerPreferences: ObservableObject {
         }
     }
 
+    var shouldDisplayContingencyMessage: Bool {
+        false
+    }
+
+    @MainActor
+    func openLearnMoreContingencyURL() {
+        #warning("DuckPlayer - Replace this with real URL")
+        guard let url = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/duck-player/") else { return }
+        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+    }
+
     init(persistor: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor(),
          privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider) {
