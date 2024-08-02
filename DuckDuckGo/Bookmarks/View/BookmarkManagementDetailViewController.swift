@@ -41,10 +41,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     private lazy var deleteItemsButton = MouseOverButton(title: "  " + UserText.bookmarksBarContextMenuDelete, target: self, action: #selector(delete))
         .withAccessibilityIdentifier("BookmarkManagementDetailViewController.deleteItemsButton")
 
+    lazy var searchBar = NSSearchField()
     private lazy var separator = NSBox()
     private lazy var scrollView = NSScrollView()
     private lazy var tableView = NSTableView()
-    private lazy var searchBar = NSSearchField()
+
 
     private lazy var emptyState = NSView()
     private lazy var emptyStateImageView = NSImageView(image: .bookmarksEmpty)
@@ -241,6 +242,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     override func keyDown(with event: NSEvent) {
         if event.charactersIgnoringModifiers == String(UnicodeScalar(NSDeleteCharacter)!) {
             deleteSelectedItems()
+        } else {
+            let commandKeyDown = event.modifierFlags.contains(.command)
+            if commandKeyDown && event.keyCode == 3 { // CMD + F
+                searchBar.makeMeFirstResponder()
+            }
         }
     }
 
@@ -402,52 +408,9 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
                    validateDrop info: NSDraggingInfo,
                    proposedRow row: Int,
                    proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation {
-
-        if let proposedDestination = fetchEntity(at: row), proposedDestination.isFolder {
-            if let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) {
-                return validateDrop(for: bookmarks, destination: proposedDestination)
-            }
-
-            if let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard) {
-                return validateDrop(for: folders, destination: proposedDestination)
-            }
-
-            return .none
-        } else {
-            if dropOperation == .above {
-                return .move
-            } else {
-                return .none
-            }
-        }
-    }
-
-    private func validateDrop(for draggedBookmarks: Set<PasteboardBookmark>, destination: BaseBookmarkEntity) -> NSDragOperation {
-        guard destination is BookmarkFolder else {
-            return .none
-        }
-
-        return .move
-    }
-
-    private func validateDrop(for draggedFolders: Set<PasteboardFolder>, destination: BaseBookmarkEntity) -> NSDragOperation {
-        guard let destinationFolder = destination as? BookmarkFolder else {
-            return .none
-        }
-
-        for folderID in draggedFolders.map(\.id) where !bookmarkManager.canMoveObjectWithUUID(objectUUID: folderID, to: destinationFolder) {
-            return .none
-        }
-
-        let tryingToDragOntoSameFolder = draggedFolders.contains { folder in
-            return folder.id == destination.id
-        }
-
-        if tryingToDragOntoSameFolder {
-            return .none
-        }
-
-        return .move
+        return managementDetailViewModel.validateDrop(pasteboardItems: info.draggingPasteboard.pasteboardItems,
+                                                      proposedRow: row,
+                                                      proposedDropOperation: dropOperation)
     }
 
     func tableView(_ tableView: NSTableView, acceptDrop info: NSDraggingInfo, row: Int, dropOperation: NSTableView.DropOperation) -> Bool {

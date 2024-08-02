@@ -410,7 +410,90 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         XCTAssertTrue(sut.shouldShowNoSearchResultsState)
     }
 
+    // MARK: - Drag and drop validation tests
+
+    func testWhenSearchQueryIsNotBlankAndProposedDestinationIsRoot_thenWeDoNotAllowDrop() {
+        let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
+        let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkTwo, bookmarkThree]
+        sut.update(selection: .empty, searchQuery: "some")
+
+        // We pick a row where the result is nil
+        let result = sut.validateDrop(pasteboardItems: nil, proposedRow: 3, proposedDropOperation: .above)
+
+        XCTAssertEqual(result, .none)
+    }
+
+    func testWhenSearchQueryIsBlankAndProposedDestinationIsRoot_thenWeAllowDrop() {
+        let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
+        let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        sut.update(selection: .empty, searchQuery: "")
+
+        // We pick a row where the result is nil
+        let result = sut.validateDrop(pasteboardItems: nil, proposedRow: 3, proposedDropOperation: .above)
+
+        XCTAssertEqual(result, .move)
+    }
+
+    func testWhenDraggingBookmarkToFolderInSearch_thenWeAllowDrop() {
+        let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
+        let bookmarkFour = Bookmark(id: "4", url: "www.test4.com", title: "Bookmark #4", isFavorite: false)
+        let bookmarkFive = Bookmark(id: "5", url: "www.test5.com", title: "Bookmark #5", isFavorite: false)
+        let children = [bookmarkFour, bookmarkFive]
+        let folder = createFolder(with: children)
+        let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        bookmarkManager.bookmarksReturnedForSearch = [folder]
+        sut.update(selection: .empty, searchQuery: "some")
+        let pasteboardItems = createPasteboardItems(for: bookmarkOne)
+
+        // Zero is the position of the folder returned in the search
+        let result = sut.validateDrop(pasteboardItems: pasteboardItems, proposedRow: 0, proposedDropOperation: .on)
+
+        XCTAssertEqual(result, .move)
+    }
+
+    func testWhenDraggingBookmarkToFolderWhenNotSearching_thenWeAllowDrop() {
+        let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
+        let bookmarkFour = Bookmark(id: "4", url: "www.test4.com", title: "Bookmark #4", isFavorite: false)
+        let bookmarkFive = Bookmark(id: "5", url: "www.test5.com", title: "Bookmark #5", isFavorite: false)
+        let children = [bookmarkFour, bookmarkFive]
+        let folder = createFolder(with: children)
+        let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        sut.update(selection: .empty, searchQuery: "")
+        let pasteboardItems = createPasteboardItems(for: bookmarkOne)
+
+        // Three is the position of the folder
+        let result = sut.validateDrop(pasteboardItems: pasteboardItems, proposedRow: 3, proposedDropOperation: .on)
+
+        XCTAssertEqual(result, .move)
+    }
+
+    func testWhenDraggingBookmarkToBookmark_thenWeDoNotAllowDrop() {
+        let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
+        let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        sut.update(selection: .empty, searchQuery: "")
+        let pasteboardItems = createPasteboardItems(for: bookmarkOne)
+
+        // We try to move bookmarkOne on bookmarkTwo
+        let result = sut.validateDrop(pasteboardItems: pasteboardItems, proposedRow: 1, proposedDropOperation: .on)
+
+        XCTAssertEqual(result, .none)
+    }
+
     // MARK: - Helper functions
+
+    private func createPasteboardItems(for bookmark: Bookmark) -> [NSPasteboardItem] {
+        let pastedBookmark = BookmarkPasteboardWriter(bookmark: bookmark)
+        let pasteboardWritedType = BookmarkPasteboardWriter.bookmarkUTIInternalType
+        let propertyList = pastedBookmark.pasteboardPropertyList(forType: pasteboardWritedType)!
+
+        return [NSPasteboardItem(pasteboardPropertyList: propertyList, ofType: pasteboardWritedType)!]
+    }
 
     private func createBookmarkManager(with bookmarks: [BaseBookmarkEntity], favorites: [BaseBookmarkEntity] = []) -> MockBookmarkManager {
         let bookmarkManager = MockBookmarkManager()
