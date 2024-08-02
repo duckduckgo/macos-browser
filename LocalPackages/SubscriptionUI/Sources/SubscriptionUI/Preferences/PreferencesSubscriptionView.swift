@@ -19,6 +19,7 @@
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
+import BrowserServicesKit
 
 public struct PreferencesSubscriptionView: View {
 
@@ -30,8 +31,12 @@ public struct PreferencesSubscriptionView: View {
 
     @State private var manageSubscriptionSheet: ManageSubscriptionSheet?
 
-    public init(model: PreferencesSubscriptionModel) {
+    private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
+
+    public init(model: PreferencesSubscriptionModel, 
+                subscriptionFeatureAvailability: SubscriptionFeatureAvailability) {
         self.model = model
+        self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
     }
 
     public var body: some View {
@@ -98,7 +103,9 @@ public struct PreferencesSubscriptionView: View {
             helpSection
 
             // Feedback section
-            feedbackSection
+            if subscriptionFeatureAvailability.usesUnifiedFeedbackForm, state == .subscriptionActive {
+                feedbackSection
+            }
         }
         .onAppear(perform: {
             if model.isUserAuthenticated {

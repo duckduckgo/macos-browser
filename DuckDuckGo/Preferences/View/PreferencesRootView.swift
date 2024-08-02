@@ -104,7 +104,8 @@ enum Preferences {
                 case .vpn:
                     VPNView(model: VPNPreferencesModel(), status: model.vpnProtectionStatus())
                 case .subscription:
-                    SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
+                    SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!,
+                                                               subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability())
                 case .autofill:
                     AutofillView(model: AutofillPreferencesModel())
                 case .accessibility:
