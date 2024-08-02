@@ -22,6 +22,7 @@ import ContentBlocking
 import Foundation
 import Navigation
 import PixelKit
+import DuckPlayer
 
 protocol YoutubeScriptsProvider {
     var youtubeOverlayScript: YoutubeOverlayUserScript? { get }
