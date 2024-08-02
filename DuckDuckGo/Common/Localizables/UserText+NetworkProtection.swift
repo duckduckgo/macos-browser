@@ -42,8 +42,8 @@ extension UserText {
     static let networkProtectionInviteSuccessMessage = "DuckDuckGo's VPN secures all of your device's Internet traffic anytime, anywhere."
 
     // MARK: - Navigation Bar Status View
-    // "network.protection.navbar.status.view.share.feedback" - Menu item for 'Share Feedback' in the VPN status view that's shown in the navigation bar
-    static let networkProtectionNavBarStatusViewShareFeedback = "Share Feedback…"
+    // "network.protection.navbar.status.view.share.feedback" - Menu item for 'Share VPN Feedback' in the VPN status view that's shown in the navigation bar
+    static let networkProtectionNavBarStatusViewShareFeedback = "Share VPN Feedback…"
     // "network.protection.status.menu.vpn.settings" - The status menu 'VPN Settings' menu item
     static let networkProtectionNavBarStatusMenuVPNSettings = "VPN Settings…"
     // "network.protection.status.menu.faq" - The status menu 'FAQ' menu item
@@ -91,6 +91,8 @@ extension UserText {
     static let pproFeedbackFormCategoryOTP = "Issue with one-time password"
     // "ppro.feedback-form.category.something-else" - Description for the feedback form when the user has an issue not categorized in other options
     static let pproFeedbackFormCategoryOther = "Something else"
+    // "vpn.feedback-form.title" - Title for each screen of the VPN feedback form
+    static let vpnFeedbackFormTitle = "Help Improve the DuckDuckGo VPN"
     // "vpn.feedback-form.category.select-category" - Title for the category selection state of the VPN feedback form
     static let vpnFeedbackFormCategorySelect = "Select a category"
     // "vpn.feedback-form.category.unable-to-install" - Title for the 'unable to install' category of the VPN feedback form
@@ -105,8 +107,10 @@ extension UserText {
     static let vpnFeedbackFormCategoryLocalDeviceConnectivity = "VPN won't let me connect to local device"
     // "vpn.feedback-form.category.browser-crash-or-freeze" - Title for the browser crash/freeze category of the VPN feedback form
     static let vpnFeedbackFormCategoryBrowserCrashOrFreeze = "VPN causes browser to crash or freeze"
+    // "vpn.feedback-form.category.feature-request" - Title for the 'VPN feature request' category of the VPN feedback form
+    static let vpnFeedbackFormCategoryFeatureRequest = "VPN feature request"
     // "vpn.feedback-form.category.other" - Title for the 'other VPN feedback' category of the VPN feedback form
-    static let vpnFeedbackFormCategoryOther = "Something else"
+    static let vpnFeedbackFormCategoryOther = "Other VPN feedback"
     // "pir.feedback-form.category.select-category" - Title for the category selection state of the PIR feedback form
     static let pirFeedbackFormCategorySelect = "Select a category"
     // "pir.feedback-form.category.no-info-on-specific-site" - Description for the feedback form when the scan didn't find user's info on a specific site

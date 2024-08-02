@@ -26,7 +26,7 @@ import NetworkProtectionIPC
 import NetworkProtectionUI
 import Subscription
 
-struct VPNMetadata: UnifiedFeedbackMetadata {
+struct VPNMetadata: Encodable {
 
     struct AppInfo: Encodable {
         let appVersion: String
@@ -100,9 +100,25 @@ struct VPNMetadata: UnifiedFeedbackMetadata {
 
         return String(data: encodedMetadata, encoding: .utf8)
     }
+
+    func toBase64() -> String {
+        let encoder = JSONEncoder()
+
+        do {
+            let encodedMetadata = try encoder.encode(self)
+            return encodedMetadata.base64EncodedString()
+        } catch {
+            return "Failed to encode metadata to JSON, error message: \(error.localizedDescription)"
+        }
+    }
+
 }
 
-final class DefaultVPNMetadataCollector: UnifiedMetadataCollector {
+protocol VPNMetadataCollector {
+    func collectVPNMetadata() async -> VPNMetadata
+}
+
+final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
     private let statusReporter: NetworkProtectionStatusReporter
     private let ipcClient: VPNControllerXPCClient
@@ -146,7 +162,7 @@ final class DefaultVPNMetadataCollector: UnifiedMetadataCollector {
     }
 
     @MainActor
-    func collectMetadata() async -> VPNMetadata? {
+    func collectVPNMetadata() async -> VPNMetadata {
         let appInfoMetadata = collectAppInfoMetadata()
         let deviceInfoMetadata = collectDeviceInfoMetadata()
         let networkInfoMetadata = await collectNetworkInformation()
@@ -200,17 +216,17 @@ final class DefaultVPNMetadataCollector: UnifiedMetadataCollector {
     }
 
     private func getMachineArchitecture() -> String {
-        #if arch(arm)
-            return "arm"
-        #elseif arch(arm64)
-            return "arm64"
-        #elseif arch(i386)
-            return "i386"
-        #elseif arch(x86_64)
-            return "x86_64"
-        #else
-            return "unknown"
-        #endif
+#if arch(arm)
+        return "arm"
+#elseif arch(arm64)
+        return "arm64"
+#elseif arch(i386)
+        return "i386"
+#elseif arch(x86_64)
+        return "x86_64"
+#else
+        return "unknown"
+#endif
     }
 
     func collectNetworkInformation() async -> VPNMetadata.NetworkInfo {
@@ -312,4 +328,14 @@ final class DefaultVPNMetadataCollector: UnifiedMetadataCollector {
         )
     }
 
+}
+
+// MARK: - Unified feedback form support
+
+extension VPNMetadata: UnifiedFeedbackMetadata {}
+
+extension DefaultVPNMetadataCollector: UnifiedMetadataCollector {
+    func collectMetadata() async -> VPNMetadata? {
+        await collectVPNMetadata()
+    }
 }
