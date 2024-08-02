@@ -64,8 +64,10 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         self.ipcClient = ipcClient
         self.vpnUninstaller = vpnUninstaller
 
+        let activeDomainPublisher = ActiveDomainPublisher(windowControllersManager: .shared)
+
         siteTroubleshootingInfoPublisher = SiteTroubleshootingInfoPublisher(
-            windowControllerManager: .shared,
+            activeDomainPublisher: activeDomainPublisher.eraseToAnyPublisher(),
             proxySettings: TransparentProxySettings(defaults: .netP))
 
         subscribeToCurrentSitePublisher()
@@ -101,10 +103,6 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             let vpnURLEventHandler = VPNURLEventHandler()
             let proxySettings = TransparentProxySettings(defaults: .netP)
             let uiActionHandler = VPNUIActionHandler(vpnURLEventHandler: vpnURLEventHandler, proxySettings: proxySettings)
-
-            // We need to force-refresh the current site as there's currently no easy mechanism
-            // to observe active-tab changes.  We just force-refresh when the popover is shown.
-            siteTroubleshootingInfoPublisher.refresh()
 
             let siteTroubleshootingFeatureFlagPublisher = NSApp.delegateTyped.internalUserDecider.isInternalUserPublisher.eraseToAnyPublisher()
 

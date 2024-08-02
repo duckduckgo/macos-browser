@@ -1,5 +1,5 @@
 //
-//  WindowControllersManager+ActiveDomain.swift
+//  ActiveDomainPublisher.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,10 +19,6 @@
 import Combine
 import Foundation
 
-protocol ActiveDomainProvider {
-    var activeDomain: String? { get }
-}
-
 /// A convenience class for publishing the active domain
 ///
 /// The active domain is the domain loaded in the last active tab within the last active window.
@@ -37,6 +33,10 @@ final class ActiveDomainPublisher {
     @MainActor
     @Published
     private var activeWindowController: MainWindowController? {
+        willSet {
+            Swift.print("🤌🤌🤌 Window updated")
+        }
+
         didSet {
             subscribeToActiveTabViewModel()
         }
@@ -45,24 +45,35 @@ final class ActiveDomainPublisher {
     @MainActor
     @Published
     private var activeTab: Tab? {
+        willSet {
+            Swift.print("🤌🤌 Tab updated")
+        }
+
         didSet {
             subscribeToActiveTabContentChanges()
         }
     }
 
     init(windowControllersManager: WindowControllersManager) {
+        self.windowControllersManager = windowControllersManager
+
         Task { @MainActor in
             subscribeToKeyWindowControllerChanges()
         }
     }
 
     @Published
-    private(set) var activeDomain: String?
+    private(set) var activeDomain: String? {
+        willSet {
+            Swift.print("🤌 Domain updated %@", newValue ?? "nil")
+        }
+    }
 
     @MainActor
     private func subscribeToKeyWindowControllerChanges() {
         activeWindowControllerCancellable = windowControllersManager
             .didChangeKeyWindowController
+            .prepend(windowControllersManager.lastKeyMainWindowController)
             .assign(to: \.activeWindowController, onWeaklyHeld: self)
     }
 
@@ -77,6 +88,7 @@ final class ActiveDomainPublisher {
     private func subscribeToActiveTabContentChanges() {
         activeTabContentCancellable = activeTab?.$content
             .map(domain(from:))
+            .removeDuplicates()
             .assign(to: \.activeDomain, onWeaklyHeld: self)
     }
 
@@ -87,5 +99,14 @@ final class ActiveDomainPublisher {
         } else {
             return nil
         }
+    }
+}
+
+extension ActiveDomainPublisher: Publisher {
+    typealias Output = String?
+    typealias Failure = Never
+
+    func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, String? == S.Input {
+        $activeDomain.subscribe(subscriber)
     }
 }

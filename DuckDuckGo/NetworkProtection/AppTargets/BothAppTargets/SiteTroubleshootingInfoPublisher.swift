@@ -22,24 +22,39 @@ import NetworkProtectionProxy
 import NetworkProtectionUI
 
 @MainActor
-final class SiteTroubleshootingInfoPublisher: Publisher {
-    typealias Output = SiteTroubleshootingInfo?
-    typealias Failure = Never
+final class SiteTroubleshootingInfoPublisher {
+
+    private var activeDomain: String? {
+        willSet {
+            Swift.print("🤌🟢 Domain updated %@", newValue ?? "nil")
+        }
+
+        didSet {
+            refreshSiteTroubleshootingInfo()
+        }
+    }
 
     private let subject: CurrentValueSubject<SiteTroubleshootingInfo?, Never>
-    private let windowControllerManager: WindowControllersManager
 
+    private let activeDomainPublisher: AnyPublisher<String?, Never>
     private let proxySettings: TransparentProxySettings
     private var cancellables = Set<AnyCancellable>()
 
-    init(windowControllerManager: WindowControllersManager,
+    init(activeDomainPublisher: AnyPublisher<String?, Never>,
          proxySettings: TransparentProxySettings) {
 
         subject = CurrentValueSubject<SiteTroubleshootingInfo?, Never>(nil)
-        self.windowControllerManager = windowControllerManager
+        self.activeDomainPublisher = activeDomainPublisher
         self.proxySettings = proxySettings
 
+        subscribeToActiveDomainChanges()
         subscribeToExclusionChanges()
+    }
+
+    private func subscribeToActiveDomainChanges() {
+        activeDomainPublisher
+            .assign(to: \.activeDomain, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     private func subscribeToExclusionChanges() {
@@ -48,14 +63,16 @@ final class SiteTroubleshootingInfoPublisher: Publisher {
 
             switch change {
             case .excludedDomains:
-                refresh()
+                refreshSiteTroubleshootingInfo()
             default:
                 break
             }
         }.store(in: &cancellables)
     }
 
-    func refresh() {
+    // MARK: - Refreshing
+
+    func refreshSiteTroubleshootingInfo() {
         if activeSiteTroubleshootingInfo != subject.value {
             subject.send(activeSiteTroubleshootingInfo)
         }
@@ -64,7 +81,7 @@ final class SiteTroubleshootingInfoPublisher: Publisher {
     // MARK: - Active Site Troubleshooting Info
 
     var activeSiteTroubleshootingInfo: SiteTroubleshootingInfo? {
-        guard let activeDomain = windowControllerManager.activeDomain else {
+        guard let activeDomain else {
             return nil
         }
 
@@ -84,8 +101,11 @@ final class SiteTroubleshootingInfoPublisher: Publisher {
 
         return currentSite
     }
+}
 
-    // MARK: - Publisher
+extension SiteTroubleshootingInfoPublisher: Publisher {
+    typealias Output = SiteTroubleshootingInfo?
+    typealias Failure = Never
 
     nonisolated
     func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, NetworkProtectionUI.SiteTroubleshootingInfo? == S.Input {
