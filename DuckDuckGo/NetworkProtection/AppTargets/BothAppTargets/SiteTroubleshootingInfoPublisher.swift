@@ -25,10 +25,6 @@ import NetworkProtectionUI
 final class SiteTroubleshootingInfoPublisher {
 
     private var activeDomain: String? {
-        willSet {
-            Swift.print("🤌🟢 Domain updated %@", newValue ?? "nil")
-        }
-
         didSet {
             refreshSiteTroubleshootingInfo()
         }

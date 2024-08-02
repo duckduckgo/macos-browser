@@ -33,10 +33,6 @@ final class ActiveDomainPublisher {
     @MainActor
     @Published
     private var activeWindowController: MainWindowController? {
-        willSet {
-            Swift.print("🤌🤌🤌 Window updated")
-        }
-
         didSet {
             subscribeToActiveTabViewModel()
         }
@@ -45,10 +41,6 @@ final class ActiveDomainPublisher {
     @MainActor
     @Published
     private var activeTab: Tab? {
-        willSet {
-            Swift.print("🤌🤌 Tab updated")
-        }
-
         didSet {
             subscribeToActiveTabContentChanges()
         }
@@ -63,11 +55,7 @@ final class ActiveDomainPublisher {
     }
 
     @Published
-    private(set) var activeDomain: String? {
-        willSet {
-            Swift.print("🤌 Domain updated %@", newValue ?? "nil")
-        }
-    }
+    private(set) var activeDomain: String?
 
     @MainActor
     private func subscribeToKeyWindowControllerChanges() {
