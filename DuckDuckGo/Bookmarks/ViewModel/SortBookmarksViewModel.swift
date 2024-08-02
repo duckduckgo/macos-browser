@@ -51,60 +51,63 @@ enum BookmarksSortMode: Codable {
         return self != .manual
     }
 
-    var menu: NSMenu {
-        switch self {
-        case .manual:
-            return NSMenu(items: [
-                menuItem(for: .manual, state: .on),
-                sortByName(state: .off),
-                NSMenuItem.separator(),
-                menuItem(for: .nameAscending, state: .off, disabled: true),
-                menuItem(for: .nameDescending, state: .off, disabled: true)
-            ])
-        case .nameAscending:
-            return NSMenu(items: [
-                menuItem(for: .manual, state: .off),
-                sortByName(state: .on),
-                NSMenuItem.separator(),
-                menuItem(for: .nameAscending, state: .on),
-                menuItem(for: .nameDescending, state: .off)
-            ])
-        case .nameDescending:
-            return NSMenu(items: [
-                menuItem(for: .manual, state: .off),
-                sortByName(state: .on),
-                NSMenuItem.separator(),
-                menuItem(for: .nameAscending, state: .off),
-                menuItem(for: .nameDescending, state: .on)
-            ])
-        }
-    }
-
     var isNameSorting: Bool {
         return self == .nameAscending || self == .nameDescending
     }
 
-    private func menuItem(for mode: BookmarksSortMode, state: NSControl.StateValue, disabled: Bool = false) -> NSMenuItem {
-        return NSMenuItem(title: mode.title, action: disabled ? nil : mode.action, state: state)
+    func menu(target: AnyObject) -> NSMenu {
+        switch self {
+        case .manual:
+            return NSMenu(items: [
+                menuItem(for: .manual, state: .on, target: target),
+                sortByName(state: .off, target: target),
+                NSMenuItem.separator(),
+                menuItem(for: .nameAscending, state: .off, target: target, disabled: true),
+                menuItem(for: .nameDescending, state: .off, target: target, disabled: true)
+            ])
+        case .nameAscending:
+            return NSMenu(items: [
+                menuItem(for: .manual, state: .off, target: target),
+                sortByName(state: .on, target: target),
+                NSMenuItem.separator(),
+                menuItem(for: .nameAscending, state: .on, target: target),
+                menuItem(for: .nameDescending, state: .off, target: target)
+            ])
+        case .nameDescending:
+            return NSMenu(items: [
+                menuItem(for: .manual, state: .off, target: target),
+                sortByName(state: .on, target: target),
+                NSMenuItem.separator(),
+                menuItem(for: .nameAscending, state: .off, target: target),
+                menuItem(for: .nameDescending, state: .on, target: target)
+            ])
+        }
     }
 
-    private func sortByName(state: NSControl.StateValue) -> NSMenuItem {
-        return NSMenuItem(title: UserText.bookmarksSortByName, action: BookmarksSortMode.nameAscending.action, state: state)
+    private func menuItem(for mode: BookmarksSortMode, state: NSControl.StateValue, target: AnyObject, disabled: Bool = false) -> NSMenuItem {
+        return NSMenuItem(title: mode.title, action: disabled ? nil : mode.action, target: target, state: state)
+    }
+
+    private func sortByName(state: NSControl.StateValue, target: AnyObject) -> NSMenuItem {
+        return NSMenuItem(title: UserText.bookmarksSortByName, action: BookmarksSortMode.nameAscending.action, target: target, state: state)
     }
 }
 
 protocol SortBookmarksRepository {
 
     var storedSortMode: BookmarksSortMode { get set }
+    var sortModePublisher: AnyPublisher<BookmarksSortMode, Never> { get }
 }
 
 final class SortBookmarksUserDefaults: SortBookmarksRepository {
+    static let shared = SortBookmarksUserDefaults()
 
     private enum Keys {
         static let sortMode = "com.duckduckgo.bookmarks.sort.mode"
     }
 
     private let userDefaults: UserDefaults
+    private var sortModeSubject = PassthroughSubject<BookmarksSortMode, Never>()
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
@@ -122,8 +125,13 @@ final class SortBookmarksUserDefaults: SortBookmarksRepository {
         set {
             if let data = try? JSONEncoder().encode(newValue) {
                 userDefaults.set(data, forKey: Keys.sortMode)
+                sortModeSubject.send(newValue)
             }
         }
+    }
+
+    var sortModePublisher: AnyPublisher<BookmarksSortMode, Never> {
+        sortModeSubject.eraseToAnyPublisher()
     }
 }
 
@@ -132,12 +140,19 @@ final class SortBookmarksViewModel: NSObject {
     private let metrics: BookmarksSearchAndSortMetrics
     private let origin: BookmarkOperationOrigin
     private var repository: SortBookmarksRepository
+    private var wasSortOptionSelected = false
+    private var cancellables = Set<AnyCancellable>()
 
     @Published
-    private(set) var selectedSortMode: BookmarksSortMode = .manual
-    private var wasSortOptionSelected = false
+    private(set) var selectedSortMode: BookmarksSortMode
 
-    init(repository: SortBookmarksRepository = SortBookmarksUserDefaults(),
+    var menu: NSMenu {
+        let menu = selectedSortMode.menu(target: self)
+        menu.delegate = self
+        return menu
+    }
+
+    init(repository: SortBookmarksRepository = SortBookmarksUserDefaults.shared,
          metrics: BookmarksSearchAndSortMetrics,
          origin: BookmarkOperationOrigin) {
         self.metrics = metrics
@@ -145,12 +160,18 @@ final class SortBookmarksViewModel: NSObject {
         self.repository = repository
 
         selectedSortMode = repository.storedSortMode
+
+        super.init()
+
+        repository.sortModePublisher
+            .receive(on: RunLoop.main)
+            .assign(to: \.selectedSortMode, on: self)
+            .store(in: &cancellables)
     }
 
     func setSort(mode: BookmarksSortMode) {
         wasSortOptionSelected = true
-        selectedSortMode = mode
-        repository.storedSortMode = selectedSortMode
+        repository.storedSortMode = mode
 
         if mode.isNameSorting {
             metrics.fireSortByName(origin: origin)
@@ -166,5 +187,20 @@ extension SortBookmarksViewModel: NSMenuDelegate {
         }
 
         wasSortOptionSelected = false
+    }
+}
+
+extension SortBookmarksViewModel: BookmarkSortMenuItemSelectors {
+
+    func manualSort(_ sender: NSMenuItem) {
+        setSort(mode: .manual)
+    }
+
+    func sortByNameAscending(_ sender: NSMenuItem) {
+        setSort(mode: .nameAscending)
+    }
+
+    func sortByNameDescending(_ sender: NSMenuItem) {
+        setSort(mode: .nameDescending)
     }
 }

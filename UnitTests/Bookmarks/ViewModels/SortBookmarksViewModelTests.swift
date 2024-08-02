@@ -18,14 +18,27 @@
 
 import XCTest
 import PixelKitTestingUtilities
+import Combine
 @testable import PixelKit
 @testable import DuckDuckGo_Privacy_Browser
 
 final class MockSortBookmarksRepository: SortBookmarksRepository {
-    var storedSortMode: BookmarksSortMode
+    private var _storedSortMode: BookmarksSortMode = .manual
+    var storedSortMode: BookmarksSortMode {
+        get {
+            return _storedSortMode
+        }
+        set {
+            _storedSortMode = newValue
+            sortModeSubject.send(newValue)
+        }
+    }
 
-    init(storedSortMode: BookmarksSortMode = .manual) {
-        self.storedSortMode = storedSortMode
+    // Publisher to emit changes to the sort mode
+    private var sortModeSubject = PassthroughSubject<BookmarksSortMode, Never>()
+
+    var sortModePublisher: AnyPublisher<BookmarksSortMode, Never> {
+        return sortModeSubject.eraseToAnyPublisher()
     }
 }
 
