@@ -46,7 +46,7 @@ struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersisto
     @UserDefaultsWrapper(key: .duckPlayerAutoplay, defaultValue: true)
     var duckPlayerAutoplay: Bool
 
-    @UserDefaultsWrapper(key: .duckPlayerOpenInNewTab, defaultValue: false)
+    @UserDefaultsWrapper(key: .duckPlayerOpenInNewTab, defaultValue: true)
     var duckPlayerOpenInNewTab: Bool
 }
 
@@ -68,9 +68,9 @@ final class DuckPlayerPreferences: ObservableObject {
         didSet {
             persistor.duckPlayerAutoplay = duckPlayerAutoplay
             if duckPlayerAutoplay {
-                PixelKit.fire(GeneralPixel.duckPlayerAutoplaySettingsOn)
+                PixelKit.fire(NonStandardEvent(GeneralPixel.duckPlayerAutoplaySettingsOn))
             } else {
-                PixelKit.fire(GeneralPixel.duckPlayerAutoplaySettingsOff)
+                PixelKit.fire(NonStandardEvent(GeneralPixel.duckPlayerAutoplaySettingsOff))
             }
         }
     }
@@ -80,9 +80,9 @@ final class DuckPlayerPreferences: ObservableObject {
         didSet {
             persistor.duckPlayerOpenInNewTab = duckPlayerOpenInNewTab
             if duckPlayerOpenInNewTab {
-                PixelKit.fire(GeneralPixel.duckPlayerNewTabSettingsOn)
+                PixelKit.fire(NonStandardEvent(GeneralPixel.duckPlayerNewTabSettingsOn))
             } else {
-                PixelKit.fire(GeneralPixel.duckPlayerNewTabSettingsOff)
+                PixelKit.fire(NonStandardEvent(GeneralPixel.duckPlayerNewTabSettingsOff))
             }
         }
     }

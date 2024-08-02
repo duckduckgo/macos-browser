@@ -35,11 +35,10 @@ final class AppRestarter: AppRestarting {
             return
         }
 
-        let preOpenCmd = "/usr/bin/xattr -d -r com.apple.quarantine \(shellQuotedString(destinationPath))"
         let openCmd = "/usr/bin/open \(shellQuotedString(destinationPath))"
 
         let script = """
-        (while /bin/kill -0 \(pid) >&/dev/null; do /bin/sleep 0.1; done; \(preOpenCmd); \(openCmd)) &
+        (while /bin/kill -0 \(pid) >&/dev/null; do /bin/sleep 0.1; done; \(openCmd)) &
         """
 
         let task = Process()
