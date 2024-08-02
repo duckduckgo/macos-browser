@@ -23,7 +23,6 @@ import SwiftUI
 
 /// Implements the logic for the VPN's simulate failures menu.
 ///
-@MainActor
 final class NetworkProtectionSimulateFailureMenu: NSMenu {
 
     private let simulateControllerFailureMenuItem = NSMenuItem(title: "Enable NetP Controller Failure",
