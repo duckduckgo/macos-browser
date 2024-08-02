@@ -28,6 +28,7 @@ final class UnifiedFeedbackFormViewController: NSViewController {
     // This should be cleaned up later, and eventually use the `sizingOptions` property of NSHostingController.
     enum Constants {
         static let landingPageHeight = 260.0
+        static let feedbackFormCompactHeight = 430.0
         static let feedbackFormHeight = 650.0
         static let feedbackSentHeight = 350.0
         static let feedbackErrorHeight = 560.0
@@ -110,10 +111,10 @@ final class UnifiedFeedbackFormViewController: NSViewController {
             if UnifiedFeedbackReportType(rawValue: viewModel.selectedReportType) == .prompt {
                 heightConstraint?.constant = Constants.landingPageHeight
             } else {
-                heightConstraint?.constant = Constants.feedbackFormHeight
+                heightConstraint?.constant = viewModel.usesCompactForm ? Constants.feedbackFormCompactHeight : Constants.feedbackFormHeight
             }
         case .feedbackSending:
-            heightConstraint?.constant = Constants.feedbackFormHeight
+            heightConstraint?.constant = viewModel.usesCompactForm ? Constants.feedbackFormCompactHeight : Constants.feedbackFormHeight
         case .feedbackSent:
             heightConstraint?.constant = Constants.feedbackSentHeight
         case .feedbackSendingFailed:

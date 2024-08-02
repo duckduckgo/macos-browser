@@ -106,6 +106,15 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     }
     @Published var selectedSubcategory: String = ""
 
+    var usesCompactForm: Bool {
+        switch UnifiedFeedbackReportType(rawValue: selectedReportType) {
+        case .reportIssue:
+            return false
+        default:
+            return true
+        }
+    }
+
     weak var delegate: UnifiedFeedbackFormViewModelDelegate?
 
     private let vpnMetadataCollector: any UnifiedMetadataCollector

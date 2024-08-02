@@ -50,9 +50,9 @@ enum UserText {
     static let preferencesSubscriptionFooterTitle = NSLocalizedString("subscription.preferences.subscription.footer.title", value: "Need help with Privacy Pro?", comment: "Title for the subscription preferences pane footer")
     static let preferencesSubscriptionFooterCaption = NSLocalizedString("subscription.preferences.subscription.footer.caption", value: "Get answers to frequently asked questions or contact Privacy Pro support from our help pages.", comment: "Caption for the subscription preferences pane footer")
     static let viewFaqsButton = NSLocalizedString("subscription.preferences.view.faqs.button", value: "FAQs and Support", comment: "Button to open page for FAQs")
-    static let preferencesSubscriptionFeedbackTitle = NSLocalizedString("subscription.preferences.feedback.title", value: "Send Feedback", comment: "Title for the subscription feedback section")
+    static let preferencesSubscriptionFeedbackTitle = NSLocalizedString("subscription.preferences.feedback.title", value: "Share Feedback", comment: "Title for the subscription feedback section")
     static let preferencesSubscriptionFeedbackCaption = NSLocalizedString("subscription.preferences.feedback.caption", value: "Help improve Privacy Pro. Your feedback matters to us. Feel free to report any issues or provide general feedback.", comment: "Caption for the subscription feedback section")
-    static let preferencesSubscriptionFeedbackButton = NSLocalizedString("subscription.preferences.feedback.button", value: "Send Feedback", comment: "Title for the subscription feedback button")
+    static let preferencesSubscriptionFeedbackButton = NSLocalizedString("subscription.preferences.feedback.button", value: "Share Feedback", comment: "Title for the subscription feedback button")
 
     static func preferencesSubscriptionActiveRenewCaption(period: String, formattedDate: String) -> String {
         let localized = NSLocalizedString("subscription.preferences.subscription.active.renew.caption", value: "Your %@ Privacy Pro subscription renews on %@.", comment: "Caption for the subscription preferences pane when the subscription is active and will renew. First parameter is renewal period (monthly/yearly). Second parameter is date.")
