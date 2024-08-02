@@ -495,8 +495,11 @@ final class AddressBarButtonsViewController: NSViewController {
             bookmarkButton.position = .right
             privacyEntryPointButton.position = .left
         }
-
-        privacyEntryPointButton.contentTintColor = .privacyEnabled
+        let isFlaggedPhishing = tabViewModel?.tab.phishingState.didBypassError ?? false
+        privacyEntryPointButton.isAnimationEnabled = !isFlaggedPhishing
+        privacyEntryPointButton.normalTintColor = isFlaggedPhishing ? .fireButtonRedPressed : .privacyEnabled
+        privacyEntryPointButton.mouseOverTintColor = isFlaggedPhishing ? .alertRedHover : privacyEntryPointButton.mouseOverTintColor
+        privacyEntryPointButton.mouseDownTintColor = isFlaggedPhishing ? .alertRedPressed : privacyEntryPointButton.mouseDownTintColor
         privacyEntryPointButton.sendAction(on: .leftMouseUp)
 
         imageButton.applyFaviconStyle()
@@ -760,9 +763,11 @@ final class AddressBarButtonsViewController: NSViewController {
             let isShieldDotVisible = isNotSecure || isUnprotected || !isCertificateValid
 
             if isFlaggedPhishing {
-                privacyEntryPointButton.image = .exclamation
-                privacyEntryPointButton.mouseOverTintColor = .systemPink
                 privacyEntryPointButton.isAnimationEnabled = false
+                privacyEntryPointButton.image = .exclamationFilled
+                privacyEntryPointButton.normalTintColor = .alertRed
+                privacyEntryPointButton.mouseOverTintColor = .alertRedHover
+                privacyEntryPointButton.mouseDownTintColor = .alertRedPressed
             } else {
                 privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
                 privacyEntryPointButton.isAnimationEnabled = true

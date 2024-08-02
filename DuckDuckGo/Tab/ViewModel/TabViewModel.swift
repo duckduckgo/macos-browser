@@ -434,7 +434,7 @@ final class TabViewModel {
     }
 
     private func errorFaviconToShow(error: WKError?) -> NSImage {
-        if error?.errorCode == NSURLErrorServerCertificateUntrusted {
+        if error?.errorCode == NSURLErrorServerCertificateUntrusted || error?.errorCode == PhishingDetectionError.detected.rawValue {
             return .redAlertCircle16
         }
         return.alertCircleColor16
