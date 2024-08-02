@@ -155,10 +155,7 @@ final class HomePageViewController: NSViewController {
             dockCustomizer: DockCustomizer(),
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
             tabCollectionViewModel: tabCollectionViewModel,
-            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(),
-            surveyRemoteMessaging: DefaultSurveyRemoteMessaging(
-                subscriptionManager: Application.appDelegate.subscriptionManager
-            )
+            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
         )
     }
 

@@ -658,10 +658,6 @@ final class MainMenu: NSMenu {
                                   openSubscriptionTab: { WindowControllersManager.shared.showTab(with: .subscription($0)) },
                                   subscriptionManager: Application.appDelegate.subscriptionManager)
 
-            NSMenuItem(title: "Privacy Pro Survey") {
-                NSMenuItem(title: "Reset Remote Message Cache", action: #selector(MainViewController.resetSurveyRemoteMessages))
-            }
-
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }
         debugMenu.addItem(internalUserItem)
