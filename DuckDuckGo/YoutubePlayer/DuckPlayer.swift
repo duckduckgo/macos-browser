@@ -240,6 +240,8 @@ final class DuckPlayer {
 
     @MainActor
     private func encodedPlayerSettings(with webView: WKWebView?) async -> InitialPlayerSettings {
+        var isPiPEnabled = webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] == true
+
         var isAutoplayEnabled = DuckPlayerPreferences.shared.duckPlayerAutoplay
 
         /// If the feature flag is disabled, we want to turn autoPlay to true since this was the default
