@@ -367,19 +367,19 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         XCTAssertNil(sut.fetchEntityAndParent(at: 1).parentFolder)
     }
 
-    // MARK: - Other tests
+    // MARK: - Content state tests
 
-    func testWhenSearchQueryIsEmptyAndResultsAreNotEmpty_thenShouldShowNoSearchResultsStateIsFalse() {
+    func testWhenSearchQueryIsEmptyAndResultsAreNotEmpty_thenContentStateIsNonEmpty() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
         let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
 
         sut.update(selection: .empty, searchQuery: "")
 
-        XCTAssertFalse(sut.shouldShowNoSearchResultsState)
+        XCTAssertEqual(sut.contentState, .nonEmpty)
     }
 
-    func testWhenSearchQueryIsNotEmptyAndResultsAreNotEmpty_thenShouldShowNoSearchResultsStateIsFalse() {
+    func testWhenSearchQueryIsNotEmptyAndResultsAreNotEmpty_thenContentStateIsNonEmpty() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkTwo]
@@ -387,19 +387,19 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
         sut.update(selection: .empty, searchQuery: "some")
 
-        XCTAssertFalse(sut.shouldShowNoSearchResultsState)
+        XCTAssertEqual(sut.contentState, .nonEmpty)
     }
 
-    func testWhenSearchQueryIsEmptyAndResultsAreEmpty_thenShouldShowNoSearchResultsStateIsFalse() {
+    func testWhenBookmarksAreEmptyAndSearchQueryIsNot_thenContentStateIsEmptyForBookmarks() {
         let bookmarkManager = MockBookmarkManager()
         let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
 
-        sut.update(selection: .empty, searchQuery: "")
+        sut.update(selection: .empty, searchQuery: "some")
 
-        XCTAssertFalse(sut.shouldShowNoSearchResultsState)
+        XCTAssertEqual(sut.contentState, .empty(emptyState: .noBookmarks))
     }
 
-    func testWhenSearchQueryIsNotEmptyAndResultsAreEmpty_thenShouldShowNoSearchResultsStateIsTrue() {
+    func testWhenBookmarksAreNotEmptyAndSearchResultsAreEmpty_thenContentStateIsEmptyForSearchResults() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
         bookmarkManager.bookmarksReturnedForSearch = []
@@ -407,7 +407,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
         sut.update(selection: .empty, searchQuery: "some")
 
-        XCTAssertTrue(sut.shouldShowNoSearchResultsState)
+        XCTAssertEqual(sut.contentState, .empty(emptyState: .noSearchResults))
     }
 
     // MARK: - Drag and drop validation tests

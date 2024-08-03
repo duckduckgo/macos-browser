@@ -251,7 +251,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     fileprivate func reloadData() {
-        handleEmptyState()
+        handleItemsVisibility()
 
         let scrollPosition = tableView.visibleRect.origin
         tableView.reloadData()
@@ -260,12 +260,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         updateToolbarButtons()
     }
 
-    private func handleEmptyState() {
-        if managementDetailViewModel.shouldShowNoSearchResultsState {
-            showEmptyStateView(for: .noSearchResults)
-        } else if bookmarkManager.list?.topLevelEntities.isEmpty ?? true {
-            showEmptyStateView(for: .noBookmarks)
-        } else {
+    private func handleItemsVisibility() {
+        switch managementDetailViewModel.contentState {
+        case .empty(let emptyState):
+            showEmptyStateView(for: emptyState)
+        case .nonEmpty:
             emptyState.isHidden = true
             tableView.isHidden = false
         }

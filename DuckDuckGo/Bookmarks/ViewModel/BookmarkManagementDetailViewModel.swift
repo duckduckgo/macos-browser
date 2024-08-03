@@ -18,6 +18,11 @@
 
 import Foundation
 
+enum BookmarksContentState: Equatable {
+    case empty(emptyState: BookmarksEmptyStateContent)
+    case nonEmpty
+}
+
 final class BookmarkManagementDetailViewModel {
 
     private let bookmarkManager: BookmarkManager
@@ -30,8 +35,14 @@ final class BookmarkManagementDetailViewModel {
         self.bookmarkManager = bookmarkManager
     }
 
-    var shouldShowNoSearchResultsState: Bool {
-        return !searchQuery.isEmpty && visibleBookmarks.isEmpty
+    var contentState: BookmarksContentState {
+        if bookmarkManager.list?.topLevelEntities.isEmpty ?? true {
+            return .empty(emptyState: .noBookmarks)
+        } else if !searchQuery.isEmpty && visibleBookmarks.isEmpty {
+            return .empty(emptyState: .noSearchResults)
+        }
+
+        return .nonEmpty
     }
 
     func update(selection: BookmarkManagementSidebarViewController.SelectionState, searchQuery: String = "") {
