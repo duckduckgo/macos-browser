@@ -26,39 +26,6 @@ protocol BookmarkListViewControllerDelegate: AnyObject {
 
 }
 
-private enum EmptyStateContent {
-    case noBookmarks
-    case noSearchResults
-
-    var title: String {
-        switch self {
-        case .noBookmarks: return UserText.bookmarksEmptyStateTitle
-        case .noSearchResults: return UserText.bookmarksEmptySearchResultStateTitle
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .noBookmarks: return UserText.bookmarksEmptyStateMessage
-        case .noSearchResults: return UserText.bookmarksEmptySearchResultStateMessage
-        }
-    }
-
-    var image: NSImage {
-        switch self {
-        case .noBookmarks: return .bookmarksEmpty
-        case .noSearchResults: return .bookmarkEmptySearch
-        }
-    }
-
-    var shouldHideImportButton: Bool {
-        switch self {
-        case .noBookmarks: return false
-        case .noSearchResults: return true
-        }
-    }
-}
-
 final class BookmarkListViewController: NSViewController {
     static let preferredContentSize = CGSize(width: 420, height: 500)
 
@@ -597,7 +564,7 @@ final class BookmarkListViewController: NSViewController {
         outlineView.reloadData()
     }
 
-    private func showEmptyStateView(for mode: EmptyStateContent) {
+    private func showEmptyStateView(for mode: BookmarksEmptyStateContent) {
         emptyState.isHidden = false
         outlineView.isHidden = true
         emptyStateTitle.stringValue = mode.title
