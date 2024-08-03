@@ -46,7 +46,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     private lazy var scrollView = NSScrollView()
     private lazy var tableView = NSTableView()
 
-
     private lazy var emptyState = NSView()
     private lazy var emptyStateImageView = NSImageView(image: .bookmarksEmpty)
     private lazy var emptyStateTitle = NSTextField()
