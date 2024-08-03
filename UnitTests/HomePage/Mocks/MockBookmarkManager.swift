@@ -22,6 +22,7 @@ import Foundation
 class MockBookmarkManager: BookmarkManager {
 
     var bookmarksReturnedForSearch = [BaseBookmarkEntity]()
+    var wasSearchByQueryCalled = false
 
     func isUrlFavorited(url: URL) -> Bool {
         return false
@@ -106,7 +107,7 @@ class MockBookmarkManager: BookmarkManager {
     }
 
     func search(by query: String) -> [BaseBookmarkEntity] {
+        wasSearchByQueryCalled = true
         return bookmarksReturnedForSearch
     }
-
 }
