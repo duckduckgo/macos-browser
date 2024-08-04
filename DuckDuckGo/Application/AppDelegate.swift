@@ -350,7 +350,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if APPSTORE
         crashCollection.startAttachingCrashLogMessages { pixelParameters, payloads, completion in
-            pixelParameters.forEach { _ in PixelKit.fire(GeneralPixel.crash) }
+            pixelParameters.forEach { parameters in
+                PixelKit.fire(GeneralPixel.crash, withAdditionalParameters: parameters, includeAppVersionParameter: false)
+            }
+
             guard let lastPayload = payloads.last else {
                 return
             }
