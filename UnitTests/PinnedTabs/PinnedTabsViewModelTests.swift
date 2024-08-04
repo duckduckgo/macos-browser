@@ -26,13 +26,13 @@ extension Tab {
     }
 }
 
-@MainActor
 class PinnedTabsViewModelTests: XCTestCase {
 
     var model: PinnedTabsViewModel!
     var collection: TabCollection!
     var bookmarkManagerMock: MockBookmarkManager!
 
+    @MainActor
     override func setUpWithError() throws {
         try super.setUpWithError()
         collection = TabCollection(tabs: [
@@ -91,6 +91,7 @@ class PinnedTabsViewModelTests: XCTestCase {
         XCTAssertEqual(model.itemsWithoutSeparator, [collection.tabs[2], collection.tabs[3], collection.tabs[4]])
     }
 
+    @MainActor
     func testWhenThereIsOnlyOneItemThenDraggingMovesWindow() throws {
         let tabA = Tab(content: .url("http://a.com".url!, source: .link))
         let tabB = Tab(content: .url("http://b.com".url!, source: .link))
@@ -102,6 +103,7 @@ class PinnedTabsViewModelTests: XCTestCase {
         XCTAssertTrue(model.dragMovesWindow)
     }
 
+    @MainActor
     func testThatItemsReorderingIsPublished() throws {
         var events: [[Tab]] = []
         let cancellable = model.tabsDidReorderPublisher.sink(receiveValue: { events.append($0) })
@@ -135,6 +137,7 @@ class PinnedTabsViewModelTests: XCTestCase {
         ])
     }
 
+    @MainActor
     func testThatContextMenuActionsArePublished() {
         let tabA = Tab(content: .url("http://a.com".url!, source: .link))
         let tabB = Tab(content: .url("http://b.com".url!, source: .link))
@@ -172,6 +175,7 @@ class PinnedTabsViewModelTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testWhenIsPinnedTabBookmarkedCalledAndURLIsBookmarkedThenReturnTrue() {
         // GIVEN
         bookmarkManagerMock.isUrlBookmarked = true
@@ -184,6 +188,7 @@ class PinnedTabsViewModelTests: XCTestCase {
         XCTAssertTrue(result)
     }
 
+    @MainActor
     func testWhenIsPinnedTabBookmarkedCalledAndURLIsNotBookmarkedThenReturnFalse() {
         // GIVEN
         bookmarkManagerMock.isUrlBookmarked = false

@@ -76,7 +76,7 @@ jobs:
     # or failed (for public releases or hotfixes), because tagging doesn't block publishing the release
     if: always()
 
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
     timeout-minutes: 10
 
     steps:

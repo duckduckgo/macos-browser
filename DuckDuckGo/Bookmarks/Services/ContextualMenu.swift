@@ -20,16 +20,17 @@ import AppKit
 
 enum ContextualMenu {
 
-    static func menu(for objects: [Any]?) -> NSMenu? {
-        menu(for: objects, target: nil)
+    static func menu(for objects: [Any]?, forSearch: Bool = false) -> NSMenu? {
+        menu(for: objects, target: nil, forSearch: forSearch)
     }
 
     /// Creates an instance of NSMenu for the specified Objects and target.
     /// - Parameters:
     ///   - objects: The objects to create the menu for.
     ///   - target: The target to associate to the `NSMenuItem`
+    ///   - forSearch: Boolean that indicates if a bookmark search is currently happening.
     /// - Returns: An instance of NSMenu or nil if `objects` is not a `Bookmark` or a `Folder`.
-    static func menu(for objects: [Any]?, target: AnyObject?) -> NSMenu? {
+    static func menu(for objects: [Any]?, target: AnyObject?, forSearch: Bool = false) -> NSMenu? {
 
         guard let objects = objects, objects.count > 0 else {
             return menuForNoSelection()
@@ -45,7 +46,7 @@ enum ContextualMenu {
 
         guard let object else { return nil }
 
-        let menu = menu(for: object, parentFolder: parentFolder)
+        let menu = menu(for: object, parentFolder: parentFolder, forSearch: forSearch)
 
         menu?.items.forEach { item in
             item.target = target
@@ -59,14 +60,15 @@ enum ContextualMenu {
     /// - Parameters:
     ///   - entity: The bookmark entity to create the menu for.
     ///   - parentFolder: An optional `BookmarkFolder`.
+    ///   - forSearch: Boolean that indicates if a bookmark search is currently happening.
     /// - Returns: An instance of NSMenu or nil if `entity` is not a `Bookmark` or a `Folder`.
-    static func menu(for entity: BaseBookmarkEntity, parentFolder: BookmarkFolder?) -> NSMenu? {
+    static func menu(for entity: BaseBookmarkEntity, parentFolder: BookmarkFolder?, forSearch: Bool = false) -> NSMenu? {
         let menu: NSMenu?
         if let bookmark = entity as? Bookmark {
-            menu = self.menu(for: bookmark, parent: parentFolder, isFavorite: bookmark.isFavorite)
+            menu = self.menu(for: bookmark, parent: parentFolder, isFavorite: bookmark.isFavorite, forSearch: forSearch)
         } else if let folder = entity as? BookmarkFolder {
             // When the user edits a folder we need to show the parent in the folder picker. Folders directly child of PseudoFolder `Bookmarks` have nil parent because their parent is not an instance of `BookmarkFolder`
-            menu = self.menu(for: folder, parent: parentFolder)
+            menu = self.menu(for: folder, parent: parentFolder, forSearch: forSearch)
         } else {
             menu = nil
         }
@@ -101,16 +103,16 @@ private extension ContextualMenu {
         NSMenu(items: [addFolderMenuItem(folder: nil)])
     }
 
-    static func menu(for bookmark: Bookmark?, parent: BookmarkFolder?, isFavorite: Bool) -> NSMenu {
-        NSMenu(items: menuItems(for: bookmark, parent: parent, isFavorite: isFavorite))
+    static func menu(for bookmark: Bookmark?, parent: BookmarkFolder?, isFavorite: Bool, forSearch: Bool = false) -> NSMenu {
+        NSMenu(items: menuItems(for: bookmark, parent: parent, isFavorite: isFavorite, forSearch: forSearch))
     }
 
-    static func menu(for folder: BookmarkFolder?, parent: BookmarkFolder?) -> NSMenu {
-       NSMenu(items: menuItems(for: folder, parent: parent))
+    static func menu(for folder: BookmarkFolder?, parent: BookmarkFolder?, forSearch: Bool) -> NSMenu {
+       NSMenu(items: menuItems(for: folder, parent: parent, forSearch: forSearch))
     }
 
-    static func menuItems(for bookmark: Bookmark?, parent: BookmarkFolder?, isFavorite: Bool) -> [NSMenuItem] {
-        [
+    static func menuItems(for bookmark: Bookmark?, parent: BookmarkFolder?, isFavorite: Bool, forSearch: Bool = false) -> [NSMenuItem] {
+        var items = [
             openBookmarkInNewTabMenuItem(bookmark: bookmark),
             openBookmarkInNewWindowMenuItem(bookmark: bookmark),
             NSMenuItem.separator(),
@@ -124,10 +126,17 @@ private extension ContextualMenu {
             addFolderMenuItem(folder: parent),
             manageBookmarksMenuItem(),
         ]
+
+        if forSearch {
+            let showInFolderItem = showInFolderMenuItem(bookmark: bookmark, parent: parent)
+            items.insert(showInFolderItem, at: 5)
+        }
+
+        return items
     }
 
-    static func menuItems(for folder: BookmarkFolder?, parent: BookmarkFolder?) -> [NSMenuItem] {
-        [
+    static func menuItems(for folder: BookmarkFolder?, parent: BookmarkFolder?, forSearch: Bool = false) -> [NSMenuItem] {
+        var items = [
             openInNewTabsMenuItem(folder: folder),
             openAllInNewWindowMenuItem(folder: folder),
             NSMenuItem.separator(),
@@ -138,6 +147,13 @@ private extension ContextualMenu {
             addFolderMenuItem(folder: folder),
             manageBookmarksMenuItem(),
         ]
+
+        if forSearch {
+            let showInFolderItem = showInFolderMenuItem(folder: folder, parent: parent)
+            items.insert(showInFolderItem, at: 3)
+        }
+
+        return items
     }
 
     static func menuItem(_ title: String, _ action: Selector, _ representedObject: Any? = nil) -> NSMenuItem {
@@ -192,6 +208,10 @@ private extension ContextualMenu {
         return menuItem(UserText.bookmarksBarContextMenuMoveToEnd, #selector(BookmarkMenuItemSelectors.moveToEnd(_:)), bookmarkEntityInfo)
     }
 
+    static func showInFolderMenuItem(bookmark: Bookmark?, parent: BookmarkFolder?) -> NSMenuItem {
+        return menuItem(UserText.showInFolder, #selector(BookmarkSearchMenuItemSelectors.showInFolder(_:)), bookmark)
+    }
+
     // MARK: - Bookmark Folder Menu Items
 
     static func openInNewTabsMenuItem(folder: BookmarkFolder?) -> NSMenuItem {
@@ -204,6 +224,10 @@ private extension ContextualMenu {
 
     static func addFolderMenuItem(folder: BookmarkFolder?) -> NSMenuItem {
         menuItem(UserText.addFolder, #selector(FolderMenuItemSelectors.newFolder(_:)), folder)
+    }
+
+    static func showInFolderMenuItem(folder: BookmarkFolder?, parent: BookmarkFolder?) -> NSMenuItem {
+        return menuItem(UserText.showInFolder, #selector(BookmarkSearchMenuItemSelectors.showInFolder(_:)), folder)
     }
 
     static func editFolderMenuItem(folder: BookmarkFolder?, parent: BookmarkFolder?) -> NSMenuItem {

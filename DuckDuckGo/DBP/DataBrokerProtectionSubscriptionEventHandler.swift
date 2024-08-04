@@ -17,6 +17,7 @@
 //
 #if DBP
 
+import Combine
 import Foundation
 import Subscription
 import DataBrokerProtection
@@ -28,6 +29,7 @@ final class DataBrokerProtectionSubscriptionEventHandler {
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private var cancellables = Set<AnyCancellable>()
 
     init(featureDisabler: DataBrokerProtectionFeatureDisabling,
          authenticationManager: DataBrokerProtectionAuthenticationManaging,
@@ -43,31 +45,42 @@ final class DataBrokerProtectionSubscriptionEventHandler {
                                                name: .accountDidSignOut,
                                                object: nil)
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(entitlementsDidChange),
-                                               name: .entitlementsDidChange,
-                                               object: nil)
+        NotificationCenter.default
+            .publisher(for: .entitlementsDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                self?.entitlementsDidChange(notification)
+            }
+            .store(in: &cancellables)
     }
 
     @objc private func handleAccountDidSignOut() {
         featureDisabler.disableAndDelete()
     }
 
-    @objc private func entitlementsDidChange() {
-        Task { @MainActor in
-            do {
-                if try await authenticationManager.hasValidEntitlement() {
-                    pixelHandler.fire(.entitlementCheckValid)
-                } else {
-                    pixelHandler.fire(.entitlementCheckInvalid)
-                    featureDisabler.disableAndDelete()
-                }
-            } catch {
-                /// We don't want to disable the agent in case of an error while checking for entitlements.
-                /// Since this is a destructive action, the only situation that should cause the data to be deleted and the agent to be removed is .success(false)
-                pixelHandler.fire(.entitlementCheckError)
-                assertionFailure("Error validating entitlement \(error)")
-            }
+    private func entitlementsDidChange(_ notification: Notification) {
+        guard let entitlements = notification.userInfo?[UserDefaultsCacheKey.subscriptionEntitlements] as? [Entitlement] else {
+
+            assertionFailure("Missing entitlements are truly unexpected")
+            return
+        }
+
+        let hasEntitlements = entitlements.contains { entitlement in
+            entitlement.product == .dataBrokerProtection
+        }
+
+        Task {
+            await entitlementsDidChange(hasEntitlements: hasEntitlements)
+        }
+    }
+
+    @MainActor
+    private func entitlementsDidChange(hasEntitlements: Bool) async {
+        if hasEntitlements {
+            pixelHandler.fire(.entitlementCheckValid)
+        } else {
+            pixelHandler.fire(.entitlementCheckInvalid)
+            featureDisabler.disableAndDelete()
         }
     }
 }
