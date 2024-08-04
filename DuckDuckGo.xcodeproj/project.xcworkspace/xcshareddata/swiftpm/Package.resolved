@@ -32,7 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "c747c5c2f1080478a61ea576575053ff06b51799"
+        "branch" : "bartek/data-debugging",
+        "revision" : "783a12fbb7587fede16e0d9e5b136894bacd24ef"
       }
     },
     {
