@@ -1,5 +1,5 @@
 //
-//  MockVPNUIActionHandler.swift
+//  VPNUIActionHandling.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,26 +17,11 @@
 //
 
 import Foundation
-import NetworkProtectionUI
 
-public final class MockVPNUIActionHandler: VPNUIActionHandling {
-    public func setExclusion(_ exclude: Bool, forDomain domain: String) async {
-        // placeholder
-    }
-
-    public func moveAppToApplications() async {
-        // placeholder
-    }
-
-    public func shareFeedback() async {
-        // placeholder
-    }
-
-    public func showVPNLocations() async {
-        // placeholder
-    }
-
-    public func showPrivacyPro() async {
-        // placeholder
-    }
+public protocol VPNUIActionHandling {
+    func moveAppToApplications() async
+    func setExclusion(_ exclude: Bool, forDomain domain: String) async
+    func shareFeedback() async
+    func showPrivacyPro() async
+    func showVPNLocations() async
 }

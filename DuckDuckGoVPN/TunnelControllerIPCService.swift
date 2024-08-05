@@ -243,6 +243,9 @@ extension TunnelControllerIPCService: XPCServerInterface {
             break
         case .removeVPNConfiguration:
             try await uninstall(.configuration)
+        case .restartAdapter:
+            // Intentional no-op: handled by the extension
+            break
         case .uninstallVPN:
             try await uninstall(.all)
         case .disableConnectOnDemandAndShutDown:
