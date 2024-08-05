@@ -1600,8 +1600,6 @@
 		7BA7CC3E2AD11E380042E5CE /* TunnelControllerIPCService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC112AD11DC80042E5CE /* TunnelControllerIPCService.swift */; };
 		7BA7CC3F2AD11E3D0042E5CE /* AppLauncher+DefaultInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC132AD11DC80042E5CE /* AppLauncher+DefaultInitializer.swift */; };
 		7BA7CC402AD11E3D0042E5CE /* AppLauncher+DefaultInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC132AD11DC80042E5CE /* AppLauncher+DefaultInitializer.swift */; };
-		7BA7CC412AD11E420042E5CE /* NetworkProtectionBouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC152AD11DC80042E5CE /* NetworkProtectionBouncer.swift */; };
-		7BA7CC422AD11E420042E5CE /* NetworkProtectionBouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC152AD11DC80042E5CE /* NetworkProtectionBouncer.swift */; };
 		7BA7CC432AD11E480042E5CE /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC172AD11DC80042E5CE /* UserText.swift */; };
 		7BA7CC442AD11E490042E5CE /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC172AD11DC80042E5CE /* UserText.swift */; };
 		7BA7CC472AD11E5C0042E5CE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7BA7CC122AD11DC80042E5CE /* Assets.xcassets */; };
@@ -3532,7 +3530,6 @@
 		7BA7CC122AD11DC80042E5CE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7BA7CC132AD11DC80042E5CE /* AppLauncher+DefaultInitializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AppLauncher+DefaultInitializer.swift"; sourceTree = "<group>"; };
 		7BA7CC142AD11DC80042E5CE /* DuckDuckGoVPNAppStore.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoVPNAppStore.entitlements; sourceTree = "<group>"; };
-		7BA7CC152AD11DC80042E5CE /* NetworkProtectionBouncer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionBouncer.swift; sourceTree = "<group>"; };
 		7BA7CC162AD11DC80042E5CE /* DuckDuckGoVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoVPN.entitlements; sourceTree = "<group>"; };
 		7BA7CC172AD11DC80042E5CE /* UserText.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserText.swift; sourceTree = "<group>"; };
 		7BA7CC182AD11DC80042E5CE /* DuckDuckGoVPNDebug.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoVPNDebug.entitlements; sourceTree = "<group>"; };
@@ -6135,7 +6132,6 @@
 				7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */,
 				7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */,
 				EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */,
-				7BA7CC152AD11DC80042E5CE /* NetworkProtectionBouncer.swift */,
 				7B8DB3192B504D7500EC16DA /* VPNAppEventsHandler.swift */,
 				7B0694972B6E980F00FA4DBA /* VPNProxyLauncher.swift */,
 				EE34245D2BA0853900173B1B /* VPNUninstaller.swift */,
@@ -11087,7 +11083,6 @@
 				7BA7CC442AD11E490042E5CE /* UserText.swift in Sources */,
 				4BF0E5142AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				F1FDC93C2BF51F41006B1435 /* VPNSettings+Environment.swift in Sources */,
-				7BA7CC422AD11E420042E5CE /* NetworkProtectionBouncer.swift in Sources */,
 				B65DA5F12A77D2BC00CBEE8D /* BundleExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -11108,7 +11103,6 @@
 				F1D0429E2BFBABA100A31506 /* SubscriptionManager+StandardConfiguration.swift in Sources */,
 				7BA7CC3F2AD11E3D0042E5CE /* AppLauncher+DefaultInitializer.swift in Sources */,
 				4B0EF7292B5780EB009D6481 /* VPNAppEventsHandler.swift in Sources */,
-				7BA7CC412AD11E420042E5CE /* NetworkProtectionBouncer.swift in Sources */,
 				4BF0E5082AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				7BA7CC582AD1203A0042E5CE /* UserText+NetworkProtection.swift in Sources */,
 				7BA7CC4B2AD11EC60042E5CE /* NetworkProtectionControllerErrorStore.swift in Sources */,
