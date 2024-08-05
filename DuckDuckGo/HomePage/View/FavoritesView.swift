@@ -256,26 +256,35 @@ struct FavoriteTemplate: View {
     let url: URL?
     let onFaviconMissing: (() -> Void)?
 
-    @State var isHovering = false
+    @State var isHovering = false {
+        didSet {
+            guard isHovering != oldValue else {
+                return
+            }
+            if isHovering {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pointingHand.pop()
+            }
+        }
+    }
 
     var body: some View {
         VStack(spacing: 5) {
 
             ZStack(alignment: .center) {
 
-                if !isHovering {
-                    ZStack(alignment: .center) {
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.homeFavoritesBackground)
-                            .shadow(color: .black.opacity(0.16), radius: 1.5, x: 0, y: 0)
-                            .shadow(color: .black.opacity(0.12), radius: 2, x: 0, y: 2)
+                ZStack(alignment: .center) {
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.homeFavoritesBackground, style: StrokeStyle(lineWidth: 1.0))
+                        .shadow(color: isHovering ? .clear : .black.opacity(0.16), radius: 1.5, x: 0, y: 0)
+                        .shadow(color: isHovering ? .clear : .black.opacity(0.12), radius: 2, x: 0, y: 2)
 
-                        RoundedRectangle(cornerRadius: 12)
-                            .background(Color.homeFavoritesBackground)
-                            .blendMode(.destinationOut)
-                    }
-                    .compositingGroup()
+                    RoundedRectangle(cornerRadius: 12)
+                        .background(Color.homeFavoritesBackground)
+                        .blendMode(.destinationOut)
                 }
+                .compositingGroup()
 
                 RoundedRectangle(cornerRadius: 12)
                     .fill(isHovering ? .buttonMouseOver : .homeFavoritesBackground)
@@ -299,12 +308,6 @@ struct FavoriteTemplate: View {
         .frame(maxWidth: FavoritesGrid.GridDimensions.itemWidth)
         .onHover { isHovering in
             self.isHovering = isHovering
-
-            if isHovering {
-                NSCursor.pointingHand.push()
-            } else {
-                NSCursor.pointingHand.pop()
-            }
         }
     }
 
