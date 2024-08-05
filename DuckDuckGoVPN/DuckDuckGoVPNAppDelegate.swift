@@ -66,8 +66,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
                                         subscriptionEndpointService: subscriptionEndpointService,
                                         authEndpointService: authEndpointService)
 
-        _delegate = DuckDuckGoVPNAppDelegate(bouncer: NetworkProtectionBouncer(accountManager: accountManager),
-                                             accountManager: accountManager,
+        _delegate = DuckDuckGoVPNAppDelegate(accountManager: accountManager,
                                              accessTokenStorage: accessTokenStorage,
                                              subscriptionEnvironment: subscriptionEnvironment)
         super.init()
@@ -130,15 +129,13 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private static let recentThreshold: TimeInterval = 5.0
 
     private let appLauncher = AppLauncher()
-    private let bouncer: NetworkProtectionBouncer
     private let accountManager: AccountManager
     private let accessTokenStorage: SubscriptionTokenKeychainStorage
 
-    public init(bouncer: NetworkProtectionBouncer,
-                accountManager: AccountManager,
+    public init(accountManager: AccountManager,
                 accessTokenStorage: SubscriptionTokenKeychainStorage,
                 subscriptionEnvironment: SubscriptionEnvironment) {
-        self.bouncer = bouncer
+
         self.accountManager = accountManager
         self.accessTokenStorage = accessTokenStorage
         self.tunnelSettings = VPNSettings(defaults: .netP)
@@ -365,10 +362,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         setupMenuVisibility()
 
         Task { @MainActor in
-            // The reason we want to await for this is that nothing else should be executed
-            // if the app should quit.
-            await bouncer.requireAuthTokenOrKillApp(controller: tunnelController)
-
             // Initialize lazy properties
             _ = tunnelControllerIPCService
             _ = vpnProxyLauncher
