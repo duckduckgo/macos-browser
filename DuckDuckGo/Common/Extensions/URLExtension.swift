@@ -23,7 +23,6 @@ import Foundation
 
 extension URL.NavigationalScheme {
 
-    static let duck = URL.NavigationalScheme(rawValue: "duck")
     static let javascript = URL.NavigationalScheme(rawValue: "javascript")
 
     static var validSchemes: [URL.NavigationalScheme] {
