@@ -33,6 +33,7 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
         let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender)
+        viewModel.selectedReportType = UnifiedFeedbackReportType.reportIssue.rawValue
         let text = "Some feedback report text"
         viewModel.feedbackFormText = text
 
@@ -46,6 +47,7 @@ final class UnifiedFeedbackFormViewModelTests: XCTestCase {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
         let viewModel = UnifiedFeedbackFormViewModel(vpnMetadataCollector: collector, feedbackSender: sender)
+        viewModel.selectedReportType = UnifiedFeedbackReportType.reportIssue.rawValue
         let text = "Some feedback report text"
         viewModel.feedbackFormText = text
         sender.throwErrorWhenSending = true
