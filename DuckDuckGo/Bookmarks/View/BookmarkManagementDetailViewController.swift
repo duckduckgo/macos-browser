@@ -41,7 +41,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         .withAccessibilityIdentifier("BookmarkManagementDetailViewController.newFolderButton")
     private lazy var deleteItemsButton = MouseOverButton(title: "  " + UserText.bookmarksBarContextMenuDelete, target: self, action: #selector(delete))
         .withAccessibilityIdentifier("BookmarkManagementDetailViewController.deleteItemsButton")
-    private lazy var sortItemsButton = MouseOverButton(title: "  " + UserText.bookmarksSort, target: self, action: #selector(sortBookmarks))
+    private lazy var sortItemsButton = MouseOverButton(title: "  " + UserText.bookmarksSort.capitalized, target: self, action: #selector(sortBookmarks))
         .withAccessibilityIdentifier("BookmarkManagementDetailViewController.sortItemsButton")
 
     lazy var searchBar = NSSearchField()
@@ -72,7 +72,9 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             clearSearch()
         }
 
-        managementDetailViewModel.update(selection: selectionState, searchQuery: searchBar.stringValue)
+        managementDetailViewModel.update(selection: selectionState,
+                                         mode: sortBookmarksViewModel.selectedSortMode,
+                                         searchQuery: searchBar.stringValue)
         self.selectionState = selectionState
     }
 
