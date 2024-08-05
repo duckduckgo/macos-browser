@@ -70,7 +70,7 @@ final class BookmarkListViewController: NSViewController {
 
     fileprivate enum Constants {
         static let preferredContentSize = CGSize(width: 420, height: 500)
-        static let noContentMenuSize = CGSize(width: 240, height: 0)
+        static let noContentMenuSize = CGSize(width: 8, height: 40)
         static let maxMenuPopoverContentWidth: CGFloat = 500 - 13 * 2
         static let minVisibleRows = 4
     }
@@ -812,8 +812,7 @@ final class BookmarkListViewController: NSViewController {
         }
 
         // TODO: when mouse is over the "scroll up" button and items are selected using the down arrow key, the button detects mouse over on appear and starts scrolling resetting the selection here.
-        if let event = NSApp.currentEvent,
-           event.type != .keyDown {
+        if let event = NSApp.currentEvent, event.type != .keyDown {
             outlineView.mouseMoved(with: event)
         }
     }

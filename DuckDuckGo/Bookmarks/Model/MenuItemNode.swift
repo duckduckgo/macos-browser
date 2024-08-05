@@ -22,10 +22,12 @@ final class MenuItemNode: Equatable {
 
     let identifier: String
     let title: String
+    let isEnabled: Bool
 
-    init(identifier: String, title: String) {
+    init(identifier: String, title: String, isEnabled: Bool) {
         self.identifier = identifier
         self.title = title
+        self.isEnabled = isEnabled
     }
 
     static func == (lhs: MenuItemNode, rhs: MenuItemNode) -> Bool {

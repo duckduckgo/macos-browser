@@ -44,12 +44,12 @@ final class BookmarksOutlineView: NSOutlineView {
 
             let rowView = rowView(atRow: row, makeIfNecessary: false) as? RoundedSelectionRowView
             rowView?.isInKeyWindow = true
-            rowView?.highlight = !(item?.representedObject is SpacerNode)
+            rowView?.highlight = item?.canBeHighlighted ?? false
             highlightedRowView = rowView
 
             let cellView = self.view(atColumn: 0, row: row, makeIfNecessary: false) as? BookmarkOutlineCellView
             cellView?.isInKeyWindow = true
-            cellView?.highlight = !(item?.representedObject is SpacerNode)
+            cellView?.highlight = item?.canBeHighlighted ?? false
             highlightedCellView = cellView
 
             var window = window

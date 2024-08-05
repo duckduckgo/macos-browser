@@ -26,13 +26,10 @@ protocol BookmarkOutlineCellViewDelegate: AnyObject {
 final class BookmarkOutlineCellView: NSTableCellView {
 
     private static let sizingCellIdentifier = NSUserInterfaceItemIdentifier("sizing")
-    static let sizingCell: BookmarkOutlineCellView = {
-        let cell = BookmarkOutlineCellView(identifier: BookmarkOutlineCellView.sizingCellIdentifier)
-        cell.translatesAutoresizingMaskIntoConstraints = false
-        return cell
-    }()
+    static let sizingCell = BookmarkOutlineCellView(identifier: BookmarkOutlineCellView.sizingCellIdentifier)
 
     static let rowHeight: CGFloat = 28
+    private static let minUrlLabelWidth: CGFloat = 42
 
     private lazy var faviconImageView = NSImageView()
     private lazy var titleLabel = NSTextField(string: "Bookmark/Folder")
@@ -71,6 +68,8 @@ final class BookmarkOutlineCellView: NSTableCellView {
     // MARK: - Private
 
     private func setupUI() {
+        translatesAutoresizingMaskIntoConstraints = false
+
         addSubview(faviconImageView)
         addSubview(titleLabel)
         addSubview(countLabel)
@@ -164,26 +163,26 @@ final class BookmarkOutlineCellView: NSTableCellView {
 
         titleLabel.leadingAnchor.constraint(equalTo: faviconImageView.trailingAnchor,
                                             constant: 10)
-            .priority(1000)
+            .priority(900)
             .autoDeactivatedWhenViewIsHidden(faviconImageView)
         menuButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor,
                                             constant: 5)
-            .priority(1000)
+            .priority(900)
             .autoDeactivatedWhenViewIsHidden(menuButton)
         countLabel.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor,
                                             constant: 5)
-            .priority(1000)
+            .priority(900)
             .autoDeactivatedWhenViewIsHidden(countLabel)
         favoriteImageView.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor,
                                                    constant: 5)
-            .priority(1000)
+            .priority(900)
             .autoDeactivatedWhenViewIsHidden(favoriteImageView)
         urlLabel.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor,
                                           constant: 6)
-            .priority(1000)
+            .priority(900)
             .autoDeactivatedWhenViewIsHidden(urlLabel)
 
-        faviconImageView.setContentHuggingPriority(NSLayoutConstraint.Priority(rawValue: 251), for: .vertical)
+        faviconImageView.setContentHuggingPriority(.init(251), for: .vertical)
         urlLabel.setContentHuggingPriority(.init(300), for: .horizontal)
         countLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
@@ -199,26 +198,43 @@ final class BookmarkOutlineCellView: NSTableCellView {
             titleLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
             urlLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
             countLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+            trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor,
+                                      constant: 8)
+                .priority(900)
+                .isActive = true
         }
     }
 
     private func updateUI() {
-        if shouldShowMenuButton {
-            countLabel.isHidden = self.highlight || countLabel.stringValue.isEmpty
-            // TODO: when adding to favorites from Edit menu – not updated in menu
-            favoriteImageView.isHidden = self.highlight || favoriteImageView.image == nil
-            menuButton.isShown = self.highlight && faviconImageView.image != nil // don‘t show for custom menu item
-            urlLabel.isShown = self.highlight && !urlLabel.stringValue.isEmpty
+        if shouldShowMenuButton && titleLabel.isEnabled {
+            let isHighlighted = self.highlight && self.isInKeyWindow
+            countLabel.isHidden = isHighlighted || countLabel.stringValue.isEmpty
+            favoriteImageView.isHidden = isHighlighted || favoriteImageView.image == nil
+            menuButton.isShown = isHighlighted && faviconImageView.image != nil // don‘t show for custom menu item
+            urlLabel.isShown = isHighlighted && !urlLabel.stringValue.isEmpty
         } else {
             menuButton.isHidden = true
             urlLabel.isHidden = true
         }
-        if highlight && isInKeyWindow {
+        if !titleLabel.isEnabled {
+            titleLabel.textColor = .disabledControlTextColor
+        } else if highlight && isInKeyWindow {
             titleLabel.textColor = .selectedMenuItemTextColor
             urlLabel.textColor = .selectedMenuItemTextColor
         } else {
             titleLabel.textColor = .controlTextColor
             urlLabel.textColor = .secondaryLabelColor
+        }
+    }
+
+    override func layout() {
+        super.layout()
+
+        // hide URL label if it can‘t fit meaningful text length
+        if urlLabel.isShown, urlLabel.frame.width < Self.minUrlLabelWidth {
+            urlLabel.stringValue = ""
+            urlLabel.isHidden = true
         }
     }
 
@@ -260,6 +276,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
         faviconImageView.image = bookmark.favicon(.small) ?? .bookmarkDefaultFavicon
         faviconImageView.isHidden = false
         titleLabel.stringValue = bookmark.title
+        titleLabel.isEnabled = true
         countLabel.stringValue = ""
         countLabel.isHidden = true
         urlLabel.stringValue = showURL ? "– " + bookmark.url.dropping(prefix: {
@@ -283,10 +300,10 @@ final class BookmarkOutlineCellView: NSTableCellView {
         faviconImageView.image = .folder
         faviconImageView.isHidden = false
         titleLabel.stringValue = folder.title
+        titleLabel.isEnabled = true
         favoriteImageView.image = showChevron ? .chevronMediumRight16 : nil
         favoriteImageView.isHidden = favoriteImageView.image == nil
         urlLabel.stringValue = ""
-        urlLabel.isHidden = true
         self.toolTip = nil
 
         let totalChildBookmarks = folder.totalChildBookmarks
@@ -310,12 +327,12 @@ final class BookmarkOutlineCellView: NSTableCellView {
         faviconImageView.image = pseudoFolder.icon
         faviconImageView.isHidden = false
         titleLabel.stringValue = pseudoFolder.name
+        titleLabel.isEnabled = true
         countLabel.stringValue = pseudoFolder.count > 0 ? String(pseudoFolder.count) : ""
         countLabel.isHidden = countLabel.stringValue.isEmpty
         favoriteImageView.image = nil
         favoriteImageView.isHidden = true
         urlLabel.stringValue = ""
-        urlLabel.isHidden = true
         self.toolTip = nil
 
         highlight = false
@@ -325,6 +342,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
         faviconImageView.image = nil
         faviconImageView.isHidden = true
         titleLabel.stringValue = menuItem.title
+        titleLabel.isEnabled = menuItem.isEnabled
         countLabel.stringValue = ""
         favoriteImageView.image = nil
         favoriteImageView.isHidden = true
@@ -364,6 +382,7 @@ extension BookmarkOutlineCellView {
                 BookmarkOutlineCellView(identifier: .init("")),
                 BookmarkOutlineCellView(identifier: .init("")),
                 BookmarkOutlineCellView(identifier: .init("")),
+                BookmarkOutlineCellView(identifier: .init("")),
             ]
 
             let stackView = NSStackView(views: cells as [NSView])
@@ -387,8 +406,11 @@ extension BookmarkOutlineCellView {
             PseudoFolder.bookmarks.count = 256
             cells[6].update(from: PseudoFolder.bookmarks)
 
-            let node = BookmarkNode(representedObject: MenuItemNode(identifier: "", title: UserText.bookmarksOpenInNewTabs), parent: BookmarkNode.genericRootNode())
+            let node = BookmarkNode(representedObject: MenuItemNode(identifier: "", title: UserText.bookmarksOpenInNewTabs, isEnabled: true), parent: BookmarkNode.genericRootNode())
             cells[7].update(from: node, isMenuPopover: true)
+
+            let emptyNode = BookmarkNode(representedObject: MenuItemNode(identifier: "", title: UserText.bookmarksBarFolderEmpty, isEnabled: false), parent: BookmarkNode.genericRootNode())
+            cells[8].update(from: emptyNode, isMenuPopover: true)
 
             widthAnchor.constraint(equalToConstant: 258).isActive = true
             heightAnchor.constraint(equalToConstant: CGFloat((28 + 1) * cells.count)).isActive = true
