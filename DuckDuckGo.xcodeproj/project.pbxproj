@@ -12513,7 +12513,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12521,7 +12520,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12529,7 +12527,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12537,7 +12534,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -12545,7 +12541,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12553,7 +12548,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12561,7 +12555,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12569,7 +12562,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -12577,7 +12569,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12585,7 +12576,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12593,7 +12583,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12601,7 +12590,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -12609,7 +12597,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12617,7 +12604,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12625,7 +12611,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12633,7 +12618,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -12641,7 +12625,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12649,7 +12632,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12664,7 +12646,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = "FEEDBACK SPARKLE STRIPE";
 			};
 			name = CI;
 		};
@@ -12672,7 +12653,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12680,7 +12660,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12812,7 +12791,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12820,7 +12798,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12828,7 +12805,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12836,7 +12812,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = "FEEDBACK DBP";
 			};
 			name = Review;
 		};
@@ -12844,7 +12819,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12852,7 +12826,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12860,7 +12833,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12868,7 +12840,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -12876,7 +12847,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12884,7 +12854,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12892,7 +12861,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12900,7 +12868,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BDA36F62B7E06A300AD5388 /* VPNProxyExtension.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12908,7 +12875,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BDA36F62B7E06A300AD5388 /* VPNProxyExtension.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12916,7 +12882,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BDA36F62B7E06A300AD5388 /* VPNProxyExtension.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -13001,7 +12966,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = "FEEDBACK SPARKLE STRIPE";
 			};
 			name = Debug;
 		};
@@ -13009,7 +12973,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = "FEEDBACK SPARKLE STRIPE";
 			};
 			name = Release;
 		};
@@ -13017,7 +12980,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -13025,7 +12987,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -13040,7 +13001,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = "FEEDBACK SPARKLE STRIPE";
 			};
 			name = Review;
 		};
@@ -13048,7 +13008,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -13056,7 +13015,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -13064,7 +13022,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -13100,7 +13057,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B6EC37FA29B6447F001ACE79 /* TestsServer.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -13108,7 +13064,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B6EC37FA29B6447F001ACE79 /* TestsServer.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -13116,7 +13071,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B6EC37FA29B6447F001ACE79 /* TestsServer.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -13124,7 +13078,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B6EC37FA29B6447F001ACE79 /* TestsServer.xcconfig */;
 			buildSettings = {
-				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
