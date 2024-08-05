@@ -256,25 +256,29 @@ struct FavoriteTemplate: View {
     let url: URL?
     let onFaviconMissing: (() -> Void)?
 
+    @State var isHovering = false
+
     var body: some View {
         VStack(spacing: 5) {
 
             ZStack(alignment: .center) {
 
-                ZStack(alignment: .center) {
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.homeFavoritesBackground)
-                        .shadow(color: .black.opacity(0.16), radius: 1.5, x: 0, y: 0)
-                        .shadow(color: .black.opacity(0.12), radius: 2, x: 0, y: 2)
+                if !isHovering {
+                    ZStack(alignment: .center) {
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.homeFavoritesBackground)
+                            .shadow(color: .black.opacity(0.16), radius: 1.5, x: 0, y: 0)
+                            .shadow(color: .black.opacity(0.12), radius: 2, x: 0, y: 2)
 
-                    RoundedRectangle(cornerRadius: 12)
-                        .background(Color.homeFavoritesBackground)
-                        .blendMode(.destinationOut)
+                        RoundedRectangle(cornerRadius: 12)
+                            .background(Color.homeFavoritesBackground)
+                            .blendMode(.destinationOut)
+                    }
+                    .compositingGroup()
                 }
-                .compositingGroup()
 
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(.homeFavoritesBackground)
+                    .fill(isHovering ? .buttonMouseOver : .homeFavoritesBackground)
 
                 if let url = url {
                     FaviconView(url: url, onFaviconMissing: onFaviconMissing)
@@ -294,6 +298,8 @@ struct FavoriteTemplate: View {
         .frame(width: FavoritesGrid.GridDimensions.itemWidth)
         .frame(maxWidth: FavoritesGrid.GridDimensions.itemWidth)
         .onHover { isHovering in
+            self.isHovering = isHovering
+
             if isHovering {
                 NSCursor.pointingHand.push()
             } else {

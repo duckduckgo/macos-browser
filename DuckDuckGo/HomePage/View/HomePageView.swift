@@ -131,7 +131,7 @@ extension HomePage.Views {
         }
 
         struct HomeContentButtonView: View {
-            let defaultColor: Color = .newTabPageBackground
+            let defaultColor: Color = .homeFavoritesBackground
             let onHoverColor: Color = .buttonMouseOver
             let onSelectedColor: Color = .buttonMouseDown
             let iconSize = 16.02
@@ -154,7 +154,7 @@ extension HomePage.Views {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6)
                         .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                        .background(Color.homeFavoritesBackground)
+                        .background(buttonBackgroundColor)
                         .cornerRadius(6)
 
                     HStack(spacing: 6) {
