@@ -82,8 +82,10 @@ final class VPNURLEventHandler {
         PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
     }
 
+#if !APPSTORE && !DEBUG
     func moveAppToApplicationsFolder() {
         // this should be run after NSApplication.shared is set
         PFMoveToApplicationsFolderIfNecessary(false)
     }
+#endif
 }
