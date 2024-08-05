@@ -19,10 +19,7 @@
 import Foundation
 
 public protocol VPNUIActionHandling {
-#if !APPSTORE && !DEBUG
     func moveAppToApplications() async
-#endif
-
     func setExclusion(_ exclude: Bool, forDomain domain: String) async
     func shareFeedback() async
     func showPrivacyPro() async

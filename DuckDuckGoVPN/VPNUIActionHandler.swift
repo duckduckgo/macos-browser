@@ -35,7 +35,9 @@ final class VPNUIActionHandler: VPNUIActionHandling {
     }
 
     public func moveAppToApplications() async {
+#if !APPSTORE && !DEBUG
         try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.moveAppToApplications)
+#endif
     }
 
     func setExclusion(_ exclude: Bool, forDomain domain: String) async {
