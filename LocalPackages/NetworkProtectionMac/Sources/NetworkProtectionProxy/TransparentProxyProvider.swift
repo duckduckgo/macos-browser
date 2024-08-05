@@ -88,7 +88,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
                 Task {
                     try await self.updateNetworkSettings()
                 }
-            case .excludedDomains(let domains):
+            case .excludedDomains:
                 Task {
                     try await self.updateNetworkSettings()
                 }
