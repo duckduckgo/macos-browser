@@ -110,8 +110,8 @@ final class BookmarksOutlineView: NSOutlineView {
     }
 
     override func mouseMoved(with event: NSEvent) {
-        let point = convert(event.locationInWindow, from: nil)
-        let row = row(at: NSPoint(x: self.bounds.midX, y: point.y))
+        let point = mouseLocationInsideBounds()
+        let row = point.map { self.row(at: NSPoint(x: self.bounds.midX, y: $0.y)) } ?? -1
         guard row >= 0, row < NSNotFound else {
             // TODO: don‘t highlight but mark as non-active when mouse exit to
             highlightedRow = nil

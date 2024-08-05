@@ -97,6 +97,15 @@ internal class MouseOverButton: NSButton, Hoverable {
         }
     }
 
+    override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        isMouseOver = true
+        return .none
+    }
+
+    override func draggingExited(_ sender: NSDraggingInfo?) {
+        isMouseOver = false
+    }
+
     func updateTintColor() {
         NSAppearance.withAppAppearance {
             if isMouseDown {

@@ -59,7 +59,7 @@ final class HoverTrackingArea: NSTrackingArea {
     private var observers: [NSKeyValueObservation]?
 
     init(owner: some Hoverable) {
-        super.init(rect: .zero, options: [.mouseEnteredAndExited, .activeInKeyWindow, .enabledDuringMouseDrag, .inVisibleRect], owner: owner, userInfo: nil)
+        super.init(rect: .zero, options: [.mouseEnteredAndExited, .activeInKeyWindow, .inVisibleRect], owner: owner, userInfo: nil)
 
         observers = [
             owner.observe(\.backgroundColor) { [weak self] _, _ in self?.updateLayer() },

@@ -599,8 +599,14 @@ final class BookmarkListViewController: NSViewController {
         preferredContentSize = Constants.preferredContentSize
 
         outlineView.setDraggingSourceOperationMask([.move], forLocal: true)
-        outlineView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
-                                             FolderPasteboardWriter.folderUTIInternalType])
+        let draggedTypes = [
+            BookmarkPasteboardWriter.bookmarkUTIInternalType,
+            FolderPasteboardWriter.folderUTIInternalType
+        ]
+        outlineView.registerForDraggedTypes(draggedTypes)
+        // allow scroll buttons to scroll when dragging bookmark over
+        scrollDownButton?.registerForDraggedTypes(draggedTypes)
+        scrollUpButton?.registerForDraggedTypes(draggedTypes)
 
         subscribeToModelEvents()
     }
@@ -679,43 +685,63 @@ final class BookmarkListViewController: NSViewController {
             }
             .store(in: &cancellables)
 
-        outlineView.$highlightedRow
-            .throttle(for: 0.3, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] row in
-                guard let self else { return }
+        // show submenu for folder
+        Publishers.Merge(
+            outlineView.$highlightedRow,
+            // expand folder when dragging over it
+            dataSource.$dragDestinationFolder.map { [weak self] folder in
+                guard let self, let folder,
+                let node = treeController.findNodeWithId(representing: folder) else { return nil }
+                let row = outlineView.row(forItem: node)
+                guard row >= 0, row != NSNotFound else { return nil }
+                return row
+            }
+        )
+        .map { [weak outlineView] row -> AnyPublisher<(Int, BookmarkFolder)?, Never> in
+            guard let row,
+                  let bookmarkNode = outlineView?.item(atRow: row) as? BookmarkNode,
+                  let folder = bookmarkNode.representedObject as? BookmarkFolder else {
+                // hide submenu instantly
+                return Just(nil).eraseToAnyPublisher()
+            }
+            // delay showing submenu by 0.3s
+            return Just((row, folder))
+                    .delay(for: 0.3, scheduler: RunLoop.main)
+                    .eraseToAnyPublisher()
+        }
+        .switchToLatest()
+        .sink { [weak self] input in
+            guard let self else { return }
+            guard let (row, folder) = input,
+                  let cell = outlineView.view(atColumn: 0, row: row, makeIfNecessary: false) else {
+                guard let bookmarkListPopover, bookmarkListPopover.isShown else { return }
+                bookmarkListPopover.close()
+                return
+            }
 
-                guard let row,
-                      let bookmarkNode = outlineView.item(atRow: row) as? BookmarkNode,
-                      let folder = bookmarkNode.representedObject as? BookmarkFolder,
-                      let cell = self.outlineView.view(atColumn: 0,
-                                                       row: row, makeIfNecessary: false) else {
-                    guard let bookmarkListPopover, bookmarkListPopover.isShown else { return }
+            let bookmarkListPopover: BookmarkListPopover
+            if let popover = self.bookmarkListPopover {
+                bookmarkListPopover = popover
+                if bookmarkListPopover.isShown {
                     bookmarkListPopover.close()
-                    return
                 }
+                bookmarkListPopover.reloadData(withRootFolder: folder)
+            } else {
+                bookmarkListPopover = BookmarkListPopover(mode: .bookmarkBarMenu, rootFolder: folder)
+                self.bookmarkListPopover = bookmarkListPopover
+            }
 
-                let bookmarkListPopover: BookmarkListPopover
-                if let popover = self.bookmarkListPopover {
-                    bookmarkListPopover = popover
-                    if bookmarkListPopover.isShown {
-                        bookmarkListPopover.close()
-                    }
-                    bookmarkListPopover.reloadData(withRootFolder: folder)
-                } else {
-                    bookmarkListPopover = BookmarkListPopover(mode: .bookmarkBarMenu, rootFolder: folder)
-                    self.bookmarkListPopover = bookmarkListPopover
-                }
-
-                bookmarkListPopover.show(positionedAsSubmenuAgainst: cell)
-                if let currentEvent = NSApp.currentEvent,
-                   currentEvent.type == .keyDown, currentEvent.keyCode == kVK_RightArrow,
-                   bookmarkListPopover.viewController.outlineView.numberOfRows > 0 {
-                    DispatchQueue.main.async {
-                        bookmarkListPopover.viewController.outlineView.highlightedRow = 0
-                    }
+            bookmarkListPopover.show(positionedAsSubmenuAgainst: cell)
+            if let currentEvent = NSApp.currentEvent,
+               currentEvent.type == .keyDown, currentEvent.keyCode == kVK_RightArrow,
+               bookmarkListPopover.viewController.outlineView.numberOfRows > 0 {
+                DispatchQueue.main.async {
+                    // TODO: highlight first highlightable
+                    bookmarkListPopover.viewController.outlineView.highlightedRow = 0
                 }
             }
-            .store(in: &cancellables)
+        }
+        .store(in: &cancellables)
     }
 
     func adjustPreferredContentSize(positionedAt preferredEdge: NSRectEdge,

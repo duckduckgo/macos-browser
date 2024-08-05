@@ -45,7 +45,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     /// When a drag and drop to a folder happens while in search, we need to stor the destination folder
     /// so we can expand the tree to the destination folder once the drop finishes.
-    private(set) var dragDestinationFolderInSearchMode: BookmarkFolder?
+    @Published private(set) var dragDestinationFolder: BookmarkFolder?
 
     private let bookmarkManager: BookmarkManager
     private let showMenuButtonOnHover: Bool
@@ -73,7 +73,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     func reloadData(with sortMode: BookmarksSortMode, withRootFolder rootFolder: BookmarkFolder? = nil) {
         isSearching = false
-        dragDestinationFolderInSearchMode = nil
+        dragDestinationFolder = nil
         treeController.rebuild(for: sortMode, withRootFolder: rootFolder)
     }
 
@@ -189,16 +189,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             }
             return .none
         }
-
-        if isSearching {
-            if let destinationFolder = destinationNode.representedObject as? BookmarkFolder {
-                self.dragDestinationFolderInSearchMode = destinationFolder
-                return .move
-            }
-
-            return .none
-        }
-
+        self.dragDestinationFolder = destinationNode.representedObject as? BookmarkFolder
         let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard)
         let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard)
 
