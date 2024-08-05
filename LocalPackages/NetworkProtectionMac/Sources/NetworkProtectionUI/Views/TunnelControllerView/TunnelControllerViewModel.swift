@@ -535,11 +535,13 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 
+#if !APPSTORE && !DEBUG
     func moveToApplications() {
         Task { @MainActor in
             await uiActionHandler.moveAppToApplications()
         }
     }
+#endif
 }
 
 extension DataVolume {
