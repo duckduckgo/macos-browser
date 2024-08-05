@@ -276,7 +276,7 @@ struct FavoriteTemplate: View {
 
                 ZStack(alignment: .center) {
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.homeFavoritesBackground, style: StrokeStyle(lineWidth: 1.0))
+                        .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
                         .shadow(color: isHovering ? .clear : .black.opacity(0.16), radius: 1.5, x: 0, y: 0)
                         .shadow(color: isHovering ? .clear : .black.opacity(0.12), radius: 2, x: 0, y: 2)
 
