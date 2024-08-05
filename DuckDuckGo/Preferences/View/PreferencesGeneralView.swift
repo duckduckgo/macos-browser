@@ -191,22 +191,21 @@ extension Preferences {
                         ToggleMenuItem(UserText.downloadsAlwaysAsk,
                                        isOn: $downloadsModel.alwaysRequestDownloadLocation)
                     }
-
-                    // SECTION 7: Phishing Detection
-                    if featureFlagger.isFeatureOn(.phishingDetectionPreferences) {
-                        PreferencePaneSection(UserText.phishingDetectionHeader) {
-                            PreferencePaneSubSection {
-                                ToggleMenuItem(UserText.phishingDetectionIsEnabled,
-                                               isOn: $phishingDetectionModel.isEnabled)
-                            }.padding(.bottom, 5)
-                            Text(UserText.phishingDetectionEnabledWarning)
-                                .font(.footnote)
-                                .foregroundColor(.red)
-                                .padding(.top, 5)
-                        }
-                    }
                 }
 
+                // SECTION 7: Phishing Detection
+                if featureFlagger.isFeatureOn(.phishingDetectionPreferences) {
+                    PreferencePaneSection(UserText.phishingDetectionHeader) {
+                        PreferencePaneSubSection {
+                            ToggleMenuItem(UserText.phishingDetectionIsEnabled,
+                                           isOn: $phishingDetectionModel.isEnabled)
+                        }.padding(.bottom, 5)
+                        Text(UserText.phishingDetectionEnabledWarning)
+                            .font(.footnote)
+                            .foregroundColor(.red)
+                            .padding(.top, 5)
+                    }
+                }
             }
         }
     }
