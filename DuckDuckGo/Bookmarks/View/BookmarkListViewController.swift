@@ -737,13 +737,14 @@ final class BookmarkListViewController: NSViewController {
         }
         guard outlineView.numberOfRows > 0 else {
             preferredContentSize = Constants.noContentMenuSize
+            preferredContentOffset.y = 0
             return
         }
 
         // available screen space at the bottom
         let windowRect = positioningView.convert(positioningView.bounds, to: nil)
         let positioningRect = mainWindow.convertToScreen(windowRect)
-        var availableHeight = positioningRect.minY - screenFrame.minY - contentInsets.bottom
+        let availableHeightBelow = positioningRect.minY - screenFrame.minY - contentInsets.bottom
 
         var preferredContentSize = NSSize.zero
         var contentHeight: CGFloat = 20
@@ -763,18 +764,31 @@ final class BookmarkListViewController: NSViewController {
             }
         }
 
-        if availableHeight < contentHeight,
-           preferredEdge == .maxX || Int(availableHeight / BookmarkOutlineCellView.rowHeight) < Constants.minVisibleRows {
-            // available screen space at the top
-            availableHeight = screenFrame.maxY - positioningRect.minY - contentInsets.top
-            // expand the menu up if available space at the bottom is less than 4 rows
-            preferredContentOffset.y = min(availableHeight, contentHeight)
+        // menu expanding from the right edge (.maxX positioning)
+        // if available space at the bottom is less than content size
+        if availableHeightBelow < contentHeight, preferredEdge == .maxX {
+            preferredContentSize.height = min(screenFrame.height - contentInsets.top - contentInsets.bottom, contentHeight)
+            // how much of the content height doesn‘t fit at the bottom?
+            let contentHeightToExpandUp = contentHeight - (positioningRect.minY - screenFrame.minY) - contentInsets.top - contentInsets.bottom
+            if contentHeightToExpandUp > 0 {
+                let availableHeightOnTop = screenFrame.maxY - positioningRect.minY - contentInsets.top
+                preferredContentOffset.y = min(availableHeightOnTop, contentHeightToExpandUp)
+            } else {
+                preferredContentOffset.y = 0
+            }
+
+        // menu expanding from the bottom edge (.minY positioning)
+        // if available space at the bottom is less than 4 rows
+        } else if Int(availableHeightBelow / BookmarkOutlineCellView.rowHeight) < Constants.minVisibleRows {
+            // expand the menu up from the bottom-most point
+            let availableHeightOnTop = screenFrame.maxY - positioningRect.minY - contentInsets.top
+            preferredContentOffset.y = min(availableHeightOnTop, contentHeight) - availableHeightBelow
             preferredContentSize.height = min(screenFrame.height - contentInsets.top - contentInsets.bottom, contentHeight)
 
         } else {
-            // expand the menu down
+            // expand the menu down when space available to fit the content
             preferredContentOffset = .zero
-            preferredContentSize.height = min(availableHeight, contentHeight)
+            preferredContentSize.height = min(availableHeightBelow, contentHeight)
         }
 
         self.preferredContentSize = preferredContentSize
@@ -819,7 +833,7 @@ final class BookmarkListViewController: NSViewController {
 
     private func updateScrollButtons() {
         guard let scrollUpButton, let scrollDownButton else { return }
-        let contentHeight = outlineView.rowHeight * CGFloat(outlineView.numberOfRows) + 16
+        let contentHeight = outlineView.bounds.height
 
         var visibleRect = scrollView.documentVisibleRect
         if scrollUpButton.isShown {
@@ -867,7 +881,7 @@ final class BookmarkListViewController: NSViewController {
         }
 
         if dataSource.isSearching {
-            if let destinationFolder = dataSource.dragDestinationFolderInSearchMode {
+            if let destinationFolder = dataSource.dragDestinationFolder {
                 hideSearchBar()
                 updateSearchAndExpand(destinationFolder)
             } else {
