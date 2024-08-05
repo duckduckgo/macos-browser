@@ -85,8 +85,9 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         settings.changePublisher.sink { change in
             switch change {
             case .appRoutingRules:
-                // TBD
-                break
+                Task {
+                    try await self.updateNetworkSettings()
+                }
             case .excludedDomains(let domains):
                 Task {
                     try await self.updateNetworkSettings()
