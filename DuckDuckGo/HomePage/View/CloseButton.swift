@@ -23,6 +23,7 @@ extension HomePage.Views {
 
     struct CloseButton: View {
         let icon: NSImage
+        let size: CGFloat
         let action: () -> Void
         let foreGroundColor: Color = .homeFavoritesBackground
         let foregroundColorOnHover: Color = .homeFavoritesHover
@@ -33,7 +34,7 @@ extension HomePage.Views {
             ZStack {
                 Circle()
                     .fill(isHovering ? foregroundColorOnHover : foreGroundColor)
-                    .frame(width: 16, height: 16)
+                    .frame(width: size, height: size)
                 IconButton(icon: icon, action: action)
                     .foregroundColor(.gray)
             }

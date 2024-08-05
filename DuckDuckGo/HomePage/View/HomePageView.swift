@@ -84,23 +84,34 @@ extension HomePage.Views {
                         }
                         .frame(maxWidth: .infinity)
                     }
-                    VStack {
-                        Spacer()
+
+                    if isHomeContentPopoverVisible {
                         HStack {
-                            Spacer(minLength: Self.targetWidth + (geometry.size.width - Self.targetWidth)/2)
-                            HomeContentButtonView(isHomeContentPopoverVisible: $isHomeContentPopoverVisible)
-                                .padding(.bottom, 14)
-                                .padding(.trailing, 14)
-                                .popover(isPresented: $isHomeContentPopoverVisible, content: {
-                                    HomeContentPopoverView(includeContinueSetUpCards: includingContinueSetUpCards)
-                                        .padding()
-                                        .environmentObject(model)
-                                        .environmentObject(continueSetUpModel)
-                                        .environmentObject(favoritesModel)
-                                })
+                            Spacer()
+                            SettingsView(isSettingsVisible: $isHomeContentPopoverVisible)
+
                         }
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                    } else {
+                        VStack {
+                            Spacer()
+                            HStack {
+                                Spacer(minLength: Self.targetWidth + (geometry.size.width - Self.targetWidth)/2)
+                                HomeContentButtonView(isHomeContentPopoverVisible: $isHomeContentPopoverVisible)
+                                    .padding(.bottom, 14)
+                                    .padding(.trailing, 14)
+                                //                                .popover(isPresented: $isHomeContentPopoverVisible, content: {
+                                //                                    HomeContentPopoverView(includeContinueSetUpCards: includingContinueSetUpCards)
+                                //                                        .padding()
+                                //                                        .environmentObject(model)
+                                //                                        .environmentObject(continueSetUpModel)
+                                //                                        .environmentObject(favoritesModel)
+                                //                                })
+                            }
+                        }
+                        .frame(width: geometry.size.width, height: geometry.size.height)
                     }
-                    .frame(width: geometry.size.width, height: geometry.size.height)
+
                 }
                 .frame(maxWidth: .infinity)
                 .background(backgroundColor)
@@ -187,7 +198,9 @@ extension HomePage.Views {
                             }
                             .fixedSize()
                             .link(onHoverChanged: nil) {
-                                isHomeContentPopoverVisible.toggle()
+                                withAnimation {
+                                    isHomeContentPopoverVisible.toggle()
+                                }
                             }
                             .onHover { isHovering in
                                 self.isHovering = isHovering

@@ -110,7 +110,7 @@ extension HomePage.Views {
                     HStack {
                         Spacer()
                         VStack {
-                            CloseButton(icon: .close) {
+                            CloseButton(icon: .close, size: 16) {
                                 model.removeItem(for: featureType)
                             }
                             .visibility(isHovering ? .visible : .gone)
