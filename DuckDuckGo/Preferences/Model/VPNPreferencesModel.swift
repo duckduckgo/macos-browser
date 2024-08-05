@@ -17,12 +17,13 @@
 //
 
 import AppKit
+import BrowserServicesKit
 import Combine
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
-import BrowserServicesKit
+import SwiftUI
 
 final class VPNPreferencesModel: ObservableObject {
 
@@ -213,6 +214,23 @@ final class VPNPreferencesModel: ObservableObject {
     @MainActor
     func manageExcludedSites() {
         let windowController = ExcludedDomainsViewController.create().wrappedInWindowController()
+
+        guard let window = windowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("DataClearingPreferences: Failed to present FireproofDomainsViewController")
+            return
+        }
+
+        parentWindowController.window?.beginSheet(window)
+    }
+
+    // MARK: - App Rules
+
+    @MainActor
+    func manageAppRules() {
+        let viewController = NSHostingController(rootView: AppRulesView())
+        let windowController = viewController.wrappedInWindowController()
 
         guard let window = windowController.window,
               let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController

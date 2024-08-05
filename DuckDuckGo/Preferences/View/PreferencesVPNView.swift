@@ -72,6 +72,21 @@ extension Preferences {
                     .padding(.bottom, 12)
                 }
 
+                // SECTION: App Rules
+
+                PreferencePaneSection(UserText.vpnExcludedSitesTitle, spacing: 4) {
+                    Text(UserText.vpnAppRulesDescription)
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 18)
+
+                    PreferencePaneSubSection {
+                        Button(UserText.vpnAppRulesManageButtonTitle) {
+                            model.manageAppRules()
+                        }
+                    }
+                }
+                .padding(.bottom, 12)
+
                 // SECTION: General
 
                 PreferencePaneSection(UserText.vpnGeneralTitle) {

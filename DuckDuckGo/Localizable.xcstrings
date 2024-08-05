@@ -876,6 +876,9 @@
         }
       }
     },
+    "Add App" : {
+
+    },
     "add.bookmark.name" : {
       "comment" : "New bookmark folder dialog folder name field heading",
       "extractionState" : "extracted_with_value",
@@ -2534,6 +2537,9 @@
           }
         }
       }
+    },
+    "App List" : {
+
     },
     "auth.alert.login.button" : {
       "comment" : "Authentication Alert Sign In Button",

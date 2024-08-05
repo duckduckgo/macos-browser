@@ -173,6 +173,12 @@ extension UserText {
     // "vpn.excluded.domains.title" - Title for the excluded sites view
     static let vpnExcludedDomainsTitle = "Excluded Websites"
 
+    // MARK: - App Rules
+    // "vpn.setting.app.rules.description" - App Rules description
+    static let vpnAppRulesDescription = "Rules to route app traffice through the VPN, outside of it, or to completely block their traffic."
+    // "vpn.setting.app.rules.manage.button.title" - App Rules management button title
+    static let vpnAppRulesManageButtonTitle = "Manage App Rules…"
+
     // MARK: - DNS
     // "vpn.dns.server.title" - Title of the DNS Server section
     static let vpnDnsServerTitle = "DNS Server"
