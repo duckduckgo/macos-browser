@@ -33,7 +33,7 @@ public struct PreferencesSubscriptionView: View {
 
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 
-    public init(model: PreferencesSubscriptionModel, 
+    public init(model: PreferencesSubscriptionModel,
                 subscriptionFeatureAvailability: SubscriptionFeatureAvailability) {
         self.model = model
         self.subscriptionFeatureAvailability = subscriptionFeatureAvailability

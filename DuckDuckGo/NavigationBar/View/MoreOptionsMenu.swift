@@ -110,7 +110,7 @@ final class MoreOptionsMenu: NSMenu {
         let feedbackMenuItem = NSMenuItem(title: feedbackString, action: nil, keyEquivalent: "")
             .withImage(.sendFeedback)
 
-        feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self, 
+        feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self,
                                                    tabCollectionViewModel: tabCollectionViewModel,
                                                    subscriptionFeatureAvailability: subscriptionFeatureAvailability,
                                                    accountManager: accountManager)
@@ -498,7 +498,7 @@ final class FeedbackSubMenu: NSMenu {
     private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
     private let accountManager: AccountManager
 
-    init(targetting target: AnyObject, 
+    init(targetting target: AnyObject,
          tabCollectionViewModel: TabCollectionViewModel,
          subscriptionFeatureAvailability: SubscriptionFeatureAvailability,
          accountManager: AccountManager) {
