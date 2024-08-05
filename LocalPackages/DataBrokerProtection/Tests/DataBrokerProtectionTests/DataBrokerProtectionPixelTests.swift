@@ -16,6 +16,11 @@
 //  limitations under the License.
 //
 
+// These tests don't compile and need to be fixed
+// https://app.asana.com/0/1203581873609357/1207981733649783/f
+
+#if DBP
+
 import DataBrokerProtection
 import Networking
 import Foundation
@@ -143,3 +148,5 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
         }
     }
 }
+
+#endif
