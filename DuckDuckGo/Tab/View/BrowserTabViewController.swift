@@ -147,7 +147,6 @@ final class BrowserTabViewController: NSViewController {
                                                name: .dbpDidClose,
                                                object: nil)
 
-
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onCloseSubscriptionPage),
                                                name: .subscriptionPageCloseAndOpenPreferences,
