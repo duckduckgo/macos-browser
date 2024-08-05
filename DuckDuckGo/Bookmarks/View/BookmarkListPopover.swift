@@ -83,7 +83,7 @@ final class BookmarkListPopover: NSPopover {
 
         if case .maxX = preferredEdge { // submenu
             // adjust the menu popover Y 16pt above the positioning view bottom edge
-            frame.origin.y = min(max(screenFrame.minY, screenPoint.y - frame.size.height + 16), screenFrame.maxY)
+            frame.origin.y = min(max(screenFrame.minY, screenPoint.y - frame.size.height + 23), screenFrame.maxY)
 
         } else { // context menu
             // align the menu popover content by the left edge of the positioning view but keeping the popover frame inside the screen bounds
