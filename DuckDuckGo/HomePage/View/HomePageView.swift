@@ -56,54 +56,57 @@ extension HomePage.Views {
         }
 
         func regularHomePageView(includingContinueSetUpCards: Bool) -> some View {
-            ZStack(alignment: .top) {
+            GeometryReader { geometry in
+                ZStack(alignment: .top) {
 
-                ScrollView {
-                    VStack(spacing: 32) {
-                        Spacer(minLength: 32)
+                    ScrollView {
+                        VStack(spacing: 32) {
+                            Spacer(minLength: 32)
 
-                        Group {
-                            remoteMessage()
+                            Group {
+                                remoteMessage()
 
-                            if includingContinueSetUpCards {
-                                ContinueSetUpView()
-                                    .visibility(model.isContinueSetUpVisible ? .visible : .gone)
-                                    .padding(.top, activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0)
+                                if includingContinueSetUpCards {
+                                    ContinueSetUpView()
+                                        .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                                        .padding(.top, activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0)
+                                }
+
+                                Favorites()
+                                    .visibility(model.isFavoriteVisible ? .visible : .gone)
+
+                                RecentlyVisited()
+                                    .padding(.bottom, 16)
+                                    .visibility(model.isRecentActivityVisible ? .visible : .gone)
+
                             }
-
-                            Favorites()
-                                .visibility(model.isFavoriteVisible ? .visible : .gone)
-
-                            RecentlyVisited()
-                                .padding(.bottom, 16)
-                                .visibility(model.isRecentActivityVisible ? .visible : .gone)
-
+                            .frame(width: Self.targetWidth)
                         }
-                        .frame(width: Self.targetWidth)
+                        .frame(maxWidth: .infinity)
                     }
-                    .frame(maxWidth: .infinity)
-                }
-                VStack {
-                    Spacer()
-                    HStack {
+                    VStack {
                         Spacer()
-                        HomeContentButtonView(isHomeContentPopoverVisible: $isHomeContentPopoverVisible)
-                            .padding(.bottom, 14)
-                            .padding(.trailing, 14)
-                            .popover(isPresented: $isHomeContentPopoverVisible, content: {
-                                HomeContentPopoverView(includeContinueSetUpCards: includingContinueSetUpCards)
-                                    .padding()
-                                    .environmentObject(model)
-                                    .environmentObject(continueSetUpModel)
-                                    .environmentObject(favoritesModel)
-                            })
+                        HStack {
+                            Spacer(minLength: Self.targetWidth + (geometry.size.width - Self.targetWidth)/2)
+                            HomeContentButtonView(isHomeContentPopoverVisible: $isHomeContentPopoverVisible)
+                                .padding(.bottom, 14)
+                                .padding(.trailing, 14)
+                                .popover(isPresented: $isHomeContentPopoverVisible, content: {
+                                    HomeContentPopoverView(includeContinueSetUpCards: includingContinueSetUpCards)
+                                        .padding()
+                                        .environmentObject(model)
+                                        .environmentObject(continueSetUpModel)
+                                        .environmentObject(favoritesModel)
+                                })
+                        }
                     }
+                    .frame(width: geometry.size.width, height: geometry.size.height)
                 }
-            }
-            .frame(maxWidth: .infinity)
-            .background(backgroundColor)
-            .onAppear {
-                LocalBookmarkManager.shared.requestSync()
+                .frame(maxWidth: .infinity)
+                .background(backgroundColor)
+                .onAppear {
+                    LocalBookmarkManager.shared.requestSync()
+                }
             }
         }
 
@@ -140,6 +143,8 @@ extension HomePage.Views {
             @State var isHovering: Bool = false
             @Binding var isHomeContentPopoverVisible: Bool
 
+            @State private var textWidth: CGFloat = .infinity
+
             private var buttonBackgroundColor: Color {
                 if isHomeContentPopoverVisible {
                     return onSelectedColor
@@ -150,32 +155,68 @@ extension HomePage.Views {
                 return defaultColor
             }
 
+            private func isCompact(with geometry: GeometryProxy) -> Bool {
+                geometry.size.width < textWidth + 52
+            }
+
             var body: some View {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                        .background(buttonBackgroundColor)
-                        .cornerRadius(6)
+                GeometryReader { geometry in
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer(minLength: 0)
+                            ZStack(alignment: .bottomTrailing) {
+                                RoundedRectangle(cornerRadius: 6)
+                                    .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                                    .background(buttonBackgroundColor)
+                                    .cornerRadius(6)
 
-                    HStack(spacing: 6) {
-                        Image(.optionsMainView)
-                            .resizable()
-                            .frame(width: iconSize, height: iconSize)
-                            .scaledToFit()
-
-                        Text("Customize")
-                            .font(.system(size: 13))
+                                HStack(spacing: 6) {
+                                    Image(.optionsMainView)
+                                        .resizable()
+                                        .frame(width: iconSize, height: iconSize)
+                                        .scaledToFit()
+                                    if !isCompact(with: geometry) {
+                                        Text("Customize")
+                                            .font(.system(size: 13))
+                                            .background(WidthGetter())
+                                    }
+                                }
+                                .frame(height: targetSize)
+                                .padding(.horizontal, isCompact(with: geometry) ? 6 : 12)
+                            }
+                            .fixedSize()
+                            .link(onHoverChanged: nil) {
+                                isHomeContentPopoverVisible.toggle()
+                            }
+                            .onHover { isHovering in
+                                self.isHovering = isHovering
+                            }
+                        }
                     }
-                    .frame(height: targetSize)
-                    .padding(.horizontal, 12)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
                 }
-                .fixedSize()
-                .link(onHoverChanged: nil) {
-                    isHomeContentPopoverVisible.toggle()
+                .onPreferenceChange(WidthPreferenceKey.self) { width in
+                    self.textWidth = width
                 }
-                .onHover { isHovering in
-                    self.isHovering = isHovering
+            }
+        }
+
+        struct WidthGetter: View {
+            var body: some View {
+                GeometryReader { geometry in
+                    Color.clear
+                        .preference(key: WidthPreferenceKey.self, value: geometry.size.width)
                 }
+            }
+        }
+
+        struct WidthPreferenceKey: PreferenceKey {
+            typealias Value = CGFloat
+            static var defaultValue: CGFloat = 0
+
+            static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+                value = nextValue()
             }
         }
     }
