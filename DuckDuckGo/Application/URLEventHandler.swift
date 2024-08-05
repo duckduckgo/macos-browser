@@ -23,10 +23,7 @@ import PixelKit
 import Subscription
 import NetworkProtectionUI
 import VPNAppLauncher
-
-#if DBP
 import DataBrokerProtection
-#endif
 
 // @MainActor
 final class URLEventHandler {
@@ -112,11 +109,9 @@ final class URLEventHandler {
             handleNetworkProtectionURL(url)
         }
 
-#if DBP
         if url.scheme?.isDataBrokerProtectionScheme == true {
             handleDataBrokerProtectionURL(url)
         }
-#endif
 
         DispatchQueue.main.async {
             if url.isFileURL && url.pathExtension == WebKitDownloadTask.downloadExtension {
@@ -173,7 +168,6 @@ final class URLEventHandler {
         }
     }
 
-#if DBP
     /// Handles DBP URLs
     ///
     private static func handleDataBrokerProtectionURL(_ url: URL) {
@@ -187,7 +181,6 @@ final class URLEventHandler {
             return
         }
     }
-#endif
 }
 
 private extension String {

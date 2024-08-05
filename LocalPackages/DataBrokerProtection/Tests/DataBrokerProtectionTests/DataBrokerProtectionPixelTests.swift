@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import DataBrokerProtection
 import Networking
 import Foundation
@@ -145,5 +143,3 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
         }
     }
 }
-
-#endif

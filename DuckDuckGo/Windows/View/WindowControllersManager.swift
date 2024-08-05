@@ -111,11 +111,9 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
 
 extension WindowControllersManager {
 
-#if DBP
     func showDataBrokerProtectionTab() {
         showTab(with: .dataBrokerProtection)
     }
-#endif
 
     func showBookmarksTab() {
         showTab(with: .bookmarks)

@@ -1322,8 +1322,6 @@
 		4B9DB0422A983B24000927DB /* WaitlistDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0182A983B24000927DB /* WaitlistDialogView.swift */; };
 		4B9DB0442A983B24000927DB /* WaitlistModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0192A983B24000927DB /* WaitlistModalViewController.swift */; };
 		4B9DB0452A983B24000927DB /* WaitlistModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0192A983B24000927DB /* WaitlistModalViewController.swift */; };
-		4B9DB0472A983B24000927DB /* WaitlistRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB01A2A983B24000927DB /* WaitlistRootView.swift */; };
-		4B9DB0482A983B24000927DB /* WaitlistRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB01A2A983B24000927DB /* WaitlistRootView.swift */; };
 		4B9DB04A2A983B24000927DB /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB01C2A983B24000927DB /* NotificationService.swift */; };
 		4B9DB04B2A983B24000927DB /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB01C2A983B24000927DB /* NotificationService.swift */; };
 		4B9DB0542A983B55000927DB /* MockWaitlistStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB04F2A983B55000927DB /* MockWaitlistStorage.swift */; };
@@ -2520,8 +2518,6 @@
 		BBB881892C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */; };
 		BBBEE1BF2C4FF63600035ABA /* SortBookmarksViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBEE1BE2C4FF63600035ABA /* SortBookmarksViewModelTests.swift */; };
 		BBBEE1C02C4FF63600035ABA /* SortBookmarksViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBEE1BE2C4FF63600035ABA /* SortBookmarksViewModelTests.swift */; };
-		BBDFDC5A2B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */; };
-		BBDFDC5D2B2B8E2100F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */; };
 		BBFB727F2C48047C0088884C /* SortBookmarksViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBFB727E2C48047C0088884C /* SortBookmarksViewModel.swift */; };
 		BBFB72802C48047C0088884C /* SortBookmarksViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBFB727E2C48047C0088884C /* SortBookmarksViewModel.swift */; };
 		BBFF355D2C4AF26200DA3289 /* BookmarksSortModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBFF355C2C4AF26200DA3289 /* BookmarksSortModeTests.swift */; };
@@ -3360,7 +3356,6 @@
 		4B9DB0172A983B24000927DB /* JoinWaitlistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoinWaitlistView.swift; sourceTree = "<group>"; };
 		4B9DB0182A983B24000927DB /* WaitlistDialogView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistDialogView.swift; sourceTree = "<group>"; };
 		4B9DB0192A983B24000927DB /* WaitlistModalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistModalViewController.swift; sourceTree = "<group>"; };
-		4B9DB01A2A983B24000927DB /* WaitlistRootView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistRootView.swift; sourceTree = "<group>"; };
 		4B9DB01C2A983B24000927DB /* NotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		4B9DB04F2A983B55000927DB /* MockWaitlistStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockWaitlistStorage.swift; sourceTree = "<group>"; };
 		4B9DB0502A983B55000927DB /* MockNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockNotificationService.swift; sourceTree = "<group>"; };
@@ -4196,7 +4191,6 @@
 		BB7B5F972C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksSearchAndSortMetrics.swift; sourceTree = "<group>"; };
 		BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeControllerSearchDataSource.swift; sourceTree = "<group>"; };
 		BBBEE1BE2C4FF63600035ABA /* SortBookmarksViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortBookmarksViewModelTests.swift; sourceTree = "<group>"; };
-		BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionExternalWaitlistPixels.swift; sourceTree = "<group>"; };
 		BBFB727E2C48047C0088884C /* SortBookmarksViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortBookmarksViewModel.swift; sourceTree = "<group>"; };
 		BBFF355C2C4AF26200DA3289 /* BookmarksSortModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksSortModeTests.swift; sourceTree = "<group>"; };
 		BD384AC72BBC821100EF3735 /* vpn-light-mode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "vpn-light-mode.json"; sourceTree = "<group>"; };
@@ -4797,7 +4791,6 @@
 				316913252BD2B76F0051B46D /* DataBrokerPrerequisitesStatusVerifier.swift */,
 				3199C6FC2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift */,
 				316850712AF3AD58009A2828 /* DataBrokerProtectionDebugMenu.swift */,
-				BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */,
 				3199C6F82AF94F5B002A7BA1 /* DataBrokerProtectionFeatureDisabler.swift */,
 				31C5FFB82AF64D120008A79F /* DataBrokerProtectionFeatureGatekeeper.swift */,
 				F1C70D782BFF50A400599292 /* DataBrokerProtectionLoginItemInterface.swift */,
@@ -5733,7 +5726,6 @@
 				4B9DB0182A983B24000927DB /* WaitlistDialogView.swift */,
 				4B9DB0192A983B24000927DB /* WaitlistModalViewController.swift */,
 				3168506C2AF3AD1C009A2828 /* WaitlistViewControllerPresenter.swift */,
-				4B9DB01A2A983B24000927DB /* WaitlistRootView.swift */,
 				4B520F622BA5573A006405C7 /* WaitlistThankYouView.swift */,
 				4B6B64832BA930420009FF9F /* WaitlistThankYouPromptPresenter.swift */,
 			);
@@ -9991,10 +9983,8 @@
 				3706FAFD293F65D500E42796 /* DownloadsPopover.swift in Sources */,
 				3706FAFE293F65D500E42796 /* SpacerNode.swift in Sources */,
 				3706FB00293F65D500E42796 /* PasswordManagementCreditCardModel.swift in Sources */,
-				BBDFDC5D2B2B8E2100F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */,
 				3706FB01293F65D500E42796 /* NSEventExtension.swift in Sources */,
 				3706FB02293F65D500E42796 /* Onboarding.swift in Sources */,
-				4B9DB0482A983B24000927DB /* WaitlistRootView.swift in Sources */,
 				3706FEB8293F6EFB00E42796 /* ConnectBitwardenView.swift in Sources */,
 				1DFAB51E2A8982A600A0F7F6 /* SetExtension.swift in Sources */,
 				B60C6F8E29B200AB007BFAA8 /* SavePanelAccessoryView.swift in Sources */,
@@ -11443,7 +11433,6 @@
 				9F6434612BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */,
 				B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */,
 				4B9DB01D2A983B24000927DB /* Waitlist.swift in Sources */,
-				BBDFDC5A2B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */,
 				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
 				1DA84D2F2C11989D0011C80F /* Update.swift in Sources */,
 				AAC30A2A268E239100D2D9CD /* CrashReport.swift in Sources */,
@@ -11838,7 +11827,6 @@
 				AA7EB6E527E7D6DC00036718 /* AnimationView.swift in Sources */,
 				8562599A269CA0A600EE44BC /* NSRectExtension.swift in Sources */,
 				4B37EE5F2B4CFC3C00A89A61 /* HomePageRemoteMessagingStorage.swift in Sources */,
-				4B9DB0472A983B24000927DB /* WaitlistRootView.swift in Sources */,
 				31F28C5128C8EEC500119F70 /* YoutubeOverlayUserScript.swift in Sources */,
 				B6ABD0CA2BC03F610000EB69 /* SecurityScopedFileURLController.swift in Sources */,
 				B6040856274B830F00680351 /* DictionaryExtension.swift in Sources */,
@@ -12525,6 +12513,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12532,6 +12521,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12539,6 +12529,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12546,6 +12537,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -12553,6 +12545,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12560,6 +12553,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12567,6 +12561,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12574,6 +12569,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -12581,6 +12577,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12588,6 +12585,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12595,6 +12593,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12602,6 +12601,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -12609,6 +12609,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12616,6 +12617,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12623,6 +12625,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12630,6 +12633,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113D72B29D0F800E794BB /* SyncE2EUITestsAppStore.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -12637,6 +12641,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12644,6 +12649,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12658,6 +12664,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = "FEEDBACK SPARKLE STRIPE";
 			};
 			name = CI;
 		};
@@ -12665,6 +12672,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12672,6 +12680,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12803,6 +12812,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12810,6 +12820,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12817,6 +12828,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12824,6 +12836,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = "FEEDBACK DBP";
 			};
 			name = Review;
 		};
@@ -12831,6 +12844,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12838,6 +12852,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12845,6 +12860,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12852,6 +12868,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -12859,6 +12876,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12866,6 +12884,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12873,6 +12892,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12880,6 +12900,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BDA36F62B7E06A300AD5388 /* VPNProxyExtension.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12887,6 +12908,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BDA36F62B7E06A300AD5388 /* VPNProxyExtension.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -12894,6 +12916,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BDA36F62B7E06A300AD5388 /* VPNProxyExtension.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -12978,6 +13001,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = "FEEDBACK SPARKLE STRIPE";
 			};
 			name = Debug;
 		};
@@ -12985,6 +13009,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = "FEEDBACK SPARKLE STRIPE";
 			};
 			name = Release;
 		};
@@ -12992,6 +13017,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -12999,6 +13025,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -13013,6 +13040,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = "FEEDBACK SPARKLE STRIPE";
 			};
 			name = Review;
 		};
@@ -13020,6 +13048,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -13027,6 +13056,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -13034,6 +13064,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
@@ -13069,6 +13100,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B6EC37FA29B6447F001ACE79 /* TestsServer.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Debug;
 		};
@@ -13076,6 +13108,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B6EC37FA29B6447F001ACE79 /* TestsServer.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = CI;
 		};
@@ -13083,6 +13116,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B6EC37FA29B6447F001ACE79 /* TestsServer.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Release;
 		};
@@ -13090,6 +13124,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B6EC37FA29B6447F001ACE79 /* TestsServer.xcconfig */;
 			buildSettings = {
+				FEATURE_FLAGS = FEEDBACK;
 			};
 			name = Review;
 		};
