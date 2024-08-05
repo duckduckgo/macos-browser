@@ -252,8 +252,6 @@
 		31F2D1FF2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */; };
 		31F2D2002AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */; };
 		31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */; };
-		31FC471F2C60CBBD00087911 /* DuckPlayerContingencyHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FC471E2C60CBBD00087911 /* DuckPlayerContingencyHandler.swift */; };
-		31FC47202C60CBBD00087911 /* DuckPlayerContingencyHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FC471E2C60CBBD00087911 /* DuckPlayerContingencyHandler.swift */; };
 		3701C9CE29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */; };
 		3701C9CF29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */; };
 		37054FC92873301700033B6F /* PinnedTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FC82873301700033B6F /* PinnedTabView.swift */; };
@@ -3068,7 +3066,6 @@
 		31F28C5228C8EECA00119F70 /* DuckURLSchemeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckURLSchemeHandler.swift; sourceTree = "<group>"; };
 		31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistTermsAndConditionsActionHandler.swift; sourceTree = "<group>"; };
 		31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimationView.swift; sourceTree = "<group>"; };
-		31FC471E2C60CBBD00087911 /* DuckPlayerContingencyHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerContingencyHandler.swift; sourceTree = "<group>"; };
 		336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUnprotectedDomains.swift; sourceTree = "<group>"; };
 		3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxBerkeleyDatabaseReader.swift; sourceTree = "<group>"; };
 		37054FC82873301700033B6F /* PinnedTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabView.swift; sourceTree = "<group>"; };
@@ -4854,7 +4851,6 @@
 				315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */,
 				31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */,
 				31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */,
-				31FC471E2C60CBBD00087911 /* DuckPlayerContingencyHandler.swift */,
 			);
 			path = YoutubePlayer;
 			sourceTree = "<group>";
@@ -9866,7 +9862,6 @@
 				37197EA22942441900394917 /* Tab+Dialogs.swift in Sources */,
 				3706FAA0293F65D500E42796 /* UserAgent.swift in Sources */,
 				3706FAA1293F65D500E42796 /* NSAlert+DataImport.swift in Sources */,
-				31FC47202C60CBBD00087911 /* DuckPlayerContingencyHandler.swift in Sources */,
 				3706FAA2293F65D500E42796 /* MainWindow.swift in Sources */,
 				3707C727294B5D2900682A9F /* WKWebView+SessionState.swift in Sources */,
 				4B44FEF42B1FEF5A000619D8 /* FocusableTextEditor.swift in Sources */,
@@ -11526,7 +11521,6 @@
 				4BBC16A227C485BC00E00A38 /* DeviceIdleStateDetector.swift in Sources */,
 				4B379C2427BDE1B0008A968E /* FlatButton.swift in Sources */,
 				37054FC92873301700033B6F /* PinnedTabView.swift in Sources */,
-				31FC471F2C60CBBD00087911 /* DuckPlayerContingencyHandler.swift in Sources */,
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
 				B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */,
 				B626A76D29928B1600053070 /* TestsClosureNavigationResponder.swift in Sources */,
@@ -13375,8 +13369,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 180.0.0;
+				branch = "bunn/duckplayer/contingency-handler";
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {

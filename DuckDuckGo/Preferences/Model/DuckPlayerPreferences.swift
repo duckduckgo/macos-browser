@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import BrowserServicesKit
 import PixelKit
+import DuckPlayer
 
 protocol DuckPlayerPreferencesPersistor {
     /// The persistor hadles raw Bool values but each one translates into a DuckPlayerMode:
@@ -124,8 +125,7 @@ final class DuckPlayerPreferences: ObservableObject {
 
     init(persistor: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor(),
          privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
-         internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider,
-         duckPlayerContingencyHandler: DuckPlayerContingencyHandler = DefaultDuckPlayerContingencyHandler()) {
+         internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider) {
         self.persistor = persistor
         duckPlayerMode = .init(persistor.duckPlayerModeBool)
         youtubeOverlayInteracted = persistor.youtubeOverlayInteracted
@@ -134,7 +134,7 @@ final class DuckPlayerPreferences: ObservableObject {
         duckPlayerOpenInNewTab = persistor.duckPlayerOpenInNewTab
         self.privacyConfigurationManager = privacyConfigurationManager
         self.internalUserDecider = internalUserDecider
-        self.duckPlayerContingencyHandler = duckPlayerContingencyHandler
+        self.duckPlayerContingencyHandler = DefaultDuckPlayerContingencyHandler(privacyConfigurationManager: privacyConfigurationManager)
     }
 
     private var persistor: DuckPlayerPreferencesPersistor
