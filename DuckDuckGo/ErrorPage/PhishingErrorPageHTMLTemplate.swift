@@ -21,7 +21,7 @@ import ContentScopeScripts
 
 struct PhishingErrorPageHTMLTemplate: ErrorPageHTMLTemplating {
     static var htmlTemplatePath: String {
-        guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/specialerrorpage") else {
+        guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/special-error") else {
             assertionFailure("HTML template not found")
             return ""
         }

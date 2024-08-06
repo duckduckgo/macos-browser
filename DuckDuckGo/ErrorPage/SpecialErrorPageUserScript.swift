@@ -20,7 +20,72 @@ import Foundation
 import UserScript
 
 final class SpecialErrorPageUserScript: NSObject, Subfeature {
-    enum MessageName: String, CaseIterable {
+    struct InitialSetupParameters {
+        let kind: String
+        let errorType: String?
+        let domain: String?
+
+        static func from(params: Any) -> Self? {
+            guard let dict = params as? [String: Any] else {
+                return nil
+            }
+
+            let kind = dict["kind"] as? String ?? ""
+            let errorType = dict["errorType"] as? String
+            let domain = dict["domain"] as? String
+
+            return InitialSetupParameters(kind: kind, errorType: errorType, domain: domain)
+        }
+    }
+
+    @MainActor
+    private func initialSetup(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+#if DEBUG
+        let env = "development"
+#else
+        let env = "production"
+#endif
+        if let initialSetupParameters = InitialSetupParameters.from(params: params) {
+            let platform = Platform(name: "macos")
+            let errorData = ErrorData(kind: initialSetupParameters.kind, errorType: initialSetupParameters.errorType, domain: initialSetupParameters.domain)
+            return InitialSetupResult(env: env, locale: Locale.current.identifier, platform: platform, errorData: errorData)
+        } else {
+            print("[-] Unable to decode initial setup params in SpecialErrorPage")
+        }
+        return nil
+    }
+
+    struct Platform: Encodable {
+        let name: String
+    }
+
+    struct ErrorData: Encodable {
+        let kind: String
+        let errorType: String?
+        let domain: String?
+    }
+
+    struct InitialSetupResult: Encodable {
+        let env: String
+        let locale: String
+        let platform: Platform
+        let errorData: ErrorData
+    }
+
+    @MainActor
+    private func reportPageException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        return nil
+    }
+
+    @MainActor
+    private func reportInitException(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        return nil
+    }
+
+    enum MessageNames: String, CaseIterable {
+        case initialSetup
+        case reportPageException
+        case reportInitException
         case leaveSite
         case visitSite
     }
@@ -38,28 +103,28 @@ final class SpecialErrorPageUserScript: NSObject, Subfeature {
         self.broker = broker
     }
 
+    private lazy var methodHandlers: [MessageNames: Handler] = [
+        .initialSetup: initialSetup,
+        .reportPageException: reportPageException,
+        .reportInitException: reportInitException,
+        .leaveSite: handleLeaveSiteAction,
+        .visitSite: handleVisitSiteAction
+    ]
+
     @MainActor
-    func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
-        guard isEnabled else { return nil }
-        switch MessageName(rawValue: methodName) {
-        case .leaveSite:
-            return handleLeaveSiteAction
-        case .visitSite:
-            return handleVisitSiteAction
-        default:
-            assertionFailure("SpecialErrorPageUserScript: Failed to parse User Script message: \(methodName)")
-            return nil
-        }
+    func handler(forMethodNamed methodName: String) -> Handler? {
+        guard let messageName = MessageNames(rawValue: methodName) else { return nil }
+        return methodHandlers[messageName]
     }
 
     @MainActor
-    func handleLeaveSiteAction(params: Any, message: UserScriptMessage) -> Encodable? {
+    func handleLeaveSiteAction(params: Any, message: WKScriptMessage) -> Encodable? {
         delegate?.leaveSite()
         return nil
     }
 
     @MainActor
-    func handleVisitSiteAction(params: Any, message: UserScriptMessage) -> Encodable? {
+    func handleVisitSiteAction(params: Any, message: WKScriptMessage) -> Encodable? {
         delegate?.visitSite()
         return nil
     }
