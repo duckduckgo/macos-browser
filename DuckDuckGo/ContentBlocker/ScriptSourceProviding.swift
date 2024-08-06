@@ -30,6 +30,7 @@ protocol ScriptSourceProviding {
     var privacyConfigurationManager: PrivacyConfigurationManaging { get }
     var autofillSourceProvider: AutofillUserScriptSourceProvider? { get }
     var sessionKey: String? { get }
+    var onboardingActionsManager: OnboardingActionsManaging? { get }
     func buildAutofillSource() -> AutofillUserScriptSourceProvider
 
 }
@@ -41,9 +42,9 @@ func DefaultScriptSourceProvider() -> ScriptSourceProviding {
 }
 
 struct ScriptSourceProvider: ScriptSourceProviding {
-
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
+    private(set) var onboardingActionsManager: OnboardingActionsManaging?
     private(set) var autofillSourceProvider: AutofillUserScriptSourceProvider?
     private(set) var sessionKey: String?
 
@@ -72,6 +73,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         self.surrogatesConfig = buildSurrogatesConfig()
         self.sessionKey = generateSessionKey()
         self.autofillSourceProvider = buildAutofillSource()
+        self.onboardingActionsManager = buildOnboardingActionsManager()
     }
 
     private func generateSessionKey() -> String {
@@ -123,6 +125,15 @@ struct ScriptSourceProvider: ScriptSourceProviding {
                                                  trackerDataManager: trackerDataManager,
                                                  tld: tld,
                                                  isDebugBuild: isDebugBuild)
+    }
+
+    private func buildOnboardingActionsManager() -> OnboardingActionsManaging {
+        return OnboardingActionsManager(
+            navigationDelegate: WindowControllersManager.shared,
+            dockCustomization: DockCustomizer(),
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            appearancePreferences: AppearancePreferences.shared,
+            startupPreferences: StartupPreferences.shared)
     }
 
     private func loadTextFile(_ fileName: String, _ fileExt: String) -> String? {

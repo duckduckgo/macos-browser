@@ -21,6 +21,8 @@ import Foundation
 
 class MockBookmarkManager: BookmarkManager {
 
+    var bookmarksReturnedForSearch = [BaseBookmarkEntity]()
+
     func isUrlFavorited(url: URL) -> Bool {
         return false
     }
@@ -101,6 +103,10 @@ class MockBookmarkManager: BookmarkManager {
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
     func requestSync() {
+    }
+
+    func search(by query: String) -> [BaseBookmarkEntity] {
+        return bookmarksReturnedForSearch
     }
 
 }

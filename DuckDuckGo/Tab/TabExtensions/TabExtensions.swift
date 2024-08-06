@@ -89,7 +89,6 @@ typealias TabExtensionsBuilderArguments = (
     webViewFuture: Future<WKWebView, Never>
 )
 
-// swiftlint:disable function_body_length
 extension TabExtensionsBuilder {
 
     /// Instantiate `TabExtension`-s for App builds here
@@ -200,6 +199,19 @@ extension TabExtensionsBuilder {
             SSLErrorPageTabExtension(webViewPublisher: args.webViewFuture,
                                   scriptsPublisher: userScripts.compactMap { $0 })
         }
+#if SPARKLE
+        add {
+            ReleaseNotesTabExtension(scriptsPublisher: userScripts.compactMap { $0 }, webViewPublisher: args.webViewFuture)
+        }
+#else
+        add {
+            ReleaseNotesTabExtension()
+        }
+#endif
+
+        add {
+            OnboardingTabExtension()
+        }
 
         if let tunnelController = dependencies.tunnelController {
             add {
@@ -209,7 +221,6 @@ extension TabExtensionsBuilder {
     }
 
 }
-// swiftlint:enable function_body_length
 
 #if DEBUG
 extension TestTabExtensionsBuilder {

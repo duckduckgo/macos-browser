@@ -22,11 +22,13 @@ import Foundation
 import PixelKit
 import Persistence
 import Combine
+import SyncDataProviders
 
 /// The SyncErrorHandling protocol defines methods for handling sync errors related to specific data types such as bookmarks and credentials.
 protocol SyncErrorHandling {
     func handleBookmarkError(_ error: Error)
     func handleCredentialError(_ error: Error)
+    func handleSettingsError(_ error: Error)
     func syncBookmarksSucceded()
     func syncCredentialsSucceded()
 }
@@ -34,21 +36,21 @@ protocol SyncErrorHandling {
 public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
 
     @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
-    private (set) var isSyncBookmarksPaused: Bool {
+    private(set) var isSyncBookmarksPaused: Bool {
         didSet {
             isSyncPausedChangedPublisher.send()
         }
     }
 
     @UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false)
-    private (set) var isSyncCredentialsPaused: Bool {
+    private(set) var isSyncCredentialsPaused: Bool {
         didSet {
             isSyncPausedChangedPublisher.send()
         }
     }
 
     @UserDefaultsWrapper(key: .syncIsPaused, defaultValue: false)
-    private (set) var isSyncPaused: Bool {
+    private(set) var isSyncPaused: Bool {
         didSet {
             isSyncPausedChangedPublisher.send()
         }
@@ -207,6 +209,7 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
 }
 
 extension SyncErrorHandler: SyncErrorHandling {
+
     func syncCredentialsSucceded() {
         lastSyncSuccessTime = Date()
         resetCredentialsErrors()
@@ -225,37 +228,34 @@ extension SyncErrorHandler: SyncErrorHandling {
         handleError(error, modelType: .credentials)
     }
 
+    public func handleSettingsError(_ error: Error) {
+         handleError(error, modelType: .settings)
+     }
+
     private func handleError(_ error: Error, modelType: ModelType) {
         switch error {
         case SyncError.patchPayloadCompressionFailed(let errorCode):
-            let pixel: PixelKit.Event = {
-                switch modelType {
-                case .bookmarks:
-                    return DebugEvent(GeneralPixel.syncBookmarksPatchCompressionFailed)
-                case .credentials:
-                    return DebugEvent(GeneralPixel.syncCredentialsPatchCompressionFailed)
-                }
-            }()
-            PixelKit.fire(pixel, withAdditionalParameters: ["error": "\(errorCode)"])
+            PixelKit.fire(DebugEvent(modelType.patchPayloadCompressionFailedPixel), withAdditionalParameters: ["error": "\(errorCode)"])
         case let syncError as SyncError:
-            switch modelType {
-            case .bookmarks:
-                PixelKit.fire(DebugEvent(GeneralPixel.syncBookmarksFailed, error: syncError))
-            case .credentials:
-                PixelKit.fire(DebugEvent(GeneralPixel.syncCredentialsFailed, error: syncError))
-            }
             handleSyncError(syncError, modelType: modelType)
+            PixelKit.fire(DebugEvent(modelType.syncFailedPixel, error: syncError))
+        case let settingsMetadataError as SettingsSyncMetadataSaveError:
+            let underlyingError = settingsMetadataError.underlyingError
+            let processedErrors = CoreDataErrorsParser.parse(error: underlyingError as NSError)
+            let params = processedErrors.errorPixelParameters
+            PixelKit.fire(DebugEvent(GeneralPixel.syncSettingsMetadataUpdateFailed, error: underlyingError), withAdditionalParameters: params)
         default:
             let nsError = error as NSError
             if nsError.domain != NSURLErrorDomain {
                 let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
                 let params = processedErrors.errorPixelParameters
-                PixelKit.fire(DebugEvent(GeneralPixel.syncBookmarksFailed, error: error), withAdditionalParameters: params)
+                PixelKit.fire(DebugEvent(modelType.syncFailedPixel, error: error), withAdditionalParameters: params)
             }
+            let modelTypeString = modelType.rawValue.capitalized
+            os_log(.error, log: OSLog.sync, "%{public}@ Sync error: %{public}s", modelTypeString, String(reflecting: error))
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func handleSyncError(_ syncError: SyncError, modelType: ModelType) {
         switch syncError {
         case .unexpectedStatusCode(409):
@@ -264,6 +264,8 @@ extension SyncErrorHandler: SyncErrorHandling {
                 syncIsPaused(errorType: .bookmarksCountLimitExceeded)
             case .credentials:
                 syncIsPaused(errorType: .credentialsCountLimitExceeded)
+            case .settings:
+                break
             }
         case .unexpectedStatusCode(413):
             switch modelType {
@@ -271,6 +273,8 @@ extension SyncErrorHandler: SyncErrorHandling {
                 syncIsPaused(errorType: .bookmarksRequestSizeLimitExceeded)
             case .credentials:
                 syncIsPaused(errorType: .credentialsRequestSizeLimitExceeded)
+            case .settings:
+                break
             }
         case .unexpectedStatusCode(400):
             switch modelType {
@@ -278,11 +282,15 @@ extension SyncErrorHandler: SyncErrorHandling {
                 syncIsPaused(errorType: .badRequestBookmarks)
             case .credentials:
                 syncIsPaused(errorType: .badRequestCredentials)
+            case .settings:
+                break
             }
+            PixelKit.fire(modelType.badRequestPixel, frequency: .legacyDaily)
         case .unexpectedStatusCode(401):
             syncIsPaused(errorType: .invalidLoginCredentials)
         case .unexpectedStatusCode(418), .unexpectedStatusCode(429):
             syncIsPaused(errorType: .tooManyRequests)
+            PixelKit.fire(modelType.tooManyRequestsPixel, frequency: .legacyDaily)
         default:
             break
         }
@@ -294,19 +302,19 @@ extension SyncErrorHandler: SyncErrorHandling {
         case .bookmarksCountLimitExceeded:
             currentSyncBookmarksPausedError = errorType.rawValue
             self.isSyncBookmarksPaused = true
-            PixelKit.fire(GeneralPixel.syncBookmarksCountLimitExceededDaily, frequency: .daily)
+            PixelKit.fire(GeneralPixel.syncBookmarksObjectLimitExceededDaily, frequency: .legacyDaily)
         case .credentialsCountLimitExceeded:
             currentSyncCredentialsPausedError = errorType.rawValue
             self.isSyncCredentialsPaused = true
-            PixelKit.fire(GeneralPixel.syncCredentialsCountLimitExceededDaily, frequency: .daily)
+            PixelKit.fire(GeneralPixel.syncCredentialsObjectLimitExceededDaily, frequency: .legacyDaily)
         case .bookmarksRequestSizeLimitExceeded:
             currentSyncBookmarksPausedError = errorType.rawValue
             self.isSyncBookmarksPaused = true
-            PixelKit.fire(GeneralPixel.syncBookmarksRequestSizeLimitExceededDaily, frequency: .daily)
+            PixelKit.fire(GeneralPixel.syncBookmarksRequestSizeLimitExceededDaily, frequency: .legacyDaily)
         case .credentialsRequestSizeLimitExceeded:
             currentSyncCredentialsPausedError = errorType.rawValue
             self.isSyncCredentialsPaused = true
-            PixelKit.fire(GeneralPixel.syncCredentialsRequestSizeLimitExceededDaily, frequency: .daily)
+            PixelKit.fire(GeneralPixel.syncCredentialsRequestSizeLimitExceededDaily, frequency: .legacyDaily)
         case .badRequestBookmarks:
             currentSyncBookmarksPausedError = errorType.rawValue
             self.isSyncBookmarksPaused = true
@@ -322,7 +330,6 @@ extension SyncErrorHandler: SyncErrorHandling {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func showSyncPausedAlertIfNeeded(for errorType: AsyncErrorType) {
         switch errorType {
         case .bookmarksCountLimitExceeded, .bookmarksRequestSizeLimitExceeded:
@@ -363,9 +370,54 @@ extension SyncErrorHandler: SyncErrorHandling {
         case badRequestCredentials
     }
 
-    private enum ModelType {
+    private enum ModelType: String {
         case bookmarks
         case credentials
+        case settings
+
+        var syncFailedPixel: GeneralPixel {
+            switch self {
+            case .bookmarks:
+                    .syncBookmarksFailed
+            case .credentials:
+                    .syncCredentialsFailed
+            case .settings:
+                    .syncSettingsFailed
+            }
+        }
+
+        var patchPayloadCompressionFailedPixel: GeneralPixel {
+            switch self {
+            case .bookmarks:
+                    .syncBookmarksPatchCompressionFailed
+            case .credentials:
+                    .syncCredentialsPatchCompressionFailed
+            case .settings:
+                    .syncSettingsPatchCompressionFailed
+            }
+        }
+
+        var tooManyRequestsPixel: GeneralPixel {
+            switch self {
+            case .bookmarks:
+                    .syncBookmarksTooManyRequestsDaily
+            case .credentials:
+                    .syncCredentialsTooManyRequestsDaily
+            case .settings:
+                    .syncSettingsTooManyRequestsDaily
+            }
+        }
+
+        var badRequestPixel: GeneralPixel {
+            switch self {
+            case .bookmarks:
+                    .syncBookmarksValidationErrorDaily
+            case .credentials:
+                    .syncCredentialsValidationErrorDaily
+            case .settings:
+                    .syncSettingsValidationErrorDaily
+            }
+        }
     }
 
     @MainActor
@@ -378,7 +430,7 @@ extension SyncErrorHandler: SyncErrorHandling {
     private func manageLogins() {
         guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
         let navigationViewController = parentWindowController.mainViewController.navigationBarViewController
-        navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
+        navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems, source: .sync)
     }
 
 }

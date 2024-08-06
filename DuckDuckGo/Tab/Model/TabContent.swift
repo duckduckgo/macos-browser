@@ -27,11 +27,13 @@ extension Tab {
         case url(URL, credential: URLCredential? = nil, source: URLSource)
         case settings(pane: PreferencePaneIdentifier?)
         case bookmarks
+        case onboardingDeprecated
         case onboarding
         case none
         case dataBrokerProtection
         case subscription(URL)
         case identityTheftRestoration(URL)
+        case releaseNotes
     }
     typealias TabContent = Tab.Content
 
@@ -95,12 +97,13 @@ extension TabContent {
 }
 extension TabContent {
 
-    // swiftlint:disable:next cyclomatic_complexity
     static func contentFromURL(_ url: URL?, source: URLSource) -> TabContent {
         switch url {
         case URL.newtab, URL.Invalid.aboutNewtab, URL.Invalid.duckHome:
             return .newtab
         case URL.welcome, URL.Invalid.aboutWelcome:
+            return .onboardingDeprecated
+        case URL.onboarding:
             return .onboarding
         case URL.settings, URL.Invalid.aboutPreferences, URL.Invalid.aboutConfig, URL.Invalid.aboutSettings, URL.Invalid.duckConfig, URL.Invalid.duckPreferences:
             return .anySettingsPane
@@ -108,6 +111,8 @@ extension TabContent {
             return .bookmarks
         case URL.dataBrokerProtection:
             return .dataBrokerProtection
+        case URL.releaseNotes:
+            return .releaseNotes
         case URL.Invalid.aboutHome:
             guard let customURL = URL(string: StartupPreferences.shared.formattedCustomHomePageURL) else {
                 return .newtab
@@ -161,7 +166,7 @@ extension TabContent {
 
     var isDisplayable: Bool {
         switch self {
-        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .identityTheftRestoration:
+        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .identityTheftRestoration, .releaseNotes:
             return true
         default:
             return false
@@ -180,6 +185,8 @@ extension TabContent {
             return true
         case (.identityTheftRestoration, .identityTheftRestoration):
             return true
+        case (.releaseNotes, .releaseNotes):
+            return true
         default:
             return false
         }
@@ -187,11 +194,12 @@ extension TabContent {
 
     var title: String? {
         switch self {
-        case .url, .newtab, .none: return nil
+        case .url, .newtab, .onboarding, .none: return nil
         case .settings: return UserText.tabPreferencesTitle
         case .bookmarks: return UserText.tabBookmarksTitle
-        case .onboarding: return UserText.tabOnboardingTitle
+        case .onboardingDeprecated: return UserText.tabOnboardingTitle
         case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
+        case .releaseNotes: return UserText.releaseNotesTitle
         case .subscription, .identityTheftRestoration: return nil
         }
     }
@@ -222,10 +230,14 @@ extension TabContent {
             return .settings
         case .bookmarks:
             return .bookmarks
-        case .onboarding:
+        case .onboardingDeprecated:
             return .welcome
+        case .onboarding:
+            return URL.onboarding
         case .dataBrokerProtection:
             return .dataBrokerProtection
+        case .releaseNotes:
+            return .releaseNotes
         case .subscription(let url), .identityTheftRestoration(let url):
             return url
         case .none:
@@ -237,7 +249,7 @@ extension TabContent {
         switch self {
         case .url(_, _, source: let source):
             return source
-        case .newtab, .settings, .bookmarks, .onboarding, .dataBrokerProtection,
+        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .releaseNotes, .dataBrokerProtection,
                 .subscription, .identityTheftRestoration, .none:
             return .ui
         }
@@ -245,7 +257,7 @@ extension TabContent {
 
     var isUrl: Bool {
         switch self {
-        case .url, .subscription, .identityTheftRestoration:
+        case .url, .subscription, .identityTheftRestoration, .releaseNotes:
             return true
         default:
             return false
@@ -279,7 +291,7 @@ extension TabContent {
 
     var canBeDuplicated: Bool {
         switch self {
-        case .settings, .subscription, .identityTheftRestoration, .dataBrokerProtection:
+        case .settings, .subscription, .identityTheftRestoration, .dataBrokerProtection, .releaseNotes:
             return false
         default:
             return true
@@ -288,7 +300,7 @@ extension TabContent {
 
     var canBePinned: Bool {
         switch self {
-        case .subscription, .identityTheftRestoration, .dataBrokerProtection:
+        case .subscription, .identityTheftRestoration, .dataBrokerProtection, .releaseNotes:
             return false
         default:
             return isUrl
@@ -297,9 +309,9 @@ extension TabContent {
 
     var canBeBookmarked: Bool {
         switch self {
-        case .newtab, .onboarding, .none:
+        case .newtab, .onboardingDeprecated, .onboarding, .none:
             return false
-        case .url, .settings, .bookmarks, .subscription, .identityTheftRestoration, .dataBrokerProtection:
+        case .url, .settings, .bookmarks, .subscription, .identityTheftRestoration, .dataBrokerProtection, .releaseNotes:
             return true
         }
     }

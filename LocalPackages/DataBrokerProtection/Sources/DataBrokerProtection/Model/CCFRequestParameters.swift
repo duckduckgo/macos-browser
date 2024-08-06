@@ -46,7 +46,6 @@ struct ActionRequest: Encodable {
         case data
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 

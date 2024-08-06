@@ -77,6 +77,15 @@ struct MirrorSite: Codable, Sendable {
     }
 }
 
+extension MirrorSite {
+
+    typealias ScannedBroker = DBPUIScanProgress.ScannedBroker
+
+    func scannedBroker(withStatus status: ScannedBroker.Status) -> ScannedBroker {
+        ScannedBroker(name: name, url: url, status: status)
+    }
+}
+
 public enum DataBrokerHierarchy: Int {
     case parent = 1
     case child = 0

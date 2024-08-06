@@ -113,6 +113,9 @@ final class TunnelControllerIPCService {
                 case .uninstall(let component):
                     try await uninstall(component)
                     return nil
+                case .quit:
+                    quitAgent()
+                    return nil
                 }
             }
         } catch {
@@ -240,11 +243,16 @@ extension TunnelControllerIPCService: XPCServerInterface {
             break
         case .removeVPNConfiguration:
             try await uninstall(.configuration)
+        case .restartAdapter:
+            // Intentional no-op: handled by the extension
+            break
         case .uninstallVPN:
             try await uninstall(.all)
         case .disableConnectOnDemandAndShutDown:
             // Not implemented on macOS yet
             break
+        case .quitAgent:
+            quitAgent()
         }
     }
 
@@ -257,6 +265,10 @@ extension TunnelControllerIPCService: XPCServerInterface {
         case .systemExtension:
             try await uninstaller.removeSystemExtension()
         }
+    }
+
+    private func quitAgent() {
+        exit(EXIT_SUCCESS)
     }
 }
 

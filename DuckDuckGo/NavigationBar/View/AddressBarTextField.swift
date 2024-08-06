@@ -25,7 +25,6 @@ import PixelKit
 import Suggestions
 import Subscription
 
-// swiftlint:disable:next type_body_length
 final class AddressBarTextField: NSTextField {
 
     var tabCollectionViewModel: TabCollectionViewModel! {
@@ -349,7 +348,7 @@ final class AddressBarTextField: NSTextField {
 
     private func updateTabUrlWithUrl(_ providedUrl: URL, userEnteredValue: String, downloadRequested: Bool, suggestion: Suggestion?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
+            os_log("AddressBarTextField: Selected tab view model is nil", type: .error)
             return
         }
 
@@ -411,7 +410,7 @@ final class AddressBarTextField: NSTextField {
         makeUrl(suggestion: suggestion,
                 stringValueWithoutSuffix: stringValueWithoutSuffix) { [weak self] url, userEnteredValue, isUpgraded in
             guard let self, let url else {
-                os_log("%s: Making url from address bar string failed", type: .error)
+                os_log("AddressBarTextField: Making url from address bar string failed", type: .error)
                 return
             }
             let tab = Tab(content: .url(url, source: .userEntered(userEnteredValue)),

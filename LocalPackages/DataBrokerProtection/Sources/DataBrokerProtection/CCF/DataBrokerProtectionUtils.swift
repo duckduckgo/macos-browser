@@ -22,11 +22,12 @@ import UserScript
 import Common
 import Combine
 
-@MainActor
 final class DataBrokerUserContentController: WKUserContentController {
 
+    @MainActor
     var dataBrokerUserScripts: DataBrokerUserScript?
 
+    @MainActor
     init(with privacyConfigurationManager: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
         dataBrokerUserScripts = DataBrokerUserScript(privacyConfig: privacyConfigurationManager, prefs: prefs, delegate: delegate)
 
@@ -42,11 +43,13 @@ final class DataBrokerUserContentController: WKUserContentController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    @MainActor
     private func installUserScripts(_ wkUserScripts: [WKUserScript], handlers: [UserScript]) {
         handlers.forEach { self.addHandler($0) }
         wkUserScripts.forEach(self.addUserScript)
     }
 
+    @MainActor
     public func cleanUpBeforeClosing() {
         os_log("Cleaning up DBP user scripts", log: .dataBrokerProtection)
 
@@ -164,7 +167,6 @@ private class PrivacyConfigurationDataBrokerProtectionConfigOverride: PrivacyCon
     var updatesPublisher: AnyPublisher<(), Never>
     var privacyConfig: PrivacyConfiguration
     var internalUserDecider: InternalUserDecider
-    var toggleProtectionsCounter: ToggleProtectionsCounter
 
     var currentConfig: Data {
         return updateConfigWithBrokerProtection()
@@ -179,7 +181,6 @@ private class PrivacyConfigurationDataBrokerProtectionConfigOverride: PrivacyCon
         updatesPublisher = manager.updatesPublisher
         privacyConfig = manager.privacyConfig
         internalUserDecider = manager.internalUserDecider
-        toggleProtectionsCounter = manager.toggleProtectionsCounter
     }
 
     private func updateConfigWithBrokerProtection() -> Data {

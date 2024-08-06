@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="JFF-Nj-8om">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -58,9 +59,65 @@
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="X6g-3K-JDi">
                                 <rect key="frame" x="0.0" y="-2" width="676" height="5"/>
                             </box>
+                            <customView verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YdB-zl-3Cf">
+                                <rect key="frame" x="10" y="26" width="65" height="28"/>
+                                <subviews>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gwe-JW-nZ6">
+                                        <rect key="frame" x="4" y="3" width="16.5" height="24"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="16" id="TNn-Xg-utS"/>
+                                            <constraint firstAttribute="height" constant="16" id="ZuD-h5-gbG"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="d0D-Sp-jQQ">
+                                            <imageReference key="image" image="square.and.arrow.down" catalog="system" symbolScale="medium"/>
+                                        </imageCell>
+                                    </imageView>
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jeg-Iv-FxB">
+                                        <rect key="frame" x="22" y="7" width="37" height="15"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="15" id="L4P-aC-UPW"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="dAL-mz-5FX">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="Nr2-47-6rU" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="65" height="28"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <integer key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="importBookmarksClicked:" target="JFF-Nj-8om" id="VgQ-gs-fxb"/>
+                                        </connections>
+                                    </customView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="Nr2-47-6rU" firstAttribute="leading" secondItem="YdB-zl-3Cf" secondAttribute="leading" id="0bx-A0-2hv"/>
+                                    <constraint firstItem="gwe-JW-nZ6" firstAttribute="centerY" secondItem="YdB-zl-3Cf" secondAttribute="centerY" id="4th-lJ-sVJ"/>
+                                    <constraint firstAttribute="trailing" secondItem="Nr2-47-6rU" secondAttribute="trailing" id="68B-Qb-2Cy"/>
+                                    <constraint firstItem="jeg-Iv-FxB" firstAttribute="leading" secondItem="gwe-JW-nZ6" secondAttribute="trailing" constant="4" id="Hte-Hn-pTm"/>
+                                    <constraint firstAttribute="height" constant="28" id="IWa-7p-Qsd"/>
+                                    <constraint firstAttribute="trailing" secondItem="jeg-Iv-FxB" secondAttribute="trailing" constant="8" id="d8s-mn-8EF"/>
+                                    <constraint firstItem="Nr2-47-6rU" firstAttribute="top" secondItem="YdB-zl-3Cf" secondAttribute="top" id="e7t-is-nFh"/>
+                                    <constraint firstItem="jeg-Iv-FxB" firstAttribute="centerY" secondItem="YdB-zl-3Cf" secondAttribute="centerY" id="eKI-2A-AvJ"/>
+                                    <constraint firstItem="gwe-JW-nZ6" firstAttribute="leading" secondItem="YdB-zl-3Cf" secondAttribute="leading" constant="4" id="fZU-zg-CEj"/>
+                                    <constraint firstAttribute="bottom" secondItem="Nr2-47-6rU" secondAttribute="bottom" id="hrd-Jq-Mcf"/>
+                                </constraints>
+                            </customView>
                         </subviews>
                         <constraints>
                             <constraint firstItem="X6g-3K-JDi" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" id="0AB-Ps-M7N"/>
+                            <constraint firstItem="YdB-zl-3Cf" firstAttribute="top" secondItem="vwg-NL-UPk" secondAttribute="top" id="0gz-SM-ZOO"/>
                             <constraint firstItem="D39-Of-BIh" firstAttribute="top" secondItem="R54-3G-cms" secondAttribute="top" constant="2" id="1I1-kg-gBo"/>
                             <constraint firstAttribute="bottom" secondItem="D39-Of-BIh" secondAttribute="bottom" constant="2" id="1fG-Jn-HEl"/>
                             <constraint firstAttribute="trailing" secondItem="D39-Of-BIh" secondAttribute="trailing" id="Cvo-oT-HF2"/>
@@ -71,6 +128,7 @@
                             <constraint firstItem="D39-Of-BIh" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" id="hOd-Bz-o5j"/>
                             <constraint firstAttribute="bottom" secondItem="X6g-3K-JDi" secondAttribute="bottom" id="iWj-iC-9gW"/>
                             <constraint firstItem="cjE-4p-vxI" firstAttribute="centerY" secondItem="R54-3G-cms" secondAttribute="centerY" id="s3N-bi-7Hr"/>
+                            <constraint firstItem="YdB-zl-3Cf" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" constant="10" id="zyW-Tf-ym2"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -81,6 +139,10 @@
                     <connections>
                         <outlet property="bookmarksBarCollectionView" destination="vwg-NL-UPk" id="1LG-QE-Dgd"/>
                         <outlet property="clippedItemsIndicator" destination="Mgr-xJ-Pl5" id="4ww-Po-dNb"/>
+                        <outlet property="importBookmarksButton" destination="YdB-zl-3Cf" id="phi-lN-qHs"/>
+                        <outlet property="importBookmarksIcon" destination="gwe-JW-nZ6" id="fsM-2E-Q5V"/>
+                        <outlet property="importBookmarksLabel" destination="jeg-Iv-FxB" id="p0A-Bi-qZg"/>
+                        <outlet property="importBookmarksMouseOverView" destination="Nr2-47-6rU" id="rCq-gq-9C4"/>
                         <outlet property="promptAnchor" destination="cjE-4p-vxI" id="IGH-2v-PGD"/>
                     </connections>
                 </viewController>
@@ -91,11 +153,18 @@
     </scenes>
     <resources>
         <image name="Chevron-Double-Right-16" width="16" height="16"/>
+        <image name="square.and.arrow.down" catalog="system" width="15" height="17"/>
         <namedColor name="AddressBarFocusedBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="BookmarkBarBackgroundColor">
             <color red="0.98039215686274506" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseDownColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.18000000715255737" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseOverColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.05000000074505806" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="NavigationBarBackgroundColor">
             <color red="0.98039215686274506" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

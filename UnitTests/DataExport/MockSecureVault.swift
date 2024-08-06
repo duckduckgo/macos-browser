@@ -37,10 +37,24 @@ let MockSecureVaultFactory = SecureVaultFactory<MockSecureVault>(
 
 final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
+    enum MockError: Error {
+        case noStubSet
+    }
+
+    var stubEncryptPassword: ((BrowserServicesKit.SecureVaultModels.WebsiteCredentials, Data?, Data?) -> SecureVaultModels.WebsiteCredentials)?
+
+    func encryptPassword(for credentials: BrowserServicesKit.SecureVaultModels.WebsiteCredentials, key l2Key: Data?, salt: Data?) throws -> BrowserServicesKit.SecureVaultModels.WebsiteCredentials {
+        guard let stubEncryptPassword = stubEncryptPassword?(credentials, l2Key, salt) else {
+            throw MockError.noStubSet
+        }
+        return stubEncryptPassword
+    }
+
     public typealias MockSecureVaultDatabaseProviders = SecureStorageProviders<T>
 
     var storedAccounts: [SecureVaultModels.WebsiteAccount] = []
     var storedCredentials: [Int64: SecureVaultModels.WebsiteCredentials] = [:]
+    var storedCredentialsForDomain: [String: [SecureVaultModels.WebsiteCredentials]] = [:]
     var storedNeverPromptWebsites = [SecureVaultModels.NeverPromptWebsites]()
     var storedNotes: [SecureVaultModels.Note] = []
     var storedIdentities: [SecureVaultModels.Identity] = []
@@ -76,6 +90,14 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
     func websiteCredentialsFor(accountId: Int64) throws -> SecureVaultModels.WebsiteCredentials? {
         return storedCredentials[accountId]
+    }
+
+    func websiteCredentialsFor(domain: String) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteCredentials] {
+        return storedCredentialsForDomain[domain] ?? []
+    }
+
+    func websiteCredentialsWithPartialMatchesFor(eTLDplus1: String) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteCredentials] {
+        return storedCredentialsForDomain[eTLDplus1] ?? []
     }
 
     func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) throws -> Int64 {
@@ -144,6 +166,10 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         return storedIdentities
     }
 
+    func identitiesCount() throws -> Int {
+        return storedIdentities.count
+    }
+
     func identityFor(id: Int64) throws -> SecureVaultModels.Identity? {
         return storedIdentities.first { $0.id == id }
     }
@@ -186,7 +212,11 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         return nil
     }
 
-    func inDatabaseTransaction(_ block: @escaping (Database) throws -> Void) throws {}
+    var spyInDatabaseTransactionBlock: ((Database) throws -> Void)?
+
+    func inDatabaseTransaction(_ block: @escaping (Database) throws -> Void) throws {
+        spyInDatabaseTransactionBlock = block
+    }
 
     func modifiedSyncableCredentials() throws -> [SecureVaultModels.SyncableCredentials] {
         []
@@ -282,6 +312,7 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
     var _creditCards = [Int64: SecureVaultModels.CreditCard]()
     var _forDomain = [String]()
     var _credentialsDict = [Int64: SecureVaultModels.WebsiteCredentials]()
+    var _credentialsForDomain = [String: [SecureVaultModels.WebsiteCredentials]]()
     var _note: SecureVaultModels.Note?
     var _neverPromptWebsites = [SecureVaultModels.NeverPromptWebsites]()
 
@@ -308,6 +339,14 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
 
     func websiteCredentialsForAccountId(_ accountId: Int64) throws -> SecureVaultModels.WebsiteCredentials? {
         return _credentialsDict[accountId]
+    }
+
+    func websiteCredentialsForDomain(_ domain: String) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteCredentials] {
+        return _credentialsForDomain[domain] ?? []
+    }
+
+    func websiteCredentialsForTopLevelDomain(_ domain: String) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteCredentials] {
+        return _credentialsForDomain[domain] ?? []
     }
 
     func websiteAccountsForDomain(_ domain: String) throws -> [SecureVaultModels.WebsiteAccount] {
@@ -389,6 +428,10 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
 
     func identities() throws -> [SecureVaultModels.Identity] {
         return Array(_identities.values)
+    }
+
+    func identitiesCount() throws -> Int {
+        return _identities.count
     }
 
     func identityForIdentityId(_ identityId: Int64) throws -> SecureVaultModels.Identity? {

@@ -198,7 +198,6 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
-        refreshSurveyMessages()
     }
 
     func windowDidResignKey() {
@@ -206,7 +205,7 @@ final class MainViewController: NSViewController {
     }
 
     func showBookmarkPromptIfNeeded() {
-        guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
+        guard !bookmarksBarViewController.bookmarksBarPromptShown, OnboardingActionsManager.isOnboardingFinished else { return }
         if bookmarksBarIsVisible {
             // Don't show this to users who obviously know about the bookmarks bar already
             bookmarksBarViewController.bookmarksBarPromptShown = true
@@ -217,16 +216,6 @@ final class MainViewController: NSViewController {
         // This won't work until the bookmarks bar is actually visible which it isn't until the next ui cycle
         DispatchQueue.main.async {
             self.bookmarksBarViewController.showBookmarksBarPrompt()
-        }
-    }
-
-    private lazy var surveyMessaging: DefaultSurveyRemoteMessaging = {
-        return DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager)
-    }()
-
-    func refreshSurveyMessages() {
-        Task {
-            await surveyMessaging.fetchRemoteMessages()
         }
     }
 
@@ -314,7 +303,14 @@ final class MainViewController: NSViewController {
             }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] title in
-                self?.view.window?.title = title
+                guard let self else { return }
+                guard !isBurner else {
+                    // Fire Window: don‘t display active Tab title as the Window title
+                    view.window?.title = UserText.burnerWindowHeader
+                    return
+                }
+
+                view.window?.title = title
             }
             .store(in: &tabViewModelCancellables)
     }

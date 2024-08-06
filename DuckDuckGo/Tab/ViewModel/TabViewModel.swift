@@ -76,7 +76,7 @@ final class TabViewModel {
     @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
 
     let zoomLevelSubject = PassthroughSubject<DefaultZoomValue, Never>()
-    private (set) var zoomLevel: DefaultZoomValue = .percent100 {
+    private(set) var zoomLevel: DefaultZoomValue = .percent100 {
         didSet {
             self.tab.webView.zoomLevel = zoomLevel
             if oldValue != zoomLevel {
@@ -98,10 +98,10 @@ final class TabViewModel {
         switch tab.content {
         case .url(let url, _, _):
             return !(url.isDuckPlayer || url.isDuckURLScheme)
-        case .subscription, .identityTheftRestoration:
+        case .subscription, .identityTheftRestoration, .releaseNotes:
             return true
 
-        case .newtab, .settings, .bookmarks, .onboarding, .dataBrokerProtection, .none:
+        case .newtab, .settings, .bookmarks, .onboardingDeprecated, .onboarding, .dataBrokerProtection, .none:
             return false
         }
     }
@@ -165,10 +165,12 @@ final class TabViewModel {
                         .settings,
                         .bookmarks,
                         .onboarding,
+                        .onboardingDeprecated,
                         .none,
                         .dataBrokerProtection,
                         .subscription,
-                        .identityTheftRestoration:
+                        .identityTheftRestoration,
+                        .releaseNotes:
                     // Update the address bar instantly for built-in content types or user-initiated navigations
                     return Just( () ).eraseToAnyPublisher()
                 }
@@ -292,7 +294,7 @@ final class TabViewModel {
 
     private func updateAddressBarString() {
         addressBarString = {
-            guard ![.none, .onboarding, .newtab].contains(tab.content),
+            guard ![.none, .onboardingDeprecated, .newtab].contains(tab.content),
                   let url = tab.content.userEditableUrl else { return "" }
 
             if url.isBlobURL {
@@ -305,7 +307,7 @@ final class TabViewModel {
     private func updatePassiveAddressBarString(showFullURL: Bool? = nil) {
         let showFullURL = showFullURL ?? appearancePreferences.showFullURL
         passiveAddressBarAttributedString = switch tab.content {
-        case .newtab, .onboarding, .none:
+        case .newtab, .onboardingDeprecated, .onboarding, .none:
                 .init() // empty
         case .settings:
                 .settingsTrustedIndicator
@@ -317,6 +319,8 @@ final class TabViewModel {
                 .subscriptionTrustedIndicator
         case .identityTheftRestoration:
                 .identityTheftRestorationTrustedIndicator
+        case .releaseNotes:
+                .releaseNotesTrustedIndicator
         case .url(let url, _, _) where url.isDuckPlayer:
                 .duckPlayerTrustedIndicator
         case .url(let url, _, _) where url.isEmailProtection:
@@ -344,7 +348,7 @@ final class TabViewModel {
         }
     }
 
-    private func updateTitle() { // swiftlint:disable:this cyclomatic_complexity
+    private func updateTitle() {
         var title: String
         switch tab.content {
             // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
@@ -366,9 +370,9 @@ final class TabViewModel {
             } else {
                 title = UserText.tabHomeTitle
             }
-        case .onboarding:
+        case .onboardingDeprecated:
             title = UserText.tabOnboardingTitle
-        case .url, .none, .subscription, .identityTheftRestoration:
+        case .url, .none, .subscription, .identityTheftRestoration, .onboarding:
             if let tabTitle = tab.title?.trimmingWhitespace(), !tabTitle.isEmpty {
                 title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
@@ -378,6 +382,8 @@ final class TabViewModel {
             } else {
                 title = addressBarString
             }
+        case .releaseNotes:
+            title = UserText.releaseNotesTitle
         }
         if title.isEmpty {
             title = UserText.tabUntitledTitle
@@ -387,7 +393,6 @@ final class TabViewModel {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func updateFavicon(_ tabFavicon: NSImage?? = .none /* provided from .sink or taken from tab.favicon (optional) if .none */) {
         guard !isShowingErrorPage else {
             favicon = errorFaviconToShow(error: tab.error)
@@ -408,11 +413,13 @@ final class TabViewModel {
             Favicon.subscription
         case .identityTheftRestoration:
             Favicon.identityTheftRestoration
+        case .releaseNotes:
+            Favicon.home
         case .url(let url, _, _) where url.isDuckPlayer:
             Favicon.duckPlayer
         case .url(let url, _, _) where url.isEmailProtection:
             Favicon.emailProtection
-        case .url, .onboarding, .none:
+        case .url, .onboardingDeprecated, .onboarding, .none:
             tabFavicon ?? tab.favicon
         }
     }
@@ -541,5 +548,7 @@ private extension NSAttributedString {
                                                                              title: UserText.duckPlayer)
     static let emailProtectionTrustedIndicator = trustedIndicatorAttributedString(with: .emailProtectionIcon,
                                                                                   title: UserText.emailProtectionPreferences)
+    static let releaseNotesTrustedIndicator = trustedIndicatorAttributedString(with: .releaseNotesIndicator,
+                                                                               title: UserText.releaseNotesTitle)
 
 }

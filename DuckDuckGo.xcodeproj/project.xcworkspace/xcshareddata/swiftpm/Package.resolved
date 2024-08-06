@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/apple-toolbox.git",
       "state" : {
-        "revision" : "ab53ca41e9044a20eab7e53249526fadcf9acc9f",
-        "version" : "3.1.1"
+        "revision" : "0c13c5f056805f2d403618ccc3bfb833c303c68d",
+        "version" : "3.1.2"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "201a932642275eeccc213940a1e85c6c19a6f3d0",
-        "version" : "158.1.0"
+        "revision" : "1d5b3d0a52f75ec5899ae79aabe6c879102cf218",
+        "version" : "181.0.0"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "ba2ad0c3a14a8c07d7be8b50a20b47efea207e86",
-        "version" : "5.19.0"
+        "revision" : "097e545c737db78cb1d253a87a9acd6dd8ad8497",
+        "version" : "6.4.0"
       }
     },
     {
@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "10aeff1ec7f533d1705233a9b14f9393a699b1c0",
-        "version" : "11.0.2"
+        "revision" : "9fea1c6762db726328b14bb9ebfd6508849eae28",
+        "version" : "12.1.0"
       }
     },
     {
@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/GRDB.swift.git",
       "state" : {
-        "revision" : "9f049d7b97b1e68ffd86744b500660d34a9e79b8",
-        "version" : "2.3.0"
+        "revision" : "4225b85c9a0c50544e413a1ea1e502c802b44b35",
+        "version" : "2.4.0"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/airbnb/lottie-spm.git",
       "state" : {
-        "revision" : "3bd43e12d6fb54654366a61f7cfaca787318b8ce",
-        "version" : "4.4.1"
+        "revision" : "1d29eccc24cc8b75bff9f6804155112c0ffc9605",
+        "version" : "4.4.3"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "b75ab2c0405860bb2616db71b9a456acb118c21a",
-        "version" : "3.1.4000"
+        "revision" : "71d303cbfa150e1fac99ffc7b4f67aad9c7a5002",
+        "version" : "3.1.5004"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "924a80e20e2465dcaf3dca32c9b6e9b9968222b9",
-        "version" : "4.1.0"
+        "revision" : "348594efe2cd40ef156e915c272d02ec22f1903f",
+        "version" : "4.2.0"
       }
     },
     {
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle.git",
       "state" : {
-        "revision" : "0a4caaf7a81eea2cece651ef4b17331fa0634dff",
-        "version" : "2.6.0"
+        "revision" : "b456fd404954a9e13f55aa0c88cd5a40b8399638",
+        "version" : "2.6.3"
       }
     },
     {

@@ -44,8 +44,7 @@ public class LegacyBookmarksStoreMigration {
         return results
     }
 
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
+    // swiftlint:disable:next cyclomatic_complexity
     public static func setupAndMigrate(from source: NSManagedObjectContext,
                                        to destination: NSManagedObjectContext) {
 
@@ -67,7 +66,7 @@ public class LegacyBookmarksStoreMigration {
         _ = LegacyBookmarkStore(context: source)
 
         // Prepare destination
-        BookmarkUtils.prepareLegacyFoldersStructure(in: destination)
+        try? BookmarkUtils.prepareLegacyFoldersStructure(in: destination)
 
         guard let newRoot = BookmarkUtils.fetchRootFolder(destination),
               let newFavoritesRoot = BookmarkUtils.fetchLegacyFavoritesFolder(destination) else {
@@ -164,7 +163,7 @@ public class LegacyBookmarksStoreMigration {
         } catch {
             destination.reset()
 
-            BookmarkUtils.prepareLegacyFoldersStructure(in: destination)
+            try? BookmarkUtils.prepareLegacyFoldersStructure(in: destination)
             do {
                 try destination.save(onErrorFire: GeneralPixel.bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration)
             } catch {
@@ -173,8 +172,6 @@ public class LegacyBookmarksStoreMigration {
             }
         }
     }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
 
     private static func cleanupOldData(in context: NSManagedObjectContext) {
         let allObjects = (try? context.fetch(BookmarkManagedObject.fetchRequest())) ?? []

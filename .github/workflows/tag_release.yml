@@ -55,7 +55,7 @@ jobs:
 
     # This doesn't need Xcode, so could technically run on Ubuntu, but actions that add comments and tasks
     # in Asana use BSD-specific sed syntax, that doesn't work with GNU sed (available on Linux).
-    runs-on: macos-13
+    runs-on: macos-14
 
     env:
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}

@@ -23,11 +23,13 @@ import Combine
 import NetworkProtection
 import NetworkProtectionUI
 import NetworkProtectionIPC
+import PixelKit
 
 protocol PopoverPresenter {
     func show(_ popover: NSPopover, positionedBelow view: NSView)
 }
 
+@MainActor
 protocol NetPPopoverManager: AnyObject {
     var isShown: Bool { get }
 
@@ -64,7 +66,7 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     private(set) var bookmarkPopover: AddBookmarkPopover?
     private weak var bookmarkPopoverDelegate: NSPopoverDelegate?
 
-    private (set) var zoomPopover: ZoomPopover?
+    private(set) var zoomPopover: ZoomPopover?
     private weak var zoomPopoverDelegate: NSPopoverDelegate?
 
     private let networkProtectionPopoverManager: NetPPopoverManager
@@ -127,13 +129,15 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         if autofillPopoverPresenter.popoverIsShown == true && button.window == autofillPopoverPresenter.popoverPresentingWindow {
             autofillPopoverPresenter.dismiss()
         } else {
-            showPasswordManagementPopover(selectedCategory: nil, from: button, withDelegate: delegate)
+            showPasswordManagementPopover(selectedCategory: nil, from: button, withDelegate: delegate, source: .shortcut)
         }
     }
 
     func toggleNetworkProtectionPopover(from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
-        if let popover = networkProtectionPopoverManager.toggle(positionedBelow: button, withDelegate: delegate) {
-            bindIsMouseDownState(of: button, to: popover)
+        Task { @MainActor in
+            if let popover = networkProtectionPopoverManager.toggle(positionedBelow: button, withDelegate: delegate) {
+                bindIsMouseDownState(of: button, to: popover)
+            }
         }
     }
 
@@ -198,8 +202,10 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
             downloadsPopover?.close()
         }
 
-        if networkProtectionPopoverManager.isShown {
-            networkProtectionPopoverManager.close()
+        Task { @MainActor in
+            if networkProtectionPopoverManager.isShown {
+                networkProtectionPopoverManager.close()
+            }
         }
 
         if bookmarkPopover?.isShown ?? false {
@@ -318,11 +324,15 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
         popover.close()
     }
 
-    func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
+    func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate, source: PasswordManagementSource?) {
         guard closeTransientPopovers() else { return }
 
         let popover = autofillPopoverPresenter.show(positionedBelow: button, withDomain: passwordManagementDomain, selectedCategory: selectedCategory)
         bindIsMouseDownState(of: button, to: popover)
+
+        if let source = source {
+            PixelKit.fire(GeneralPixel.autofillManagementOpened, withAdditionalParameters: ["source": source.rawValue])
+        }
     }
 
     func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount, from button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
@@ -427,8 +437,11 @@ final class NavigationBarPopovers: NSObject, PopoverPresenter {
     // MARK: - VPN
 
     func showNetworkProtectionPopover(positionedBelow button: MouseOverButton, withDelegate delegate: NSPopoverDelegate) {
-        let popover = networkProtectionPopoverManager.show(positionedBelow: button, withDelegate: delegate)
-        bindIsMouseDownState(of: button, to: popover)
+
+        Task { @MainActor in
+            let popover = networkProtectionPopoverManager.show(positionedBelow: button, withDelegate: delegate)
+            bindIsMouseDownState(of: button, to: popover)
+        }
     }
 }
 

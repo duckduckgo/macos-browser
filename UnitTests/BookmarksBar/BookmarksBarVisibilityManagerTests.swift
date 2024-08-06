@@ -20,7 +20,6 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class BookmarksBarVisibilityManagerTests: XCTestCase {
     private let selectedTabSubject = PassthroughSubject<TabViewModel?, Never>()
     private var appearance: AppearancePreferences!
@@ -31,6 +30,7 @@ final class BookmarksBarVisibilityManagerTests: XCTestCase {
         .url(URL.duckDuckGo, credential: nil, source: .link),
         .settings(pane: nil),
         .bookmarks,
+        .onboardingDeprecated,
         .onboarding,
         .dataBrokerProtection,
         .subscription(URL.duckDuckGo),
@@ -71,6 +71,7 @@ final class BookmarksBarVisibilityManagerTests: XCTestCase {
     // MARK: - Selecting a Tab
 
     // Appearance `showBookmarksBars` false
+    @MainActor
     func testWhenSelectedTaContentAndShowBookmarksBarIsFalseThenIsBookmarksBarVisibleIsFalse() throws {
         // GIVEN
         appearance.showBookmarksBar = false
@@ -95,6 +96,7 @@ final class BookmarksBarVisibilityManagerTests: XCTestCase {
 
     // Appearance `showBookmarksBars` true and .newTabOnly
 
+    @MainActor
     func testWhenShowBookmarksBarIsTrueAndBookmarkBarAppearanceIsTabOnlyThenIsBookmarksBarVisibleIsTrueForNoneAndNewTab() throws {
         // GIVEN
         appearance.showBookmarksBar = true
@@ -125,6 +127,7 @@ final class BookmarksBarVisibilityManagerTests: XCTestCase {
 
     // Appearance `showBookmarksBars` true and .alwaysOn
 
+    @MainActor
     func testWhenShowBookmarksBarIsTrueAndBookmarkBarAppearanceIsAlwaysOnThenIsBookmarksBarVisibleIsTrue() throws {
         // GIVEN
         appearance.showBookmarksBar = true
@@ -150,6 +153,7 @@ final class BookmarksBarVisibilityManagerTests: XCTestCase {
 
     // MARK: - Settings Change
 
+    @MainActor
     func testWhenChangingShowBookmarksBarToTrueThenIsBookmarksBarVisibleIsTrue() throws {
         // GIVEN
         appearance.showBookmarksBar = false
@@ -175,6 +179,7 @@ final class BookmarksBarVisibilityManagerTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testWhenChangingShowBookmarksBarToFalseThenIsBookmarksBarVisibleIsFalse() throws {
         // GIVEN
         appearance.showBookmarksBar = true
@@ -199,6 +204,7 @@ final class BookmarksBarVisibilityManagerTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testWhenBookmarksBarAppearanceChangesToAlwaysVisibleThenIsBookmarkBarVisibleIsTrue() throws {
         // GIVEN
         appearance.showBookmarksBar = true
@@ -224,6 +230,7 @@ final class BookmarksBarVisibilityManagerTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testWhenBookmarksBarAppearanceChangesToOnlyOnNewTabThenIsBookmarkBarVisibleIsTrueForNoneAndNewTab() throws {
         // GIVEN
         appearance.showBookmarksBar = true
@@ -256,6 +263,7 @@ final class BookmarksBarVisibilityManagerTests: XCTestCase {
 
     // MARK: - New Tab becoming URL
 
+    @MainActor
     func testWhenBookmarksBarAppeareanceIsNewTabOnlyAndTabContentBecomesURLThenIsBookmarkBarVisibleIsFalse() throws {
         // GIVEN
         appearance.showBookmarksBar = true

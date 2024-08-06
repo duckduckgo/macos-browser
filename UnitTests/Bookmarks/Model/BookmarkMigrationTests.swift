@@ -49,7 +49,6 @@ class MockBookmarksDatabase {
     }
 }
 
-@MainActor
 class BookmarksMigrationTests: XCTestCase {
 
     var destinationStack: CoreDataDatabase!

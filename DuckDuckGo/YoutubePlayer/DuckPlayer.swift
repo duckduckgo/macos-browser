@@ -53,22 +53,52 @@ enum DuckPlayerMode: Equatable, Codable {
 }
 
 /// Values that the Frontend can use to determine the current state.
-struct InitialSetupSettings: Codable {
+struct InitialPlayerSettings: Codable {
     struct PlayerSettings: Codable {
         let pip: PIP
+        let autoplay: Autoplay
     }
 
     struct PIP: Codable {
-        let status: Status
+        let state: State
     }
 
-    enum Status: String, Codable {
+    struct Platform: Codable {
+        let name: String
+    }
+
+    enum Locale: String, Codable {
+        case en
+    }
+
+    struct Autoplay: Codable {
+        let state: State
+    }
+
+    enum State: String, Codable {
         case enabled
         case disabled
     }
 
+    enum Environment: String, Codable {
+        case development
+        case production
+    }
+
     let userValues: UserValues
     let settings: PlayerSettings
+    let platform: Platform
+    let environment: Environment
+    let locale: Locale
+}
+
+struct InitialOverlaySettings: Codable {
+    let userValues: UserValues
+}
+
+// Values that the YouTube Overlays can use to determine the current state
+struct OverlaysInitialSettings: Codable {
+    let userValues: UserValues
 }
 
 /// Values that the Frontend can use to determine user settings
@@ -109,12 +139,19 @@ final class DuckPlayer {
         preferences.youtubeOverlayInteracted
     }
 
+    var shouldDisplayPreferencesSideBar: Bool {
+        isAvailable || preferences.shouldDisplayContingencyMessage
+    }
+
     init(
         preferences: DuckPlayerPreferences = .shared,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager
     ) {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
+        isPiPFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.pip)
+        isAutoplayFeatureEnabled = privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay)
+
         mode = preferences.duckPlayerMode
         bindDuckPlayerModeIfNeeded()
 
@@ -128,7 +165,6 @@ final class DuckPlayer {
 
     // MARK: - Common Message Handlers
 
-    // swiftlint:disable:next cyclomatic_complexity
     public func handleSetUserValuesMessage(
         from origin: YoutubeOverlayUserScript.MessageOrigin
     ) -> (_ params: Any, _ message: UserScriptMessage) -> Encodable? {
@@ -187,9 +223,15 @@ final class DuckPlayer {
         encodeUserValues()
     }
 
-    public func initialSetup(with webView: WKWebView?) -> (_ params: Any, _ message: UserScriptMessage) async -> Encodable? {
+    public func initialPlayerSetup(with webView: WKWebView?) -> (_ params: Any, _ message: UserScriptMessage) async -> Encodable? {
         return { _, _ in
-            return await self.encodedSettings(with: webView)
+            return await self.encodedPlayerSettings(with: webView)
+        }
+    }
+
+    public func initialOverlaySetup(with webView: WKWebView?) -> (_ params: Any, _ message: UserScriptMessage) async -> Encodable? {
+        return { _, _ in
+            return await self.encodedOverlaySettings(with: webView)
         }
     }
 
@@ -201,14 +243,43 @@ final class DuckPlayer {
     }
 
     @MainActor
-    private func encodedSettings(with webView: WKWebView?) async -> InitialSetupSettings {
-        let isPiPEnabled = webView?.configuration.allowsPictureInPictureMediaPlayback == true
-        let pip = InitialSetupSettings.PIP(status: isPiPEnabled ? .enabled : .disabled)
+    private func encodedPlayerSettings(with webView: WKWebView?) async -> InitialPlayerSettings {
+        var isPiPEnabled = webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] == true
 
-        let playerSettings = InitialSetupSettings.PlayerSettings(pip: pip)
+        var isAutoplayEnabled = DuckPlayerPreferences.shared.duckPlayerAutoplay
+
+        /// If the feature flag is disabled, we want to turn autoPlay to true since this was the default
+        /// https://app.asana.com/0/1204167627774280/1207906550241281/f
+        if !isAutoplayFeatureEnabled {
+            isAutoplayEnabled = true
+        }
+
+        // Disable WebView PiP if if the subFeature is off
+        if !isPiPFeatureEnabled {
+            webView?.configuration.preferences[.allowsPictureInPictureMediaPlayback] = false
+            isPiPEnabled = false
+        }
+
+        let pip = InitialPlayerSettings.PIP(state: isPiPEnabled ? .enabled : .disabled)
+        let autoplay = InitialPlayerSettings.Autoplay(state: isAutoplayEnabled ? .enabled : .disabled)
+        let platform = InitialPlayerSettings.Platform(name: "macos")
+        let environment = InitialPlayerSettings.Environment.development
+        let locale = InitialPlayerSettings.Locale.en
+        let playerSettings = InitialPlayerSettings.PlayerSettings(pip: pip, autoplay: autoplay)
         let userValues = encodeUserValues()
 
-        return InitialSetupSettings(userValues: userValues, settings: playerSettings)
+        return InitialPlayerSettings(userValues: userValues,
+                                     settings: playerSettings,
+                                     platform: platform,
+                                     environment: environment,
+                                     locale: locale)
+    }
+
+    @MainActor
+    private func encodedOverlaySettings(with webView: WKWebView?) async -> InitialOverlaySettings {
+        let userValues = encodeUserValues()
+
+        return InitialOverlaySettings(userValues: userValues)
     }
 
     // MARK: - Private
@@ -223,6 +294,8 @@ final class DuckPlayer {
     }
     private var modeCancellable: AnyCancellable?
     private var isFeatureEnabledCancellable: AnyCancellable?
+    private var isPiPFeatureEnabled: Bool
+    private var isAutoplayFeatureEnabled: Bool
 
     private func bindDuckPlayerModeIfNeeded() {
         if isFeatureEnabled {
@@ -295,15 +368,22 @@ extension DuckPlayer {
 #if DEBUG
 
 final class DuckPlayerPreferencesPersistorMock: DuckPlayerPreferencesPersistor {
-
     var duckPlayerModeBool: Bool?
     var youtubeOverlayInteracted: Bool
     var youtubeOverlayAnyButtonPressed: Bool
+    var duckPlayerAutoplay: Bool
+    var duckPlayerOpenInNewTab: Bool
 
-    init(duckPlayerMode: DuckPlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false, youtubeOverlayAnyButtonPressed: Bool = false) {
+    init(duckPlayerMode: DuckPlayerMode = .alwaysAsk,
+         youtubeOverlayInteracted: Bool = false,
+         youtubeOverlayAnyButtonPressed: Bool = false,
+         duckPlayerAutoplay: Bool = false,
+         duckPlayerOpenInNewTab: Bool = false) {
         self.duckPlayerModeBool = duckPlayerMode.boolValue
         self.youtubeOverlayInteracted = youtubeOverlayInteracted
         self.youtubeOverlayAnyButtonPressed = youtubeOverlayAnyButtonPressed
+        self.duckPlayerAutoplay = duckPlayerAutoplay
+        self.duckPlayerOpenInNewTab = duckPlayerOpenInNewTab
     }
 }
 

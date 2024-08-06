@@ -50,8 +50,12 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     private lazy var scrollView = NSScrollView(frame: NSRect(x: 0, y: 0, width: 232, height: 410))
     private lazy var outlineView = BookmarksOutlineView(frame: scrollView.frame)
 
-    private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource)
-    private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: bookmarkManager, treeController: treeController, showMenuButtonOnHover: false)
+    private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource, sortMode: .manual)
+    private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly,
+                                                                bookmarkManager: bookmarkManager,
+                                                                treeController: treeController,
+                                                                sortMode: .manual,
+                                                                showMenuButtonOnHover: false)
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -184,7 +188,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
 
     private func reloadData() {
         let selectedNodes = self.selectedNodes
-        dataSource.reloadData()
+        dataSource.reloadData(with: .manual)
         outlineView.reloadData()
 
         expandAndRestore(selectedNodes: selectedNodes)
@@ -351,6 +355,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 
         let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
         tabCollection.append(tabs: tabs)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     func openAllInNewWindow(_ sender: NSMenuItem) {
@@ -363,6 +368,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 
         let newTabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
         WindowsManager.openNewWindow(with: newTabCollection, isBurner: tabCollection.isBurner)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
 }
@@ -370,7 +376,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 #if DEBUG
 private let previewSize = NSSize(width: 400, height: 660)
 @available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: previewSize.width, height: previewSize.height)) { {
+#Preview(traits: previewSize.fixedLayout) { {
 
     let vc = BookmarkManagementSidebarViewController(bookmarkManager: {
         let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [

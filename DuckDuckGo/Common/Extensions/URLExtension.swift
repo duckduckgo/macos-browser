@@ -24,7 +24,6 @@ import Foundation
 
 extension URL.NavigationalScheme {
 
-    static let duck = URL.NavigationalScheme(rawValue: "duck")
     static let javascript = URL.NavigationalScheme(rawValue: "javascript")
 
     static var validSchemes: [URL.NavigationalScheme] {
@@ -140,6 +139,7 @@ extension URL {
     static let welcome = URL(string: "duck://welcome")!
     static let settings = URL(string: "duck://settings")!
     static let bookmarks = URL(string: "duck://bookmarks")!
+    static let releaseNotes = URL(string: "duck://release-notes")!
     // base url for Error Page Alternate HTML loaded into Web View
     static let error = URL(string: "duck://error")!
 
@@ -342,10 +342,15 @@ extension URL {
     }
 
     var isExternalSchemeLink: Bool {
-        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript].contains(navigationalScheme)
+        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript, .duck].contains(navigationalScheme)
     }
 
     // MARK: - DuckDuckGo
+
+    static var onboarding: URL {
+        let onboardingUrlString = "duck://onboarding"
+        return URL(string: onboardingUrlString)!
+    }
 
     static var duckDuckGo: URL {
         let duckDuckGoUrlString = "https://duckduckgo.com/"
@@ -358,6 +363,10 @@ extension URL {
 
     static var aboutDuckDuckGo: URL {
         return URL(string: "https://duckduckgo.com/about")!
+    }
+
+    static var updates: URL {
+        return URL(string: "https://duckduckgo.com/updates")!
     }
 
     static var webTrackingProtection: URL {

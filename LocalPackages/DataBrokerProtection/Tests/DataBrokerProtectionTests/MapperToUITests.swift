@@ -45,7 +45,7 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(result.scanProgress.totalScans, 2)
     }
 
-    func testWhenAScanRanOnAllProfileQueriesOnTheSameBroker_thenCurrentScansReflectsThatScansWereDoneOnThatBroker() {
+    func testWhenAScanRanOnAllProfileQueriesOnTheSameBroker_thenScannedBrokersAndCurrentScansReflectsThat() {
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
@@ -55,6 +55,23 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.currentScans, 1)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, "Broker #1")
+        XCTAssertTrue(result.resultsFound.isEmpty)
+    }
+
+    func testWhenAScanRanOnOneProfileQueryOnTheSameBroker_thenScannedBrokersAndCurrentScansReflectsThat() {
+        let brokerProfileQueryData: [BrokerProfileQueryData] = [
+            .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
+            .mock(dataBrokerName: "Broker #1"),
+            .mock(dataBrokerName: "Broker #2")
+        ]
+
+        let result = sut.initialScanState(brokerProfileQueryData)
+
+        XCTAssertEqual(result.scanProgress.currentScans, 1)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.first!.name, "Broker #1")
         XCTAssertTrue(result.resultsFound.isEmpty)
     }
 
@@ -78,7 +95,7 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(result.resultsFound.count, 2)
     }
 
-    func testWhenAllScansRan_thenCurrentScansEqualsTotalScans() {
+    func testWhenAllScansRan_thenScannedBrokersAndCurrentScansEqualsTotalScans() {
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
             .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
@@ -88,6 +105,9 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.totalScans, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.currentScans, 2)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
     }
 
     func testWhenScansHaveDeprecatedProfileQueries_thenThoseAreNotTakenIntoAccount() {
@@ -102,6 +122,8 @@ final class MapperToUITests: XCTestCase {
 
         XCTAssertEqual(result.scanProgress.totalScans, 2)
         XCTAssertEqual(result.scanProgress.currentScans, 2)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
         XCTAssertEqual(result.resultsFound.count, 1)
     }
 
@@ -118,6 +140,8 @@ final class MapperToUITests: XCTestCase {
 
         XCTAssertEqual(result.scanProgress.totalScans, 2)
         XCTAssertEqual(result.scanProgress.currentScans, 2)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "Broker #2"])
         XCTAssertEqual(result.resultsFound.count, 1)
     }
 
@@ -212,7 +236,7 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(result.scanProgress.totalScans, 2)
     }
 
-    func testWhenMirrorSiteIsNotInRemovedPeriod_thenItShouldBeAddedToCurrentScans() {
+    func testWhenMirrorSiteIsNotInRemovedPeriod_thenItShouldBeAddedToScannedBrokersAndCurrentScans() {
         let brokerWithMirrorSiteNotRemovedAndWithScan = BrokerProfileQueryData.mock(
             dataBrokerName: "Broker #1",
             lastRunDate: Date(),
@@ -227,9 +251,11 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.currentScans, 2)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #1", "mirror"])
     }
 
-    func testWhenMirrorSiteIsInRemovedPeriod_thenItShouldNotBeAddedToCurrentScans() {
+    func testWhenMirrorSiteIsInRemovedPeriod_thenItShouldNotBeAddedToScannedBrokersCurrentScans() {
         let brokerWithMirrorSiteRemovedAndWithScan = BrokerProfileQueryData.mock(
             dataBrokerName: "Broker #2",
             lastRunDate: Date(),
@@ -244,6 +270,8 @@ final class MapperToUITests: XCTestCase {
         let result = sut.initialScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanProgress.currentScans, 1)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.count, result.scanProgress.currentScans)
+        XCTAssertEqual(result.scanProgress.scannedBrokers.map{ $0.name }.sorted(), ["Broker #2"])
     }
 
     func testWhenMirrorSiteIsNotInRemovedPeriod_thenMatchIsAdded() {
@@ -330,6 +358,48 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(result.scanSchedule.nextScan.dataBrokers.count, 3)
         XCTAssertTrue(areDatesEqualsOnDayMonthAndYear(date1: Date().tomorrow, date2: Date(timeIntervalSince1970: result.scanSchedule.nextScan.date)))
     }
+
+    func testBrokersWithMixedScanProgress_areOrderedByLastRunDate_andHaveCorrectStatus() {
+
+        // Given
+        let minusTwoHours = Date.minusTwoHours
+        let minusThreeHours = Date.minusThreeHours
+        let brokerProfileQueryData: [BrokerProfileQueryData] = [
+            .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
+            .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
+            .mock(dataBrokerName: "Broker #1", lastRunDate: minusTwoHours),
+            .mock(dataBrokerName: "Broker #2"),
+            .mock(dataBrokerName: "Broker #2", lastRunDate: .minusOneHour),
+            .mock(dataBrokerName: "Broker #2", lastRunDate: minusThreeHours),
+            .mock(dataBrokerName: "Broker #3", lastRunDate: minusTwoHours),
+            .mock(dataBrokerName: "Broker #3"),
+            .mock(dataBrokerName: "Broker #3", lastRunDate: Date()),
+            .mock(dataBrokerName: "Broker #4"),
+            .mock(dataBrokerName: "Broker #5"),
+            .mock(dataBrokerName: "Broker #7", lastRunDate: minusThreeHours),
+            .mock(dataBrokerName: "Broker #6", lastRunDate: minusThreeHours)
+        ]
+
+        let expected: [DBPUIScanProgress.ScannedBroker] = [
+            .mock("Broker #2", status: .inProgress),
+            .mock("Broker #6", status: .completed),
+            .mock("Broker #7", status: .completed),
+            .mock("Broker #1", status: .completed),
+            .mock("Broker #3", status: .inProgress)
+        ]
+
+        let result = sut.initialScanState(brokerProfileQueryData)
+
+        XCTAssertEqual(result.scanProgress.currentScans, 5)
+        XCTAssertEqual(result.scanProgress.scannedBrokers, expected)
+    }
+
+}
+
+extension DBPUIScanProgress.ScannedBroker {
+    static func mock(_ name: String, status: Self.Status) -> DBPUIScanProgress.ScannedBroker {
+        .init(name: name, url: "test.com", status: status)
+    }
 }
 
 extension Date {
@@ -344,5 +414,22 @@ extension Date {
         let calendar = Calendar.current
 
         return calendar.date(byAdding: .day, value: 1, to: self)
+    }
+
+    static var minusOneHour: Date? {
+        nowMinusHour(1)
+    }
+
+    static var minusTwoHours: Date? {
+        nowMinusHour(2)
+    }
+
+    static var minusThreeHours: Date? {
+        nowMinusHour(3)
+    }
+
+    private static func nowMinusHour(_ hour: Int) -> Date? {
+        let calendar = Calendar.current
+        return calendar.date(byAdding: .hour, value: -hour, to: Date())
     }
 }

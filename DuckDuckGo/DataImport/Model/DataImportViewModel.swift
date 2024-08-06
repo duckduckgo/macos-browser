@@ -44,7 +44,7 @@ struct DataImportViewModel {
     /// Factory for a DataImporter for importSource
     private let dataImporterFactory: DataImporterFactory
 
-    /// Show a master password input dialog callback
+    /// Show a main password input dialog callback
     private let requestPrimaryPasswordCallback: @MainActor (Source) -> String?
 
     /// Show Open Panel to choose CSV/HTML file
@@ -167,6 +167,8 @@ struct DataImportViewModel {
         self.requestPrimaryPasswordCallback = requestPrimaryPasswordCallback
         self.openPanelCallback = openPanelCallback
         self.reportSenderFactory = reportSenderFactory
+
+        PixelExperiment.fireOnboardingImportRequestedPixel()
     }
 
     /// Import button press (starts browser data import)
@@ -221,7 +223,7 @@ struct DataImportViewModel {
 
     /// Called with data import task result to update the state by merging the summary with an existing summary
     @MainActor
-    private mutating func mergeImportSummary(with summary: DataImportSummary) { // swiftlint:disable:this cyclomatic_complexity
+    private mutating func mergeImportSummary(with summary: DataImportSummary) {
         self.importTask = nil
 
         log("merging summary \(summary)")
@@ -296,7 +298,7 @@ struct DataImportViewModel {
                 // stay on the same screen
                 return true
 
-            // firefox passwords db is master-password protected: request password
+            // firefox passwords db is main-password protected: request password
             case let error as FirefoxLoginReader.ImportError where error.type == .requiresPrimaryPassword:
 
                 log("primary password required")

@@ -27,6 +27,7 @@ final class NavigationBarPopoversTests: XCTestCase {
     private var sut: NavigationBarPopovers!
     private var autofillPopoverPresenter: MockAutofillPopoverPresenter!
 
+    @MainActor
     override func setUpWithError() throws {
         autofillPopoverPresenter = MockAutofillPopoverPresenter()
             sut = NavigationBarPopovers(networkProtectionPopoverManager: NetPPopoverManagerMock(), autofillPopoverPresenter: autofillPopoverPresenter)
@@ -79,7 +80,7 @@ final class NavigationBarPopoversTests: XCTestCase {
 
     func testShowsPasswordPopoverWithCategory() throws {
         // When
-        sut.showPasswordManagementPopover(selectedCategory: nil, from: MouseOverButton(), withDelegate: MockNSPopoverDelegate())
+        sut.showPasswordManagementPopover(selectedCategory: nil, from: MouseOverButton(), withDelegate: MockNSPopoverDelegate(), source: nil)
 
         // Then
         XCTAssertTrue(autofillPopoverPresenter.didShowWithCategory)

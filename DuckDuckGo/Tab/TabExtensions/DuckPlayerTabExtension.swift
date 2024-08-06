@@ -22,6 +22,7 @@ import ContentBlocking
 import Foundation
 import Navigation
 import PixelKit
+import DuckPlayer
 
 protocol YoutubeScriptsProvider {
     var youtubeOverlayScript: YoutubeOverlayUserScript? { get }
@@ -34,6 +35,15 @@ final class DuckPlayerTabExtension {
     private let isBurner: Bool
     private var cancellables = Set<AnyCancellable>()
     private var youtubePlayerCancellables = Set<AnyCancellable>()
+    private var shouldOpenInNewTab: Bool  {
+        preferences.isOpenInNewTabSettingsAvailable &&
+        preferences.duckPlayerOpenInNewTab &&
+        preferences.duckPlayerMode != .disabled
+    }
+    private var shouldOpenDuckPlayerDirectly: Bool {
+        preferences.duckPlayerMode == .enabled
+    }
+    private let preferences: DuckPlayerPreferences
 
     private weak var webView: WKWebView? {
         didSet {
@@ -49,9 +59,11 @@ final class DuckPlayerTabExtension {
     init(duckPlayer: DuckPlayer,
          isBurner: Bool,
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
-         webViewPublisher: some Publisher<WKWebView, Never>) {
+         webViewPublisher: some Publisher<WKWebView, Never>,
+         preferences: DuckPlayerPreferences = .shared) {
         self.duckPlayer = duckPlayer
         self.isBurner = isBurner
+        self.preferences = preferences
 
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
@@ -113,13 +125,18 @@ extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL, in webView: WKWebView) {
         if duckPlayer.mode == .enabled {
             PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeAutomatic)
-        } else {
-            PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaHoverButton)
         }
-        // to be standardised across the app
-        let isRequestingNewTab = NSApp.isCommandPressed
+
+        var shouldRequestNewTab = shouldOpenInNewTab
+
+        // PopUpWindows don't support tabs
+        if let window = webView.window, window is PopUpWindow {
+            shouldRequestNewTab = false
+        }
+
+        let isRequestingNewTab = NSApp.isCommandPressed || shouldRequestNewTab
         if isRequestingNewTab {
-            shouldSelectNextNewTab = NSApp.isShiftPressed
+            shouldSelectNextNewTab = NSApp.isShiftPressed || shouldOpenInNewTab
             webView.loadInNewWindow(url)
         } else {
             shouldSelectNextNewTab = nil
@@ -204,16 +221,35 @@ extension DuckPlayerTabExtension: NavigationResponder {
         if navigationAction.url.isDuckURLScheme || navigationAction.url.isDuckPlayer {
             if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
                 PixelKit.fire(GeneralPixel.duckPlayerViewFromSERP)
+
+                if shouldOpenInNewTab,
+                   let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
+                    shouldSelectNextNewTab = true
+                    webView?.loadInNewWindow(navigationAction.url)
+                    return .cancel
+                }
             }
             return .allow
         }
 
         // Navigating to a Youtube URL
-        if navigationAction.url.isYoutubeVideo,
-           let (videoID, timestamp) = navigationAction.url.youtubeVideoParams {
-            return decidePolicy(for: navigationAction, withYoutubeVideoID: videoID, timestamp: timestamp)
+        return handleYoutubeNavigation(for: navigationAction)
+    }
+
+    @MainActor
+    private func handleYoutubeNavigation(for navigationAction: NavigationAction) -> NavigationActionPolicy? {
+        guard navigationAction.url.isYoutubeVideo,
+              let (videoID, timestamp) = navigationAction.url.youtubeVideoParams else {
+            return .next
         }
-        return .next
+
+        if shouldOpenInNewTab, shouldOpenDuckPlayerDirectly,
+           let url = webView?.url, !url.isEmpty, !url.isYoutubeVideo {
+            webView?.loadInNewWindow(navigationAction.url)
+            return .cancel
+        }
+
+        return decidePolicy(for: navigationAction, withYoutubeVideoID: videoID, timestamp: timestamp)
     }
 
     func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
@@ -314,7 +350,14 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
         if navigation.url.isDuckPlayer {
             let setting = duckPlayer.mode == .enabled ? "always" : "default"
-            PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView, frequency: .legacyDaily, withAdditionalParameters: ["setting": setting])
+            let newTabSettings = preferences.duckPlayerOpenInNewTab ? "true" : "false"
+            let autoplay = preferences.duckPlayerAutoplay ? "true" : "false"
+
+            PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView,
+                          frequency: .legacyDaily,
+                          withAdditionalParameters: ["setting": setting,
+                                                     "newtab": newTabSettings,
+                                                     "autoplay": autoplay])
         }
     }
 

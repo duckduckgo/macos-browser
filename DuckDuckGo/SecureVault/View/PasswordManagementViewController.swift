@@ -33,7 +33,6 @@ protocol PasswordManagementDelegate: AnyObject {
 
 }
 
-// swiftlint:disable:next type_body_length
 final class PasswordManagementViewController: NSViewController {
 
     static func create() -> Self {
@@ -323,6 +322,7 @@ final class PasswordManagementViewController: NSViewController {
             self.refreshData {
                 self.select(category: .logins)
             }
+            PixelKit.fire(GeneralPixel.autofillManagementDeleteAllLogins)
         }
     }
 
@@ -540,8 +540,10 @@ final class PasswordManagementViewController: NSViewController {
                     self?.syncModelsOnCredentials(savedCredentials, select: true)
                 }
                 NotificationCenter.default.post(name: .autofillSaveEvent, object: nil, userInfo: nil)
+                PixelKit.fire(GeneralPixel.autofillManagementSaveLogin)
             } else {
                 syncModelsOnCredentials(savedCredentials)
+                PixelKit.fire(GeneralPixel.autofillManagementUpdateLogin)
             }
             postChange()
             requestSync()
@@ -635,6 +637,7 @@ final class PasswordManagementViewController: NSViewController {
                     try self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
                     self.requestSync()
                     self.refreshData()
+                    PixelKit.fire(GeneralPixel.autofillManagementDeleteLogin)
                 } catch {
                     PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
@@ -721,8 +724,6 @@ final class PasswordManagementViewController: NSViewController {
 
     var passwordManagerSelectionCancellable: AnyCancellable?
 
-    // swiftlint:disable function_body_length
-    // swiftlint:disable:next cyclomatic_complexity
     private func createListView() {
         let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator, onItemSelected: { [weak self] previousValue, newValue in
             guard let newValue = newValue,
@@ -816,8 +817,6 @@ final class PasswordManagementViewController: NSViewController {
         let view = NSHostingView(rootView: passwordManagerView)
         replaceItemContainerChildView(with: view)
     }
-
-    // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
         return NSMenu {
@@ -989,8 +988,8 @@ final class PasswordManagementViewController: NSViewController {
         switch category {
         case .allItems: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
         case .logins: showEmptyState(image: .passwordsAdd128, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
-        case .identities: showEmptyState(image: .identitiesEmpty, title: UserText.pmEmptyStateIdentitiesTitle)
-        case .cards: showEmptyState(image: .creditCardsEmpty, title: UserText.pmEmptyStateCardsTitle)
+        case .identities: showEmptyState(image: .identityAdd128, title: UserText.pmEmptyStateIdentitiesTitle)
+        case .cards: showEmptyState(image: .creditCardsAdd128, title: UserText.pmEmptyStateCardsTitle)
         }
     }
 

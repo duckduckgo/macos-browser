@@ -18,6 +18,9 @@
 
 import Foundation
 import Combine
+import BrowserServicesKit
+import PixelKit
+import DuckPlayer
 
 protocol DuckPlayerPreferencesPersistor {
     /// The persistor hadles raw Bool values but each one translates into a DuckPlayerMode:
@@ -26,6 +29,8 @@ protocol DuckPlayerPreferencesPersistor {
     var duckPlayerModeBool: Bool? { get set }
     var youtubeOverlayInteracted: Bool { get set }
     var youtubeOverlayAnyButtonPressed: Bool { get set }
+    var duckPlayerAutoplay: Bool { get set }
+    var duckPlayerOpenInNewTab: Bool { get set }
 }
 
 struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersistor {
@@ -38,17 +43,62 @@ struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersisto
 
     @UserDefaultsWrapper(key: .youtubeOverlayButtonsUsed, defaultValue: false)
     var youtubeOverlayAnyButtonPressed: Bool
+
+    @UserDefaultsWrapper(key: .duckPlayerAutoplay, defaultValue: true)
+    var duckPlayerAutoplay: Bool
+
+    @UserDefaultsWrapper(key: .duckPlayerOpenInNewTab, defaultValue: true)
+    var duckPlayerOpenInNewTab: Bool
 }
 
 final class DuckPlayerPreferences: ObservableObject {
+    private let internalUserDecider: InternalUserDecider
+    private let duckPlayerContingencyHandler: DuckPlayerContingencyHandler
 
     static let shared = DuckPlayerPreferences()
+    private let privacyConfigurationManager: PrivacyConfigurationManaging
 
     @Published
     var duckPlayerMode: DuckPlayerMode {
         didSet {
             persistor.duckPlayerModeBool = duckPlayerMode.boolValue
         }
+    }
+
+    @Published
+    var duckPlayerAutoplay: Bool {
+        didSet {
+            persistor.duckPlayerAutoplay = duckPlayerAutoplay
+            if duckPlayerAutoplay {
+                PixelKit.fire(NonStandardEvent(GeneralPixel.duckPlayerAutoplaySettingsOn))
+            } else {
+                PixelKit.fire(NonStandardEvent(GeneralPixel.duckPlayerAutoplaySettingsOff))
+            }
+        }
+    }
+
+    @Published
+    var duckPlayerOpenInNewTab: Bool {
+        didSet {
+            persistor.duckPlayerOpenInNewTab = duckPlayerOpenInNewTab
+            if duckPlayerOpenInNewTab {
+                PixelKit.fire(NonStandardEvent(GeneralPixel.duckPlayerNewTabSettingsOn))
+            } else {
+                PixelKit.fire(NonStandardEvent(GeneralPixel.duckPlayerNewTabSettingsOff))
+            }
+        }
+    }
+
+    var shouldDisplayAutoPlaySettings: Bool {
+        privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.autoplay) || internalUserDecider.isInternalUser
+    }
+
+    var isOpenInNewTabSettingsAvailable: Bool {
+        privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DuckPlayerSubfeature.openInNewTab) || internalUserDecider.isInternalUser
+    }
+
+    var isNewTabSettingsAvailable: Bool {
+        duckPlayerMode != .disabled
     }
 
     var youtubeOverlayInteracted: Bool {
@@ -63,11 +113,28 @@ final class DuckPlayerPreferences: ObservableObject {
         }
     }
 
-    init(persistor: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor()) {
+    var shouldDisplayContingencyMessage: Bool {
+        duckPlayerContingencyHandler.shouldDisplayContingencyMessage
+    }
+
+    @MainActor
+    func openLearnMoreContingencyURL() {
+        guard let url = duckPlayerContingencyHandler.learnMoreURL else { return }
+        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+    }
+
+    init(persistor: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor(),
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+         internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider) {
         self.persistor = persistor
         duckPlayerMode = .init(persistor.duckPlayerModeBool)
         youtubeOverlayInteracted = persistor.youtubeOverlayInteracted
         youtubeOverlayAnyButtonPressed = persistor.youtubeOverlayAnyButtonPressed
+        duckPlayerAutoplay = persistor.duckPlayerAutoplay
+        duckPlayerOpenInNewTab = persistor.duckPlayerOpenInNewTab
+        self.privacyConfigurationManager = privacyConfigurationManager
+        self.internalUserDecider = internalUserDecider
+        self.duckPlayerContingencyHandler = DefaultDuckPlayerContingencyHandler(privacyConfigurationManager: privacyConfigurationManager)
     }
 
     private var persistor: DuckPlayerPreferencesPersistor

@@ -39,7 +39,7 @@ let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = {
     }, makeKeyStoreProvider: { _ in
         return keystoreProvider
     }, makeDatabaseProvider: { key in
-        return try DefaultDataBrokerProtectionDatabaseProvider(file: fileURL, key: key)
+        try DefaultDataBrokerProtectionDatabaseProvider.create(key: key)
     }
 )
 }()

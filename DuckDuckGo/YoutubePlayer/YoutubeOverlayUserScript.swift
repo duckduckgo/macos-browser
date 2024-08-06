@@ -66,6 +66,7 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
     // MARK: - MessageNames
 
     enum MessageNames: String, CaseIterable {
+        case initialSetup
         case setUserValues
         case getUserValues
         case openDuckPlayer
@@ -82,6 +83,8 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
             return DuckPlayer.shared.handleSetUserValuesMessage(from: origin)
         case .getUserValues:
             return DuckPlayer.shared.handleGetUserValues
+        case .initialSetup:
+            return DuckPlayer.shared.initialOverlaySetup(with: webView)
         case .openDuckPlayer:
             return handleOpenDuckPlayer
         case .sendDuckPlayerPixel:
@@ -135,6 +138,12 @@ extension YoutubeOverlayUserScript {
         case "play.use":
             duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
             PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaMainOverlay)
+            // Temporary pixel for first time user uses Duck Player
+            if AppDelegate.isNewUser {
+                PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .legacyInitial)
+            }
+        case "play.use.thumbnail":
+            PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaHoverButton)
             // Temporary pixel for first time user uses Duck Player
             if AppDelegate.isNewUser {
                 PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .legacyInitial)

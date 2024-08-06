@@ -40,7 +40,6 @@ extension HomePage.Models {
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
         let privacyConfigurationManager: PrivacyConfigurationManaging
-        let surveyRemoteMessaging: SurveyRemoteMessaging
         let permanentSurveyManager: SurveyManager
 
         var duckPlayerURL: String {
@@ -54,7 +53,7 @@ extension HomePage.Models {
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
-        private let subscriptionManager: SubscriptionManaging
+        private let subscriptionManager: SubscriptionManager
 
         @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
         var shouldShowAllFeatures: Bool {
@@ -108,17 +107,15 @@ extension HomePage.Models {
              tabCollectionViewModel: TabCollectionViewModel,
              emailManager: EmailManager = EmailManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
-             surveyRemoteMessaging: SurveyRemoteMessaging,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
              permanentSurveyManager: SurveyManager = PermanentSurveyManager(),
-             subscriptionManager: SubscriptionManaging = Application.appDelegate.subscriptionManager) {
+             subscriptionManager: SubscriptionManager = Application.appDelegate.subscriptionManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dockCustomizer = dockCustomizer
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
             self.emailManager = emailManager
             self.duckPlayerPreferences = duckPlayerPreferences
-            self.surveyRemoteMessaging = surveyRemoteMessaging
             self.privacyConfigurationManager = privacyConfigurationManager
             self.permanentSurveyManager = permanentSurveyManager
             self.subscriptionManager = subscriptionManager
@@ -143,8 +140,6 @@ extension HomePage.Models {
                 performEmailProtectionAction()
             case .permanentSurvey:
                 visitSurvey()
-            case .surveyRemoteMessage(let message):
-                handle(remoteMessage: message)
             }
         }
 
@@ -195,23 +190,13 @@ extension HomePage.Models {
                 shouldShowEmailProtectionSetting = false
             case .permanentSurvey:
                 shouldShowPermanentSurvey = false
-            case .surveyRemoteMessage(let message):
-                surveyRemoteMessaging.dismiss(message: message)
-                PixelKit.fire(GeneralPixel.surveyRemoteMessageDismissed(messageID: message.id))
             }
             refreshFeaturesMatrix()
         }
 
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
-
-            for message in surveyRemoteMessaging.presentableRemoteMessages() {
-                features.append(.surveyRemoteMessage(message))
-                PixelKit.fire(GeneralPixel.surveyRemoteMessageDisplayed(messageID: message.id), frequency: .daily)
-            }
-
             appendFeatureCards(&features)
-
             featuresMatrix = features.chunked(into: itemsPerRow)
         }
 
@@ -235,8 +220,6 @@ extension HomePage.Models {
                 return shouldEmailProtectionCardBeVisible
             case .permanentSurvey:
                 return shouldPermanentSurveyBeVisible
-            case .surveyRemoteMessage:
-                return false // This is handled separately
             }
         }
 
@@ -312,8 +295,7 @@ extension HomePage.Models {
 
         private var shouldPermanentSurveyBeVisible: Bool {
             return shouldShowPermanentSurvey &&
-            permanentSurveyManager.isSurveyAvailable &&
-            surveyRemoteMessaging.presentableRemoteMessages().isEmpty // When Privacy Pro survey is visible, ensure we do not show multiple at once
+            permanentSurveyManager.isSurveyAvailable
         }
 
         @MainActor private func visitSurvey() {
@@ -322,44 +304,6 @@ extension HomePage.Models {
             let tab = Tab(content: .url(url, source: .ui), shouldLoadInBackground: true)
             tabCollectionViewModel.append(tab: tab)
             shouldShowPermanentSurvey = false
-        }
-
-        @MainActor private func handle(remoteMessage: SurveyRemoteMessage) {
-            guard let actionType = remoteMessage.action.actionType else {
-                PixelKit.fire(GeneralPixel.surveyRemoteMessageDismissed(messageID: remoteMessage.id))
-                surveyRemoteMessaging.dismiss(message: remoteMessage)
-                refreshFeaturesMatrix()
-                return
-            }
-
-            switch actionType {
-            case .openSurveyURL, .openURL:
-                Task { @MainActor in
-                    var subscription: Subscription?
-
-                    if let token = subscriptionManager.accountManager.accessToken {
-                        switch await subscriptionManager.subscriptionService.getSubscription(
-                            accessToken: token,
-                            cachePolicy: .returnCacheDataElseLoad
-                        ) {
-                        case .success(let fetchedSubscription):
-                            subscription = fetchedSubscription
-                        case .failure:
-                            break
-                        }
-                    }
-
-                    if let surveyURL = remoteMessage.presentableSurveyURL(subscription: subscription) {
-                        let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
-                        tabCollectionViewModel.append(tab: tab)
-                        PixelKit.fire(GeneralPixel.surveyRemoteMessageOpened(messageID: remoteMessage.id))
-
-                        // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
-                        surveyRemoteMessaging.dismiss(message: remoteMessage)
-                        refreshFeaturesMatrix()
-                    }
-                }
-            }
         }
 
     }
@@ -384,7 +328,6 @@ extension HomePage.Models {
         case dock
         case importBookmarksAndPasswords
         case permanentSurvey
-        case surveyRemoteMessage(SurveyRemoteMessage)
 
         var title: String {
             switch self {
@@ -400,8 +343,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionCardTitle
             case .permanentSurvey:
                 return PermanentSurveyManager.title
-            case .surveyRemoteMessage(let message):
-                return message.cardTitle
             }
         }
 
@@ -419,8 +360,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionSummary
             case .permanentSurvey:
                 return PermanentSurveyManager.body
-            case .surveyRemoteMessage(let message):
-                return message.cardDescription
             }
         }
 
@@ -438,8 +377,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionAction
             case .permanentSurvey:
                 return PermanentSurveyManager.actionTitle
-            case .surveyRemoteMessage(let message):
-                return message.action.actionTitle
             }
         }
 
@@ -468,8 +405,6 @@ extension HomePage.Models {
                 return .inbox128.resized(to: iconSize)!
             case .permanentSurvey:
                 return .survey128.resized(to: iconSize)!
-            case .surveyRemoteMessage:
-                return .privacyProSurvey.resized(to: iconSize)!
             }
         }
     }

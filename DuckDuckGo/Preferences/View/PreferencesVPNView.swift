@@ -19,12 +19,15 @@
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
+import NetworkProtection
+import PixelKit
 
 extension Preferences {
 
     struct VPNView: View {
         @ObservedObject var model: VPNPreferencesModel
         @ObservedObject var status: PrivacyProtectionStatus
+        @State private var showsCustomDNSServerPageSheet = false
 
         var body: some View {
             PreferencePane(UserText.vpn, spacing: 4) {
@@ -52,7 +55,24 @@ extension Preferences {
                 }
                 .padding(.bottom, 12)
 
-                // SECTION: Manage VPN
+                // SECTION: Excluded Sites
+
+                if model.showExcludedSites {
+                    PreferencePaneSection(UserText.vpnExcludedSitesTitle, spacing: 4) {
+                        Text(UserText.vpnExcludedDomainsDescription)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 18)
+
+                        PreferencePaneSubSection {
+                            Button(UserText.vpnExcludedDomainsManageButtonTitle) {
+                                model.manageExcludedSites()
+                            }
+                        }
+                    }
+                    .padding(.bottom, 12)
+                }
+
+                // SECTION: General
 
                 PreferencePaneSection(UserText.vpnGeneralTitle) {
 
@@ -68,32 +88,6 @@ extension Preferences {
                             spacing: 12
                         )
                     }
-
-                    VStack(alignment: .leading) {
-                        HStack(spacing: 10) {
-                            Image(.infoSubtle16)
-
-                            VStack {
-                                HStack {
-                                    Text(UserText.vpnSecureDNSSettingDescription)
-                                        .padding(0)
-                                        .font(.system(size: 11))
-                                        .foregroundColor(Color(.blackWhite60))
-                                        .multilineTextAlignment(.leading)
-                                        .fixMultilineScrollableText()
-
-                                    Spacer()
-                                }
-                            }
-                            .frame(idealWidth: .infinity, maxWidth: .infinity)
-
-                            Spacer()
-                        }
-                    }.frame(alignment: .topLeading)
-                        .frame(idealWidth: .infinity, maxWidth: .infinity)
-                        .padding(10)
-                        .background(Color(.blackWhite1))
-                        .roundedBorder()
                 }
                 .padding(.bottom, 12)
 
@@ -113,9 +107,59 @@ extension Preferences {
                 // SECTION: VPN Notifications
 
                 PreferencePaneSection(UserText.vpnNotificationsSettingsTitle) {
-                    ToggleMenuItem("VPN connection drops or status changes", isOn: $model.notifyStatusChanges)
+                    ToggleMenuItem(UserText.vpnNotificationsConnectionDropsOrStatusChangesTitle,
+                                   isOn: $model.notifyStatusChanges)
                 }
                 .padding(.bottom, 12)
+
+                // SECTION: DNS Settings
+
+                PreferencePaneSection(UserText.vpnDnsServerTitle) {
+                    PreferencePaneSubSection {
+                        Picker(selection: $model.isCustomDNSSelected, label: EmptyView()) {
+                            Text(UserText.vpnDnsServerPickerDefaultTitle).tag(false)
+                            VStack(alignment: .leading, spacing: 0) {
+                                HStack(spacing: 15) {
+                                    Text(UserText.vpnDnsServerPickerCustomTitle)
+                                    Button(UserText.vpnDnsServerPickerCustomButtonTitle) {
+                                        showsCustomDNSServerPageSheet.toggle()
+                                    }.disabled(!model.isCustomDNSSelected)
+                                }
+                                if let dnsServersText = model.dnsSettings.dnsServersText {
+                                    TextMenuItemCaption(dnsServersText)
+                                        .padding(.top, 0)
+                                        .visibility(model.isCustomDNSSelected ? .visible : .gone)
+                                }
+                            }.tag(true)
+                        }
+                        .pickerStyle(.radioGroup)
+                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        .onChange(of: model.isCustomDNSSelected) { isCustomDNSSelected in
+                            if isCustomDNSSelected {
+                                showsCustomDNSServerPageSheet.toggle()
+                            } else {
+                                model.resetDNSSettings()
+                                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .dailyAndCount)
+                            }
+                        }
+                        .onChange(of: showsCustomDNSServerPageSheet) { showsCustomDNSServerPageSheet in
+                            guard !showsCustomDNSServerPageSheet else { return }
+                            /// Flip the setting back if no DNS server is defined
+                            if model.isCustomDNSSelected, !model.dnsSettings.usesCustomDNS {
+                                model.isCustomDNSSelected = false
+                            }
+                        }
+
+                        if model.isCustomDNSSelected {
+                            TextMenuItemCaption(UserText.vpnDnsServerIPv4Disclaimer)
+                        } else {
+                            TextMenuItemCaption(UserText.vpnSecureDNSSettingDescription)
+                        }
+                    }
+                }.sheet(isPresented: $showsCustomDNSServerPageSheet) {
+                    CustomDNSServerPageSheet(settings: VPNSettings(defaults: .netP),
+                                             isSheetPresented: $showsCustomDNSServerPageSheet)
+                }
 
                 // SECTION: Uninstall
 
@@ -130,5 +174,81 @@ extension Preferences {
                 }
             }
         }
+    }
+}
+
+struct CustomDNSServerPageSheet: View {
+    private let settings: VPNSettings
+
+    @State var customDNSServers = ""
+    @State var isValidDNSServers = true
+    @Binding var isSheetPresented: Bool
+
+    init(settings: VPNSettings, isSheetPresented: Binding<Bool>) {
+        self.settings = settings
+        self._isSheetPresented = isSheetPresented
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(UserText.vpnDnsServerSheetTitle)
+                .fontWeight(.bold)
+
+            Divider()
+
+            Group {
+                HStack {
+                    Text(UserText.vpnDnsServerIPv4Description)
+                        .padding(.trailing, 10)
+                    Spacer()
+                    TextField("0.0.0.0", text: $customDNSServers)
+                        .frame(width: 250)
+                        .onChange(of: customDNSServers) { newValue in
+                            validateDNSServers(newValue)
+                        }
+                }
+                Text(UserText.vpnDnsServerIPv4Disclaimer)
+                    .multilineText()
+                    .multilineTextAlignment(.leading)
+                    .fixMultilineScrollableText()
+                    .foregroundColor(.secondary)
+            }
+
+            Divider()
+
+            HStack(alignment: .center) {
+                Spacer()
+                Button(UserText.cancel) {
+                    isSheetPresented.toggle()
+                }
+                Button(UserText.vpnDnsServerApplyButtonTitle) {
+                    saveChanges()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!isValidDNSServers)
+            }
+        }
+        .padding(EdgeInsets(top: 16, leading: 20, bottom: 16, trailing: 20))
+        .frame(width: 400)
+        .onAppear {
+            customDNSServers = settings.dnsSettings.dnsServersText ?? ""
+        }
+    }
+
+    private func saveChanges() {
+        settings.dnsSettings = .custom([customDNSServers])
+        isSheetPresented.toggle()
+
+        /// Updating `dnsSettings` does an IPv4 conversion before actually commiting the change,
+        /// so we do a final check to see which outcome the user ends up with
+        if settings.dnsSettings.usesCustomDNS {
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateCustom, frequency: .dailyAndCount)
+        } else {
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionDNSUpdateDefault, frequency: .dailyAndCount)
+        }
+    }
+
+    private func validateDNSServers(_ text: String) {
+        isValidDNSServers = !text.isEmpty && text.isValidIpv4Host
     }
 }

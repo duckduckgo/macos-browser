@@ -32,6 +32,10 @@ fileprivate extension Font {
             .system(size: 13, weight: .regular, design: .default)
         }
 
+        static var currentSite: Font {
+            .system(size: 13, weight: .regular, design: .default)
+        }
+
         static var location: Font {
             .system(size: 13, weight: .regular, design: .default)
         }
@@ -100,6 +104,10 @@ fileprivate extension View {
         opacity(Opacity.dataVolume(colorScheme: colorScheme))
             .font(.NetworkProtection.dataVolume)
             .foregroundColor(Color(.defaultText))
+    }
+
+    func applyCurrentSiteAttributes() -> some View {
+        font(.NetworkProtection.currentSite)
     }
 
     func applyLocationAttributes() -> some View {
@@ -171,6 +179,8 @@ public struct TunnelControllerView: View {
 
             Divider()
                 .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+
+            SiteTroubleshootingView()
 
             locationView()
 
@@ -297,8 +307,13 @@ public struct TunnelControllerView: View {
                 .applySectionHeaderAttributes(colorScheme: colorScheme)
                 .padding(EdgeInsets(top: 6, leading: 9, bottom: 6, trailing: 9))
 
-            connectionStatusRow(title: UserText.networkProtectionStatusViewIPAddress,
+            connectionDetailRow(title: UserText.networkProtectionStatusViewIPAddress,
                                 details: model.serverAddress)
+
+            if model.dnsSettings.usesCustomDNS {
+                connectionDetailRow(title: UserText.vpnDnsServer,
+                                    details: String(describing: model.dnsSettings))
+            }
 
             dataVolumeRow(title: UserText.vpnDataVolume, dataVolume: model.formattedDataVolume)
 
@@ -340,7 +355,7 @@ public struct TunnelControllerView: View {
         .padding(EdgeInsets(top: 3, leading: 9, bottom: 3, trailing: 9))
     }
 
-    private func connectionStatusRow(title: String, details: String) -> some View {
+    private func connectionDetailRow(title: String, details: String) -> some View {
         HStack(spacing: 0) {
             Text(title)
                 .applyLabelAttributes(colorScheme: colorScheme)

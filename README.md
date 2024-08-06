@@ -31,7 +31,7 @@ Please refer to [contributing](CONTRIBUTING.md).
 
 ## Discuss
 
-Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat. You can also use the feedback form embedded within our app - to do so please go to Main Menu -> Help -> Send Feedback. 
+If you have feedback or questions, you can [contact us](https://duckduckgo.com/duckduckgo-help-pages/company/contact-us/). You can also use the feedback form in the browser. To do so, go to the three-dot menu > Send Feedback.
 
 ## License
 DuckDuckGo is distributed under the Apache 2.0 [license](LICENSE.md).

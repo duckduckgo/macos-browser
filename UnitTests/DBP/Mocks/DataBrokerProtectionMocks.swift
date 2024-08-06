@@ -20,7 +20,7 @@ import Foundation
 import Subscription
 @testable import DuckDuckGo_Privacy_Browser
 
-final class MockAccountManager: AccountManaging {
+final class MockAccountManager: AccountManager {
     var hasEntitlementResult: Result<Bool, any Error> = .success(true)
 
     var delegate: AccountManagerKeychainAccessDelegate?
@@ -50,18 +50,18 @@ final class MockAccountManager: AccountManaging {
     func migrateAccessTokenToNewStore() throws {
     }
 
-    func hasEntitlement(for entitlement: Entitlement.ProductName, cachePolicy: CachePolicy) async -> Result<Bool, any Error> {
+    func hasEntitlement(forProductName productName: Entitlement.ProductName, cachePolicy: APICachePolicy) async -> Result<Bool, any Error> {
         hasEntitlementResult
     }
 
-    func hasEntitlement(for entitlement: Entitlement.ProductName) async -> Result<Bool, any Error> {
+    func hasEntitlement(forProductName productName: Entitlement.ProductName) async -> Result<Bool, any Error> {
         hasEntitlementResult
     }
 
     func updateCache(with entitlements: [Entitlement]) {
     }
 
-    func fetchEntitlements(cachePolicy: CachePolicy) async -> Result<[Entitlement], any Error> {
+    func fetchEntitlements(cachePolicy: APICachePolicy) async -> Result<[Entitlement], any Error> {
         .success([])
     }
 
@@ -71,9 +71,6 @@ final class MockAccountManager: AccountManaging {
 
     func fetchAccountDetails(with accessToken: String) async -> Result<AccountDetails, any Error> {
         .success(AccountDetails(email: "", externalID: ""))
-    }
-
-    func refreshSubscriptionAndEntitlements() async {
     }
 
     func checkForEntitlements(wait waitTime: Double, retry retryCount: Int) async -> Bool {

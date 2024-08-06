@@ -45,6 +45,10 @@ final class UserScripts: UserScriptsProvider {
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
     let sslErrorPageUserScript: SSLErrorPageUserScript?
+    let onboardingUserScript: OnboardingUserScript?
+#if SPARKLE
+    let releaseNotesUserScript: ReleaseNotesUserScript?
+#endif
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript()
@@ -66,6 +70,8 @@ final class UserScripts: UserScriptsProvider {
 
         sslErrorPageUserScript = SSLErrorPageUserScript()
 
+        onboardingUserScript = OnboardingUserScript(onboardingActionsManager: sourceProvider.onboardingActionsManager!)
+
         specialPages = SpecialPagesUserScript()
 
         if DuckPlayer.shared.isAvailable {
@@ -75,6 +81,10 @@ final class UserScripts: UserScriptsProvider {
             youtubeOverlayScript = nil
             youtubePlayerUserScript = nil
         }
+
+#if SPARKLE
+        releaseNotesUserScript = ReleaseNotesUserScript()
+#endif
 
         userScripts.append(autoconsentUserScript)
 
@@ -91,11 +101,24 @@ final class UserScripts: UserScriptsProvider {
             if let youtubePlayerUserScript {
                 specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
             }
+#if SPARKLE
+            if let releaseNotesUserScript {
+                specialPages.registerSubfeature(delegate: releaseNotesUserScript)
+            }
+#endif
+            if let onboardingUserScript {
+                specialPages.registerSubfeature(delegate: onboardingUserScript)
+            }
             userScripts.append(specialPages)
         }
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: Application.appDelegate.subscriptionManager,
+            let subscriptionManager = Application.appDelegate.subscriptionManager
+            let stripePurchaseFlow = DefaultStripePurchaseFlow(subscriptionEndpointService: subscriptionManager.subscriptionEndpointService,
+                                                               authEndpointService: subscriptionManager.authEndpointService,
+                                                               accountManager: subscriptionManager.accountManager)
+            let delegate = SubscriptionPagesUseSubscriptionFeature(subscriptionManager: subscriptionManager,
+                                                                   stripePurchaseFlow: stripePurchaseFlow,
                                                                    uiHandler: Application.appDelegate.subscriptionUIHandler)
             subscriptionPagesUserScript.registerSubfeature(delegate: delegate)
             userScripts.append(subscriptionPagesUserScript)

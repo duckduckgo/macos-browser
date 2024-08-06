@@ -276,8 +276,6 @@ final class BWManager: BWManagement, ObservableObject {
         sendStatus()
     }
 
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
     private func handleEncryptedResponse(_ encryptedPayload: BWResponse.EncryptedPayload, messageId: MessageId) {
         guard let dataString = encryptedPayload.data,
               let data = Data(base64Encoded: dataString),
@@ -339,8 +337,6 @@ final class BWManager: BWManagement, ObservableObject {
 
         logOrAssertionFailure("BWManager: Unhandled response")
     }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
 
     private func handleStatusResponse(payloadItemArray: [BWResponse.PayloadItem]) {
         // Find the active vault
