@@ -35,7 +35,7 @@ extension HomePage.Views {
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
         @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
 
-        @State private var isHomeContentPopoverVisible = false
+        @State private var isSettingsVisible = false
 
         var body: some View {
             if isBurner {
@@ -56,37 +56,41 @@ extension HomePage.Views {
             }
         }
 
+        func innerViewOffset(with geometry: GeometryProxy) -> CGFloat {
+            max(0, ((settingsPanelWidth + 600) - geometry.size.width) / 2)
+        }
+
         func regularHomePageView(includingContinueSetUpCards: Bool) -> some View {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
 
-                    if isHomeContentPopoverVisible {
-                        HStack(spacing: 0) {
-                            // Left view
-                            ZStack(alignment: .leading) {
-                                ScrollView {
-                                    innerView(includingContinueSetUpCards: includingContinueSetUpCards)
-                                        .frame(width: min(Self.targetWidth, geometry.size.width - settingsPanelWidth))
-                                        .offset(x: max(0, ((settingsPanelWidth + Self.targetWidth) - geometry.size.width) / 2))
-                                }
+                    HStack(spacing: 0) {
+                        // Left view
+                        ZStack(alignment: .leading) {
+                            ScrollView {
+                                innerView(includingContinueSetUpCards: includingContinueSetUpCards)
+                                    .frame(width: geometry.size.width - (isSettingsVisible ? settingsPanelWidth : 0))
+                                    .offset(x: isSettingsVisible ? innerViewOffset(with: geometry) : 0)
                             }
-                            .frame(width: max(0, geometry.size.width - settingsPanelWidth))
+                        }
+                        .frame(width: isSettingsVisible ? geometry.size.width - settingsPanelWidth : geometry.size.width)
 
+                        if isSettingsVisible {
                             // Right view
-                            SettingsView(isSettingsVisible: $isHomeContentPopoverVisible)
+                            SettingsView(isSettingsVisible: $isSettingsVisible)
                                 .frame(width: settingsPanelWidth)
+                                .transition(.move(edge: .trailing))
                                 .layoutPriority(1)
                         }
-                    } else {
-                        ScrollView {
-                            innerView(includingContinueSetUpCards: includingContinueSetUpCards)
-                        }
+                    }
+                    .animation(.easeInOut, value: isSettingsVisible)
 
+                    if !isSettingsVisible {
                         VStack {
                             Spacer()
                             HStack {
                                 Spacer(minLength: Self.targetWidth + (geometry.size.width - Self.targetWidth)/2)
-                                HomeContentButtonView(isHomeContentPopoverVisible: $isHomeContentPopoverVisible)
+                                HomeContentButtonView(isHomeContentPopoverVisible: $isSettingsVisible)
                                     .padding(.bottom, 14)
                                     .padding(.trailing, 14)
                             }
