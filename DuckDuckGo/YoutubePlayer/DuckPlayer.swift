@@ -139,6 +139,10 @@ final class DuckPlayer {
         preferences.youtubeOverlayInteracted
     }
 
+    var shouldDisplayPreferencesSideBar: Bool {
+        isAvailable || preferences.shouldDisplayContingencyMessage
+    }
+
     init(
         preferences: DuckPlayerPreferences = .shared,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager
