@@ -27,6 +27,7 @@ extension HomePage.Views {
 
         let backgroundColor: Color = .newTabPageBackground
         static let targetWidth: CGFloat = 508
+        let settingsPanelWidth: CGFloat = 236
         let isBurner: Bool
 
         @EnvironmentObject var model: AppearancePreferences
@@ -59,40 +60,28 @@ extension HomePage.Views {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
 
-                    ScrollView {
-                        VStack(spacing: 32) {
-                            Spacer(minLength: 32)
-
-                            Group {
-                                remoteMessage()
-
-                                if includingContinueSetUpCards {
-                                    ContinueSetUpView()
-                                        .visibility(model.isContinueSetUpVisible ? .visible : .gone)
-                                        .padding(.top, activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0)
-                                }
-
-                                Favorites()
-                                    .visibility(model.isFavoriteVisible ? .visible : .gone)
-
-                                RecentlyVisited()
-                                    .padding(.bottom, 16)
-                                    .visibility(model.isRecentActivityVisible ? .visible : .gone)
-
-                            }
-                            .frame(width: Self.targetWidth)
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-
                     if isHomeContentPopoverVisible {
-                        HStack {
-                            Spacer()
-                            SettingsView(isSettingsVisible: $isHomeContentPopoverVisible)
+                        HStack(spacing: 0) {
+                            // Left view
+                            ZStack(alignment: .leading) {
+                                ScrollView {
+                                    innerView(includingContinueSetUpCards: includingContinueSetUpCards)
+                                        .frame(width: min(Self.targetWidth, geometry.size.width - settingsPanelWidth))
+                                        .offset(x: max(0, ((settingsPanelWidth + Self.targetWidth) - geometry.size.width) / 2))
+                                }
+                            }
+                            .frame(width: max(0, geometry.size.width - settingsPanelWidth))
 
+                            // Right view
+                            SettingsView(isSettingsVisible: $isHomeContentPopoverVisible)
+                                .frame(width: settingsPanelWidth)
+                                .layoutPriority(1)
                         }
-                        .frame(width: geometry.size.width, height: geometry.size.height)
                     } else {
+                        ScrollView {
+                            innerView(includingContinueSetUpCards: includingContinueSetUpCards)
+                        }
+
                         VStack {
                             Spacer()
                             HStack {
@@ -100,18 +89,10 @@ extension HomePage.Views {
                                 HomeContentButtonView(isHomeContentPopoverVisible: $isHomeContentPopoverVisible)
                                     .padding(.bottom, 14)
                                     .padding(.trailing, 14)
-                                //                                .popover(isPresented: $isHomeContentPopoverVisible, content: {
-                                //                                    HomeContentPopoverView(includeContinueSetUpCards: includingContinueSetUpCards)
-                                //                                        .padding()
-                                //                                        .environmentObject(model)
-                                //                                        .environmentObject(continueSetUpModel)
-                                //                                        .environmentObject(favoritesModel)
-                                //                                })
                             }
                         }
                         .frame(width: geometry.size.width, height: geometry.size.height)
                     }
-
                 }
                 .frame(maxWidth: .infinity)
                 .background(backgroundColor)
@@ -119,6 +100,32 @@ extension HomePage.Views {
                     LocalBookmarkManager.shared.requestSync()
                 }
             }
+        }
+
+        func innerView(includingContinueSetUpCards: Bool) -> some View {
+            VStack(spacing: 32) {
+                Spacer(minLength: 32)
+
+                Group {
+                    remoteMessage()
+
+                    if includingContinueSetUpCards {
+                        ContinueSetUpView()
+                            .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                            .padding(.top, activeRemoteMessageModel.shouldShowRemoteMessage ? 24 : 0)
+                    }
+
+                    Favorites()
+                        .visibility(model.isFavoriteVisible ? .visible : .gone)
+
+                    RecentlyVisited()
+                        .padding(.bottom, 16)
+                        .visibility(model.isRecentActivityVisible ? .visible : .gone)
+
+                }
+                .frame(width: Self.targetWidth)
+            }
+            .frame(maxWidth: .infinity)
         }
 
         @ViewBuilder

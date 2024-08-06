@@ -28,7 +28,7 @@ extension HomePage.Views {
         var body: some View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    HStack {
+                    HStack(spacing: 0) {
                         Text("Customize")
                             .font(.system(size: 17).bold())
                         Spacer()
