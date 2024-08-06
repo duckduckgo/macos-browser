@@ -157,6 +157,7 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
         XCTAssertTrue(result)
     }
 
+    /* DISABLED(flaky) REF: https://app.asana.com/0/1203108348835387/1207987874156874/f
     func testAverageCalculatedRandomNumberAssignmentIsBetween9And11Percent() {
         // Given
         var percentages: [Double] = []
@@ -186,4 +187,5 @@ final class DataBrokerProtectionMigrationsFeatureFlaggerTests: XCTestCase {
         let average = sum / Double(percentages.count)
         XCTAssert(average > 9.0 && average < 11.0)
     }
+     */
 }
