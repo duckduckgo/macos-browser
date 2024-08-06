@@ -76,7 +76,7 @@ extension Preferences {
                     .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
 
                     TextMenuItemCaption(UserText.duckPlayerExplanation)
-                }
+                }.disabled(model.shouldDisplayContingencyMessage)
 
                 if model.shouldDisplayAutoPlaySettings || model.isOpenInNewTabSettingsAvailable {
                     PreferencePaneSection(UserText.duckPlayerVideoPreferencesTitle) {
@@ -89,7 +89,7 @@ extension Preferences {
                             ToggleMenuItem(UserText.duckPlayerNewTabPreference, isOn: $model.duckPlayerOpenInNewTab)
                                 .disabled(!model.isNewTabSettingsAvailable)
                         }
-                    }
+                    }.disabled(model.shouldDisplayContingencyMessage)
                 }
 
             }

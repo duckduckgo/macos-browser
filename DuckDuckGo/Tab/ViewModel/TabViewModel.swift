@@ -548,7 +548,7 @@ private extension NSAttributedString {
                                                                              title: UserText.duckPlayer)
     static let emailProtectionTrustedIndicator = trustedIndicatorAttributedString(with: .emailProtectionIcon,
                                                                                   title: UserText.emailProtectionPreferences)
-    static let releaseNotesTrustedIndicator = trustedIndicatorAttributedString(with: .duckPlayerSettings,
+    static let releaseNotesTrustedIndicator = trustedIndicatorAttributedString(with: .releaseNotesIndicator,
                                                                                title: UserText.releaseNotesTitle)
 
 }

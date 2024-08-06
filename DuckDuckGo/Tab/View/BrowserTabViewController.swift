@@ -1175,7 +1175,7 @@ extension BrowserTabViewController {
 
     private func subscribeToTabSelectedInCurrentKeyWindow() {
         let lastKeyWindowOtherThanOurs = WindowControllersManager.shared.didChangeKeyWindowController
-            .map { WindowControllersManager.shared.lastKeyMainWindowController }
+            .map { $0 }
             .prepend(WindowControllersManager.shared.lastKeyMainWindowController)
             .compactMap { $0 }
             .filter { [weak self] in $0.window !== self?.view.window }

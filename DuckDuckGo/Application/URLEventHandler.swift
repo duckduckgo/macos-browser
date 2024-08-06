@@ -28,6 +28,9 @@ import DataBrokerProtection
 // @MainActor
 final class URLEventHandler {
 
+    @MainActor
+    private static let vpnURLEventHandler = VPNURLEventHandler()
+
     private let handler: (URL) -> Void
 
     private var didFinishLaunching = false
@@ -106,7 +109,9 @@ final class URLEventHandler {
 
     private static func openURL(_ url: URL) {
         if url.scheme?.isNetworkProtectionScheme == true {
-            handleNetworkProtectionURL(url)
+            Task { @MainActor in
+                await vpnURLEventHandler.handle(url)
+            }
         }
 
         if url.scheme?.isDataBrokerProtectionScheme == true {
@@ -132,38 +137,6 @@ final class URLEventHandler {
             if url.scheme?.isNetworkProtectionScheme == false && url.scheme?.isDataBrokerProtectionScheme == false {
                 WaitlistModalDismisser.dismissWaitlistModalViewControllerIfNecessary(url)
                 WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
-            }
-        }
-    }
-
-    /// Handles NetP URLs
-    private static func handleNetworkProtectionURL(_ url: URL) {
-        DispatchQueue.main.async {
-            switch url {
-            case VPNAppLaunchCommand.showStatus.launchURL:
-                Task {
-                    await WindowControllersManager.shared.showNetworkProtectionStatus()
-                }
-            case VPNAppLaunchCommand.showSettings.launchURL:
-                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
-            case VPNAppLaunchCommand.shareFeedback.launchURL:
-                WindowControllersManager.shared.showShareFeedbackModal()
-            case VPNAppLaunchCommand.justOpen.launchURL:
-                WindowControllersManager.shared.showMainWindow()
-            case VPNAppLaunchCommand.showVPNLocations.launchURL:
-                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
-                WindowControllersManager.shared.showLocationPickerSheet()
-            case VPNAppLaunchCommand.showPrivacyPro.launchURL:
-                let url = Application.appDelegate.subscriptionManager.url(for: .purchase)
-                WindowControllersManager.shared.showTab(with: .subscription(url))
-                PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
-#if !APPSTORE && !DEBUG
-            case VPNAppLaunchCommand.moveAppToApplications.launchURL:
-                // this should be run after NSApplication.shared is set
-                PFMoveToApplicationsFolderIfNecessary(false)
-#endif
-            default:
-                return
             }
         }
     }
