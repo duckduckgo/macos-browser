@@ -1798,6 +1798,7 @@
 		9D9AE9202AAA3B450026E7DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9162AAA3B450026E7DC /* Assets.xcassets */; };
 		9D9AE9212AAA3B450026E7DC /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9172AAA3B450026E7DC /* UserText.swift */; };
 		9D9AE9222AAA3B450026E7DC /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9172AAA3B450026E7DC /* UserText.swift */; };
+		9D9DE56C2C62B3CC00D20B15 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE56B2C62B3CC00D20B15 /* BrowserServicesKit */; };
 		9DA609352C62AE99000A9B1A /* NSApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DA609342C62AE99000A9B1A /* NSApplicationExtension.swift */; };
 		9DA609362C62AE99000A9B1A /* NSApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DA609342C62AE99000A9B1A /* NSApplicationExtension.swift */; };
 		9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC70B192AA1FA5B005A844B /* LoginItems */; };
@@ -4584,6 +4585,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D9DE56C2C62B3CC00D20B15 /* BrowserServicesKit in Frameworks */,
 				9D2589C32C58FA0800C49B14 /* MacOSCommon in Frameworks */,
 				B6E6BA082BA1FE24008AA7E1 /* Common in Frameworks */,
 			);
@@ -9129,6 +9131,7 @@
 			packageProductDependencies = (
 				B6E6BA072BA1FE24008AA7E1 /* Common */,
 				9D2589C22C58FA0800C49B14 /* MacOSCommon */,
+				9D9DE56B2C62B3CC00D20B15 /* BrowserServicesKit */,
 			);
 			productName = "sandbox-test-tool";
 			productReference = B6E6B9F32BA1FD90008AA7E1 /* sandbox-test-tool.app */;
@@ -13932,6 +13935,11 @@
 		9D9AE8FA2AAA3AD90026E7DC /* DataBrokerProtection */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DataBrokerProtection;
+		};
+		9D9DE56B2C62B3CC00D20B15 /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrowserServicesKit;
 		};
 		9DC70B192AA1FA5B005A844B /* LoginItems */ = {
 			isa = XCSwiftPackageProductDependency;
