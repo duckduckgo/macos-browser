@@ -181,10 +181,7 @@ private class MockVPNFeedbackSender: UnifiedFeedbackSender {
         self.receivedData = (metadata as? VPNMetadata, source, category, subcategory, description)
     }
 
-    func sendGeneralScreenShowPixel() async {}
-    func sendActionsScreenShowPixel(source: String) async {}
-    func sendCategoryScreenShowPixel(source: String, reportType: String) async {}
-    func sendSubcategoryScreenShowPixel(source: String, reportType: String, category: String) async {}
+    func sendFormShowPixel() async {}
     func sendSubmitScreenShowPixel(source: String, reportType: String, category: String, subcategory: String) async {}
 }
 

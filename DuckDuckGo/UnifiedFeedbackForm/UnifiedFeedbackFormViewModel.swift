@@ -80,11 +80,6 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
             default: defaultCategory = .prompt
             }
             selectedCategory = defaultCategory.rawValue
-
-            Task {
-                await feedbackSender.sendCategoryScreenShowPixel(source: source,
-                                                                 reportType: selectedReportType)
-            }
         }
     }
     @Published var selectedCategory: String = UnifiedFeedbackCategory.prompt.rawValue {
@@ -95,12 +90,6 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
             case .vpn: selectedSubcategory = VPNFeedbackSubcategory.prompt.rawValue
             case .pir: selectedSubcategory = PIRFeedbackSubcategory.prompt.rawValue
             case .itr: selectedSubcategory = ITRFeedbackSubcategory.prompt.rawValue
-            }
-
-            Task {
-                await feedbackSender.sendSubcategoryScreenShowPixel(source: source,
-                                                                    reportType: selectedReportType,
-                                                                    category: selectedCategory)
             }
         }
     }

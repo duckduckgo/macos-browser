@@ -83,10 +83,6 @@ final class UnifiedFeedbackFormViewController: NSViewController {
         ])
 
         subscribeToViewModelChanges()
-
-        Task {
-            await feedbackSender.sendActionsScreenShowPixel(source: viewModel.source)
-        }
     }
 
     func subscribeToViewModelChanges() {

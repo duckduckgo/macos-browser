@@ -24,10 +24,7 @@ protocol UnifiedFeedbackSender {
     func sendGeneralFeedbackPixel(description: String, source: String) async throws
     func sendReportIssuePixel<T: UnifiedFeedbackMetadata>(source: String, category: String, subcategory: String, description: String, metadata: T?) async throws
 
-    func sendGeneralScreenShowPixel() async
-    func sendActionsScreenShowPixel(source: String) async
-    func sendCategoryScreenShowPixel(source: String, reportType: String) async
-    func sendSubcategoryScreenShowPixel(source: String, reportType: String, category: String) async
+    func sendFormShowPixel() async
     func sendSubmitScreenShowPixel(source: String, reportType: String, category: String, subcategory: String) async
 }
 
@@ -105,26 +102,8 @@ struct DefaultFeedbackSender: UnifiedFeedbackSender {
                                                                  metadata: metadata?.toBase64() ?? ""))
     }
 
-    func sendGeneralScreenShowPixel() async {
-        try? await sendPixel(GeneralPixel.pproFeedbackGeneralScreenShow,
-                             frequency: .dailyAndCount)
-    }
-
-    func sendActionsScreenShowPixel(source: String) async {
-        try? await sendPixel(GeneralPixel.pproFeedbackActionsScreenShow(source: source),
-                             frequency: .dailyAndCount)
-    }
-
-    func sendCategoryScreenShowPixel(source: String, reportType: String) async {
-        try? await sendPixel(GeneralPixel.pproFeedbackCategoryScreenShow(source: source,
-                                                                         reportType: ReportType.from(reportType)),
-                             frequency: .dailyAndCount)
-    }
-
-    func sendSubcategoryScreenShowPixel(source: String, reportType: String, category: String) async {
-        try? await sendPixel(GeneralPixel.pproFeedbackSubcategoryScreenShow(source: source,
-                                                                            reportType: ReportType.from(reportType),
-                                                                            category: Category.from(category)),
+    func sendFormShowPixel() async {
+        try? await sendPixel(GeneralPixel.pproFeedbackFormShow,
                              frequency: .dailyAndCount)
     }
 

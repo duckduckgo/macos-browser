@@ -143,10 +143,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case pproFeedbackGeneralFeedback(description: String, source: String)
     case pproFeedbackReportIssue(source: String, category: String, subcategory: String, description: String, metadata: String)
 
-    case pproFeedbackGeneralScreenShow
-    case pproFeedbackActionsScreenShow(source: String)
-    case pproFeedbackCategoryScreenShow(source: String, reportType: String)
-    case pproFeedbackSubcategoryScreenShow(source: String, reportType: String, category: String)
+    case pproFeedbackFormShow
     case pproFeedbackSubmitScreenShow(source: String, reportType: String, category: String, subcategory: String)
 
     case networkProtectionEnabledOnSearch
@@ -636,14 +633,8 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_ppro_feedback_general-feedback"
         case .pproFeedbackReportIssue:
             return "m_mac_ppro_feedback_report-issue"
-        case .pproFeedbackGeneralScreenShow:
-            return "m_mac_ppro_feedback_general-screen_show"
-        case .pproFeedbackActionsScreenShow:
-            return "m_mac_ppro_feedback_actions-screen_show"
-        case .pproFeedbackCategoryScreenShow:
-            return "m_mac_ppro_feedback_category-screen_show"
-        case .pproFeedbackSubcategoryScreenShow:
-            return "m_mac_ppro_feedback_subcategory-screen_show"
+        case .pproFeedbackFormShow:
+            return "m_mac_ppro_feedback_form_show"
         case .pproFeedbackSubmitScreenShow:
             return "m_mac_ppro_feedback_submit-screen_show"
 
@@ -1117,21 +1108,6 @@ enum GeneralPixel: PixelKitEventV2 {
                 PixelKit.Parameters.pproIssueSubcategory: subcategory,
                 PixelKit.Parameters.pproIssueDescription: description,
                 PixelKit.Parameters.pproIssueMetadata: metadata,
-            ]
-        case .pproFeedbackActionsScreenShow(let source):
-            return [
-                PixelKit.Parameters.pproIssueSource: source,
-            ]
-        case .pproFeedbackCategoryScreenShow(let source, let reportType):
-            return [
-                PixelKit.Parameters.pproIssueSource: source,
-                PixelKit.Parameters.pproIssueReportType: reportType,
-            ]
-        case .pproFeedbackSubcategoryScreenShow(let source, let reportType, let category):
-            return [
-                PixelKit.Parameters.pproIssueSource: source,
-                PixelKit.Parameters.pproIssueReportType: reportType,
-                PixelKit.Parameters.pproIssueCategory: category,
             ]
         case .pproFeedbackSubmitScreenShow(let source, let reportType, let category, let subcategory):
             return [
