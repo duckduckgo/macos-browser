@@ -1799,6 +1799,7 @@
 		9D9AE9212AAA3B450026E7DC /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9172AAA3B450026E7DC /* UserText.swift */; };
 		9D9AE9222AAA3B450026E7DC /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9172AAA3B450026E7DC /* UserText.swift */; };
 		9D9DE56C2C62B3CC00D20B15 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE56B2C62B3CC00D20B15 /* BrowserServicesKit */; };
+		9D9DE56E2C62B66200D20B15 /* MacOSCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE56D2C62B66200D20B15 /* MacOSCommon */; };
 		9DA609352C62AE99000A9B1A /* NSApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DA609342C62AE99000A9B1A /* NSApplicationExtension.swift */; };
 		9DA609362C62AE99000A9B1A /* NSApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DA609342C62AE99000A9B1A /* NSApplicationExtension.swift */; };
 		9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC70B192AA1FA5B005A844B /* LoginItems */; };
@@ -4498,6 +4499,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7BDA36E62B7E037100AD5388 /* NetworkExtension.framework in Frameworks */,
+				9D9DE56E2C62B66200D20B15 /* MacOSCommon in Frameworks */,
 				7B97CD592B7E0B57004FEF43 /* NetworkProtectionProxy in Frameworks */,
 				7B7DFB222B7E7473009EA1A3 /* Networking in Frameworks */,
 				7B97CD5B2B7E0B85004FEF43 /* Common in Frameworks */,
@@ -8973,6 +8975,7 @@
 				7B97CD582B7E0B57004FEF43 /* NetworkProtectionProxy */,
 				7B97CD5A2B7E0B85004FEF43 /* Common */,
 				7B7DFB212B7E7473009EA1A3 /* Networking */,
+				9D9DE56D2C62B66200D20B15 /* MacOSCommon */,
 			);
 			productName = VPNProxyExtension;
 			productReference = 7BDA36E52B7E037100AD5388 /* VPNProxyExtension.appex */;
@@ -13940,6 +13943,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = BrowserServicesKit;
+		};
+		9D9DE56D2C62B66200D20B15 /* MacOSCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MacOSCommon;
 		};
 		9DC70B192AA1FA5B005A844B /* LoginItems */ = {
 			isa = XCSwiftPackageProductDependency;
