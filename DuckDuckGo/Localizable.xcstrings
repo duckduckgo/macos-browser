@@ -15243,6 +15243,9 @@
         }
       }
     },
+    "Customize" : {
+
+    },
     "dashboard.permission.allow" : {
       "comment" : "Privacy Dashboard: Website can always access input media device",
       "extractionState" : "extracted_with_value",

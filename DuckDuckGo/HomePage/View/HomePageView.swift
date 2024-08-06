@@ -33,6 +33,7 @@ extension HomePage.Views {
         @EnvironmentObject var model: AppearancePreferences
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
+        @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
         @EnvironmentObject var activeRemoteMessageModel: ActiveRemoteMessageModel
 
         @State private var isSettingsVisible = false
@@ -81,6 +82,7 @@ extension HomePage.Views {
                                 .frame(width: settingsPanelWidth)
                                 .transition(.move(edge: .trailing))
                                 .layoutPriority(1)
+                                .environmentObject(settingsModel)
                         }
                     }
                     .animation(.easeInOut, value: isSettingsVisible)
