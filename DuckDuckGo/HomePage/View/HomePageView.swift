@@ -90,7 +90,7 @@ extension HomePage.Views {
                             Spacer()
                             HStack {
                                 Spacer(minLength: Self.targetWidth + (geometry.size.width - Self.targetWidth)/2)
-                                HomeContentButtonView(isHomeContentPopoverVisible: $isSettingsVisible)
+                                SettingsButtonView(isSettingsVisible: $isSettingsVisible)
                                     .padding(.bottom, 14)
                                     .padding(.trailing, 14)
                             }
@@ -155,7 +155,7 @@ extension HomePage.Views {
             }
         }
 
-        struct HomeContentButtonView: View {
+        struct SettingsButtonView: View {
             let defaultColor: Color = .homeFavoritesBackground
             let onHoverColor: Color = .buttonMouseOver
             let onSelectedColor: Color = .buttonMouseDown
@@ -163,12 +163,12 @@ extension HomePage.Views {
             let targetSize = 28.0
 
             @State var isHovering: Bool = false
-            @Binding var isHomeContentPopoverVisible: Bool
+            @Binding var isSettingsVisible: Bool
 
             @State private var textWidth: CGFloat = .infinity
 
             private var buttonBackgroundColor: Color {
-                if isHomeContentPopoverVisible {
+                if isSettingsVisible {
                     return onSelectedColor
                 }
                 if isHovering {
@@ -210,7 +210,7 @@ extension HomePage.Views {
                             .fixedSize()
                             .link(onHoverChanged: nil) {
                                 withAnimation {
-                                    isHomeContentPopoverVisible.toggle()
+                                    isSettingsVisible.toggle()
                                 }
                             }
                             .onHover { isHovering in
