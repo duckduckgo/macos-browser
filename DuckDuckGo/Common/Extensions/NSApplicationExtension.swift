@@ -19,8 +19,6 @@
 import Foundation
 
 extension NSApplication {
-
-#if !NETWORK_EXTENSION && !SANDBOX_TEST_TOOL
     var mainMenuTyped: MainMenu {
         return mainMenu as! MainMenu // swiftlint:disable:this force_cast
     }
@@ -28,6 +26,4 @@ extension NSApplication {
     var delegateTyped: AppDelegate {
         return delegate as! AppDelegate // swiftlint:disable:this force_cast
     }
-#endif
-
 }
