@@ -18,6 +18,7 @@
 
 import AppKit
 import Foundation
+import MacOSCommon
 
 extension UserDefaults {
     /// The app group's shared UserDefaults
