@@ -29,6 +29,15 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
             return
         }
 
+        // Handle error page resources, requestURL will be the failingURL
+        // so we need to look at the target URL
+        if let targetUrlType = urlSchemeTask.request.url?.type {
+            if targetUrlType == .errorPageResource {
+                handleSpecialPages(urlSchemeTask: urlSchemeTask)
+                return
+            }
+        }
+
         switch requestURL.type {
         case .onboarding, .releaseNotes:
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
@@ -128,6 +137,8 @@ private extension DuckURLSchemeHandler {
             directoryURL = URL(fileURLWithPath: "/pages/onboarding")
         } else if url.isReleaseNotesScheme {
             directoryURL = URL(fileURLWithPath: "/pages/release-notes")
+        } else if url.isErrorPageResource {
+            directoryURL = URL(fileURLWithPath: "/pages/special-error")
         } else {
             assertionFailure("Unknown scheme")
             return nil
@@ -208,6 +219,7 @@ extension URL {
     enum URLType {
         case onboarding
         case duckPlayer
+        case errorPageResource
         case phishingErrorPage
         case releaseNotes
     }
@@ -217,6 +229,8 @@ extension URL {
             return .duckPlayer
         } else if self.isOnboarding {
             return .onboarding
+        } else if self.isErrorPageResource {
+            return .errorPageResource
         } else if self.isPhishingErrorPage {
             return .phishingErrorPage
         } else if self.isReleaseNotesScheme {
@@ -236,6 +250,10 @@ extension URL {
 
     var isErrorPage: Bool {
         isDuckURLScheme && self.host == "error"
+    }
+
+    var isErrorPageResource: Bool {
+        return isErrorPage && pathComponents.contains("js")
     }
 
     var isPhishingErrorPage: Bool {

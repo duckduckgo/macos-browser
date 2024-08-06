@@ -123,6 +123,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
         self.phishingStateManager.isShowingPhishingError = isMalicious
         if isMalicious {
             errorPageType = .phishing
+            self.specialErrorPageUserScript?.errorData.kind = "phishing"
             if let mainFrameTarget = navigationAction.mainFrameTarget {
                 specialErrorPageUserScript?.failingURL = navigationAction.url
                 return .redirect(mainFrameTarget) { navigator in

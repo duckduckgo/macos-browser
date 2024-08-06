@@ -20,23 +20,7 @@ import Foundation
 import UserScript
 
 final class SpecialErrorPageUserScript: NSObject, Subfeature {
-    struct InitialSetupParameters {
-        let kind: String
-        let errorType: String?
-        let domain: String?
-
-        static func from(params: Any) -> Self? {
-            guard let dict = params as? [String: Any] else {
-                return nil
-            }
-
-            let kind = dict["kind"] as? String ?? ""
-            let errorType = dict["errorType"] as? String
-            let domain = dict["domain"] as? String
-
-            return InitialSetupParameters(kind: kind, errorType: errorType, domain: domain)
-        }
-    }
+    public var errorData = ErrorData(kind: "", errorType: nil, domain: nil)
 
     @MainActor
     private func initialSetup(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -45,14 +29,8 @@ final class SpecialErrorPageUserScript: NSObject, Subfeature {
 #else
         let env = "production"
 #endif
-        if let initialSetupParameters = InitialSetupParameters.from(params: params) {
-            let platform = Platform(name: "macos")
-            let errorData = ErrorData(kind: initialSetupParameters.kind, errorType: initialSetupParameters.errorType, domain: initialSetupParameters.domain)
-            return InitialSetupResult(env: env, locale: Locale.current.identifier, platform: platform, errorData: errorData)
-        } else {
-            print("[-] Unable to decode initial setup params in SpecialErrorPage")
-        }
-        return nil
+        let platform = Platform(name: "macos")
+        return InitialSetupResult(env: env, locale: Locale.current.identifier, platform: platform, errorData: self.errorData)
     }
 
     struct Platform: Encodable {
@@ -60,9 +38,9 @@ final class SpecialErrorPageUserScript: NSObject, Subfeature {
     }
 
     struct ErrorData: Encodable {
-        let kind: String
-        let errorType: String?
-        let domain: String?
+        var kind: String
+        var errorType: String?
+        var domain: String?
     }
 
     struct InitialSetupResult: Encodable {
@@ -91,7 +69,7 @@ final class SpecialErrorPageUserScript: NSObject, Subfeature {
     }
 
     public let messageOriginPolicy: MessageOriginPolicy = .all
-    public let featureName: String = "specialErrorPage"
+    public let featureName: String = "special-error"
 
     var isEnabled: Bool = false
     var failingURL: URL?
