@@ -442,7 +442,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
 extension NSApplication {
 
-    enum RunType: Int, CustomStringConvertible {
+    enum RunType2: Int, CustomStringConvertible {
         case normal
         var description: String {
             switch self {
@@ -450,6 +450,6 @@ extension NSApplication {
             }
         }
     }
-    static var runType: RunType { .normal }
+    static var runType: RunType2 { .normal }
 
 }
