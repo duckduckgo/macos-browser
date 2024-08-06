@@ -111,13 +111,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     // MARK: - User Defaults
 
-    /* Temporarily disabled - https://app.asana.com/0/0/1205766100762904/f
-    /// Test setting to exclude duckduckgo route from VPN
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionExcludedRoutes, defaultValue: [:])
-    private(set) var excludedRoutesPreferences: [String: Bool]
-     */
-
     @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .netP)
     private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
 

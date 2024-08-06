@@ -124,6 +124,8 @@ extension UserText {
     // MARK: - Setting Titles
     // "vpn.location.title" - Location section title in VPN settings
     static let vpnLocationTitle = "Location"
+    // "vpn.excluded.sites.title" - Excluded Sites title in VPN settings
+    static let vpnExcludedSitesTitle = "Excluded Sites"
     // "vpn.general.title" - General section title in VPN settings
     static let vpnGeneralTitle = "General"
     // "vpn.shortcuts.settings.title" - Shortcuts section title in VPN settings
@@ -160,6 +162,16 @@ extension UserText {
         let message = "%d cities"
         return String(format: message, count)
     }
+
+    // MARK: - Excluded Domains
+    // "vpn.setting.excluded.domains.description" - Excluded Sites description
+    static let vpnExcludedDomainsDescription = "Websites you selected to be excluded even when the VPN is connected."
+    // "vpn.setting.excluded.domains.manage.button.title" - Excluded Sites management button title
+    static let vpnExcludedDomainsManageButtonTitle = "Manage Excluded Sites…"
+    // "vpn.excluded.domains.add.domain" - Add Domain button for the excluded sites view
+    static let vpnExcludedDomainsAddDomain = "Add Website"
+    // "vpn.excluded.domains.title" - Title for the excluded sites view
+    static let vpnExcludedDomainsTitle = "Excluded Websites"
 
     // MARK: - DNS
     // "vpn.dns.server.title" - Title of the DNS Server section

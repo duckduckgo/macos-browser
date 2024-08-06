@@ -262,7 +262,7 @@ final class DuckPlayer {
 
         let pip = InitialPlayerSettings.PIP(state: isPiPEnabled ? .enabled : .disabled)
         let autoplay = InitialPlayerSettings.Autoplay(state: isAutoplayEnabled ? .enabled : .disabled)
-        let platform = InitialPlayerSettings.Platform(name: "ios")
+        let platform = InitialPlayerSettings.Platform(name: "macos")
         let environment = InitialPlayerSettings.Environment.development
         let locale = InitialPlayerSettings.Locale.en
         let playerSettings = InitialPlayerSettings.PlayerSettings(pip: pip, autoplay: autoplay)

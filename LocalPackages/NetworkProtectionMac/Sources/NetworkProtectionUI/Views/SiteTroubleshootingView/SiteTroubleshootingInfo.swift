@@ -1,5 +1,5 @@
 //
-//  AppLauncher+VPNUIActionHandler.swift
+//  SiteTroubleshootingInfo.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,25 +16,21 @@
 //  limitations under the License.
 //
 
-import AppLauncher
+import AppKit
 import Foundation
-import NetworkProtectionUI
 
-extension AppLauncher: VPNUIActionHandler {
+public struct SiteTroubleshootingInfo {
+    public let icon: NSImage
+    public let domain: String
+    public let excluded: Bool
 
-    public func moveAppToApplications() async {
-        try? await launchApp(withCommand: VPNAppLaunchCommand.moveAppToApplications)
+    public init(icon: NSImage?, domain: String, excluded: Bool) {
+        self.icon = icon ?? NSImage(systemSymbolName: "globe", accessibilityDescription: nil)!
+        self.domain = domain
+        self.excluded = excluded
     }
+}
 
-    public func shareFeedback() async {
-        try? await launchApp(withCommand: VPNAppLaunchCommand.shareFeedback)
-    }
+extension SiteTroubleshootingInfo: Equatable {
 
-    public func showVPNLocations() async {
-        try? await launchApp(withCommand: VPNAppLaunchCommand.showVPNLocations)
-    }
-
-    public func showPrivacyPro() async {
-        try? await launchApp(withCommand: VPNAppLaunchCommand.showPrivacyPro)
-    }
 }
