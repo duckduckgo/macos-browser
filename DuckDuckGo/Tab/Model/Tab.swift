@@ -209,7 +209,7 @@ protocol NewWindowPolicyDecisionMaker {
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
                                                  burnerMode: burnerMode,
-                                                 earlyAccessUserScripts: specialPagesUserScript.map { [$0] } ?? [])
+                                                 earlyAccessHandlers: specialPagesUserScript.map { [$0] } ?? [])
 
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
@@ -1019,6 +1019,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.faviconScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
+        specialPagesUserScript = nil
     }
 
 }

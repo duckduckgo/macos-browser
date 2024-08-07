@@ -25,7 +25,7 @@ import UserScript
 extension WKWebViewConfiguration {
 
     @MainActor
-    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, burnerMode: BurnerMode, earlyAccessUserScripts: [UserScript] = []) {
+    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, burnerMode: BurnerMode, earlyAccessHandlers: [UserScript] = []) {
         if case .burner(let websiteDataStore) = burnerMode {
             self.websiteDataStore = websiteDataStore
             // Fire Window: disable audio/video item info reporting to macOS Control Center / Lock Screen
@@ -55,7 +55,7 @@ extension WKWebViewConfiguration {
 
         let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
                                                           privacyConfigurationManager: contentBlocking.privacyConfigurationManager,
-                                                          earlyAccessScripts: earlyAccessUserScripts)
+                                                          earlyAccessHandlers: earlyAccessHandlers)
 
         self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
