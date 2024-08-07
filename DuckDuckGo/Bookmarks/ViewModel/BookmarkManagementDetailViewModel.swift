@@ -31,6 +31,10 @@ final class BookmarkManagementDetailViewModel {
     private var searchQuery = ""
     private(set) var visibleBookmarks = [BaseBookmarkEntity]()
 
+    var isSearching: Bool {
+        !searchQuery.isBlank
+    }
+
     init(bookmarkManager: BookmarkManager) {
         self.bookmarkManager = bookmarkManager
     }
@@ -70,6 +74,14 @@ final class BookmarkManagementDetailViewModel {
         default:
             return (visibleBookmarks[safe: row], nil)
         }
+    }
+
+    func searchForParent(bookmark: Bookmark) -> BookmarkFolder? {
+        guard let parentID = bookmark.parentFolderUUID else {
+            return nil
+        }
+
+        return bookmarkManager.getBookmarkFolder(withId: parentID)
     }
 
     // MARK: - Drag and drop
