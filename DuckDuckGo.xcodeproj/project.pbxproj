@@ -13369,8 +13369,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "sabrina/onboarding-fix";
-				kind = branch;
+				kind = revision;
+				revision = 1d50e24bcd4328e4859c1807ee5f5ed2d0500345;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
