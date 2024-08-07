@@ -81,7 +81,7 @@ extension HomePage.Views {
         @ViewBuilder
         var rootView: some View {
             SettingsSection(title: "Background") {
-                VStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 12) {
                     HStack(spacing: 12) {
                         BackgroundMode(title: "Gradients", isSelected: model.isGradientSelected) {
                             model.contentType = .gradientPicker
@@ -105,6 +105,9 @@ extension HomePage.Views {
                         } backgroundPreview: {
                             model.backgroundPreview(for: .customImage)
                         }
+                    }
+                    TextButton("Reset Background") {
+                        model.customBackground = nil
                     }
                 }
             }
