@@ -1455,6 +1455,8 @@
 		562532A12BC069190034D316 /* ZoomPopoverViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5625329D2BC069100034D316 /* ZoomPopoverViewModelTests.swift */; };
 		562984702AC4610100AC20EB /* SyncPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5629846E2AC4610100AC20EB /* SyncPreferencesTests.swift */; };
 		562984712AC469E400AC20EB /* SyncPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5629846E2AC4610100AC20EB /* SyncPreferencesTests.swift */; };
+		56406D4B2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56406D4A2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift */; };
+		56406D4C2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56406D4A2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift */; };
 		56534DED29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56534DEC29DF252C00121467 /* CapturingDefaultBrowserProvider.swift */; };
 		56534DEE29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56534DEC29DF252C00121467 /* CapturingDefaultBrowserProvider.swift */; };
 		565E46E02B2725DD0013AC2A /* CriticalPathsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565E46DF2B2725DD0013AC2A /* CriticalPathsTests.swift */; };
@@ -3468,6 +3470,7 @@
 		561D66692B95C45A008ACC5C /* Suggestion.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Suggestion.storyboard; sourceTree = "<group>"; };
 		5625329D2BC069100034D316 /* ZoomPopoverViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomPopoverViewModelTests.swift; sourceTree = "<group>"; };
 		5629846E2AC4610100AC20EB /* SyncPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPreferencesTests.swift; sourceTree = "<group>"; };
+		56406D4A2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecialPagesUserScriptExtension.swift; sourceTree = "<group>"; };
 		56534DEC29DF252C00121467 /* CapturingDefaultBrowserProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingDefaultBrowserProvider.swift; sourceTree = "<group>"; };
 		565E46DD2B2725DC0013AC2A /* SyncE2EUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SyncE2EUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		565E46DF2B2725DD0013AC2A /* CriticalPathsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CriticalPathsTests.swift; sourceTree = "<group>"; };
@@ -7366,6 +7369,7 @@
 				983DFB2428B67036006B7E34 /* UserContentUpdating.swift */,
 				B634DBE2293C8FFF00C3C99E /* UserDialogRequest.swift */,
 				1D1A33482A6FEB170080ACED /* BurnerMode.swift */,
+				56406D4A2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -10082,6 +10086,7 @@
 				3706FB1A293F65D500E42796 /* OutlineSeparatorViewCell.swift in Sources */,
 				3706FB1B293F65D500E42796 /* SafariDataImporter.swift in Sources */,
 				3706FB1D293F65D500E42796 /* StatisticsLoader.swift in Sources */,
+				56406D4C2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift in Sources */,
 				3793FDD829535EBA00A2E28F /* Assertions.swift in Sources */,
 				F188267D2BBEB3AA00D9AC4F /* GeneralPixel.swift in Sources */,
 				B62B48572ADE730D000DECE5 /* FileImportView.swift in Sources */,
@@ -11411,6 +11416,7 @@
 				AAC30A28268E045400D2D9CD /* CrashReportReader.swift in Sources */,
 				85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */,
 				EECE10E529DD77E60044D027 /* FeatureFlag.swift in Sources */,
+				56406D4B2C636A8900BF8FA2 /* SpecialPagesUserScriptExtension.swift in Sources */,
 				AA3D531727A1EEED00074EC1 /* FeedbackViewController.swift in Sources */,
 				AAEF6BC8276A081C0024DCF4 /* FaviconSelector.swift in Sources */,
 				4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */,

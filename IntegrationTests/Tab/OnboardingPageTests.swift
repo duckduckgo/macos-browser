@@ -37,6 +37,7 @@ final class OnboardingPageTests: XCTestCase {
     @MainActor
     override func setUp() {
         super.setUp()
+        _=WKUserContentController.swizzleScriptMessageHandlerWithReplyMethodsOnce
         webViewConfiguration = WKWebViewConfiguration()
         let contentBlockingMock = ContentBlockingMock()
         privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
@@ -48,6 +49,13 @@ final class OnboardingPageTests: XCTestCase {
         window = nil
         tab = nil
         super.tearDown()
+    }
+
+    @MainActor func testWhenTabInitialisedSpeacialPagesHandlersAdded() throws {
+        let tab = Tab(content: .onboarding)
+        let ucc = try XCTUnwrap(tab.userContentController)
+
+        XCTAssertTrue(ucc.registeredScriptHandlerNames.contains("specialPages"))
     }
 
     @available(macOS 12.0, *)
@@ -85,4 +93,39 @@ final class OnboardingPageTests: XCTestCase {
         }
     }
 
+}
+
+extension WKUserContentController {
+    private static let scriptHandlersKey = UnsafeRawPointer(bitPattern: "scriptHandlersKey".hashValue)!
+
+    private static var installedScriptHandlers: [(WKScriptMessageHandlerWithReply, WKContentWorld, String)] {
+        get {
+            objc_getAssociatedObject(self, scriptHandlersKey) as? [(WKScriptMessageHandlerWithReply, WKContentWorld, String)] ?? []
+        }
+        set {
+            objc_setAssociatedObject(self, scriptHandlersKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+
+    static let swizzleScriptMessageHandlerWithReplyMethodsOnce: Void = {
+        let originalAddMethod = class_getInstanceMethod(WKUserContentController.self, #selector(WKUserContentController.addScriptMessageHandler(_:contentWorld:name:)))!
+        let swizzledAddMethod = class_getInstanceMethod(WKUserContentController.self, #selector(swizzled_addScriptMessageHandler(_:contentWorld:name:)))!
+        method_exchangeImplementations(originalAddMethod, swizzledAddMethod)
+    }()
+
+    @objc dynamic private func swizzled_addScriptMessageHandler(_ scriptMessageHandlerWithReply: WKScriptMessageHandlerWithReply, contentWorld: WKContentWorld, name: String) {
+        // Append the handler to our array
+        Self.installedScriptHandlers.append((scriptMessageHandlerWithReply, contentWorld, name))
+
+        // Call the original method
+        swizzled_addScriptMessageHandler(scriptMessageHandlerWithReply, contentWorld: contentWorld, name: name)
+    }
+
+    var registeredScriptHandlerNames: [String] {
+        return Self.installedScriptHandlers.map { $0.2 }
+    }
+
+    var registeredScriptHandlers: [(WKScriptMessageHandlerWithReply, WKContentWorld, String)] {
+        return Self.installedScriptHandlers
+    }
 }
