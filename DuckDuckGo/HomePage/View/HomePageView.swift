@@ -176,13 +176,7 @@ extension HomePage.Views {
             @State private var textWidth: CGFloat = .infinity
 
             private var buttonBackgroundColor: Color {
-                if isSettingsVisible {
-                    return onSelectedColor
-                }
-                if isHovering {
-                    return onHoverColor
-                }
-                return defaultColor
+                isHovering ? onHoverColor : defaultColor
             }
 
             private func isCompact(with geometry: GeometryProxy) -> Bool {
@@ -198,8 +192,11 @@ extension HomePage.Views {
                             ZStack(alignment: .bottomTrailing) {
                                 RoundedRectangle(cornerRadius: 6)
                                     .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                                    .background(buttonBackgroundColor)
+                                    .vibrancyEffect()
                                     .cornerRadius(6)
+
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(buttonBackgroundColor)
 
                                 HStack(spacing: 6) {
                                     Image(.optionsMainView)

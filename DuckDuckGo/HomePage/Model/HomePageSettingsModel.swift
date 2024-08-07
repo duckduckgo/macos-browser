@@ -126,7 +126,7 @@ extension HomePage.Models.SettingsModel {
         }
     }
 
-    enum CustomBackground: ColorSchemeProviding {
+    enum CustomBackground: Equatable, ColorSchemeProviding {
         case gradient(Gradient)
         case solidColor(SolidColor)
         case illustration(Illustration)
@@ -147,7 +147,7 @@ extension HomePage.Models.SettingsModel {
                 illustration.colorScheme
             case .solidColor(let solidColor):
                 solidColor.colorScheme
-            case .customImage(let image):
+            case .customImage:
                 .light
             }
         }

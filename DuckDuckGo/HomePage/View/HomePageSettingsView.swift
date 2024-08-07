@@ -123,9 +123,8 @@ extension HomePage.Views {
                 grid(with: HomePage.Models.SettingsModel.SolidColor.allCases) { solidColor in
                     Button {
                         model.customBackground = .solidColor(solidColor)
-                        model.contentType = .root
                     } label: {
-                        BackgroundPreview(isSelected: false) {
+                        BackgroundPreview(isSelected: model.customBackground == .solidColor(solidColor)) {
                             solidColor.color.scaledToFill()
                         }
                     }
@@ -134,15 +133,15 @@ extension HomePage.Views {
             }
         }
 
-        @ViewBuilder var gradientPickerView: some View {
+        @ViewBuilder
+        var gradientPickerView: some View {
             VStack(spacing: 16) {
                 backButton(title: "Gradients")
                 grid(with: HomePage.Models.SettingsModel.Gradient.allCases) { gradient in
                     Button {
                         model.customBackground = .gradient(gradient)
-                        model.contentType = .root
                     } label: {
-                        BackgroundPreview(isSelected: false) {
+                        BackgroundPreview(isSelected: model.customBackground == .gradient(gradient)) {
                             gradient.image.resizable().scaledToFill()
                         }
                     }
@@ -151,15 +150,15 @@ extension HomePage.Views {
             }
         }
 
-        @ViewBuilder var illustrationPickerView: some View {
+        @ViewBuilder
+        var illustrationPickerView: some View {
             VStack(spacing: 16) {
                 backButton(title: "Illustrations")
                 grid(with: HomePage.Models.SettingsModel.Illustration.allCases) { illustration in
                     Button {
                         model.customBackground = .illustration(illustration)
-                        model.contentType = .root
                     } label: {
-                        BackgroundPreview(isSelected: false) {
+                        BackgroundPreview(isSelected: model.customBackground == .illustration(illustration)) {
                             illustration.image.resizable().scaledToFill()
                         }
                     }
@@ -214,10 +213,11 @@ extension HomePage.Views {
         var body: some View {
             Button(action: action) {
                 VStack(alignment: .leading, spacing: 6) {
-                    BackgroundPreview(isSelected: isSelected) {
-                        backgroundPreview().scaledToFill()
+                    ZStack {
+                        BackgroundPreview(isSelected: isSelected, showSelectionCheckmark: true) {
+                            backgroundPreview().scaledToFill()
+                        }
                     }
-
                     Text(title)
                         .font(.system(size: 11))
                 }
@@ -228,7 +228,14 @@ extension HomePage.Views {
 
     struct BackgroundPreview<Content>: View where Content: View {
         let isSelected: Bool
+        let showSelectionCheckmark: Bool
         @ViewBuilder public let content: () -> Content
+
+        init(isSelected: Bool, showSelectionCheckmark: Bool = false, content: @escaping () -> Content) {
+            self.isSelected = isSelected
+            self.showSelectionCheckmark = showSelectionCheckmark
+            self.content = content
+        }
 
         var body: some View {
             ZStack {
@@ -249,9 +256,10 @@ extension HomePage.Views {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6)
                         .stroke(Color(.updateIndicator), lineWidth: 2)
-
-                    Image(.solidCheckmark)
-                        .opacity(0.64)
+                    if showSelectionCheckmark {
+                        Image(.solidCheckmark)
+                            .opacity(0.64)
+                    }
                 }
                 .padding(-2)
             }
