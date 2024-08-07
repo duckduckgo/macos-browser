@@ -19,6 +19,7 @@
 import AppLauncher
 import AppKit
 import Combine
+import Common
 import Foundation
 import LoginItems
 import NetworkProtection
@@ -26,6 +27,8 @@ import NetworkProtectionIPC
 import NetworkProtectionUI
 import Subscription
 import VPNAppLauncher
+import SwiftUI
+import NetworkProtectionProxy
 
 protocol NetworkProtectionIPCClient {
     var ipcStatusObserver: ConnectionStatusObserver { get }
@@ -44,15 +47,36 @@ extension VPNControllerXPCClient: NetworkProtectionIPCClient {
     public var ipcDataVolumeObserver: any NetworkProtection.DataVolumeObserver { dataVolumeObserver }
 }
 
+@MainActor
 final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var networkProtectionPopover: NetworkProtectionPopover?
     let ipcClient: NetworkProtectionIPCClient
     let vpnUninstaller: VPNUninstalling
 
+    @Published
+    private var siteInfo: SiteTroubleshootingInfo?
+    private let siteTroubleshootingInfoPublisher: SiteTroubleshootingInfoPublisher
+    private var cancellables = Set<AnyCancellable>()
+
     init(ipcClient: VPNControllerXPCClient,
          vpnUninstaller: VPNUninstalling) {
+
         self.ipcClient = ipcClient
         self.vpnUninstaller = vpnUninstaller
+
+        let activeDomainPublisher = ActiveDomainPublisher(windowControllersManager: .shared)
+
+        siteTroubleshootingInfoPublisher = SiteTroubleshootingInfoPublisher(
+            activeDomainPublisher: activeDomainPublisher.eraseToAnyPublisher(),
+            proxySettings: TransparentProxySettings(defaults: .netP))
+
+        subscribeToCurrentSitePublisher()
+    }
+
+    private func subscribeToCurrentSitePublisher() {
+        siteTroubleshootingInfoPublisher
+            .assign(to: \.siteInfo, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     var isShown: Bool {
@@ -60,8 +84,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     }
 
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) -> NSPopover {
-        let popover = {
-
+        let popover: NSPopover = {
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
             let statusReporter = DefaultNetworkProtectionStatusReporter(
@@ -77,12 +100,23 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
             _ = VPNSettings(defaults: .netP)
             let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+            let vpnURLEventHandler = VPNURLEventHandler()
+            let proxySettings = TransparentProxySettings(defaults: .netP)
+            let uiActionHandler = VPNUIActionHandler(vpnURLEventHandler: vpnURLEventHandler, proxySettings: proxySettings)
 
-            let popover = NetworkProtectionPopover(controller: controller,
-                                                   onboardingStatusPublisher: onboardingStatusPublisher,
-                                                   statusReporter: statusReporter,
-                                                   uiActionHandler: appLauncher,
-                                                   menuItems: {
+            let siteTroubleshootingFeatureFlagPublisher = NSApp.delegateTyped.internalUserDecider.isInternalUserPublisher.eraseToAnyPublisher()
+
+            let siteTroubleshootingViewModel = SiteTroubleshootingView.Model(
+                featureFlagPublisher: siteTroubleshootingFeatureFlagPublisher,
+                connectionStatusPublisher: statusReporter.statusObserver.publisher,
+                siteTroubleshootingInfoPublisher: $siteInfo.eraseToAnyPublisher(),
+                uiActionHandler: uiActionHandler)
+
+            let statusViewModel = NetworkProtectionStatusView.Model(controller: controller,
+                                              onboardingStatusPublisher: onboardingStatusPublisher,
+                                              statusReporter: statusReporter,
+                                              uiActionHandler: uiActionHandler,
+                                              menuItems: {
                 if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
                     return [
                         NetworkProtectionStatusView.Model.MenuItem(
@@ -113,13 +147,19 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                     ]
                 }
             },
-                                                   agentLoginItem: LoginItem.vpnMenu,
-                                                   isMenuBarStatusView: false,
-                                                   userDefaults: .netP,
-                                                   locationFormatter: DefaultVPNLocationFormatter(),
-                                                   uninstallHandler: { [weak self] in
+                                              agentLoginItem: LoginItem.vpnMenu,
+                                              isMenuBarStatusView: false,
+                                              userDefaults: .netP,
+                                              locationFormatter: DefaultVPNLocationFormatter(),
+                                              uninstallHandler: { [weak self] in
                 _ = try? await self?.vpnUninstaller.uninstall(removeSystemExtension: true)
             })
+
+            let popover = NetworkProtectionPopover(
+                statusViewModel: statusViewModel,
+                statusReporter: statusReporter,
+                siteTroubleshootingViewModel: siteTroubleshootingViewModel,
+                debugInformationViewModel: DebugInformationViewModel(showDebugInformation: false))
             popover.delegate = delegate
 
             networkProtectionPopover = popover

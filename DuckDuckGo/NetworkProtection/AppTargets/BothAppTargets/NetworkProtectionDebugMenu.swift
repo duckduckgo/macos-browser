@@ -82,6 +82,14 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem.separator()
 
+            NSMenuItem(title: "Adapter") {
+                NSMenuItem(title: "Restart Adapter", action: #selector(NetworkProtectionDebugMenu.restartAdapter(_:)))
+                    .targetting(self)
+
+                NSMenuItem(title: "Re-create Adapter", action: #selector(NetworkProtectionDebugMenu.restartAdapter(_:)))
+                    .targetting(self)
+            }
+
             NSMenuItem(title: "Tunnel Settings") {
                 shouldIncludeAllNetworksMenuItem
                     .targetting(self)
@@ -212,6 +220,18 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             do {
                 try await debugUtilities.removeVPNConfiguration()
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
+    }
+
+    /// Removes the system extension and agents for DuckDuckGo VPN.
+    ///
+    @objc func restartAdapter(_ sender: Any?) {
+        Task { @MainActor in
+            do {
+                try await debugUtilities.restartAdapter()
             } catch {
                 await NSAlert(error: error).runModal()
             }
@@ -449,8 +469,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private let ddgBrowserAppIdentifier = Bundle.main.bundleIdentifier!
 
     private func updateExclusionsMenu() {
-        excludeDBPTrafficFromVPN.state = transparentProxySettings.isExcluding(dbpBackgroundAppIdentifier) ? .on : .off
-        excludeDDGBrowserTrafficFromVPN.state = transparentProxySettings.isExcluding(ddgBrowserAppIdentifier) ? .on : .off
+        excludeDBPTrafficFromVPN.state = transparentProxySettings.isExcluding(appIdentifier: dbpBackgroundAppIdentifier) ? .on : .off
+        excludeDDGBrowserTrafficFromVPN.state = transparentProxySettings.isExcluding(appIdentifier: ddgBrowserAppIdentifier) ? .on : .off
     }
 
     @objc private func toggleExcludeDBPBackgroundAgent() {
