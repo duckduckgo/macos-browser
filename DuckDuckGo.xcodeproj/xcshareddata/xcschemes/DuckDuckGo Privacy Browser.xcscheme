@@ -189,6 +189,9 @@
                <Test
                   Identifier = "TabContentTests/testWhenPDFContextMenuSaveAsChosen_saveDialogOpens()">
                </Test>
+               <Test
+                  Identifier = "TabContentTests/testWhenPDFMainMenuPrintChosen_printDialogOpens()">
+               </Test>
             </SkippedTests>
          </TestableReference>
          <TestableReference

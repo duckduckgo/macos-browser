@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import Foundation
 import DataBrokerProtection
 import Common
@@ -41,19 +39,14 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
     }
 
     func disableAndDelete() {
-        if !DefaultDataBrokerProtectionFeatureGatekeeper.bypassWaitlist {
-
-            do {
-                try dataManager.removeAllData()
-                // the dataManagers delegate handles login item disabling
-            } catch {
-                os_log("DataBrokerProtectionFeatureDisabler error: disableAndDelete, error: %{public}@", log: .error, error.localizedDescription)
-            }
-
-            DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerDisableAndDeleteDaily, frequency: .daily)
-            NotificationCenter.default.post(name: .dbpWasDisabled, object: nil)
+        do {
+            try dataManager.removeAllData()
+            // the dataManagers delegate handles login item disabling
+        } catch {
+            os_log("DataBrokerProtectionFeatureDisabler error: disableAndDelete, error: %{public}@", log: .error, error.localizedDescription)
         }
+
+        DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerDisableAndDeleteDaily, frequency: .daily)
+        NotificationCenter.default.post(name: .dbpWasDisabled, object: nil)
     }
 }
-
-#endif

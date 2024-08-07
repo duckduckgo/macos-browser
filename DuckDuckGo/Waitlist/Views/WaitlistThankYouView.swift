@@ -23,13 +23,6 @@ import SwiftUI
 // MARK: - Model
 
 struct WaitlistBetaThankYouCopy {
-    static let dbp = WaitlistBetaThankYouCopy(
-        title: UserText.dbpThankYouTitle,
-        subtitle: UserText.dbpThankYouSubtitle,
-        body1: UserText.dbpThankYouBody1,
-        body2: UserText.dbpThankYouBody2
-    )
-
     static let vpn = WaitlistBetaThankYouCopy(
         title: UserText.vpnThankYouTitle,
         subtitle: UserText.vpnThankYouSubtitle,

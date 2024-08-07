@@ -72,17 +72,3 @@ struct JoinWaitlistView: View {
         .environmentObject(model)
     }
 }
-
-#if DBP
-
-struct DataBrokerProtectionJoinWaitlistViewData: JoinWaitlistViewViewData {
-    let headerImageName = "DBP-Information-Remover"
-    let title = UserText.dataBrokerProtectionWaitlistJoinTitle
-    let subtitle1 = UserText.dataBrokerProtectionWaitlistInvitedSubtitle
-    let subtitle2 = ""
-    let availabilityDisclaimer = UserText.dataBrokerProtectionWaitlistAvailabilityDisclaimer
-    let buttonCloseLabel = UserText.dataBrokerProtectionWaitlistButtonClose
-    let buttonJoinWaitlistLabel = UserText.dataBrokerProtectionWaitlistButtonJoinWaitlist
-}
-
-#endif

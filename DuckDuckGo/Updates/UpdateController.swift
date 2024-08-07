@@ -232,14 +232,14 @@ extension UpdateController: SPUUpdaterDelegate {
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
         os_log("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))", log: .updates)
 
+        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
+
         guard !areAutomaticUpdatesEnabled else {
             // If automatic updates are enabled, we are waiting until the update is downloaded
             return
         }
         // For manual updates, show the available update without downloading
         onUpdateCheckEnd(item: item, isInstalled: false)
-
-        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
     }
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
