@@ -43,10 +43,10 @@ final class OutlineSeparatorViewCell: NSTableCellView {
         self.identifier = identifier
     }
 
-    convenience init(separatorVisible: Bool = false) {
-        self.init(identifier: separatorVisible ? Self.separatorIdentifier : Self.blankIdentifier)
+    convenience init(isSeparatorVisible: Bool = false) {
+        self.init(identifier: isSeparatorVisible ? Self.separatorIdentifier : Self.blankIdentifier)
 
-        if separatorVisible {
+        if isSeparatorVisible {
             addSubview(separatorView)
 
             separatorView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5).isActive = true

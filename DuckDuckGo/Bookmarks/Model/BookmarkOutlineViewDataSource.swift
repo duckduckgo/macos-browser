@@ -27,7 +27,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         case foldersOnly
         case bookmarksMenu
 
-        var separatorVisible: Bool {
+        var isSeparatorVisible: Bool {
             switch self {
             case .bookmarksAndFolders, .bookmarksMenu: true
             case .foldersOnly: false
@@ -147,10 +147,10 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             return nil
         }
         if node.representedObject is SpacerNode {
-            return outlineView.makeView(withIdentifier: contentMode.separatorVisible
+            return outlineView.makeView(withIdentifier: contentMode.isSeparatorVisible
                                         ? OutlineSeparatorViewCell.separatorIdentifier
                                         : OutlineSeparatorViewCell.blankIdentifier, owner: self) as? OutlineSeparatorViewCell
-                ?? OutlineSeparatorViewCell(separatorVisible: contentMode.separatorVisible)
+                ?? OutlineSeparatorViewCell(isSeparatorVisible: contentMode.isSeparatorVisible)
         }
 
         let cell = outlineView.makeView(withIdentifier: .init(BookmarkOutlineCellView.className()), owner: self) as? BookmarkOutlineCellView

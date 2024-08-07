@@ -1199,7 +1199,7 @@ extension BookmarkListViewController: NSMenuDelegate {
     }
 
 }
-
+// MARK: - BookmarkMenuItemSelectors
 extension BookmarkListViewController: BookmarkMenuItemSelectors {
 
     func openBookmarkInNewTab(_ sender: NSMenuItem) {
@@ -1283,7 +1283,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
     }
 
 }
-
+// MARK: - FolderMenuItemSelectors
 extension BookmarkListViewController: FolderMenuItemSelectors {
 
     func newFolder(_ sender: NSMenuItem) {
@@ -1338,7 +1338,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
     }
 
 }
-
+// MARK: - BookmarkSearchMenuItemSelectors
 extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
     func showInFolder(_ sender: NSMenuItem) {
         guard let baseBookmark = sender.representedObject as? BaseBookmarkEntity else {
@@ -1356,7 +1356,7 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
         outlineView.highlight(node)
     }
 }
-
+// MARK: - BookmarkSortMenuItemSelectors
 extension BookmarkListViewController: BookmarkSortMenuItemSelectors {
 
     func manualSort(_ sender: NSMenuItem) {
