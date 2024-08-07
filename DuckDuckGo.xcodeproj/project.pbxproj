@@ -1804,6 +1804,7 @@
 		9D9DE57D2C63AA2400D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE57C2C63AA2400D20B15 /* AppKitExtensions */; };
 		9D9DE57F2C63B64F00D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE57E2C63B64F00D20B15 /* AppKitExtensions */; };
 		9D9DE5812C63BA0B00D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE5802C63BA0B00D20B15 /* AppKitExtensions */; };
+		9D9DE5832C63BE9600D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE5822C63BE9600D20B15 /* AppKitExtensions */; };
 		9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC70B192AA1FA5B005A844B /* LoginItems */; };
 		9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 9DEF97E02B06C4EE00764F03 /* Networking */; };
 		9F0660732BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0660722BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift */; };
@@ -4448,6 +4449,7 @@
 				F198C71C2BD18A61000BF24D /* PixelKit in Frameworks */,
 				7BEEA5142AD1236300A9E72B /* NetworkProtectionIPC in Frameworks */,
 				BDADBDCB2BD2BC2800421B9B /* Lottie in Frameworks */,
+				9D9DE5832C63BE9600D20B15 /* AppKitExtensions in Frameworks */,
 				7B00997F2B6508C200FE7C31 /* NetworkProtectionProxy in Frameworks */,
 				EE7295EF2A545C12008C0991 /* NetworkProtection in Frameworks */,
 				4B2D067F2A1334D700DE1F49 /* NetworkProtectionUI in Frameworks */,
@@ -8861,6 +8863,7 @@
 				F198C71B2BD18A61000BF24D /* PixelKit */,
 				BDADBDCA2BD2BC2800421B9B /* Lottie */,
 				7B23668D2C09FAFA002D393F /* VPNAppLauncher */,
+				9D9DE5822C63BE9600D20B15 /* AppKitExtensions */,
 			);
 			productName = DuckDuckGoAgentAppStore;
 			productReference = 4B2D06692A13318400DE1F49 /* DuckDuckGo VPN App Store.app */;
@@ -13957,6 +13960,10 @@
 			productName = AppKitExtensions;
 		};
 		9D9DE5802C63BA0B00D20B15 /* AppKitExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppKitExtensions;
+		};
+		9D9DE5822C63BE9600D20B15 /* AppKitExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppKitExtensions;
 		};
