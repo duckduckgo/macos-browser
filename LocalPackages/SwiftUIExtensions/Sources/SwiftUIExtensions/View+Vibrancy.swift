@@ -18,6 +18,25 @@
 
 import SwiftUI
 
+struct VisualEffectBlur: NSViewRepresentable {
+    var material: NSVisualEffectView.Material
+    var blendingMode: NSVisualEffectView.BlendingMode
+
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.material = material
+        view.blendingMode = blendingMode
+        view.state = .active
+        return view
+    }
+
+    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
+        nsView.material = material
+        nsView.blendingMode = blendingMode
+        nsView.state = .active
+    }
+}
+
 public extension View {
     /**
      * Displays `cursor` when the view is hovered.
@@ -27,21 +46,27 @@ public extension View {
      * before updating the cursor, removing the need to add a separate `.onHover`
      * modifier.
      */
-    func ultraThinVibrancyBackground(or color: Color) -> some View {
-        modifier(VibrancyModifier(color: color))
+    func vibrancyEffect(
+        material: NSVisualEffectView.Material = .hudWindow,
+        blendingMode: NSVisualEffectView.BlendingMode = .withinWindow
+    ) -> some View {
+        modifier(VibrancyModifier(material: material, blendingMode: blendingMode))
     }
 }
 
 private struct VibrancyModifier: ViewModifier {
 
-    let color: Color
+    let material: NSVisualEffectView.Material
+    let blendingMode: NSVisualEffectView.BlendingMode
+//    let color: Color
 
     @ViewBuilder
     func body(content: Content) -> some View {
-        if #available(macOS 12.0, *) {
-            content.background(.ultraThinMaterial)
-        } else {
-            content.background(color)
-        }
+        content.background(VisualEffectBlur(material: material, blendingMode: blendingMode))
+//        if #available(macOS 12.0, *) {
+//            content.background(.ultraThinMaterial)
+//        } else {
+//            content.background(color)
+//        }
     }
 }

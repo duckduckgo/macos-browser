@@ -19,6 +19,10 @@
 import Foundation
 import SwiftUI
 
+protocol ColorSchemeProviding {
+    var colorScheme: ColorScheme { get }
+}
+
 extension HomePage.Models {
 
     final class SettingsModel: ObservableObject {
@@ -122,10 +126,10 @@ extension HomePage.Models.SettingsModel {
         }
     }
 
-    enum CustomBackground {
-        case gradient(Image)
+    enum CustomBackground: ColorSchemeProviding {
+        case gradient(Gradient)
         case solidColor(SolidColor)
-        case illustration(Image)
+        case illustration(Illustration)
         case customImage(Image)
 
         var isSolidColor: Bool {
@@ -135,23 +139,40 @@ extension HomePage.Models.SettingsModel {
             return true
         }
 
-        @ViewBuilder
-        var view: some View {
+        var colorScheme: ColorScheme {
             switch self {
-            case .gradient(let image), .illustration(let image), .customImage(let image):
-                image.resizable().aspectRatio(contentMode: .fill)
+            case .gradient(let gradient):
+                gradient.colorScheme
+            case .illustration(let illustration):
+                illustration.colorScheme
             case .solidColor(let solidColor):
-                solidColor.color
+                solidColor.colorScheme
+            case .customImage(let image):
+                .light
             }
         }
 
-        static let placeholderGradient = CustomBackground.gradient(Image(nsImage: .homePageBackgroundGradient03))
+        @ViewBuilder
+        var view: some View {
+            switch self {
+            case .gradient(let gradient):
+                gradient.image.resizable().aspectRatio(contentMode: .fill)
+            case .illustration(let illustration):
+                illustration.image.resizable().aspectRatio(contentMode: .fill)
+            case .solidColor(let solidColor):
+                solidColor.color
+            case .customImage(let image):
+                image.resizable().aspectRatio(contentMode: .fill)
+            }
+        }
+
+        static let placeholderGradient = CustomBackground.gradient(.gradient03)
         static let placeholderColor = CustomBackground.solidColor(.lightPurple)
-        static let placeholderIllustration = CustomBackground.illustration(Image(nsImage: .homePageBackgroundIllustration01))
+        static let placeholderIllustration = CustomBackground.illustration(.illustration01)
         static let placeholderCustomImage = CustomBackground.solidColor(.gray)
     }
 
-    enum Gradient: Equatable, Identifiable, CaseIterable {
+    enum Gradient: Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
         var id: Self {
             self
         }
@@ -182,9 +203,18 @@ extension HomePage.Models.SettingsModel {
                 Image(nsImage: .homePageBackgroundGradient07)
             }
         }
+
+        var colorScheme: ColorScheme {
+            switch self {
+            case .gradient01, .gradient02, .gradient03:
+                    .light
+            case .gradient04, .gradient05, .gradient06, .gradient07:
+                    .dark
+            }
+        }
     }
 
-    enum Illustration: Equatable, Identifiable, CaseIterable {
+    enum Illustration: Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
         var id: Self {
             self
         }
@@ -212,9 +242,13 @@ extension HomePage.Models.SettingsModel {
                 Image(nsImage: .homePageBackgroundIllustration06)
             }
         }
+
+        var colorScheme: ColorScheme {
+            .light
+        }
     }
 
-    enum SolidColor: Equatable, Identifiable, CaseIterable {
+    enum SolidColor: Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
         var id: Self {
             self
         }

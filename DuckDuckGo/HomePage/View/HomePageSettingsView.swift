@@ -139,7 +139,7 @@ extension HomePage.Views {
                 backButton(title: "Gradients")
                 grid(with: HomePage.Models.SettingsModel.Gradient.allCases) { gradient in
                     Button {
-                        model.customBackground = .gradient(gradient.image)
+                        model.customBackground = .gradient(gradient)
                         model.contentType = .root
                     } label: {
                         BackgroundPreview(isSelected: false) {
@@ -156,7 +156,7 @@ extension HomePage.Views {
                 backButton(title: "Illustrations")
                 grid(with: HomePage.Models.SettingsModel.Illustration.allCases) { illustration in
                     Button {
-                        model.customBackground = .illustration(illustration.image)
+                        model.customBackground = .illustration(illustration)
                         model.contentType = .root
                     } label: {
                         BackgroundPreview(isSelected: false) {
@@ -263,10 +263,14 @@ extension HomePage.Models.SettingsModel.CustomBackground {
     @ViewBuilder
     var preview: some View {
         switch self {
-        case .gradient(let image), .illustration(let image), .customImage(let image):
-            image.resizable()
+        case .gradient(let gradient):
+            gradient.image.resizable()
         case .solidColor(let solidColor):
             solidColor.color
+        case .illustration(let illustration):
+            illustration.image.resizable()
+        case .customImage(let image):
+            image.resizable()
         }
     }
 }

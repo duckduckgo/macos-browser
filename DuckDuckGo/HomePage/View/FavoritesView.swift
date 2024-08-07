@@ -281,7 +281,7 @@ struct FavoriteTemplate: View {
                         .shadow(color: isHovering ? .clear : .black.opacity(0.12), radius: 2, x: 0, y: 2)
 
                     RoundedRectangle(cornerRadius: 12)
-                        .ultraThinVibrancyBackground(or: .homeFavoritesBackground)
+                        .vibrancyEffect()
                         .cornerRadius(12)
                         .blendMode(.destinationOut)
                 }
@@ -289,7 +289,7 @@ struct FavoriteTemplate: View {
 
                 RoundedRectangle(cornerRadius: 12)
                     .fill(isHovering ? .buttonMouseOver : .clear)
-                    .ultraThinVibrancyBackground(or: .homeFavoritesBackground)
+                    .vibrancyEffect()
                     .cornerRadius(12)
 
                 if let url = url {

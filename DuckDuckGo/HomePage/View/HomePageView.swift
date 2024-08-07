@@ -71,6 +71,9 @@ extension HomePage.Views {
                                 innerView(includingContinueSetUpCards: includingContinueSetUpCards)
                                     .frame(width: geometry.size.width - (isSettingsVisible ? settingsPanelWidth : 0))
                                     .offset(x: isSettingsVisible ? innerViewOffset(with: geometry) : 0)
+                                    .ifLet(settingsModel.customBackground?.colorScheme) { view, colorScheme in
+                                        view.colorScheme(colorScheme)
+                                    }
                             }
                         }
                         .frame(width: isSettingsVisible ? geometry.size.width - settingsPanelWidth : geometry.size.width)
@@ -97,6 +100,9 @@ extension HomePage.Views {
                             }
                         }
                         .frame(width: geometry.size.width, height: geometry.size.height)
+                        .ifLet(settingsModel.customBackground?.colorScheme) { view, colorScheme in
+                            view.colorScheme(colorScheme)
+                        }
                     }
                 }
                 .frame(maxWidth: .infinity)

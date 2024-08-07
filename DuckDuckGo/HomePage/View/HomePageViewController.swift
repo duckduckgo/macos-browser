@@ -44,7 +44,6 @@ final class HomePageViewController: NSViewController {
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
-    var settingsModel: HomePage.Models.SettingsModel!
     let accessibilityPreferences: AccessibilityPreferences
     let appearancePreferences: AppearancePreferences
     let defaultBrowserPreferences: DefaultBrowserPreferences
@@ -83,7 +82,6 @@ final class HomePageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
-        settingsModel = createSettingsModel()
 
         refreshModels()
 
@@ -92,7 +90,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
             .environmentObject(featuresModel)
-            .environmentObject(settingsModel)
+            .environmentObject(Application.appDelegate.homePageSettingsModel)
             .environmentObject(accessibilityPreferences)
             .environmentObject(appearancePreferences)
             .environmentObject(Application.appDelegate.activeRemoteMessageModel)
@@ -160,10 +158,6 @@ final class HomePageViewController: NSViewController {
             tabCollectionViewModel: tabCollectionViewModel,
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
         )
-    }
-
-    func createSettingsModel() -> HomePage.Models.SettingsModel {
-        HomePage.Models.SettingsModel()
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {
