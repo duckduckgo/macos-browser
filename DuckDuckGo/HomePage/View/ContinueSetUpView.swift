@@ -150,7 +150,7 @@ extension HomePage.Views {
                 ZStack(alignment: .center) {
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                        .background(Color.homeFavoritesBackground)
+                        .ultraThinVibrancyBackground(or: .homeFavoritesBackground)
                         .cornerRadius(12)
 
                     ZStack {

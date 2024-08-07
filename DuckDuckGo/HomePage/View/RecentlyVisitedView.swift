@@ -31,7 +31,7 @@ struct RecentlyVisited: View {
 
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                .background(Color.homeFavoritesBackground)
+                .ultraThinVibrancyBackground(or: .homeFavoritesBackground)
                 .cornerRadius(12)
 
             VStack(spacing: 0) {

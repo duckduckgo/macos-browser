@@ -281,13 +281,16 @@ struct FavoriteTemplate: View {
                         .shadow(color: isHovering ? .clear : .black.opacity(0.12), radius: 2, x: 0, y: 2)
 
                     RoundedRectangle(cornerRadius: 12)
-                        .background(Color.homeFavoritesBackground)
+                        .ultraThinVibrancyBackground(or: .homeFavoritesBackground)
+                        .cornerRadius(12)
                         .blendMode(.destinationOut)
                 }
                 .compositingGroup()
 
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isHovering ? .buttonMouseOver : .homeFavoritesBackground)
+                    .fill(isHovering ? .buttonMouseOver : .clear)
+                    .ultraThinVibrancyBackground(or: .homeFavoritesBackground)
+                    .cornerRadius(12)
 
                 if let url = url {
                     FaviconView(url: url, onFaviconMissing: onFaviconMissing)
