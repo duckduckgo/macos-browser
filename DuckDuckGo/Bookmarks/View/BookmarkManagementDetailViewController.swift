@@ -23,6 +23,7 @@ protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
 
     func bookmarkManagementDetailViewControllerDidSelectFolder(_ folder: BookmarkFolder)
     func bookmarkManagementDetailViewControllerDidStartSearching()
+    func bookmarkManagementDetailViewControllerShowInFolder(_ folder: BookmarkFolder)
 
 }
 
@@ -563,7 +564,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
             return
         }
 
-        guard let contextMenu = ContextualMenu.menu(for: [bookmark], target: self) else { return }
+        guard let contextMenu = ContextualMenu.menu(for: [bookmark], target: self, forSearch: managementDetailViewModel.isSearching) else { return }
         contextMenu.popUpAtMouseLocation(in: view)
     }
 
@@ -588,7 +589,7 @@ extension BookmarkManagementDetailViewController: NSMenuDelegate {
         let (item, parent) = fetchEntityAndParent(at: row)
 
         if let item {
-            return ContextualMenu.menu(for: item, parentFolder: parent)
+            return ContextualMenu.menu(for: item, parentFolder: parent, forSearch: managementDetailViewModel.isSearching)
         } else {
             return nil
         }
@@ -758,6 +759,22 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
         bookmarkManager.remove(objectsWithUUIDs: uuids)
     }
 
+}
+
+extension BookmarkManagementDetailViewController: BookmarkSearchMenuItemSelectors {
+    func showInFolder(_ sender: NSMenuItem) {
+        guard let baseBookmark = sender.representedObject as? BaseBookmarkEntity else {
+            assertionFailure("Failed to retrieve Bookmark from Show in Folder context menu item")
+            return
+        }
+
+        if let bookmark = baseBookmark as? Bookmark,
+            let folder = managementDetailViewModel.searchForParent(bookmark: bookmark) {
+            delegate?.bookmarkManagementDetailViewControllerShowInFolder(folder)
+        } else if let folder = baseBookmark as? BookmarkFolder {
+            delegate?.bookmarkManagementDetailViewControllerShowInFolder(folder)
+        }
+    }
 }
 
 // MARK: - Search field delegate

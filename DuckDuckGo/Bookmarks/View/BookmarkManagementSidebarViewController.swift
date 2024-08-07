@@ -194,6 +194,17 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         }
     }
 
+    func showBookmarkInFolder(_ folder: BookmarkFolder) {
+        guard let node = dataSource.treeController.node(representing: folder) else {
+            return
+        }
+
+        let path = BookmarkNode.Path(node: node)
+        outlineView.revealAndSelect(nodePath: path)
+        outlineView.scrollToAdjustedPositionInOutlineView(node)
+        outlineView.highlight(node)
+    }
+
     private func reloadData() {
         let selectedNodes = self.selectedNodes
         dataSource.reloadData(with: .manual)
