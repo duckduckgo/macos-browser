@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "ff87c19636bce8baa34b7984defa779c083f9ce9",
-        "version" : "181.1.0"
+        "branch" : "sam/vpn-snooze-initial-support",
+        "revision" : "71a50fcb80ad5ba324e1ba58dbd7439d4924845b"
       }
     },
     {

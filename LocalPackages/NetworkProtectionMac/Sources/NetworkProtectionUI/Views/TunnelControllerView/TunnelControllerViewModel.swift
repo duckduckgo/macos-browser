@@ -385,6 +385,8 @@ public final class TunnelControllerViewModel: ObservableObject {
             return UserText.networkProtectionStatusDisconnected
         case .disconnecting:
             return UserText.networkProtectionStatusDisconnecting
+        case .snoozing:
+            return UserText.networkProtectionStatusSnoozing
         }
     }
 
