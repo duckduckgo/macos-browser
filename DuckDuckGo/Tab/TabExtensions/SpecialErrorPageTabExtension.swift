@@ -133,6 +133,7 @@ extension SpecialErrorPageTabExtension: NavigationResponder {
                 }
             } else {
                 // Malicious iFrame Detected
+                PixelKit.fire(PhishingDetectionPixels.iframeLoaded)
                 let iframeTopUrl = navigationAction.sourceFrame.url
                 specialErrorPageUserScript?.failingURL = iframeTopUrl
                 if let errorURL = self.generateErrorPageURL(iframeTopUrl) {
