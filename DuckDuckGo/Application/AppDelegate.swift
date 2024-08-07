@@ -159,7 +159,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
            !didCrashDuringCrashHandlersSetUp.wrappedValue {
 
             didCrashDuringCrashHandlersSetUp.wrappedValue = true
-            CrashLogMessageExtractor.setUp()
+            CrashLogMessageExtractor.setUp(swapCxaThrow: false)
             didCrashDuringCrashHandlersSetUp.wrappedValue = false
         }
 
@@ -192,18 +192,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 fatalError("Could not load DB: \(error.localizedDescription)")
             }
 
-            let preMigrationErrorHandling = EventMapping<BookmarkFormFactorFavoritesMigration.MigrationErrors> { _, error, _, _ in
+            do {
+                let formFactorFavMigration = BookmarkFormFactorFavoritesMigration()
+                let favoritesOrder = try formFactorFavMigration.getFavoritesOrderFromPreV4Model(dbContainerLocation: BookmarkDatabase.defaultDBLocation,
+                                                                                                dbFileURL: BookmarkDatabase.defaultDBFileURL)
+                BookmarkDatabase.shared.preFormFactorSpecificFavoritesFolderOrder = favoritesOrder
+            } catch {
                 PixelKit.fire(DebugEvent(GeneralPixel.bookmarksCouldNotLoadDatabase(error: error)))
                 Thread.sleep(forTimeInterval: 1)
-                fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
+                fatalError("Could not create Bookmarks database stack: \(error.localizedDescription)")
             }
-
-            BookmarkDatabase.shared.preFormFactorSpecificFavoritesFolderOrder = BookmarkFormFactorFavoritesMigration
-                .getFavoritesOrderFromPreV4Model(
-                    dbContainerLocation: BookmarkDatabase.defaultDBLocation,
-                    dbFileURL: BookmarkDatabase.defaultDBFileURL,
-                    errorEvents: preMigrationErrorHandling
-                )
 
             BookmarkDatabase.shared.db.loadStore { context, error in
                 guard let context = context else {
@@ -395,6 +393,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
         remoteMessagingClient?.startRefreshingRemoteMessages()
+
+        // This messaging system has been replaced by RMF, but we need to clean up the message manifest for any users who had it stored.
+        let deprecatedRemoteMessagingStorage = DefaultSurveyRemoteMessagingStorage.surveys()
+        deprecatedRemoteMessagingStorage.removeStoredMessagesIfNecessary()
 
         if didCrashDuringCrashHandlersSetUp {
             PixelKit.fire(GeneralPixel.crashOnCrashHandlersSetUp)

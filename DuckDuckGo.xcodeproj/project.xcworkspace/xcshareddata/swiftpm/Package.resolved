@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "mgurgel/bump-privacy-dashboard-5_0_0",
-        "revision" : "81610ce02c2e1048d2c165875c3d295f19b59c49"
+        "revision" : "449b0dce6ea26e3d905ddd346b5498d28eebac3f",
+        "version" : "181.0.1"
       }
     },
     {
@@ -75,7 +75,7 @@
     {
       "identity" : "lottie-spm",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/airbnb/lottie-spm",
+      "location" : "https://github.com/airbnb/lottie-spm.git",
       "state" : {
         "revision" : "1d29eccc24cc8b75bff9f6804155112c0ffc9605",
         "version" : "4.4.3"
