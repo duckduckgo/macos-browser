@@ -733,11 +733,11 @@ protocol NewWindowPolicyDecisionMaker {
         }
 #endif
 
-//        if PixelExperiment.cohort == .newOnboarding {
-//            setContent(.onboarding)
-//        } else {
+        if PixelExperiment.cohort == .newOnboarding {
+            setContent(.onboarding)
+        } else {
             setContent(.onboardingDeprecated)
-//        }
+        }
     }
 
     @MainActor(unsafe)
