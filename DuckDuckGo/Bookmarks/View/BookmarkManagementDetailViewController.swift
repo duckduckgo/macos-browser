@@ -53,6 +53,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     weak var delegate: BookmarkManagementDetailViewControllerDelegate?
 
     private let bookmarkManager: BookmarkManager
+    private let dragDropManager: BookmarkDragDropManager
     private var selectionState: BookmarkManagementSidebarViewController.SelectionState = .empty {
         didSet {
             reloadData()
@@ -63,8 +64,10 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         self.selectionState = selectionState
     }
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         dragDropManager: BookmarkDragDropManager = BookmarkDragDropManager.shared) {
         self.bookmarkManager = bookmarkManager
+        self.dragDropManager = dragDropManager
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -210,8 +213,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         super.viewDidLoad()
 
         tableView.setDraggingSourceOperationMask([.move], forLocal: true)
-        tableView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
-                                           FolderPasteboardWriter.folderUTIInternalType])
+        tableView.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
 
         reloadData()
     }
@@ -367,82 +369,36 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         return entity.pasteboardWriter
     }
 
+    private func destination(for dropOperation: NSTableView.DropOperation, at row: Int) -> Any {
+        switch dropOperation {
+        case .on:
+            if let entity = fetchEntity(at: row) {
+                return entity
+            }
+        case .above:
+            if let folder = selectionState.folder {
+                return folder
+            }
+        @unknown default: preconditionFailure()
+        }
+        return selectionState == .favorites ? PseudoFolder.favorites : PseudoFolder.bookmarks
+    }
+
     func tableView(_ tableView: NSTableView,
                    validateDrop info: NSDraggingInfo,
                    proposedRow row: Int,
                    proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation {
 
-        if let proposedDestination = fetchEntity(at: row), proposedDestination.isFolder {
-            if let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) {
-                return validateDrop(for: bookmarks, destination: proposedDestination)
-            }
-
-            if let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard) {
-                return validateDrop(for: folders, destination: proposedDestination)
-            }
-
-            return .none
-        } else {
-            if dropOperation == .above {
-                return .move
-            } else {
-                return .none
-            }
-        }
-    }
-
-    private func validateDrop(for draggedBookmarks: Set<PasteboardBookmark>, destination: BaseBookmarkEntity) -> NSDragOperation {
-        guard destination is BookmarkFolder else {
-            return .none
-        }
-
-        return .move
-    }
-
-    private func validateDrop(for draggedFolders: Set<PasteboardFolder>, destination: BaseBookmarkEntity) -> NSDragOperation {
-        guard let destinationFolder = destination as? BookmarkFolder else {
-            return .none
-        }
-
-        for folderID in draggedFolders.map(\.id) where !bookmarkManager.canMoveObjectWithUUID(objectUUID: folderID, to: destinationFolder) {
-            return .none
-        }
-
-        let tryingToDragOntoSameFolder = draggedFolders.contains { folder in
-            return folder.id == destination.id
-        }
-
-        if tryingToDragOntoSameFolder {
-            return .none
-        }
-
-        return .move
+        let destination = destination(for: dropOperation, at: row)
+        return dragDropManager.validateDrop(info, to: destination)
     }
 
     func tableView(_ tableView: NSTableView, acceptDrop info: NSDraggingInfo, row: Int, dropOperation: NSTableView.DropOperation) -> Bool {
-        guard let draggedItemIdentifiers = info.draggingPasteboard.pasteboardItems?.compactMap(\.bookmarkEntityUUID),
-              !draggedItemIdentifiers.isEmpty else {
-            return false
-        }
 
-        if let parent = fetchEntity(at: row) as? BookmarkFolder, dropOperation == .on {
-            bookmarkManager.add(objectsWithUUIDs: draggedItemIdentifiers, to: parent) { _ in }
-            return true
-        } else if let currentFolderUUID = selectionState.selectedFolderUUID {
-            bookmarkManager.move(objectUUIDs: draggedItemIdentifiers,
-                                 toIndex: row,
-                                 withinParentFolder: .parent(uuid: currentFolderUUID)) { _ in }
-            return true
-        } else {
-            if selectionState == .favorites {
-                bookmarkManager.moveFavorites(with: draggedItemIdentifiers, toIndex: row) { _ in }
-            } else {
-                bookmarkManager.move(objectUUIDs: draggedItemIdentifiers,
-                                     toIndex: row,
-                                     withinParentFolder: .root) { _ in }
-            }
-            return true
-        }
+        let destination = destination(for: dropOperation, at: row)
+        let index = dropOperation == .above ? row : -1
+
+        return dragDropManager.acceptDrop(info, to: destination, at: index)
     }
 
     private func fetchEntity(at row: Int) -> BaseBookmarkEntity? {

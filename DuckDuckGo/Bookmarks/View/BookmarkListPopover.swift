@@ -26,7 +26,7 @@ final class BookmarkListPopover: NSPopover {
     private(set) var rootFolder: BookmarkFolder?
 
     private var preferredEdge: NSRectEdge?
-    private weak var positioningView: NSView?
+    private(set) weak var positioningView: NSView?
 
     private static let popoverInsets = NSEdgeInsets(top: 13, left: 13, bottom: 13, right: 13)
 
@@ -65,6 +65,7 @@ final class BookmarkListPopover: NSPopover {
     }
 
     override func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
+        Self.closeBookmarkListPopovers(shownIn: mainWindow, except: self)
         self.positioningView = positioningView
         self.preferredEdge = preferredEdge
         viewController.adjustPreferredContentSize(positionedAt: preferredEdge, of: positioningView, contentInsets: Self.popoverInsets)
@@ -92,6 +93,16 @@ final class BookmarkListPopover: NSPopover {
             frame.origin.y = min(max(screenFrame.minY, screenPoint.y - frame.size.height - Self.popoverInsets.top), screenFrame.maxY)
         }
         return frame
+    }
+
+    /// close other BookmarkListPopover-s shown from the main window when opening a new one
+    static func closeBookmarkListPopovers(shownIn window: NSWindow?, except popoverToKeep: BookmarkListPopover? = nil) {
+        guard let window,
+              // ignore when opening a submenu from another BookmarkListPopover
+              !(window.contentViewController?.nextResponder is Self) else { return }
+        for case let .some(popover as Self) in (window.childWindows ?? []).map(\.contentViewController?.nextResponder) where popover !== popoverToKeep && popover.isShown {
+            popover.close()
+        }
     }
 
 }

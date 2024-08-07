@@ -1674,6 +1674,8 @@
 		844683092C537F5200A15F93 /* MenuItemNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844683072C537F5200A15F93 /* MenuItemNode.swift */; };
 		8446830B2C59015200A15F93 /* SteppedScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8446830A2C59015200A15F93 /* SteppedScrollView.swift */; };
 		8446830C2C59015200A15F93 /* SteppedScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8446830A2C59015200A15F93 /* SteppedScrollView.swift */; };
+		84CB98002C636A8F0063F1D2 /* BookmarkDragDropManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CB97FF2C636A8F0063F1D2 /* BookmarkDragDropManager.swift */; };
+		84CB98012C636A8F0063F1D2 /* BookmarkDragDropManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CB97FF2C636A8F0063F1D2 /* BookmarkDragDropManager.swift */; };
 		84DC715A2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DC715B2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
@@ -3592,6 +3594,7 @@
 		841211352C4631E900088FBC /* BookmarkListPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListPopover.swift; sourceTree = "<group>"; };
 		844683072C537F5200A15F93 /* MenuItemNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuItemNode.swift; sourceTree = "<group>"; };
 		8446830A2C59015200A15F93 /* SteppedScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SteppedScrollView.swift; sourceTree = "<group>"; };
+		84CB97FF2C636A8F0063F1D2 /* BookmarkDragDropManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDragDropManager.swift; sourceTree = "<group>"; };
 		84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperTests.swift; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
 		850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarAppearance.swift; sourceTree = "<group>"; };
@@ -7624,6 +7627,7 @@
 				9F872DA22B90920F00138637 /* BookmarkFolderInfo.swift */,
 				BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */,
 				BB7B5F972C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift */,
+				84CB97FF2C636A8F0063F1D2 /* BookmarkDragDropManager.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -10058,6 +10062,7 @@
 				3706FB00293F65D500E42796 /* PasswordManagementCreditCardModel.swift in Sources */,
 				BBDFDC5D2B2B8E2100F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */,
 				3706FB01293F65D500E42796 /* NSEventExtension.swift in Sources */,
+				84CB98012C636A8F0063F1D2 /* BookmarkDragDropManager.swift in Sources */,
 				3706FB02293F65D500E42796 /* Onboarding.swift in Sources */,
 				4B9DB0482A983B24000927DB /* WaitlistRootView.swift in Sources */,
 				3706FEB8293F6EFB00E42796 /* ConnectBitwardenView.swift in Sources */,
@@ -11898,6 +11903,7 @@
 				B6F1B02A2BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift in Sources */,
 				B6C8CAA72AD010DD0060E1CD /* YandexDataImporter.swift in Sources */,
 				EE66666F2B56EDE4001D898D /* VPNLocationsHostingViewController.swift in Sources */,
+				84CB98002C636A8F0063F1D2 /* BookmarkDragDropManager.swift in Sources */,
 				37CC53EC27E8A4D10028713D /* PreferencesDataClearingView.swift in Sources */,
 				4B0135CE2729F1AA00D54834 /* NSPasteboardExtension.swift in Sources */,
 				85707F31276A7DCA00DC0649 /* OnboardingViewModel.swift in Sources */,

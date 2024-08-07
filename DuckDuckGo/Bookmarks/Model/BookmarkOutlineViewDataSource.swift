@@ -48,6 +48,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     @Published private(set) var dragDestinationFolder: BookmarkFolder?
 
     private let bookmarkManager: BookmarkManager
+    private let dragDropManager: BookmarkDragDropManager
     private let showMenuButtonOnHover: Bool
     private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
     private let presentFaviconsFetcherOnboarding: (() -> Void)?
@@ -56,6 +57,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         contentMode: ContentMode,
         bookmarkManager: BookmarkManager,
         treeController: BookmarkTreeController,
+        dragDropManager: BookmarkDragDropManager,
         sortMode: BookmarksSortMode,
         showMenuButtonOnHover: Bool = true,
         onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)? = nil,
@@ -63,6 +65,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     ) {
         self.contentMode = contentMode
         self.bookmarkManager = bookmarkManager
+        self.dragDropManager = dragDropManager
         self.treeController = treeController
         self.showMenuButtonOnHover = showMenuButtonOnHover
         self.onMenuRequestedAction = onMenuRequestedAction
@@ -163,6 +166,13 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return cell
     }
 
+    func outlineView(_ outlineView: NSOutlineView, rowViewForItem item: Any) -> NSTableRowView? {
+        let view = RoundedSelectionRowView()
+        view.insets = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
+
+        return view
+    }
+
     func outlineView(_ outlineView: NSOutlineView, heightOfRowByItem item: Any) -> CGFloat {
         if let node = item as? BookmarkNode, node.representedObject is SpacerNode {
             return OutlineSeparatorViewCell.rowHeight(for: contentMode == .bookmarksMenu ? .bookmarkBarMenu : .popover)
@@ -175,163 +185,43 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return entity.pasteboardWriter
     }
 
-    func outlineView(_ outlineView: NSOutlineView,
-                     validateDrop info: NSDraggingInfo,
-                     proposedItem item: Any?,
-                     proposedChildIndex index: Int) -> NSDragOperation {
+    func outlineView(_ outlineView: NSOutlineView, validateDrop info: NSDraggingInfo, proposedItem item: Any?, proposedChildIndex index: Int) -> NSDragOperation {
         let destinationNode = nodeForItem(item)
 
-        if contentMode == .foldersOnly {
-            // when in folders sidebar mode only allow moving a folder to another folder (or root)
-            if destinationNode.representedObject is BookmarkFolder
-                || (destinationNode.representedObject as? PseudoFolder == .bookmarks) {
-                return .move
-            }
-            return .none
-        }
-        self.dragDestinationFolder = destinationNode.representedObject as? BookmarkFolder
-        let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard)
-        let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard)
-
-        if let bookmarks = bookmarks, let folders = folders {
-            let canMoveBookmarks = validateDrop(for: bookmarks, destination: destinationNode) == .move
-            let canMoveFolders = validateDrop(for: folders, destination: destinationNode) == .move
-
-            // If the dragged values contain both folders and bookmarks, only validate the move if all objects can be moved.
-            if canMoveBookmarks, canMoveFolders {
-                return .move
-            } else {
-                return .none
-            }
-        }
-
-        if let bookmarks = bookmarks {
-            return validateDrop(for: bookmarks, destination: destinationNode)
-        }
-
-        if let folders = folders {
-            return validateDrop(for: folders, destination: destinationNode)
-        }
-
-        return .none
-    }
-
-    func validateDrop(for draggedBookmarks: Set<PasteboardBookmark>, destination: BookmarkNode) -> NSDragOperation {
-        guard destination.representedObject is BookmarkFolder || destination.representedObject is PseudoFolder || destination.isRoot else {
+        if contentMode == .foldersOnly, destinationNode.isRoot {
+            // disable dropping at Root in Bookmark Manager tree view
             return .none
         }
 
-        return .move
-    }
-
-    func validateDrop(for draggedFolders: Set<PasteboardFolder>, destination: BookmarkNode) -> NSDragOperation {
-        if destination.isRoot {
-            return .move
-        }
-
-        if let pseudoFolder = destination.representedObject as? PseudoFolder, pseudoFolder == .bookmarks {
-            return .move
-        }
-
-        guard let destinationFolder = destination.representedObject as? BookmarkFolder else {
-            return .none
-        }
-
-        // Folders cannot be dragged onto themselves:
-
-        let containsDestination = draggedFolders.contains { draggedFolder in
-            return draggedFolder.id == destinationFolder.id
-        }
-
-        if containsDestination {
-            return .none
-        }
-
-        // Folders cannot be dragged onto any of their descendants:
-
-        let containsDescendantOfDestination = draggedFolders.contains { draggedFolder in
-            let folder = BookmarkFolder(id: draggedFolder.id, title: draggedFolder.name, parentFolderUUID: draggedFolder.parentFolderUUID, children: draggedFolder.children)
-
-            guard let draggedNode = treeController.findNodeWithId(representing: folder) else { return false }
-
-            let descendant = draggedNode.descendantNodeRepresenting(object: destination.representedObject)
-
-            return descendant != nil
-        }
-
-        if containsDescendantOfDestination {
-            return .none
-        }
-
-        return .move
+        return dragDropManager.validateDrop(info, to: destinationNode.representedObject)
     }
 
     func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
-        guard let draggedObjectIdentifiers = info.draggingPasteboard.pasteboardItems?.compactMap(\.bookmarkEntityUUID),
-              !draggedObjectIdentifiers.isEmpty else {
-            return false
+        var representedObject = (item as? BookmarkNode)?.representedObject ?? (treeController.rootNode.isRoot ? nil : treeController.rootNode.representedObject)
+        if (representedObject as? BookmarkFolder)?.id == PseudoFolder.bookmarks.id {
+            // BookmarkFolder with id == PseudoFolder.bookmarks.id is used for Clipped Items menu
+            // use the PseudoFolder.bookmarks root as the destination and calculate drop index based on nearest items indices.
+            representedObject = PseudoFolder.bookmarks
         }
+        let index = {
+            // for folders-only calculate new real index based on the nearest folder index
+            if contentMode == .foldersOnly || representedObject is PseudoFolder,
+               index > -1,
+               // get folder before the insertion point (or the first one)
+               let nearestObject = (outlineView.child(max(0, index - 1), ofItem: item) as? BookmarkNode)?.representedObject as? BookmarkFolder,
+               // get all the children of a new parent folder (take actual bookmark list for the root)
+               let siblings = ((representedObject is PseudoFolder ? nil : representedObject) as? BookmarkFolder)?.children ?? bookmarkManager.list?.topLevelEntities {
 
-        let representedObject = (item as? BookmarkNode)?.representedObject ?? (treeController.rootNode.isRoot ? nil : treeController.rootNode.representedObject)
-
-        // Handle the nil destination case:
-
-        switch contentMode {
-        case .foldersOnly: break
-        case .bookmarksAndFolders, .bookmarksMenu:
-            guard let pseudoFolder = representedObject as? PseudoFolder else { break }
-            if pseudoFolder == .favorites {
-                bookmarkManager.update(objectsWithUUIDs: draggedObjectIdentifiers, update: { entity in
-                    let bookmark = entity as? Bookmark
-                    bookmark?.isFavorite = true
-                }, completion: { error in
-                    if let error = error {
-                        os_log("Failed to update entities during drop via outline view: %s", error.localizedDescription)
-                    }
-                })
-            } else if pseudoFolder == .bookmarks {
-                bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: nil) { error in
-                    if let error = error {
-                        os_log("Failed to accept nil parent drop via outline view: %s", error.localizedDescription)
-                    }
-                }
+                // insert after the nearest item (or in place of the nearest item for index == 0)
+                return (siblings.firstIndex(of: nearestObject) ?? 0) + (index == 0 ? 0 : 1)
+            } else if index == -1 {
+                // drop onto folder
+                return 0
             }
+            return index
+        }()
 
-            return true
-        }
-
-        // Handle the existing destination case:
-        let parent: ParentFolderType = (representedObject as? BookmarkFolder).map { $0.id == PseudoFolder.bookmarks.id ? .root : .parent(uuid: $0.id) } ?? .root
-        var index = index
-        // for folders-only calculate new real index based on the nearest folder index
-        if contentMode == .foldersOnly || parent == .root,
-           index > -1,
-           // get folder before the insertion point (or the first one)
-           let nearestObject = (outlineView.child(max(0, index - 1), ofItem: item) as? BookmarkNode)?.representedObject as? BookmarkFolder,
-           // get all the children of a new parent folder (take actual bookmark list for the root)
-           let siblings = ((parent == .root ? nil : representedObject) as? BookmarkFolder)?.children ?? bookmarkManager.list?.topLevelEntities {
-
-            // insert after the nearest item (or in place of the nearest item for index == 0)
-            index = (siblings.firstIndex(of: nearestObject) ?? 0) + (index == 0 ? 0 : 1)
-        } else if index == -1 {
-            // drop onto folder
-            index = 0
-        }
-
-        bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: parent) { error in
-            if let error = error {
-                os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
-            }
-        }
-
-        return true
-    }
-
-    func outlineView(_ outlineView: NSOutlineView, rowViewForItem item: Any) -> NSTableRowView? {
-        let view = RoundedSelectionRowView()
-        view.insets = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
-
-        return view
+        return dragDropManager.acceptDrop(info, to: representedObject ?? PseudoFolder.bookmarks, at: index)
     }
 
     // MARK: - NSTableViewDelegate

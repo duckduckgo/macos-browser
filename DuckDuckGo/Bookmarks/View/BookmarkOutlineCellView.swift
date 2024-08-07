@@ -212,6 +212,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
             countLabel.isHidden = isHighlighted || countLabel.stringValue.isEmpty
             favoriteImageView.isHidden = isHighlighted || favoriteImageView.image == nil
             menuButton.isShown = isHighlighted && faviconImageView.image != nil // don‘t show for custom menu item
+            menuButton.contentTintColor = isHighlighted ? .selectedMenuItemTextColor : .button
             urlLabel.isShown = isHighlighted && !urlLabel.stringValue.isEmpty
         } else {
             menuButton.isHidden = true

@@ -44,6 +44,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     }
 
     private let bookmarkManager: BookmarkManager
+    private let dragDropManager: BookmarkDragDropManager
     private let treeControllerDataSource: BookmarkSidebarTreeController
 
     private lazy var tabSwitcherButton = NSPopUpButton()
@@ -53,7 +54,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource, sortMode: .manual)
     private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly,
                                                                 bookmarkManager: bookmarkManager,
-                                                                treeController: treeController,
+                                                                treeController: treeController, dragDropManager: dragDropManager,
                                                                 sortMode: .manual,
                                                                 showMenuButtonOnHover: false)
 
@@ -68,8 +69,10 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         return [BookmarkNode]()
     }
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         dragDropManager: BookmarkDragDropManager = BookmarkDragDropManager.shared) {
         self.bookmarkManager = bookmarkManager
+        self.dragDropManager = dragDropManager
         treeControllerDataSource = .init(bookmarkManager: bookmarkManager)
         super.init(nibName: nil, bundle: nil)
     }
@@ -148,8 +151,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         outlineView.setDraggingSourceOperationMask([.move], forLocal: true)
-        outlineView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
-                                             FolderPasteboardWriter.folderUTIInternalType])
+        outlineView.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
 
         dataSource.$selectedFolders.sink { [weak self] selectedFolders in
             guard let self else { return }

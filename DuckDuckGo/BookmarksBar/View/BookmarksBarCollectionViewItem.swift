@@ -20,19 +20,25 @@ import Cocoa
 
 protocol BookmarksBarCollectionViewItemDelegate: AnyObject {
 
-    func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem)
+    @MainActor func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem)
 
-    func bookmarksBarCollectionViewItemOpenInNewTabAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemOpenInNewWindowAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemToggleFavoritesAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewEditAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemMoveToEndAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemCopyBookmarkURLAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemDeleteEntityAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemAddEntityAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemManageBookmarksAction(_ item: BookmarksBarCollectionViewItem)
+    @MainActor func bookmarksBarCollectionViewItemOpenInNewTabAction(_ item: BookmarksBarCollectionViewItem)
+    @MainActor func bookmarksBarCollectionViewItemOpenInNewWindowAction(_ item: BookmarksBarCollectionViewItem)
+    @MainActor func bookmarksBarCollectionViewItemToggleFavoritesAction(_ item: BookmarksBarCollectionViewItem)
+    @MainActor func bookmarksBarCollectionViewEditAction(_ item: BookmarksBarCollectionViewItem)
+    @MainActor func bookmarksBarCollectionViewItemMoveToEndAction(_ item: BookmarksBarCollectionViewItem)
+    @MainActor func bookmarksBarCollectionViewItemCopyBookmarkURLAction(_ item: BookmarksBarCollectionViewItem)
+    @MainActor func bookmarksBarCollectionViewItemDeleteEntityAction(_ item: BookmarksBarCollectionViewItem)
+    @MainActor func bookmarksBarCollectionViewItemAddEntityAction(_ item: BookmarksBarCollectionViewItem)
+    @MainActor func bookmarksBarCollectionViewItemManageBookmarksAction(_ item: BookmarksBarCollectionViewItem)
 
-    func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, isMouseOver: Bool)
+    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, isMouseOver: Bool)
+
+    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, draggingEntered info: NSDraggingInfo) -> NSDragOperation
+    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, draggingUpdatedWith info: NSDraggingInfo) -> NSDragOperation
+    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, draggingEndedWith info: NSDraggingInfo)
+    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, draggingExitedWith info: NSDraggingInfo?)
+    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, performDragOperation info: NSDraggingInfo) -> Bool
 
 }
 
@@ -67,6 +73,16 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     weak var delegate: BookmarksBarCollectionViewItemDelegate?
     private var entityType: EntityType?
 
+    var isDisplayingMouseDownState: Bool {
+        get {
+            mouseOverView.backgroundColor == .buttonMouseDown
+        }
+        set {
+            mouseOverView.backgroundColor = newValue ? .buttonMouseDown : .clear
+            mouseOverView.mouseOverColor = newValue ? .buttonMouseDown : .buttonMouseOver
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -78,6 +94,7 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         self.representedObject = entity
         self.title = entity.title
 
+        mouseOverView.unregisterDraggedTypes()
         if let bookmark = entity as? Bookmark {
             let favicon = bookmark.favicon(.small)?.copy() as? NSImage
             favicon?.size = NSSize.faviconSize
@@ -88,6 +105,9 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
                                         isFavorite: bookmark.isFavorite)
         } else if let folder = entity as? BookmarkFolder {
             self.entityType = .folder(title: folder.title)
+
+            mouseOverView.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
+
         } else {
             fatalError("Could not cast bookmark subclass from entity")
         }
@@ -152,6 +172,26 @@ extension BookmarksBarCollectionViewItem: MouseOverViewDelegate {
 
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
         delegate?.bookmarksBarCollectionViewItem(self, isMouseOver: isMouseOver)
+    }
+
+    func mouseOverView(_ sender: MouseOverView, draggingEntered info: any NSDraggingInfo) -> NSDragOperation {
+        return delegate?.bookmarksBarCollectionViewItem(self, draggingEntered: info) ?? .none
+    }
+
+    func mouseOverView(_ sender: MouseOverView, draggingUpdatedWith info: any NSDraggingInfo) -> NSDragOperation {
+        return delegate?.bookmarksBarCollectionViewItem(self, draggingUpdatedWith: info) ?? .none
+    }
+
+    func mouseOverView(_ sender: MouseOverView, draggingEndedWith info: any NSDraggingInfo) {
+        delegate?.bookmarksBarCollectionViewItem(self, draggingEndedWith: info)
+    }
+
+    func mouseOverView(_ sender: MouseOverView, performDragOperation info: any NSDraggingInfo) -> Bool {
+        delegate?.bookmarksBarCollectionViewItem(self, performDragOperation: info) ?? false
+    }
+
+    func mouseOverView(_ sender: MouseOverView, draggingExitedWith info: (any NSDraggingInfo)?) {
+        delegate?.bookmarksBarCollectionViewItem(self, draggingExitedWith: info)
     }
 
 }

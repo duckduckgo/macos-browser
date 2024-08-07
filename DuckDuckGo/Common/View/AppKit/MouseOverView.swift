@@ -28,6 +28,12 @@ import Combine
     @objc optional func mouseClickView(_ mouseClickView: MouseClickView, rightMouseDownEvent: NSEvent)
     @objc optional func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent)
 
+    @objc optional func mouseOverView(_ sender: MouseOverView, draggingEntered info: NSDraggingInfo) -> NSDragOperation
+    @objc optional func mouseOverView(_ sender: MouseOverView, draggingUpdatedWith info: NSDraggingInfo) -> NSDragOperation
+    @objc optional func mouseOverView(_ sender: MouseOverView, performDragOperation info: NSDraggingInfo) -> Bool
+    @objc optional func mouseOverView(_ sender: MouseOverView, draggingEndedWith info: NSDraggingInfo)
+    @objc optional func mouseOverView(_ sender: MouseOverView, draggingExitedWith info: NSDraggingInfo?)
+
 }
 typealias MouseClickViewDelegate = MouseOverViewDelegate
 
@@ -51,7 +57,7 @@ internal class MouseOverView: NSControl, Hoverable {
 
     @IBInspectable var clickThrough: Bool = false
 
-    var isMouseOver = false {
+    @objc dynamic var isMouseOver = false {
         didSet {
             delegate?.mouseOverView?(self, isMouseOver: isMouseOver)
             if isMouseDown {
@@ -176,6 +182,34 @@ internal class MouseOverView: NSControl, Hoverable {
         if eventTypeMask.contains(.init(type: event.type)), let action {
             NSApp.sendAction(action, to: target, from: self)
         }
+    }
+
+    override func draggingEntered(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        let operation = delegate?.mouseOverView?(self, draggingEntered: draggingInfo) ?? .none
+        if operation != .none {
+            isMouseOver = true
+        }
+        return operation
+    }
+
+    override func draggingUpdated(_ draggingInfo: any NSDraggingInfo) -> NSDragOperation {
+        let operation = delegate?.mouseOverView?(self, draggingUpdatedWith: draggingInfo) ?? super.draggingUpdated(draggingInfo)
+        isMouseOver = true // (operation != .none)
+        return operation
+    }
+
+    override func performDragOperation(_ draggingInfo: any NSDraggingInfo) -> Bool {
+        return delegate?.mouseOverView?(self, performDragOperation: draggingInfo) ?? false
+    }
+
+    override func draggingEnded(_ draggingInfo: any NSDraggingInfo) {
+        isMouseOver = false
+        delegate?.mouseOverView?(self, draggingEndedWith: draggingInfo)
+    }
+
+    override func draggingExited(_ draggingInfo: NSDraggingInfo?) {
+        isMouseOver = false
+        delegate?.mouseOverView?(self, draggingExitedWith: draggingInfo)
     }
 
 }

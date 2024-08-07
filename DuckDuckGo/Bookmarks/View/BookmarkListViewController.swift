@@ -110,6 +110,7 @@ final class BookmarkListViewController: NSViewController {
     private var importButton: NSButton?
 
     private let bookmarkManager: BookmarkManager
+    private let dragDropManager: BookmarkDragDropManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
     private let treeControllerSearchDataSource: BookmarkListTreeControllerSearchDataSource
     private let sortBookmarksViewModel: SortBookmarksViewModel
@@ -139,6 +140,7 @@ final class BookmarkListViewController: NSViewController {
             contentMode: mode == .bookmarkBarMenu ? .bookmarksMenu : .bookmarksAndFolders,
             bookmarkManager: bookmarkManager,
             treeController: treeController,
+            dragDropManager: dragDropManager,
             sortMode: sortBookmarksViewModel.selectedSortMode,
             onMenuRequestedAction: { [weak self] cell in
                 self?.showContextMenu(for: cell)
@@ -169,11 +171,13 @@ final class BookmarkListViewController: NSViewController {
 
     init(mode: Mode = .popover,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         dragDropManager: BookmarkDragDropManager = BookmarkDragDropManager.shared,
          rootFolder: BookmarkFolder? = nil,
          metrics: BookmarksSearchAndSortMetrics = BookmarksSearchAndSortMetrics()) {
 
         self.mode = mode
         self.bookmarkManager = bookmarkManager
+        self.dragDropManager = dragDropManager
         self.bookmarkMetrics = metrics
         self.sortBookmarksViewModel = SortBookmarksViewModel(metrics: metrics, origin: .panel)
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
@@ -599,14 +603,10 @@ final class BookmarkListViewController: NSViewController {
         preferredContentSize = Constants.preferredContentSize
 
         outlineView.setDraggingSourceOperationMask([.move], forLocal: true)
-        let draggedTypes = [
-            BookmarkPasteboardWriter.bookmarkUTIInternalType,
-            FolderPasteboardWriter.folderUTIInternalType
-        ]
-        outlineView.registerForDraggedTypes(draggedTypes)
+        outlineView.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
         // allow scroll buttons to scroll when dragging bookmark over
-        scrollDownButton?.registerForDraggedTypes(draggedTypes)
-        scrollUpButton?.registerForDraggedTypes(draggedTypes)
+        scrollDownButton?.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
+        scrollUpButton?.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
 
         subscribeToModelEvents()
     }
@@ -649,7 +649,7 @@ final class BookmarkListViewController: NSViewController {
                 self?.scrollViewDidScroll(old: change.old, new: change.new)
             }.store(in: &cancellables)
 
-        scrollUpButton?.$isMouseOver
+        scrollUpButton?.publisher(for: \.isMouseOver)
             .map { isMouseOver in
                 guard isMouseOver else {
                     return Empty<Void, Never>().eraseToAnyPublisher()
@@ -667,7 +667,7 @@ final class BookmarkListViewController: NSViewController {
             }
             .store(in: &cancellables)
 
-        scrollDownButton?.$isMouseOver
+        scrollDownButton?.publisher(for: \.isMouseOver)
             .map { isMouseOver in
                 guard isMouseOver else {
                     return Empty<Void, Never>().eraseToAnyPublisher()

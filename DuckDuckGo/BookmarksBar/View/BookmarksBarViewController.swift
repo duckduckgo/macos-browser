@@ -34,10 +34,15 @@ final class BookmarksBarViewController: NSViewController {
     private var bookmarkListPopover: BookmarkListPopover?
 
     private let bookmarkManager: BookmarkManager
+    private let dragDropManager: BookmarkDragDropManager
     private let viewModel: BookmarksBarViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
 
     private var cancellables = Set<AnyCancellable>()
+
+    private static let maxDragDistanceToExpandHoveredFolder: CGFloat = 4
+    private static let dragOverFolderExpandDelay: TimeInterval = 0.3
+    private var dragDestination: (folder: BookmarkFolder, mouseLocation: NSPoint, hoverStarted: Date)?
 
     fileprivate var clipThreshold: CGFloat {
         let viewWidthWithoutClipIndicator = view.frame.width - clippedItemsIndicator.frame.minX
@@ -53,10 +58,12 @@ final class BookmarksBarViewController: NSViewController {
         }!
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, dragDropManager: BookmarkDragDropManager = BookmarkDragDropManager.shared) {
         self.bookmarkManager = bookmarkManager
+        self.dragDropManager = dragDropManager
+
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.viewModel = BookmarksBarViewModel(bookmarkManager: bookmarkManager, tabCollectionViewModel: tabCollectionViewModel)
+        self.viewModel = BookmarksBarViewModel(bookmarkManager: bookmarkManager, dragDropManager: dragDropManager, tabCollectionViewModel: tabCollectionViewModel)
 
         super.init(coder: coder)
     }
@@ -79,12 +86,13 @@ final class BookmarksBarViewController: NSViewController {
         let nib = NSNib(nibNamed: "BookmarksBarCollectionViewItem", bundle: .main)
         bookmarksBarCollectionView.setDraggingSourceOperationMask([.copy, .move], forLocal: true)
         bookmarksBarCollectionView.register(nib, forItemWithIdentifier: BookmarksBarCollectionViewItem.identifier)
-        bookmarksBarCollectionView.registerForDraggedTypes([
-            .string,
-            .URL,
-            BookmarkPasteboardWriter.bookmarkUTIInternalType,
-            FolderPasteboardWriter.folderUTIInternalType
-        ])
+
+        bookmarksBarCollectionView.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
+
+        clippedItemsIndicator.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
+        clippedItemsIndicator.delegate = self
+        clippedItemsIndicator.sendAction(on: .leftMouseDown)
+
         importBookmarksLabel.stringValue = UserText.importBookmarks
 
         bookmarksBarCollectionView.delegate = viewModel
@@ -174,7 +182,7 @@ final class BookmarksBarViewController: NSViewController {
             }
             .store(in: &cancellables)
 
-        clippedItemsIndicator.$isMouseOver
+        clippedItemsIndicator.publisher(for: \.isMouseOver)
             .sink { [weak self] isMouseOver in
                 guard isMouseOver, let self, let clippedItemsIndicator else { return }
                 mouseDidHover(over: clippedItemsIndicator)
@@ -184,6 +192,32 @@ final class BookmarksBarViewController: NSViewController {
 
     private func unsubscribeFromEvents() {
         cancellables.removeAll()
+    }
+
+    private func dragging(over view: NSView?, representing folder: BookmarkFolder?, updatedWith info: NSDraggingInfo?) {
+        guard let view, let folder, let cursorPosition = info?.draggingLocation else {
+            dragDestination = nil
+            // close all Bookmarks popovers including the Bookmarks Button popover
+            BookmarkListPopover.closeBookmarkListPopovers(shownIn: self.view.window)
+            return
+        }
+        if let bookmarkListPopover, bookmarkListPopover.isShown,
+           (bookmarkListPopover.viewController.representedObject as? BookmarkFolder)?.id == folder.id {
+            // folder menu already shown
+            return
+        }
+
+        // show folder bookmarks menu after 0.3
+        if let dragDestination,
+           dragDestination.folder.id == folder.id,
+           dragDestination.mouseLocation.distance(to: cursorPosition) < Self.maxDragDistanceToExpandHoveredFolder {
+
+            if Date().timeIntervalSince(dragDestination.hoverStarted) >= Self.dragOverFolderExpandDelay {
+                showSubmenu(for: folder, fromView: view)
+            }
+        } else {
+            self.dragDestination = (folder: folder, mouseLocation: cursorPosition, hoverStarted: Date())
+        }
     }
 
     // MARK: - Layout
@@ -288,6 +322,37 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         } else {
             bookmarkListPopover.close()
         }
+    }
+
+    func dragging(over item: Any?, updatedWith info: (any NSDraggingInfo)?) {
+        guard let info, let item = item as? BookmarksBarCollectionViewItem,
+              let folder = item.representedObject as? BookmarkFolder else {
+            self.dragging(over: nil, representing: nil, updatedWith: info)
+            return
+        }
+
+        self.dragging(over: item.view, representing: folder, updatedWith: info)
+    }
+
+}
+
+extension BookmarksBarViewController: MouseOverButtonDelegate {
+
+    func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo) -> NSDragOperation {
+        guard sender === clippedItemsIndicator else { return .none }
+        return dragDropManager.validateDrop(info, to: clippedItemsBookmarkFolder())
+    }
+
+    func mouseOverButton(_ sender: MouseOverButton, draggingUpdatedWith info: any NSDraggingInfo) -> NSDragOperation {
+        guard sender === clippedItemsIndicator else { return .none }
+        let clippedItemsBookmarkFolder = clippedItemsBookmarkFolder()
+        self.dragging(over: sender, representing: clippedItemsBookmarkFolder, updatedWith: info)
+        return dragDropManager.validateDrop(info, to: clippedItemsBookmarkFolder)
+    }
+
+    func mouseOverButton(_ sender: MouseOverButton, performDragOperation info: any NSDraggingInfo) -> Bool {
+        guard sender === clippedItemsIndicator else { return false }
+        return dragDropManager.acceptDrop(info, to: clippedItemsBookmarkFolder(), at: -1)
     }
 
 }
@@ -395,6 +460,14 @@ private extension BookmarksBarViewController {
         }
 
         bookmarkListPopover.show(positionedBelow: view)
+
+        if view === clippedItemsIndicator {
+            // display pressed state
+            clippedItemsIndicator.backgroundColor = .buttonMouseDown
+            clippedItemsIndicator.mouseOverColor = .buttonMouseDown
+        } else if let collectionViewItem = view.nextResponder as? BookmarksBarCollectionViewItem {
+            collectionViewItem.isDisplayingMouseDownState = true
+        }
     }
 
     func addFolder(inParent parent: BookmarkFolder?) {
@@ -437,7 +510,7 @@ extension BookmarksBarViewController: NSPopoverDelegate {
         if NSApp.currentEvent?.type == .leftMouseUp {
            if let point = bookmarksBarCollectionView.mouseLocationInsideBounds(),
               let indexPath = bookmarksBarCollectionView.indexPathForItem(at: point),
-              let _ = bookmarkManager.list?.topLevelEntities[safe: indexPath.item] as? BookmarkFolder {
+              bookmarkManager.list?.topLevelEntities[safe: indexPath.item] is BookmarkFolder {
                // we‘ll close the popover inside the click handler calling `showSubmenu`
                return false
            } else if clippedItemsIndicator.mouseLocationInsideBounds() != nil {
@@ -445,8 +518,19 @@ extension BookmarksBarViewController: NSPopoverDelegate {
                return false
            }
         }
-
         return true
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+        guard let bookmarkListPopover = notification.object as? BookmarkListPopover,
+              let positioningView = bookmarkListPopover.positioningView else { return }
+
+        if positioningView === clippedItemsIndicator {
+            clippedItemsIndicator.backgroundColor = .clear
+            clippedItemsIndicator.mouseOverColor = .buttonMouseOver
+        } else if let collectionViewItem = positioningView.nextResponder as? BookmarksBarCollectionViewItem {
+            collectionViewItem.isDisplayingMouseDownState = false
+        }
     }
 
 }
