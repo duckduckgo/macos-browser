@@ -43,15 +43,12 @@ extension HomePage.Views {
                     SettingsSection(title: "Background") {
                         VStack(spacing: 12) {
                             HStack(spacing: 12) {
-                                BackgroundType(title: "Gradients", isSelected: false)
-                                BackgroundType(
-                                    title: "Solid Colors",
-                                    isSelected: model.customBackground?.isSolidColor == true
-                                )
+                                BackgroundMode(title: "Gradients", isSelected: model.isGradientSelected, customBackground: .placeholderGradient)
+                                BackgroundMode(title: "Solid Colors", isSelected: model.isSolidColorSelected, customBackground: .placeholderColor)
                             }
                             HStack(spacing: 12) {
-                                BackgroundType(title: "Illustrations", isSelected: false)
-                                BackgroundType(title: "Upload Image", isSelected: false)
+                                BackgroundMode(title: "Illustrations", isSelected: model.isIllustrationSelected, customBackground: .placeholderIllustration)
+                                BackgroundMode(title: "Upload Image", isSelected: model.isCustomImageSelected, customBackground: .placeholderCustomImage)
                             }
                         }
                     }
@@ -86,6 +83,25 @@ extension HomePage.Views {
         }
     }
 
+    struct BackgroundMode: View {
+        let title: String
+        let isSelected: Bool
+        let customBackground: HomePage.Models.SettingsModel.CustomBackground
+
+        @EnvironmentObject var model: HomePage.Models.SettingsModel
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 6) {
+                BackgroundPreview(isSelected: isSelected) {
+                    customBackground.preview.scaledToFill()
+                }
+
+                Text(title)
+                    .font(.system(size: 11))
+            }
+        }
+    }
+
     struct BackgroundPreview<Content>: View where Content: View {
         let isSelected: Bool
         @ViewBuilder public let content: () -> Content
@@ -116,36 +132,15 @@ extension HomePage.Views {
                 .padding(-2)
             }
         }
-
     }
-
-    struct BackgroundType: View {
-        let title: String
-        let isSelected: Bool
-
-        @EnvironmentObject var model: HomePage.Models.SettingsModel
-
-        var body: some View {
-            VStack(alignment: .leading, spacing: 6) {
-                BackgroundPreview(isSelected: isSelected) {
-                    if isSelected, let preview = model.customBackground?.preview {
-                        preview
-                    } else {
-                        EmptyView()
-                    }
-                }
-
-                Text(title)
-                    .font(.system(size: 11))
-            }
-        }
-    }
-
 }
 
 extension HomePage.Models.SettingsModel.CustomBackground {
+    @ViewBuilder
     var preview: some View {
         switch self {
+        case .gradient(let image), .illustration(let image), .customImage(let image):
+            image.resizable()
         case .solidColor(let solidColor):
             solidColor.color
         }
@@ -157,7 +152,7 @@ extension HomePage.Views.SettingsView {
     fileprivate typealias SettingsSection = HomePage.Views.SettingsSection
 }
 
-extension HomePage.Views.BackgroundType {
+extension HomePage.Views.BackgroundMode {
     fileprivate typealias BackgroundPreview = HomePage.Views.BackgroundPreview
 }
 

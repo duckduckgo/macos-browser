@@ -23,12 +23,43 @@ extension HomePage.Models {
 
     final class SettingsModel: ObservableObject {
         @Published var customBackground: CustomBackground?
+
+        var isGradientSelected: Bool {
+            guard case .gradient = customBackground else {
+                return false
+            }
+            return true
+        }
+
+        var isSolidColorSelected: Bool {
+            guard case .solidColor = customBackground else {
+                return false
+            }
+            return true
+        }
+
+        var isIllustrationSelected: Bool {
+            guard case .illustration = customBackground else {
+                return false
+            }
+            return true
+        }
+
+        var isCustomImageSelected: Bool {
+            guard case .customImage = customBackground else {
+                return false
+            }
+            return true
+        }
     }
 }
 
 extension HomePage.Models.SettingsModel {
     enum CustomBackground {
+        case gradient(Image)
         case solidColor(SolidColor)
+        case illustration(Image)
+        case customImage(Image)
 
         var isSolidColor: Bool {
             guard case .solidColor = self else {
@@ -36,6 +67,11 @@ extension HomePage.Models.SettingsModel {
             }
             return true
         }
+
+        static let placeholderGradient = CustomBackground.gradient(Image(nsImage: NSImage.homePageBackgroundGradient03))
+        static let placeholderColor = CustomBackground.solidColor(.lightPurple)
+        static let placeholderIllustration = CustomBackground.illustration(Image(nsImage: NSImage.homePageBackgroundIllustration01))
+        static let placeholderCustomImage = CustomBackground.solidColor(.gray)
     }
 
     enum SolidColor: Equatable {
