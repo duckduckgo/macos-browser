@@ -112,6 +112,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionWireguardErrorCannotSetNetworkSettings(error)
             case .startWireGuardBackend(let code):
                 domainEvent = .networkProtectionWireguardErrorCannotStartWireguardBackend(code: code)
+            case .setWireguardConfig(let errorCode):
+                domainEvent = .networkProtectionWireguardErrorCannotSetWireguardConfig(errorCode: errorCode)
             case .noAuthTokenFound:
                 domainEvent = .networkProtectionNoAuthTokenFoundError
             case .failedToFetchServerStatus(let error):
