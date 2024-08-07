@@ -64,7 +64,6 @@ final class UserText {
     static let networkProtectionStatusDisconnecting = NSLocalizedString("network.protection.status.disconnecting", value: "Disconnecting...", comment: "The label for the NetP VPN when disconnecting")
     static let networkProtectionStatusConnected = NSLocalizedString("network.protection.status.connected", value: "Connected", comment: "The label for the NetP VPN when connected")
     static let networkProtectionStatusConnecting = NSLocalizedString("network.protection.status.connected", value: "Connecting...", comment: "The label for the NetP VPN when connecting")
-    static let networkProtectionStatusSnoozing = NSLocalizedString("network.protection.status.snoozing", value: "Snoozing", comment: "The label for the NetP VPN when snoozing")
 
     // MARK: - Connection Issues
 
