@@ -269,6 +269,8 @@ struct FavoriteTemplate: View {
         }
     }
 
+    @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
+
     var body: some View {
         VStack(spacing: 5) {
 
@@ -280,17 +282,31 @@ struct FavoriteTemplate: View {
                         .shadow(color: isHovering ? .clear : .black.opacity(0.16), radius: 1.5, x: 0, y: 0)
                         .shadow(color: isHovering ? .clear : .black.opacity(0.12), radius: 2, x: 0, y: 2)
 
-                    RoundedRectangle(cornerRadius: 12)
-                        .vibrancyEffect()
-                        .cornerRadius(12)
-                        .blendMode(.destinationOut)
+                    if settingsModel.customBackground != nil {
+                        RoundedRectangle(cornerRadius: 12)
+                            .vibrancyEffect()
+                            .cornerRadius(12)
+                            .blendMode(.destinationOut)
+                    } else {
+                        RoundedRectangle(cornerRadius: 12)
+                            .background(Color.homeFavoritesBackground)
+                            .cornerRadius(12)
+                            .blendMode(.destinationOut)
+                    }
                 }
                 .compositingGroup()
 
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isHovering ? .buttonMouseOver : .clear)
-                    .vibrancyEffect()
-                    .cornerRadius(12)
+                if settingsModel.customBackground != nil {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(isHovering ? .buttonMouseOver : .clear)
+                        .vibrancyEffect()
+                        .cornerRadius(12)
+                } else {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(isHovering ? .buttonMouseOver : .clear)
+                        .background(Color.homeFavoritesBackground)
+                        .cornerRadius(12)
+                }
 
                 if let url = url {
                     FaviconView(url: url, onFaviconMissing: onFaviconMissing)
