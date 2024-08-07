@@ -1802,6 +1802,7 @@
 		9D9DE5792C63AA1A00D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE5782C63AA1A00D20B15 /* AppKitExtensions */; };
 		9D9DE57B2C63AA1F00D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE57A2C63AA1F00D20B15 /* AppKitExtensions */; };
 		9D9DE57D2C63AA2400D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE57C2C63AA2400D20B15 /* AppKitExtensions */; };
+		9D9DE57F2C63B64F00D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE57E2C63B64F00D20B15 /* AppKitExtensions */; };
 		9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC70B192AA1FA5B005A844B /* LoginItems */; };
 		9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 9DEF97E02B06C4EE00764F03 /* Networking */; };
 		9F0660732BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0660722BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift */; };
@@ -4490,6 +4491,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EE02D4202BB460C000DBE6B3 /* BrowserServicesKit in Frameworks */,
+				9D9DE57F2C63B64F00D20B15 /* AppKitExtensions in Frameworks */,
 				B64E42872B908501006C1346 /* SnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8946,6 +8948,7 @@
 			packageProductDependencies = (
 				B65CD8D22B316E1700A595BB /* SnapshotTesting */,
 				EE02D41F2BB460C000DBE6B3 /* BrowserServicesKit */,
+				9D9DE57E2C63B64F00D20B15 /* AppKitExtensions */,
 			);
 			productName = "UI Tests";
 			productReference = 7B4CE8DA26F02108009134B1 /* UI Tests.xctest */;
@@ -13943,6 +13946,10 @@
 			productName = AppKitExtensions;
 		};
 		9D9DE57C2C63AA2400D20B15 /* AppKitExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppKitExtensions;
+		};
+		9D9DE57E2C63B64F00D20B15 /* AppKitExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppKitExtensions;
 		};
