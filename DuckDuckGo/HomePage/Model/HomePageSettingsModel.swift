@@ -22,7 +22,56 @@ import SwiftUI
 extension HomePage.Models {
 
     final class SettingsModel: ObservableObject {
+
+        enum ContentType: Equatable {
+            case root
+            case gradientPicker
+            case colorPicker
+            case illustrationPicker
+            case customImagePicker
+        }
+
+        @Published var contentType: ContentType = .root
         @Published var customBackground: CustomBackground?
+
+        @ViewBuilder
+        var backgroundView: some View {
+            if let customBackground {
+                customBackground.view
+            } else {
+                Color.newTabPageBackground
+            }
+        }
+
+        @ViewBuilder
+        func backgroundPreview(for backgroundType: CustomBackgroundType) -> some View {
+            switch backgroundType {
+            case .gradient:
+                if isGradientSelected, let preview = customBackground?.preview {
+                    preview
+                } else {
+                    backgroundType.placeholderView
+                }
+            case .solidColor:
+                if isSolidColorSelected, let preview = customBackground?.preview {
+                    preview
+                } else {
+                    backgroundType.placeholderView
+                }
+            case .illustration:
+                if isIllustrationSelected, let preview = customBackground?.preview {
+                    preview
+                } else {
+                    backgroundType.placeholderView
+                }
+            case .customImage:
+                if isCustomImageSelected, let preview = customBackground?.preview {
+                    preview
+                } else {
+                    backgroundType.placeholderView
+                }
+            }
+        }
 
         var isGradientSelected: Bool {
             guard case .gradient = customBackground else {
@@ -55,6 +104,24 @@ extension HomePage.Models {
 }
 
 extension HomePage.Models.SettingsModel {
+    enum CustomBackgroundType {
+        case gradient, solidColor, illustration, customImage
+
+        @ViewBuilder
+        var placeholderView: some View {
+            switch self {
+            case .gradient:
+                CustomBackground.placeholderGradient.preview
+            case .solidColor:
+                CustomBackground.placeholderColor.preview
+            case .illustration:
+                CustomBackground.placeholderIllustration.preview
+            case .customImage:
+                CustomBackground.placeholderCustomImage.preview
+            }
+        }
+    }
+
     enum CustomBackground {
         case gradient(Image)
         case solidColor(SolidColor)
@@ -68,27 +135,104 @@ extension HomePage.Models.SettingsModel {
             return true
         }
 
-        static let placeholderGradient = CustomBackground.gradient(Image(nsImage: NSImage.homePageBackgroundGradient03))
+        @ViewBuilder
+        var view: some View {
+            switch self {
+            case .gradient(let image), .illustration(let image), .customImage(let image):
+                image.resizable().aspectRatio(contentMode: .fill)
+            case .solidColor(let solidColor):
+                solidColor.color
+            }
+        }
+
+        static let placeholderGradient = CustomBackground.gradient(Image(nsImage: .homePageBackgroundGradient03))
         static let placeholderColor = CustomBackground.solidColor(.lightPurple)
-        static let placeholderIllustration = CustomBackground.illustration(Image(nsImage: NSImage.homePageBackgroundIllustration01))
+        static let placeholderIllustration = CustomBackground.illustration(Image(nsImage: .homePageBackgroundIllustration01))
         static let placeholderCustomImage = CustomBackground.solidColor(.gray)
     }
 
-    enum SolidColor: Equatable {
+    enum Gradient: Equatable, Identifiable, CaseIterable {
+        var id: Self {
+            self
+        }
+
+        case gradient01
+        case gradient02
+        case gradient03
+        case gradient04
+        case gradient05
+        case gradient06
+        case gradient07
+
+        var image: Image {
+            switch self {
+            case .gradient01:
+                Image(nsImage: .homePageBackgroundGradient01)
+            case .gradient02:
+                Image(nsImage: .homePageBackgroundGradient02)
+            case .gradient03:
+                Image(nsImage: .homePageBackgroundGradient03)
+            case .gradient04:
+                Image(nsImage: .homePageBackgroundGradient04)
+            case .gradient05:
+                Image(nsImage: .homePageBackgroundGradient05)
+            case .gradient06:
+                Image(nsImage: .homePageBackgroundGradient06)
+            case .gradient07:
+                Image(nsImage: .homePageBackgroundGradient07)
+            }
+        }
+    }
+
+    enum Illustration: Equatable, Identifiable, CaseIterable {
+        var id: Self {
+            self
+        }
+
+        case illustration01
+        case illustration02
+        case illustration03
+        case illustration04
+        case illustration05
+        case illustration06
+
+        var image: Image {
+            switch self {
+            case .illustration01:
+                Image(nsImage: .homePageBackgroundIllustration01)
+            case .illustration02:
+                Image(nsImage: .homePageBackgroundIllustration02)
+            case .illustration03:
+                Image(nsImage: .homePageBackgroundIllustration03)
+            case .illustration04:
+                Image(nsImage: .homePageBackgroundIllustration04)
+            case .illustration05:
+                Image(nsImage: .homePageBackgroundIllustration05)
+            case .illustration06:
+                Image(nsImage: .homePageBackgroundIllustration06)
+            }
+        }
+    }
+
+    enum SolidColor: Equatable, Identifiable, CaseIterable {
+        var id: Self {
+            self
+        }
+
+        case lightPink
+        case darkPink
+        case lightOrange
+        case darkOrange
+        case lightYellow
+        case darkYellow
+        case lightGreen
+        case darkGreen
+        case lightBlue
+        case darkBlue
+        case lightPurple
+        case darkPurple
         case gray
         case black
-        case lightPink
-        case lightOrange
-        case lightYellow
-        case lightGreen
-        case lightBlue
-        case lightPurple
-        case darkPink
-        case darkOrange
-        case darkYellow
-        case darkGreen
-        case darkBlue
-        case darkPurple
 
         var color: Color {
             switch self {

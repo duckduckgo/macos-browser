@@ -40,23 +40,19 @@ extension HomePage.Views {
                             }
                         }
                     }
-                    SettingsSection(title: "Background") {
-                        VStack(spacing: 12) {
-                            HStack(spacing: 12) {
-                                BackgroundMode(title: "Gradients", isSelected: model.isGradientSelected, customBackground: .placeholderGradient)
-                                BackgroundMode(title: "Solid Colors", isSelected: model.isSolidColorSelected, customBackground: .placeholderColor)
-                            }
-                            HStack(spacing: 12) {
-                                BackgroundMode(title: "Illustrations", isSelected: model.isIllustrationSelected, customBackground: .placeholderIllustration)
-                                BackgroundMode(title: "Upload Image", isSelected: model.isCustomImageSelected, customBackground: .placeholderCustomImage)
-                            }
+                    Group {
+                        switch model.contentType {
+                        case .root:
+                            rootView
+                        case .colorPicker:
+                            colorPickerView
+                        case .gradientPicker:
+                            gradientPickerView
+                        case .illustrationPicker:
+                            illustrationPickerView
+                        case .customImagePicker:
+                            backButton(title: "Custom Image")
                         }
-                    }
-                    SettingsSection(title: "Browser Theme") {
-
-                    }
-                    SettingsSection(title: "Sections") {
-
                     }
                     Spacer()
                 }
@@ -67,6 +63,130 @@ extension HomePage.Views {
             .background(Color.homeSettingsBackground)
             .shadow(color: .black.opacity(0.12), radius: 6, x: 0, y: 8)
             .shadow(color: .black.opacity(0.08), radius: 1, x: 0, y: 0)
+        }
+
+        func backButton(title: String) -> some View {
+            Button {
+                model.contentType = .root
+            } label: {
+                HStack(spacing: 4) {
+                    Image(nsImage: .chevronMediumRight16).rotationEffect(.degrees(180))
+                    Text(title).font(.system(size: 15).weight(.semibold))
+                    Spacer()
+                }
+            }
+            .buttonStyle(.plain)
+        }
+
+        @ViewBuilder
+        var rootView: some View {
+            SettingsSection(title: "Background") {
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        BackgroundMode(title: "Gradients", isSelected: model.isGradientSelected) {
+                            model.contentType = .gradientPicker
+                        } backgroundPreview: {
+                            model.backgroundPreview(for: .gradient)
+                        }
+                        BackgroundMode(title: "Solid Colors", isSelected: model.isSolidColorSelected) {
+                            model.contentType = .colorPicker
+                        } backgroundPreview: {
+                            model.backgroundPreview(for: .solidColor)
+                        }
+                    }
+                    HStack(spacing: 12) {
+                        BackgroundMode(title: "Illustrations", isSelected: model.isIllustrationSelected) {
+                            model.contentType = .illustrationPicker
+                        } backgroundPreview: {
+                            model.backgroundPreview(for: .illustration)
+                        }
+                        BackgroundMode(title: "Upload Image", isSelected: model.isCustomImageSelected) {
+                            model.contentType = .customImagePicker
+                        } backgroundPreview: {
+                            model.backgroundPreview(for: .customImage)
+                        }
+                    }
+                }
+            }
+            SettingsSection(title: "Browser Theme") {
+
+            }
+            SettingsSection(title: "Sections") {
+
+            }
+        }
+
+        @ViewBuilder
+        var colorPickerView: some View {
+            VStack(spacing: 16) {
+                backButton(title: "Solid Colors")
+                grid(with: HomePage.Models.SettingsModel.SolidColor.allCases) { solidColor in
+                    Button {
+                        model.customBackground = .solidColor(solidColor)
+                        model.contentType = .root
+                    } label: {
+                        BackgroundPreview(isSelected: false) {
+                            solidColor.color.scaledToFill()
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+
+        @ViewBuilder var gradientPickerView: some View {
+            VStack(spacing: 16) {
+                backButton(title: "Gradients")
+                grid(with: HomePage.Models.SettingsModel.Gradient.allCases) { gradient in
+                    Button {
+                        model.customBackground = .gradient(gradient.image)
+                        model.contentType = .root
+                    } label: {
+                        BackgroundPreview(isSelected: false) {
+                            gradient.image.resizable().scaledToFill()
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+
+        @ViewBuilder var illustrationPickerView: some View {
+            VStack(spacing: 16) {
+                backButton(title: "Illustrations")
+                grid(with: HomePage.Models.SettingsModel.Illustration.allCases) { illustration in
+                    Button {
+                        model.customBackground = .illustration(illustration.image)
+                        model.contentType = .root
+                    } label: {
+                        BackgroundPreview(isSelected: false) {
+                            illustration.image.resizable().scaledToFill()
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+
+        @ViewBuilder
+        func grid<T: Identifiable & Hashable>(with items: [T], @ViewBuilder itemView: @escaping (T) -> some View) -> some View {
+            if #available(macOS 12.0, *) {
+                LazyVGrid(
+                    columns: Array(repeating: GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: 12), count: 2),
+                    spacing: 12
+                ) {
+                    ForEach(items, content: itemView)
+                }
+            } else {
+                let rows = items.chunked(into: 2)
+                VStack(spacing: 12) {
+                    ForEach(rows, id: \.self) { row in
+                        HStack(spacing: 12) {
+                            ForEach(row, content: itemView)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -83,22 +203,26 @@ extension HomePage.Views {
         }
     }
 
-    struct BackgroundMode: View {
+    struct BackgroundMode<Content>: View where Content: View {
         let title: String
         let isSelected: Bool
-        let customBackground: HomePage.Models.SettingsModel.CustomBackground
+        let action: () -> Void
+        @ViewBuilder public let backgroundPreview: () -> Content
 
         @EnvironmentObject var model: HomePage.Models.SettingsModel
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 6) {
-                BackgroundPreview(isSelected: isSelected) {
-                    customBackground.preview.scaledToFill()
-                }
+            Button(action: action) {
+                VStack(alignment: .leading, spacing: 6) {
+                    BackgroundPreview(isSelected: isSelected) {
+                        backgroundPreview().scaledToFill()
+                    }
 
-                Text(title)
-                    .font(.system(size: 11))
+                    Text(title)
+                        .font(.system(size: 11))
+                }
             }
+            .buttonStyle(.plain)
         }
     }
 
@@ -150,6 +274,8 @@ extension HomePage.Models.SettingsModel.CustomBackground {
 extension HomePage.Views.SettingsView {
     fileprivate typealias CloseButton = HomePage.Views.CloseButton
     fileprivate typealias SettingsSection = HomePage.Views.SettingsSection
+    fileprivate typealias BackgroundPreview = HomePage.Views.BackgroundPreview
+    fileprivate typealias BackgroundMode = HomePage.Views.BackgroundMode
 }
 
 extension HomePage.Views.BackgroundMode {

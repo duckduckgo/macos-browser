@@ -25,7 +25,6 @@ extension HomePage.Views {
 
     struct RootView: View {
 
-        let backgroundColor: Color = .newTabPageBackground
         static let targetWidth: CGFloat = 508
         let settingsPanelWidth: CGFloat = 236
         let isBurner: Bool
@@ -101,7 +100,8 @@ extension HomePage.Views {
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .background(backgroundColor)
+                .background(settingsModel.backgroundView)
+                .clipped()
                 .onAppear {
                     LocalBookmarkManager.shared.requestSync()
                 }
