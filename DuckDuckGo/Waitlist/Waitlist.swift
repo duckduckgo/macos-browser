@@ -64,8 +64,6 @@ enum WaitlistInviteCodeFetchError: Error, Equatable {
 extension Notification.Name {
 
     static let networkProtectionWaitlistAccessChanged = Notification.Name(rawValue: "networkProtectionWaitlistAccessChanged")
-    static let dataBrokerProtectionWaitlistAccessChanged = Notification.Name(rawValue: "dataBrokerProtectionWaitlistAccessChanged")
-    static let dataBrokerProtectionUserPressedOnGetStartedOnWaitlist = Notification.Name(rawValue: "dataBrokerProtectionUserPressedOnGetStartedOnWaitlist")
 
 }
 
@@ -153,85 +151,3 @@ extension ProductWaitlistRequest {
         self.init(productName: productName, makeHTTPRequest: makeHTTPRequest)
     }
 }
-
-#if DBP
-
-// MARK: - DataBroker Protection Waitlist
-
-import DataBrokerProtection
-
-struct DataBrokerProtectionWaitlist: Waitlist {
-
-    static let identifier: String = "databrokerprotection"
-    static let apiProductName: String = "dbp"
-    static let keychainAppGroup: String = Bundle.main.appGroup(bundle: .dbp)
-
-    static let notificationIdentifier = "com.duckduckgo.macos.browser.data-broker-protection.invite-code-available"
-    static let inviteAvailableNotificationTitle = UserText.dataBrokerProtectionWaitlistNotificationTitle
-    static let inviteAvailableNotificationBody = UserText.dataBrokerProtectionWaitlistNotificationText
-
-    let waitlistStorage: WaitlistStorage
-    let waitlistRequest: WaitlistRequest
-
-    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
-    private let redeemAuthenticationRepository: AuthenticationRepository
-
-    var readyToAcceptTermsAndConditions: Bool {
-        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
-        return waitlistStorage.isInvited && !accepted
-    }
-
-    init() {
-        self.init(
-            store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier, keychainAppGroup: Self.keychainAppGroup),
-            request: ProductWaitlistRequest(productName: Self.apiProductName),
-            redeemUseCase: RedeemUseCase(),
-            redeemAuthenticationRepository: KeychainAuthenticationData()
-        )
-    }
-
-    init(store: WaitlistStorage, request: WaitlistRequest,
-         redeemUseCase: DataBrokerProtectionRedeemUseCase,
-         redeemAuthenticationRepository: AuthenticationRepository) {
-        self.waitlistStorage = store
-        self.waitlistRequest = request
-        self.redeemUseCase = redeemUseCase
-        self.redeemAuthenticationRepository = redeemAuthenticationRepository
-    }
-
-    private func fetchInviteCode() async throws -> String {
-
-        // First check if we have it stored locally
-        if let inviteCode = waitlistStorage.getWaitlistInviteCode() {
-            return inviteCode
-        }
-
-        // If not, then try to fetch it remotely
-        _ = await fetchInviteCodeIfAvailable()
-
-        // Try to fetch it from storage again
-        if let inviteCode = waitlistStorage.getWaitlistInviteCode() {
-            return inviteCode
-        } else {
-            throw WaitlistInviteCodeFetchError.noCodeAvailable
-        }
-    }
-
-    private func redeemInviteCode(_ inviteCode: String) async throws {
-        os_log("Redeeming DBP invite code...", log: .dataBrokerProtection)
-
-        try await redeemUseCase.redeem(inviteCode: inviteCode)
-        NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
-
-        os_log("DBP invite code redeemed", log: .dataBrokerProtection)
-        UserDefaults().setValue(true, forKey: UserDefaultsWrapper<Bool>.Key.shouldShowDBPWaitlistInvitedCardUI.rawValue)
-
-        sendInviteCodeAvailableNotification {
-            DispatchQueue.main.async {
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
-            }
-        }
-    }
-}
-
-#endif

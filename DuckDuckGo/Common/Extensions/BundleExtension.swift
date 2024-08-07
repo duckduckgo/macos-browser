@@ -38,10 +38,8 @@ extension Bundle {
 
         static let ipcAppGroup = "IPC_APP_GROUP"
 
-#if DBP
         static let dbpBackgroundAgentBundleId = "DBP_BACKGROUND_AGENT_BUNDLE_ID"
         static let dbpBackgroundAgentProductName = "DBP_BACKGROUND_AGENT_PRODUCT_NAME"
-#endif
     }
 
     var buildNumber: String {
@@ -87,7 +85,6 @@ extension Bundle {
     }
 #endif
 
-#if DBP
     var dbpBackgroundAgentBundleId: String {
         guard let bundleID = object(forInfoDictionaryKey: Keys.dbpBackgroundAgentBundleId) as? String else {
             fatalError("Info.plist is missing \(Keys.dbpBackgroundAgentBundleId)")
@@ -101,7 +98,6 @@ extension Bundle {
         }
         return loginItemsURL.appendingPathComponent(productName + ".app")
     }
-#endif
 
     func appGroup(bundle: BundleGroup) -> String {
         let appGroupName = bundle.appGroupKey
