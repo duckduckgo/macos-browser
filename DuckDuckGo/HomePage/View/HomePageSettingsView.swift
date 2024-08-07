@@ -35,8 +35,17 @@ extension HomePage.Views {
                             .font(.system(size: 17).bold())
                         Spacer()
                         CloseButton(icon: .closeLarge, size: 28) {
-                            withAnimation {
-                                isSettingsVisible = false
+                            if #available(macOS 14.0, *) {
+                                withAnimation {
+                                    isSettingsVisible = false
+                                } completion: {
+                                    model.contentType = .root
+                                }
+                            } else {
+                                withAnimation {
+                                    isSettingsVisible = false
+                                    model.contentType = .root
+                                }
                             }
                         }
                     }
@@ -44,14 +53,19 @@ extension HomePage.Views {
                         switch model.contentType {
                         case .root:
                             rootView
+                                .transition(.move(edge: .leading).combined(with: .opacity))
                         case .colorPicker:
                             colorPickerView
+                                .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .gradientPicker:
                             gradientPickerView
+                                .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .illustrationPicker:
                             illustrationPickerView
+                                .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .customImagePicker:
                             backButton(title: "Custom Image")
+                                .transition(.move(edge: .trailing).combined(with: .opacity))
                         }
                     }
                     Spacer()
@@ -67,7 +81,9 @@ extension HomePage.Views {
 
         func backButton(title: String) -> some View {
             Button {
-                model.contentType = .root
+                withAnimation {
+                    model.contentType = .root
+                }
             } label: {
                 HStack(spacing: 4) {
                     Image(nsImage: .chevronMediumRight16).rotationEffect(.degrees(180))
@@ -84,30 +100,40 @@ extension HomePage.Views {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(spacing: 12) {
                         BackgroundMode(title: "Gradients", isSelected: model.isGradientSelected) {
-                            model.contentType = .gradientPicker
+                            withAnimation {
+                                model.contentType = .gradientPicker
+                            }
                         } backgroundPreview: {
                             model.backgroundPreview(for: .gradient)
                         }
                         BackgroundMode(title: "Solid Colors", isSelected: model.isSolidColorSelected) {
-                            model.contentType = .colorPicker
+                            withAnimation {
+                                model.contentType = .colorPicker
+                            }
                         } backgroundPreview: {
                             model.backgroundPreview(for: .solidColor)
                         }
                     }
                     HStack(spacing: 12) {
                         BackgroundMode(title: "Illustrations", isSelected: model.isIllustrationSelected) {
-                            model.contentType = .illustrationPicker
+                            withAnimation {
+                                model.contentType = .illustrationPicker
+                            }
                         } backgroundPreview: {
                             model.backgroundPreview(for: .illustration)
                         }
                         BackgroundMode(title: "Upload Image", isSelected: model.isCustomImageSelected) {
-                            model.contentType = .customImagePicker
+                            withAnimation {
+                                model.contentType = .customImagePicker
+                            }
                         } backgroundPreview: {
                             model.backgroundPreview(for: .customImage)
                         }
                     }
                     TextButton("Reset Background") {
-                        model.customBackground = nil
+                        withAnimation {
+                            model.customBackground = nil
+                        }
                     }
                 }
             }
@@ -125,7 +151,9 @@ extension HomePage.Views {
                 backButton(title: "Solid Colors")
                 grid(with: HomePage.Models.SettingsModel.SolidColor.allCases) { solidColor in
                     Button {
-                        model.customBackground = .solidColor(solidColor)
+                        withAnimation {
+                            model.customBackground = .solidColor(solidColor)
+                        }
                     } label: {
                         BackgroundPreview(isSelected: model.customBackground == .solidColor(solidColor)) {
                             solidColor.color.scaledToFill()
@@ -142,7 +170,9 @@ extension HomePage.Views {
                 backButton(title: "Gradients")
                 grid(with: HomePage.Models.SettingsModel.Gradient.allCases) { gradient in
                     Button {
-                        model.customBackground = .gradient(gradient)
+                        withAnimation {
+                            model.customBackground = .gradient(gradient)
+                        }
                     } label: {
                         BackgroundPreview(isSelected: model.customBackground == .gradient(gradient)) {
                             gradient.image.resizable().scaledToFill()
@@ -159,7 +189,9 @@ extension HomePage.Views {
                 backButton(title: "Illustrations")
                 grid(with: HomePage.Models.SettingsModel.Illustration.allCases) { illustration in
                     Button {
-                        model.customBackground = .illustration(illustration)
+                        withAnimation {
+                            model.customBackground = .illustration(illustration)
+                        }
                     } label: {
                         BackgroundPreview(isSelected: model.customBackground == .illustration(illustration)) {
                             illustration.image.resizable().scaledToFill()
