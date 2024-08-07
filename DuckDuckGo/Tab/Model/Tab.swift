@@ -77,6 +77,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     private(set) var userContentController: UserContentController?
+    private(set) var specialPagesUserScript: SpecialPagesUserScript?
 
     @MainActor
     convenience init(content: TabContent,
@@ -202,9 +203,14 @@ protocol NewWindowPolicyDecisionMaker {
         self.startupPreferences = startupPreferences
         self.tabsPreferences = tabsPreferences
 
+        self.specialPagesUserScript = SpecialPagesUserScript()
+        specialPagesUserScript?
+            .withAllSubfeatures()
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
-                                                 burnerMode: burnerMode)
+                                                 burnerMode: burnerMode,
+                                                 earlyAccessUserScripts: specialPagesUserScript.map { [$0] } ?? [])
+
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
         assert(userContentController != nil)
