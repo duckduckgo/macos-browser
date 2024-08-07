@@ -183,6 +183,12 @@
                <Test
                   Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
                </Test>
+               <Test
+                  Identifier = "TabContentTests/testWhenPDFContextMenuPrintChosen_printDialogOpens()">
+               </Test>
+               <Test
+                  Identifier = "TabContentTests/testWhenPDFContextMenuSaveAsChosen_saveDialogOpens()">
+               </Test>
             </SkippedTests>
          </TestableReference>
          <TestableReference

@@ -75,7 +75,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
         self.delegate = _delegate
 
 #if DEBUG
-        if let token = accountManager.accessToken {
+        if accountManager.accessToken != nil {
             os_log(.error, log: .networkProtection, "🟢 VPN Agent found token")
         } else {
             os_log(.error, log: .networkProtection, "🔴 VPN Agent found no token")
@@ -311,6 +311,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         }.eraseToAnyPublisher()
 
         let model = StatusBarMenuModel(vpnSettings: .init(defaults: .netP))
+        let uiActionHandler = VPNUIActionHandler(
+            appLauncher: appLauncher,
+            proxySettings: proxySettings)
 
         return StatusBarMenu(
             model: model,
@@ -318,7 +321,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             statusReporter: statusReporter,
             controller: tunnelController,
             iconProvider: iconProvider,
-            uiActionHandler: appLauncher,
+            uiActionHandler: uiActionHandler,
             menuItems: {
                 [
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
