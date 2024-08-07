@@ -24,6 +24,7 @@ extension HomePage.Views {
     struct SettingsView: View {
 
         @EnvironmentObject var model: HomePage.Models.SettingsModel
+        @EnvironmentObject var appearancePreferences: AppearancePreferences
 
         @Binding var isSettingsVisible: Bool
 
@@ -138,7 +139,7 @@ extension HomePage.Views {
                 }
             }
             SettingsSection(title: "Browser Theme") {
-
+                ThemePicker()
             }
             SettingsSection(title: "Sections") {
 
@@ -219,6 +220,49 @@ extension HomePage.Views {
                             ForEach(row, content: itemView)
                         }
                     }
+                }
+            }
+        }
+    }
+
+    struct ThemePicker: View {
+        @EnvironmentObject var appearancePreferences: AppearancePreferences
+
+        var body: some View {
+            HStack(spacing: 24) {
+                ForEach(ThemeName.allCases, id: \.self) { theme in
+                    themeButton(for: theme)
+                }
+            }
+        }
+
+        func themeButton(for themeName: ThemeName) -> some View {
+            Button {
+                appearancePreferences.currentThemeName = themeName
+            } label: {
+                VStack(spacing: 6) {
+                    ZStack {
+                        themeName.pickerView
+                        Circle()
+                            .stroke(Color.black.opacity(0.12))
+                    }
+                    .frame(width: 42, height: 42)
+                    .padding(2)
+                    .background(selectionBackground(for: themeName))
+
+                    Text(themeName.displayName)
+                }
+            }
+            .buttonStyle(.plain)
+        }
+
+        func selectionBackground(for themeName: ThemeName) -> some View {
+            Group {
+                if appearancePreferences.currentThemeName == themeName {
+                    Circle()
+                        .stroke(Color(.linkBlue), lineWidth: 2)
+                } else {
+                    EmptyView()
                 }
             }
         }
@@ -314,6 +358,29 @@ extension HomePage.Models.SettingsModel.CustomBackground {
             illustration.image.resizable()
         case .customImage(let image):
             image.resizable()
+        }
+    }
+}
+
+fileprivate extension ThemeName {
+    @ViewBuilder
+    var pickerView: some View {
+        switch self {
+        case .light:
+            Circle().fill(Color.white)
+        case .dark:
+            Circle().fill(Color(hex: "444444"))
+        case .systemDefault:
+            GeometryReader { geometry in
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                        .clipShape(Rectangle().offset(x: -geometry.size.width/2))
+                    Circle()
+                        .fill(Color(hex: "444444"))
+                        .clipShape(Rectangle().offset(x: geometry.size.width/2))
+                }
+            }
         }
     }
 }
