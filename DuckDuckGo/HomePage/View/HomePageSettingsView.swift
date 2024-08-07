@@ -69,6 +69,7 @@ extension HomePage.Views {
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         }
                     }
+                    .animation(.none, value: model.customBackground)
                     Spacer()
                 }
                 .frame(width: 204)
@@ -138,6 +139,7 @@ extension HomePage.Views {
                     }
                 }
             }
+            .animation(.none, value: model.customBackground)
             SettingsSection(title: "Browser Theme") {
                 ThemePicker()
             }
