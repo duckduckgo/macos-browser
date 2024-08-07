@@ -34,9 +34,8 @@ struct RecentlyVisited: View {
                 .vibrancyEffect()
                 .cornerRadius(12)
 
-            VStack(spacing: 0) {
+            VStack(spacing: 18) {
                 RecentlyVisitedTitle(isExpanded: $model.showRecentlyVisited)
-                    .padding(.bottom, 18)
 
                 Group {
                     if #available(macOS 12, *) {
