@@ -60,8 +60,8 @@ enum PixelExperiment: String, CaseIterable {
 
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
     //  remember to keep it clear for privacy triage.
-    case control
-//    case newOnboarding = "ob"
+    case control = "oa"
+    case newOnboarding = "ob"
 }
 
 // These functions contain the business logic for determining if the pixel should be fired or not.
