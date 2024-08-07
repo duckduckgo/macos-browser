@@ -64,8 +64,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     func update(selectionState: BookmarkManagementSidebarViewController.SelectionState) {
-        self.clearSearch()
-        managementDetailViewModel.update(selection: selectionState)
+        if case .folder = selectionState {
+            clearSearch()
+        }
+
+        managementDetailViewModel.update(selection: selectionState, searchQuery: searchBar.stringValue)
         self.selectionState = selectionState
     }
 
