@@ -100,8 +100,6 @@ protocol SortBookmarksRepository {
 }
 
 final class SortBookmarksUserDefaults: SortBookmarksRepository {
-    static let shared = SortBookmarksUserDefaults()
-
     private enum Keys {
         static let sortMode = "com.duckduckgo.bookmarks.sort.mode"
     }
@@ -139,7 +137,7 @@ final class SortBookmarksViewModel: NSObject {
 
     private let metrics: BookmarksSearchAndSortMetrics
     private let origin: BookmarkOperationOrigin
-    private var repository: SortBookmarksRepository
+    private var manager: BookmarkManager
     private var wasSortOptionSelected = false
     private var cancellables = Set<AnyCancellable>()
 
@@ -152,18 +150,18 @@ final class SortBookmarksViewModel: NSObject {
         return menu
     }
 
-    init(repository: SortBookmarksRepository = SortBookmarksUserDefaults.shared,
+    init(manager: BookmarkManager,
          metrics: BookmarksSearchAndSortMetrics,
          origin: BookmarkOperationOrigin) {
         self.metrics = metrics
         self.origin = origin
-        self.repository = repository
+        self.manager = manager
 
-        selectedSortMode = repository.storedSortMode
+        selectedSortMode = manager.sortMode
 
         super.init()
 
-        repository.sortModePublisher
+        manager.sortModePublisher
             .receive(on: RunLoop.main)
             .assign(to: \.selectedSortMode, on: self)
             .store(in: &cancellables)
@@ -171,7 +169,7 @@ final class SortBookmarksViewModel: NSObject {
 
     func setSort(mode: BookmarksSortMode) {
         wasSortOptionSelected = true
-        repository.storedSortMode = mode
+        manager.setSortMode(mode)
 
         if mode.isNameSorting {
             metrics.fireSortByName(origin: origin)

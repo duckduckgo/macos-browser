@@ -69,10 +69,9 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         return [BookmarkNode]()
     }
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-         repository: SortBookmarksRepository = SortBookmarksUserDefaults.shared) {
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.bookmarkManager = bookmarkManager
-        self.selectedSortMode = repository.storedSortMode
+        self.selectedSortMode = bookmarkManager.sortMode
         treeControllerDataSource = .init(bookmarkManager: bookmarkManager)
         super.init(nibName: nil, bundle: nil)
     }

@@ -81,11 +81,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.bookmarkManager = bookmarkManager
         let metrics = BookmarksSearchAndSortMetrics()
-        let sortViewModel = SortBookmarksViewModel(metrics: metrics, origin: .manager)
+        let sortViewModel = SortBookmarksViewModel(manager: bookmarkManager, metrics: metrics, origin: .manager)
         self.sortBookmarksViewModel = sortViewModel
         self.managementDetailViewModel = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager,
                                                                            metrics: metrics,
-                                                                           mode: sortViewModel.selectedSortMode)
+                                                                           mode: bookmarkManager.sortMode)
         super.init(nibName: nil, bundle: nil)
     }
 

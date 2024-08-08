@@ -20,7 +20,6 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockBookmarkManager: BookmarkManager {
-
     var bookmarksReturnedForSearch = [BaseBookmarkEntity]()
     var wasSearchByQueryCalled = false
 
@@ -109,5 +108,13 @@ class MockBookmarkManager: BookmarkManager {
     func search(by query: String) -> [BaseBookmarkEntity] {
         wasSearchByQueryCalled = true
         return bookmarksReturnedForSearch
+    }
+
+    var sortModePublisher: Published<BookmarksSortMode>.Publisher { $sortMode }
+
+    @Published var sortMode: BookmarksSortMode = .manual
+
+    func setSortMode(_ mode: BookmarksSortMode) {
+        sortMode = mode
     }
 }

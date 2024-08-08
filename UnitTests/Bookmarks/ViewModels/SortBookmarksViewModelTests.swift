@@ -22,81 +22,59 @@ import Combine
 @testable import PixelKit
 @testable import DuckDuckGo_Privacy_Browser
 
-final class MockSortBookmarksRepository: SortBookmarksRepository {
-    private var _storedSortMode: BookmarksSortMode = .manual
-    var storedSortMode: BookmarksSortMode {
-        get {
-            return _storedSortMode
-        }
-        set {
-            _storedSortMode = newValue
-            sortModeSubject.send(newValue)
-        }
-    }
-
-    // Publisher to emit changes to the sort mode
-    private var sortModeSubject = PassthroughSubject<BookmarksSortMode, Never>()
-
-    var sortModePublisher: AnyPublisher<BookmarksSortMode, Never> {
-        return sortModeSubject.eraseToAnyPublisher()
-    }
-}
-
 class SortBookmarksViewModelTests: XCTestCase {
     let testUserDefault = UserDefaults(suiteName: #function)!
-    let repository = MockSortBookmarksRepository()
+    let manager = MockBookmarkManager()
     let metrics = BookmarksSearchAndSortMetrics()
 
     func testWhenSortingIsNameAscending_thenSortByNameMetricIsFired() async throws {
-        let sut = SortBookmarksViewModel(repository: repository, metrics: metrics, origin: .panel)
+        let sut = SortBookmarksViewModel(manager: manager, metrics: metrics, origin: .panel)
         let expectedPixel = GeneralPixel.bookmarksSortByName(origin: "panel")
 
         try await verify(expectedPixel: expectedPixel, for: { sut.setSort(mode: .nameAscending) })
     }
 
     func testWhenSortingIsNameDescending_thenSortByNameMetricIsFired() async throws {
-        let sut = SortBookmarksViewModel(repository: repository, metrics: metrics, origin: .panel)
+        let sut = SortBookmarksViewModel(manager: manager, metrics: metrics, origin: .panel)
         let expectedPixel = GeneralPixel.bookmarksSortByName(origin: "panel")
 
         try await verify(expectedPixel: expectedPixel, for: { sut.setSort(mode: .nameDescending) })
     }
 
     func testWhenSortingIsManual_thenSortByNameMetricIsNotFired() async throws {
-        let sut = SortBookmarksViewModel(repository: repository, metrics: metrics, origin: .panel)
+        let sut = SortBookmarksViewModel(manager: manager, metrics: metrics, origin: .panel)
         let notExpectedPixel = GeneralPixel.bookmarksSortByName(origin: "panel")
 
         try await verifyNotFired(pixel: notExpectedPixel, for: { sut.setSort(mode: .manual) })
     }
 
     func testWhenSortingIsManual_thenIsSavedToRepository() {
-        let sut = SortBookmarksViewModel(repository: repository, metrics: metrics, origin: .panel)
+        let sut = SortBookmarksViewModel(manager: manager, metrics: metrics, origin: .panel)
 
         sut.setSort(mode: .manual)
 
-        XCTAssertEqual(repository.storedSortMode, .manual)
+        XCTAssertEqual(manager.sortMode, .manual)
     }
 
     func testWhenSortingIsNameAscending_thenIsSavedToRepository() {
-        let repository = MockSortBookmarksRepository()
-        let sut = SortBookmarksViewModel(repository: repository, metrics: metrics, origin: .panel)
+        let sut = SortBookmarksViewModel(manager: manager, metrics: metrics, origin: .panel)
 
         sut.setSort(mode: .nameAscending)
 
-        XCTAssertEqual(repository.storedSortMode, .nameAscending)
+        XCTAssertEqual(manager.sortMode, .nameAscending)
     }
 
     func testWhenSortingIsNameDescending_thenIsSavedToRepository() {
-        let repository = MockSortBookmarksRepository()
-        let sut = SortBookmarksViewModel(repository: repository, metrics: metrics, origin: .panel)
+        let sut = SortBookmarksViewModel(manager: manager, metrics: metrics, origin: .panel)
 
         sut.setSort(mode: .nameDescending)
 
-        XCTAssertEqual(repository.storedSortMode, .nameDescending)
+        XCTAssertEqual(manager.sortMode, .nameDescending)
     }
 
     @MainActor
     func testWhenMenuIsClosedAndNoOptionWasSelected_thenSortButtonDismissedIsFired() async throws {
-        let sut = SortBookmarksViewModel(repository: repository, metrics: metrics, origin: .panel)
+        let sut = SortBookmarksViewModel(manager: manager, metrics: metrics, origin: .panel)
         let expectedPixel = GeneralPixel.bookmarksSortButtonDismissed(origin: "panel")
 
         try await verify(expectedPixel: expectedPixel, for: { sut.menuDidClose(NSMenu()) })
@@ -104,7 +82,7 @@ class SortBookmarksViewModelTests: XCTestCase {
 
     @MainActor
     func testWhenMenuIsClosedAndOptionWasSelected_thenSortButtonDismissedIsNotFired() async throws {
-        let sut = SortBookmarksViewModel(repository: repository, metrics: metrics, origin: .panel)
+        let sut = SortBookmarksViewModel(manager: manager, metrics: metrics, origin: .panel)
         let notExpectedPixel = GeneralPixel.bookmarksSortButtonDismissed(origin: "panel")
 
         try await verifyNotFired(pixel: notExpectedPixel, for: {

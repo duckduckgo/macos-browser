@@ -106,7 +106,7 @@ final class BookmarkListViewController: NSViewController {
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
         self.treeControllerSearchDataSource = BookmarkListTreeControllerSearchDataSource(bookmarkManager: bookmarkManager)
         self.bookmarkMetrics = metrics
-        self.sortBookmarksViewModel = SortBookmarksViewModel(metrics: metrics, origin: .panel)
+        self.sortBookmarksViewModel = SortBookmarksViewModel(manager: bookmarkManager, metrics: metrics, origin: .panel)
         super.init(nibName: nil, bundle: nil)
     }
 
