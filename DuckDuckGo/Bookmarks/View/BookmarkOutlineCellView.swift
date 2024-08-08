@@ -261,9 +261,9 @@ final class BookmarkOutlineCellView: NSTableCellView {
         let representedObject = (object as? BookmarkNode)?.representedObject ?? object
         switch representedObject {
         case let bookmark as Bookmark:
-            update(from: bookmark, showURL: identifier != Self.sizingCellIdentifier)
+            update(from: bookmark, isSearch: isSearch, showURL: identifier != Self.sizingCellIdentifier)
         case let folder as BookmarkFolder:
-            update(from: folder, showChevron: isMenuPopover)
+            update(from: folder, isSearch: isSearch, showChevron: isMenuPopover)
         case let folder as PseudoFolder:
             update(from: folder)
         case let menuItem as MenuItemNode:
@@ -384,6 +384,8 @@ extension BookmarkOutlineCellView {
                 BookmarkOutlineCellView(identifier: .init("")),
                 BookmarkOutlineCellView(identifier: .init("")),
                 BookmarkOutlineCellView(identifier: .init("")),
+                BookmarkOutlineCellView(identifier: .init("")),
+                BookmarkOutlineCellView(identifier: .init("")),
             ]
 
             let stackView = NSStackView(views: cells as [NSView])
@@ -412,6 +414,10 @@ extension BookmarkOutlineCellView {
 
             let emptyNode = BookmarkNode(representedObject: MenuItemNode(identifier: "", title: UserText.bookmarksBarFolderEmpty, isEnabled: false), parent: BookmarkNode.genericRootNode())
             cells[8].update(from: emptyNode, isMenuPopover: true)
+
+            let sbkm = Bookmark(id: "3", url: "http://a.b", title: "Bookmark in Search mode", isFavorite: false)
+            cells[9].update(from: sbkm, isSearch: true, showURL: false)
+            cells[10].update(from: BookmarkFolder(id: "5", title: "Folder in Search mode", children: Array(repeating: Bookmark(id: "2", url: "http://a.b", title: "DuckDuckGo", isFavorite: true), count: 42)), isSearch: true, showChevron: false)
 
             widthAnchor.constraint(equalToConstant: 258).isActive = true
             heightAnchor.constraint(equalToConstant: CGFloat((28 + 1) * cells.count)).isActive = true
