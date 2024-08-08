@@ -185,7 +185,9 @@ extension HomePage.Views {
                 grid(with: HomePage.Models.SettingsModel.SolidColor.allCases) { solidColor in
                     Button {
                         withAnimation {
-                            model.customBackground = .solidColor(solidColor)
+                            if model.customBackground != .solidColor(solidColor) {
+                                model.customBackground = .solidColor(solidColor)
+                            }
                         }
                     } label: {
                         BackgroundPreview(isSelected: model.customBackground == .solidColor(solidColor)) {
@@ -204,7 +206,9 @@ extension HomePage.Views {
                 grid(with: HomePage.Models.SettingsModel.Gradient.allCases) { gradient in
                     Button {
                         withAnimation {
-                            model.customBackground = .gradient(gradient)
+                            if model.customBackground != .gradient(gradient) {
+                                model.customBackground = .gradient(gradient)
+                            }
                         }
                     } label: {
                         BackgroundPreview(isSelected: model.customBackground == .gradient(gradient)) {
@@ -223,7 +227,9 @@ extension HomePage.Views {
                 grid(with: HomePage.Models.SettingsModel.Illustration.allCases) { illustration in
                     Button {
                         withAnimation {
-                            model.customBackground = .illustration(illustration)
+                            if model.customBackground != .illustration(illustration) {
+                                model.customBackground = .illustration(illustration)
+                            }
                         }
                     } label: {
                         BackgroundPreview(isSelected: model.customBackground == .illustration(illustration)) {
@@ -242,7 +248,9 @@ extension HomePage.Views {
                 grid(with: model.customImagesManager.availableImages) { userBackgroundImage in
                     Button {
                         withAnimation {
-                            model.customBackground = .customImage(userBackgroundImage)
+                            if model.customBackground != .customImage(userBackgroundImage) {
+                                model.customBackground = .customImage(userBackgroundImage)
+                            }
                         }
                     } label: {
                         BackgroundPreview(isSelected: model.customBackground == .customImage(userBackgroundImage)) {
@@ -262,7 +270,7 @@ extension HomePage.Views {
 
         @ViewBuilder
         func grid<T: Identifiable & Hashable>(with items: [T], @ViewBuilder itemView: @escaping (T) -> some View) -> some View {
-            if #available(macOS 12.0, *) {
+            if #available(macOS 12.0, *), items.count > 1 {
                 LazyVGrid(
                     columns: Array(repeating: GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: 12), count: 2),
                     spacing: 12
@@ -273,8 +281,13 @@ extension HomePage.Views {
                 let rows = items.chunked(into: 2)
                 VStack(spacing: 12) {
                     ForEach(rows, id: \.self) { row in
-                        HStack(spacing: 12) {
-                            ForEach(row, content: itemView)
+                        GeometryReader { geometry in
+                            HStack(spacing: 12) {
+                                ForEach(row, content: itemView)
+                                if row.count == 1 {
+                                    Spacer(minLength: geometry.size.width/2 - 6)
+                                }
+                            }
                         }
                     }
                 }
