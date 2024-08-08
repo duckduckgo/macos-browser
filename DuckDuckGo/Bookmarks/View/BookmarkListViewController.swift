@@ -598,8 +598,6 @@ final class BookmarkListViewController: NSViewController {
     }
 
     override func viewDidLoad() {
-        super.viewDidLoad()
-
         preferredContentSize = Constants.preferredContentSize
 
         outlineView.setDraggingSourceOperationMask([.move], forLocal: true)
@@ -607,8 +605,14 @@ final class BookmarkListViewController: NSViewController {
         // allow scroll buttons to scroll when dragging bookmark over
         scrollDownButton?.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
         scrollUpButton?.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
+    }
 
+    override func viewWillAppear() {
         subscribeToModelEvents()
+    }
+
+    override func viewWillDisappear() {
+        cancellables = []
     }
 
     private func subscribeToModelEvents() {
@@ -740,6 +744,40 @@ final class BookmarkListViewController: NSViewController {
                     bookmarkListPopover.viewController.outlineView.highlightedRow = 0
                 }
             }
+        }
+        .store(in: &cancellables)
+        // only subscribe in root bookmarks menu
+        if !(view.window?.parent?.contentViewController is Self) {
+            subscribeToClickOutsideEvents()
+        }
+    }
+
+    private func subscribeToClickOutsideEvents() {
+        Publishers.Merge(
+            // close bookmarks menu when main menu is clicked
+            NotificationCenter.default.publisher(for: NSMenu.didBeginTrackingNotification, object: NSApp.mainMenu).asVoid(),
+            // close bookmarks menu on click outside of the menu or its submenus
+            NSEvent.publisher(forEvents: [.local, .global],
+                              matching: [.leftMouseDown, .rightMouseDown])
+            .filter { [weak self] event in
+                if event.type == .leftMouseDown,
+                   event.deviceIndependentFlags == .command,
+                   event.window == nil {
+                    // don‘t close on Cmd+click in other app
+                    return false
+                }
+                guard let self,
+                      let eventWindow = event.window else { return true /* close */}
+                for window in sequence(first: eventWindow, next: \.parent)
+                where window === self.view.window {
+                    // we found our window: the click was in the menu tree
+                    return false // don‘t close
+                }
+                return true // close
+            }.asVoid()
+        )
+        .sink { [weak self] _ in
+            self?.delegate?.popoverShouldClose(self!)
         }
         .store(in: &cancellables)
     }
