@@ -103,6 +103,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         scrollView.borderType = .noBorder
         scrollView.drawsBackground = false
         scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalScroller = false
         scrollView.usesPredominantAxisScrolling = false
 
