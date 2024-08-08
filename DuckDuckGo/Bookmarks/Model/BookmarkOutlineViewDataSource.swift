@@ -37,8 +37,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     @Published var selectedFolders: [BookmarkFolder] = []
 
-    let treeController: BookmarkTreeController
-
+    private let outlineView: NSOutlineView
     private let contentMode: ContentMode
     private(set) var expandedNodesIDs = Set<String>()
     private(set) var isSearching = false
@@ -47,6 +46,27 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     /// so we can expand the tree to the destination folder once the drop finishes.
     @Published private(set) var dragDestinationFolder: BookmarkFolder?
 
+    /// Represents currently highlighted drag&drop target row
+    @PublishedAfter var targetRowForDropOperation: Int? {
+        didSet {
+            // unhighlight old highlighted row
+            if let oldValue, oldValue != targetRowForDropOperation,
+               oldValue < outlineView.numberOfRows,
+               let oldTargetRowViewForDropOperation = outlineView.rowView(atRow: oldValue, makeIfNecessary: false),
+               oldTargetRowViewForDropOperation.isTargetForDropOperation {
+                oldTargetRowViewForDropOperation.isTargetForDropOperation = false
+            }
+            // highlight newly highlighted row on value change from outside
+            if let targetRowForDropOperation,
+               targetRowForDropOperation < outlineView.numberOfRows,
+               let targetRowViewForDropOperation = outlineView.rowView(atRow: targetRowForDropOperation, makeIfNecessary: false),
+               !targetRowViewForDropOperation.isTargetForDropOperation {
+                targetRowViewForDropOperation.isTargetForDropOperation = true
+            }
+        }
+    }
+
+    private let treeController: BookmarkTreeController
     private let bookmarkManager: BookmarkManager
     private let dragDropManager: BookmarkDragDropManager
     private let showMenuButtonOnHover: Bool
@@ -54,6 +74,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     private let presentFaviconsFetcherOnboarding: (() -> Void)?
 
     init(
+        outlineView: NSOutlineView,
         contentMode: ContentMode,
         bookmarkManager: BookmarkManager,
         treeController: BookmarkTreeController,
@@ -63,6 +84,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)? = nil,
         presentFaviconsFetcherOnboarding: (() -> Void)? = nil
     ) {
+        self.outlineView = outlineView
         self.contentMode = contentMode
         self.bookmarkManager = bookmarkManager
         self.dragDropManager = dragDropManager
@@ -167,10 +189,24 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func outlineView(_ outlineView: NSOutlineView, rowViewForItem item: Any) -> NSTableRowView? {
-        let view = RoundedSelectionRowView()
-        view.insets = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
-
-        return view
+        let row = outlineView.row(forItem: item)
+        let rowView = RoundedSelectionRowView()
+        rowView.insets = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
+        // observe row drag&drop target highlight state and update `targetRowForDropOperation`
+        let cancellable = rowView.publisher(for: \.isTargetForDropOperation).sink { [weak self] isTargetForDropOperation in
+            guard let self else { return }
+            if isTargetForDropOperation {
+                if self.targetRowForDropOperation != row {
+                    self.targetRowForDropOperation = row
+                }
+            } else if self.targetRowForDropOperation == row {
+                self.targetRowForDropOperation = nil
+            }
+        }
+        rowView.onDeinit {
+            withExtendedLifetime(cancellable) {}
+        }
+        return rowView
     }
 
     func outlineView(_ outlineView: NSOutlineView, heightOfRowByItem item: Any) -> CGFloat {
@@ -193,7 +229,10 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             return .none
         }
 
-        return dragDropManager.validateDrop(info, to: destinationNode.representedObject)
+        let operation = dragDropManager.validateDrop(info, to: destinationNode.representedObject)
+        self.dragDestinationFolder = (operation == .none || item == nil) ? nil : destinationNode.representedObject as? BookmarkFolder
+
+        return operation
     }
 
     func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
@@ -222,6 +261,10 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }()
 
         return dragDropManager.acceptDrop(info, to: representedObject ?? PseudoFolder.bookmarks, at: index)
+    }
+
+    func outlineView(_ outlineView: NSOutlineView, draggingSession session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
+        dragDestinationFolder = nil
     }
 
     // MARK: - NSTableViewDelegate
