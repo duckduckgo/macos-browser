@@ -67,6 +67,8 @@ extension HomePage.Views {
                         case .customImagePicker:
                             backButton(title: "Custom Image")
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
+                        case .uploadImage:
+                            EmptyView()
                         }
                     }
                     .animation(.none, value: model.customBackground)
@@ -105,42 +107,14 @@ extension HomePage.Views {
         @ViewBuilder
         var rootView: some View {
             SettingsSection(title: "Background") {
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack(spacing: 12) {
-                        BackgroundMode(title: "Gradients", isSelected: model.isGradientSelected) {
-                            withAnimation {
-                                model.contentType = .gradientPicker
-                            }
-                        } backgroundPreview: {
-                            model.backgroundPreview(for: .gradient)
-                        }
-                        BackgroundMode(title: "Solid Colors", isSelected: model.isSolidColorSelected) {
-                            withAnimation {
-                                model.contentType = .colorPicker
-                            }
-                        } backgroundPreview: {
-                            model.backgroundPreview(for: .solidColor)
-                        }
-                    }
-                    HStack(spacing: 12) {
-                        BackgroundMode(title: "Illustrations", isSelected: model.isIllustrationSelected) {
-                            withAnimation {
-                                model.contentType = .illustrationPicker
-                            }
-                        } backgroundPreview: {
-                            model.backgroundPreview(for: .illustration)
-                        }
-                        BackgroundMode(title: "Upload Image", isSelected: model.isCustomImageSelected) {
-                            withAnimation {
-                                model.contentType = .customImagePicker
-                            }
-                        } backgroundPreview: {
-                            model.backgroundPreview(for: .customImage)
-                        }
-                    }
-                    TextButton("Reset Background") {
+                grid(with: model.backgroundModes) { mode in
+                    BackgroundMode(title: mode.title, isSelected: mode.isSelected) {
                         withAnimation {
-                            model.customBackground = nil
+                            model.contentType = mode.contentType
+                        }
+                    } backgroundPreview: {
+                        if let customBackgroundType = mode.contentType.customBackgroundType {
+                            model.backgroundPreview(for: customBackgroundType)
                         }
                     }
                 }

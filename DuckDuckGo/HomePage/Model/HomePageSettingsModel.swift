@@ -38,6 +38,32 @@ extension HomePage.Models {
             case colorPicker
             case illustrationPicker
             case customImagePicker
+            case uploadImage
+
+            var customBackgroundType: CustomBackgroundType? {
+                switch self {
+                case .gradientPicker:
+                        .gradient
+                case .colorPicker:
+                        .solidColor
+                case .illustrationPicker:
+                        .illustration
+                case .customImagePicker:
+                        .customImage
+                case .root, .uploadImage:
+                    nil
+                }
+            }
+        }
+
+        struct BackgroundModeModel: Identifiable, Hashable {
+            let contentType: ContentType
+            let title: String
+            let isSelected: Bool
+
+            var id: String {
+                title
+            }
         }
 
         let appearancePreferences: AppearancePreferences
@@ -60,6 +86,19 @@ extension HomePage.Models {
         @Published var vibrancyMaterial: VibrancyMaterial = .ultraThinMaterial
         @Published var legacyVibrancyMaterial: NSVisualEffectView.Material = .hudWindow
         @Published var vibrancyAlpha: CGFloat = 1.0
+
+        var backgroundModes: [BackgroundModeModel] {
+            var modes: [BackgroundModeModel] = [
+                .init(contentType: .gradientPicker, title: "Gradients", isSelected: customBackground?.gradient != nil),
+                .init(contentType: .colorPicker, title: "Solid Colors", isSelected: customBackground?.solidColor != nil),
+                .init(contentType: .illustrationPicker, title: "Illustrations", isSelected: customBackground?.illustration != nil)
+            ]
+            if customImagesManager.availableImages.count > 0 {
+                modes.append(.init(contentType: .customImagePicker, title: "Custom Images", isSelected: customBackground?.userBackgroundImage != nil))
+            }
+            modes.append(.init(contentType: .uploadImage, title: "Upload Image", isSelected: false))
+            return modes
+        }
 
         @ViewBuilder
         var backgroundView: some View {
