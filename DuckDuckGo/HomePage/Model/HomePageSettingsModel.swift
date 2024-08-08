@@ -18,6 +18,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftUIExtensions
 
 protocol ColorSchemeProviding {
     var colorScheme: ColorScheme { get }
@@ -37,6 +38,10 @@ extension HomePage.Models {
 
         @Published var contentType: ContentType = .root
         @Published var customBackground: CustomBackground?
+        @Published var usesLegacyBlur: Bool = true
+        @Published var vibrancyMaterial: VibrancyMaterial = .ultraThinMaterial
+        @Published var legacyVibrancyMaterial: NSVisualEffectView.Material = .hudWindow
+        @Published var vibrancyAlpha: CGFloat = 1.0
 
         @ViewBuilder
         var backgroundView: some View {

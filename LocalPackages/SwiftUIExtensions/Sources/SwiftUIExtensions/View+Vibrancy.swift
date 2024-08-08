@@ -21,12 +21,15 @@ import SwiftUI
 struct VisualEffectBlur: NSViewRepresentable {
     var material: NSVisualEffectView.Material
     var blendingMode: NSVisualEffectView.BlendingMode
+    var alpha: CGFloat
 
     func makeNSView(context: Context) -> NSVisualEffectView {
         let view = NSVisualEffectView()
         view.material = material
         view.blendingMode = blendingMode
         view.state = .active
+        view.alphaValue = alpha
+        view.isEmphasized = true
         return view
     }
 
@@ -34,6 +37,8 @@ struct VisualEffectBlur: NSViewRepresentable {
         nsView.material = material
         nsView.blendingMode = blendingMode
         nsView.state = .active
+        nsView.alphaValue = alpha
+        nsView.isEmphasized = true
     }
 }
 
@@ -47,26 +52,59 @@ public extension View {
      * modifier.
      */
     func vibrancyEffect(
-        material: NSVisualEffectView.Material = .hudWindow,
-        blendingMode: NSVisualEffectView.BlendingMode = .withinWindow
+        useLegacyBlur: Bool,
+        material: VibrancyMaterial,
+        legacyMaterial: NSVisualEffectView.Material = .hudWindow,
+        blendingMode: NSVisualEffectView.BlendingMode = .withinWindow,
+        alpha: CGFloat = 1.0
     ) -> some View {
-        modifier(VibrancyModifier(material: material, blendingMode: blendingMode))
+        modifier(VibrancyModifier(useLegacyBlur: useLegacyBlur, material: material, legacyMaterial: legacyMaterial, blendingMode: blendingMode, alpha: alpha))
+    }
+}
+
+public enum VibrancyMaterial {
+    case regular
+    case thickMaterial
+    case thinMaterial
+    case ultraThinMaterial
+    case ultraThickMaterial
+
+    @available(macOS 12.0, *)
+    var material: Material {
+        switch self {
+        case .regular:
+                .regular
+        case .thickMaterial:
+                .thickMaterial
+        case .thinMaterial:
+                .thinMaterial
+        case .ultraThinMaterial:
+                .ultraThinMaterial
+        case .ultraThickMaterial:
+                .ultraThickMaterial
+        }
     }
 }
 
 private struct VibrancyModifier: ViewModifier {
 
-    let material: NSVisualEffectView.Material
+    let useLegacyBlur: Bool
+    let material: VibrancyMaterial
+    let legacyMaterial: NSVisualEffectView.Material
     let blendingMode: NSVisualEffectView.BlendingMode
+    let alpha: CGFloat
 //    let color: Color
 
     @ViewBuilder
     func body(content: Content) -> some View {
-        content.background(VisualEffectBlur(material: material, blendingMode: blendingMode))
-//        if #available(macOS 12.0, *) {
-//            content.background(.ultraThinMaterial)
-//        } else {
-//            content.background(color)
-//        }
+        if useLegacyBlur {
+            content.background(VisualEffectBlur(material: legacyMaterial, blendingMode: blendingMode, alpha: alpha))
+        } else {
+            if #available(macOS 12.0, *) {
+                content.background(material.material.opacity(alpha))
+            } else {
+                content.background(Color.white)
+            }
+        }
     }
 }
