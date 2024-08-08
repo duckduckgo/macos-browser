@@ -20,9 +20,13 @@ import CoreImage
 import Foundation
 import SwiftUI
 
-struct UserBackgroundImage: Equatable, ColorSchemeProviding {
+struct UserBackgroundImage: Hashable, Identifiable, ColorSchemeProviding {
     let fileName: String
     let colorScheme: ColorScheme
+
+    var id: String {
+        fileName
+    }
 }
 
 protocol UserBackgroundImagesManaging {
@@ -30,7 +34,7 @@ protocol UserBackgroundImagesManaging {
     var maximumNumberOfImages: Int { get }
     var availableImages: [UserBackgroundImage] { get }
 
-    func addImage(with url: URL) throws
+    func addImage(with url: URL) throws -> UserBackgroundImage?
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage?
 }
 
@@ -78,39 +82,46 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
     private(set) var availableImages: [UserBackgroundImage] = []
 
     @UserDefaultsWrapper(key: .homePageUserBackgroundImages, defaultValue: [])
-    private var imagesMetadata: [String]
+    private var imagesMetadata: [String] {
+        didSet {
+            availableImages = imagesMetadata.compactMap(UserBackgroundImage.init)
+        }
+    }
 
     init(maximumNumberOfImages: Int, applicationSupportDirectory: URL) {
         assert(maximumNumberOfImages > 0, "maximumNumberOfImages must be greater than 0")
         self.maximumNumberOfImages = maximumNumberOfImages
         storageLocation = applicationSupportDirectory.appendingPathComponent("UserBackgroundImages")
         setUpStorageDirectory()
-        verifyStoredImages()
         availableImages = imagesMetadata.compactMap(UserBackgroundImage.init)
+        verifyStoredImages()
     }
 
-    func addImage(with url: URL) throws {
-        let fileName = UUID().uuidString
+    func addImage(with url: URL) throws -> UserBackgroundImage? {
+        let fileName = [UUID().uuidString, url.pathExtension].joined(separator: ".")
         let destinationURL = storageLocation.appendingPathComponent(fileName)
         try FileManager.default.copyItem(at: url, to: destinationURL)
 
         guard let image = NSImage(contentsOf: destinationURL) else {
             // pixel
-            return
+            return nil
         }
 
         let colorScheme = calculatePreferredColorScheme(for: image)
         let userBackgroundImage = UserBackgroundImage(fileName: fileName, colorScheme: colorScheme)
 
-        let imagesToDelete = imagesMetadata.suffix(from: maximumNumberOfImages)
-        imagesToDelete.forEach { imageMetadata in
-            guard let fileName = UserBackgroundImage(imageMetadata)?.fileName else {
-                return
+        if imagesMetadata.count > maximumNumberOfImages {
+            let imagesToDelete = imagesMetadata.suffix(from: maximumNumberOfImages)
+            imagesToDelete.forEach { imageMetadata in
+                guard let fileName = UserBackgroundImage(imageMetadata)?.fileName else {
+                    return
+                }
+                FileManager.default.remove(fileAtURL: storageLocation.appendingPathComponent(fileName))
             }
-            FileManager.default.remove(fileAtURL: storageLocation.appendingPathComponent(imageMetadata))
         }
 
         imagesMetadata = [userBackgroundImage.description] + imagesMetadata.prefix(maximumNumberOfImages - 1)
+        return userBackgroundImage
     }
 
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage? {

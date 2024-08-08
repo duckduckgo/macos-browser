@@ -80,7 +80,17 @@ extension HomePage.Models {
             self.customImagesManager = userBackgroundImagesManager
         }
 
-        @Published var contentType: ContentType = .root
+        @Published var contentType: ContentType = .root {
+            didSet {
+                if contentType == .uploadImage {
+                    let panel = NSOpenPanel(allowedFileTypes: [.image])
+                    guard case .OK = panel.runModal(), let url = panel.url else { return }
+                    if let image = try? customImagesManager.addImage(with: url) {
+                        customBackground = .customImage(image)
+                    }
+                }
+            }
+        }
         @Published var customBackground: CustomBackground?
         @Published var usesLegacyBlur: Bool = true
         @Published var vibrancyMaterial: VibrancyMaterial = .ultraThinMaterial

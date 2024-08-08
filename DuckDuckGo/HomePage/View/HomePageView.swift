@@ -106,7 +106,10 @@ extension HomePage.Views {
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .background(settingsModel.backgroundView)
+                .background(
+                    settingsModel.backgroundView
+                        .animation(.none, value: isSettingsVisible)
+                )
                 .clipped()
                 .onAppear {
                     LocalBookmarkManager.shared.requestSync()

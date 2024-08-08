@@ -52,7 +52,7 @@ extension HomePage.Views {
                     }
                     Group {
                         switch model.contentType {
-                        case .root:
+                        case .root, .uploadImage:
                             rootView
                                 .transition(.move(edge: .leading).combined(with: .opacity))
                         case .colorPicker:
@@ -65,10 +65,8 @@ extension HomePage.Views {
                             illustrationPickerView
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .customImagePicker:
-                            backButton(title: "Custom Image")
+                            userBackgroundImagePickerView
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
-                        case .uploadImage:
-                            EmptyView()
                         }
                     }
                     .animation(.none, value: model.customBackground)
@@ -115,6 +113,8 @@ extension HomePage.Views {
                     } backgroundPreview: {
                         if let customBackgroundType = mode.contentType.customBackgroundType {
                             model.backgroundPreview(for: customBackgroundType)
+                        } else if mode.contentType == .uploadImage {
+                            HomePage.Models.SettingsModel.SolidColor.gray.color
                         }
                     }
                 }
@@ -228,6 +228,31 @@ extension HomePage.Views {
                     } label: {
                         BackgroundPreview(isSelected: model.customBackground == .illustration(illustration)) {
                             illustration.image.resizable().scaledToFill()
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+
+        @ViewBuilder
+        var userBackgroundImagePickerView: some View {
+            VStack(spacing: 16) {
+                backButton(title: "My Images")
+                grid(with: model.customImagesManager.availableImages) { userBackgroundImage in
+                    Button {
+                        withAnimation {
+                            model.customBackground = .customImage(userBackgroundImage)
+                        }
+                    } label: {
+                        BackgroundPreview(isSelected: model.customBackground == .customImage(userBackgroundImage)) {
+                            Group {
+                                if let image = model.customImagesManager.image(for: userBackgroundImage) {
+                                    Image(nsImage: image).resizable().scaledToFill()
+                                } else {
+                                    EmptyView()
+                                }
+                            }
                         }
                     }
                     .buttonStyle(.plain)

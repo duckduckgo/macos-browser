@@ -486,6 +486,9 @@
         }
       }
     },
+    "0" : {
+
+    },
     "0.0.0.0" : {
       "localizations" : {
         "de" : {
@@ -537,6 +540,9 @@
           }
         }
       }
+    },
+    "1" : {
+
     },
     "1." : {
       "localizations" : {
@@ -2482,6 +2488,9 @@
         }
       }
     },
+    "Alpha" : {
+
+    },
     "Always Show" : {
       "comment" : "Preference for always showing the bookmarks bar",
       "localizations" : {
@@ -2534,6 +2543,12 @@
           }
         }
       }
+    },
+    "AppKit" : {
+
+    },
+    "Apple HIG Documentation" : {
+
     },
     "auth.alert.login.button" : {
       "comment" : "Authentication Alert Sign In Button",
@@ -13090,6 +13105,9 @@
         }
       }
     },
+    "contentBackground" : {
+
+    },
     "context.menu.home.button.mode.hide" : {
       "comment" : "Preferences > Home Button > None item",
       "extractionState" : "extracted_with_value",
@@ -23506,6 +23524,9 @@
         }
       }
     },
+    "fullScreenUI" : {
+
+    },
     "generic.delete.button" : {
       "comment" : "Label of a button that allows the user to delete an item",
       "extractionState" : "extracted_with_value",
@@ -23865,6 +23886,9 @@
           }
         }
       }
+    },
+    "headerView" : {
+
     },
     "Help" : {
       "comment" : "Main Menu Help",
@@ -25157,6 +25181,9 @@
           }
         }
       }
+    },
+    "hudWindow" : {
+
     },
     "If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.\n\nImported passwords are stored securely using encryption." : {
       "comment" : "Warning that Chromium data import would require entering system passwords.",
@@ -32463,6 +32490,15 @@
         }
       }
     },
+    "Material (AppKit)" : {
+
+    },
+    "Material (SwiftUI)" : {
+
+    },
+    "menu" : {
+
+    },
     "menu.add.folder" : {
       "comment" : "Menu item to add a folder",
       "extractionState" : "extracted_with_value",
@@ -32808,6 +32844,9 @@
           }
         }
       }
+    },
+    "Mode" : {
+
     },
     "more-options.zoom.default-zoom-page" : {
       "comment" : "Default page zoom picker title",
@@ -46920,6 +46959,9 @@
         }
       }
     },
+    "popover" : {
+
+    },
     "preferences-homepage-address" : {
       "comment" : "Homepage address field label",
       "extractionState" : "extracted_with_value",
@@ -51405,6 +51447,9 @@
         }
       }
     },
+    "regular" : {
+
+    },
     "release.notes.menu.item" : {
       "comment" : "Title of the dialog menu item that opens release notes",
       "extractionState" : "extracted_with_value",
@@ -52683,6 +52728,9 @@
         }
       }
     },
+    "selection" : {
+
+    },
     "send.browser.feedback" : {
       "comment" : "Menu with feedback commands",
       "extractionState" : "extracted_with_value",
@@ -53948,6 +53996,9 @@
         }
       }
     },
+    "sheet" : {
+
+    },
     "Show Autofill Shortcut" : {
       "comment" : "Main Menu View item",
       "localizations" : {
@@ -54491,6 +54542,9 @@
           }
         }
       }
+    },
+    "sidebar" : {
+
     },
     "Smart Copy/Paste" : {
       "comment" : "Main Menu Edit-Substitutions item",
@@ -55756,6 +55810,9 @@
         }
       }
     },
+    "SwiftUI" : {
+
+    },
     "tab.bookmarks.title" : {
       "comment" : "Tab bookmarks title",
       "extractionState" : "extracted_with_value",
@@ -56387,6 +56444,18 @@
           }
         }
       }
+    },
+    "thick" : {
+
+    },
+    "thin" : {
+
+    },
+    "titlebar" : {
+
+    },
+    "toolTip" : {
+
     },
     "tooltip.addToFavorites" : {
       "comment" : "Tooltip for add to favorites button",
@@ -58181,6 +58250,18 @@
         }
       }
     },
+    "ultraThick" : {
+
+    },
+    "ultraThin" : {
+
+    },
+    "underPageBackground" : {
+
+    },
+    "underWindowBackground" : {
+
+    },
     "uninstall" : {
       "comment" : "Uninstall button",
       "extractionState" : "extracted_with_value",
@@ -59450,6 +59531,9 @@
           }
         }
       }
+    },
+    "windowBackground" : {
+
     },
     "You'll be asked to enter your Primary Password for %@.\n\nImported passwords are encrypted and only stored on this computer." : {
       "comment" : "Warning that Firefox-based browser name (%@) data import would require entering a Primary Password for the browser.",
