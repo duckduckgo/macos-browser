@@ -404,22 +404,6 @@ extension HomePage.Views {
     }
 }
 
-extension HomePage.Models.SettingsModel.CustomBackground {
-    @ViewBuilder
-    var preview: some View {
-        switch self {
-        case .gradient(let gradient):
-            gradient.image.resizable()
-        case .solidColor(let solidColor):
-            solidColor.color
-        case .illustration(let illustration):
-            illustration.image.resizable()
-        case .customImage(let image):
-            image.resizable()
-        }
-    }
-}
-
 fileprivate extension ThemeName {
     @ViewBuilder
     var pickerView: some View {

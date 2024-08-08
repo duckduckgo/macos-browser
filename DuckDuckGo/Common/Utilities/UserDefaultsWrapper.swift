@@ -145,6 +145,7 @@ public struct UserDefaultsWrapper<T> {
         case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
+        case homePageUserBackgroundImages = "home.page.user.background.images"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 

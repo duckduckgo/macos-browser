@@ -28,12 +28,30 @@ extension HomePage.Models {
 
     final class SettingsModel: ObservableObject {
 
+        enum Const {
+            static let maximumNumberOfUserImages = 4
+        }
+
         enum ContentType: Equatable {
             case root
             case gradientPicker
             case colorPicker
             case illustrationPicker
             case customImagePicker
+        }
+
+        let appearancePreferences: AppearancePreferences
+        let customImagesManager: UserBackgroundImagesManaging
+
+        init(
+            appearancePreferences: AppearancePreferences = .shared,
+            userBackgroundImagesManager: UserBackgroundImagesManaging = UserBackgroundImagesManager(
+                maximumNumberOfImages: Const.maximumNumberOfUserImages,
+                applicationSupportDirectory: URL.sandboxApplicationSupportURL
+            )
+        ) {
+            self.appearancePreferences = appearancePreferences
+            self.customImagesManager = userBackgroundImagesManager
         }
 
         @Published var contentType: ContentType = .root
@@ -46,10 +64,47 @@ extension HomePage.Models {
         @ViewBuilder
         var backgroundView: some View {
             if let customBackground {
-                customBackground.view
-                    .animation(.none, value: contentType)
+
+                switch customBackground {
+                case .gradient(let gradient):
+                    gradient.image.resizable().aspectRatio(contentMode: .fill)
+                        .animation(.none, value: contentType)
+                case .illustration(let illustration):
+                    illustration.image.resizable().aspectRatio(contentMode: .fill)
+                        .animation(.none, value: contentType)
+                case .solidColor(let solidColor):
+                    solidColor.color
+                        .animation(.none, value: contentType)
+                case .customImage(let userBackgroundImage):
+                    if let nsImage = customImagesManager.image(for: userBackgroundImage) {
+                        Image(nsImage: nsImage).resizable().aspectRatio(contentMode: .fill)
+                            .animation(.none, value: contentType)
+                    } else {
+                        Color.newTabPageBackground
+                    }
+                }
             } else {
                 Color.newTabPageBackground
+            }
+        }
+
+        @ViewBuilder
+        var preview: some View {
+            switch customBackground {
+            case .gradient(let gradient):
+                gradient.image.resizable()
+            case .solidColor(let solidColor):
+                solidColor.color
+            case .illustration(let illustration):
+                illustration.image.resizable()
+            case .customImage(let userBackgroundImage):
+                if let nsImage = customImagesManager.image(for: userBackgroundImage) {
+                    Image(nsImage: nsImage).resizable()
+                } else {
+                    CustomBackground.placeholderCustomImage
+                }
+            case .none:
+                EmptyView()
             }
         }
 
@@ -57,28 +112,32 @@ extension HomePage.Models {
         func backgroundPreview(for backgroundType: CustomBackgroundType) -> some View {
             switch backgroundType {
             case .gradient:
-                if isGradientSelected, let preview = customBackground?.preview {
-                    preview
+                if case let .gradient(gradient) = customBackground {
+                    gradient.image.resizable()
                 } else {
-                    backgroundType.placeholderView
+                    CustomBackground.placeholderGradient
                 }
             case .solidColor:
-                if isSolidColorSelected, let preview = customBackground?.preview {
-                    preview
+                if case let .solidColor(solidColor) = customBackground {
+                    solidColor.color
                 } else {
-                    backgroundType.placeholderView
+                    CustomBackground.placeholderColor
                 }
             case .illustration:
-                if isIllustrationSelected, let preview = customBackground?.preview {
-                    preview
+                if case let .illustration(illustration) = customBackground {
+                    illustration.image.resizable()
                 } else {
-                    backgroundType.placeholderView
+                    CustomBackground.placeholderIllustration
                 }
             case .customImage:
-                if isCustomImageSelected, let preview = customBackground?.preview {
-                    preview
+                if case let .customImage(userBackgroundImage) = customBackground, let nsImage = customImagesManager.image(for: userBackgroundImage) {
+                    Image(nsImage: nsImage).resizable()
+                } else if let lastUsedUserBackgroundImage = customImagesManager.availableImages.first,
+                          let nsImage = customImagesManager.image(for: lastUsedUserBackgroundImage)
+                {
+                    Image(nsImage: nsImage).resizable()
                 } else {
-                    backgroundType.placeholderView
+                    CustomBackground.placeholderCustomImage
                 }
             }
         }
@@ -121,13 +180,13 @@ extension HomePage.Models.SettingsModel {
         var placeholderView: some View {
             switch self {
             case .gradient:
-                CustomBackground.placeholderGradient.preview
+                CustomBackground.placeholderGradient
             case .solidColor:
-                CustomBackground.placeholderColor.preview
+                CustomBackground.placeholderColor
             case .illustration:
-                CustomBackground.placeholderIllustration.preview
+                CustomBackground.placeholderIllustration
             case .customImage:
-                CustomBackground.placeholderCustomImage.preview
+                CustomBackground.placeholderCustomImage
             }
         }
     }
@@ -136,7 +195,7 @@ extension HomePage.Models.SettingsModel {
         case gradient(Gradient)
         case solidColor(SolidColor)
         case illustration(Illustration)
-        case customImage(Image)
+        case customImage(UserBackgroundImage)
 
         var isSolidColor: Bool {
             guard case .solidColor = self else {
@@ -153,29 +212,43 @@ extension HomePage.Models.SettingsModel {
                 illustration.colorScheme
             case .solidColor(let solidColor):
                 solidColor.colorScheme
-            case .customImage:
-                .light
-            }
-        }
-
-        @ViewBuilder
-        var view: some View {
-            switch self {
-            case .gradient(let gradient):
-                gradient.image.resizable().aspectRatio(contentMode: .fill)
-            case .illustration(let illustration):
-                illustration.image.resizable().aspectRatio(contentMode: .fill)
-            case .solidColor(let solidColor):
-                solidColor.color
             case .customImage(let image):
-                image.resizable().aspectRatio(contentMode: .fill)
+                image.colorScheme
             }
         }
 
-        static let placeholderGradient = CustomBackground.gradient(.gradient03)
-        static let placeholderColor = CustomBackground.solidColor(.lightPurple)
-        static let placeholderIllustration = CustomBackground.illustration(.illustration01)
-        static let placeholderCustomImage = CustomBackground.solidColor(.gray)
+        var gradient: Gradient? {
+            guard case let .gradient(gradient) = self else {
+                return nil
+            }
+            return gradient
+        }
+
+        var solidColor: SolidColor? {
+            guard case let .solidColor(solidColor) = self else {
+                return nil
+            }
+            return solidColor
+        }
+
+        var illustration: Illustration? {
+            guard case let .illustration(illustration) = self else {
+                return nil
+            }
+            return illustration
+        }
+
+        var userBackgroundImage: UserBackgroundImage? {
+            guard case let .customImage(image) = self else {
+                return nil
+            }
+            return image
+        }
+
+        static let placeholderGradient: some View = Gradient.gradient03.image.resizable()
+        static let placeholderColor: some View = SolidColor.lightPurple.color
+        static let placeholderIllustration: some View = Illustration.illustration01.image.resizable()
+        static let placeholderCustomImage: some View = SolidColor.gray.color
     }
 
     enum Gradient: Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
@@ -314,6 +387,15 @@ extension HomePage.Models.SettingsModel {
             case .black, .darkPink, .darkOrange, .darkYellow, .darkGreen, .darkBlue, .darkPurple:
                     .dark
             }
+        }
+    }
+
+    struct CustomImage: Equatable, Identifiable, ColorSchemeProviding {
+        let name: String
+        let colorScheme: ColorScheme
+
+        var id: String {
+            name
         }
     }
 }
