@@ -76,9 +76,15 @@ extension HomePage.Views {
                 .padding(16)
                 .frame(maxHeight: .infinity)
             }
-            .background(Color.homeSettingsBackground)
-            .shadow(color: .black.opacity(0.12), radius: 6, x: 0, y: 8)
-            .shadow(color: .black.opacity(0.08), radius: 1, x: 0, y: 0)
+            .background(
+                GeometryReader { geometry in
+                    Rectangle()
+                        .fill(Color.homeSettingsBackground)
+                        .shadow(color: .black.opacity(0.12), radius: 6, x: 0, y: 8)
+                        .shadow(color: .black.opacity(0.08), radius: 1, x: 0, y: 0)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                }
+            )
         }
 
         func backButton(title: String) -> some View {
