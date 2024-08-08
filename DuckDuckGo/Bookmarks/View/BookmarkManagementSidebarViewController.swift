@@ -185,8 +185,12 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     func select(folder: BookmarkFolder) {
         if let node = treeController.node(representing: folder) {
             let path = BookmarkNode.Path(node: node)
+
+            if !outlineView.isItemVisible(node) {
+                outlineView.scrollToAdjustedPositionInOutlineView(node)
+            }
+
             outlineView.revealAndSelect(nodePath: path)
-            outlineView.scrollToAdjustedPositionInOutlineView(node)
         }
     }
 
@@ -195,17 +199,6 @@ final class BookmarkManagementSidebarViewController: NSViewController {
             let path = BookmarkNode.Path(node: node)
             outlineView.revealAndSelect(nodePath: path)
         }
-    }
-
-    func showBookmarkInFolder(_ folder: BookmarkFolder) {
-        guard let node = dataSource.treeController.node(representing: folder) else {
-            return
-        }
-
-        let path = BookmarkNode.Path(node: node)
-        outlineView.revealAndSelect(nodePath: path)
-        outlineView.scrollToAdjustedPositionInOutlineView(node)
-        outlineView.highlight(node)
     }
 
     func sortModeChanged(_ mode: BookmarksSortMode) {

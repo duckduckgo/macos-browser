@@ -23,7 +23,6 @@ protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
 
     func bookmarkManagementDetailViewControllerDidSelectFolder(_ folder: BookmarkFolder)
     func bookmarkManagementDetailViewControllerDidStartSearching()
-    func bookmarkManagementDetailViewControllerShowInFolder(_ folder: BookmarkFolder)
     func bookmarkManagementDetailViewControllerSortChanged(_ mode: BookmarksSortMode)
 
 }
@@ -822,9 +821,9 @@ extension BookmarkManagementDetailViewController: BookmarkSearchMenuItemSelector
 
         if let bookmark = baseBookmark as? Bookmark,
             let folder = managementDetailViewModel.searchForParent(bookmark: bookmark) {
-            delegate?.bookmarkManagementDetailViewControllerShowInFolder(folder)
+            delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
         } else if let folder = baseBookmark as? BookmarkFolder {
-            delegate?.bookmarkManagementDetailViewControllerShowInFolder(folder)
+            delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
         }
     }
 }

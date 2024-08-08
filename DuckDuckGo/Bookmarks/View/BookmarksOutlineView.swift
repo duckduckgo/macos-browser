@@ -100,4 +100,15 @@ final class BookmarksOutlineView: NSOutlineView {
             rowView.highlight = false
         }
     }
+
+    func isItemVisible(_ item: Any) -> Bool {
+        let rowIndex = self.row(forItem: item)
+
+        if rowIndex == -1 {
+            return false
+        }
+
+        let visibleRowsRange = self.rows(in: self.visibleRect)
+        return visibleRowsRange.contains(rowIndex)
+    }
 }
