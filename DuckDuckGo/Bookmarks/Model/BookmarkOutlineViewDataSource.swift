@@ -37,7 +37,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     @Published var selectedFolders: [BookmarkFolder] = []
 
-    private let outlineView: NSOutlineView
+    private var outlineView: NSOutlineView?
     private let contentMode: ContentMode
     private(set) var expandedNodesIDs = Set<String>()
     private(set) var isSearching = false
@@ -49,6 +49,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     /// Represents currently highlighted drag&drop target row
     @PublishedAfter var targetRowForDropOperation: Int? {
         didSet {
+            guard let outlineView else { return }
             // unhighlight old highlighted row
             if let oldValue, oldValue != targetRowForDropOperation,
                oldValue < outlineView.numberOfRows,
@@ -74,17 +75,15 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     private let presentFaviconsFetcherOnboarding: (() -> Void)?
 
     init(
-        outlineView: NSOutlineView,
         contentMode: ContentMode,
         bookmarkManager: BookmarkManager,
         treeController: BookmarkTreeController,
-        dragDropManager: BookmarkDragDropManager,
+        dragDropManager: BookmarkDragDropManager = .shared,
         sortMode: BookmarksSortMode,
         showMenuButtonOnHover: Bool = true,
         onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)? = nil,
         presentFaviconsFetcherOnboarding: (() -> Void)? = nil
     ) {
-        self.outlineView = outlineView
         self.contentMode = contentMode
         self.bookmarkManager = bookmarkManager
         self.dragDropManager = dragDropManager
@@ -134,6 +133,9 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
+        if self.outlineView == nil {
+            self.outlineView = outlineView
+        }
         return nodeForItem(item).numberOfChildNodes
     }
 

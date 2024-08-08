@@ -52,7 +52,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     private lazy var outlineView = BookmarksOutlineView(frame: scrollView.frame)
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource, sortMode: .manual)
-    private lazy var dataSource = BookmarkOutlineViewDataSource(outlineView: outlineView, contentMode: .foldersOnly,
+    private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly,
                                                                 bookmarkManager: bookmarkManager,
                                                                 treeController: treeController, dragDropManager: dragDropManager,
                                                                 sortMode: .manual,

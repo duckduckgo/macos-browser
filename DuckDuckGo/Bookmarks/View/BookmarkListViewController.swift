@@ -137,7 +137,7 @@ final class BookmarkListViewController: NSViewController {
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
         BookmarkOutlineViewDataSource(
-            outlineView: outlineView, contentMode: mode == .bookmarkBarMenu ? .bookmarksMenu : .bookmarksAndFolders,
+            contentMode: mode == .bookmarkBarMenu ? .bookmarksMenu : .bookmarksAndFolders,
             bookmarkManager: bookmarkManager,
             treeController: treeController,
             dragDropManager: dragDropManager,
