@@ -19,7 +19,7 @@ import AppKit
 
 extension NSCollectionLayoutGroup {
 
-    static func horizontallyCentered(cellSizes: [CGSize], interItemSpacing: CGFloat = 6, centered: Bool = true) -> NSCollectionLayoutGroup {
+    static func horizontallyCentered(cellSizes: [CGSize], interItemSpacing: CGFloat = 2, centered: Bool = true) -> NSCollectionLayoutGroup {
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(28))
 
         return custom(layoutSize: groupSize) { environment in

@@ -37,10 +37,8 @@ final class BookmarksBarViewModel: NSObject {
     enum Constants {
         static let buttonSpacing: CGFloat = 6
         static let buttonHeight: CGFloat = 28
-        static let maximumButtonWidth: CGFloat = 120
+        static let maximumButtonWidth: CGFloat = 128
         static let labelFont = NSFont.systemFont(ofSize: 12)
-
-        static let additionalItemWidth = 34.0
 
         static let interItemGapIndicatorIdentifier = "NSCollectionElementKindInterItemGapIndicator"
     }
@@ -230,13 +228,13 @@ final class BookmarksBarViewModel: NSObject {
 
     func cachedWidth(buttonTitle: String) -> CGFloat {
         if let cachedValue = collectionViewItemSizeCache[buttonTitle] {
-            return cachedValue + Constants.additionalItemWidth
+            return cachedValue
         } else {
             textSizeCalculationLabel.stringValue = buttonTitle
             textSizeCalculationLabel.sizeToFit()
 
             let cappedTitleWidth = ceil(min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width))
-            let calculatedWidth = min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width) + Constants.additionalItemWidth
+            let calculatedWidth = min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width)
             collectionViewItemSizeCache[buttonTitle] = cappedTitleWidth
 
             return ceil(calculatedWidth)
