@@ -96,7 +96,6 @@ enum BookmarksSortMode: Codable {
 protocol SortBookmarksRepository {
 
     var storedSortMode: BookmarksSortMode { get set }
-    var sortModePublisher: AnyPublisher<BookmarksSortMode, Never> { get }
 }
 
 final class SortBookmarksUserDefaults: SortBookmarksRepository {
@@ -123,13 +122,8 @@ final class SortBookmarksUserDefaults: SortBookmarksRepository {
         set {
             if let data = try? JSONEncoder().encode(newValue) {
                 userDefaults.set(data, forKey: Keys.sortMode)
-                sortModeSubject.send(newValue)
             }
         }
-    }
-
-    var sortModePublisher: AnyPublisher<BookmarksSortMode, Never> {
-        sortModeSubject.eraseToAnyPublisher()
     }
 }
 
@@ -169,7 +163,7 @@ final class SortBookmarksViewModel: NSObject {
 
     func setSort(mode: BookmarksSortMode) {
         wasSortOptionSelected = true
-        manager.setSortMode(mode)
+        manager.sortMode = mode
 
         if mode.isNameSorting {
             metrics.fireSortByName(origin: origin)

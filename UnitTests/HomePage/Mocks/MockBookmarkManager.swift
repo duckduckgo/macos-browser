@@ -113,8 +113,4 @@ class MockBookmarkManager: BookmarkManager {
     var sortModePublisher: Published<BookmarksSortMode>.Publisher { $sortMode }
 
     @Published var sortMode: BookmarksSortMode = .manual
-
-    func setSortMode(_ mode: BookmarksSortMode) {
-        sortMode = mode
-    }
 }

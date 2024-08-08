@@ -62,8 +62,7 @@ protocol BookmarkManager: AnyObject {
     var list: BookmarkList? { get }
 
     var sortModePublisher: Published<BookmarksSortMode>.Publisher { get }
-    var sortMode: BookmarksSortMode { get }
-    func setSortMode(_ mode: BookmarksSortMode)
+    var sortMode: BookmarksSortMode { get set }
 
     func requestSync()
 
@@ -82,7 +81,6 @@ final class LocalBookmarkManager: BookmarkManager {
 
         self.subscribeToFavoritesDisplayMode()
         self.sortMode = sortRepository.storedSortMode
-        self.subscribeToSortModeChanges()
     }
 
     private func subscribeToFavoritesDisplayMode() {
@@ -96,17 +94,14 @@ final class LocalBookmarkManager: BookmarkManager {
             }
     }
 
-    private func subscribeToSortModeChanges() {
-        sortRepository.sortModePublisher
-            .receive(on: RunLoop.main)
-            .assign(to: \.sortMode, on: self)
-            .store(in: &sortModeCancellables)
-    }
-
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
-    @Published var sortMode: BookmarksSortMode = .manual
+    @Published var sortMode: BookmarksSortMode = .manual {
+        didSet {
+            sortRepository.storedSortMode = sortMode
+        }
+    }
     var sortModePublisher: Published<BookmarksSortMode>.Publisher { $sortMode }
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
@@ -115,7 +110,6 @@ final class LocalBookmarkManager: BookmarkManager {
 
     private var favoritesDisplayMode: FavoritesDisplayMode = .displayNative(.desktop)
     private var favoritesDisplayModeCancellable: AnyCancellable?
-    private var sortModeCancellables = Set<AnyCancellable>()
 
     // MARK: - Bookmarks
 
@@ -441,11 +435,5 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         return result
-    }
-
-     // MARK: - Sort
-
-    func setSortMode(_ mode: BookmarksSortMode) {
-        sortRepository.storedSortMode = mode
     }
 }
