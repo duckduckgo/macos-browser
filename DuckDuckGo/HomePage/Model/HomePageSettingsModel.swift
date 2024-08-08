@@ -78,6 +78,7 @@ extension HomePage.Models {
         ) {
             self.appearancePreferences = appearancePreferences
             self.customImagesManager = userBackgroundImagesManager
+            customBackground = appearancePreferences.homePageCustomBackground
         }
 
         @Published var contentType: ContentType = .root {
@@ -91,7 +92,11 @@ extension HomePage.Models {
                 }
             }
         }
-        @Published var customBackground: CustomBackground?
+        @Published var customBackground: CustomBackground? {
+            didSet {
+                appearancePreferences.homePageCustomBackground = customBackground
+            }
+        }
         @Published var usesLegacyBlur: Bool = true
         @Published var vibrancyMaterial: VibrancyMaterial = .ultraThinMaterial
         @Published var legacyVibrancyMaterial: NSVisualEffectView.Material = .hudWindow
@@ -240,7 +245,51 @@ extension HomePage.Models.SettingsModel {
         }
     }
 
-    enum CustomBackground: Equatable, ColorSchemeProviding {
+    enum CustomBackground: Equatable, ColorSchemeProviding, LosslessStringConvertible {
+        init?(_ description: String) {
+            let components = description.components(separatedBy: "|")
+            guard components.count == 2 else {
+                return nil
+            }
+            switch components[0] {
+            case "gradient":
+                guard let gradient = Gradient(rawValue: components[1]) else {
+                    return nil
+                }
+                self = .gradient(gradient)
+            case "solidColor":
+                guard let solidColor = SolidColor(rawValue: components[1]) else {
+                    return nil
+                }
+                self = .solidColor(solidColor)
+            case "illustration":
+                guard let illustration = Illustration(rawValue: components[1]) else {
+                    return nil
+                }
+                self = .illustration(illustration)
+            case "customImage":
+                guard let userBackgroundImage = UserBackgroundImage(components[1]) else {
+                    return nil
+                }
+                self = .customImage(userBackgroundImage)
+            default:
+                return nil
+            }
+        }
+
+        var description: String {
+            switch self {
+            case let .gradient(gradient):
+                "gradient|\(gradient.rawValue)"
+            case let .solidColor(solidColor):
+                "solidColor|\(solidColor.rawValue)"
+            case let .illustration(illustration):
+                "illustration|\(illustration.rawValue)"
+            case let .customImage(userBackgroundImage):
+                "customImage|\(userBackgroundImage.description)"
+            }
+        }
+
         case gradient(Gradient)
         case solidColor(SolidColor)
         case illustration(Illustration)
@@ -300,7 +349,7 @@ extension HomePage.Models.SettingsModel {
         static let placeholderCustomImage: some View = SolidColor.gray.color
     }
 
-    enum Gradient: Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
+    enum Gradient: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
         var id: Self {
             self
         }
@@ -342,7 +391,7 @@ extension HomePage.Models.SettingsModel {
         }
     }
 
-    enum Illustration: Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
+    enum Illustration: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
         var id: Self {
             self
         }
@@ -376,7 +425,7 @@ extension HomePage.Models.SettingsModel {
         }
     }
 
-    enum SolidColor: Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
+    enum SolidColor: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
         var id: Self {
             self
         }

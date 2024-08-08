@@ -33,6 +33,7 @@ protocol AppearancePreferencesPersistor {
     var showBookmarksBar: Bool { get set }
     var bookmarksBarAppearance: BookmarksBarAppearance { get set }
     var homeButtonPosition: HomeButtonPosition { get set }
+    var homePageCustomBackground: String? { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -77,6 +78,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
             }
         }
     }
+
+    @UserDefaultsWrapper(key: .homePageCustomBackground, defaultValue: nil)
+    var homePageCustomBackground: String?
 }
 
 enum HomeButtonPosition: String, CaseIterable {
@@ -219,6 +223,12 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var homePageCustomBackground: HomePage.Models.SettingsModel.CustomBackground? {
+        didSet {
+            persistor.homePageCustomBackground = homePageCustomBackground?.description
+        }
+    }
+
     var isContinueSetUpAvailable: Bool {
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
 
@@ -241,6 +251,7 @@ final class AppearancePreferences: ObservableObject {
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
         homeButtonPosition = persistor.homeButtonPosition
+        homePageCustomBackground = persistor.homePageCustomBackground.flatMap(HomePage.Models.SettingsModel.CustomBackground.init)
     }
 
     private var persistor: AppearancePreferencesPersistor
