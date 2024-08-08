@@ -42,6 +42,7 @@ extension HomePage.Models {
         var backgroundView: some View {
             if let customBackground {
                 customBackground.view
+                    .animation(.none, value: contentType)
             } else {
                 Color.newTabPageBackground
             }
