@@ -1806,9 +1806,6 @@
 		9D9DE5812C63BA0B00D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE5802C63BA0B00D20B15 /* AppKitExtensions */; };
 		9D9DE5832C63BE9600D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE5822C63BE9600D20B15 /* AppKitExtensions */; };
 		9D9DE5852C64FDE900D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE5842C64FDE900D20B15 /* AppKitExtensions */; };
-		9D9DE5872C6502DF00D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE5862C6502DF00D20B15 /* AppKitExtensions */; };
-		9D9DE5892C6502E300D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE5882C6502E300D20B15 /* AppKitExtensions */; };
-		9D9DE58B2C6502E700D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE58A2C6502E700D20B15 /* AppKitExtensions */; };
 		9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC70B192AA1FA5B005A844B /* LoginItems */; };
 		9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 9DEF97E02B06C4EE00764F03 /* Networking */; };
 		9F0660732BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0660722BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift */; };
@@ -4377,7 +4374,6 @@
 				F19547AB2C33FA650041ACC9 /* Subscription in Frameworks */,
 				F116A7C72BD1925500F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CF2B316E0200A595BB /* SnapshotTesting in Frameworks */,
-				9D9DE5892C6502E300D20B15 /* AppKitExtensions in Frameworks */,
 				F1DA51A52BF6114200CF29FA /* SubscriptionTestingUtilities in Frameworks */,
 				3706FE89293F661700E42796 /* OHHTTPStubsSwift in Frameworks */,
 			);
@@ -4388,7 +4384,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				B65CD8D12B316E0C00A595BB /* SnapshotTesting in Frameworks */,
-				9D9DE58B2C6502E700D20B15 /* AppKitExtensions in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4405,7 +4400,6 @@
 			files = (
 				F116A7C92BD1929000F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CD2B316DFC00A595BB /* SnapshotTesting in Frameworks */,
-				9D9DE5872C6502DF00D20B15 /* AppKitExtensions in Frameworks */,
 				B6AE39F329374AEC00C37AA4 /* OHHTTPStubs in Frameworks */,
 				B6AE39F529374AEC00C37AA4 /* OHHTTPStubsSwift in Frameworks */,
 			);
@@ -8710,7 +8704,6 @@
 				F116A7C62BD1925500F3FCF7 /* PixelKitTestingUtilities */,
 				F1DA51A42BF6114200CF29FA /* SubscriptionTestingUtilities */,
 				F19547AA2C33FA650041ACC9 /* Subscription */,
-				9D9DE5882C6502E300D20B15 /* AppKitExtensions */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = 3706FE99293F661700E42796 /* Unit Tests App Store.xctest */;
@@ -8733,7 +8726,6 @@
 			name = "Integration Tests App Store";
 			packageProductDependencies = (
 				B65CD8D02B316E0C00A595BB /* SnapshotTesting */,
-				9D9DE58A2C6502E700D20B15 /* AppKitExtensions */,
 			);
 			productName = "Integration Tests";
 			productReference = 3706FEB2293F662100E42796 /* Integration Tests App Store.xctest */;
@@ -8777,7 +8769,6 @@
 				B6AE39F429374AEC00C37AA4 /* OHHTTPStubsSwift */,
 				B65CD8CC2B316DFC00A595BB /* SnapshotTesting */,
 				F116A7C82BD1929000F3FCF7 /* PixelKitTestingUtilities */,
-				9D9DE5862C6502DF00D20B15 /* AppKitExtensions */,
 			);
 			productName = "Integration Tests";
 			productReference = 4B1AD89D25FC27E200261379 /* Integration Tests.xctest */;
@@ -13980,18 +13971,6 @@
 			productName = AppKitExtensions;
 		};
 		9D9DE5842C64FDE900D20B15 /* AppKitExtensions */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = AppKitExtensions;
-		};
-		9D9DE5862C6502DF00D20B15 /* AppKitExtensions */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = AppKitExtensions;
-		};
-		9D9DE5882C6502E300D20B15 /* AppKitExtensions */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = AppKitExtensions;
-		};
-		9D9DE58A2C6502E700D20B15 /* AppKitExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppKitExtensions;
 		};
