@@ -28,7 +28,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="676" height="52"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <collectionView selectable="YES" id="vwg-NL-UPk">
+                                        <collectionView selectable="YES" id="vwg-NL-UPk" customClass="ItemCachingCollectionView" customModule="DuckDuckGo_Privacy_Browser">
                                             <rect key="frame" x="0.0" y="0.0" width="676" height="52"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                             <collectionViewLayout key="collectionViewLayout" id="YNm-eM-CbC"/>

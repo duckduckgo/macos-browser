@@ -46,8 +46,6 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
 
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "BookmarksBarCollectionViewItem")
 
-    var indexPath: IndexPath?
-
     @IBOutlet private weak var mouseOverView: MouseOverView!
     @IBOutlet var stackView: NSStackView!
     @IBOutlet private var faviconView: NSImageView! {
