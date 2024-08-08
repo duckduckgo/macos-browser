@@ -24,6 +24,7 @@ protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
     func bookmarkManagementDetailViewControllerDidSelectFolder(_ folder: BookmarkFolder)
     func bookmarkManagementDetailViewControllerDidStartSearching()
     func bookmarkManagementDetailViewControllerShowInFolder(_ folder: BookmarkFolder)
+    func bookmarkManagementDetailViewControllerSortChanged(_ mode: BookmarksSortMode)
 
 }
 
@@ -260,6 +261,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
                 self.sortItemsButton.image = .bookmarkSortAsc
             }
 
+            delegate?.bookmarkManagementDetailViewControllerSortChanged(newSortMode)
             self.setupSort(mode: newSortMode)
         }.store(in: &cancellables)
     }

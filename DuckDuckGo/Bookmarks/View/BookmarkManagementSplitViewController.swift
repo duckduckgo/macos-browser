@@ -98,6 +98,10 @@ extension BookmarkManagementSplitViewController: BookmarkManagementDetailViewCon
         sidebarViewController.showBookmarkInFolder(folder)
     }
 
+    func bookmarkManagementDetailViewControllerSortChanged(_ mode: BookmarksSortMode) {
+        sidebarViewController.sortModeChanged(mode)
+    }
+
 }
 
 #if DEBUG
