@@ -323,6 +323,10 @@ extension AppDelegate {
     @objc func resetRemoteMessages(_ sender: Any?) {
         remoteMessagingClient.store?.resetRemoteMessages()
     }
+    
+    @objc func resetCpmCohort(_ sender: Any?) {
+        UserDefaultsWrapper.clear(.autoconsentFilterlistExperimentCohort)
+    }
 }
 
 extension MainViewController {
