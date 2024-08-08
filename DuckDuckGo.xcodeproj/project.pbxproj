@@ -1676,6 +1676,8 @@
 		8446830C2C59015200A15F93 /* SteppedScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8446830A2C59015200A15F93 /* SteppedScrollView.swift */; };
 		84CB98002C636A8F0063F1D2 /* BookmarkDragDropManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CB97FF2C636A8F0063F1D2 /* BookmarkDragDropManager.swift */; };
 		84CB98012C636A8F0063F1D2 /* BookmarkDragDropManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CB97FF2C636A8F0063F1D2 /* BookmarkDragDropManager.swift */; };
+		84CB98032C648BA00063F1D2 /* NSDragOperationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CB98022C648BA00063F1D2 /* NSDragOperationExtension.swift */; };
+		84CB98042C648BA00063F1D2 /* NSDragOperationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CB98022C648BA00063F1D2 /* NSDragOperationExtension.swift */; };
 		84DC715A2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		84DC715B2C1C1E9000033B8C /* UserDefaultsWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */; };
 		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
@@ -3595,6 +3597,7 @@
 		844683072C537F5200A15F93 /* MenuItemNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuItemNode.swift; sourceTree = "<group>"; };
 		8446830A2C59015200A15F93 /* SteppedScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SteppedScrollView.swift; sourceTree = "<group>"; };
 		84CB97FF2C636A8F0063F1D2 /* BookmarkDragDropManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDragDropManager.swift; sourceTree = "<group>"; };
+		84CB98022C648BA00063F1D2 /* NSDragOperationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSDragOperationExtension.swift; sourceTree = "<group>"; };
 		84DC71582C1C1E8A00033B8C /* UserDefaultsWrapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperTests.swift; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
 		850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarAppearance.swift; sourceTree = "<group>"; };
@@ -7743,8 +7746,8 @@
 				B6DB3CF826A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift */,
 				B6106B9D26A565DA0013B453 /* BundleExtension.swift */,
 				B626A75F2992407C00053070 /* CancellableExtension.swift */,
-				4BA1A6C1258B0A1300F6F690 /* ContiguousBytesExtension.swift */,
 				B603FD9D2A02712E00F3FCA9 /* CIImageExtension.swift */,
+				4BA1A6C1258B0A1300F6F690 /* ContiguousBytesExtension.swift */,
 				85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */,
 				B6040855274B830F00680351 /* DictionaryExtension.swift */,
 				B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */,
@@ -7753,7 +7756,6 @@
 				B634DBE6293C98C500C3C99E /* FutureExtension.swift */,
 				1DA6D0FC2A1FF9A100540406 /* HTTPCookie.swift */,
 				AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */,
-				EEE50C282C38249C003DD7FF /* OptionalExtension.swift */,
 				0230C0A2272080090018F728 /* KeyedCodingExtension.swift */,
 				4B8D9061276D1D880078DB17 /* LocaleExtension.swift */,
 				B66B9C5B29A5EBAD0010E8F3 /* NavigationActionExtension.swift */,
@@ -7765,6 +7767,7 @@
 				B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */,
 				B63D467925BFC3E100874977 /* NSCoderExtensions.swift */,
 				F41D174025CB131900472416 /* NSColorExtension.swift */,
+				84CB98022C648BA00063F1D2 /* NSDragOperationExtension.swift */,
 				31B4AF522901A4F20013585E /* NSEventExtension.swift */,
 				B657841825FA484B00D8DB33 /* NSException+Catch.h */,
 				B657841925FA484B00D8DB33 /* NSException+Catch.m */,
@@ -7792,9 +7795,10 @@
 				AA9E9A5525A3AE8400D1959D /* NSWindowExtension.swift */,
 				B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */,
 				B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */,
+				EEE50C282C38249C003DD7FF /* OptionalExtension.swift */,
 				B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */,
-				B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */,
 				B68C2FB127706E6A00BF2C7D /* ProcessExtension.swift */,
+				B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */,
 				B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */,
 				4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */,
 				1DFAB51C2A8982A600A0F7F6 /* SetExtension.swift */,
@@ -7810,11 +7814,11 @@
 				B65C7DFA2B886CF0001E2D5C /* WKPDFHUDViewWrapper.swift */,
 				B645D8F529FA95440024461F /* WKProcessPoolExtension.swift */,
 				AAA0CC69253CC43C0079BC96 /* WKUserContentControllerExtension.swift */,
+				4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */,
 				B63D466725BEB6C200874977 /* WKWebView+Private.h */,
 				B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */,
 				B68458CC25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift */,
 				AA92127625ADA07900600CD4 /* WKWebViewExtension.swift */,
-				4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -10537,6 +10541,7 @@
 				3706FC37293F65D500E42796 /* CoreDataStore.swift in Sources */,
 				3706FC38293F65D500E42796 /* BundleExtension.swift in Sources */,
 				4B9DB04B2A983B24000927DB /* NotificationService.swift in Sources */,
+				84CB98042C648BA00063F1D2 /* NSDragOperationExtension.swift in Sources */,
 				3706FC3A293F65D500E42796 /* NSOpenPanelExtensions.swift in Sources */,
 				F118EA862BEACC7000F77634 /* NonStandardPixel.swift in Sources */,
 				3706FC3B293F65D500E42796 /* FirePopover.swift in Sources */,
@@ -11802,6 +11807,7 @@
 				1D69C553291302F200B75945 /* BWVault.swift in Sources */,
 				AA6FFB4424DC33320028F4D0 /* NSViewExtension.swift in Sources */,
 				B6C0B23E26E8BF1F0031CB7F /* DownloadListViewModel.swift in Sources */,
+				84CB98032C648BA00063F1D2 /* NSDragOperationExtension.swift in Sources */,
 				1D9A37672BD8EA8800EBC58D /* DockPositionProvider.swift in Sources */,
 				4B9292D52667123700AD2C21 /* BookmarkManagementDetailViewController.swift in Sources */,
 				F188267C2BBEB3AA00D9AC4F /* GeneralPixel.swift in Sources */,

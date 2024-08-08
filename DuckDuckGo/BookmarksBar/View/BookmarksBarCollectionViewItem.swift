@@ -174,12 +174,16 @@ extension BookmarksBarCollectionViewItem: MouseOverViewDelegate {
         delegate?.bookmarksBarCollectionViewItem(self, isMouseOver: isMouseOver)
     }
 
-    func mouseOverView(_ sender: MouseOverView, draggingEntered info: any NSDraggingInfo) -> NSDragOperation {
-        return delegate?.bookmarksBarCollectionViewItem(self, draggingEntered: info) ?? .none
+    func mouseOverView(_ sender: MouseOverView, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+        let operation = delegate?.bookmarksBarCollectionViewItem(self, draggingEntered: info) ?? .none
+        isMouseOver.pointee = (operation != .none)
+        return operation
     }
 
-    func mouseOverView(_ sender: MouseOverView, draggingUpdatedWith info: any NSDraggingInfo) -> NSDragOperation {
-        return delegate?.bookmarksBarCollectionViewItem(self, draggingUpdatedWith: info) ?? .none
+    func mouseOverView(_ sender: MouseOverView, draggingUpdatedWith info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+        let operation = delegate?.bookmarksBarCollectionViewItem(self, draggingUpdatedWith: info) ?? .none
+        isMouseOver.pointee = (operation != .none)
+        return operation
     }
 
     func mouseOverView(_ sender: MouseOverView, draggingEndedWith info: any NSDraggingInfo) {

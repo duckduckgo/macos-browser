@@ -338,16 +338,20 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
 
 extension BookmarksBarViewController: MouseOverButtonDelegate {
 
-    func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo) -> NSDragOperation {
+    func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
         guard sender === clippedItemsIndicator else { return .none }
-        return dragDropManager.validateDrop(info, to: clippedItemsBookmarkFolder())
+        let operation = dragDropManager.validateDrop(info, to: clippedItemsBookmarkFolder())
+        isMouseOver.pointee = (operation != .none)
+        return operation
     }
 
-    func mouseOverButton(_ sender: MouseOverButton, draggingUpdatedWith info: any NSDraggingInfo) -> NSDragOperation {
+    func mouseOverButton(_ sender: MouseOverButton, draggingUpdatedWith info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
         guard sender === clippedItemsIndicator else { return .none }
         let clippedItemsBookmarkFolder = clippedItemsBookmarkFolder()
         self.dragging(over: sender, representing: clippedItemsBookmarkFolder, updatedWith: info)
-        return dragDropManager.validateDrop(info, to: clippedItemsBookmarkFolder)
+        let operation = dragDropManager.validateDrop(info, to: clippedItemsBookmarkFolder)
+        isMouseOver.pointee = (operation != .none)
+        return operation
     }
 
     func mouseOverButton(_ sender: MouseOverButton, performDragOperation info: any NSDraggingInfo) -> Bool {

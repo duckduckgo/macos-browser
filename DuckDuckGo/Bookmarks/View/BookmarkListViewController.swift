@@ -137,7 +137,7 @@ final class BookmarkListViewController: NSViewController {
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
         BookmarkOutlineViewDataSource(
-            contentMode: mode == .bookmarkBarMenu ? .bookmarksMenu : .bookmarksAndFolders,
+            outlineView: outlineView, contentMode: mode == .bookmarkBarMenu ? .bookmarksMenu : .bookmarksAndFolders,
             bookmarkManager: bookmarkManager,
             treeController: treeController,
             dragDropManager: dragDropManager,
@@ -377,6 +377,7 @@ final class BookmarkListViewController: NSViewController {
             scrollUpButton.normalTintColor = .labelColor
             scrollUpButton.backgroundColor = .clear
             scrollUpButton.mouseOverColor = .blackWhite10
+            scrollUpButton.delegate = self
             return scrollUpButton
         }()
 
@@ -387,6 +388,7 @@ final class BookmarkListViewController: NSViewController {
             scrollDownButton.normalTintColor = .labelColor
             scrollDownButton.backgroundColor = .clear
             scrollDownButton.mouseOverColor = .blackWhite10
+            scrollDownButton.delegate = self
             return scrollDownButton
         }()
 
@@ -689,37 +691,99 @@ final class BookmarkListViewController: NSViewController {
             }
             .store(in: &cancellables)
 
-        // show submenu for folder
+        // show submenu for folder when dragging or hovering over it
+        enum HighlightEvent { case hover, dragging }
+        typealias RowEvtPub = AnyPublisher<(Int?, BookmarkFolder?, HighlightEvent), Never>
         Publishers.Merge(
-            outlineView.$highlightedRow,
-            // expand folder when dragging over it
+            // hover
+            outlineView.$highlightedRow.map { ($0, HighlightEvent.hover) },
+            // dragging over folder
             dataSource.$dragDestinationFolder.map { [weak self] folder in
                 guard let self, let folder,
-                let node = treeController.findNodeWithId(representing: folder) else { return nil }
-                let row = outlineView.row(forItem: node)
-                guard row >= 0, row != NSNotFound else { return nil }
-                return row
+                      let node = treeController.findNodeWithId(representing: folder),
+                      let row = outlineView.rowIfValid(forItem: node) else {
+                    return (nil, .dragging)
+                }
+                return (row, .dragging)
             }
         )
-        .map { [weak outlineView] row -> AnyPublisher<(Int, BookmarkFolder)?, Never> in
-            guard let row,
-                  let bookmarkNode = outlineView?.item(atRow: row) as? BookmarkNode,
-                  let folder = bookmarkNode.representedObject as? BookmarkFolder else {
-                // hide submenu instantly
-                return Just(nil).eraseToAnyPublisher()
+        .compactMap { [weak self] (row, event) -> RowEvtPub? in
+            guard let self else { return nil }
+            let bookmarkNode = row.flatMap {
+                self.outlineView.item(atRow: $0)
+            } as? BookmarkNode
+            let folder = bookmarkNode?.representedObject as? BookmarkFolder
+
+            var delay: RunLoop.SchedulerTimeType.Stride
+            let isMouseMovingDownRight: Bool = {
+                if let currentEvent = NSApp.currentEvent,
+                   currentEvent.type == .mouseMoved,
+                   currentEvent.deltaY >= 0,
+                   currentEvent.deltaX >= currentEvent.deltaY {
+                    true
+                } else {
+                    false
+                }
+            }()
+            if event == .hover, isMouseMovingDownRight,
+               let bookmarkListPopover, bookmarkListPopover.isShown,
+               let expandedFolder = bookmarkListPopover.rootFolder,
+               let node = treeController.node(representing: expandedFolder),
+               let expandedRow = outlineView.rowIfValid(forItem: node) {
+                guard expandedRow != row else { return nil }
+
+                // delay submenu hiding when cursor is moving right (to the menu)
+                // over other elements that would normally hide the submenu
+                delay = 0.3
+                // restore the originally highlighted row for the expanded folder
+                outlineView.highlightedRow = expandedRow
+
+            } else if event == .dragging {
+                // delay folder expanding when dragging over a subfolder
+                delay = 0.2
+            } else if folder != nil {
+                // delay folder expanding when hovering over a subfolder
+                delay = 0.1
+            } else {
+                // hide submenu instantly when mouse is moved away from folder
+                // unless it‘s moving down-right as handled above.
+                delay = 0
             }
-            // delay showing submenu by 0.3s
-            return Just((row, folder))
-                    .delay(for: 0.3, scheduler: RunLoop.main)
+
+            let valuePublisher = Just((row, folder, event))
+            if delay > 0 {
+                return valuePublisher
+                    .delay(for: delay, scheduler: RunLoop.main)
                     .eraseToAnyPublisher()
+            } else {
+                return valuePublisher.eraseToAnyPublisher()
+            }
         }
         .switchToLatest()
-        .sink { [weak self] input in
+        .filter { [weak dataSource, weak outlineView] (row, folder, event) in
+            // following is valid only when dragging
+            guard event == .dragging else {
+                return outlineView?.highlightedRow == row
+            }
+            // don‘t hide subfolder menu or switch to another folder if
+            // mouse cursor is outside of the view
+            guard outlineView?.isMouseLocationInsideBounds() == true else { return false }
+            if let folder {
+                // only show submenu if cursor is still pointing to the folder
+                return folder == dataSource?.dragDestinationFolder
+            } else {
+                // hide submenu if mouse cursor moved away from the folder
+                return true
+            }
+        }
+        .sink { [weak self] (row, folder, _) in
             guard let self else { return }
-            guard let (row, folder) = input,
+            guard let row, let folder,
                   let cell = outlineView.view(atColumn: 0, row: row, makeIfNecessary: false) else {
                 guard let bookmarkListPopover, bookmarkListPopover.isShown else { return }
                 bookmarkListPopover.close()
+                // unhighlight drop destination row if highlighted
+                dataSource.targetRowForDropOperation = nil
                 return
             }
 
@@ -727,6 +791,10 @@ final class BookmarkListViewController: NSViewController {
             if let popover = self.bookmarkListPopover {
                 bookmarkListPopover = popover
                 if bookmarkListPopover.isShown {
+                    if bookmarkListPopover.rootFolder?.id == folder.id {
+                        // submenu for the folder is already shown
+                        return
+                    }
                     bookmarkListPopover.close()
                 }
                 bookmarkListPopover.reloadData(withRootFolder: folder)
@@ -746,6 +814,39 @@ final class BookmarkListViewController: NSViewController {
             }
         }
         .store(in: &cancellables)
+
+        // restore drag&drop target folder highlight on mouse out
+        // when the submenu is shown
+        enum DropRowEvent {
+            case dropRow(Int?)
+            case highlightedRow(Int?)
+        }
+        Publishers.Merge(
+            dataSource.$targetRowForDropOperation.map(DropRowEvent.dropRow),
+            outlineView.$highlightedRow.map(DropRowEvent.highlightedRow)
+        )
+        .sink { [weak self] event in
+            guard let self else { return }
+            switch event {
+            case .dropRow(let row):
+                guard row == nil else { break }
+                if let bookmarkListPopover, bookmarkListPopover.isShown,
+                   let expandedFolder = bookmarkListPopover.rootFolder,
+                   let node = treeController.node(representing: expandedFolder),
+                   let expandedRow = outlineView.rowIfValid(forItem: node),
+                   expandedRow != outlineView.highlightedRow {
+                    // restore expanded subfolder drop target row highlight
+                    dataSource.targetRowForDropOperation = expandedRow
+                }
+            case .highlightedRow:
+                // hide drop destination row highlight when drag operation ends
+                if dataSource.targetRowForDropOperation != nil {
+                    dataSource.targetRowForDropOperation = nil
+                }
+            }
+        }
+        .store(in: &cancellables)
+
         // only subscribe in root bookmarks menu
         if !(view.window?.parent?.contentViewController is Self) {
             subscribeToClickOutsideEvents()
@@ -969,7 +1070,7 @@ final class BookmarkListViewController: NSViewController {
         expandFoldersAndScrollUntil(folder)
         outlineView.scrollToAdjustedPositionInOutlineView(folder)
 
-        guard let node = dataSource.treeController.node(representing: folder) else { return }
+        guard let node = treeController.node(representing: folder) else { return }
 
         outlineView.highlight(node)
     }
@@ -1387,7 +1488,7 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
         hideSearchBar()
         showTreeView()
 
-        guard let node = dataSource.treeController.node(representing: baseBookmark) else { return }
+        guard let node = treeController.node(representing: baseBookmark) else { return }
 
         expandFoldersUntil(node: node)
         outlineView.scrollToAdjustedPositionInOutlineView(node)
@@ -1431,18 +1532,35 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
     private func showSearch(forSearchQuery searchQuery: String) {
         dataSource.reloadData(forSearchQuery: searchQuery, sortMode: sortBookmarksViewModel.selectedSortMode)
 
-        if dataSource.treeController.rootNode.childNodes.isEmpty {
+        if treeController.rootNode.childNodes.isEmpty {
             showEmptyStateView(for: .noSearchResults)
         } else {
             emptyState?.isHidden = true
             outlineView.isHidden = false
             outlineView.reloadData()
 
-            if let firstNode = dataSource.treeController.rootNode.childNodes.first {
+            if let firstNode = treeController.rootNode.childNodes.first {
                 outlineView.scrollTo(firstNode)
             }
         }
     }
+}
+
+extension BookmarkListViewController: MouseOverButtonDelegate {
+
+    func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+
+        assert(sender === scrollUpButton || sender === scrollDownButton)
+        isMouseOver.pointee = true
+        return .none
+    }
+
+    func mouseOverButton(_ sender: MouseOverButton, draggingUpdatedWith info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+        assert(sender === scrollUpButton || sender === scrollDownButton)
+        isMouseOver.pointee = true
+        return .none
+    }
+
 }
 
 #if DEBUG

@@ -25,10 +25,10 @@ final class BookmarkListPopover: NSPopover {
     private let bookmarkManager: BookmarkManager
     private(set) var rootFolder: BookmarkFolder?
 
-    private var preferredEdge: NSRectEdge?
+    private(set) var preferredEdge: NSRectEdge?
     private(set) weak var positioningView: NSView?
 
-    private static let popoverInsets = NSEdgeInsets(top: 13, left: 13, bottom: 13, right: 13)
+    static let popoverInsets = NSEdgeInsets(top: 13, left: 13, bottom: 13, right: 13)
 
     init(mode: BookmarkListViewController.Mode = .popover, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, rootFolder: BookmarkFolder? = nil) {
         self.mode = mode

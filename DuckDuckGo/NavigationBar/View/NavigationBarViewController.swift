@@ -1141,16 +1141,20 @@ extension NavigationBarViewController: DownloadsViewControllerDelegate {
 
 extension NavigationBarViewController: MouseOverButtonDelegate {
 
-    func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo) -> NSDragOperation {
+    func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
         guard sender === bookmarkListButton else { return .none }
-        return dragDropManager.validateDrop(info, to: PseudoFolder.bookmarks)
+        let operation = dragDropManager.validateDrop(info, to: PseudoFolder.bookmarks)
+        isMouseOver.pointee = (operation != .none)
+        return operation
     }
 
-    func mouseOverButton(_ sender: MouseOverButton, draggingUpdatedWith info: any NSDraggingInfo) -> NSDragOperation {
+    func mouseOverButton(_ sender: MouseOverButton, draggingUpdatedWith info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
         guard sender === bookmarkListButton else { return .none }
         cursorDraggedOverBookmarkListButton(with: info)
 
-        return dragDropManager.validateDrop(info, to: PseudoFolder.bookmarks)
+        let operation = dragDropManager.validateDrop(info, to: PseudoFolder.bookmarks)
+        isMouseOver.pointee = (operation != .none)
+        return operation
     }
 
     private func cursorDraggedOverBookmarkListButton(with info: any NSDraggingInfo) {

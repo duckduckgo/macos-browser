@@ -20,18 +20,12 @@ import AppKit
 import Carbon
 import Combine
 
-extension NSDragOperation {
-
-    static let none = NSDragOperation([])
-
-}
-
 final class BookmarksOutlineView: NSOutlineView {
 
     private var highlightedRowView: RoundedSelectionRowView?
     private var highlightedCellView: BookmarkOutlineCellView?
 
-    @Published var highlightedRow: Int? {
+    @PublishedAfter var highlightedRow: Int? {
         didSet {
             highlightedRowView?.highlight = false
             highlightedCellView?.highlight = false
@@ -298,4 +292,5 @@ final class BookmarksOutlineView: NSOutlineView {
             rowView.highlight = false
         }
     }
+
 }
