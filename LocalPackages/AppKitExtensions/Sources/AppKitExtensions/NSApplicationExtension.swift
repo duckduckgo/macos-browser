@@ -45,7 +45,8 @@ public extension NSApplication {
     }
 
     static let runType: RunType = {
-#if DEBUG
+        let isCI = ProcessInfo.processInfo.environment["CI"] != nil
+
         if let testBundlePath = ProcessInfo().environment["XCTestBundlePath"] {
             if testBundlePath.contains("Unit") {
                 return .unitTests
@@ -58,25 +59,11 @@ public extension NSApplication {
             return .xcPreviews
         } else if ProcessInfo.processInfo.environment["UITEST_MODE_ONBOARDING"] == "1"{
             return .uiTestsOnboarding
-        } else if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+        } else if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" || isCI {
             return .uiTests
         } else {
             return .normal
         }
-#elseif REVIEW
-        let isCI = ProcessInfo.processInfo.environment["CI"] != nil
-        // UITEST_MODE is set from UI Tests code, but this check didn't work reliably
-        // in CI on its own, so we're defaulting all CI runs of the REVIEW app to UI Tests
-        if ProcessInfo().environment["UITEST_MODE_ONBOARDING"] == "1" {
-            return .uiTestsOnboarding
-        }
-        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" || isCI {
-            return .uiTests
-        }
-        return .normal
-#else
-        return .normal
-#endif
     }()
     var runType: RunType { Self.runType }
 
