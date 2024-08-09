@@ -138,7 +138,6 @@ final class BrowserTabViewController: NSViewController {
                                                name: .emailDidCloseEmailProtection,
                                                object: nil)
 
-#if DBP
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onDBPFeatureDisabled),
                                                name: .dbpWasDisabled,
@@ -147,12 +146,6 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onCloseDataBrokerProtection),
                                                name: .dbpDidClose,
                                                object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onDataBrokerWaitlistGetStartedPressedByUser),
-                                               name: .dataBrokerProtectionUserPressedOnGetStartedOnWaitlist,
-                                               object: nil)
-
-#endif
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onCloseSubscriptionPage),
@@ -195,7 +188,6 @@ final class BrowserTabViewController: NSViewController {
         self.previouslySelectedTab = nil
     }
 
-#if DBP
     @objc
     private func onDBPFeatureDisabled(_ notification: Notification) {
         Task { @MainActor in
@@ -220,8 +212,6 @@ final class BrowserTabViewController: NSViewController {
     private func onDataBrokerWaitlistGetStartedPressedByUser(_ notification: Notification) {
         WindowControllersManager.shared.showDataBrokerProtectionTab()
     }
-
-#endif
 
     @objc
     private func onCloseSubscriptionPage(_ notification: Notification) {
@@ -288,13 +278,11 @@ final class BrowserTabViewController: NSViewController {
     private func removeDataBrokerViewIfNecessary() -> ([Tab]) -> Void {
         { [weak self] (tabs: [Tab]) in
             guard let self else { return }
-#if DBP
             if let dataBrokerProtectionHomeViewController,
                !tabs.contains(where: { $0.content == .dataBrokerProtection }) {
                 dataBrokerProtectionHomeViewController.removeCompletely()
                 self.dataBrokerProtectionHomeViewController = nil
             }
-#endif
         }
     }
 
@@ -557,9 +545,7 @@ final class BrowserTabViewController: NSViewController {
         preferencesViewController?.removeCompletely()
         bookmarksViewController?.removeCompletely()
         homePageViewController?.removeCompletely()
-#if DBP
         dataBrokerProtectionHomeViewController?.removeCompletely()
-#endif
         if includingWebView {
             self.removeWebViewFromHierarchy()
         }
@@ -611,13 +597,11 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
             addAndLayoutChild(homePageViewControllerCreatingIfNeeded())
 
-#if DBP
         case .dataBrokerProtection:
             removeAllTabContent()
             let dataBrokerProtectionViewController = dataBrokerProtectionHomeViewControllerCreatingIfNeeded()
             self.previouslySelectedTab = tabCollectionViewModel.selectedTab
             addAndLayoutChild(dataBrokerProtectionViewController)
-#endif
         default:
             removeAllTabContent()
         }
@@ -695,7 +679,6 @@ final class BrowserTabViewController: NSViewController {
         }()
     }
 
-#if DBP
     // MARK: - DataBrokerProtection
 
     var dataBrokerProtectionHomeViewController: DBPHomeViewController?
@@ -706,7 +689,6 @@ final class BrowserTabViewController: NSViewController {
             return dataBrokerProtectionHomeViewController
         }()
     }
-#endif
 
     // MARK: - Preferences
 
@@ -1193,7 +1175,7 @@ extension BrowserTabViewController {
 
     private func subscribeToTabSelectedInCurrentKeyWindow() {
         let lastKeyWindowOtherThanOurs = WindowControllersManager.shared.didChangeKeyWindowController
-            .map { WindowControllersManager.shared.lastKeyMainWindowController }
+            .map { $0 }
             .prepend(WindowControllersManager.shared.lastKeyMainWindowController)
             .compactMap { $0 }
             .filter { [weak self] in $0.window !== self?.view.window }

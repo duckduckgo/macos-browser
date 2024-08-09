@@ -391,6 +391,10 @@ struct UserText {
     static let duckPlayerNewTabPreferenceExtraInfo = NSLocalizedString("duck-player.newtab.info-preference", value: "When browsing YouTube on the web", comment: "New tab preference extra info in settings")
     static let duckPlayerVideoPreferencesTitle = NSLocalizedString("duck-player.video-preferences-title", value: "Video Preferences", comment: "Video Preferences title in settings")
 
+    static let duckPlayerContingencyMessageTitle = NSLocalizedString("duck-player.contingency-title", value: "Duck Player Unavailable", comment: "Title for message explaining to the user that Duck Player is not available")
+    static let duckPlayerContingencyMessageBody = NSLocalizedString("duck-player.video-contingency-message", value: "Duck Player's functionality has been affected by recent changes to YouTube. We’re working to fix these issues and appreciate your understanding.", comment: "Message explaining to the user that Duck Player is not available")
+    static let duckPlayerContingencyMessageCTA = NSLocalizedString("duck-player.video-contingency-cta", value: "Learn More", comment: "Button for the message explaining to the user that Duck Player is not available so the user can learn more")
+
 
     static let gpcCheckboxTitle = NSLocalizedString("gpc.checkbox.title", value: "Enable Global Privacy Control", comment: "GPC settings checkbox title")
     static let gpcExplanation = NSLocalizedString("gpc.explanation", value: "Tells participating websites not to sell or share your data.", comment: "GPC explanation in settings")

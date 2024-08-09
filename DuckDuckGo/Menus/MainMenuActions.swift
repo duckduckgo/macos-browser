@@ -915,14 +915,6 @@ extension MainViewController {
         }
     }
 
-    @objc func showPIRThankYouModal(_ sender: Any?) {
-        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .dbp)
-        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
-        if let thankYouWindow = thankYouWindowController.window {
-            WindowsManager.windows.first?.beginSheet(thankYouWindow)
-        }
-    }
-
     @objc func resetEmailProtectionInContextPrompt(_ sender: Any?) {
         EmailManager().resetEmailProtectionInContextPrompt()
     }

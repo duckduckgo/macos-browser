@@ -38,13 +38,7 @@ public struct NetworkProtectionStatusView: View {
 
     /// The view model that this instance will use.
     ///
-    @ObservedObject var model: Model
-
-    // MARK: - Initializers
-
-    public init(model: Model) {
-        self.model = model
-    }
+    @EnvironmentObject var model: Model
 
     // MARK: - View Contents
 
@@ -74,10 +68,8 @@ public struct NetworkProtectionStatusView: View {
             TunnelControllerView(model: model.tunnelControllerViewModel)
                 .disabled(model.tunnelControllerViewDisabled)
 
-            if model.showDebugInformation {
-                DebugInformationView(model: DebugInformationViewModel())
-                    .transition(.slide)
-            }
+            DebugInformationView()
+                .transition(.slide)
 
             bottomMenuView()
         }

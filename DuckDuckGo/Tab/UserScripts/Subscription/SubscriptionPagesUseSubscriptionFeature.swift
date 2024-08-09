@@ -151,7 +151,9 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         switch subscriptionPlatform {
         case .appStore:
             if #available(macOS 12.0, *) {
-                return await subscriptionManager.storePurchaseManager().subscriptionOptions()
+                if let subscriptionOptions = await subscriptionManager.storePurchaseManager().subscriptionOptions() {
+                    return subscriptionOptions
+                }
             }
         case .stripe:
             switch await stripePurchaseFlow.subscriptionOptions() {

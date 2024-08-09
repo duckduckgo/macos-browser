@@ -74,10 +74,6 @@ final class NetworkProtectionIPCTunnelController {
     // MARK: - Login Items Manager
 
     private func enableLoginItems() async throws {
-        guard try await featureGatekeeper.canStartVPN() else {
-            throw RequestError.notAuthorizedToEnableLoginItem
-        }
-
         do {
             try loginItemsManager.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
         } catch {
@@ -103,6 +99,10 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
         }
 
         do {
+            guard try await featureGatekeeper.canStartVPN() else {
+                throw RequestError.notAuthorizedToEnableLoginItem
+            }
+
             try await enableLoginItems()
 
             knownFailureStore.reset()

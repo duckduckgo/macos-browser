@@ -124,6 +124,7 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
         }
 
         let dismissedMessageIds = store.fetchDismissedRemoteMessageIDs()
+        let shownMessageIds = store.fetchShownRemoteMessageIDs()
 
 #if APPSTORE
         let isInstalledMacAppStore = true
@@ -155,6 +156,7 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
                                                        isPrivacyProSubscriptionExpiring: isPrivacyProSubscriptionExpiring,
                                                        isPrivacyProSubscriptionExpired: isPrivacyProSubscriptionExpired,
                                                        dismissedMessageIds: dismissedMessageIds,
+                                                       shownMessageIds: shownMessageIds,
                                                        pinnedTabsCount: pinnedTabsManager.tabCollection.tabs.count,
                                                        hasCustomHomePage: startupPreferencesPersistor().launchToCustomHomePage,
                                                        isDuckPlayerOnboarded: duckPlayerPreferencesPersistor.youtubeOverlayAnyButtonPressed,

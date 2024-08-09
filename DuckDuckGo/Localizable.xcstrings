@@ -17381,6 +17381,18 @@
         }
       }
     },
+    "duck-player.contingency-title" : {
+      "comment" : "Title for message explaining to the user that Duck Player is not available",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck Player Unavailable"
+          }
+        }
+      }
+    },
     "duck-player.explanation" : {
       "comment" : "Private YouTube Player explanation in settings",
       "extractionState" : "extracted_with_value",
@@ -17797,6 +17809,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Проигрыватель Duck Player"
+          }
+        }
+      }
+    },
+    "duck-player.video-contingency-cta" : {
+      "comment" : "Button for the message explaining to the user that Duck Player is not available so the user can learn more",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn More"
+          }
+        }
+      }
+    },
+    "duck-player.video-contingency-message" : {
+      "comment" : "Message explaining to the user that Duck Player is not available",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck Player's functionality has been affected by recent changes to YouTube. We’re working to fix these issues and appreciate your understanding."
           }
         }
       }
@@ -57085,6 +57121,9 @@
           }
         }
       }
+    },
+    "URL" : {
+
     },
     "version" : {
       "comment" : "Displays the version and build numbers",

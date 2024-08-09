@@ -20,6 +20,7 @@ import AppKit
 import Combine
 import Foundation
 import NetworkProtection
+import NetworkProtectionIPC
 import NetworkProtectionUI
 import BrowserServicesKit
 
@@ -38,6 +39,9 @@ final class VPNPreferencesModel: ObservableObject {
     @Published var excludeLocalNetworks: Bool {
         didSet {
             settings.excludeLocalNetworks = excludeLocalNetworks
+            Task {
+                try await vpnXPCClient.command(.restartAdapter)
+            }
         }
     }
 
@@ -59,6 +63,13 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
+    /// Whether the excluded sites section in preferences is shown.
+    ///
+    /// Only necessary because this is feature flagged to internal users.
+    ///
+    @Published
+    var showExcludedSites: Bool
+
     @Published var notifyStatusChanges: Bool {
         didSet {
             settings.notifyStatusChanges = notifyStatusChanges
@@ -74,19 +85,25 @@ final class VPNPreferencesModel: ObservableObject {
     }
 
     @Published public var dnsSettings: NetworkProtectionDNSSettings = .default
-
     @Published public var isCustomDNSSelected = false
     @Published public var customDNSServers: String?
 
+    private let vpnXPCClient: VPNControllerXPCClient
     private let settings: VPNSettings
     private let pinningManager: PinningManager
+    private let internalUserDecider: InternalUserDecider
     private var cancellables = Set<AnyCancellable>()
 
-    init(settings: VPNSettings = .init(defaults: .netP),
+    init(vpnXPCClient: VPNControllerXPCClient = .shared,
+         settings: VPNSettings = .init(defaults: .netP),
          pinningManager: PinningManager = LocalPinningManager.shared,
-         defaults: UserDefaults = .netP) {
+         defaults: UserDefaults = .netP,
+         internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider) {
+
+        self.vpnXPCClient = vpnXPCClient
         self.settings = settings
         self.pinningManager = pinningManager
+        self.internalUserDecider = internalUserDecider
 
         connectOnLogin = settings.connectOnLogin
         excludeLocalNetworks = settings.excludeLocalNetworks
@@ -94,6 +111,7 @@ final class VPNPreferencesModel: ObservableObject {
         showInMenuBar = settings.showInMenuBar
         showInBrowserToolbar = pinningManager.isPinned(.networkProtection)
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
+        showExcludedSites = internalUserDecider.isInternalUser
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
 
@@ -102,6 +120,7 @@ final class VPNPreferencesModel: ObservableObject {
         subscribeToShowInBrowserToolbarSettingsChanges()
         subscribeToLocationSettingChanges()
         subscribeToDNSSettingsChanges()
+        subscribeToInternalUserChanges()
     }
 
     func subscribeToOnboardingStatusChanges(defaults: UserDefaults) {
@@ -150,6 +169,12 @@ final class VPNPreferencesModel: ObservableObject {
         customDNSServers = settings.dnsSettings.dnsServersText
     }
 
+    private func subscribeToInternalUserChanges() {
+        internalUserDecider.isInternalUserPublisher
+            .assign(to: \.showExcludedSites, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
     func resetDNSSettings() {
         settings.dnsSettings = .default
     }
@@ -181,6 +206,22 @@ final class VPNPreferencesModel: ObservableObject {
         cancelButton.keyEquivalent = "\r"
 
         return alert
+    }
+
+    // MARK: - Excluded Sites
+
+    @MainActor
+    func manageExcludedSites() {
+        let windowController = ExcludedDomainsViewController.create().wrappedInWindowController()
+
+        guard let window = windowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("DataClearingPreferences: Failed to present ExcludedDomainsViewController")
+            return
+        }
+
+        parentWindowController.window?.beginSheet(window)
     }
 }
 

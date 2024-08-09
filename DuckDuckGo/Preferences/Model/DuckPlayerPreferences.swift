@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import BrowserServicesKit
 import PixelKit
+import DuckPlayer
 
 protocol DuckPlayerPreferencesPersistor {
     /// The persistor hadles raw Bool values but each one translates into a DuckPlayerMode:
@@ -52,6 +53,7 @@ struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersisto
 
 final class DuckPlayerPreferences: ObservableObject {
     private let internalUserDecider: InternalUserDecider
+    private let duckPlayerContingencyHandler: DuckPlayerContingencyHandler
 
     static let shared = DuckPlayerPreferences()
     private let privacyConfigurationManager: PrivacyConfigurationManaging
@@ -111,6 +113,16 @@ final class DuckPlayerPreferences: ObservableObject {
         }
     }
 
+    var shouldDisplayContingencyMessage: Bool {
+        duckPlayerContingencyHandler.shouldDisplayContingencyMessage
+    }
+
+    @MainActor
+    func openLearnMoreContingencyURL() {
+        guard let url = duckPlayerContingencyHandler.learnMoreURL else { return }
+        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+    }
+
     init(persistor: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor(),
          privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider) {
@@ -122,6 +134,7 @@ final class DuckPlayerPreferences: ObservableObject {
         duckPlayerOpenInNewTab = persistor.duckPlayerOpenInNewTab
         self.privacyConfigurationManager = privacyConfigurationManager
         self.internalUserDecider = internalUserDecider
+        self.duckPlayerContingencyHandler = DefaultDuckPlayerContingencyHandler(privacyConfigurationManager: privacyConfigurationManager)
     }
 
     private var persistor: DuckPlayerPreferencesPersistor

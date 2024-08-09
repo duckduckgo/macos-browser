@@ -31,25 +31,21 @@ public struct DebugInformationView: View {
 
     /// The view model that this instance will use.
     ///
-    @ObservedObject var model: DebugInformationViewModel
-
-    // MARK: - Initializers
-
-    public init(model: DebugInformationViewModel) {
-        self.model = model
-    }
+    @EnvironmentObject var model: DebugInformationViewModel
 
     // MARK: - View Contents
 
     public var body: some View {
-        Group {
-            VStack(alignment: .leading, spacing: 0) {
-                informationRow(title: "Bundle Path", details: model.bundlePath)
-                informationRow(title: "Version", details: model.version)
-            }
+        if model.showDebugInformation {
+            Group {
+                VStack(alignment: .leading, spacing: 0) {
+                    informationRow(title: "Bundle Path", details: model.bundlePath)
+                    informationRow(title: "Version", details: model.version)
+                }
 
-            Divider()
-                .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+                Divider()
+                    .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+            }
         }
     }
 
