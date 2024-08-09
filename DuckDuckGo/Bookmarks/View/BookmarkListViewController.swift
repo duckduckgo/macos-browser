@@ -106,7 +106,7 @@ final class BookmarkListViewController: NSViewController {
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
         self.treeControllerSearchDataSource = BookmarkListTreeControllerSearchDataSource(bookmarkManager: bookmarkManager)
         self.bookmarkMetrics = metrics
-        self.sortBookmarksViewModel = SortBookmarksViewModel(metrics: metrics, origin: .panel)
+        self.sortBookmarksViewModel = SortBookmarksViewModel(manager: bookmarkManager, metrics: metrics, origin: .panel)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -458,9 +458,8 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @objc func sortBookmarksButtonClicked(_ sender: NSButton) {
-        let menu = sortBookmarksViewModel.selectedSortMode.menu
+        let menu = sortBookmarksViewModel.menu
         bookmarkMetrics.fireSortButtonClicked(origin: .panel)
-        menu.delegate = sortBookmarksViewModel
         menu.popUpAtMouseLocation(in: sortBookmarksButton)
     }
 
@@ -853,21 +852,6 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
         expandFoldersUntil(node: node)
         outlineView.scrollToAdjustedPositionInOutlineView(node)
         outlineView.highlight(node)
-    }
-}
-
-extension BookmarkListViewController: BookmarkSortMenuItemSelectors {
-
-    func manualSort(_ sender: NSMenuItem) {
-        sortBookmarksViewModel.setSort(mode: .manual)
-    }
-
-    func sortByNameAscending(_ sender: NSMenuItem) {
-        sortBookmarksViewModel.setSort(mode: .nameAscending)
-    }
-
-    func sortByNameDescending(_ sender: NSMenuItem) {
-        sortBookmarksViewModel.setSort(mode: .nameDescending)
     }
 }
 

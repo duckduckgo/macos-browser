@@ -23,7 +23,7 @@ protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
 
     func bookmarkManagementDetailViewControllerDidSelectFolder(_ folder: BookmarkFolder)
     func bookmarkManagementDetailViewControllerDidStartSearching()
-    func bookmarkManagementDetailViewControllerShowInFolder(_ folder: BookmarkFolder)
+    func bookmarkManagementDetailViewControllerSortChanged(_ mode: BookmarksSortMode)
 
 }
 
@@ -41,6 +41,8 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         .withAccessibilityIdentifier("BookmarkManagementDetailViewController.newFolderButton")
     private lazy var deleteItemsButton = MouseOverButton(title: "  " + UserText.bookmarksBarContextMenuDelete, target: self, action: #selector(delete))
         .withAccessibilityIdentifier("BookmarkManagementDetailViewController.deleteItemsButton")
+    private lazy var sortItemsButton = MouseOverButton(title: "  " + UserText.bookmarksSort.capitalized, target: self, action: #selector(sortBookmarks))
+        .withAccessibilityIdentifier("BookmarkManagementDetailViewController.sortItemsButton")
 
     lazy var searchBar = NSSearchField()
     private lazy var separator = NSBox()
@@ -57,24 +59,33 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     private let managementDetailViewModel: BookmarkManagementDetailViewModel
     private let bookmarkManager: BookmarkManager
+    private let sortBookmarksViewModel: SortBookmarksViewModel
     private var selectionState: BookmarkManagementSidebarViewController.SelectionState = .empty {
         didSet {
             reloadData()
         }
     }
+    private var cancellables = Set<AnyCancellable>()
 
     func update(selectionState: BookmarkManagementSidebarViewController.SelectionState) {
         if case .folder = selectionState {
             clearSearch()
         }
 
-        managementDetailViewModel.update(selection: selectionState, searchQuery: searchBar.stringValue)
+        managementDetailViewModel.update(selection: selectionState,
+                                         mode: sortBookmarksViewModel.selectedSortMode,
+                                         searchQuery: searchBar.stringValue)
         self.selectionState = selectionState
     }
 
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.bookmarkManager = bookmarkManager
-        self.managementDetailViewModel = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let metrics = BookmarksSearchAndSortMetrics()
+        let sortViewModel = SortBookmarksViewModel(manager: bookmarkManager, metrics: metrics, origin: .manager)
+        self.sortBookmarksViewModel = sortViewModel
+        self.managementDetailViewModel = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager,
+                                                                           metrics: metrics,
+                                                                           mode: bookmarkManager.sortMode)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -94,12 +105,14 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         toolbarButtonsStackView.addArrangedSubview(newBookmarkButton)
         toolbarButtonsStackView.addArrangedSubview(newFolderButton)
         toolbarButtonsStackView.addArrangedSubview(deleteItemsButton)
+        toolbarButtonsStackView.addArrangedSubview(sortItemsButton)
         toolbarButtonsStackView.translatesAutoresizingMaskIntoConstraints = false
         toolbarButtonsStackView.distribution = .fill
 
         configureToolbar(button: newBookmarkButton, image: .addBookmark, isHidden: false)
         configureToolbar(button: newFolderButton, image: .addFolder, isHidden: false)
         configureToolbar(button: deleteItemsButton, image: .trash, isHidden: true)
+        configureToolbar(button: sortItemsButton, image: .sortAscending, isHidden: false)
 
         emptyState.addSubview(emptyStateImageView)
         emptyState.addSubview(emptyStateTitle)
@@ -204,6 +217,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             newBookmarkButton.heightAnchor.constraint(equalToConstant: 24),
             newFolderButton.heightAnchor.constraint(equalToConstant: 24),
             deleteItemsButton.heightAnchor.constraint(equalToConstant: 24),
+            sortItemsButton.heightAnchor.constraint(equalToConstant: 24),
 
             emptyStateMessage.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor),
 
@@ -235,6 +249,20 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
                                            FolderPasteboardWriter.folderUTIInternalType])
 
         reloadData()
+
+        sortBookmarksViewModel.$selectedSortMode.sink { [weak self] newSortMode in
+            guard let self else { return }
+
+            switch newSortMode {
+            case .nameDescending:
+                self.sortItemsButton.image = .bookmarkSortDesc
+            default:
+                self.sortItemsButton.image = .bookmarkSortAsc
+            }
+
+            delegate?.bookmarkManagementDetailViewControllerSortChanged(newSortMode)
+            self.setupSort(mode: newSortMode)
+        }.store(in: &cancellables)
     }
 
     override func viewDidDisappear() {
@@ -301,6 +329,8 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             return
         }
 
+        managementDetailViewModel.onBookmarkTapped()
+
         if let url = (entity as? Bookmark)?.urlObject {
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
                 WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
@@ -330,12 +360,30 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         deleteSelectedItems()
     }
 
+    @objc func sortBookmarks(_ sender: NSButton) {
+        let menu = sortBookmarksViewModel.menu
+        managementDetailViewModel.onSortButtonTapped()
+        menu.popUpAtMouseLocation(in: sortItemsButton)
+    }
+
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         if menuItem.action == #selector(BookmarkManagementDetailViewController.delete(_:)) {
             return !tableView.selectedRowIndexes.isEmpty
         }
 
         return true
+    }
+
+    private func setupSort(mode: BookmarksSortMode) {
+        clearSearch()
+        managementDetailViewModel.update(selection: selectionState, mode: mode)
+        tableView.reloadData()
+        sortItemsButton.backgroundColor = mode.shouldHighlightButton ? .buttonMouseDown : .clear
+        sortItemsButton.mouseOverColor = mode.shouldHighlightButton ? .buttonMouseDown : .buttonMouseOver
+    }
+
+    private func clearSearch() {
+        searchBar.stringValue = ""
     }
 
     private func totalRows() -> Int {
@@ -472,10 +520,6 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             let cell = self.tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? BookmarkTableCellView
             cell?.isSelected = false
         }
-    }
-
-    private func clearSearch() {
-        searchBar.stringValue = ""
     }
 
     func tableViewSelectionDidChange(_ notification: Notification) {
@@ -689,6 +733,8 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
+        managementDetailViewModel.onBookmarkTapped()
+
         WindowControllersManager.shared.show(url: url, source: .bookmark, newTab: true)
         PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
@@ -699,6 +745,8 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             assertionFailure("Failed to cast menu represented object to Bookmark")
             return
         }
+
+        managementDetailViewModel.onBookmarkTapped()
 
         WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
         PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
@@ -773,9 +821,9 @@ extension BookmarkManagementDetailViewController: BookmarkSearchMenuItemSelector
 
         if let bookmark = baseBookmark as? Bookmark,
             let folder = managementDetailViewModel.searchForParent(bookmark: bookmark) {
-            delegate?.bookmarkManagementDetailViewControllerShowInFolder(folder)
+            delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
         } else if let folder = baseBookmark as? BookmarkFolder {
-            delegate?.bookmarkManagementDetailViewControllerShowInFolder(folder)
+            delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
         }
     }
 }
@@ -786,7 +834,9 @@ extension BookmarkManagementDetailViewController: NSSearchFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
         if let searchField = obj.object as? NSSearchField {
-            managementDetailViewModel.update(selection: selectionState, searchQuery: searchField.stringValue)
+            managementDetailViewModel.update(selection: selectionState,
+                                             mode: sortBookmarksViewModel.selectedSortMode,
+                                             searchQuery: searchField.stringValue)
             delegate?.bookmarkManagementDetailViewControllerDidStartSearching()
             reloadData()
         }

@@ -54,10 +54,11 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly,
                                                                 bookmarkManager: bookmarkManager,
                                                                 treeController: treeController,
-                                                                sortMode: .manual,
+                                                                sortMode: selectedSortMode,
                                                                 showMenuButtonOnHover: false)
 
     private var cancellables = Set<AnyCancellable>()
+    private var selectedSortMode: BookmarksSortMode
 
     weak var delegate: BookmarkManagementSidebarViewControllerDelegate?
 
@@ -70,6 +71,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
 
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.bookmarkManager = bookmarkManager
+        self.selectedSortMode = bookmarkManager.sortMode
         treeControllerDataSource = .init(bookmarkManager: bookmarkManager)
         super.init(nibName: nil, bundle: nil)
     }
@@ -182,8 +184,12 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     func select(folder: BookmarkFolder) {
         if let node = treeController.node(representing: folder) {
             let path = BookmarkNode.Path(node: node)
+
+            if !outlineView.isItemVisible(node) {
+                outlineView.scrollToAdjustedPositionInOutlineView(node)
+            }
+
             outlineView.revealAndSelect(nodePath: path)
-            outlineView.scrollToAdjustedPositionInOutlineView(node)
         }
     }
 
@@ -194,20 +200,14 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         }
     }
 
-    func showBookmarkInFolder(_ folder: BookmarkFolder) {
-        guard let node = dataSource.treeController.node(representing: folder) else {
-            return
-        }
-
-        let path = BookmarkNode.Path(node: node)
-        outlineView.revealAndSelect(nodePath: path)
-        outlineView.scrollToAdjustedPositionInOutlineView(node)
-        outlineView.highlight(node)
+    func sortModeChanged(_ mode: BookmarksSortMode) {
+        self.selectedSortMode = mode
+        reloadData()
     }
 
     private func reloadData() {
         let selectedNodes = self.selectedNodes
-        dataSource.reloadData(with: .manual)
+        dataSource.reloadData(with: selectedSortMode)
         outlineView.reloadData()
 
         expandAndRestore(selectedNodes: selectedNodes)

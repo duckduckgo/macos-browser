@@ -26,17 +26,21 @@ enum BookmarksContentState: Equatable {
 final class BookmarkManagementDetailViewModel {
 
     private let bookmarkManager: BookmarkManager
+    private let bookmarksSearchAndSortMetrics: BookmarksSearchAndSortMetrics
 
     private var currentSelectionState: BookmarkManagementSidebarViewController.SelectionState = .empty
     private var searchQuery = ""
     private(set) var visibleBookmarks = [BaseBookmarkEntity]()
+    private var mode: BookmarksSortMode
 
     var isSearching: Bool {
         !searchQuery.isBlank
     }
 
-    init(bookmarkManager: BookmarkManager) {
+    init(bookmarkManager: BookmarkManager, metrics: BookmarksSearchAndSortMetrics, mode: BookmarksSortMode = .manual) {
         self.bookmarkManager = bookmarkManager
+        self.bookmarksSearchAndSortMetrics = metrics
+        self.mode = mode
     }
 
     var contentState: BookmarksContentState {
@@ -49,10 +53,18 @@ final class BookmarkManagementDetailViewModel {
         return .nonEmpty
     }
 
-    func update(selection: BookmarkManagementSidebarViewController.SelectionState, searchQuery: String = "") {
+    func update(selection: BookmarkManagementSidebarViewController.SelectionState,
+                mode: BookmarksSortMode = .manual,
+                searchQuery: String = "") {
         self.currentSelectionState = selection
         self.searchQuery = searchQuery
+        self.mode = mode
         self.visibleBookmarks = fetchVisibleBookmarks(for: currentSelectionState, searchQuery: searchQuery)
+            .sorted(by: mode)
+
+        if !searchQuery.isBlank {
+            bookmarksSearchAndSortMetrics.fireSearchExecuted(origin: .manager)
+        }
     }
 
     func totalRows() -> Int {
@@ -135,6 +147,18 @@ final class BookmarkManagementDetailViewModel {
         }
 
         return .move
+    }
+
+    // MARK: - Metrics
+
+    func onSortButtonTapped() {
+        bookmarksSearchAndSortMetrics.fireSortButtonClicked(origin: .manager)
+    }
+
+    func onBookmarkTapped() {
+        if !searchQuery.isBlank {
+            bookmarksSearchAndSortMetrics.fireSearchResultClicked(origin: .manager)
+        }
     }
 
     // MARK: - Private

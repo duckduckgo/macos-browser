@@ -17,9 +17,13 @@
 //
 
 import XCTest
+import PixelKitTestingUtilities
 @testable import DuckDuckGo_Privacy_Browser
+@testable import PixelKit
 
 final class BookmarkManagementDetailViewModelTests: XCTestCase {
+    private let testUserDefault = UserDefaults(suiteName: #function)!
+    private let metrics = BookmarksSearchAndSortMetrics()
 
     // MARK: - Empty selection state tests
 
@@ -27,7 +31,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "")
 
         XCTAssertEqual(sut.totalRows(), 3)
@@ -39,7 +43,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkTwo]
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "some")
 
         XCTAssertEqual(sut.totalRows(), 1)
@@ -50,7 +54,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "")
 
         XCTAssertEqual(sut.index(for: bookmarkOne), 0)
@@ -63,7 +67,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkTwo]
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "some")
 
         XCTAssertEqual(sut.index(for: bookmarkTwo), 0)
@@ -75,7 +79,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "")
 
         XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkOne)
@@ -88,7 +92,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkTwo]
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "some")
 
         XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkTwo)
@@ -99,7 +103,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "")
 
         XCTAssertEqual(sut.fetchEntityAndParent(at: 0).entity, bookmarkOne)
@@ -115,7 +119,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkTwo]
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "some")
 
         XCTAssertEqual(sut.fetchEntityAndParent(at: 0).entity, bookmarkTwo)
@@ -135,7 +139,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .folder(folder), searchQuery: "")
 
         XCTAssertEqual(sut.totalRows(), 2)
@@ -150,7 +154,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
         bookmarkManager.bookmarksReturnedForSearch = folder.children
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .folder(folder), searchQuery: "some")
 
         XCTAssertEqual(sut.totalRows(), 2)
@@ -165,7 +169,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .folder(folder), searchQuery: "")
 
         XCTAssertEqual(sut.index(for: bookmarkFour), 0)
@@ -184,7 +188,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkFive]
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .folder(folder), searchQuery: "some")
 
         XCTAssertEqual(sut.index(for: bookmarkOne), 0)
@@ -202,7 +206,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .folder(folder), searchQuery: "")
 
         XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkFour)
@@ -219,7 +223,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkFive]
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .folder(folder), searchQuery: "some")
 
         XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkOne)
@@ -235,7 +239,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .folder(folder), searchQuery: "")
 
         XCTAssertEqual(sut.fetchEntityAndParent(at: 0).entity, bookmarkFour)
@@ -255,7 +259,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkFive]
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .folder(folder), searchQuery: "some")
 
         XCTAssertEqual(sut.fetchEntityAndParent(at: 0).entity, bookmarkOne)
@@ -272,7 +276,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree], favorites: [bookmarkTwo])
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .favorites, searchQuery: "")
 
         XCTAssertEqual(sut.totalRows(), 1)
@@ -284,7 +288,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree], favorites: [bookmarkOne, bookmarkTwo])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkTwo]
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .favorites, searchQuery: "some")
 
         XCTAssertEqual(sut.totalRows(), 2)
@@ -295,7 +299,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree], favorites: [bookmarkTwo])
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .favorites, searchQuery: "")
 
         XCTAssertEqual(sut.index(for: bookmarkTwo), 0)
@@ -308,7 +312,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree], favorites: [bookmarkOne, bookmarkTwo])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkTwo]
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .favorites, searchQuery: "some")
 
         XCTAssertEqual(sut.index(for: bookmarkOne), 0)
@@ -320,7 +324,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree], favorites: [bookmarkTwo])
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .favorites, searchQuery: "")
 
         XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkTwo)
@@ -332,7 +336,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree], favorites: [bookmarkOne, bookmarkTwo])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkTwo]
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .favorites, searchQuery: "some")
 
         XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkOne)
@@ -344,7 +348,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree], favorites: [bookmarkTwo])
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .favorites, searchQuery: "")
 
         XCTAssertEqual(sut.fetchEntityAndParent(at: 0).entity, bookmarkTwo)
@@ -358,7 +362,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree], favorites: [bookmarkOne, bookmarkTwo])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkTwo]
 
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .favorites, searchQuery: "some")
 
         XCTAssertEqual(sut.fetchEntityAndParent(at: 0).entity, bookmarkOne)
@@ -372,7 +376,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
     func testWhenSearchQueryIsEmptyAndResultsAreNotEmpty_thenContentStateIsNonEmpty() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
 
         sut.update(selection: .empty, searchQuery: "")
 
@@ -383,7 +387,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkTwo]
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
 
         sut.update(selection: .empty, searchQuery: "some")
 
@@ -392,7 +396,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
     func testWhenBookmarksAreEmptyAndSearchQueryIsNot_thenContentStateIsEmptyForBookmarks() {
         let bookmarkManager = MockBookmarkManager()
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
 
         sut.update(selection: .empty, searchQuery: "some")
 
@@ -403,7 +407,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
         bookmarkManager.bookmarksReturnedForSearch = []
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
 
         sut.update(selection: .empty, searchQuery: "some")
 
@@ -415,7 +419,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
     func testWhenSearchQueryIsNotBlankAndProposedDestinationIsRoot_thenWeDoNotAllowDrop() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkTwo, bookmarkThree]
         sut.update(selection: .empty, searchQuery: "some")
 
@@ -428,7 +432,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
     func testWhenSearchQueryIsBlankAndProposedDestinationIsRoot_thenWeAllowDrop() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "")
 
         // We pick a row where the result is nil
@@ -444,7 +448,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let children = [bookmarkFour, bookmarkFive]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         bookmarkManager.bookmarksReturnedForSearch = [folder]
         sut.update(selection: .empty, searchQuery: "some")
         let pasteboardItems = createPasteboardItems(for: bookmarkOne)
@@ -462,7 +466,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let children = [bookmarkFour, bookmarkFive]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "")
         let pasteboardItems = createPasteboardItems(for: bookmarkOne)
 
@@ -475,7 +479,7 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
     func testWhenDraggingBookmarkToBookmark_thenWeDoNotAllowDrop() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager)
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "")
         let pasteboardItems = createPasteboardItems(for: bookmarkOne)
 
@@ -483,6 +487,126 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let result = sut.validateDrop(pasteboardItems: pasteboardItems, proposedRow: 1, proposedDropOperation: .on)
 
         XCTAssertEqual(result, .none)
+    }
+
+    // MARK: - Sort tests
+
+    func testWhenSortModeIsManualAndInSearch_thenBookmarksAreInTheSameOrderAsReturnedFromManager() {
+        let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
+        let bookmarkManager = createBookmarkManager(with: [bookmarkTwo, bookmarkOne, bookmarkThree])
+        bookmarkManager.bookmarksReturnedForSearch = [bookmarkTwo, bookmarkOne, bookmarkThree]
+
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
+        sut.update(selection: .empty, mode: .manual, searchQuery: "some")
+
+        XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkTwo)
+        XCTAssertEqual(sut.fetchEntity(at: 1), bookmarkOne)
+        XCTAssertEqual(sut.fetchEntity(at: 2), bookmarkThree)
+    }
+
+    func testWhenSortModeIsManualAndNotInSearch_thenBookmarksAreInTheSameOrderAsReturnedFromManager() {
+        let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
+        let bookmarkManager = createBookmarkManager(with: [bookmarkTwo, bookmarkOne, bookmarkThree])
+
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
+        sut.update(selection: .empty, mode: .manual, searchQuery: "")
+
+        XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkTwo)
+        XCTAssertEqual(sut.fetchEntity(at: 1), bookmarkOne)
+        XCTAssertEqual(sut.fetchEntity(at: 2), bookmarkThree)
+    }
+
+    func testWhenSortModeIsNameAscendingAndInSearch_thenBookmarksAreReturnedByTitleAscending() {
+        let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
+        let bookmarkManager = createBookmarkManager(with: [bookmarkTwo, bookmarkOne, bookmarkThree])
+        bookmarkManager.bookmarksReturnedForSearch = [bookmarkTwo, bookmarkOne, bookmarkThree]
+
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
+        sut.update(selection: .empty, mode: .nameAscending, searchQuery: "")
+
+        XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkOne)
+        XCTAssertEqual(sut.fetchEntity(at: 1), bookmarkTwo)
+        XCTAssertEqual(sut.fetchEntity(at: 2), bookmarkThree)
+    }
+
+    func testWhenSortModeIsNameAscendingAndNotInSearch_thenBookmarksAreReturnedByTitleAscending() {
+        let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
+        let bookmarkManager = createBookmarkManager(with: [bookmarkTwo, bookmarkOne, bookmarkThree])
+
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
+        sut.update(selection: .empty, mode: .nameAscending, searchQuery: "")
+
+        XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkOne)
+        XCTAssertEqual(sut.fetchEntity(at: 1), bookmarkTwo)
+        XCTAssertEqual(sut.fetchEntity(at: 2), bookmarkThree)
+    }
+
+    func testWhenSortModeIsNameDescendingAndInSearch_thenBookmarksAreReturnedByTitleAscending() {
+        let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
+        let bookmarkManager = createBookmarkManager(with: [bookmarkTwo, bookmarkOne, bookmarkThree])
+        bookmarkManager.bookmarksReturnedForSearch = [bookmarkTwo, bookmarkOne, bookmarkThree]
+
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
+        sut.update(selection: .empty, mode: .nameDescending, searchQuery: "some")
+
+        XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkThree)
+        XCTAssertEqual(sut.fetchEntity(at: 1), bookmarkTwo)
+        XCTAssertEqual(sut.fetchEntity(at: 2), bookmarkOne)
+    }
+
+    func testWhenSortModeIsNameDescendingAndNotInSearch_thenBookmarksAreReturnedByTitleAscending() {
+        let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
+        let bookmarkManager = createBookmarkManager(with: [bookmarkTwo, bookmarkOne, bookmarkThree])
+
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
+        sut.update(selection: .empty, mode: .nameDescending, searchQuery: "")
+
+        XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkThree)
+        XCTAssertEqual(sut.fetchEntity(at: 1), bookmarkTwo)
+        XCTAssertEqual(sut.fetchEntity(at: 2), bookmarkOne)
+    }
+
+    // MARK: - Metrics tests
+
+    func testWhenOnSortButtonTapped_thenSortButtonClickedPixelIsFired() async throws {
+        let expectedPixel = GeneralPixel.bookmarksSortButtonClicked(origin: "manager")
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: MockBookmarkManager(), metrics: metrics)
+
+        try await verify(expectedPixel: expectedPixel, for: { sut.onSortButtonTapped() })
+    }
+
+    func testWhenUpdateHappensAndSearchQueryIsNotEmpty_thenSearchExecutedIsFired() async throws{
+        let expectedPixel = GeneralPixel.bookmarksSearchExecuted(origin: "manager")
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: MockBookmarkManager(), metrics: metrics)
+
+        try await verify(expectedPixel: expectedPixel, for: { sut.update(selection: .empty, searchQuery: "some") })
+    }
+
+    func testWhenUpdateHappensAndSearchQueryIsEmpty_thenSearchExecutedIsNotFired() async throws {
+        let notExpectedPixel = GeneralPixel.bookmarksSearchExecuted(origin: "manager")
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: MockBookmarkManager(), metrics: metrics)
+
+        try await verifyNotFired(pixel: notExpectedPixel, for: { sut.update(selection: .empty) })
+    }
+
+    func testWhenOnBookmarksTappedAndSearchQueryIsEmpty_thenSearchResultClickedIsNotFired() async throws {
+        let notExpectedPixel = GeneralPixel.bookmarksSearchResultClicked(origin: "manager")
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: MockBookmarkManager(), metrics: metrics)
+
+        try await verifyNotFired(pixel: notExpectedPixel, for: {
+            sut.update(selection: .empty)
+            sut.onBookmarkTapped()
+        })
+    }
+
+    func testWhenOnBookmarksTappedAndSearchQueryIsNotEmpty_thenSearchResultClickedIsFired() async throws {
+        let expectedPixel = GeneralPixel.bookmarksSearchResultClicked(origin: "manager")
+        let sut = BookmarkManagementDetailViewModel(bookmarkManager: MockBookmarkManager(), metrics: metrics)
+
+        try await verify(expectedPixel: expectedPixel, for: {
+            sut.update(selection: .empty, searchQuery: "some")
+            sut.onBookmarkTapped()
+        })
     }
 
     // MARK: - Helper functions
@@ -510,5 +634,57 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
     private func createFolder(with children: [Bookmark]) -> BookmarkFolder {
         return BookmarkFolder(id: "6", title: "Folder", children: children)
+    }
+
+    // MARK: - Pixel testing helper methods
+
+    private func verify(expectedPixel: GeneralPixel, for code: () -> Void) async throws {
+        let pixelExpectation = expectation(description: "Pixel fired")
+        try await verify(pixel: expectedPixel, for: code, expectation: pixelExpectation) {
+            await fulfillment(of: [pixelExpectation], timeout: 1.0)
+        }
+    }
+
+    private func verifyNotFired(pixel: GeneralPixel, for code: () -> Void) async throws {
+        let pixelExpectation = expectation(description: "Pixel not fired")
+        try await verify(pixel: pixel, for: code, expectation: pixelExpectation) {
+            let result = await XCTWaiter().fulfillment(of: [pixelExpectation], timeout: 1)
+
+            if result == .timedOut {
+                pixelExpectation.fulfill()
+            } else {
+                XCTFail("Pixel was fired")
+            }
+        }
+    }
+
+    private func verify(pixel: GeneralPixel,
+                        for code: () -> Void,
+                        expectation: XCTestExpectation,
+                        verification: () async -> Void) async throws {
+        let pixelKit = createPixelKit(pixelNamePrefix: pixel.name, pixelExpectation: expectation)
+
+        PixelKit.setSharedForTesting(pixelKit: pixelKit)
+
+        code()
+        await verification()
+
+        cleanUp(pixelKit: pixelKit)
+    }
+
+    private func createPixelKit(pixelNamePrefix: String, pixelExpectation: XCTestExpectation) -> PixelKit {
+        return PixelKit(dryRun: false,
+                        appVersion: "1.0.0",
+                        defaultHeaders: [:],
+                        defaults: testUserDefault) { pixelName, _, _, _, _, _ in
+            if pixelName.hasPrefix(pixelNamePrefix) {
+                pixelExpectation.fulfill()
+            }
+        }
+    }
+
+    private func cleanUp(pixelKit: PixelKit) {
+        PixelKit.tearDown()
+        pixelKit.clearFrequencyHistoryForAllPixels()
     }
 }
