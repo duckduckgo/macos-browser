@@ -18,6 +18,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftUIExtensions
 
 extension HomePage.Views {
 
@@ -26,6 +27,7 @@ extension HomePage.Views {
         static let height: CGFloat = 273
 
         @Environment(\.colorScheme) var colorScheme
+        @EnvironmentObject var settingsModel: HomePage.Models.SettingsModel
 
         let backgroundColor = Color(.newTabPageBackground)
         private var infoBackgroundColor: Color {
@@ -46,7 +48,7 @@ extension HomePage.Views {
 
         var body: some View {
             ZStack {
-                backgroundColor.edgesIgnoringSafeArea(.all)
+                Color.clear.background(settingsModel.backgroundView)
 
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
@@ -71,11 +73,31 @@ extension HomePage.Views {
                        alignment: .leading)
                 .padding(.horizontal, 40)
                 .padding(.vertical, 20)
-                .background(RoundedRectangle(cornerRadius: 8).fill(infoBackgroundColor))
+                .background(infoBackground)
                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(infoStrokeColor2, lineWidth: 1))
                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(infoStrokeColor1, lineWidth: 1).padding(1)) // Add this line
-                .shadow(color: infoShadowColor, radius: 2, x: 0, y: 2)
+                .ifLet(settingsModel.customBackground?.colorScheme) { view, colorScheme in
+                    view.colorScheme(colorScheme)
+                }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .clipped()
+        }
+
+        @ViewBuilder
+        var infoBackground: some View {
+            if settingsModel.customBackground != nil {
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                    .vibrancyEffect(useLegacyBlur: settingsModel.usesLegacyBlur, material: settingsModel.vibrancyMaterial, legacyMaterial: settingsModel.legacyVibrancyMaterial, alpha: settingsModel.vibrancyAlpha)
+                    .cornerRadius(8)
+            } else {
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                    .background(infoBackgroundColor)
+                    .cornerRadius(8)
+            }
+
         }
     }
 
