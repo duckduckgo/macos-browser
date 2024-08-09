@@ -4291,7 +4291,6 @@
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
 		F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentScopeFeatureFlagging.swift; sourceTree = "<group>"; };
-		FD2225582C5CFF9C00199373 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		FD22255C2C64B68500199373 /* AutoconsentExperiment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoconsentExperiment.swift; sourceTree = "<group>"; };
 		FD23FD2A28816606007F6985 /* AutoconsentMessageProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AutoconsentMessageProtocolTests.swift; path = UnitTests/Autoconsent/AutoconsentMessageProtocolTests.swift; sourceTree = SOURCE_ROOT; };
 		FD23FD2C2886A81D007F6985 /* AutoconsentManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoconsentManagement.swift; sourceTree = "<group>"; };
@@ -5032,7 +5031,6 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
-				FD2225582C5CFF9C00199373 /* BrowserServicesKit */,
 				7B9167A82C09E88800322310 /* AppLauncher */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
@@ -13383,8 +13381,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 177.0.2;
+				branch = "max/cpm-ad-experiment";
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
