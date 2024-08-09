@@ -83,12 +83,9 @@ extension HomePage.Models {
 
         @Published var contentType: ContentType = .root {
             didSet {
-                if contentType == .uploadImage {
-                    let panel = NSOpenPanel(allowedFileTypes: [.image])
-                    guard case .OK = panel.runModal(), let url = panel.url else { return }
-                    if let image = try? customImagesManager.addImage(with: url) {
-                        customBackground = .customImage(image)
-                    }
+                if contentType == .uploadImage, contentType != oldValue {
+                    contentType = .root
+                    uploadNewImage()
                 }
             }
         }
@@ -101,6 +98,20 @@ extension HomePage.Models {
         @Published var vibrancyMaterial: VibrancyMaterial = .ultraThinMaterial
         @Published var legacyVibrancyMaterial: NSVisualEffectView.Material = .hudWindow
         @Published var vibrancyAlpha: CGFloat = 1.0
+
+        func uploadNewImage() {
+            let panel = NSOpenPanel(allowedFileTypes: [.image])
+            guard case .OK = panel.runModal(), let url = panel.url else {
+                return
+            }
+            Task {
+                if let image = try? await customImagesManager.addImage(with: url) {
+                    Task { @MainActor in
+                        customBackground = .customImage(image)
+                    }
+                }
+            }
+        }
 
         var backgroundModes: [BackgroundModeModel] {
             var modes: [BackgroundModeModel] = [

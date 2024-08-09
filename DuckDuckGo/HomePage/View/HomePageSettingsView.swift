@@ -101,7 +101,7 @@ extension HomePage.Views {
                     HStack {
                         Text("All Settings")
                         Spacer()
-                        Image(.openIn)
+                        Image(.externalAppScheme)
                     }
                     .foregroundColor(.accentColor)
                     .onHover { isHovering in
@@ -143,7 +143,10 @@ extension HomePage.Views {
                         if let customBackgroundType = mode.contentType.customBackgroundType {
                             model.backgroundPreview(for: customBackgroundType)
                         } else if mode.contentType == .uploadImage {
-                            HomePage.Models.SettingsModel.SolidColor.gray.color
+                            ZStack {
+                                Color.blackWhite5
+                                Image(.share)
+                            }
                         }
                     }
                 }
@@ -304,6 +307,9 @@ extension HomePage.Views {
                     }
                     .buttonStyle(.plain)
                 }
+                Text("Images are stored on your device so DuckDuckGo can't see or access them.")
+                    .foregroundColor(.blackWhite60)
+                    .multilineTextAlignment(.leading)
             }
         }
 
@@ -318,14 +324,11 @@ extension HomePage.Views {
                 }
             } else {
                 let rows = items.chunked(into: 2)
-                VStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 12) {
                     ForEach(rows, id: \.self) { row in
-                        GeometryReader { geometry in
-                            HStack(spacing: 12) {
-                                ForEach(row, content: itemView)
-                                if row.count == 1 {
-                                    Spacer(minLength: geometry.size.width/2 - 6)
-                                }
+                        HStack(spacing: 12) {
+                            ForEach(row) { row in
+                                itemView(row).frame(width: 96)
                             }
                         }
                     }

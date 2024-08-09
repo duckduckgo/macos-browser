@@ -34,12 +34,12 @@ protocol UserBackgroundImagesManaging {
     var maximumNumberOfImages: Int { get }
     var availableImages: [UserBackgroundImage] { get }
 
-    func addImage(with url: URL) throws -> UserBackgroundImage?
+    func addImage(with url: URL) async throws -> UserBackgroundImage?
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage?
 }
 
 protocol ImageColorSchemeCalculating {
-    func calculatePreferredColorScheme(for image: NSImage) -> ColorScheme
+    func calculatePreferredColorScheme(forImageAt url: URL) -> ColorScheme
 }
 
 extension ColorScheme: LosslessStringConvertible {
@@ -97,17 +97,18 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         verifyStoredImages()
     }
 
-    func addImage(with url: URL) throws -> UserBackgroundImage? {
+    func addImage(with url: URL) async throws -> UserBackgroundImage? {
         let fileName = [UUID().uuidString, url.pathExtension].joined(separator: ".")
         let destinationURL = storageLocation.appendingPathComponent(fileName)
         try FileManager.default.copyItem(at: url, to: destinationURL)
 
-        guard let image = NSImage(contentsOf: destinationURL) else {
-            // pixel
-            return nil
-        }
+        let date = Date()
+        let colorScheme = await Task {
+            calculatePreferredColorScheme(forImageAt: destinationURL)
+        }.value
+        let diff = date.distance(to: Date())
+        print("color scheme calculation took \(diff) seconds")
 
-        let colorScheme = calculatePreferredColorScheme(for: image)
         let userBackgroundImage = UserBackgroundImage(fileName: fileName, colorScheme: colorScheme)
 
         if imagesMetadata.count > maximumNumberOfImages {
@@ -155,43 +156,45 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 }
 
 extension UserBackgroundImagesManager: ImageColorSchemeCalculating {
-    func calculatePreferredColorScheme(for image: NSImage) -> ColorScheme {
-        guard let tiffData = image.tiffRepresentation,
-              let bitmapImage = NSBitmapImageRep(data: tiffData),
-              let cgImage = bitmapImage.cgImage else { return .light }
 
-        let ciImage = CIImage(cgImage: cgImage)
-        let context = CIContext(options: nil)
+    func calculatePreferredColorScheme(forImageAt url: URL) -> ColorScheme {
+        guard let image = NSImage(contentsOf: url), let averageBrightness = image.averageBrightness() else { return .light }
+        return averageBrightness > 0.5 ? .light : .dark
+    }
 
-        // Create a grayscale filter
-        let grayscaleFilter = CIFilter(name: "CIColorControls")!
-        grayscaleFilter.setValue(ciImage, forKey: kCIInputImageKey)
-        grayscaleFilter.setValue(0.0, forKey: kCIInputSaturationKey)
+}
 
-        guard let outputImage = grayscaleFilter.outputImage else { return .light }
+extension NSImage {
+    func averageBrightness(sampleSize: Int = 2000) -> CGFloat? {
+        guard let tiffData = self.tiffRepresentation,
+              let bitmapImage = NSBitmapImageRep(data: tiffData) else { return nil }
 
-        // Create a bitmap representation
-        let extent = outputImage.extent
-        let bitmap = context.createCGImage(outputImage, from: extent)
+        let width = bitmapImage.pixelsWide
+        let height = bitmapImage.pixelsHigh
 
-        guard let data = bitmap?.dataProvider?.data else { return .light }
-        let ptr = CFDataGetBytePtr(data)
+        guard let pixelData = bitmapImage.bitmapData else { return nil }
+
+        let totalPixels = width * height
+        let step = max(1, totalPixels / sampleSize)
 
         var totalBrightness: CGFloat = 0.0
-        let pixelCount = Int(extent.width * extent.height)
+        var sampledPixels = 0
 
-        for i in 0..<pixelCount {
-            let pixelIndex = i * 4
-            let r = CGFloat(ptr![pixelIndex])
-            let g = CGFloat(ptr![pixelIndex + 1])
-            let b = CGFloat(ptr![pixelIndex + 2])
+        for i in stride(from: 0, to: totalPixels, by: step) {
+            let x = (i % width)
+            let y = (i / width)
+            let pixelIndex = (y * width + x) * 4
+            let r = CGFloat(pixelData[pixelIndex]) / 255.0
+            let g = CGFloat(pixelData[pixelIndex + 1]) / 255.0
+            let b = CGFloat(pixelData[pixelIndex + 2]) / 255.0
 
             // Calculate brightness using the luminance formula
-            let brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255.0
+            let brightness = 0.299 * r + 0.587 * g + 0.114 * b
             totalBrightness += brightness
+            sampledPixels += 1
         }
 
-        let averageBrightness = totalBrightness / CGFloat(pixelCount)
-        return averageBrightness > 0.5 ? .light : .dark
+        let averageBrightness = totalBrightness / CGFloat(sampledPixels)
+        return averageBrightness
     }
 }
