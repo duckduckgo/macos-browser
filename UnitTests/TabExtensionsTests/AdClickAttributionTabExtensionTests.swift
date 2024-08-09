@@ -93,7 +93,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
                                                contentBlockerRulesScriptPublisher: self.contentBlockerRulesScriptSubj,
                                                trackerInfoPublisher: self.trackerInfoPublisher,
                                                dependencies: dependencies.privacyFeatures.contentBlocking,
-                                               dateTimeProvider: { self.now }) { _ in
+                                               dateTimeProvider: { self.now }) { _,_ in
                     (logic: self.logic, detection: self.detection)
                 }
             }
@@ -671,7 +671,7 @@ class MockAdClickLogic: AdClickLogicProtocol {
     }
 
     var onRequestDetected: ((DetectedRequest) -> Void)!
-    func onRequestDetected(request: DetectedRequest) {
+    func onRequestDetected(request: DetectedRequest, cpmExperimentOn: Bool? = nil) {
         onRequestDetected(request)
     }
 
