@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "max/cpm-ad-experiment",
-        "revision" : "d839736c41a709a2215e9d22c125b271142059fc"
+        "revision" : "94101c21e8a848508b7ac6d83cf22484ca5ce9f8"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "348594efe2cd40ef156e915c272d02ec22f1903f",
-        "version" : "4.2.0"
+        "revision" : "36dc07cba4bc1e7e0c1d1fb679c3cd077694a072",
+        "version" : "5.0.0"
       }
     },
     {
