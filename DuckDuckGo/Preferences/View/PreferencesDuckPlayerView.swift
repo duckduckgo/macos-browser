@@ -48,6 +48,15 @@ extension Preferences {
                 // TITLE
                 TextMenuTitle(UserText.duckPlayer)
 
+                if model.shouldDisplayContingencyMessage {
+                    PreferencePaneSection {
+                        ContingencyMessageView {
+                            model.openLearnMoreContingencyURL()
+                        }
+                        .frame(width: 512)
+                    }
+                }
+
                 PreferencePaneSection {
                     Picker(selection: duckPlayerModeBinding, content: {
                         Text(UserText.duckPlayerAlwaysOpenInPlayer)
@@ -67,24 +76,78 @@ extension Preferences {
                     .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
 
                     TextMenuItemCaption(UserText.duckPlayerExplanation)
+                }.disabled(model.shouldDisplayContingencyMessage)
+
+                if model.shouldDisplayAutoPlaySettings || model.isOpenInNewTabSettingsAvailable {
+                    PreferencePaneSection(UserText.duckPlayerVideoPreferencesTitle) {
+
+                        if model.shouldDisplayAutoPlaySettings {
+                            ToggleMenuItem(UserText.duckPlayerAutoplayPreference, isOn: $model.duckPlayerAutoplay)
+                        }
+
+                        if model.isOpenInNewTabSettingsAvailable {
+                            ToggleMenuItem(UserText.duckPlayerNewTabPreference, isOn: $model.duckPlayerOpenInNewTab)
+                                .disabled(!model.isNewTabSettingsAvailable)
+                        }
+                    }.disabled(model.shouldDisplayContingencyMessage)
                 }
 
-                // Auto Play
-                if model.shouldDisplayAutoPlaySettings {
-                    PreferencePaneSection(UserText.duckPlayerAutoplayTitle) {
-                        ToggleMenuItem(UserText.duckPlayerAutoplayPreference, isOn: $model.duckPlayerAutoplay)
-                    }
-                }
-
-                // New Tab
-                if model.isOpenInNewTabSettingsAvailable {
-                    PreferencePaneSection(UserText.duckPlayerNewTabTitle) {
-                        TextMenuItemCaption(UserText.duckPlayerNewTabPreferenceExtraInfo)
-                        ToggleMenuItem(UserText.duckPlayerNewTabPreference, isOn: $model.duckPlayerOpenInNewTab)
-                            .disabled(!model.isNewTabSettingsAvailable)
-                    }
-                }
             }
         }
     }
+}
+
+private struct ContingencyMessageView: View {
+    private enum Copy {
+        static let title: String = UserText.duckPlayerContingencyMessageTitle
+        static let message: String = UserText.duckPlayerContingencyMessageBody
+        static let buttonTitle: String = UserText.duckPlayerContingencyMessageCTA
+    }
+
+    private enum Constants {
+        static let cornerRadius: CGFloat = 8
+        static let imageName: String = "WarningYoutube"
+        static let imageSize: CGSize = CGSize(width: 64, height: 48)
+    }
+
+    let buttonCallback: () -> Void
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 20) {
+            Image(Constants.imageName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: Constants.imageSize.width, height: Constants.imageSize.height)
+
+            VStack (alignment: .leading, spacing: 3) {
+                Text(Copy.title)
+                    .bold()
+                Text(Copy.message)
+                    .foregroundColor(Color(.blackWhite60))
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button {
+                    buttonCallback()
+                } label: {
+                    Text(Copy.buttonTitle)
+                }.padding(.top, 15)
+            }
+        }
+        .padding()
+          .background(
+            ZStack {
+                RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                    .stroke(Color(.blackWhite10), lineWidth: 1)
+                RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                    .fill(Color(.blackWhite1))
+            }
+          )
+    }
+}
+
+#Preview {
+    Group {
+        ContingencyMessageView { }
+    }.frame(height: 300)
 }

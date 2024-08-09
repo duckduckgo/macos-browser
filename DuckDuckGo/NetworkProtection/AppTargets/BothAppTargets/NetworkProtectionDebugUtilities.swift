@@ -54,6 +54,10 @@ final class NetworkProtectionDebugUtilities {
 
     // MARK: - Debug commands for the extension
 
+    func restartAdapter() async throws {
+        try await ipcClient.command(.restartAdapter)
+    }
+
     func resetAllState(keepAuthToken: Bool) async throws {
         try await vpnUninstaller.uninstall(removeSystemExtension: true)
 

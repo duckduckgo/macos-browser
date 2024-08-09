@@ -20,8 +20,6 @@ import Foundation
 import LoginItems
 import DataBrokerProtection
 
-#if DBP
-
 extension LoginItem {
 
     static let dbpBackgroundAgent = LoginItem(bundleId: Bundle.main.dbpBackgroundAgentBundleId, defaults: .dbp, log: .dbp)
@@ -51,5 +49,3 @@ extension LoginItem: DBPLoginItemStatusChecker {
         return false
     }
 }
-
-#endif

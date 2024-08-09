@@ -38,6 +38,7 @@ class TabContentTests: XCTestCase {
 
     @MainActor
     override func setUp() async throws {
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     @MainActor
@@ -94,7 +95,6 @@ class TabContentTests: XCTestCase {
         }
 
         // right-click
-        NSApp.activate(ignoringOtherApps: true)
         sendRightMouseClick(to: tab.webView)
         await fulfillment(of: [eMenuShown])
 
@@ -207,7 +207,6 @@ class TabContentTests: XCTestCase {
         }
 
         // right-click
-        NSApp.activate(ignoringOtherApps: true)
         sendRightMouseClick(to: tab.webView)
         await fulfillment(of: [eMenuShown])
 

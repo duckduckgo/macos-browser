@@ -1,5 +1,5 @@
 //
-//  VPNUIActionHandler.swift
+//  AnimationConstants.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,9 +18,6 @@
 
 import Foundation
 
-public protocol VPNUIActionHandler {
-    func moveAppToApplications() async
-    func shareFeedback() async
-    func showPrivacyPro() async
-    func showVPNLocations() async
+struct AnimationConstants {
+    static let highlightAnimationStepSpeed = 0.05
 }
