@@ -31,13 +31,16 @@ extension HomePage.Views {
         @State var isHovering = false
 
         var body: some View {
-            ZStack {
-                Circle()
-                    .fill(isHovering ? foregroundColorOnHover : foreGroundColor)
-                    .frame(width: size, height: size)
-                IconButton(icon: icon, action: action)
-                    .foregroundColor(.gray)
+            Button(action: action) {
+                ZStack {
+                    Circle()
+                        .fill(isHovering ? foregroundColorOnHover : foreGroundColor)
+                        .frame(width: size, height: size)
+                    Image(nsImage: icon)
+                        .foregroundColor(.gray)
+                }
             }
+            .buttonStyle(.plain)
             .onHover { isHovering in
                 self.isHovering = isHovering
             }

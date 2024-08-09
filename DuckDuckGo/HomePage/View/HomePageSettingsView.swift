@@ -104,13 +104,7 @@ extension HomePage.Views {
                         Image(.externalAppScheme)
                     }
                     .foregroundColor(.accentColor)
-                    .onHover { isHovering in
-                        if isHovering {
-                            NSCursor.pointingHand.push()
-                        } else {
-                            NSCursor.pointingHand.pop()
-                        }
-                    }
+                    .cursor(.pointingHand)
                 }
                 .buttonStyle(.plain)
             }
@@ -127,6 +121,7 @@ extension HomePage.Views {
                     Text(title).font(.system(size: 15).weight(.semibold))
                     Spacer()
                 }
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
         }
@@ -439,6 +434,7 @@ extension HomePage.Views {
                     .frame(height: 64)
                     .background(selectionBackground)
             }
+            .contentShape(Rectangle())
         }
 
         @ViewBuilder
