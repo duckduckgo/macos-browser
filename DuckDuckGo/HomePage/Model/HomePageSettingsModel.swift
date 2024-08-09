@@ -96,7 +96,7 @@ extension HomePage.Models {
         }
         @Published var usesLegacyBlur: Bool = true
         @Published var vibrancyMaterial: VibrancyMaterial = .ultraThinMaterial
-        @Published var legacyVibrancyMaterial: NSVisualEffectView.Material = .hudWindow
+        @Published var legacyVibrancyMaterial: NSVisualEffectView.Material = .fullScreenUI
         @Published var vibrancyAlpha: CGFloat = 1.0
 
         func uploadNewImage() {

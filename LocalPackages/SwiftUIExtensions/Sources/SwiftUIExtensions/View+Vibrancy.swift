@@ -54,7 +54,7 @@ public extension View {
     func vibrancyEffect(
         useLegacyBlur: Bool,
         material: VibrancyMaterial,
-        legacyMaterial: NSVisualEffectView.Material = .hudWindow,
+        legacyMaterial: NSVisualEffectView.Material = .fullScreenUI,
         blendingMode: NSVisualEffectView.BlendingMode = .withinWindow,
         alpha: CGFloat = 1.0
     ) -> some View {
