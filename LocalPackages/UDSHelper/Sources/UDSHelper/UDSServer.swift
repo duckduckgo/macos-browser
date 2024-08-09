@@ -18,7 +18,6 @@
 
 import Foundation
 import Network
-// swiftlint:disable:next enforce_os_log_wrapper
 import os.log
 
 /// Convenience Hashable support for `NWConnection`, so we can use `Set<NWConnection>`

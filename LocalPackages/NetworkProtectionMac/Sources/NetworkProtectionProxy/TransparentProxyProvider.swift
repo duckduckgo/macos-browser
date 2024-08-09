@@ -20,7 +20,7 @@ import Combine
 import Foundation
 import NetworkExtension
 import NetworkProtection
-import os.log // swiftlint:disable:this enforce_os_log_wrapper
+import os.log
 import SystemConfiguration
 
 open class TransparentProxyProvider: NETransparentProxyProvider {
