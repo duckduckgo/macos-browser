@@ -2428,6 +2428,9 @@
         }
       }
     },
+    "All Settings" : {
+
+    },
     "allow.integration" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",

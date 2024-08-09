@@ -23,8 +23,11 @@ extension HomePage.Views {
 
     struct SettingsView: View {
 
+        let includingContinueSetUpCards: Bool
         @EnvironmentObject var model: HomePage.Models.SettingsModel
         @EnvironmentObject var appearancePreferences: AppearancePreferences
+        @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
+        @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
 
         @Binding var isSettingsVisible: Bool
 
@@ -50,7 +53,7 @@ extension HomePage.Views {
                             }
                         }
                     }
-                    Group {
+                    VStack(alignment: .leading, spacing: 36) {
                         switch model.contentType {
                         case .root, .uploadImage:
                             rootView
@@ -70,6 +73,7 @@ extension HomePage.Views {
                         }
                     }
                     .animation(.none, value: model.customBackground)
+
                     Spacer()
                 }
                 .frame(width: 204)
@@ -85,6 +89,31 @@ extension HomePage.Views {
                         .frame(width: geometry.size.width, height: geometry.size.height)
                 }
             )
+        }
+
+        var footer: some View {
+            VStack(spacing: 18) {
+                Divider()
+
+                Button {
+                    WindowControllersManager.shared.showTab(with: .settings(pane: .appearance))
+                } label: {
+                    HStack {
+                        Text("All Settings")
+                        Spacer()
+                        Image(.openIn)
+                    }
+                    .foregroundColor(.accentColor)
+                    .onHover { isHovering in
+                        if isHovering {
+                            NSCursor.pointingHand.push()
+                        } else {
+                            NSCursor.pointingHand.pop()
+                        }
+                    }
+                }
+                .buttonStyle(.plain)
+            }
         }
 
         func backButton(title: String) -> some View {
@@ -118,11 +147,21 @@ extension HomePage.Views {
                         }
                     }
                 }
+                TextButton("Reset Background") {
+                    withAnimation {
+                        model.customBackground = nil
+                    }
+                }
             }
             .animation(.none, value: model.customBackground)
             SettingsSection(title: "Browser Theme") {
                 ThemePicker()
             }
+            SettingsSection(title: "Sections") {
+                HomeContentSectionsView(includeContinueSetUpCards: includingContinueSetUpCards)
+            }
+            footer
+
             SettingsSection(title: "Blur Settings") {
                 Link("Apple HIG Documentation", destination: "https://developer.apple.com/design/human-interface-guidelines/materials#macOS".url!)
 
@@ -414,6 +453,51 @@ extension HomePage.Views {
             }
         }
     }
+
+    struct HomeContentSectionsView: View {
+        let includeContinueSetUpCards: Bool
+        @EnvironmentObject var model: AppearancePreferences
+        @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
+        @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
+        let iconSize: CGFloat = 16
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                if includeContinueSetUpCards {
+                    Toggle(isOn: $model.isContinueSetUpVisible) {
+                        HStack {
+                            Image(.rocketGrayscale)
+                                .frame(width: iconSize, height: iconSize)
+                            Text(UserText.newTabSetUpSectionTitle)
+                            Spacer()
+                        }
+                    }
+                    .toggleStyle(.switch)
+                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+                }
+
+                Toggle(isOn: $model.isFavoriteVisible) {
+                    HStack {
+                        Image(.favorite)
+                            .frame(width: iconSize, height: iconSize)
+                        Text(UserText.newTabFavoriteSectionTitle)
+                        Spacer()
+                    }
+                }
+                .toggleStyle(.switch)
+
+                Toggle(isOn: $model.isRecentActivityVisible) {
+                    HStack {
+                        Image(.shield)
+                            .frame(width: iconSize, height: iconSize)
+                        Text(UserText.newTabRecentActivitySectionTitle)
+                        Spacer()
+                    }
+                }
+                .toggleStyle(.switch)
+            }
+        }
+    }
 }
 
 fileprivate extension ThemeName {
@@ -456,7 +540,7 @@ extension HomePage.Views.BackgroundMode {
     let model = HomePage.Models.SettingsModel()
     model.customBackground = .solidColor(.lightPink)
 
-    return HomePage.Views.SettingsView(isSettingsVisible: $isSettingsVisible)
+    return HomePage.Views.SettingsView(includingContinueSetUpCards: true, isSettingsVisible: $isSettingsVisible)
         .frame(width: 236)
         .environmentObject(model)
 }

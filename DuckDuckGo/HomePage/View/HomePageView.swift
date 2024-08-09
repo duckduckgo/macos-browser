@@ -80,7 +80,7 @@ extension HomePage.Views {
 
                         if isSettingsVisible {
                             // Right view
-                            SettingsView(isSettingsVisible: $isSettingsVisible)
+                            SettingsView(includingContinueSetUpCards: includingContinueSetUpCards, isSettingsVisible: $isSettingsVisible)
                                 .frame(width: settingsPanelWidth)
                                 .transition(.move(edge: .trailing))
                                 .layoutPriority(1)
@@ -257,54 +257,6 @@ extension HomePage.Views {
 
             static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
                 value = nextValue()
-            }
-        }
-    }
-
-    struct HomeContentPopoverView: View {
-        let includeContinueSetUpCards: Bool
-        @EnvironmentObject var model: AppearancePreferences
-        @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
-        @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
-        let iconSize = 16.02
-
-        var body: some View {
-            Text(UserText.newTabBottomPopoverTitle)
-                .bold()
-                .font(.system(size: 13))
-            Divider()
-            if includeContinueSetUpCards {
-                HStack {
-                    Toggle(isOn: $model.isContinueSetUpVisible, label: {
-                        HStack {
-                            Image(.rocketGrayscale)
-                                .frame(width: iconSize, height: iconSize)
-                            Text(UserText.newTabSetUpSectionTitle)
-                        }
-                    })
-                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
-                    Spacer()
-                }
-            }
-            HStack {
-                Toggle(isOn: $model.isFavoriteVisible, label: {
-                    HStack {
-                        Image(.favorite)
-                            .frame(width: iconSize, height: iconSize)
-                        Text(UserText.newTabFavoriteSectionTitle)
-                    }
-                })
-                Spacer()
-            }
-            HStack {
-                Toggle(isOn: $model.isRecentActivityVisible, label: {
-                    HStack {
-                        Image(.shield)
-                            .frame(width: iconSize, height: iconSize)
-                        Text(UserText.newTabRecentActivitySectionTitle)
-                    }
-                })
-                Spacer()
             }
         }
     }
