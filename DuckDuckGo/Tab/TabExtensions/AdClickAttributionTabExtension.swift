@@ -136,7 +136,7 @@ final class AdClickAttributionTabExtension: TabExtension {
         self.dateTimeProvider = dateTimeProvider
 
         // do not enroll users who have CPM disabled
-        if !CookiePopupProtectionPreferences.shared.isAutoconsentEnabled || !dependencies.privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(AutoconsentSubfeature.filterlistExperiment) {
+        if !CookiePopupProtectionPreferences.shared.isAutoconsentEnabled {
             self.cpmExperimentOn = nil
         } else {
             self.cpmExperimentOn = AutoconsentFilterlistExperiment.cohort == AutoconsentFilterlistExperiment.test

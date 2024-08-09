@@ -39,7 +39,7 @@ final internal class AutoconsentExperimentLogic {
             os_log("🚧 existing CPM cohort: %s", log: .autoconsent, type: .debug, String(describing: cohort.rawValue))
             return cohort
         }
-        let cohort = AutoconsentFilterlistExperiment.allCases.randomElement()!
+        let cohort = AutoconsentFilterlistExperiment.test
         os_log("🚧 new CPM cohort: %s", log: .autoconsent, type: .debug, String(describing: cohort.rawValue))
         allocatedExperimentCohort = cohort.rawValue
         return cohort
