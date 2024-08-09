@@ -109,6 +109,7 @@ extension HomePage.Views {
                 .background(
                     settingsModel.backgroundView
                         .animation(.none, value: isSettingsVisible)
+                        .animation(.easeInOut(duration: 0.5), value: settingsModel.customBackground)
                 )
                 .clipped()
                 .onAppear {
