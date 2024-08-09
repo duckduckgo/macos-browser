@@ -1518,12 +1518,12 @@
 		56AC09C82C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */; };
 		56B234BF2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */; };
 		56B234C02A84EFD800F2A1CC /* NavigationBarUrlExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */; };
-		56BA1E752BAAF70F001CF69F /* SSLErrorPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E742BAAF70F001CF69F /* SSLErrorPageTabExtension.swift */; };
-		56BA1E762BAAF70F001CF69F /* SSLErrorPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E742BAAF70F001CF69F /* SSLErrorPageTabExtension.swift */; };
+		56BA1E752BAAF70F001CF69F /* SpecialErrorPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E742BAAF70F001CF69F /* SpecialErrorPageTabExtension.swift */; };
+		56BA1E762BAAF70F001CF69F /* SpecialErrorPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E742BAAF70F001CF69F /* SpecialErrorPageTabExtension.swift */; };
 		56BA1E7F2BAB2D29001CF69F /* ErrorPageTabExtensionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E7C2BAB290E001CF69F /* ErrorPageTabExtensionTest.swift */; };
 		56BA1E802BAB2E43001CF69F /* ErrorPageTabExtensionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E7C2BAB290E001CF69F /* ErrorPageTabExtensionTest.swift */; };
-		56BA1E822BAC506F001CF69F /* SSLErrorPageUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E812BAC506F001CF69F /* SSLErrorPageUserScript.swift */; };
-		56BA1E832BAC506F001CF69F /* SSLErrorPageUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E812BAC506F001CF69F /* SSLErrorPageUserScript.swift */; };
+		56BA1E822BAC506F001CF69F /* SpecialErrorPageUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E812BAC506F001CF69F /* SpecialErrorPageUserScript.swift */; };
+		56BA1E832BAC506F001CF69F /* SpecialErrorPageUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E812BAC506F001CF69F /* SpecialErrorPageUserScript.swift */; };
 		56BA1E872BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E862BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift */; };
 		56BA1E882BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E862BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift */; };
 		56BA1E8A2BB1CB5B001CF69F /* CertificateTrustEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E892BB1CB5B001CF69F /* CertificateTrustEvaluator.swift */; };
@@ -3499,9 +3499,9 @@
 		56A054522C2592CE007D8FAB /* OnboardingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingUITests.swift; sourceTree = "<group>"; };
 		56AC09C62C2D7DD6002D70E0 /* BookmarksBarViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewControllerTests.swift; sourceTree = "<group>"; };
 		56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarUrlExtensionsTests.swift; sourceTree = "<group>"; };
-		56BA1E742BAAF70F001CF69F /* SSLErrorPageTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSLErrorPageTabExtension.swift; sourceTree = "<group>"; };
+		56BA1E742BAAF70F001CF69F /* SpecialErrorPageTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecialErrorPageTabExtension.swift; sourceTree = "<group>"; };
 		56BA1E7C2BAB290E001CF69F /* ErrorPageTabExtensionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorPageTabExtensionTest.swift; sourceTree = "<group>"; };
-		56BA1E812BAC506F001CF69F /* SSLErrorPageUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSLErrorPageUserScript.swift; sourceTree = "<group>"; };
+		56BA1E812BAC506F001CF69F /* SpecialErrorPageUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecialErrorPageUserScript.swift; sourceTree = "<group>"; };
 		56BA1E862BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSLErrorPageUserScriptTests.swift; sourceTree = "<group>"; };
 		56BA1E892BB1CB5B001CF69F /* CertificateTrustEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificateTrustEvaluator.swift; sourceTree = "<group>"; };
 		56CEE9092B7A66C500CF10AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -8054,7 +8054,7 @@
 				B66260DC29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift */,
 				B6F1B0292BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift */,
 				B6BF5D842946FFDA006742B1 /* PrivacyDashboardTabExtension.swift */,
-				56BA1E742BAAF70F001CF69F /* SSLErrorPageTabExtension.swift */,
+				56BA1E742BAAF70F001CF69F /* SpecialErrorPageTabExtension.swift */,
 				B6BDDA002942389000F68088 /* TabExtensions.swift */,
 				1D9A4E592B43213B00F449E2 /* TabSnapshotExtension.swift */,
 				B626A76C29928B1600053070 /* TestsClosureNavigationResponder.swift */,
@@ -8135,7 +8135,7 @@
 			isa = PBXGroup;
 			children = (
 				B684121B2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift */,
-				56BA1E812BAC506F001CF69F /* SSLErrorPageUserScript.swift */,
+				56BA1E812BAC506F001CF69F /* SpecialErrorPageUserScript.swift */,
 			);
 			path = ErrorPage;
 			sourceTree = "<group>";
@@ -10113,7 +10113,7 @@
 				3706FB35293F65D500E42796 /* FlatButton.swift in Sources */,
 				3706FB36293F65D500E42796 /* PinnedTabView.swift in Sources */,
 				3706FB37293F65D500E42796 /* DataEncryption.swift in Sources */,
-				56BA1E762BAAF70F001CF69F /* SSLErrorPageTabExtension.swift in Sources */,
+				56BA1E762BAAF70F001CF69F /* SpecialErrorPageTabExtension.swift in Sources */,
 				4B9DB0362A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				37197EA82942443D00394917 /* BrowserTabViewController.swift in Sources */,
 				3706FB39293F65D500E42796 /* PrivacyDashboardPopover.swift in Sources */,
@@ -10500,7 +10500,7 @@
 				3706FC30293F65D500E42796 /* FireInfoViewController.swift in Sources */,
 				B6F1B02F2BCE6B47005E863C /* TunnelControllerProvider.swift in Sources */,
 				31A83FB62BE28D7D00F74E67 /* UserText+DBP.swift in Sources */,
-				56BA1E832BAC506F001CF69F /* SSLErrorPageUserScript.swift in Sources */,
+				56BA1E832BAC506F001CF69F /* SpecialErrorPageUserScript.swift in Sources */,
 				3706FC31293F65D500E42796 /* PermissionButton.swift in Sources */,
 				9F6434622BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */,
 				3706FC32293F65D500E42796 /* MoreOptionsMenu.swift in Sources */,
@@ -11754,7 +11754,7 @@
 				4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */,
 				7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */,
 				B6085D092743AAB600A9C456 /* FireproofDomains.xcdatamodeld in Sources */,
-				56BA1E752BAAF70F001CF69F /* SSLErrorPageTabExtension.swift in Sources */,
+				56BA1E752BAAF70F001CF69F /* SpecialErrorPageTabExtension.swift in Sources */,
 				85589E8227BBB8630038AD11 /* HomePageView.swift in Sources */,
 				B6BF5D932947199A006742B1 /* SerpHeadersNavigationResponder.swift in Sources */,
 				569277C129DDCBB500B633EF /* HomePageContinueSetUpModel.swift in Sources */,
@@ -11834,7 +11834,7 @@
 				B66260E629ACAE4B00E9E3EE /* NavigationHotkeyHandler.swift in Sources */,
 				EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
-				56BA1E822BAC506F001CF69F /* SSLErrorPageUserScript.swift in Sources */,
+				56BA1E822BAC506F001CF69F /* SpecialErrorPageUserScript.swift in Sources */,
 				85C5991B27D10CF000E605B2 /* FireAnimationView.swift in Sources */,
 				B6B4D1CA2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */,
 				AA6197C4276B314D008396F0 /* FaviconUrlReference.swift in Sources */,
@@ -13425,8 +13425,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 181.1.0;
+				branch = "sabrina/refactor-ssl-page";
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {

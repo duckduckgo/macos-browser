@@ -351,6 +351,11 @@ extension URL {
         return URL(string: onboardingUrlString)!
     }
 
+    static var specialError: URL {
+        let specialErrorUrlString = "duck://special-error"
+        return URL(string: specialErrorUrlString)!
+    }
+
     static var duckDuckGo: URL {
         let duckDuckGoUrlString = "https://duckduckgo.com/"
         return URL(string: duckDuckGoUrlString)!

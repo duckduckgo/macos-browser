@@ -23,12 +23,12 @@ import UserScript
 
 final class SSLErrorPageUserScriptTests: XCTestCase {
 
-    var delegate: CapturingSSLErrorPageUserScriptDelegate!
-    var userScript: SSLErrorPageUserScript!
+    var delegate: CapturingSpecialErrorPageUserScriptDelegate!
+    var userScript: SpecialErrorPageUserScript!
 
     override func setUpWithError() throws {
-        delegate = CapturingSSLErrorPageUserScriptDelegate()
-        userScript = SSLErrorPageUserScript()
+        delegate = CapturingSpecialErrorPageUserScriptDelegate()
+        userScript = SpecialErrorPageUserScript()
         userScript.delegate = delegate
     }
 
@@ -38,7 +38,7 @@ final class SSLErrorPageUserScriptTests: XCTestCase {
     }
 
     func test_FeatureHasCorrectName() throws {
-        XCTAssertEqual(userScript.featureName, "sslErrorPage")
+        XCTAssertEqual(userScript.featureName, "special-error")
     }
 
     func test_BrokerIsCorrectlyAdded() throws {
@@ -48,6 +48,33 @@ final class SSLErrorPageUserScriptTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(userScript.broker, broker)
+    }
+
+    @MainActor
+    func test_WhenHandlerForInitialSetUpCalled_AndIsEnabledFalse_ThenNoHandlerIsReturned() {
+        // WHEN
+        let handler = userScript.handler(forMethodNamed: "initialSetup")
+
+        // THEN
+        XCTAssertNil(handler)
+    }
+
+    @MainActor
+    func test_WhenHandlerForReportInitExceptionCalled_AndIsEnabledFalse_ThenNoHandlerIsReturned() {
+        // WHEN
+        let handler = userScript.handler(forMethodNamed: "reportInitException")
+
+        // THEN
+        XCTAssertNil(handler)
+    }
+
+    @MainActor
+    func test_WhenHandlerForReportPageExceptionCalled_AndIsEnabledFalse_ThenNoHandlerIsReturned() {
+        // WHEN
+        let handler = userScript.handler(forMethodNamed: "reportPageException")
+
+        // THEN
+        XCTAssertNil(handler)
     }
 
     @MainActor
@@ -66,6 +93,28 @@ final class SSLErrorPageUserScriptTests: XCTestCase {
 
         // THEN
         XCTAssertNil(handler)
+    }
+
+    @MainActor
+    func test_WhenHandlerForInitialSetUpCalled_AndIsEnabledTrue_ThenRightParameterReturned() async {
+        // GIVEN
+        let expectedData = SpecialErrorData(kind: "ssl", errorType: "some error type", domain: "someDomain")
+        var encodable: Encodable?
+        userScript.isEnabled = true
+        delegate.errorData = expectedData
+
+        // WHEN
+        let handler = userScript.handler(forMethodNamed: "initialSetup")
+        if let handler {
+            encodable = try? await handler(Data(), WKScriptMessage())
+        }
+
+        // THEN
+        XCTAssertNotNil(handler)
+        XCTAssertNotNil(encodable)
+        let data = encodable as? SpecialErrorPageUserScript.InitialSetupResult
+        XCTAssertEqual(data?.platform.name, "macos")
+        XCTAssertEqual(data?.errorData, expectedData)
     }
 
     @MainActor
@@ -108,7 +157,8 @@ final class SSLErrorPageUserScriptTests: XCTestCase {
 
 }
 
-class CapturingSSLErrorPageUserScriptDelegate: SSLErrorPageUserScriptDelegate {
+class CapturingSpecialErrorPageUserScriptDelegate: SpecialErrorPageUserScriptDelegate {
+    var errorData: SpecialErrorData?
     var leaveSiteCalled = false
     var visitSiteCalled = false
 

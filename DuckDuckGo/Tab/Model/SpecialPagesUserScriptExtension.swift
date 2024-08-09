@@ -38,8 +38,8 @@ extension SpecialPagesUserScript {
     }
 
     func withErrorPages() {
-        let sslErrorPageUserScript = SSLErrorPageUserScript()
-        self.registerSubfeature(delegate: sslErrorPageUserScript)
+        let specialErrorPageUserScript = SpecialErrorPageUserScript()
+        self.registerSubfeature(delegate: specialErrorPageUserScript)
     }
 
 #if SPARKLE

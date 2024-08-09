@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "ff87c19636bce8baa34b7984defa779c083f9ce9",
-        "version" : "181.1.0"
+        "branch" : "sabrina/refactor-ssl-page",
+        "revision" : "f1e69cadaeac84ca2bfd8f74103e89660fa9f35f"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "097e545c737db78cb1d253a87a9acd6dd8ad8497",
-        "version" : "6.4.0"
+        "branch" : "pr-releases/pr-1009",
+        "revision" : "26f123eef5095b230e9f3aec496d48302e81b945"
       }
     },
     {

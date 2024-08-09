@@ -29,7 +29,7 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
         }
 
         switch requestURL.type {
-        case .onboarding, .releaseNotes:
+        case .onboarding, .releaseNotes, .specialError:
             handleSpecialPages(urlSchemeTask: urlSchemeTask)
         case .duckPlayer:
             handleDuckPlayer(requestURL: requestURL, urlSchemeTask: urlSchemeTask, webView: webView)
@@ -67,7 +67,6 @@ extension DuckURLSchemeHandler {
     private func handleNativeUIPages(requestURL: URL, urlSchemeTask: WKURLSchemeTask) {
         // return empty page for native UI pages navigations (like the Home page or Settings) if the request is not for the Duck Player
         let data = Self.emptyHtml.utf8data
-
         let response = URLResponse(url: requestURL,
                                    mimeType: "text/html",
                                    expectedContentLength: data.count,
@@ -108,7 +107,7 @@ private extension DuckURLSchemeHandler {
 private extension DuckURLSchemeHandler {
     func handleSpecialPages(urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = urlSchemeTask.request.url else {
-            assertionFailure("No URL for Onboarding scheme handler")
+            assertionFailure("No URL for Special Pages scheme handler")
             return
         }
         guard let (response, data) = response(for: requestURL) else { return }
@@ -125,6 +124,8 @@ private extension DuckURLSchemeHandler {
             directoryURL = URL(fileURLWithPath: "/pages/onboarding")
         } else if url.isReleaseNotesScheme {
             directoryURL = URL(fileURLWithPath: "/pages/release-notes")
+        } else if url.isSpecialErrorScheme {
+            directoryURL = URL(fileURLWithPath: "/pages/special-error")
         } else {
             assertionFailure("Unknown scheme")
             return nil
@@ -172,6 +173,7 @@ extension URL {
         case onboarding
         case duckPlayer
         case releaseNotes
+        case specialError
     }
 
     var type: URLType? {
@@ -181,6 +183,8 @@ extension URL {
             return .onboarding
         } else if self.isReleaseNotesScheme {
             return .releaseNotes
+        } else if self.isSpecialErrorScheme {
+            return .specialError
         } else {
             return nil
         }
@@ -196,6 +200,10 @@ extension URL {
 
     var isReleaseNotesScheme: Bool {
         return isDuckURLScheme && host == "release-notes"
+    }
+
+    var isSpecialErrorScheme: Bool {
+        return isDuckURLScheme && host == "special-error"
     }
 
 }
