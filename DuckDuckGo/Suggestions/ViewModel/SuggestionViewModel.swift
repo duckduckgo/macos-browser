@@ -75,8 +75,8 @@ struct SuggestionViewModel: Equatable {
                         lowTemperature: _,
                         location: _,
                         url: _):
-            var firstPart = "\(currentTemperature)°"
-            var secondPart = " \(self.weatherDescription(from: conditionCode) ?? "")"
+            let firstPart = "\(temperatureFormatted(currentTemperature))"
+            let secondPart = " \(self.weatherDescription(from: conditionCode) ?? "")"
             let attributedString = NSMutableAttributedString(string: firstPart, attributes: tableRowViewBoldAttributes)
             let secondAttributedString = NSAttributedString(string: secondPart, attributes: tableRowViewStandardAttributes)
             attributedString.append(secondAttributedString)
@@ -106,7 +106,7 @@ struct SuggestionViewModel: Equatable {
                         lowTemperature: let lowTemperature,
                         location: let location,
                         url: _):
-            return "High \(highTemperature)° / Low \(lowTemperature)° - \(location)"
+            return "High \(temperatureFormatted(highTemperature)) / Low \(temperatureFormatted(lowTemperature)) - \(location)"
         default:
             return ""
         }
@@ -227,6 +227,17 @@ struct SuggestionViewModel: Equatable {
     }
 
     // MARK: - Weather IA
+
+    func temperatureFormatted(_ temperature: Int) -> String {
+        let formatter = MeasurementFormatter()
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .none
+        formatter.numberFormatter = numberFormatter
+        formatter.unitOptions = .temperatureWithoutUnit
+        let measurement = Measurement(value: Double(temperature), unit: UnitTemperature.celsius)
+        let temperature = formatter.string(from: measurement)
+        return temperature
+    }
 
     func weatherDescription(from conditionCode: String) -> String? {
         let conditionCodeToDescription: [String: String] = [
