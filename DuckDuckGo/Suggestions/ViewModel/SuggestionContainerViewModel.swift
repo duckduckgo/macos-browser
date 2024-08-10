@@ -67,9 +67,12 @@ final class SuggestionContainerViewModel {
         suggestionResultCancellable = suggestionContainer.$result.receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
             guard let self = self,
-                  self.shouldSelectTopSuggestion
-            else { return }
-
+                  self.shouldSelectTopSuggestion else {
+                if self?.selectionIndex != nil && self?.suggestionContainer.result?.instantAnswer != nil {
+                    self?.clearSelection()
+                }
+                return
+            }
             self.select(at: 0)
         }
     }
