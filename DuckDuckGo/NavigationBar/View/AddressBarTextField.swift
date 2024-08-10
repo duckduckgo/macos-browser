@@ -443,7 +443,7 @@ final class AddressBarTextField: NSTextField {
              .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .website(url: let url),
              .internalPage(title: _, url: let url),
-             .weatherIA(icon: _, currentTemperature: _, description: _, highTemperature: _, lowTemperature: _, location: _, url: let url):
+             .weatherIA(conditionCode: _, currentTemperature: _, highTemperature: _, lowTemperature: _, location: _, url: let url):
             finalUrl = url
             userEnteredValue = url.absoluteString
         case .phrase(phrase: let phrase),
@@ -829,7 +829,7 @@ extension AddressBarTextField {
             case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
                  .historyEntry(title: _, url: let url, allowedInTopHits: _),
                  .internalPage(title: _, url: let url),
-                 .weatherIA(icon: _, currentTemperature: _, description: _, highTemperature: _, lowTemperature: _, location: _, url: let url):
+                 .weatherIA(conditionCode: _, currentTemperature: _, highTemperature: _, lowTemperature: _, location: _, url: let url):
                 if let title = suggestionViewModel.title,
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {

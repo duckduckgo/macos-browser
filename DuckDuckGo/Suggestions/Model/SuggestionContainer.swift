@@ -119,7 +119,10 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
                            completion: @escaping (Data?, Error?) -> Void) {
         let url = url.appendingParameters(parameters)
         var request = URLRequest.defaultRequest(with: url)
-        request.timeoutInterval = 1
+        // TODO: Temporary drop of the optimization for the instant answer
+        if parameters["q"] != "weather" {
+            request.timeoutInterval = 1
+        }
 
         suggestionsURLSession.dataTask(with: request) { (data, _, error) in
             completion(data, error)

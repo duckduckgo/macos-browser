@@ -47,8 +47,7 @@ final class SuggestionWeatherIATableCellView: NSTableCellView {
 
     func display(_ suggestionViewModel: SuggestionViewModel) {
         attributedString = suggestionViewModel.tableCellViewAttributedString
-        //TODO: Set image based on the weather data
-//        iconImageView.image = suggestionViewModel.icon
+        iconImageView.image = suggestionViewModel.icon
         suffixTextField.stringValue = suggestionViewModel.suffix
         secondaryTextField.stringValue = suggestionViewModel.secondaryString
 

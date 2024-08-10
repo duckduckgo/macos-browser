@@ -69,15 +69,14 @@ struct SuggestionViewModel: Equatable {
 
     var tableCellViewAttributedString: NSAttributedString {
         switch suggestion {
-        case .weatherIA(icon: _,
+        case .weatherIA(conditionCode: let conditionCode,
                         currentTemperature: let currentTemperature,
-                        description: let description,
                         highTemperature: _,
                         lowTemperature: _,
                         location: _,
                         url: _):
             var firstPart = "\(currentTemperature)°"
-            var secondPart = " \(description)"
+            var secondPart = " \(self.weatherDescription(from: conditionCode) ?? "")"
             let attributedString = NSMutableAttributedString(string: firstPart, attributes: tableRowViewBoldAttributes)
             let secondAttributedString = NSAttributedString(string: secondPart, attributes: tableRowViewStandardAttributes)
             attributedString.append(secondAttributedString)
@@ -101,9 +100,8 @@ struct SuggestionViewModel: Equatable {
 
     var secondaryString: String {
         switch suggestion {
-        case .weatherIA(icon: _,
+        case .weatherIA(conditionCode: _,
                         currentTemperature: _,
-                        description: _,
                         highTemperature: let highTemperature,
                         lowTemperature: let lowTemperature,
                         location: let location,
@@ -223,9 +221,91 @@ struct SuggestionViewModel: Equatable {
         case .internalPage(title: _, url: let url):
             guard url == URL(string: StartupPreferences.shared.formattedCustomHomePageURL) else { return nil }
             return .home16
-        case .weatherIA:
-            return nil
+        case .weatherIA(conditionCode: let conditionCode, currentTemperature: _, highTemperature: _, lowTemperature: _, location: _, url: _):
+            return weatherIcon(from: conditionCode)
         }
+    }
+
+    // MARK: - Weather IA
+
+    func weatherDescription(from conditionCode: String) -> String? {
+        let conditionCodeToDescription: [String: String] = [
+            "Blizzard": "Blizzard",
+            "BlowingDust": "Blowing Dust",
+            "BlowingSnow": "Blowing Snow",
+            "Breezy": "Breezy",
+            "Clear": "Clear",
+            "Cloudy": "Cloudy",
+            "Drizzle": "Drizzle",
+            "Flurries": "Flurries",
+            "Foggy": "Foggy",
+            "FreezingDrizzle": "Freezing Drizzle",
+            "FreezingRain": "Freezing Rain",
+            "Frigid": "Frigid",
+            "Haze": "Haze",
+            "Hail": "Hail",
+            "HeavyRain": "Heavy Rain",
+            "HeavySnow": "Heavy Snow",
+            "Hot": "Hot",
+            "Hurricane": "Hurricane",
+            "IsolatedThunderstorms": "Isolated Thunderstorms",
+            "MostlyClear": "Mostly Clear",
+            "MostlyCloudy": "Cloudy",
+            "PartlyCloudy": "Partly Cloudy",
+            "Rain": "Rain",
+            "Sleet": "Sleet",
+            "Smoky": "Smoky",
+            "Snow": "Snow",
+            "StrongStorms": "Strong Storms",
+            "SunFlurries": "Sunflurries",
+            "SunShowers": "Sunshowers",
+            "Thunderstorms": "Thunderstorms",
+            "TropicalStorm": "Tropical Storm",
+            "Windy": "Windy",
+            "WintryMix": "Wintry Mix"
+        ]
+
+        return conditionCodeToDescription[conditionCode]
+    }
+
+    func weatherIcon(from conditionCode: String) -> NSImage? {
+        let conditionCodeToIcon: [String: NSImage] = [
+            "Blizzard": .blizzard,
+            "BlowingDust": .blowingDust,
+            "Breezy": .breezy,
+            "Clear": .weatherClear,
+            "Cloudy": .cloudy,
+            "Drizzle": .drizzle,
+            "Flurries": .flurries,
+            "Foggy": .foggy,
+            "FreezingDrizzle": .freezingDrizzle,
+            "FreezingRain": .freezingRain,
+            "Frigid": .frigid,
+            "Haze": .haze,
+            "Hail": .hail,
+            "HeavyRain": .heavyRain,
+            "HeavySnow": .heavySnow,
+            "Hot": .hot,
+            "Hurricane": .hurricane,
+            "IsolatedThunderstorms": .isolatedThunderstorms,
+            "MostlyClear": .mostlyClear,
+            "MostlyCloudy": .mostyCloudy,
+            "PartlyCloudy": .partlyCloudy,
+            "Rain": .rain,
+            "ScatteredThunderstorms": .scatteredThunderstorms,
+            "Sleet": .sleet,
+            "Smoky": .smoky,
+            "Snow": .snow,
+            "StrongStorms": .strongStorms,
+            "SunFlurries": .sunFlurries,
+            "SunShowers": .sunShowers,
+            "Thunderstorms": .thunderstorms,
+            "TropicalStorm": .tropicalStorm,
+            "Windy": .windy,
+            "WintryMix": .wintryMix
+        ]
+
+        return conditionCodeToIcon[conditionCode]
     }
 
 }
