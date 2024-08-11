@@ -10718,6 +10718,126 @@
         }
       }
     },
+    "bookmarks.empty.search.resukt..state.title" : {
+      "comment" : "Title displayed in Bookmark Panel when there is no bookmarks that match the search query",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Lesezeichen gefunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No bookmarks found"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se han encontrado marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun signet trouvé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sono stati trovati segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen bladwijzers gevonden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie znaleziono zakładek"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhum marcador encontrado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закладки не найдены"
+          }
+        }
+      }
+    },
+    "bookmarks.empty.search.result.state.message" : {
+      "comment" : "Text displayed in Bookmark Panel when there is no bookmarks that match the search query",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probiere verschiedene Suchbegriffe aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try different search terms."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prueba con diferentes términos de búsqueda."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayez différents termes de recherche."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prova con altri termini di ricerca."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probeer verschillende zoektermen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spróbuj z innymi wyszukiwanymi hasłami."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimenta termos de pesquisa diferentes."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте другие поисковые запросы."
+          }
+        }
+      }
+    },
     "bookmarks.empty.state.message" : {
       "comment" : "Text displayed in Bookmark Manager when there is no bookmarks yet",
       "extractionState" : "extracted_with_value",
@@ -11314,6 +11434,246 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть панель закладок"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.manual" : {
+      "comment" : "Button to sort bookmarks by manual",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuell"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manual"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuale"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handmatig"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ręcznie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вручную"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.name" : {
+      "comment" : "Button to sort bookmarks by name ascending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naam"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nazwa"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.name.asc" : {
+      "comment" : "Button to sort bookmarks by name ascending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufsteigend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Ascending"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendente"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oplopend"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rosnąco"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По возрастанию"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.name.desc" : {
+      "comment" : "Button to sort bookmarks by name descending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Absteigend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Descending"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descendente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descendant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discendente"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aflopend"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Malejąco"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descendente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По убыванию"
           }
         }
       }
@@ -16908,19 +17268,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Videos automatisch abspielen, wenn sie im Duck Player geöffnet werden"
+            "value" : "In Duck Player geöffnete Videos automatisch abspielen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Autoplay videos when opened in Duck Player"
+            "value" : "Autoplay videos opened in Duck Player"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reproducir automáticamente los vídeos cuando se abran en Duck Player"
+            "value" : "Reproducir automáticamente los vídeos abiertos en Duck Player"
           }
         },
         "fr" : {
@@ -16932,7 +17292,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Riproduzione automatica dei video quando li apri in Duck Player"
+            "value" : "Riproduzione automatica dei video aperti in Duck Player"
           }
         },
         "nl" : {
@@ -16944,13 +17304,13 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatyczne odtwarzanie filmów po otwarciu w Duck Player"
+            "value" : "Automatyczne odtwarzanie filmów otwieranych w Duck Player"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reproduzir vídeos automaticamente quando abertos no Duck Player"
+            "value" : "Reproduzir automaticamente vídeos abertos no Duck Player"
           }
         },
         "ru" : {
@@ -16963,7 +17323,7 @@
     },
     "duck-player.autoplay-title" : {
       "comment" : "Autoplay title in settings",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -17017,6 +17377,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Автовоспроизведение"
+          }
+        }
+      }
+    },
+    "duck-player.contingency-title" : {
+      "comment" : "Title for message explaining to the user that Duck Player is not available",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck Player Unavailable"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player no disponible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player n'est pas disponible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player non disponibile"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player is niet beschikbaar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player jest niedostępny"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player indisponível"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player недоступен"
           }
         }
       }
@@ -17085,22 +17505,118 @@
       "comment" : "New tab preference in settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne Duck Player nach Möglichkeit in einem neuen Tab"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Open Duck Player in a new tab whenever possible"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre Duck Player en una pestaña nueva siempre que sea posible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre Duck Player dans un nouvel onglet chaque fois que possible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri sempre Duck Player in una nuova scheda quando possibile"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Duck Player waar mogelijk in een nieuw tabblad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwieraj Duck Player w nowej karcie, gdy tylko jest to możliwe"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir o Duck Player num novo separador sempre que possível"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По возможности открывать Duck Player в новой вкладке"
           }
         }
       }
     },
     "duck-player.newtab-title" : {
       "comment" : "New Tab title in settings",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Tab"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "New Tab"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueva pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvel onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova scheda"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuw tabblad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nowa karta"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novo separador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новая вкладка"
           }
         }
       }
@@ -17109,10 +17625,58 @@
       "comment" : "New tab preference extra info in settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Browsen auf YouTube im Internet"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "When browsing YouTube on the web"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al navegar en YouTube en la web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lorsque vous naviguez sur YouTube sur le Web"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durante la navigazione di YouTube sul Web"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wanneer je YouTube op het web bekijkt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podczas przeglądania YouTube w Internecie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao navegar no YouTube na Internet"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При просмотре YouTube в интернете"
           }
         }
       }
@@ -17293,6 +17857,186 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Проигрыватель Duck Player"
+          }
+        }
+      }
+    },
+    "duck-player.video-contingency-cta" : {
+      "comment" : "Button for the message explaining to the user that Duck Player is not available so the user can learn more",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr erfahren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn More"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más información"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En savoir plus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ulteriori informazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meer informatie"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dowiedz się więcej"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saiba mais"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Узнать больше"
+          }
+        }
+      }
+    },
+    "duck-player.video-contingency-message" : {
+      "comment" : "Message explaining to the user that Duck Player is not available",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Funktionalität des Duck Players wird durch die jüngsten Änderungen bei YouTube beeinträchtigt. Vielen Dank für dein Verständnis, während wir daran arbeiten, diese Probleme zu beheben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck Player's functionality has been affected by recent changes to YouTube. We’re working to fix these issues and appreciate your understanding."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La funcionalidad de Duck Player se ha visto afectada por los cambios recientes en YouTube. Estamos trabajando para solucionar estos problemas y agradecemos tu comprensión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les récents changements apportés à YouTube ont affecté la fonctionnalité de Duck Player. Nous nous efforçons de résoudre ces problèmes et vous remercions de votre compréhension."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La funzionalità di Duck Player è stata influenzata dalle recenti modifiche a YouTube. Stiamo lavorando per risolvere questi problemi. Ti ringraziamo per la comprensione."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recente wijzigingen in YouTube hebben invloed op de functionaliteit van Duck Player. We werken aan een oplossing voor deze problemen. Bedankt voor je begrip."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatnie zmiany w serwisie YouTube miały wpływ na działanie Duck Player. Pracujemy nad rozwiązaniem tych problemów i dziękujemy za zrozumienie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A funcionalidade do Duck Player foi afetada por alterações recentes ao YouTube. Estamos a trabalhar para resolver estes problemas e agradecemos a tua compreensão."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Недавние изменения YouTube приводят к некорректной работе проигрывателя Duck Player. Мы занимаемся решением этой проблемы и благодарим вас за понимание."
+          }
+        }
+      }
+    },
+    "duck-player.video-preferences-title" : {
+      "comment" : "Video Preferences title in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video-Einstellungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Video Preferences"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferencias de vídeo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préférences vidéo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferenze video"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videovoorkeuren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferencje filmów"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferências de vídeo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки видео"
           }
         }
       }
@@ -24205,19 +24949,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Öffne und entsperre **%2$s**\n%3$d Wähle **Datei → Tresor exportieren** in der Menüleiste\n%4$d Wähle das Dateiformat: **.csv**\n%5$d Gib dein Bitwarden Master-Passwort ein\n%6$d Klicke auf %7$@ und speichere die Datei an einem Ort, an dem du sie finden kannst (z. B. auf dem Desktop)\n%8$d %9$@"
+            "value" : "%1$d Öffne und entsperre **%2$s**\n%3$d Wähle **Datei → Tresor exportieren** in der Menüleiste\n%4$d Wähle das Dateiformat: **.csv**\n%5$d Gib dein Bitwarden Haupt-Passwort ein\n%6$d Klicke auf %7$@ und speichere die Datei an einem Ort, an dem du sie finden kannst (z. B. auf dem Desktop)\n%8$d %9$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select **File → Export vault** from the Menu Bar\n%4$d Select the File Format: **.csv**\n%5$d Enter your Bitwarden master password\n%6$d Click %7$@ and save the file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
+            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select **File → Export vault** from the Menu Bar\n%4$d Select the File Format: **.csv**\n%5$d Enter your Bitwarden main password\n%6$d Click %7$@ and save the file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre y desbloquea **%2$s**\n%3$d Selecciona **Archivo → Exportar caja fuerte** en la barra de menú\n%4$d Selecciona el formato de archivo: **.csv**\n%5$d Introduce tu contraseña maestra de Bitwarden\n%6$d Haz clic en %7$@ y guarda el archivo donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n%8$d %9$@"
+            "value" : "%1$d Abre y desbloquea **%2$s**\n%3$d Selecciona **Archivo → Exportar caja fuerte** en la barra de menú\n%4$d Selecciona el formato de archivo: **.csv**\n%5$d Introduce tu contraseña principal de Bitwarden\n%6$d Haz clic en %7$@ y guarda el archivo donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n%8$d %9$@"
           }
         },
         "fr" : {
@@ -24229,25 +24973,25 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Apri e sblocca **%2$s**\n%3$d Seleziona **File → Esporta cassaforte** dalla Barra dei menu\n%4$d Seleziona il Formato file: **.csv**\n%5$d Inserisci la tua master password Bitwarden\n%6$d Fai clic su %7$@ e salva il file dove puoi trovarlo (ad esempio, sul desktop)\n%8$d %9$@"
+            "value" : "%1$d Apri e sblocca **%2$s**\n%3$d Seleziona **File → Esporta vault** dalla Barra dei menu\n%4$d Seleziona il Formato del file: **.csv**\n%5$d Inserisci la tua password principale Bitwarden\n%6$d Clicca su %7$@ e salva il file dove puoi trovarlo (ad esempio, sul desktop)\n%8$d %9$@"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer **Bestand → Kluis exporteren** in de menubalk\n%4$d Selecteer de bestandsindeling: **.csv**\n%5$d Voer je Bitwarden-masterwachtwoord in\n%6$d Klik op %7$@ en bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@"
+            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer **Bestand → Kluis exporteren** in de menubalk\n%4$d Selecteer de bestandsindeling: **.csv**\n%5$d Voer je Bitwarden-hoofdwachtwoord in\n%6$d Klik op %7$@ en bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Otwórz i odblokuj aplikację **%2$s**\n%3$d Wybierz **Plik → Eksportuj sejf** na pasku menu\n%4$d Wybierz format pliku: **.csv**\n%5$d Wprowadź hasło główne aplikacji Bitwarden\n%6$d Kliknij %7$@ i zapisz plik w łatwo dostępnym miejscu (np. na biurku)\n%8$d %9$@"
+            "value" : "%1$d Otwórz i odblokuj aplikację **%2$s**\n%3$d Wybierz **Plik → Eksportuj sejf** na pasku menu\n%4$d Wybierz format pliku: **.csv**\n%5$d Wprowadź hasło główne aplikacji Bitwarden\n%6$d Kliknij %7$@ i zapisz plik w łatwo dostępnym miejscu (np. na pulpicie)\n%8$d %9$@"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre e desbloqueia o **%2$s**\n%3$d Seleciona **Ficheiro → Exportar cofre** na barra de menus\n%4$d Seleciona o formato do ficheiro: **.csv**\n%5$d Introduz a tua palavra-passe mestra do Bitwarden\n%6$d Clica em %7$@ e guarda o ficheiro onde consigas encontrá-lo (por exemplo, no ambiente de trabalho)\n%8$d %9$@"
+            "value" : "%1$d Abre e desbloqueia o **%2$s**\n%3$d Seleciona **Ficheiro → Exportar cofre** na barra de menus\n%4$d Seleciona o formato do ficheiro: **.csv**\n%5$d Introduz a tua palavra-passe principal do Bitwarden\n%6$d Clica em %7$@ e guarda o ficheiro onde consigas encontrá-lo (por exemplo, no ambiente de trabalho)\n%8$d %9$@"
           }
         },
         "ru" : {
@@ -24625,19 +25369,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Klicke auf das **%2$s** Symbol in deinem Browser und gib dein Master-Passwort ein\n%3$d Wähle **Meinen Tresor öffnen**\n%4$d Wähle in der Seitenleiste **Erweiterte Optionen → Exportieren**\n%5$d Gib dein LastPass Master-Passwort ein\n%6$d Wähle das Dateiformat: **Comma Delimited Text (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Klicke auf das **%2$s** Symbol in deinem Browser und gib dein Haupt-Passwort ein\n%3$d Wähle **Meinen Tresor öffnen**\n%4$d Wähle in der Seitenleiste **Erweiterte Optionen → Exportieren**\n%5$d Gib dein LastPass Haupt-Passwort ein\n%6$d Wähle das Dateiformat: **Comma Delimited Text (.csv)**\n%7$d %8$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Click on the **%2$s** icon in your browser and enter your master password\n%3$d Select **Open My Vault**\n%4$d From the sidebar select **Advanced Options → Export**\n%5$d Enter your LastPass master password\n%6$d Select the File Format: **Comma Delimited Text (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Click on the **%2$s** icon in your browser and enter your main password\n%3$d Select **Open My Vault**\n%4$d From the sidebar select **Advanced Options → Export**\n%5$d Enter your LastPass main password\n%6$d Select the File Format: **Comma Delimited Text (.csv)**\n%7$d %8$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Haz clic en el icono **%2$s** de tu navegador e introduce tu contraseña maestra\n%3$d Selecciona **Abrir mi caja fuerte**\n%4$d En la barra lateral, selecciona **Opciones avanzadas → Exportar**\n%5$d Introduce tu contraseña maestra de LastPass\n%6$d Selecciona el formato de archivo: **Texto delimitado por comas (.csv)**\n%7$d %8$@."
+            "value" : "%1$d Haz clic en el icono **%2$s** de tu navegador e introduce tu contraseña principal\n%3$d Selecciona **Abrir mi caja fuerte**\n%4$d En la barra lateral, selecciona **Opciones avanzadas → Exportar**\n%5$d Introduce tu contraseña principal de LastPass\n%6$d Selecciona el formato de archivo: **Texto delimitado por comas (.csv)**\n%7$d %8$@."
           }
         },
         "fr" : {
@@ -24649,31 +25393,31 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Fai clic sull'icona **%2$s** nel browser e immetti la master password\n%3$d Seleziona **Apri la mia cassaforte**\n%4$d Dalla barra laterale seleziona **Opzioni avanzate → Esporta\n**%5$d Immetti la master password LastPass\n%6$d Seleziona il formato del file: **Testo delimitato da virgole (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Clicca sull'icona **%2$s** nel browser e inserisci la tua password principale\n%3$d Seleziona **Apri il Mio Vault**\n%4$d Dalla barra laterale seleziona **Opzioni avanzate → Esporta**\n%5$d Inserisci la tua password principale LastPass\n%6$d Seleziona il formato del file: **Testo delimitato da virgolette (.csv)**\n%7$d %8$@"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Klik op het pictogram **%2$s** in je browser en voer je masterwachtwoord in\n%3$d Selecteer **Open mijn kluis**\n%4$d Klik in de zijbalk op **Geavanceerde opties → Exporteren**\n%5$d Voer je LastPass-masterwachtwoord in\n%6$d Selecteer de bestandsindeling: **Door komma's gescheiden tekst (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Klik op het pictogram **%2$s** in je browser en voer je hoofdwachtwoord in\n%3$d Selecteer **Open mijn kluis**\n%4$d Klik in de zijbalk op **Geavanceerde opties → Exporteren**\n%5$d Voer je LastPass-hoofdwachtwoord in\n%6$d Selecteer de bestandsindeling: **Door komma's gescheiden tekst (.csv)**\n%7$d %8$@"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Kliknij ikonę **%2$s** w przeglądarce i wprowadź hasło główne\n%3$d Wybierz **Open My Vault**\n%4$d Na pasku bocznym wybierz **Advanced Options → Export**\n%5$d Wprowadź hasło główne narzędzia LastPass\n%6$d Wybierz format pliku: **Comma Delimited Text (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Kliknij ikonę **%2$s** w przeglądarce i wprowadź hasło główne\n%3$d Wybierz **Otwórz mój sejf**\n%4$d Na pasku bocznym wybierz **Opcje zaawansowane → Eksportuj**\n%5$d Wprowadź hasło główne splikacji LastPass\n%6$d Wybierz format pliku: **Tekst rozdzielany przecinkami (.csv)**\n%7$d %8$@"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Clica no ícone da aplicação **%2$s** no teu navegador e introduz a tua palavra-passe mestra\n%3$d Seleciona **Abrir o meu cofre**\n%4$d Na barra lateral, seleciona **Opções avançadas → Exportar**\n%5$d Introduz a tua palavra-passe mestra da aplicação LastPass\n%6$d Seleciona o formato do ficheiro: **Texto delimitado por vírgula (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Clica no ícone da aplicação **%2$s** no teu navegador e introduz a tua palavra-passe principal\n%3$d Seleciona **Abrir o meu cofre**\n%4$d Na barra lateral, seleciona **Opções avançadas → Exportar**\n%5$d Introduz a tua palavra-passe principal da aplicação LastPass\n%6$d Seleciona o formato do ficheiro: **Texto delimitado por vírgula (.csv)**\n%7$d %8$@"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Нажмите значок **%2$s** в браузере и введите основной пароль\n%3$d Выберите меню **Открыть мое хранилище**\n%4$d На боковой панели выберите **Дополнительные опции → Экспортировать**\n%5$d Введите основной пароль к LastPass\n%6$d Сохраните файл в формате: **текст с разделяющими запятыми (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Нажмите на значок **%2$s** в браузере и введите основной пароль\n%3$d Выберите меню **Открыть мое хранилище**\n%4$d На боковой панели выберите **Дополнительные опции → Экспортировать**\n%5$d Введите основной пароль к LastPass\n%6$d Сохраните файл в формате: **текст с разделяющими запятыми (.csv)**\n%7$d %8$@"
           }
         }
       }
@@ -24685,19 +25429,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Öffne und entsperre **%2$s**\n%3$d Wähle den Tresor aus, den du exportieren möchtest (du kannst immer nur einen Tresor auf einmal exportieren)\n%4$d Wähle **Datei → Exportieren → Alle Elemente** aus der Menüleiste\n%5$d Gib dein 1Password Master- oder Account-Passwort ein\n%6$d Wähle das Dateiformat: **iCloud-Schlüsselbund (.csv)**\n%7$d Speichere die Passwortdatei an einem Ort, an dem du sie finden kannst (z. B. auf dem Desktop)\n%8$d %9$@"
+            "value" : "%1$d Öffne und entsperre **%2$s**\n%3$d Wähle den Tresor aus, den du exportieren möchtest (du kannst immer nur einen Tresor auf einmal exportieren)\n%4$d Wähle **Datei → Exportieren → Alle Elemente** aus der Menüleiste\n%5$d Gib dein 1Password Haupt- oder Account-Passwort ein\n%6$d Wähle das Dateiformat: **iCloud-Schlüsselbund (.csv)**\n%7$d Speichere die Passwortdatei an einem Ort, an dem du sie finden kannst (z. B. auf dem Desktop)\n%8$d %9$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select the vault you want to export (you can only export one vault at a time)\n%4$d Select **File → Export → All Items** from the Menu Bar\n%5$d Enter your 1Password master or account password\n%6$d Select the File Format: **iCloud Keychain (.csv)**\n%7$d Save the passwords file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
+            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select the vault you want to export (you can only export one vault at a time)\n%4$d Select **File → Export → All Items** from the Menu Bar\n%5$d Enter your 1Password main or account password\n%6$d Select the File Format: **iCloud Keychain (.csv)**\n%7$d Save the passwords file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre y desbloquea **%2$s**\n%3$d Selecciona la caja fuerte que quieres exportar (solo puedes exportar una caja fuerte a la vez)\n%4$d Selecciona **Archivo → Exportar → Todos los elementos** en la barra de menú\n%5$d Introduce tu contraseña maestra o de cuenta de 1Password\n%6$d Selecciona el formato de archivo: **Llavero de iCloud (.csv) **\n%7$d Guarda el archivo de contraseñas donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n%8$d %9$@"
+            "value" : "%1$d Abre y desbloquea **%2$s**\n%3$d Selecciona la caja fuerte que quieres exportar (solo puedes exportar una caja fuerte a la vez)\n%4$d Selecciona **Archivo → Exportar → Todos los elementos** en la barra de menú\n%5$d Introduce tu contraseña principal o de cuenta de 1Password\n%6$d Selecciona el formato de archivo: **Llavero de iCloud (.csv) **\n%7$d Guarda el archivo de contraseñas donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n%8$d %9$@"
           }
         },
         "fr" : {
@@ -24709,25 +25453,25 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Apri e sblocca **%2$s\n**%3$d Seleziona la cassaforte da esportare (è possibile esportare solo una cassaforte alla volta)\n%4$d Seleziona **File → Esporta → Tutti gli elementi** dalla Barra dei menu\n%5$d Inserisci la master password o quella dell'account 1Password\n%6$d Seleziona il formato file: **Keychain iCloud (.csv)**\n%7$d Salva il file delle password dove puoi trovarlo (ad esempio, sul desktop)\n%8$d %9$@"
+            "value" : "%1$d Apri e sblocca **%2$s**\n%3$d Seleziona il vault da esportare (puoi esportarne solo uno per volta)\n%4$d Seleziona **File → Esporta → Tutti gli elementi** dalla Barra dei menu\n%5$d Inserisci la tua password principale o dell'account 1Password\n%6$d Seleziona il formato del file: **Portachiavi iCloud (.csv)**\n%7$d Salva il file delle password dove puoi trovarlo (ad esempio, sul desktop)\n%8$d %9$@"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer de kluis die je wilt exporteren (je kunt slechts één kluis per keer exporteren)\n%4$d Selecteer **Bestand → Exporteren → Alle items** in de menubalk\n%5$d Voer je master- of accountwachtwoord van 1Password in\n%6$d Selecteer de bestandsindeling: **iCloud Keychain (.csv)**\n%7$d Bewaar het bestand met de wachtwoorden op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@"
+            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer de kluis die je wilt exporteren (je kunt slechts één kluis per keer exporteren)\n%4$d Selecteer **Bestand → Exporteren → Alle items** in de menubalk\n%5$d Voer je 1Password hoofd- of accountwachtwoord in\n%6$d Selecteer de bestandsindeling: **iCloud Keychain (.csv)**\n%7$d Bewaar het bestand met de wachtwoorden op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Otwórz i odblokuj aplikację **%2$s**\n%3$d Wybierz sejf, który chcesz wyeksportować (możesz eksportować tylko jeden sejf naraz)\n%4$d Na pasku menu wybierz **File → Export → All Items**\n%5$d Wprowadź hasło główne lub hasło konta 1Password\n%6$d Wybierz format pliku: **iCloud Keychain (.csv)**\n%7$d Zapisz plik haseł w łatwo dostępnym miejscu (np. na biurku)\n%8$d %9$@"
+            "value" : "%1$d Otwórz i odblokuj aplikację **%2$s**\n%3$d Wybierz sejf, który chcesz wyeksportować (możesz eksportować tylko jeden sejf naraz)\n%4$d Na pasku menu wybierz **Plik → Eksportuj → Wszystkie elementy**\n%5$d Wprowadź hasło główne lub hasło konta 1Password\n%6$d Wybierz format pliku: **iCloud Keychain (.csv)**\n%7$d Zapisz plik haseł w łatwo dostępnym miejscu (np. na pulpicie)\n%8$d %9$@"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre e desbloqueia a aplicação **%2$s**\n%3$d Seleciona o cofre que pretendes exportar (só podes exportar um cofre de cada vez)\n%4$d Seleciona **Ficheiro → Exportar → Todos os elementos** na barra de menus\n%5$d Introduz a tua palavra-passe mestra da 1Password ou a palavra-passe da conta\n%6$d Seleciona o formato do ficheiro: **Porta-chaves em iCloud (.csv)**\n%7$d Guarda o ficheiro de palavras-passe onde consigas encontrá-lo (por exemplo, no ambiente de trabalho)\n%8$d %9$@"
+            "value" : "%1$d Abre e desbloqueia a aplicação **%2$s**\n%3$d Seleciona o cofre que pretendes exportar (só podes exportar um cofre de cada vez)\n%4$d Seleciona **Ficheiro → Exportar → Todos os elementos** na barra de menus\n%5$d Introduz a tua palavra-passe principal da aplicação ou da conta 1Password\n%6$d Seleciona o formato do ficheiro: **Porta-chaves em iCloud (.csv)**\n%7$d Guarda o ficheiro de palavras-passe onde consigas encontrá-lo (por exemplo, no ambiente de trabalho)\n%8$d %9$@"
           }
         },
         "ru" : {
@@ -30632,6 +31376,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Новая вкладка"
+          }
+        }
+      }
+    },
+    "menu.show.in.folder" : {
+      "comment" : "Menu item to show where a bookmark is located",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Ordner anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show in Folder"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar en la carpeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher dans le dossier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra nella cartella"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weergeven in map"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż w folderze"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar na pasta"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать в папке"
           }
         }
       }
@@ -54909,6 +55713,66 @@
         }
       }
     },
+    "tooltip.bookmarks.search" : {
+      "comment" : "Tooltip to activate the bookmark search",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen durchsuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Search bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher des favoris"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers zoeken"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyszukaj zakładki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisar marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск по закладкам"
+          }
+        }
+      }
+    },
     "tooltip.bookmarks.shortcut" : {
       "comment" : "Tooltip for the bookmarks shortcut",
       "extractionState" : "extracted_with_value",
@@ -54965,6 +55829,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закладки"
+          }
+        }
+      }
+    },
+    "tooltip.bookmarks.sort" : {
+      "comment" : "Tooltip to activate the bookmark sort",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen sortieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sort bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trier les signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordina i segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers sorteren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortuj zakładki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сортировка закладок"
           }
         }
       }
@@ -56338,6 +57262,58 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Доступно обновление: перезапустить"
+          }
+        }
+      }
+    },
+    "URL" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adres URL"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
           }
         }
       }

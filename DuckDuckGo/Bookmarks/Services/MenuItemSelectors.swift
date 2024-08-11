@@ -44,3 +44,15 @@ import AppKit
     func openAllInNewWindow(_ sender: NSMenuItem)
 
 }
+
+@objc protocol BookmarkSearchMenuItemSelectors {
+
+    func showInFolder(_ sender: NSMenuItem)
+}
+
+@objc protocol BookmarkSortMenuItemSelectors {
+
+    func manualSort(_ sender: NSMenuItem)
+    func sortByNameAscending(_ sender: NSMenuItem)
+    func sortByNameDescending(_ sender: NSMenuItem)
+}

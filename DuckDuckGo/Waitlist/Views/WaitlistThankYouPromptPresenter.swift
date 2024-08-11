@@ -25,20 +25,11 @@ final class WaitlistThankYouPromptPresenter {
 
     private enum Constants {
         static let didShowThankYouPromptKey = "duckduckgo.macos.browser.did-show-thank-you-prompt"
-        static let didDismissPIRCardKey = "duckduckgo.macos.browser.did-dismiss-pir-card"
     }
 
-    private let isPIRBetaTester: () -> Bool
     private let userDefaults: UserDefaults
 
-    convenience init() {
-        self.init(isPIRBetaTester: {
-            false
-        })
-    }
-
-    init(isPIRBetaTester: @escaping () -> Bool, userDefaults: UserDefaults = .standard) {
-        self.isPIRBetaTester = isPIRBetaTester
+    init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
     }
 
@@ -51,30 +42,12 @@ final class WaitlistThankYouPromptPresenter {
         guard canShowPromptCheck() else {
             return
         }
-
-        if isPIRBetaTester() {
-            saveDidShowPromptCheck()
-            presentPIRThankYouPrompt(in: window)
-        }
-    }
-
-    @MainActor
-    func presentPIRThankYouPrompt(in window: NSWindow) {
-        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .dbp)
-        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
-        if let thankYouWindow = thankYouWindowController.window {
-            window.beginSheet(thankYouWindow)
-        }
     }
 
     // MARK: - Eligibility
 
     var canShowPIRCard: Bool {
-        guard !self.userDefaults.bool(forKey: Constants.didDismissPIRCardKey) else {
-            return false
-        }
-
-        return isPIRBetaTester()
+        return false
     }
 
     func canShowPromptCheck() -> Bool {
@@ -82,10 +55,6 @@ final class WaitlistThankYouPromptPresenter {
     }
 
     // MARK: - Dismissal
-
-    func didDismissPIRThankYouCard() {
-        self.userDefaults.setValue(true, forKey: Constants.didDismissPIRCardKey)
-    }
 
     private func saveDidShowPromptCheck() {
         self.userDefaults.setValue(true, forKey: Constants.didShowThankYouPromptKey)
@@ -95,7 +64,6 @@ final class WaitlistThankYouPromptPresenter {
 
     func resetPromptCheck() {
         self.userDefaults.removeObject(forKey: Constants.didShowThankYouPromptKey)
-        self.userDefaults.removeObject(forKey: Constants.didDismissPIRCardKey)
     }
 
 }

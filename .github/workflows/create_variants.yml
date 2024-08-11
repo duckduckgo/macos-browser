@@ -54,7 +54,7 @@ jobs:
 
     name: Set Up Variants
 
-    runs-on: macos-13
+    runs-on: macos-14
     timeout-minutes: 15
 
     outputs:
@@ -76,7 +76,7 @@ jobs:
 
     name: Download Release App and upload artifact
 
-    runs-on: macos-13
+    runs-on: macos-14
     timeout-minutes: 15
 
     steps:

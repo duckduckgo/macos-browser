@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import Foundation
 import DataBrokerProtection
 import Common
@@ -115,5 +113,3 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
         return await ipcClient.getDebugMetadata()
     }
 }
-
-#endif

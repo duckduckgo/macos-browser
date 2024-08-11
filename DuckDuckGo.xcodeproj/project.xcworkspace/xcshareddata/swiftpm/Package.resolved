@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "dc26bfc6e33ad9c79a719b7f21d5ca0564db1859",
-        "version" : "6.3.0"
+        "revision" : "f97053d24c21ea301d4067adbbe0899ff940526a",
+        "version" : "6.7.0"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "2b81745565db09eee8c1cd44d38eefa1011a9f0a",
-        "version" : "12.0.1"
+        "revision" : "9fea1c6762db726328b14bb9ebfd6508849eae28",
+        "version" : "12.1.0"
       }
     },
     {
@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/GRDB.swift.git",
       "state" : {
-        "revision" : "9f049d7b97b1e68ffd86744b500660d34a9e79b8",
-        "version" : "2.3.0"
+        "revision" : "4225b85c9a0c50544e413a1ea1e502c802b44b35",
+        "version" : "2.4.0"
       }
     },
     {
@@ -66,7 +66,7 @@
     {
       "identity" : "lottie-spm",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/airbnb/lottie-spm",
+      "location" : "https://github.com/airbnb/lottie-spm.git",
       "state" : {
         "revision" : "1d29eccc24cc8b75bff9f6804155112c0ffc9605",
         "version" : "4.4.3"
@@ -86,8 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "b75ab2c0405860bb2616db71b9a456acb118c21a",
-        "version" : "3.1.4000"
+        "revision" : "71d303cbfa150e1fac99ffc7b4f67aad9c7a5002",
+        "version" : "3.1.5004"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "348594efe2cd40ef156e915c272d02ec22f1903f",
-        "version" : "4.2.0"
+        "revision" : "36dc07cba4bc1e7e0c1d1fb679c3cd077694a072",
+        "version" : "5.0.0"
       }
     },
     {

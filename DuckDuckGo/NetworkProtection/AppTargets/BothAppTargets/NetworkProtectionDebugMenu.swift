@@ -25,7 +25,6 @@ import SwiftUI
 
 /// Controller for the VPN debug menu.
 ///
-@MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
 
     private let transparentProxySettings = TransparentProxySettings(defaults: .netP)
@@ -42,13 +41,11 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private let resetToDefaults = NSMenuItem(title: "Reset Settings to defaults", action: #selector(NetworkProtectionDebugMenu.resetSettings))
 
-    private let excludedRoutesMenu = NSMenu()
     private let excludeDDGBrowserTrafficFromVPN = NSMenuItem(title: "DDG Browser", action: #selector(toggleExcludeDDGBrowser))
     private let excludeDBPTrafficFromVPN = NSMenuItem(title: "DBP Background Agent", action: #selector(toggleExcludeDBPBackgroundAgent))
 
-    private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "Kill Switch (enforceRoutes)", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
+    private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "enforceRoutes", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
     private let shouldIncludeAllNetworksMenuItem = NSMenuItem(title: "includeAllNetworks", action: #selector(NetworkProtectionDebugMenu.toggleIncludeAllNetworks))
-    private let connectOnLogInMenuItem = NSMenuItem(title: "Connect on Log In", action: #selector(NetworkProtectionDebugMenu.toggleConnectOnLogInAction))
     private let disableRekeyingMenuItem = NSMenuItem(title: "Disable Rekeying", action: #selector(NetworkProtectionDebugMenu.toggleRekeyingDisabled))
 
     private let excludeLocalNetworksMenuItem = NSMenuItem(title: "excludeLocalNetworks", action: #selector(NetworkProtectionDebugMenu.toggleShouldExcludeLocalRoutes))
@@ -85,10 +82,25 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem.separator()
 
-            connectOnLogInMenuItem
-                .targetting(self)
-            shouldEnforceRoutesMenuItem
-                .targetting(self)
+            NSMenuItem(title: "Adapter") {
+                NSMenuItem(title: "Restart Adapter", action: #selector(NetworkProtectionDebugMenu.restartAdapter(_:)))
+                    .targetting(self)
+
+                NSMenuItem(title: "Re-create Adapter", action: #selector(NetworkProtectionDebugMenu.restartAdapter(_:)))
+                    .targetting(self)
+            }
+
+            NSMenuItem(title: "Tunnel Settings") {
+                shouldIncludeAllNetworksMenuItem
+                    .targetting(self)
+
+                excludeLocalNetworksMenuItem
+                    .targetting(self)
+
+                shouldEnforceRoutesMenuItem
+                    .targetting(self)
+            }
+
             NSMenuItem.separator()
 
             NSMenuItem(title: "Send Test Notification", action: #selector(NetworkProtectionDebugMenu.sendTestNotification))
@@ -103,12 +115,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Environment")
                 .submenu(environmentMenu)
 
-            NSMenuItem(title: "Exclusions") {
-                NSMenuItem(title: "Excluded Apps") {
-                    excludeDDGBrowserTrafficFromVPN.targetting(self)
-                    excludeDBPTrafficFromVPN.targetting(self)
-                }
-                NSMenuItem(title: "Excluded Routes").submenu(excludedRoutesMenu)
+            NSMenuItem(title: "Excluded Apps") {
+                excludeDDGBrowserTrafficFromVPN.targetting(self)
+                excludeDBPTrafficFromVPN.targetting(self)
             }
 
             NSMenuItem(title: "Preferred Server").submenu(preferredServerMenu)
@@ -128,25 +137,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Simulate Failure")
                 .submenu(NetworkProtectionSimulateFailureMenu())
 
-            NSMenuItem(title: "Override NetP Activation Date") {
-                NSMenuItem(title: "Reset Activation Date", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionActivationDate))
-                    .targetting(self)
-                NSMenuItem(title: "Set Activation Date to Now", action: #selector(NetworkProtectionDebugMenu.overrideNetworkProtectionActivationDateToNow))
-                    .targetting(self)
-                NSMenuItem(title: "Set Activation Date to 5 Days Ago", action: #selector(NetworkProtectionDebugMenu.overrideNetworkProtectionActivationDateTo5DaysAgo))
-                    .targetting(self)
-                NSMenuItem(title: "Set Activation Date to 10 Days Ago", action: #selector(NetworkProtectionDebugMenu.overrideNetworkProtectionActivationDateTo10DaysAgo))
-                    .targetting(self)
-            }
-
             NSMenuItem.separator()
-
-            NSMenuItem(title: "Kill Switch (alternative approach)") {
-                shouldIncludeAllNetworksMenuItem
-                    .targetting(self)
-                excludeLocalNetworksMenuItem
-                    .targetting(self)
-            }
 
             NSMenuItem(title: "Open App Container in Finder", action: #selector(NetworkProtectionDebugMenu.openAppContainerInFinder))
                 .targetting(self)
@@ -158,10 +149,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
             try? await populateNetworkProtectionServerListMenuItems()
         }
         populateNetworkProtectionRegistrationKeyValidityMenuItems()
-
-        excludedRoutesMenu.delegate = self
-        excludedRoutesMenu.autoenablesItems = false
-        populateExclusionsMenuItems()
     }
 
     required init(coder: NSCoder) {
@@ -233,6 +220,18 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             do {
                 try await debugUtilities.removeVPNConfiguration()
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
+    }
+
+    /// Removes the system extension and agents for DuckDuckGo VPN.
+    ///
+    @objc func restartAdapter(_ sender: Any?) {
+        Task { @MainActor in
+            do {
+                try await debugUtilities.restartAdapter()
             } catch {
                 await NSAlert(error: error).runModal()
             }
@@ -313,21 +312,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
         settings.excludeLocalNetworks.toggle()
     }
 
-    @objc func toggleConnectOnLogInAction(_ sender: Any?) {
-        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
-    }
-
-    @objc func toggleExclusionAction(_ sender: NSMenuItem) {
-        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
-        /*
-        guard let addressRange = sender.representedObject as? String else {
-            assertionFailure("Unexpected representedObject")
-            return
-        }
-
-        NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)*/
-    }
-
     @objc func openAppContainerInFinder(_ sender: Any?) {
         let containerURL = URL.sandboxApplicationSupportURL
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: containerURL.path)
@@ -401,27 +385,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
             }
         }
 #endif
-    }
-
-    private func populateExclusionsMenuItems() {
-        excludedRoutesMenu.removeAllItems()
-
-        for item in settings.excludedRoutes {
-            let menuItem: NSMenuItem
-            switch item {
-            case .section(let title):
-                menuItem = NSMenuItem(title: title, action: nil, target: nil)
-                menuItem.isEnabled = false
-
-            case .range(let range, let description):
-                menuItem = NSMenuItem(title: "\(range)\(description != nil ? " (\(description!))" : "")",
-                                      action: #selector(toggleExclusionAction),
-                                      target: self,
-                                      representedObject: range.stringRepresentation)
-            }
-            excludedRoutesMenu.addItem(menuItem)
-        }
-
     }
 
     func menuItem(title: String, action: Selector, representedObject: Any?) -> NSMenuItem {
@@ -500,42 +463,14 @@ final class NetworkProtectionDebugMenu: NSMenu {
         disableRekeyingMenuItem.state = settings.disableRekeying ? .on : .off
     }
 
-    // MARK: Waitlist
-
-    @objc func resetNetworkProtectionActivationDate(_ sender: Any?) {
-        overrideNetworkProtectionActivationDate(to: nil)
-    }
-
-    @objc func overrideNetworkProtectionActivationDateToNow(_ sender: Any?) {
-        overrideNetworkProtectionActivationDate(to: Date())
-    }
-
-    @objc func overrideNetworkProtectionActivationDateTo5DaysAgo(_ sender: Any?) {
-        overrideNetworkProtectionActivationDate(to: Date.daysAgo(5))
-    }
-
-    @objc func overrideNetworkProtectionActivationDateTo10DaysAgo(_ sender: Any?) {
-        overrideNetworkProtectionActivationDate(to: Date.daysAgo(10))
-    }
-
-    private func overrideNetworkProtectionActivationDate(to date: Date?) {
-        let store = DefaultWaitlistActivationDateStore(source: .netP)
-
-        if let date {
-            store.updateActivationDate(date)
-        } else {
-            store.removeDates()
-        }
-    }
-
     // MARK: - Exclusions
 
     private let dbpBackgroundAppIdentifier = Bundle.main.dbpBackgroundAgentBundleId
     private let ddgBrowserAppIdentifier = Bundle.main.bundleIdentifier!
 
     private func updateExclusionsMenu() {
-        excludeDBPTrafficFromVPN.state = transparentProxySettings.isExcluding(dbpBackgroundAppIdentifier) ? .on : .off
-        excludeDDGBrowserTrafficFromVPN.state = transparentProxySettings.isExcluding(ddgBrowserAppIdentifier) ? .on : .off
+        excludeDBPTrafficFromVPN.state = transparentProxySettings.isExcluding(appIdentifier: dbpBackgroundAppIdentifier) ? .on : .off
+        excludeDDGBrowserTrafficFromVPN.state = transparentProxySettings.isExcluding(appIdentifier: ddgBrowserAppIdentifier) ? .on : .off
     }
 
     @objc private func toggleExcludeDBPBackgroundAgent() {
@@ -544,24 +479,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @objc private func toggleExcludeDDGBrowser() {
         transparentProxySettings.toggleExclusion(for: ddgBrowserAppIdentifier)
-    }
-}
-
-extension NetworkProtectionDebugMenu: NSMenuDelegate {
-
-    func menuNeedsUpdate(_ menu: NSMenu) {
-        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
-        /*
-        if menu === exclusionsMenu {
-            let controller = NetworkProtectionTunnelController()
-            for item in menu.items {
-                guard let route = item.representedObject as? String else { continue }
-                item.state = controller.isExcludedRouteEnabled(route) ? .on : .off
-                // TO BE fixed: see NetworkProtectionTunnelController.excludedRoutes()
-                item.isEnabled = !(controller.shouldEnforceRoutes && route == "10.0.0.0/8")
-            }
-        }
-         */
     }
 }
 

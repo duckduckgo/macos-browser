@@ -21,7 +21,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor final class DataImportViewModelTests: XCTestCase {
+final class DataImportViewModelTests: XCTestCase {
 
     typealias Source = DataImport.Source
     typealias BrowserProfileList = DataImport.BrowserProfileList
@@ -212,12 +212,14 @@ import XCTest
 
     // MARK: - Buttons
 
+    @MainActor
     func testWhenNextButtonIsClicked_screenForTheButtonIsShown() {
         setupModel(with: .safari)
         model.performAction(.next(.fileImport(dataType: .bookmarks)))
         XCTAssertEqual(model.screen, .fileImport(dataType: .bookmarks))
     }
 
+    @MainActor
     func testWhenNoDataTypesSelected_actionButtonDisabled() {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker {
             model = DataImportViewModel(importSource: source)
@@ -232,6 +234,7 @@ import XCTest
         }
     }
 
+    @MainActor
     func testWhenCancelButtonClicked_dismissIsCalled() {
         model = DataImportViewModel(importSource: .safari)
 
@@ -244,6 +247,7 @@ import XCTest
         waitForExpectations(timeout: 0)
     }
 
+    @MainActor
     func testWhenProfilesAreLoadedAndImporterCanImportStraightAway_buttonActionsAreCancelAndImport() {
         model = DataImportViewModel(importSource: .safari, loadProfiles: { .init(browser: $0, profiles: [.test(for: $0)]) }, dataImporterFactory: { _, _, _, _ in
             ImporterMock()
@@ -254,6 +258,7 @@ import XCTest
         XCTAssertEqual(model.secondaryButton, .cancel)
     }
 
+    @MainActor
     func testWhenProfilesAreLoadedAndImporterRequiresKeyChainPassword_buttonActionsAreCancelAndMoreInfo() {
         model = DataImportViewModel(importSource: .safari, loadProfiles: { .init(browser: $0, profiles: [.test(for: $0)]) }, dataImporterFactory: { _, _, _, _ in
             ImporterMock(keychainPasswordRequiredFor: [.passwords])
@@ -273,6 +278,7 @@ import XCTest
         XCTAssertEqual(model.screen, Source.safari.initialScreen)
     }
 
+    @MainActor
     func testWhenProfilesAreLoadedAndImporterRequiresKeyChainPasswordButPasswordsDataTypeNotSelected_buttonActionsAreCancelAndImport() {
         model = DataImportViewModel(importSource: .safari, loadProfiles: { .init(browser: $0, profiles: [.test(for: $0)]) }, dataImporterFactory: { _, _, _, _ in
             ImporterMock(keychainPasswordRequiredFor: [.passwords])
@@ -283,6 +289,7 @@ import XCTest
         XCTAssertEqual(model.secondaryButton, .cancel)
     }
 
+    @MainActor
     func testWhenFileImportSourceSelected_buttonActionsAreCancelAndNone() {
         for source in Source.allCases where ThirdPartyBrowser.browser(for: source) == nil || source.isBrowser == false {
             model = DataImportViewModel(importSource: source, loadProfiles: {
@@ -297,6 +304,7 @@ import XCTest
         }
     }
 
+    @MainActor
     func testWhenNoProfilesAreLoaded_buttonActionsAreCancelAndProceedToFileImport() {
         model = DataImportViewModel(importSource: .firefox, loadProfiles: { .init(browser: $0, profiles: []) })
 
@@ -305,6 +313,7 @@ import XCTest
         XCTAssertEqual(model.secondaryButton, .cancel)
     }
 
+    @MainActor
     func testWhenNoProfilesAreLoadedAndBookmarksDataTypeUnselected_fileImportDataTypeChanges() {
         model = DataImportViewModel(importSource: .firefox, loadProfiles: { .init(browser: $0, profiles: []) })
 
@@ -315,6 +324,7 @@ import XCTest
         XCTAssertEqual(model.secondaryButton, .cancel)
     }
 
+    @MainActor
     func testWhenPasswordsDataTypeUnselected_fileImportDataTypeChanges() {
         model = DataImportViewModel(importSource: .firefox, loadProfiles: { .init(browser: $0, profiles: []) })
 
@@ -325,6 +335,7 @@ import XCTest
         XCTAssertEqual(model.secondaryButton, .cancel)
     }
 
+    @MainActor
     func testWhenImportSourceChanges_selectedDataTypesAreReset() {
         setupModel(with: .safari, profiles: [BrowserProfile.test]) { _, _, _, _ in
             ImporterMock(importableTypes: [.passwords, .bookmarks], keychainPasswordRequiredFor: [.passwords])
@@ -340,6 +351,7 @@ import XCTest
         XCTAssertEqual(model.secondaryButton, .cancel)
     }
 
+    @MainActor
     func testWhenImporterCannotImportPasswords_nextScreenIsFileImport() {
         model = DataImportViewModel(importSource: .yandex, loadProfiles: { .init(browser: $0, profiles: [.test(for: $0)]) }, dataImporterFactory: { _, _, _, _ in
             ImporterMock(importableTypes: [.bookmarks])
@@ -351,6 +363,7 @@ import XCTest
         XCTAssertEqual(model.secondaryButton, .cancel)
     }
 
+    @MainActor
     func testWhenReadPermissionRequired_nextScreenIsReadPermission() {
         setupModel(with: .safari, profiles: [BrowserProfile.test]) { _, _, _, _ in
             ImporterMock { _, _ in
@@ -465,6 +478,7 @@ import XCTest
         XCTAssertEqual(model.description, expected.description)
     }
 
+    @MainActor
     func testWhenImporterRequiresKeychainPasswordButRejected_moreInfoScreenRestored() async throws {
         setupModel(with: .brave, profiles: [BrowserProfile.test]) { _, _, _, p in
             ImporterMock(password: p, keychainPasswordRequiredFor: [.passwords], accessValidator: { _, _ in
@@ -974,6 +988,7 @@ import XCTest
     }
 
     // initial -> import passwords -> only file import supported for passwords -> [Next] -> file import
+    @MainActor
     func testWhenBrowserOnlySelectedPasswordsCannotBeImported_manualImportSuggested() throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker {
             setupModel(with: source, profiles: [BrowserProfile.test, BrowserProfile.default, BrowserProfile.test2], dataImporterFactory: { src, dataType, _, _ in
@@ -997,6 +1012,7 @@ import XCTest
     // MARK: - File Import Sources
 
     // csv/html file import succeeds -> summary
+    @MainActor
     func testWhenFileImportSourceImportSucceeds_summaryShown() async throws {
         for source in Source.allCases where source.initialScreen.isFileImport {
             setupModel(with: source)
@@ -1020,6 +1036,7 @@ import XCTest
     }
 
     // csv/html file import succeeds with 0 passwords/bookmarks imported -> summary
+    @MainActor
     func testWhenFileImportSourceImportSucceedsWithNoDataFound_summaryShown() async throws {
         for source in Source.allCases where source.initialScreen.isFileImport {
             setupModel(with: source)
@@ -1042,6 +1059,7 @@ import XCTest
     }
 
     // csv/html file import fails -> feedback
+    @MainActor
     func testWhenFileImportSourceImportFails_feedbackScreenShown() async throws {
         for source in Source.allCases where source.initialScreen.isFileImport {
             setupModel(with: source)
@@ -1110,6 +1128,7 @@ import XCTest
         nil, // skip
     ]
 
+    @MainActor
     func testWhenBrowsersBookmarksFileImportSucceedsAndNoPasswordsFileImportNeeded_summaryShown() async throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
             for bookmarksSummary in bookmarksSummaries
@@ -1150,6 +1169,7 @@ import XCTest
         }
     }
 
+    @MainActor
     func testWhenBrowsersOnlySelectedBookmarksFileImportSucceeds_summaryShown() async throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker {
             for bookmarksSummary in bookmarksSummaries
@@ -1187,6 +1207,7 @@ import XCTest
         }
     }
 
+    @MainActor
     func testWhenBrowsersBookmarksFileImportFailsAndNoPasswordsFileImportNeeded_feedbackShown() async throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
             for bookmarksSummary in bookmarksSummaries
@@ -1230,6 +1251,7 @@ import XCTest
         }
     }
 
+    @MainActor
     func testWhenBrowsersBookmarksImportFailsNoDataAndFileImportSkippedAndNoPasswordsFileImportNeeded_shortcutsShown() throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
 
@@ -1252,6 +1274,7 @@ import XCTest
         }
     }
 
+    @MainActor
     func testWhenBrowsersOnlySelectedBookmarksFileImportFails_feedbackShown() async throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker {
             for bookmarksSummary in bookmarksSummaries
@@ -1289,6 +1312,7 @@ import XCTest
         }
     }
 
+    @MainActor
     func testWhenBrowsersBookmarksFileImportFailsAndPasswordsFileImportIsNeeded_bookmarksSummaryWithNextButtonShown() async throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
             for bookmarksSummary in bookmarksSummaries
@@ -1327,6 +1351,7 @@ import XCTest
         }
     }
 
+    @MainActor
     func testWhenBrowsersBookmarksFileImportSkippedAndPasswordsFileImportIsNeeded_passwordsFileImportShown() async throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
             for bookmarksSummary in bookmarksSummaries
@@ -1367,6 +1392,7 @@ import XCTest
 
     // MARK: File import after passwords failure
 
+    @MainActor
     func testWhenBrowsersPasswordsFileImportSucceeds_summaryShown() async throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
             for bookmarksSummary in bookmarksSummaries {
@@ -1415,6 +1441,7 @@ import XCTest
         }
     }
 
+    @MainActor
     func testWhenBrowsersOnlySelectedPasswordsFileImportSucceeds_summaryShown() async throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
             for passwordsSummary in passwordsSummaries
@@ -1450,6 +1477,7 @@ import XCTest
         }
     }
 
+    @MainActor
     func testWhenBrowsersPasswordsFileImportFails_feedbackShown() async throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
             for bookmarksSummary in bookmarksSummaries {
@@ -1499,6 +1527,7 @@ import XCTest
         }
     }
 
+    @MainActor
     func testWhenBrowsersPasswordsImportFailNoDataAndFileImportSkipped_dialogDismissedOrShortcutsShown() throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
             for bookmarksSummary in bookmarksSummaries {
@@ -1536,6 +1565,7 @@ import XCTest
         }
     }
 
+    @MainActor
     func testWhenBrowsersOnlySelectedPasswordsFileImportFails_feedbackShown() async throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
             for passwordsSummary in passwordsSummaries
@@ -1573,6 +1603,7 @@ import XCTest
 
     // MARK: - Feedback
 
+    @MainActor
     func testFeedbackSending() {
         NSError.disableSwizzledDescription = true
 
@@ -1644,6 +1675,8 @@ import XCTest
     }
 
     private var importTask: ((Set<DataImport.DataType>, DataImportProgressCallback) async -> DataImportSummary)!
+
+    @MainActor
     func initiateImport(of dataTypes: Set<DataType>, from profile: BrowserProfile? = nil, fromFile url: URL? = nil, resultingWith result: DataImportSummary? = nil, file: StaticString = #filePath, line: UInt = #line, _ descr: String? = nil, progress progressUpdateCallback: ((DataImportProgressEvent) -> Void)? = nil) async throws {
         assert((profile != nil) != (url != nil), "must provide either profile or url")
 

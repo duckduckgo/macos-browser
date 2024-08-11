@@ -38,6 +38,10 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
 
     static let shared = WindowControllersManager(pinnedTabsManager: Application.appDelegate.pinnedTabsManager)
 
+    var activeViewController: MainViewController? {
+        lastKeyMainWindowController?.mainViewController
+    }
+
     init(pinnedTabsManager: PinnedTabsManager) {
         self.pinnedTabsManager = pinnedTabsManager
     }
@@ -52,7 +56,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
     weak var lastKeyMainWindowController: MainWindowController? {
         didSet {
             if lastKeyMainWindowController != oldValue {
-                didChangeKeyWindowController.send(())
+                didChangeKeyWindowController.send(lastKeyMainWindowController)
             }
         }
     }
@@ -69,7 +73,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
         return mainWindowController?.mainViewController.tabCollectionViewModel.selectedTab
     }
 
-    let didChangeKeyWindowController = PassthroughSubject<Void, Never>()
+    let didChangeKeyWindowController = PassthroughSubject<MainWindowController?, Never>()
     let didRegisterWindowController = PassthroughSubject<(MainWindowController), Never>()
     let didUnregisterWindowController = PassthroughSubject<(MainWindowController), Never>()
 
@@ -111,11 +115,9 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
 
 extension WindowControllersManager {
 
-#if DBP
     func showDataBrokerProtectionTab() {
         showTab(with: .dataBrokerProtection)
     }
-#endif
 
     func showBookmarksTab() {
         showTab(with: .bookmarks)

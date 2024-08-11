@@ -911,14 +911,6 @@ extension MainViewController {
         }
     }
 
-    @objc func showPIRThankYouModal(_ sender: Any?) {
-        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .dbp)
-        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
-        if let thankYouWindow = thankYouWindowController.window {
-            WindowsManager.windows.first?.beginSheet(thankYouWindow)
-        }
-    }
-
     @objc func resetEmailProtectionInContextPrompt(_ sender: Any?) {
         EmailManager().resetEmailProtectionInContextPrompt()
     }
@@ -967,11 +959,6 @@ extension MainViewController {
 
     @objc func resetConfigurationToDefault(_ sender: Any?) {
         setConfigurationUrl(nil)
-    }
-
-    @objc func resetSurveyRemoteMessages(_ sender: Any?) {
-        DefaultSurveyRemoteMessagingStorage.surveys().removeStoredAndDismissedMessages()
-        DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager).resetLastRefreshTimestamp()
     }
 
     // MARK: - Developer Tools

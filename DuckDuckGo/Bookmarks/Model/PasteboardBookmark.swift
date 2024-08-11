@@ -58,8 +58,8 @@ struct PasteboardBookmark: Hashable {
         self.init(dictionary: dictionary)
     }
 
-    static func pasteboardBookmarks(with pasteboard: NSPasteboard) -> Set<PasteboardBookmark>? {
-        guard let items = pasteboard.pasteboardItems else {
+    static func pasteboardBookmarks(with pasteboardItems: [NSPasteboardItem]?) -> Set<PasteboardBookmark>? {
+        guard let items = pasteboardItems else {
             return nil
         }
 
