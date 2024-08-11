@@ -78,7 +78,9 @@ struct SuggestionViewModel: Equatable {
             let firstPart = "\(temperatureFormatted(currentTemperature))"
             let secondPart = " \(self.weatherDescription(from: conditionCode) ?? "")"
             let attributedString = NSMutableAttributedString(string: firstPart, attributes: tableRowViewBoldAttributes)
-            let secondAttributedString = NSAttributedString(string: secondPart, attributes: tableRowViewStandardAttributes)
+            var attributes = tableRowViewStandardAttributes
+            let secondAttributedString = NSAttributedString(string: secondPart, attributes: attributes)
+
             attributedString.append(secondAttributedString)
 
             return attributedString

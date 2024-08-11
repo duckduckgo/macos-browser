@@ -62,7 +62,12 @@ final class SuggestionWeatherIATableCellView: NSTableCellView {
             return
         }
         if isSelected {
-            textField?.attributedStringValue = attributedString
+            if let attributedString = attributedString.mutableCopy() as? NSMutableAttributedString {
+                attributedString.removeAttribute(.foregroundColor, range: NSRange(location: 0, length: attributedString.length))
+                textField?.attributedStringValue = attributedString
+            } else {
+                textField?.attributedStringValue = attributedString
+            }
             textField?.textColor = Self.selectedTintColor
             suffixTextField.textColor = Self.selectedTintColor
             secondaryTextField.textColor = Self.selectedTintColor

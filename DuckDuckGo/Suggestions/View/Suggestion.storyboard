@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvc-K3-VCn">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22689"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22690"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -108,9 +108,9 @@
                                                         </userDefinedRuntimeAttributes>
                                                     </customView>
                                                     <scrollView borderType="none" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cx3-LG-ZUH">
-                                                        <rect key="frame" x="4" y="0.0" width="608" height="150"/>
+                                                        <rect key="frame" x="4" y="0.0" width="608" height="155"/>
                                                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="pb8-sX-fSc">
-                                                            <rect key="frame" x="0.0" y="0.0" width="608" height="150"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="608" height="155"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" id="4Z2-d8-NA2">
@@ -140,31 +140,31 @@
                                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                     <subviews>
                                                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Fdz-bm-Ynm">
-                                                                                            <rect key="frame" x="6" y="4" width="40" height="40"/>
+                                                                                            <rect key="frame" x="3" y="4" width="40" height="40"/>
                                                                                             <constraints>
                                                                                                 <constraint firstAttribute="height" constant="40" id="XdH-Wp-KgC"/>
                                                                                                 <constraint firstAttribute="width" constant="40" id="qz3-VA-4SW"/>
                                                                                             </constraints>
                                                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="WeatherSun" id="2tj-eB-v6v"/>
                                                                                         </imageView>
-                                                                                        <textField horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="sdG-pL-WHu">
-                                                                                            <rect key="frame" x="48" y="23" width="119" height="16"/>
+                                                                                        <textField focusRingType="none" horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="sdG-pL-WHu">
+                                                                                            <rect key="frame" x="45" y="24" width="119" height="16"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Search Suggestion" id="ILU-ky-cD5">
                                                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                                             </textFieldCell>
                                                                                         </textField>
-                                                                                        <textField horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="dew-ps-kUd">
-                                                                                            <rect key="frame" x="48" y="9" width="103" height="14"/>
+                                                                                        <textField focusRingType="none" horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="dew-ps-kUd">
+                                                                                            <rect key="frame" x="45" y="8" width="103" height="14"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Search Suggestion" id="JKv-KW-gDe">
                                                                                                 <font key="font" metaFont="smallSystem"/>
                                                                                                 <color key="textColor" name="SecondaryColor"/>
                                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                                             </textFieldCell>
                                                                                         </textField>
-                                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="31F-iY-bsC">
-                                                                                            <rect key="frame" x="147" y="9" width="431" height="14"/>
+                                                                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="31F-iY-bsC">
+                                                                                            <rect key="frame" x="144" y="8" width="434" height="14"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title=" – See more" id="m5m-PW-Oqj">
                                                                                                 <font key="font" metaFont="smallSystem"/>
                                                                                                 <color key="textColor" name="controlAccentColor" catalog="System" colorSpace="catalog"/>
@@ -173,16 +173,16 @@
                                                                                         </textField>
                                                                                     </subviews>
                                                                                     <constraints>
-                                                                                        <constraint firstItem="dew-ps-kUd" firstAttribute="centerY" secondItem="QSr-7b-5GM" secondAttribute="centerY" constant="8" id="4Kc-D5-8lM"/>
+                                                                                        <constraint firstItem="dew-ps-kUd" firstAttribute="centerY" secondItem="QSr-7b-5GM" secondAttribute="centerY" constant="9" id="4Kc-D5-8lM"/>
                                                                                         <constraint firstItem="Fdz-bm-Ynm" firstAttribute="centerY" secondItem="QSr-7b-5GM" secondAttribute="centerY" id="5Iu-aI-6ow"/>
                                                                                         <constraint firstItem="31F-iY-bsC" firstAttribute="centerY" secondItem="dew-ps-kUd" secondAttribute="centerY" id="Ikx-ms-7dO"/>
-                                                                                        <constraint firstItem="sdG-pL-WHu" firstAttribute="centerY" secondItem="QSr-7b-5GM" secondAttribute="centerY" constant="-7" id="JTP-lb-Lb2"/>
+                                                                                        <constraint firstItem="sdG-pL-WHu" firstAttribute="centerY" secondItem="QSr-7b-5GM" secondAttribute="centerY" constant="-8" id="JTP-lb-Lb2"/>
                                                                                         <constraint firstItem="sdG-pL-WHu" firstAttribute="leading" secondItem="Fdz-bm-Ynm" secondAttribute="trailing" constant="4" id="PJY-2z-nqK"/>
                                                                                         <constraint firstItem="dew-ps-kUd" firstAttribute="leading" secondItem="Fdz-bm-Ynm" secondAttribute="trailing" constant="4" id="PzM-er-P8m"/>
                                                                                         <constraint firstItem="31F-iY-bsC" firstAttribute="width" secondItem="sdG-pL-WHu" secondAttribute="width" multiplier="0.55" priority="250" id="Sn6-lE-QX0"/>
                                                                                         <constraint firstItem="31F-iY-bsC" firstAttribute="leading" secondItem="dew-ps-kUd" secondAttribute="trailing" id="bYg-1c-oKj"/>
                                                                                         <constraint firstAttribute="trailing" secondItem="31F-iY-bsC" secondAttribute="trailing" constant="8" id="iRk-n7-neR"/>
-                                                                                        <constraint firstItem="Fdz-bm-Ynm" firstAttribute="leading" secondItem="QSr-7b-5GM" secondAttribute="leading" constant="6" id="xyt-u1-UQA"/>
+                                                                                        <constraint firstItem="Fdz-bm-Ynm" firstAttribute="leading" secondItem="QSr-7b-5GM" secondAttribute="leading" constant="3" id="xyt-u1-UQA"/>
                                                                                     </constraints>
                                                                                     <connections>
                                                                                         <outlet property="iconImageView" destination="Fdz-bm-Ynm" id="g8L-OL-KWG"/>
@@ -203,7 +203,7 @@
                                                                                             </constraints>
                                                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="zsh-dc-Umh"/>
                                                                                         </imageView>
-                                                                                        <textField horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="bOr-Go-gyW">
+                                                                                        <textField focusRingType="none" horizontalHuggingPriority="252" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="bOr-Go-gyW">
                                                                                             <rect key="frame" x="34" y="33" width="119" height="16"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Search Suggestion" id="7bg-HA-vCm">
                                                                                                 <font key="font" usesAppearanceFont="YES"/>
@@ -211,7 +211,7 @@
                                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                                             </textFieldCell>
                                                                                         </textField>
-                                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="efo-Vy-aEh">
+                                                                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="252" translatesAutoresizingMaskIntoConstraints="NO" id="efo-Vy-aEh">
                                                                                             <rect key="frame" x="149" y="33" width="429" height="15"/>
                                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title=" – Search with DuckDuckGo" id="UZv-CE-fbV">
                                                                                                 <font key="font" metaFont="cellTitle"/>
@@ -280,7 +280,7 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ATb-xt-XAg" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="1" y="150" width="614" height="1"/>
+                                                <rect key="frame" x="1" y="155" width="614" height="1"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="G3c-nz-oCJ"/>
                                                 </constraints>
