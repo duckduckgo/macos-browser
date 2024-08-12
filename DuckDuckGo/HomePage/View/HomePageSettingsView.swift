@@ -302,6 +302,9 @@ extension HomePage.Views {
                             ForEach(row) { row in
                                 itemView(row).frame(width: 96)
                             }
+                            if row.count == 1 {
+                                Spacer()
+                            }
                         }
                     }
                 }
@@ -458,16 +461,14 @@ extension HomePage.Views {
 
         @ViewBuilder
         private var selectionBackground: some View {
-            if model.customBackground == customBackground {
+            if let customBackground, model.customBackground == customBackground {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6)
                         .stroke(Color(.updateIndicator), lineWidth: 2)
                     if showSelectionCheckmark {
                         Image(.solidCheckmark)
                             .opacity(0.8)
-                            .ifLet(customBackground?.colorScheme) { view, colorScheme in
-                                view.colorScheme(colorScheme)
-                            }
+                            .colorScheme(customBackground.colorScheme)
                     }
                 }
                 .padding(-2)
