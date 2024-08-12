@@ -40,7 +40,7 @@ class BookmarksSortModeTests: XCTestCase {
     }
 
     func testMenuForManual() {
-        let manualMenu = BookmarksSortMode.manual.menu
+        let manualMenu = BookmarksSortMode.manual.menu(target: self)
 
         XCTAssertEqual(manualMenu.items.count, 5)
 
@@ -62,7 +62,7 @@ class BookmarksSortModeTests: XCTestCase {
     }
 
     func testMenuForNameAscending() {
-        let ascendingMenu = BookmarksSortMode.nameAscending.menu
+        let ascendingMenu = BookmarksSortMode.nameAscending.menu(target: self)
 
         XCTAssertEqual(ascendingMenu.items.count, 5)
 
@@ -82,7 +82,7 @@ class BookmarksSortModeTests: XCTestCase {
     }
 
     func testMenuForNameDescending() {
-        let descendingMenu = BookmarksSortMode.nameDescending.menu
+        let descendingMenu = BookmarksSortMode.nameDescending.menu(target: self)
 
         XCTAssertEqual(descendingMenu.items.count, 5)
 

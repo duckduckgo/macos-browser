@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import DataBrokerProtection
 import Foundation
 import AppKit
@@ -56,25 +54,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         super.init(title: "Personal Information Removal")
 
         buildItems {
-            NSMenuItem(title: "Waitlist") {
-                NSMenuItem(title: "Reset Waitlist State", action: #selector(DataBrokerProtectionDebugMenu.resetWaitlistState))
-                    .targetting(self)
-                NSMenuItem(title: "Reset T&C Acceptance", action: #selector(DataBrokerProtectionDebugMenu.resetTermsAndConditionsAcceptance))
-                    .targetting(self)
-
-                NSMenuItem(title: "Send Notification", action: #selector(DataBrokerProtectionDebugMenu.sendWaitlistAvailableNotification))
-                    .targetting(self)
-
-                NSMenuItem.separator()
-
-                NSMenuItem.separator()
-
-                waitlistTokenItem
-                waitlistTimestampItem
-                waitlistInviteCodeItem
-                waitlistTermsAndConditionsAcceptedItem
-            }
-
             NSMenuItem(title: "Environment")
                 .submenu(environmentMenu)
 
@@ -231,7 +210,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     @objc private func deleteAllDataAndStopAgent() {
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await NSAlert.removeAllDBPStateAndDataAlert().runModal() else { return }
-            resetWaitlistState()
             DataBrokerProtectionFeatureDisabler().disableAndDelete()
         }
     }
@@ -290,28 +268,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         if let updater = DefaultDataBrokerProtectionBrokerUpdater.provideForDebug() {
             updater.updateBrokers()
         }
-    }
-
-    @objc private func resetWaitlistState() {
-        DataBrokerProtectionWaitlist().waitlistStorage.deleteWaitlistState()
-        KeychainAuthenticationData().reset()
-
-        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.shouldShowDBPWaitlistInvitedCardUI.rawValue)
-        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
-        NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
-        os_log("DBP waitlist state cleaned", log: .dataBrokerProtection)
-    }
-
-    @objc private func resetTermsAndConditionsAcceptance() {
-        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
-        NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
-        os_log("DBP waitlist terms and conditions cleaned", log: .dataBrokerProtection)
-    }
-
-    @objc private func sendWaitlistAvailableNotification() {
-        DataBrokerProtectionWaitlist().sendInviteCodeAvailableNotification(completion: nil)
-
-        os_log("DBP waitlist notification sent", log: .dataBrokerProtection)
     }
 
     @objc private func toggleShowStatusMenuItem() {
@@ -384,5 +340,3 @@ extension DataBrokerProtectionDebugMenu: NSWindowDelegate {
         dataBrokerForceOptOutWindowController = nil
     }
 }
-
-#endif

@@ -116,17 +116,3 @@ struct WaitlistEntryViewItemViewData: Identifiable {
     let title: String
     let subtitle: String
 }
-
-#if DBP
-
-struct DataBrokerProtectionInvitedToWaitlistViewData: InvitedToWaitlistViewData {
-    let headerImageName = "Gift-96"
-    let title = UserText.dataBrokerProtectionWaitlistInvitedTitle
-    let subtitle = UserText.dataBrokerProtectionWaitlistInvitedSubtitle
-    let buttonDismissLabel = UserText.dataBrokerProtectionWaitlistButtonDismiss
-    let buttonGetStartedLabel = UserText.dataBrokerProtectionWaitlistButtonGetStarted
-    let availabilityDisclaimer = UserText.dataBrokerProtectionWaitlistAvailabilityDisclaimer
-    let entryViewViewDataList = [WaitlistEntryViewItemViewData]()
-}
-
-#endif

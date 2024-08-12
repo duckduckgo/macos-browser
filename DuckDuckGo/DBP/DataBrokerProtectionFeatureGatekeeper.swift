@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import Foundation
 import BrowserServicesKit
 import Common
@@ -25,13 +23,9 @@ import DataBrokerProtection
 import Subscription
 
 protocol DataBrokerProtectionFeatureGatekeeper {
-    var waitlistIsOngoing: Bool { get }
     func isFeatureVisible() -> Bool
     func disableAndDeleteForAllUsers()
-    func disableAndDeleteForWaitlistUsers()
     func isPrivacyProEnabled() -> Bool
-    func isEligibleForThankYouMessage() -> Bool
-    func cleanUpDBPForPrivacyProIfNecessary() -> Bool
     func arePrerequisitesSatisfied() async -> Bool
 }
 
@@ -40,33 +34,21 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
-    private let waitlistStorage: WaitlistStorage
     private let subscriptionAvailability: SubscriptionFeatureAvailability
     private let accountManager: AccountManager
-
-    private let dataBrokerProtectionKey = "data-broker-protection.cleaned-up-from-waitlist-to-privacy-pro"
-
-    /// Temporary code to use while we have both redeem flow for diary study users. Should be removed later
-    static var bypassWaitlist = false
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler(),
          pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
          userDefaults: UserDefaults = .standard,
-         waitlistStorage: WaitlistStorage = DataBrokerProtectionWaitlist().waitlistStorage,
          subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
          accountManager: AccountManager) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
-        self.waitlistStorage = waitlistStorage
         self.subscriptionAvailability = subscriptionAvailability
         self.accountManager = accountManager
-    }
-
-    var waitlistIsOngoing: Bool {
-        isWaitlistEnabled && isWaitlistBetaActive
     }
 
     var isUserLocaleAllowed: Bool {
@@ -91,34 +73,10 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
         return subscriptionAvailability.isFeatureAvailable
     }
 
-    func isEligibleForThankYouMessage() -> Bool {
-        return wasWaitlistUser && isPrivacyProEnabled()
-    }
-
     func disableAndDeleteForAllUsers() {
         featureDisabler.disableAndDelete()
 
         os_log("Disabling and removing DBP for all users", log: .dataBrokerProtection)
-    }
-
-    func disableAndDeleteForWaitlistUsers() {
-        guard isWaitlistUser else {
-            return
-        }
-
-        os_log("Disabling and removing DBP for waitlist users", log: .dataBrokerProtection)
-        featureDisabler.disableAndDelete()
-    }
-
-    /// Returns true if a cleanup was performed, false otherwise
-    func cleanUpDBPForPrivacyProIfNecessary() -> Bool {
-        if isPrivacyProEnabled() && wasWaitlistUser && !dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro {
-            disableAndDeleteForWaitlistUsers()
-            dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro = true
-            return true
-        } else {
-            return false
-        }
     }
 
     /// If we want to prevent new users from joining the waitlist while still allowing waitlist users to continue using it,
@@ -129,13 +87,7 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
         guard isUserLocaleAllowed else { return false }
 
         // US internal users should have it available by default
-        guard !isInternalUser else { return true }
-
-        if isWaitlistUser {
-            return isWaitlistBetaActive
-        } else {
-            return isWaitlistEnabled && isWaitlistBetaActive
-        }
+        return isInternalUser
     }
 
     func arePrerequisitesSatisfied() async -> Bool {
@@ -159,33 +111,8 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
 
 private extension DefaultDataBrokerProtectionFeatureGatekeeper {
 
-    var dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro: Bool {
-        get {
-            return userDefaults.bool(forKey: dataBrokerProtectionKey)
-        }
-        nonmutating set {
-            userDefaults.set(newValue, forKey: dataBrokerProtectionKey)
-        }
-    }
-
     var isInternalUser: Bool {
         NSApp.delegateTyped.internalUserDecider.isInternalUser
-    }
-
-    var isWaitlistBetaActive: Bool {
-        return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlistBetaActive)
-    }
-
-    var isWaitlistEnabled: Bool {
-        return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlist)
-    }
-
-    var isWaitlistUser: Bool {
-        waitlistStorage.isWaitlistUser
-    }
-
-    var wasWaitlistUser: Bool {
-        waitlistStorage.getWaitlistInviteCode() != nil
     }
 
     func firePrerequisitePixelsAndLogIfNecessary(hasEntitlements: Bool, isAuthenticatedResult: Bool) {
@@ -200,4 +127,3 @@ private extension DefaultDataBrokerProtectionFeatureGatekeeper {
         }
     }
 }
-#endif

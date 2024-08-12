@@ -84,18 +84,3 @@ struct JoinedWaitlistView: View {
         .environmentObject(model)
     }
 }
-
-#if DBP
-
-struct DataBrokerProtectionJoinedWaitlistViewData: JoinedWaitlistViewData {
-    let headerImageName = "JoinedWaitlistHeader"
-    var title = UserText.dataBrokerProtectionWaitlistJoinedTitle
-    var joinedWithNoNotificationSubtitle1 = UserText.dataBrokerProtectionWaitlistJoinedWithNotificationsSubtitle1
-    var joinedWithNoNotificationSubtitle2 = UserText.dataBrokerProtectionWaitlistJoinedWithNotificationsSubtitle2
-    var enableNotificationSubtitle = UserText.dataBrokerProtectionWaitlistEnableNotifications
-    var buttonConfirmLabel = UserText.dataBrokerProtectionWaitlistButtonDone
-    var buttonCancelLabel = UserText.dataBrokerProtectionWaitlistButtonNoThanks
-    var buttonEnableNotificationLabel = UserText.dataBrokerProtectionWaitlistButtonEnableNotifications
-}
-
-#endif

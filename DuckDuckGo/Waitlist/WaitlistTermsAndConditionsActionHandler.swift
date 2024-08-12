@@ -25,24 +25,3 @@ protocol WaitlistTermsAndConditionsActionHandler {
     func didShow()
     mutating func didAccept()
 }
-
-#if DBP
-
-struct DataBrokerProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAndConditionsActionHandler {
-    @UserDefaultsWrapper(key: .dataBrokerProtectionTermsAndConditionsAccepted, defaultValue: false)
-    var acceptedTermsAndConditions: Bool
-
-    func didShow() {
-        PixelKit.fire(GeneralPixel.dataBrokerProtectionWaitlistTermsAndConditionsDisplayed, frequency: .dailyAndCount)
-    }
-
-    mutating func didAccept() {
-        acceptedTermsAndConditions = true
-        // Remove delivered NetP notifications in case the user didn't click them.
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [DataBrokerProtectionWaitlist.notificationIdentifier])
-
-        PixelKit.fire(GeneralPixel.dataBrokerProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndCount)
-    }
-}
-
-#endif
