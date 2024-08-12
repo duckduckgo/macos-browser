@@ -36,12 +36,17 @@ protocol UserBackgroundImagesManaging {
 
     func addImage(with url: URL) async throws -> UserBackgroundImage?
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage?
+    func previewImage(for userBackgroundImage: UserBackgroundImage) -> NSImage?
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage)
     func sortImages()
 }
 
 protocol ImageColorSchemeCalculating {
     func calculatePreferredColorScheme(forImageAt url: URL) -> ColorScheme
+}
+
+protocol ImageResizng {
+    func resizeImage(at url: URL, to newSize: CGSize) -> Data?
 }
 
 extension ColorScheme: LosslessStringConvertible {
@@ -79,7 +84,14 @@ extension UserBackgroundImage: LosslessStringConvertible {
 final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
     let storageLocation: URL
+    private let previewsStorageLocation: URL
+
     let maximumNumberOfImages: Int
+
+    enum Const {
+        static let storageDirectoryName = "UserBackgroundImages"
+        static let previewsDirectoryName = "previews"
+    }
 
     private(set) var availableImages: [UserBackgroundImage] = [] {
         didSet {
@@ -101,23 +113,42 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
     init(maximumNumberOfImages: Int, applicationSupportDirectory: URL) {
         assert(maximumNumberOfImages > 0, "maximumNumberOfImages must be greater than 0")
         self.maximumNumberOfImages = maximumNumberOfImages
-        storageLocation = applicationSupportDirectory.appendingPathComponent("UserBackgroundImages")
-        setUpStorageDirectory()
+        storageLocation = applicationSupportDirectory.appendingPathComponent(Const.storageDirectoryName)
+        previewsStorageLocation = storageLocation.appendingPathComponent(Const.previewsDirectoryName)
+
+        setUpStorageDirectory(at: storageLocation.path)
+        setUpStorageDirectory(at: previewsStorageLocation.path)
+
         availableImages = imagesMetadata.compactMap(UserBackgroundImage.init)
         verifyStoredImages()
     }
 
     func addImage(with url: URL) async throws -> UserBackgroundImage? {
-        let fileName = [UUID().uuidString, url.pathExtension].joined(separator: ".")
-        let destinationURL = storageLocation.appendingPathComponent(fileName)
-        try FileManager.default.copyItem(at: url, to: destinationURL)
+        let fileExtension = url.pathExtension
+        let isHEIC = fileExtension.lowercased() == "heic"
+        let destinationExtension = isHEIC ? "jpg" : fileExtension
 
-        let date = Date()
-        let colorScheme = await Task {
+        let fileName = [UUID().uuidString, destinationExtension].joined(separator: ".")
+        let destinationURL = storageLocation.appendingPathComponent(fileName)
+        if fileExtension.lowercased() == "heic" {
+            try copyHEIC(at: url, toJPEGAt: destinationURL)
+        } else {
+            try FileManager.default.copyItem(at: url, to: destinationURL)
+        }
+
+        async let resizeImageTask: Void = {
+            let date = Date()
+            let resizedImage: Data? = resizeImage(at: destinationURL, to: .init(width: 192, height: 128))
+            try resizedImage?.write(to: previewsStorageLocation.appendingPathComponent(fileName))
+            print("Resizing took \(Date().timeIntervalSince(date)) seconds")
+        }()
+
+        async let colorSchemeTask = {
             calculatePreferredColorScheme(forImageAt: destinationURL)
-        }.value
-        let diff = date.distance(to: Date())
-        print("color scheme calculation took \(diff) seconds")
+        }()
+
+        try await resizeImageTask
+        let colorScheme = await colorSchemeTask
 
         let userBackgroundImage = UserBackgroundImage(fileName: fileName, colorScheme: colorScheme)
 
@@ -139,6 +170,14 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         NSImage(contentsOf: storageLocation.appendingPathComponent(userBackgroundImage.fileName))
     }
 
+    func previewImage(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
+        NSImage(
+            contentsOf: storageLocation
+                .appendingPathComponent(Const.previewsDirectoryName)
+                .appendingPathComponent(userBackgroundImage.fileName)
+        )
+    }
+
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage) {
         guard let index = availableImagesSortedByAccessTime.firstIndex(of: userBackgroundImage) else {
             assertionFailure("selected image is not present in available images")
@@ -153,18 +192,24 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         imagesMetadata = availableImagesSortedByAccessTime.map(\.description)
     }
 
-    private func setUpStorageDirectory() {
+    private func setUpStorageDirectory(at path: String) {
         var isDirectory: ObjCBool = .init(booleanLiteral: false)
-        let fileExists = FileManager.default.fileExists(atPath: storageLocation.path, isDirectory: &isDirectory)
+        let fileExists = FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory)
 
         switch (fileExists, isDirectory.boolValue) {
         case (true, true):
             return
         case (true, false):
-            assertionFailure("File at \(storageLocation.path) is not a directory")
+            assertionFailure("File at \(path) is not a directory")
+            do {
+                try FileManager.default.removeItem(atPath: path)
+            } catch {
+                // fire pixel
+            }
+            fallthrough
         case (false, _):
             do {
-                try FileManager.default.createDirectory(at: storageLocation, withIntermediateDirectories: true)
+                try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
             } catch {
                 // fire pixel
             }
@@ -188,8 +233,173 @@ extension UserBackgroundImagesManager: ImageColorSchemeCalculating {
 
 }
 
+extension UserBackgroundImagesManager: ImageResizng {
+
+    func copyHEIC(at sourceURL: URL, toJPEGAt destinationURL: URL) throws {
+        guard let data = convertHEICToJPEG(at: sourceURL) else {
+            // throw error
+            return
+        }
+        try data.write(to: destinationURL)
+    }
+
+    func correctImageOrientation(cgImage: CGImage, orientation: CGImagePropertyOrientation) -> CGImage? {
+        var transform = CGAffineTransform.identity
+        let width = CGFloat(cgImage.width)
+        let height = CGFloat(cgImage.height)
+
+        switch orientation {
+        case .up, .upMirrored:
+            return cgImage
+        case .down, .downMirrored:
+            transform = transform.translatedBy(x: width, y: height)
+            transform = transform.rotated(by: .pi)
+        case .left, .leftMirrored:
+            transform = transform.translatedBy(x: width, y: 0)
+            transform = transform.rotated(by: .pi / 2)
+        case .right, .rightMirrored:
+            transform = transform.translatedBy(x: 0, y: height)
+            transform = transform.rotated(by: -.pi / 2)
+        }
+
+        switch orientation {
+        case .upMirrored, .downMirrored:
+            transform = transform.translatedBy(x: width, y: 0)
+            transform = transform.scaledBy(x: -1, y: 1)
+        case .leftMirrored, .rightMirrored:
+            transform = transform.translatedBy(x: height, y: 0)
+            transform = transform.scaledBy(x: -1, y: 1)
+        default:
+            break
+        }
+
+        let contextWidth: Int, contextHeight: Int
+        switch orientation {
+        case .left, .leftMirrored, .right, .rightMirrored:
+            contextWidth = Int(height)
+            contextHeight = Int(width)
+        default:
+            contextWidth = Int(width)
+            contextHeight = Int(height)
+        }
+
+        guard let context = CGContext(
+            data: nil,
+            width: contextWidth,
+            height: contextHeight,
+            bitsPerComponent: cgImage.bitsPerComponent,
+            bytesPerRow: 0,
+            space: cgImage.colorSpace ?? CGColorSpace(name: CGColorSpace.sRGB)!,
+            bitmapInfo: cgImage.bitmapInfo.rawValue
+        ) else {
+            return nil
+        }
+
+        context.concatenate(transform)
+
+        switch orientation {
+        case .left, .leftMirrored, .right, .rightMirrored:
+            context.draw(cgImage, in: CGRect(x: 0, y: 0, width: height, height: width))
+        default:
+            context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+        }
+
+        return context.makeImage()
+    }
+
+    func convertHEICToJPEG(at url: URL) -> Data? {
+        // Create a CGImageSource from the HEIC data
+        guard let data = try? Data(contentsOf: url),
+              let imageSource = CGImageSourceCreateWithData(data as CFData, nil),
+              let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil) else {
+            return nil
+        }
+
+        // Create a mutable data object to hold the JPEG data
+        let mutableData = NSMutableData()
+
+        // Create a CGImageDestination for the JPEG format
+        guard let imageDestination = CGImageDestinationCreateWithData(mutableData, kUTTypeJPEG, 1, nil) else {
+            return nil
+        }
+
+        let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [CFString: Any]
+        let orientationRawValue = properties?[kCGImagePropertyOrientation] as? UInt32 ?? 1
+        let orientation = CGImagePropertyOrientation(rawValue: orientationRawValue) ?? .up
+
+        guard let correctedCGImage = correctImageOrientation(cgImage: cgImage, orientation: orientation) else {
+            return nil
+        }
+
+        // Add the CGImage to the destination
+        CGImageDestinationAddImage(imageDestination, correctedCGImage, nil)
+
+        // Finalize the image destination to write the data
+        guard CGImageDestinationFinalize(imageDestination) else {
+            return nil
+        }
+
+        return mutableData as Data
+    }
+
+    func resizeImage(at url: URL, to newSize: CGSize) -> Data? {
+        guard let data = try? Data(contentsOf: url),
+              let imageSource = CGImageSourceCreateWithData(data as CFData, nil),
+              let originalImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)
+        else {
+            return nil
+        }
+
+        let originalWidth = CGFloat(originalImage.width)
+        let originalHeight = CGFloat(originalImage.height)
+
+        let widthRatio = newSize.width / originalWidth
+        let heightRatio = newSize.height / originalHeight
+        let scale = max(widthRatio, heightRatio)
+
+        let scaledWidth = newSize.width / scale
+        let scaledHeight = newSize.height / scale
+
+        let xOffset = (originalWidth - scaledWidth) / 2
+        let yOffset = (originalHeight - scaledHeight) / 2
+
+        let cropRect = CGRect(x: xOffset, y: yOffset, width: scaledWidth, height: scaledHeight)
+
+        guard let croppedImage = originalImage.cropping(to: cropRect) else {
+            return nil
+        }
+
+        let context = CGContext(
+            data: nil,
+            width: Int(newSize.width),
+            height: Int(newSize.height),
+            bitsPerComponent: originalImage.bitsPerComponent,
+            bytesPerRow: 0,
+            space: originalImage.colorSpace ?? CGColorSpace(name: CGColorSpace.sRGB)!,
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Little.rawValue
+        )
+
+        context?.draw(croppedImage, in: CGRect(origin: .zero, size: newSize))
+
+        guard let resizedImage = context?.makeImage() else {
+            return nil
+        }
+
+        let mutableData = NSMutableData()
+        guard let imageDestination = CGImageDestinationCreateWithData(mutableData, kUTTypePNG, 1, nil) else {
+            return nil
+        }
+
+        CGImageDestinationAddImage(imageDestination, resizedImage, nil)
+        CGImageDestinationFinalize(imageDestination)
+
+        return mutableData as Data
+    }
+
+}
+
 extension NSImage {
-    func averageBrightness(sampleSize: Int = 2000) -> CGFloat? {
+    func averageBrightness(sampleSize: Int = 2048) -> CGFloat? {
         guard let tiffData = self.tiffRepresentation,
               let bitmapImage = NSBitmapImageRep(data: tiffData) else { return nil }
 

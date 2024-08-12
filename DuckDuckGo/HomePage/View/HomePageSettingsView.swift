@@ -394,7 +394,7 @@ extension HomePage.Views {
                 illustration.image.resizable().scaledToFill()
             case .customImage(let userBackgroundImage):
                 Group {
-                    if let image = model.customImagesManager.image(for: userBackgroundImage) {
+                    if let image = model.customImagesManager.previewImage(for: userBackgroundImage) {
                         Image(nsImage: image).resizable().scaledToFill()
                     } else {
                         EmptyView()
