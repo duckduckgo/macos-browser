@@ -61,12 +61,14 @@ protocol BookmarkManager: AnyObject {
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
 
+    var sortModePublisher: Published<BookmarksSortMode>.Publisher { get }
+    var sortMode: BookmarksSortMode { get set }
+
     func requestSync()
 
 }
 
 final class LocalBookmarkManager: BookmarkManager {
-
     static let shared = LocalBookmarkManager()
 
     init(bookmarkStore: BookmarkStore? = nil, faviconManagement: FaviconManagement? = nil) {
@@ -76,7 +78,9 @@ final class LocalBookmarkManager: BookmarkManager {
         if let faviconManagement {
             self.faviconManagement = faviconManagement
         }
+
         self.subscribeToFavoritesDisplayMode()
+        self.sortMode = sortRepository.storedSortMode
     }
 
     private func subscribeToFavoritesDisplayMode() {
@@ -93,8 +97,16 @@ final class LocalBookmarkManager: BookmarkManager {
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
+    @Published var sortMode: BookmarksSortMode = .manual {
+        didSet {
+            sortRepository.storedSortMode = sortMode
+        }
+    }
+    var sortModePublisher: Published<BookmarksSortMode>.Publisher { $sortMode }
+
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
+    private lazy var sortRepository: SortBookmarksRepository = SortBookmarksUserDefaults()
 
     private var favoritesDisplayMode: FavoritesDisplayMode = .displayNative(.desktop)
     private var favoritesDisplayModeCancellable: AnyCancellable?
