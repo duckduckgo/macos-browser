@@ -31,6 +31,7 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
     weak var broker: UserScriptMessageBroker?
     weak var webView: WKWebView?
     private var cancellables = Set<AnyCancellable>()
+    private var initialized = false
 
     // MARK: - MessageNames
     enum MessageNames: String, CaseIterable {
@@ -62,11 +63,8 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
     }
 
     public func onUpdate() {
-        guard NSApp.runType != .uiTests else {
+        guard NSApp.runType != .uiTests, initialized, let webView = webView else {
             return
-        }
-        guard let webView = webView else {
-            return assertionFailure("Could not access webView")
         }
 
         guard webView.url?.isReleaseNotesScheme ?? false else {
@@ -99,6 +97,8 @@ extension ReleaseNotesUserScript {
 #else
         let env = "production"
 #endif
+
+        initialized = true
         return InitialSetupResult(env: env, locale: Locale.current.identifier)
     }
 
