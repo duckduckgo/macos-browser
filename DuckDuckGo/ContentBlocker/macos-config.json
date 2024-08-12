@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1722602607085,
+    "version": 1723142919820,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -84,6 +84,9 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
@@ -111,7 +114,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "4efd0ce3e46f0b52aa919a6f80edcd00"
+            "hash": "fa5f86bac5946c528cd6bc7449a2718a"
         },
         "androidBrowserConfig": {
             "exceptions": [],
@@ -142,6 +145,9 @@
                 },
                 {
                     "domain": "eleconomista.es"
+                },
+                {
+                    "domain": "eurostar.com"
                 },
                 {
                     "domain": "ksta.de"
@@ -330,6 +336,9 @@
                     "domain": "dailymail.co.uk"
                 },
                 {
+                    "domain": "newsforkids.net"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -337,6 +346,9 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "flexmls.com"
                 },
                 {
                     "domain": "instructure.com"
@@ -351,7 +363,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "16ae53feb54606dee484b0ed4da3e7e8"
+            "hash": "ee9a64bd4f869975e27812b48f8a2061"
         },
         "autofillBreakageReporter": {
             "state": "disabled",
@@ -1058,6 +1070,9 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "tinder.com"
                 },
                 {
@@ -1080,7 +1095,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "1.93.0",
-            "hash": "242071b6df63a9285e4519b3e29e34c1"
+            "hash": "81933e08c573f41c7a7e1620de3e2dbd"
         },
         "clickToPlay": {
             "exceptions": [
@@ -1092,6 +1107,9 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "flexmls.com"
                 },
                 {
                     "domain": "instructure.com"
@@ -1107,7 +1125,7 @@
                 }
             },
             "state": "enabled",
-            "hash": "daa147e3f277083d492964c68a9f5caf"
+            "hash": "f48fcbcedd692bef6e3279e323727b54"
         },
         "clientBrandHint": {
             "exceptions": [],
@@ -1148,10 +1166,13 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "42da678c1cc61b0d52986f536e05f416"
+            "hash": "96b2f778bab196aa424e9c859ddea778"
         },
         "cookie": {
             "settings": {
@@ -1212,11 +1233,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "d23565fe73c051c53bff8a40396f705d"
+            "hash": "6b4d2cef180104c5c84f5687479b8492"
         },
         "customUserAgent": {
             "settings": {
@@ -1418,6 +1442,9 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "flexmls.com"
                 },
                 {
                     "domain": "wunderground.com"
@@ -4666,7 +4693,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "4540ef2182cc5c1a82008606b63a1cbd"
+            "hash": "4e344fae2b186575742da5eedccb5e86"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4680,11 +4707,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "139d551fb343ef36567a2d35e7c4457a"
+            "hash": "be6751fe0307a7e1b9476f4d8b8d0aaf"
         },
         "extendedOnboarding": {
             "exceptions": [],
@@ -4707,10 +4737,13 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "a05e98b812061f4362468b51c4951937"
+            "hash": "7f042650922da2636492e77ed1101bce"
         },
         "fingerprintingBattery": {
             "exceptions": [
@@ -4727,11 +4760,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "0b7239752bdfb9fd3e1eeaff733fe613"
+            "hash": "b9993a70bb5d6bfba23b4ec797f8a684"
         },
         "fingerprintingCanvas": {
             "settings": {
@@ -4832,11 +4868,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "5a29a3dee399844c40b4b759b5fc524c"
+            "hash": "49a3d497835bf5715aaaa73f87dd974f"
         },
         "fingerprintingHardware": {
             "settings": {
@@ -4904,6 +4943,9 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "airbnb.com"
                 },
                 {
@@ -4941,7 +4983,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "895f01c838574b034e405f4e506ebe94"
+            "hash": "97e86f6982f80cebfd56915be1457595"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -4991,11 +5033,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "e316926668f68f7288c1c09c7158834f"
+            "hash": "9c9c85ea83b8e7c6d07c20d1539a000f"
         },
         "fingerprintingTemporaryStorage": {
             "exceptions": [
@@ -5018,11 +5063,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "318229ab4611a2cd34b23aae9135122b"
+            "hash": "2dc4c0ade2e385d208695d770002c725"
         },
         "googleRejected": {
             "exceptions": [
@@ -5036,11 +5084,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "139d551fb343ef36567a2d35e7c4457a"
+            "hash": "be6751fe0307a7e1b9476f4d8b8d0aaf"
         },
         "gpc": {
             "state": "enabled",
@@ -5100,6 +5151,9 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
@@ -5112,7 +5166,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "f1edc5fb05afdac69084326add51da45"
+            "hash": "c299dcdfe928b8fb57fcb671d22680c8"
         },
         "harmfulApis": {
             "settings": {
@@ -5224,11 +5278,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "d12818afbee58693fc60fd0be7cc90db"
+            "hash": "fb598c4167ff166d85dd49c701cc5579"
         },
         "history": {
             "state": "disabled",
@@ -5257,10 +5314,13 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "fd20e89d32343cf42c4b7f5101d5b900"
+            "hash": "b47d255c6f836ecb7ae0b3e61cc2c025"
         },
         "incontextSignup": {
             "exceptions": [],
@@ -5307,6 +5367,9 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
@@ -5318,7 +5381,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "68732c967df2ff5beb2d851378395cfd"
+            "hash": "d14f6e3a9aa4139ee1d517016b59691e"
         },
         "networkProtection": {
             "state": "enabled",
@@ -5392,11 +5455,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "4977063ee77c043c5ad51e3daeb188ca"
+            "hash": "82088db85ca7f64418fbfd57db25ade1"
         },
         "performanceMetrics": {
             "state": "enabled",
@@ -5411,10 +5477,13 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "94113375ad83c83f79c508e5a6b4d204"
+            "hash": "6792064606a5a72c5cd44addb4d40bda"
         },
         "phishingDetection": {
             "state": "internal",
@@ -5429,6 +5498,9 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
@@ -5440,7 +5512,7 @@
                     "state": "internal"
                 }
             },
-            "hash": "ca33e2c8e25f0502cbf45bedb02dddf4"
+            "hash": "9a9143022e6cc8976461b337abfa81a1"
         },
         "pluginPointFocusedViewPlugin": {
             "state": "disabled",
@@ -5575,11 +5647,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "f2d162b61ce76263251dbea36b528cfe"
+            "hash": "138c3b2409f6b3bf967b804ab9bf2ce2"
         },
         "remoteMessaging": {
             "state": "enabled",
@@ -5599,13 +5674,16 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "settings": {
                 "windowInMs": 0
             },
-            "hash": "d424b3a064dd4abfccbd145270b121cf"
+            "hash": "baf19d9e0f506ed09f46c95b1849adee"
         },
         "runtimeChecks": {
             "state": "disabled",
@@ -5620,11 +5698,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "settings": {},
-            "hash": "7dd7a12bfb6c39e9fe94cc24a81c56fc"
+            "hash": "dfede9f06b9e322e198736703d013d15"
         },
         "serviceworkerInitiatedRequests": {
             "exceptions": [
@@ -5638,11 +5719,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "139d551fb343ef36567a2d35e7c4457a"
+            "hash": "be6751fe0307a7e1b9476f4d8b8d0aaf"
         },
         "sslCertificates": {
             "state": "enabled",
@@ -7417,6 +7501,24 @@
                                 "domains": [
                                     "<all>"
                                 ]
+                            },
+                            {
+                                "rule": "meetings.hubspot.com",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "app.hubspot.com/hubsettings",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "app.hubspot.com/userpreferences",
+                                "domains": [
+                                    "<all>"
+                                ]
                             }
                         ]
                     },
@@ -9010,10 +9112,13 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
-            "hash": "2760d1d1407d43cb407a3954b693bbc8"
+            "hash": "5b165417204a223eecb181ae535bc194"
         },
         "trackingCookies1p": {
             "settings": {
@@ -9033,11 +9138,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "4e5efbd74ddcc8849735bfe590ed0d78"
+            "hash": "763f56424b0827b5731927a043219912"
         },
         "trackingCookies3p": {
             "settings": {
@@ -9054,11 +9162,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "4977063ee77c043c5ad51e3daeb188ca"
+            "hash": "82088db85ca7f64418fbfd57db25ade1"
         },
         "trackingParameters": {
             "exceptions": [
@@ -9073,6 +9184,9 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "flexmls.com"
                 },
                 {
                     "domain": "instructure.com"
@@ -9109,7 +9223,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "0.22.3",
-            "hash": "ae9d3a7642a97199783380b145748b15"
+            "hash": "d4fd05626079512387bd1fc0de585cb9"
         },
         "userAgentRotation": {
             "settings": {
@@ -9126,11 +9240,14 @@
                     "domain": "noaprints.com"
                 },
                 {
+                    "domain": "flexmls.com"
+                },
+                {
                     "domain": "instructure.com"
                 }
             ],
             "state": "disabled",
-            "hash": "8e86f07f09dcca5d1f327c31f8da38a6"
+            "hash": "9225b8785d6973db37abde99d81d219c"
         },
         "voiceSearch": {
             "exceptions": [],
@@ -9150,6 +9267,9 @@
                 },
                 {
                     "domain": "noaprints.com"
+                },
+                {
+                    "domain": "flexmls.com"
                 },
                 {
                     "domain": "lastpass.com"
@@ -9416,7 +9536,7 @@
                     }
                 ]
             },
-            "hash": "5fbe07453e4502170f302049c96f8b1b"
+            "hash": "68c020008cb8344c77c40ba98f937ac7"
         },
         "webViewBlobDownload": {
             "exceptions": [],
