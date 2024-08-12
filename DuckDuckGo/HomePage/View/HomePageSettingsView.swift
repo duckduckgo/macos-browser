@@ -150,60 +150,6 @@ extension HomePage.Views {
                 HomeContentSectionsView(includeContinueSetUpCards: includingContinueSetUpCards)
             }
             footer
-
-//            SettingsSection(title: "Blur Settings") {
-//                Link("Apple HIG Documentation", destination: "https://developer.apple.com/design/human-interface-guidelines/materials#macOS".url!)
-//
-//                Text("Mode").font(.system(size: 13.0, weight: .semibold))
-//                Picker(selection: $model.usesLegacyBlur, content: {
-//                    Text("SwiftUI").tag(false)
-//                    Text("AppKit").tag(true)
-//                }, label: {})
-//                .pickerStyle(.radioGroup)
-//
-//                Text("Material (SwiftUI)").font(.system(size: 13.0, weight: .semibold))
-//                Picker(selection: $model.vibrancyMaterial, content: {
-//                    Text("ultraThin").tag(VibrancyMaterial.ultraThinMaterial)
-//                    Text("thin").tag(VibrancyMaterial.thinMaterial)
-//                    Text("regular").tag(VibrancyMaterial.regular)
-//                    Text("thick").tag(VibrancyMaterial.thickMaterial)
-//                    Text("ultraThick").tag(VibrancyMaterial.ultraThickMaterial)
-//                }, label: {})
-//                .pickerStyle(.radioGroup)
-//                .disabled(model.usesLegacyBlur)
-//
-//                Text("Material (AppKit)").font(.system(size: 13.0, weight: .semibold))
-//                Picker(selection: $model.legacyVibrancyMaterial, content: {
-//                    Text("titlebar").tag(NSVisualEffectView.Material.titlebar)
-//                    Text("selection").tag(NSVisualEffectView.Material.selection)
-//                    Text("menu").tag(NSVisualEffectView.Material.menu)
-//                    Text("popover").tag(NSVisualEffectView.Material.popover)
-//                    Text("sidebar").tag(NSVisualEffectView.Material.sidebar)
-//                    Text("headerView").tag(NSVisualEffectView.Material.headerView)
-//                    Text("sheet").tag(NSVisualEffectView.Material.sheet)
-//                    Text("windowBackground").tag(NSVisualEffectView.Material.windowBackground)
-//                    Text("hudWindow").tag(NSVisualEffectView.Material.hudWindow)
-//                    Text("fullScreenUI").tag(NSVisualEffectView.Material.fullScreenUI)
-//                    Text("toolTip").tag(NSVisualEffectView.Material.toolTip)
-//                    Text("contentBackground").tag(NSVisualEffectView.Material.contentBackground)
-//                    Text("underWindowBackground").tag(NSVisualEffectView.Material.underWindowBackground)
-//                    Text("underPageBackground").tag(NSVisualEffectView.Material.underPageBackground)
-//                }, label: {})
-//                .pickerStyle(.radioGroup)
-//                .disabled(!model.usesLegacyBlur)
-//
-//                Text("Alpha").font(.system(size: 13.0, weight: .semibold))
-//                HStack {
-//                    Slider(value: $model.vibrancyAlpha, in: 0...1.0) {
-//                    } minimumValueLabel: {
-//                        Text("0")
-//                    } maximumValueLabel: {
-//                        Text("1")
-//                    }
-//                    Text(String(format: "%.2f", arguments: [model.vibrancyAlpha]))
-//                        .frame(width: 30)
-//                }
-//            }
         }
 
         @ViewBuilder

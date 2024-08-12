@@ -44,67 +44,25 @@ struct VisualEffectBlur: NSViewRepresentable {
 
 public extension View {
     /**
-     * Displays `cursor` when the view is hovered.
-     *
-     * This modifier uses `.onHover` under the hood, so it takes an optional
-     * closure parameter that would be called inside the `.onHover` modifier
-     * before updating the cursor, removing the need to add a separate `.onHover`
-     * modifier.
+     * Sets the vibrancy effect as background using `NSVisualEffectView` representable.
      */
     func vibrancyEffect(
-        useLegacyBlur: Bool,
-        material: VibrancyMaterial,
-        legacyMaterial: NSVisualEffectView.Material = .fullScreenUI,
+        material: NSVisualEffectView.Material = .fullScreenUI,
         blendingMode: NSVisualEffectView.BlendingMode = .withinWindow,
         alpha: CGFloat = 1.0
     ) -> some View {
-        modifier(VibrancyModifier(useLegacyBlur: useLegacyBlur, material: material, legacyMaterial: legacyMaterial, blendingMode: blendingMode, alpha: alpha))
-    }
-}
-
-public enum VibrancyMaterial {
-    case regular
-    case thickMaterial
-    case thinMaterial
-    case ultraThinMaterial
-    case ultraThickMaterial
-
-    @available(macOS 12.0, *)
-    var material: Material {
-        switch self {
-        case .regular:
-                .regular
-        case .thickMaterial:
-                .thickMaterial
-        case .thinMaterial:
-                .thinMaterial
-        case .ultraThinMaterial:
-                .ultraThinMaterial
-        case .ultraThickMaterial:
-                .ultraThickMaterial
-        }
+        modifier(VibrancyModifier(material: material, blendingMode: blendingMode, alpha: alpha))
     }
 }
 
 private struct VibrancyModifier: ViewModifier {
 
-    let useLegacyBlur: Bool
-    let material: VibrancyMaterial
-    let legacyMaterial: NSVisualEffectView.Material
+    let material: NSVisualEffectView.Material
     let blendingMode: NSVisualEffectView.BlendingMode
     let alpha: CGFloat
-//    let color: Color
 
     @ViewBuilder
     func body(content: Content) -> some View {
-        if useLegacyBlur {
-            content.background(VisualEffectBlur(material: legacyMaterial, blendingMode: blendingMode, alpha: alpha))
-        } else {
-            if #available(macOS 12.0, *) {
-                content.background(material.material.opacity(alpha))
-            } else {
-                content.background(Color.white)
-            }
-        }
+        content.background(VisualEffectBlur(material: material, blendingMode: blendingMode, alpha: alpha))
     }
 }
