@@ -385,6 +385,9 @@ public final class TunnelControllerViewModel: ObservableObject {
             return UserText.networkProtectionStatusDisconnected
         case .disconnecting:
             return UserText.networkProtectionStatusDisconnecting
+        case .snoozing:
+            // Snooze mode is not supported on macOS, but fall back to the disconnected string to be safe.
+            return UserText.networkProtectionStatusDisconnected
         }
     }
 
