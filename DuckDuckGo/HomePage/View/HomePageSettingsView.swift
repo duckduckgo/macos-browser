@@ -103,7 +103,7 @@ extension HomePage.Views {
                         Spacer()
                         Image(.externalAppScheme)
                     }
-                    .foregroundColor(.accentColor)
+                    .foregroundColor(Color.linkBlue)
                     .cursor(.pointingHand)
                 }
                 .buttonStyle(.plain)
