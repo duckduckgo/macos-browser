@@ -59,7 +59,7 @@ extension HomePage.Models {
         struct BackgroundModeModel: Identifiable, Hashable {
             let contentType: ContentType
             let title: String
-            let isSelected: Bool
+            let customBackgroundPreview: CustomBackground?
 
             var id: String {
                 title
@@ -117,14 +117,23 @@ extension HomePage.Models {
 
         var backgroundModes: [BackgroundModeModel] {
             var modes: [BackgroundModeModel] = [
-                .init(contentType: .gradientPicker, title: "Gradients", isSelected: customBackground?.gradient != nil),
-                .init(contentType: .colorPicker, title: "Solid Colors", isSelected: customBackground?.solidColor != nil),
-                .init(contentType: .illustrationPicker, title: "Illustrations", isSelected: customBackground?.illustration != nil)
+                .init(contentType: .gradientPicker, title: "Gradients", customBackgroundPreview: .gradient(customBackground?.gradient ?? CustomBackground.placeholderGradient)),
+                .init(contentType: .colorPicker, title: "Solid Colors", customBackgroundPreview: .solidColor(customBackground?.solidColor ?? CustomBackground.placeholderColor)),
+                .init(contentType: .illustrationPicker, title: "Illustrations", customBackgroundPreview: .illustration(customBackground?.illustration ?? CustomBackground.placeholderIllustration))
             ]
             if customImagesManager.availableImages.count > 0 {
-                modes.append(.init(contentType: .customImagePicker, title: "Custom Images", isSelected: customBackground?.userBackgroundImage != nil))
+                let preview: CustomBackground? = {
+                    guard customBackground?.userBackgroundImage == nil else {
+                        return customBackground
+                    }
+                    guard let lastUsedUserBackgroundImage = customImagesManager.availableImages.first else {
+                        return nil
+                    }
+                    return .customImage(lastUsedUserBackgroundImage)
+                }()
+                modes.append(.init(contentType: .customImagePicker, title: "Custom Images", customBackgroundPreview: preview))
             }
-            modes.append(.init(contentType: .uploadImage, title: "Upload Image", isSelected: false))
+            modes.append(.init(contentType: .uploadImage, title: "Upload Image", customBackgroundPreview: nil))
             return modes
         }
 
@@ -152,60 +161,6 @@ extension HomePage.Models {
                 }
             } else {
                 Color.newTabPageBackground
-            }
-        }
-
-        @ViewBuilder
-        var preview: some View {
-            switch customBackground {
-            case .gradient(let gradient):
-                gradient.image.resizable()
-            case .solidColor(let solidColor):
-                solidColor.color
-            case .illustration(let illustration):
-                illustration.image.resizable()
-            case .customImage(let userBackgroundImage):
-                if let nsImage = customImagesManager.image(for: userBackgroundImage) {
-                    Image(nsImage: nsImage).resizable()
-                } else {
-                    CustomBackground.placeholderCustomImage
-                }
-            case .none:
-                EmptyView()
-            }
-        }
-
-        @ViewBuilder
-        func backgroundPreview(for backgroundType: CustomBackgroundType) -> some View {
-            switch backgroundType {
-            case .gradient:
-                if case let .gradient(gradient) = customBackground {
-                    gradient.image.resizable()
-                } else {
-                    CustomBackground.placeholderGradient
-                }
-            case .solidColor:
-                if case let .solidColor(solidColor) = customBackground {
-                    solidColor.color
-                } else {
-                    CustomBackground.placeholderColor
-                }
-            case .illustration:
-                if case let .illustration(illustration) = customBackground {
-                    illustration.image.resizable()
-                } else {
-                    CustomBackground.placeholderIllustration
-                }
-            case .customImage:
-                if case let .customImage(userBackgroundImage) = customBackground, let nsImage = customImagesManager.image(for: userBackgroundImage) {
-                    Image(nsImage: nsImage).resizable()
-                } else if let lastUsedUserBackgroundImage = customImagesManager.availableImages.first,
-                          let nsImage = customImagesManager.image(for: lastUsedUserBackgroundImage)
-                {
-                    Image(nsImage: nsImage).resizable()
-                } else {
-                    CustomBackground.placeholderCustomImage
-                }
             }
         }
 
@@ -242,23 +197,9 @@ extension HomePage.Models {
 extension HomePage.Models.SettingsModel {
     enum CustomBackgroundType {
         case gradient, solidColor, illustration, customImage
-
-        @ViewBuilder
-        var placeholderView: some View {
-            switch self {
-            case .gradient:
-                CustomBackground.placeholderGradient
-            case .solidColor:
-                CustomBackground.placeholderColor
-            case .illustration:
-                CustomBackground.placeholderIllustration
-            case .customImage:
-                CustomBackground.placeholderCustomImage
-            }
-        }
     }
 
-    enum CustomBackground: Equatable, ColorSchemeProviding, LosslessStringConvertible {
+    enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessStringConvertible {
         init?(_ description: String) {
             let components = description.components(separatedBy: "|")
             guard components.count == 2 else {
@@ -287,6 +228,19 @@ extension HomePage.Models.SettingsModel {
                 self = .customImage(userBackgroundImage)
             default:
                 return nil
+            }
+        }
+
+        var customBackgroundType: CustomBackgroundType {
+            switch self {
+            case .gradient:
+                    .gradient
+            case .solidColor:
+                    .solidColor
+            case .illustration:
+                    .illustration
+            case .customImage:
+                    .customImage
             }
         }
 
@@ -356,10 +310,10 @@ extension HomePage.Models.SettingsModel {
             return image
         }
 
-        static let placeholderGradient: some View = Gradient.gradient03.image.resizable()
-        static let placeholderColor: some View = SolidColor.lightPurple.color
-        static let placeholderIllustration: some View = Illustration.illustration01.image.resizable()
-        static let placeholderCustomImage: some View = SolidColor.gray.color
+        static let placeholderGradient: Gradient = .gradient03
+        static let placeholderColor: SolidColor = .lightPurple
+        static let placeholderIllustration: Illustration = .illustration01
+        static let placeholderCustomImage: SolidColor = .gray
     }
 
     enum Gradient: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
@@ -498,15 +452,6 @@ extension HomePage.Models.SettingsModel {
             case .black, .darkPink, .darkOrange, .darkYellow, .darkGreen, .darkBlue, .darkPurple:
                     .dark
             }
-        }
-    }
-
-    struct CustomImage: Equatable, Identifiable, ColorSchemeProviding {
-        let name: String
-        let colorScheme: ColorScheme
-
-        var id: String {
-            name
         }
     }
 }

@@ -130,18 +130,9 @@ extension HomePage.Views {
         var rootView: some View {
             SettingsSection(title: "Background") {
                 grid(with: model.backgroundModes) { mode in
-                    BackgroundMode(title: mode.title, isSelected: mode.isSelected) {
+                    BackgroundMode(modeModel: mode) {
                         withAnimation {
                             model.contentType = mode.contentType
-                        }
-                    } backgroundPreview: {
-                        if let customBackgroundType = mode.contentType.customBackgroundType {
-                            model.backgroundPreview(for: customBackgroundType)
-                        } else if mode.contentType == .uploadImage {
-                            ZStack {
-                                Color.blackWhite5
-                                Image(.share)
-                            }
                         }
                     }
                 }
@@ -227,9 +218,7 @@ extension HomePage.Views {
                             }
                         }
                     } label: {
-                        BackgroundPreview(isSelected: model.customBackground == .solidColor(solidColor)) {
-                            solidColor.color.scaledToFill()
-                        }
+                        BackgroundPreview(customBackground: .solidColor(solidColor))
                     }
                     .buttonStyle(.plain)
                 }
@@ -248,9 +237,7 @@ extension HomePage.Views {
                             }
                         }
                     } label: {
-                        BackgroundPreview(isSelected: model.customBackground == .gradient(gradient)) {
-                            gradient.image.resizable().scaledToFill()
-                        }
+                        BackgroundPreview(customBackground: .gradient(gradient))
                     }
                     .buttonStyle(.plain)
                 }
@@ -269,9 +256,7 @@ extension HomePage.Views {
                             }
                         }
                     } label: {
-                        BackgroundPreview(isSelected: model.customBackground == .illustration(illustration)) {
-                            illustration.image.resizable().scaledToFill()
-                        }
+                        BackgroundPreview(customBackground: .illustration(illustration))
                     }
                     .buttonStyle(.plain)
                 }
@@ -290,15 +275,7 @@ extension HomePage.Views {
                             }
                         }
                     } label: {
-                        BackgroundPreview(isSelected: model.customBackground == .customImage(userBackgroundImage)) {
-                            Group {
-                                if let image = model.customImagesManager.image(for: userBackgroundImage) {
-                                    Image(nsImage: image).resizable().scaledToFill()
-                                } else {
-                                    EmptyView()
-                                }
-                            }
-                        }
+                        BackgroundPreview(customBackground: .customImage(userBackgroundImage))
                     }
                     .buttonStyle(.plain)
                 }
@@ -377,7 +354,7 @@ extension HomePage.Views {
 
     struct SettingsSection<Content>: View where Content: View {
         let title: String
-        @ViewBuilder public let content: () -> Content
+        @ViewBuilder let content: () -> Content
 
         var body: some View {
             VStack(alignment: .leading, spacing: 16) {
@@ -388,11 +365,9 @@ extension HomePage.Views {
         }
     }
 
-    struct BackgroundMode<Content>: View where Content: View {
-        let title: String
-        let isSelected: Bool
+    struct BackgroundMode: View {
+        let modeModel: HomePage.Models.SettingsModel.BackgroundModeModel
         let action: () -> Void
-        @ViewBuilder public let backgroundPreview: () -> Content
 
         @EnvironmentObject var model: HomePage.Models.SettingsModel
 
@@ -400,11 +375,21 @@ extension HomePage.Views {
             Button(action: action) {
                 VStack(alignment: .leading, spacing: 6) {
                     ZStack {
-                        BackgroundPreview(isSelected: isSelected, showSelectionCheckmark: true) {
-                            backgroundPreview().scaledToFill()
+                        if modeModel.contentType == .uploadImage {
+                            BackgroundPreview(showSelectionCheckmark: true) {
+                                ZStack {
+                                    Color.blackWhite5
+                                    Image(.share)
+                                }
+                            }
+                        } else {
+                            BackgroundPreview(
+                                showSelectionCheckmark: true,
+                                customBackground: modeModel.customBackgroundPreview ?? .solidColor(.gray)
+                            )
                         }
                     }
-                    Text(title)
+                    Text(modeModel.title)
                         .font(.system(size: 11))
                 }
             }
@@ -413,12 +398,24 @@ extension HomePage.Views {
     }
 
     struct BackgroundPreview<Content>: View where Content: View {
-        let isSelected: Bool
         let showSelectionCheckmark: Bool
-        @ViewBuilder public let content: () -> Content
+        let customBackground: HomePage.Models.SettingsModel.CustomBackground?
+        @ViewBuilder let content: () -> Content
 
-        init(isSelected: Bool, showSelectionCheckmark: Bool = false, content: @escaping () -> Content) {
-            self.isSelected = isSelected
+        @EnvironmentObject var model: HomePage.Models.SettingsModel
+
+        init(
+            showSelectionCheckmark: Bool = false,
+            customBackground: HomePage.Models.SettingsModel.CustomBackground,
+            @ViewBuilder content: @escaping () -> Content = { EmptyView() }
+        ) {
+            self.showSelectionCheckmark = showSelectionCheckmark
+            self.customBackground = customBackground
+            self.content = content
+        }
+
+        init(showSelectionCheckmark: Bool = false, @ViewBuilder content: @escaping () -> Content) {
+            customBackground = nil
             self.showSelectionCheckmark = showSelectionCheckmark
             self.content = content
         }
@@ -427,7 +424,7 @@ extension HomePage.Views {
             ZStack {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(.clear)
-                    .background(content())
+                    .background(previewContent)
                     .cornerRadius(4)
                 RoundedRectangle(cornerRadius: 4)
                     .stroke(Color.homeSettingsBackgroundPreviewStroke)
@@ -438,14 +435,39 @@ extension HomePage.Views {
         }
 
         @ViewBuilder
+        private var previewContent: some View {
+            switch customBackground {
+            case .gradient(let gradient):
+                gradient.image.resizable().scaledToFill()
+            case .solidColor(let solidColor):
+                solidColor.color.scaledToFill()
+            case .illustration(let illustration):
+                illustration.image.resizable().scaledToFill()
+            case .customImage(let userBackgroundImage):
+                Group {
+                    if let image = model.customImagesManager.image(for: userBackgroundImage) {
+                        Image(nsImage: image).resizable().scaledToFill()
+                    } else {
+                        EmptyView()
+                    }
+                }
+            case .none:
+                content()
+            }
+        }
+
+        @ViewBuilder
         private var selectionBackground: some View {
-            if isSelected {
+            if model.customBackground == customBackground {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6)
                         .stroke(Color(.updateIndicator), lineWidth: 2)
                     if showSelectionCheckmark {
                         Image(.solidCheckmark)
                             .opacity(0.64)
+                            .ifLet(customBackground?.colorScheme) { view, colorScheme in
+                                view.colorScheme(colorScheme)
+                            }
                     }
                 }
                 .padding(-2)
