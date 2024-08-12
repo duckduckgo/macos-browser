@@ -244,6 +244,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     private lazy var statusObserver = ConnectionStatusObserverThroughSession(
         tunnelSessionProvider: tunnelController,
+        platformSnoozeTimingStore: NetworkProtectionSnoozeTimingStore(userDefaults: .netP),
         platformNotificationCenter: NSWorkspace.shared.notificationCenter,
         platformDidWakeNotification: NSWorkspace.didWakeNotification)
 
@@ -438,18 +439,4 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             }
         }
     }
-}
-
-extension NSApplication {
-
-    enum RunType: Int, CustomStringConvertible {
-        case normal
-        var description: String {
-            switch self {
-            case .normal: return "normal"
-            }
-        }
-    }
-    static var runType: RunType { .normal }
-
 }

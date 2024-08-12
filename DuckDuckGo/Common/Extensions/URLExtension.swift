@@ -20,6 +20,7 @@ import AppKit
 import BrowserServicesKit
 import Common
 import Foundation
+import AppKitExtensions
 
 extension URL.NavigationalScheme {
 
