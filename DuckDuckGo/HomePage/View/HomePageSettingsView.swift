@@ -464,7 +464,7 @@ extension HomePage.Views {
                         .stroke(Color(.updateIndicator), lineWidth: 2)
                     if showSelectionCheckmark {
                         Image(.solidCheckmark)
-                            .opacity(0.64)
+                            .opacity(0.8)
                             .ifLet(customBackground?.colorScheme) { view, colorScheme in
                                 view.colorScheme(colorScheme)
                             }

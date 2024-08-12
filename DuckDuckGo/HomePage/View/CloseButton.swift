@@ -25,7 +25,7 @@ extension HomePage.Views {
         let icon: NSImage
         let size: CGFloat
         let action: () -> Void
-        let foreGroundColor: Color = .homeFavoritesBackground
+        let foregroundColor: Color = .homeFavoritesBackground
         let foregroundColorOnHover: Color = .homeFavoritesHover
 
         @State var isHovering = false
@@ -34,10 +34,10 @@ extension HomePage.Views {
             Button(action: action) {
                 ZStack {
                     Circle()
-                        .fill(isHovering ? foregroundColorOnHover : foreGroundColor)
+                        .fill(isHovering ? foregroundColorOnHover : foregroundColor)
                         .frame(width: size, height: size)
                     Image(nsImage: icon)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.blackWhite80)
                 }
             }
             .buttonStyle(.plain)

@@ -69,6 +69,7 @@ extension HomePage.Models {
         let appearancePreferences: AppearancePreferences
         let customImagesManager: UserBackgroundImagesManaging
         let openURL: (URL) -> Void
+
         init(
             appearancePreferences: AppearancePreferences = .shared,
             userBackgroundImagesManager: UserBackgroundImagesManaging = UserBackgroundImagesManager(
