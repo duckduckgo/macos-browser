@@ -23,7 +23,6 @@ import GRDB
 
 enum DataBrokerProtectionDatabaseErrors: Error {
     case elementNotFound
-    case migrationFailureIntegrityCheck
 }
 
 protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
