@@ -137,7 +137,7 @@ extension HomePage.Models {
                     }
                     return .customImage(lastUsedUserBackgroundImage)
                 }()
-                modes.append(.init(contentType: .customImagePicker, title: "Custom Images", customBackgroundPreview: preview))
+                modes.append(.init(contentType: .customImagePicker, title: "My Images", customBackgroundPreview: preview))
             }
             modes.append(.init(contentType: .uploadImage, title: "Upload Image", customBackgroundPreview: nil))
             return modes
