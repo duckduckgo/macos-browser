@@ -527,17 +527,17 @@ fileprivate extension ThemeName {
     var pickerView: some View {
         switch self {
         case .light:
-            Circle().fill(Color.white)
+            Circle().fill(Color.colorSchemePickerWhite)
         case .dark:
-            Circle().fill(Color(hex: "444444"))
+            Circle().fill(Color.colorSchemePickerBlack)
         case .systemDefault:
             GeometryReader { geometry in
                 ZStack {
                     Circle()
-                        .fill(Color.white)
+                        .fill(Color.colorSchemePickerWhite)
                         .clipShape(Rectangle().offset(x: -geometry.size.width/2))
                     Circle()
-                        .fill(Color(hex: "444444"))
+                        .fill(Color.colorSchemePickerBlack)
                         .clipShape(Rectangle().offset(x: geometry.size.width/2))
                 }
             }
