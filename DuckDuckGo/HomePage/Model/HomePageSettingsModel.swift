@@ -89,12 +89,17 @@ extension HomePage.Models {
                 if contentType == .uploadImage, contentType != oldValue {
                     contentType = .root
                     uploadNewImage()
+                } else if contentType == .customImagePicker {
+                    customImagesManager.sortImages()
                 }
             }
         }
         @Published var customBackground: CustomBackground? {
             didSet {
                 appearancePreferences.homePageCustomBackground = customBackground
+                if case .customImage(let userBackgroundImage) = customBackground {
+                    customImagesManager.updateSelectedTimestamp(for: userBackgroundImage)
+                }
             }
         }
         @Published var usesLegacyBlur: Bool = true

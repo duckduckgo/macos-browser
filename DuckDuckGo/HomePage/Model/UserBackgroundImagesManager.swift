@@ -36,6 +36,8 @@ protocol UserBackgroundImagesManaging {
 
     func addImage(with url: URL) async throws -> UserBackgroundImage?
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage?
+    func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage)
+    func sortImages()
 }
 
 protocol ImageColorSchemeCalculating {
@@ -79,7 +81,15 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
     let storageLocation: URL
     let maximumNumberOfImages: Int
 
-    private(set) var availableImages: [UserBackgroundImage] = []
+    private(set) var availableImages: [UserBackgroundImage] = [] {
+        didSet {
+            if availableImagesSortedByAccessTime != availableImages {
+                availableImagesSortedByAccessTime = availableImages
+            }
+        }
+    }
+
+    private var availableImagesSortedByAccessTime: [UserBackgroundImage] = []
 
     @UserDefaultsWrapper(key: .homePageUserBackgroundImages, defaultValue: [])
     private var imagesMetadata: [String] {
@@ -127,6 +137,20 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
         NSImage(contentsOf: storageLocation.appendingPathComponent(userBackgroundImage.fileName))
+    }
+
+    func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage) {
+        guard let index = availableImagesSortedByAccessTime.firstIndex(of: userBackgroundImage) else {
+            assertionFailure("selected image is not present in available images")
+            return
+        }
+        var images = availableImagesSortedByAccessTime
+        images.remove(at: index)
+        availableImagesSortedByAccessTime = [userBackgroundImage] + images
+    }
+
+    func sortImages() {
+        imagesMetadata = availableImagesSortedByAccessTime.map(\.description)
     }
 
     private func setUpStorageDirectory() {
