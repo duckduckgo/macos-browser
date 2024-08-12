@@ -66,7 +66,7 @@ struct AccordionView<Label: View, Submenu: View>: View {
     }
 
     private var content: some View {
-        VStack {
+        VStack(spacing: 0) {
             Button(action: {
                 buttonTapped()
             }) {
@@ -96,7 +96,7 @@ struct AccordionView<Label: View, Submenu: View>: View {
                 }
 
             if showSubmenu {
-                VStack {
+                VStack(spacing: 0) {
                     submenu()
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }

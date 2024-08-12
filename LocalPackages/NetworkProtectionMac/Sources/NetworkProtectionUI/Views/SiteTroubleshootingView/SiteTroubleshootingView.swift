@@ -28,6 +28,9 @@ fileprivate extension View {
 
 public struct SiteTroubleshootingView: View {
 
+    static let iconSize = CGFloat(16)
+
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var model: Model
 
     // MARK: - View Contents
@@ -43,55 +46,79 @@ public struct SiteTroubleshootingView: View {
 
     private func siteTroubleshootingView(_ siteInfo: SiteTroubleshootingInfo) -> some View {
         Group {
-            AccordionView { _ in
+            AccordionView { isHovered in
                 Image(nsImage: siteInfo.icon)
                     .resizable()
-                    .frame(width: 16, height: 16)
+                    .frame(width: Self.iconSize, height: Self.iconSize)
                     .clipShape(RoundedRectangle(cornerRadius: 3.0))
-                Text("\(siteInfo.domain) issues?")
+                Text("\(siteInfo.domain) not working?")
                     .applyCurrentSiteAttributes()
+                    .padding(.vertical, 3)
+                    .foregroundColor(isHovered ? .white : Color(.defaultText))
             } submenu: {
-                VStack {
-                    MenuItemCustomButton {
-                        model.setExclusion(true, forDomain: siteInfo.domain)
-                    } label: { _ in
-                        HStack {
-                            if siteInfo.excluded {
-                                Image(.accordionViewCheckmark)
-                                    .resizable()
-                                    .font(.system(size: 13))
-                                    .frame(width: 16, height: 16)
-                                    .applyCurrentSiteAttributes()
-                            } else {
-                                Rectangle()
-                                    .fill(Color.clear)
-                                    .frame(width: 16, height: 16)
-                            }
-                            Text("Exclude from VPN")
-                        }
-                    }
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Excluding \(siteInfo.domain) might help")
+                        .font(.system(size: 12))
+                        .foregroundColor(Color(.defaultText))
+                        .padding(.horizontal, 9)
+                        .padding(.bottom, 4)
 
-                    MenuItemCustomButton {
-                        model.setExclusion(false, forDomain: siteInfo.domain)
-                    } label: { _ in
-                        if !siteInfo.excluded {
-                            Image(.accordionViewCheckmark)
-                                .resizable()
-                                .font(.system(size: 13))
-                                .frame(width: 16, height: 16)
-                        } else {
-                            Rectangle()
-                                .fill(Color.clear)
-                                .frame(width: 16, height: 16)
+                    VStack(alignment: .leading, spacing: 0) {
+                        exclusionOptionMenuButton(title: "Exclude website from VPN", selected: siteInfo.excluded) {
+                            model.setExclusion(true, forDomain: siteInfo.domain)
                         }
 
-                        Text("Route through VPN")
+                        exclusionOptionMenuButton(title: "Include website in VPN", selected: !siteInfo.excluded) {
+                            model.setExclusion(false, forDomain: siteInfo.domain)
+                        }
+                    }.padding(.horizontal, 9)
+
+                    manageExclusionsMenuButton(title: "Manage website exclusions...", selected: !siteInfo.excluded) {
+
+                        model.manageExclusions()
                     }
-                }
+                }.padding(.vertical, 6)
+                    .background(colorScheme == .light ? Color.black.opacity(0.05) : Color.white.opacity(0.05))
+            }
+        }
+    }
+
+    /// Creates a menu button for the site troubleshooting view.
+    ///
+    @ViewBuilder
+    private func exclusionOptionMenuButton(title: String, selected: Bool, action: @escaping () -> Void) -> MenuItemCustomButton<some View> {
+
+        MenuItemCustomButton {
+            action()
+        } label: { isHovered in
+            if selected {
+                Image(.accordionViewCheckmark)
+                    .resizable()
+                    .font(.system(size: 8))
+                    .frame(width: Self.iconSize, height: Self.iconSize)
+            } else {
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(width: Self.iconSize, height: Self.iconSize)
             }
 
-            Divider()
-                .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+            Text(title)
+                .font(.system(size: 12))
+                .foregroundColor(isHovered ? .white : Color(.defaultText))
+        }
+    }
+
+    /// Creates a menu button for the site troubleshooting view.
+    ///
+    @ViewBuilder
+    private func manageExclusionsMenuButton(title: String, selected: Bool, action: @escaping () -> Void) -> MenuItemCustomButton<some View> {
+
+        MenuItemCustomButton {
+            action()
+        } label: { isHovered in
+            Text(title)
+                .font(.system(size: 12))
+                .foregroundColor(isHovered ? .white : Color(.defaultText))
         }
     }
 }

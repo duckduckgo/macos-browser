@@ -40,6 +40,10 @@ final class VPNUIActionHandler: VPNUIActionHandling {
         self.proxySettings = proxySettings
     }
 
+    public func manageExclusions() async {
+        await vpnURLEventHandler.manageExclusions()
+    }
+
     public func moveAppToApplications() async {
 #if !APPSTORE && !DEBUG
         await vpnURLEventHandler.moveAppToApplicationsFolder()

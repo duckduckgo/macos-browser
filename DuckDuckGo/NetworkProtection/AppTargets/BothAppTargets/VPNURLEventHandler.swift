@@ -54,6 +54,10 @@ final class VPNURLEventHandler {
         }
     }
 
+    func manageExclusions() async {
+        windowControllerManager.showPreferencesTab(withSelectedPane: .vpn)
+    }
+
     func showStatus() async {
         await windowControllerManager.showNetworkProtectionStatus()
     }

@@ -34,6 +34,10 @@ final class VPNUIActionHandler: VPNUIActionHandling {
         self.proxySettings = proxySettings
     }
 
+    public func manageExclusions() async {
+        
+    }
+
     public func moveAppToApplications() async {
 #if !APPSTORE && !DEBUG
         try? await appLauncher.launchApp(withCommand: VPNAppLaunchCommand.moveAppToApplications)
