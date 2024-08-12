@@ -90,7 +90,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var privacyDashboardWindow: NSWindow?
 
     let activeRemoteMessageModel: ActiveRemoteMessageModel
-    let homePageSettingsModel = HomePage.Models.SettingsModel()
+    let homePageSettingsModel = HomePage.Models.SettingsModel { url in
+        Task.detached { @MainActor in
+            WindowControllersManager.shared.showTab(with: .url(url, credential: nil, source: .ui))
+        }
+    }
     let remoteMessagingClient: RemoteMessagingClient!
 
     public let subscriptionManager: SubscriptionManager

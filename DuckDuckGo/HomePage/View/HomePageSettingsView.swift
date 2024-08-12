@@ -96,7 +96,7 @@ extension HomePage.Views {
                 Divider()
 
                 Button {
-                    WindowControllersManager.shared.showTab(with: .settings(pane: .appearance))
+                    model.openURL(.settingsPane(.appearance))
                 } label: {
                     HStack {
                         Text("All Settings")
@@ -536,7 +536,7 @@ extension HomePage.Views.BackgroundMode {
 #Preview {
     @State var isSettingsVisible: Bool = true
 
-    let model = HomePage.Models.SettingsModel()
+    let model = HomePage.Models.SettingsModel(openURL: { _ in })
     model.customBackground = .solidColor(.lightPink)
 
     return HomePage.Views.SettingsView(includingContinueSetUpCards: true, isSettingsVisible: $isSettingsVisible)
