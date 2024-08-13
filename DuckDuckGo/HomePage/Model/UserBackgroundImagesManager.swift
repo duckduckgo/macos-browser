@@ -127,7 +127,6 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
     }
 
     func addImage(with url: URL) async throws -> UserBackgroundImage? {
-        let fileExtension = url.pathExtension
         let fileName = [UUID().uuidString, "jpg"].joined(separator: ".")
         let destinationURL = storageLocation.appendingPathComponent(fileName)
 

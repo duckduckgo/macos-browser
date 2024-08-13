@@ -203,28 +203,28 @@ extension HomePage.Models.SettingsModel {
 
     enum CustomBackground: Equatable, Hashable, ColorSchemeProviding, LosslessStringConvertible {
         init?(_ description: String) {
-            let components = description.components(separatedBy: "|")
+            let components = description.split(separator: "|", maxSplits: 1)
             guard components.count == 2 else {
                 return nil
             }
             switch components[0] {
             case "gradient":
-                guard let gradient = Gradient(rawValue: components[1]) else {
+                guard let gradient = Gradient(rawValue: String(components[1])) else {
                     return nil
                 }
                 self = .gradient(gradient)
             case "solidColor":
-                guard let solidColor = SolidColor(rawValue: components[1]) else {
+                guard let solidColor = SolidColor(rawValue: String(components[1])) else {
                     return nil
                 }
                 self = .solidColor(solidColor)
             case "illustration":
-                guard let illustration = Illustration(rawValue: components[1]) else {
+                guard let illustration = Illustration(rawValue: String(components[1])) else {
                     return nil
                 }
                 self = .illustration(illustration)
             case "customImage":
-                guard let userBackgroundImage = UserBackgroundImage(components[1]) else {
+                guard let userBackgroundImage = UserBackgroundImage(String(components[1])) else {
                     return nil
                 }
                 self = .customImage(userBackgroundImage)
