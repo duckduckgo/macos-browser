@@ -18,7 +18,7 @@
 
 import Foundation
 import Common
-import MacOSCommon
+import AppKitExtensions
 import Cocoa
 import SecureStorage
 
