@@ -28,6 +28,9 @@ fileprivate extension View {
 
 public struct SiteTroubleshootingView: View {
 
+    // TODO: Remove this.  It's temporary
+    let accordionUI = true
+
     static let iconSize = CGFloat(16)
 
     @Environment(\.colorScheme) var colorScheme
@@ -44,42 +47,81 @@ public struct SiteTroubleshootingView: View {
         }
     }
 
+    @ViewBuilder
     private func siteTroubleshootingView(_ siteInfo: SiteTroubleshootingInfo) -> some View {
-        Group {
-            AccordionView { isHovered in
-                Image(nsImage: siteInfo.icon)
-                    .resizable()
-                    .frame(width: Self.iconSize, height: Self.iconSize)
-                    .clipShape(RoundedRectangle(cornerRadius: 3.0))
-                Text("\(siteInfo.domain) not working?")
-                    .applyCurrentSiteAttributes()
-                    .padding(.vertical, 3)
-                    .foregroundColor(isHovered ? .white : Color(.defaultText))
-            } submenu: {
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("Excluding \(siteInfo.domain) might help")
-                        .font(.system(size: 12))
-                        .foregroundColor(Color(.defaultText))
-                        .padding(.horizontal, 9)
-                        .padding(.bottom, 4)
-
-                    VStack(alignment: .leading, spacing: 0) {
-                        exclusionOptionMenuButton(title: "Exclude website from VPN", selected: siteInfo.excluded) {
-                            model.setExclusion(true, forDomain: siteInfo.domain)
-                        }
-
-                        exclusionOptionMenuButton(title: "Include website in VPN", selected: !siteInfo.excluded) {
-                            model.setExclusion(false, forDomain: siteInfo.domain)
-                        }
-                    }.padding(.horizontal, 9)
-
-                    manageExclusionsMenuButton(title: "Manage website exclusions...", selected: !siteInfo.excluded) {
-
-                        model.manageExclusions()
-                    }
-                }.padding(.vertical, 6)
-                    .background(colorScheme == .light ? Color.black.opacity(0.05) : Color.white.opacity(0.05))
+        if accordionUI {
+            mainAccordionView(siteInfo)
+        } else {
+            if !accordionUI {
+                Divider()
+                    .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
             }
+
+            VStack(alignment: .leading) {
+                Text("Website not working?")
+                    //.applyCurrentSiteAttributes()
+                    .font(.system(size: 13, weight: .bold))
+                    .padding(.vertical, 3)
+                    .padding(.horizontal, 9)
+                    .foregroundColor(Color(.defaultText))
+
+                Toggle(isOn: Binding(get: {
+                    siteInfo.excluded
+                }, set: { value in
+                    model.setExclusion(value, forDomain: siteInfo.domain)
+                })) {
+                    HStack {
+                        Image(nsImage: siteInfo.icon)
+                            .resizable()
+                            .frame(width: Self.iconSize, height: Self.iconSize)
+
+                        Text("Exclude website from VPN")
+                            .font(.system(size: 12))
+                            .foregroundColor(Color(.defaultText))
+
+                        Spacer()
+                    }
+                    .padding(.bottom, 5)
+                }.padding(.horizontal, 9)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func mainAccordionView(_ siteInfo: SiteTroubleshootingInfo) -> some View {
+        AccordionView { isHovered in
+            Image(nsImage: siteInfo.icon)
+                .resizable()
+                .frame(width: Self.iconSize, height: Self.iconSize)
+                .clipShape(RoundedRectangle(cornerRadius: 3.0))
+            Text("\(siteInfo.domain) not working?")
+                .applyCurrentSiteAttributes()
+                .padding(.vertical, 3)
+                .foregroundColor(isHovered ? .white : Color(.defaultText))
+        } submenu: {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Excluding \(siteInfo.domain) might help")
+                    .font(.system(size: 12))
+                    .foregroundColor(Color(.defaultText))
+                    .padding(.horizontal, 9)
+                    .padding(.bottom, 4)
+
+                VStack(alignment: .leading, spacing: 0) {
+                    exclusionOptionMenuButton(title: "Exclude website from VPN", selected: siteInfo.excluded) {
+                        model.setExclusion(true, forDomain: siteInfo.domain)
+                    }
+
+                    exclusionOptionMenuButton(title: "Include website in VPN", selected: !siteInfo.excluded) {
+                        model.setExclusion(false, forDomain: siteInfo.domain)
+                    }
+                }.padding(.horizontal, 9)
+
+                manageExclusionsMenuButton(title: "Manage website exclusions...", selected: !siteInfo.excluded) {
+
+                    model.manageExclusions()
+                }
+            }.padding(.vertical, 6)
+                .background(colorScheme == .light ? Color.black.opacity(0.05) : Color.white.opacity(0.05))
         }
     }
 
