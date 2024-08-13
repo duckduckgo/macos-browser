@@ -1591,8 +1591,6 @@
 		7B7F5D222C526CE600826256 /* AddExcludedDomainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7F5D202C526CE600826256 /* AddExcludedDomainView.swift */; };
 		7B7F5D242C52725A00826256 /* AddExcludedDomainButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7F5D232C52725A00826256 /* AddExcludedDomainButtonsView.swift */; };
 		7B7F5D252C52725A00826256 /* AddExcludedDomainButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7F5D232C52725A00826256 /* AddExcludedDomainButtonsView.swift */; };
-		7B7FCD0F2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */; };
-		7B7FCD102BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */; };
 		7B8594192B5B26230007EB3E /* UDSHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 7B8594182B5B26230007EB3E /* UDSHelper */; };
 		7B8DB31A2B504D7500EC16DA /* VPNAppEventsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8DB3192B504D7500EC16DA /* VPNAppEventsHandler.swift */; };
 		7B934C412A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
@@ -3547,7 +3545,6 @@
 		7B76E6852AD5D77600186A84 /* XPCHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = XPCHelper; sourceTree = "<group>"; };
 		7B7F5D202C526CE600826256 /* AddExcludedDomainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExcludedDomainView.swift; sourceTree = "<group>"; };
 		7B7F5D232C52725A00826256 /* AddExcludedDomainButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExcludedDomainButtonsView.swift; sourceTree = "<group>"; };
-		7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+vpnLegacyUser.swift"; sourceTree = "<group>"; };
 		7B8594172B5B25FB0007EB3E /* UDSHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = UDSHelper; sourceTree = "<group>"; };
 		7B8DB3192B504D7500EC16DA /* VPNAppEventsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNAppEventsHandler.swift; sourceTree = "<group>"; };
 		7B9167A82C09E88800322310 /* AppLauncher */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AppLauncher; sourceTree = "<group>"; };
@@ -5736,7 +5733,6 @@
 				7BD8679A2A9E9E000063B9F7 /* VPNFeatureGatekeeper.swift */,
 				4B6785432AA8DE1F008A5004 /* VPNUninstaller.swift */,
 				7BFF35722C10D75000F89673 /* IPCServiceLauncher.swift */,
-				7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */,
 				31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */,
 				31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */,
 				4B9DB0072A983B23000927DB /* Waitlist.swift */,
@@ -10214,7 +10210,6 @@
 				1D4071AF2BD64267002D4537 /* DockCustomizer.swift in Sources */,
 				4B41EDA42B1543B9001EEDF4 /* VPNPreferencesModel.swift in Sources */,
 				1E559BB22BBCA9F1002B4AF6 /* RedirectNavigationResponder.swift in Sources */,
-				7B7FCD102BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift in Sources */,
 				3706FB6C293F65D500E42796 /* FaviconStore.swift in Sources */,
 				3706FB6D293F65D500E42796 /* SuggestionListCharacteristics.swift in Sources */,
 				F1C70D7A2BFF50A400599292 /* DataBrokerProtectionLoginItemInterface.swift in Sources */,
@@ -12144,7 +12139,6 @@
 				9F514F912B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift in Sources */,
 				9FA173E32B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift in Sources */,
 				37534CA8281198CD002621E7 /* AdjacentItemEnumerator.swift in Sources */,
-				7B7FCD0F2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift in Sources */,
 				987799F62999996B005D8EB6 /* BookmarkDatabase.swift in Sources */,
 				7BB4BC6A2C5CD96200E06FC8 /* ActiveDomainPublisher.swift in Sources */,
 				4BE53374286E39F10019DBFD /* ChromiumKeychainPrompt.swift in Sources */,
