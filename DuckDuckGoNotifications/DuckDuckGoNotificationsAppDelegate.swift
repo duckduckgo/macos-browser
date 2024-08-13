@@ -129,7 +129,7 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
 
     func showConnectedNotification(serverLocation: String?) {
         os_log("Presenting reconnected notification", log: .networkProtection, type: .info)
-        notificationsPresenter.showConnectedNotification(serverLocation: serverLocation)
+        notificationsPresenter.showConnectedNotification(serverLocation: serverLocation, snoozeEnded: false)
     }
 
     func showReconnectingNotification() {
