@@ -22,7 +22,7 @@ import Combine
 import PhishingDetection
 @testable import DuckDuckGo_Privacy_Browser
 
-final class MockPhishingDetectionDataStore: PhishingDetectionDataStoring {
+final class MockPhishingDetectionDataStore: PhishingDetectionDataFileStoring {
     var currentRevision: Int = 0
     var didWriteData: Bool = false
     var didLoadData: Bool = false

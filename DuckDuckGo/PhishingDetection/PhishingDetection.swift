@@ -34,7 +34,7 @@ public class PhishingDetection: PhishingSiteDetecting {
     private var updateManager: PhishingDetectionUpdateManaging
     private var dataActivities: PhishingDetectionDataActivityHandling
     private var detectionPreferences: PhishingDetectionPreferences
-    private var dataStore: PhishingDetectionDataStoring
+    private var dataStore: PhishingDetectionDataSaving
     private var featureFlagger: FeatureFlagger
     private var config: PrivacyConfiguration
     private var cancellable: AnyCancellable?
@@ -52,7 +52,7 @@ public class PhishingDetection: PhishingSiteDetecting {
         hashPrefixDataSHA: String = "c61349d196c46db9155ca654a0d33368ee0f33766fcd63e5a20f1d5c92026dc5",
         detectionClient: PhishingDetectionAPIClient = PhishingDetectionAPIClient(),
         dataProvider: PhishingDetectionDataProvider? = nil,
-        dataStore: PhishingDetectionDataStoring? = nil,
+        dataStore: PhishingDetectionDataSaving? = nil,
         detector: PhishingDetecting? = nil,
         updateManager: PhishingDetectionUpdateManaging? = nil,
         dataActivities: PhishingDetectionDataActivityHandling? = nil,
@@ -73,9 +73,9 @@ public class PhishingDetection: PhishingSiteDetecting {
             hashPrefixDataSHA: hashPrefixDataSHA
         )
         self.dataStore = dataStore ?? PhishingDetectionDataStore(dataProvider: resolvedDataProvider)
-        self.detector = detector ?? PhishingDetector(apiClient: detectionClient, dataProvider: resolvedDataProvider, dataStore: self.dataStore)
+        self.detector = detector ?? PhishingDetector(apiClient: detectionClient, dataProvider: resolvedDataProvider, dataStore: self.dataStore as! PhishingDetectionDataSets)
         self.updateManager = updateManager ?? PhishingDetectionUpdateManager(client: detectionClient, dataStore: self.dataStore)
-        self.dataActivities = dataActivities ?? PhishingDetectionDataActivities(detectionService: self.detector, phishingDetectionDataProvider: resolvedDataProvider, updateManager: self.updateManager)
+        self.dataActivities = dataActivities ?? PhishingDetectionDataActivities(phishingDetectionDataProvider: resolvedDataProvider, updateManager: self.updateManager)
         self.detectionPreferences = detectionPreferences
         self.featureFlagger = NSApp.delegateTyped.featureFlagger
         self.config = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
@@ -89,7 +89,7 @@ public class PhishingDetection: PhishingSiteDetecting {
 
     convenience init(
         dataActivities: PhishingDetectionDataActivityHandling,
-        dataStore: PhishingDetectionDataStoring,
+        dataStore: PhishingDetectionDataSaving,
         detector: PhishingDetecting
     ) {
         self.init(
@@ -123,10 +123,7 @@ public class PhishingDetection: PhishingSiteDetecting {
     }
 
     private func startUpdateTasks() {
-        Task {
-            await dataStore.loadData()
-            dataActivities.start()
-        }
+        dataActivities.start()
     }
 
     private func stopUpdateTasks() {
