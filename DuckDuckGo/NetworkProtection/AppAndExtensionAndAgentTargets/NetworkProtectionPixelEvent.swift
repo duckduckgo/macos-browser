@@ -98,8 +98,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionWireguardErrorInvalidState(reason: String)
     case networkProtectionWireguardErrorFailedDNSResolution
     case networkProtectionWireguardErrorCannotSetNetworkSettings(_ error: Error)
-    case networkProtectionWireguardErrorCannotStartWireguardBackend(code: Int32)
-    case networkProtectionWireguardErrorCannotSetWireguardConfig(errorCode: Int64)
+    case networkProtectionWireguardErrorCannotStartWireguardBackend(_ error: Error)
+    case networkProtectionWireguardErrorCannotSetWireguardConfig(_ error: Error)
 
     case networkProtectionNoAuthTokenFoundError
 
@@ -382,10 +382,10 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
             return parameters
         case .networkProtectionWireguardErrorCannotSetNetworkSettings(let error):
             return error.pixelParameters
-        case .networkProtectionWireguardErrorCannotStartWireguardBackend(let code):
-            return [PixelKit.Parameters.errorCode: String(code)]
-        case .networkProtectionWireguardErrorCannotSetWireguardConfig(let errorCode):
-            return [PixelKit.Parameters.errorCode: String(errorCode)]
+        case .networkProtectionWireguardErrorCannotStartWireguardBackend(let error):
+            return error.pixelParameters
+        case .networkProtectionWireguardErrorCannotSetWireguardConfig(let error):
+            return error.pixelParameters
         case .networkProtectionClientFailedToFetchServerStatus(let error):
             return error?.pixelParameters
         case .networkProtectionClientFailedToParseServerStatusResponse(let error):
@@ -464,6 +464,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionTunnelWakeFailure(let error),
                 .networkProtectionClientFailedToParseRedeemResponse(let error),
                 .networkProtectionWireguardErrorCannotSetNetworkSettings(let error),
+                .networkProtectionWireguardErrorCannotStartWireguardBackend(let error),
+                .networkProtectionWireguardErrorCannotSetWireguardConfig(let error),
                 .networkProtectionRekeyFailure(let error),
                 .networkProtectionUnhandledError(_, _, let error),
                 .networkProtectionSystemExtensionActivationFailure(let error),
@@ -521,10 +523,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionDNSUpdateCustom,
                 .networkProtectionDNSUpdateDefault:
             return nil
-        case .networkProtectionWireguardErrorCannotStartWireguardBackend(let code):
-            return NSError(domain: "WireGuardAdapter", code: Int(code))
-        case .networkProtectionWireguardErrorCannotSetWireguardConfig(let errorCode):
-            return NSError(domain: "WireGuardAdapter", code: Int(errorCode))
         }
     }
 }
