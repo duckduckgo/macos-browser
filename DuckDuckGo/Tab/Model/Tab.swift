@@ -1124,6 +1124,18 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func willStart(_ navigation: Navigation) {
         if error != nil { error = nil }
 
+        guard navigation.url.navigationalScheme == .about, navigation.url != .blankPage else {
+            delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
+            return
+        }
+
+        // Fix issue with https://app.asana.com/0/1204167627774280/1207499238994722/f
+        let tabContent = TabContent.contentFromURL(navigation.url, source: .webViewUpdated)
+        guard case .url = tabContent else {
+            setContent(tabContent)
+            return
+        }
+
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
     }
 
