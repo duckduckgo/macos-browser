@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKitExtensions
 import CoreImage
 import Foundation
 import SwiftUI
@@ -407,39 +408,4 @@ extension UserBackgroundImagesManager: ImageResizng {
         return mutableData as Data
     }
 
-}
-
-extension NSImage {
-    func averageBrightness(sampleSize: Int = 2048) -> CGFloat? {
-        guard let tiffData = self.tiffRepresentation,
-              let bitmapImage = NSBitmapImageRep(data: tiffData) else { return nil }
-
-        let width = bitmapImage.pixelsWide
-        let height = bitmapImage.pixelsHigh
-
-        guard let pixelData = bitmapImage.bitmapData else { return nil }
-
-        let totalPixels = width * height
-        let step = max(1, totalPixels / sampleSize)
-
-        var totalBrightness: CGFloat = 0.0
-        var sampledPixels = 0
-
-        for i in stride(from: 0, to: totalPixels, by: step) {
-            let x = (i % width)
-            let y = (i / width)
-            let pixelIndex = (y * width + x) * 4
-            let r = CGFloat(pixelData[pixelIndex]) / 255.0
-            let g = CGFloat(pixelData[pixelIndex + 1]) / 255.0
-            let b = CGFloat(pixelData[pixelIndex + 2]) / 255.0
-
-            // Calculate brightness using the luminance formula
-            let brightness = 0.299 * r + 0.587 * g + 0.114 * b
-            totalBrightness += brightness
-            sampledPixels += 1
-        }
-
-        let averageBrightness = totalBrightness / CGFloat(sampledPixels)
-        return averageBrightness
-    }
 }
