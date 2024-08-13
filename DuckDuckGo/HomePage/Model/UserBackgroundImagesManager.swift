@@ -19,6 +19,7 @@
 import CoreImage
 import Foundation
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct UserBackgroundImage: Hashable, Identifiable, ColorSchemeProviding {
     let fileName: String
@@ -255,11 +256,13 @@ extension UserBackgroundImagesManager: ImageResizng {
             transform = transform.translatedBy(x: width, y: height)
             transform = transform.rotated(by: .pi)
         case .left, .leftMirrored:
-            transform = transform.translatedBy(x: width, y: 0)
+            transform = transform.translatedBy(x: height, y: 0)
             transform = transform.rotated(by: .pi / 2)
+            transform = transform.scaledBy(x: width/height, y: height/width)
         case .right, .rightMirrored:
-            transform = transform.translatedBy(x: 0, y: height)
+            transform = transform.translatedBy(x: 0, y: width)
             transform = transform.rotated(by: -.pi / 2)
+            transform = transform.scaledBy(x: width/height, y: height/width)
         }
 
         switch orientation {
@@ -273,25 +276,25 @@ extension UserBackgroundImagesManager: ImageResizng {
             break
         }
 
-        let contextWidth: Int, contextHeight: Int
-        switch orientation {
-        case .left, .leftMirrored, .right, .rightMirrored:
-            contextWidth = Int(height)
-            contextHeight = Int(width)
-        default:
-            contextWidth = Int(width)
-            contextHeight = Int(height)
-        }
+        let contextSize: CGSize = {
+            switch orientation {
+            case .left, .leftMirrored, .right, .rightMirrored:
+                CGSize(width: height, height: width)
+            default:
+                CGSize(width: width, height: height)
+            }
+        }()
 
         guard let context = CGContext(
             data: nil,
-            width: contextWidth,
-            height: contextHeight,
+            width: Int(contextSize.width),
+            height: Int(contextSize.height),
             bitsPerComponent: cgImage.bitsPerComponent,
-            bytesPerRow: 0,
+            bytesPerRow: cgImage.bytesPerRow,
             space: cgImage.colorSpace ?? CGColorSpace(name: CGColorSpace.sRGB)!,
             bitmapInfo: cgImage.bitmapInfo.rawValue
         ) else {
+            // pixel/error
             return nil
         }
 
@@ -311,7 +314,9 @@ extension UserBackgroundImagesManager: ImageResizng {
         // Create a CGImageSource from the HEIC data
         guard let data = try? Data(contentsOf: url),
               let imageSource = CGImageSourceCreateWithData(data as CFData, nil),
-              let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil) else {
+              let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)
+        else {
+            // pixel/error
             return nil
         }
 
@@ -319,7 +324,8 @@ extension UserBackgroundImagesManager: ImageResizng {
         let mutableData = NSMutableData()
 
         // Create a CGImageDestination for the JPEG format
-        guard let imageDestination = CGImageDestinationCreateWithData(mutableData, kUTTypeJPEG, 1, nil) else {
+        guard let imageDestination = CGImageDestinationCreateWithData(mutableData, UTType.jpeg.identifier as CFString, 1, nil) else {
+            // pixel/error
             return nil
         }
 
@@ -328,6 +334,7 @@ extension UserBackgroundImagesManager: ImageResizng {
         let orientation = CGImagePropertyOrientation(rawValue: orientationRawValue) ?? .up
 
         guard let correctedCGImage = correctImageOrientation(cgImage: cgImage, orientation: orientation) else {
+            // pixel/error
             return nil
         }
 
@@ -336,6 +343,7 @@ extension UserBackgroundImagesManager: ImageResizng {
 
         // Finalize the image destination to write the data
         guard CGImageDestinationFinalize(imageDestination) else {
+            // pixel/error
             return nil
         }
 
@@ -366,7 +374,8 @@ extension UserBackgroundImagesManager: ImageResizng {
         let cropRect = CGRect(x: xOffset, y: yOffset, width: scaledWidth, height: scaledHeight)
 
         guard let croppedImage = originalImage.cropping(to: cropRect) else {
-            return nil
+            // pixel/error
+            return data
         }
 
         let context = CGContext(
@@ -374,7 +383,7 @@ extension UserBackgroundImagesManager: ImageResizng {
             width: Int(newSize.width),
             height: Int(newSize.height),
             bitsPerComponent: originalImage.bitsPerComponent,
-            bytesPerRow: 0,
+            bytesPerRow: originalImage.bytesPerRow,
             space: originalImage.colorSpace ?? CGColorSpace(name: CGColorSpace.sRGB)!,
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Little.rawValue
         )
@@ -382,12 +391,14 @@ extension UserBackgroundImagesManager: ImageResizng {
         context?.draw(croppedImage, in: CGRect(origin: .zero, size: newSize))
 
         guard let resizedImage = context?.makeImage() else {
-            return nil
+            // pixel/error
+            return data
         }
 
         let mutableData = NSMutableData()
-        guard let imageDestination = CGImageDestinationCreateWithData(mutableData, kUTTypePNG, 1, nil) else {
-            return nil
+        guard let imageDestination = CGImageDestinationCreateWithData(mutableData, UTType.jpeg.identifier as CFString, 1, nil) else {
+            // pixel/error
+            return data
         }
 
         CGImageDestinationAddImage(imageDestination, resizedImage, nil)
