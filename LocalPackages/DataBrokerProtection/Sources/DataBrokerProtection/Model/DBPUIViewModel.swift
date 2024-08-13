@@ -27,7 +27,7 @@ protocol DBPUIScanOps: AnyObject {
     func getBackgroundAgentMetadata() async -> DBPBackgroundAgentMetadata?
 }
 
-final class DBPUIViewModel {
+public final class DBPUIViewModel {
     private let dataManager: DataBrokerProtectionDataManaging
     private let agentInterface: DataBrokerProtectionAppToAgentInterface
 
@@ -38,7 +38,7 @@ final class DBPUIViewModel {
     private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
-    init(dataManager: DataBrokerProtectionDataManaging,
+    public init(dataManager: DataBrokerProtectionDataManaging,
          agentInterface: DataBrokerProtectionAppToAgentInterface,
          webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
          privacyConfig: PrivacyConfigurationManaging? = nil,
