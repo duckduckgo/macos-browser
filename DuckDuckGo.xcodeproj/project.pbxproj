@@ -1810,6 +1810,7 @@
 		9DC5FAC92C6B8B910011F068 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC5FAC82C6B8B910011F068 /* AppKitExtensions */; };
 		9DC5FACB2C6B8E050011F068 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC5FACA2C6B8E050011F068 /* AppKitExtensions */; };
 		9DC5FACD2C6B8E620011F068 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC5FACC2C6B8E620011F068 /* AppKitExtensions */; };
+		9DC5FACF2C6BA23C0011F068 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC5FACE2C6BA23C0011F068 /* AppKitExtensions */; };
 		9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC70B192AA1FA5B005A844B /* LoginItems */; };
 		9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 9DEF97E02B06C4EE00764F03 /* Networking */; };
 		9F0660732BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0660722BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift */; };
@@ -4398,6 +4399,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B65CD8D12B316E0C00A595BB /* SnapshotTesting in Frameworks */,
+				9DC5FACF2C6BA23C0011F068 /* AppKitExtensions in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8755,6 +8757,7 @@
 			name = "Integration Tests App Store";
 			packageProductDependencies = (
 				B65CD8D02B316E0C00A595BB /* SnapshotTesting */,
+				9DC5FACE2C6BA23C0011F068 /* AppKitExtensions */,
 			);
 			productName = "Integration Tests";
 			productReference = 3706FEB2293F662100E42796 /* Integration Tests App Store.xctest */;
@@ -14025,6 +14028,10 @@
 			productName = AppKitExtensions;
 		};
 		9DC5FACC2C6B8E620011F068 /* AppKitExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppKitExtensions;
+		};
+		9DC5FACE2C6BA23C0011F068 /* AppKitExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppKitExtensions;
 		};
