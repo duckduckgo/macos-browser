@@ -322,12 +322,18 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
                                  underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionWireguardErrorCannotStartWireguardBackend(code: 1),
+        fire(NetworkProtectionPixelEvent.networkProtectionWireguardErrorCannotStartWireguardBackend(TestError.testError),
              frequency: .dailyAndCount,
              and: .expect(pixelName: "m_mac_netp_wireguard_error_cannot_start_wireguard_backend",
-                          customFields: [
-                            PixelKit.Parameters.errorCode: "1"
-                          ]),
+                          error: TestError.testError,
+                          underlyingErrors: [TestError.underlyingError]),
+             file: #filePath,
+             line: #line)
+        fire(NetworkProtectionPixelEvent.networkProtectionWireguardErrorCannotSetWireguardConfig(TestError.testError),
+             frequency: .dailyAndCount,
+             and: .expect(pixelName: "m_mac_netp_wireguard_error_cannot_set_wireguard_config",
+                          error: TestError.testError,
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionNoAuthTokenFoundError,
