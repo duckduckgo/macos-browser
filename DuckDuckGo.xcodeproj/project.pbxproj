@@ -1805,6 +1805,11 @@
 		9D9DE57F2C63B64F00D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE57E2C63B64F00D20B15 /* AppKitExtensions */; };
 		9D9DE5812C63BA0B00D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE5802C63BA0B00D20B15 /* AppKitExtensions */; };
 		9D9DE5832C63BE9600D20B15 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9DE5822C63BE9600D20B15 /* AppKitExtensions */; };
+		9DC5FAC52C6B8A010011F068 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC5FAC42C6B8A010011F068 /* AppKitExtensions */; };
+		9DC5FAC72C6B8A080011F068 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC5FAC62C6B8A080011F068 /* AppKitExtensions */; };
+		9DC5FAC92C6B8B910011F068 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC5FAC82C6B8B910011F068 /* AppKitExtensions */; };
+		9DC5FACB2C6B8E050011F068 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC5FACA2C6B8E050011F068 /* AppKitExtensions */; };
+		9DC5FACD2C6B8E620011F068 /* AppKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC5FACC2C6B8E620011F068 /* AppKitExtensions */; };
 		9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC70B192AA1FA5B005A844B /* LoginItems */; };
 		9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 9DEF97E02B06C4EE00764F03 /* Networking */; };
 		9F0660732BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0660722BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift */; };
@@ -4382,6 +4387,7 @@
 				F19547AB2C33FA650041ACC9 /* Subscription in Frameworks */,
 				F116A7C72BD1925500F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CF2B316E0200A595BB /* SnapshotTesting in Frameworks */,
+				9DC5FACD2C6B8E620011F068 /* AppKitExtensions in Frameworks */,
 				F1DA51A52BF6114200CF29FA /* SubscriptionTestingUtilities in Frameworks */,
 				3706FE89293F661700E42796 /* OHHTTPStubsSwift in Frameworks */,
 			);
@@ -4408,6 +4414,7 @@
 			files = (
 				F116A7C92BD1929000F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CD2B316DFC00A595BB /* SnapshotTesting in Frameworks */,
+				9DC5FAC92C6B8B910011F068 /* AppKitExtensions in Frameworks */,
 				B6AE39F329374AEC00C37AA4 /* OHHTTPStubs in Frameworks */,
 				B6AE39F529374AEC00C37AA4 /* OHHTTPStubsSwift in Frameworks */,
 			);
@@ -4526,6 +4533,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */,
+				9DC5FAC52C6B8A010011F068 /* AppKitExtensions in Frameworks */,
 				F1D0428E2BFB9F9C00A31506 /* Subscription in Frameworks */,
 				9D9AE8F92AAA3AD00026E7DC /* DataBrokerProtection in Frameworks */,
 			);
@@ -4536,6 +4544,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				315A023F2B6421AE00BFA577 /* Networking in Frameworks */,
+				9DC5FAC72C6B8A080011F068 /* AppKitExtensions in Frameworks */,
 				F1D042902BFB9FA300A31506 /* Subscription in Frameworks */,
 				9D9AE8FB2AAA3AD90026E7DC /* DataBrokerProtection in Frameworks */,
 			);
@@ -4593,6 +4602,7 @@
 				F19547A92C33FA4C0041ACC9 /* Subscription in Frameworks */,
 				F116A7C32BD1924B00F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CB2B316DF100A595BB /* SnapshotTesting in Frameworks */,
+				9DC5FACB2C6B8E050011F068 /* AppKitExtensions in Frameworks */,
 				F1DA51A92BF6114C00CF29FA /* SubscriptionTestingUtilities in Frameworks */,
 				B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */,
 			);
@@ -8722,6 +8732,7 @@
 				F116A7C62BD1925500F3FCF7 /* PixelKitTestingUtilities */,
 				F1DA51A42BF6114200CF29FA /* SubscriptionTestingUtilities */,
 				F19547AA2C33FA650041ACC9 /* Subscription */,
+				9DC5FACC2C6B8E620011F068 /* AppKitExtensions */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = 3706FE99293F661700E42796 /* Unit Tests App Store.xctest */;
@@ -8787,6 +8798,7 @@
 				B6AE39F429374AEC00C37AA4 /* OHHTTPStubsSwift */,
 				B65CD8CC2B316DFC00A595BB /* SnapshotTesting */,
 				F116A7C82BD1929000F3FCF7 /* PixelKitTestingUtilities */,
+				9DC5FAC82C6B8B910011F068 /* AppKitExtensions */,
 			);
 			productName = "Integration Tests";
 			productReference = 4B1AD89D25FC27E200261379 /* Integration Tests.xctest */;
@@ -9021,6 +9033,7 @@
 				9D9AE8F82AAA3AD00026E7DC /* DataBrokerProtection */,
 				9DEF97E02B06C4EE00764F03 /* Networking */,
 				F1D0428D2BFB9F9C00A31506 /* Subscription */,
+				9DC5FAC42C6B8A010011F068 /* AppKitExtensions */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGo Personal Information Removal.app */;
@@ -9044,6 +9057,7 @@
 				9D9AE8FA2AAA3AD90026E7DC /* DataBrokerProtection */,
 				315A023E2B6421AE00BFA577 /* Networking */,
 				F1D0428F2BFB9FA300A31506 /* Subscription */,
+				9DC5FAC62C6B8A080011F068 /* AppKitExtensions */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal App Store.app */;
@@ -9134,6 +9148,7 @@
 				F116A7C22BD1924B00F3FCF7 /* PixelKitTestingUtilities */,
 				F1DA51A82BF6114C00CF29FA /* SubscriptionTestingUtilities */,
 				F19547A82C33FA4C0041ACC9 /* Subscription */,
+				9DC5FACA2C6B8E050011F068 /* AppKitExtensions */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */;
@@ -13990,6 +14005,26 @@
 			productName = AppKitExtensions;
 		};
 		9D9DE5822C63BE9600D20B15 /* AppKitExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppKitExtensions;
+		};
+		9DC5FAC42C6B8A010011F068 /* AppKitExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppKitExtensions;
+		};
+		9DC5FAC62C6B8A080011F068 /* AppKitExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppKitExtensions;
+		};
+		9DC5FAC82C6B8B910011F068 /* AppKitExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppKitExtensions;
+		};
+		9DC5FACA2C6B8E050011F068 /* AppKitExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppKitExtensions;
+		};
+		9DC5FACC2C6B8E620011F068 /* AppKitExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppKitExtensions;
 		};

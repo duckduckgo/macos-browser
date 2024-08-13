@@ -31,6 +31,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "183.0.0"),
         .package(path: "../SwiftUIExtensions"),
+        .package(path: "../AppKitExtensions"),
         .package(path: "../XPCHelper"),
     ],
     targets: [
@@ -39,6 +40,7 @@ let package = Package(
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
+                .product(name: "AppKitExtensions", package: "AppKitExtensions"),
                 .byName(name: "XPCHelper"),
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
             ],
