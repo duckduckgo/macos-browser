@@ -38,7 +38,7 @@ protocol UserBackgroundImagesManaging {
 
     func addImage(with url: URL) async throws -> UserBackgroundImage?
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage?
-    func previewImage(for userBackgroundImage: UserBackgroundImage) -> NSImage?
+    func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage?
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage)
     func sortImages()
 }
@@ -47,7 +47,8 @@ protocol ImageColorSchemeCalculating {
     func calculatePreferredColorScheme(forImageAt url: URL) -> ColorScheme
 }
 
-protocol ImageResizng {
+protocol ImageProcessing {
+    func convertImageToJPEG(at url: URL) -> Data?
     func resizeImage(at url: URL, to newSize: CGSize) -> Data?
 }
 
@@ -70,7 +71,7 @@ extension ColorScheme: LosslessStringConvertible {
 
 extension UserBackgroundImage: LosslessStringConvertible {
     init?(_ description: String) {
-        let components = description.split(separator: ";")
+        let components = description.split(separator: "|")
         guard components.count == 2, let colorScheme = ColorScheme(String(components[1])) else {
             return nil
         }
@@ -79,20 +80,20 @@ extension UserBackgroundImage: LosslessStringConvertible {
     }
 
     var description: String {
-        "\(fileName);\(colorScheme.description)"
+        "\(fileName)|\(colorScheme.description)"
     }
 }
 
 final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
     let storageLocation: URL
-    private let previewsStorageLocation: URL
+    private let thumbnailsStorageLocation: URL
 
     let maximumNumberOfImages: Int
 
     enum Const {
         static let storageDirectoryName = "UserBackgroundImages"
-        static let previewsDirectoryName = "previews"
+        static let thumbnailsDirectoryName = "thumbnails"
     }
 
     private(set) var availableImages: [UserBackgroundImage] = [] {
@@ -116,10 +117,10 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         assert(maximumNumberOfImages > 0, "maximumNumberOfImages must be greater than 0")
         self.maximumNumberOfImages = maximumNumberOfImages
         storageLocation = applicationSupportDirectory.appendingPathComponent(Const.storageDirectoryName)
-        previewsStorageLocation = storageLocation.appendingPathComponent(Const.previewsDirectoryName)
+        thumbnailsStorageLocation = storageLocation.appendingPathComponent(Const.thumbnailsDirectoryName)
 
         setUpStorageDirectory(at: storageLocation.path)
-        setUpStorageDirectory(at: previewsStorageLocation.path)
+        setUpStorageDirectory(at: thumbnailsStorageLocation.path)
 
         availableImages = imagesMetadata.compactMap(UserBackgroundImage.init)
         verifyStoredImages()
@@ -127,22 +128,16 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
     func addImage(with url: URL) async throws -> UserBackgroundImage? {
         let fileExtension = url.pathExtension
-        let isHEIC = fileExtension.lowercased() == "heic"
-        let destinationExtension = isHEIC ? "jpg" : fileExtension
-
-        let fileName = [UUID().uuidString, destinationExtension].joined(separator: ".")
+        let fileName = [UUID().uuidString, "jpg"].joined(separator: ".")
         let destinationURL = storageLocation.appendingPathComponent(fileName)
-        if fileExtension.lowercased() == "heic" {
-            try copyHEIC(at: url, toJPEGAt: destinationURL)
-        } else {
-            try FileManager.default.copyItem(at: url, to: destinationURL)
-        }
+
+        try copyImage(at: url, toJPEGAt: destinationURL)
 
         async let resizeImageTask: Void = {
             let date = Date()
             let resizedImage: Data? = resizeImage(at: destinationURL, to: .init(width: 192, height: 128))
-            try resizedImage?.write(to: previewsStorageLocation.appendingPathComponent(fileName))
-            print("Resizing took \(Date().timeIntervalSince(date)) seconds")
+            try resizedImage?.write(to: thumbnailsStorageLocation.appendingPathComponent(fileName))
+            print("Resizing \(fileName) took \(Date().timeIntervalSince(date)) seconds")
         }()
 
         async let colorSchemeTask = {
@@ -159,6 +154,14 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         return userBackgroundImage
     }
 
+    private func copyImage(at sourceURL: URL, toJPEGAt destinationURL: URL) throws {
+        guard let data = convertImageToJPEG(at: sourceURL) else {
+            // throw error
+            return
+        }
+        try data.write(to: destinationURL)
+    }
+
     private func deleteOldImages() {
         guard imagesMetadata.count >= maximumNumberOfImages else {
             return
@@ -169,17 +172,18 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
     private func deleteImage(_ image: UserBackgroundImage) {
         FileManager.default.remove(fileAtURL: storageLocation.appendingPathComponent(image.fileName))
-        FileManager.default.remove(fileAtURL: previewsStorageLocation.appendingPathComponent(image.fileName))
+        FileManager.default.remove(fileAtURL: thumbnailsStorageLocation.appendingPathComponent(image.fileName))
     }
+
 
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
         NSImage(contentsOf: storageLocation.appendingPathComponent(userBackgroundImage.fileName))
     }
 
-    func previewImage(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
+    func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
         NSImage(
             contentsOf: storageLocation
-                .appendingPathComponent(Const.previewsDirectoryName)
+                .appendingPathComponent(Const.thumbnailsDirectoryName)
                 .appendingPathComponent(userBackgroundImage.fileName)
         )
     }
@@ -239,15 +243,7 @@ extension UserBackgroundImagesManager: ImageColorSchemeCalculating {
 
 }
 
-extension UserBackgroundImagesManager: ImageResizng {
-
-    func copyHEIC(at sourceURL: URL, toJPEGAt destinationURL: URL) throws {
-        guard let data = convertHEICToJPEG(at: sourceURL) else {
-            // throw error
-            return
-        }
-        try data.write(to: destinationURL)
-    }
+extension UserBackgroundImagesManager: ImageProcessing {
 
     func correctImageOrientation(cgImage: CGImage, orientation: CGImagePropertyOrientation) -> CGImage? {
         var transform = CGAffineTransform.identity
@@ -315,8 +311,8 @@ extension UserBackgroundImagesManager: ImageResizng {
         return context.makeImage()
     }
 
-    func convertHEICToJPEG(at url: URL) -> Data? {
-        // Create a CGImageSource from the HEIC data
+    func convertImageToJPEG(at url: URL) -> Data? {
+        // Create a CGImageSource from the source image data
         guard let data = try? Data(contentsOf: url),
               let imageSource = CGImageSourceCreateWithData(data as CFData, nil),
               let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)
