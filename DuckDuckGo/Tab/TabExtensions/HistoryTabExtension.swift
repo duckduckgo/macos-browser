@@ -61,15 +61,18 @@ final class HistoryTabExtension: NSObject {
         case added
     }
     private var visitState: VisitState = .expected
+    private var phishingStateManager: PhishingTabStateManager
 
     init(isBurner: Bool,
          historyCoordinating: HistoryCoordinating,
          trackersPublisher: some Publisher<DetectedTracker, Never>,
          urlPublisher: some Publisher<URL?, Never>,
-         titlePublisher: some Publisher<String?, Never>) {
+         titlePublisher: some Publisher<String?, Never>,
+         phishingStateManager: PhishingTabStateManager) {
 
         self.historyCoordinating = historyCoordinating
         self.isBurner = isBurner
+        self.phishingStateManager = phishingStateManager
         super.init()
 
         trackersPublisher.sink { [weak self] tracker in
@@ -106,6 +109,7 @@ final class HistoryTabExtension: NSObject {
 
     private func addVisit() {
         guard !isBurner else { return }
+        guard !phishingStateManager.isShowingPhishingError else { return }
 
         guard let url else {
             assertionFailure("HistoryTabExtension.state.currentUrl not set")
