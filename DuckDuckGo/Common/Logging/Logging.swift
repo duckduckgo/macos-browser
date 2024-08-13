@@ -46,7 +46,7 @@ extension OSLog {
 
     enum AllCategories {
         static var allCases: [String] {
-            Categories.allCases.map(\.rawValue) + AppCategories.allCases.map(\.rawValue)
+            AppCategories.allCases.map(\.rawValue)
         }
     }
 
