@@ -18,6 +18,7 @@
 
 import AppKit
 import RemoteMessaging
+import AppKitExtensions
 
 final class RemoteMessagingDebugMenu: NSMenu {
 

@@ -460,6 +460,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,
                    controllerErrorStore: controllerErrorStore,
+                   snoozeTimingStore: NetworkProtectionSnoozeTimingStore(userDefaults: .netP),
                    keychainType: Bundle.keychainType,
                    tokenStore: tokenStore,
                    debugEvents: debugEvents,
