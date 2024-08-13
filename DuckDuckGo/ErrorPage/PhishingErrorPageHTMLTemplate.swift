@@ -34,8 +34,7 @@ struct PhishingErrorPageHTMLTemplate: ErrorPageHTMLTemplating {
             assertionFailure("Should be able to load template")
             return ""
         }
-        let loadTimeData = createJSONString(header: phishingError.header, body: phishingError.body, advancedButton: phishingError.advancedButton, leaveSiteButton: phishingError.leaveSiteButton, advancedInfoHeader: phishingError.advancedInfoTitle, readMore: phishingError.readMoreCTA, advancedInfoBody: phishingError.advancedInfoBody, visitSiteButton: phishingError.visitSiteButton)
-        return html.replacingOccurrences(of: "$LOAD_TIME_DATA$", with: loadTimeData, options: .literal)
+        return html
     }
 
     private func createJSONString(header: String, body: String, advancedButton: String, leaveSiteButton: String, advancedInfoHeader: String, readMore: String, advancedInfoBody: String, visitSiteButton: String) -> String {
