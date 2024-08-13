@@ -176,7 +176,7 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
             birthYear: 1980
         )
 
-        //_ = try! await database.save(profile)
+        _ = try! await database.save(profile)
         XCTAssertTrue(vault.wasSaveProfileQueryCalled)
         XCTAssertFalse(vault.wasUpdateProfileQueryCalled)
         XCTAssertFalse(vault.wasDeleteProfileQueryCalled)
