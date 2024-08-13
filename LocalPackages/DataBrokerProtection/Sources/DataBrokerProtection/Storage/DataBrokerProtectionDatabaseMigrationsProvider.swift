@@ -20,6 +20,12 @@ import Foundation
 import GRDB
 import Common
 
+enum DataBrokerProtectionDatabaseMigrationErrors: Error {
+    case deleteOrphanedRecordFailed
+    case recreateTablesFailed
+    case foreignKeyViolation
+}
+
 /// Conforming types provide migrations for the PIR database. Mostly utilized for testing.
 protocol DataBrokerProtectionDatabaseMigrationsProvider {
     static var v2Migrations: (inout DatabaseMigrator) throws -> Void { get }
@@ -238,7 +244,7 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
             // Throws an error if a foreign key violation exists in the database.
             try database.checkForeignKeys()
         } catch {
-            throw DataBrokerProtectionDatabaseErrors.migrationFailureIntegrityCheck
+            throw DataBrokerProtectionDatabaseMigrationErrors.foreignKeyViolation
         }
     }
 
@@ -279,8 +285,12 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
         deleteStatements.append(sqlOrphanedCleanupFromProfile(of: AddressDB.databaseTableName))
         deleteStatements.append(sqlOrphanedCleanupFromProfile(of: PhoneDB.databaseTableName))
 
-        for sql in deleteStatements {
-            try database.execute(sql: sql)
+        do {
+            for sql in deleteStatements {
+                try database.execute(sql: sql)
+            }
+        } catch {
+            throw DataBrokerProtectionDatabaseMigrationErrors.deleteOrphanedRecordFailed
         }
 
         // As a precaution, explicitly check for any foreign key violations which were missed
@@ -356,16 +366,20 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
     }
 
     private static func recreateTablesV3(database: Database) throws {
-        try recreateNameTable(database: database)
-        try recreateAddressTable(database: database)
-        try recreatePhoneTable(database: database)
-        try recreateProfileQueryTable(database: database)
-        try recreateScanTable(database: database)
-        try recreateScanHistoryTable(database: database)
-        try recreateExtractedProfileTable(database: database)
-        try recreateOptOutTable(database: database)
-        try recreateOptOutHistoryTable(database: database)
-        try recreateOptOutAttemptTable(database: database)
+        do {
+            try recreateNameTable(database: database)
+            try recreateAddressTable(database: database)
+            try recreatePhoneTable(database: database)
+            try recreateProfileQueryTable(database: database)
+            try recreateScanTable(database: database)
+            try recreateScanHistoryTable(database: database)
+            try recreateExtractedProfileTable(database: database)
+            try recreateOptOutTable(database: database)
+            try recreateOptOutHistoryTable(database: database)
+            try recreateOptOutAttemptTable(database: database)
+        } catch {
+            throw DataBrokerProtectionDatabaseMigrationErrors.recreateTablesFailed
+        }
     }
 
     private static func recreateNameTable(database: Database) throws {
