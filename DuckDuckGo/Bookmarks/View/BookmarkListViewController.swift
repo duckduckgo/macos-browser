@@ -26,39 +26,6 @@ protocol BookmarkListViewControllerDelegate: AnyObject {
 
 }
 
-private enum EmptyStateContent {
-    case noBookmarks
-    case noSearchResults
-
-    var title: String {
-        switch self {
-        case .noBookmarks: return UserText.bookmarksEmptyStateTitle
-        case .noSearchResults: return UserText.bookmarksEmptySearchResultStateTitle
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .noBookmarks: return UserText.bookmarksEmptyStateMessage
-        case .noSearchResults: return UserText.bookmarksEmptySearchResultStateMessage
-        }
-    }
-
-    var image: NSImage {
-        switch self {
-        case .noBookmarks: return .bookmarksEmpty
-        case .noSearchResults: return .bookmarkEmptySearch
-        }
-    }
-
-    var shouldHideImportButton: Bool {
-        switch self {
-        case .noBookmarks: return false
-        case .noSearchResults: return true
-        }
-    }
-}
-
 final class BookmarkListViewController: NSViewController {
     static let preferredContentSize = CGSize(width: 420, height: 500)
 
@@ -139,7 +106,7 @@ final class BookmarkListViewController: NSViewController {
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
         self.treeControllerSearchDataSource = BookmarkListTreeControllerSearchDataSource(bookmarkManager: bookmarkManager)
         self.bookmarkMetrics = metrics
-        self.sortBookmarksViewModel = SortBookmarksViewModel(metrics: metrics, origin: .panel)
+        self.sortBookmarksViewModel = SortBookmarksViewModel(manager: bookmarkManager, metrics: metrics, origin: .panel)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -491,9 +458,8 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @objc func sortBookmarksButtonClicked(_ sender: NSButton) {
-        let menu = sortBookmarksViewModel.selectedSortMode.menu
+        let menu = sortBookmarksViewModel.menu
         bookmarkMetrics.fireSortButtonClicked(origin: .panel)
-        menu.delegate = sortBookmarksViewModel
         menu.popUpAtMouseLocation(in: sortBookmarksButton)
     }
 
@@ -597,7 +563,7 @@ final class BookmarkListViewController: NSViewController {
         outlineView.reloadData()
     }
 
-    private func showEmptyStateView(for mode: EmptyStateContent) {
+    private func showEmptyStateView(for mode: BookmarksEmptyStateContent) {
         emptyState.isHidden = false
         outlineView.isHidden = true
         emptyStateTitle.stringValue = mode.title
@@ -886,21 +852,6 @@ extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
         expandFoldersUntil(node: node)
         outlineView.scrollToAdjustedPositionInOutlineView(node)
         outlineView.highlight(node)
-    }
-}
-
-extension BookmarkListViewController: BookmarkSortMenuItemSelectors {
-
-    func manualSort(_ sender: NSMenuItem) {
-        sortBookmarksViewModel.setSort(mode: .manual)
-    }
-
-    func sortByNameAscending(_ sender: NSMenuItem) {
-        sortBookmarksViewModel.setSort(mode: .nameAscending)
-    }
-
-    func sortByNameDescending(_ sender: NSMenuItem) {
-        sortBookmarksViewModel.setSort(mode: .nameDescending)
     }
 }
 

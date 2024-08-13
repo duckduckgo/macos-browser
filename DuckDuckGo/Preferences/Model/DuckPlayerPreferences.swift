@@ -120,6 +120,7 @@ final class DuckPlayerPreferences: ObservableObject {
     @MainActor
     func openLearnMoreContingencyURL() {
         guard let url = duckPlayerContingencyHandler.learnMoreURL else { return }
+        PixelKit.fire(NonStandardEvent(GeneralPixel.duckPlayerContingencyLearnMoreClicked))
         WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
     }
 
