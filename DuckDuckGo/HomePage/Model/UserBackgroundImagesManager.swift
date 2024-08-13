@@ -152,20 +152,24 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         try await resizeImageTask
         let colorScheme = await colorSchemeTask
 
+        deleteOldImages()
+
         let userBackgroundImage = UserBackgroundImage(fileName: fileName, colorScheme: colorScheme)
-
-        if imagesMetadata.count > maximumNumberOfImages {
-            let imagesToDelete = imagesMetadata.suffix(from: maximumNumberOfImages)
-            imagesToDelete.forEach { imageMetadata in
-                guard let fileName = UserBackgroundImage(imageMetadata)?.fileName else {
-                    return
-                }
-                FileManager.default.remove(fileAtURL: storageLocation.appendingPathComponent(fileName))
-            }
-        }
-
         imagesMetadata = [userBackgroundImage.description] + imagesMetadata.prefix(maximumNumberOfImages - 1)
         return userBackgroundImage
+    }
+
+    private func deleteOldImages() {
+        guard imagesMetadata.count >= maximumNumberOfImages else {
+            return
+        }
+        let imagesToDelete = imagesMetadata.suffix(from: maximumNumberOfImages - 1).compactMap(UserBackgroundImage.init)
+        imagesToDelete.forEach { deleteImage($0) }
+    }
+
+    private func deleteImage(_ image: UserBackgroundImage) {
+        FileManager.default.remove(fileAtURL: storageLocation.appendingPathComponent(image.fileName))
+        FileManager.default.remove(fileAtURL: previewsStorageLocation.appendingPathComponent(image.fileName))
     }
 
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
