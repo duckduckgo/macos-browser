@@ -17,12 +17,13 @@
 //
 
 import AppKitExtensions
+import Combine
 import CoreImage
 import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct UserBackgroundImage: Hashable, Identifiable, ColorSchemeProviding {
+struct UserBackgroundImage: Hashable, Equatable, Identifiable, ColorSchemeProviding {
     let fileName: String
     let colorScheme: ColorScheme
 
@@ -35,8 +36,10 @@ protocol UserBackgroundImagesManaging {
     var storageLocation: URL { get }
     var maximumNumberOfImages: Int { get }
     var availableImages: [UserBackgroundImage] { get }
+    var availableImagesPublisher: AnyPublisher<[UserBackgroundImage], Never> { get }
 
     func addImage(with url: URL) async throws -> UserBackgroundImage?
+    func deleteImage(_ userBackgroundImage: UserBackgroundImage)
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage?
     func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage?
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage)
@@ -96,12 +99,16 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         static let thumbnailsDirectoryName = "thumbnails"
     }
 
-    private(set) var availableImages: [UserBackgroundImage] = [] {
+    @Published private(set) var availableImages: [UserBackgroundImage] = [] {
         didSet {
             if availableImagesSortedByAccessTime != availableImages {
                 availableImagesSortedByAccessTime = availableImages
             }
         }
+    }
+
+    var availableImagesPublisher: AnyPublisher<[UserBackgroundImage], Never> {
+        $availableImages.removeDuplicates().eraseToAnyPublisher()
     }
 
     private var availableImagesSortedByAccessTime: [UserBackgroundImage] = []
@@ -153,6 +160,14 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         return userBackgroundImage
     }
 
+    func deleteImage(_ userBackgroundImage: UserBackgroundImage) {
+        guard let index = imagesMetadata.firstIndex(of: userBackgroundImage.description) else {
+            return
+        }
+        imagesMetadata.remove(at: index)
+        deleteImage(userBackgroundImage)
+    }
+
     private func copyImage(at sourceURL: URL, toJPEGAt destinationURL: URL) throws {
         guard let data = convertImageToJPEG(at: sourceURL) else {
             // throw error
@@ -166,14 +181,13 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
             return
         }
         let imagesToDelete = imagesMetadata.suffix(from: maximumNumberOfImages - 1).compactMap(UserBackgroundImage.init)
-        imagesToDelete.forEach { deleteImage($0) }
+        imagesToDelete.forEach { deleteImages(for: $0) }
     }
 
-    private func deleteImage(_ image: UserBackgroundImage) {
-        FileManager.default.remove(fileAtURL: storageLocation.appendingPathComponent(image.fileName))
-        FileManager.default.remove(fileAtURL: thumbnailsStorageLocation.appendingPathComponent(image.fileName))
+    private func deleteImages(for userBackgroundImage: UserBackgroundImage) {
+        FileManager.default.remove(fileAtURL: storageLocation.appendingPathComponent(userBackgroundImage.fileName))
+        FileManager.default.remove(fileAtURL: thumbnailsStorageLocation.appendingPathComponent(userBackgroundImage.fileName))
     }
-
 
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
         NSImage(contentsOf: storageLocation.appendingPathComponent(userBackgroundImage.fileName))

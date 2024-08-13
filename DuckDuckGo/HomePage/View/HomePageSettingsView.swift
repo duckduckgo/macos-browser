@@ -213,7 +213,7 @@ extension HomePage.Views {
         var userBackgroundImagePickerView: some View {
             VStack(spacing: 16) {
                 backButton(title: "My Images")
-                grid(with: model.customImagesManager.availableImages) { userBackgroundImage in
+                grid(with: model.availableUserBackgroundImages) { userBackgroundImage in
                     Button {
                         withAnimation {
                             if model.customBackground != .customImage(userBackgroundImage) {
@@ -399,6 +399,9 @@ extension HomePage.Views {
                     } else {
                         EmptyView()
                     }
+                }
+                .contextMenu {
+                    Button("Delete Image", action: { model.customImagesManager.deleteImage(userBackgroundImage) })
                 }
             case .none:
                 content()

@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import SwiftUI
 import SwiftUIExtensions
@@ -70,6 +71,10 @@ extension HomePage.Models {
         let customImagesManager: UserBackgroundImagesManaging
         let openURL: (URL) -> Void
 
+        @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
+
+        private var availableCustomImagesCancellable: AnyCancellable?
+
         init(
             appearancePreferences: AppearancePreferences = .shared,
             userBackgroundImagesManager: UserBackgroundImagesManaging = UserBackgroundImagesManager(
@@ -82,6 +87,23 @@ extension HomePage.Models {
             self.customImagesManager = userBackgroundImagesManager
             customBackground = appearancePreferences.homePageCustomBackground
             self.openURL = openURL
+
+            availableCustomImagesCancellable = customImagesManager.availableImagesPublisher
+                .receive(on: DispatchQueue.main)
+                .handleEvents(receiveOutput: { [weak self] images in
+                    guard case .customImage(let userBackgroundImage) = self?.customBackground, !images.contains(userBackgroundImage) else {
+                        return
+                    }
+                    if let firstImage = images.first {
+                        self?.customBackground = .customImage(firstImage)
+                    } else {
+                        self?.customBackground = nil
+                        withAnimation {
+                            self?.contentType = .root
+                        }
+                    }
+                })
+                .assign(to: \.availableUserBackgroundImages, onWeaklyHeld: self)
         }
 
         @Published var contentType: ContentType = .root {
@@ -135,7 +157,7 @@ extension HomePage.Models {
                 }()
                 modes.append(.init(contentType: .customImagePicker, title: "My Images", customBackgroundPreview: preview))
             }
-            modes.append(.init(contentType: .uploadImage, title: "Upload Image", customBackgroundPreview: nil))
+            modes.append(.init(contentType: .uploadImage, title: "Add Background", customBackgroundPreview: nil))
             return modes
         }
 
@@ -164,34 +186,6 @@ extension HomePage.Models {
             } else {
                 Color.newTabPageBackground
             }
-        }
-
-        var isGradientSelected: Bool {
-            guard case .gradient = customBackground else {
-                return false
-            }
-            return true
-        }
-
-        var isSolidColorSelected: Bool {
-            guard case .solidColor = customBackground else {
-                return false
-            }
-            return true
-        }
-
-        var isIllustrationSelected: Bool {
-            guard case .illustration = customBackground else {
-                return false
-            }
-            return true
-        }
-
-        var isCustomImageSelected: Bool {
-            guard case .customImage = customBackground else {
-                return false
-            }
-            return true
         }
     }
 }
@@ -263,13 +257,6 @@ extension HomePage.Models.SettingsModel {
         case solidColor(SolidColor)
         case illustration(Illustration)
         case customImage(UserBackgroundImage)
-
-        var isSolidColor: Bool {
-            guard case .solidColor = self else {
-                return false
-            }
-            return true
-        }
 
         var colorScheme: ColorScheme {
             switch self {

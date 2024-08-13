@@ -15848,6 +15848,9 @@
         }
       }
     },
+    "Delete Image" : {
+
+    },
     "delete-bookmark" : {
       "comment" : "Delete Bookmark button",
       "extractionState" : "extracted_with_value",
