@@ -29,20 +29,21 @@ final class BookmarksOutlineView: NSOutlineView {
         didSet {
             highlightedRowView?.highlight = false
             highlightedCellView?.highlight = false
-            guard let row = highlightedRow else { return }
+            guard let row = highlightedRow, row < numberOfRows else { return }
             if case .keyDown = NSApp.currentEvent?.type {
                 scrollRowToVisible(row)
             }
 
             let item = item(atRow: row) as? BookmarkNode
 
+            let isInKeyPopover = self.isInKeyPopover
             let rowView = rowView(atRow: row, makeIfNecessary: false) as? RoundedSelectionRowView
-            rowView?.isInKeyWindow = true
+            rowView?.isInKeyWindow = isInKeyPopover
             rowView?.highlight = item?.canBeHighlighted ?? false
             highlightedRowView = rowView
 
             let cellView = self.view(atColumn: 0, row: row, makeIfNecessary: false) as? BookmarkOutlineCellView
-            cellView?.isInKeyWindow = true
+            cellView?.isInKeyWindow = isInKeyPopover
             cellView?.highlight = item?.canBeHighlighted ?? false
             highlightedCellView = cellView
 
@@ -57,6 +58,22 @@ final class BookmarksOutlineView: NSOutlineView {
                 outlineView.highlightedCellView?.isInKeyWindow = false
             }
         }
+    }
+
+    private var isInKeyPopover: Bool {
+        if window?.childWindows?.first(where: { child in
+            if type(of: child) == type(of: window!),
+               let scrollView = child.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
+               let outlineView = scrollView.documentView as? Self,
+               outlineView.highlightedRow != nil {
+                true
+            } else {
+                false
+            }
+        }) != nil {
+            return false
+        }
+        return true
     }
 
     override var clickedRow: Int {
@@ -104,19 +121,7 @@ final class BookmarksOutlineView: NSOutlineView {
     }
 
     override func mouseMoved(with event: NSEvent) {
-        let point = mouseLocationInsideBounds()
-        let row = point.map { self.row(at: NSPoint(x: self.bounds.midX, y: $0.y)) } ?? -1
-        guard row >= 0, row < NSNotFound else {
-            // TODO: don‘t highlight but mark as non-active when mouse exit to
-            highlightedRow = nil
-            return
-        }
-        if highlightedRow != row {
-            highlightedRow = row
-        } else {
-            highlightedRowView?.isInKeyWindow = true
-            highlightedCellView?.isInKeyWindow = true
-        }
+        updateHighlightedRowUnderCursor()
     }
 
     override func mouseExited(with event: NSEvent) {
@@ -290,6 +295,21 @@ final class BookmarksOutlineView: NSOutlineView {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
             rowView.highlight = false
+        }
+    }
+
+    func updateHighlightedRowUnderCursor() {
+        let point = mouseLocationInsideBounds()
+        let row = point.map { self.row(at: NSPoint(x: self.bounds.midX, y: $0.y)) } ?? -1
+        guard row >= 0, row < NSNotFound else {
+            highlightedRow = nil
+            return
+        }
+        if highlightedRow != row {
+            highlightedRow = row
+        } else {
+            highlightedRowView?.isInKeyWindow = true
+            highlightedCellView?.isInKeyWindow = true
         }
     }
 

@@ -618,20 +618,13 @@ final class BookmarkListViewController: NSViewController {
     }
 
     private func subscribeToModelEvents() {
-        bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] list in
-            guard let self else { return }
-
-            self.reloadData()
-
-            let isEmpty = list?.topLevelEntities.isEmpty ?? true
-            self.emptyState?.isHidden = !isEmpty
-            self.searchBookmarksButton?.isHidden = isEmpty
-            self.outlineView.isHidden = isEmpty
-
-            if isEmpty {
-                self.showEmptyStateView(for: .noBookmarks)
+        bookmarkManager.listPublisher
+            .dropFirst() // reloadData will be called from adjustPreferredContentSize
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.reloadData()
             }
-        }.store(in: &cancellables)
+            .store(in: &cancellables)
 
         sortBookmarksViewModel.$selectedSortMode.sink { [weak self] newSortMode in
             self?.setupSort(mode: newSortMode)
@@ -656,8 +649,14 @@ final class BookmarkListViewController: NSViewController {
             }.store(in: &cancellables)
 
         scrollUpButton?.publisher(for: \.isMouseOver)
-            .map { isMouseOver in
-                guard isMouseOver else {
+            .map { [weak scrollDownButton] isMouseOver in
+                guard isMouseOver,
+                      NSApp.currentEvent?.type != .keyDown else {
+                    if let scrollDownButton, scrollDownButton.isMouseOver {
+                        // ignore mouse over change when the button appears on
+                        // the Down key press
+                        scrollDownButton.isMouseOver = false
+                    }
                     return Empty<Void, Never>().eraseToAnyPublisher()
                 }
                 return Timer.publish(every: 0.1, on: .main, in: .default)
@@ -674,8 +673,14 @@ final class BookmarkListViewController: NSViewController {
             .store(in: &cancellables)
 
         scrollDownButton?.publisher(for: \.isMouseOver)
-            .map { isMouseOver in
-                guard isMouseOver else {
+            .map { [weak scrollDownButton] isMouseOver in
+                guard isMouseOver,
+                      NSApp.currentEvent?.type != .keyDown else {
+                    if let scrollDownButton, scrollDownButton.isMouseOver {
+                        // ignore mouse over change when the button appears on
+                        // the Down key press
+                        scrollDownButton.isMouseOver = false
+                    }
                     return Empty<Void, Never>().eraseToAnyPublisher()
                 }
                 return Timer.publish(every: 0.1, on: .main, in: .default)
@@ -868,7 +873,16 @@ final class BookmarkListViewController: NSViewController {
                     return false
                 }
                 guard let self,
+                      // always close on global event
                       let eventWindow = event.window else { return true /* close */}
+                if let popover = nextResponder as? BookmarkListPopover,
+                   let positioningView = popover.positioningView,
+                   positioningView.isMouseLocationInsideBounds(event.locationInWindow) {
+                    // don‘t close when the button used to open the popover is
+                    // clicked again, it‘ll be managed by
+                    // BookmarksBarViewController.popoverShouldClose
+                    return false
+                }
                 for window in sequence(first: eventWindow, next: \.parent)
                 where window === self.view.window {
                     // we found our window: the click was in the menu tree
@@ -883,15 +897,15 @@ final class BookmarkListViewController: NSViewController {
         .store(in: &cancellables)
     }
 
-    func adjustPreferredContentSize(positionedAt preferredEdge: NSRectEdge,
+    func adjustPreferredContentSize(positionedRelativeTo positioningRect: NSRect,
                                     of positioningView: NSView,
-                                    contentInsets: NSEdgeInsets) {
+                                    at preferredEdge: NSRectEdge) {
         _=view // loadViewIfNeeded()
 
         guard let mainWindow = positioningView.window,
               let screenFrame = mainWindow.screen?.visibleFrame else { return }
 
-        reloadData(withRootFolder: representedObject as? BookmarkFolder)
+        self.reloadData(withRootFolder: representedObject as? BookmarkFolder)
         outlineView.highlightedRow = nil
         scrollView.contentView.bounds.origin = .zero // scroll to top
 
@@ -906,35 +920,21 @@ final class BookmarkListViewController: NSViewController {
             return
         }
 
+        let contentInsets = BookmarkListPopover.popoverInsets
         // available screen space at the bottom
-        let windowRect = positioningView.convert(positioningView.bounds, to: nil)
+        let windowRect = positioningView.convert(positioningRect, to: nil)
         let positioningRect = mainWindow.convertToScreen(windowRect)
         let availableHeightBelow = positioningRect.minY - screenFrame.minY - contentInsets.bottom
 
-        var preferredContentSize = NSSize.zero
-        var contentHeight: CGFloat = 20
-        for row in 0..<outlineView.numberOfRows {
-            let node = outlineView.item(atRow: row) as? BookmarkNode
-
-            if preferredContentSize.width < Constants.maxMenuPopoverContentWidth {
-                let cellWidth = BookmarkOutlineCellView.preferredContentWidth(for: node) + contentInsets.left + contentInsets.right
-                if cellWidth > preferredContentSize.width {
-                    preferredContentSize.width = min(Constants.maxMenuPopoverContentWidth, cellWidth)
-                }
-            }
-            if node?.representedObject is SpacerNode {
-                contentHeight += OutlineSeparatorViewCell.rowHeight(for: mode)
-            } else {
-                contentHeight += BookmarkOutlineCellView.rowHeight
-            }
-        }
+        var preferredContentSize = calculatePreferredContentSize()
 
         // menu expanding from the right edge (.maxX positioning)
-        // if available space at the bottom is less than content size
-        if availableHeightBelow < contentHeight, preferredEdge == .maxX {
-            preferredContentSize.height = min(screenFrame.height - contentInsets.top - contentInsets.bottom, contentHeight)
+        // expand up if available space at the bottom is less than content size
+        if availableHeightBelow < preferredContentSize.height,
+           preferredEdge == .maxX {
             // how much of the content height doesn‘t fit at the bottom?
-            let contentHeightToExpandUp = contentHeight - (positioningRect.minY - screenFrame.minY) - contentInsets.top - contentInsets.bottom
+            let contentHeightToExpandUp = preferredContentSize.height - (positioningRect.minY - screenFrame.minY) - contentInsets.top - contentInsets.bottom
+            preferredContentSize.height = min(screenFrame.height - contentInsets.top - contentInsets.bottom, preferredContentSize.height)
             if contentHeightToExpandUp > 0 {
                 let availableHeightOnTop = screenFrame.maxY - positioningRect.minY - contentInsets.top
                 preferredContentOffset.y = min(availableHeightOnTop, contentHeightToExpandUp)
@@ -942,22 +942,78 @@ final class BookmarkListViewController: NSViewController {
                 preferredContentOffset.y = 0
             }
 
-        // menu expanding from the bottom edge (.minY positioning)
+        // menu expanding up from the bottom edge (.minY positioning)
         // if available space at the bottom is less than 4 rows
         } else if Int(availableHeightBelow / BookmarkOutlineCellView.rowHeight) < Constants.minVisibleRows {
             // expand the menu up from the bottom-most point
             let availableHeightOnTop = screenFrame.maxY - positioningRect.minY - contentInsets.top
-            preferredContentOffset.y = min(availableHeightOnTop, contentHeight) - availableHeightBelow
-            preferredContentSize.height = min(screenFrame.height - contentInsets.top - contentInsets.bottom, contentHeight)
+            preferredContentOffset.y = min(availableHeightOnTop, preferredContentSize.height) - availableHeightBelow
+            preferredContentSize.height = min(screenFrame.height - contentInsets.top - contentInsets.bottom, preferredContentSize.height)
 
         } else {
             // expand the menu down when space available to fit the content
             preferredContentOffset = .zero
-            preferredContentSize.height = min(availableHeightBelow, contentHeight)
+            preferredContentSize.height = min(availableHeightBelow, preferredContentSize.height)
         }
 
         self.preferredContentSize = preferredContentSize
 
+        updateScrollButtons()
+    }
+
+    func calculatePreferredContentSize() -> NSSize {
+        let contentInsets = BookmarkListPopover.popoverInsets
+        var contentSize = NSSize(width: 0, height: 20)
+        for row in 0..<outlineView.numberOfRows {
+            let node = outlineView.item(atRow: row) as? BookmarkNode
+
+            if contentSize.width < Constants.maxMenuPopoverContentWidth {
+                let cellWidth = BookmarkOutlineCellView.preferredContentWidth(for: node) + contentInsets.left + contentInsets.right
+                if cellWidth > contentSize.width {
+                    contentSize.width = min(Constants.maxMenuPopoverContentWidth, cellWidth)
+                }
+            }
+            if node?.representedObject is SpacerNode {
+                contentSize.height += OutlineSeparatorViewCell.rowHeight(for: mode)
+            } else {
+                contentSize.height += BookmarkOutlineCellView.rowHeight
+            }
+        }
+        return contentSize
+    }
+
+    private func updatePositionAndContentSize(oldContentSize: NSSize, popoverPositioningEdge: NSRectEdge) {
+
+        guard let window = view.window,
+              let screenFrame = window.screen?.visibleFrame else { return }
+
+        var contentSize = calculatePreferredContentSize()
+        guard contentSize != oldContentSize else { return }
+
+        let heightChange = contentSize.height - oldContentSize.height
+        let availableHeightBelow = window.frame.minY - screenFrame.minY/* - contentInsets.bottom*/
+        let availableHeightOnTop = screenFrame.maxY - window.frame.maxY/* - contentInsets.top*/
+
+        // growing
+        if heightChange > 0 {
+            // expand popover down as much as available screen space allows
+            contentSize.height = preferredContentSize.height + min(availableHeightBelow, heightChange)
+            // shift popover upwards if not enough space at the bottom
+            if availableHeightBelow < heightChange {
+                preferredContentOffset.y += min(availableHeightOnTop, heightChange - availableHeightBelow)
+            }
+
+        // collapsing
+        } else if /* heightChange < 0 && */ contentSize.height < scrollView.frame.height {
+            // reduce the offset of the popover upwards relative to the presenting view
+            preferredContentOffset.y = max(0, preferredContentOffset.y + heightChange)
+            // contentSize.height = contentSize.height
+        } else {
+            // don‘t reduce the popover size if the content size still needs scrolling
+            contentSize.height = preferredContentSize.height
+        }
+
+        preferredContentSize = contentSize
         updateScrollButtons()
     }
 
@@ -983,16 +1039,20 @@ final class BookmarkListViewController: NSViewController {
                 preferredContentOffset.y = popoverHeightIncrement
                 preferredContentSize.height += popoverHeightIncrement
                 // decrement scrolling position
-                scrollView.contentView.bounds.origin.y -= popoverHeightIncrement
+                if preferredContentSize.height + popoverHeightIncrement > contentHeight {
+                    scrollView.contentView.bounds.origin.y = 0
+                } else {
+                    scrollView.contentView.bounds.origin.y -= popoverHeightIncrement
+                }
             }
             // will update scroll buttons on viewDidLayout
         } else {
             updateScrollButtons()
         }
 
-        // TODO: when mouse is over the "scroll up" button and items are selected using the down arrow key, the button detects mouse over on appear and starts scrolling resetting the selection here.
         if let event = NSApp.currentEvent, event.type != .keyDown {
-            outlineView.mouseMoved(with: event)
+            // update current highlighted row to match cursor position
+            outlineView.updateHighlightedRowUnderCursor()
         }
     }
 
@@ -1025,6 +1085,11 @@ final class BookmarkListViewController: NSViewController {
     }
 
     func reloadData(withRootFolder rootFolder: BookmarkFolder? = nil) {
+        let isChangingRootFolder = if let rootFolder, let currentFolder = representedObject as? BookmarkFolder {
+            currentFolder.id != rootFolder.id
+        } else {
+            false
+        }
         if let rootFolder {
             self.representedObject = rootFolder
             isSearchVisible = false
@@ -1059,9 +1124,50 @@ final class BookmarkListViewController: NSViewController {
 
             dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode,
                                   withRootFolder: rootFolder ?? self.representedObject as? BookmarkFolder)
+            let oldContentSize = outlineView.bounds.size
             outlineView.reloadData()
 
-            expandAndRestore(selectedNodes: selectedNodes)
+            switch mode {
+            case .popover:
+                expandAndRestore(selectedNodes: selectedNodes)
+            case .bookmarkBarMenu:
+                guard !isChangingRootFolder,
+                      let popover = nextResponder as? BookmarkListPopover,
+                      popover.isShown,
+                      let preferredEdge = popover.preferredEdge else { break }
+
+                updatePositionAndContentSize(oldContentSize: oldContentSize,
+                                             popoverPositioningEdge: preferredEdge)
+            }
+        }
+
+        let isEmpty = (outlineView.numberOfRows == 0)
+        self.emptyState?.isHidden = !isEmpty
+        self.searchBookmarksButton?.isHidden = isEmpty
+        self.outlineView.isHidden = isEmpty
+
+        if isEmpty {
+            self.showEmptyStateView(for: .noBookmarks)
+
+        } else {
+            DispatchQueue.main.async { [outlineView, weak self] in
+                if outlineView.isMouseLocationInsideBounds() {
+                    outlineView.updateHighlightedRowUnderCursor()
+                } else if !isChangingRootFolder,
+                          let highlightedRow = outlineView.highlightedRow,
+                          outlineView.numberOfRows > highlightedRow {
+                    // restore current highlight on a highlighted row
+                    outlineView.highlightedRow = highlightedRow
+                } else if !isChangingRootFolder,
+                          let bookmarkListPopover = self?.bookmarkListPopover,
+                          bookmarkListPopover.isShown,
+                          let expandedFolder = bookmarkListPopover.rootFolder,
+                          let node = self?.treeController.findNodeWithId(representing: expandedFolder),
+                          let expandedRow = outlineView.rowIfValid(forItem: node) {
+                    // restore current highlight on a expanded folder row
+                    outlineView.highlightedRow = expandedRow
+                }
+            }
         }
     }
 
@@ -1512,7 +1618,6 @@ extension BookmarkListViewController: BookmarkSortMenuItemSelectors {
 }
 
 // MARK: - Search field delegate
-
 extension BookmarkListViewController: NSSearchFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
@@ -1546,8 +1651,10 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
     }
 }
 
+// MARK: - MouseOverButtonDelegate
 extension BookmarkListViewController: MouseOverButtonDelegate {
 
+    // scroll bookmarks menu up/down on scroll buttons mouse over
     func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
 
         assert(sender === scrollUpButton || sender === scrollDownButton)
@@ -1555,6 +1662,7 @@ extension BookmarkListViewController: MouseOverButtonDelegate {
         return .none
     }
 
+    // scroll bookmarks menu up/down on dragging over scroll buttons
     func mouseOverButton(_ sender: MouseOverButton, draggingUpdatedWith info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
         assert(sender === scrollUpButton || sender === scrollDownButton)
         isMouseOver.pointee = true

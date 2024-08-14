@@ -33,13 +33,6 @@ protocol BookmarksBarCollectionViewItemDelegate: AnyObject {
     @MainActor func bookmarksBarCollectionViewItemManageBookmarksAction(_ item: BookmarksBarCollectionViewItem)
 
     @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, isMouseOver: Bool)
-
-    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, draggingEntered info: NSDraggingInfo) -> NSDragOperation
-    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, draggingUpdatedWith info: NSDraggingInfo) -> NSDragOperation
-    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, draggingEndedWith info: NSDraggingInfo)
-    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, draggingExitedWith info: NSDraggingInfo?)
-    @MainActor func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, performDragOperation info: NSDraggingInfo) -> Bool
-
 }
 
 final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
@@ -81,6 +74,22 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         }
     }
 
+    override var highlightState: NSCollectionViewItem.HighlightState {
+        get { super.highlightState }
+        set {
+            switch newValue {
+            case .asDropTarget:
+                mouseOverView.isMouseOver = true
+            case .forSelection, .forDeselection, .none:
+                if highlightState == .asDropTarget {
+                    mouseOverView.isMouseOver = false
+                }
+            @unknown default: break
+            }
+            super.highlightState = newValue
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -92,7 +101,6 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         self.representedObject = entity
         self.title = entity.title
 
-        mouseOverView.unregisterDraggedTypes()
         if let bookmark = entity as? Bookmark {
             let favicon = bookmark.favicon(.small)?.copy() as? NSImage
             favicon?.size = NSSize.faviconSize
@@ -103,8 +111,6 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
                                         isFavorite: bookmark.isFavorite)
         } else if let folder = entity as? BookmarkFolder {
             self.entityType = .folder(title: folder.title)
-
-            mouseOverView.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
 
         } else {
             fatalError("Could not cast bookmark subclass from entity")
@@ -170,30 +176,6 @@ extension BookmarksBarCollectionViewItem: MouseOverViewDelegate {
 
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
         delegate?.bookmarksBarCollectionViewItem(self, isMouseOver: isMouseOver)
-    }
-
-    func mouseOverView(_ sender: MouseOverView, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
-        let operation = delegate?.bookmarksBarCollectionViewItem(self, draggingEntered: info) ?? .none
-        isMouseOver.pointee = (operation != .none)
-        return operation
-    }
-
-    func mouseOverView(_ sender: MouseOverView, draggingUpdatedWith info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
-        let operation = delegate?.bookmarksBarCollectionViewItem(self, draggingUpdatedWith: info) ?? .none
-        isMouseOver.pointee = (operation != .none)
-        return operation
-    }
-
-    func mouseOverView(_ sender: MouseOverView, draggingEndedWith info: any NSDraggingInfo) {
-        delegate?.bookmarksBarCollectionViewItem(self, draggingEndedWith: info)
-    }
-
-    func mouseOverView(_ sender: MouseOverView, performDragOperation info: any NSDraggingInfo) -> Bool {
-        delegate?.bookmarksBarCollectionViewItem(self, performDragOperation: info) ?? false
-    }
-
-    func mouseOverView(_ sender: MouseOverView, draggingExitedWith info: (any NSDraggingInfo)?) {
-        delegate?.bookmarksBarCollectionViewItem(self, draggingExitedWith: info)
     }
 
 }

@@ -26,7 +26,7 @@ protocol BookmarksBarViewModelDelegate: AnyObject {
     func bookmarksBarViewModelWidthForContainer() -> CGFloat
     func bookmarksBarViewModelReloadedData()
     func mouseDidHover(over item: Any)
-    func dragging(over item: Any?, updatedWith info: NSDraggingInfo?)
+    func dragging(over item: BookmarksBarCollectionViewItem?, updatedWith info: NSDraggingInfo?)
 
 }
 
@@ -40,7 +40,8 @@ final class BookmarksBarViewModel: NSObject {
         static let maximumButtonWidth: CGFloat = 128
         static let labelFont = NSFont.systemFont(ofSize: 12)
 
-        static let interItemGapIndicatorIdentifier = "NSCollectionElementKindInterItemGapIndicator"
+        static let additionalItemWidth: CGFloat = 28.0
+        static let ignoredXDragDistanceFromCellBorders: CGFloat = 5.0
     }
 
     enum BookmarksBarItemAction {
@@ -233,9 +234,8 @@ final class BookmarksBarViewModel: NSObject {
             textSizeCalculationLabel.stringValue = buttonTitle
             textSizeCalculationLabel.sizeToFit()
 
-            let cappedTitleWidth = ceil(min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width))
-            let calculatedWidth = min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width)
-            collectionViewItemSizeCache[buttonTitle] = cappedTitleWidth
+            let calculatedWidth = min(Constants.maximumButtonWidth, ceil(textSizeCalculationLabel.frame.width) + Constants.additionalItemWidth)
+            collectionViewItemSizeCache[buttonTitle] = calculatedWidth
 
             return ceil(calculatedWidth)
         }
@@ -272,7 +272,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
     func collectionView(_ collectionView: NSCollectionView,
                         viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
                         at indexPath: IndexPath) -> NSView {
-        guard kind == Constants.interItemGapIndicatorIdentifier else {
+        guard kind == NSCollectionView.interItemGapIndicatorIdentifier else {
             assertionFailure("Received requested for unexpected supplementary element type")
             return NSView()
         }
@@ -305,10 +305,6 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
         self.existingItemDraggingIndexPath = indexPaths.first
     }
 
-    func collectionView(_ collectionView: NSCollectionView, draggingSession session: NSDraggingSession, endedAt screenPoint: NSPoint, dragOperation operation: NSDragOperation) {
-        self.existingItemDraggingIndexPath = nil
-    }
-
     func collectionView(_ collectionView: NSCollectionView, canDragItemsAt indexPaths: Set<IndexPath>, with event: NSEvent) -> Bool {
         return true
     }
@@ -322,23 +318,31 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                         proposedIndexPath proposedDropIndexPath: AutoreleasingUnsafeMutablePointer<NSIndexPath>,
                         dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionView.DropOperation>) -> NSDragOperation {
         var destination: Any
+        var mouseLocationInsideCell: NSPoint?
+        var contractedBounds: NSRect?
+        var item = collectionView.item(at: proposedDropIndexPath.pointee as IndexPath) as? BookmarksBarCollectionViewItem
         if proposedDropOperation.pointee == .on,
+           let cell = item?.view {
+            mouseLocationInsideCell = cell.mouseLocationInsideBounds(draggingInfo.draggingLocation)
+            // ignore extra pixels at the cell borders to let to drop an item between the items
+            contractedBounds = cell.bounds.insetBy(dx: Constants.ignoredXDragDistanceFromCellBorders, dy: 0)
+        }
+        if let mouseLocationInsideCell, let contractedBounds, contractedBounds.contains(mouseLocationInsideCell),
            let folder = bookmarksBarItems[safe: proposedDropIndexPath.pointee.item]?.entity as? BookmarkFolder {
+            // dragging over a folder
             destination = folder
         } else {
+            // reordering (dragging in inter-item space)
             proposedDropOperation.pointee = .before
             destination = PseudoFolder.bookmarks
-            if let cell = collectionView.item(at: proposedDropIndexPath.pointee as IndexPath)?.view {
-                cell.withMouseLocationInViewCoordinates(draggingInfo.draggingLocation) { point in
-                    if point.x > cell.bounds.midX {
-                        // when dragging closer to the cell‘s right edge – set the insertion point after the item
-                        proposedDropIndexPath.pointee = NSIndexPath(forItem: proposedDropIndexPath.pointee.item + 1, inSection: 0)
-                    }
-                }
+            if let mouseLocationInsideCell, let contractedBounds,
+               mouseLocationInsideCell.x > contractedBounds.midX {
+                // when dragging closer to the cell‘s right edge – set the insertion point after the item
+                proposedDropIndexPath.pointee = NSIndexPath(forItem: proposedDropIndexPath.pointee.item + 1, inSection: 0)
             }
-
-            delegate?.dragging(over: nil, updatedWith: draggingInfo)
+            item = nil
         }
+        delegate?.dragging(over: item, updatedWith: draggingInfo)
 
         return dragDropManager.validateDrop(draggingInfo, to: destination)
     }
@@ -368,6 +372,18 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
         // move to a folder (index == -1) when dropping on a folder item
         let index = (destination is PseudoFolder) ? newIndexPath.item : -1
         return dragDropManager.acceptDrop(draggingInfo, to: destination, at: index)
+    }
+
+    func collectionView(_ collectionView: NSCollectionView, draggingSession session: NSDraggingSession, endedAt screenPoint: NSPoint, dragOperation operation: NSDragOperation) {
+        // `existingItemDraggingIndexPath` is reset on items reordering
+        if let indexPath = existingItemDraggingIndexPath, bookmarksBarItems.indices.contains(indexPath.item) {
+            // dragDropManager clears draggingPasteboard items on acceptDrop to another folder
+            if (session.draggingPasteboard.pasteboardItems ?? []).isEmpty {
+                bookmarksBarItems.remove(at: indexPath.item)
+                collectionView.deleteItems(at: [indexPath])
+            }
+            self.existingItemDraggingIndexPath = nil
+        }
     }
 
     /// On rare occasions, a click event will be sent immediately after a drag and drop operation completes.
@@ -432,39 +448,6 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
         if isMouseOver {
             delegate?.mouseDidHover(over: item)
         }
-    }
-
-    func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, draggingEntered info: any NSDraggingInfo) -> NSDragOperation {
-        guard let folder = item.representedObject as? BookmarkFolder else { return .none }
-        delegate?.dragging(over: item, updatedWith: info)
-        return dragDropManager.validateDrop(info, to: folder)
-    }
-
-    func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, draggingUpdatedWith info: any NSDraggingInfo) -> NSDragOperation {
-        guard let folder = item.representedObject as? BookmarkFolder else { return .none }
-        delegate?.dragging(over: item, updatedWith: info)
-        return dragDropManager.validateDrop(info, to: folder)
-    }
-
-    func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, performDragOperation info: any NSDraggingInfo) -> Bool {
-        guard let folder = item.representedObject as? BookmarkFolder,
-              dragDropManager.acceptDrop(info, to: folder, at: -1) else { return false }
-
-        // remove the Bookmarks Bar item with animation when dragged into a folder
-        if let existingIndexPath = existingItemDraggingIndexPath, bookmarksBarItems.indices.contains(existingIndexPath.item),
-           let collectionView = item.collectionView {
-            self.bookmarksBarItems.remove(at: existingIndexPath.item)
-            collectionView.animator().deleteItems(at: [existingIndexPath])
-            existingItemDraggingIndexPath = nil
-        }
-        return true
-    }
-
-    func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, draggingEndedWith info: any NSDraggingInfo) {
-        delegate?.dragging(over: nil, updatedWith: info)
-    }
-
-    func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, draggingExitedWith info: (any NSDraggingInfo)?) {
     }
 
 }

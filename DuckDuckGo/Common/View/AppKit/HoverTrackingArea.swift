@@ -109,6 +109,12 @@ final class HoverTrackingArea: NSTrackingArea {
         view?.mouseEntered(with: event)
     }
 
+    @objc func mouseMoved(_ event: NSEvent) {
+        if let view, !view.isMouseOver {
+            view.isMouseOver = true
+        }
+    }
+
     @objc func mouseExited(_ event: NSEvent) {
         view?.isMouseOver = false
         view?.mouseExited(with: event)

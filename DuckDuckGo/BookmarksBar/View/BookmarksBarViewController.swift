@@ -194,17 +194,20 @@ final class BookmarksBarViewController: NSViewController {
         cancellables.removeAll()
     }
 
-    private func dragging(over view: NSView?, representing folder: BookmarkFolder?, updatedWith info: NSDraggingInfo?) {
+    /// Open bookmarks submenu after delay when dragging an item over a Folder (or cancel when dragging out of it)
+    /// - Returns: was submenu shown?
+    @discardableResult
+    private func dragging(over view: NSView?, representing folder: BookmarkFolder?, updatedWith info: NSDraggingInfo?) -> Bool {
         guard let view, let folder, let cursorPosition = info?.draggingLocation else {
             dragDestination = nil
             // close all Bookmarks popovers including the Bookmarks Button popover
             BookmarkListPopover.closeBookmarkListPopovers(shownIn: self.view.window)
-            return
+            return false
         }
         if let bookmarkListPopover, bookmarkListPopover.isShown,
            (bookmarkListPopover.viewController.representedObject as? BookmarkFolder)?.id == folder.id {
             // folder menu already shown
-            return
+            return true
         }
 
         // show folder bookmarks menu after 0.3
@@ -214,10 +217,12 @@ final class BookmarksBarViewController: NSViewController {
 
             if Date().timeIntervalSince(dragDestination.hoverStarted) >= Self.dragOverFolderExpandDelay {
                 showSubmenu(for: folder, fromView: view)
+                return true
             }
         } else {
             self.dragDestination = (folder: folder, mouseLocation: cursorPosition, hoverStarted: Date())
         }
+        return false
     }
 
     // MARK: - Layout
@@ -228,7 +233,7 @@ final class BookmarksBarViewController: NSViewController {
     }
 
     func createCenteredCollectionViewLayout() -> NSCollectionViewLayout {
-        return NSCollectionViewCompositionalLayout { [unowned self] _, _ in
+        return BookmarksBarCenteredLayout { [unowned self] _, _ in
             return createCenteredLayout(centered: viewModel.clippedItems.isEmpty)
         }
     }
@@ -324,18 +329,48 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         }
     }
 
-    func dragging(over item: Any?, updatedWith info: (any NSDraggingInfo)?) {
-        guard let info, let item = item as? BookmarksBarCollectionViewItem,
+    func dragging(over item: BookmarksBarCollectionViewItem?, updatedWith info: (any NSDraggingInfo)?) {
+        guard let info, let item = item,
               let folder = item.representedObject as? BookmarkFolder else {
+            info?.draggingInfoUpdatedTimerCancellable = nil
+
             self.dragging(over: nil, representing: nil, updatedWith: info)
             return
         }
 
-        self.dragging(over: item.view, representing: folder, updatedWith: info)
+        let submenuShown = self.dragging(over: item.view, representing: folder, updatedWith: info)
+        if !submenuShown {
+            let draggingLocation = info.draggingLocation
+            // NSCollectionView doesn‘t send extra `draggingUpdated` events when cursor stays at the same point
+            // here we simulate the standard `NSView.draggingUpdated` behavior sent continuously while dragging
+            // to open the Folder submenu after a delay while dragging over it.
+            Task { @MainActor [weak self, weak info] in
+                while let self, let info, info.draggingLocation == draggingLocation {
+                    if self.dragging(over: item.view, representing: folder, updatedWith: info) == true {
+                        return
+                    }
+                    try await Task.sleep(interval: 0.05)
+                }
+            }
+        }
     }
 
 }
 
+private let draggingInfoUpdatedTimerKey = UnsafeRawPointer(bitPattern: "draggingInfoUpdatedTimerKey".hashValue)!
+extension NSDraggingInfo {
+    var draggingInfoUpdatedTimerCancellable: AnyCancellable? {
+        get {
+            objc_getAssociatedObject(self, draggingInfoUpdatedTimerKey) as? AnyCancellable
+        }
+        set {
+            objc_setAssociatedObject(self, draggingInfoUpdatedTimerKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+    }
+
+}
+
+// MARK: - Drag&Drop over Clipped Items indicator
 extension BookmarksBarViewController: MouseOverButtonDelegate {
 
     func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {

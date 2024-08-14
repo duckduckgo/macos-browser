@@ -66,9 +66,23 @@ final class BookmarkListPopover: NSPopover {
 
     override func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
         Self.closeBookmarkListPopovers(shownIn: mainWindow, except: self)
+
+        var positioningView = positioningView
+        var positioningRect = positioningRect
+        // add temporary view to bookmarks menu table to prevent popover jumping on table reloading
+        // showing the popover against coordinates in the table view breaks popover positioning
+        // the view will be removed in `close()`
+        if positioningView is NSTableCellView,
+           let tableView = positioningView.superview?.superview as? NSTableView {
+            let v = NSView(frame: positioningView.convert(positioningRect, to: tableView))
+            positioningRect = v.bounds
+            positioningView = v
+            tableView.addSubview(v)
+        }
+
         self.positioningView = positioningView
         self.preferredEdge = preferredEdge
-        viewController.adjustPreferredContentSize(positionedAt: preferredEdge, of: positioningView, contentInsets: Self.popoverInsets)
+        viewController.adjustPreferredContentSize(positionedRelativeTo: positioningRect, of: positioningView, at: preferredEdge)
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
     }
 
@@ -84,7 +98,7 @@ final class BookmarkListPopover: NSPopover {
 
         if case .maxX = preferredEdge { // submenu
             // adjust the menu popover Y 16pt above the positioning view bottom edge
-            frame.origin.y = min(max(screenFrame.minY, screenPoint.y - frame.size.height + 23), screenFrame.maxY)
+            frame.origin.y = min(max(screenFrame.minY, screenPoint.y - frame.size.height + 36), screenFrame.maxY)
 
         } else { // context menu
             // align the menu popover content by the left edge of the positioning view but keeping the popover frame inside the screen bounds
@@ -103,6 +117,14 @@ final class BookmarkListPopover: NSPopover {
         for case let .some(popover as Self) in (window.childWindows ?? []).map(\.contentViewController?.nextResponder) where popover !== popoverToKeep && popover.isShown {
             popover.close()
         }
+    }
+
+    override func close() {
+        // remove temporary positioning view from bookmarks menu table
+        if let positioningView, positioningView.superview is NSTableView {
+            positioningView.removeFromSuperview()
+        }
+        super.close()
     }
 
 }

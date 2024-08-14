@@ -14,7 +14,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aEY-jN-qvL" userLabel="Favicon Image View">
-                    <rect key="frame" x="7" y="42" width="16" height="16"/>
+                    <rect key="frame" x="6" y="42" width="16" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="LbV-fW-nWP"/>
                         <constraint firstAttribute="width" constant="16" id="s73-Is-qty"/>
@@ -23,11 +23,11 @@
                     <color key="contentTintColor" name="BlackWhite80"/>
                 </imageView>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fMp-kj-J3A">
-                    <rect key="frame" x="25" y="42" width="154" height="15"/>
+                    <rect key="frame" x="24" y="42" width="156" height="15"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingMiddle" alignment="left" title="Bookmark" id="7mq-oj-2L8">
                         <font key="font" metaFont="cellTitle"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                     </textFieldCell>
                 </textField>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="IHK-ff-XkT" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -55,10 +55,10 @@
                 <constraint firstItem="aEY-jN-qvL" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="FRD-J2-zMP"/>
                 <constraint firstItem="fMp-kj-J3A" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="H0Q-is-CJW"/>
                 <constraint firstItem="IHK-ff-XkT" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="RMp-c3-xiB"/>
-                <constraint firstAttribute="trailing" secondItem="fMp-kj-J3A" secondAttribute="trailing" constant="7" id="lxn-aE-KVB"/>
+                <constraint firstAttribute="trailing" secondItem="fMp-kj-J3A" secondAttribute="trailing" constant="6" id="lxn-aE-KVB"/>
                 <constraint firstAttribute="bottom" secondItem="IHK-ff-XkT" secondAttribute="bottom" id="qDr-an-58u"/>
                 <constraint firstItem="fMp-kj-J3A" firstAttribute="leading" secondItem="aEY-jN-qvL" secondAttribute="trailing" constant="4" id="svg-gd-cvC"/>
-                <constraint firstItem="aEY-jN-qvL" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="7" id="vtS-fU-Vm0"/>
+                <constraint firstItem="aEY-jN-qvL" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="6" id="vtS-fU-Vm0"/>
             </constraints>
             <point key="canvasLocation" x="255" y="121"/>
         </customView>
