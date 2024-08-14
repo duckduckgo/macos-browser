@@ -135,7 +135,6 @@ final class URLEventHandler {
             }
 
             if url.scheme?.isNetworkProtectionScheme == false && url.scheme?.isDataBrokerProtectionScheme == false {
-                WaitlistModalDismisser.dismissWaitlistModalViewControllerIfNecessary(url)
                 WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
             }
         }
