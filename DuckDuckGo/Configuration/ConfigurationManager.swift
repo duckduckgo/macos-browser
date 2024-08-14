@@ -24,52 +24,17 @@ import Common
 import Networking
 import PixelKit
 
-final class ConfigurationManager {
+final class ConfigurationManager: DefaultConfigurationManager {
 
-    enum Error: Swift.Error {
-
-        case timeout
-        case bloomFilterSpecNotFound
-        case bloomFilterBinaryNotFound
-        case bloomFilterPersistenceFailed
-        case bloomFilterExclusionsNotFound
-        case bloomFilterExclusionsPersistenceFailed
-
-        func withUnderlyingError(_ underlyingError: Swift.Error) -> Swift.Error {
-            let nsError = self as NSError
-            return NSError(domain: nsError.domain, code: nsError.code, userInfo: [NSUnderlyingErrorKey: underlyingError])
-        }
-
-    }
-
-    enum Constants {
-
-        static let downloadTimeoutSeconds = 60.0 * 5
-#if DEBUG
-        static let refreshPeriodSeconds = 60.0 * 2 // 2 minutes
-#else
-        static let refreshPeriodSeconds = 60.0 * 30 // 30 minutes
-#endif
-        static let retryDelaySeconds = 60.0 * 60 * 1 // 1 hour delay before checking again if something went wrong last time
-        static let refreshCheckIntervalSeconds = 60.0 // check if we need a refresh every minute
-
-    }
-
-    static let shared = ConfigurationManager()
-    static let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
+    static let shared = ConfigurationManager(fetcher: ConfigurationFetcher(store: ConfigurationStore.shared,
+                                                                           log: .config,
+                                                                           eventMapping: configurationDebugEvents))
 
     @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
     private(set) var lastUpdateTime: Date
 
     @UserDefaultsWrapper(key: .configLastInstalled, defaultValue: nil)
     private(set) var lastConfigurationInstallDate: Date?
-
-    private var timerCancellable: AnyCancellable?
-    private var lastRefreshCheckTime: Date = Date()
-
-    private lazy var fetcher = ConfigurationFetcher(store: ConfigurationStore.shared,
-                                                    log: .config,
-                                                    eventMapping: Self.configurationDebugEvents)
 
     static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
         let domainEvent: GeneralPixel
@@ -81,26 +46,12 @@ final class ConfigurationManager {
         PixelKit.fire(DebugEvent(domainEvent, error: error))
     }
 
-    func start() {
-        os_log("Starting configuration refresh timer", log: .config, type: .debug)
-        timerCancellable = Timer.publish(every: Constants.refreshCheckIntervalSeconds, on: .main, in: .default)
-            .autoconnect()
-            .receive(on: Self.queue)
-            .sink(receiveValue: { _ in
-                self.lastRefreshCheckTime = Date()
-                self.refreshIfNeeded()
-            })
-        Task {
-            await refreshNow()
-        }
-    }
-
     func log() {
         os_log("last update %{public}s", log: .config, type: .default, String(describing: lastUpdateTime))
         os_log("last refresh check %{public}s", log: .config, type: .default, String(describing: lastRefreshCheckTime))
     }
 
-    private func refreshNow(isDebug: Bool = false) async {
+    override public func refreshNow(isDebug: Bool = false) async {
         let updateTrackerBlockingDependenciesTask = Task {
             let didFetchAnyTrackerBlockingDependencies = await fetchTrackerBlockingDependencies(isDebug: isDebug)
             if didFetchAnyTrackerBlockingDependencies {
@@ -172,34 +123,6 @@ final class ConfigurationManager {
         os_log("Failed to complete configuration update %@", log: .config, type: .error, error.localizedDescription)
         PixelKit.fire(DebugEvent(GeneralPixel.configurationFetchError(error: error)))
         tryAgainSoon()
-    }
-
-    @discardableResult
-    public func refreshIfNeeded() -> Task<Void, Never>? {
-        guard isReadyToRefresh else {
-            os_log("Configuration refresh is not needed at this time", log: .config, type: .debug)
-            return nil
-        }
-        return Task {
-            await refreshNow()
-        }
-    }
-
-    private var isReadyToRefresh: Bool { Date().timeIntervalSince(lastUpdateTime) > Constants.refreshPeriodSeconds }
-
-    public func forceRefresh(isDebug: Bool = false) {
-        Task {
-            await refreshNow(isDebug: isDebug)
-        }
-    }
-
-    private func tryAgainLater() {
-        lastUpdateTime = Date()
-    }
-
-    private func tryAgainSoon() {
-        // Set the last update time to in the past so it triggers again sooner
-        lastUpdateTime = Date(timeIntervalSinceNow: Constants.refreshPeriodSeconds - Constants.retryDelaySeconds)
     }
 
     private func updateTrackerBlockingDependencies() {

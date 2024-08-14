@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		020807B22C6CFF95006F94C4 /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = 020807B12C6CFF95006F94C4 /* Configuration */; };
 		021EA0802BD2A9D500772C9A /* TabsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021EA07F2BD2A9D500772C9A /* TabsPreferences.swift */; };
 		021EA0812BD2A9D500772C9A /* TabsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021EA07F2BD2A9D500772C9A /* TabsPreferences.swift */; };
 		021EA0842BD6E01A00772C9A /* TabsPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021EA0822BD6DF1B00772C9A /* TabsPreferencesTests.swift */; };
@@ -2948,6 +2949,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		020807B52C6D00A8006F94C4 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		021EA07F2BD2A9D500772C9A /* TabsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabsPreferences.swift; sourceTree = "<group>"; };
 		021EA0822BD6DF1B00772C9A /* TabsPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabsPreferencesTests.swift; sourceTree = "<group>"; };
 		0230C0A2272080090018F728 /* KeyedCodingExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyedCodingExtension.swift; sourceTree = "<group>"; };
@@ -4523,6 +4525,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */,
+				020807B22C6CFF95006F94C4 /* Configuration in Frameworks */,
 				F1D0428E2BFB9F9C00A31506 /* Subscription in Frameworks */,
 				9D9AE8F92AAA3AD00026E7DC /* DataBrokerProtection in Frameworks */,
 			);
@@ -6836,6 +6839,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				020807B52C6D00A8006F94C4 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -9009,6 +9013,7 @@
 				9D9AE8F82AAA3AD00026E7DC /* DataBrokerProtection */,
 				9DEF97E02B06C4EE00764F03 /* Networking */,
 				F1D0428D2BFB9F9C00A31506 /* Subscription */,
+				020807B12C6CFF95006F94C4 /* Configuration */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGo Personal Information Removal.app */;
@@ -13535,6 +13540,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		020807B12C6CFF95006F94C4 /* Configuration */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Configuration;
+		};
 		08D4923DC968236E22E373E2 /* Crashes */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = FAE06B199CA1F209B55B34E9 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
