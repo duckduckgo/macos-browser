@@ -20,13 +20,13 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class BookmarkAllTabsDialogCoordinatorViewModelTests: XCTestCase {
     private var sut: BookmarkAllTabsDialogCoordinatorViewModel<BookmarkAllTabsDialogViewModelMock, AddEditBookmarkFolderDialogViewModelMock>!
     private var bookmarkAllTabsViewModelMock: BookmarkAllTabsDialogViewModelMock!
     private var bookmarkFolderViewModelMock: AddEditBookmarkFolderDialogViewModelMock!
     private var cancellables: Set<AnyCancellable>!
 
+    @MainActor
     override func setUpWithError() throws {
         try super.setUpWithError()
 
@@ -61,6 +61,7 @@ final class BookmarkAllTabsDialogCoordinatorViewModelTests: XCTestCase {
 
     }
 
+    @MainActor
     func testWhenAddFolderActionIsCalledThenSetSelectedFolderOnFolderViewModelIsCalledAndReturnAddFolderViewState() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: "Folder")
@@ -112,6 +113,7 @@ final class BookmarkAllTabsDialogCoordinatorViewModelTests: XCTestCase {
         XCTAssertTrue(didCallChangeValue)
     }
 
+    @MainActor
     func testWhenAddFolderPublisherSendsEventThenSelectedFolderOnBookmarkAllTabsViewModelIsSet() {
         // GIVEN
         let expectation = self.expectation(description: #function)
@@ -129,6 +131,7 @@ final class BookmarkAllTabsDialogCoordinatorViewModelTests: XCTestCase {
 
     // MARK: - Integration Test
 
+    @MainActor
     func testWhenAddFolderMultipleTimesThenFolderListIsUpdatedAndSelectedFolderIsNil() {
         // GIVEN
         let expectation = self.expectation(description: #function)

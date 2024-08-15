@@ -25,12 +25,14 @@ extension TabCollectionViewModelTests {
 
     // MARK: - Select
 
+    @MainActor
     func test_WithPinnedTabs_WhenTabCollectionViewModelIsInitializedThenSelectedTabViewModelIsFirst() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
 
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenSelectionIndexIsOutOfBoundsThenSelectedTabViewModelIsNil() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
 
@@ -41,6 +43,7 @@ extension TabCollectionViewModelTests {
         XCTAssertNil(tabCollectionViewModel.selectedTabViewModel)
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenSelectionIndexPointsToPinnedTabThenSelectedTabViewModelReturnsTheTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendNewTab()
@@ -51,6 +54,7 @@ extension TabCollectionViewModelTests {
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.pinnedTabsManager!.tabViewModel(at: 0))
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenSelectNextIsCalledThenNextPinnedTabIsSelected() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendPinnedTab()
@@ -61,6 +65,7 @@ extension TabCollectionViewModelTests {
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.pinnedTabsManager!.tabViewModel(at: 1))
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenLastUnpinnedTabIsSelectedThenSelectNextChangesSelectionToFirstPinnedTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
 
@@ -70,6 +75,7 @@ extension TabCollectionViewModelTests {
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.pinnedTabsManager!.tabViewModel(at: 0))
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenLastPinnedTabIsSelectedThenSelectNextChangesSelectionToFirstUnpinnedTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
 
@@ -79,6 +85,7 @@ extension TabCollectionViewModelTests {
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenSelectPreviousIsCalledThenPreviousPinnedTabIsSelected() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendPinnedTab()
@@ -89,6 +96,7 @@ extension TabCollectionViewModelTests {
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.pinnedTabsManager!.tabViewModel(at: 0))
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenFirstUnpinnedTabIsSelectedThenSelectPreviousChangesSelectionToLastPinnedTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendPinnedTab()
@@ -99,6 +107,7 @@ extension TabCollectionViewModelTests {
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.pinnedTabsManager!.tabViewModel(at: 1))
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenFirstPinnedTabIsSelectedThenSelectPreviousChangesSelectionToLastUnpinnedTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
 
@@ -110,6 +119,7 @@ extension TabCollectionViewModelTests {
 
     // MARK: - Insert
 
+    @MainActor
     func test_WithPinnedTabsManager_WhenInsertNewTabIsCalledThenNewTabIsAlsoSelected() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
 
@@ -120,6 +130,7 @@ extension TabCollectionViewModelTests {
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenInsertChildOfPinnedTabAndNoOtherChildTabIsNearParent_ThenTabIsInsertedAsFirstUnpinnedTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
 
@@ -132,6 +143,7 @@ extension TabCollectionViewModelTests {
         XCTAssertIdentical(tab, tabCollectionViewModel.tabViewModel(at: 0)?.tab)
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenInsertChildOfPinnedTabAndOtherChildTabsAreNearParent_ThenTabIsInsertedAtTheEndOfChildList() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendNewTab()
@@ -150,6 +162,7 @@ extension TabCollectionViewModelTests {
 
     // MARK: - Insert or Append
 
+    @MainActor
     func test_WithPinnedTabs_WhenInsertOrAppendCalledPreferencesAreRespected() {
         let persistor = MockTabsPreferencesPersistor()
         var tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection(), pinnedTabsManager: PinnedTabsManager(),
@@ -178,6 +191,7 @@ extension TabCollectionViewModelTests {
 
     // MARK: - Remove
 
+    @MainActor
     func test_WithPinnedTabs_WhenRemoveIsCalledWithIndexOutOfBoundsThenNoTabIsRemoved() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
 
@@ -186,6 +200,7 @@ extension TabCollectionViewModelTests {
         XCTAssertEqual(tabCollectionViewModel.pinnedTabsCollection?.tabs.count, 1)
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenPinnedTabIsRemovedAndSelectedPinnedTabHasHigherIndexThenSelectionIsPreserved() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendPinnedTab()
@@ -200,6 +215,7 @@ extension TabCollectionViewModelTests {
         XCTAssertEqual(tabCollectionViewModel.selectionIndex, .pinned(1))
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenSelectedPinnedTabIsRemovedThenNextPinnedTabWithHigherIndexIsSelected() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendPinnedTab()
@@ -213,6 +229,7 @@ extension TabCollectionViewModelTests {
         XCTAssertEqual(tabCollectionViewModel.selectionIndex, .pinned(1))
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenSelectedLastPinnedTabIsRemovedThenFirstUnpinnedTabIsSelected() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendPinnedTab()
@@ -225,6 +242,7 @@ extension TabCollectionViewModelTests {
         XCTAssertEqual(tabCollectionViewModel.selectionIndex, .unpinned(0))
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenLastTabIsRemoved_ThenLastPinnedTabIsSelected() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendPinnedTab()
@@ -236,6 +254,7 @@ extension TabCollectionViewModelTests {
         XCTAssertEqual(tabCollectionViewModel.selectionIndex, .pinned(1))
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenNoTabIsSelectedAndTabIsRemoved_ThenSelectionStaysEmpty() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendPinnedTab()
@@ -249,6 +268,7 @@ extension TabCollectionViewModelTests {
         XCTAssertNil(tabCollectionViewModel.selectionIndex)
     }
 
+    @MainActor
     func test_WithPinnedTabs_WhenChildTabIsInsertedAndRemoved_ThenPinnedParentIsSelectedBack() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendPinnedTab()
@@ -265,6 +285,7 @@ extension TabCollectionViewModelTests {
         XCTAssertEqual(tabCollectionViewModel.selectionIndex, .pinned(0))
     }
 
+    @MainActor
     func test_WithPinnedTabs_RemoveSelected() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendNewTab()
@@ -280,6 +301,7 @@ extension TabCollectionViewModelTests {
 
     // MARK: - Duplicate
 
+    @MainActor
     func test_WithPinnedTabs_WhenPinnedTabIsDuplicatedThenItsCopyHasHigherIndexByOne() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         let firstTabViewModel = tabCollectionViewModel.pinnedTabsManager!.tabViewModel(at: 0)
@@ -291,6 +313,7 @@ extension TabCollectionViewModelTests {
 
     // MARK: - Publishers
 
+    @MainActor
     func test_WithPinnedTabs_WhenSelectionIndexIsUpdatedWithTheSameValueThenSelectedTabViewModelIsOnlyPublishedOnce() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         let firstTabViewModel = tabCollectionViewModel.pinnedTabsManager!.tabViewModel(at: 0)

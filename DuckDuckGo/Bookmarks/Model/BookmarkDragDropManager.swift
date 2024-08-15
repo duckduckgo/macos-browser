@@ -38,8 +38,8 @@ final class BookmarkDragDropManager {
     }
 
     func validateDrop(_ info: NSDraggingInfo, to destination: Any) -> NSDragOperation {
-        let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard)
-        let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard)
+        let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard.pasteboardItems)
+        let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard.pasteboardItems)
 
         let bookmarksDragOperation = bookmarks.flatMap { validateMove(for: $0, destination: destination) }
         let foldersDragOperation = folders.flatMap { validateMove(for: $0, destination: destination) }

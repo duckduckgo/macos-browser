@@ -198,7 +198,6 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
-        refreshSurveyMessages()
     }
 
     func windowDidResignKey() {
@@ -217,16 +216,6 @@ final class MainViewController: NSViewController {
         // This won't work until the bookmarks bar is actually visible which it isn't until the next ui cycle
         DispatchQueue.main.async {
             self.bookmarksBarViewController.showBookmarksBarPrompt()
-        }
-    }
-
-    private lazy var surveyMessaging: DefaultSurveyRemoteMessaging = {
-        return DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager)
-    }()
-
-    func refreshSurveyMessages() {
-        Task {
-            await surveyMessaging.fetchRemoteMessages()
         }
     }
 

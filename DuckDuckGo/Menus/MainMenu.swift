@@ -601,9 +601,6 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
                 NSMenuItem(title: "Show Credentials Saved Popover", action: #selector(MainViewController.showCredentialsSavedPopover))
                 NSMenuItem(title: "Show Pop Up Window", action: #selector(MainViewController.showPopUpWindow))
-                NSMenuItem(title: "Show VPN Thank You Modal", action: #selector(MainViewController.showVPNThankYouModal))
-                NSMenuItem(title: "Show PIR Thank You Modal", action: #selector(MainViewController.showPIRThankYouModal))
-                NSMenuItem(title: "Reset Thank You Modal Checks", action: #selector(MainViewController.resetThankYouModalChecks))
             }
             NSMenuItem(title: "Remote Configuration") {
                 customConfigurationUrlMenuItem
@@ -622,10 +619,8 @@ final class MainMenu: NSMenu {
                 .submenu(SyncDebugMenu())
                 .withAccessibilityIdentifier("MainMenu.syncAndBackup")
 
-#if DBP
             NSMenuItem(title: "Personal Information Removal")
                 .submenu(DataBrokerProtectionDebugMenu())
-#endif
 
             if case .normal = NSApp.runType {
                 NSMenuItem(title: "VPN")
@@ -657,10 +652,6 @@ final class MainMenu: NSMenu {
                                   currentViewController: { WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController },
                                   openSubscriptionTab: { WindowControllersManager.shared.showTab(with: .subscription($0)) },
                                   subscriptionManager: Application.appDelegate.subscriptionManager)
-
-            NSMenuItem(title: "Privacy Pro Survey") {
-                NSMenuItem(title: "Reset Remote Message Cache", action: #selector(MainViewController.resetSurveyRemoteMessages))
-            }
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }

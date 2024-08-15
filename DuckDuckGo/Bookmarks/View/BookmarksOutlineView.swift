@@ -151,8 +151,8 @@ final class BookmarksOutlineView: NSOutlineView {
             } else if numberOfRows > 0 /* && highlightedRow == nil */ {
                 if let window, let windowParent = window.parent,
                    type(of: windowParent) == type(of: window) /* _NSPopoverWindow */,
-                    let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
-                    let outlineView = scrollView.documentView as? Self {
+                   let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
+                   let outlineView = scrollView.documentView as? Self {
 
                     // when no highlighted row in child menu popover: send event to parent menu
                     outlineView.keyDown(with: event)
@@ -312,6 +312,17 @@ final class BookmarksOutlineView: NSOutlineView {
             highlightedRowView?.isInKeyWindow = true
             highlightedCellView?.isInKeyWindow = true
         }
+    }
+
+    func isItemVisible(_ item: Any) -> Bool {
+        let rowIndex = self.row(forItem: item)
+
+        if rowIndex == -1 {
+            return false
+        }
+
+        let visibleRowsRange = self.rows(in: self.visibleRect)
+        return visibleRowsRange.contains(rowIndex)
     }
 
 }

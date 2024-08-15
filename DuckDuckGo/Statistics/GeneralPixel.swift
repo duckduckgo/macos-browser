@@ -130,15 +130,12 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerAutoplaySettingsOff
     case duckPlayerNewTabSettingsOn
     case duckPlayerNewTabSettingsOff
+    case duckPlayerContingencySettingsDisplayed
+    case duckPlayerContingencyLearnMoreClicked
 
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
     case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
-
-    // Survey
-    case surveyRemoteMessageDisplayed(messageID: String)
-    case surveyRemoteMessageDismissed(messageID: String)
-    case surveyRemoteMessageOpened(messageID: String)
 
     // VPN
     case vpnBreakageReport(category: String, description: String, metadata: String)
@@ -404,8 +401,6 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case burnerTabMisplaced
 
-    case surveyRemoteMessageFetchingFailed
-    case surveyRemoteMessageStorageFailed
     case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
 
     // Tracks installation without tracking retention.
@@ -611,6 +606,10 @@ enum GeneralPixel: PixelKitEventV2 {
             return "duckplayer_mac_newtab_setting-on"
         case .duckPlayerNewTabSettingsOff:
             return "duckplayer_mac_newtab_setting-off"
+        case .duckPlayerContingencySettingsDisplayed:
+            return "duckplayer_mac_contingency_settings-displayed"
+        case .duckPlayerContingencyLearnMoreClicked:
+            return "duckplayer_mac_contingency_learn-more-clicked"
         case .dashboardProtectionAllowlistAdd:
             return "m_mac_mp_wla"
         case .dashboardProtectionAllowlistRemove:
@@ -626,12 +625,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .vpnBreakageReport:
             return "m_mac_vpn_breakage_report"
 
-        case .surveyRemoteMessageDisplayed(let messageID):
-            return "m_mac_survey_remote_message_displayed_\(messageID)"
-        case .surveyRemoteMessageDismissed(let messageID):
-            return "m_mac_survey_remote_message_dismissed_\(messageID)"
-        case .surveyRemoteMessageOpened(let messageID):
-            return "m_mac_survey_remote_message_opened_\(messageID)"
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
 
@@ -995,8 +988,6 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .burnerTabMisplaced: return "burner_tab_misplaced"
 
-        case .surveyRemoteMessageFetchingFailed: return "survey_remote_message_fetching_failed"
-        case .surveyRemoteMessageStorageFailed: return "survey_remote_message_storage_failed"
         case .loginItemUpdateError: return "login-item_update-error"
 
             // Installation Attribution

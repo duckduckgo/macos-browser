@@ -19,7 +19,6 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     func testWhenBookmarkStoreHasNoFolders_ThenOnlyDefaultNodesAreReturned() {
@@ -39,6 +38,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         XCTAssert(representedObjects.first === PseudoFolder.bookmarks)
     }
 
+    @MainActor
     func testWhenBookmarkStoreHasNoTopLevelFolders_ThenTheDefaultBookmarksNodeHasNoChildren() throws {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
@@ -59,6 +59,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         XCTAssertEqual(pseudoFolder.name, "Bookmarks")
     }
 
+    @MainActor
     func testWhenBookmarkStoreHasTopLevelFolders_ThenTheDefaultBookmarksNodeHasThemAsChildren() {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
@@ -80,6 +81,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         XCTAssert(childNode.representedObjectEquals(topLevelFolder))
     }
 
+    @MainActor
     func testWhenBookmarkStoreHasNestedFolders_ThenTheTreeContainsNestedNodes() {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
