@@ -78,7 +78,6 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
 
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
 
-    typealias FeatureFlagger = DataBrokerProtectionMigrationsFeatureFlagger
     typealias MigrationsProvider = DataBrokerProtectionDatabaseMigrationsProvider
 
     public static func defaultDatabaseURL() -> URL {
@@ -94,14 +93,8 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     /// - Returns: DefaultDataBrokerProtectionDatabaseProvider instance
     public static func create<T: MigrationsProvider>(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
                                                      key: Data,
-                                                     featureFlagger: FeatureFlagger = DefaultDataBrokerProtectionMigrationsFeatureFlagger(),
                                                      migrationProvider: T.Type = DefaultDataBrokerProtectionDatabaseMigrationsProvider.self) throws -> DefaultDataBrokerProtectionDatabaseProvider {
-
-        if featureFlagger.isUserIn(percent: 10) {
-            return try DefaultDataBrokerProtectionDatabaseProvider(file: file, key: key, registerMigrationsHandler: migrationProvider.v3Migrations)
-        } else {
-            return try DefaultDataBrokerProtectionDatabaseProvider(file: file, key: key, registerMigrationsHandler: migrationProvider.v2Migrations)
-        }
+            try DefaultDataBrokerProtectionDatabaseProvider(file: file, key: key, registerMigrationsHandler: migrationProvider.v3Migrations)
     }
 
     public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
