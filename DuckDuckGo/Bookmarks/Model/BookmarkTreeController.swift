@@ -19,13 +19,11 @@
 import Foundation
 
 protocol BookmarkTreeControllerDataSource: AnyObject {
-
     func treeController(childNodesFor: BookmarkNode, sortMode: BookmarksSortMode) -> [BookmarkNode]
 }
 
 protocol BookmarkTreeControllerSearchDataSource: AnyObject {
-
-    func nodes(for searchQuery: String, sortMode: BookmarksSortMode) -> [BookmarkNode]
+    func nodes(forSearchQuery searchQuery: String, sortMode: BookmarksSortMode) -> [BookmarkNode]
 }
 
 final class BookmarkTreeController {
@@ -75,8 +73,8 @@ final class BookmarkTreeController {
 
     // MARK: - Public
 
-    func rebuild(for searchQuery: String, sortMode: BookmarksSortMode) {
-        rootNode.childNodes = searchDataSource?.nodes(for: searchQuery, sortMode: sortMode) ?? []
+    func rebuild(forSearchQuery searchQuery: String, sortMode: BookmarksSortMode) {
+        rootNode.childNodes = searchDataSource?.nodes(forSearchQuery: searchQuery, sortMode: sortMode) ?? []
     }
 
     func rebuild(for sortMode: BookmarksSortMode, withRootFolder rootFolder: BookmarkFolder? = nil) {
@@ -125,9 +123,7 @@ final class BookmarkTreeController {
 
     @discardableResult
     private func rebuildChildNodes(node: BookmarkNode, sortMode: BookmarksSortMode = .manual) -> Bool {
-        guard node.canHaveChildNodes else {
-            return false
-        }
+        guard node.canHaveChildNodes else { return false }
 
         let childNodes: [BookmarkNode] = dataSource?.treeController(childNodesFor: node, sortMode: sortMode) ?? []
         var childNodesDidChange = childNodes != node.childNodes
