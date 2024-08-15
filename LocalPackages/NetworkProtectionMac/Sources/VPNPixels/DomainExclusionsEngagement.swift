@@ -39,7 +39,7 @@ public enum DomainExclusionsEngagement: VPNPixel {
     //
     // var name: String
 
-    public var unscopedName: String {
+    public var unscopedPixelName: String {
         switch self {
         case .excluded:
             return "domain_excluded"

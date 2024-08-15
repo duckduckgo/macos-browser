@@ -30,7 +30,6 @@ let package = Package(
         .library(name: "NetworkProtectionProxy", targets: ["NetworkProtectionProxy"]),
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"]),
         .library(name: "VPNAppLauncher", targets: ["VPNAppLauncher"]),
-        .library(name: "VPNPixels", targets: ["VPNPixels"]),
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "184.0.1"),
@@ -102,6 +101,7 @@ let package = Package(
         .target(
             name: "NetworkProtectionUI",
             dependencies: [
+                "VPNPixels",
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),

@@ -27,7 +27,7 @@ public protocol VPNPixel: PixelKitEventV2 {
 
     /// The name of the pixel without the module prefix.
     ///
-    var unscopedName: String { get }
+    var unscopedPixelName: String { get }
 }
 
 extension VPNPixel {
@@ -35,7 +35,7 @@ extension VPNPixel {
     /// Convenience method to provide the scoped pixel name.
     ///
     public var name: String {
-        scopedPixelName(forUnscopedPixelName: unscopedName)
+        scopedPixelName(forUnscopedPixelName: unscopedPixelName)
     }
 
     func scopedPixelName(forUnscopedPixelName unscopedName: String) -> String {

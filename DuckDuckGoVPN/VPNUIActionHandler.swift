@@ -30,15 +30,12 @@ final class VPNUIActionHandler: VPNUIActionHandling {
 
     private let appLauncher: AppLauncher
     private let proxySettings: TransparentProxySettings
-    private let pixelKit: PixelFiring?
 
     init(appLauncher: AppLauncher,
-         proxySettings: TransparentProxySettings,
-         pixelKit: PixelFiring? = PixelKit.shared) {
+         proxySettings: TransparentProxySettings) {
 
         self.appLauncher = appLauncher
         self.proxySettings = proxySettings
-        self.pixelKit = pixelKit
     }
 
     public func moveAppToApplications() async {
@@ -48,10 +45,6 @@ final class VPNUIActionHandler: VPNUIActionHandling {
     }
 
     func setExclusion(_ exclude: Bool, forDomain domain: String) async {
-
-        let engagementPixel = DomainExclusionsEngagement(exclude: exclude, domain: domain)
-        pixelKit?.fire(engagementPixel)
-
         proxySettings.setExclusion(exclude, forDomain: domain)
     }
 

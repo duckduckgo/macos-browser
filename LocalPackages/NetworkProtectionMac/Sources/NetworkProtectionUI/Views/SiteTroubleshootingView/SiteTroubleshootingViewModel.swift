@@ -19,6 +19,8 @@
 import Combine
 import Foundation
 import NetworkProtection
+import PixelKit
+import VPNPixels
 
 extension SiteTroubleshootingView {
 
@@ -42,14 +44,17 @@ extension SiteTroubleshootingView {
         }
 
         private let uiActionHandler: VPNUIActionHandling
+        private let pixelKit: PixelFiring?
         private var cancellables = Set<AnyCancellable>()
 
         public init(featureFlagPublisher: AnyPublisher<Bool, Never>,
                     connectionStatusPublisher: AnyPublisher<ConnectionStatus, Never>,
                     siteTroubleshootingInfoPublisher: AnyPublisher<SiteTroubleshootingInfo?, Never>,
-                    uiActionHandler: VPNUIActionHandling) {
+                    uiActionHandler: VPNUIActionHandling,
+                    pixelKit: PixelFiring? = PixelKit.shared) {
 
             self.uiActionHandler = uiActionHandler
+            self.pixelKit = pixelKit
 
             subscribeToConnectionStatusChanges(connectionStatusPublisher)
             subscribeToSiteTroubleshootingInfoChanges(siteTroubleshootingInfoPublisher)
@@ -81,6 +86,9 @@ extension SiteTroubleshootingView {
 
         func setExclusion(_ exclude: Bool, forDomain domain: String) {
             Task { @MainActor in
+                let engagementPixel = DomainExclusionsEngagement(exclude: exclude, domain: domain)
+                pixelKit?.fire(engagementPixel)
+
                 await uiActionHandler.setExclusion(exclude, forDomain: domain)
             }
         }
