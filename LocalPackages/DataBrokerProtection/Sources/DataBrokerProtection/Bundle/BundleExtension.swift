@@ -25,18 +25,10 @@ protocol GroupNameProviding {
 extension Bundle: GroupNameProviding {
 
     static let dbpAppGroupName = "DBP_APP_GROUP"
-    static let subsAppGroupName = "SUBSCRIPTION_APP_GROUP"
 
     var appGroupName: String {
         guard let appGroup = object(forInfoDictionaryKey: Bundle.dbpAppGroupName) as? String else {
             fatalError("Info.plist is missing \(Bundle.dbpAppGroupName)")
-        }
-        return appGroup
-    }
-
-    var subsAppGroupName: String {
-        guard let appGroup = object(forInfoDictionaryKey: Bundle.subsAppGroupName) as? String else {
-            fatalError("Info.plist is missing \(Bundle.subsAppGroupName)")
         }
         return appGroup
     }
