@@ -288,8 +288,12 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             try vault.save(brokerId: optOut.brokerId,
                            profileQueryId: optOut.profileQueryId,
                            extractedProfile: extractedProfile,
+                           createdDate: optOut.createdDate,
                            lastRunDate: optOut.lastRunDate,
-                           preferredRunDate: optOut.preferredRunDate)
+                           preferredRunDate: optOut.preferredRunDate,
+                           sevenDaysConfirmationPixelFired: optOut.sevenDaysConfirmationPixelFired,
+                           fourteenDaysConfirmationPixelFired: optOut.fourteenDaysConfirmationPixelFired,
+                           twentyOneDaysConfirmationPixelFired: optOut.twentyOneDaysConfirmationPixelFired)
         } catch {
             os_log("Database error: saveOptOutOperation, error: %{public}@", log: .error, error.localizedDescription)
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.saveOptOutOperation optOut extractedProfile"))

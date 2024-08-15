@@ -59,8 +59,15 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
     func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanJobData?
     func fetchAllScans() throws -> [ScanJobData]
 
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfile, lastRunDate: Date?, preferredRunDate: Date?) throws
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws
+    func save(brokerId: Int64,
+              profileQueryId: Int64,
+              extractedProfile: ExtractedProfile,
+              createdDate: Date,
+              lastRunDate: Date?,
+              preferredRunDate: Date?,
+              sevenDaysConfirmationPixelFired: Bool,
+              fourteenDaysConfirmationPixelFired: Bool,
+              twentyOneDaysConfirmationPixelFired: Bool) throws
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutJobData?
@@ -230,25 +237,27 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         return scans
     }
 
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfile, lastRunDate: Date?, preferredRunDate: Date?) throws {
+    func save(brokerId: Int64,
+              profileQueryId: Int64,
+              extractedProfile: ExtractedProfile,
+              createdDate: Date,
+              lastRunDate: Date?,
+              preferredRunDate: Date?,
+              sevenDaysConfirmationPixelFired: Bool,
+              fourteenDaysConfirmationPixelFired: Bool,
+              twentyOneDaysConfirmationPixelFired: Bool) throws {
         let mapper = MapperToDB(mechanism: l2Encrypt(data:))
         let extractedProfileDB = try mapper.mapToDB(extractedProfile, brokerId: brokerId, profileQueryId: profileQueryId)
         try self.providers.database.save(
             brokerId: brokerId,
             profileQueryId: profileQueryId,
             extractedProfile: extractedProfileDB,
+            createdDate: createdDate,
             lastRunDate: lastRunDate,
-            preferredRunDate: preferredRunDate
-        )
-    }
-
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
-        try self.providers.database.save(
-            brokerId: brokerId,
-            profileQueryId: profileQueryId,
-            extractedProfileId: extractedProfileId,
-            lastRunDate: lastRunDate,
-            preferredRunDate: preferredRunDate
+            preferredRunDate: preferredRunDate,
+            sevenDaysConfirmationPixelFired: sevenDaysConfirmationPixelFired,
+            fourteenDaysConfirmationPixelFired: fourteenDaysConfirmationPixelFired,
+            twentyOneDaysConfirmationPixelFired: twentyOneDaysConfirmationPixelFired
         )
     }
 

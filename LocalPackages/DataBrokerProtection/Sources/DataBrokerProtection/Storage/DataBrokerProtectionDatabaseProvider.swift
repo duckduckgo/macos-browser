@@ -50,8 +50,15 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanDB?
     func fetchAllScans() throws -> [ScanDB]
 
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfileDB, lastRunDate: Date?, preferredRunDate: Date?) throws
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws
+    func save(brokerId: Int64,
+              profileQueryId: Int64,
+              extractedProfile: ExtractedProfileDB,
+              createdDate: Date,
+              lastRunDate: Date?,
+              preferredRunDate: Date?,
+              sevenDaysConfirmationPixelFired: Bool,
+              fourteenDaysConfirmationPixelFired: Bool,
+              twentyOneDaysConfirmationPixelFired: Bool) throws
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> (optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)?
@@ -329,7 +336,15 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfileDB, lastRunDate: Date?, preferredRunDate: Date?) throws {
+    func save(brokerId: Int64,
+              profileQueryId: Int64,
+              extractedProfile: ExtractedProfileDB,
+              createdDate: Date,
+              lastRunDate: Date?,
+              preferredRunDate: Date?,
+              sevenDaysConfirmationPixelFired: Bool,
+              fourteenDaysConfirmationPixelFired: Bool,
+              twentyOneDaysConfirmationPixelFired: Bool) throws {
         try db.write { db in
             try extractedProfile.insert(db)
             let extractedProfileId = db.lastInsertedRowID
@@ -337,20 +352,12 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                 brokerId: brokerId,
                 profileQueryId: profileQueryId,
                 extractedProfileId: extractedProfileId,
+                createdDate: createdDate,
                 lastRunDate: lastRunDate,
-                preferredRunDate: preferredRunDate
-            ).insert(db)
-        }
-    }
-
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
-        try db.write { db in
-            try OptOutDB(
-                brokerId: brokerId,
-                profileQueryId: profileQueryId,
-                extractedProfileId: extractedProfileId,
-                lastRunDate: lastRunDate,
-                preferredRunDate: preferredRunDate
+                preferredRunDate: preferredRunDate,
+                sevenDaysConfirmationPixelFired: sevenDaysConfirmationPixelFired,
+                fourteenDaysConfirmationPixelFired: fourteenDaysConfirmationPixelFired,
+                twentyOneDaysConfirmationPixelFired: twentyOneDaysConfirmationPixelFired
             ).insert(db)
         }
     }

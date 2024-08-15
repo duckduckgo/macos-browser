@@ -70,22 +70,34 @@ struct ScanJobData: BrokerJobData, Sendable {
 struct OptOutJobData: BrokerJobData, Sendable {
     let brokerId: Int64
     let profileQueryId: Int64
+    let createdDate: Date
     let preferredRunDate: Date?
     let historyEvents: [HistoryEvent]
     let lastRunDate: Date?
     let extractedProfile: ExtractedProfile
+    let sevenDaysConfirmationPixelFired: Bool
+    let fourteenDaysConfirmationPixelFired: Bool
+    let twentyOneDaysConfirmationPixelFired: Bool
 
     init(brokerId: Int64,
          profileQueryId: Int64,
+         createdDate: Date,
          preferredRunDate: Date? = nil,
          historyEvents: [HistoryEvent],
          lastRunDate: Date? = nil,
-         extractedProfile: ExtractedProfile) {
+         extractedProfile: ExtractedProfile,
+         sevenDaysConfirmationPixelFired: Bool = false,
+         fourteenDaysConfirmationPixelFired: Bool = false,
+         twentyOneDaysConfirmationPixelFired: Bool = false) {
         self.brokerId = brokerId
         self.profileQueryId = profileQueryId
+        self.createdDate = createdDate
         self.preferredRunDate = preferredRunDate
         self.historyEvents = historyEvents
         self.lastRunDate = lastRunDate
         self.extractedProfile = extractedProfile
+        self.sevenDaysConfirmationPixelFired = sevenDaysConfirmationPixelFired
+        self.fourteenDaysConfirmationPixelFired = fourteenDaysConfirmationPixelFired
+        self.twentyOneDaysConfirmationPixelFired = twentyOneDaysConfirmationPixelFired
     }
 }
