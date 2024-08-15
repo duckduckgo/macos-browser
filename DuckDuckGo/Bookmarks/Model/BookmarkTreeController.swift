@@ -30,7 +30,11 @@ protocol BookmarkTreeControllerSearchDataSource: AnyObject {
 
 final class BookmarkTreeController {
 
-    let rootNode: BookmarkNode
+    static let openAllInNewTabsIdentifier = "openAllInNewTabs"
+    static let emptyPlaceholderIdentifier = "empty"
+
+    private(set) var rootNode: BookmarkNode
+    private let isBookmarksBarMenu: Bool
 
     private weak var dataSource: BookmarkTreeControllerDataSource?
     private weak var searchDataSource: BookmarkTreeControllerSearchDataSource?
@@ -38,18 +42,35 @@ final class BookmarkTreeController {
     init(dataSource: BookmarkTreeControllerDataSource,
          sortMode: BookmarksSortMode,
          searchDataSource: BookmarkTreeControllerSearchDataSource? = nil,
-         rootNode: BookmarkNode) {
+         rootNode: BookmarkNode? = nil,
+         isBookmarksBarMenu: Bool = false) {
         self.dataSource = dataSource
         self.searchDataSource = searchDataSource
-        self.rootNode = rootNode
+        self.rootNode = rootNode ?? BookmarkNode.genericRootNode()
+        self.isBookmarksBarMenu = isBookmarksBarMenu
 
         rebuild(for: sortMode)
     }
 
     convenience init(dataSource: BookmarkTreeControllerDataSource,
                      sortMode: BookmarksSortMode,
-                     searchDataSource: BookmarkTreeControllerSearchDataSource? = nil) {
-        self.init(dataSource: dataSource, sortMode: sortMode, searchDataSource: searchDataSource, rootNode: BookmarkNode.genericRootNode())
+                     searchDataSource: BookmarkTreeControllerSearchDataSource? = nil,
+                     rootFolder: BookmarkFolder?,
+                     isBookmarksBarMenu: Bool) {
+        self.init(dataSource: dataSource, sortMode: sortMode, searchDataSource: searchDataSource, rootNode: rootFolder.map(Self.rootNode(from:)), isBookmarksBarMenu: isBookmarksBarMenu)
+    }
+
+    private static func rootNode(from rootFolder: BookmarkFolder) -> BookmarkNode {
+        let genericRootNode = BookmarkNode.genericRootNode()
+        let bookmarksNode = BookmarkNode(representedObject: rootFolder, parent: genericRootNode)
+        bookmarksNode.canHaveChildNodes = true
+        return bookmarksNode
+    }
+
+    private static func separatorNode(for parentNode: BookmarkNode) -> BookmarkNode {
+        let spacerObject = SpacerNode.divider
+        let node = BookmarkNode(representedObject: spacerObject, parent: parentNode)
+        return node
     }
 
     // MARK: - Public
@@ -58,7 +79,10 @@ final class BookmarkTreeController {
         rootNode.childNodes = searchDataSource?.nodes(for: searchQuery, sortMode: sortMode) ?? []
     }
 
-    func rebuild(for sortMode: BookmarksSortMode) {
+    func rebuild(for sortMode: BookmarksSortMode, withRootFolder rootFolder: BookmarkFolder? = nil) {
+        if let rootFolder {
+            self.rootNode = Self.rootNode(from: rootFolder)
+        }
         rebuildChildNodes(node: rootNode, sortMode: sortMode)
     }
 
@@ -112,12 +136,16 @@ final class BookmarkTreeController {
             node.childNodes = childNodes
         }
 
-        childNodes.forEach { childNode in
-            if rebuildChildNodes(node: childNode, sortMode: sortMode) {
-                childNodesDidChange = true
+        if isBookmarksBarMenu {
+        } else {
+            childNodes.forEach { childNode in
+                if rebuildChildNodes(node: childNode, sortMode: sortMode) {
+                    childNodesDidChange = true
+                }
             }
         }
 
         return childNodesDidChange
     }
+
 }

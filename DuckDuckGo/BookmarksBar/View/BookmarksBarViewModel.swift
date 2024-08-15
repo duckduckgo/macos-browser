@@ -25,6 +25,8 @@ protocol BookmarksBarViewModelDelegate: AnyObject {
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem)
     func bookmarksBarViewModelWidthForContainer() -> CGFloat
     func bookmarksBarViewModelReloadedData()
+    func mouseDidHover(over item: Any)
+
 }
 
 final class BookmarksBarViewModel: NSObject {
@@ -34,12 +36,10 @@ final class BookmarksBarViewModel: NSObject {
     enum Constants {
         static let buttonSpacing: CGFloat = 6
         static let buttonHeight: CGFloat = 28
-        static let maximumButtonWidth: CGFloat = 120
+        static let maximumButtonWidth: CGFloat = 128
         static let labelFont = NSFont.systemFont(ofSize: 12)
 
-        static let additionalItemWidth = 34.0
-
-        static let interItemGapIndicatorIdentifier = "NSCollectionElementKindInterItemGapIndicator"
+        static let additionalItemWidth = 28.0
     }
 
     enum BookmarksBarItemAction {
@@ -225,14 +225,13 @@ final class BookmarksBarViewModel: NSObject {
 
     func cachedWidth(buttonTitle: String) -> CGFloat {
         if let cachedValue = collectionViewItemSizeCache[buttonTitle] {
-            return cachedValue + Constants.additionalItemWidth
+            return cachedValue
         } else {
             textSizeCalculationLabel.stringValue = buttonTitle
             textSizeCalculationLabel.sizeToFit()
 
-            let cappedTitleWidth = ceil(min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width))
-            let calculatedWidth = min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width) + Constants.additionalItemWidth
-            collectionViewItemSizeCache[buttonTitle] = cappedTitleWidth
+            let calculatedWidth = min(Constants.maximumButtonWidth, ceil(textSizeCalculationLabel.frame.width) + Constants.additionalItemWidth)
+            collectionViewItemSizeCache[buttonTitle] = calculatedWidth
 
             return ceil(calculatedWidth)
         }
@@ -262,41 +261,6 @@ final class BookmarksBarViewModel: NSObject {
         return true
     }
 
-    func buildClippedItemsMenu() -> NSMenu {
-        let menu = NSMenu()
-        menu.items = bookmarksTreeMenuItems(from: clippedItems)
-        return menu
-    }
-
-    func bookmarksTreeMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {
-        var menuItems = [NSMenuItem]()
-
-        for viewModel in bookmarkViewModels {
-            let menuItem = NSMenuItem(bookmarkViewModel: viewModel)
-
-            if let folder = viewModel.entity as? BookmarkFolder {
-                let subMenu = NSMenu(title: folder.title)
-                let childViewModels = folder.children.map(BookmarkViewModel.init)
-                let childMenuItems = bookmarksTreeMenuItems(from: childViewModels, topLevel: false)
-                subMenu.items = childMenuItems
-
-                if !subMenu.items.isEmpty {
-                    menuItem.submenu = subMenu
-                }
-            }
-
-            menuItems.append(menuItem)
-        }
-
-        let showOpenInTabsItem = bookmarkViewModels.compactMap { $0.entity as? Bookmark }.count > 1
-        if showOpenInTabsItem {
-            menuItems.append(.separator())
-            menuItems.append(NSMenuItem(bookmarkViewModels: bookmarkViewModels))
-        }
-
-        return menuItems
-    }
-
 }
 
 extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataSource {
@@ -304,7 +268,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
     func collectionView(_ collectionView: NSCollectionView,
                         viewForSupplementaryElementOfKind kind: NSCollectionView.SupplementaryElementKind,
                         at indexPath: IndexPath) -> NSView {
-        guard kind == Constants.interItemGapIndicatorIdentifier else {
+        guard kind == NSCollectionView.interItemGapIndicatorIdentifier else {
             assertionFailure("Received requested for unexpected supplementary element type")
             return NSView()
         }
@@ -320,11 +284,8 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
-        let genericCollectionViewItem = collectionView.makeItem(withIdentifier: BookmarksBarCollectionViewItem.identifier, for: indexPath)
-
-        guard let bookmarksCollectionViewItem = genericCollectionViewItem as? BookmarksBarCollectionViewItem else {
-            return genericCollectionViewItem
-        }
+        // swiftlint:disable:next force_cast
+        let bookmarksCollectionViewItem = collectionView.makeItem(withIdentifier: BookmarksBarCollectionViewItem.identifier, for: indexPath) as! BookmarksBarCollectionViewItem
 
         let bookmarksBarItem = bookmarksBarItems[indexPath.item]
         bookmarksCollectionViewItem.delegate = self
@@ -333,19 +294,11 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
         return bookmarksCollectionViewItem
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        draggingSession session: NSDraggingSession,
-                        willBeginAt screenPoint: NSPoint,
-                        forItemsAt indexPaths: Set<IndexPath>) {
+    // MARK: - Drag & Drop
+
+    func collectionView(_ collectionView: NSCollectionView, draggingSession session: NSDraggingSession, willBeginAt screenPoint: NSPoint, forItemsAt indexPaths: Set<IndexPath>) {
         assert(indexPaths.count == 1) // Only one item can be dragged from the bar at a time
         self.existingItemDraggingIndexPath = indexPaths.first
-    }
-
-    func collectionView(_ collectionView: NSCollectionView,
-                        draggingSession session: NSDraggingSession,
-                        endedAt screenPoint: NSPoint,
-                        dragOperation operation: NSDragOperation) {
-        self.existingItemDraggingIndexPath = nil
     }
 
     func collectionView(_ collectionView: NSCollectionView, canDragItemsAt indexPaths: Set<IndexPath>, with event: NSEvent) -> Bool {
@@ -429,6 +382,10 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
         return false
     }
 
+    func collectionView(_ collectionView: NSCollectionView, draggingSession session: NSDraggingSession, endedAt screenPoint: NSPoint, dragOperation operation: NSDragOperation) {
+        self.existingItemDraggingIndexPath = nil
+    }
+
     @MainActor
     private func createBookmarks(from pasteboardItems: [NSPasteboardItem], at index: Int) {
         var currentIndex = index
@@ -452,8 +409,6 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
             currentIndex += 1
         }
     }
-
-    // MARK: - Drag & Drop
 
     /// On rare occasions, a click event will be sent immediately after a drag and drop operation completes.
     /// To prevent drag and drop from accidentally triggering a bookmark to load or folder to open, all click events are ignored for a short period after a drop has been accepted.
@@ -511,6 +466,12 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
 
     func bookmarksBarCollectionViewItemManageBookmarksAction(_ item: BookmarksBarCollectionViewItem) {
         delegate?.bookmarksBarViewModelReceived(action: .manageBookmarks, for: item)
+    }
+
+    func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, isMouseOver: Bool) {
+        if isMouseOver {
+            delegate?.mouseDidHover(over: item)
+        }
     }
 
 }

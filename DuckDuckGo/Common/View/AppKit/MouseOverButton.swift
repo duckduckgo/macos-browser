@@ -85,7 +85,7 @@ internal class MouseOverButton: NSButton, Hoverable {
         isMouseDown = false
     }
 
-    @Published var isMouseOver = false {
+    @objc dynamic var isMouseOver = false {
         didSet {
             updateTintColor()
         }

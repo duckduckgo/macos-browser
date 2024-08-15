@@ -26,7 +26,58 @@ extension NSDragOperation {
 
 final class BookmarksOutlineView: NSOutlineView {
 
-    var lastRow: RoundedSelectionRowView?
+    private var highlightedRowView: RoundedSelectionRowView?
+    private var highlightedCellView: BookmarkOutlineCellView?
+
+    @PublishedAfter var highlightedRow: Int? {
+        didSet {
+            highlightedRowView?.highlight = false
+            highlightedCellView?.highlight = false
+            guard let row = highlightedRow, row < numberOfRows else { return }
+            if case .keyDown = NSApp.currentEvent?.type {
+                scrollRowToVisible(row)
+            }
+
+            let item = item(atRow: row) as? BookmarkNode
+            let isInKeyPopover = self.isInKeyPopover
+            let rowView = rowView(atRow: row, makeIfNecessary: false) as? RoundedSelectionRowView
+            rowView?.isInKeyWindow = isInKeyPopover
+            rowView?.highlight = item?.canBeHighlighted ?? false
+            highlightedRowView = rowView
+
+            let cellView = self.view(atColumn: 0, row: row, makeIfNecessary: false) as? BookmarkOutlineCellView
+            cellView?.isInKeyWindow = isInKeyPopover
+            cellView?.highlight = item?.canBeHighlighted ?? false
+            highlightedCellView = cellView
+
+            var window = window
+            while let windowParent = window?.parent,
+                  type(of: windowParent) == type(of: window!),
+                  let scrollView = windowParent.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
+                  let outlineView = scrollView.documentView as? Self {
+                window = windowParent
+
+                outlineView.highlightedRowView?.isInKeyWindow = false
+                outlineView.highlightedCellView?.isInKeyWindow = false
+            }
+        }
+    }
+
+    private var isInKeyPopover: Bool {
+        if window?.childWindows?.first(where: { child in
+            if type(of: child) == type(of: window!),
+               let scrollView = child.contentView?.subviews.first(where: { $0 is NSScrollView }) as? NSScrollView,
+               let outlineView = scrollView.documentView as? Self,
+               outlineView.highlightedRow != nil {
+                true
+            } else {
+                false
+            }
+        }) != nil {
+            return false
+        }
+        return true
+    }
 
     override func frameOfOutlineCell(atRow row: Int) -> NSRect {
         let frame = super.frameOfOutlineCell(atRow: row)
@@ -51,22 +102,30 @@ final class BookmarksOutlineView: NSOutlineView {
     }
 
     override func viewDidMoveToWindow() {
+        highlightedRow = nil
+
         super.viewDidMoveToWindow()
         guard let scrollView = enclosingScrollView else { return }
 
-        let trackingArea = NSTrackingArea(rect: .zero, options: [.mouseMoved, .activeInKeyWindow, .inVisibleRect], owner: self, userInfo: nil)
+        let trackingArea = NSTrackingArea(rect: .zero, options: [.mouseMoved, .mouseEnteredAndExited, .activeInKeyWindow, .inVisibleRect], owner: self, userInfo: nil)
 
         scrollView.addTrackingArea(trackingArea)
     }
 
     override func mouseMoved(with event: NSEvent) {
-        lastRow?.highlight = false
-        let point = convert(event.locationInWindow, to: nil)
-        let row = row(at: point)
-        guard row >= 0, let rowView = rowView(atRow: row, makeIfNecessary: false) as? RoundedSelectionRowView else { return }
-        let item = item(atRow: row) as? BookmarkNode
-        rowView.highlight = !(item?.representedObject is SpacerNode)
-        lastRow = rowView
+        updateHighlightedRowUnderCursor()
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        let windowNumber = NSWindow.windowNumber(at: NSEvent.mouseLocation, belowWindowWithWindowNumber: 0)
+        if let window = NSApp.window(withWindowNumber: windowNumber),
+           window.contentViewController?.nextResponder is NSPopover {
+
+            highlightedRowView?.isInKeyWindow = false
+            highlightedCellView?.isInKeyWindow = false
+        } else {
+            highlightedRow = nil
+        }
     }
 
     func scrollTo(_ item: Any, code: ((Int) -> Void)? = nil) {
@@ -101,6 +160,21 @@ final class BookmarksOutlineView: NSOutlineView {
         }
     }
 
+    func updateHighlightedRowUnderCursor() {
+        let point = mouseLocationInsideBounds()
+        let row = point.map { self.row(at: NSPoint(x: self.bounds.midX, y: $0.y)) } ?? -1
+        guard row >= 0, row < NSNotFound else {
+            highlightedRow = nil
+            return
+        }
+        if highlightedRow != row {
+            highlightedRow = row
+        } else {
+            highlightedRowView?.isInKeyWindow = true
+            highlightedCellView?.isInKeyWindow = true
+        }
+    }
+
     func isItemVisible(_ item: Any) -> Bool {
         let rowIndex = self.row(forItem: item)
 
@@ -111,4 +185,5 @@ final class BookmarksOutlineView: NSOutlineView {
         let visibleRowsRange = self.rows(in: self.visibleRect)
         return visibleRowsRange.contains(rowIndex)
     }
+
 }

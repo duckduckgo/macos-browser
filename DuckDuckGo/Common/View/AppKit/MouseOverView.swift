@@ -51,7 +51,7 @@ internal class MouseOverView: NSControl, Hoverable {
 
     @IBInspectable var clickThrough: Bool = false
 
-    var isMouseOver = false {
+    @objc dynamic var isMouseOver = false {
         didSet {
             delegate?.mouseOverView?(self, isMouseOver: isMouseOver)
             if isMouseDown {

@@ -334,5 +334,6 @@ final class BookmarksBarViewModelDelegateMock: BookmarksBarViewModelDelegate {
     }
 
     func bookmarksBarViewModelReloadedData() {}
+    func mouseDidHover(over item: Any) {}
 
 }

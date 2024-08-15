@@ -25,11 +25,19 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     enum ContentMode {
         case bookmarksAndFolders
         case foldersOnly
+        case bookmarksMenu
+
+        var isSeparatorVisible: Bool {
+            switch self {
+            case .bookmarksAndFolders, .bookmarksMenu: true
+            case .foldersOnly: false
+            }
+        }
     }
 
     @Published var selectedFolders: [BookmarkFolder] = []
 
-    let treeController: BookmarkTreeController
+    private var outlineView: NSOutlineView?
 
     private let contentMode: ContentMode
     private(set) var expandedNodesIDs = Set<String>()
@@ -39,13 +47,11 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     /// so we can expand the tree to the destination folder once the drop finishes.
     private(set) var dragDestinationFolderInSearchMode: BookmarkFolder?
 
+    private let treeController: BookmarkTreeController
     private let bookmarkManager: BookmarkManager
     private let showMenuButtonOnHover: Bool
     private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
     private let presentFaviconsFetcherOnboarding: (() -> Void)?
-
-    private var favoritesPseudoFolder = PseudoFolder.favorites
-    private var bookmarksPseudoFolder = PseudoFolder.bookmarks
 
     init(
         contentMode: ContentMode,
@@ -64,26 +70,17 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         self.presentFaviconsFetcherOnboarding = presentFaviconsFetcherOnboarding
 
         super.init()
-
-        reloadData(with: sortMode)
     }
 
-    func reloadData(with sortMode: BookmarksSortMode) {
+    func reloadData(with sortMode: BookmarksSortMode, withRootFolder rootFolder: BookmarkFolder? = nil) {
         isSearching = false
         dragDestinationFolderInSearchMode = nil
-        setFolderCount()
-        treeController.rebuild(for: sortMode)
+        treeController.rebuild(for: sortMode, withRootFolder: rootFolder)
     }
 
-    func reloadData(for searchQuery: String, and sortMode: BookmarksSortMode) {
+    func reloadData(for searchQuery: String, sortMode: BookmarksSortMode) {
         isSearching = true
-        setFolderCount()
         treeController.rebuild(for: searchQuery, sortMode: sortMode)
-    }
-
-    private func setFolderCount() {
-        favoritesPseudoFolder.count = bookmarkManager.list?.favoriteBookmarks.count ?? 0
-        bookmarksPseudoFolder.count = bookmarkManager.list?.totalBookmarks ?? 0
     }
 
     // MARK: - Private
@@ -113,6 +110,9 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
+        if self.outlineView == nil {
+            self.outlineView = outlineView
+        }
         return nodeForItem(item).numberOfChildNodes
     }
 
@@ -121,7 +121,8 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-        return nodeForItem(item).canHaveChildNodes
+        // don‘t display disclosure indicator for “empty” nodes when no indentation level
+        return contentMode == .bookmarksMenu ? false : nodeForItem(item).canHaveChildNodes
     }
 
     func outlineViewSelectionDidChange(_ notification: Notification) {
@@ -146,38 +147,38 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             assertionFailure("\(#file): Failed to cast item to Node")
             return nil
         }
+        if node.representedObject is SpacerNode {
+            return outlineView.makeView(withIdentifier: contentMode.isSeparatorVisible
+                                        ? OutlineSeparatorViewCell.separatorIdentifier
+                                        : OutlineSeparatorViewCell.blankIdentifier, owner: self) as? OutlineSeparatorViewCell
+                ?? OutlineSeparatorViewCell(isSeparatorVisible: contentMode.isSeparatorVisible)
+        }
+
         let cell = outlineView.makeView(withIdentifier: .init(BookmarkOutlineCellView.className()), owner: self) as? BookmarkOutlineCellView
             ?? BookmarkOutlineCellView(identifier: .init(BookmarkOutlineCellView.className()))
         cell.shouldShowMenuButton = showMenuButtonOnHover
         cell.delegate = self
+        cell.update(from: node, isSearch: isSearching, isMenuPopover: contentMode == .bookmarksMenu)
 
-        if let bookmark = node.representedObject as? Bookmark {
-            cell.update(from: bookmark, isSearch: isSearching)
-
-            if bookmark.favicon(.small) == nil {
-                presentFaviconsFetcherOnboarding?()
-            }
-            return cell
+        if let bookmark = node.representedObject as? Bookmark, bookmark.favicon(.small) == nil {
+            presentFaviconsFetcherOnboarding?()
         }
 
-        if let folder = node.representedObject as? BookmarkFolder {
-            cell.update(from: folder, isSearch: isSearching)
-            return cell
+        return cell
+    }
+
+    func outlineView(_ outlineView: NSOutlineView, rowViewForItem item: Any) -> NSTableRowView? {
+        let view = RoundedSelectionRowView()
+        view.insets = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
+
+        return view
+    }
+
+    func outlineView(_ outlineView: NSOutlineView, heightOfRowByItem item: Any) -> CGFloat {
+        if let node = item as? BookmarkNode, node.representedObject is SpacerNode {
+            return OutlineSeparatorViewCell.rowHeight(for: contentMode == .bookmarksMenu ? .bookmarkBarMenu : .popover)
         }
-
-        if let folder = node.representedObject as? PseudoFolder {
-            if folder == .bookmarks {
-                cell.update(from: bookmarksPseudoFolder)
-            } else if folder == .favorites {
-                cell.update(from: favoritesPseudoFolder)
-            } else {
-                assertionFailure("\(#file): Tried to update PseudoFolder cell with invalid type")
-            }
-
-            return cell
-        }
-
-        return OutlineSeparatorViewCell(separatorVisible: contentMode == .bookmarksAndFolders)
+        return BookmarkOutlineCellView.rowHeight
     }
 
     func outlineView(_ outlineView: NSOutlineView, pasteboardWriterForItem item: Any) -> NSPasteboardWriting? {
@@ -185,10 +186,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return entity.pasteboardWriter
     }
 
-    func outlineView(_ outlineView: NSOutlineView,
-                     validateDrop info: NSDraggingInfo,
-                     proposedItem item: Any?,
-                     proposedChildIndex index: Int) -> NSDragOperation {
+    func outlineView(_ outlineView: NSOutlineView, validateDrop info: NSDraggingInfo, proposedItem item: Any?, proposedChildIndex index: Int) -> NSDragOperation {
         let destinationNode = nodeForItem(item)
 
         if contentMode == .foldersOnly {
@@ -345,13 +343,6 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
 
         return true
-    }
-
-    func outlineView(_ outlineView: NSOutlineView, rowViewForItem item: Any) -> NSTableRowView? {
-        let view = RoundedSelectionRowView()
-        view.insets = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
-
-        return view
     }
 
     // MARK: - NSTableViewDelegate

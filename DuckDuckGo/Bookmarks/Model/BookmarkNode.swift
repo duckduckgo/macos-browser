@@ -39,7 +39,7 @@ final class BookmarkNode: Hashable {
     var childNodes = [BookmarkNode]()
 
     var isRoot: Bool {
-        return parent == nil
+        return representedObject is RootNode
     }
 
     var numberOfChildNodes: Int {
@@ -77,6 +77,14 @@ final class BookmarkNode: Hashable {
         self.representedObject = representedObject
         self.parent = parent
         self.uniqueID = uniqueId
+    }
+
+    var canBeHighlighted: Bool {
+        if representedObject is SpacerNode {
+            return false
+        } else {
+            return true
+        }
     }
 
     /// Creates an instance of a bookmark node.

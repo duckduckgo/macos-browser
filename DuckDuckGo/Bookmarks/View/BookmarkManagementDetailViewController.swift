@@ -149,6 +149,8 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         emptyStateImageView.imageScaling = .scaleProportionallyDown
 
         scrollView.autohidesScrollers = true
+        scrollView.hasVerticalScroller = true
+        scrollView.hasHorizontalScroller = false
         scrollView.borderType = .noBorder
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.usesPredominantAxisScrolling = false
