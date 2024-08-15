@@ -63,4 +63,3 @@ final class VPNUIActionHandler: VPNUIActionHandling {
         await vpnURLEventHandler.showPrivacyPro()
     }
 }
-
