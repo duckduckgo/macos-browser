@@ -97,13 +97,6 @@ final class BookmarksBarViewController: NSViewController {
 
         view.postsFrameChangedNotifications = true
         bookmarksBarCollectionView.setAccessibilityIdentifier("BookmarksBarViewController.bookmarksBarCollectionView")
-
-        clippedItemsIndicator.publisher(for: \.isMouseOver)
-            .sink { [weak self] isMouseOver in
-                guard isMouseOver, let self, let clippedItemsIndicator else { return }
-                mouseDidHover(over: clippedItemsIndicator)
-            }
-            .store(in: &cancellables)
     }
 
     private func setUpImportBookmarksButton() {
@@ -182,6 +175,13 @@ final class BookmarksBarViewController: NSViewController {
                 if self?.bookmarkManager.list != nil {
                     self?.importBookmarksButton.isHidden = !items.isEmpty
                 }
+            }
+            .store(in: &cancellables)
+
+        clippedItemsIndicator.publisher(for: \.isMouseOver)
+            .sink { [weak self] isMouseOver in
+                guard isMouseOver, let self, let clippedItemsIndicator else { return }
+                mouseDidHover(over: clippedItemsIndicator)
             }
             .store(in: &cancellables)
     }
