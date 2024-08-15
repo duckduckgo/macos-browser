@@ -30,6 +30,7 @@ enum DataBrokerProtectionDatabaseMigrationErrors: Error {
 protocol DataBrokerProtectionDatabaseMigrationsProvider {
     static var v2Migrations: (inout DatabaseMigrator) throws -> Void { get }
     static var v3Migrations: (inout DatabaseMigrator) throws -> Void { get }
+    static var v4Migrations: (inout DatabaseMigrator) throws -> Void { get }
 }
 
 final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {

@@ -101,7 +101,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     public static func create<T: MigrationsProvider>(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
                                                      key: Data,
                                                      migrationProvider: T.Type = DefaultDataBrokerProtectionDatabaseMigrationsProvider.self) throws -> DefaultDataBrokerProtectionDatabaseProvider {
-            try DefaultDataBrokerProtectionDatabaseProvider(file: file, key: key, registerMigrationsHandler: migrationProvider.v3Migrations)
+            try DefaultDataBrokerProtectionDatabaseProvider(file: file, key: key, registerMigrationsHandler: migrationProvider.v4Migrations)
     }
 
     public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
