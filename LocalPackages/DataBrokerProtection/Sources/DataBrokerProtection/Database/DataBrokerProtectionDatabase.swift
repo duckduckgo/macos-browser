@@ -291,6 +291,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                            createdDate: optOut.createdDate,
                            lastRunDate: optOut.lastRunDate,
                            preferredRunDate: optOut.preferredRunDate,
+                           submittedSuccessfullyDate: optOut.submittedSuccessfullyDate,
                            sevenDaysConfirmationPixelFired: optOut.sevenDaysConfirmationPixelFired,
                            fourteenDaysConfirmationPixelFired: optOut.fourteenDaysConfirmationPixelFired,
                            twentyOneDaysConfirmationPixelFired: optOut.twentyOneDaysConfirmationPixelFired)

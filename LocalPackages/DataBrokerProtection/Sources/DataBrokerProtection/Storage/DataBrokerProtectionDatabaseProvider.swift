@@ -56,6 +56,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
               createdDate: Date,
               lastRunDate: Date?,
               preferredRunDate: Date?,
+              submittedSuccessfullyDate: Date?,
               sevenDaysConfirmationPixelFired: Bool,
               fourteenDaysConfirmationPixelFired: Bool,
               twentyOneDaysConfirmationPixelFired: Bool) throws
@@ -335,6 +336,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
               createdDate: Date,
               lastRunDate: Date?,
               preferredRunDate: Date?,
+              submittedSuccessfullyDate: Date?,
               sevenDaysConfirmationPixelFired: Bool,
               fourteenDaysConfirmationPixelFired: Bool,
               twentyOneDaysConfirmationPixelFired: Bool) throws {
@@ -348,6 +350,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                 createdDate: createdDate,
                 lastRunDate: lastRunDate,
                 preferredRunDate: preferredRunDate,
+                submittedSuccessfullyDate: submittedSuccessfullyDate,
                 sevenDaysConfirmationPixelFired: sevenDaysConfirmationPixelFired,
                 fourteenDaysConfirmationPixelFired: fourteenDaysConfirmationPixelFired,
                 twentyOneDaysConfirmationPixelFired: twentyOneDaysConfirmationPixelFired

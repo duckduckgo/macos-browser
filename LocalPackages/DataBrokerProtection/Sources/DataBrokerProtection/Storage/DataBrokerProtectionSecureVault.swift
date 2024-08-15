@@ -65,6 +65,7 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
               createdDate: Date,
               lastRunDate: Date?,
               preferredRunDate: Date?,
+              submittedSuccessfullyDate: Date?,
               sevenDaysConfirmationPixelFired: Bool,
               fourteenDaysConfirmationPixelFired: Bool,
               twentyOneDaysConfirmationPixelFired: Bool) throws
@@ -243,6 +244,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
               createdDate: Date,
               lastRunDate: Date?,
               preferredRunDate: Date?,
+              submittedSuccessfullyDate: Date?,
               sevenDaysConfirmationPixelFired: Bool,
               fourteenDaysConfirmationPixelFired: Bool,
               twentyOneDaysConfirmationPixelFired: Bool) throws {
@@ -255,6 +257,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
             createdDate: createdDate,
             lastRunDate: lastRunDate,
             preferredRunDate: preferredRunDate,
+            submittedSuccessfullyDate: submittedSuccessfullyDate,
             sevenDaysConfirmationPixelFired: sevenDaysConfirmationPixelFired,
             fourteenDaysConfirmationPixelFired: fourteenDaysConfirmationPixelFired,
             twentyOneDaysConfirmationPixelFired: twentyOneDaysConfirmationPixelFired

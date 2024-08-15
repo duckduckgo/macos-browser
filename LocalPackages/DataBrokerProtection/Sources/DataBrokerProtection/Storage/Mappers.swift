@@ -217,6 +217,7 @@ struct MapperToModel {
             preferredRunDate: optOutDB.preferredRunDate,
             historyEvents: try events.map(mapToModel(_:)),
             lastRunDate: optOutDB.lastRunDate,
+            submittedSuccessfullyDate: optOutDB.submittedSuccessfullyDate,
             extractedProfile: try mapToModel(extractedProfileDB),
             sevenDaysConfirmationPixelFired: optOutDB.sevenDaysConfirmationPixelFired,
             fourteenDaysConfirmationPixelFired: optOutDB.fourteenDaysConfirmationPixelFired,

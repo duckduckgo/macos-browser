@@ -74,6 +74,7 @@ struct OptOutJobData: BrokerJobData, Sendable {
     let preferredRunDate: Date?
     let historyEvents: [HistoryEvent]
     let lastRunDate: Date?
+    let submittedSuccessfullyDate: Date?
     let extractedProfile: ExtractedProfile
     let sevenDaysConfirmationPixelFired: Bool
     let fourteenDaysConfirmationPixelFired: Bool
@@ -85,6 +86,7 @@ struct OptOutJobData: BrokerJobData, Sendable {
          preferredRunDate: Date? = nil,
          historyEvents: [HistoryEvent],
          lastRunDate: Date? = nil,
+         submittedSuccessfullyDate: Date? = nil,
          extractedProfile: ExtractedProfile,
          sevenDaysConfirmationPixelFired: Bool = false,
          fourteenDaysConfirmationPixelFired: Bool = false,
@@ -95,6 +97,7 @@ struct OptOutJobData: BrokerJobData, Sendable {
         self.preferredRunDate = preferredRunDate
         self.historyEvents = historyEvents
         self.lastRunDate = lastRunDate
+        self.submittedSuccessfullyDate = submittedSuccessfullyDate
         self.extractedProfile = extractedProfile
         self.sevenDaysConfirmationPixelFired = sevenDaysConfirmationPixelFired
         self.fourteenDaysConfirmationPixelFired = fourteenDaysConfirmationPixelFired

@@ -175,6 +175,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                           createdDate: Date(),
                                                           preferredRunDate: preferredRunOperation,
                                                           historyEvents: [HistoryEvent](),
+                                                          submittedSuccessfullyDate: nil,
                                                           extractedProfile: extractedProfile,
                                                           sevenDaysConfirmationPixelFired: false,
                                                           fourteenDaysConfirmationPixelFired: false,
