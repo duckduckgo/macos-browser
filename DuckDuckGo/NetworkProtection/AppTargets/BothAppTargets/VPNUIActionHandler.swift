@@ -22,6 +22,7 @@ import NetworkProtectionIPC
 import NetworkProtectionProxy
 import NetworkProtectionUI
 import PixelKit
+import VPNPixels
 import VPNAppLauncher
 
 /// Main App's VPN UI action handler
@@ -52,7 +53,8 @@ final class VPNUIActionHandler: VPNUIActionHandling {
 
     func setExclusion(_ exclude: Bool, forDomain domain: String) async {
 
-        
+        let engagementPixel = DomainExclusionsEngagement(exclude: exclude, domain: domain)
+        pixelKit?.fire(engagementPixel)
 
         proxySettings.setExclusion(exclude, forDomain: domain)
         try? await vpnIPCClient.command(.restartAdapter)

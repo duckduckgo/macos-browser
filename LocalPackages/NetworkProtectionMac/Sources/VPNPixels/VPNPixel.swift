@@ -1,5 +1,5 @@
 //
-//  DomainExclusionEngagement.swift
+//  VPNPixel.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,7 +17,28 @@
 //
 
 import Foundation
+import PixelKit
 
 /// The prefix that should be used for all pixels in this module
 ///
-static let vpnPixelModulePrefix = "vpn"
+let vpnPixelModulePrefix = "vpn"
+
+public protocol VPNPixel: PixelKitEventV2 {
+
+    /// The name of the pixel without the module prefix.
+    ///
+    var unscopedName: String { get }
+}
+
+extension VPNPixel {
+
+    /// Convenience method to provide the scoped pixel name.
+    ///
+    public var name: String {
+        scopedPixelName(forUnscopedPixelName: unscopedName)
+    }
+
+    func scopedPixelName(forUnscopedPixelName unscopedName: String) -> String {
+        "\(vpnPixelModulePrefix)_\(unscopedName)"
+    }
+}

@@ -1,5 +1,5 @@
 //
-//  DomainExclusionEngagement.swift
+//  DomainExclusionsEngagement.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -21,31 +21,43 @@ import PixelKit
 
 /// Pixels to understand domain exclusion engagement
 ///
-enum DomainExclusionEngagement: PixelKitEventV2 {
+public enum DomainExclusionsEngagement: VPNPixel {
+
     case excluded(_ domain: String)
     case included(_ domain: String)
 
-    var name: String {
+    public init(exclude: Bool, domain: String) {
+        if exclude {
+            self = .excluded(domain)
+        } else {
+            self = .included(domain)
+        }
+    }
+
+    // The name is provided by the convenience implementation in VPNPixel,
+    // so we don't need to implement it here.
+    //
+    // var name: String
+
+    public var unscopedName: String {
         switch self {
         case .excluded:
-            return "vpn_domain_excluded"
+            return "domain_excluded"
 
         case .included:
-            return "vpn_domain_included"
+            return "domain_included"
         }
     }
 
-    var parameters: [String: String]? {
-        return nil
-    }
-
-    var error: Error? {
+    public var parameters: [String: String]? {
         switch self {
-        case .begin,
-                .success:
-            return nil
-        case .failure(let error):
-            return error
+        case .excluded(let domain),
+                .included(let domain):
+            [PixelKit.Parameters.domain: domain]
         }
+    }
+
+    public var error: Error? {
+        return nil
     }
 }
