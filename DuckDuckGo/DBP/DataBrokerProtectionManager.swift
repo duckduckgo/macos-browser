@@ -21,6 +21,7 @@ import BrowserServicesKit
 import DataBrokerProtection
 import LoginItems
 import Common
+import PrivacyProFreemium
 
 public final class DataBrokerProtectionManager {
 
@@ -52,7 +53,7 @@ public final class DataBrokerProtectionManager {
     }
 
     public func isUserAuthenticated() -> Bool {
-        authenticationManager.isUserAuthenticated
+        authenticationManager.isUserAuthenticated || DefaultPrivacyProFreemium.isFreemium
     }
 
     // MARK: - Debugging Features

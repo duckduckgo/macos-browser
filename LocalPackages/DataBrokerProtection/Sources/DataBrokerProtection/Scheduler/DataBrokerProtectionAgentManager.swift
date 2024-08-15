@@ -20,6 +20,7 @@ import Foundation
 import Common
 import BrowserServicesKit
 import PixelKit
+import PrivacyProFreemium
 
 // This is to avoid exposing all the dependancies outside of the DBP package
 public class DataBrokerProtectionAgentManagerProvider {
@@ -146,7 +147,7 @@ public final class DataBrokerProtectionAgentManager {
 
             activityScheduler.startScheduler()
             didStartActivityScheduler = true
-            queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: nil)
+            runScheduledOperations()
 
             /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
             /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
@@ -158,7 +159,7 @@ public final class DataBrokerProtectionAgentManager {
 extension DataBrokerProtectionAgentManager: DataBrokerProtectionBackgroundActivitySchedulerDelegate {
 
     public func dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(_ activityScheduler: DataBrokerProtection.DataBrokerProtectionBackgroundActivityScheduler, completion: (() -> Void)?) {
-        queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies) { _ in
+        runScheduledOperations { _ in
             completion?()
         }
     }
@@ -205,9 +206,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
     }
 
     public func appLaunched() {
-        queueManager.startScheduledOperationsIfPermitted(showWebView: false,
-                                                         operationDependencies:
-                                                            operationDependencies) { [weak self] errors in
+        runScheduledOperations { [weak self] errors in
             guard let self = self else { return }
 
             if let errors = errors {
@@ -244,6 +243,14 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
                                                              profileQueries: profileQueries))
         } catch {
             os_log("Initial Scans Error when trying to fetch the profile to get the profile queries", log: .dataBrokerProtection)
+        }
+    }
+
+    private func runScheduledOperations(withCompletion completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)? = nil) {
+        if DefaultPrivacyProFreemium.isFreemium {
+            queueManager.startFreemiumScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: completion)
+        } else {
+            queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: completion)
         }
     }
 }

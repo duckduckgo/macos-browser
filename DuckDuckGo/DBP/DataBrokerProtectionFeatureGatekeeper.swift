@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Common
 import DataBrokerProtection
 import Subscription
+import PrivacyProFreemium
 
 protocol DataBrokerProtectionFeatureGatekeeper {
     func isFeatureVisible() -> Bool
@@ -91,6 +92,11 @@ struct DefaultDataBrokerProtectionFeatureGatekeeper: DataBrokerProtectionFeature
     }
 
     func arePrerequisitesSatisfied() async -> Bool {
+
+        if DefaultPrivacyProFreemium.isFreemium {
+            return true
+        }
+
         let entitlements = await accountManager.hasEntitlement(forProductName: .dataBrokerProtection,
                                                                cachePolicy: .reloadIgnoringLocalCacheData)
         var hasEntitlements: Bool

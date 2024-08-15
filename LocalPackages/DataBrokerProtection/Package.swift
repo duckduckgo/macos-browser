@@ -32,6 +32,7 @@ let package = Package(
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "184.0.1"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../XPCHelper"),
+        .package(path: "../PrivacyProFreemium"),
     ],
     targets: [
         .target(
@@ -41,6 +42,7 @@ let package = Package(
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .byName(name: "XPCHelper"),
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
+                .product(name: "PrivacyProFreemium", package: "PrivacyProFreemium")
             ],
             resources: [.process("Resources")],
             swiftSettings: [

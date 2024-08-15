@@ -2577,6 +2577,7 @@
 		C13909F52B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */; };
 		C13909FB2B861039001626ED /* AutofillActionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909FA2B861039001626ED /* AutofillActionPresenter.swift */; };
 		C13909FC2B861039001626ED /* AutofillActionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909FA2B861039001626ED /* AutofillActionPresenter.swift */; };
+		C14F0DDD2C6E2A4B0035540C /* PrivacyProFreemium in Frameworks */ = {isa = PBXBuildFile; productRef = C14F0DDC2C6E2A4B0035540C /* PrivacyProFreemium */; };
 		C16127EE2BDFB46400966BB9 /* DataImportShortcutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16127ED2BDFB46400966BB9 /* DataImportShortcutsView.swift */; };
 		C16127EF2BDFB46400966BB9 /* DataImportShortcutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16127ED2BDFB46400966BB9 /* DataImportShortcutsView.swift */; };
 		C168B9AC2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */; };
@@ -4241,12 +4242,12 @@
 		C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionExecutor.swift; sourceTree = "<group>"; };
 		C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillDeleteAllPasswordsExecutorTests.swift; sourceTree = "<group>"; };
 		C13909FA2B861039001626ED /* AutofillActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionPresenter.swift; sourceTree = "<group>"; };
+		C14F0DDB2C6E28FD0035540C /* PrivacyProFreemium */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = PrivacyProFreemium; sourceTree = "<group>"; };
 		C16127ED2BDFB46400966BB9 /* DataImportShortcutsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportShortcutsView.swift; sourceTree = "<group>"; };
 		C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillNeverPromptWebsitesManager.swift; sourceTree = "<group>"; };
 		C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopoversTests.swift; sourceTree = "<group>"; };
 		C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAutofillPopoverPresenter.swift; sourceTree = "<group>"; };
 		C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportShortcutsViewModel.swift; sourceTree = "<group>"; };
-		C1B2198D2C6B637D00B79F01 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionMocks.swift; sourceTree = "<group>"; };
 		C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPopoverPresenter.swift; sourceTree = "<group>"; };
 		C1E961E72B879E4D001760E1 /* MockAutofillActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAutofillActionPresenter.swift; sourceTree = "<group>"; };
@@ -4555,6 +4556,7 @@
 				F198C71E2BD18D88000BF24D /* SwiftLintTool in Frameworks */,
 				1EA7B8D52B7E078C000330A4 /* Subscription in Frameworks */,
 				B6B77BE8297973D4001E68A1 /* Navigation in Frameworks */,
+				C14F0DDD2C6E2A4B0035540C /* PrivacyProFreemium in Frameworks */,
 				F198C7122BD18A28000BF24D /* PixelKit in Frameworks */,
 				3739326729AE4B42009346AE /* DDGSync in Frameworks */,
 				7BA59C9B2AE18B49009A97B1 /* SystemExtensionManager in Frameworks */,
@@ -5063,7 +5065,7 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
-				C1B2198D2C6B637D00B79F01 /* BrowserServicesKit */,
+				C14F0DDB2C6E28FD0035540C /* PrivacyProFreemium */,
 				9D9DE5712C63A96400D20B15 /* AppKitExtensions */,
 				7B9167A82C09E88800322310 /* AppLauncher */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
@@ -9085,6 +9087,7 @@
 				371209222C232E66003ADF3D /* RemoteMessaging */,
 				D6BC8AC52C5A95AA0025375B /* DuckPlayer */,
 				9D9DE5722C63AA0700D20B15 /* AppKitExtensions */,
+				C14F0DDC2C6E2A4B0035540C /* PrivacyProFreemium */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -14061,6 +14064,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */;
 			productName = Lottie;
+		};
+		C14F0DDC2C6E2A4B0035540C /* PrivacyProFreemium */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PrivacyProFreemium;
 		};
 		CBC83E3529B63D380008E19C /* Configuration */ = {
 			isa = XCSwiftPackageProductDependency;

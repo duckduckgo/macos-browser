@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionBundleExtension.swift
+//  PrivacyProFreemium.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,8 +18,19 @@
 
 import Foundation
 
+extension Bundle {
+
+    static let subsAppGroupName = "SUBSCRIPTION_APP_GROUP"
+
+    var appGroupName: String {
+        guard let appGroup = object(forInfoDictionaryKey: Bundle.subsAppGroupName) as? String else {
+            fatalError("Info.plist is missing \(Bundle.subsAppGroupName)")
+        }
+        return appGroup
+    }
+}
+
 extension UserDefaults {
-    static let dbp = UserDefaults(suiteName: Bundle.main.dbpAppGroup)!
     static let subs = UserDefaults(suiteName: Bundle.main.subsAppGroup)!
 }
 
@@ -31,11 +42,21 @@ extension Bundle {
         }
         return appGroup
     }
+}
 
-    var dbpAppGroup: String {
-        guard let appGroup = object(forInfoDictionaryKey: Bundle.dbpAppGroupName) as? String else {
-            fatalError("Info.plist is missing \(appGroupName)")
+public protocol PrivacyProFreemium {
+    static var isFreemium: Bool { get }
+}
+
+public struct DefaultPrivacyProFreemium: PrivacyProFreemium {
+    private static let key = "macos.browser.privacy-pro.freemium"
+
+    public static var isFreemium: Bool {
+        get {
+            UserDefaults.subs.bool(forKey: key)
         }
-        return appGroup
+        set {
+            UserDefaults.setValue(newValue, forKey: key)
+        }
     }
 }

@@ -79,6 +79,9 @@ protocol DataBrokerProtectionQueueManager {
     func startScheduledOperationsIfPermitted(showWebView: Bool,
                                              operationDependencies: DataBrokerOperationDependencies,
                                              completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+    func startFreemiumScheduledOperationsIfPermitted(showWebView: Bool,
+                                                     operationDependencies: DataBrokerOperationDependencies,
+                                                     completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
 
     func execute(_ command: DataBrokerProtectionQueueManagerDebugCommand)
     var debugRunningStatusString: String { get }
@@ -138,6 +141,17 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
         let newMode = DataBrokerProtectionQueueMode.scheduled(completion: completion)
         startOperationsIfPermitted(forNewMode: newMode,
                                    type: .all,
+                                   showWebView: showWebView,
+                                   operationDependencies: operationDependencies,
+                                   completion: completion)
+    }
+
+    func startFreemiumScheduledOperationsIfPermitted(showWebView: Bool,
+                                                     operationDependencies: DataBrokerOperationDependencies,
+                                                     completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
+        let newMode = DataBrokerProtectionQueueMode.scheduled(completion: completion)
+        startOperationsIfPermitted(forNewMode: newMode,
+                                   type: .scan,
                                    showWebView: showWebView,
                                    operationDependencies: operationDependencies,
                                    completion: completion)

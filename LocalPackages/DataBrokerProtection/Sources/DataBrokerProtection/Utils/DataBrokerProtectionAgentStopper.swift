@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import PrivacyProFreemium
 
 protocol DataBrokerProtectionAgentStopper {
     /// Validates if the user has profile data, is authenticated, and has valid entitlement. If any of these conditions are not met, the agent will be stopped.
@@ -48,6 +49,10 @@ struct DefaultDataBrokerProtectionAgentStopper: DataBrokerProtectionAgentStopper
     }
 
     public func validateRunPrerequisitesAndStopAgentIfNecessary() async {
+        if DefaultPrivacyProFreemium.isFreemium {
+            return
+        }
+
         do {
             guard try dataManager.fetchProfile() != nil,
                   authenticationManager.isUserAuthenticated else {

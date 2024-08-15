@@ -19,6 +19,7 @@
 import Foundation
 import Subscription
 import Common
+import PrivacyProFreemium
 
 public protocol DataBrokerProtectionSubscriptionManaging {
     var isUserAuthenticated: Bool { get }
@@ -31,7 +32,7 @@ public final class DataBrokerProtectionSubscriptionManager: DataBrokerProtection
     let subscriptionManager: SubscriptionManager
 
     public var isUserAuthenticated: Bool {
-        subscriptionManager.accountManager.accessToken != nil
+        subscriptionManager.accountManager.accessToken != nil || DefaultPrivacyProFreemium.isFreemium
     }
 
     public var accessToken: String? {

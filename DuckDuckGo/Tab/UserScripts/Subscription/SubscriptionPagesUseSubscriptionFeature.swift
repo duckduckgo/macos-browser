@@ -38,7 +38,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     var subscriptionPlatform: SubscriptionEnvironment.PurchasePlatform { subscriptionManager.currentEnvironment.purchasePlatform }
 
     let stripePurchaseFlow: StripePurchaseFlow
-    let freemiumFlow: FreemiumFlow
     let subscriptionErrorReporter = DefaultSubscriptionErrorReporter()
     let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
     let uiHandler: SubscriptionUIHandling
@@ -46,11 +45,9 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     public init(subscriptionManager: SubscriptionManager,
                 subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = PrivacyProSubscriptionAttributionPixelHandler(),
                 stripePurchaseFlow: StripePurchaseFlow,
-                freemiumFlow: FreemiumFlow,
                 uiHandler: SubscriptionUIHandling) {
         self.subscriptionManager = subscriptionManager
         self.stripePurchaseFlow = stripePurchaseFlow
-        self.freemiumFlow = freemiumFlow
         self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
         self.uiHandler = uiHandler
     }
@@ -109,12 +106,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             case token
         }
         let token: String
-    }
-
-    func setupFreemium() async {
-//        _ = await freemiumFlow.setupFreemium()
-
-        await uiHandler.showTab(with: .dataBrokerProtection)
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -318,13 +309,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     // MARK: functions used in SubscriptionAccessActionHandlers
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-//        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseOfferPageEntry)
-//        Task { @MainActor in
-//            uiHandler.presentSubscriptionAccessViewController(handler: self, message: original)
-//        }
-
-        await setupFreemium()
-
+        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseOfferPageEntry)
+        Task { @MainActor in
+            uiHandler.presentSubscriptionAccessViewController(handler: self, message: original)
+        }
         return nil
     }
 

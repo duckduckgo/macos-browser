@@ -27,6 +27,7 @@ import NetworkProtectionIPC
 import NetworkProtectionUI
 import Subscription
 import SubscriptionUI
+import PrivacyProFreemium
 
 final class NavigationBarViewController: NSViewController {
 
@@ -310,20 +311,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func freemiumPIRbuttonAction(_ sender: Any) {
-
-        Task {
-            // Setup Freemium if necessary
-            // TODO: Extract and encapsulate
-            do {
-                let freemiumFlow = DefaultFreemiumFlow(authEndpointService: subscriptionManager.authEndpointService, accountManager: subscriptionManager.accountManager)
-                try await freemiumFlow.setupFreemiumLocal()
-
-                // Open PIR
-                WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
-            } catch {
-
-            }
-        }
+        DefaultPrivacyProFreemium.isFreemium = true
+        WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
     }
 
     override func mouseDown(with event: NSEvent) {
