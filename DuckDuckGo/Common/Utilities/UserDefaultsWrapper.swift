@@ -18,6 +18,7 @@
 
 import AppKit
 import Foundation
+import AppKitExtensions
 
 extension UserDefaults {
     /// The app group's shared UserDefaults
@@ -174,8 +175,6 @@ public struct UserDefaultsWrapper<T> {
         // VPN
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
-        case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
-        case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
         // VPN: Shared Defaults
         // ---
@@ -183,8 +182,6 @@ public struct UserDefaultsWrapper<T> {
         // or else KVO will just not work as of 2023-08-07
 
         case networkProtectionOnboardingStatusRawValue = "networkProtectionOnboardingStatusRawValue"
-        case networkProtectionWaitlistActiveOverrideRawValue = "networkProtectionWaitlistActiveOverrideRawValue"
-        case networkProtectionWaitlistEnabledOverrideRawValue = "networkProtectionWaitlistEnabledOverrideRawValue"
 
         // Updates
         case automaticUpdates = "updates.automatic"

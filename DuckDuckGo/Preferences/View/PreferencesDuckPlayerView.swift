@@ -25,6 +25,9 @@ extension Preferences {
 
     struct DuckPlayerView: View {
         @ObservedObject var model: DuckPlayerPreferences
+        /// The ContingencyMessageView may be redrawn multiple times in the onAppear method if the user changes tabs.
+        /// This property ensures that the associated action is only triggered once per viewing session, preventing redundant executions.
+        @State private var hasFiredSettingsDisplayedPixel = false
 
         var duckPlayerModeBinding: Binding<DuckPlayerMode> {
             .init {
@@ -54,6 +57,12 @@ extension Preferences {
                             model.openLearnMoreContingencyURL()
                         }
                         .frame(width: 512)
+                        .onAppear {
+                            if !hasFiredSettingsDisplayedPixel {
+                                PixelKit.fire(NonStandardEvent(GeneralPixel.duckPlayerContingencySettingsDisplayed))
+                                hasFiredSettingsDisplayedPixel = true
+                            }
+                        }
                     }
                 }
 

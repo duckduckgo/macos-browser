@@ -82,6 +82,7 @@ extension EventMapping where Event == NetworkProtectionError {
                 .wireGuardDnsResolution,
                 .wireGuardSetNetworkSettings,
                 .startWireGuardBackend,
+                .setWireguardConfig,
                 .failedToRetrieveAuthToken,
                 .failedToFetchServerStatus,
                 .failedToParseServerStatusResponse:

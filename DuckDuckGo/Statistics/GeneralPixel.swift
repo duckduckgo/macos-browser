@@ -130,6 +130,8 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerAutoplaySettingsOff
     case duckPlayerNewTabSettingsOn
     case duckPlayerNewTabSettingsOff
+    case duckPlayerContingencySettingsDisplayed
+    case duckPlayerContingencyLearnMoreClicked
 
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
@@ -604,6 +606,10 @@ enum GeneralPixel: PixelKitEventV2 {
             return "duckplayer_mac_newtab_setting-on"
         case .duckPlayerNewTabSettingsOff:
             return "duckplayer_mac_newtab_setting-off"
+        case .duckPlayerContingencySettingsDisplayed:
+            return "duckplayer_mac_contingency_settings-displayed"
+        case .duckPlayerContingencyLearnMoreClicked:
+            return "duckplayer_mac_contingency_learn-more-clicked"
         case .dashboardProtectionAllowlistAdd:
             return "m_mac_mp_wla"
         case .dashboardProtectionAllowlistRemove:
