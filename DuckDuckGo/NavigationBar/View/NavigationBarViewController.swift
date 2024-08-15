@@ -169,6 +169,7 @@ final class NavigationBarViewController: NSViewController {
         bookmarkListButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
         bookmarkListButton.delegate = self
+        bookmarkListButton.setAccessibilityIdentifier("NavigationBarViewController.bookmarkListButton")
         downloadsButton.sendAction(on: .leftMouseDown)
         networkProtectionButton.sendAction(on: .leftMouseDown)
         passwordManagementButton.sendAction(on: .leftMouseDown)
