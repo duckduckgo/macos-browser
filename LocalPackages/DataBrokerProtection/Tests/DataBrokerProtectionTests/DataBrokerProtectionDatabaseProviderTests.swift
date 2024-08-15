@@ -216,30 +216,6 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
         XCTAssertNoThrow(try sut.deleteProfileData())
         XCTAssertTrue(try sut.db.allTablesAreEmpty())
     }
-
-    func testCreationWithUserNotIn10PercentUsesV2Migrations() throws {
-        // Given
-        let mockFeatureFlagger = MockFeatureFlagger(isUserIn: false)
-
-        // When
-        _ = try DefaultDataBrokerProtectionDatabaseProvider.create(file: vaultURL, key: key, featureFlagger: mockFeatureFlagger, migrationProvider: MockMigrationsProvider.self)
-
-        // Then
-        XCTAssertTrue(MockMigrationsProvider.didCallV2Migrations)
-        XCTAssertFalse(MockMigrationsProvider.didCallV3Migrations)
-    }
-
-    func testCreationWithUserIn10PercentUsesV3Migrations() throws {
-        // Given
-        let mockFeatureFlagger = MockFeatureFlagger(isUserIn: true)
-
-        // When
-        _ = try DefaultDataBrokerProtectionDatabaseProvider.create(file: vaultURL, key: key, featureFlagger: mockFeatureFlagger, migrationProvider: MockMigrationsProvider.self)
-
-        // Then
-        XCTAssertFalse(MockMigrationsProvider.didCallV2Migrations)
-        XCTAssertTrue(MockMigrationsProvider.didCallV3Migrations)
-    }
 }
 
 private extension DatabaseWriter {
