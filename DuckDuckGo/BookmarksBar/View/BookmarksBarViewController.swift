@@ -197,7 +197,7 @@ final class BookmarksBarViewController: NSViewController {
     // MARK: - Layout
 
     private func createCenteredLayout(centered: Bool) -> NSCollectionLayoutSection {
-        let group = NSCollectionLayoutGroup.horizontallyCentered(cellSizes: viewModel.cellSizes, centered: centered)
+        let group = NSCollectionLayoutGroup.horizontallyCentered(cellSizes: viewModel.cellSizes, interItemSpacing: BookmarksBarViewModel.Constants.buttonSpacing, centered: centered)
         return NSCollectionLayoutSection(group: group)
     }
 
