@@ -337,7 +337,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             hasAccessToITR = result
         case .failure:
             hasAccessToITR = false
-        }
+        } 
     }
 
     @MainActor func fetchEmailAndRemoteEntitlements() async {

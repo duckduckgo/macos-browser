@@ -4246,6 +4246,7 @@
 		C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopoversTests.swift; sourceTree = "<group>"; };
 		C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAutofillPopoverPresenter.swift; sourceTree = "<group>"; };
 		C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportShortcutsViewModel.swift; sourceTree = "<group>"; };
+		C1B2198D2C6B637D00B79F01 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionMocks.swift; sourceTree = "<group>"; };
 		C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPopoverPresenter.swift; sourceTree = "<group>"; };
 		C1E961E72B879E4D001760E1 /* MockAutofillActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAutofillActionPresenter.swift; sourceTree = "<group>"; };
@@ -5062,6 +5063,7 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
+				C1B2198D2C6B637D00B79F01 /* BrowserServicesKit */,
 				9D9DE5712C63A96400D20B15 /* AppKitExtensions */,
 				7B9167A82C09E88800322310 /* AppLauncher */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,

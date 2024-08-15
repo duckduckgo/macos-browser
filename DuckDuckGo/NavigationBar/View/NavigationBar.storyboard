@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="o2v-eH-jTI">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22690"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -200,6 +200,32 @@
                                             <action selector="downloadsButtonAction:" target="o2v-eH-jTI" id="UIu-gq-V20"/>
                                         </connections>
                                     </button>
+                                    <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="emE-Ol-o3T" userLabel="Freemium PIR Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="DBP-Icon" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="n8e-Lr-hor">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="ButtonColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="ccD-dm-aXk"/>
+                                            <constraint firstAttribute="width" constant="28" id="slm-z5-ih8"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="freemiumPIRbuttonAction:" target="o2v-eH-jTI" id="jRj-18-cU3"/>
+                                        </connections>
+                                    </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="1nW-I1-nut" userLabel="Password Management Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="PasswordManagement" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="4Lj-Dl-t3g">
@@ -311,8 +337,10 @@
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
+                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
@@ -357,6 +385,7 @@
                         <outlet property="buttonsTopConstraint" destination="qeF-30-DZN" id="WfB-NP-nV7"/>
                         <outlet property="daxLogo" destination="8Ha-or-PB2" id="Id4-3e-U4K"/>
                         <outlet property="downloadsButton" destination="G8p-di-fq4" id="oxD-pc-8hn"/>
+                        <outlet property="freemiumPIRButton" destination="emE-Ol-o3T" id="tKJ-vA-GUZ"/>
                         <outlet property="goBackButton" destination="kky-0N-Cfd" id="RA9-yE-URS"/>
                         <outlet property="goForwardButton" destination="mdE-u0-Ei5" id="7wT-nX-Avr"/>
                         <outlet property="homeButton" destination="s7D-YB-p00" id="sjk-Af-Zl4"/>
@@ -906,6 +935,7 @@
         <image name="Camera-Icon" width="16" height="12"/>
         <image name="Camera-Tab-Blocked" width="16" height="14"/>
         <image name="Clear" width="9" height="9"/>
+        <image name="DBP-Icon" width="16" height="16"/>
         <image name="Downloads" width="16" height="16"/>
         <image name="ExternalAppScheme" width="16" height="16"/>
         <image name="Forward" width="16" height="16"/>

@@ -45,6 +45,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var homeButtonSeparator: NSBox!
     @IBOutlet weak var downloadsButton: MouseOverButton!
     @IBOutlet weak var networkProtectionButton: MouseOverButton!
+    @IBOutlet weak var freemiumPIRButton: MouseOverButton!
     @IBOutlet weak var navigationButtons: NSStackView!
     @IBOutlet weak var addressBarContainer: NSView!
     @IBOutlet weak var daxLogo: NSImageView!
@@ -159,6 +160,7 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.sendAction(on: .leftMouseDown)
         networkProtectionButton.sendAction(on: .leftMouseDown)
         passwordManagementButton.sendAction(on: .leftMouseDown)
+        freemiumPIRButton.sendAction(on: .leftMouseDown)
 
         optionsButton.toolTip = UserText.applicationMenuTooltip
         optionsButton.setAccessibilityIdentifier("NavigationBarViewController.optionsButton")
@@ -177,6 +179,7 @@ final class NavigationBarViewController: NSViewController {
         updatePasswordManagementButton()
         updateBookmarksButton()
         updateHomeButton()
+        updateFreemiumPIRButton()
 
         if view.window?.isPopUpWindow == true {
             goBackButton.isHidden = true
@@ -306,6 +309,23 @@ final class NavigationBarViewController: NSViewController {
         toggleDownloadsPopover(keepButtonVisible: false)
     }
 
+    @IBAction func freemiumPIRbuttonAction(_ sender: Any) {
+
+        Task {
+            // Setup Freemium if necessary
+            // TODO: Extract and encapsulate
+            do {
+                let freemiumFlow = DefaultFreemiumFlow(authEndpointService: subscriptionManager.authEndpointService, accountManager: subscriptionManager.accountManager)
+                try await freemiumFlow.setupFreemiumLocal()
+
+                // Open PIR
+                WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+            } catch {
+
+            }
+        }
+    }
+
     override func mouseDown(with event: NSEvent) {
         if let menu = view.menu, NSEvent.isContextClick(event) {
             NSMenu.popUpContextMenu(menu, with: event, for: view)
@@ -351,6 +371,8 @@ final class NavigationBarViewController: NSViewController {
                     self.updateHomeButton()
                 case .networkProtection:
                     self.networkProtectionButtonModel.updateVisibility()
+                case .freemiumPIR:
+                    self.updateFreemiumPIRButton()
                 }
             } else {
                 assertionFailure("Failed to get changed pinned view type")
@@ -852,6 +874,21 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
+    private func updateFreemiumPIRButton() {
+        let menu = NSMenu()
+        let title = LocalPinningManager.shared.shortcutTitle(for: .freemiumPIR)
+        menu.addItem(withTitle: title, action: #selector(toggleFreemiumPIRPanelPinning(_:)), keyEquivalent: "")
+
+        freemiumPIRButton.menu = menu
+        freemiumPIRButton.toolTip = "Freemium PIR Button"
+
+        if LocalPinningManager.shared.isPinned(.freemiumPIR) {
+            freemiumPIRButton.isHidden = false
+        } else {
+            freemiumPIRButton.isHidden = true
+        }
+    }
+
     private func subscribeToCredentialsToSave() {
         credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.autofillDataToSavePublisher
             .receive(on: DispatchQueue.main)
@@ -938,6 +975,9 @@ extension NavigationBarViewController: NSMenuDelegate {
         let downloadsTitle = LocalPinningManager.shared.shortcutTitle(for: .downloads)
         menu.addItem(withTitle: downloadsTitle, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "J")
 
+        let freemiumPIRTitle = LocalPinningManager.shared.shortcutTitle(for: .freemiumPIR)
+        menu.addItem(withTitle: freemiumPIRTitle, action: #selector(toggleFreemiumPIRPanelPinning), keyEquivalent: "F")
+
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
         if !isPopUpWindow && DefaultVPNFeatureGatekeeper(subscriptionManager: subscriptionManager).isVPNVisible() {
@@ -949,6 +989,7 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleAutofillPanelPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .autofill)
+        LocalPinningManager.shared.togglePinning(for: .freemiumPIR)
     }
 
     @objc
@@ -964,6 +1005,11 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleNetworkProtectionPanelPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
+    }
+
+    @objc
+    private func toggleFreemiumPIRPanelPinning(_ sender: NSMenuItem) {
+        LocalPinningManager.shared.togglePinning(for: .freemiumPIR)
     }
 
     // MARK: - VPN

@@ -130,6 +130,8 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(NSMenuItem.separator())
 
+        addFreemiumItem()
+
         addSubscriptionItems()
 
         addPageItems()
@@ -311,6 +313,28 @@ final class MoreOptionsMenu: NSMenu {
             .withAccessibilityIdentifier("MoreOptionsMenu.autofill")
 
         addItem(NSMenuItem.separator())
+    }
+
+    private func addFreemiumItem() {
+        guard subscriptionFeatureAvailability.isFeatureAvailable else { return }
+
+        func shouldHideDueToNoProduct() -> Bool {
+            let platform = subscriptionManager.currentEnvironment.purchasePlatform
+            return platform == .appStore && subscriptionManager.canPurchase == false
+        }
+
+        let privacyProItem = NSMenuItem(title: "Freemium PIR").withImage(.subscriptionIcon)
+
+        if !accountManager.isUserAuthenticated {
+            privacyProItem.target = self
+            privacyProItem.action = #selector(openSubscriptionPurchasePage(_:))
+
+            // Do not add for App Store when purchase not available in the region
+            if !shouldHideDueToNoProduct() {
+                addItem(privacyProItem)
+                addItem(NSMenuItem.separator())
+            }
+        }
     }
 
     private func addSubscriptionItems() {
