@@ -247,6 +247,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
     }
 
     private func runScheduledOperations(withCompletion completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)? = nil) {
+        // TODO: NEED TO CHECK FREEMIUM AND NOT AUTH
         if DefaultPrivacyProFreemium.isFreemium {
             queueManager.startFreemiumScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: completion)
         } else {

@@ -22,6 +22,7 @@ import Subscription
 import DataBrokerProtection
 import PixelKit
 import Common
+import PrivacyProFreemium
 
 final class DataBrokerProtectionSubscriptionEventHandler {
 
@@ -54,6 +55,7 @@ final class DataBrokerProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignOut() {
+        guard !DefaultPrivacyProFreemium.isFreemium else { return }
         featureDisabler.disableAndDelete()
     }
 

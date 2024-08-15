@@ -56,7 +56,7 @@ public struct DefaultPrivacyProFreemium: PrivacyProFreemium {
             UserDefaults.subs.bool(forKey: key)
         }
         set {
-            UserDefaults.setValue(newValue, forKey: key)
+            UserDefaults.subs.setValue(newValue, forKey: key)
         }
     }
 }
