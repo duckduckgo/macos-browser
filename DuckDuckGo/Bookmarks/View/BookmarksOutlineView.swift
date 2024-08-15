@@ -137,6 +137,7 @@ final class BookmarksOutlineView: NSOutlineView {
     }
 
     override func keyDown(with event: NSEvent) {
+        // TODO: arrow up/down -> skip items that aren‘t `canBeHighlighted`; don‘t highlight in child menu if no such items
         switch Int(event.keyCode) {
         case kVK_DownArrow:
             if let highlightedRow {
@@ -250,7 +251,7 @@ final class BookmarksOutlineView: NSOutlineView {
                 outlineView.highlightedCellView?.isInKeyWindow = false
             }
 
-        case kVK_Escape:
+        case kVK_Escape: // TODO: hide search when active first
             var window = window
             while let windowParent = window?.parent,
                   type(of: windowParent) == type(of: window!) {
