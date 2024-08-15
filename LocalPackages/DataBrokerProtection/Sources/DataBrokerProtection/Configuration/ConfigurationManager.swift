@@ -19,23 +19,49 @@
 import Foundation
 import BrowserServicesKit
 import Configuration
+import Common
+import PixelKit
 
-final class ConfigurationManager {
+final class ConfigurationManager: DefaultConfigurationManager {
 
-    enum Constants {
+    static let shared = ConfigurationManager(fetcher: ConfigurationFetcher(store: ConfigurationStore.shared,
+                                                                           log: .default,
+                                                                           eventMapping: nil))
+    // TODO: EventMapping for error pixels
 
-        static let downloadTimeoutSeconds = 60.0 * 5
-#if DEBUG
-        static let refreshPeriodSeconds = 60.0 * 2 // 2 minutes
-#else
-        static let refreshPeriodSeconds = 60.0 * 30 // 30 minutes
-#endif
-        static let retryDelaySeconds = 60.0 * 60 * 1 // 1 hour delay before checking again if something went wrong last time
-        static let refreshCheckIntervalSeconds = 60.0 // check if we need a refresh every minute
+    override public func refreshNow(isDebug: Bool = false) async {
+        let updateConfigDependenciesTask = Task {
+            let didFetchConfig = await fetchConfigDependencies(isDebug: isDebug)
+            if didFetchConfig {
+                updateConfigDependencies()
+                tryAgainLater()
+            }
+        }
 
+        await updateConfigDependenciesTask.value
+
+//        ConfigurationStore.shared.log()
+//        log()
     }
 
-    static let shared = ConfigurationManager()
-    static let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
+    func fetchConfigDependencies(isDebug: Bool) async -> Bool {
+        do {
+            try await fetcher.fetch(.privacyConfiguration, isDebug: isDebug)
+            return true
+        } catch {
+            os_log("Failed to complete configuration update to %@: %@",
+                   log: .default,
+                   type: .error,
+                   Configuration.privacyConfiguration.rawValue,
+                   error.localizedDescription)
+            tryAgainSoon()
+        }
 
+        return false
+    }
+
+    func updateConfigDependencies() {
+        // TODO: Update lastConfigurationInstallDate
+        // TODO: Provide config to dependency manager
+    }
 }
