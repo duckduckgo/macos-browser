@@ -45,14 +45,18 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         .withAccessibilityIdentifier("BookmarkManagementDetailViewController.sortItemsButton")
 
     lazy var searchBar = NSSearchField()
+        .withAccessibilityIdentifier("BookmarkManagementDetailViewController.searchBar")
     private lazy var separator = NSBox()
     private lazy var scrollView = NSScrollView()
     private lazy var tableView = NSTableView()
 
     private lazy var emptyState = NSView()
     private lazy var emptyStateImageView = NSImageView(image: .bookmarksEmpty)
+        .withAccessibilityIdentifier(BookmarksEmptyStateContent.imageAccessibilityIdentifier)
     private lazy var emptyStateTitle = NSTextField()
+        .withAccessibilityIdentifier(BookmarksEmptyStateContent.titleAccessibilityIdentifier)
     private lazy var emptyStateMessage = NSTextField()
+        .withAccessibilityIdentifier(BookmarksEmptyStateContent.descriptionAccessibilityIdentifier)
     private lazy var importButton = NSButton(title: UserText.importBookmarksButtonTitle, target: self, action: #selector(onImportClicked))
 
     weak var delegate: BookmarkManagementDetailViewControllerDelegate?

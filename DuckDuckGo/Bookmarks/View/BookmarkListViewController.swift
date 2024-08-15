@@ -37,7 +37,9 @@ final class BookmarkListViewController: NSViewController {
     private lazy var stackView = NSStackView()
     private lazy var newBookmarkButton = MouseOverButton(image: .addBookmark, target: self, action: #selector(newBookmarkButtonClicked))
     private lazy var newFolderButton = MouseOverButton(image: .addFolder, target: self, action: #selector(newFolderButtonClicked))
+        .withAccessibilityIdentifier("BookmarkListViewController.newFolderButton")
     private lazy var searchBookmarksButton = MouseOverButton(image: .searchBookmarks, target: self, action: #selector(searchBookmarkButtonClicked))
+        .withAccessibilityIdentifier("BookmarkListViewController.searchBookmarksButton")
     private lazy var sortBookmarksButton = MouseOverButton(image: .bookmarkSortAsc, target: self, action: #selector(sortBookmarksButtonClicked))
     private var isSearchVisible = false
 
@@ -50,10 +52,14 @@ final class BookmarkListViewController: NSViewController {
 
     private lazy var emptyState = NSView()
     private lazy var emptyStateTitle = NSTextField()
+        .withAccessibilityIdentifier(BookmarksEmptyStateContent.titleAccessibilityIdentifier)
     private lazy var emptyStateMessage = NSTextField()
+        .withAccessibilityIdentifier(BookmarksEmptyStateContent.descriptionAccessibilityIdentifier)
     private lazy var emptyStateImageView = NSImageView(image: .bookmarksEmpty)
+        .withAccessibilityIdentifier(BookmarksEmptyStateContent.imageAccessibilityIdentifier)
     private lazy var importButton = NSButton(title: UserText.importBookmarksButtonTitle, target: self, action: #selector(onImportClicked))
     private lazy var searchBar = NSSearchField()
+        .withAccessibilityIdentifier("BookmarkListViewController.searchBar")
     private var boxDividerTopConstraint = NSLayoutConstraint()
 
     private var cancellables = Set<AnyCancellable>()

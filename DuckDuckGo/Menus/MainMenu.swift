@@ -285,28 +285,30 @@ final class MainMenu: NSMenu {
     }
 
     func buildBookmarksMenu() -> NSMenuItem {
-        NSMenuItem(title: UserText.bookmarks).submenu(bookmarksMenu.buildItems {
-            NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(MainViewController.bookmarkThisPage), keyEquivalent: "d")
-            NSMenuItem(title: UserText.bookmarkAllTabs, action: #selector(MainViewController.bookmarkAllOpenTabs), keyEquivalent: [.command, .shift, "d"])
-            manageBookmarksMenuItem
-            bookmarksMenuToggleBookmarksBarMenuItem
-            NSMenuItem.separator()
+        NSMenuItem(title: UserText.bookmarks)
+            .withAccessibilityIdentifier("MainMenu.bookmarks")
+            .submenu(bookmarksMenu.buildItems {
+                NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(MainViewController.bookmarkThisPage), keyEquivalent: "d")
+                NSMenuItem(title: UserText.bookmarkAllTabs, action: #selector(MainViewController.bookmarkAllOpenTabs), keyEquivalent: [.command, .shift, "d"])
+                manageBookmarksMenuItem
+                bookmarksMenuToggleBookmarksBarMenuItem
+                NSMenuItem.separator()
 
-            importBookmarksMenuItem
-            NSMenuItem(title: UserText.exportBookmarks, action: #selector(AppDelegate.openExportBookmarks))
-            NSMenuItem.separator()
+                importBookmarksMenuItem
+                NSMenuItem(title: UserText.exportBookmarks, action: #selector(AppDelegate.openExportBookmarks))
+                NSMenuItem.separator()
 
-            NSMenuItem(title: UserText.favorites)
-                .submenu(favoritesMenu.buildItems {
-                    NSMenuItem(title: UserText.mainMenuHistoryFavoriteThisPage, action: #selector(MainViewController.favoriteThisPage))
-                        .withImage(.favorite)
-                        .withAccessibilityIdentifier("MainMenu.favoriteThisPage")
-                    NSMenuItem.separator()
-                })
-                .withImage(.favorite)
+                NSMenuItem(title: UserText.favorites)
+                    .submenu(favoritesMenu.buildItems {
+                        NSMenuItem(title: UserText.mainMenuHistoryFavoriteThisPage, action: #selector(MainViewController.favoriteThisPage))
+                            .withImage(.favorite)
+                            .withAccessibilityIdentifier("MainMenu.favoriteThisPage")
+                        NSMenuItem.separator()
+                    })
+                    .withImage(.favorite)
 
-            NSMenuItem.separator()
-        })
+                NSMenuItem.separator()
+            })
     }
 
     func buildWindowMenu() -> NSMenuItem {

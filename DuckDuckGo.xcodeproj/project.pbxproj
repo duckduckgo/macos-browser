@@ -2541,6 +2541,8 @@
 		BB7B5F992C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7B5F972C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift */; };
 		BBB881882C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */; };
 		BBB881892C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */; };
+		BBBB65402C77BB9400E69AC6 /* BookmarkSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB653F2C77BB9400E69AC6 /* BookmarkSearchTests.swift */; };
+		BBBB65422C77C46100E69AC6 /* BookmarksUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB65412C77C46100E69AC6 /* BookmarksUtilites.swift */; };
 		BBBEE1BF2C4FF63600035ABA /* SortBookmarksViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBEE1BE2C4FF63600035ABA /* SortBookmarksViewModelTests.swift */; };
 		BBBEE1C02C4FF63600035ABA /* SortBookmarksViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBEE1BE2C4FF63600035ABA /* SortBookmarksViewModelTests.swift */; };
 		BBC063E82C5A9E4B007BDC18 /* BookmarkManagementDetailViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBC063E72C5A9E4B007BDC18 /* BookmarkManagementDetailViewModelTests.swift */; };
@@ -4237,6 +4239,8 @@
 		BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionSubscriptionEventHandler.swift; sourceTree = "<group>"; };
 		BB7B5F972C4ED73800BA4AF8 /* BookmarksSearchAndSortMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksSearchAndSortMetrics.swift; sourceTree = "<group>"; };
 		BBB881872C4029BA001247C6 /* BookmarkListTreeControllerSearchDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeControllerSearchDataSource.swift; sourceTree = "<group>"; };
+		BBBB653F2C77BB9400E69AC6 /* BookmarkSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkSearchTests.swift; sourceTree = "<group>"; };
+		BBBB65412C77C46100E69AC6 /* BookmarksUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksUtilites.swift; sourceTree = "<group>"; };
 		BBBEE1BE2C4FF63600035ABA /* SortBookmarksViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortBookmarksViewModelTests.swift; sourceTree = "<group>"; };
 		BBC063E72C5A9E4B007BDC18 /* BookmarkManagementDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManagementDetailViewModelTests.swift; sourceTree = "<group>"; };
 		BBE013E92C5BFD660025F2C6 /* BookmarksEmptyStateContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksEmptyStateContent.swift; sourceTree = "<group>"; };
@@ -6165,6 +6169,7 @@
 				EE9D81C22BC57A3700338BE3 /* StateRestorationTests.swift */,
 				7B4CE8E626F02134009134B1 /* TabBarTests.swift */,
 				56A054522C2592CE007D8FAB /* OnboardingUITests.swift */,
+				BBBB653F2C77BB9400E69AC6 /* BookmarkSearchTests.swift */,
 			);
 			path = UITests;
 			sourceTree = "<group>";
@@ -8560,6 +8565,7 @@
 			children = (
 				EE02D4192BB4609900DBE6B3 /* UITests.swift */,
 				EEBCE6812BA444FA00B9DF00 /* XCUIElementExtension.swift */,
+				BBBB65412C77C46100E69AC6 /* BookmarksUtilites.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -11282,12 +11288,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBBB65422C77C46100E69AC6 /* BookmarksUtilites.swift in Sources */,
 				EEBCE6842BA4643200B9DF00 /* NSSizeExtension.swift in Sources */,
 				EE7F74912BB5D76600CD9456 /* BookmarksBarTests.swift in Sources */,
 				EE02D41C2BB460A600DBE6B3 /* BrowsingHistoryTests.swift in Sources */,
 				EE02D41A2BB4609900DBE6B3 /* UITests.swift in Sources */,
 				EE0429E02BA31D2F009EB20F /* FindInPageTests.swift in Sources */,
 				EE02D4212BB460FE00DBE6B3 /* StringExtension.swift in Sources */,
+				BBBB65402C77BB9400E69AC6 /* BookmarkSearchTests.swift in Sources */,
 				56A054532C2592CE007D8FAB /* OnboardingUITests.swift in Sources */,
 				EE9D81C32BC57A3700338BE3 /* StateRestorationTests.swift in Sources */,
 				EEC7BE2E2BC6C09500F86835 /* AddressBarKeyboardShortcutsTests.swift in Sources */,
