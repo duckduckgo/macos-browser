@@ -21,8 +21,6 @@ import Foundation
 import NetworkProtectionProxy
 import NetworkProtectionUI
 import VPNAppLauncher
-import VPNPixels
-import PixelKit
 
 /// VPN Agent's UI action handler
 ///
@@ -31,9 +29,7 @@ final class VPNUIActionHandler: VPNUIActionHandling {
     private let appLauncher: AppLauncher
     private let proxySettings: TransparentProxySettings
 
-    init(appLauncher: AppLauncher,
-         proxySettings: TransparentProxySettings) {
-
+    init(appLauncher: AppLauncher, proxySettings: TransparentProxySettings) {
         self.appLauncher = appLauncher
         self.proxySettings = proxySettings
     }
