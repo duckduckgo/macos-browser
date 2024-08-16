@@ -203,7 +203,10 @@ struct OptOutDB: Codable {
     let createdDate: Date
     var lastRunDate: Date?
     var preferredRunDate: Date?
+
+    // This was added in a later migration (V4), so will be nil for older entries submitted before the migration
     var submittedSuccessfullyDate: Date?
+
     var sevenDaysConfirmationPixelFired: Bool
     var fourteenDaysConfirmationPixelFired: Bool
     var twentyOneDaysConfirmationPixelFired: Bool

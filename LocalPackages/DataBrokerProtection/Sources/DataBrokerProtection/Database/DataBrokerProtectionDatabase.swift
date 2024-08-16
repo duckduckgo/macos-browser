@@ -37,6 +37,22 @@ protocol DataBrokerProtectionRepository {
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateSubmittedSuccessfullyDate(_ date: Date?,
+                                         forBrokerId brokerId: Int64,
+                                         profileQueryId: Int64,
+                                         extractedProfileId: Int64) throws
+    func updateSevenDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                               forBrokerId brokerId: Int64,
+                                               profileQueryId: Int64,
+                                               extractedProfileId: Int64) throws
+    func updateFourteenDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                                  forBrokerId brokerId: Int64,
+                                                  profileQueryId: Int64,
+                                                  extractedProfileId: Int64) throws
+    func updateTwentyOneDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                                   forBrokerId brokerId: Int64,
+                                                   profileQueryId: Int64,
+                                                   extractedProfileId: Int64) throws
     func updateRemovedDate(_ date: Date?, on extractedProfileId: Int64) throws
 
     func add(_ historyEvent: HistoryEvent) throws
@@ -217,6 +233,86 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             os_log("Database error: updateLastRunDate with extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateLastRunDate date brokerId profileQueryId extractedProfileId"))
+            throw error
+        }
+    }
+
+    func updateSubmittedSuccessfullyDate(_ date: Date?,
+                                         forBrokerId brokerId: Int64,
+                                         profileQueryId: Int64,
+                                         extractedProfileId: Int64) throws {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
+
+            try vault.updateSubmittedSuccessfullyDate(
+                date,
+                forBrokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId
+            )
+        } catch {
+            os_log("Database error: updateSubmittedSuccessfullyDate, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateSubmittedSuccessfullyDate date forBrokerId profileQueryId extractedProfileId"))
+            throw error
+        }
+    }
+
+    func updateSevenDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                               forBrokerId brokerId: Int64,
+                                               profileQueryId: Int64,
+                                               extractedProfileId: Int64) throws {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
+
+            try vault.updateSevenDaysConfirmationPixelFired(
+                pixelFired,
+                forBrokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId
+            )
+        } catch {
+            os_log("Database error: updateSevenDaysConfirmationPixelFired, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateSevenDaysConfirmationPixelFired pixelFired forBrokerId profileQueryId extractedProfileId"))
+            throw error
+        }
+    }
+
+    func updateFourteenDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                                  forBrokerId brokerId: Int64,
+                                                  profileQueryId: Int64,
+                                                  extractedProfileId: Int64) throws {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
+
+            try vault.updateFourteenDaysConfirmationPixelFired(
+                pixelFired,
+                forBrokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId
+            )
+        } catch {
+            os_log("Database error: updateFourteenDaysConfirmationPixelFired, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateFourteenDaysConfirmationPixelFired pixelFired forBrokerId profileQueryId extractedProfileId"))
+            throw error
+        }
+    }
+
+    func updateTwentyOneDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                                   forBrokerId brokerId: Int64,
+                                                   profileQueryId: Int64,
+                                                   extractedProfileId: Int64) throws {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
+
+            try vault.updateTwentyOneDaysConfirmationPixelFired(
+                pixelFired,
+                forBrokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId
+            )
+        } catch {
+            os_log("Database error: updateTwentyOneDaysConfirmationPixelFired, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateTwentyOneDaysConfirmationPixelFired pixelFired forBrokerId profileQueryId extractedProfileId"))
             throw error
         }
     }

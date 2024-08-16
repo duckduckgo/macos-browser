@@ -71,6 +71,22 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
               twentyOneDaysConfirmationPixelFired: Bool) throws
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateSubmittedSuccessfullyDate(_ date: Date?,
+                                         forBrokerId brokerId: Int64,
+                                         profileQueryId: Int64,
+                                         extractedProfileId: Int64) throws
+    func updateSevenDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                               forBrokerId brokerId: Int64,
+                                               profileQueryId: Int64,
+                                               extractedProfileId: Int64) throws
+    func updateFourteenDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                                  forBrokerId brokerId: Int64,
+                                                  profileQueryId: Int64,
+                                                  extractedProfileId: Int64) throws
+    func updateTwentyOneDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                                   forBrokerId brokerId: Int64,
+                                                   profileQueryId: Int64,
+                                                   extractedProfileId: Int64) throws
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutJobData?
     func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutJobData]
     func fetchAllOptOuts() throws -> [OptOutJobData]
@@ -270,6 +286,43 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
 
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
         try self.providers.database.updateLastRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+    }
+
+    func updateSubmittedSuccessfullyDate(_ date: Date?,
+                                         forBrokerId brokerId: Int64,
+                                         profileQueryId: Int64,
+                                         extractedProfileId: Int64) throws {
+        try self.providers.database.updateSubmittedSuccessfullyDate(date, forBrokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+    }
+
+    func updateSevenDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                               forBrokerId brokerId: Int64,
+                                               profileQueryId: Int64,
+                                               extractedProfileId: Int64) throws {
+        try self.providers.database.updateSevenDaysConfirmationPixelFired(pixelFired, 
+                                                                          forBrokerId: brokerId,
+                                                                          profileQueryId: profileQueryId,
+                                                                          extractedProfileId: extractedProfileId)
+    }
+
+    func updateFourteenDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                                  forBrokerId brokerId: Int64,
+                                                  profileQueryId: Int64,
+                                                  extractedProfileId: Int64) throws {
+        try self.providers.database.updateFourteenDaysConfirmationPixelFired(pixelFired, 
+                                                                             forBrokerId: brokerId,
+                                                                             profileQueryId: profileQueryId,
+                                                                             extractedProfileId: extractedProfileId)
+    }
+
+    func updateTwentyOneDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                                   forBrokerId brokerId: Int64,
+                                                   profileQueryId: Int64,
+                                                   extractedProfileId: Int64) throws {
+        try self.providers.database.updateTwentyOneDaysConfirmationPixelFired(pixelFired, 
+                                                                              forBrokerId: brokerId,
+                                                                              profileQueryId: profileQueryId,
+                                                                              extractedProfileId: extractedProfileId)
     }
 
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutJobData? {

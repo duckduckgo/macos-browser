@@ -74,7 +74,10 @@ struct OptOutJobData: BrokerJobData, Sendable {
     let preferredRunDate: Date?
     let historyEvents: [HistoryEvent]
     let lastRunDate: Date?
+
+    // This was added in a later DB migration (V4), so will be nil for older entries submitted before the migration
     let submittedSuccessfullyDate: Date?
+
     let extractedProfile: ExtractedProfile
     let sevenDaysConfirmationPixelFired: Bool
     let fourteenDaysConfirmationPixelFired: Bool

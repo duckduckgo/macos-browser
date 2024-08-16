@@ -261,7 +261,9 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
             // We default `createdDate` values to unix epoch to avoid any existing data being treated as new data
             $0.add(column: OptOutDB.Columns.createdDate.name, .datetime).notNull().defaults(to: Date(timeIntervalSince1970: 0))
 
+            // For existing data this will be nil even for opt outs that have been submitted
             $0.add(column: OptOutDB.Columns.submittedSuccessfullyDate.name, .datetime)
+
             $0.add(column: OptOutDB.Columns.sevenDaysConfirmationPixelFired.name, .boolean).notNull().defaults(to: false)
             $0.add(column: OptOutDB.Columns.fourteenDaysConfirmationPixelFired.name, .boolean).notNull().defaults(to: false)
             $0.add(column: OptOutDB.Columns.twentyOneDaysConfirmationPixelFired.name, .boolean).notNull().defaults(to: false)
