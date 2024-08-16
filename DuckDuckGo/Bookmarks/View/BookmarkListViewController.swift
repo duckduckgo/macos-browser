@@ -795,6 +795,11 @@ final class BookmarkListViewController: NSViewController {
     }
 
     func reloadData(withRootFolder rootFolder: BookmarkFolder? = nil) {
+        let isChangingRootFolder = if let rootFolder, let currentFolder = representedObject as? BookmarkFolder {
+            currentFolder.id != rootFolder.id
+        } else {
+            false
+        }
         if let rootFolder {
             self.representedObject = rootFolder
             isSearchVisible = false
@@ -829,9 +834,21 @@ final class BookmarkListViewController: NSViewController {
 
             dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode,
                                   withRootFolder: rootFolder ?? self.representedObject as? BookmarkFolder)
+            let oldContentSize = outlineView.bounds.size
             outlineView.reloadData()
 
-            expandAndRestore(selectedNodes: selectedNodes)
+            switch mode {
+            case .popover:
+                expandAndRestore(selectedNodes: selectedNodes)
+            case .bookmarkBarMenu:
+                guard !isChangingRootFolder,
+                      let popover = nextResponder as? BookmarkListPopover,
+                      popover.isShown,
+                      let preferredEdge = popover.preferredEdge else { break }
+
+                updatePositionAndContentSize(oldContentSize: oldContentSize,
+                                             popoverPositioningEdge: preferredEdge)
+            }
         }
 
         let isEmpty = (outlineView.numberOfRows == 0)
@@ -841,6 +858,30 @@ final class BookmarkListViewController: NSViewController {
 
         if isEmpty {
             self.showEmptyStateView(for: .noBookmarks)
+
+        } else {
+            updateHighlightedRowAfterReload(isChangingRootFolder: isChangingRootFolder)
+        }
+    }
+
+    private func updateHighlightedRowAfterReload(isChangingRootFolder: Bool) {
+        DispatchQueue.main.async { [outlineView, weak self] in
+            if outlineView.isMouseLocationInsideBounds() {
+                outlineView.updateHighlightedRowUnderCursor()
+            } else if !isChangingRootFolder,
+                      let highlightedRow = outlineView.highlightedRow,
+                      outlineView.numberOfRows > highlightedRow {
+                // restore current highlight on a highlighted row
+                outlineView.highlightedRow = highlightedRow
+            } else if !isChangingRootFolder,
+                      let bookmarkListPopover = self?.bookmarkListPopover,
+                      bookmarkListPopover.isShown,
+                      let expandedFolder = bookmarkListPopover.rootFolder,
+                      let node = self?.treeController.findNodeWithId(representing: expandedFolder),
+                      let expandedRow = outlineView.rowIfValid(forItem: node) {
+                // restore current highlight on a expanded folder row
+                outlineView.highlightedRow = expandedRow
+            }
         }
     }
 
@@ -954,6 +995,41 @@ final class BookmarkListViewController: NSViewController {
             }
         }
         return contentSize
+    }
+
+    private func updatePositionAndContentSize(oldContentSize: NSSize, popoverPositioningEdge: NSRectEdge) {
+
+        guard let window = view.window,
+              let screenFrame = window.screen?.visibleFrame else { return }
+
+        var contentSize = calculatePreferredContentSize()
+        guard contentSize != oldContentSize else { return }
+
+        let heightChange = contentSize.height - oldContentSize.height
+        let availableHeightBelow = window.frame.minY - screenFrame.minY/* - contentInsets.bottom*/
+        let availableHeightOnTop = screenFrame.maxY - window.frame.maxY/* - contentInsets.top*/
+
+        // growing
+        if heightChange > 0 {
+            // expand popover down as much as available screen space allows
+            contentSize.height = preferredContentSize.height + min(availableHeightBelow, heightChange)
+            // shift popover upwards if not enough space at the bottom
+            if availableHeightBelow < heightChange {
+                preferredContentOffset.y += min(availableHeightOnTop, heightChange - availableHeightBelow)
+            }
+
+        // collapsing
+        } else if /* heightChange < 0 && */ contentSize.height < scrollView.frame.height {
+            // reduce the offset of the popover upwards relative to the presenting view
+            preferredContentOffset.y = max(0, preferredContentOffset.y + heightChange)
+            // contentSize.height = contentSize.height
+        } else {
+            // don‘t reduce the popover size if the content size still needs scrolling
+            contentSize.height = preferredContentSize.height
+        }
+
+        preferredContentSize = contentSize
+        updateScrollButtons()
     }
 
     override func viewDidLayout() {
