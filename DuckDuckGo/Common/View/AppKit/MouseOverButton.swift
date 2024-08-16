@@ -19,6 +19,13 @@
 import Cocoa
 
 @objc protocol MouseOverButtonDelegate: AnyObject {
+
+    @objc optional func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation
+    @objc optional func mouseOverButton(_ sender: MouseOverButton, draggingUpdatedWith info: NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation
+    @objc optional func mouseOverButton(_ sender: MouseOverButton, draggingEndedWith info: NSDraggingInfo)
+    @objc optional func mouseOverButton(_ sender: MouseOverButton, draggingExitedWith info: NSDraggingInfo?)
+    @objc optional func mouseOverButton(_ sender: MouseOverButton, performDragOperation info: NSDraggingInfo) -> Bool
+
 }
 
 internal class MouseOverButton: NSButton, Hoverable {
@@ -100,6 +107,56 @@ internal class MouseOverButton: NSButton, Hoverable {
         didSet {
             updateTintColor()
         }
+    }
+
+    override func draggingEntered(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        var newMouseOver: Bool?
+        var isMouseOver: Bool {
+            get {
+                newMouseOver ?? self.isMouseOver
+            }
+            set {
+                newMouseOver = newValue
+            }
+        }
+        let operation = delegate?.mouseOverButton?(self, draggingEntered: draggingInfo, isMouseOver: &isMouseOver) ?? .none
+        // set isMouseOver if delegate has modified it
+        if let newMouseOver, newMouseOver != self.isMouseOver {
+            self.isMouseOver = newMouseOver
+        }
+        return operation
+    }
+
+    override func draggingUpdated(_ draggingInfo: any NSDraggingInfo) -> NSDragOperation {
+        var newMouseOver: Bool?
+        var isMouseOver: Bool {
+            get {
+                newMouseOver ?? self.isMouseOver
+            }
+            set {
+                newMouseOver = newValue
+            }
+        }
+        let operation = delegate?.mouseOverButton?(self, draggingUpdatedWith: draggingInfo, isMouseOver: &isMouseOver) ?? super.draggingUpdated(draggingInfo)
+        // set isMouseOver if delegate has modified it
+        if let newMouseOver, newMouseOver != self.isMouseOver {
+            self.isMouseOver = newMouseOver
+        }
+        return operation
+    }
+
+    override func performDragOperation(_ draggingInfo: any NSDraggingInfo) -> Bool {
+        return delegate?.mouseOverButton?(self, performDragOperation: draggingInfo) ?? false
+    }
+
+    override func draggingEnded(_ draggingInfo: any NSDraggingInfo) {
+        isMouseOver = false
+        delegate?.mouseOverButton?(self, draggingEndedWith: draggingInfo)
+    }
+
+    override func draggingExited(_ draggingInfo: NSDraggingInfo?) {
+        isMouseOver = false
+        delegate?.mouseOverButton?(self, draggingExitedWith: draggingInfo)
     }
 
     func updateTintColor() {

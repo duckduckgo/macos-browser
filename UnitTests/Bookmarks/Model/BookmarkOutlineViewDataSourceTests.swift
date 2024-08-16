@@ -94,8 +94,11 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: LocalBookmarkManager(), treeController: treeController, sortMode: .manual)
 
-        let pasteboardBookmark = PasteboardBookmark(id: UUID().uuidString, url: "https://example.com", title: "Pasteboard Bookmark")
-        let result = dataSource.validateDrop(for: [pasteboardBookmark], destination: mockDestinationNode)
+        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Pasteboard Bookmark", isFavorite: false)
+        let pasteboard = NSPasteboard()
+        pasteboard.writeObjects([bookmark.pasteboardWriter])
+        let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
+        let result = dataSource.outlineView(NSOutlineView(), validateDrop: draggingInfo, proposedItem: mockDestinationNode, proposedChildIndex: -1)
 
         XCTAssertEqual(result, .move)
     }
@@ -115,8 +118,11 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: LocalBookmarkManager(), treeController: treeController, sortMode: .manual)
 
-        let pasteboardFolder = PasteboardFolder(folder: .init(id: UUID().uuidString, title: "Pasteboard Folder"))
-        let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
+        let folder = BookmarkFolder(id: UUID().uuidString, title: "Pasteboard Folder")
+        let pasteboard = NSPasteboard()
+        pasteboard.writeObjects([folder.pasteboardWriter])
+        let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
+        let result = dataSource.outlineView(NSOutlineView(), validateDrop: draggingInfo, proposedItem: mockDestinationNode, proposedChildIndex: -1)
 
         XCTAssertEqual(result, .move)
     }
@@ -136,8 +142,10 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: LocalBookmarkManager(), treeController: treeController, sortMode: .manual)
         let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
 
-        let pasteboardFolder = PasteboardFolder(folder: mockDestinationFolder)
-        let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
+        let pasteboard = NSPasteboard()
+        pasteboard.writeObjects([mockDestinationFolder.pasteboardWriter])
+        let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
+        let result = dataSource.outlineView(NSOutlineView(), validateDrop: draggingInfo, proposedItem: mockDestinationNode, proposedChildIndex: -1)
 
         XCTAssertEqual(result, .none)
     }
@@ -160,8 +168,10 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let mockDestinationNode = treeController.node(representing: childFolder)!
 
         // Simulate dragging the root folder onto the child folder:
-        let draggedFolder = PasteboardFolder(folder: rootFolder)
-        let result = dataSource.validateDrop(for: [draggedFolder], destination: mockDestinationNode)
+        let pasteboard = NSPasteboard()
+        pasteboard.writeObjects([rootFolder.pasteboardWriter])
+        let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
+        let result = dataSource.outlineView(NSOutlineView(), validateDrop: draggingInfo, proposedItem: mockDestinationNode, proposedChildIndex: -1)
 
         XCTAssertEqual(result, .none)
     }
@@ -250,5 +260,58 @@ extension Bookmark {
 extension BookmarkFolder {
 
     static var mock = BookmarkFolder(id: UUID().uuidString, title: "Title")
+
+}
+
+private class MockDraggingInfo: NSObject, NSDraggingInfo {
+
+    var draggingDestinationWindow: NSWindow?
+
+    var draggingSourceOperationMask: NSDragOperation
+
+    var draggingLocation: NSPoint
+
+    var draggedImageLocation: NSPoint
+
+    var draggedImage: NSImage?
+
+    var draggingPasteboard: NSPasteboard
+
+    var draggingSource: Any?
+
+    var draggingSequenceNumber: Int
+
+    var draggingFormation: NSDraggingFormation
+
+    var animatesToDestination: Bool
+
+    var numberOfValidItemsForDrop: Int
+
+    var springLoadingHighlight: NSSpringLoadingHighlight
+
+    init(draggingDestinationWindow: NSWindow? = nil, draggingSourceOperationMask: NSDragOperation = .move, draggingLocation: NSPoint = .zero, draggedImageLocation: NSPoint = .zero, draggedImage: NSImage? = nil, draggingPasteboard: NSPasteboard, draggingSource: Any? = nil, draggingSequenceNumber: Int = 0, draggingFormation: NSDraggingFormation = .default, animatesToDestination: Bool = true, numberOfValidItemsForDrop: Int = 0, springLoadingHighlight: NSSpringLoadingHighlight = .standard) {
+        self.draggingDestinationWindow = draggingDestinationWindow
+        self.draggingSourceOperationMask = draggingSourceOperationMask
+        self.draggingLocation = draggingLocation
+        self.draggedImageLocation = draggedImageLocation
+        self.draggedImage = draggedImage
+        self.draggingPasteboard = draggingPasteboard
+        self.draggingSource = draggingSource
+        self.draggingSequenceNumber = draggingSequenceNumber
+        self.draggingFormation = draggingFormation
+        self.animatesToDestination = animatesToDestination
+        self.numberOfValidItemsForDrop = numberOfValidItemsForDrop
+        self.springLoadingHighlight = springLoadingHighlight
+    }
+
+    func slideDraggedImage(to screenPoint: NSPoint) {}
+
+    func enumerateDraggingItems(options enumOpts: NSDraggingItemEnumerationOptions = [], for view: NSView?, classes classArray: [AnyClass], searchOptions: [NSPasteboard.ReadingOptionKey: Any] = [:], using block: @escaping (NSDraggingItem, Int, UnsafeMutablePointer<ObjCBool>) -> Void) {
+        fatalError()
+    }
+
+    func resetSpringLoading() {
+        fatalError()
+    }
 
 }

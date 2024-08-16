@@ -18,12 +18,6 @@
 
 import AppKit
 
-extension NSDragOperation {
-
-    static let none = NSDragOperation([])
-
-}
-
 final class BookmarksOutlineView: NSOutlineView {
 
     private var highlightedRowView: RoundedSelectionRowView?

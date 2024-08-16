@@ -26,6 +26,7 @@ protocol BookmarksBarViewModelDelegate: AnyObject {
     func bookmarksBarViewModelWidthForContainer() -> CGFloat
     func bookmarksBarViewModelReloadedData()
     func mouseDidHover(over item: Any)
+    func dragging(over item: BookmarksBarCollectionViewItem?, updatedWith info: NSDraggingInfo?)
 
 }
 
@@ -34,12 +35,13 @@ final class BookmarksBarViewModel: NSObject {
     // MARK: Enums
 
     enum Constants {
-        static let buttonSpacing: CGFloat = 2
+        static let buttonSpacing: CGFloat = 6
         static let buttonHeight: CGFloat = 28
         static let maximumButtonWidth: CGFloat = 128
         static let labelFont = NSFont.systemFont(ofSize: 12)
 
-        static let additionalItemWidth = 28.0
+        static let additionalItemWidth: CGFloat = 28.0
+        static let ignoredXDragDistanceFromCellBorders: CGFloat = 5.0
     }
 
     enum BookmarksBarItemAction {
@@ -73,6 +75,7 @@ final class BookmarksBarViewModel: NSObject {
     var isInteractionPrevented = false
 
     private let bookmarkManager: BookmarkManager
+    private let dragDropManager: BookmarkDragDropManager
     private let tabCollectionViewModel: TabCollectionViewModel
     private var cancellables = Set<AnyCancellable>()
 
@@ -118,8 +121,9 @@ final class BookmarksBarViewModel: NSObject {
 
     // MARK: - Initialization
 
-    init(bookmarkManager: BookmarkManager, tabCollectionViewModel: TabCollectionViewModel) {
+    init(bookmarkManager: BookmarkManager, dragDropManager: BookmarkDragDropManager = .shared, tabCollectionViewModel: TabCollectionViewModel) {
         self.bookmarkManager = bookmarkManager
+        self.dragDropManager = dragDropManager
         self.tabCollectionViewModel = tabCollectionViewModel
         super.init()
         subscribeToBookmarks()
@@ -313,15 +317,34 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                         validateDrop draggingInfo: NSDraggingInfo,
                         proposedIndexPath proposedDropIndexPath: AutoreleasingUnsafeMutablePointer<NSIndexPath>,
                         dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionView.DropOperation>) -> NSDragOperation {
-        if proposedDropOperation.pointee == .on {
-            proposedDropOperation.pointee = .before
+        var destination: Any
+        var mouseLocationInsideCell: NSPoint?
+        var contractedBounds: NSRect?
+        var item = collectionView.item(at: proposedDropIndexPath.pointee as IndexPath) as? BookmarksBarCollectionViewItem
+        if proposedDropOperation.pointee == .on,
+           let cell = item?.view {
+            mouseLocationInsideCell = cell.mouseLocationInsideBounds(draggingInfo.draggingLocation)
+            // ignore extra pixels at the cell borders to let to drop an item between the items
+            contractedBounds = cell.bounds.insetBy(dx: Constants.ignoredXDragDistanceFromCellBorders, dy: 0)
         }
-
-        if existingItemDraggingIndexPath != nil {
-            return .move
+        if let mouseLocationInsideCell, let contractedBounds, contractedBounds.contains(mouseLocationInsideCell),
+           let folder = bookmarksBarItems[safe: proposedDropIndexPath.pointee.item]?.entity as? BookmarkFolder {
+            // dragging over a folder
+            destination = folder
         } else {
-            return .copy
+            // reordering (dragging in inter-item space)
+            proposedDropOperation.pointee = .before
+            destination = PseudoFolder.bookmarks
+            if let mouseLocationInsideCell, let contractedBounds,
+               mouseLocationInsideCell.x > contractedBounds.midX {
+                // when dragging closer to the cell‘s right edge – set the insertion point after the item
+                proposedDropIndexPath.pointee = NSIndexPath(forItem: proposedDropIndexPath.pointee.item + 1, inSection: 0)
+            }
+            item = nil
         }
+        delegate?.dragging(over: item, updatedWith: draggingInfo)
+
+        return dragDropManager.validateDrop(draggingInfo, to: destination)
     }
 
     func collectionView(_ collectionView: NSCollectionView,
@@ -330,83 +353,36 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
                         dropOperation: NSCollectionView.DropOperation) -> Bool {
         beginClickPreventionTimer()
 
-        if let existingIndexPath = existingItemDraggingIndexPath {
-            let entityUUID = self.bookmarksBarItems[existingIndexPath.item].entity.id
+        var destination: Any
+        if dropOperation == .on,
+           let folder = bookmarksBarItems[safe: newIndexPath.item]?.entity as? BookmarkFolder {
+            destination = folder
+        } else {
+            destination = PseudoFolder.bookmarks
+        }
 
-            let index: Int
-
-            if existingIndexPath.item <= newIndexPath.item {
-                index = newIndexPath.item - 1
-            } else {
-                index = newIndexPath.item
-            }
-
+        if let existingIndexPath = existingItemDraggingIndexPath, destination is PseudoFolder {
+            let index = (existingIndexPath.item <= newIndexPath.item) ? newIndexPath.item - 1 : newIndexPath.item
             self.bookmarksBarItems.move(fromOffsets: IndexSet(integer: existingIndexPath.item), toOffset: newIndexPath.item)
             collectionView.animator().moveItem(at: existingIndexPath, to: IndexPath(item: index, section: 0))
             existingItemDraggingIndexPath = nil
-
-            bookmarkManager.move(objectUUIDs: [entityUUID], toIndex: newIndexPath.item, withinParentFolder: .root) { error in
-                if error != nil {
-                    self.delegate?.bookmarksBarViewModelReloadedData()
-                }
-            }
-
-            return true
-        } else if let pasteboardItems = draggingInfo.draggingPasteboard.pasteboardItems {
-            var bookmarksBarUUIDs: [String] = []
-            var otherItems: [NSPasteboardItem] = []
-
-            pasteboardItems.forEach { item in
-                if let bookmarkEntityUUID = item.bookmarkEntityUUID {
-                    bookmarksBarUUIDs.append(bookmarkEntityUUID)
-                } else {
-                    otherItems.append(item)
-                }
-            }
-
-            if !bookmarksBarUUIDs.isEmpty {
-                bookmarkManager.move(objectUUIDs: bookmarksBarUUIDs, toIndex: newIndexPath.item, withinParentFolder: .root) { error in
-                    if error != nil {
-                        self.delegate?.bookmarksBarViewModelReloadedData()
-                    }
-                }
-            }
-
-            if !otherItems.isEmpty {
-                createBookmarks(from: pasteboardItems, at: newIndexPath.item)
-            }
-
-            return true
         }
 
-        return false
+        // apply index change when dropping on the Bookmarks Bar (PseudoFolder.bookmarks)
+        // move to a folder (index == -1) when dropping on a folder item
+        let index = (destination is PseudoFolder) ? newIndexPath.item : -1
+        return dragDropManager.acceptDrop(draggingInfo, to: destination, at: index)
     }
 
     func collectionView(_ collectionView: NSCollectionView, draggingSession session: NSDraggingSession, endedAt screenPoint: NSPoint, dragOperation operation: NSDragOperation) {
-        self.existingItemDraggingIndexPath = nil
-    }
-
-    @MainActor
-    private func createBookmarks(from pasteboardItems: [NSPasteboardItem], at index: Int) {
-        var currentIndex = index
-
-        for item in pasteboardItems {
-            if let webViewItem = item.draggedWebViewValues() {
-                let title = webViewItem.title ?? tabCollectionViewModel.title(forTabWithURL: webViewItem.url) ?? webViewItem.url.absoluteString
-                self.bookmarkManager.makeBookmark(for: webViewItem.url, title: title, isFavorite: false, index: currentIndex, parent: nil)
-            } else if let draggedString = item.string(forType: .string), let draggedURL = URL(string: draggedString) {
-                let title: String
-
-                if let tabTitle = tabCollectionViewModel.title(forTabWithURL: draggedURL) {
-                    title = tabTitle
-                } else {
-                    title = draggedURL.absoluteString
-                }
-
-                self.bookmarkManager.makeBookmark(for: draggedURL, title: title, isFavorite: false, index: currentIndex, parent: nil)
+        // `existingItemDraggingIndexPath` is reset on items reordering
+        if let indexPath = existingItemDraggingIndexPath, bookmarksBarItems.indices.contains(indexPath.item) {
+            // dragDropManager clears draggingPasteboard items on acceptDrop to another folder
+            if (session.draggingPasteboard.pasteboardItems ?? []).isEmpty {
+                bookmarksBarItems.remove(at: indexPath.item)
+                collectionView.deleteItems(at: [indexPath])
             }
-
-            currentIndex += 1
+            self.existingItemDraggingIndexPath = nil
         }
     }
 
