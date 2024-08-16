@@ -140,9 +140,11 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                                        extractedProfileId: extractedProfileId)
         }
 
-        if let lastEvent = brokerProfileQuery.events.last,
-           lastEvent.type == .optOutRequested,
-           let extractedProfileId = extractedProfileId {
+        if let extractedProfileId = extractedProfileId,
+           let optOutJob = optOutJob,
+           let lastEvent = brokerProfileQuery.events.last,
+           lastEvent.type == .optOutRequested && optOutJob.submittedSuccessfullyDate == nil
+        {
             let submittedSuccessfullyDate = SystemDate().now
             try database.updateSubmittedSuccessfullyDate(submittedSuccessfullyDate, forBrokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
         }
