@@ -567,6 +567,19 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
     }
 
+    func updateSubmittedSuccessfullyDate(_ date: Date?, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    }
+
+    func updateSevenDaysConfirmationPixelFired(_ pixelFired: Bool, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    }
+
+    func updateFourteenDaysConfirmationPixelFired(_ pixelFired: Bool, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    }
+
+    func updateTwentyOneDaysConfirmationPixelFired(_ pixelFired: Bool, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+
+    }
+
     func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanJobData? {
         scanJobData.first
     }
@@ -575,10 +588,14 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
         return scanJobData
     }
 
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfile, lastRunDate: Date?, preferredRunDate: Date?) throws {
-    }
-
-    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
+    func save(brokerId: Int64, profileQueryId: Int64,
+              extractedProfile: DataBrokerProtection.ExtractedProfile,
+              createdDate: Date, lastRunDate: Date?,
+              preferredRunDate: Date?,
+              submittedSuccessfullyDate: Date?,
+              sevenDaysConfirmationPixelFired: Bool,
+              fourteenDaysConfirmationPixelFired: Bool,
+              twentyOneDaysConfirmationPixelFired: Bool) throws {
     }
 
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
@@ -687,6 +704,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var wasUpdatedPreferredRunDateForOptOutCalled = false
     var wasUpdateLastRunDateForScanCalled = false
     var wasUpdateLastRunDateForOptOutCalled = false
+    var wasUpdateSubmittedSuccessfullyDateForOptOutCalled = false
+    var wasUpdateSevenDaysConfirmationPixelFired = false
+    var wasUpdateFourteenDaysConfirmationPixelFired = false
+    var wasUpdateTwentyOneDaysConfirmationPixelFired = false
     var wasUpdateRemoveDateCalled = false
     var wasAddHistoryEventCalled = false
     var wasFetchLastHistoryEventCalled = false
@@ -695,6 +716,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastHistoryEventToReturn: HistoryEvent?
     var lastPreferredRunDateOnScan: Date?
     var lastPreferredRunDateOnOptOut: Date?
+    var submittedSuccessfullyDate: Date?
     var extractedProfileRemovedDate: Date?
     var extractedProfilesFromBroker = [ExtractedProfile]()
     var childBrokers = [DataBroker]()
@@ -714,6 +736,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
         wasFetchAllBrokerProfileQueryDataCalled,
         wasUpdatedPreferredRunDateForScanCalled,
         wasUpdatedPreferredRunDateForOptOutCalled,
+        wasUpdateSubmittedSuccessfullyDateForOptOutCalled,
+        wasUpdateSevenDaysConfirmationPixelFired,
+        wasUpdateFourteenDaysConfirmationPixelFired,
+        wasUpdateTwentyOneDaysConfirmationPixelFired,
         wasUpdateLastRunDateForScanCalled,
         wasUpdateLastRunDateForOptOutCalled,
         wasUpdateRemoveDateCalled,
@@ -775,6 +801,23 @@ final class MockDatabase: DataBrokerProtectionRepository {
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) {
         lastPreferredRunDateOnOptOut = date
         wasUpdatedPreferredRunDateForOptOutCalled = true
+    }
+
+    func updateSubmittedSuccessfullyDate(_ date: Date?, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        submittedSuccessfullyDate = date
+        wasUpdateSubmittedSuccessfullyDateForOptOutCalled = true
+    }
+
+    func updateSevenDaysConfirmationPixelFired(_ pixelFired: Bool, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        wasUpdateSevenDaysConfirmationPixelFired = true
+    }
+
+    func updateFourteenDaysConfirmationPixelFired(_ pixelFired: Bool, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        wasUpdateFourteenDaysConfirmationPixelFired = true
+    }
+
+    func updateTwentyOneDaysConfirmationPixelFired(_ pixelFired: Bool, forBrokerId brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        wasUpdateTwentyOneDaysConfirmationPixelFired = true
     }
 
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) {
@@ -1013,7 +1056,7 @@ extension ScanJobData {
 extension OptOutJobData {
     static func mock(with extractedProfile: ExtractedProfile,
                      historyEvents: [HistoryEvent] = [HistoryEvent]()) -> OptOutJobData {
-        .init(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents, extractedProfile: extractedProfile)
+        .init(brokerId: 1, profileQueryId: 1, createdDate: Date(), historyEvents: historyEvents, extractedProfile: extractedProfile)
     }
 }
 
@@ -1733,6 +1776,7 @@ extension ExtractedProfileDB {
 struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
     static var didCallV2Migrations = false
     static var didCallV3Migrations = false
+    static var didCallV4Migrations = false
 
     static var v2Migrations: (inout GRDB.DatabaseMigrator) throws -> Void {
         didCallV2Migrations = true
@@ -1741,6 +1785,11 @@ struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
 
     static var v3Migrations: (inout GRDB.DatabaseMigrator) throws -> Void {
         didCallV3Migrations = true
+        return { _ in }
+    }
+
+    static var v4Migrations: (inout GRDB.DatabaseMigrator) throws -> Void {
+        didCallV4Migrations = true
         return { _ in }
     }
 }
