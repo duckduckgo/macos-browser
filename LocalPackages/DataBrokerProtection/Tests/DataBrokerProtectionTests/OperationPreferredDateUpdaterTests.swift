@@ -61,4 +61,22 @@ final class OperationPreferredDateUpdaterTests: XCTestCase {
 
         XCTAssertFalse(databaseMock.wasDatabaseCalled)
     }
+
+    func testWhenOptOutSubmitted_thenSubittedSuccessfullyDateIsUpdated() {
+        // Given
+        let sut = OperationPreferredDateUpdaterUseCase(database: databaseMock)
+        let extractedProfileId: Int64 = 1
+        let brokerId: Int64 = 1
+        let profileQueryId: Int64 = 11
+        let submittedDate = Date()
+        databaseMock.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested, date: submittedDate)
+
+        // When
+        XCTAssertNoThrow(try sut.updateOperationDataDates(origin: .optOut, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: DataBrokerScheduleConfig.mock))
+
+        // Then
+        XCTAssertTrue(databaseMock.wasUpdateSubmittedSuccessfullyDateForOptOutCalled)
+        let date = databaseMock.submittedSuccessfullyDate!
+        XCTAssertTrue(date >= submittedDate)
+    }
 }
