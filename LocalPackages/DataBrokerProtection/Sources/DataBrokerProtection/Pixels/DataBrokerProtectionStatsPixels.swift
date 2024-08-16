@@ -266,7 +266,7 @@ final class DataBrokerProtectionStatsPixels: StatsPixels {
                 }
             }
 
-            numberOfReAppearences += calculateNumberOfReAppereances(query.scanJobData) + mirrorSitesSize
+            numberOfReAppearences += calculateNumberOfProfileReAppereances(query.scanJobData) + mirrorSitesSize
         }
 
         let numberOfFailureOptOuts = numberOfProfilesFound - numberOfOptOutsInProgress - numberOfSuccessfulOptOuts
@@ -345,8 +345,11 @@ final class DataBrokerProtectionStatsPixels: StatsPixels {
 }
 
 private extension DataBrokerProtectionStatsPixels {
-
-    func calculateNumberOfReAppereances(_ scan: ScanJobData) -> Int {
+    
+    /// Calculates the number of profile reappearances
+    /// - Parameter scan: Scan Job Data
+    /// - Returns: Count of reappearances
+    func calculateNumberOfProfileReAppereances(_ scan: ScanJobData) -> Int {
         return scan.historyEvents.filter { $0.type == .reAppearence }.count
     }
 

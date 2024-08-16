@@ -68,20 +68,20 @@ struct DefaultDataBrokerProtectionCustomStatsProvider: DataBrokerProtectionCusto
             // Get opt-out jobs between start - end dates
             let optOutJobs = optOutJobsBetween(startDate: startDate, endDate: endDate, queryData: brokerQueryData)
 
-            let optOutCount = optOutJobs.count
+            let optOutJobsCount = optOutJobs.count
 
             // If optOutCount is zero, skip to the next data broker
-            guard optOutCount != 0 else { continue }
+            guard optOutJobsCount != 0 else { continue }
 
-            totalGlobalOptOuts += optOutCount
+            totalGlobalOptOuts += optOutJobsCount
 
             // Get opt-out request count since start date
-            let requestsCountSinceStartDate = optOutRequestCountSince(startDate: startDate, for: optOutJobs)
+            let requestsCountSinceStartDate = optOutSuccessfulRequestCountSince(startDate: startDate, for: optOutJobs)
 
             totalGlobalRequests += requestsCountSinceStartDate
 
             // Calculate opt-out success rate
-            let optOutSuccessRate = optOutCount > 0 ? Double(requestsCountSinceStartDate) / Double(optOutCount) : 0
+            let optOutSuccessRate = optOutJobsCount > 0 ? Double(requestsCountSinceStartDate) / Double(optOutJobsCount) : 0
             let roundedOptOutSuccessRate = (optOutSuccessRate * 100).rounded() / 100
 
             let dataBrokerName = groupedByBroker[dataBroker]?.first?.dataBroker.name ?? ""
@@ -113,7 +113,7 @@ private extension DefaultDataBrokerProtectionCustomStatsProvider {
         }
     }
 
-    func optOutRequestCountSince(startDate: Date?,
+    func optOutSuccessfulRequestCountSince(startDate: Date?,
                                  for optOutJobData: [OptOutJobData]) -> Int {
 
         return optOutJobData.reduce(0) { result, optOutJobData in
