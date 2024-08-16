@@ -131,7 +131,7 @@ final class BookmarkListPopover: NSPopover {
 
 extension BookmarkListPopover: BookmarkListViewControllerDelegate {
 
-    func popoverShouldClose(_ bookmarkListViewController: BookmarkListViewController) {
+    func closeBookmarksPopovers(_ sender: BookmarkListViewController) {
         close()
     }
 
