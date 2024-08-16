@@ -205,7 +205,7 @@ final class BookmarksBarViewController: NSViewController {
             return false
         }
         if let bookmarkListPopover, bookmarkListPopover.isShown,
-           (bookmarkListPopover.viewController.representedObject as? BookmarkFolder)?.id == folder.id {
+           bookmarkListPopover.rootFolder?.id == folder.id {
             // folder menu already shown
             return true
         }
@@ -304,7 +304,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         bookmarksBarCollectionView.reloadData()
 
         if let bookmarkListPopover, bookmarkListPopover.isShown,
-           bookmarkListPopover.rootFolder?.id == PseudoFolder.bookmarks.id {
+           bookmarkListPopover.rootFolder?.id == PseudoFolder.bookmarks.id /* clipped items folder has id of the root */ {
             bookmarkListPopover.reloadData(withRootFolder: clippedItemsBookmarkFolder())
         }
     }
@@ -322,7 +322,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         }
         if let bookmarkFolder, let view {
             // already shown?
-            guard (bookmarkListPopover.viewController.representedObject as? BookmarkFolder)?.id != bookmarkFolder.id else { return }
+            guard bookmarkListPopover.rootFolder?.id != bookmarkFolder.id else { return }
             showSubmenu(for: bookmarkFolder, fromView: view)
         } else {
             bookmarkListPopover.close()
@@ -487,7 +487,7 @@ private extension BookmarksBarViewController {
             bookmarkListPopover = popover
             if bookmarkListPopover.isShown {
                 bookmarkListPopover.close()
-                if (bookmarkListPopover.viewController.representedObject as? BookmarkFolder)?.id == folder.id {
+                if bookmarkListPopover.rootFolder?.id == folder.id {
                     return // close popover on 2nd click on the same folder
                 }
             }
@@ -543,7 +543,7 @@ extension BookmarksBarViewController: NSMenuDelegate {
 
 }
 
-extension BookmarksBarViewController: NSPopoverDelegate {
+extension BookmarksBarViewController: BookmarkListPopoverDelegate {
 
     func popoverShouldClose(_ popover: NSPopover) -> Bool {
         if NSApp.currentEvent?.type == .leftMouseUp {
@@ -569,6 +569,81 @@ extension BookmarksBarViewController: NSPopoverDelegate {
             clippedItemsIndicator.mouseOverColor = .buttonMouseOver
         } else if let collectionViewItem = positioningView.nextResponder as? BookmarksBarCollectionViewItem {
             collectionViewItem.isDisplayingMouseDownState = false
+        }
+    }
+
+    func openNextBookmarksMenu(_ sender: BookmarkListPopover) {
+        guard let folder = sender.rootFolder else {
+            assertionFailure("No root folder set in BookmarkListPopover")
+            return
+        }
+        let folderIdx: Int?
+        if folder.id == PseudoFolder.bookmarks.id {
+            // clipped items folder has id of the root
+            folderIdx = nil
+        } else if let idx = viewModel.bookmarksBarItems.firstIndex(where: { $0.entity.id == folder.id }) {
+            folderIdx = idx
+        } else {
+            assertionFailure("Could not find currently open folder in the Bookmarks Bar")
+            return
+        }
+        if let folderIdx, folderIdx + 1 < viewModel.bookmarksBarItems.count {
+            // switch to next folder in the Bookmarks Bar on Right arrow press
+            for idx in viewModel.bookmarksBarItems.indices[(folderIdx + 1)...] {
+                guard let folder = viewModel.bookmarksBarItems[idx].entity as? BookmarkFolder,
+                      let cell = bookmarksBarCollectionView.item(at: idx)?.view else { continue }
+                showSubmenu(for: folder, fromView: cell)
+                return
+            }
+        }
+        // next folder not found: open clipped items menu (if not switching from it: folderIdx != nil)
+        if folderIdx != nil, !viewModel.clippedItems.isEmpty {
+            showSubmenu(for: clippedItemsBookmarkFolder(), fromView: clippedItemsIndicator)
+            return
+        }
+        // switch to 1st folder in the Bookmarks Bar after the Clipped Items menu or after last folder if no clipped items
+        for (idx, item) in viewModel.bookmarksBarItems.enumerated() {
+            guard let folder = item.entity as? BookmarkFolder, let cell = bookmarksBarCollectionView.item(at: idx)?.view else { continue }
+            showSubmenu(for: folder, fromView: cell)
+            return
+        }
+    }
+
+    func openPreviousBookmarksMenu(_ sender: BookmarkListPopover) {
+        guard let folder = sender.rootFolder else {
+            assertionFailure("No root folder set in BookmarkListPopover")
+            return
+        }
+        let folderIdx: Int
+        if folder.id == PseudoFolder.bookmarks.id {
+            // clipped items folder has id of the root
+            folderIdx = viewModel.bookmarksBarItems.count
+        } else if let idx = viewModel.bookmarksBarItems.firstIndex(where: { $0.entity.id == folder.id }) {
+            folderIdx = idx
+        } else {
+            assertionFailure("Could not find currently open folder in the Bookmarks Bar")
+            return
+        }
+        if folderIdx > 0, !viewModel.bookmarksBarItems.isEmpty {
+            // switch to previous folder in the Bookmarks Bar on Left arrow press
+            for idx in viewModel.bookmarksBarItems.indices[..<folderIdx].reversed() {
+                guard let folder = viewModel.bookmarksBarItems[idx].entity as? BookmarkFolder,
+                      let cell = bookmarksBarCollectionView.item(at: idx)?.view else { continue }
+                showSubmenu(for: folder, fromView: cell)
+                return
+            }
+        }
+        // previous folder not found: open clipped items menu (if not switching from it: folderIdx != nil)
+        if !viewModel.clippedItems.isEmpty {
+            guard folderIdx != viewModel.bookmarksBarItems.count else { return } // if already in the clipped items menu
+            showSubmenu(for: clippedItemsBookmarkFolder(), fromView: clippedItemsIndicator)
+            return
+        }
+        // switch to last folder in the Bookmarks Bar before the Clipped Items menu or after last folder if no clipped items
+        for (idx, item) in viewModel.bookmarksBarItems.enumerated().reversed() {
+            guard let folder = item.entity as? BookmarkFolder, let cell = bookmarksBarCollectionView.item(at: idx)?.view else { continue }
+            showSubmenu(for: folder, fromView: cell)
+            return
         }
     }
 

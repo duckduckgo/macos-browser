@@ -20,7 +20,7 @@ import AppKit
 import Common
 import Foundation
 
-final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate {
+final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSource, NSOutlineViewDelegate {
 
     enum ContentMode {
         case bookmarksAndFolders
@@ -165,6 +165,32 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         if let objectID = id(from: notification) {
             expandedNodesIDs.remove(objectID)
         }
+    }
+
+    func firstHighlightableRow(for _: BookmarksOutlineView) -> Int? {
+        nodeForItem(nil).childNodes.firstIndex { $0.canBeHighlighted }
+    }
+
+    func nextHighlightableRow(inNextSection: Bool, for outlineView: BookmarksOutlineView, after row: Int) -> Int? {
+        if inNextSection {
+            return lastHighlightableRow(for: outlineView) // no sections support for now
+        }
+        let nodes = nodeForItem(nil).childNodes
+        guard nodes.indices.contains(row + 1) else { return nil }
+        return nodes[(row + 1)...].firstIndex { $0.canBeHighlighted }
+    }
+
+    func previousHighlightableRow(inPreviousSection: Bool, for outlineView: BookmarksOutlineView, before row: Int) -> Int? {
+        if inPreviousSection {
+            return firstHighlightableRow(for: outlineView) // no sections support for now
+        }
+        let nodes = nodeForItem(nil).childNodes
+        guard nodes.indices.contains(row) else { return nil }
+        return nodes[..<row].lastIndex { $0.canBeHighlighted }
+    }
+
+    func lastHighlightableRow(for _: BookmarksOutlineView) -> Int? {
+        nodeForItem(nil).childNodes.lastIndex { $0.canBeHighlighted }
     }
 
     func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {

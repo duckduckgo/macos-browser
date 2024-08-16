@@ -17,12 +17,16 @@
 //
 
 import AppKit
+import Carbon
 import Combine
 
 protocol BookmarkListViewControllerDelegate: AnyObject {
 
     func closeBookmarksPopovers(_ sender: BookmarkListViewController)
     func popover(shouldPreventClosure: Bool)
+
+    func openNextBookmarksMenu(_ sender: BookmarkListViewController)
+    func openPreviousBookmarksMenu(_ sender: BookmarkListViewController)
 
 }
 
@@ -655,6 +659,14 @@ final class BookmarkListViewController: NSViewController {
     ///           with delay added if needed.
     private func delayedHighlightRowEventPublisher(forRow row: Int?, on event: HighlightEvent) -> AnyPublisher<(Int?, BookmarkFolder?, HighlightEvent), Never>? {
 
+        if let currentEvent = NSApp.currentEvent,
+           currentEvent.type == .keyDown,
+           currentEvent.keyCode == kVK_RightArrow {
+            // don‘t expand the first highlighted folder in a submenu when it was
+            // expanded using the Right arrow key
+            return Empty().eraseToAnyPublisher()
+        }
+
         let bookmarkNode = row.flatMap { outlineView.item(atRow: $0) } as? BookmarkNode
         let folder = bookmarkNode?.representedObject as? BookmarkFolder
 
@@ -963,6 +975,7 @@ final class BookmarkListViewController: NSViewController {
     private func showSearchBar() {
         isSearchVisible = true
         view.addSubview(searchBar)
+        outlineView.highlightedRow = nil
 
         guard let titleTextField, let boxDivider else { return }
         boxDividerTopConstraint?.isActive = false
@@ -984,6 +997,8 @@ final class BookmarkListViewController: NSViewController {
 
     private func hideSearchBar() {
         isSearchVisible = false
+        outlineView.highlightedRow = nil
+        outlineView.makeMeFirstResponder()
         searchBar.stringValue = ""
         searchBar.removeFromSuperview()
         boxDividerTopConstraint?.isActive = true
@@ -996,6 +1011,9 @@ final class BookmarkListViewController: NSViewController {
         outlineView.isHidden = false
         dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode)
         outlineView.reloadData()
+        if !isSearchVisible {
+            outlineView.makeMeFirstResponder()
+        }
     }
 
     private func showEmptyStateView(for mode: BookmarksEmptyStateContent) {
@@ -1007,17 +1025,89 @@ final class BookmarkListViewController: NSViewController {
         importButton?.isHidden = mode.shouldHideImportButton
     }
 
+    private func showSubmenu(for folder: BookmarkFolder, atRow row: Int) {
+        guard let cell = outlineView.view(atColumn: 0, row: row, makeIfNecessary: false) else { return }
+
+        let bookmarkListPopover: BookmarkListPopover
+        if let popover = self.bookmarkListPopover {
+            bookmarkListPopover = popover
+            if bookmarkListPopover.isShown {
+                if bookmarkListPopover.rootFolder?.id == folder.id {
+                    // submenu for the folder is already shown
+                    return
+                }
+                bookmarkListPopover.close()
+            }
+            // reuse the popover for another folder
+            bookmarkListPopover.reloadData(withRootFolder: folder)
+        } else {
+            bookmarkListPopover = BookmarkListPopover(mode: .bookmarkBarMenu, rootFolder: folder)
+            bookmarkListPopover.delegate = self
+            self.bookmarkListPopover = bookmarkListPopover
+        }
+
+        bookmarkListPopover.show(positionedAsSubmenuAgainst: cell)
+    }
+
     // MARK: Actions
 
     override func keyDown(with event: NSEvent) {
-        let commandKeyDown = event.modifierFlags.contains(.command)
-        if commandKeyDown && event.keyCode == 3 { // CMD + F
+        switch Int(event.keyCode) {
+        case kVK_ANSI_F where event.deviceIndependentFlags == .command
+            && mode != .bookmarkBarMenu:
+
             if isSearchVisible {
                 searchBar.makeMeFirstResponder()
             } else {
                 showSearchBar()
             }
-        } else {
+
+        case kVK_Return, kVK_ANSI_KeypadEnter, kVK_Space:
+            if outlineView.highlightedRow != nil {
+                // submit action when there‘s a highlighted row
+                handleClick(outlineView)
+
+            } else if outlineView.numberOfRows > 0 {
+                // when in child menu popover without selection: highlight first row
+                outlineView.highlightedRow = 0
+            }
+
+        case kVK_Escape:
+            delegate?.closeBookmarksPopovers(self)
+
+        case kVK_LeftArrow:
+            // if in submenu: close this submenu
+            if view.window?.parent?.contentViewController is Self,
+               let popover = nextResponder as? NSPopover {
+                popover.close()
+            } else /* we‘re in root menu */ {
+                // switch between bookmarks menus on left/right
+                delegate?.openPreviousBookmarksMenu(self)
+            }
+        case kVK_RightArrow:
+            // expand currently highlighted folder
+            if let highlightedRow = outlineView.highlightedRow,
+               let bookmarkNode = outlineView.item(atRow: highlightedRow) as? BookmarkNode,
+               let folder = bookmarkNode.representedObject as? BookmarkFolder {
+                showSubmenu(for: folder, atRow: highlightedRow)
+                // highlight first submenu row when expanding with Right key
+                bookmarkListPopover?.viewController.outlineView.highlightFirstItem()
+            } else {
+                // switch between bookmarks menus on left/right
+                delegate?.openNextBookmarksMenu(self)
+            }
+
+        default:
+            // start search when letters are typed
+            if mode != .bookmarkBarMenu,
+               let characters = event.characters,
+               !characters.isEmpty {
+
+                showSearchBar()
+                searchBar.currentEditor()?.keyDown(with: event)
+                return
+            }
+
             super.keyDown(with: event)
         }
     }
@@ -1049,19 +1139,26 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @objc func handleClick(_ sender: NSOutlineView) {
-        guard sender.clickedRow != -1 else { return }
-
-        let item = sender.item(atRow: sender.clickedRow)
+        let row = NSApp.currentEvent?.type == .keyDown ? outlineView.highlightedRow : sender.clickedRow
+        guard let row, row != -1 else { return }
+        let item = sender.item(atRow: row)
         guard let node = item as? BookmarkNode else { return }
 
         switch node.representedObject {
         case let bookmark as Bookmark:
             onBookmarkClick(bookmark)
 
-        case let folder as BookmarkFolder where dataSource.isSearching:
-            bookmarkMetrics.fireSearchResultClicked(origin: .panel)
-            hideSearchBar()
-            updateSearchAndExpand(folder)
+        case let folder as BookmarkFolder:
+            switch mode {
+            case .popover where dataSource.isSearching:
+                bookmarkMetrics.fireSearchResultClicked(origin: .panel)
+                hideSearchBar()
+                updateSearchAndExpand(folder)
+            case .popover:
+                handleItemClickWhenNotInSearchMode(item: item)
+            case .bookmarkBarMenu:
+                showSubmenu(for: folder, atRow: row)
+            }
 
         case let menuItem as MenuItemNode:
             if menuItem.identifier == BookmarkTreeController.openAllInNewTabsIdentifier {
@@ -1071,8 +1168,7 @@ final class BookmarkListViewController: NSViewController {
             }
             delegate?.closeBookmarksPopovers(self)
 
-        default:
-            handleItemClickWhenNotInSearchMode(item: item)
+        default: break
         }
     }
 
@@ -1182,8 +1278,7 @@ final class BookmarkListViewController: NSViewController {
     /// Show or close folder submenu on row hover
     /// the method is called from `outlineView.$highlightedRow` observer after a delay as needed
     func outlineViewDidHighlight(_ folder: BookmarkFolder?, atRow row: Int?) {
-        guard let row, let folder,
-              let cell = outlineView.view(atColumn: 0, row: row, makeIfNecessary: false) else {
+        guard let row, let folder else {
             // close submenu if shown
             guard let bookmarkListPopover, bookmarkListPopover.isShown else { return }
             bookmarkListPopover.close()
@@ -1192,24 +1287,7 @@ final class BookmarkListViewController: NSViewController {
             return
         }
 
-        let bookmarkListPopover: BookmarkListPopover
-        if let popover = self.bookmarkListPopover {
-            bookmarkListPopover = popover
-            if bookmarkListPopover.isShown {
-                if bookmarkListPopover.rootFolder?.id == folder.id {
-                    // submenu for the folder is already shown
-                    return
-                }
-                bookmarkListPopover.close()
-            }
-            // reuse the popover for another folder
-            bookmarkListPopover.reloadData(withRootFolder: folder)
-        } else {
-            bookmarkListPopover = BookmarkListPopover(mode: .bookmarkBarMenu, rootFolder: folder)
-            self.bookmarkListPopover = bookmarkListPopover
-        }
-
-        bookmarkListPopover.show(positionedAsSubmenuAgainst: cell)
+        showSubmenu(for: folder, atRow: row)
     }
 
     // MARK: Bookmarks Menu scrolling
@@ -1543,6 +1621,7 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
     }
 
     private func showSearch(forSearchQuery searchQuery: String) {
+        outlineView.highlightedRow = nil
         dataSource.reloadData(forSearchQuery: searchQuery, sortMode: sortBookmarksViewModel.selectedSortMode)
 
         if treeController.rootNode.childNodes.isEmpty {
@@ -1557,6 +1636,37 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
             }
         }
     }
+
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy selector: Selector) -> Bool {
+        guard control === searchBar else {
+            assertionFailure("Unexpected delegating control")
+            return false
+        }
+        switch selector {
+        case #selector(cancelOperation):
+            // handle Esc key press while in search mode
+            isSearchVisible = false
+
+        case #selector(moveUp):
+            // handle Up Arrow in search mode
+            if !outlineView.highlightPreviousItem() {
+                // unhighlight for the first row
+                outlineView.highlightedRow = nil
+            }
+        case #selector(moveDown):
+            // handle Down Arrow in search mode
+            outlineView.highlightNextItem()
+
+        case #selector(insertNewline) where outlineView.highlightedRow != nil:
+            // handle Enter key in search mode when there‘s a highlighted row
+            handleClick(outlineView)
+
+        default:
+            return false
+        }
+        return true
+    }
+
 }
 // MARK: - MouseOverButtonDelegate
 extension BookmarkListViewController: MouseOverButtonDelegate {
@@ -1576,6 +1686,16 @@ extension BookmarkListViewController: MouseOverButtonDelegate {
         return .none
     }
 
+}
+// MARK: - BookmarkListPopoverDelegate
+extension BookmarkListViewController: BookmarkListPopoverDelegate {
+    // pass delegate calls up when called from submenu
+    func openNextBookmarksMenu(_ sender: BookmarkListPopover) {
+        delegate?.openNextBookmarksMenu(self)
+    }
+    func openPreviousBookmarksMenu(_ sender: BookmarkListPopover) {
+        delegate?.openPreviousBookmarksMenu(self)
+    }
 }
 
 // MARK: - Preview
