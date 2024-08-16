@@ -216,7 +216,7 @@ extension BookmarksBarCollectionViewItem: FolderMenuItemSelectors {
         delegate?.bookmarksBarCollectionViewItemDeleteEntityAction(self)
     }
 
-    func openInNewTabs(_ sender: NSMenuItem) {
+    func openInNewTabs(_ sender: Any) {
         delegate?.bookmarksBarCollectionViewItemOpenInNewTabAction(self)
     }
 

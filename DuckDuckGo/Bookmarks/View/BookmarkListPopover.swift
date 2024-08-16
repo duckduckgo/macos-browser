@@ -131,8 +131,18 @@ final class BookmarkListPopover: NSPopover {
 
 extension BookmarkListPopover: BookmarkListViewControllerDelegate {
 
-    func popoverShouldClose(_ bookmarkListViewController: BookmarkListViewController) {
-        close()
+    func closeBookmarksPopovers(_ sender: BookmarkListViewController) {
+        var window = sender.view.window
+        // find root BookmarkListPopover in Bookmarks menu structure
+        while let parent = window?.parent, parent.contentViewController?.nextResponder is Self {
+            window = parent
+        }
+        guard let popover = window?.contentViewController?.nextResponder as? Self else {
+            assertionFailure("Expected BookmarkListPopover as \(window?.debugDescription ?? "<nil>")‘s contentViewController nextResponder")
+            return
+        }
+        // close root BookmarkListPopover
+        popover.close()
     }
 
     func popover(shouldPreventClosure: Bool) {

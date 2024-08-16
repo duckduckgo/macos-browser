@@ -21,7 +21,7 @@ import Combine
 
 protocol BookmarkListViewControllerDelegate: AnyObject {
 
-    func popoverShouldClose(_ bookmarkListViewController: BookmarkListViewController)
+    func closeBookmarksPopovers(_ sender: BookmarkListViewController)
     func popover(shouldPreventClosure: Bool)
 
 }
@@ -687,7 +687,7 @@ final class BookmarkListViewController: NSViewController {
                    positioningView.isMouseLocationInsideBounds(event.locationInWindow) {
                     // don‘t close when the button used to open the popover is
                     // clicked again, it‘ll be managed by
-                    // BookmarksBarViewController.popoverShouldClose
+                    // BookmarksBarViewController.closeBookmarksPopovers
                     return false
                 }
                 // go up from the clicked window to figure out if the click is in a submenu
@@ -700,7 +700,7 @@ final class BookmarkListViewController: NSViewController {
             }.asVoid()
         )
         .sink { [weak self] _ in
-            self?.delegate?.popoverShouldClose(self!) // close
+            self?.delegate?.closeBookmarksPopovers(self!) // close
         }
         .store(in: &cancellables)
     }
@@ -986,6 +986,14 @@ final class BookmarkListViewController: NSViewController {
             hideSearchBar()
             updateSearchAndExpand(folder)
 
+        case let menuItem as MenuItemNode:
+            if menuItem.identifier == BookmarkTreeController.openAllInNewTabsIdentifier {
+                self.openInNewTabs(sender)
+            } else {
+                assertionFailure("Unsupported menu item action \(menuItem.identifier)")
+            }
+            delegate?.closeBookmarksPopovers(self)
+
         default:
             handleItemClickWhenNotInSearchMode(item: item)
         }
@@ -997,7 +1005,7 @@ final class BookmarkListViewController: NSViewController {
         }
 
         WindowControllersManager.shared.open(bookmark: bookmark)
-        delegate?.popoverShouldClose(self)
+        delegate?.closeBookmarksPopovers(self)
     }
 
     private func handleItemClickWhenNotInSearchMode(item: Any?) {
@@ -1014,7 +1022,7 @@ final class BookmarkListViewController: NSViewController {
 
     private func showManageBookmarks() {
         WindowControllersManager.shared.showBookmarksTab()
-        delegate?.popoverShouldClose(self)
+        delegate?.closeBookmarksPopovers(self)
     }
 
     // MARK: NSOutlineView Configuration
@@ -1392,13 +1400,14 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
         bookmarkManager.remove(folder: folder)
     }
 
-    func openInNewTabs(_ sender: NSMenuItem) {
+    func openInNewTabs(_ sender: Any) {
         guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
-              let folder = sender.representedObject as? BookmarkFolder
+              let folder = ((sender as? NSMenuItem)?.representedObject ?? self.treeController.rootNode.representedObject) as? BookmarkFolder
         else {
             assertionFailure("Cannot open all in new tabs")
             return
         }
+        delegate?.closeBookmarksPopovers(self)
 
         let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
         tabCollection.append(tabs: tabs)

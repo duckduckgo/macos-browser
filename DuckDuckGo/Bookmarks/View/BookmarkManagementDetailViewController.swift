@@ -699,11 +699,11 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
         bookmarkManager.move(objectUUIDs: [bookmarkEntity.entityId], toIndex: nil, withinParentFolder: parentFolderType) { _ in }
     }
 
-    func openInNewTabs(_ sender: NSMenuItem) {
-        if let children = (sender.representedObject as? BookmarkFolder)?.children {
+    func openInNewTabs(_ sender: Any) {
+        if let children = ((sender as? NSMenuItem)?.representedObject as? BookmarkFolder)?.children {
             let bookmarks = children.compactMap { $0 as? Bookmark }
             openBookmarksInNewTabs(bookmarks)
-        } else if let bookmarks = sender.representedObject as? [Bookmark] {
+        } else if let bookmarks = (sender as? NSMenuItem)?.representedObject as? [Bookmark] {
             openBookmarksInNewTabs(bookmarks)
         } else {
             assertionFailure("Failed to open entity in new tabs")

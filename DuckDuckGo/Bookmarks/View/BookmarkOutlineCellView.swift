@@ -248,7 +248,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
     static func preferredContentWidth(for object: Any?) -> CGFloat {
         guard let representedObject = (object as? BookmarkNode)?.representedObject ?? object,
               representedObject is Bookmark || representedObject is BookmarkFolder
-                || representedObject is PseudoFolder else { return 0 }
+                || representedObject is PseudoFolder || representedObject is MenuItemNode else { return 0 }
 
         sizingCell.frame = .zero
         sizingCell.update(from: representedObject, isMenuPopover: true)
@@ -266,6 +266,8 @@ final class BookmarkOutlineCellView: NSTableCellView {
             update(from: folder, isSearch: isSearch, showChevron: isMenuPopover)
         case let folder as PseudoFolder:
             update(from: folder)
+        case let menuItem as MenuItemNode:
+            update(from: menuItem)
         default:
             assertionFailure("Unexpected object \(object).\(String(describing: (object as? BookmarkNode)?.representedObject))")
         }
@@ -337,6 +339,21 @@ final class BookmarkOutlineCellView: NSTableCellView {
         highlight = false
     }
 
+    func update(from menuItem: MenuItemNode) {
+        faviconImageView.image = nil
+        faviconImageView.isHidden = true
+        titleLabel.stringValue = menuItem.title
+        titleLabel.isEnabled = menuItem.isEnabled
+        countLabel.stringValue = ""
+        favoriteImageView.image = nil
+        favoriteImageView.isHidden = true
+        urlLabel.stringValue = ""
+        urlLabel.isHidden = true
+        self.toolTip = nil
+
+        highlight = false
+    }
+
 }
 
 // MARK: - Preview
@@ -391,6 +408,12 @@ extension BookmarkOutlineCellView {
             cells[5].update(from: PseudoFolder.favorites)
             PseudoFolder.bookmarks.count = 256
             cells[6].update(from: PseudoFolder.bookmarks)
+
+            let node = BookmarkNode(representedObject: MenuItemNode(identifier: "", title: UserText.bookmarksOpenInNewTabs, isEnabled: true), parent: BookmarkNode.genericRootNode())
+            cells[7].update(from: node, isMenuPopover: true)
+
+            let emptyNode = BookmarkNode(representedObject: MenuItemNode(identifier: "", title: UserText.bookmarksBarFolderEmpty, isEnabled: false), parent: BookmarkNode.genericRootNode())
+            cells[8].update(from: emptyNode, isMenuPopover: true)
 
             let sbkm = Bookmark(id: "3", url: "http://a.b", title: "Bookmark in Search mode", isFavorite: false)
             cells[9].update(from: sbkm, isSearch: true, showURL: false)
