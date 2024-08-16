@@ -27102,6 +27102,18 @@
         }
       }
     },
+    "import.logins.passwords.explainer" : {
+      "comment" : "Explanatory text for the Passwords import option to alleviate security concerns and explain usage.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords are encrypted and locked with Touch ID or password. Nobody but you can see your passwords, not even us. Find Passwords in DuckDuckGo Settings > Passwords & Autofill."
+          }
+        }
+      }
+    },
     "import.logins.select-csv-file" : {
       "comment" : "Button text for selecting a CSV file",
       "extractionState" : "extracted_with_value",
@@ -38290,6 +38302,9 @@
           }
         }
       }
+    },
+    "Passwords are encrypted and locked with Touch ID or password. Nobody but you can see your passwords, not even us. Find Passwords in DuckDuckGo Settings > Passwords & Autofill." : {
+
     },
     "Passwords:" : {
       "comment" : "Data import summary format of how many passwords were successfully imported.",
