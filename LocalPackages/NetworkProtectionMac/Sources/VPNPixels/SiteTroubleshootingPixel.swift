@@ -1,5 +1,5 @@
 //
-//  DomainExclusionsEngagement.swift
+//  SiteTroubleshootingPixel.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,20 +19,13 @@
 import Foundation
 import PixelKit
 
-/// Pixels to understand domain exclusion engagement
+/// Site troubleshooting pixels
 ///
-public enum DomainExclusionsEngagement: VPNPixel {
+public enum SiteTroubleshootingPixel: VPNPixel {
 
-    case excluded(_ domain: String)
-    case included(_ domain: String)
-
-    public init(exclude: Bool, domain: String) {
-        if exclude {
-            self = .excluded(domain)
-        } else {
-            self = .included(domain)
-        }
-    }
+    /// The user decided to report site issues.
+    ///
+    case reportIssues(domain: String)
 
     // The name is provided by the convenience implementation in VPNPixel,
     // so we don't need to implement it here.
@@ -41,19 +34,15 @@ public enum DomainExclusionsEngagement: VPNPixel {
 
     public var unscopedPixelName: String {
         switch self {
-        case .excluded:
-            return "domain_excluded"
-
-        case .included:
-            return "domain_included"
+        case .reportIssues:
+            return "report_site_issues"
         }
     }
 
     public var parameters: [String: String]? {
         switch self {
-        case .excluded(let domain),
-                .included(let domain):
-            [PixelKit.Parameters.domain: domain]
+        case .reportIssues(let domain):
+            return [PixelKit.Parameters.domain: domain]
         }
     }
 

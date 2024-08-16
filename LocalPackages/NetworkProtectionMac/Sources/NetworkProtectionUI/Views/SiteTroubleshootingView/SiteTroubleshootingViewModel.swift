@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Combine
 import Foundation
 import NetworkProtection
@@ -86,10 +87,20 @@ extension SiteTroubleshootingView {
 
         func setExclusion(_ exclude: Bool, forDomain domain: String) {
             Task { @MainActor in
-                let engagementPixel = DomainExclusionsEngagement(exclude: exclude, domain: domain)
+                guard let siteInfo,
+                      siteInfo.excluded != exclude else {
+                    return
+                }
+
+                let engagementPixel = DomainExclusionsEngagementPixel(added: exclude)
                 pixelKit?.fire(engagementPixel)
 
                 await uiActionHandler.setExclusion(exclude, forDomain: domain)
+
+                if exclude && true {
+                    let siteIssuesReporter = SiteIssuesReporter(pixelKit: pixelKit)
+                    siteIssuesReporter.askUserToReportIssues(withDomain: domain)
+                }
             }
         }
     }
