@@ -321,9 +321,11 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private func populateNetworkProtectionEnvironmentListMenuItems() {
         environmentMenu.items = [
-            NSMenuItem(title: "⚠️ The environment can be set in the Subscription > Environment menu", action: nil, target: nil),
-            NSMenuItem(title: "Production", action: nil, target: nil, keyEquivalent: ""),
-            NSMenuItem(title: "Staging", action: nil, target: nil, keyEquivalent: ""),
+            NSMenuItem(title: "⚠️ A staging subscription can only be used for the staging VPN environment", action: nil, target: nil),
+            NSMenuItem(title: "⚠️ A production subscription can be used for both VPN environments", action: nil, target: nil),
+            NSMenuItem.separator(),
+            NSMenuItem(title: "Production", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+            NSMenuItem(title: "Staging", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
         ]
     }
 
@@ -406,10 +408,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private func updateEnvironmentMenu() {
         let selectedEnvironment = settings.selectedEnvironment
-        guard environmentMenu.items.count == 3 else { return }
+        guard environmentMenu.items.count == 5 else { return }
 
-        environmentMenu.items[1].state = selectedEnvironment == .production ? .on: .off
-        environmentMenu.items[2].state = selectedEnvironment == .staging ? .on: .off
+        environmentMenu.items[3].state = selectedEnvironment == .production ? .on : .off
+        environmentMenu.items[4].state = selectedEnvironment == .staging ? .on : .off
     }
 
     private func updatePreferredServerMenu() {
@@ -479,6 +481,28 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @objc private func toggleExcludeDDGBrowser() {
         transparentProxySettings.toggleExclusion(for: ddgBrowserAppIdentifier)
+    }
+
+    // MARK: Environment
+
+    @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
+        let title = menuItem.title
+        let selectedEnvironment: VPNSettings.SelectedEnvironment
+
+        if title == "Staging" {
+            selectedEnvironment = .staging
+        } else {
+            selectedEnvironment = .production
+        }
+
+        settings.selectedEnvironment = selectedEnvironment
+
+        Task {
+            _ = try await NetworkProtectionDeviceManager.create().refreshServerList()
+            try? await populateNetworkProtectionServerListMenuItems()
+
+            settings.selectedServer = .automatic
+        }
     }
 }
 
