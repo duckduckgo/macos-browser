@@ -69,7 +69,7 @@ extension HomePage.Models {
 
         let appearancePreferences: AppearancePreferences
         let customImagesManager: UserBackgroundImagesManaging
-        let openURL: (URL) -> Void
+        let openSettings: () -> Void
 
         @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
 
@@ -81,12 +81,12 @@ extension HomePage.Models {
                 maximumNumberOfImages: Const.maximumNumberOfUserImages,
                 applicationSupportDirectory: URL.sandboxApplicationSupportURL
             ),
-            openURL: @escaping (URL) -> Void
+            openSettings: @escaping () -> Void
         ) {
             self.appearancePreferences = appearancePreferences
             self.customImagesManager = userBackgroundImagesManager
             customBackground = appearancePreferences.homePageCustomBackground
-            self.openURL = openURL
+            self.openSettings = openSettings
 
             availableCustomImagesCancellable = customImagesManager.availableImagesPublisher
                 .receive(on: DispatchQueue.main)
