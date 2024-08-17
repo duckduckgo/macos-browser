@@ -165,7 +165,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
             return
         }
         imagesMetadata.remove(at: index)
-        deleteImage(userBackgroundImage)
+        deleteImages(for: userBackgroundImage)
     }
 
     private func copyImage(at sourceURL: URL, toJPEGAt destinationURL: URL) throws {
