@@ -39,7 +39,7 @@ extension HomePage.Models {
             case colorPicker
             case illustrationPicker
             case customImagePicker
-            case uploadImage
+            case addImage
 
             var customBackgroundType: CustomBackgroundType? {
                 switch self {
@@ -51,13 +51,13 @@ extension HomePage.Models {
                         .illustration
                 case .customImagePicker:
                         .customImage
-                case .root, .uploadImage:
+                case .root, .addImage:
                     nil
                 }
             }
         }
 
-        struct BackgroundModeModel: Identifiable, Hashable {
+        struct CustomBackgroundModeModel: Identifiable, Hashable {
             let contentType: ContentType
             let title: String
             let customBackgroundPreview: CustomBackground?
@@ -119,10 +119,10 @@ extension HomePage.Models {
 
         @Published var contentType: ContentType = .root {
             didSet {
-                if contentType == .uploadImage, contentType != oldValue {
+                if contentType == .addImage, contentType != oldValue {
                     contentType = customImagesManager.availableImages.isEmpty ? .root : .customImagePicker
                     uploadNewImage()
-                } else if contentType == .customImagePicker, oldValue != .uploadImage {
+                } else if contentType == .customImagePicker, oldValue != .addImage {
                     customImagesManager.sortImagesByLastUsed()
                 }
             }
@@ -151,13 +151,30 @@ extension HomePage.Models {
             }
         }
 
-        var backgroundModes: [BackgroundModeModel] {
-            var modes: [BackgroundModeModel] = [
-                .init(contentType: .gradientPicker, title: "Gradients", customBackgroundPreview: .gradient(customBackground?.gradient ?? CustomBackground.placeholderGradient)),
-                .init(contentType: .colorPicker, title: "Solid Colors", customBackgroundPreview: .solidColor(customBackground?.solidColor ?? CustomBackground.placeholderColor)),
-                .init(contentType: .illustrationPicker, title: "Illustrations", customBackgroundPreview: .illustration(customBackground?.illustration ?? CustomBackground.placeholderIllustration))
-            ]
-            if customImagesManager.availableImages.count > 0 {
+        func customBackgroundModeModel(for contentType: ContentType) -> CustomBackgroundModeModel {
+            switch contentType {
+            case .root:
+                assertionFailure("\(#function) must not be called for ContentType.root")
+                return CustomBackgroundModeModel(contentType: .root, title: "", customBackgroundPreview: nil)
+            case .gradientPicker:
+                return CustomBackgroundModeModel(
+                    contentType: .gradientPicker,
+                    title: "Gradients",
+                    customBackgroundPreview: .gradient(customBackground?.gradient ?? CustomBackground.placeholderGradient)
+                )
+            case .colorPicker:
+                return CustomBackgroundModeModel(
+                    contentType: .colorPicker,
+                    title: "Solid Colors",
+                    customBackgroundPreview: .solidColor(customBackground?.solidColor ?? CustomBackground.placeholderColor)
+                )
+            case .illustrationPicker:
+                return CustomBackgroundModeModel(
+                    contentType: .illustrationPicker,
+                    title: "Illustrations",
+                    customBackgroundPreview: .illustration(customBackground?.illustration ?? CustomBackground.placeholderIllustration)
+                )
+            case .customImagePicker:
                 let preview: CustomBackground? = {
                     guard customBackground?.userBackgroundImage == nil else {
                         return customBackground
@@ -167,9 +184,22 @@ extension HomePage.Models {
                     }
                     return .customImage(lastUsedUserBackgroundImage)
                 }()
-                modes.append(.init(contentType: .customImagePicker, title: "My Images", customBackgroundPreview: preview))
+                return CustomBackgroundModeModel(contentType: .customImagePicker, title: "My Images", customBackgroundPreview: preview)
+            case .addImage:
+                return CustomBackgroundModeModel(contentType: .addImage, title: "Add Background", customBackgroundPreview: nil)
+            }
+        }
+
+        var customBackgroundModes: [CustomBackgroundModeModel] {
+            var modes: [CustomBackgroundModeModel] = [
+                customBackgroundModeModel(for: .gradientPicker),
+                customBackgroundModeModel(for: .colorPicker),
+                customBackgroundModeModel(for: .illustrationPicker)
+            ]
+            if customImagesManager.availableImages.count > 0 {
+                modes.append(customBackgroundModeModel(for: .customImagePicker))
             } else {
-                modes.append(.init(contentType: .uploadImage, title: "Add Background", customBackgroundPreview: nil))
+                modes.append(customBackgroundModeModel(for: .addImage))
             }
             return modes
         }

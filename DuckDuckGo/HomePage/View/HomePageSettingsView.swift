@@ -55,7 +55,7 @@ extension HomePage.Views {
                     }
                     VStack(alignment: .leading, spacing: 36) {
                         switch model.contentType {
-                        case .root, .uploadImage:
+                        case .root, .addImage:
                             rootView
                                 .transition(.move(edge: .leading).combined(with: .opacity))
                         case .colorPicker:
@@ -129,7 +129,7 @@ extension HomePage.Views {
         @ViewBuilder
         var rootView: some View {
             SettingsSection(title: "Background") {
-                grid(with: model.backgroundModes) { mode in
+                grid(with: model.customBackgroundModes) { mode in
                     BackgroundMode(modeModel: mode) {
                         withAnimation {
                             model.contentType = mode.contentType
@@ -228,11 +228,11 @@ extension HomePage.Views {
                         .buttonStyle(.plain)
                     case .addImage:
                         BackgroundMode(
-                            modeModel: .init(contentType: .uploadImage, title: "Add Background", customBackgroundPreview: nil),
+                            modeModel: model.customBackgroundModeModel(for: .addImage),
                             showTitle: false
                         ) {
                             withAnimation {
-                                model.contentType = .uploadImage
+                                model.contentType = .addImage
                             }
                         }
                     }
@@ -327,11 +327,11 @@ extension HomePage.Views {
     }
 
     struct BackgroundMode: View {
-        let modeModel: HomePage.Models.SettingsModel.BackgroundModeModel
+        let modeModel: HomePage.Models.SettingsModel.CustomBackgroundModeModel
         let showTitle: Bool
         let action: () -> Void
 
-        init(modeModel: HomePage.Models.SettingsModel.BackgroundModeModel, showTitle: Bool = true, action: @escaping () -> Void) {
+        init(modeModel: HomePage.Models.SettingsModel.CustomBackgroundModeModel, showTitle: Bool = true, action: @escaping () -> Void) {
             self.modeModel = modeModel
             self.showTitle = showTitle
             self.action = action
@@ -343,7 +343,7 @@ extension HomePage.Views {
             Button(action: action) {
                 VStack(alignment: .leading, spacing: 6) {
                     ZStack {
-                        if modeModel.contentType == .uploadImage {
+                        if modeModel.contentType == .addImage {
                             BackgroundPreview(showSelectionCheckmark: true) {
                                 ZStack {
                                     Color.blackWhite5
