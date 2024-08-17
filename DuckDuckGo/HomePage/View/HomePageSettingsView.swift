@@ -213,17 +213,29 @@ extension HomePage.Views {
         var userBackgroundImagePickerView: some View {
             VStack(spacing: 16) {
                 backButton(title: "My Images")
-                grid(with: model.availableUserBackgroundImages) { userBackgroundImage in
-                    Button {
-                        withAnimation {
-                            if model.customBackground != .customImage(userBackgroundImage) {
-                                model.customBackground = .customImage(userBackgroundImage)
+                grid(with: model.userBackgroundImagesPickerContent) { item in
+                    switch item {
+                    case .image(let userBackgroundImage):
+                        Button {
+                            withAnimation {
+                                if model.customBackground != .customImage(userBackgroundImage) {
+                                    model.customBackground = .customImage(userBackgroundImage)
+                                }
+                            }
+                        } label: {
+                            BackgroundPreview(customBackground: .customImage(userBackgroundImage))
+                        }
+                        .buttonStyle(.plain)
+                    case .addImage:
+                        BackgroundMode(
+                            modeModel: .init(contentType: .uploadImage, title: "Add Background", customBackgroundPreview: nil),
+                            showTitle: false
+                        ) {
+                            withAnimation {
+                                model.contentType = .uploadImage
                             }
                         }
-                    } label: {
-                        BackgroundPreview(customBackground: .customImage(userBackgroundImage))
                     }
-                    .buttonStyle(.plain)
                 }
                 Text("Images are stored on your device so DuckDuckGo can't see or access them.")
                     .foregroundColor(.blackWhite60)
@@ -316,7 +328,14 @@ extension HomePage.Views {
 
     struct BackgroundMode: View {
         let modeModel: HomePage.Models.SettingsModel.BackgroundModeModel
+        let showTitle: Bool
         let action: () -> Void
+
+        init(modeModel: HomePage.Models.SettingsModel.BackgroundModeModel, showTitle: Bool = true, action: @escaping () -> Void) {
+            self.modeModel = modeModel
+            self.showTitle = showTitle
+            self.action = action
+        }
 
         @EnvironmentObject var model: HomePage.Models.SettingsModel
 
@@ -338,8 +357,10 @@ extension HomePage.Views {
                             )
                         }
                     }
-                    Text(modeModel.title)
-                        .font(.system(size: 11))
+                    if showTitle {
+                        Text(modeModel.title)
+                            .font(.system(size: 11))
+                    }
                 }
             }
             .buttonStyle(.plain)

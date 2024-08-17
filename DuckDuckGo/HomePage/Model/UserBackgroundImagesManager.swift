@@ -43,7 +43,7 @@ protocol UserBackgroundImagesManaging {
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage?
     func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage?
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage)
-    func sortImages()
+    func sortImagesByLastUsed()
 }
 
 protocol ImageColorSchemeCalculating {
@@ -211,7 +211,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         availableImagesSortedByAccessTime = [userBackgroundImage] + images
     }
 
-    func sortImages() {
+    func sortImagesByLastUsed() {
         imagesMetadata = availableImagesSortedByAccessTime.map(\.description)
     }
 

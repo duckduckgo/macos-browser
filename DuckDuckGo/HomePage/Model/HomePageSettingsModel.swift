@@ -72,6 +72,17 @@ extension HomePage.Models {
         let openSettings: () -> Void
 
         @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
+        enum UserBackgroundImageItem: Identifiable, Hashable {
+            case image(UserBackgroundImage)
+            case addImage
+            var id: Self { self }
+        }
+        var userBackgroundImagesPickerContent: [UserBackgroundImageItem] {
+            guard !availableUserBackgroundImages.isEmpty else {
+                return [.addImage]
+            }
+            return availableUserBackgroundImages.map(UserBackgroundImageItem.image) + [.addImage]
+        }
 
         private var availableCustomImagesCancellable: AnyCancellable?
 
@@ -109,13 +120,14 @@ extension HomePage.Models {
         @Published var contentType: ContentType = .root {
             didSet {
                 if contentType == .uploadImage, contentType != oldValue {
-                    contentType = .root
+                    contentType = customImagesManager.availableImages.isEmpty ? .root : .customImagePicker
                     uploadNewImage()
-                } else if contentType == .customImagePicker {
-                    customImagesManager.sortImages()
+                } else if contentType == .customImagePicker, oldValue != .uploadImage {
+                    customImagesManager.sortImagesByLastUsed()
                 }
             }
         }
+
         @Published var customBackground: CustomBackground? {
             didSet {
                 appearancePreferences.homePageCustomBackground = customBackground
@@ -156,8 +168,9 @@ extension HomePage.Models {
                     return .customImage(lastUsedUserBackgroundImage)
                 }()
                 modes.append(.init(contentType: .customImagePicker, title: "My Images", customBackgroundPreview: preview))
+            } else {
+                modes.append(.init(contentType: .uploadImage, title: "Add Background", customBackgroundPreview: nil))
             }
-            modes.append(.init(contentType: .uploadImage, title: "Add Background", customBackgroundPreview: nil))
             return modes
         }
 
