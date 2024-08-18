@@ -75,13 +75,17 @@ final class DataBrokerProtectionKeyStoreProvider: SecureStorageKeyStoreProvider 
     }
 
     func attributesForEntry(named: String, serviceName: String) -> [String: Any] {
-        [
+        var attributes = [
            kSecClass: kSecClassGenericPassword,
            kSecUseDataProtectionKeychain: true,
            kSecAttrSynchronizable: false,
            kSecAttrAccessGroup: groupNameProvider.appGroupName,
            kSecAttrAccount: named,
        ] as [String: Any]
+#if CI
+        attributes.removeValue(forKey: kSecAttrAccessGroup)
+#endif
+        return attributes
     }
 }
 
