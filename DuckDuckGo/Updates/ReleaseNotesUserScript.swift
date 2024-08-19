@@ -31,7 +31,7 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
     weak var broker: UserScriptMessageBroker?
     weak var webView: WKWebView?
     private var cancellables = Set<AnyCancellable>()
-    private var initialized = false
+    private var isInitialized = false
 
     // MARK: - MessageNames
     enum MessageNames: String, CaseIterable {
@@ -63,7 +63,7 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
     }
 
     public func onUpdate() {
-        guard NSApp.runType != .uiTests, initialized, let webView = webView else {
+        guard NSApp.runType != .uiTests, isInitialized, let webView = webView else {
             return
         }
 
@@ -87,6 +87,8 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
 extension ReleaseNotesUserScript {
     @MainActor
     private func initialSetup(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        isInitialized = true
+
         // Initialize the page right after sending the initial setup result
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.onUpdate()
@@ -98,7 +100,6 @@ extension ReleaseNotesUserScript {
         let env = "production"
 #endif
 
-        initialized = true
         return InitialSetupResult(env: env, locale: Locale.current.identifier)
     }
 
