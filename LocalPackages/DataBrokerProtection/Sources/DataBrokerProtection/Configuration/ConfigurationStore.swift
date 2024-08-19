@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Common
 import Configuration
+import PixelKit
 
 final class ConfigurationStore: ConfigurationStoring {
 
@@ -55,7 +56,7 @@ final class ConfigurationStore: ConfigurationStoring {
     }
 
     func log() {
-        os_log("privacyConfigurationEtag %{public}s", log: .default, type: .default, privacyConfigurationEtag ?? "")
+        os_log("privacyConfigurationEtag %{public}s", log: .config, type: .default, privacyConfigurationEtag ?? "")
     }
 
     func loadData(for configuration: Configuration) -> Data? {
@@ -65,38 +66,35 @@ final class ConfigurationStore: ConfigurationStoring {
         do {
             return try Data(contentsOf: file)
         } catch {
-            // TODO: Fire error pixel
-
+            PixelKit.fire(DataBrokerProtectionPixels.errorLoadingCachedConfig(error))
             return nil
         }
     }
-    
+
     func loadEtag(for configuration: Configuration) -> String? {
         guard configuration == .privacyConfiguration else { return nil }
 
         return privacyConfigurationEtag
     }
-    
-    func loadEmbeddedEtag(for configuration: Configuration) -> String? {
-        guard configuration == .privacyConfiguration else { return nil }
 
-        // TODO: Handle embedded config
-        return privacyConfigurationEtag
+    func loadEmbeddedEtag(for configuration: Configuration) -> String? {
+        // If we embed the full config somday we need to load the etag for it here
+        return nil
     }
-    
+
     func saveData(_ data: Data, for configuration: Configuration) throws {
         guard configuration == .privacyConfiguration else { throw Error.unsupportedConfig }
 
         let file = fileUrl(for: configuration)
         try data.write(to: file, options: .atomic)
     }
-    
+
     func saveEtag(_ etag: String, for configuration: Configuration) throws {
         guard configuration == .privacyConfiguration else { throw Error.unsupportedConfig }
 
         privacyConfigurationEtag = etag
     }
-    
+
     func fileUrl(for config: Configuration) -> URL {
         let fm = FileManager.default
 

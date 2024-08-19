@@ -55,6 +55,7 @@ public enum DataBrokerProtectionPixels {
         static let triesKey = "tries"
         static let errorCategoryKey = "error_category"
         static let errorDetailsKey = "error_details"
+        static let errorDomainKey = "error_domain"
         static let pattern = "pattern"
         static let isParent = "is_parent"
         static let actionIDKey = "action_id"
@@ -183,6 +184,7 @@ public enum DataBrokerProtectionPixels {
 
     // Configuration
     case invalidPayload(Configuration)
+    case errorLoadingCachedConfig(Error)
 
     // Measure success/failure rate of Personal Information Removal Pixels
     // https://app.asana.com/0/1204006570077678/1206889724879222/f
@@ -316,6 +318,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
             // Configuration
         case .invalidPayload(let configuration): return "m_mac_dbp_\(configuration.rawValue)_invalid_payload".lowercased()
+        case .errorLoadingCachedConfig: return "m_mac_dbp_configuration_error_loading_cached_config"
         }
     }
 
@@ -475,6 +478,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                            Consts.durationOfFirstOptOut: String(durationOfFirstOptOut),
                            Consts.numberOfNewRecordsFound: String(numberOfNewRecordsFound),
                            Consts.numberOfReappereances: String(numberOfReappereances)]
+        case .errorLoadingCachedConfig(let error):
+            return [Consts.errorDomainKey: (error as NSError).domain]
         }
     }
 }
@@ -491,6 +496,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             case .error(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .generalError(let error, _):
+                PixelKit.fire(DebugEvent(event, error: error))
+            case .errorLoadingCachedConfig(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .secureVaultInitError(let error),
                     .secureVaultError(let error),

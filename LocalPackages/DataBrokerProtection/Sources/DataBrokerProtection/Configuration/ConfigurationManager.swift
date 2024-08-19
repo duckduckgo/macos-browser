@@ -26,7 +26,7 @@ import PixelKit
 final class ConfigurationManager: DefaultConfigurationManager {
 
     static let shared = ConfigurationManager(fetcher: ConfigurationFetcher(store: ConfigurationStore.shared,
-                                                                           log: .default,
+                                                                           log: .config,
                                                                            eventMapping: configurationDebugEvents))
 
     static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
@@ -40,8 +40,8 @@ final class ConfigurationManager: DefaultConfigurationManager {
     }
 
     func log() {
-        os_log("last update %{public}s", log: .default, type: .default, String(describing: lastUpdateTime))
-        os_log("last refresh check %{public}s", log: .default, type: .default, String(describing: lastRefreshCheckTime))
+        os_log("last update %{public}s", log: .config, type: .default, String(describing: lastUpdateTime))
+        os_log("last refresh check %{public}s", log: .config, type: .default, String(describing: lastRefreshCheckTime))
     }
 
     override public func refreshNow(isDebug: Bool = false) async {
@@ -65,7 +65,7 @@ final class ConfigurationManager: DefaultConfigurationManager {
             return true
         } catch {
             os_log("Failed to complete configuration update to %@: %@",
-                   log: .default,
+                   log: .config,
                    type: .error,
                    Configuration.privacyConfiguration.rawValue,
                    error.localizedDescription)
@@ -76,7 +76,6 @@ final class ConfigurationManager: DefaultConfigurationManager {
     }
 
     func updateConfigDependencies() {
-        // TODO: Update lastConfigurationInstallDate
         DBBPPrivacyConfigurationManager.shared.reload(
             etag: ConfigurationStore.shared.loadEtag(for: .privacyConfiguration),
             data: ConfigurationStore.shared.loadData(for: .privacyConfiguration)

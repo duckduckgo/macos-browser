@@ -24,7 +24,6 @@ extension OSLog {
 
     enum AppCategories: String, CaseIterable {
         case atb = "ATB"
-        case config = "Configuration Downloading"
         case downloads = "Downloads"
         case fire = "Fire"
         case dataImportExport = "Data Import/Export"
@@ -53,7 +52,6 @@ extension OSLog {
     }
 
     @OSLogWrapper(AppCategories.atb) static var atb
-    @OSLogWrapper(AppCategories.config) static var config
     @OSLogWrapper(AppCategories.downloads) static var downloads
     @OSLogWrapper(AppCategories.fire) static var fire
     @OSLogWrapper(AppCategories.dataImportExport) static var dataImportExport

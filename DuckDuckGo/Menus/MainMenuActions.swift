@@ -922,13 +922,13 @@ extension MainViewController {
     }
 
     @objc func reloadConfigurationNow(_ sender: Any?) {
-        OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
+        OSLog.loggingCategories.insert(OSLog.Categories.config.rawValue)
 
         ConfigurationManager.shared.forceRefresh(isDebug: true)
     }
 
     private func setConfigurationUrl(_ configurationUrl: URL?) {
-        OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
+        OSLog.loggingCategories.insert(OSLog.Categories.config.rawValue)
 
         var configurationProvider = AppConfigurationURLProvider(customPrivacyConfiguration: configurationUrl)
         if configurationUrl == nil {
