@@ -137,7 +137,7 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
                                              completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
         let newMode = DataBrokerProtectionQueueMode.scheduled(completion: completion)
         startOperationsIfPermitted(forNewMode: newMode,
-                                   type: .all,
+                                   type: .scan,
                                    showWebView: showWebView,
                                    operationDependencies: operationDependencies,
                                    completion: completion)
