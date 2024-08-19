@@ -61,12 +61,6 @@ enum WaitlistInviteCodeFetchError: Error, Equatable {
     }
 }
 
-extension Notification.Name {
-
-    static let networkProtectionWaitlistAccessChanged = Notification.Name(rawValue: "networkProtectionWaitlistAccessChanged")
-
-}
-
 extension Waitlist {
 
     func fetchInviteCodeIfAvailable() async -> WaitlistInviteCodeFetchError? {
