@@ -299,7 +299,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
                                                forBrokerId brokerId: Int64,
                                                profileQueryId: Int64,
                                                extractedProfileId: Int64) throws {
-        try self.providers.database.updateSevenDaysConfirmationPixelFired(pixelFired, 
+        try self.providers.database.updateSevenDaysConfirmationPixelFired(pixelFired,
                                                                           forBrokerId: brokerId,
                                                                           profileQueryId: profileQueryId,
                                                                           extractedProfileId: extractedProfileId)
@@ -309,7 +309,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
                                                   forBrokerId brokerId: Int64,
                                                   profileQueryId: Int64,
                                                   extractedProfileId: Int64) throws {
-        try self.providers.database.updateFourteenDaysConfirmationPixelFired(pixelFired, 
+        try self.providers.database.updateFourteenDaysConfirmationPixelFired(pixelFired,
                                                                              forBrokerId: brokerId,
                                                                              profileQueryId: profileQueryId,
                                                                              extractedProfileId: extractedProfileId)
@@ -319,7 +319,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
                                                    forBrokerId brokerId: Int64,
                                                    profileQueryId: Int64,
                                                    extractedProfileId: Int64) throws {
-        try self.providers.database.updateTwentyOneDaysConfirmationPixelFired(pixelFired, 
+        try self.providers.database.updateTwentyOneDaysConfirmationPixelFired(pixelFired,
                                                                               forBrokerId: brokerId,
                                                                               profileQueryId: profileQueryId,
                                                                               extractedProfileId: extractedProfileId)
