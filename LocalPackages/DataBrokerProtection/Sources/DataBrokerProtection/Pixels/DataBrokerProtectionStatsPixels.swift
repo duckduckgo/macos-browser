@@ -381,7 +381,7 @@ final class DataBrokerProtectionStatsPixels {
 
 extension DataBrokerProtectionStatsPixels {
     // swiftlint:disable:next cyclomatic_complexity
-    private func fireRegularIntervalConfirmationPixelsForSubmittedOptOuts(for brokerProfileQueryData: [BrokerProfileQueryData]) {
+    func fireRegularIntervalConfirmationPixelsForSubmittedOptOuts(for brokerProfileQueryData: [BrokerProfileQueryData]) {
         /*
          This fires pixels to indicate if any submitted opt outs have been confirmed or unconfirmed
          at fixed intervals after the submission (7, 14, and 21 days)
@@ -416,7 +416,7 @@ extension DataBrokerProtectionStatsPixels {
         let twentyOneDayOldPlusOptOutsThatHaveNotFiredPixel = successfullySubmittedOptOuts.filter { optOutJob in
             guard let submittedSuccessfullyDate = optOutJob.submittedSuccessfullyDate else { return false }
             let hasEnoughTimePassedToFirePixel = submittedSuccessfullyDate.hasBeenExceededByNumberOfDays(21)
-            return hasEnoughTimePassedToFirePixel && !optOutJob.sevenDaysConfirmationPixelFired
+            return hasEnoughTimePassedToFirePixel && !optOutJob.twentyOneDaysConfirmationPixelFired
         }
 
         let brokerIDsToNames = brokerProfileQueryData.reduce(into: [Int64: String]()) {
@@ -485,6 +485,6 @@ private extension Date {
         guard let submittedDatePlusTimeInterval = Calendar.current.date(byAdding: .day, value: days, to: self) else {
             return false
         }
-        return submittedDatePlusTimeInterval >= Date()
+        return submittedDatePlusTimeInterval <= Date()
     }
 }

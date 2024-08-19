@@ -1058,6 +1058,30 @@ extension OptOutJobData {
                      historyEvents: [HistoryEvent] = [HistoryEvent]()) -> OptOutJobData {
         .init(brokerId: 1, profileQueryId: 1, createdDate: Date(), historyEvents: historyEvents, extractedProfile: extractedProfile)
     }
+
+    static func mock(with type: HistoryEvent.EventType,
+                     submittedDate: Date?,
+                     sevenDaysConfirmationPixelFired: Bool,
+                     fourteenDaysConfirmationPixelFired: Bool,
+                     twentyOneDaysConfirmationPixelFired: Bool) -> OptOutJobData {
+        let extractedProfileId: Int64 = 1
+        let brokerId: Int64 = 1
+        let profileQueryId: Int64 = 11
+
+        let historyEvent = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested, date: submittedDate ?? Date())
+        let scanJobData = ScanJobData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [historyEvent])
+
+        let extractedProfile = type == .optOutConfirmed ? ExtractedProfile.mockWithRemovedDate : ExtractedProfile.mockWithoutRemovedDate
+        return OptOutJobData(brokerId: brokerId,
+                             profileQueryId: profileQueryId,
+                             createdDate: submittedDate ?? Date(),
+                             historyEvents: [historyEvent],
+                             submittedSuccessfullyDate: submittedDate,
+                             extractedProfile: extractedProfile,
+                             sevenDaysConfirmationPixelFired: sevenDaysConfirmationPixelFired,
+                             fourteenDaysConfirmationPixelFired: fourteenDaysConfirmationPixelFired,
+                             twentyOneDaysConfirmationPixelFired: twentyOneDaysConfirmationPixelFired)
+    }
 }
 
 extension DataBroker {
