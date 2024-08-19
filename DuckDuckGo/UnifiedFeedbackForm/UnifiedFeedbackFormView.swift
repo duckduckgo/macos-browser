@@ -70,11 +70,11 @@ private struct FeedbackFormBodyView: View {
                 EmptyView()
             case .general:
                 FeedbackFormIssueDescriptionView {
-                    Text("Please give us your feedback:")
+                    Text(UserText.pproFeedbackFormGeneralFeedbackPlaceholder)
                 }
             case .requestFeature:
                 FeedbackFormIssueDescriptionView {
-                    Text("What feature would you like to see?")
+                    Text(UserText.pproFeedbackFormRequestFeaturePlaceholder)
                 }
             case .reportIssue:
                 reportProblemView()
@@ -111,14 +111,20 @@ private struct FeedbackFormBodyView: View {
     @ViewBuilder
     func issueDescriptionView() -> some View {
         FeedbackFormIssueDescriptionView {
-            Text("Please check [faq url](https://duckduckgo.com) first for a solution. If you couldn't find a solution there, please describe the issue, what you expected, and the steps you took that led to the problem.")
+            Text(LocalizedStringKey(UserText.pproFeedbackFormText1))
+                .onURLTap { _ in
+                    Task {
+                        await viewModel.process(action: .reportFAQClick)
+                        await viewModel.process(action: .faqClick)
+                    }
+                }
         } footer: {
-            Text(UserText.vpnFeedbackFormText2)
+            Text(UserText.pproFeedbackFormText2)
             VStack(alignment: .leading) {
-                Text(UserText.vpnFeedbackFormText3)
-                Text(UserText.vpnFeedbackFormText4)
+                Text(UserText.pproFeedbackFormText3)
+                Text(UserText.pproFeedbackFormText4)
             }
-            Text(UserText.vpnFeedbackFormText5)
+            Text(UserText.pproFeedbackFormText5)
         }
     }
 }
@@ -188,7 +194,7 @@ private struct FeedbackFormIssueDescriptionView<Label: View, Content: View, Foot
         } content: {
             EmptyView()
         } footer: {
-            Text("Reports are anonymous and sent to DuckDuckGo to help improve our service")
+            Text(UserText.pproFeedbackFormDisclaimer)
         }
     }
 
@@ -245,11 +251,11 @@ private struct FeedbackFormSentView: View {
             Image(.vpnFeedbackSent)
                 .padding(.top, 20)
 
-            Text(UserText.vpnFeedbackFormSendingConfirmationTitle)
+            Text(UserText.pproFeedbackFormSendingConfirmationTitle)
                 .font(.system(size: 18, weight: .medium))
                 .padding(.top, 30)
 
-            Text(UserText.vpnFeedbackFormSendingConfirmationDescription)
+            Text(UserText.pproFeedbackFormSendingConfirmationDescription)
                 .multilineTextAlignment(.center)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
@@ -266,11 +272,11 @@ private struct FeedbackFormButtons: View {
     var body: some View {
         HStack {
             if viewModel.viewState == .feedbackSent {
-                button(text: UserText.vpnFeedbackFormButtonDone, action: .cancel)
+                button(text: UserText.pproFeedbackFormButtonDone, action: .cancel)
                     .keyboardShortcut(.defaultAction)
             } else {
-                button(text: UserText.vpnFeedbackFormButtonCancel, action: .cancel)
-                button(text: viewModel.viewState == .feedbackSending ? UserText.vpnFeedbackFormButtonSubmitting : UserText.vpnFeedbackFormButtonSubmit, action: .submit)
+                button(text: UserText.pproFeedbackFormButtonCancel, action: .cancel)
+                button(text: viewModel.viewState == .feedbackSending ? UserText.pproFeedbackFormButtonSubmitting : UserText.pproFeedbackFormButtonSubmit, action: .submit)
                     .keyboardShortcut(.defaultAction)
                     .disabled(!viewModel.submitButtonEnabled)
             }

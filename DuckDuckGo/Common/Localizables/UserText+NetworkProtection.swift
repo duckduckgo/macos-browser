@@ -132,6 +132,40 @@ extension UserText {
     // "itr.feedback-form.category.something-else" - Description for the feedback form when the user has an issue not categorized in other options
     static let itrFeedbackFormCategorySomethingElse = "Something else"
 
+    // "ppro.feedback-form.text-1" - Text for the body of the PPro feedback form
+    static let pproFeedbackFormText1 = "Found an issue not cover in our [help center](duck://)? We definitely want to know about it.\n\nTell us what's going on:"
+    // "ppro.feedback-form.text-2" - Text for the body of the PPro feedback form
+    static let pproFeedbackFormText2 = "In addition to the details entered above, we send some anonymized info with your feedback:"
+    // "ppro.feedback-form.text-3" - Bullet text for the body of the PPro feedback form
+    static let pproFeedbackFormText3 = "• Whether specific browser features are active"
+    // "ppro.feedback-form.text-4" - Bullet text for the body of the PPro feedback form
+    static let pproFeedbackFormText4 = "• Aggregate app diagnostics (e.g., error codes)"
+    // "ppro.feedback-form.text-5" - Text for the body of the PPro feedback form
+    static let pproFeedbackFormText5 = "By clicking \"Submit\" you agree that DuckDuckGo may use information submitted to improve the app."
+    // "ppro.feedback-form.disclaimer" - Text for the disclaimer of the PPro feedback form
+    static let pproFeedbackFormDisclaimer = "Reports are anonymous and sent to DuckDuckGo to help improve our service"
+
+    // "ppro.feedback-form.sending-confirmation.title" - Title for the feedback sent view title of the feedback form
+    static let pproFeedbackFormSendingConfirmationTitle = "Thank you!"
+    // "ppro.feedback-form.sending-confirmation.description" - Title for the feedback sent view description of the feedback form
+    static let pproFeedbackFormSendingConfirmationDescription = "Your Feedback will help us improve Privacy Pro."
+    // "ppro.feedback-form.sending-confirmation.error" - Title for the feedback sending error text of the feedback form
+    static let pproFeedbackFormSendingConfirmationError = "We couldn't send your feedback right now, please try again."
+
+    // "ppro.feedback-form.button.done" - Title for the Done button of the PPro feedback form
+    static let pproFeedbackFormButtonDone = "Done"
+    // "ppro.feedback-form.button.cancel" - Title for the Cancel button of the PPro feedback form
+    static let pproFeedbackFormButtonCancel = "Cancel"
+    // "ppro.feedback-form.button.submit" - Title for the Submit button of the PPro feedback form
+    static let pproFeedbackFormButtonSubmit = "Submit"
+    // "ppro.feedback-form.button.submitting" - Title for the Submitting state of the PPro feedback form
+    static let pproFeedbackFormButtonSubmitting = "Submitting…"
+
+    // "ppro.feedback-form.general-feedback.placeholder" - Placeholder for the General Feedback step in the Privacy Pro feedback form
+    static let pproFeedbackFormGeneralFeedbackPlaceholder = "Please give us your feedback:"
+    // "ppro.feedback-form.request-feature.placeholder" - Placeholder for the Feature Request step in the Privacy Pro feedback form
+    static let pproFeedbackFormRequestFeaturePlaceholder = "What feature would you like to see?"
+
     // "pir.feedback-form.category.other" - Description for the feedback form when the user has an issue not categorized in other options
     static let pirFeedbackFormCategoryOther = "Something else"
     // "vpn.feedback-form.text-1" - Text for the body of the VPN feedback form

@@ -54,6 +54,10 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     enum ViewAction {
         case cancel
         case submit
+        case faqClick
+        case reportShow
+        case reportSubmitShow
+        case reportFAQClick
     }
 
     @Published var viewState: ViewState {
@@ -138,6 +142,46 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
             } catch {
                 self.viewState = .feedbackSendingFailed
             }
+        case .faqClick:
+            await openFAQ()
+        case .reportShow:
+            await feedbackSender.sendFormShowPixel()
+        case .reportSubmitShow:
+            if !selectedReportType.isEmpty, !selectedCategory.isEmpty, !selectedSubcategory.isEmpty {
+                await feedbackSender.sendSubmitScreenShowPixel(source: source,
+                                                               reportType: selectedReportType,
+                                                               category: selectedCategory,
+                                                               subcategory: selectedSubcategory)
+            }
+        case .reportFAQClick:
+            if !selectedReportType.isEmpty, !selectedCategory.isEmpty, !selectedSubcategory.isEmpty {
+                await feedbackSender.sendSubmitScreenFAQClickPixel(source: source,
+                                                                   reportType: selectedReportType,
+                                                                   category: selectedCategory,
+                                                                   subcategory: selectedSubcategory)
+            }
+        }
+    }
+    
+    private func openFAQ() async {
+        guard !selectedReportType.isEmpty, UnifiedFeedbackReportType(rawValue: selectedReportType) == .reportIssue,
+              !selectedCategory.isEmpty, let category = UnifiedFeedbackCategory(rawValue: selectedCategory),
+              !selectedSubcategory.isEmpty else {
+            return
+        }
+
+        let url: URL? = {
+            switch category {
+            case .selectFeature: return nil
+            case .subscription: return PrivacyProFeedbackSubcategory(rawValue: selectedSubcategory)?.url
+            case .vpn: return VPNFeedbackSubcategory(rawValue: selectedSubcategory)?.url
+            case .pir: return PIRFeedbackSubcategory(rawValue: selectedSubcategory)?.url
+            case .itr: return ITRFeedbackSubcategory(rawValue: selectedSubcategory)?.url
+            }
+        }()
+
+        if let url {
+            NSWorkspace.shared.open(url)
         }
     }
 
