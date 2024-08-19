@@ -30,6 +30,7 @@ extension NSImage {
         guard let tiffData = self.tiffRepresentation,
               let bitmapImage = NSBitmapImageRep(data: tiffData) else { return nil }
 
+        let date = Date()
         let width = bitmapImage.pixelsWide
         let height = bitmapImage.pixelsHigh
 
@@ -45,17 +46,27 @@ extension NSImage {
             let x = (i % width)
             let y = (i / width)
             let pixelIndex = (y * width + x) * 4
-            let r = CGFloat(pixelData[pixelIndex]) / 255.0
-            let g = CGFloat(pixelData[pixelIndex + 1]) / 255.0
-            let b = CGFloat(pixelData[pixelIndex + 2]) / 255.0
 
-            // Calculate brightness using the luminance formula
-            let brightness = 0.299 * r + 0.587 * g + 0.114 * b
+            // Consult https://www.w3.org/WAI/GL/wiki/Relative_luminance for more information
+            // about gamma correction and relative luminance formula.
+            let r = invertingGammaCorrection(CGFloat(pixelData[pixelIndex]) / 255.0)
+            let g = invertingGammaCorrection(CGFloat(pixelData[pixelIndex + 1]) / 255.0)
+            let b = invertingGammaCorrection(CGFloat(pixelData[pixelIndex + 2]) / 255.0)
+
+            let brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b
             totalBrightness += brightness
             sampledPixels += 1
         }
 
         let averageBrightness = totalBrightness / CGFloat(sampledPixels)
+        print("\(#function) took \(Date().timeIntervalSince(date)) seconds")
         return averageBrightness
+    }
+
+    private func invertingGammaCorrection(_ colorComponent: CGFloat) -> CGFloat {
+        if colorComponent <= 0.03928 {
+            return colorComponent / 12.92
+        }
+        return pow((colorComponent + 0.055)/1.055, 2.4)
     }
 }
