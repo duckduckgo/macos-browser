@@ -63,7 +63,7 @@ protocol AdClickLogicProtocol: AnyObject {
 
     func applyInheritedAttribution(state: AdClickAttributionLogic.State?)
     func onRulesChanged(latestRules: [ContentBlockerRulesManager.Rules])
-    func onRequestDetected(request: DetectedRequest)
+    func onRequestDetected(request: DetectedRequest, cpmExperimentOn: Bool?)
 
     func onBackForwardNavigation(mainFrameURL: URL?)
     func onProvisionalNavigation() async
@@ -79,12 +79,13 @@ extension ContentBlockerRulesUserScript: ContentBlockerScriptProtocol {}
 
 final class AdClickAttributionTabExtension: TabExtension {
 
-    private static func makeAdClickAttributionDetection(with dependencies: any AdClickAttributionDependencies, delegate: AdClickAttributionLogic) -> AdClickAttributionDetection {
+    private static func makeAdClickAttributionDetection(with dependencies: any AdClickAttributionDependencies, delegate: AdClickAttributionLogic, cpmExperimentOn: Bool?) -> AdClickAttributionDetection {
         let detection = AdClickAttributionDetection(feature: dependencies.adClickAttribution,
                                                     tld: dependencies.tld,
                                                     eventReporting: dependencies.attributionEvents,
                                                     errorReporting: dependencies.attributionDebugEvents,
-                                                    log: OSLog.attribution)
+                                                    log: OSLog.attribution,
+                                                    cpmExperimentOn: cpmExperimentOn)
         detection.delegate = delegate
         return detection
 
@@ -99,9 +100,9 @@ final class AdClickAttributionTabExtension: TabExtension {
                                        log: OSLog.attribution)
     }
 
-    private static func makeAdClickAttribution(with dependencies: any AdClickAttributionDependencies) -> (AdClickLogicProtocol, AdClickAttributionDetecting) {
+    private static func makeAdClickAttribution(with dependencies: any AdClickAttributionDependencies, cpmExperimentOn: Bool?) -> (AdClickLogicProtocol, AdClickAttributionDetecting) {
         let logic = makeAdClickAttributionLogic(with: dependencies)
-        let detection = makeAdClickAttributionDetection(with: dependencies, delegate: logic)
+        let detection = makeAdClickAttributionDetection(with: dependencies, delegate: logic, cpmExperimentOn: cpmExperimentOn)
         return (logic, detection)
     }
 
@@ -121,6 +122,7 @@ final class AdClickAttributionTabExtension: TabExtension {
     }
 
     private var cancellables = Set<AnyCancellable>()
+    private let cpmExperimentOn: Bool?
 
     init(inheritedAttribution: AdClickAttributionLogic.State?,
          userContentControllerFuture: some Publisher<some UserContentControllerProtocol, Never>,
@@ -128,12 +130,18 @@ final class AdClickAttributionTabExtension: TabExtension {
          trackerInfoPublisher: some Publisher<DetectedRequest, Never>,
          dependencies: some AdClickAttributionDependencies,
          dateTimeProvider: @escaping () -> Date = Date.init,
-         logicsProvider: (AdClickAttributionDependencies) -> (AdClickLogicProtocol, AdClickAttributionDetecting) = AdClickAttributionTabExtension.makeAdClickAttribution) {
+         logicsProvider: (AdClickAttributionDependencies, Bool?) -> (AdClickLogicProtocol, AdClickAttributionDetecting) = AdClickAttributionTabExtension.makeAdClickAttribution) {
 
         self.dependencies = dependencies
         self.dateTimeProvider = dateTimeProvider
 
-        (self.logic, self.detection) = logicsProvider(dependencies)
+        // do not enroll users who have CPM disabled
+        if !CookiePopupProtectionPreferences.shared.isAutoconsentEnabled || !dependencies.privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(AutoconsentSubfeature.filterlistExperiment) {
+            self.cpmExperimentOn = nil
+        } else {
+            self.cpmExperimentOn = AutoconsentFilterlistExperiment.cohort == AutoconsentFilterlistExperiment.test
+        }
+        (self.logic, self.detection) = logicsProvider(dependencies, self.cpmExperimentOn)
         self.logic.delegate = self
 
         // delay firing up until UserContentController is published
@@ -166,7 +174,7 @@ final class AdClickAttributionTabExtension: TabExtension {
 
         trackerInfoPublisher
             .sink { [weak self] tracker in
-                self?.logic.onRequestDetected(request: tracker)
+                self?.logic.onRequestDetected(request: tracker, cpmExperimentOn: self?.cpmExperimentOn)
             }
             .store(in: &cancellables)
     }
