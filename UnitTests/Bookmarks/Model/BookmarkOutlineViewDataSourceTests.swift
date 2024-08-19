@@ -95,7 +95,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: LocalBookmarkManager(), treeController: treeController, sortMode: .manual)
 
         let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Pasteboard Bookmark", isFavorite: false)
-        let pasteboard = NSPasteboard()
+        let pasteboard = NSPasteboard.test
         pasteboard.writeObjects([bookmark.pasteboardWriter])
         let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
         let result = dataSource.outlineView(NSOutlineView(), validateDrop: draggingInfo, proposedItem: mockDestinationNode, proposedChildIndex: -1)
@@ -119,7 +119,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: LocalBookmarkManager(), treeController: treeController, sortMode: .manual)
 
         let folder = BookmarkFolder(id: UUID().uuidString, title: "Pasteboard Folder")
-        let pasteboard = NSPasteboard()
+        let pasteboard = NSPasteboard.test
         pasteboard.writeObjects([folder.pasteboardWriter])
         let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
         let result = dataSource.outlineView(NSOutlineView(), validateDrop: draggingInfo, proposedItem: mockDestinationNode, proposedChildIndex: -1)
@@ -142,7 +142,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: LocalBookmarkManager(), treeController: treeController, sortMode: .manual)
         let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
 
-        let pasteboard = NSPasteboard()
+        let pasteboard = NSPasteboard.test
         pasteboard.writeObjects([mockDestinationFolder.pasteboardWriter])
         let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
         let result = dataSource.outlineView(NSOutlineView(), validateDrop: draggingInfo, proposedItem: mockDestinationNode, proposedChildIndex: -1)
@@ -168,7 +168,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let mockDestinationNode = treeController.node(representing: childFolder)!
 
         // Simulate dragging the root folder onto the child folder:
-        let pasteboard = NSPasteboard()
+        let pasteboard = NSPasteboard.test
         pasteboard.writeObjects([rootFolder.pasteboardWriter])
         let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
         let result = dataSource.outlineView(NSOutlineView(), validateDrop: draggingInfo, proposedItem: mockDestinationNode, proposedChildIndex: -1)
@@ -263,7 +263,7 @@ extension BookmarkFolder {
 
 }
 
-private class MockDraggingInfo: NSObject, NSDraggingInfo {
+class MockDraggingInfo: NSObject, NSDraggingInfo {
 
     var draggingDestinationWindow: NSWindow?
 

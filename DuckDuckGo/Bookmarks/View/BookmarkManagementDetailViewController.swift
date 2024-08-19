@@ -57,7 +57,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     weak var delegate: BookmarkManagementDetailViewControllerDelegate?
 
-    private let managementDetailViewModel: BookmarkManagementDetailViewModel
+    let managementDetailViewModel: BookmarkManagementDetailViewModel
     private let bookmarkManager: BookmarkManager
     private let dragDropManager: BookmarkDragDropManager
     private let sortBookmarksViewModel: SortBookmarksViewModel
