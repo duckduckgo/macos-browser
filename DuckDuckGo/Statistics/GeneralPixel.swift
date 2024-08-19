@@ -145,6 +145,7 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case pproFeedbackFormShow
     case pproFeedbackSubmitScreenShow(source: String, reportType: String, category: String, subcategory: String)
+    case pproFeedbackSubmitScreenFAQClick(source: String, reportType: String, category: String, subcategory: String)
 
     case networkProtectionEnabledOnSearch
     case networkProtectionGeoswitchingOpened
@@ -634,9 +635,11 @@ enum GeneralPixel: PixelKitEventV2 {
         case .pproFeedbackReportIssue:
             return "m_mac_ppro_feedback_report-issue"
         case .pproFeedbackFormShow:
-            return "m_mac_ppro_feedback_form_show"
+            return "m_mac_ppro_feedback_general-screen_show"
         case .pproFeedbackSubmitScreenShow:
             return "m_mac_ppro_feedback_submit-screen_show"
+        case .pproFeedbackSubmitScreenFAQClick:
+            return "m_mac_ppro_feedback_submit-screen-faq_click"
 
         case .networkProtectionEnabledOnSearch:
             return "m_mac_netp_ev_enabled_on_search"
@@ -1110,6 +1113,13 @@ enum GeneralPixel: PixelKitEventV2 {
                 PixelKit.Parameters.pproIssueMetadata: metadata,
             ]
         case .pproFeedbackSubmitScreenShow(let source, let reportType, let category, let subcategory):
+            return [
+                PixelKit.Parameters.pproIssueSource: source,
+                PixelKit.Parameters.pproIssueReportType: reportType,
+                PixelKit.Parameters.pproIssueCategory: category,
+                PixelKit.Parameters.pproIssueSubcategory: subcategory,
+            ]
+        case .pproFeedbackSubmitScreenFAQClick(let source, let reportType, let category, let subcategory):
             return [
                 PixelKit.Parameters.pproIssueSource: source,
                 PixelKit.Parameters.pproIssueReportType: reportType,

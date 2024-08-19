@@ -26,15 +26,11 @@ protocol UnifiedFeedbackSender {
 
     func sendFormShowPixel() async
     func sendSubmitScreenShowPixel(source: String, reportType: String, category: String, subcategory: String) async
+    func sendSubmitScreenFAQClickPixel(source: String, reportType: String, category: String, subcategory: String) async
 }
 
 extension UnifiedFeedbackSender {
-    static func encode(_ text: String) -> String {
-        let urlAllowed: CharacterSet = .alphanumerics.union(.init(charactersIn: "-._~"))
-        return text.addingPercentEncoding(withAllowedCharacters: urlAllowed) ?? text
-    }
-
-    func sendPixel(_ pixel: PixelKitEventV2, frequency: PixelKit.Frequency = .standard) async throws {
+    func sendPixel(_ pixel: PixelKitEventV2, frequency: PixelKit.Frequency) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             var count = 0
             PixelKit.fire(pixel, frequency: frequency) { _, error in
@@ -85,21 +81,24 @@ struct DefaultFeedbackSender: UnifiedFeedbackSender {
     }
 
     func sendFeatureRequestPixel(description: String, source: String) async throws {
-        try await sendPixel(GeneralPixel.pproFeedbackFeatureRequest(description: Self.encode(description),
-                                                                    source: Source.from(source)))
+        try await sendPixel(GeneralPixel.pproFeedbackFeatureRequest(description: description,
+                                                                    source: Source.from(source)),
+                            frequency: .standard)
     }
 
     func sendGeneralFeedbackPixel(description: String, source: String) async throws {
-        try await sendPixel(GeneralPixel.pproFeedbackGeneralFeedback(description: Self.encode(description),
-                                                                     source: Source.from(source)))
+        try await sendPixel(GeneralPixel.pproFeedbackGeneralFeedback(description: description,
+                                                                     source: Source.from(source)),
+                            frequency: .standard)
     }
 
     func sendReportIssuePixel<T: UnifiedFeedbackMetadata>(source: String, category: String, subcategory: String, description: String, metadata: T?) async throws {
         try await sendPixel(GeneralPixel.pproFeedbackReportIssue(source: Source.from(source),
                                                                  category: Category.from(category),
                                                                  subcategory: Subcategory.from(subcategory),
-                                                                 description: Self.encode(description),
-                                                                 metadata: metadata?.toBase64() ?? ""))
+                                                                 description: description,
+                                                                 metadata: metadata?.toBase64() ?? ""),
+                            frequency: .standard)
     }
 
     func sendFormShowPixel() async {
@@ -112,6 +111,14 @@ struct DefaultFeedbackSender: UnifiedFeedbackSender {
                                                                        reportType: ReportType.from(reportType),
                                                                        category: Category.from(category),
                                                                        subcategory: Subcategory.from(subcategory)),
+                             frequency: .dailyAndCount)
+    }
+
+    func sendSubmitScreenFAQClickPixel(source: String, reportType: String, category: String, subcategory: String) async {
+        try? await sendPixel(GeneralPixel.pproFeedbackSubmitScreenFAQClick(source: source,
+                                                                           reportType: ReportType.from(reportType),
+                                                                           category: Category.from(category),
+                                                                           subcategory: Subcategory.from(subcategory)),
                              frequency: .dailyAndCount)
     }
 }
