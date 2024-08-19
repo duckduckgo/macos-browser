@@ -150,6 +150,92 @@ extension HomePage.Views {
                 HomeContentSectionsView(includeContinueSetUpCards: includingContinueSetUpCards)
             }
             footer
+
+            SettingsSection(title: "Sections Background") {
+                HStack {
+                    Text("Color").font(.system(size: 13.0, weight: .semibold))
+                    if #available(macOS 12.0, *) {
+                        Spacer()
+                        ZStack {
+                            Rectangle()
+                                .foregroundColor(Color(nsColor: model.backgroundColor))
+                            Rectangle()
+                                .stroke(Color.black.opacity(0.12))
+                        }
+                        .frame(width: 40, height: 20)
+                    }
+                }
+                HStack {
+                    Slider(value: $model.backgroundColorRed, in: 0...1.0) {
+                        Color.red.frame(width: 24, height: 24)
+                    }
+                    Text(String(format: "%.2f", arguments: [model.backgroundColorRed]))
+                        .frame(width: 30)
+                }
+                HStack {
+                    Slider(value: $model.backgroundColorGreen, in: 0...1.0) {
+                        Color.green.frame(width: 24, height: 24)
+                    }
+                    Text(String(format: "%.2f", arguments: [model.backgroundColorGreen]))
+                        .frame(width: 30)
+                }
+                HStack {
+                    Slider(value: $model.backgroundColorBlue, in: 0...1.0) {
+                        Color.blue.frame(width: 24, height: 24)
+                    }
+                    Text(String(format: "%.2f", arguments: [model.backgroundColorBlue]))
+                        .frame(width: 30)
+                }
+                HStack {
+                    Slider(value: $model.backgroundColorAlpha, in: 0...1.0) {
+                        ZStack {
+                            Rectangle()
+                                .fill(Color.colorSchemePickerWhite)
+                                .clipShape(Rectangle().offset(x: -12))
+                            Rectangle()
+                                .fill(Color.colorSchemePickerBlack)
+                                .clipShape(Rectangle().offset(x: 12))
+                            Rectangle()
+                                .stroke(Color.black.opacity(0.12))
+                        }
+                        .frame(width: 24, height: 24)
+                        .clipped()
+                    }
+                    Text(String(format: "%.2f", arguments: [model.backgroundColorAlpha]))
+                        .frame(width: 30)
+                }
+
+                Text("Vibrancy Material").font(.system(size: 13.0, weight: .semibold))
+                Picker(selection: $model.vibrancyMaterial, content: {
+                    Text("titlebar").tag(NSVisualEffectView.Material.titlebar)
+                    Text("selection").tag(NSVisualEffectView.Material.selection)
+                    Text("menu").tag(NSVisualEffectView.Material.menu)
+                    Text("popover").tag(NSVisualEffectView.Material.popover)
+                    Text("sidebar").tag(NSVisualEffectView.Material.sidebar)
+                    Text("headerView").tag(NSVisualEffectView.Material.headerView)
+                    Text("sheet").tag(NSVisualEffectView.Material.sheet)
+                    Text("windowBackground").tag(NSVisualEffectView.Material.windowBackground)
+                    Text("hudWindow").tag(NSVisualEffectView.Material.hudWindow)
+                    Text("fullScreenUI").tag(NSVisualEffectView.Material.fullScreenUI)
+                    Text("toolTip").tag(NSVisualEffectView.Material.toolTip)
+                    Text("contentBackground").tag(NSVisualEffectView.Material.contentBackground)
+                    Text("underWindowBackground").tag(NSVisualEffectView.Material.underWindowBackground)
+                    Text("underPageBackground").tag(NSVisualEffectView.Material.underPageBackground)
+                }, label: {})
+                .pickerStyle(.radioGroup)
+
+                Text("Alpha").font(.system(size: 13.0, weight: .semibold))
+                HStack {
+                    Slider(value: $model.vibrancyAlpha, in: 0...1.0) {
+                    } minimumValueLabel: {
+                        Text("0")
+                    } maximumValueLabel: {
+                        Text("1")
+                    }
+                    Text(String(format: "%.2f", arguments: [model.vibrancyAlpha]))
+                        .frame(width: 30)
+                }
+            }
         }
 
         @ViewBuilder

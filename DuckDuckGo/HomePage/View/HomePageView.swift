@@ -198,7 +198,7 @@ extension HomePage.Views {
                                 if settingsModel.customBackground != nil {
                                     RoundedRectangle(cornerRadius: 6)
                                         .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
-                                        .vibrancyEffect()
+                                        .vibrancyEffect(material: settingsModel.vibrancyMaterial, alpha: settingsModel.vibrancyAlpha, color: settingsModel.backgroundColor)
                                         .cornerRadius(6)
                                 } else {
                                     RoundedRectangle(cornerRadius: 6)

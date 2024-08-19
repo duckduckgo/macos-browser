@@ -2491,6 +2491,9 @@
         }
       }
     },
+    "Alpha" : {
+
+    },
     "Always Show" : {
       "comment" : "Preference for always showing the bookmarks bar",
       "localizations" : {
@@ -13046,6 +13049,9 @@
         }
       }
     },
+    "Color" : {
+
+    },
     "Contact Info" : {
       "comment" : "Title of the section of the Identities manager where the user can add/modify contact info (phone, email address)",
       "localizations" : {
@@ -13098,6 +13104,9 @@
           }
         }
       }
+    },
+    "contentBackground" : {
+
     },
     "context.menu.home.button.mode.hide" : {
       "comment" : "Preferences > Home Button > None item",
@@ -23518,6 +23527,9 @@
         }
       }
     },
+    "fullScreenUI" : {
+
+    },
     "generic.delete.button" : {
       "comment" : "Label of a button that allows the user to delete an item",
       "extractionState" : "extracted_with_value",
@@ -23877,6 +23889,9 @@
           }
         }
       }
+    },
+    "headerView" : {
+
     },
     "Help" : {
       "comment" : "Main Menu Help",
@@ -25169,6 +25184,9 @@
           }
         }
       }
+    },
+    "hudWindow" : {
+
     },
     "If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.\n\nImported passwords are stored securely using encryption." : {
       "comment" : "Warning that Chromium data import would require entering system passwords.",
@@ -32477,6 +32495,9 @@
           }
         }
       }
+    },
+    "menu" : {
+
     },
     "menu.add.folder" : {
       "comment" : "Menu item to add a folder",
@@ -46935,6 +46956,9 @@
         }
       }
     },
+    "popover" : {
+
+    },
     "preferences-homepage-address" : {
       "comment" : "Homepage address field label",
       "extractionState" : "extracted_with_value",
@@ -52698,6 +52722,9 @@
         }
       }
     },
+    "selection" : {
+
+    },
     "send.browser.feedback" : {
       "comment" : "Menu with feedback commands",
       "extractionState" : "extracted_with_value",
@@ -53963,6 +53990,9 @@
         }
       }
     },
+    "sheet" : {
+
+    },
     "Show Autofill Shortcut" : {
       "comment" : "Main Menu View item",
       "localizations" : {
@@ -54506,6 +54536,9 @@
           }
         }
       }
+    },
+    "sidebar" : {
+
     },
     "Smart Copy/Paste" : {
       "comment" : "Main Menu Edit-Substitutions item",
@@ -56403,6 +56436,12 @@
         }
       }
     },
+    "titlebar" : {
+
+    },
+    "toolTip" : {
+
+    },
     "tooltip.addToFavorites" : {
       "comment" : "Tooltip for add to favorites button",
       "extractionState" : "extracted_with_value",
@@ -58196,6 +58235,12 @@
         }
       }
     },
+    "underPageBackground" : {
+
+    },
+    "underWindowBackground" : {
+
+    },
     "uninstall" : {
       "comment" : "Uninstall button",
       "extractionState" : "extracted_with_value",
@@ -58667,6 +58712,9 @@
           }
         }
       }
+    },
+    "Vibrancy Material" : {
+
     },
     "View" : {
       "comment" : "Main Menu View",
@@ -59465,6 +59513,9 @@
           }
         }
       }
+    },
+    "windowBackground" : {
+
     },
     "You'll be asked to enter your Primary Password for %@.\n\nImported passwords are encrypted and only stored on this computer." : {
       "comment" : "Warning that Firefox-based browser name (%@) data import would require entering a Primary Password for the browser.",

@@ -44,14 +44,20 @@ struct VisualEffectBlur: NSViewRepresentable {
 
 public extension View {
     /**
-     * Sets the vibrancy effect as background using `NSVisualEffectView` representable.
+     * Displays `cursor` when the view is hovered.
+     *
+     * This modifier uses `.onHover` under the hood, so it takes an optional
+     * closure parameter that would be called inside the `.onHover` modifier
+     * before updating the cursor, removing the need to add a separate `.onHover`
+     * modifier.
      */
     func vibrancyEffect(
         material: NSVisualEffectView.Material = .fullScreenUI,
         blendingMode: NSVisualEffectView.BlendingMode = .withinWindow,
-        alpha: CGFloat = 1.0
+        alpha: CGFloat = 1.0,
+        color: NSColor = .clear
     ) -> some View {
-        modifier(VibrancyModifier(material: material, blendingMode: blendingMode, alpha: alpha))
+        modifier(VibrancyModifier(material: material, blendingMode: blendingMode, alpha: alpha, color: color))
     }
 }
 
@@ -60,9 +66,17 @@ private struct VibrancyModifier: ViewModifier {
     let material: NSVisualEffectView.Material
     let blendingMode: NSVisualEffectView.BlendingMode
     let alpha: CGFloat
+    let color: NSColor
 
     @ViewBuilder
     func body(content: Content) -> some View {
-        content.background(VisualEffectBlur(material: material, blendingMode: blendingMode, alpha: alpha))
+        content.background(
+            ZStack {
+                if #available(macOS 12.0, *) {
+                    Color(nsColor: color)
+                }
+                VisualEffectBlur(material: material, blendingMode: blendingMode, alpha: alpha)
+            }
+        )
     }
 }

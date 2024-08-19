@@ -136,6 +136,15 @@ extension HomePage.Models {
                 }
             }
         }
+        @Published var vibrancyMaterial: NSVisualEffectView.Material = .fullScreenUI
+        @Published var vibrancyAlpha: CGFloat = 1.0
+        @Published var backgroundColorRed: CGFloat = 0.0
+        @Published var backgroundColorGreen: CGFloat = 0.0
+        @Published var backgroundColorBlue: CGFloat = 0.0
+        @Published var backgroundColorAlpha: CGFloat = 0.0
+        var backgroundColor: NSColor {
+            .init(red: backgroundColorRed, green: backgroundColorGreen, blue: backgroundColorBlue, alpha: backgroundColorAlpha)
+        }
 
         func uploadNewImage() {
             let panel = NSOpenPanel(allowedFileTypes: [.image])
