@@ -160,6 +160,23 @@ final class BookmarksOutlineView: NSOutlineView {
         NotificationCenter.default.addObserver(self, selector: #selector(popoverDidClose), name: NSPopover.didCloseNotification, object: window?.contentViewController?.nextResponder)
     }
 
+    override func didAdd(_ rowView: NSTableRowView, forRow row: Int) {
+        guard let rowView = rowView as? RoundedSelectionRowView,
+              let cell = rowView.subviews.first as? BookmarkOutlineCellView else { return }
+
+        let highlight = (row == highlightedRow)
+
+        rowView.highlight = highlight
+        cell.highlight = highlight
+
+        if highlight {
+            highlightedRowView = rowView
+            highlightedCellView = cell
+
+            updateIsInKeyPopoverState()
+        }
+    }
+
     override func mouseMoved(with event: NSEvent) {
         updateHighlightedRowUnderCursor()
     }
@@ -301,14 +318,8 @@ final class BookmarksOutlineView: NSOutlineView {
     }
 
     func highlight(_ item: Any) {
-        let row = row(forItem: item)
-        guard let rowView = rowView(atRow: row, makeIfNecessary: false) as? RoundedSelectionRowView else { return }
-
-        rowView.highlight = true
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-            rowView.highlight = false
-        }
+        guard let row = rowIfValid(forItem: item) else { return }
+        self.highlightedRow = row
     }
 
     @discardableResult

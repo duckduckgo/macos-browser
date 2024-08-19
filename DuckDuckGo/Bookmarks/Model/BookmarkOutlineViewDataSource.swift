@@ -37,7 +37,7 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
 
     @Published var selectedFolders: [BookmarkFolder] = []
 
-    private var outlineView: NSOutlineView?
+    private var outlineView: BookmarksOutlineView?
 
     private let contentMode: ContentMode
     private(set) var expandedNodesIDs = Set<String>()
@@ -136,7 +136,10 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
 
     func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
         if self.outlineView == nil {
-            self.outlineView = outlineView
+            self.outlineView = outlineView as? BookmarksOutlineView ?? {
+                assertionFailure("BookmarksOutlineView subclass expected instead of \(outlineView)")
+                return nil
+            }()
         }
         return nodeForItem(item).numberOfChildNodes
     }
