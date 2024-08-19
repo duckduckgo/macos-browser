@@ -29,7 +29,11 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [.exact(hostname: "release-notes")])
     let featureName: String = "release-notes"
     weak var broker: UserScriptMessageBroker?
-    weak var webView: WKWebView?
+    weak var webView: WKWebView? {
+        didSet {
+            onUpdate()
+        }
+    }
     private var cancellables = Set<AnyCancellable>()
     private var isInitialized = false
 
@@ -85,6 +89,7 @@ final class ReleaseNotesUserScript: NSObject, Subfeature {
 }
 
 extension ReleaseNotesUserScript {
+
     @MainActor
     private func initialSetup(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         isInitialized = true
