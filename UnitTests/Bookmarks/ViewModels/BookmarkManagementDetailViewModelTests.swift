@@ -419,13 +419,14 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
     func testWhenSearchQueryIsNotBlankAndProposedDestinationIsRoot_thenWeDoNotAllowDrop() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
-        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: .shared)
+        let dragDropManager = BookmarkDragDropManager(bookmarkManager: bookmarkManager)
+        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: dragDropManager)
         let sut = viewController.managementDetailViewModel
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkTwo, bookmarkThree]
         sut.update(selection: .empty, searchQuery: "some")
 
         // We pick a row where the result is nil
-        let pasteboard = NSPasteboard.test
+        let pasteboard = NSPasteboard.test()
         pasteboard.clearContents()
         let result = viewController.tableView(NSTableView(), validateDrop: MockDraggingInfo(draggingPasteboard: pasteboard), proposedRow: 3, proposedDropOperation: .above)
 
@@ -435,12 +436,13 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
     func testWhenSearchQueryIsBlankAndProposedDestinationIsRoot_thenWeAllowDrop() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
-        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: .shared)
+        let dragDropManager = BookmarkDragDropManager(bookmarkManager: bookmarkManager)
+        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: dragDropManager)
         let sut = viewController.managementDetailViewModel
         sut.update(selection: .empty, searchQuery: "")
 
         // We pick a row where the result is nil
-        let pasteboard = NSPasteboard.test
+        let pasteboard = NSPasteboard.test()
         pasteboard.clearContents()
         let result = viewController.tableView(NSTableView(), validateDrop: MockDraggingInfo(draggingPasteboard: pasteboard), proposedRow: 3, proposedDropOperation: .above)
 
@@ -454,11 +456,12 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let children = [bookmarkFour, bookmarkFive]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
-        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: .shared)
+        let dragDropManager = BookmarkDragDropManager(bookmarkManager: bookmarkManager)
+        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: dragDropManager)
         let sut = viewController.managementDetailViewModel
         bookmarkManager.bookmarksReturnedForSearch = [folder]
         sut.update(selection: .empty, searchQuery: "some")
-        let pasteboard = NSPasteboard.test
+        let pasteboard = NSPasteboard.test()
         pasteboard.writeObjects([bookmarkOne.pasteboardWriter])
         let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
 
@@ -475,10 +478,11 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let children = [bookmarkFour, bookmarkFive]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
-        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: .shared)
+        let dragDropManager = BookmarkDragDropManager(bookmarkManager: bookmarkManager)
+        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: dragDropManager)
         let sut = viewController.managementDetailViewModel
         sut.update(selection: .empty, searchQuery: "")
-        let pasteboard = NSPasteboard.test
+        let pasteboard = NSPasteboard.test()
         pasteboard.writeObjects([bookmarkOne.pasteboardWriter])
         let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
 
@@ -491,10 +495,11 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
     func testWhenDraggingBookmarkToBookmark_thenWeDoNotAllowDrop() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
-        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: .shared)
+        let dragDropManager = BookmarkDragDropManager(bookmarkManager: bookmarkManager)
+        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: dragDropManager)
         let sut = viewController.managementDetailViewModel
         sut.update(selection: .empty, searchQuery: "")
-        let pasteboard = NSPasteboard.test
+        let pasteboard = NSPasteboard.test()
         pasteboard.writeObjects([bookmarkOne.pasteboardWriter])
         let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
 

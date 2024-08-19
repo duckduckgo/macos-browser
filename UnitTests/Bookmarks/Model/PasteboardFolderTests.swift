@@ -60,7 +60,7 @@ class PasteboardFolderTests: XCTestCase {
         let folder = BookmarkFolder(id: UUID().uuidString, title: "Example")
         let writer = FolderPasteboardWriter(folder: folder)
 
-        let pasteboard = NSPasteboard.test
+        let pasteboard = NSPasteboard.test()
         let types = writer.writableTypes(for: pasteboard)
         XCTAssert(types.contains(FolderPasteboardWriter.folderUTIInternalType))
     }

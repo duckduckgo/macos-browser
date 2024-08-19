@@ -19,5 +19,9 @@
 import Foundation
 
 extension NSPasteboard {
-    static var test = NSPasteboard(name: .init("Test Pasteboard"))
+    static func test() -> NSPasteboard {
+        let pasteboard = NSPasteboard(name: .init("Test Pasteboard"))
+        pasteboard.prepareForNewContents()
+        return pasteboard
+    }
 }
