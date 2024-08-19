@@ -475,8 +475,6 @@ extension DataBrokerProtectionStatsPixels {
                                                                     profileQueryId: optOutJob.profileQueryId,
                                                                     extractedProfileId: extractedProfileID)
         }
-        // Also, and this is fairly major, need to actually set the submittedSuccessfullyDate at some point
-
     }
 }
 
