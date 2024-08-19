@@ -18,15 +18,17 @@
 
 import Foundation
 
-/// `UserDefault` keys
+/// Freemium-related `UserDefault` keys
 private enum Keys {
     static let pir = "macos.browser.freemium.pir"
 }
 
+/// `FreemiumState` types provide access to Freemium-related state
 protocol FreemiumState {
     var hasFreemiumPIR: Bool { get set }
 }
 
+/// Default implementation of `FreemiumState`. `UserDefaults` is used as underlying storage.
 public final class DefaultFreemiumState: FreemiumState {
 
     private let userDefaults: UserDefaults
