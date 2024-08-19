@@ -1125,6 +1125,20 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func willStart(_ navigation: Navigation) {
         if error != nil { error = nil }
 
+        /*
+         From a certain point, WebKit no longer supports loading any URL with the "about:" scheme, except for "about:blank".
+         Although "about:" requests are approved without waiting for the `decidePolicyForNavigationAction:` decision, we will only receive the `willBegin` delegate call.
+         If we receive an "about:" request pointing to an internal page like "about:preferences" or others, we should redirect to a "duck://" address by directly setting the Tab Content.
+         Other "about:" URLs will fail to load and display an error page.
+         */
+        if navigation.url.navigationalScheme == .about, navigation.url != .blankPage {
+            let tabContent = TabContent.contentFromURL(navigation.url, source: .webViewUpdated)
+            guard case .url = tabContent else {
+                setContent(tabContent)
+                return
+            }
+        }
+
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
     }
 

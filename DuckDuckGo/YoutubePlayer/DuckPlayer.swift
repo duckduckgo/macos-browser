@@ -248,10 +248,10 @@ final class DuckPlayer {
 
         var isAutoplayEnabled = DuckPlayerPreferences.shared.duckPlayerAutoplay
 
-        /// If the feature flag is disabled, we want to turn autoPlay to true since this was the default
+        /// If the feature flag is disabled, we want to turn autoPlay to false
         /// https://app.asana.com/0/1204167627774280/1207906550241281/f
         if !isAutoplayFeatureEnabled {
-            isAutoplayEnabled = true
+            isAutoplayEnabled = false
         }
 
         // Disable WebView PiP if if the subFeature is off
