@@ -583,4 +583,42 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         // Cleanup
         handler.clear()
     }
+
+    func testWhenSubmittedDateIsNil_thenNoPixelsAreFired() async {
+        // Migrating existing users the submitted date defaults to nil, and pixels shouldn't be fired
+
+        // Given
+        let mockDatabase = MockDatabase()
+        let optOutJobData = OptOutJobData.mock(with: .optOutConfirmed,
+                                               submittedDate: nil,
+                                               sevenDaysConfirmationPixelFired: false,
+                                               fourteenDaysConfirmationPixelFired: false,
+                                               twentyOneDaysConfirmationPixelFired: false)
+        let brokerProfileQueryData = BrokerProfileQueryData(
+            dataBroker: .mock,
+            profileQuery: .mock,
+            scanJobData: .mockWith(historyEvents: optOutJobData.historyEvents),
+            optOutJobData: [optOutJobData])
+
+        let sut = DataBrokerProtectionStatsPixels(database: mockDatabase,
+                                                  handler: handler,
+                                                  repository: MockDataBrokerProtectionStatsPixelsRepository())
+
+        // When
+        sut.fireRegularIntervalConfirmationPixelsForSubmittedOptOuts(for: [brokerProfileQueryData])
+        let pixels = MockDataBrokerProtectionPixelsHandler.lastPixelsFired
+        print(pixels)
+
+        // Then
+        validatePixelsNotFired([optOutJobAt7DaysConfirmedPixel,
+                                optOutJobAt7DaysUnconfirmedPixel,
+                                optOutJobAt14DaysConfirmedPixel,
+                                optOutJobAt14DaysUnconfirmedPixel,
+                                optOutJobAt21DaysConfirmedPixel,
+                                optOutJobAt21DaysUnconfirmedPixel
+                               ])
+
+        // Cleanup
+        handler.clear()
+    }
 }
