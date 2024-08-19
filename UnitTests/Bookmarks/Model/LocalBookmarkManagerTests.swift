@@ -197,7 +197,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
     func testWhenGetBookmarkFolderIsCalledAndFolderExistsInStoreThenBookmarkStoreReturnsFolder() throws {
         // GIVEN
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
-        let folder = BookmarkFolder(id: "1", title: "Test")
+        let folder = BookmarkFolder(id: #function, title: "Test")
         bookmarkStoreMock.bookmarkFolderWithId = {
             XCTAssertEqual($0, folder.id)
             return folder
