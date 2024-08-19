@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import BrowserServicesKit
+import Configuration
 import PixelKit
 
 enum ErrorCategory: Equatable {
@@ -180,6 +181,9 @@ public enum DataBrokerProtectionPixels {
     case entitlementCheckInvalid
     case entitlementCheckError
 
+    // Configuration
+    case invalidPayload(Configuration)
+
     // Measure success/failure rate of Personal Information Removal Pixels
     // https://app.asana.com/0/1204006570077678/1206889724879222/f
     case globalMetricsWeeklyStats(profilesFound: Int, optOutsInProgress: Int, successfulOptOuts: Int, failedOptOuts: Int, durationOfFirstOptOut: Int, numberOfNewRecordsFound: Int)
@@ -309,6 +313,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             // Feature Gatekeeper
         case .gatekeeperNotAuthenticated: return "m_mac_dbp_gatekeeper_not_authenticated"
         case .gatekeeperEntitlementsInvalid: return "m_mac_dbp_gatekeeper_entitlements_invalid"
+
+            // Configuration
+        case .invalidPayload(let configuration): return "m_mac_dbp_\(configuration.rawValue)_invalid_payload".lowercased()
         }
     }
 
@@ -411,7 +418,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .secureVaultKeyStoreUpdateError,
                 .secureVaultError,
                 .gatekeeperNotAuthenticated,
-                .gatekeeperEntitlementsInvalid:
+                .gatekeeperEntitlementsInvalid,
+                .invalidPayload:
             return [:]
         case .ipcServerProfileSavedCalledByApp,
                 .ipcServerProfileSavedReceivedByAgent,
@@ -551,7 +559,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerMetricsWeeklyStats,
                     .dataBrokerMetricsMonthlyStats,
                     .gatekeeperNotAuthenticated,
-                    .gatekeeperEntitlementsInvalid:
+                    .gatekeeperEntitlementsInvalid,
+                    .invalidPayload:
 
                 PixelKit.fire(event)
 

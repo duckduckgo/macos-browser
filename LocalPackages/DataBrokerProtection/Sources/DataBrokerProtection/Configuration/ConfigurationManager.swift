@@ -20,14 +20,29 @@ import Foundation
 import BrowserServicesKit
 import Configuration
 import Common
+import Networking
 import PixelKit
 
 final class ConfigurationManager: DefaultConfigurationManager {
 
     static let shared = ConfigurationManager(fetcher: ConfigurationFetcher(store: ConfigurationStore.shared,
                                                                            log: .default,
-                                                                           eventMapping: nil))
-    // TODO: EventMapping for error pixels
+                                                                           eventMapping: configurationDebugEvents))
+
+    static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
+        let domainEvent: DataBrokerProtectionPixels
+        switch event {
+        case .invalidPayload(let configuration):
+            domainEvent = .invalidPayload(configuration)
+        }
+
+        PixelKit.fire(DebugEvent(domainEvent, error: error))
+    }
+
+    func log() {
+        os_log("last update %{public}s", log: .default, type: .default, String(describing: lastUpdateTime))
+        os_log("last refresh check %{public}s", log: .default, type: .default, String(describing: lastRefreshCheckTime))
+    }
 
     override public func refreshNow(isDebug: Bool = false) async {
         let updateConfigDependenciesTask = Task {
@@ -40,8 +55,8 @@ final class ConfigurationManager: DefaultConfigurationManager {
 
         await updateConfigDependenciesTask.value
 
-//        ConfigurationStore.shared.log()
-//        log()
+        ConfigurationStore.shared.log()
+        log()
     }
 
     func fetchConfigDependencies(isDebug: Bool) async -> Bool {
@@ -62,6 +77,9 @@ final class ConfigurationManager: DefaultConfigurationManager {
 
     func updateConfigDependencies() {
         // TODO: Update lastConfigurationInstallDate
-        // TODO: Provide config to dependency manager
+        DBBPPrivacyConfigurationManager.shared.reload(
+            etag: ConfigurationStore.shared.loadEtag(for: .privacyConfiguration),
+            data: ConfigurationStore.shared.loadData(for: .privacyConfiguration)
+        )
     }
 }

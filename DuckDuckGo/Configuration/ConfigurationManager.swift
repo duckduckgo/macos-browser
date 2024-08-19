@@ -30,9 +30,6 @@ final class ConfigurationManager: DefaultConfigurationManager {
                                                                            log: .config,
                                                                            eventMapping: configurationDebugEvents))
 
-    @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
-    private(set) var lastUpdateTime: Date
-
     @UserDefaultsWrapper(key: .configLastInstalled, defaultValue: nil)
     private(set) var lastConfigurationInstallDate: Date?
 

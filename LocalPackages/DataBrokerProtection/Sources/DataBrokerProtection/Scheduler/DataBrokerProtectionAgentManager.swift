@@ -32,7 +32,7 @@ public class DataBrokerProtectionAgentManagerProvider {
 
         let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
         ConfigurationManager.shared.start()
-        let privacyConfigurationManager = PrivacyConfigurationManagingMock() // Forgive me, for I have sinned
+        let privacyConfigurationManager = DBBPPrivacyConfigurationManager.shared
         let ipcServer = DefaultDataBrokerProtectionIPCServer(machServiceName: Bundle.main.bundleIdentifier!)
 
         let features = ContentScopeFeatureToggles(emailProtection: false,
