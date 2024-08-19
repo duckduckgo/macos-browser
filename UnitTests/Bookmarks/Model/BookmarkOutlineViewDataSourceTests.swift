@@ -155,10 +155,17 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
 
     @MainActor
     func testWhenValidatingFolderDrop_AndDestinationIsAncestor_ThenNoneIsReturned() {
-        let childFolder = BookmarkFolder(id: UUID().uuidString, title: "Child")
-        let rootFolder = BookmarkFolder(id: UUID().uuidString, title: "Root", children: [childFolder])
+        let childFolder = BookmarkFolder(id: UUID().uuidString, title: "Child", parentFolderUUID: "rootfolder")
+        let rootFolder = BookmarkFolder(id: "rootfolder", title: "Root", children: [childFolder])
 
         let bookmarkStoreMock = BookmarkStoreMock()
+        bookmarkStoreMock.bookmarkFolderWithId = {
+            switch $0 {
+            case childFolder.id: childFolder
+            case rootFolder.id: rootFolder
+            default: fatalError()
+            }
+        }
         let faviconManagerMock = FaviconManagerMock()
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
         let dragDropManager = BookmarkDragDropManager(bookmarkManager: bookmarkManager)
