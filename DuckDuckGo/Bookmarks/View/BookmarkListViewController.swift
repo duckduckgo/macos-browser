@@ -80,7 +80,7 @@ final class BookmarkListViewController: NSViewController {
     private let dragDropManager: BookmarkDragDropManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
     private let treeControllerSearchDataSource: BookmarkListTreeControllerSearchDataSource
-    private let sortBookmarksViewModel: SortBookmarksViewModel
+    private let sortBookmarksViewModel: SortBookmarksViewModel?
     private let bookmarkMetrics: BookmarksSearchAndSortMetrics
 
     private let treeController: BookmarkTreeController
@@ -109,7 +109,7 @@ final class BookmarkListViewController: NSViewController {
             bookmarkManager: bookmarkManager,
             treeController: treeController,
             dragDropManager: dragDropManager,
-            sortMode: sortBookmarksViewModel.selectedSortMode,
+            sortMode: sortBookmarksViewModel?.selectedSortMode ?? .manual,
             onMenuRequestedAction: { [weak self] cell in
                 self?.showContextMenu(for: cell)
             },
@@ -147,11 +147,15 @@ final class BookmarkListViewController: NSViewController {
         self.bookmarkManager = bookmarkManager
         self.dragDropManager = dragDropManager
         self.bookmarkMetrics = metrics
-        self.sortBookmarksViewModel = SortBookmarksViewModel(manager: bookmarkManager, metrics: metrics, origin: .panel)
+        self.sortBookmarksViewModel = if mode == .popover {
+            SortBookmarksViewModel(manager: bookmarkManager, metrics: metrics, origin: .panel)
+        } else {
+            nil
+        }
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
         self.treeControllerSearchDataSource = BookmarkListTreeControllerSearchDataSource(bookmarkManager: bookmarkManager)
         self.treeController = BookmarkTreeController(dataSource: treeControllerDataSource,
-                                                     sortMode: sortBookmarksViewModel.selectedSortMode,
+                                                     sortMode: sortBookmarksViewModel?.selectedSortMode ?? .manual,
                                                      searchDataSource: treeControllerSearchDataSource,
                                                      rootFolder: rootFolder,
                                                      isBookmarksBarMenu: mode == .bookmarkBarMenu)
@@ -595,7 +599,7 @@ final class BookmarkListViewController: NSViewController {
             }
             .store(in: &cancellables)
 
-        sortBookmarksViewModel.$selectedSortMode.sink { [weak self] newSortMode in
+        sortBookmarksViewModel?.$selectedSortMode.sink { [weak self] newSortMode in
             self?.setupSort(mode: newSortMode)
         }.store(in: &cancellables)
 
@@ -826,13 +830,13 @@ final class BookmarkListViewController: NSViewController {
                 updateSearchAndExpand(destinationFolder)
             } else {
                 dataSource.reloadData(forSearchQuery: searchBar.stringValue,
-                                      sortMode: sortBookmarksViewModel.selectedSortMode)
+                                      sortMode: sortBookmarksViewModel?.selectedSortMode ?? .manual)
                 outlineView.reloadData()
             }
         } else {
             let selectedNodes = self.selectedNodes
 
-            dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode,
+            dataSource.reloadData(with: sortBookmarksViewModel?.selectedSortMode ?? .manual,
                                   withRootFolder: rootFolder ?? self.representedObject as? BookmarkFolder)
             let oldContentSize = outlineView.bounds.size
             outlineView.reloadData()
@@ -1085,7 +1089,7 @@ final class BookmarkListViewController: NSViewController {
     private func showTreeView() {
         emptyState?.isHidden = true
         outlineView.isHidden = false
-        dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode)
+        dataSource.reloadData(with: sortBookmarksViewModel?.selectedSortMode ?? .manual)
         outlineView.reloadData()
         if !isSearchVisible {
             outlineView.makeMeFirstResponder()
@@ -1204,6 +1208,10 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @objc func sortBookmarksButtonClicked(_ sender: NSButton) {
+        guard let sortBookmarksViewModel else {
+            assertionFailure("sortBookmarksViewModel is nil")
+            return
+        }
         let menu = sortBookmarksViewModel.menu
         bookmarkMetrics.fireSortButtonClicked(origin: .panel)
         menu.delegate = sortBookmarksViewModel
@@ -1698,7 +1706,8 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
 
     private func showSearch(forSearchQuery searchQuery: String) {
         outlineView.highlightedRow = nil
-        dataSource.reloadData(forSearchQuery: searchQuery, sortMode: sortBookmarksViewModel.selectedSortMode)
+        dataSource.reloadData(forSearchQuery: searchQuery,
+                              sortMode: sortBookmarksViewModel?.selectedSortMode ?? .manual)
 
         if treeController.rootNode.childNodes.isEmpty {
             showEmptyStateView(for: .noSearchResults)
