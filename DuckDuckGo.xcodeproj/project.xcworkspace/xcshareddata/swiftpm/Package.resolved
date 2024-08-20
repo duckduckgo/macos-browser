@@ -32,8 +32,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "anh/ppro/unified-feedback",
-        "revision" : "c371a9d9ca3a4ac17541c43e1e76774e5a928d81"
+        "revision" : "0e9f45c1612c27aba128ba2142caf984362c95db"
       }
     },
     {

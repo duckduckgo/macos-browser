@@ -2551,8 +2551,8 @@
 		BD7090D02C5182FB009EED82 /* UnifiedFeedbackFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7090CE2C5182FB009EED82 /* UnifiedFeedbackFormView.swift */; };
 		BD7090D22C52ECFE009EED82 /* UnifiedMetadataCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7090D12C52ECFE009EED82 /* UnifiedMetadataCollector.swift */; };
 		BD7090D32C52ECFE009EED82 /* UnifiedMetadataCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7090D12C52ECFE009EED82 /* UnifiedMetadataCollector.swift */; };
-		BD7090D62C540D5D009EED82 /* DefaultMetadataCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7090D52C540D5D009EED82 /* DefaultMetadataCollector.swift */; };
-		BD7090D72C540D5D009EED82 /* DefaultMetadataCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7090D52C540D5D009EED82 /* DefaultMetadataCollector.swift */; };
+		BD7090D62C540D5D009EED82 /* EmptyMetadataCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7090D52C540D5D009EED82 /* EmptyMetadataCollector.swift */; };
+		BD7090D72C540D5D009EED82 /* EmptyMetadataCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7090D52C540D5D009EED82 /* EmptyMetadataCollector.swift */; };
 		BD88A83E2C4F3E4300460A26 /* FeedbackCategoryProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD88A83D2C4F3E4300460A26 /* FeedbackCategoryProviding.swift */; };
 		BD88A83F2C4F3E4300460A26 /* FeedbackCategoryProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD88A83D2C4F3E4300460A26 /* FeedbackCategoryProviding.swift */; };
 		BDA7647C2BC497BE00D0400C /* DefaultVPNLocationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA7647B2BC497BE00D0400C /* DefaultVPNLocationFormatter.swift */; };
@@ -4249,7 +4249,7 @@
 		BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "vpn-dark-mode.json"; sourceTree = "<group>"; };
 		BD7090CE2C5182FB009EED82 /* UnifiedFeedbackFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedFeedbackFormView.swift; sourceTree = "<group>"; };
 		BD7090D12C52ECFE009EED82 /* UnifiedMetadataCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedMetadataCollector.swift; sourceTree = "<group>"; };
-		BD7090D52C540D5D009EED82 /* DefaultMetadataCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultMetadataCollector.swift; sourceTree = "<group>"; };
+		BD7090D52C540D5D009EED82 /* EmptyMetadataCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyMetadataCollector.swift; sourceTree = "<group>"; };
 		BD88A83D2C4F3E4300460A26 /* FeedbackCategoryProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackCategoryProviding.swift; sourceTree = "<group>"; };
 		BDA7647B2BC497BE00D0400C /* DefaultVPNLocationFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultVPNLocationFormatter.swift; sourceTree = "<group>"; };
 		BDA7648C2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultVPNLocationFormatterTests.swift; sourceTree = "<group>"; };
@@ -8449,7 +8449,7 @@
 			isa = PBXGroup;
 			children = (
 				BD7090D12C52ECFE009EED82 /* UnifiedMetadataCollector.swift */,
-				BD7090D52C540D5D009EED82 /* DefaultMetadataCollector.swift */,
+				BD7090D52C540D5D009EED82 /* EmptyMetadataCollector.swift */,
 			);
 			path = MetadataCollectors;
 			sourceTree = "<group>";
@@ -10339,7 +10339,7 @@
 				B690152D2ACBF4DA00AD0BAB /* MenuPreview.swift in Sources */,
 				1D36F4252A3B85C50052B527 /* TabCleanupPreparer.swift in Sources */,
 				3706FB97293F65D500E42796 /* ActionSpeech.swift in Sources */,
-				BD7090D72C540D5D009EED82 /* DefaultMetadataCollector.swift in Sources */,
+				BD7090D72C540D5D009EED82 /* EmptyMetadataCollector.swift in Sources */,
 				B6AFE6BD29A5D621002FF962 /* HTTPSUpgradeTabExtension.swift in Sources */,
 				3706FB9A293F65D500E42796 /* FireproofDomainsStore.swift in Sources */,
 				3706FB9B293F65D500E42796 /* PrivacyDashboardPermissionHandler.swift in Sources */,
@@ -11510,7 +11510,7 @@
 				7BEC20452B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift in Sources */,
 				B6C0BB6A29AF1C7000AE8E3C /* BrowserTabView.swift in Sources */,
 				B6B1E88026D5DA9B0062C350 /* DownloadsViewController.swift in Sources */,
-				BD7090D62C540D5D009EED82 /* DefaultMetadataCollector.swift in Sources */,
+				BD7090D62C540D5D009EED82 /* EmptyMetadataCollector.swift in Sources */,
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,
 				85480FCF25D1AA22009424E3 /* ConfigurationStore.swift in Sources */,
 				AA3D531B27A2F57E00074EC1 /* Feedback.swift in Sources */,
@@ -13511,7 +13511,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = c371a9d9ca3a4ac17541c43e1e76774e5a928d81;
+				revision = 0e9f45c1612c27aba128ba2142caf984362c95db;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
