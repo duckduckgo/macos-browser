@@ -42,8 +42,8 @@ extension UserText {
     static let networkProtectionInviteSuccessMessage = "DuckDuckGo's VPN secures all of your device's Internet traffic anytime, anywhere."
 
     // MARK: - Navigation Bar Status View
-    // "network.protection.navbar.status.view.share.feedback" - Menu item for 'Share VPN Feedback' in the VPN status view that's shown in the navigation bar
-    static let networkProtectionNavBarStatusViewShareFeedback = "Share VPN Feedback…"
+    // "network.protection.navbar.status.view.send.feedback" - Menu item for 'Send Feedback' in the VPN status view that's shown in the navigation bar
+    static let networkProtectionNavBarStatusViewSendFeedback = "Send Feedback…"
     // "network.protection.status.menu.vpn.settings" - The status menu 'VPN Settings' menu item
     static let networkProtectionNavBarStatusMenuVPNSettings = "VPN Settings…"
     // "network.protection.status.menu.faq" - The status menu 'FAQ' menu item
