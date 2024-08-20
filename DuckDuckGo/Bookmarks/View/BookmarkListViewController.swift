@@ -1006,8 +1006,8 @@ final class BookmarkListViewController: NSViewController {
         guard contentSize != oldContentSize else { return }
 
         let heightChange = contentSize.height - oldContentSize.height
-        let availableHeightBelow = window.frame.minY - screenFrame.minY/* - contentInsets.bottom*/
-        let availableHeightOnTop = screenFrame.maxY - window.frame.maxY/* - contentInsets.top*/
+        let availableHeightBelow = window.frame.minY - screenFrame.minY
+        let availableHeightOnTop = screenFrame.maxY - window.frame.maxY
 
         // growing
         if heightChange > 0 {
@@ -1019,7 +1019,7 @@ final class BookmarkListViewController: NSViewController {
             }
 
         // collapsing
-        } else if /* heightChange < 0 && */ contentSize.height < scrollView.frame.height {
+        } else if /* heightChange <= 0 && */ contentSize.height < scrollView.frame.height {
             // reduce the offset of the popover upwards relative to the presenting view
             preferredContentOffset.y = max(0, preferredContentOffset.y + heightChange)
             // contentSize.height = contentSize.height
