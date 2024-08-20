@@ -313,8 +313,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
         // “Watch in YouTube” selected
         // when currently displayed content is the Duck Player and loading a YouTube URL, don‘t override it
-        if navigationAction.targetFrame?.url.isDuckPlayer == true,
-           navigationAction.targetFrame?.url.youtubeVideoID == videoID {
+        if didUserSelectWatchInYoutubeFromDuckPlayer(navigationAction, preferences: preferences, videoID: videoID) {
             PixelKit.fire(GeneralPixel.duckPlayerWatchOnYoutube)
             return .next
 
@@ -348,6 +347,11 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
 
         return .next
+    }
+
+    private func didUserSelectWatchInYoutubeFromDuckPlayer(_ navigationAction: NavigationAction, preferences: DuckPlayerPreferences, videoID: String) -> Bool {
+        let url = preferences.duckPlayerOpenInNewTab ? navigationAction.sourceFrame.url : navigationAction.targetFrame?.url
+        return url?.isDuckPlayer == true && url?.youtubeVideoID == videoID
     }
 
     func didCommit(_ navigation: Navigation) {

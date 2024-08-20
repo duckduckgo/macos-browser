@@ -20,7 +20,7 @@ import Combine
 import Foundation
 import NetworkExtension
 import NetworkProtection
-import OSLog // swiftlint:disable:this enforce_os_log_wrapper
+import os.log
 import PixelKit
 import SystemExtensions
 
