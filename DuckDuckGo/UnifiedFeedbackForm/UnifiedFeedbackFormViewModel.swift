@@ -145,20 +145,20 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
         case .faqClick:
             await openFAQ()
         case .reportShow:
-            await feedbackSender.sendFormShowPixel()
+            feedbackSender.sendFormShowPixel()
         case .reportSubmitShow:
             if !selectedReportType.isEmpty, !selectedCategory.isEmpty, !selectedSubcategory.isEmpty {
-                await feedbackSender.sendSubmitScreenShowPixel(source: source,
-                                                               reportType: selectedReportType,
-                                                               category: selectedCategory,
-                                                               subcategory: selectedSubcategory)
+                feedbackSender.sendSubmitScreenShowPixel(source: source,
+                                                         reportType: selectedReportType,
+                                                         category: selectedCategory,
+                                                         subcategory: selectedSubcategory)
             }
         case .reportFAQClick:
             if !selectedReportType.isEmpty, !selectedCategory.isEmpty, !selectedSubcategory.isEmpty {
-                await feedbackSender.sendSubmitScreenFAQClickPixel(source: source,
-                                                                   reportType: selectedReportType,
-                                                                   category: selectedCategory,
-                                                                   subcategory: selectedSubcategory)
+                feedbackSender.sendSubmitScreenFAQClickPixel(source: source,
+                                                             reportType: selectedReportType,
+                                                             category: selectedCategory,
+                                                             subcategory: selectedSubcategory)
             }
         }
     }
@@ -199,10 +199,10 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
             try await reportProblem()
         }
 
-        await feedbackSender.sendSubmitScreenShowPixel(source: source,
-                                                       reportType: selectedReportType,
-                                                       category: selectedCategory,
-                                                       subcategory: selectedSubcategory)
+        feedbackSender.sendSubmitScreenShowPixel(source: source,
+                                                 reportType: selectedReportType,
+                                                 category: selectedCategory,
+                                                 subcategory: selectedSubcategory)
     }
 
     private func reportProblem() async throws {

@@ -24,15 +24,15 @@ protocol UnifiedFeedbackSender {
     func sendGeneralFeedbackPixel(description: String, source: String) async throws
     func sendReportIssuePixel<T: UnifiedFeedbackMetadata>(source: String, category: String, subcategory: String, description: String, metadata: T?) async throws
 
-    func sendFormShowPixel() async
-    func sendSubmitScreenShowPixel(source: String, reportType: String, category: String, subcategory: String) async
-    func sendSubmitScreenFAQClickPixel(source: String, reportType: String, category: String, subcategory: String) async
+    func sendFormShowPixel()
+    func sendSubmitScreenShowPixel(source: String, reportType: String, category: String, subcategory: String)
+    func sendSubmitScreenFAQClickPixel(source: String, reportType: String, category: String, subcategory: String)
 }
 
 extension UnifiedFeedbackSender {
-    func sendPixel(_ pixel: PixelKitEventV2, frequency: PixelKit.Frequency) async throws {
+    func sendStandardPixel(_ pixel: PixelKitEventV2) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            PixelKit.fire(pixel, frequency: frequency) { _, error in
+            PixelKit.fire(pixel, frequency: .standard) { _, error in
                 if let error {
                     continuation.resume(throwing: error)
                 } else {
@@ -79,44 +79,38 @@ struct DefaultFeedbackSender: UnifiedFeedbackSender {
     }
 
     func sendFeatureRequestPixel(description: String, source: String) async throws {
-        try await sendPixel(GeneralPixel.pproFeedbackFeatureRequest(description: description,
-                                                                    source: Source.from(source)),
-                            frequency: .standard)
+        try await sendStandardPixel(GeneralPixel.pproFeedbackFeatureRequest(description: description,
+                                                                            source: Source.from(source)))
     }
 
     func sendGeneralFeedbackPixel(description: String, source: String) async throws {
-        try await sendPixel(GeneralPixel.pproFeedbackGeneralFeedback(description: description,
-                                                                     source: Source.from(source)),
-                            frequency: .standard)
+        try await sendStandardPixel(GeneralPixel.pproFeedbackGeneralFeedback(description: description,
+                                                                             source: Source.from(source)))
     }
 
     func sendReportIssuePixel<T: UnifiedFeedbackMetadata>(source: String, category: String, subcategory: String, description: String, metadata: T?) async throws {
-        try await sendPixel(GeneralPixel.pproFeedbackReportIssue(source: Source.from(source),
-                                                                 category: Category.from(category),
-                                                                 subcategory: Subcategory.from(subcategory),
-                                                                 description: description,
-                                                                 metadata: metadata?.toBase64() ?? ""),
-                            frequency: .standard)
+        try await sendStandardPixel(GeneralPixel.pproFeedbackReportIssue(source: Source.from(source),
+                                                                         category: Category.from(category),
+                                                                         subcategory: Subcategory.from(subcategory),
+                                                                         description: description,
+                                                                         metadata: metadata?.toBase64() ?? ""))
     }
 
-    func sendFormShowPixel() async {
-        try? await sendPixel(GeneralPixel.pproFeedbackFormShow,
-                             frequency: .dailyAndCount)
+    func sendFormShowPixel() {
+        PixelKit.fire(GeneralPixel.pproFeedbackFormShow)
     }
 
-    func sendSubmitScreenShowPixel(source: String, reportType: String, category: String, subcategory: String) async {
-        try? await sendPixel(GeneralPixel.pproFeedbackSubmitScreenShow(source: source,
-                                                                       reportType: ReportType.from(reportType),
-                                                                       category: Category.from(category),
-                                                                       subcategory: Subcategory.from(subcategory)),
-                             frequency: .dailyAndCount)
+    func sendSubmitScreenShowPixel(source: String, reportType: String, category: String, subcategory: String) {
+        PixelKit.fire(GeneralPixel.pproFeedbackSubmitScreenShow(source: source,
+                                                                reportType: ReportType.from(reportType),
+                                                                category: Category.from(category),
+                                                                subcategory: Subcategory.from(subcategory)))
     }
 
-    func sendSubmitScreenFAQClickPixel(source: String, reportType: String, category: String, subcategory: String) async {
-        try? await sendPixel(GeneralPixel.pproFeedbackSubmitScreenFAQClick(source: source,
-                                                                           reportType: ReportType.from(reportType),
-                                                                           category: Category.from(category),
-                                                                           subcategory: Subcategory.from(subcategory)),
-                             frequency: .dailyAndCount)
+    func sendSubmitScreenFAQClickPixel(source: String, reportType: String, category: String, subcategory: String) {
+        PixelKit.fire(GeneralPixel.pproFeedbackSubmitScreenFAQClick(source: source,
+                                                                    reportType: ReportType.from(reportType),
+                                                                    category: Category.from(category),
+                                                                    subcategory: Subcategory.from(subcategory)))
     }
 }
