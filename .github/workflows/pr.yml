@@ -161,7 +161,6 @@ jobs:
           -derivedDataPath "DerivedData" \
           -configuration "CI" \
           -skipPackagePluginValidation -skipMacroValidation \
-          ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           "-skip-testing:${{ matrix.integration-tests-target }}" \
           | tee ${{ matrix.flavor }}-unittests-xcodebuild.log \
@@ -175,7 +174,6 @@ jobs:
           -derivedDataPath "DerivedData" \
           -configuration "CI" \
           -skipPackagePluginValidation -skipMacroValidation \
-          ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           "-only-testing:${{ matrix.integration-tests-target }}" \
           -retry-tests-on-failure \
