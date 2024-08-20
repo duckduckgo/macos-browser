@@ -30,6 +30,7 @@ enum DataBrokerProtectionDatabaseMigrationErrors: Error {
 protocol DataBrokerProtectionDatabaseMigrationsProvider {
     static var v2Migrations: (inout DatabaseMigrator) throws -> Void { get }
     static var v3Migrations: (inout DatabaseMigrator) throws -> Void { get }
+    static var v4Migrations: (inout DatabaseMigrator) throws -> Void { get }
 }
 
 final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
@@ -43,6 +44,13 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
         migrator.registerMigration("v1", migrate: migrateV1(database:))
         migrator.registerMigration("v2", migrate: migrateV2(database:))
         migrator.registerMigration("v3", migrate: migrateV3(database:))
+    }
+
+    static var v4Migrations: (inout DatabaseMigrator) throws -> Void = { migrator in
+        migrator.registerMigration("v1", migrate: migrateV1(database:))
+        migrator.registerMigration("v2", migrate: migrateV2(database:))
+        migrator.registerMigration("v3", migrate: migrateV3(database:))
+        migrator.registerMigration("v4", migrate: migrateV4(database:))
     }
 
     static func migrateV1(database: Database) throws {
@@ -245,6 +253,20 @@ final class DefaultDataBrokerProtectionDatabaseMigrationsProvider: DataBrokerPro
             try database.checkForeignKeys()
         } catch {
             throw DataBrokerProtectionDatabaseMigrationErrors.foreignKeyViolation
+        }
+    }
+
+    static func migrateV4(database: Database) throws {
+        try database.alter(table: OptOutDB.databaseTableName) {
+            // We default `createdDate` values to unix epoch to avoid any existing data being treated as new data
+            $0.add(column: OptOutDB.Columns.createdDate.name, .datetime).notNull().defaults(to: Date(timeIntervalSince1970: 0))
+
+            // For existing data this will be nil even for opt outs that have been submitted
+            $0.add(column: OptOutDB.Columns.submittedSuccessfullyDate.name, .datetime)
+
+            $0.add(column: OptOutDB.Columns.sevenDaysConfirmationPixelFired.name, .boolean).notNull().defaults(to: false)
+            $0.add(column: OptOutDB.Columns.fourteenDaysConfirmationPixelFired.name, .boolean).notNull().defaults(to: false)
+            $0.add(column: OptOutDB.Columns.twentyOneDaysConfirmationPixelFired.name, .boolean).notNull().defaults(to: false)
         }
     }
 

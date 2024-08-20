@@ -153,6 +153,14 @@ public enum DataBrokerProtectionPixels {
     case scanningEventNewMatch
     case scanningEventReAppearance
 
+    // Additional opt out metrics
+    case optOutJobAt7DaysConfirmed(dataBroker: String)
+    case optOutJobAt7DaysUnconfirmed(dataBroker: String)
+    case optOutJobAt14DaysConfirmed(dataBroker: String)
+    case optOutJobAt14DaysUnconfirmed(dataBroker: String)
+    case optOutJobAt21DaysConfirmed(dataBroker: String)
+    case optOutJobAt21DaysUnconfirmed(dataBroker: String)
+
     // Web UI - loading errors
     case webUILoadingStarted(environment: String)
     case webUILoadingFailed(errorCategory: String)
@@ -284,6 +292,14 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .webUILoadingSuccess: return "m_mac_dbp_web_ui_loading_success"
         case .webUILoadingFailed: return "m_mac_dbp_web_ui_loading_failed"
 
+            // Additional opt out metrics
+        case .optOutJobAt7DaysConfirmed: return "m_mac_dbp_optoutjob_at-7-days_confirmed"
+        case .optOutJobAt7DaysUnconfirmed: return "m_mac_dbp_optoutjob_at-7-days_unconfirmed"
+        case .optOutJobAt14DaysConfirmed: return "m_mac_dbp_optoutjob_at-14-days_confirmed"
+        case .optOutJobAt14DaysUnconfirmed: return "m_mac_dbp_optoutjob_at-14-days_unconfirmed"
+        case .optOutJobAt21DaysConfirmed: return "m_mac_dbp_optoutjob_at-21-days_confirmed"
+        case .optOutJobAt21DaysUnconfirmed: return "m_mac_dbp_optoutjob_at-21-days_unconfirmed"
+
             // Backend service errors
         case .generateEmailHTTPErrorDaily: return "m_mac_dbp_service_email-generate-http-error"
         case .emptyAccessTokenDaily: return "m_mac_dbp_service_empty-auth-token"
@@ -384,6 +400,13 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.hadNewMatch: hadNewMatch ? "1" : "0", Consts.hadReAppereance: hadReAppereance ? "1" : "0", Consts.scanCoverage: scanCoverage.description]
         case .weeklyReportRemovals(let removals):
             return [Consts.removals: String(removals)]
+        case .optOutJobAt7DaysConfirmed(let dataBroker),
+                .optOutJobAt7DaysUnconfirmed(let dataBroker),
+                .optOutJobAt14DaysConfirmed(let dataBroker),
+                .optOutJobAt14DaysUnconfirmed(let dataBroker),
+                .optOutJobAt21DaysConfirmed(let dataBroker),
+                .optOutJobAt21DaysUnconfirmed(let dataBroker):
+            return [Consts.dataBrokerParamKey: dataBroker]
         case .webUILoadingStarted(let environment):
             return [Consts.environmentKey: environment]
         case .webUILoadingSuccess(let environment):
@@ -550,6 +573,12 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .monthlyActiveUser,
                     .weeklyReportScanning,
                     .weeklyReportRemovals,
+                    .optOutJobAt7DaysConfirmed,
+                    .optOutJobAt7DaysUnconfirmed,
+                    .optOutJobAt14DaysConfirmed,
+                    .optOutJobAt14DaysUnconfirmed,
+                    .optOutJobAt21DaysConfirmed,
+                    .optOutJobAt21DaysUnconfirmed,
                     .scanningEventNewMatch,
                     .scanningEventReAppearance,
                     .webUILoadingFailed,

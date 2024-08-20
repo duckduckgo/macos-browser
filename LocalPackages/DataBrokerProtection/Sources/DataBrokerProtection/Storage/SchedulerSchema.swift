@@ -196,12 +196,20 @@ extension ScanHistoryEventDB: PersistableRecord, FetchableRecord {
 }
 
 struct OptOutDB: Codable {
-    let createdDate: Date
     let brokerId: Int64
     let profileQueryId: Int64
     let extractedProfileId: Int64
+
+    let createdDate: Date
     var lastRunDate: Date?
     var preferredRunDate: Date?
+
+    // This was added in a later migration (V4), so will be nil for older entries submitted before the migration
+    var submittedSuccessfullyDate: Date?
+
+    var sevenDaysConfirmationPixelFired: Bool
+    var fourteenDaysConfirmationPixelFired: Bool
+    var twentyOneDaysConfirmationPixelFired: Bool
 }
 
 extension OptOutDB: PersistableRecord, FetchableRecord {
@@ -216,30 +224,42 @@ extension OptOutDB: PersistableRecord, FetchableRecord {
     }
 
     enum Columns: String, ColumnExpression {
-        case createdDate
         case brokerId
         case profileQueryId
         case extractedProfileId
+        case createdDate
         case lastRunDate
         case preferredRunDate
+        case submittedSuccessfullyDate
+        case sevenDaysConfirmationPixelFired
+        case fourteenDaysConfirmationPixelFired
+        case twentyOneDaysConfirmationPixelFired
     }
 
     init(row: Row) throws {
-        createdDate = row[Columns.createdDate]
         brokerId = row[Columns.brokerId]
         profileQueryId = row[Columns.profileQueryId]
         extractedProfileId = row[Columns.extractedProfileId]
+        createdDate = row[Columns.createdDate]
         lastRunDate = row[Columns.lastRunDate]
         preferredRunDate = row[Columns.preferredRunDate]
+        submittedSuccessfullyDate = row[Columns.submittedSuccessfullyDate]
+        sevenDaysConfirmationPixelFired = row[Columns.sevenDaysConfirmationPixelFired]
+        fourteenDaysConfirmationPixelFired = row[Columns.fourteenDaysConfirmationPixelFired]
+        twentyOneDaysConfirmationPixelFired = row[Columns.twentyOneDaysConfirmationPixelFired]
     }
 
     func encode(to container: inout PersistenceContainer) throws {
-        container[Columns.createdDate] = createdDate
         container[Columns.brokerId] = brokerId
         container[Columns.profileQueryId] = profileQueryId
         container[Columns.extractedProfileId] = extractedProfileId
+        container[Columns.createdDate] = createdDate
         container[Columns.lastRunDate] = lastRunDate
         container[Columns.preferredRunDate] = preferredRunDate
+        container[Columns.submittedSuccessfullyDate] = submittedSuccessfullyDate
+        container[Columns.sevenDaysConfirmationPixelFired] = sevenDaysConfirmationPixelFired
+        container[Columns.fourteenDaysConfirmationPixelFired] = fourteenDaysConfirmationPixelFired
+        container[Columns.twentyOneDaysConfirmationPixelFired] = twentyOneDaysConfirmationPixelFired
     }
 }
 

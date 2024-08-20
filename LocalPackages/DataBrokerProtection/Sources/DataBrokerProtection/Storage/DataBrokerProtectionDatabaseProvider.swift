@@ -50,9 +50,34 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanDB?
     func fetchAllScans() throws -> [ScanDB]
 
-    func save(createdDate: Date, brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfileDB, lastRunDate: Date?, preferredRunDate: Date?) throws
+    func save(brokerId: Int64,
+              profileQueryId: Int64,
+              extractedProfile: ExtractedProfileDB,
+              createdDate: Date,
+              lastRunDate: Date?,
+              preferredRunDate: Date?,
+              submittedSuccessfullyDate: Date?,
+              sevenDaysConfirmationPixelFired: Bool,
+              fourteenDaysConfirmationPixelFired: Bool,
+              twentyOneDaysConfirmationPixelFired: Bool) throws
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateSubmittedSuccessfullyDate(_ date: Date?,
+                                         forBrokerId brokerId: Int64,
+                                         profileQueryId: Int64,
+                                         extractedProfileId: Int64) throws
+    func updateSevenDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                               forBrokerId brokerId: Int64,
+                                               profileQueryId: Int64,
+                                               extractedProfileId: Int64) throws
+    func updateFourteenDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                                  forBrokerId brokerId: Int64,
+                                                  profileQueryId: Int64,
+                                                  extractedProfileId: Int64) throws
+    func updateTwentyOneDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                                   forBrokerId brokerId: Int64,
+                                                   profileQueryId: Int64,
+                                                   extractedProfileId: Int64) throws
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> (optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)?
     func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [(optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)]
     func fetchAllOptOuts() throws -> [(optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)]
@@ -93,7 +118,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     public static func create<T: MigrationsProvider>(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
                                                      key: Data,
                                                      migrationProvider: T.Type = DefaultDataBrokerProtectionDatabaseMigrationsProvider.self) throws -> DefaultDataBrokerProtectionDatabaseProvider {
-            try DefaultDataBrokerProtectionDatabaseProvider(file: file, key: key, registerMigrationsHandler: migrationProvider.v3Migrations)
+            try DefaultDataBrokerProtectionDatabaseProvider(file: file, key: key, registerMigrationsHandler: migrationProvider.v4Migrations)
     }
 
     public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(),
@@ -321,28 +346,45 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    func save(createdDate: Date, brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfileDB, lastRunDate: Date?, preferredRunDate: Date?) throws {
+    func save(brokerId: Int64,
+              profileQueryId: Int64,
+              extractedProfile: ExtractedProfileDB,
+              createdDate: Date,
+              lastRunDate: Date?,
+              preferredRunDate: Date?,
+              submittedSuccessfullyDate: Date?,
+              sevenDaysConfirmationPixelFired: Bool,
+              fourteenDaysConfirmationPixelFired: Bool,
+              twentyOneDaysConfirmationPixelFired: Bool) throws {
         try db.write { db in
             try extractedProfile.insert(db)
             let extractedProfileId = db.lastInsertedRowID
             try OptOutDB(
-                createdDate: createdDate,
                 brokerId: brokerId,
                 profileQueryId: profileQueryId,
                 extractedProfileId: extractedProfileId,
+                createdDate: createdDate,
                 lastRunDate: lastRunDate,
-                preferredRunDate: preferredRunDate
+                preferredRunDate: preferredRunDate,
+                submittedSuccessfullyDate: submittedSuccessfullyDate,
+                sevenDaysConfirmationPixelFired: sevenDaysConfirmationPixelFired,
+                fourteenDaysConfirmationPixelFired: fourteenDaysConfirmationPixelFired,
+                twentyOneDaysConfirmationPixelFired: twentyOneDaysConfirmationPixelFired
             ).insert(db)
         }
     }
 
-    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    private func updateOptOutField<T>(_ fieldUpdate: @escaping (inout OptOutDB, T) -> Void,
+                                      value: T,
+                                      forBrokerId brokerId: Int64,
+                                      profileQueryId: Int64,
+                                      extractedProfileId: Int64) throws {
         try db.write { db in
             if var optOut = try OptOutDB.fetchOne(db, key: [
                 OptOutDB.Columns.brokerId.name: brokerId,
                 OptOutDB.Columns.profileQueryId.name: profileQueryId,
                 OptOutDB.Columns.extractedProfileId.name: extractedProfileId]) {
-                optOut.preferredRunDate = date
+                fieldUpdate(&optOut, value)
                 try optOut.update(db)
             } else {
                 throw DataBrokerProtectionDatabaseErrors.elementNotFound
@@ -350,18 +392,59 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        try updateOptOutField({ $0.preferredRunDate = $1 },
+                              value: date, forBrokerId: brokerId,
+                              profileQueryId: profileQueryId,
+                              extractedProfileId: extractedProfileId)
+    }
+
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
-        try db.write { db in
-            if var optOut = try OptOutDB.fetchOne(db, key: [
-                OptOutDB.Columns.brokerId.name: brokerId,
-                OptOutDB.Columns.profileQueryId.name: profileQueryId,
-                OptOutDB.Columns.extractedProfileId.name: extractedProfileId]) {
-                optOut.lastRunDate = date
-                try optOut.update(db)
-            } else {
-                throw DataBrokerProtectionDatabaseErrors.elementNotFound
-            }
-        }
+        try updateOptOutField({ $0.lastRunDate = $1 },
+                              value: date,
+                              forBrokerId: brokerId,
+                              profileQueryId: profileQueryId,
+                              extractedProfileId: extractedProfileId)
+    }
+
+    func updateSubmittedSuccessfullyDate(_ date: Date?,
+                                         forBrokerId brokerId: Int64,
+                                         profileQueryId: Int64,
+                                         extractedProfileId: Int64) throws {
+        try updateOptOutField({ $0.submittedSuccessfullyDate = $1 },
+                              value: date, forBrokerId: brokerId,
+                              profileQueryId: profileQueryId,
+                              extractedProfileId: extractedProfileId)
+    }
+
+    func updateSevenDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                               forBrokerId brokerId: Int64,
+                                               profileQueryId: Int64,
+                                               extractedProfileId: Int64) throws {
+        try updateOptOutField({ $0.sevenDaysConfirmationPixelFired = $1 },
+                              value: pixelFired, forBrokerId: brokerId,
+                              profileQueryId: profileQueryId,
+                              extractedProfileId: extractedProfileId)
+    }
+
+    func updateFourteenDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                                  forBrokerId brokerId: Int64,
+                                                  profileQueryId: Int64,
+                                                  extractedProfileId: Int64) throws {
+        try updateOptOutField({ $0.fourteenDaysConfirmationPixelFired = $1 },
+                              value: pixelFired, forBrokerId: brokerId,
+                              profileQueryId: profileQueryId,
+                              extractedProfileId: extractedProfileId)
+    }
+
+    func updateTwentyOneDaysConfirmationPixelFired(_ pixelFired: Bool,
+                                                   forBrokerId brokerId: Int64,
+                                                   profileQueryId: Int64,
+                                                   extractedProfileId: Int64) throws {
+        try updateOptOutField({ $0.twentyOneDaysConfirmationPixelFired = $1 },
+                              value: pixelFired, forBrokerId: brokerId,
+                              profileQueryId: profileQueryId,
+                              extractedProfileId: extractedProfileId)
     }
 
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> (optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)? {
