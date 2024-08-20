@@ -53,21 +53,24 @@ final class RemoteMessagingDebugMenu: NSMenu {
         }
 
         let database = NSApp.delegateTyped.remoteMessagingClient.database
-        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
+        let context = database.makeContext(concurrencyType: .privateQueueConcurrencyType)
         let fetchRequest = RemoteMessageManagedObject.fetchRequest()
         fetchRequest.returnsObjectsAsFaults = false
-        let messages = (try? context.fetch(fetchRequest)) ?? []
 
-        let headerItem = NSMenuItem(title: "\(messages.count) Message(s) in database:")
-        headerItem.isEnabled = false
+        context.performAndWait {
+            let messages = (try? context.fetch(fetchRequest)) ?? []
 
-        addItem(NSMenuItem.separator())
-        addItem(headerItem)
+            let headerItem = NSMenuItem(title: "\(messages.count) Message(s) in database:")
+            headerItem.isEnabled = false
 
-        for message in messages {
-            let item = NSMenuItem(title: "ID: \(message.id ?? "?") | \(message.shown ? "shown" : "not shown") | \(statusString(for: message.status))")
-            item.isEnabled = false
-            addItem(item)
+            addItem(NSMenuItem.separator())
+            addItem(headerItem)
+
+            for message in messages {
+                let item = NSMenuItem(title: "ID: \(message.id ?? "?") | \(message.shown ? "shown" : "not shown") | \(statusString(for: message.status))")
+                item.isEnabled = false
+                addItem(item)
+            }
         }
     }
 
