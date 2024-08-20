@@ -114,7 +114,7 @@ private extension DefaultDataBrokerProtectionCustomOptOutStatsProvider {
     }
 
     func optOutSuccessfulRequestCountSince(startDate: Date?,
-                                 for optOutJobData: [OptOutJobData]) -> Int {
+                                           for optOutJobData: [OptOutJobData]) -> Int {
 
         return optOutJobData.reduce(0) { result, optOutJobData in
             let optOutRequested = optOutJobData.historyEvents.contains { historyEvent in
