@@ -122,7 +122,7 @@ extension HomePage.Models {
                 if contentType == .addImage, contentType != oldValue {
                     contentType = customImagesManager.availableImages.isEmpty ? .root : .customImagePicker
                     uploadNewImage()
-                } else if contentType == .customImagePicker, oldValue != .addImage {
+                } else if contentType == .root, oldValue == .customImagePicker {
                     customImagesManager.sortImagesByLastUsed()
                 }
             }
