@@ -18,16 +18,26 @@
 
 import SwiftUI
 
+protocol DuckPlayerOnboardingViewModelDelegate: AnyObject {
+    func duckPlayerOnboardingViewModelDidSelectTurnOn(_ viewModel: DuckPlayerOnboardingViewModel)
+    func duckPlayerOnboardingViewModelDidSelectNotNow(_ viewModel: DuckPlayerOnboardingViewModel)
+    func duckPlayerOnboardingViewModelDidSelectGotIt(_ viewModel: DuckPlayerOnboardingViewModel)
+}
+
 final class DuckPlayerOnboardingViewModel: ObservableObject {
-    internal init(actionTurnOnDuckPlayer: @escaping () -> Void, actionNotNow: @escaping () -> Void, actionGotIt: @escaping () -> Void) {
-        self.actionTurnOnDuckPlayer = actionTurnOnDuckPlayer
-        self.actionNotNow = actionNotNow
-        self.actionGotIt = actionGotIt
+    weak var delegate: DuckPlayerOnboardingViewModelDelegate?
+
+    func handleTurnOnCTA() {
+        delegate?.duckPlayerOnboardingViewModelDidSelectTurnOn(self)
     }
 
-    let actionTurnOnDuckPlayer: () -> Void
-    let actionNotNow: () -> Void
-    let actionGotIt: () -> Void
+    func handleNotNowCTA() {
+        delegate?.duckPlayerOnboardingViewModelDidSelectNotNow(self)
+    }
+
+    func handleGotItCTA() {
+        delegate?.duckPlayerOnboardingViewModelDidSelectGotIt(self)
+    }
 }
 
 struct DuckPlayerOnboardingModalView: View {
@@ -56,13 +66,13 @@ struct DuckPlayerOnboardingModalView: View {
         if shouldShowConfirmationView {
             DuckPlayerOnboardingConfirmationView {
                 shouldShowConfirmationView = false
-                viewModel.actionGotIt()
+                viewModel.handleGotItCTA()
             }
         } else {
             DuckPlayerOnboardingChoiceView(turnOnButtonPressed: {
                 shouldShowConfirmationView = true
-                viewModel.actionTurnOnDuckPlayer()
-            }, notNowPressed: viewModel.actionNotNow)
+                viewModel.handleTurnOnCTA()
+            }, notNowPressed: viewModel.handleNotNowCTA)
         }
     }
 }
@@ -185,34 +195,34 @@ private struct SpeechBubble: View {
                     path.addLine(to: CGPoint(x: rect.minX - tailSize, y: tailPosition))
                     path.addLine(to: CGPoint(x: rect.minX, y: tailPosition - tailHeight / 2))
 
-                     path.addArc(
-                         center: CGPoint(x: rect.minX + radius, y: rect.minY + radius),
-                         radius: radius,
-                         startAngle: .degrees(180),
-                         endAngle: .degrees(270),
-                         clockwise: false
-                     )
-                     path.addArc(
-                         center: CGPoint(x: rect.maxX - radius, y: rect.minY + radius),
-                         radius: radius,
-                         startAngle: .degrees(270),
-                         endAngle: .degrees(0),
-                         clockwise: false
-                     )
-                     path.addArc(
-                         center: CGPoint(x: rect.maxX - radius, y: rect.maxY - radius),
-                         radius: radius,
-                         startAngle: .degrees(0),
-                         endAngle: .degrees(90),
-                         clockwise: false
-                     )
-                     path.addArc(
-                         center: CGPoint(x: rect.minX + radius, y: rect.maxY - radius),
-                         radius: radius,
-                         startAngle: .degrees(90),
-                         endAngle: .degrees(180),
-                         clockwise: false
-                     )
+                    path.addArc(
+                        center: CGPoint(x: rect.minX + radius, y: rect.minY + radius),
+                        radius: radius,
+                        startAngle: .degrees(180),
+                        endAngle: .degrees(270),
+                        clockwise: false
+                    )
+                    path.addArc(
+                        center: CGPoint(x: rect.maxX - radius, y: rect.minY + radius),
+                        radius: radius,
+                        startAngle: .degrees(270),
+                        endAngle: .degrees(0),
+                        clockwise: false
+                    )
+                    path.addArc(
+                        center: CGPoint(x: rect.maxX - radius, y: rect.maxY - radius),
+                        radius: radius,
+                        startAngle: .degrees(0),
+                        endAngle: .degrees(90),
+                        clockwise: false
+                    )
+                    path.addArc(
+                        center: CGPoint(x: rect.minX + radius, y: rect.maxY - radius),
+                        radius: radius,
+                        startAngle: .degrees(90),
+                        endAngle: .degrees(180),
+                        clockwise: false
+                    )
 
                 }
                 .fill(Color(.interfaceBackground))
@@ -255,9 +265,9 @@ private struct SecondaryCTAStyle: ButtonStyle {
             .frame(maxWidth: .infinity)
             .background(
                 RoundedRectangle(cornerRadius: Consts.Layout.CTACornerRadius, style: .continuous)
-                .fill(color)
-                .shadow(color: .black.opacity(0.1), radius: 0.1, x: 0, y: 1)
-                .shadow(color: .primary.opacity(outterShadowOpacity), radius: 0.1, x: 0, y: -0.6))
+                    .fill(color)
+                    .shadow(color: .black.opacity(0.1), radius: 0.1, x: 0, y: 1)
+                    .shadow(color: .primary.opacity(outterShadowOpacity), radius: 0.1, x: 0, y: -0.6))
 
             .overlay(
                 RoundedRectangle(cornerRadius: Consts.Layout.CTACornerRadius)
@@ -292,7 +302,7 @@ private enum Consts {
         }, notNowPressed: {
 
         })
-            .frame(width: 504, height: 286)
+        .frame(width: 504, height: 286)
 
         Divider()
             .padding()
@@ -300,7 +310,7 @@ private enum Consts {
         DuckPlayerOnboardingConfirmationView(voidButtonPressed: {
 
         })
-            .frame(width: 504, height: 152)
+        .frame(width: 504, height: 152)
     }
     .padding()
 }

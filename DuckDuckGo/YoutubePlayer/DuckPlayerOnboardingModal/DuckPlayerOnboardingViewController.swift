@@ -16,29 +16,47 @@
 //  limitations under the License.
 //
 
-import Foundation
-import SwiftUI
-
 import SwiftUI
 import AppKit
 
 final class DuckPlayerOnboardingViewController: NSViewController {
 
     private var hostingView: NSHostingView<DuckPlayerOnboardingModalView>!
+    private lazy var viewModel: DuckPlayerOnboardingViewModel = {
+        let viewModel = DuckPlayerOnboardingViewModel()
+        viewModel.delegate = self
+        return viewModel
+    }()
 
     override func loadView() {
-
-        let viewModel = DuckPlayerOnboardingViewModel {
-            print("AA")
-        } actionNotNow: {
-            print("BB")
-        } actionGotIt: {
-            print("CC")
-        }
-
         let consentView = DuckPlayerOnboardingModalView(viewModel: viewModel)
         hostingView = NSHostingView(rootView: consentView)
         self.view = hostingView
     }
 
+    private func handleEnableDuckPlayerActionButton() {
+        print("Enabled")
+    }
+
+    private func handleNotNowActionButton() {
+        print("Not Now")
+    }
+
+    private func handleGotItActionButton() {
+        print("Got it")
+    }
+}
+
+extension DuckPlayerOnboardingViewController: DuckPlayerOnboardingViewModelDelegate{
+    func duckPlayerOnboardingViewModelDidSelectTurnOn(_ viewModel: DuckPlayerOnboardingViewModel) {
+        handleEnableDuckPlayerActionButton()
+    }
+
+    func duckPlayerOnboardingViewModelDidSelectNotNow(_ viewModel: DuckPlayerOnboardingViewModel) {
+        handleNotNowActionButton()
+    }
+
+    func duckPlayerOnboardingViewModelDidSelectGotIt(_ viewModel: DuckPlayerOnboardingViewModel) {
+        handleGotItActionButton()
+    }
 }
