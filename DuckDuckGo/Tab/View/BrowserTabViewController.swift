@@ -157,9 +157,6 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onSubscriptionAccountDidSignOut),
                                                name: .accountDidSignOut,
                                                object: nil)
-
-        duckPlayerOnboardingModalManager.show(on: self.view, animated: true)
-        duckPlayerOnboardingModalManager.currentTab = tabViewModel!.tab
     }
 
     @objc
@@ -259,6 +256,7 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
+                self.subscribeToDuckPlayerOnboardingPrompt(of: selectedTabViewModel)
 
                 self.adjustFirstResponder(force: true)
             }
@@ -434,19 +432,18 @@ final class BrowserTabViewController: NSViewController {
 #endif
     }
 
-    private func subscribeToDuckPlayerConsentPrompt(of tabViewModel: TabViewModel?) {
-//        duckPlayerConsentCancellable = tabViewModel?.tab.cookieConsentPromptRequestPublisher.sink { [weak self, weak tab=tabViewModel?.tab] request in
-//            guard let self, let tab, let request else {
-//                self?.cookieConsentPopoverManager.close(animated: false)
-//                return
-//            }
-//            self.cookieConsentPopoverManager.show(on: self.view, animated: true) { [weak request] result in
-//                request?.submit(result)
-//            }
-//            self.cookieConsentPopoverManager.currentTab = tab
-//        }
-    }
+    private func subscribeToDuckPlayerOnboardingPrompt(of tabViewModel: TabViewModel?) {
+        tabViewModel?.tab.duckPlayerOnboardingPublisher.sink { [weak self, weak tab = tabViewModel?.tab] shouldShowBanner in
 
+            guard let self, let tab, let shouldShowBanner = shouldShowBanner, shouldShowBanner else  {
+                self?.duckPlayerOnboardingModalManager.close(animated: false)
+                return
+            }
+
+            self.duckPlayerOnboardingModalManager.show(on: self.view, animated: true)
+            self.duckPlayerOnboardingModalManager.currentTab = tab
+        }.store(in: &tabViewModelCancellables)
+    }
 
     private func shouldMakeContentViewFirstResponder(for tabContent: Tab.TabContent) -> Bool {
         // always steal focus when first responder is not a text field

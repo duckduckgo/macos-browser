@@ -196,6 +196,9 @@ extension TabExtensionsBuilder {
         }
 
         add {
+            DuckPlayerOnboardingTabExtension()
+        }
+        add {
             SSLErrorPageTabExtension(webViewPublisher: args.webViewFuture,
                                   scriptsPublisher: userScripts.compactMap { $0 })
         }

@@ -177,11 +177,6 @@ extension DuckPlayerTabExtension: NavigationResponder {
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // only proceed when Private Player is enabled
 
-        if navigationAction.url.absoluteString == "https://www.youtube.com/" {
-            print("POTATO")
-            return .allow
-        }
-
         guard duckPlayer.isAvailable, duckPlayer.mode != .disabled else {
             return decidePolicyWithDisabledDuckPlayer(for: navigationAction)
         }
@@ -386,5 +381,7 @@ extension DuckPlayerTabExtension: DuckPlayerExtensionProtocol, TabExtension {
 }
 
 extension TabExtensions {
-    var duckPlayer: DuckPlayerExtensionProtocol? { resolve(DuckPlayerTabExtension.self) }
+    var duckPlayer: DuckPlayerExtensionProtocol? {
+        resolve(DuckPlayerTabExtension.self)
+    }
 }
