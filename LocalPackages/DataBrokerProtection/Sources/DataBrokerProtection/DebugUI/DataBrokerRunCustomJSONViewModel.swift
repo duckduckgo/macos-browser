@@ -154,7 +154,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
     private let authenticationManager: DataBrokerProtectionAuthenticationManaging
 
     init(authenticationManager: DataBrokerProtectionAuthenticationManaging) {
-        let privacyConfigurationManager = DBBPPrivacyConfigurationManager.shared
+        let privacyConfigurationManager = DBPPrivacyConfigurationManager.shared
         let features = ContentScopeFeatureToggles(emailProtection: false,
                                                   emailProtectionIncontextSignup: false,
                                                   credentialsAutofill: false,

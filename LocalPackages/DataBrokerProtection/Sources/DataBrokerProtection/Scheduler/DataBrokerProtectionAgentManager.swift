@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import BrowserServicesKit
+import Configuration
 import PixelKit
 
 // This is to avoid exposing all the dependancies outside of the DBP package
@@ -31,8 +32,12 @@ public class DataBrokerProtectionAgentManagerProvider {
         let activityScheduler = DefaultDataBrokerProtectionBackgroundActivityScheduler(config: executionConfig)
 
         let notificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
+        Configuration.setURLProvider(DBPAgentConfigurationURLProvider())
         ConfigurationManager.shared.start()
-        let privacyConfigurationManager = DBBPPrivacyConfigurationManager.shared
+        let privacyConfigurationManager = DBPPrivacyConfigurationManager.shared
+        // Load cached config (if any)
+        let configStore = ConfigurationStore.shared
+        privacyConfigurationManager.reload(etag: configStore.loadEtag(for: .privacyConfiguration), data: configStore.loadData(for: .privacyConfiguration))
         let ipcServer = DefaultDataBrokerProtectionIPCServer(machServiceName: Bundle.main.bundleIdentifier!)
 
         let features = ContentScopeFeatureToggles(emailProtection: false,
@@ -152,6 +157,10 @@ public final class DataBrokerProtectionAgentManager {
             /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
             /// While keeping the agent active with invalid entitlement has no significant risk, setting the monitoring interval at 60 minutes is a good balance to minimize backend checks.
             agentStopper.monitorEntitlementAndStopAgentIfEntitlementIsInvalid(interval: .minutes(60))
+
+            if DBPPrivacyConfigurationManager.shared.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest) {
+                PixelKit.fire(DataBrokerProtectionPixels.pixelTest)
+            }
         }
     }
 }

@@ -76,7 +76,7 @@ final class ConfigurationManager: DefaultConfigurationManager {
     }
 
     func updateConfigDependencies() {
-        DBBPPrivacyConfigurationManager.shared.reload(
+        DBPPrivacyConfigurationManager.shared.reload(
             etag: ConfigurationStore.shared.loadEtag(for: .privacyConfiguration),
             data: ConfigurationStore.shared.loadData(for: .privacyConfiguration)
         )

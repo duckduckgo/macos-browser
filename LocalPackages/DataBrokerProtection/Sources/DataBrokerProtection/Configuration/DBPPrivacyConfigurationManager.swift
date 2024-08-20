@@ -21,9 +21,9 @@ import BrowserServicesKit
 import Combine
 import Common
 
-public final class DBBPPrivacyConfigurationManager: PrivacyConfigurationManaging {
+public final class DBPPrivacyConfigurationManager: PrivacyConfigurationManaging {
 
-    static let shared = DBBPPrivacyConfigurationManager()
+    static let shared = DBPPrivacyConfigurationManager()
 
     private let lock = NSLock()
 

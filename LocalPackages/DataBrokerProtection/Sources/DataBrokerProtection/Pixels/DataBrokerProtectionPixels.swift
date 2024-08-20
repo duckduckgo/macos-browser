@@ -185,6 +185,7 @@ public enum DataBrokerProtectionPixels {
     // Configuration
     case invalidPayload(Configuration)
     case errorLoadingCachedConfig(Error)
+    case pixelTest
 
     // Measure success/failure rate of Personal Information Removal Pixels
     // https://app.asana.com/0/1204006570077678/1206889724879222/f
@@ -319,6 +320,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             // Configuration
         case .invalidPayload(let configuration): return "m_mac_dbp_\(configuration.rawValue)_invalid_payload".lowercased()
         case .errorLoadingCachedConfig: return "m_mac_dbp_configuration_error_loading_cached_config"
+        case .pixelTest: return "m_mac_dbp_configuration_pixel_test"
         }
     }
 
@@ -422,7 +424,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .secureVaultError,
                 .gatekeeperNotAuthenticated,
                 .gatekeeperEntitlementsInvalid,
-                .invalidPayload:
+                .invalidPayload,
+                .pixelTest:
             return [:]
         case .ipcServerProfileSavedCalledByApp,
                 .ipcServerProfileSavedReceivedByAgent,
@@ -567,7 +570,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerMetricsMonthlyStats,
                     .gatekeeperNotAuthenticated,
                     .gatekeeperEntitlementsInvalid,
-                    .invalidPayload:
+                    .invalidPayload,
+                    .pixelTest:
 
                 PixelKit.fire(event)
 
