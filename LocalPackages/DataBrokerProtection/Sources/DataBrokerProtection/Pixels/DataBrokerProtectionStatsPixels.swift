@@ -589,3 +589,113 @@ private extension Date {
         return submittedDatePlusTimeInterval <= Date()
     }
 }
+
+// MARK: - Opt out confirmation pixels
+
+extension DataBrokerProtectionStatsPixels {
+    // swiftlint:disable:next cyclomatic_complexity
+    func fireRegularIntervalConfirmationPixelsForSubmittedOptOuts(for brokerProfileQueryData: [BrokerProfileQueryData]) {
+        /*
+         This fires pixels to indicate if any submitted opt outs have been confirmed or unconfirmed
+         at fixed intervals after the submission (7, 14, and 21 days)
+         Goal: Be able to calculate what % of removals occur within x weeks of successful opt-out submission.
+
+         - We get all opt out jobs with status showing they were submitted successfully
+         - Compare the date they were submitted successfully with the current date
+         - Bucket into >=7, >=14, and >=21 days groups (with overlap between the groups, e.g. it's possible it's been 15 days but neither the 7 day or the 14 day pixel has been fired)
+         - Filter those groups based on if the pixel for that time interval has been fired yet
+         - Fire the appropriate confirmed/unconfirmed pixels for each job
+         - Update the DB to indicate which pixels have been newly fired
+
+         Because submittedSuccessfullyDate will be nil for data that existed before the migration
+         the pixels won't fire for old data, which is the behaviour we want.
+         */
+
+        let allOptOuts = brokerProfileQueryData.flatMap { $0.optOutJobData }
+        let successfullySubmittedOptOuts = allOptOuts.filter { $0.submittedSuccessfullyDate != nil }
+
+        let sevenDayOldPlusOptOutsThatHaveNotFiredPixel = successfullySubmittedOptOuts.filter { optOutJob in
+            guard let submittedSuccessfullyDate = optOutJob.submittedSuccessfullyDate else { return false }
+            let hasEnoughTimePassedToFirePixel = submittedSuccessfullyDate.hasBeenExceededByNumberOfDays(7)
+            return hasEnoughTimePassedToFirePixel && !optOutJob.sevenDaysConfirmationPixelFired
+        }
+
+        let fourteenDayOldPlusOptOutsThatHaveNotFiredPixel = successfullySubmittedOptOuts.filter { optOutJob in
+            guard let submittedSuccessfullyDate = optOutJob.submittedSuccessfullyDate else { return false }
+            let hasEnoughTimePassedToFirePixel = submittedSuccessfullyDate.hasBeenExceededByNumberOfDays(14)
+            return hasEnoughTimePassedToFirePixel && !optOutJob.fourteenDaysConfirmationPixelFired
+        }
+
+        let twentyOneDayOldPlusOptOutsThatHaveNotFiredPixel = successfullySubmittedOptOuts.filter { optOutJob in
+            guard let submittedSuccessfullyDate = optOutJob.submittedSuccessfullyDate else { return false }
+            let hasEnoughTimePassedToFirePixel = submittedSuccessfullyDate.hasBeenExceededByNumberOfDays(21)
+            return hasEnoughTimePassedToFirePixel && !optOutJob.twentyOneDaysConfirmationPixelFired
+        }
+
+        let brokerIDsToNames = brokerProfileQueryData.reduce(into: [Int64: String]()) {
+            // Really the ID should never be zero
+            $0[$1.dataBroker.id ?? -1] = $1.dataBroker.name
+        }
+
+        // Now fire the pixels and update the DB
+        for optOutJob in sevenDayOldPlusOptOutsThatHaveNotFiredPixel {
+            let brokerName = brokerIDsToNames[optOutJob.brokerId] ?? ""
+            let isOptOutConfirmed = optOutJob.extractedProfile.removedDate != nil
+
+            if isOptOutConfirmed {
+                handler.fire(.optOutJobAt7DaysConfirmed(dataBroker: brokerName))
+            } else {
+                handler.fire(.optOutJobAt7DaysUnconfirmed(dataBroker: brokerName))
+            }
+
+            guard let extractedProfileID = optOutJob.extractedProfile.id else { continue }
+            try? database.updateSevenDaysConfirmationPixelFired(true,
+                                                                forBrokerId: optOutJob.brokerId,
+                                                                profileQueryId: optOutJob.profileQueryId,
+                                                                extractedProfileId: extractedProfileID)
+        }
+
+        for optOutJob in fourteenDayOldPlusOptOutsThatHaveNotFiredPixel {
+            let brokerName = brokerIDsToNames[optOutJob.brokerId] ?? ""
+            let isOptOutConfirmed = optOutJob.extractedProfile.removedDate != nil
+
+            if isOptOutConfirmed {
+                handler.fire(.optOutJobAt14DaysConfirmed(dataBroker: brokerName))
+            } else {
+                handler.fire(.optOutJobAt14DaysUnconfirmed(dataBroker: brokerName))
+            }
+
+            guard let extractedProfileID = optOutJob.extractedProfile.id else { continue }
+            try? database.updateFourteenDaysConfirmationPixelFired(true,
+                                                                   forBrokerId: optOutJob.brokerId,
+                                                                   profileQueryId: optOutJob.profileQueryId,
+                                                                   extractedProfileId: extractedProfileID)
+        }
+
+        for optOutJob in twentyOneDayOldPlusOptOutsThatHaveNotFiredPixel {
+            let brokerName = brokerIDsToNames[optOutJob.brokerId] ?? ""
+            let isOptOutConfirmed = optOutJob.extractedProfile.removedDate != nil
+
+            if isOptOutConfirmed {
+                handler.fire(.optOutJobAt21DaysConfirmed(dataBroker: brokerName))
+            } else {
+                handler.fire(.optOutJobAt21DaysUnconfirmed(dataBroker: brokerName))
+            }
+
+            guard let extractedProfileID = optOutJob.extractedProfile.id else { continue }
+            try? database.updateTwentyOneDaysConfirmationPixelFired(true,
+                                                                    forBrokerId: optOutJob.brokerId,
+                                                                    profileQueryId: optOutJob.profileQueryId,
+                                                                    extractedProfileId: extractedProfileID)
+        }
+    }
+}
+
+private extension Date {
+    func hasBeenExceededByNumberOfDays(_ days: Int) -> Bool {
+        guard let submittedDatePlusTimeInterval = Calendar.current.date(byAdding: .day, value: days, to: self) else {
+            return false
+        }
+        return submittedDatePlusTimeInterval <= Date()
+    }
+}

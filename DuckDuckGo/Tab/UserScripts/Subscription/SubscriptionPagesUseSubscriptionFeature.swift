@@ -24,6 +24,7 @@ import WebKit
 import UserScript
 import Subscription
 import PixelKit
+import os.log
 
 /// Use Subscription sub-feature
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
@@ -186,14 +187,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     return nil
                 }
 
-                os_log(.info, log: .subscription, "[Purchase] Starting purchase for: %{public}s", subscriptionSelection.id)
+                Logger.subscription.info("[Purchase] Starting purchase for: \(subscriptionSelection.id, privacy: .public)")
 
                 await uiHandler.presentProgressViewController(withTitle: UserText.purchasingSubscriptionTitle)
 
                 // Check for active subscriptions
                 if await subscriptionManager.storePurchaseManager().hasActiveSubscription() {
                     PixelKit.fire(PrivacyProPixel.privacyProRestoreAfterPurchaseAttempt)
-                    os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
+                    Logger.subscription.info("[Purchase] Found active subscription during purchase")
                     subscriptionErrorReporter.report(subscriptionActivationError: .hasActiveSubscription)
                     await showSubscriptionFoundAlert(originalMessage: message)
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
@@ -212,7 +213,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                                                                        appStoreRestoreFlow: appStoreRestoreFlow,
                                                                        authEndpointService: subscriptionManager.authEndpointService)
 
-                os_log(.info, log: .subscription, "[Purchase] Purchasing")
+                Logger.subscription.info("[Purchase] Purchasing")
                 switch await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
                 case .success(let transactionJWS):
                     purchaseTransactionJWS = transactionJWS
@@ -247,11 +248,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 await uiHandler.updateProgressViewController(title: UserText.completingPurchaseTitle)
 
-                os_log(.info, log: .subscription, "[Purchase] Completing purchase")
+                Logger.subscription.info("[Purchase] Completing purchase")
                 let completePurchaseResult = await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS)
                 switch completePurchaseResult {
                 case .success(let purchaseUpdate):
-                    os_log(.info, log: .subscription, "[Purchase] Purchase complete")
+                    Logger.subscription.info("[Purchase] Purchase complete")
                     PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .dailyAndCount)
                     PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .unique)
                     subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
