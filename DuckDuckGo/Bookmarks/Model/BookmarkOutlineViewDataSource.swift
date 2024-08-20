@@ -233,7 +233,8 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             return .none
         }
 
-        let operation = dragDropManager.validateDrop(info, to: destinationNode.representedObject)
+        let destination = destinationNode.isRoot ? PseudoFolder.bookmarks : destinationNode.representedObject
+        let operation = dragDropManager.validateDrop(info, to: destination)
         self.dragDestinationFolder = (operation == .none || item == nil) ? nil : destinationNode.representedObject as? BookmarkFolder
 
         return operation
