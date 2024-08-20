@@ -97,6 +97,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
     enum Const {
         static let storageDirectoryName = "UserBackgroundImages"
         static let thumbnailsDirectoryName = "thumbnails"
+        static let thumbnailSize = CGSize(width: 192, height: 128)
     }
 
     @Published private(set) var availableImages: [UserBackgroundImage] = [] {
@@ -141,7 +142,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
         async let resizeImageTask: Void = {
             let date = Date()
-            let resizedImage: Data? = resizeImage(at: destinationURL, to: .init(width: 192, height: 128))
+            let resizedImage: Data? = resizeImage(at: destinationURL, to: Const.thumbnailSize)
             try resizedImage?.write(to: thumbnailsStorageLocation.appendingPathComponent(fileName))
             print("Resizing \(fileName) took \(Date().timeIntervalSince(date)) seconds")
         }()
@@ -250,7 +251,11 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 extension UserBackgroundImagesManager: ImageColorSchemeCalculating {
 
     func calculatePreferredColorScheme(forImageAt url: URL) -> ColorScheme {
-        guard let image = NSImage(contentsOf: url), let averageBrightness = image.averageBrightness() else { return .light }
+        let date = Date()
+        defer {
+            print("\(#function) for \(url.lastPathComponent) took \(Date().timeIntervalSince(date)) seconds")
+        }
+        guard let averageBrightness = NSImage(contentsOf: url)?.averageBrightness() else { return .light }
         return averageBrightness > 0.5 ? .light : .dark
     }
 
@@ -365,8 +370,15 @@ extension UserBackgroundImagesManager: ImageProcessing {
     }
 
     func resizeImage(at url: URL, to newSize: CGSize) -> Data? {
-        guard let data = try? Data(contentsOf: url),
-              let imageSource = CGImageSourceCreateWithData(data as CFData, nil),
+        guard let data = try? Data(contentsOf: url) else {
+            return nil
+        }
+
+        return resizeImage(with: data, to: newSize)
+    }
+
+    func resizeImage(with data: Data, to newSize: CGSize) -> Data? {
+        guard let imageSource = CGImageSourceCreateWithData(data as CFData, nil),
               let originalImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)
         else {
             return nil
