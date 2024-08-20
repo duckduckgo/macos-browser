@@ -18,7 +18,6 @@
 
 import SwiftUI
 
-
 struct DuckPlayerOnboardingModalView: View {
     @Environment(\.colorScheme) var colorScheme
 
@@ -26,23 +25,31 @@ struct DuckPlayerOnboardingModalView: View {
         VStack {
             HStack (alignment: .top) {
                 Image("DuckPlayerOnboardingModalDax")
+                    .padding(.top, 8)
+                    .padding(.leading, -10)
 
-                VStack (alignment: .leading) {
-                    Text("Drowning in ads on YouTube?")
-                        .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+                    VStack (alignment: .leading) {
+                        Text("Drowning in ads on YouTube?")
+                            .font(.title)
+                            .padding(.horizontal)
 
-                    Text("Duck Player lets you watch without targeted ads and comes free to use in DuckDuckGo.")
+                        Text("Duck Player lets you watch without targeted ads and comes free to use in DuckDuckGo.")
+                            .multilineText()
+                            .padding(.horizontal)
 
-                    HStack {
-                        Spacer()
-                        Image("DuckPlayerOnboardingModal")
-                        Spacer()
-                    }
+                        HStack {
+                            Spacer()
+                            Image("DuckPlayerOnboardingModal")
+                            Spacer()
+                        }
+                    }.background(
+                        SpeechBubble()
+                            .frame(width: 432, height: 198)
+                    )
+                    .padding(24)
                 }
 
-            }
             HStack {
-
                 Button {
 
                 } label: {
@@ -50,18 +57,17 @@ struct DuckPlayerOnboardingModalView: View {
                 }
                 .buttonStyle(SecondaryCTAStyle())
 
+                Spacer()
                 Button {
 
                 } label: {
                     Text("Turn on Duck Player")
                 }
                 .buttonStyle(PrimaryCTAStyle())
-
-
             }
         }
-        .frame(width: 504, height: 296)
-        .padding(Consts.Layout.containerPadding)
+        .frame(width: Consts.Layout.outerContainerWidth, height: Consts.Layout.outerContainerHeight)
+        .padding(.horizontal)
         .background(Color("DialogPanelBackground"))
         .cornerRadius(Consts.Layout.containerCornerRadius)
         .overlay(
@@ -76,34 +82,63 @@ struct DuckPlayerOnboardingModalView: View {
     DuckPlayerOnboardingModalView()
 }
 
-struct SpeechBalloon: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
+private struct SpeechBubble: View {
 
-        // Draw the balloon
-        let balloonRect = CGRect(x: 20, y: 0, width: rect.width - 20, height: rect.height)
-        path.addRoundedRect(in: balloonRect, cornerSize: CGSize(width: 28, height: 28))
+    let radius: CGFloat = 20
+    let tailSize: CGFloat = 12
+    let tailPosition: CGFloat = 38
+    let tailHeight: CGFloat = 28
 
-        // Draw the curved tail
-        let tailStart = CGPoint(x: 20, y: 40)
-        let tailControl1 = CGPoint(x: 0, y: 0)
-        let tailControl2 = CGPoint(x: 0, y: 40)
-        let tailEnd = CGPoint(x: 20, y: 60)
+    var body: some View {
+        ZStack {
+            GeometryReader { g in
+                let rect = CGRect(x: 0, y: 0, width: g.size.width, height: g.size.height)
 
-        path.move(to: tailStart)
-        path.addCurve(to: tailEnd, control1: tailControl1, control2: tailControl2)
+                Path { path in
 
-        // Draw the inner curve of the tail
-//        let innerTailControl1 = CGPoint(x: 10, y: 50)
-//        let innerTailControl2 = CGPoint(x: 10, y: 10)
-//        let innerTailEnd = CGPoint(x: 20, y: 20)
-//
-//        path.addCurve(to: innerTailEnd, control1: innerTailControl1, control2: innerTailControl2)
+                    path.move(to: CGPoint(x: rect.minX, y: rect.maxY - radius))
 
-        return path
+                    path.addLine(to: CGPoint(x: rect.minX, y: tailPosition + tailHeight / 2))
+                    path.addLine(to: CGPoint(x: rect.minX - tailSize, y: tailPosition))
+                    path.addLine(to: CGPoint(x: rect.minX, y: tailPosition - tailHeight / 2))
+
+                     path.addArc(
+                         center: CGPoint(x: rect.minX + radius, y: rect.minY + radius),
+                         radius: radius,
+                         startAngle: .degrees(180),
+                         endAngle: .degrees(270),
+                         clockwise: false
+                     )
+                     path.addArc(
+                         center: CGPoint(x: rect.maxX - radius, y: rect.minY + radius),
+                         radius: radius,
+                         startAngle: .degrees(270),
+                         endAngle: .degrees(0),
+                         clockwise: false
+                     )
+                     path.addArc(
+                         center: CGPoint(x: rect.maxX - radius, y: rect.maxY - radius),
+                         radius: radius,
+                         startAngle: .degrees(0),
+                         endAngle: .degrees(90),
+                         clockwise: false
+                     )
+                     path.addArc(
+                         center: CGPoint(x: rect.minX + radius, y: rect.maxY - radius),
+                         radius: radius,
+                         startAngle: .degrees(90),
+                         endAngle: .degrees(180),
+                         clockwise: false
+                     )
+
+                }
+                .fill(Color(.interfaceBackground))
+                .shadow(color: Color(.onboardingDaxSpeechShadow), radius: 2, x: 0, y: 0)
+            }
+
+        }
     }
 }
-
 
 private struct PrimaryCTAStyle: ButtonStyle {
 
@@ -149,10 +184,9 @@ private struct SecondaryCTAStyle: ButtonStyle {
 
 private enum Consts {
     struct Layout {
-        static let outerContainerWidth: CGFloat = 490
+        static let outerContainerWidth: CGFloat = 504
+        static let outerContainerHeight: CGFloat = 286
         static let daxContainerWidth: CGFloat = 84
-        static let innerContainerHeight: CGFloat = 190
-        static let daxImageSize: CGFloat = 64
         static let containerCornerRadius: CGFloat = 12
         static let CTACornerRadius: CGFloat = 8
         static let containerPadding: CGFloat = 20
