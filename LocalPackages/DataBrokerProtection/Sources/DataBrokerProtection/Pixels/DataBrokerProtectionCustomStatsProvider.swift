@@ -19,24 +19,24 @@
 import Foundation
 
 /// Type encapsulating custom data broker and global stats
-struct CustomStats: Equatable {
-    let customDataBrokerStats: [CustomDataBrokerStat]
-    let customGlobalStat: CustomGlobalStat
+struct CustomOptOutStats: Equatable {
+    let customIndividualDataBrokerStat: [CustomIndividualDataBrokerStat]
+    let customAggregateBrokersStat: CustomAggregateBrokersStat
 }
 
 /// Encapsulates data broker stats
-struct CustomDataBrokerStat: Equatable {
+struct CustomIndividualDataBrokerStat: Equatable {
     let dataBrokerName: String
     let optoutSubmitSuccessRate: Double
 }
 
-/// Encapsulates global (i.e across all data broker) stats
-struct CustomGlobalStat: Equatable {
+/// Encapsulates aggregate (i.e across all data broker) stats
+struct CustomAggregateBrokersStat: Equatable {
     let optoutSubmitSuccessRate: Double
 }
 
-// Conforming types provide a method to calculate `CustomStats`
-protocol DataBrokerProtectionCustomStatsProvider {
+// Conforming types provide a method to calculate `CustomOptOutStats`
+protocol DataBrokerProtectionCustomOptOutStatsProvider {
 
     /// This method calculates custom statistics for data brokers based on the provided query data within a specified date range.
     /// - Parameters:
@@ -44,18 +44,18 @@ protocol DataBrokerProtectionCustomStatsProvider {
     ///   - endDate: The end date to filter optout creation events. All optout creation events considered up to this date.
     ///   - queryData: An array of BrokerProfileQueryData objects containing data broker query information, scan job data, and opt-out job data.
     /// - Returns: A CustomStats object containing the statistics for each data broker and the global statistics.
-    func customStats(startDate: Date?,
-                     endDate: Date,
-                     andQueryData queryData: [BrokerProfileQueryData]) -> CustomStats
+    func customOptOutStats(startDate: Date?,
+                           endDate: Date,
+                           andQueryData queryData: [BrokerProfileQueryData]) -> CustomOptOutStats
 }
 
-struct DefaultDataBrokerProtectionCustomStatsProvider: DataBrokerProtectionCustomStatsProvider {
+struct DefaultDataBrokerProtectionCustomOptOutStatsProvider: DataBrokerProtectionCustomOptOutStatsProvider {
 
-    func customStats(startDate: Date?,
-                     endDate: Date,
-                     andQueryData queryData: [BrokerProfileQueryData]) -> CustomStats {
+    func customOptOutStats(startDate: Date?,
+                           endDate: Date,
+                           andQueryData queryData: [BrokerProfileQueryData]) -> CustomOptOutStats {
 
-        var customDataBrokerStats: [CustomDataBrokerStat] = []
+        var customIndividualDataBrokerStats: [CustomIndividualDataBrokerStat] = []
         var totalGlobalOptOuts: Int = 0
         var totalGlobalRequests: Int = 0
 
@@ -86,21 +86,21 @@ struct DefaultDataBrokerProtectionCustomStatsProvider: DataBrokerProtectionCusto
 
             let dataBrokerName = groupedByBroker[dataBroker]?.first?.dataBroker.name ?? ""
 
-            let customDataBrokerStat = CustomDataBrokerStat(dataBrokerName: dataBrokerName,
-                                                            optoutSubmitSuccessRate: roundedOptOutSuccessRate)
+            let customIndividualDataBrokerStat = CustomIndividualDataBrokerStat(dataBrokerName: dataBrokerName,
+                                                                                optoutSubmitSuccessRate: roundedOptOutSuccessRate)
 
-            customDataBrokerStats.append(customDataBrokerStat)
+            customIndividualDataBrokerStats.append(customIndividualDataBrokerStat)
 
         }
 
         let globalSuccessRate = totalGlobalOptOuts > 0 ? Double(totalGlobalRequests) / Double(totalGlobalOptOuts) : 0
         let roundedGlobalSuccessRate = (globalSuccessRate * 100).rounded() / 100
-        let globalStats = CustomGlobalStat(optoutSubmitSuccessRate: roundedGlobalSuccessRate)
-        return CustomStats(customDataBrokerStats: customDataBrokerStats, customGlobalStat: globalStats)
+        let aggregateStats = CustomAggregateBrokersStat(optoutSubmitSuccessRate: roundedGlobalSuccessRate)
+        return CustomOptOutStats(customIndividualDataBrokerStat: customIndividualDataBrokerStats, customAggregateBrokersStat: aggregateStats)
     }
 }
 
-private extension DefaultDataBrokerProtectionCustomStatsProvider {
+private extension DefaultDataBrokerProtectionCustomOptOutStatsProvider {
 
     func optOutJobsBetween(startDate: Date?, endDate: Date, queryData: [BrokerProfileQueryData]) -> [OptOutJobData] {
         let allOptOuts = queryData.flatMap { $0.optOutJobData }

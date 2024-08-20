@@ -1154,7 +1154,6 @@ extension OptOutJobData {
         let profileQueryId: Int64 = 11
 
         let historyEvent = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested, date: submittedDate ?? Date())
-        let scanJobData = ScanJobData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [historyEvent])
 
         let extractedProfile = type == .optOutConfirmed ? ExtractedProfile.mockWithRemovedDate : ExtractedProfile.mockWithoutRemovedDate
         return OptOutJobData(brokerId: brokerId,
@@ -1758,12 +1757,12 @@ final class MockDataBrokerProtectionStatsPixelsRepository: DataBrokerProtectionS
     }
 }
 
-final class MockDataBrokerProtectionCustomStatsProvider: DataBrokerProtectionCustomStatsProvider {
+final class MockDataBrokerProtectionCustomOptOutStatsProvider: DataBrokerProtectionCustomOptOutStatsProvider {
 
     var customStatsWasCalled = false
-    var customStatsToReturn = CustomStats(customDataBrokerStats: [], customGlobalStat: CustomGlobalStat(optoutSubmitSuccessRate: 0))
+    var customStatsToReturn = CustomOptOutStats(customIndividualDataBrokerStat: [], customAggregateBrokersStat: CustomAggregateBrokersStat(optoutSubmitSuccessRate: 0))
 
-    func customStats(startDate: Date?, endDate: Date, andQueryData queryData: [BrokerProfileQueryData]) -> CustomStats {
+    func customOptOutStats(startDate: Date?, endDate: Date, andQueryData queryData: [BrokerProfileQueryData]) -> CustomOptOutStats {
         customStatsWasCalled = true
         return customStatsToReturn
     }
