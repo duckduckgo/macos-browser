@@ -347,7 +347,7 @@ final class DataBrokerProtectionStatsPixels: StatsPixels {
 }
 
 private extension DataBrokerProtectionStatsPixels {
-    
+
     /// Calculates the number of profile reappearances
     /// - Parameter scan: Scan Job Data
     /// - Returns: Count of reappearances
