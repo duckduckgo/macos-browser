@@ -1,5 +1,5 @@
 //
-//  DuckPlayerConsentModalManager.swift
+//  DuckPlayerOnboardingModalManager.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,13 +18,13 @@
 
 import Foundation
 
-final class DuckPlayerConsentModalManager {
+final class DuckPlayerOnboardingModalManager {
     var completion: ((Bool) -> Void)?
     weak var currentTab: Tab?
 
-    private(set) var modal: DuckPlayerConsentModal?
+    private(set) var modal: DuckPlayerOnboardingModal?
 
-    func cookieConsentPopover(_ modal: DuckPlayerConsentModal, didFinishWithResult result: Bool) {
+    func cookieConsentPopover(_ modal: DuckPlayerOnboardingModal, didFinishWithResult result: Bool) {
         modal.close(animated: true) {
             withExtendedLifetime(modal) {}
         }
@@ -66,12 +66,12 @@ final class DuckPlayerConsentModalManager {
             return
         }
 
-        modal = DuckPlayerConsentModal()
+        modal = DuckPlayerOnboardingModal()
         modal?.delegate = self
     }
 }
 
-extension DuckPlayerConsentModalManager: DuckPlayerConsentModalDelegate {
-    func duckPlayerConsentModal(_ modal: DuckPlayerConsentModal, didFinishWithResult result: Bool) {
+extension DuckPlayerOnboardingModalManager: DuckPlayerOnboardingModalDelegate {
+    func duckPlayerOnboardingModal(_ modal: DuckPlayerOnboardingModal, didFinishWithResult result: Bool) {
     }
 }

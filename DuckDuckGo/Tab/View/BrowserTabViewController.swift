@@ -54,7 +54,7 @@ final class BrowserTabViewController: NSViewController {
     private var hoverLabelWorkItem: DispatchWorkItem?
 
     private(set) var transientTabContentViewController: NSViewController?
-    private var duckPlayerConsentModalManager = DuckPlayerConsentModalManager()
+    private var duckPlayerOnboardingModalManager = DuckPlayerOnboardingModalManager()
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -158,8 +158,8 @@ final class BrowserTabViewController: NSViewController {
                                                name: .accountDidSignOut,
                                                object: nil)
 
-        duckPlayerConsentModalManager.show(on: self.view, animated: true)
-        duckPlayerConsentModalManager.currentTab = tabViewModel!.tab
+        duckPlayerOnboardingModalManager.show(on: self.view, animated: true)
+        duckPlayerOnboardingModalManager.currentTab = tabViewModel!.tab
     }
 
     @objc

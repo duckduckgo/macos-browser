@@ -1,5 +1,5 @@
 //
-//  DuckPlayerConsentViewController.swift
+//  DuckPlayerOnboardingViewController.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -22,12 +22,12 @@ import SwiftUI
 import SwiftUI
 import AppKit
 
-final class DuckPlayerConsentViewController: NSViewController {
+final class DuckPlayerOnboardingViewController: NSViewController {
 
-    private var hostingView: NSHostingView<DuckPlayerConsentModalView>!
+    private var hostingView: NSHostingView<DuckPlayerOnboardingModalView>!
 
     override func loadView() {
-        let consentView = DuckPlayerConsentModalView()
+        let consentView = DuckPlayerOnboardingModalView()
         hostingView = NSHostingView(rootView: consentView)
         self.view = hostingView
     }

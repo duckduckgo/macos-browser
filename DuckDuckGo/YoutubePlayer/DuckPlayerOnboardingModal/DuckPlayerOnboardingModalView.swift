@@ -1,5 +1,5 @@
 //
-//  DuckPlayerConsentModalView.swift
+//  DuckPlayerOnboardingModalView.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,13 +19,13 @@
 import SwiftUI
 
 
-struct DuckPlayerConsentModalView: View {
+struct DuckPlayerOnboardingModalView: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         VStack {
             HStack (alignment: .top) {
-                Image("DuckPlayerConsentModalDax")
+                Image("DuckPlayerOnboardingModalDax")
 
                 VStack (alignment: .leading) {
                     Text("Drowning in ads on YouTube?")
@@ -35,7 +35,7 @@ struct DuckPlayerConsentModalView: View {
 
                     HStack {
                         Spacer()
-                        Image("DuckPlayerConsentModal")
+                        Image("DuckPlayerOnboardingModal")
                         Spacer()
                     }
                 }
@@ -73,7 +73,7 @@ struct DuckPlayerConsentModalView: View {
 }
 
 #Preview {
-    DuckPlayerConsentModalView()
+    DuckPlayerOnboardingModalView()
 }
 
 struct SpeechBalloon: Shape {
@@ -109,7 +109,7 @@ private struct PrimaryCTAStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
 
-        let color = configuration.isPressed ? Color("DuckPlayerConsentPrimaryButtonPressed") : Color("DuckPlayerConsentPrimaryButton")
+        let color = configuration.isPressed ? Color("DuckPlayerOnboardingPrimaryButtonPressed") : Color("DuckPlayerOnboardingPrimaryButton")
 
         configuration.label
             .padding(.vertical, 10)
@@ -126,7 +126,7 @@ private struct SecondaryCTAStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
 
-        let color = configuration.isPressed ? Color("DuckPlayerConsentSecondaryButtonPressed") : Color("DuckPlayerConsentSecondaryButton")
+        let color = configuration.isPressed ? Color("DuckPlayerOnboardingSecondaryButtonPressed") : Color("DuckPlayerOnboardingSecondaryButton")
 
         let outterShadowOpacity = colorScheme == .dark ? 0.8 : 0.0
 

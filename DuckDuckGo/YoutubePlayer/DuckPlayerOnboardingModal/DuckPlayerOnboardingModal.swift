@@ -1,5 +1,5 @@
 //
-//  DuckPlayerConsentModal.swift
+//  DuckPlayerOnboardingModal.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -25,20 +25,20 @@ private enum AnimationConsts {
     static let duration: CGFloat = 0.6
 }
 
-protocol DuckPlayerConsentModalDelegate: AnyObject {
-    func duckPlayerConsentModal(_ modal: DuckPlayerConsentModal, didFinishWithResult result: Bool)
+protocol DuckPlayerOnboardingModalDelegate: AnyObject {
+    func duckPlayerOnboardingModal(_ modal: DuckPlayerOnboardingModal, didFinishWithResult result: Bool)
 }
 
-public final class DuckPlayerConsentModal {
-    weak var delegate: DuckPlayerConsentModalDelegate?
-    var viewController: DuckPlayerConsentViewController
+public final class DuckPlayerOnboardingModal {
+    weak var delegate: DuckPlayerOnboardingModalDelegate?
+    var viewController: DuckPlayerOnboardingViewController
     var windowController: NSWindowController
     private var resizeObserver: Any?
 
     private var cancellables = Set<AnyCancellable>()
 
     public init() {
-        viewController = DuckPlayerConsentViewController()
+        viewController = DuckPlayerOnboardingViewController()
         windowController = NSWindowController(window: NSWindow(contentViewController: viewController))
 
         if let window = windowController.window {
@@ -138,6 +138,6 @@ public final class DuckPlayerConsentModal {
     }
 
     public required init?(coder: NSCoder) {
-        fatalError("DuckPlayerConsentModal: Bad initializer")
+        fatalError("DuckPlayerOnboardingModal: Bad initializer")
     }
 }

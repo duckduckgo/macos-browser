@@ -1,5 +1,5 @@
 //
-//  DuckPlayerConsentModalConfirmationView.swift
+//  DuckPlayerOnboardingModalConfirmationView.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,12 +18,12 @@
 
 import SwiftUI
 
-struct DuckPlayerConsentModalConfirmationView: View {
+struct DuckPlayerOnboardingModalConfirmationView: View {
     var body: some View {
         Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
     }
 }
 
 #Preview {
-    DuckPlayerConsentModalConfirmationView()
+    DuckPlayerOnboardingModalConfirmationView()
 }
