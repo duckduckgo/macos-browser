@@ -55,6 +55,16 @@ struct UnifiedFeedbackFormView: View {
             FeedbackFormButtons()
                 .padding(20)
         }
+        .onChange(of: viewModel.needsSubmitShowReport) { needsSubmitShowReport in
+            if needsSubmitShowReport {
+                Task {
+                    await viewModel.process(action: .reportSubmitShow)
+                }
+            }
+        }
+        .task {
+            await viewModel.process(action: .reportShow)
+        }
     }
 
 }

@@ -84,20 +84,32 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
             default: defaultCategory = .prompt
             }
             selectedCategory = defaultCategory.rawValue
+            updateSubmitShowStatus()
         }
     }
     @Published var selectedCategory: String = UnifiedFeedbackCategory.prompt.rawValue {
         didSet {
-            switch UnifiedFeedbackCategory(rawValue: selectedCategory) {
-            case .selectFeature, nil: selectedSubcategory = ""
-            case .subscription: selectedSubcategory = PrivacyProFeedbackSubcategory.prompt.rawValue
-            case .vpn: selectedSubcategory = VPNFeedbackSubcategory.prompt.rawValue
-            case .pir: selectedSubcategory = PIRFeedbackSubcategory.prompt.rawValue
-            case .itr: selectedSubcategory = ITRFeedbackSubcategory.prompt.rawValue
-            }
+            selectedSubcategory = selectedSubcategoryPrompt
+            updateSubmitShowStatus()
         }
     }
-    @Published var selectedSubcategory: String = ""
+    @Published var selectedSubcategory = "" {
+        didSet {
+            updateSubmitShowStatus()
+        }
+    }
+
+    private var selectedSubcategoryPrompt: String {
+        switch UnifiedFeedbackCategory(rawValue: selectedCategory) {
+        case .selectFeature, nil: return ""
+        case .subscription: return PrivacyProFeedbackSubcategory.prompt.rawValue
+        case .vpn: return VPNFeedbackSubcategory.prompt.rawValue
+        case .pir: return PIRFeedbackSubcategory.prompt.rawValue
+        case .itr: return ITRFeedbackSubcategory.prompt.rawValue
+        }
+    }
+
+    @Published var needsSubmitShowReport = false
 
     var usesCompactForm: Bool {
         switch UnifiedFeedbackReportType(rawValue: selectedReportType) {
@@ -147,22 +159,19 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
         case .reportShow:
             feedbackSender.sendFormShowPixel()
         case .reportSubmitShow:
-            if !selectedReportType.isEmpty, !selectedCategory.isEmpty, !selectedSubcategory.isEmpty {
-                feedbackSender.sendSubmitScreenShowPixel(source: source,
+            feedbackSender.sendSubmitScreenShowPixel(source: source,
+                                                     reportType: selectedReportType,
+                                                     category: selectedCategory,
+                                                     subcategory: selectedSubcategory)
+            needsSubmitShowReport = false
+        case .reportFAQClick:
+            feedbackSender.sendSubmitScreenFAQClickPixel(source: source,
                                                          reportType: selectedReportType,
                                                          category: selectedCategory,
                                                          subcategory: selectedSubcategory)
-            }
-        case .reportFAQClick:
-            if !selectedReportType.isEmpty, !selectedCategory.isEmpty, !selectedSubcategory.isEmpty {
-                feedbackSender.sendSubmitScreenFAQClickPixel(source: source,
-                                                             reportType: selectedReportType,
-                                                             category: selectedCategory,
-                                                             subcategory: selectedSubcategory)
-            }
         }
     }
-    
+
     private func openFAQ() async {
         guard !selectedReportType.isEmpty, UnifiedFeedbackReportType(rawValue: selectedReportType) == .reportIssue,
               !selectedCategory.isEmpty, let category = UnifiedFeedbackCategory(rawValue: selectedCategory),
@@ -198,11 +207,6 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
         case .reportIssue:
             try await reportProblem()
         }
-
-        feedbackSender.sendSubmitScreenShowPixel(source: source,
-                                                 reportType: selectedReportType,
-                                                 category: selectedCategory,
-                                                 subcategory: selectedSubcategory)
     }
 
     private func reportProblem() async throws {
@@ -228,4 +232,16 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
         self.submitButtonEnabled = viewState.canSubmit && !feedbackFormText.isEmpty
     }
 
+    private func updateSubmitShowStatus() {
+        needsSubmitShowReport = {
+            switch UnifiedFeedbackReportType(rawValue: selectedReportType) {
+            case .selectReportType, nil:
+                return false
+            case .requestFeature, .general:
+                return true
+            case .reportIssue:
+                return selectedCategory != UnifiedFeedbackCategory.prompt.rawValue && selectedSubcategory != selectedSubcategoryPrompt
+            }
+        }()
+    }
 }
