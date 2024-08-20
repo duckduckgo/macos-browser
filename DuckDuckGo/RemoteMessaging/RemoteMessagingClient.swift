@@ -193,7 +193,8 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         isRemoteMessagingDatabaseLoaded = true
     }
 
-    private var isRemoteMessagingDatabaseLoaded = false
+    // Publicly accessible for use in RemoteMessagingDebugMenu
+    private(set) var isRemoteMessagingDatabaseLoaded = false
     private let remoteMessagingStoreProvider: RemoteMessagingStoreProviding
     private var scheduledRefreshCancellable: AnyCancellable?
     private var featureFlagCancellable: AnyCancellable?
