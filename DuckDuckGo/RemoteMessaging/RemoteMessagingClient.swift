@@ -157,6 +157,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
 
     private func subscribeToFeatureFlagChanges() {
         featureFlagCancellable = remoteMessagingAvailabilityProvider.isRemoteMessagingAvailablePublisher
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] isRemoteMessagingAvailable in
                 if isRemoteMessagingAvailable {
                     self?.initializeDatabaseIfNeeded()
