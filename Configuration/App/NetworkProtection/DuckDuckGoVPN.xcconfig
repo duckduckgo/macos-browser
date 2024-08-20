@@ -40,12 +40,13 @@ CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVP
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
-CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+//CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 PRODUCT_NAME = $(AGENT_PRODUCT_NAME)
 PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = macOS NetP VPN App - CI (XPC)
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS NetP VPN App - Review (XPC)
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS NetP VPN App - Release (XPC)
 

@@ -36,12 +36,13 @@ CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGoNotifications/Du
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
-CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+//CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 PRODUCT_NAME_PREFIX = $(NOTIFICATIONS_AGENT_PRODUCT_NAME)
 PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(NOTIFICATIONS_AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = Mac Browser NetP Developer ID Not. (CI)
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = MacOS Browser NetP Notifications Product Review
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID Not. (Distribution)
 
