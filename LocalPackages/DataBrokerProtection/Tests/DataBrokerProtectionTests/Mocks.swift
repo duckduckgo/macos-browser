@@ -1744,11 +1744,3 @@ struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
         return { _ in }
     }
 }
-
-struct MockFeatureFlagger: DataBrokerProtectionMigrationsFeatureFlagger {
-    var isUserIn = false
-
-    func isUserIn(percent: Int) -> Bool {
-        isUserIn
-    }
-}
