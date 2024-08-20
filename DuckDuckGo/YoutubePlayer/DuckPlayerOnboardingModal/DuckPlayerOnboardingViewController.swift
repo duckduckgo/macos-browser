@@ -27,7 +27,16 @@ final class DuckPlayerOnboardingViewController: NSViewController {
     private var hostingView: NSHostingView<DuckPlayerOnboardingModalView>!
 
     override func loadView() {
-        let consentView = DuckPlayerOnboardingModalView()
+
+        let viewModel = DuckPlayerOnboardingViewModel {
+            print("AA")
+        } actionNotNow: {
+            print("BB")
+        } actionGotIt: {
+            print("CC")
+        }
+
+        let consentView = DuckPlayerOnboardingModalView(viewModel: viewModel)
         hostingView = NSHostingView(rootView: consentView)
         self.view = hostingView
     }

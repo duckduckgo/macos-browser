@@ -18,40 +18,85 @@
 
 import SwiftUI
 
+final class DuckPlayerOnboardingViewModel: ObservableObject {
+    internal init(actionTurnOnDuckPlayer: @escaping () -> Void, actionNotNow: @escaping () -> Void, actionGotIt: @escaping () -> Void) {
+        self.actionTurnOnDuckPlayer = actionTurnOnDuckPlayer
+        self.actionNotNow = actionNotNow
+        self.actionGotIt = actionGotIt
+    }
+
+    let actionTurnOnDuckPlayer: () -> Void
+    let actionNotNow: () -> Void
+    let actionGotIt: () -> Void
+}
+
 struct DuckPlayerOnboardingModalView: View {
+    @ObservedObject var viewModel: DuckPlayerOnboardingViewModel
     @Environment(\.colorScheme) var colorScheme
+    @State var didPressFrame = false
+    let smallHeight: CGFloat = 182
+    let bigHeight: CGFloat = 286
+    @State var shouldShowConfirmationView = false
 
     var body: some View {
-        VStack {
-            HStack (alignment: .top) {
-                Image("DuckPlayerOnboardingModalDax")
-                    .padding(.top, 8)
-                    .padding(.leading, -10)
+        currentView
+            .padding()
+            .frame(width: Consts.Layout.outerContainerWidth, height: shouldShowConfirmationView ? smallHeight: bigHeight)
+            .padding(.horizontal)
+            .background(Color("DialogPanelBackground"))
+            .cornerRadius(Consts.Layout.containerCornerRadius)
+            .overlay(
+                RoundedRectangle(cornerRadius: Consts.Layout.containerCornerRadius)
+                    .stroke(colorScheme == .dark ? Consts.Colors.darkModeBorderColor : Consts.Colors.whiteModeBorderColor, lineWidth: 1)
+            )
+    }
 
-                    VStack (alignment: .leading) {
-                        Text("Drowning in ads on YouTube?")
-                            .font(.title)
-                            .padding(.horizontal)
+    @ViewBuilder
+    var currentView: some View {
+        if shouldShowConfirmationView {
+            DuckPlayerOnboardingConfirmationView {
+                shouldShowConfirmationView = false
+                viewModel.actionGotIt()
+            }
+        } else {
+            DuckPlayerOnboardingChoiceView(turnOnButtonPressed: {
+                shouldShowConfirmationView = true
+                viewModel.actionTurnOnDuckPlayer()
+            }, notNowPressed: viewModel.actionNotNow)
+        }
+    }
+}
 
-                        Text("Duck Player lets you watch without targeted ads and comes free to use in DuckDuckGo.")
-                            .multilineText()
-                            .padding(.horizontal)
+private struct DuckPlayerOnboardingChoiceView: View {
+    let turnOnButtonPressed: () -> Void
+    let notNowPressed: () -> Void
 
-                        HStack {
-                            Spacer()
-                            Image("DuckPlayerOnboardingModal")
-                            Spacer()
-                        }
-                    }.background(
-                        SpeechBubble()
-                            .frame(width: 432, height: 198)
-                    )
-                    .padding(24)
-                }
+    var body: some View {
+        VStack(spacing: 20) {
+            DaxSpeechBubble {
+                VStack (alignment: .leading, spacing: 8) {
+                    Text("Drowning in ads on YouTube?")
+                        .font(.title)
+                        .padding(.horizontal)
+
+                    Text("Duck Player lets you watch without targeted ads and comes free to use in DuckDuckGo.")
+                        .font(.body)
+                        .multilineText()
+                        .padding(.horizontal)
+
+                    HStack {
+                        Spacer()
+                        Image("DuckPlayerOnboardingModal")
+                        Spacer()
+                    }
+                }.frame(maxWidth: .infinity)
+                    .padding()
+
+            }
 
             HStack {
                 Button {
-
+                    notNowPressed()
                 } label: {
                     Text("Not Now")
                 }
@@ -59,27 +104,65 @@ struct DuckPlayerOnboardingModalView: View {
 
                 Spacer()
                 Button {
-
+                    turnOnButtonPressed()
                 } label: {
                     Text("Turn on Duck Player")
                 }
                 .buttonStyle(PrimaryCTAStyle())
             }
         }
-        .frame(width: Consts.Layout.outerContainerWidth, height: Consts.Layout.outerContainerHeight)
-        .padding(.horizontal)
-        .background(Color("DialogPanelBackground"))
-        .cornerRadius(Consts.Layout.containerCornerRadius)
-        .overlay(
-            RoundedRectangle(cornerRadius: Consts.Layout.containerCornerRadius)
-                .stroke(colorScheme == .dark ? Consts.Colors.darkModeBorderColor : Consts.Colors.whiteModeBorderColor, lineWidth: 1)
-        )
-
     }
 }
 
-#Preview {
-    DuckPlayerOnboardingModalView()
+private struct DuckPlayerOnboardingConfirmationView: View {
+    let voidButtonPressed: () -> Void
+    var body: some View {
+        VStack(spacing: 20) {
+            DaxSpeechBubble {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("All set!")
+                        .font(.title)
+                        .padding(.horizontal)
+
+                    Text("Pick a video to see Duck Player work its magic.")
+                        .font(.body)
+                        .padding(.horizontal)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+
+            }
+
+            Button {
+                voidButtonPressed()
+            } label: {
+                Text("Got it")
+            }
+            .buttonStyle(PrimaryCTAStyle())
+        }
+    }
+}
+
+private struct DaxSpeechBubble<Content: View>: View {
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack {
+            HStack(alignment: .top, spacing: 12) {
+                Image("DuckPlayerOnboardingModalDax")
+                    .padding(.leading, -10)
+
+                ZStack {
+                    SpeechBubble()
+                    content
+                }
+            }
+        }
+    }
 }
 
 private struct SpeechBubble: View {
@@ -200,4 +283,24 @@ private enum Consts {
     struct Font {
         static let size: CGFloat = 15
     }
+}
+
+#Preview {
+    VStack {
+        DuckPlayerOnboardingChoiceView(turnOnButtonPressed: {
+
+        }, notNowPressed: {
+
+        })
+            .frame(width: 504, height: 286)
+
+        Divider()
+            .padding()
+
+        DuckPlayerOnboardingConfirmationView(voidButtonPressed: {
+
+        })
+            .frame(width: 504, height: 152)
+    }
+    .padding()
 }
