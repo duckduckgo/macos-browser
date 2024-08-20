@@ -129,13 +129,13 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
     let source: String
 
     init(vpnMetadataCollector: any UnifiedMetadataCollector,
-         defaultMetadatCollector: any UnifiedMetadataCollector = DefaultMetadataCollector(),
+         defaultMetadataCollector: any UnifiedMetadataCollector = EmptyMetadataCollector(),
          feedbackSender: any UnifiedFeedbackSender = DefaultFeedbackSender(),
          source: Source = .unknown) {
         self.viewState = .feedbackPending
 
         self.vpnMetadataCollector = vpnMetadataCollector
-        self.defaultMetadataCollector = defaultMetadatCollector
+        self.defaultMetadataCollector = defaultMetadataCollector
         self.feedbackSender = feedbackSender
         self.source = source.rawValue
     }
@@ -224,7 +224,7 @@ final class UnifiedFeedbackFormViewModel: ObservableObject {
                                                           category: selectedCategory,
                                                           subcategory: selectedSubcategory,
                                                           description: feedbackFormText,
-                                                          metadata: metadata as? DefaultFeedbackMetadata)
+                                                          metadata: metadata as? EmptyFeedbackMetadata)
         }
     }
 

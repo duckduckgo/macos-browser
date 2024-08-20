@@ -1,5 +1,5 @@
 //
-//  DefaultMetadataCollector.swift
+//  EmptyMetadataCollector.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,12 +18,12 @@
 
 import Foundation
 
-struct DefaultFeedbackMetadata: UnifiedFeedbackMetadata {
+struct EmptyFeedbackMetadata: UnifiedFeedbackMetadata {
 
 }
 
-final class DefaultMetadataCollector: UnifiedMetadataCollector {
-    func collectMetadata() async -> DefaultFeedbackMetadata? {
+final class EmptyMetadataCollector: UnifiedMetadataCollector {
+    func collectMetadata() async -> EmptyFeedbackMetadata? {
         nil
     }
 }
