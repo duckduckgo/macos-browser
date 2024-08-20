@@ -22,6 +22,36 @@ import AppKitExtensions
 
 final class RemoteMessagingDebugMenu: NSMenu {
 
+    struct MessageModel: CustomStringConvertible {
+        let id: String
+        let shown: String
+        let status: String
+
+        init(message: RemoteMessageManagedObject) {
+            self.id = message.id ?? "?"
+            self.shown = message.shown ? "shown" : "not shown"
+            self.status = Self.statusString(for: message.status)
+        }
+
+        var description: String {
+            "ID: \(id) | \(shown) | \(status)"
+        }
+
+        /// This should be kept in sync with `RemoteMessageStatus` private enum from BSK
+        private static func statusString(for status: NSNumber?) -> String {
+            switch status?.int16Value {
+            case 0:
+                return "scheduled"
+            case 1:
+                return "dismissed"
+            case 2:
+                return "done"
+            default:
+                return "unknown"
+            }
+        }
+    }
+
     init() {
         super.init(title: "")
 
@@ -48,7 +78,7 @@ final class RemoteMessagingDebugMenu: NSMenu {
             removeItem(at: 3)
         }
 
-        guard NSApplication.runType.requiresEnvironment else {
+        guard NSApplication.runType.requiresEnvironment, NSApp.delegateTyped.remoteMessagingClient.isRemoteMessagingDatabaseLoaded else {
             return
         }
 
@@ -57,20 +87,25 @@ final class RemoteMessagingDebugMenu: NSMenu {
         let fetchRequest = RemoteMessageManagedObject.fetchRequest()
         fetchRequest.returnsObjectsAsFaults = false
 
+        var messageModels: [MessageModel] = []
+
         context.performAndWait {
             let messages = (try? context.fetch(fetchRequest)) ?? []
-
-            let headerItem = NSMenuItem(title: "\(messages.count) Message(s) in database:")
-            headerItem.isEnabled = false
-
-            addItem(NSMenuItem.separator())
-            addItem(headerItem)
-
             for message in messages {
-                let item = NSMenuItem(title: "ID: \(message.id ?? "?") | \(message.shown ? "shown" : "not shown") | \(statusString(for: message.status))")
-                item.isEnabled = false
-                addItem(item)
+                messageModels.append(MessageModel(message: message))
             }
+        }
+
+        let headerItem = NSMenuItem(title: "\(messageModels.count) Message(s) in database:")
+        headerItem.isEnabled = false
+
+        addItem(NSMenuItem.separator())
+        addItem(headerItem)
+
+        for message in messageModels {
+            let item = NSMenuItem(title: message.description)
+            item.isEnabled = false
+            addItem(item)
         }
     }
 
@@ -84,17 +119,4 @@ final class RemoteMessagingDebugMenu: NSMenu {
         }
     }
 
-    /// This should be kept in sync with `RemoteMessageStatus` private enum from BSK
-    private func statusString(for status: NSNumber?) -> String {
-        switch status?.int16Value {
-        case 0:
-            return "scheduled"
-        case 1:
-            return "dismissed"
-        case 2:
-            return "done"
-        default:
-            return "unknown"
-        }
-    }
 }
