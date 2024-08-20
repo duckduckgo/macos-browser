@@ -328,6 +328,10 @@ extension AppDelegate {
     @objc func resetRemoteMessages(_ sender: Any?) {
         remoteMessagingClient.store?.resetRemoteMessages()
     }
+
+    @objc func resetCpmCohort(_ sender: Any?) {
+        UserDefaultsWrapper.clear(.autoconsentFilterlistExperimentCohort)
+    }
 }
 
 extension MainViewController {
@@ -839,7 +843,6 @@ extension MainViewController {
     ///
     private func clearPrivacyProState() {
         Application.appDelegate.subscriptionManager.accountManager.signOut()
-        resetThankYouModalChecks(nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
     }
 
@@ -900,28 +903,6 @@ extension MainViewController {
                       webViewSize: .zero)
 
         WindowsManager.openPopUpWindow(with: tab, origin: nil, contentSize: nil)
-    }
-
-    @objc func resetThankYouModalChecks(_ sender: Any?) {
-        let presenter = WaitlistThankYouPromptPresenter()
-        presenter.resetPromptCheck()
-        UserDefaults.netP.removeObject(forKey: UserDefaults.vpnLegacyUserAccessDisabledOnceKey)
-    }
-
-    @objc func showVPNThankYouModal(_ sender: Any?) {
-        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .vpn)
-        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
-        if let thankYouWindow = thankYouWindowController.window {
-            WindowsManager.windows.first?.beginSheet(thankYouWindow)
-        }
-    }
-
-    @objc func showPIRThankYouModal(_ sender: Any?) {
-        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .dbp)
-        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
-        if let thankYouWindow = thankYouWindowController.window {
-            WindowsManager.windows.first?.beginSheet(thankYouWindow)
-        }
     }
 
     @objc func resetEmailProtectionInContextPrompt(_ sender: Any?) {

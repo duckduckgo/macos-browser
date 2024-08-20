@@ -21,7 +21,7 @@ import Combine
 import Common
 import BrowserServicesKit
 import PixelKit
-
+import os.log
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
@@ -874,23 +874,23 @@ final class NavigationBarViewController: NSViewController {
         let autofillPreferences = AutofillPreferences()
 
         if autofillPreferences.askToSaveUsernamesAndPasswords, let credentials = data.credentials {
-            os_log("Presenting Save Credentials popover", log: .passwordManager)
+            Logger.passwordManager.debug("Presenting Save Credentials popover")
             popovers.displaySaveCredentials(credentials,
                                             automaticallySaved: data.automaticallySavedCredentials,
                                             usingView: passwordManagementButton,
                                             withDelegate: self)
         } else if autofillPreferences.askToSavePaymentMethods, let card = data.creditCard {
-            os_log("Presenting Save Payment Method popover", log: .passwordManager)
+            Logger.passwordManager.debug("Presenting Save Payment Method popover")
             popovers.displaySavePaymentMethod(card,
                                               usingView: passwordManagementButton,
                                               withDelegate: self)
         } else if autofillPreferences.askToSaveAddresses, let identity = data.identity {
-            os_log("Presenting Save Identity popover", log: .passwordManager)
+            Logger.passwordManager.debug("Presenting Save Identity popover")
             popovers.displaySaveIdentity(identity,
                                          usingView: passwordManagementButton,
                                          withDelegate: self)
         } else {
-            os_log("Received save autofill data call, but there was no data to present", log: .passwordManager)
+            Logger.passwordManager.error("Received save autofill data call, but there was no data to present")
         }
     }
 
@@ -1020,11 +1020,9 @@ extension NavigationBarViewController: NSMenuDelegate {
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
-#if DBP
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu) {
         WindowControllersManager.shared.showDataBrokerProtectionTab()
     }
-#endif
 
     func optionsButtonMenuRequestedOpenExternalPasswordManager(_ menu: NSMenu) {
         BWManager.shared.openBitwarden()

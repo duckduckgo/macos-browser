@@ -32,11 +32,10 @@ protocol UnifiedFeedbackSender {
 extension UnifiedFeedbackSender {
     func sendPixel(_ pixel: PixelKitEventV2, frequency: PixelKit.Frequency) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            var count = 0
-            PixelKit.fire(pixel, frequency: frequency) { pixelName, frequency, _, error in
+            PixelKit.fire(pixel, frequency: frequency) { _, error in
                 if let error {
                     continuation.resume(throwing: error)
-                } else if frequency != .dailyAndCount || pixelName.hasSuffix("_c") {
+                } else {
                     continuation.resume()
                 }
             }

@@ -272,10 +272,6 @@ final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
         // intentional no-op
     }
 
-    var isEligibleForThankYouMessage: Bool {
-        false
-    }
-
     func disableIfUserHasNoAccess() async {
         // Intentional no-op
     }

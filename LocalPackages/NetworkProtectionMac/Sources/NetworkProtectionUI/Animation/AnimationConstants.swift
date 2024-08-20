@@ -1,5 +1,5 @@
 //
-//  UserDefaults+vpnLegacyUser.swift
+//  AnimationConstants.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,23 +18,6 @@
 
 import Foundation
 
-extension UserDefaults {
-    static var vpnLegacyUserAccessDisabledOnceKey: String {
-        "vpnLegacyUserAccessDisabledOnce"
-    }
-
-    @objc
-    dynamic var vpnLegacyUserAccessDisabledOnce: Bool {
-        get {
-            bool(forKey: Self.vpnLegacyUserAccessDisabledOnceKey)
-        }
-
-        set {
-            set(newValue, forKey: Self.vpnLegacyUserAccessDisabledOnceKey)
-        }
-    }
-
-    func resetVPNLegacyUserAccessDisabledOnce() {
-        removeObject(forKey: Self.vpnLegacyUserAccessDisabledOnceKey)
-    }
+struct AnimationConstants {
+    static let highlightAnimationStepSpeed = 0.05
 }

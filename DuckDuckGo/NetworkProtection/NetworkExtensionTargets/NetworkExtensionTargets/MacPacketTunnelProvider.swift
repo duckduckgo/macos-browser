@@ -110,8 +110,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionWireguardErrorFailedDNSResolution
             case .wireGuardSetNetworkSettings(let error):
                 domainEvent = .networkProtectionWireguardErrorCannotSetNetworkSettings(error)
-            case .startWireGuardBackend(let code):
-                domainEvent = .networkProtectionWireguardErrorCannotStartWireguardBackend(code: code)
+            case .startWireGuardBackend(let error):
+                domainEvent = .networkProtectionWireguardErrorCannotStartWireguardBackend(error)
+            case .setWireguardConfig(let error):
+                domainEvent = .networkProtectionWireguardErrorCannotSetWireguardConfig(error)
             case .noAuthTokenFound:
                 domainEvent = .networkProtectionNoAuthTokenFoundError
             case .failedToFetchServerStatus(let error):
@@ -458,6 +460,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,
                    controllerErrorStore: controllerErrorStore,
+                   snoozeTimingStore: NetworkProtectionSnoozeTimingStore(userDefaults: .netP),
                    keychainType: Bundle.keychainType,
                    tokenStore: tokenStore,
                    debugEvents: debugEvents,

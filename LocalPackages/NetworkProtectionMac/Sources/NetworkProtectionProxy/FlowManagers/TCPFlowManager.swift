@@ -18,7 +18,7 @@
 
 import Foundation
 import NetworkExtension
-import OSLog // swiftlint:disable:this enforce_os_log_wrapper
+import os.log
 
 /// A private global actor to handle UDP flows management
 ///
@@ -30,20 +30,35 @@ struct TCPFlowActor {
 }
 
 @TCPFlowActor
-enum RemoteConnectionError: Error {
+enum RemoteConnectionError: CustomNSError {
     case complete
     case cancelled
     case couldNotEstablishConnection(_ error: Error)
     case unhandledError(_ error: Error)
+
+    nonisolated
+    var errorUserInfo: [String: Any] {
+        switch self {
+        case .complete,
+                .cancelled:
+            return [:]
+        case .couldNotEstablishConnection(let error),
+                .unhandledError(let error):
+            return [NSUnderlyingErrorKey: error as NSError]
+
+        }
+    }
 }
 
 final class TCPFlowManager {
     private let flow: NEAppProxyTCPFlow
     private var connectionTask: Task<Void, Error>?
     private var connection: NWConnection?
+    private let logger: Logger
 
-    init(flow: NEAppProxyTCPFlow) {
+    init(flow: NEAppProxyTCPFlow, logger: Logger) {
         self.flow = flow
+        self.logger = logger
     }
 
     deinit {
@@ -67,10 +82,13 @@ final class TCPFlowManager {
         do {
             try await startDataCopyLoop(for: remoteConnection)
 
+            logger.log("🔴 Stopping proxy connection to \(remoteEndpoint, privacy: .public)")
             remoteConnection.cancel()
             flow.closeReadWithError(nil)
             flow.closeWriteWithError(nil)
         } catch {
+            logger.log("🔴 Stopping proxy connection to \(remoteEndpoint, privacy: .public) with error \(String(reflecting: error), privacy: .public)")
+
             remoteConnection.cancel()
             flow.closeReadWithError(error)
             flow.closeWriteWithError(error)

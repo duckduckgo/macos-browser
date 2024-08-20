@@ -40,9 +40,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedPreferences(_ menu: NSMenu)
     func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu)
     func optionsButtonMenuRequestedAccessibilityPreferences(_ menu: NSMenu)
-#if DBP
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
-#endif
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu)
     func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu)
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu)
@@ -149,11 +147,9 @@ final class MoreOptionsMenu: NSMenu {
         addItem(preferencesItem)
     }
 
-#if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
     }
-#endif // DBP
 
     @objc func showNetworkProtectionStatus(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedNetworkProtectionPopover(self)
@@ -855,8 +851,6 @@ final class SubscriptionSubMenu: NSMenu, NSMenuDelegate {
                 self.networkProtectionItem.isEnabled = isNetworkProtectionItemEnabled
                 self.dataBrokerProtectionItem.isEnabled = isDataBrokerProtectionItemEnabled
                 self.identityTheftRestorationItem.isEnabled = isIdentityTheftRestorationItemEnabled
-
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
             }
         }
     }

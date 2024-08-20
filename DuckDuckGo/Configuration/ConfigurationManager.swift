@@ -68,7 +68,6 @@ final class ConfigurationManager {
     private var lastRefreshCheckTime: Date = Date()
 
     private lazy var fetcher = ConfigurationFetcher(store: ConfigurationStore.shared,
-                                                    log: .config,
                                                     eventMapping: Self.configurationDebugEvents)
 
     static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in

@@ -139,6 +139,10 @@ final class DuckPlayer {
         preferences.youtubeOverlayInteracted
     }
 
+    var shouldDisplayPreferencesSideBar: Bool {
+        isAvailable || preferences.shouldDisplayContingencyMessage
+    }
+
     init(
         preferences: DuckPlayerPreferences = .shared,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager
@@ -244,10 +248,10 @@ final class DuckPlayer {
 
         var isAutoplayEnabled = DuckPlayerPreferences.shared.duckPlayerAutoplay
 
-        /// If the feature flag is disabled, we want to turn autoPlay to true since this was the default
+        /// If the feature flag is disabled, we want to turn autoPlay to false
         /// https://app.asana.com/0/1204167627774280/1207906550241281/f
         if !isAutoplayFeatureEnabled {
-            isAutoplayEnabled = true
+            isAutoplayEnabled = false
         }
 
         // Disable WebView PiP if if the subFeature is off
@@ -258,7 +262,7 @@ final class DuckPlayer {
 
         let pip = InitialPlayerSettings.PIP(state: isPiPEnabled ? .enabled : .disabled)
         let autoplay = InitialPlayerSettings.Autoplay(state: isAutoplayEnabled ? .enabled : .disabled)
-        let platform = InitialPlayerSettings.Platform(name: "ios")
+        let platform = InitialPlayerSettings.Platform(name: "macos")
         let environment = InitialPlayerSettings.Environment.development
         let locale = InitialPlayerSettings.Locale.en
         let playerSettings = InitialPlayerSettings.PlayerSettings(pip: pip, autoplay: autoplay)

@@ -21,22 +21,3 @@ import Foundation
 protocol WaitlistFeatureSetupHandler {
     func confirmFeature()
 }
-
-struct NetworkProtectionWaitlistFeatureSetupHandler: WaitlistFeatureSetupHandler {
-    func confirmFeature() {
-        LocalPinningManager.shared.pin(.networkProtection)
-        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-    }
-}
-
-#if DBP
-
-struct DataBrokerProtectionWaitlistFeatureSetupHandler: WaitlistFeatureSetupHandler {
-    func confirmFeature() {
-        NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
-        NotificationCenter.default.post(name: .dataBrokerProtectionUserPressedOnGetStartedOnWaitlist, object: nil)
-        UserDefaults().setValue(false, forKey: UserDefaultsWrapper<Bool>.Key.shouldShowDBPWaitlistInvitedCardUI.rawValue)
-    }
-}
-
-#endif
