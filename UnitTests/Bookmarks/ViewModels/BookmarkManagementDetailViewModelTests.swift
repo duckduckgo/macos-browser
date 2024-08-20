@@ -134,8 +134,8 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
     func testWhenNoSearchAndFolderSelection_thenTotalRowsReturnFolderAndChildrenCount() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
-        let children = [Bookmark(id: "4", url: "www.test4.com", title: "Bookmark #4", isFavorite: false),
-                        Bookmark(id: "5", url: "www.test5.com", title: "Bookmark #5", isFavorite: false)]
+        let children = [Bookmark(id: "4", url: "https://www.test4.com", title: "Bookmark #4", isFavorite: false),
+                        Bookmark(id: "5", url: "https://www.test5.com", title: "Bookmark #5", isFavorite: false)]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
 
@@ -148,8 +148,8 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
     func testWhenSearchAndFolderSelection_thenTotalRowsReturnFolderAndChildrenSearchCount() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
-        let children = [Bookmark(id: "4", url: "www.test4.com", title: "Bookmark #4", isFavorite: false),
-                        Bookmark(id: "5", url: "www.test5.com", title: "Bookmark #5", isFavorite: false)]
+        let children = [Bookmark(id: "4", url: "https://www.test4.com", title: "Bookmark #4", isFavorite: false),
+                        Bookmark(id: "5", url: "https://www.test5.com", title: "Bookmark #5", isFavorite: false)]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
         bookmarkManager.bookmarksReturnedForSearch = folder.children
@@ -163,8 +163,8 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
     func testWhenNoSearchAndFolderSelection_thenIndexIsCorrect() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
-        let bookmarkFour = Bookmark(id: "4", url: "www.test4.com", title: "Bookmark #4", isFavorite: false)
-        let bookmarkFive = Bookmark(id: "5", url: "www.test5.com", title: "Bookmark #5", isFavorite: false)
+        let bookmarkFour = Bookmark(id: "4", url: "https://www.test4.com", title: "Bookmark #4", isFavorite: false)
+        let bookmarkFive = Bookmark(id: "5", url: "https://www.test5.com", title: "Bookmark #5", isFavorite: false)
         let children = [bookmarkFour, bookmarkFive]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
@@ -181,8 +181,8 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
     func testWhenSearchAndFolderSelection_thenIndexIsCorrect() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
-        let bookmarkFour = Bookmark(id: "4", url: "www.test4.com", title: "Bookmark #4", isFavorite: false)
-        let bookmarkFive = Bookmark(id: "5", url: "www.test5.com", title: "Bookmark #5", isFavorite: false)
+        let bookmarkFour = Bookmark(id: "4", url: "https://www.test4.com", title: "Bookmark #4", isFavorite: false)
+        let bookmarkFive = Bookmark(id: "5", url: "https://www.test5.com", title: "Bookmark #5", isFavorite: false)
         let children = [bookmarkFour, bookmarkFive]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
@@ -200,8 +200,8 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
     func testWhenNoSearchAndFolderSelection_thenFetchEntityIsCorrect() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
-        let bookmarkFour = Bookmark(id: "4", url: "www.test4.com", title: "Bookmark #4", isFavorite: false)
-        let bookmarkFive = Bookmark(id: "5", url: "www.test5.com", title: "Bookmark #5", isFavorite: false)
+        let bookmarkFour = Bookmark(id: "4", url: "https://www.test4.com", title: "Bookmark #4", isFavorite: false)
+        let bookmarkFive = Bookmark(id: "5", url: "https://www.test5.com", title: "Bookmark #5", isFavorite: false)
         let children = [bookmarkFour, bookmarkFive]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
@@ -216,8 +216,8 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
     func testWhenSearchAndFolderSelection_thenFetchEntityIsCorrect() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
-        let bookmarkFour = Bookmark(id: "4", url: "www.test4.com", title: "Bookmark #4", isFavorite: false)
-        let bookmarkFive = Bookmark(id: "5", url: "www.test5.com", title: "Bookmark #5", isFavorite: false)
+        let bookmarkFour = Bookmark(id: "4", url: "https://www.test4.com", title: "Bookmark #4", isFavorite: false)
+        let bookmarkFive = Bookmark(id: "5", url: "https://www.test5.com", title: "Bookmark #5", isFavorite: false)
         let children = [bookmarkFour, bookmarkFive]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
@@ -233,8 +233,8 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
     func testWhenNoSearchAndFolderSelection_thenFetchEntityAndParentIsCorrect() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
-        let bookmarkFour = Bookmark(id: "4", url: "www.test4.com", title: "Bookmark #4", isFavorite: false)
-        let bookmarkFive = Bookmark(id: "5", url: "www.test5.com", title: "Bookmark #5", isFavorite: false)
+        let bookmarkFour = Bookmark(id: "4", url: "https://www.test4.com", title: "Bookmark #4", isFavorite: false)
+        let bookmarkFive = Bookmark(id: "5", url: "https://www.test5.com", title: "Bookmark #5", isFavorite: false)
         let children = [bookmarkFour, bookmarkFive]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
@@ -252,8 +252,8 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
     func testWhenSearchAndFolderSelection_thenFetchEntityAndParentIsCorrect() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
-        let bookmarkFour = Bookmark(id: "4", url: "www.test4.com", title: "Bookmark #4", isFavorite: false)
-        let bookmarkFive = Bookmark(id: "5", url: "www.test5.com", title: "Bookmark #5", isFavorite: false)
+        let bookmarkFour = Bookmark(id: "4", url: "https://www.test4.com", title: "Bookmark #4", isFavorite: false)
+        let bookmarkFive = Bookmark(id: "5", url: "https://www.test5.com", title: "Bookmark #5", isFavorite: false)
         let children = [bookmarkFour, bookmarkFive]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
@@ -419,12 +419,16 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
     func testWhenSearchQueryIsNotBlankAndProposedDestinationIsRoot_thenWeDoNotAllowDrop() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
+        let dragDropManager = BookmarkDragDropManager(bookmarkManager: bookmarkManager)
+        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: dragDropManager)
+        let sut = viewController.managementDetailViewModel
         bookmarkManager.bookmarksReturnedForSearch = [bookmarkOne, bookmarkTwo, bookmarkThree]
         sut.update(selection: .empty, searchQuery: "some")
 
         // We pick a row where the result is nil
-        let result = sut.validateDrop(pasteboardItems: nil, proposedRow: 3, proposedDropOperation: .above)
+        let pasteboard = NSPasteboard.test()
+        pasteboard.clearContents()
+        let result = viewController.tableView(NSTableView(), validateDrop: MockDraggingInfo(draggingPasteboard: pasteboard), proposedRow: 3, proposedDropOperation: .above)
 
         XCTAssertEqual(result, .none)
     }
@@ -432,46 +436,58 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
     func testWhenSearchQueryIsBlankAndProposedDestinationIsRoot_thenWeAllowDrop() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
+        let dragDropManager = BookmarkDragDropManager(bookmarkManager: bookmarkManager)
+        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: dragDropManager)
+        let sut = viewController.managementDetailViewModel
         sut.update(selection: .empty, searchQuery: "")
 
         // We pick a row where the result is nil
-        let result = sut.validateDrop(pasteboardItems: nil, proposedRow: 3, proposedDropOperation: .above)
+        let pasteboard = NSPasteboard.test()
+        pasteboard.clearContents()
+        let result = viewController.tableView(NSTableView(), validateDrop: MockDraggingInfo(draggingPasteboard: pasteboard), proposedRow: 3, proposedDropOperation: .above)
 
-        XCTAssertEqual(result, .move)
+        XCTAssertEqual(result, .none)
     }
 
     func testWhenDraggingBookmarkToFolderInSearch_thenWeAllowDrop() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
-        let bookmarkFour = Bookmark(id: "4", url: "www.test4.com", title: "Bookmark #4", isFavorite: false)
-        let bookmarkFive = Bookmark(id: "5", url: "www.test5.com", title: "Bookmark #5", isFavorite: false)
+        let bookmarkFour = Bookmark(id: "4", url: "https://www.test4.com", title: "Bookmark #4", isFavorite: false)
+        let bookmarkFive = Bookmark(id: "5", url: "https://www.test5.com", title: "Bookmark #5", isFavorite: false)
         let children = [bookmarkFour, bookmarkFive]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
+        let dragDropManager = BookmarkDragDropManager(bookmarkManager: bookmarkManager)
+        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: dragDropManager)
+        let sut = viewController.managementDetailViewModel
         bookmarkManager.bookmarksReturnedForSearch = [folder]
         sut.update(selection: .empty, searchQuery: "some")
-        let pasteboardItems = createPasteboardItems(for: bookmarkOne)
+        let pasteboard = NSPasteboard.test()
+        pasteboard.writeObjects([bookmarkOne.pasteboardWriter])
+        let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
 
         // Zero is the position of the folder returned in the search
-        let result = sut.validateDrop(pasteboardItems: pasteboardItems, proposedRow: 0, proposedDropOperation: .on)
+        let result = viewController.tableView(NSTableView(), validateDrop: draggingInfo, proposedRow: 0, proposedDropOperation: .on)
 
         XCTAssertEqual(result, .move)
     }
 
     func testWhenDraggingBookmarkToFolderWhenNotSearching_thenWeAllowDrop() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
-        let bookmarkFour = Bookmark(id: "4", url: "www.test4.com", title: "Bookmark #4", isFavorite: false)
-        let bookmarkFive = Bookmark(id: "5", url: "www.test5.com", title: "Bookmark #5", isFavorite: false)
+        let bookmarkFour = Bookmark(id: "4", url: "https://www.test4.com", title: "Bookmark #4", isFavorite: false)
+        let bookmarkFive = Bookmark(id: "5", url: "https://www.test5.com", title: "Bookmark #5", isFavorite: false)
         let children = [bookmarkFour, bookmarkFive]
         let folder = createFolder(with: children)
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree, folder])
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
+        let dragDropManager = BookmarkDragDropManager(bookmarkManager: bookmarkManager)
+        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: dragDropManager)
+        let sut = viewController.managementDetailViewModel
         sut.update(selection: .empty, searchQuery: "")
-        let pasteboardItems = createPasteboardItems(for: bookmarkOne)
+        let pasteboard = NSPasteboard.test()
+        pasteboard.writeObjects([bookmarkOne.pasteboardWriter])
+        let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
 
         // Three is the position of the folder
-        let result = sut.validateDrop(pasteboardItems: pasteboardItems, proposedRow: 3, proposedDropOperation: .on)
+        let result = viewController.tableView(NSTableView(), validateDrop: draggingInfo, proposedRow: 3, proposedDropOperation: .on)
 
         XCTAssertEqual(result, .move)
     }
@@ -479,12 +495,16 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
     func testWhenDraggingBookmarkToBookmark_thenWeDoNotAllowDrop() {
         let (bookmarkOne, bookmarkTwo, bookmarkThree) = createBookmarks()
         let bookmarkManager = createBookmarkManager(with: [bookmarkOne, bookmarkTwo, bookmarkThree])
-        let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
+        let dragDropManager = BookmarkDragDropManager(bookmarkManager: bookmarkManager)
+        let viewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager, dragDropManager: dragDropManager)
+        let sut = viewController.managementDetailViewModel
         sut.update(selection: .empty, searchQuery: "")
-        let pasteboardItems = createPasteboardItems(for: bookmarkOne)
+        let pasteboard = NSPasteboard.test()
+        pasteboard.writeObjects([bookmarkOne.pasteboardWriter])
+        let draggingInfo = MockDraggingInfo(draggingPasteboard: pasteboard)
 
         // We try to move bookmarkOne on bookmarkTwo
-        let result = sut.validateDrop(pasteboardItems: pasteboardItems, proposedRow: 1, proposedDropOperation: .on)
+        let result = viewController.tableView(NSTableView(), validateDrop: draggingInfo, proposedRow: 1, proposedDropOperation: .on)
 
         XCTAssertEqual(result, .none)
     }
@@ -611,14 +631,6 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
 
     // MARK: - Helper functions
 
-    private func createPasteboardItems(for bookmark: Bookmark) -> [NSPasteboardItem] {
-        let pastedBookmark = BookmarkPasteboardWriter(bookmark: bookmark)
-        let pasteboardWritedType = BookmarkPasteboardWriter.bookmarkUTIInternalType
-        let propertyList = pastedBookmark.pasteboardPropertyList(forType: pasteboardWritedType)!
-
-        return [NSPasteboardItem(pasteboardPropertyList: propertyList, ofType: pasteboardWritedType)!]
-    }
-
     private func createBookmarkManager(with bookmarks: [BaseBookmarkEntity], favorites: [BaseBookmarkEntity] = []) -> MockBookmarkManager {
         let bookmarkManager = MockBookmarkManager()
         bookmarkManager.list = BookmarkList(entities: bookmarks, topLevelEntities: bookmarks, favorites: favorites)
@@ -626,9 +638,9 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
     }
 
     private func createBookmarks() -> (Bookmark, Bookmark, Bookmark) {
-        let bookmarkOne = Bookmark(id: "1", url: "www.test1.com", title: "Bookmark #1", isFavorite: false)
-        let bookmarkTwo = Bookmark(id: "2", url: "www.test2.com", title: "Bookmark #2", isFavorite: true)
-        let bookmarkThree = Bookmark(id: "3", url: "www.test3.com", title: "Bookmark #3", isFavorite: false)
+        let bookmarkOne = Bookmark(id: "1", url: "https://www.test1.com", title: "Bookmark #1", isFavorite: false)
+        let bookmarkTwo = Bookmark(id: "2", url: "https://www.test2.com", title: "Bookmark #2", isFavorite: true)
+        let bookmarkThree = Bookmark(id: "3", url: "https://www.test3.com", title: "Bookmark #3", isFavorite: false)
         return (bookmarkOne, bookmarkTwo, bookmarkThree)
     }
 
