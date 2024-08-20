@@ -31,12 +31,18 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
     init(
         bookmarksDatabase: CoreDataDatabase,
         appearancePreferences: AppearancePreferences,
+        startupPreferencesPersistor: @escaping @autoclosure () -> StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(),
+        duckPlayerPreferencesPersistor: @escaping @autoclosure () -> DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor(),
+        pinnedTabsManager: PinnedTabsManager,
         internalUserDecider: InternalUserDecider,
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
         variantManager: VariantManager = DefaultVariantManager()
     ) {
         self.bookmarksDatabase = bookmarksDatabase
         self.appearancePreferences = appearancePreferences
+        self.startupPreferencesPersistor = startupPreferencesPersistor
+        self.duckPlayerPreferencesPersistor = duckPlayerPreferencesPersistor
+        self.pinnedTabsManager = pinnedTabsManager
         self.internalUserDecider = internalUserDecider
         self.statisticsStore = statisticsStore
         self.variantManager = variantManager
@@ -44,6 +50,9 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
 
     let bookmarksDatabase: CoreDataDatabase
     let appearancePreferences: AppearancePreferences
+    let startupPreferencesPersistor: () -> StartupPreferencesPersistor
+    let duckPlayerPreferencesPersistor: () -> DuckPlayerPreferencesPersistor
+    let pinnedTabsManager: PinnedTabsManager
     let internalUserDecider: InternalUserDecider
     let statisticsStore: StatisticsStore
     let variantManager: VariantManager
@@ -115,11 +124,23 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
         }
 
         let dismissedMessageIds = store.fetchDismissedRemoteMessageIDs()
+        let shownMessageIds = store.fetchShownRemoteMessageIDs()
+
+#if APPSTORE
+        let isInstalledMacAppStore = true
+#else
+        let isInstalledMacAppStore = false
+#endif
+
+        let duckPlayerPreferencesPersistor = duckPlayerPreferencesPersistor()
+
+        let deprecatedRemoteMessageStorage = DefaultSurveyRemoteMessagingStorage.surveys()
 
         return RemoteMessagingConfigMatcher(
             appAttributeMatcher: AppAttributeMatcher(statisticsStore: statisticsStore,
                                                      variantManager: variantManager,
-                                                     isInternalUser: internalUserDecider.isInternalUser),
+                                                     isInternalUser: internalUserDecider.isInternalUser,
+                                                     isInstalledMacAppStore: isInstalledMacAppStore),
             userAttributeMatcher: UserAttributeMatcher(statisticsStore: statisticsStore,
                                                        variantManager: variantManager,
                                                        bookmarksCount: bookmarksCount,
@@ -134,7 +155,14 @@ final class RemoteMessagingConfigMatcherProvider: RemoteMessagingConfigMatcherPr
                                                        isPrivacyProSubscriptionActive: isPrivacyProSubscriptionActive,
                                                        isPrivacyProSubscriptionExpiring: isPrivacyProSubscriptionExpiring,
                                                        isPrivacyProSubscriptionExpired: isPrivacyProSubscriptionExpired,
-                                                       dismissedMessageIds: dismissedMessageIds),
+                                                       dismissedMessageIds: dismissedMessageIds,
+                                                       shownMessageIds: shownMessageIds,
+                                                       pinnedTabsCount: pinnedTabsManager.tabCollection.tabs.count,
+                                                       hasCustomHomePage: startupPreferencesPersistor().launchToCustomHomePage,
+                                                       isDuckPlayerOnboarded: duckPlayerPreferencesPersistor.youtubeOverlayAnyButtonPressed,
+                                                       isDuckPlayerEnabled: duckPlayerPreferencesPersistor.duckPlayerModeBool != false,
+                                                       dismissedDeprecatedMacRemoteMessageIds: deprecatedRemoteMessageStorage.dismissedMessageIDs()
+                                                      ),
             percentileStore: RemoteMessagingPercentileUserDefaultsStore(keyValueStore: UserDefaults.standard),
             surveyActionMapper: surveyActionMapper,
             dismissedMessageIds: dismissedMessageIds

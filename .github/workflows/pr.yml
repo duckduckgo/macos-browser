@@ -58,7 +58,7 @@ jobs:
 
     name: Test Shell Scripts
 
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
     - name: Check out the code
@@ -88,6 +88,7 @@ jobs:
     name: Test
 
     strategy:
+      fail-fast: false
       matrix:
         flavor: [ "Sandbox", "Non-Sandbox" ]
         include:
@@ -108,7 +109,7 @@ jobs:
           - cache-key: sandbox-
             flavor: Sandbox
 
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
     timeout-minutes: 30
 
     outputs:
@@ -223,10 +224,12 @@ jobs:
       run: |
         # Extract failed tests from the junit report
         # Only keep failures unique by classname and name (column 1 and 2 of the yq output)
-        yq < ${{ matrix.flavor }}.xml -p xml -o json -r \
-          $'[.testsuites.testsuite[].testcase] | flatten | map(select(.failure) | .+@classname + " " + .+@name + " \'" + .failure.+@message + "\' ${{ env.WORKFLOW_URL }}") | .[]' \
-          | sort -u -k 1,2 \
-          | xargs -L 1 ./scripts/report-failed-unit-test.sh
+        for file in "${{ matrix.flavor }}-unittests.xml" "${{ matrix.flavor }}-integrationtests.xml"; do
+          yq < "$file" -p xml -o json -r \
+            $'[.testsuites.testsuite[].testcase] | flatten | map(select(.failure) | .+@classname + " " + .+@name + " \'" + .failure.+@message + "\' ${{ env.WORKFLOW_URL }}") | .[]' \
+            | sort -u -k 1,2 \
+            | xargs -L 1 ./scripts/report-failed-unit-test.sh
+        done
 
     - name: Upload failed unit tests log
       uses: actions/upload-artifact@v4
@@ -286,7 +289,7 @@ jobs:
     # workflow_call is used by bump_internal_release and is followed by a proper release job
     if: github.actor != 'dependabot[bot]' && (github.event_name == 'push' || github.event_name == 'pull_request')
 
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
     timeout-minutes: 30
 
     steps:

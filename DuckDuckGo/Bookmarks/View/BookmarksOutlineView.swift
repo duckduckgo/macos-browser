@@ -69,4 +69,46 @@ final class BookmarksOutlineView: NSOutlineView {
         lastRow = rowView
     }
 
+    func scrollTo(_ item: Any, code: ((Int) -> Void)? = nil) {
+        let rowIndex = row(forItem: item)
+
+        if rowIndex != -1 {
+            scrollRowToVisible(rowIndex)
+            code?(rowIndex)
+        }
+    }
+
+    /// Scrolls to the passed node and tries to position it in the second row.
+    func scrollToAdjustedPositionInOutlineView(_ item: Any) {
+        scrollTo(item) { rowIndex in
+            if let enclosingScrollView = self.enclosingScrollView {
+                let rowRect = self.rect(ofRow: rowIndex)
+                let desiredTopPosition = rowRect.origin.y - self.rowHeight // Adjusted position one row height from the top.
+                let scrollPoint = NSPoint(x: 0, y: desiredTopPosition - enclosingScrollView.contentInsets.top)
+                enclosingScrollView.contentView.scroll(to: scrollPoint)
+            }
+        }
+    }
+
+    func highlight(_ item: Any) {
+        let row = row(forItem: item)
+        guard let rowView = rowView(atRow: row, makeIfNecessary: false) as? RoundedSelectionRowView else { return }
+
+        rowView.highlight = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            rowView.highlight = false
+        }
+    }
+
+    func isItemVisible(_ item: Any) -> Bool {
+        let rowIndex = self.row(forItem: item)
+
+        if rowIndex == -1 {
+            return false
+        }
+
+        let visibleRowsRange = self.rows(in: self.visibleRect)
+        return visibleRowsRange.contains(rowIndex)
+    }
 }

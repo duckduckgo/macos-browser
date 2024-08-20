@@ -18,6 +18,7 @@
 
 import AppKit
 import Foundation
+import AppKitExtensions
 
 extension UserDefaults {
     /// The app group's shared UserDefaults
@@ -77,6 +78,7 @@ public struct UserDefaultsWrapper<T> {
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
         case youtubeOverlayButtonsUsed = "preferences.youtube-overlay-user-used-buttons"
         case duckPlayerAutoplay = "preferences.duckplayer.autoplay"
+        case duckPlayerOpenInNewTab = "preferences.duckplayer.open-new-tab"
 
         case selectedPasswordManager = "preferences.autofill.selected-password-manager"
 
@@ -89,6 +91,7 @@ public struct UserDefaultsWrapper<T> {
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
         case lastCrashReportCheckDate = "last.crash.report.check.date"
+        case didCrashDuringCrashHandlersSetUp = "browser.didCrashDuringCrashHandlersSetUp"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
         case appTerminationHandledCorrectly = "app.termination.handled.correctly"
@@ -171,8 +174,6 @@ public struct UserDefaultsWrapper<T> {
         // VPN
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
-        case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
-        case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
         // VPN: Shared Defaults
         // ---
@@ -180,8 +181,9 @@ public struct UserDefaultsWrapper<T> {
         // or else KVO will just not work as of 2023-08-07
 
         case networkProtectionOnboardingStatusRawValue = "networkProtectionOnboardingStatusRawValue"
-        case networkProtectionWaitlistActiveOverrideRawValue = "networkProtectionWaitlistActiveOverrideRawValue"
-        case networkProtectionWaitlistEnabledOverrideRawValue = "networkProtectionWaitlistEnabledOverrideRawValue"
+
+        // Updates
+        case automaticUpdates = "updates.automatic"
 
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"
@@ -189,6 +191,10 @@ public struct UserDefaultsWrapper<T> {
         case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
         case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
         case campaignVariant = "campaign.variant"
+
+        // Updates
+        case previousAppVersion = "previous.app.version"
+        case previousBuild = "previous.build"
 
         // Sync
 
@@ -214,7 +220,6 @@ public struct UserDefaultsWrapper<T> {
 
         // Subscription
 
-        case subscriptionInternalTesting = "subscription.internal-testing-enabled"
         case subscriptionEnvironment = "subscription.environment"
     }
 

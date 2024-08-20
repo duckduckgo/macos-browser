@@ -33,6 +33,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
     private lazy var trackingArea: NSTrackingArea = {
         NSTrackingArea(rect: .zero, options: [.inVisibleRect, .activeAlways, .mouseEnteredAndExited], owner: self, userInfo: nil)
     }()
+    private var leadingConstraint = NSLayoutConstraint()
 
     var shouldShowMenuButton = false
 
@@ -117,10 +118,12 @@ final class BookmarkOutlineCellView: NSTableCellView {
     }
 
     private func setupLayout() {
+        leadingConstraint = faviconImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5)
+
         NSLayoutConstraint.activate([
             faviconImageView.heightAnchor.constraint(equalToConstant: 16),
             faviconImageView.widthAnchor.constraint(equalToConstant: 16),
-            faviconImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5),
+            leadingConstraint,
             faviconImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
 
             titleLabel.leadingAnchor.constraint(equalTo: faviconImageView.trailingAnchor, constant: 10),
@@ -132,7 +135,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
             trailingAnchor.constraint(equalTo: countLabel.trailingAnchor),
 
             menuButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
-           menuButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 5),
+            menuButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 5),
             menuButton.trailingAnchor.constraint(equalTo: trailingAnchor),
             menuButton.topAnchor.constraint(equalTo: topAnchor),
             menuButton.bottomAnchor.constraint(equalTo: bottomAnchor),
@@ -162,14 +165,15 @@ final class BookmarkOutlineCellView: NSTableCellView {
 
     // MARK: - Public
 
-    func update(from bookmark: Bookmark) {
+    func update(from bookmark: Bookmark, isSearch: Bool = false) {
         faviconImageView.image = bookmark.favicon(.small) ?? .bookmarkDefaultFavicon
         titleLabel.stringValue = bookmark.title
         countLabel.stringValue = ""
         favoriteImageView.image = bookmark.isFavorite ? .favoriteFilledBorder : nil
+        updateConstraints(isSearch: isSearch)
     }
 
-    func update(from folder: BookmarkFolder) {
+    func update(from folder: BookmarkFolder, isSearch: Bool = false) {
         faviconImageView.image = .folder
         titleLabel.stringValue = folder.title
         favoriteImageView.image = nil
@@ -180,6 +184,12 @@ final class BookmarkOutlineCellView: NSTableCellView {
         } else {
             countLabel.stringValue = ""
         }
+
+        updateConstraints(isSearch: isSearch)
+    }
+
+    private func updateConstraints(isSearch: Bool) {
+        leadingConstraint.constant = isSearch ? -8 : 5
     }
 
     func update(from pseudoFolder: PseudoFolder) {

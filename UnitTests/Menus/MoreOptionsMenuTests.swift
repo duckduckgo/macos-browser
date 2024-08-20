@@ -154,7 +154,8 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertEqual(moreOptionsMenu.items[14].title, UserText.subscriptionOptionsMenuItem)
         XCTAssertFalse(moreOptionsMenu.items[14].hasSubmenu)
         XCTAssertTrue(moreOptionsMenu.items[15].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.settings)
+        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.mainMenuHelp)
+        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.settings)
     }
 
     @MainActor
@@ -189,7 +190,8 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertEqual(moreOptionsMenu.items[14].submenu?.items[4].title, UserText.subscriptionSettingsOptionsMenuItem)
 
         XCTAssertTrue(moreOptionsMenu.items[15].isSeparatorItem)
-        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.settings)
+        XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.mainMenuHelp)
+        XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.settings)
     }
 
     // MARK: Zoom
@@ -267,10 +269,6 @@ final class NetworkProtectionVisibilityMock: VPNFeatureGatekeeper {
 
     func disableForAllUsers() async {
         // intentional no-op
-    }
-
-    var isEligibleForThankYouMessage: Bool {
-        false
     }
 
     func disableIfUserHasNoAccess() async {

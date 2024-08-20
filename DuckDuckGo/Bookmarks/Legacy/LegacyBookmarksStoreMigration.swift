@@ -66,7 +66,7 @@ public class LegacyBookmarksStoreMigration {
         _ = LegacyBookmarkStore(context: source)
 
         // Prepare destination
-        BookmarkUtils.prepareLegacyFoldersStructure(in: destination)
+        try? BookmarkUtils.prepareLegacyFoldersStructure(in: destination)
 
         guard let newRoot = BookmarkUtils.fetchRootFolder(destination),
               let newFavoritesRoot = BookmarkUtils.fetchLegacyFavoritesFolder(destination) else {
@@ -163,7 +163,7 @@ public class LegacyBookmarksStoreMigration {
         } catch {
             destination.reset()
 
-            BookmarkUtils.prepareLegacyFoldersStructure(in: destination)
+            try? BookmarkUtils.prepareLegacyFoldersStructure(in: destination)
             do {
                 try destination.save(onErrorFire: GeneralPixel.bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration)
             } catch {

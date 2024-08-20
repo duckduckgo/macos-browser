@@ -19,11 +19,12 @@
 import BrowserServicesKit
 import Cocoa
 import Common
-import WebKit
 import Configuration
+import Crashes
 import History
 import PixelKit
 import Subscription
+import WebKit
 
 // Actions are sent to objects of responder chain
 
@@ -33,9 +34,18 @@ extension AppDelegate {
 
     // MARK: - DuckDuckGo
 
+    @MainActor
     @objc func checkForUpdates(_ sender: Any?) {
 #if SPARKLE
-        updateController.checkForUpdates(sender)
+        if !SupportedOSChecker.isCurrentOSReceivingUpdates {
+            // Show not supported info
+            if NSAlert.osNotSupported().runModal() != .cancel {
+                let url = Preferences.UnsupportedDeviceInfoBox.softwareUpdateURL
+                NSWorkspace.shared.open(url)
+            }
+        }
+
+        showAbout(sender)
 #endif
     }
 
@@ -134,6 +144,21 @@ extension AppDelegate {
     }
 
     // MARK: - Help
+
+    @MainActor
+    @objc func showAbout(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .settings(pane: .about))
+    }
+
+    @MainActor
+    @objc func showReleaseNotes(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .releaseNotes)
+    }
+
+    @MainActor
+    @objc func showWhatIsNew(_ sender: Any?) {
+        WindowControllersManager.shared.showTab(with: .url(.updates, source: .appOpenUrl))
+    }
 
     #if FEEDBACK
 
@@ -295,6 +320,9 @@ extension AppDelegate {
         }
     }
 
+    @objc func resetRemoteMessages(_ sender: Any?) {
+        remoteMessagingClient.store?.resetRemoteMessages()
+    }
 }
 
 extension MainViewController {
@@ -719,6 +747,16 @@ extension MainViewController {
         fatalError("Fatal error triggered from the Debug menu")
     }
 
+    @objc func crashOnException(_ sender: Any?) {
+        DispatchQueue.main.async {
+            self.navigationBarViewController.addressBarViewController?.addressBarTextField.suggestionViewController.tableView.view(atColumn: 1, row: .max, makeIfNecessary: false)
+        }
+    }
+
+    @objc func crashOnCxxException(_ sender: Any?) {
+        throwTestCppExteption()
+    }
+
     @objc func resetSecureVaultData(_ sender: Any?) {
         let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
 
@@ -796,7 +834,6 @@ extension MainViewController {
     ///
     private func clearPrivacyProState() {
         Application.appDelegate.subscriptionManager.accountManager.signOut()
-        resetThankYouModalChecks(nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
     }
 
@@ -859,28 +896,6 @@ extension MainViewController {
         WindowsManager.openPopUpWindow(with: tab, origin: nil, contentSize: nil)
     }
 
-    @objc func resetThankYouModalChecks(_ sender: Any?) {
-        let presenter = WaitlistThankYouPromptPresenter()
-        presenter.resetPromptCheck()
-        UserDefaults.netP.removeObject(forKey: UserDefaults.vpnLegacyUserAccessDisabledOnceKey)
-    }
-
-    @objc func showVPNThankYouModal(_ sender: Any?) {
-        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .vpn)
-        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
-        if let thankYouWindow = thankYouWindowController.window {
-            WindowsManager.windows.first?.beginSheet(thankYouWindow)
-        }
-    }
-
-    @objc func showPIRThankYouModal(_ sender: Any?) {
-        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .dbp)
-        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
-        if let thankYouWindow = thankYouWindowController.window {
-            WindowsManager.windows.first?.beginSheet(thankYouWindow)
-        }
-    }
-
     @objc func resetEmailProtectionInContextPrompt(_ sender: Any?) {
         EmailManager().resetEmailProtectionInContextPrompt()
     }
@@ -929,11 +944,6 @@ extension MainViewController {
 
     @objc func resetConfigurationToDefault(_ sender: Any?) {
         setConfigurationUrl(nil)
-    }
-
-    @objc func resetSurveyRemoteMessages(_ sender: Any?) {
-        DefaultSurveyRemoteMessagingStorage.surveys().removeStoredAndDismissedMessages()
-        DefaultSurveyRemoteMessaging(subscriptionManager: Application.appDelegate.subscriptionManager).resetLastRefreshTimestamp()
     }
 
     // MARK: - Developer Tools

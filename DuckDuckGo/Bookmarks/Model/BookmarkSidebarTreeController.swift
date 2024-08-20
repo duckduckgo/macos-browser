@@ -20,8 +20,8 @@ import Foundation
 
 final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
 
-    func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
-        return node.isRoot ? childNodesForRootNode(node) : childNodes(for: node)
+    func treeController(childNodesFor node: BookmarkNode, sortMode: BookmarksSortMode) -> [BookmarkNode] {
+        return node.isRoot ? childNodesForRootNode(node) : childNodes(for: node, sortMode: sortMode)
     }
 
     private let bookmarkManager: BookmarkManager
@@ -40,13 +40,13 @@ final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
         return [bookmarksNode]
     }
 
-    private func childNodes(for parentNode: BookmarkNode) -> [BookmarkNode] {
+    private func childNodes(for parentNode: BookmarkNode, sortMode: BookmarksSortMode) -> [BookmarkNode] {
         if let pseudoFolder = parentNode.representedObject as? PseudoFolder, pseudoFolder == PseudoFolder.bookmarks {
-            return childNodesForBookmarksPseudoFolder(parentNode)
+            return childNodesForBookmarksPseudoFolder(parentNode, sortMode: sortMode)
         }
 
         if let folder = parentNode.representedObject as? BookmarkFolder {
-            return childNodes(for: folder, parentNode: parentNode)
+            return childNodes(for: folder, parentNode: parentNode, sortMode: sortMode)
         }
 
         return []
@@ -59,38 +59,44 @@ final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
         return node
     }
 
-    private func childNodesForBookmarksPseudoFolder(_ parent: BookmarkNode) -> [BookmarkNode] {
-        let nodes = bookmarkManager.list?.topLevelEntities.compactMap { (possibleFolder) -> BookmarkNode? in
-            guard let folder = possibleFolder as? BookmarkFolder else { return nil }
+    private func childNodesForBookmarksPseudoFolder(_ parent: BookmarkNode, sortMode: BookmarksSortMode) -> [BookmarkNode] {
+        let nodes = bookmarkManager.list?.topLevelEntities
+            .sorted(by: sortMode)
+            .compactMap { (possibleFolder) -> BookmarkNode? in
+                guard let folder = possibleFolder as? BookmarkFolder else { return nil }
 
-            let folderNode = parent.findOrCreateChildNode(with: folder)
-            folderNode.canHaveChildNodes = !folder.childFolders.isEmpty
+                let folderNode = parent.findOrCreateChildNode(with: folder)
+                folderNode.canHaveChildNodes = !folder.childFolders.isEmpty
 
-            return folderNode
-        } ?? []
+                return folderNode
+            } ?? []
 
         return nodes
     }
 
-    private func childNodes(for folder: BookmarkFolder, parentNode: BookmarkNode) -> [BookmarkNode] {
-        var children = [BookmarkFolder]()
+    private func childNodes(for folder: BookmarkFolder, parentNode: BookmarkNode, sortMode: BookmarksSortMode) -> [BookmarkNode] {
+        var children = [BaseBookmarkEntity]()
         var updatedChildNodes = [BookmarkNode]()
 
         for folder in folder.childFolders {
             children.append(folder)
         }
 
-        children.forEach { folder in
-            if let existingNode = parentNode.childNodeRepresenting(object: folder) {
-                if !updatedChildNodes.contains(existingNode) {
-                    updatedChildNodes += [existingNode]
-                    return
+        children
+            .sorted(by: sortMode)
+            .forEach { folder in
+                if let folder = folder as? BookmarkFolder {
+                    if let existingNode = parentNode.childNodeRepresenting(object: folder) {
+                        if !updatedChildNodes.contains(existingNode) {
+                            updatedChildNodes += [existingNode]
+                            return
+                        }
+                    }
+
+                    let newNode = self.createNode(with: folder, parent: parentNode)
+                    updatedChildNodes += [newNode]
                 }
             }
-
-            let newNode = self.createNode(with: folder, parent: parentNode)
-            updatedChildNodes += [newNode]
-        }
 
         return updatedChildNodes
     }

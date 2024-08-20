@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import Foundation
 import LoginItems
 import Common
@@ -46,15 +44,6 @@ struct DataBrokerProtectionAppEvents {
     }
 
     func applicationDidFinishLaunching() {
-        guard !featureGatekeeper.cleanUpDBPForPrivacyProIfNecessary() else { return }
-
-        /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
-        /// since the waitlist flag might have been turned off
-        if !featureGatekeeper.isFeatureVisible() && !featureGatekeeper.isPrivacyProEnabled() {
-            featureGatekeeper.disableAndDeleteForWaitlistUsers()
-            return
-        }
-
         let loginItemsManager = LoginItemsManager()
         let loginItemInterface = DataBrokerProtectionManager.shared.loginItemInterface
 
@@ -68,8 +57,6 @@ struct DataBrokerProtectionAppEvents {
                 // Wait to make sure the agent has had time to restart before attempting to call a method on it
                 try await Task.sleep(nanoseconds: 1_000_000_000)
                 loginItemInterface.appLaunched()
-            } else {
-                featureGatekeeper.disableAndDeleteForWaitlistUsers()
             }
         }
 
@@ -85,29 +72,6 @@ struct DataBrokerProtectionAppEvents {
                 return
             }
         }
-
-        guard !featureGatekeeper.cleanUpDBPForPrivacyProIfNecessary() else { return }
-
-        /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
-        /// since the waitlist flag might have been turned off
-        if !featureGatekeeper.isFeatureVisible() && !featureGatekeeper.isPrivacyProEnabled() {
-            featureGatekeeper.disableAndDeleteForWaitlistUsers()
-            return
-        }
-    }
-
-    @MainActor
-    func handleWaitlistInvitedNotification(source: WaitlistNotificationSource) {
-        if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
-            switch source {
-            case .cardUI:
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistCardUITapped, frequency: .dailyAndCount)
-            case .localPush:
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
-            }
-
-            DataBrokerProtectionWaitlistViewControllerPresenter.show()
-        }
     }
 
     private func restartBackgroundAgent(loginItemsManager: LoginItemsManager) {
@@ -118,5 +82,3 @@ struct DataBrokerProtectionAppEvents {
         // restartLoginItems doesn't work when we change the agent name
     }
 }
-
-#endif

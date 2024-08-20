@@ -46,6 +46,9 @@ final class UserScripts: UserScriptsProvider {
     let youtubePlayerUserScript: YoutubePlayerUserScript?
     let sslErrorPageUserScript: SSLErrorPageUserScript?
     let onboardingUserScript: OnboardingUserScript?
+#if SPARKLE
+    let releaseNotesUserScript: ReleaseNotesUserScript?
+#endif
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript()
@@ -79,6 +82,10 @@ final class UserScripts: UserScriptsProvider {
             youtubePlayerUserScript = nil
         }
 
+#if SPARKLE
+        releaseNotesUserScript = ReleaseNotesUserScript()
+#endif
+
         userScripts.append(autoconsentUserScript)
 
         contentScopeUserScriptIsolated.registerSubfeature(delegate: clickToLoadScript)
@@ -94,6 +101,11 @@ final class UserScripts: UserScriptsProvider {
             if let youtubePlayerUserScript {
                 specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
             }
+#if SPARKLE
+            if let releaseNotesUserScript {
+                specialPages.registerSubfeature(delegate: releaseNotesUserScript)
+            }
+#endif
             if let onboardingUserScript {
                 specialPages.registerSubfeature(delegate: onboardingUserScript)
             }

@@ -55,7 +55,24 @@ extension Preferences {
                 }
                 .padding(.bottom, 12)
 
-                // SECTION: Manage VPN
+                // SECTION: Excluded Sites
+
+                if model.showExcludedSites {
+                    PreferencePaneSection(UserText.vpnExcludedSitesTitle, spacing: 4) {
+                        Text(UserText.vpnExcludedDomainsDescription)
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 18)
+
+                        PreferencePaneSubSection {
+                            Button(UserText.vpnExcludedDomainsManageButtonTitle) {
+                                model.manageExcludedSites()
+                            }
+                        }
+                    }
+                    .padding(.bottom, 12)
+                }
+
+                // SECTION: General
 
                 PreferencePaneSection(UserText.vpnGeneralTitle) {
 

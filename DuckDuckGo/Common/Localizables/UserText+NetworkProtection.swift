@@ -124,6 +124,8 @@ extension UserText {
     // MARK: - Setting Titles
     // "vpn.location.title" - Location section title in VPN settings
     static let vpnLocationTitle = "Location"
+    // "vpn.excluded.sites.title" - Excluded Sites title in VPN settings
+    static let vpnExcludedSitesTitle = "Excluded Sites"
     // "vpn.general.title" - General section title in VPN settings
     static let vpnGeneralTitle = "General"
     // "vpn.shortcuts.settings.title" - Shortcuts section title in VPN settings
@@ -160,6 +162,16 @@ extension UserText {
         let message = "%d cities"
         return String(format: message, count)
     }
+
+    // MARK: - Excluded Domains
+    // "vpn.setting.excluded.domains.description" - Excluded Sites description
+    static let vpnExcludedDomainsDescription = "Websites you selected to be excluded even when the VPN is connected."
+    // "vpn.setting.excluded.domains.manage.button.title" - Excluded Sites management button title
+    static let vpnExcludedDomainsManageButtonTitle = "Manage Excluded Sites…"
+    // "vpn.excluded.domains.add.domain" - Add Domain button for the excluded sites view
+    static let vpnExcludedDomainsAddDomain = "Add Website"
+    // "vpn.excluded.domains.title" - Title for the excluded sites view
+    static let vpnExcludedDomainsTitle = "Excluded Websites"
 
     // MARK: - DNS
     // "vpn.dns.server.title" - Title of the DNS Server section
@@ -213,24 +225,4 @@ extension UserText {
     static func netPVPNSettingsLocationSubtitleFormattedCityAndCountry(city: String, country: String) -> String {
         return "\(city), \(country)"
     }
-}
-
-// MARK: - Thank You Modals
-
-extension UserText {
-    static let dbpThankYouTitle = "Personal Information Removal early access is over"
-    static let dbpThankYouSubtitle = "Thank you for being a tester!"
-    static let dbpThankYouBody1 = "To continue using Personal Information Removal, subscribe to DuckDuckGo Privacy Pro and get 40% off with promo code THANKYOU"
-
-    static let vpnThankYouTitle = "DuckDuckGo VPN early access is over"
-    static let vpnThankYouSubtitle = "Thank you for being a tester!"
-    static let vpnThankYouBody1 = "To continue using the VPN, subscribe to DuckDuckGo Privacy Pro and get 40% off with promo code THANKYOU"
-
-#if APPSTORE
-    static let dbpThankYouBody2 = "Offer redeemable for a limited time only in the desktop version of the DuckDuckGo browser by U.S. testers when you download from duckduckgo.com/app"
-    static let vpnThankYouBody2 = "Offer redeemable for a limited time only in the desktop version of the DuckDuckGo browser by U.S. testers when you download from duckduckgo.com/app"
-#else
-    static let dbpThankYouBody2 = "Offer redeemable for a limited time in the desktop version of the DuckDuckGo browser by U.S. beta testers only."
-    static let vpnThankYouBody2 = "Offer redeemable for a limited time in the desktop version of the DuckDuckGo browser by U.S. beta testers only."
-#endif
 }

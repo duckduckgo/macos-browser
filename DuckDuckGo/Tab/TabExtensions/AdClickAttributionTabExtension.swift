@@ -114,6 +114,8 @@ final class AdClickAttributionTabExtension: TabExtension {
     private let detection: AdClickAttributionDetecting
     private let logic: AdClickLogicProtocol
 
+    private var didReceiveRedirectCancellation = false
+
     public var currentAttributionState: AdClickAttributionLogic.State {
         logic.state
     }
@@ -225,6 +227,7 @@ extension AdClickAttributionTabExtension: NavigationResponder {
 
     @MainActor
     func didStart(_ navigation: Navigation) {
+        didReceiveRedirectCancellation = false
         detection.onStartNavigation(url: navigation.url)
     }
 
@@ -244,13 +247,26 @@ extension AdClickAttributionTabExtension: NavigationResponder {
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
         guard navigation.isCurrent else { return }
+
+        didReceiveRedirectCancellation = false
         detection.onDidFinishNavigation(url: navigation.url)
         logic.onDidFinishNavigation(host: navigation.url.host, currentTime: dateTimeProvider())
     }
 
     @MainActor
+    func didCancelNavigationAction(_ navigationAction: NavigationAction, withRedirectNavigations expectedNavigations: [ExpectedNavigation]?) {
+        if let expectedNavigations, !expectedNavigations.isEmpty {
+            didReceiveRedirectCancellation = true
+        }
+    }
+
+    @MainActor
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         guard navigation.isCurrent else { return }
+        guard !didReceiveRedirectCancellation else {
+            didReceiveRedirectCancellation = false
+            return
+        }
         detection.onDidFailNavigation()
     }
 

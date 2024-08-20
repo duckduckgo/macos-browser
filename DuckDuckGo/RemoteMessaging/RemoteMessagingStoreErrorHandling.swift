@@ -39,16 +39,10 @@ public class RemoteMessagingStoreErrorHandling: EventMapping<RemoteMessagingStor
                 switch event {
                 case .saveConfigFailed:
                     return .remoteMessagingSaveConfigError
-                case .invalidateConfigFailed:
-                    return .remoteMessagingInvalidateConfigError
                 case .updateMessageShownFailed:
                     return .remoteMessagingUpdateMessageShownError
-                case .saveMessageFailed:
-                    return .remoteMessagingSaveMessageError
                 case .updateMessageStatusFailed:
                     return .remoteMessagingUpdateMessageStatusError
-                case .deleteScheduledMessageFailed:
-                    return .remoteMessagingDeleteScheduledMessageError
                 }
             }()
 

@@ -21,14 +21,15 @@ import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class AppStateChangePublisherTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
+    @MainActor
     override func setUp() {
         assert(WindowControllersManager.shared.mainWindowControllers.isEmpty)
     }
 
+    @MainActor
     override func tearDown() {
         cancellables.removeAll()
         WindowsManager.closeWindows()
@@ -45,6 +46,7 @@ final class AppStateChangePublisherTests: XCTestCase {
 
     // MARK: -
 
+    @MainActor
     func testWhenWindowIsOpenedThenStateChangePublished() {
         let e = expectation(description: "Window Opened fires State change")
 
@@ -57,6 +59,7 @@ final class AppStateChangePublisherTests: XCTestCase {
         waitForExpectations(timeout: 0.3, handler: nil)
     }
 
+    @MainActor
     func testWhenManyWindowsOpenedThenStateChangePublished() {
         WindowsManager.openNewWindow(with: Tab(content: .none))
 
@@ -76,6 +79,7 @@ final class AppStateChangePublisherTests: XCTestCase {
         cancellables.removeAll()
     }
 
+    @MainActor
     func testWhenWindowIsClosedThenStateChangePublished() {
         let window = WindowsManager.openNewWindow(with: Tab(content: .none))
 
@@ -90,6 +94,7 @@ final class AppStateChangePublisherTests: XCTestCase {
         waitForExpectations(timeout: 3, handler: nil)
     }
 
+    @MainActor
     func testWhenWindowIsPositionedThenStateChangePublished() {
         let window = WindowsManager.openNewWindow(with: Tab(content: .none))
 
@@ -105,6 +110,7 @@ final class AppStateChangePublisherTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
+    @MainActor
     func testWhenWindowIsResizedThenStateChangePublished() {
         let window = WindowsManager.openNewWindow(with: Tab(content: .none))
 
@@ -120,6 +126,7 @@ final class AppStateChangePublisherTests: XCTestCase {
         waitForExpectations(timeout: 0.3, handler: nil)
     }
 
+    @MainActor
     func testWhenNewTabIsOpenedThenStateChangePublished() {
         WindowsManager.openNewWindow(with: Tab(content: .none))
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
@@ -138,6 +145,7 @@ final class AppStateChangePublisherTests: XCTestCase {
         waitForExpectations(timeout: 0.3, handler: nil)
     }
 
+    @MainActor
     func testWhenTabIsClosedThenStateChangePublished() {
         WindowsManager.openNewWindow(with: Tab(content: .none))
         WindowsManager.openNewWindow(with: Tab(content: .none))
@@ -161,6 +169,7 @@ final class AppStateChangePublisherTests: XCTestCase {
         waitForExpectations(timeout: 0.3, handler: nil)
     }
 
+    @MainActor
     func testWhenAllTabsExceptOneClosedThenStateChangePublished() {
         WindowsManager.openNewWindow(with: Tab(content: .none))
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
@@ -183,6 +192,7 @@ final class AppStateChangePublisherTests: XCTestCase {
         waitForExpectations(timeout: 0.3, handler: nil)
     }
 
+    @MainActor
     func testWhenTabsReorderedThenStateChangePublished() {
         WindowsManager.openNewWindow(with: Tab(content: .none))
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
@@ -205,6 +215,7 @@ final class AppStateChangePublisherTests: XCTestCase {
         waitForExpectations(timeout: 0.3, handler: nil)
     }
 
+    @MainActor
     func testWhenTabURLChangedThenStateChangePublished() {
         WindowsManager.openNewWindow(with: Tab(content: .none))
 
@@ -221,6 +232,7 @@ final class AppStateChangePublisherTests: XCTestCase {
         waitForExpectations(timeout: 0.3, handler: nil)
     }
 
+    @MainActor
     func testWhenTabFaviconChangedThenStateChangePublished() {
         WindowsManager.openNewWindow(with: Tab(content: .none))
 

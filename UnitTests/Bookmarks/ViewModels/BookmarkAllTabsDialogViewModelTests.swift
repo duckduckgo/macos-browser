@@ -19,12 +19,12 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
     private var bookmarkManager: LocalBookmarkManager!
     private var bookmarkStoreMock: BookmarkStoreMock!
     private var foldersStoreMock: BookmarkFolderStoreMock!
 
+    @MainActor
     override func setUpWithError() throws {
         try super.setUpWithError()
         bookmarkStoreMock = BookmarkStoreMock()
@@ -43,6 +43,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
 
     // MARK: - Copy
 
+    @MainActor
     func testWhenTitleIsCalledThenItReflectsThenNumberOfWebsites() {
         // GIVEN
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo, occurrences: 10)
@@ -55,6 +56,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(title, String(format: UserText.Bookmarks.Dialog.Title.bookmarkOpenTabs, websitesInfo.count))
     }
 
+    @MainActor
     func testWhenCancelActionTitleIsCalledThenItReturnsTheRightTitle() {
         // GIVEN
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
@@ -67,6 +69,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(title, UserText.cancel)
     }
 
+    @MainActor
     func testWhenEducationalMessageIsCalledThenItReturnsTheRightMessage() {
         // GIVEN
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
@@ -79,6 +82,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(title, UserText.Bookmarks.Dialog.Message.bookmarkOpenTabsEducational)
     }
 
+    @MainActor
     func testWhenDefaultActionTitleIsCalledThenItReturnsTheRightTitle() {
         // GIVEN
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
@@ -91,6 +95,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(title, UserText.Bookmarks.Dialog.Action.addAllBookmarks)
     }
 
+    @MainActor
     func testWhenFolderNameFieldTitleIsCalledThenItReturnsTheRightTitle() {
         // GIVEN
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
@@ -103,6 +108,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(title, UserText.Bookmarks.Dialog.Field.folderName)
     }
 
+    @MainActor
     func testWhenLocationFieldTitleIsCalledThenItReturnsTheRightTitle() {
         // GIVEN
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
@@ -117,6 +123,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
 
     // MARK: - State
 
+    @MainActor
     func testWhenInitThenFolderNameIsSetToCurrentDateAndNumberOfWebsites() throws {
         // GIVEN
         let date = Date(timeIntervalSince1970: 1712902304) // 12th of April 2024
@@ -138,6 +145,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(result, String(format: UserText.Bookmarks.Dialog.Value.folderName, "2024-04-12", websitesInfo.count))
     }
 
+    @MainActor
     func testWhenInitAndTimeZoneIsPDTThenFolderNameIsSetToCurrentDateAndNumberOfWebsites() throws {
         // GIVEN
         let date = Date(timeIntervalSince1970: 1712902304) // 12th of April 2024 (GMT)
@@ -160,6 +168,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(result, String(format: UserText.Bookmarks.Dialog.Value.folderName, expectedDate, websitesInfo.count))
     }
 
+    @MainActor
     func testWhenInitThenFoldersAreSetFromBookmarkList() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
@@ -176,6 +185,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(result.first?.entity, folder)
     }
 
+    @MainActor
     func testWhenInitAndFoldersStoreLastUsedFolderIsNilThenDoNotAskBookmarkStoreForBookmarkFolder() {
         // GIVEN
         foldersStoreMock.lastBookmarkAllTabsFolderIdUsed = nil
@@ -190,6 +200,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertNil(bookmarkStoreMock.capturedFolderId)
     }
 
+    @MainActor
     func testWhenInitAndFoldersStoreLastUsedFolderIsNotNilThenAskBookmarkStoreForBookmarkFolder() {
         foldersStoreMock.lastBookmarkAllTabsFolderIdUsed = "1ABCDE"
         XCTAssertFalse(bookmarkStoreMock.bookmarkFolderWithIdCalled)
@@ -203,6 +214,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(bookmarkStoreMock.capturedFolderId, "1ABCDE")
     }
 
+    @MainActor
     func testWhenFoldersStoreLastUsedFolderIsNotNilAndBookmarkStoreDoesNotContainFolderThenSelectedFolderIsNil() throws {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
@@ -220,6 +232,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertNil(result)
     }
 
+    @MainActor
     func testWhenFoldersStoreLastUsedFolderIsNotNilThenSelectedFolderIsNotNil() throws {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
@@ -237,6 +250,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(result, folder)
     }
 
+    @MainActor
     func testWhenFolderIsAddedThenFoldersListIsRefreshed() {
         // GIVEN
         let expectation = self.expectation(description: #function)
@@ -273,6 +287,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
 
     // MARK: - Actions
 
+    @MainActor
     func testWhenIsOtherActionDisabledCalledThenReturnFalse() {
         // GIVEN
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
@@ -285,6 +300,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
+    @MainActor
     func testWhenFolderNameIsEmptyDefaultActionIsDisabled() {
         // GIVEN
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
@@ -298,6 +314,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertTrue(result)
     }
 
+    @MainActor
     func testWhenFolderNameIsNotEmptyDefaultActionIsEnabled() {
         // GIVEN
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
@@ -311,6 +328,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
+    @MainActor
     func testWhenCancelIsCalledThenDismissIsCalled() {
         // GIVEN
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
@@ -326,6 +344,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertTrue(didCallDismiss)
     }
 
+    @MainActor
     func testWhenAddOrSaveIsCalledAndSelectedFolderIsNilThenBookmarkStoreIsAskedToBookmarkWebsitesInfoInRootFolder() {
         // GIVEN
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
@@ -345,6 +364,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
 
     }
 
+    @MainActor
     func testWhenAddOrSaveIsCalledAndSelectedFolderIsNotNilThenBookmarkStoreIsAskedToBookmarkWebsitesInfoNotInRootFolder() {
         // GIVEN
         let folder = BookmarkFolder(id: "ABCDE", title: "Saved Tabs")
@@ -364,6 +384,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .parent(uuid: "ABCDE"))
     }
 
+    @MainActor
     func testWhenAddOrSaveIsCalledThenDismissIsCalled() {
         // GIVEN
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)

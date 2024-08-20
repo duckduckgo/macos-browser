@@ -362,7 +362,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Open and unlock **%s**
         %d Select the vault you want to export (you can only export one vault at a time)
         %d Select **File → Export → All Items** from the Menu Bar
-        %d Enter your 1Password master or account password
+        %d Enter your 1Password main or account password
         %d Select the File Format: **iCloud Keychain (.csv)**
         %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
@@ -380,7 +380,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Open and unlock **%s**
         %d Select **File → Export vault** from the Menu Bar
         %d Select the File Format: **.csv**
-        %d Enter your Bitwarden master password
+        %d Enter your Bitwarden main password
         %d Click %@ and save the file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
@@ -396,10 +396,10 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
 
     case (.lastPass, .passwords):
         NSLocalizedString("import.csv.instructions.lastpass", value: """
-        %d Click on the **%s** icon in your browser and enter your master password
+        %d Click on the **%s** icon in your browser and enter your main password
         %d Select **Open My Vault**
         %d From the sidebar select **Advanced Options → Export**
-        %d Enter your LastPass master password
+        %d Enter your LastPass main password
         %d Select the File Format: **Comma Delimited Text (.csv)**
         %d %@
         """, comment: """

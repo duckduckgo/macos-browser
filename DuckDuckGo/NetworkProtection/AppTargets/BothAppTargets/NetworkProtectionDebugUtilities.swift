@@ -54,19 +54,25 @@ final class NetworkProtectionDebugUtilities {
 
     // MARK: - Debug commands for the extension
 
+    func restartAdapter() async throws {
+        try await ipcClient.command(.restartAdapter)
+    }
+
     func resetAllState(keepAuthToken: Bool) async throws {
         try await vpnUninstaller.uninstall(removeSystemExtension: true)
 
         settings.resetToDefaults()
 
-        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
-        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
     }
 
     func removeSystemExtensionAndAgents() async throws {
         try await vpnUninstaller.removeSystemExtension()
         vpnUninstaller.removeAgents()
+    }
+
+    func removeVPNConfiguration() async throws {
+        try await vpnUninstaller.removeVPNConfiguration()
     }
 
     func sendTestNotificationRequest() async throws {

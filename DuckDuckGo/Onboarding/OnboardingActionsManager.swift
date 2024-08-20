@@ -125,6 +125,7 @@ final class OnboardingActionsManager: OnboardingActionsManaging {
         navigation.replaceTabWith(tab)
 
         tab.navigationDidEndPublisher
+            .first()
             .sink { [weak self] _ in
                 self?.navigation.focusOnAddressBar()
             }

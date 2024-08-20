@@ -24,9 +24,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     var currentEnvironment: SubscriptionEnvironment
     var updateServiceEnvironment: (SubscriptionEnvironment.ServiceEnvironment) -> Void
     var updatePurchasingPlatform: (SubscriptionEnvironment.PurchasePlatform) -> Void
-
-    var isInternalTestingEnabled: () -> Bool
-    var updateInternalTestingFlag: (Bool) -> Void
+    var openSubscriptionTab: (URL) -> Void
 
     private var purchasePlatformItem: NSMenuItem?
 
@@ -53,16 +51,14 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     public init(currentEnvironment: SubscriptionEnvironment,
                 updateServiceEnvironment: @escaping (SubscriptionEnvironment.ServiceEnvironment) -> Void,
                 updatePurchasingPlatform: @escaping (SubscriptionEnvironment.PurchasePlatform) -> Void,
-                isInternalTestingEnabled: @escaping () -> Bool,
-                updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
+                openSubscriptionTab: @escaping (URL) -> Void,
                 subscriptionManager: SubscriptionManager) {
         self.currentEnvironment = currentEnvironment
         self.updateServiceEnvironment = updateServiceEnvironment
         self.updatePurchasingPlatform = updatePurchasingPlatform
-        self.isInternalTestingEnabled = isInternalTestingEnabled
-        self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
+        self.openSubscriptionTab = openSubscriptionTab
         self.subscriptionManager = subscriptionManager
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
         self.submenu = makeSubmenu()
@@ -71,20 +67,19 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private func makeSubmenu() -> NSMenu {
         let menu = NSMenu(title: "")
 
-        menu.addItem(NSMenuItem(title: "Simulate Subscription Active State (fake token)", action: #selector(simulateSubscriptionActiveState), target: self))
-        menu.addItem(NSMenuItem(title: "Clear Subscription Authorization Data", action: #selector(signOut), target: self))
-        menu.addItem(NSMenuItem(title: "Show account details", action: #selector(showAccountDetails), target: self))
+        menu.addItem(NSMenuItem(title: "I Have a Subscription", action: #selector(activateSubscription), target: self))
+        menu.addItem(NSMenuItem(title: "Remove Subscription From This Device", action: #selector(signOut), target: self))
+        menu.addItem(NSMenuItem(title: "Show Account Details", action: #selector(showAccountDetails), target: self))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Validate Token", action: #selector(validateToken), target: self))
         menu.addItem(NSMenuItem(title: "Check Entitlements", action: #selector(checkEntitlements), target: self))
-        menu.addItem(NSMenuItem(title: "Get Subscription Info", action: #selector(getSubscriptionDetails), target: self))
-        menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
-        menu.addItem(NSMenuItem(title: "Post didSignIn notification", action: #selector(postDidSignInNotification), target: self))
-        menu.addItem(NSMenuItem(title: "Post subscriptionDidChange notification", action: #selector(postSubscriptionDidChangeNotification), target: self))
-        menu.addItem(.separator())
+        menu.addItem(NSMenuItem(title: "Get Subscription Details", action: #selector(getSubscriptionDetails), target: self))
+
         if #available(macOS 12.0, *) {
+            menu.addItem(.separator())
             menu.addItem(NSMenuItem(title: "Sync App Store AppleID Account (re- sign-in)", action: #selector(syncAppleIDAccount), target: self))
             menu.addItem(NSMenuItem(title: "Purchase Subscription from App Store", action: #selector(showPurchaseView), target: self))
+            menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
         }
 
         menu.addItem(.separator())
@@ -96,12 +91,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         let environmentItem = NSMenuItem(title: "Environment", action: nil, target: nil)
         environmentItem.submenu = makeEnvironmentSubmenu()
         menu.addItem(environmentItem)
-
-        menu.addItem(.separator())
-
-        let internalTestingItem = NSMenuItem(title: "Internal testing", action: #selector(toggleInternalTesting), target: self)
-        internalTestingItem.state = isInternalTestingEnabled() ? .on : .off
-        menu.addItem(internalTestingItem)
 
         menu.delegate = self
 
@@ -170,8 +159,9 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     }
 
     @objc
-    func simulateSubscriptionActiveState() {
-        accountManager.storeAccount(token: "fake-token", email: "fake@email.com", externalID: "123")
+    func activateSubscription() {
+        let url = subscriptionManager.url(for: .activateViaEmail)
+        openSubscriptionTab(url)
     }
 
     @objc
@@ -308,16 +298,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     // MARK: -
 
     @objc
-    func postDidSignInNotification(_ sender: Any?) {
-        NotificationCenter.default.post(name: .accountDidSignIn, object: self, userInfo: nil)
-    }
-
-    @objc
-    func postSubscriptionDidChangeNotification(_ sender: Any?) {
-        NotificationCenter.default.post(name: .subscriptionDidChange, object: self, userInfo: nil)
-    }
-
-    @objc
     func restorePurchases(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             Task {
@@ -327,26 +307,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                                                                      authEndpointService: subscriptionManager.authEndpointService)
                 await appStoreRestoreFlow.restoreAccountFromPastPurchase()
             }
-        }
-    }
-
-    @objc
-    func toggleInternalTesting(_ sender: Any?) {
-        Task { @MainActor in
-            let currentValue = isInternalTestingEnabled()
-            let shouldShowAlert = currentValue == false
-
-            if shouldShowAlert {
-                let alert = makeAlert(title: "Are you sure you want to enable internal testing",
-                                      message: "Only enable this option if you are participating in internal testing and have been requested to do so.",
-                                      buttonNames: ["Yes", "No"])
-                let response = alert.runModal()
-
-                guard case .alertFirstButtonReturn = response else { return }
-            }
-
-            updateInternalTestingFlag(!currentValue)
-            self.refreshSubmenu()
         }
     }
 
@@ -367,6 +327,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         for buttonName in buttonNames {
             alert.addButton(withTitle: buttonName)
         }
+        alert.accessoryView = NSView(frame: NSRect(x: 0, y: 0, width: 300, height: 0))
         return alert
     }
 }

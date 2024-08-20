@@ -211,6 +211,64 @@
         }
       }
     },
+    "%@: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ : %2$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
     "%lld" : {
       "localizations" : {
         "de" : {
@@ -429,7 +487,56 @@
       }
     },
     "0.0.0.0" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0.0.0.0"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0.0.0.0"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0.0.0.0"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0.0.0.0"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0.0.0.0"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0.0.0.0"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0.0.0.0"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0.0.0.0"
+          }
+        }
+      }
     },
     "1." : {
       "localizations" : {
@@ -2428,9 +2535,6 @@
         }
       }
     },
-    "Apply" : {
-
-    },
     "auth.alert.login.button" : {
       "comment" : "Authentication Alert Sign In Button",
       "extractionState" : "extracted_with_value",
@@ -4250,7 +4354,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Borrar todas las contraseñas..."
+            "value" : "Eliminar todas las contraseñas..."
           }
         },
         "fr" : {
@@ -4550,7 +4654,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Borrar todas las contraseñas"
+            "value" : "Eliminar todas las contraseñas"
           }
         },
         "fr" : {
@@ -6523,7 +6627,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cumpleaños"
+            "value" : "Fecha de nacimiento"
           }
         },
         "fr" : {
@@ -7169,8 +7273,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Die folgenden Bitwarden-Versionen sind mit DuckDuckGo inkompatibel: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Bitte kehre zu einer älteren Version zurück, indem du die folgenden Schritte ausführst:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "en" : {
@@ -7181,44 +7285,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Las siguientes versiones de Bitwarden son incompatibles con DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Vuelve a una versión anterior siguiendo estos pasos:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Les versions suivantes de Bitwarden sont incompatibles avec DuckDuckGo : v2024.3.0, v2024.3.2, v2024.4.0 et v2024.4.1. Veuillez revenir à une version antérieure en procédant comme suit :"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Le seguenti versioni di Bitwarden non sono compatibili con DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. È necessario tornare a una versione precedente seguendo questi passaggi:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "De volgende versies van Bitwarden zijn niet compatibel met DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Volg deze stappen om terug te gaan naar een oudere versie:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Następujące wersje Bitwarden są niezgodne z DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Przywróć starszą wersję, wykonując następujące czynności:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "As seguintes versões do Bitwarden são incompatíveis com o DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0 e v2024.4.1. Reverte para uma versão mais antiga seguindo estes passos:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "С DuckDuckGo несовместимы следующие версии Bitwarden: 2024.3.0, 2024.3.2, 2024.4.0, 2024.4.1. Вернитесь к более старой версии, выполнив следующие действия:"
+            "state" : "translated",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         }
       }
@@ -7229,8 +7333,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "V2014.2.1 herunterladen"
+            "state" : "translated",
+            "value" : "Download v2024.4.3"
           }
         },
         "en" : {
@@ -7241,44 +7345,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Descargar v2014.2.1"
+            "state" : "translated",
+            "value" : "Download v2024.4.3"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Télécharger v2014.2.1"
+            "state" : "translated",
+            "value" : "Download v2024.4.3"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Scarica la versione v2014.2.1"
+            "state" : "translated",
+            "value" : "Download v2024.4.3"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Download v2014.2.1"
+            "state" : "translated",
+            "value" : "Download v2024.4.3"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pobierz v2014.2.1"
+            "state" : "translated",
+            "value" : "Download v2024.4.3"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Transfere a versão v2014.2.1"
+            "state" : "translated",
+            "value" : "Download v2024.4.3"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Скачайте версию 2014.2.1"
+            "state" : "translated",
+            "value" : "Download v2024.4.3"
           }
         }
       }
@@ -10614,6 +10718,126 @@
         }
       }
     },
+    "bookmarks.empty.search.resukt..state.title" : {
+      "comment" : "Title displayed in Bookmark Panel when there is no bookmarks that match the search query",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Lesezeichen gefunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No bookmarks found"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se han encontrado marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun signet trouvé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sono stati trovati segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen bladwijzers gevonden"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie znaleziono zakładek"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhum marcador encontrado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закладки не найдены"
+          }
+        }
+      }
+    },
+    "bookmarks.empty.search.result.state.message" : {
+      "comment" : "Text displayed in Bookmark Panel when there is no bookmarks that match the search query",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probiere verschiedene Suchbegriffe aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try different search terms."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prueba con diferentes términos de búsqueda."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayez différents termes de recherche."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prova con altri termini di ricerca."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probeer verschillende zoektermen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spróbuj z innymi wyszukiwanymi hasłami."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimenta termos de pesquisa diferentes."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте другие поисковые запросы."
+          }
+        }
+      }
+    },
     "bookmarks.empty.state.message" : {
       "comment" : "Text displayed in Bookmark Manager when there is no bookmarks yet",
       "extractionState" : "extracted_with_value",
@@ -11210,6 +11434,246 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть панель закладок"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.manual" : {
+      "comment" : "Button to sort bookmarks by manual",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuell"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manual"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuale"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handmatig"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ręcznie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вручную"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.name" : {
+      "comment" : "Button to sort bookmarks by name ascending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naam"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nazwa"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.name.asc" : {
+      "comment" : "Button to sort bookmarks by name ascending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufsteigend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Ascending"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendente"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oplopend"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rosnąco"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascendente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По возрастанию"
+          }
+        }
+      }
+    },
+    "bookmarks.sort.name.desc" : {
+      "comment" : "Button to sort bookmarks by name descending",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Absteigend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Descending"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descendente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descendant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discendente"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aflopend"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Malejąco"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descendente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По убыванию"
           }
         }
       }
@@ -13578,12 +14042,6 @@
           }
         }
       }
-    },
-    "Custom" : {
-
-    },
-    "Custom DNS Server" : {
-
     },
     "dashboard.permission.allow" : {
       "comment" : "Privacy Dashboard: Website can always access input media device",
@@ -16805,24 +17263,180 @@
     },
     "duck-player.autoplay-preference" : {
       "comment" : "Autoplay preference in settings",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Duck Player geöffnete Videos automatisch abspielen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Autoplay videos when opened in Duck Player"
+            "value" : "Autoplay videos opened in Duck Player"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducir automáticamente los vídeos abiertos en Duck Player"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture automatique des vidéos ouvertes dans Duck Player"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riproduzione automatica dei video aperti in Duck Player"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video's automatisch afspelen wanneer ze worden geopend in Duck Player"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatyczne odtwarzanie filmów otwieranych w Duck Player"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproduzir automaticamente vídeos abertos no Duck Player"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически проигрывать видео при открытии в Duck Player"
           }
         }
       }
     },
     "duck-player.autoplay-title" : {
       "comment" : "Autoplay title in settings",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisches Abspielen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Autoplay"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducción automática"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture automatique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riproduzione automatica"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch afspelen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatyczne odtwarzanie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprodução automática"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автовоспроизведение"
+          }
+        }
+      }
+    },
+    "duck-player.contingency-title" : {
+      "comment" : "Title for message explaining to the user that Duck Player is not available",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck Player Unavailable"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player no disponible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player n'est pas disponible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player non disponibile"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player is niet beschikbaar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player jest niedostępny"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player indisponível"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duck Player недоступен"
           }
         }
       }
@@ -16883,6 +17497,186 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Проигрыватель Duck Player обеспечивает беспрепятственный просмотр без персонализированной рекламы и влияния просмотренных роликов на рекомендации в YouTube."
+          }
+        }
+      }
+    },
+    "duck-player.newtab-preference" : {
+      "comment" : "New tab preference in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne Duck Player nach Möglichkeit in einem neuen Tab"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open Duck Player in a new tab whenever possible"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre Duck Player en una pestaña nueva siempre que sea posible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre Duck Player dans un nouvel onglet chaque fois que possible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri sempre Duck Player in una nuova scheda quando possibile"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Duck Player waar mogelijk in een nieuw tabblad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwieraj Duck Player w nowej karcie, gdy tylko jest to możliwe"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir o Duck Player num novo separador sempre que possível"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По возможности открывать Duck Player в новой вкладке"
+          }
+        }
+      }
+    },
+    "duck-player.newtab-title" : {
+      "comment" : "New Tab title in settings",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Tab"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New Tab"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueva pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvel onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova scheda"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuw tabblad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nowa karta"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novo separador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новая вкладка"
+          }
+        }
+      }
+    },
+    "duck-player.newtab.info-preference" : {
+      "comment" : "New tab preference extra info in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Browsen auf YouTube im Internet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "When browsing YouTube on the web"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al navegar en YouTube en la web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lorsque vous naviguez sur YouTube sur le Web"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durante la navigazione di YouTube sul Web"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wanneer je YouTube op het web bekijkt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podczas przeglądania YouTube w Internecie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao navegar no YouTube na Internet"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При просмотре YouTube в интернете"
           }
         }
       }
@@ -17067,8 +17861,245 @@
         }
       }
     },
-    "DuckDuckGo (Recommended)" : {
-
+    "duck-player.video-autoplay-preference" : {
+      "comment" : "Autoplay preference in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos automatisch abspielen, wenn sie im Duck Player geöffnet werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Autoplay videos when opened in Duck Player"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducir automáticamente los vídeos cuando se abran en Duck Player"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture automatique des vidéos ouvertes dans Duck Player"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riproduzione automatica dei video quando li apri in Duck Player"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video's automatisch afspelen wanneer ze worden geopend in Duck Player"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatyczne odtwarzanie filmów po otwarciu w Duck Player"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproduzir vídeos automaticamente quando abertos no Duck Player"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически проигрывать видео при открытии в Duck Player"
+          }
+        }
+      }
+    },
+    "duck-player.video-contingency-cta" : {
+      "comment" : "Button for the message explaining to the user that Duck Player is not available so the user can learn more",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehr erfahren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn More"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más información"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En savoir plus"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ulteriori informazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meer informatie"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dowiedz się więcej"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saiba mais"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Узнать больше"
+          }
+        }
+      }
+    },
+    "duck-player.video-contingency-message" : {
+      "comment" : "Message explaining to the user that Duck Player is not available",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Funktionalität des Duck Players wird durch die jüngsten Änderungen bei YouTube beeinträchtigt. Vielen Dank für dein Verständnis, während wir daran arbeiten, diese Probleme zu beheben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duck Player's functionality has been affected by recent changes to YouTube. We’re working to fix these issues and appreciate your understanding."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La funcionalidad de Duck Player se ha visto afectada por los cambios recientes en YouTube. Estamos trabajando para solucionar estos problemas y agradecemos tu comprensión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les récents changements apportés à YouTube ont affecté la fonctionnalité de Duck Player. Nous nous efforçons de résoudre ces problèmes et vous remercions de votre compréhension."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La funzionalità di Duck Player è stata influenzata dalle recenti modifiche a YouTube. Stiamo lavorando per risolvere questi problemi. Ti ringraziamo per la comprensione."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recente wijzigingen in YouTube hebben invloed op de functionaliteit van Duck Player. We werken aan een oplossing voor deze problemen. Bedankt voor je begrip."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatnie zmiany w serwisie YouTube miały wpływ na działanie Duck Player. Pracujemy nad rozwiązaniem tych problemów i dziękujemy za zrozumienie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A funcionalidade do Duck Player foi afetada por alterações recentes ao YouTube. Estamos a trabalhar para resolver estes problemas e agradecemos a tua compreensão."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Недавние изменения YouTube приводят к некорректной работе проигрывателя Duck Player. Мы занимаемся решением этой проблемы и благодарим вас за понимание."
+          }
+        }
+      }
+    },
+    "duck-player.video-preferences-title" : {
+      "comment" : "Video Preferences title in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video-Einstellungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Video Preferences"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferencias de vídeo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préférences vidéo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferenze video"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videovoorkeuren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferencje filmów"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferências de vídeo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки видео"
+          }
+        }
+      }
     },
     "DuckDuckGo browser version" : {
       "comment" : "Data import failure Report dialog description of a report field providing current DuckDuckGo Browser version",
@@ -17350,10 +18381,108 @@
       }
     },
     "Duplicates Skipped:" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplikate übersprungen:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicados omitidos:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doublons ignorés :"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicati ignorati:"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overgeslagen duplicaten:"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pominięte duplikaty:"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicados ignorados:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пропущенные дубликаты:"
+          }
+        }
+      }
     },
     "Duplicates Skipped: " : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplikate übersprungen: "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicados omitidos: "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doublons ignorés : "
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicati ignorati: "
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overgeslagen duplicaten: "
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pominięte duplikaty: "
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicados ignorados: "
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пропущенные дубликаты: "
+          }
+        }
+      }
     },
     "edit" : {
       "comment" : "Edit button",
@@ -23880,19 +25009,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Öffne und entsperre **%2$s**\n%3$d Wähle **Datei → Tresor exportieren** in der Menüleiste\n%4$d Wähle das Dateiformat: **.csv**\n%5$d Gib dein Bitwarden Master-Passwort ein\n%6$d Klicke auf %7$@ und speichere die Datei an einem Ort, an dem du sie finden kannst (z. B. auf dem Desktop)\n%8$d %9$@"
+            "value" : "%1$d Öffne und entsperre **%2$s**\n%3$d Wähle **Datei → Tresor exportieren** in der Menüleiste\n%4$d Wähle das Dateiformat: **.csv**\n%5$d Gib dein Bitwarden Haupt-Passwort ein\n%6$d Klicke auf %7$@ und speichere die Datei an einem Ort, an dem du sie finden kannst (z. B. auf dem Desktop)\n%8$d %9$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select **File → Export vault** from the Menu Bar\n%4$d Select the File Format: **.csv**\n%5$d Enter your Bitwarden master password\n%6$d Click %7$@ and save the file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
+            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select **File → Export vault** from the Menu Bar\n%4$d Select the File Format: **.csv**\n%5$d Enter your Bitwarden main password\n%6$d Click %7$@ and save the file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre y desbloquea **%2$s**\n%3$d Selecciona **Archivo → Exportar caja fuerte** en la barra de menú\n%4$d Selecciona el formato de archivo: **.csv**\n%5$d Introduce tu contraseña maestra de Bitwarden\n%6$d Haz clic en %7$@ y guarda el archivo donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n%8$d %9$@"
+            "value" : "%1$d Abre y desbloquea **%2$s**\n%3$d Selecciona **Archivo → Exportar caja fuerte** en la barra de menú\n%4$d Selecciona el formato de archivo: **.csv**\n%5$d Introduce tu contraseña principal de Bitwarden\n%6$d Haz clic en %7$@ y guarda el archivo donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n%8$d %9$@"
           }
         },
         "fr" : {
@@ -23904,25 +25033,25 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Apri e sblocca **%2$s**\n%3$d Seleziona **File → Esporta cassaforte** dalla Barra dei menu\n%4$d Seleziona il Formato file: **.csv**\n%5$d Inserisci la tua master password Bitwarden\n%6$d Fai clic su %7$@ e salva il file dove puoi trovarlo (ad esempio, sul desktop)\n%8$d %9$@"
+            "value" : "%1$d Apri e sblocca **%2$s**\n%3$d Seleziona **File → Esporta vault** dalla Barra dei menu\n%4$d Seleziona il Formato del file: **.csv**\n%5$d Inserisci la tua password principale Bitwarden\n%6$d Clicca su %7$@ e salva il file dove puoi trovarlo (ad esempio, sul desktop)\n%8$d %9$@"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer **Bestand → Kluis exporteren** in de menubalk\n%4$d Selecteer de bestandsindeling: **.csv**\n%5$d Voer je Bitwarden-masterwachtwoord in\n%6$d Klik op %7$@ en bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@"
+            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer **Bestand → Kluis exporteren** in de menubalk\n%4$d Selecteer de bestandsindeling: **.csv**\n%5$d Voer je Bitwarden-hoofdwachtwoord in\n%6$d Klik op %7$@ en bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Otwórz i odblokuj aplikację **%2$s**\n%3$d Wybierz **Plik → Eksportuj sejf** na pasku menu\n%4$d Wybierz format pliku: **.csv**\n%5$d Wprowadź hasło główne aplikacji Bitwarden\n%6$d Kliknij %7$@ i zapisz plik w łatwo dostępnym miejscu (np. na biurku)\n%8$d %9$@"
+            "value" : "%1$d Otwórz i odblokuj aplikację **%2$s**\n%3$d Wybierz **Plik → Eksportuj sejf** na pasku menu\n%4$d Wybierz format pliku: **.csv**\n%5$d Wprowadź hasło główne aplikacji Bitwarden\n%6$d Kliknij %7$@ i zapisz plik w łatwo dostępnym miejscu (np. na pulpicie)\n%8$d %9$@"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre e desbloqueia o **%2$s**\n%3$d Seleciona **Ficheiro → Exportar cofre** na barra de menus\n%4$d Seleciona o formato do ficheiro: **.csv**\n%5$d Introduz a tua palavra-passe mestra do Bitwarden\n%6$d Clica em %7$@ e guarda o ficheiro onde consigas encontrá-lo (por exemplo, no ambiente de trabalho)\n%8$d %9$@"
+            "value" : "%1$d Abre e desbloqueia o **%2$s**\n%3$d Seleciona **Ficheiro → Exportar cofre** na barra de menus\n%4$d Seleciona o formato do ficheiro: **.csv**\n%5$d Introduz a tua palavra-passe principal do Bitwarden\n%6$d Clica em %7$@ e guarda o ficheiro onde consigas encontrá-lo (por exemplo, no ambiente de trabalho)\n%8$d %9$@"
           }
         },
         "ru" : {
@@ -24300,19 +25429,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Klicke auf das **%2$s** Symbol in deinem Browser und gib dein Master-Passwort ein\n%3$d Wähle **Meinen Tresor öffnen**\n%4$d Wähle in der Seitenleiste **Erweiterte Optionen → Exportieren**\n%5$d Gib dein LastPass Master-Passwort ein\n%6$d Wähle das Dateiformat: **Comma Delimited Text (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Klicke auf das **%2$s** Symbol in deinem Browser und gib dein Haupt-Passwort ein\n%3$d Wähle **Meinen Tresor öffnen**\n%4$d Wähle in der Seitenleiste **Erweiterte Optionen → Exportieren**\n%5$d Gib dein LastPass Haupt-Passwort ein\n%6$d Wähle das Dateiformat: **Comma Delimited Text (.csv)**\n%7$d %8$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Click on the **%2$s** icon in your browser and enter your master password\n%3$d Select **Open My Vault**\n%4$d From the sidebar select **Advanced Options → Export**\n%5$d Enter your LastPass master password\n%6$d Select the File Format: **Comma Delimited Text (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Click on the **%2$s** icon in your browser and enter your main password\n%3$d Select **Open My Vault**\n%4$d From the sidebar select **Advanced Options → Export**\n%5$d Enter your LastPass main password\n%6$d Select the File Format: **Comma Delimited Text (.csv)**\n%7$d %8$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Haz clic en el icono **%2$s** de tu navegador e introduce tu contraseña maestra\n%3$d Selecciona **Abrir mi caja fuerte**\n%4$d En la barra lateral, selecciona **Opciones avanzadas → Exportar**\n%5$d Introduce tu contraseña maestra de LastPass\n%6$d Selecciona el formato de archivo: **Texto delimitado por comas (.csv)**\n%7$d %8$@."
+            "value" : "%1$d Haz clic en el icono **%2$s** de tu navegador e introduce tu contraseña principal\n%3$d Selecciona **Abrir mi caja fuerte**\n%4$d En la barra lateral, selecciona **Opciones avanzadas → Exportar**\n%5$d Introduce tu contraseña principal de LastPass\n%6$d Selecciona el formato de archivo: **Texto delimitado por comas (.csv)**\n%7$d %8$@."
           }
         },
         "fr" : {
@@ -24324,31 +25453,31 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Fai clic sull'icona **%2$s** nel browser e immetti la master password\n%3$d Seleziona **Apri la mia cassaforte**\n%4$d Dalla barra laterale seleziona **Opzioni avanzate → Esporta\n**%5$d Immetti la master password LastPass\n%6$d Seleziona il formato del file: **Testo delimitato da virgole (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Clicca sull'icona **%2$s** nel browser e inserisci la tua password principale\n%3$d Seleziona **Apri il Mio Vault**\n%4$d Dalla barra laterale seleziona **Opzioni avanzate → Esporta**\n%5$d Inserisci la tua password principale LastPass\n%6$d Seleziona il formato del file: **Testo delimitato da virgolette (.csv)**\n%7$d %8$@"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Klik op het pictogram **%2$s** in je browser en voer je masterwachtwoord in\n%3$d Selecteer **Open mijn kluis**\n%4$d Klik in de zijbalk op **Geavanceerde opties → Exporteren**\n%5$d Voer je LastPass-masterwachtwoord in\n%6$d Selecteer de bestandsindeling: **Door komma's gescheiden tekst (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Klik op het pictogram **%2$s** in je browser en voer je hoofdwachtwoord in\n%3$d Selecteer **Open mijn kluis**\n%4$d Klik in de zijbalk op **Geavanceerde opties → Exporteren**\n%5$d Voer je LastPass-hoofdwachtwoord in\n%6$d Selecteer de bestandsindeling: **Door komma's gescheiden tekst (.csv)**\n%7$d %8$@"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Kliknij ikonę **%2$s** w przeglądarce i wprowadź hasło główne\n%3$d Wybierz **Open My Vault**\n%4$d Na pasku bocznym wybierz **Advanced Options → Export**\n%5$d Wprowadź hasło główne narzędzia LastPass\n%6$d Wybierz format pliku: **Comma Delimited Text (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Kliknij ikonę **%2$s** w przeglądarce i wprowadź hasło główne\n%3$d Wybierz **Otwórz mój sejf**\n%4$d Na pasku bocznym wybierz **Opcje zaawansowane → Eksportuj**\n%5$d Wprowadź hasło główne splikacji LastPass\n%6$d Wybierz format pliku: **Tekst rozdzielany przecinkami (.csv)**\n%7$d %8$@"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Clica no ícone da aplicação **%2$s** no teu navegador e introduz a tua palavra-passe mestra\n%3$d Seleciona **Abrir o meu cofre**\n%4$d Na barra lateral, seleciona **Opções avançadas → Exportar**\n%5$d Introduz a tua palavra-passe mestra da aplicação LastPass\n%6$d Seleciona o formato do ficheiro: **Texto delimitado por vírgula (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Clica no ícone da aplicação **%2$s** no teu navegador e introduz a tua palavra-passe principal\n%3$d Seleciona **Abrir o meu cofre**\n%4$d Na barra lateral, seleciona **Opções avançadas → Exportar**\n%5$d Introduz a tua palavra-passe principal da aplicação LastPass\n%6$d Seleciona o formato do ficheiro: **Texto delimitado por vírgula (.csv)**\n%7$d %8$@"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Нажмите значок **%2$s** в браузере и введите основной пароль\n%3$d Выберите меню **Открыть мое хранилище**\n%4$d На боковой панели выберите **Дополнительные опции → Экспортировать**\n%5$d Введите основной пароль к LastPass\n%6$d Сохраните файл в формате: **текст с разделяющими запятыми (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Нажмите на значок **%2$s** в браузере и введите основной пароль\n%3$d Выберите меню **Открыть мое хранилище**\n%4$d На боковой панели выберите **Дополнительные опции → Экспортировать**\n%5$d Введите основной пароль к LastPass\n%6$d Сохраните файл в формате: **текст с разделяющими запятыми (.csv)**\n%7$d %8$@"
           }
         }
       }
@@ -24360,19 +25489,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Öffne und entsperre **%2$s**\n%3$d Wähle den Tresor aus, den du exportieren möchtest (du kannst immer nur einen Tresor auf einmal exportieren)\n%4$d Wähle **Datei → Exportieren → Alle Elemente** aus der Menüleiste\n%5$d Gib dein 1Password Master- oder Account-Passwort ein\n%6$d Wähle das Dateiformat: **iCloud-Schlüsselbund (.csv)**\n%7$d Speichere die Passwortdatei an einem Ort, an dem du sie finden kannst (z. B. auf dem Desktop)\n%8$d %9$@"
+            "value" : "%1$d Öffne und entsperre **%2$s**\n%3$d Wähle den Tresor aus, den du exportieren möchtest (du kannst immer nur einen Tresor auf einmal exportieren)\n%4$d Wähle **Datei → Exportieren → Alle Elemente** aus der Menüleiste\n%5$d Gib dein 1Password Haupt- oder Account-Passwort ein\n%6$d Wähle das Dateiformat: **iCloud-Schlüsselbund (.csv)**\n%7$d Speichere die Passwortdatei an einem Ort, an dem du sie finden kannst (z. B. auf dem Desktop)\n%8$d %9$@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select the vault you want to export (you can only export one vault at a time)\n%4$d Select **File → Export → All Items** from the Menu Bar\n%5$d Enter your 1Password master or account password\n%6$d Select the File Format: **iCloud Keychain (.csv)**\n%7$d Save the passwords file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
+            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select the vault you want to export (you can only export one vault at a time)\n%4$d Select **File → Export → All Items** from the Menu Bar\n%5$d Enter your 1Password main or account password\n%6$d Select the File Format: **iCloud Keychain (.csv)**\n%7$d Save the passwords file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre y desbloquea **%2$s**\n%3$d Selecciona la caja fuerte que quieres exportar (solo puedes exportar una caja fuerte a la vez)\n%4$d Selecciona **Archivo → Exportar → Todos los elementos** en la barra de menú\n%5$d Introduce tu contraseña maestra o de cuenta de 1Password\n%6$d Selecciona el formato de archivo: **Llavero de iCloud (.csv) **\n%7$d Guarda el archivo de contraseñas donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n%8$d %9$@"
+            "value" : "%1$d Abre y desbloquea **%2$s**\n%3$d Selecciona la caja fuerte que quieres exportar (solo puedes exportar una caja fuerte a la vez)\n%4$d Selecciona **Archivo → Exportar → Todos los elementos** en la barra de menú\n%5$d Introduce tu contraseña principal o de cuenta de 1Password\n%6$d Selecciona el formato de archivo: **Llavero de iCloud (.csv) **\n%7$d Guarda el archivo de contraseñas donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n%8$d %9$@"
           }
         },
         "fr" : {
@@ -24384,25 +25513,25 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Apri e sblocca **%2$s\n**%3$d Seleziona la cassaforte da esportare (è possibile esportare solo una cassaforte alla volta)\n%4$d Seleziona **File → Esporta → Tutti gli elementi** dalla Barra dei menu\n%5$d Inserisci la master password o quella dell'account 1Password\n%6$d Seleziona il formato file: **Keychain iCloud (.csv)**\n%7$d Salva il file delle password dove puoi trovarlo (ad esempio, sul desktop)\n%8$d %9$@"
+            "value" : "%1$d Apri e sblocca **%2$s**\n%3$d Seleziona il vault da esportare (puoi esportarne solo uno per volta)\n%4$d Seleziona **File → Esporta → Tutti gli elementi** dalla Barra dei menu\n%5$d Inserisci la tua password principale o dell'account 1Password\n%6$d Seleziona il formato del file: **Portachiavi iCloud (.csv)**\n%7$d Salva il file delle password dove puoi trovarlo (ad esempio, sul desktop)\n%8$d %9$@"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer de kluis die je wilt exporteren (je kunt slechts één kluis per keer exporteren)\n%4$d Selecteer **Bestand → Exporteren → Alle items** in de menubalk\n%5$d Voer je master- of accountwachtwoord van 1Password in\n%6$d Selecteer de bestandsindeling: **iCloud Keychain (.csv)**\n%7$d Bewaar het bestand met de wachtwoorden op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@"
+            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer de kluis die je wilt exporteren (je kunt slechts één kluis per keer exporteren)\n%4$d Selecteer **Bestand → Exporteren → Alle items** in de menubalk\n%5$d Voer je 1Password hoofd- of accountwachtwoord in\n%6$d Selecteer de bestandsindeling: **iCloud Keychain (.csv)**\n%7$d Bewaar het bestand met de wachtwoorden op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Otwórz i odblokuj aplikację **%2$s**\n%3$d Wybierz sejf, który chcesz wyeksportować (możesz eksportować tylko jeden sejf naraz)\n%4$d Na pasku menu wybierz **File → Export → All Items**\n%5$d Wprowadź hasło główne lub hasło konta 1Password\n%6$d Wybierz format pliku: **iCloud Keychain (.csv)**\n%7$d Zapisz plik haseł w łatwo dostępnym miejscu (np. na biurku)\n%8$d %9$@"
+            "value" : "%1$d Otwórz i odblokuj aplikację **%2$s**\n%3$d Wybierz sejf, który chcesz wyeksportować (możesz eksportować tylko jeden sejf naraz)\n%4$d Na pasku menu wybierz **Plik → Eksportuj → Wszystkie elementy**\n%5$d Wprowadź hasło główne lub hasło konta 1Password\n%6$d Wybierz format pliku: **iCloud Keychain (.csv)**\n%7$d Zapisz plik haseł w łatwo dostępnym miejscu (np. na pulpicie)\n%8$d %9$@"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre e desbloqueia a aplicação **%2$s**\n%3$d Seleciona o cofre que pretendes exportar (só podes exportar um cofre de cada vez)\n%4$d Seleciona **Ficheiro → Exportar → Todos os elementos** na barra de menus\n%5$d Introduz a tua palavra-passe mestra da 1Password ou a palavra-passe da conta\n%6$d Seleciona o formato do ficheiro: **Porta-chaves em iCloud (.csv)**\n%7$d Guarda o ficheiro de palavras-passe onde consigas encontrá-lo (por exemplo, no ambiente de trabalho)\n%8$d %9$@"
+            "value" : "%1$d Abre e desbloqueia a aplicação **%2$s**\n%3$d Seleciona o cofre que pretendes exportar (só podes exportar um cofre de cada vez)\n%4$d Seleciona **Ficheiro → Exportar → Todos os elementos** na barra de menus\n%5$d Introduz a tua palavra-passe principal da aplicação ou da conta 1Password\n%6$d Seleciona o formato do ficheiro: **Porta-chaves em iCloud (.csv)**\n%7$d Guarda o ficheiro de palavras-passe onde consigas encontrá-lo (por exemplo, no ambiente de trabalho)\n%8$d %9$@"
           }
         },
         "ru" : {
@@ -26752,9 +27881,6 @@
           }
         }
       }
-    },
-    "IPv4 Address:" : {
-
     },
     "JavaScript Console" : {
       "comment" : "Main Menu View-Developer item",
@@ -30314,6 +31440,66 @@
         }
       }
     },
+    "menu.show.in.folder" : {
+      "comment" : "Menu item to show where a bookmark is located",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Ordner anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show in Folder"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar en la carpeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher dans le dossier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra nella cartella"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weergeven in map"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż w folderze"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar na pasta"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать в папке"
+          }
+        }
+      }
+    },
     "Merge All Windows" : {
       "comment" : "Main Menu Window item",
       "localizations" : {
@@ -32869,6 +34055,246 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Всплывающее окно скрыто"
+          }
+        }
+      }
+    },
+    "notification.browser.downgraded" : {
+      "comment" : "Notification informing user the app has been downgraded",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browser herabgestuft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Browser Downgraded"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navegador degradado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version antérieure du navigateur activée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browser declassato"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browser gedegradeerd"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zmieniono wersję przeglądarki na niższą"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navegador com versão anterior"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версия браузера понижена"
+          }
+        }
+      }
+    },
+    "notification.browser.updated" : {
+      "comment" : "Notification informing user the app has been updated",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browser aktualisiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Browser Updated"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navegador actualizado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigateur mis à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browser aggiornato"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browser bijgewerkt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zaktualizowano przeglądarkę"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navegador atualizado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Браузер обновлен"
+          }
+        }
+      }
+    },
+    "notification.critical.update" : {
+      "comment" : "Notification informing user a critical update is required.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kritisches Update erforderlich. Zum Aktualisieren neu starten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Critical update required. Restart to update."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se requiere una actualización crítica. Reinicia para actualizar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une mise à jour critique est requise. Redémarrer pour mettre à jour."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornamento critico obbligatorio. Riavvia per aggiornare."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kritieke update vereist. Start opnieuw om bij te werken."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wymagana krytyczna aktualizacja. Uruchom ponownie, aby zaktualizować."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualização crítica obrigatória. Reiniciar para atualizar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Требуется критическое обновление. Перезапустите приложение."
+          }
+        }
+      }
+    },
+    "notification.update.available" : {
+      "comment" : "Notification informing user the a version of app is available",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue Version verfügbar. Zum Aktualisieren neu starten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New version available. Restart to update."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueva versión disponible. Reinicia para actualizar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une nouvelle version est disponible. Redémarrer pour mettre à jour."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova versione disponibile. Riavvia per aggiornare."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuwe versie beschikbaar. Start opnieuw om bij te werken."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dostępna nowa wersja. Uruchom ponownie, aby zaktualizować."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nova versão disponível. Reiniciar para atualizar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доступна новая версия. Перезапустите приложение."
           }
         }
       }
@@ -40710,7 +42136,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si tus contraseñas se guardan en otro navegador, puedes importarlas a DuckDuckGo."
+            "value" : "Si tienes contraseñas guardadas en otro navegador, puedes importarlas a DuckDuckGo."
           }
         },
         "fr" : {
@@ -48776,6 +50202,66 @@
         }
       }
     },
+    "release.notes.menu.item" : {
+      "comment" : "Title of the dialog menu item that opens release notes",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versionshinweise"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Release Notes"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notas de la versión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes de mise à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note di rilascio"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Release-opmerkingen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informacje o wersji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notas de lançamento"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Примечания к релизу"
+          }
+        }
+      }
+    },
     "Reload Page" : {
       "comment" : "Main Menu View item",
       "localizations" : {
@@ -50583,6 +52069,486 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки..."
+          }
+        }
+      }
+    },
+    "settings.automatic.updates" : {
+      "comment" : "Title of the checkbox item to set up automatic updates of the browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updates automatisch installieren (empfohlen)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Automatically install updates (recommended)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalar actualizaciones automáticamente (recomendado)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installer automatiquement les mises à jour (recommandé)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installa automaticamente gli aggiornamenti (scelta consigliata)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updates automatisch installeren (aanbevolen)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatyczne instalowanie aktualizacji (zalecane)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalar atualizações automaticamente (recomendado)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически устанавливать обновления (рекомендуется)"
+          }
+        }
+      }
+    },
+    "settings.browser.updates.title" : {
+      "comment" : "Title of the section in Settings where people set up automatic vs manual updates",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browser-Updates"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Browser Updates"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizaciones del navegador"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mises à jour du navigateur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornamenti del browser"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browserupdates"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktualizacje przeglądarki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualizações do navegador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновления браузера"
+          }
+        }
+      }
+    },
+    "settings.checking.for.update" : {
+      "comment" : "Label informing users the app is currently checking for new update",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Update suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Checking for update"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscando actualización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification de la mise à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controllo della presenza di aggiornamenti"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controleren op updates"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprawdzanie dostępności aktualizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A verificar atualizações…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверка обновлений"
+          }
+        }
+      }
+    },
+    "settings.last.checked" : {
+      "comment" : "Label informing users what is the last time the app checked for the update.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuletzt nach Update gesucht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Last checked"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Última comprobación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernière vérification"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ultimo controllo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laatst gecontroleerd"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatnio sprawdzane"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Última verificação"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Последняя проверка"
+          }
+        }
+      }
+    },
+    "settings.manual.updates" : {
+      "comment" : "Title of the checkbox item to set up manual updates of the browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Updates suchen, aber selbst entscheiden, ob du sie installieren möchtest"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Check for updates but let you choose to install them"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprueba las actualizaciones, pero deja que tú decidas si las instalas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher les mises à jour sans les installer automatiquement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controlla gli aggiornamenti, ma ti fa scegliere se installarli"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controleren op updates, maar keuze om te installeren of niet"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprawdź dostępność aktualizacji, ale użytkownik decyduje o instalacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificar se existem atualizações, mas deixa-te escolher instalá-las"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверять на обновления, но доверить установку вам"
+          }
+        }
+      }
+    },
+    "settings.newer.version.available" : {
+      "comment" : "Label informing users the newer version of the app is available to install.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuere Version verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Newer version available"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión más reciente disponible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une version plus récente est disponible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È disponibile una versione più recente"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuwere versie beschikbaar"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dostępna nowsza wersja"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versão mais recente disponível"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доступна более новая версия"
+          }
+        }
+      }
+    },
+    "settings.restart.to.update" : {
+      "comment" : "Button label trigering restart and update of the application.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Aktualisieren neu starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Restart to Update"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar para actualizar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redémarrer pour mettre à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riavvia per aggiornare"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start opnieuw om bij te werken"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uruchom ponownie, aby zaktualizować"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar para atualizar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перезапустите для обновления"
+          }
+        }
+      }
+    },
+    "settings.up.to.date" : {
+      "comment" : "Label informing users the app is currently up to date and no update is required.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo ist auf dem neuesten Stand"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo is up to date"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo está actualizado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo est à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo è aggiornato"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo is up-to-date"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przeglądarka DuckDuckGo jest aktualna"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O DuckDuckGo está atualizado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo обновлен"
           }
         }
       }
@@ -52935,6 +54901,66 @@
         }
       }
     },
+    "tab.releaseNotes.title" : {
+      "comment" : "Title of deticated tab for Release Notes",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versionshinweise"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Release Notes"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notas de la versión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes de mise à jour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note di rilascio"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Release-opmerkingen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informacje o wersji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notas de lançamento"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Примечания к релизу"
+          }
+        }
+      }
+    },
     "Text Replacement" : {
       "comment" : "Main Menu Edit-Substitutions item",
       "localizations" : {
@@ -53747,6 +55773,66 @@
         }
       }
     },
+    "tooltip.bookmarks.search" : {
+      "comment" : "Tooltip to activate the bookmark search",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen durchsuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Search bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher des favoris"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers zoeken"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyszukaj zakładki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisar marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск по закладкам"
+          }
+        }
+      }
+    },
     "tooltip.bookmarks.shortcut" : {
       "comment" : "Tooltip for the bookmarks shortcut",
       "extractionState" : "extracted_with_value",
@@ -53803,6 +55889,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закладки"
+          }
+        }
+      }
+    },
+    "tooltip.bookmarks.sort" : {
+      "comment" : "Tooltip to activate the bookmark sort",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen sortieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sort bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trier les signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordina i segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers sorteren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortuj zakładki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сортировка закладок"
           }
         }
       }
@@ -55120,8 +57266,117 @@
         }
       }
     },
-    "Using a custom DNS server can impact browsing speeds and expose your activity to third parties if the server isn't secure or reliable." : {
-
+    "update.available.menu.item" : {
+      "comment" : "Title of the menu item that informs user that a new update is available. Clicking on the menu item restarts the app and installs the update",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update verfügbar – Jetzt neu starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update Available - Restart Now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualización disponible - Reiniciar ahora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mise à jour disponible : redémarrer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornamento disponibile - Riavvia ora"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update beschikbaar - nu opnieuw opstarten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dostępna aktualizacja — uruchom ponownie teraz"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualização disponível – Reiniciar agora"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доступно обновление: перезапустить"
+          }
+        }
+      }
+    },
+    "URL" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adres URL"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        }
+      }
     },
     "version" : {
       "comment" : "Displays the version and build numbers",
@@ -55232,6 +57487,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вид"
+          }
+        }
+      }
+    },
+    "view.details.button" : {
+      "comment" : "Button title to open more details about the update",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "View Details"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver detalles"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voir les détails"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda i dettagli"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details bekijken"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyświetl szczegóły"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver detalhes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробнее"
           }
         }
       }
@@ -55804,6 +58119,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Защита от отслеживания онлайн"
+          }
+        }
+      }
+    },
+    "whats.new.menu.item" : {
+      "comment" : "Title of the dialog menu item that opens the 'What's New' page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was gibt's Neues?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "What's New"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novedades"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveautés"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novità"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wat is er nieuw?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Co nowego"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novidades"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что нового"
           }
         }
       }

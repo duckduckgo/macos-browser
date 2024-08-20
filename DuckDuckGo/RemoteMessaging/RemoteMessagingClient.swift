@@ -55,6 +55,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         }()
     }
 
+    let database: CoreDataDatabase
     let endpoint: URL = Constants.endpoint
     let configFetcher: RemoteMessagingConfigFetching
     let configMatcherProvider: RemoteMessagingConfigMatcherProviding
@@ -65,6 +66,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         database: CoreDataDatabase,
         bookmarksDatabase: CoreDataDatabase,
         appearancePreferences: AppearancePreferences,
+        pinnedTabsManager: PinnedTabsManager,
         internalUserDecider: InternalUserDecider,
         configurationStore: ConfigurationStoring,
         remoteMessagingAvailabilityProvider: RemoteMessagingAvailabilityProviding,
@@ -73,6 +75,7 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         let provider = RemoteMessagingConfigMatcherProvider(
             bookmarksDatabase: bookmarksDatabase,
             appearancePreferences: appearancePreferences,
+            pinnedTabsManager: pinnedTabsManager,
             internalUserDecider: internalUserDecider
         )
         self.init(
@@ -137,6 +140,17 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
             }
     }
 
+    /// It's public in order to allow refreshing on demand via Debug menu. Otherwise it shouldn't be called from outside.
+    func refreshRemoteMessages() {
+        guard let store else {
+            return
+        }
+
+        Task {
+            try? await fetchAndProcess(using: store)
+        }
+    }
+
     private func stopRefreshingRemoteMessages() {
         scheduledRefreshCancellable?.cancel()
     }
@@ -181,19 +195,8 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         isRemoteMessagingDatabaseLoaded = true
     }
 
-    private let database: CoreDataDatabase
     private var isRemoteMessagingDatabaseLoaded = false
     private let remoteMessagingStoreProvider: RemoteMessagingStoreProviding
     private var scheduledRefreshCancellable: AnyCancellable?
     private var featureFlagCancellable: AnyCancellable?
-
-    private func refreshRemoteMessages() {
-        guard let store else {
-            return
-        }
-
-        Task {
-            try? await fetchAndProcess(using: store)
-        }
-    }
 }

@@ -77,6 +77,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     private(set) var userContentController: UserContentController?
+    private(set) var specialPagesUserScript: SpecialPagesUserScript?
 
     @MainActor
     convenience init(content: TabContent,
@@ -202,9 +203,14 @@ protocol NewWindowPolicyDecisionMaker {
         self.startupPreferences = startupPreferences
         self.tabsPreferences = tabsPreferences
 
+        self.specialPagesUserScript = SpecialPagesUserScript()
+        specialPagesUserScript?
+            .withAllSubfeatures()
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
-                                                 burnerMode: burnerMode)
+                                                 burnerMode: burnerMode,
+                                                 earlyAccessHandlers: specialPagesUserScript.map { [$0] } ?? [])
+
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
         assert(userContentController != nil)
@@ -1013,6 +1019,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.faviconScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
+        specialPagesUserScript = nil
     }
 
 }
@@ -1116,6 +1123,20 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     @MainActor
     func willStart(_ navigation: Navigation) {
         if error != nil { error = nil }
+
+        /*
+         From a certain point, WebKit no longer supports loading any URL with the "about:" scheme, except for "about:blank".
+         Although "about:" requests are approved without waiting for the `decidePolicyForNavigationAction:` decision, we will only receive the `willBegin` delegate call.
+         If we receive an "about:" request pointing to an internal page like "about:preferences" or others, we should redirect to a "duck://" address by directly setting the Tab Content.
+         Other "about:" URLs will fail to load and display an error page.
+         */
+        if navigation.url.navigationalScheme == .about, navigation.url != .blankPage {
+            let tabContent = TabContent.contentFromURL(navigation.url, source: .webViewUpdated)
+            guard case .url = tabContent else {
+                setContent(tabContent)
+                return
+            }
+        }
 
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
     }

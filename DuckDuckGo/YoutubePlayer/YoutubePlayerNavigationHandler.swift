@@ -18,6 +18,7 @@
 
 import Foundation
 import ContentScopeScripts
+import DuckPlayer
 
 struct YoutubePlayerNavigationHandler {
 

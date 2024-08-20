@@ -93,15 +93,11 @@ final class MainMenu: NSMenu {
 
     // MARK: Help
 
-    let helpMenu = NSMenu(title: UserText.mainMenuHelp) {
-        NSMenuItem(title: UserText.mainMenuHelpDuckDuckGoHelp, action: #selector(NSApplication.showHelp), keyEquivalent: "?")
-            .hidden()
-
-#if FEEDBACK
-        NSMenuItem.separator()
-        NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
-#endif
-    }
+    let helpMenu = NSMenu(title: UserText.mainMenuHelp)
+    let aboutMenuItem = NSMenuItem(title: UserText.about, action: #selector(AppDelegate.showAbout))
+    let releaseNotesMenuItem = NSMenuItem(title: UserText.releaseNotesMenuItem, action: #selector(AppDelegate.showReleaseNotes))
+    let whatIsNewMenuItem = NSMenuItem(title: UserText.whatsNewMenuItem, action: #selector(AppDelegate.showWhatIsNew))
+    let sendFeedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: #selector(AppDelegate.openFeedback))
 
     // MARK: - Initialization
 
@@ -378,7 +374,22 @@ final class MainMenu: NSMenu {
 
     func buildHelpMenu() -> NSMenuItem {
         NSMenuItem(title: UserText.mainMenuHelp)
-            .submenu(helpMenu)
+            .submenu(helpMenu.buildItems {
+                NSMenuItem(title: UserText.mainMenuHelpDuckDuckGoHelp, action: #selector(NSApplication.showHelp), keyEquivalent: "?")
+                    .hidden()
+
+                NSMenuItem.separator()
+
+                aboutMenuItem
+#if SPARKLE
+                releaseNotesMenuItem
+                whatIsNewMenuItem
+#endif
+
+#if FEEDBACK
+                sendFeedbackMenuItem
+#endif
+            })
     }
 
     required init(coder: NSCoder) {
@@ -584,14 +595,12 @@ final class MainMenu: NSMenu {
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
+                NSMenuItem(title: "Reset Remote Messages", action: #selector(AppDelegate.resetRemoteMessages))
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
                 NSMenuItem(title: "Show Credentials Saved Popover", action: #selector(MainViewController.showCredentialsSavedPopover))
                 NSMenuItem(title: "Show Pop Up Window", action: #selector(MainViewController.showPopUpWindow))
-                NSMenuItem(title: "Show VPN Thank You Modal", action: #selector(MainViewController.showVPNThankYouModal))
-                NSMenuItem(title: "Show PIR Thank You Modal", action: #selector(MainViewController.showPIRThankYouModal))
-                NSMenuItem(title: "Reset Thank You Modal Checks", action: #selector(MainViewController.resetThankYouModalChecks))
             }
             NSMenuItem(title: "Remote Configuration") {
                 customConfigurationUrlMenuItem
@@ -601,6 +610,8 @@ final class MainMenu: NSMenu {
                 NSMenuItem(title: "Set custom configuration URL…", action: #selector(MainViewController.setCustomConfigurationURL))
                 NSMenuItem(title: "Reset configuration to default", action: #selector(MainViewController.resetConfigurationToDefault))
             }
+            NSMenuItem(title: "Remote Messaging Framework")
+                .submenu(RemoteMessagingDebugMenu())
             NSMenuItem(title: "User Scripts") {
                 NSMenuItem(title: "Remove user scripts from selected tab", action: #selector(MainViewController.removeUserScripts))
             }
@@ -608,19 +619,20 @@ final class MainMenu: NSMenu {
                 .submenu(SyncDebugMenu())
                 .withAccessibilityIdentifier("MainMenu.syncAndBackup")
 
-#if DBP
             NSMenuItem(title: "Personal Information Removal")
                 .submenu(DataBrokerProtectionDebugMenu())
-#endif
 
             if case .normal = NSApp.runType {
                 NSMenuItem(title: "VPN")
                     .submenu(NetworkProtectionDebugMenu())
             }
 
-            NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
+            NSMenuItem(title: "Simulate crash") {
+                NSMenuItem(title: "fatalError", action: #selector(MainViewController.triggerFatalError))
+                NSMenuItem(title: "NSException", action: #selector(MainViewController.crashOnException))
+                NSMenuItem(title: "C++ exception", action: #selector(MainViewController.crashOnCxxException))
+            }
 
-            let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
             let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
             let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
 
@@ -637,14 +649,9 @@ final class MainMenu: NSMenu {
             SubscriptionDebugMenu(currentEnvironment: currentEnvironment,
                                   updateServiceEnvironment: updateServiceEnvironment,
                                   updatePurchasingPlatform: updatePurchasingPlatform,
-                                  isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
-                                  updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
                                   currentViewController: { WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController },
+                                  openSubscriptionTab: { WindowControllersManager.shared.showTab(with: .subscription($0)) },
                                   subscriptionManager: Application.appDelegate.subscriptionManager)
-
-            NSMenuItem(title: "Privacy Pro Survey") {
-                NSMenuItem(title: "Reset Remote Message Cache", action: #selector(MainViewController.resetSurveyRemoteMessages))
-            }
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }

@@ -26,7 +26,7 @@ class OnboardingManagerTests: XCTestCase {
     var navigationDelegate: CapturingOnboardingNavigation!
     var dockCustomization: CapturingDockCustomizer!
     var defaultBrowserProvider: CapturingDefaultBrowserProvider!
-    var apperancePreferences: AppearancePreferences!
+    var appearancePreferences: AppearancePreferences!
     var startupPreferences: StartupPreferences!
     var appearancePersistor: MockAppearancePreferencesPersistor!
     var startupPersistor: StartupPreferencesUserDefaultsPersistor!
@@ -37,10 +37,10 @@ class OnboardingManagerTests: XCTestCase {
         dockCustomization = CapturingDockCustomizer()
         defaultBrowserProvider = CapturingDefaultBrowserProvider()
         appearancePersistor = MockAppearancePreferencesPersistor()
-        apperancePreferences = AppearancePreferences(persistor: appearancePersistor)
-        startupPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: apperancePreferences)
-        startupPreferences = StartupPreferences(persistor: startupPersistor)
-        manager = OnboardingActionsManager(navigationDelegate: navigationDelegate, dockCustomization: dockCustomization, defaultBrowserProvider: defaultBrowserProvider, appearancePreferences: apperancePreferences, startupPreferences: startupPreferences)
+        appearancePreferences = AppearancePreferences(persistor: appearancePersistor)
+        startupPersistor = StartupPreferencesUserDefaultsPersistor()
+        startupPreferences = StartupPreferences(appearancePreferences: appearancePreferences, persistor: startupPersistor)
+        manager = OnboardingActionsManager(navigationDelegate: navigationDelegate, dockCustomization: dockCustomization, defaultBrowserProvider: defaultBrowserProvider, appearancePreferences: appearancePreferences, startupPreferences: startupPreferences)
     }
 
     override func tearDown() {
@@ -48,7 +48,7 @@ class OnboardingManagerTests: XCTestCase {
         navigationDelegate = nil
         dockCustomization = nil
         defaultBrowserProvider = nil
-        apperancePreferences = nil
+        appearancePreferences = nil
         startupPreferences = nil
         super.tearDown()
     }
@@ -118,6 +118,22 @@ class OnboardingManagerTests: XCTestCase {
         XCTAssertTrue(navigationDelegate.focusOnAddressBarCalled)
     }
 
+    func test_WhenFireNavigationDidEndTwice_FocusOnBarIsCalledOnlyOnce() {
+        // Given
+        let isOnboardingFinished = UserDefaultsWrapper(key: .onboardingFinished, defaultValue: true)
+        isOnboardingFinished.wrappedValue = false
+        manager.goToAddressBar()
+        navigationDelegate.fireNavigationDidEnd()
+        XCTAssertTrue(navigationDelegate.focusOnAddressBarCalled)
+        navigationDelegate.focusOnAddressBarCalled = false
+
+        // When
+        navigationDelegate.fireNavigationDidEnd()
+
+        // Then
+        XCTAssertFalse(navigationDelegate.focusOnAddressBarCalled)
+    }
+
     func testGoToAddressBar_NavigatesToSettings() {
         // When
         manager.goToSettings()
@@ -162,7 +178,7 @@ class OnboardingManagerTests: XCTestCase {
 
     func testOnSetBookmarksBar_andBarIsShown_ThenBarIsShown() {
         // Given
-        apperancePreferences.showBookmarksBar = true
+        appearancePreferences.showBookmarksBar = true
 
         // When
         manager.setBookmarkBar(enabled: false)
