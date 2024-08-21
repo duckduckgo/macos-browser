@@ -293,7 +293,6 @@ final class BookmarkOutlineCellView: NSTableCellView {
         favoriteImageView.image = bookmark.isFavorite ? .favoriteFilledBorder : nil
         favoriteImageView.isHidden = favoriteImageView.image == nil
 
-        highlight = false
         updateConstraints(isSearch: isSearch)
     }
 
@@ -315,8 +314,6 @@ final class BookmarkOutlineCellView: NSTableCellView {
             countLabel.stringValue = ""
             countLabel.isHidden = true
         }
-
-        highlight = false
         updateConstraints(isSearch: isSearch)
     }
 
@@ -335,8 +332,6 @@ final class BookmarkOutlineCellView: NSTableCellView {
         favoriteImageView.isHidden = true
         urlLabel.stringValue = ""
         self.toolTip = nil
-
-        highlight = false
     }
 
     func update(from menuItem: MenuItemNode) {
@@ -350,8 +345,6 @@ final class BookmarkOutlineCellView: NSTableCellView {
         urlLabel.stringValue = ""
         urlLabel.isHidden = true
         self.toolTip = nil
-
-        highlight = false
     }
 
 }

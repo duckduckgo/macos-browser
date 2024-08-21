@@ -18,7 +18,6 @@
 
 import Foundation
 import Network
-// swiftlint:disable:next enforce_os_log_wrapper
 import os.log
 
 public actor UDSClient {
