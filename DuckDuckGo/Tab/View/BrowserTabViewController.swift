@@ -433,15 +433,16 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToDuckPlayerOnboardingPrompt(of tabViewModel: TabViewModel?) {
-        tabViewModel?.tab.duckPlayerOnboardingPublisher.sink { [weak self, weak tab = tabViewModel?.tab] shouldShowBanner in
+        tabViewModel?.tab.duckPlayerOnboardingPublisher.sink { [weak self, weak tab = tabViewModel?.tab] onboardingState in
 
-            guard let self, let tab, let shouldShowBanner = shouldShowBanner, shouldShowBanner else  {
+            guard let self, let tab, let onboardingState = onboardingState, onboardingState.onboardingDecider.canDisplayOnboarding else  {
                 self?.duckPlayerOnboardingModalManager.close(animated: false)
                 return
             }
 
             self.duckPlayerOnboardingModalManager.show(on: self.view, animated: true)
             self.duckPlayerOnboardingModalManager.currentTab = tab
+            // You can now access onboardingState.onboardingDecider here
         }.store(in: &tabViewModelCancellables)
     }
 

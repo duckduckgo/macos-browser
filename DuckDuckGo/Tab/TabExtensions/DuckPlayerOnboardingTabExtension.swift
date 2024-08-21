@@ -20,8 +20,10 @@ import Foundation
 import Navigation
 import Combine
 
+typealias DuckPlayerOnboardingPublisher = AnyPublisher<OnboardingState?, Never>
+
 final class DuckPlayerOnboardingTabExtension: TabExtension {
-    @Published private(set) var shouldShowBanner: Bool?
+    @Published private(set) var onboardingState: OnboardingState?
     private let onboardingDecider: DuckPlayerOnboardingDecider
 
     init(onboardingDecider: DuckPlayerOnboardingDecider = DefaultDuckPlayerOnboardingDecider()) {
@@ -33,20 +35,24 @@ extension DuckPlayerOnboardingTabExtension: NavigationResponder {
 
     func navigationDidFinish(_ navigation: Navigation) {
         if navigation.url.absoluteString == "https://www.youtube.com/", onboardingDecider.canDisplayOnboarding {
-            shouldShowBanner = true
+            onboardingState = .init(onboardingDecider: onboardingDecider)
         }
     }
 }
 
+struct OnboardingState {
+    let onboardingDecider: DuckPlayerOnboardingDecider
+}
+
 protocol DuckPlayerOnboardingProtocol: AnyObject, NavigationResponder {
-    var duckPlayerOnboardingPublisher: AnyPublisher<Bool?, Never>  { get }
+    var duckPlayerOnboardingPublisher:DuckPlayerOnboardingPublisher  { get }
 }
 
 extension DuckPlayerOnboardingTabExtension: DuckPlayerOnboardingProtocol {
     func getPublicProtocol() -> DuckPlayerOnboardingProtocol { self }
 
-    var duckPlayerOnboardingPublisher: AnyPublisher<Bool?, Never> {
-        self.$shouldShowBanner.eraseToAnyPublisher()
+    var duckPlayerOnboardingPublisher: DuckPlayerOnboardingPublisher {
+        self.$onboardingState.eraseToAnyPublisher()
     }
 }
 
@@ -57,7 +63,7 @@ extension TabExtensions {
 }
 
 extension Tab {
-    var duckPlayerOnboardingPublisher: AnyPublisher<Bool?, Never> {
+    var duckPlayerOnboardingPublisher:DuckPlayerOnboardingPublisher {
         self.duckPlayerOnboarding?.duckPlayerOnboardingPublisher ?? Just(nil).eraseToAnyPublisher()
     }
 }

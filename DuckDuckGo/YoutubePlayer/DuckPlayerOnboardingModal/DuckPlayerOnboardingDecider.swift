@@ -24,7 +24,7 @@ protocol DuckPlayerOnboardingDecider {
 
     func setOnboardingAsDone()
     func setOpenFirstVideoOnDuckPlayer()
-    func markFirstVideoInDuckPlayerAsDone()
+    func setFirstVideoInDuckPlayerAsDone()
 
     func reset()
 }
@@ -41,7 +41,7 @@ struct DefaultDuckPlayerOnboardingDecider: DuckPlayerOnboardingDecider {
     }
 
     var shouldOpenFirstVideoOnDuckPlayer: Bool {
-        return !defaults.bool(forKey: firstVideoKey) && !defaults.bool(forKey: firstVideoDoneKey)
+        return defaults.bool(forKey: firstVideoKey) && !defaults.bool(forKey: firstVideoDoneKey)
     }
 
     func setOnboardingAsDone() {
@@ -52,7 +52,7 @@ struct DefaultDuckPlayerOnboardingDecider: DuckPlayerOnboardingDecider {
         defaults.set(true, forKey: firstVideoKey)
     }
 
-    func markFirstVideoInDuckPlayerAsDone() {
+    func setFirstVideoInDuckPlayerAsDone() {
         defaults.set(true, forKey: firstVideoDoneKey)
     }
 

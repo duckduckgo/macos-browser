@@ -41,7 +41,7 @@ final class DuckPlayerTabExtension {
         preferences.duckPlayerMode != .disabled
     }
     private var shouldOpenDuckPlayerDirectly: Bool {
-        preferences.duckPlayerMode == .enabled
+        preferences.duckPlayerMode == .enabled || onboardingDecider.shouldOpenFirstVideoOnDuckPlayer
     }
     private let preferences: DuckPlayerPreferences
 
@@ -53,17 +53,19 @@ final class DuckPlayerTabExtension {
     }
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
-
+    private let onboardingDecider: DuckPlayerOnboardingDecider
     private var shouldSelectNextNewTab: Bool?
 
     init(duckPlayer: DuckPlayer,
          isBurner: Bool,
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
          webViewPublisher: some Publisher<WKWebView, Never>,
-         preferences: DuckPlayerPreferences = .shared) {
+         preferences: DuckPlayerPreferences = .shared,
+         onboardingDecider: DuckPlayerOnboardingDecider = DefaultDuckPlayerOnboardingDecider()) {
         self.duckPlayer = duckPlayer
         self.isBurner = isBurner
         self.preferences = preferences
+        self.onboardingDecider = onboardingDecider
 
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
@@ -255,7 +257,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
     func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
         // Navigating to a Youtube URL without page reload
-        if duckPlayer.mode == .enabled,
+        if shouldOpenDuckPlayerDirectly,
            case .sessionStatePush = navigationType,
            let webView, let url = webView.url,
            url.isYoutubeVideo,
@@ -296,7 +298,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // SERP+Video <<<< YT (redirected to DP) <- Duck Player
         //
         if case .backForward(distance: let distance) = navigationAction.navigationType, distance < 0,
-           duckPlayer.mode == .enabled,
+           shouldOpenDuckPlayerDirectly,
            navigationAction.sourceFrame.url.isDuckPlayer,
            navigationAction.url.youtubeVideoID == navigationAction.sourceFrame.url.youtubeVideoID,
            let mainFrame = navigationAction.mainFrameTarget {
@@ -320,7 +322,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
 
         // Redirect youtube urls to Duck Player when [Always enable] preference is set
-        if duckPlayer.mode == .enabled
+        if shouldOpenDuckPlayerDirectly
             // - or - recommendations must always be opened in the Duck Player
             || (navigationAction.sourceFrame.url.isDuckPlayer && navigationAction.url.isYoutubeVideoRecommendation),
            let mainFrame = navigationAction.mainFrameTarget {
@@ -354,9 +356,12 @@ extension DuckPlayerTabExtension: NavigationResponder {
             return
         }
         if navigation.url.isDuckPlayer {
-            let setting = duckPlayer.mode == .enabled ? "always" : "default"
+            var setting = preferences.duckPlayerMode == .enabled ? "always" : "default"
             let newTabSettings = preferences.duckPlayerOpenInNewTab ? "true" : "false"
             let autoplay = preferences.duckPlayerAutoplay ? "true" : "false"
+
+            // WIP
+            onboardingDecider.setFirstVideoInDuckPlayerAsDone()
 
             PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView,
                           frequency: .legacyDaily,
