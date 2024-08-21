@@ -39,6 +39,31 @@ final class ConfigurationManager: DefaultConfigurationManager {
         PixelKit.fire(DebugEvent(domainEvent, error: error))
     }
 
+    private var fileDispatchSource: DispatchSourceFileSystemObject?
+
+    override init(fetcher: ConfigurationFetcher, defaults: UserDefaults = UserDefaults()) {
+        super.init(fetcher: fetcher, defaults: defaults)
+
+        do {
+            let fileHandle = try FileHandle(forReadingFrom: ConfigurationStore.shared.fileUrl(for: .privacyConfiguration))
+            fileDispatchSource = DispatchSource.makeFileSystemObjectSource(
+                fileDescriptor: fileHandle.fileDescriptor,
+                eventMask: .write,
+                queue: ConfigurationManager.queue
+            )
+            fileDispatchSource?.setEventHandler { [weak self] in
+                self?.updateConfigDependencies()
+            }
+            fileDispatchSource?.resume()
+        } catch {
+            os_log("unable to set up configuration dispatch source: %{public}s", log: .config, type: .error, error.localizedDescription)
+        }
+    }
+
+    deinit {
+        fileDispatchSource?.cancel()
+    }
+
     func log() {
         os_log("last update %{public}s", log: .config, type: .default, String(describing: lastUpdateTime))
         os_log("last refresh check %{public}s", log: .config, type: .default, String(describing: lastRefreshCheckTime))
