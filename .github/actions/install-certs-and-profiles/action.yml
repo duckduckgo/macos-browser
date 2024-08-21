@@ -10,36 +10,6 @@ inputs:
   KEYCHAIN_PASSWORD:
     required: true
     type: string
-  REVIEW_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  RELEASE_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
   APPSTORE_CI_PROVISION_PROFILE_BASE64:
     required: true
     type: string
@@ -52,13 +22,43 @@ inputs:
   DBP_AGENT_CI_PROVISION_PROFILE_BASE64:
     required: true
     type: string
+  DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
+  DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
   INTEGRATION_TESTS_APPSTORE_CI_PROVISION_PROFILE_BASE64:
     required: true
     type: string
   INTEGRATION_TESTS_CI_PROVISION_PROFILE_BASE64:
     required: true
     type: string
+  NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
+  NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
   NETP_NOTIFICATIONS_CI_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
+  NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
+  NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
+  NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
+  NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
+  RELEASE_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
+  REVIEW_PROVISION_PROFILE_BASE64:
     required: true
     type: string
   UNIT_TESTS_APPSTORE_CI_PROVISION_PROFILE_BASE64:
@@ -98,24 +98,23 @@ runs:
         # create variables
         CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
         KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-        REVIEW_PP_PATH=$RUNNER_TEMP/review_pp.provisionprofile
-        RELEASE_PP_PATH=$RUNNER_TEMP/release_pp.provisionprofile
-        DBP_AGENT_RELEASE_PP_PATH=$RUNNER_TEMP/dbp_agent_release_pp.provisionprofile
-        DBP_AGENT_REVIEW_PP_PATH=$RUNNER_TEMP/dbp_agent_review_pp.provisionprofile
-        NETP_SYSEX_RELEASE_PP_PATH=$RUNNER_TEMP/netp_sysex_release_pp.provisionprofile
-        NETP_SYSEX_REVIEW_PP_PATH=$RUNNER_TEMP/netp_sysex_review_pp.provisionprofile
-        NETP_AGENT_RELEASE_PP_PATH=$RUNNER_TEMP/netp_agent_release_pp.provisionprofile
-        NETP_AGENT_REVIEW_PP_PATH=$RUNNER_TEMP/netp_agent_review_pp.provisionprofile
-        NETP_NOTIFICATIONS_RELEASE_PP_PATH=$RUNNER_TEMP/netp_notifications_release_pp.provisionprofile
-        NETP_NOTIFICATIONS_REVIEW_PP_PATH=$RUNNER_TEMP/netp_notifications_review_pp.provisionprofile
-
         APPSTORE_CI_PP_PATH=$RUNNER_TEMP/appstore_ci.provisionprofile
         CI_PP_PATH=$RUNNER_TEMP/ci.provisionprofile
         DBP_AGENT_APPSTORE_CI_PP_PATH=$RUNNER_TEMP/dbp_agent_appstore_ci.provisionprofile
         DBP_AGENT_CI_PP_PATH=$RUNNER_TEMP/dbp_agent_ci.provisionprofile
+        DBP_AGENT_RELEASE_PP_PATH=$RUNNER_TEMP/dbp_agent_release_pp.provisionprofile
+        DBP_AGENT_REVIEW_PP_PATH=$RUNNER_TEMP/dbp_agent_review_pp.provisionprofile
         INTEGRATION_TESTS_APPSTORE_CI_PP_PATH=$RUNNER_TEMP/integration_tests_appstore_ci.provisionprofile
         INTEGRATION_TESTS_CI_PP_PATH=$RUNNER_TEMP/integration_tests_ci.provisionprofile
+        NETP_AGENT_RELEASE_PP_PATH=$RUNNER_TEMP/netp_agent_release_pp.provisionprofile
+        NETP_AGENT_REVIEW_PP_PATH=$RUNNER_TEMP/netp_agent_review_pp.provisionprofile
         NETP_NOTIFICATIONS_CI_PP_PATH=$RUNNER_TEMP/netp_notifications_ci.provisionprofile
+        NETP_NOTIFICATIONS_RELEASE_PP_PATH=$RUNNER_TEMP/netp_notifications_release_pp.provisionprofile
+        NETP_NOTIFICATIONS_REVIEW_PP_PATH=$RUNNER_TEMP/netp_notifications_review_pp.provisionprofile
+        NETP_SYSEX_RELEASE_PP_PATH=$RUNNER_TEMP/netp_sysex_release_pp.provisionprofile
+        NETP_SYSEX_REVIEW_PP_PATH=$RUNNER_TEMP/netp_sysex_review_pp.provisionprofile
+        RELEASE_PP_PATH=$RUNNER_TEMP/release_pp.provisionprofile
+        REVIEW_PP_PATH=$RUNNER_TEMP/review_pp.provisionprofile
         UNIT_TESTS_APPSTORE_CI_PP_PATH=$RUNNER_TEMP/unit_tests_appstore_ci.provisionprofile
         UNIT_TESTS_CI_PP_PATH=$RUNNER_TEMP/unit_tests_ci.provisionprofile
         VPN_APPEX_APPSTORE_CI_PP_PATH=$RUNNER_TEMP/vpn_appex_appstore_ci.provisionprofile
@@ -125,24 +124,23 @@ runs:
 
         # import certificate from secrets
         echo -n "${{ inputs.BUILD_CERTIFICATE_BASE64 }}" | base64 --decode -o $CERTIFICATE_PATH
-        echo -n "${{ inputs.REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $REVIEW_PP_PATH
-        echo -n "${{ inputs.RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $RELEASE_PP_PATH
-        echo -n "${{ inputs.DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $DBP_AGENT_RELEASE_PP_PATH
-        echo -n "${{ inputs.DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $DBP_AGENT_REVIEW_PP_PATH
-        echo -n "${{ inputs.NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_SYSEX_RELEASE_PP_PATH
-        echo -n "${{ inputs.NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_SYSEX_REVIEW_PP_PATH
-        echo -n "${{ inputs.NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_AGENT_RELEASE_PP_PATH
-        echo -n "${{ inputs.NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_AGENT_REVIEW_PP_PATH
-        echo -n "${{ inputs.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_NOTIFICATIONS_RELEASE_PP_PATH
-        echo -n "${{ inputs.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_NOTIFICATIONS_REVIEW_PP_PATH
-
         echo -n "${{ inputs.APPSTORE_CI_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $APPSTORE_CI_PP_PATH
         echo -n "${{ inputs.CI_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $CI_PP_PATH
         echo -n "${{ inputs.DBP_AGENT_APPSTORE_CI_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $DBP_AGENT_APPSTORE_CI_PP_PATH
         echo -n "${{ inputs.DBP_AGENT_CI_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $DBP_AGENT_CI_PP_PATH
+        echo -n "${{ inputs.DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $DBP_AGENT_RELEASE_PP_PATH
+        echo -n "${{ inputs.DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $DBP_AGENT_REVIEW_PP_PATH
         echo -n "${{ inputs.INTEGRATION_TESTS_APPSTORE_CI_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $INTEGRATION_TESTS_APPSTORE_CI_PP_PATH
         echo -n "${{ inputs.INTEGRATION_TESTS_CI_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $INTEGRATION_TESTS_CI_PP_PATH
+        echo -n "${{ inputs.NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_AGENT_RELEASE_PP_PATH
+        echo -n "${{ inputs.NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_AGENT_REVIEW_PP_PATH
         echo -n "${{ inputs.NETP_NOTIFICATIONS_CI_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_NOTIFICATIONS_CI_PP_PATH
+        echo -n "${{ inputs.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_NOTIFICATIONS_RELEASE_PP_PATH
+        echo -n "${{ inputs.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_NOTIFICATIONS_REVIEW_PP_PATH
+        echo -n "${{ inputs.NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_SYSEX_RELEASE_PP_PATH
+        echo -n "${{ inputs.NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_SYSEX_REVIEW_PP_PATH
+        echo -n "${{ inputs.RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $RELEASE_PP_PATH
+        echo -n "${{ inputs.REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $REVIEW_PP_PATH
         echo -n "${{ inputs.UNIT_TESTS_APPSTORE_CI_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $UNIT_TESTS_APPSTORE_CI_PP_PATH
         echo -n "${{ inputs.UNIT_TESTS_CI_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $UNIT_TESTS_CI_PP_PATH
         echo -n "${{ inputs.VPN_APPEX_APPSTORE_CI_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $VPN_APPEX_APPSTORE_CI_PP_PATH
@@ -162,28 +160,28 @@ runs:
 
         # apply provisioning profile
         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-        cp $REVIEW_PP_PATH \
-            $RELEASE_PP_PATH \
-            $DBP_AGENT_RELEASE_PP_PATH \
-            $DBP_AGENT_REVIEW_PP_PATH \
-            $NETP_SYSEX_RELEASE_PP_PATH \
-            $NETP_SYSEX_REVIEW_PP_PATH \
-            $NETP_AGENT_RELEASE_PP_PATH \
-            $NETP_AGENT_REVIEW_PP_PATH \
-            $NETP_NOTIFICATIONS_RELEASE_PP_PATH \
-            $NETP_NOTIFICATIONS_REVIEW_PP_PATH \
-            $APPSTORE_CI_PP_PATH \
+        cp $APPSTORE_CI_PP_PATH \
             $CI_PP_PATH \
             $DBP_AGENT_APPSTORE_CI_PP_PATH \
             $DBP_AGENT_CI_PP_PATH \
+            $DBP_AGENT_RELEASE_PP_PATH \
+            $DBP_AGENT_REVIEW_PP_PATH \
             $INTEGRATION_TESTS_APPSTORE_CI_PP_PATH \
             $INTEGRATION_TESTS_CI_PP_PATH \
+            $NETP_AGENT_RELEASE_PP_PATH \
+            $NETP_AGENT_REVIEW_PP_PATH \
             $NETP_NOTIFICATIONS_CI_PP_PATH \
+            $NETP_NOTIFICATIONS_RELEASE_PP_PATH \
+            $NETP_NOTIFICATIONS_REVIEW_PP_PATH \
+            $NETP_SYSEX_RELEASE_PP_PATH \
+            $NETP_SYSEX_REVIEW_PP_PATH \
+            $RELEASE_PP_PATH \
             $UNIT_TESTS_APPSTORE_CI_PP_PATH \
             $UNIT_TESTS_CI_PP_PATH \
             $VPN_APPEX_APPSTORE_CI_PP_PATH \
             $VPN_APP_APPSTORE_CI_PP_PATH \
             $VPN_APP_CI_PP_PATH \
             $VPN_PROXY_EXTENSION_CI_PP_PATH \
+            $REVIEW_PP_PATH \
             ~/Library/MobileDevice/Provisioning\ Profiles
       shell: bash
