@@ -299,33 +299,39 @@ extension HomePage.Views {
         var userBackgroundImagePickerView: some View {
             VStack(spacing: 16) {
                 backButton(title: "My Images")
-                grid(with: model.userBackgroundImagesPickerContent) { item in
-                    switch item {
-                    case .image(let userBackgroundImage):
-                        Button {
-                            withAnimation {
-                                if model.customBackground != .customImage(userBackgroundImage) {
-                                    model.customBackground = .customImage(userBackgroundImage)
-                                }
-                            }
-                        } label: {
-                            BackgroundPreview(customBackground: .customImage(userBackgroundImage))
-                        }
-                        .buttonStyle(.plain)
-                    case .addImage:
-                        BackgroundMode(
-                            modeModel: model.customBackgroundModeModel(for: .addImage),
-                            showTitle: false
-                        ) {
-                            withAnimation {
-                                model.contentType = .addImage
+                grid(with: model.availableUserBackgroundImages) { userBackgroundImage in
+                    Button {
+                        withAnimation {
+                            if model.customBackground != .customImage(userBackgroundImage) {
+                                model.customBackground = .customImage(userBackgroundImage)
                             }
                         }
+                    } label: {
+                        BackgroundPreview(customBackground: .customImage(userBackgroundImage))
                     }
+                    .buttonStyle(.plain)
                 }
+                addBackgroundButton
                 Text("Images are stored on your device so DuckDuckGo can't see or access them.")
                     .foregroundColor(.blackWhite60)
                     .multilineTextAlignment(.leading)
+            }
+        }
+
+        @ViewBuilder
+        var addBackgroundButton: some View {
+            let button = Button {
+                model.addNewImage()
+            } label: {
+                Text("Add Background")
+                    .frame(maxWidth: .infinity)
+            }
+                .controlSize(.large)
+
+            if #available(macOS 12.0, *) {
+                button.buttonStyle(.borderedProminent)
+            } else {
+                button.buttonStyle(DefaultActionButtonStyle(enabled: true))
             }
         }
 
@@ -508,7 +514,7 @@ extension HomePage.Views {
                     }
                 }
                 .contextMenu {
-                    Button("Delete Image", action: { model.customImagesManager.deleteImage(userBackgroundImage) })
+                    Button("Delete Background", action: { model.customImagesManager.deleteImage(userBackgroundImage) })
                 }
             case .none:
                 content()

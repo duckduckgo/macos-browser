@@ -72,17 +72,6 @@ extension HomePage.Models {
         let openSettings: () -> Void
 
         @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
-        enum UserBackgroundImageItem: Identifiable, Hashable {
-            case image(UserBackgroundImage)
-            case addImage
-            var id: Self { self }
-        }
-        var userBackgroundImagesPickerContent: [UserBackgroundImageItem] {
-            guard !availableUserBackgroundImages.isEmpty else {
-                return [.addImage]
-            }
-            return availableUserBackgroundImages.map(UserBackgroundImageItem.image) + [.addImage]
-        }
 
         private var availableCustomImagesCancellable: AnyCancellable?
 
@@ -121,7 +110,7 @@ extension HomePage.Models {
             didSet {
                 if contentType == .addImage, contentType != oldValue {
                     contentType = customImagesManager.availableImages.isEmpty ? .root : .customImagePicker
-                    uploadNewImage()
+                    addNewImage()
                 } else if contentType == .root, oldValue == .customImagePicker {
                     customImagesManager.sortImagesByLastUsed()
                 }
@@ -146,7 +135,7 @@ extension HomePage.Models {
             .init(red: backgroundColorRed, green: backgroundColorGreen, blue: backgroundColorBlue, alpha: backgroundColorAlpha)
         }
 
-        func uploadNewImage() {
+        func addNewImage() {
             let panel = NSOpenPanel(allowedFileTypes: [.image])
             guard case .OK = panel.runModal(), let url = panel.url else {
                 return

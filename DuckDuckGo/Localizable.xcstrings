@@ -882,6 +882,9 @@
         }
       }
     },
+    "Add Background" : {
+
+    },
     "add.bookmark.name" : {
       "comment" : "New bookmark folder dialog folder name field heading",
       "extractionState" : "extracted_with_value",
@@ -15857,7 +15860,7 @@
         }
       }
     },
-    "Delete Image" : {
+    "Delete Background" : {
 
     },
     "delete-bookmark" : {
