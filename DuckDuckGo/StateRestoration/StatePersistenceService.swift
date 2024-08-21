@@ -93,17 +93,16 @@ final class StatePersistenceService {
     /// if the state was loaded from `persistentState.1`, it will be renamed to `persistentState.2`
     /// `persistentState.2` won‘t restore windows automatically to avoid a possible crash loop
     func didLoadState() {
-        let fm = FileManager.default
         let location = URL.persistenceLocation(for: self.fileName)
         let location1 = URL.persistenceLocation(for: self.lastLoadedStateFileName)
         let location2 = URL.persistenceLocation(for: self.oldStateFileName)
-        if fm.fileExists(atPath: location.path) {
+        if fileStore.hasData(at: location) {
             fileStore.remove(fileAtURL: location1)
             fileStore.remove(fileAtURL: location2)
-            try? FileManager.default.moveItem(at: location, to: location1)
-        } else if fm.fileExists(atPath: location1.path) {
+            fileStore.move(fileAt: location, to: location1)
+        } else if fileStore.hasData(at: location1) {
             fileStore.remove(fileAtURL: location2)
-            try? FileManager.default.moveItem(at: location1, to: location2)
+            fileStore.move(fileAt: location1, to: location2)
         }
     }
 
