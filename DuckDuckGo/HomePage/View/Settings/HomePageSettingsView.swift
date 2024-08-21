@@ -34,15 +34,9 @@ extension HomePage.Views {
         var body: some View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    HStack(spacing: 0) {
-                        Text("Customize")
-                            .font(.system(size: 17).bold())
-                        Spacer()
-                        CloseButton(icon: .closeLarge, size: 28) {
-                            isSettingsVisible = false
-                            model.popToRootView()
-                        }
-                    }
+
+                    header
+
                     VStack(alignment: .leading, spacing: 36) {
                         switch model.contentType {
                         case .root:
@@ -79,6 +73,18 @@ extension HomePage.Views {
                         .frame(width: geometry.size.width, height: geometry.size.height)
                 }
             )
+        }
+
+        var header: some View {
+            HStack(spacing: 0) {
+                Text("Customize")
+                    .font(.system(size: 17).bold())
+                Spacer()
+                CloseButton(icon: .closeLarge, size: 28) {
+                    isSettingsVisible = false
+                    model.popToRootView()
+                }
+            }
         }
 
         var footer: some View {
@@ -348,49 +354,6 @@ extension HomePage.Views {
         }
     }
 
-    struct ThemePicker: View {
-        @EnvironmentObject var appearancePreferences: AppearancePreferences
-
-        var body: some View {
-            HStack(spacing: 24) {
-                ForEach(ThemeName.allCases, id: \.self) { theme in
-                    themeButton(for: theme)
-                }
-            }
-        }
-
-        func themeButton(for themeName: ThemeName) -> some View {
-            Button {
-                appearancePreferences.currentThemeName = themeName
-            } label: {
-                VStack(spacing: 6) {
-                    ZStack {
-                        themeName.pickerView
-                        Circle()
-                            .stroke(Color.black.opacity(0.12))
-                    }
-                    .frame(width: 42, height: 42)
-                    .padding(2)
-                    .background(selectionBackground(for: themeName))
-
-                    Text(themeName.displayName)
-                }
-            }
-            .buttonStyle(.plain)
-        }
-
-        func selectionBackground(for themeName: ThemeName) -> some View {
-            Group {
-                if appearancePreferences.currentThemeName == themeName {
-                    Circle()
-                        .stroke(Color(.linkBlue), lineWidth: 2)
-                } else {
-                    EmptyView()
-                }
-            }
-        }
-    }
-
     struct SettingsSection<Content>: View where Content: View {
         let title: String
         @ViewBuilder let content: () -> Content
@@ -520,74 +483,6 @@ extension HomePage.Views {
                     }
                 }
                 .padding(-2)
-            }
-        }
-    }
-
-    struct HomeContentSectionsView: View {
-        let includeContinueSetUpCards: Bool
-        @EnvironmentObject var model: AppearancePreferences
-        @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
-        @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
-        let iconSize: CGFloat = 16
-
-        var body: some View {
-            VStack(alignment: .leading, spacing: 12) {
-                if includeContinueSetUpCards {
-                    Toggle(isOn: $model.isContinueSetUpVisible) {
-                        HStack {
-                            Image(.rocketGrayscale)
-                                .frame(width: iconSize, height: iconSize)
-                            Text(UserText.newTabSetUpSectionTitle)
-                            Spacer()
-                        }
-                    }
-                    .toggleStyle(.switch)
-                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
-                }
-
-                Toggle(isOn: $model.isFavoriteVisible) {
-                    HStack {
-                        Image(.favorite)
-                            .frame(width: iconSize, height: iconSize)
-                        Text(UserText.newTabFavoriteSectionTitle)
-                        Spacer()
-                    }
-                }
-                .toggleStyle(.switch)
-
-                Toggle(isOn: $model.isRecentActivityVisible) {
-                    HStack {
-                        Image(.shield)
-                            .frame(width: iconSize, height: iconSize)
-                        Text(UserText.newTabRecentActivitySectionTitle)
-                        Spacer()
-                    }
-                }
-                .toggleStyle(.switch)
-            }
-        }
-    }
-}
-
-fileprivate extension ThemeName {
-    @ViewBuilder
-    var pickerView: some View {
-        switch self {
-        case .light:
-            Circle().fill(Color.colorSchemePickerWhite)
-        case .dark:
-            Circle().fill(Color.colorSchemePickerBlack)
-        case .systemDefault:
-            GeometryReader { geometry in
-                ZStack {
-                    Circle()
-                        .fill(Color.colorSchemePickerWhite)
-                        .clipShape(Rectangle().offset(x: -geometry.size.width/2))
-                    Circle()
-                        .fill(Color.colorSchemePickerBlack)
-                        .clipShape(Rectangle().offset(x: geometry.size.width/2))
-                }
             }
         }
     }
