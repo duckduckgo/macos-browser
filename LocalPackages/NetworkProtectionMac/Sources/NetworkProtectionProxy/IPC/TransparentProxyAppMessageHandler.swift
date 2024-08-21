@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import OSLog // swiftlint:disable:this enforce_os_log_wrapper
+import os.log
 import NetworkExtension
 
 /// Handles app messages

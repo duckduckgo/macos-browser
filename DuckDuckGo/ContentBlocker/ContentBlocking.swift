@@ -80,8 +80,7 @@ final class AppContentBlocking {
         contentBlockingManager = ContentBlockerRulesManager(rulesSource: contentBlockerRulesSource,
                                                             exceptionsSource: exceptionsSource,
                                                             cache: ContentBlockingRulesCache(),
-                                                            errorReporting: Self.debugEvents,
-                                                            log: .contentBlocking)
+                                                            errorReporting: Self.debugEvents)
         userContentUpdating = UserContentUpdating(contentBlockerRulesManager: contentBlockingManager,
                                                   privacyConfigurationManager: privacyConfigurationManager,
                                                   trackerDataManager: trackerDataManager,
