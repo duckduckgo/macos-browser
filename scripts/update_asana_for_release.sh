@@ -54,7 +54,14 @@ fetch_current_release_notes() {
 get_task_id() {
 	local url="$1"
 	if [[ "$url" =~ ${task_url_regex} ]]; then
-		echo "${BASH_REMATCH[1]}"
+		local task_id="${BASH_REMATCH[1]}"
+		local http_code
+		http_code=$(curl -fLSs "${asana_api_url}/tasks/${task_id}?opt_fields=gid" -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" --write-out '%{http_code}' --output /dev/null)
+		if [[ "$http_code" -eq 200 ]]; then
+			echo "${task_id}"
+		else
+			echo ""
+		fi
 	fi
 }
 
@@ -265,7 +272,11 @@ handle_internal_release() {
 
 	local task_ids=()
 	while read -r line; do
-		task_ids+=("$(get_task_id "$line")")
+		local task_id
+		task_id="$(get_task_id "$line")"
+		if [[ -n "$task_id" ]]; then
+			task_ids+=("$task_id")
+		fi
 	done <<< "$(find_task_urls_in_git_log "$last_release_tag")"
 
 	# 2. Fetch current release notes from Asana release task.
@@ -327,7 +338,11 @@ get_tasks_in_last_internal_release() {
 	# 2. Convert Asana task URLs from git commit messages to task IDs
 	local task_ids=()
 	while read -r line; do
-		task_ids+=("$(get_task_id "$line")")
+		local task_id
+		task_id="$(get_task_id "$line")"
+		if [[ -n "$task_id" ]]; then
+			task_ids+=("$task_id")
+		fi
 	done <<< "$(find_task_urls_in_git_log "$last_release_tag")"
 
 	# 3. Construct a HTML list of task IDs
