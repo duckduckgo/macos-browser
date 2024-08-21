@@ -48,7 +48,7 @@ class PasteboardBookmarkTests: XCTestCase {
         let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Example", isFavorite: false)
         let writer = BookmarkPasteboardWriter(bookmark: bookmark)
 
-        let pasteboard = NSPasteboard.test
+        let pasteboard = NSPasteboard.test()
         let types = writer.writableTypes(for: pasteboard)
         XCTAssert(types.contains(BookmarkPasteboardWriter.bookmarkUTIInternalType))
     }

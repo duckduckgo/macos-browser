@@ -395,9 +395,7 @@ extension BookmarksBarViewController: MouseOverButtonDelegate {
     }
 
 }
-
 // MARK: - Private
-
 private extension BookmarksBarViewController {
 
     func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for bookmark: Bookmark) {
@@ -526,9 +524,7 @@ private extension BookmarksBarViewController {
     }
 
 }
-
 // MARK: - Menu
-
 extension BookmarksBarViewController: NSMenuDelegate {
 
     public func menuNeedsUpdate(_ menu: NSMenu) {
@@ -542,7 +538,7 @@ extension BookmarksBarViewController: NSMenuDelegate {
     }
 
 }
-
+// MARK: - BookmarkListPopoverDelegate
 extension BookmarksBarViewController: BookmarkListPopoverDelegate {
 
     func popoverShouldClose(_ popover: NSPopover) -> Bool {
