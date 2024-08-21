@@ -26,20 +26,19 @@ private enum AnimationConsts {
 }
 
 protocol DuckPlayerOnboardingModalDelegate: AnyObject {
-    func duckPlayerOnboardingModal(_ modal: DuckPlayerOnboardingModal, didFinishWithResult result: Bool)
+    func duckPlayerOnboardingModalDidFinish(_ modal: DuckPlayerOnboardingModal)
 }
 
 public final class DuckPlayerOnboardingModal {
     weak var delegate: DuckPlayerOnboardingModalDelegate?
-    var viewController: DuckPlayerOnboardingViewController
-    var windowController: NSWindowController
-    private var resizeObserver: Any?
+    private lazy var viewController: DuckPlayerOnboardingViewController = {
+        let viewController = DuckPlayerOnboardingViewController()
+        viewController.delegate = self
+        return viewController
+    }()
 
-    private var cancellables = Set<AnyCancellable>()
-
-    public init() {
-        viewController = DuckPlayerOnboardingViewController()
-        windowController = NSWindowController(window: NSWindow(contentViewController: viewController))
+    private lazy var windowController: NSWindowController = {
+        let  windowController = NSWindowController(window: NSWindow(contentViewController: viewController))
 
         if let window = windowController.window {
             window.styleMask = [.borderless]
@@ -51,6 +50,14 @@ public final class DuckPlayerOnboardingModal {
             window.level = .floating
         }
         viewController.view.wantsLayer = true
+        return windowController
+    }()
+
+    private var resizeObserver: Any?
+    private var cancellables = Set<AnyCancellable>()
+
+    public init() {
+
     }
 
     public func close(animated: Bool, completion: (() -> Void)? = nil) {
@@ -139,5 +146,12 @@ public final class DuckPlayerOnboardingModal {
 
     public required init?(coder: NSCoder) {
         fatalError("DuckPlayerOnboardingModal: Bad initializer")
+    }
+}
+
+
+extension DuckPlayerOnboardingModal: DuckPlayerOnboardingViewControllerDelegate {
+    func duckPlayerOnboardingViewControllerDidFinish(_ viewController: DuckPlayerOnboardingViewController) {
+        delegate?.duckPlayerOnboardingModalDidFinish(self)
     }
 }

@@ -25,6 +25,12 @@ protocol DuckPlayerOnboardingViewModelDelegate: AnyObject {
 }
 
 final class DuckPlayerOnboardingViewModel: ObservableObject {
+    enum DuckPlayerModalCurrentView {
+        case onboardingOptions
+        case confirmation
+    }
+
+    @Published var currentView: DuckPlayerModalCurrentView = .onboardingOptions
     weak var delegate: DuckPlayerOnboardingViewModelDelegate?
 
     func handleTurnOnCTA() {
@@ -46,12 +52,11 @@ struct DuckPlayerOnboardingModalView: View {
     @State var didPressFrame = false
     let smallHeight: CGFloat = 182
     let bigHeight: CGFloat = 286
-    @State var shouldShowConfirmationView = false
 
     var body: some View {
         currentView
             .padding()
-            .frame(width: Consts.Layout.outerContainerWidth, height: shouldShowConfirmationView ? smallHeight: bigHeight)
+            .frame(width: Consts.Layout.outerContainerWidth, height: containerHeight)
             .padding(.horizontal)
             .background(Color("DialogPanelBackground"))
             .cornerRadius(Consts.Layout.containerCornerRadius)
@@ -61,16 +66,27 @@ struct DuckPlayerOnboardingModalView: View {
             )
     }
 
+    private var containerHeight: CGFloat {
+        switch viewModel.currentView {
+        case .confirmation:
+            return smallHeight
+
+        case .onboardingOptions:
+            return bigHeight
+        }
+    }
+
     @ViewBuilder
     var currentView: some View {
-        if shouldShowConfirmationView {
+        switch viewModel.currentView {
+        case .confirmation:
             DuckPlayerOnboardingConfirmationView {
-                shouldShowConfirmationView = false
                 viewModel.handleGotItCTA()
             }
-        } else {
+
+        case .onboardingOptions:
             DuckPlayerOnboardingChoiceView(turnOnButtonPressed: {
-                shouldShowConfirmationView = true
+                viewModel.currentView = .confirmation
                 viewModel.handleTurnOnCTA()
             }, notNowPressed: viewModel.handleNotNowCTA)
         }

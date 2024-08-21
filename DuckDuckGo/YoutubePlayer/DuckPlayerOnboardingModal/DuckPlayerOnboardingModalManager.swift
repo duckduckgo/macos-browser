@@ -72,6 +72,7 @@ final class DuckPlayerOnboardingModalManager {
 }
 
 extension DuckPlayerOnboardingModalManager: DuckPlayerOnboardingModalDelegate {
-    func duckPlayerOnboardingModal(_ modal: DuckPlayerOnboardingModal, didFinishWithResult result: Bool) {
+    func duckPlayerOnboardingModalDidFinish(_ modal: DuckPlayerOnboardingModal) {
+        self.close(animated: true)
     }
 }

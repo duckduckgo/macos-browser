@@ -19,7 +19,12 @@
 import SwiftUI
 import AppKit
 
+protocol DuckPlayerOnboardingViewControllerDelegate: AnyObject {
+    func duckPlayerOnboardingViewControllerDidFinish(_ viewController: DuckPlayerOnboardingViewController)
+}
+
 final class DuckPlayerOnboardingViewController: NSViewController {
+    weak var delegate: DuckPlayerOnboardingViewControllerDelegate?
 
     private var hostingView: NSHostingView<DuckPlayerOnboardingModalView>!
     private lazy var viewModel: DuckPlayerOnboardingViewModel = {
@@ -39,11 +44,11 @@ final class DuckPlayerOnboardingViewController: NSViewController {
     }
 
     private func handleNotNowActionButton() {
-        print("Not Now")
+        delegate?.duckPlayerOnboardingViewControllerDidFinish(self)
     }
 
     private func handleGotItActionButton() {
-        print("Got it")
+        delegate?.duckPlayerOnboardingViewControllerDidFinish(self)
     }
 }
 
