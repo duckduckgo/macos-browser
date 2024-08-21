@@ -234,6 +234,8 @@ extension AutoconsentUserScript {
         }
         let remoteConfig = self.config.settings(for: .autoconsent)
         let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
+        let isFilterListExperimentEnabled = config.isSubfeatureEnabled(AutoconsentSubfeature.filterlistExperiment)
+        let enableFilterList = isFilterListExperimentEnabled && AutoconsentFilterlistExperiment.cohort == AutoconsentFilterlistExperiment.test
 
         replyHandler([
             "type": "initResp",
@@ -245,7 +247,8 @@ extension AutoconsentUserScript {
                 "enablePrehide": true,
                 "enableCosmeticRules": true,
                 "detectRetries": 20,
-                "isMainWorld": false
+                "isMainWorld": false,
+                "enableFilterList": enableFilterList
             ] as [String: Any?]
         ] as [String: Any?], nil)
     }

@@ -17263,7 +17263,7 @@
     },
     "duck-player.autoplay-preference" : {
       "comment" : "Autoplay preference in settings",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -17857,6 +17857,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Проигрыватель Duck Player"
+          }
+        }
+      }
+    },
+    "duck-player.video-autoplay-preference" : {
+      "comment" : "Autoplay preference in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos automatisch abspielen, wenn sie im Duck Player geöffnet werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Autoplay videos when opened in Duck Player"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducir automáticamente los vídeos cuando se abran en Duck Player"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture automatique des vidéos ouvertes dans Duck Player"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riproduzione automatica dei video quando li apri in Duck Player"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video's automatisch afspelen wanneer ze worden geopend in Duck Player"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatyczne odtwarzanie filmów po otwarciu w Duck Player"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproduzir vídeos automaticamente quando abertos no Duck Player"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически проигрывать видео при открытии в Duck Player"
           }
         }
       }

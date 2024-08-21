@@ -18,7 +18,7 @@
 
 import Foundation
 import NetworkExtension
-import OSLog // swiftlint:disable:this enforce_os_log_wrapper
+import os.log
 
 /// A private global actor to handle UDP flows management
 ///

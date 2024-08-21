@@ -201,7 +201,7 @@ final class DuckPlayer {
                 // If user checks "Remember my choice" and clicks "Watch here", we won't show
                 // the overlay anymore, but will keep presenting Dax logos (the mode stays at
                 // "alwaysAsk" which may be a bit counterintuitive, but it's the overlayInteracted
-                // flag that plays a role here). We want to track users opting in to not showing overlays,
+                // flag that plays a role here). We want to anonymously track users opting in to not showing overlays,
                 // hence firing the pixel here.
                 if userValues.duckPlayerMode == .alwaysAsk {
                     switch origin {
@@ -248,10 +248,10 @@ final class DuckPlayer {
 
         var isAutoplayEnabled = DuckPlayerPreferences.shared.duckPlayerAutoplay
 
-        /// If the feature flag is disabled, we want to turn autoPlay to true since this was the default
+        /// If the feature flag is disabled, we want to turn autoPlay to false
         /// https://app.asana.com/0/1204167627774280/1207906550241281/f
         if !isAutoplayFeatureEnabled {
-            isAutoplayEnabled = true
+            isAutoplayEnabled = false
         }
 
         // Disable WebView PiP if if the subFeature is off
