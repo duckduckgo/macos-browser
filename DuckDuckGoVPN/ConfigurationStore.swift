@@ -44,7 +44,7 @@ final class ConfigurationStore: ConfigurationStoring {
     }
 
     static let shared = ConfigurationStore()
-    let defaults = UserDefaults.dbp
+    let defaults = UserDefaults.netP
 
     var privacyConfigurationEtag: String? {
         get {
@@ -66,7 +66,7 @@ final class ConfigurationStore: ConfigurationStoring {
         do {
             return try Data(contentsOf: file)
         } catch {
-            PixelKit.fire(DataBrokerProtectionPixels.errorLoadingCachedConfig(error))
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionConfigurationErrorLoadingCachedConfig(error))
             return nil
         }
     }
@@ -98,7 +98,7 @@ final class ConfigurationStore: ConfigurationStoring {
     func fileUrl(for config: Configuration) -> URL {
         let fm = FileManager.default
 
-        guard let dir = fm.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.dbpAppGroup) else { // TODO: Change to Configuration group
+        guard let dir = fm.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.bundleIdentifier!) else { // TODO: Change to Configuration group
             fatalError("Failed to get application group URL")
         }
         let subDir = dir.appendingPathComponent("Configuration")

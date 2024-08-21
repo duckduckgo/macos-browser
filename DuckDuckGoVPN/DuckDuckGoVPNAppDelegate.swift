@@ -19,7 +19,9 @@
 import AppLauncher
 import Cocoa
 import Combine
+import BrowserServicesKit
 import Common
+import Configuration
 import LoginItems
 import Networking
 import NetworkExtension
@@ -363,6 +365,14 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog)
 
+        // Setup Remote Configuration
+        Configuration.setURLProvider(VPNAgentConfigurationURLProvider())
+        ConfigurationManager.shared.start()
+        let privacyConfigurationManager = VPNPrivacyConfigurationManager.shared
+        // Load cached config (if any)
+        let configStore = ConfigurationStore.shared
+        privacyConfigurationManager.reload(etag: configStore.loadEtag(for: .privacyConfiguration), data: configStore.loadData(for: .privacyConfiguration))
+
         setupMenuVisibility()
 
         Task { @MainActor in
@@ -377,6 +387,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             launchInformation.update()
 
             setUpSubscriptionMonitoring()
+
+            if privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(BackgroundAgentPixelTestSubfeature.pixelTest) {
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionConfigurationPixelTest)
+            }
 
             if launchedOnStartup {
                 Task {

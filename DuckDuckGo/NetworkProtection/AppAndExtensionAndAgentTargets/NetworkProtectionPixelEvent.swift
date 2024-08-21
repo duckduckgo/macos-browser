@@ -19,6 +19,7 @@
 import Foundation
 import PixelKit
 import NetworkProtection
+import Configuration
 
 enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     static let vpnErrorDomain = "com.duckduckgo.vpn.errorDomain"
@@ -111,6 +112,10 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionDNSUpdateDefault
 
     case networkProtectionSystemExtensionActivationFailure(_ error: Error)
+
+    case networkProtectionConfigurationInvalidPayload(configuration: Configuration)
+    case networkProtectionConfigurationErrorLoadingCachedConfig(_ error: Error)
+    case networkProtectionConfigurationPixelTest
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
@@ -330,6 +335,15 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionDNSUpdateDefault:
             return "netp_ev_update_dns_default"
 
+        case .networkProtectionConfigurationInvalidPayload(let config):
+            return "netp_ev_configuration_\(config.rawValue)_invalid_payload".lowercased()
+
+        case .networkProtectionConfigurationErrorLoadingCachedConfig:
+            return "netp_ev_configuration_error_loading_cached_config"
+
+        case .networkProtectionConfigurationPixelTest:
+            return "netp_ev_configuration_pixel_test"
+
         case .networkProtectionUnhandledError:
             return "netp_unhandled_error"
         }
@@ -394,6 +408,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
             return [PixelKit.Parameters.reason: reason]
         case .networkProtectionServerMigrationFailure:
             return error?.pixelParameters
+        case .networkProtectionConfigurationErrorLoadingCachedConfig(let error):
+            return error.pixelParameters
         case .networkProtectionActiveUser,
                 .networkProtectionNewUser,
                 .networkProtectionControllerStartAttempt,
@@ -442,7 +458,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionServerMigrationAttempt,
                 .networkProtectionServerMigrationSuccess,
                 .networkProtectionDNSUpdateCustom,
-                .networkProtectionDNSUpdateDefault:
+                .networkProtectionDNSUpdateDefault,
+                .networkProtectionConfigurationInvalidPayload,
+                .networkProtectionConfigurationPixelTest:
             return nil
         }
     }
@@ -469,7 +487,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionRekeyFailure(let error),
                 .networkProtectionUnhandledError(_, _, let error),
                 .networkProtectionSystemExtensionActivationFailure(let error),
-                .networkProtectionServerMigrationFailure(let error):
+                .networkProtectionServerMigrationFailure(let error),
+                .networkProtectionConfigurationErrorLoadingCachedConfig(let error):
             return error
         case .networkProtectionActiveUser,
                 .networkProtectionNewUser,
@@ -521,7 +540,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionServerMigrationAttempt,
                 .networkProtectionServerMigrationSuccess,
                 .networkProtectionDNSUpdateCustom,
-                .networkProtectionDNSUpdateDefault:
+                .networkProtectionDNSUpdateDefault,
+                .networkProtectionConfigurationInvalidPayload,
+                .networkProtectionConfigurationPixelTest:
             return nil
         }
     }
