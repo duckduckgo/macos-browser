@@ -425,11 +425,11 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         sut.fireCustomStatsPixelsIfNeeded()
 
         // There is a 100ms delay between pixels firing, so we need a delay
-        DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + 4.0) {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: 2.0) { error in
+        waitForExpectations(timeout: 5.0) { error in
             if let error = error {
                 XCTFail("Expectation failed with error: \(error)")
             }
