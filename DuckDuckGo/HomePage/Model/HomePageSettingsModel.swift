@@ -39,7 +39,6 @@ extension HomePage.Models {
             case colorPicker
             case illustrationPicker
             case customImagePicker
-            case addImage
 
             var customBackgroundType: CustomBackgroundType? {
                 switch self {
@@ -51,7 +50,7 @@ extension HomePage.Models {
                         .illustration
                 case .customImagePicker:
                         .customImage
-                case .root, .addImage:
+                case .root:
                     nil
                 }
             }
@@ -106,12 +105,29 @@ extension HomePage.Models {
                 .assign(to: \.availableUserBackgroundImages, onWeaklyHeld: self)
         }
 
-        @Published var contentType: ContentType = .root {
+        var hasUserImages: Bool {
+            !customImagesManager.availableImages.isEmpty
+        }
+
+        func popToRootView() {
+            withAnimation {
+                contentType = .root
+            }
+        }
+
+        func handleRootGridSelection(_ modeModel: CustomBackgroundModeModel) {
+            if modeModel.contentType == .customImagePicker && !hasUserImages {
+                addNewImage()
+            } else {
+                withAnimation {
+                    contentType = modeModel.contentType
+                }
+            }
+        }
+
+        @Published private(set) var contentType: ContentType = .root {
             didSet {
-                if contentType == .addImage, contentType != oldValue {
-                    contentType = customImagesManager.availableImages.isEmpty ? .root : .customImagePicker
-                    addNewImage()
-                } else if contentType == .root, oldValue == .customImagePicker {
+                if contentType == .root, oldValue == .customImagePicker {
                     customImagesManager.sortImagesByLastUsed()
                 }
             }
@@ -173,6 +189,7 @@ extension HomePage.Models {
                     customBackgroundPreview: .illustration(customBackground?.illustration ?? CustomBackground.placeholderIllustration)
                 )
             case .customImagePicker:
+                let title = customImagesManager.availableImages.isEmpty ? "Add Background" : "My Backgrounds"
                 let preview: CustomBackground? = {
                     guard customBackground?.userBackgroundImage == nil else {
                         return customBackground
@@ -182,9 +199,7 @@ extension HomePage.Models {
                     }
                     return .customImage(lastUsedUserBackgroundImage)
                 }()
-                return CustomBackgroundModeModel(contentType: .customImagePicker, title: "My Backgrounds", customBackgroundPreview: preview)
-            case .addImage:
-                return CustomBackgroundModeModel(contentType: .addImage, title: "Add Background", customBackgroundPreview: nil)
+                return CustomBackgroundModeModel(contentType: .customImagePicker, title: title, customBackgroundPreview: preview)
             }
         }
 
@@ -192,13 +207,9 @@ extension HomePage.Models {
             var modes: [CustomBackgroundModeModel] = [
                 customBackgroundModeModel(for: .gradientPicker),
                 customBackgroundModeModel(for: .colorPicker),
-                customBackgroundModeModel(for: .illustrationPicker)
+                customBackgroundModeModel(for: .illustrationPicker),
+                customBackgroundModeModel(for: .customImagePicker)
             ]
-            if customImagesManager.availableImages.count > 0 {
-                modes.append(customBackgroundModeModel(for: .customImagePicker))
-            } else {
-                modes.append(customBackgroundModeModel(for: .addImage))
-            }
             return modes
         }
 

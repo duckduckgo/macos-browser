@@ -65,7 +65,6 @@ extension HomePage.Views {
                 ZStack(alignment: .top) {
 
                     HStack(spacing: 0) {
-                        // Left view
                         ZStack(alignment: .leading) {
                             ScrollView {
                                 innerView(includingContinueSetUpCards: includingContinueSetUpCards)
@@ -79,7 +78,6 @@ extension HomePage.Views {
                         .frame(width: isSettingsVisible ? geometry.size.width - settingsPanelWidth : geometry.size.width)
 
                         if isSettingsVisible {
-                            // Right view
                             SettingsView(includingContinueSetUpCards: includingContinueSetUpCards, isSettingsVisible: $isSettingsVisible)
                                 .frame(width: settingsPanelWidth)
                                 .transition(.move(edge: .trailing))

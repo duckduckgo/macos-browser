@@ -39,15 +39,13 @@ extension HomePage.Views {
                             .font(.system(size: 17).bold())
                         Spacer()
                         CloseButton(icon: .closeLarge, size: 28) {
-                            withAnimation {
-                                isSettingsVisible = false
-                                model.contentType = .root
-                            }
+                            isSettingsVisible = false
+                            model.popToRootView()
                         }
                     }
                     VStack(alignment: .leading, spacing: 36) {
                         switch model.contentType {
-                        case .root, .addImage:
+                        case .root:
                             rootView
                                 .transition(.move(edge: .leading).combined(with: .opacity))
                         case .colorPicker:
@@ -104,9 +102,7 @@ extension HomePage.Views {
 
         func backButton(title: String) -> some View {
             Button {
-                withAnimation {
-                    model.contentType = .root
-                }
+                model.popToRootView()
             } label: {
                 HStack(spacing: 4) {
                     Image(nsImage: .chevronMediumRight16).rotationEffect(.degrees(180))
@@ -123,9 +119,7 @@ extension HomePage.Views {
             SettingsSection(title: "Background") {
                 grid(with: model.customBackgroundModes) { mode in
                     BackgroundMode(modeModel: mode) {
-                        withAnimation {
-                            model.contentType = mode.contentType
-                        }
+                        model.handleRootGridSelection(mode)
                     }
                 }
                 TextButton("Reset Background") {
@@ -427,7 +421,7 @@ extension HomePage.Views {
             Button(action: action) {
                 VStack(alignment: .leading, spacing: 6) {
                     ZStack {
-                        if modeModel.contentType == .addImage {
+                        if modeModel.contentType == .customImagePicker && !model.hasUserImages {
                             BackgroundPreview(showSelectionCheckmark: true) {
                                 ZStack {
                                     Color.blackWhite5
