@@ -22,18 +22,19 @@ import Combine
 
 final class DuckPlayerOnboardingTabExtension: TabExtension {
     @Published private(set) var shouldShowBanner: Bool?
+    private let onboardingDecider: DuckPlayerOnboardingDecider
+
+    init(onboardingDecider: DuckPlayerOnboardingDecider = DefaultDuckPlayerOnboardingDecider()) {
+        self.onboardingDecider = onboardingDecider
+    }
 }
 
 extension DuckPlayerOnboardingTabExtension: NavigationResponder {
 
-    @MainActor
-    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-
-        if navigationAction.url.absoluteString == "https://www.youtube.com/" {
+    func navigationDidFinish(_ navigation: Navigation) {
+        if navigation.url.absoluteString == "https://www.youtube.com/", onboardingDecider.canDisplayOnboarding {
             shouldShowBanner = true
-            return .allow
         }
-        return .allow
     }
 }
 

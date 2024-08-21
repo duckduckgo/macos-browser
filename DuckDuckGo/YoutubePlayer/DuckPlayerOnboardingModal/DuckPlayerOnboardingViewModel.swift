@@ -25,9 +25,15 @@ protocol DuckPlayerOnboardingViewModelDelegate: AnyObject {
 }
 
 final class DuckPlayerOnboardingViewModel: ObservableObject {
+    private let onboardingDecider: DuckPlayerOnboardingDecider
+
     enum DuckPlayerModalCurrentView {
         case onboardingOptions
         case confirmation
+    }
+
+    init(onboardingDecider: DuckPlayerOnboardingDecider = DefaultDuckPlayerOnboardingDecider()) {
+        self.onboardingDecider = onboardingDecider
     }
 
     @Published var currentView: DuckPlayerModalCurrentView = .onboardingOptions
@@ -35,10 +41,14 @@ final class DuckPlayerOnboardingViewModel: ObservableObject {
 
     func handleTurnOnCTA() {
         delegate?.duckPlayerOnboardingViewModelDidSelectTurnOn(self)
+
+        onboardingDecider.setOpenFirstVideoOnDuckPlayer()
+        onboardingDecider.setOnboardingAsDone()
     }
 
     func handleNotNowCTA() {
         delegate?.duckPlayerOnboardingViewModelDidSelectNotNow(self)
+        onboardingDecider.setOnboardingAsDone()
     }
 
     func handleGotItCTA() {
