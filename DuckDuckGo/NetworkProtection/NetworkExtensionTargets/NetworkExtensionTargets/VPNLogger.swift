@@ -18,8 +18,7 @@
 
 import Foundation
 import NetworkProtection
-// swiftlint:disable:next enforce_os_log_wrapper
-import OSLog
+import os.log
 
 /// Logger for the VPN
 ///

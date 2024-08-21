@@ -37,7 +37,7 @@ class BookmarkNodeTests: XCTestCase {
     }
 
     func testWhenIsRootNode_ThenIsRootReturnsCorrectValue() {
-        let rootNode = BookmarkNode(representedObject: TestObject(), parent: nil)
+        let rootNode = BookmarkNode.genericRootNode()
         XCTAssertTrue(rootNode.isRoot)
 
         let childNode = BookmarkNode(representedObject: TestObject(), parent: rootNode)
