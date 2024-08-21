@@ -21,11 +21,29 @@ import Foundation
 final class StatePersistenceService {
     private let fileStore: FileStore
     private let fileName: String
+    ///  The `persistentState` file is renamed to `persistentState.1` after it‘s loaded for the first time
+    ///  if no new persistentState is written during the session it will be used on the next load and renamed to `persistentState.2`
+    private var lastLoadedStateFileName: String {
+        fileName + ".1"
+    }
+    private var oldStateFileName: String {
+        fileName + ".2"
+    }
     private var lastSessionStateArchive: Data?
     private let queue = DispatchQueue(label: "StateRestorationManager.queue", qos: .background)
     private var job: DispatchWorkItem?
 
     private(set) var error: Error?
+
+    /// `false` if `persistentState` or `persistentState.1` file exists,
+    /// `true` if `persistentState.2` (old app state that was not updated after 2nd app relaunch) file exists
+    var isAppStateFileStale: Bool {
+        if fileStore.hasData(at: .persistenceLocation(for: fileName)) || fileStore.hasData(at: .persistenceLocation(for: lastLoadedStateFileName)) {
+            return false
+        } else {
+            return true
+        }
+    }
 
     init(fileStore: FileStore, fileName: String) {
         self.fileStore = fileStore
@@ -49,8 +67,7 @@ final class StatePersistenceService {
 
         job?.cancel()
         job = DispatchWorkItem {
-            let location = URL.persistenceLocation(for: self.fileName)
-            self.fileStore.remove(fileAtURL: location)
+            self.performClearState()
         }
         queue.dispatch(job!, sync: sync)
     }
@@ -63,9 +80,31 @@ final class StatePersistenceService {
         lastSessionStateArchive = loadStateFromFile()
     }
 
-    func removeLastSessionState() {
+    // perform state clearing synchronously, called from `clearState(sync:)` on `StateRestorationManager.queue`
+    func performClearState() {
         lastSessionStateArchive = nil
-        fileStore.remove(fileAtURL: URL.persistenceLocation(for: self.fileName))
+        let location = URL.persistenceLocation(for: self.fileName)
+        fileStore.remove(fileAtURL: location)
+        fileStore.remove(fileAtURL: .persistenceLocation(for: self.lastLoadedStateFileName))
+        fileStore.remove(fileAtURL: .persistenceLocation(for: self.oldStateFileName))
+    }
+
+    /// rename `persistentState` to `persistentState.1` after the state was loaded
+    /// if the state was loaded from `persistentState.1`, it will be renamed to `persistentState.2`
+    /// `persistentState.2` won‘t restore windows automatically to avoid a possible crash loop
+    func didLoadState() {
+        let fm = FileManager.default
+        let location = URL.persistenceLocation(for: self.fileName)
+        let location1 = URL.persistenceLocation(for: self.lastLoadedStateFileName)
+        let location2 = URL.persistenceLocation(for: self.oldStateFileName)
+        if fm.fileExists(atPath: location.path) {
+            fileStore.remove(fileAtURL: location1)
+            fileStore.remove(fileAtURL: location2)
+            try? FileManager.default.moveItem(at: location, to: location1)
+        } else if fm.fileExists(atPath: location1.path) {
+            fileStore.remove(fileAtURL: location2)
+            try? FileManager.default.moveItem(at: location1, to: location2)
+        }
     }
 
     @MainActor
@@ -93,12 +132,16 @@ final class StatePersistenceService {
             if !self.fileStore.persist(data, url: location) {
                 self.error = CocoaError(.fileWriteNoPermission)
             }
+            self.fileStore.remove(fileAtURL: .persistenceLocation(for: self.lastLoadedStateFileName))
+            self.fileStore.remove(fileAtURL: .persistenceLocation(for: self.oldStateFileName))
         }
         queue.dispatch(job!, sync: sync)
     }
 
     private func loadStateFromFile() -> Data? {
         fileStore.loadData(at: URL.persistenceLocation(for: self.fileName), decryptIfNeeded: false)
+        ?? fileStore.loadData(at: .persistenceLocation(for: self.lastLoadedStateFileName), decryptIfNeeded: false)
+        ?? fileStore.loadData(at: .persistenceLocation(for: self.oldStateFileName), decryptIfNeeded: false)
     }
 
     @MainActor
