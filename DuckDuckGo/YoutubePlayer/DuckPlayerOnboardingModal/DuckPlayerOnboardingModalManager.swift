@@ -18,42 +18,78 @@
 
 import Foundation
 
+/// A manager for presenting the DuckPlayer onboarding modal.
+///
+/// The `DuckPlayerOnboardingModalManager` class is responsible for presenting the onboarding modal and handling its lifecycle.
+///
 final class DuckPlayerOnboardingModalManager {
-    var completion: ((Bool) -> Void)?
     weak var currentTab: Tab?
-
     private(set) var modal: DuckPlayerOnboardingModal?
+}
 
+// MARK: - Public functions
+
+extension DuckPlayerOnboardingModalManager {
+    /**
+     Called when the cookie consent popover is finished.
+
+     - Parameters:
+       - modal: The onboarding modal instance.
+       - result: A `Bool` indicating whether the user consented to cookies.
+     */
     func cookieConsentPopover(_ modal: DuckPlayerOnboardingModal, didFinishWithResult result: Bool) {
         modal.close(animated: true) {
             withExtendedLifetime(modal) {}
         }
         self.modal = nil
         self.currentTab = nil
-
-        if let completion = completion {
-            completion(result)
-        }
     }
 
-    func show(on view: NSView, animated: Bool, result: ((Bool) -> Void)? = nil) {
+    /**
+     Shows the onboarding modal on the specified view.
+
+     - Parameters:
+       - view: The view on which to show the modal.
+       - animated: A `Bool` indicating whether to animate the presentation.
+
+     - Note: If the modal is already presented, this method does nothing.
+     */
+    func show(on view: NSView, animated: Bool) {
         prepareModal()
         guard let modal = modal else {
             return
         }
 
         modal.show(on: view, animated: animated)
-        if let result = result {
-            self.completion = result
-        }
     }
 
+    /**
+     Closes the onboarding modal and cleans up memory references.
+
+     - Parameters:
+       - animated: A `Bool` indicating whether to animate the dismissal.
+
+     - Note: If the modal is not presented, this method does nothing.
+     */
     func close(animated: Bool) {
         guard let modal = modal else {
             return
         }
 
-        modal.close(animated: animated)
+        modal.close(animated: animated) { [weak self] in
+            self?.cleanUp()
+        }
+    }
+
+}
+
+// MARK: - Private functions
+
+extension DuckPlayerOnboardingModalManager {
+
+    private func cleanUp() {
+        self.modal = nil
+        self.currentTab = nil
     }
 
     private func prepareModal() {
@@ -72,6 +108,7 @@ final class DuckPlayerOnboardingModalManager {
 }
 
 extension DuckPlayerOnboardingModalManager: DuckPlayerOnboardingModalDelegate {
+
     func duckPlayerOnboardingModalDidFinish(_ modal: DuckPlayerOnboardingModal) {
         self.close(animated: true)
     }

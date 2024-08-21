@@ -18,61 +18,39 @@
 
 import SwiftUI
 
-protocol DuckPlayerOnboardingViewModelDelegate: AnyObject {
-    func duckPlayerOnboardingViewModelDidSelectTurnOn(_ viewModel: DuckPlayerOnboardingViewModel)
-    func duckPlayerOnboardingViewModelDidSelectNotNow(_ viewModel: DuckPlayerOnboardingViewModel)
-    func duckPlayerOnboardingViewModelDidSelectGotIt(_ viewModel: DuckPlayerOnboardingViewModel)
-}
-
-final class DuckPlayerOnboardingViewModel: ObservableObject {
-    enum DuckPlayerModalCurrentView {
-        case onboardingOptions
-        case confirmation
-    }
-
-    @Published var currentView: DuckPlayerModalCurrentView = .onboardingOptions
-    weak var delegate: DuckPlayerOnboardingViewModelDelegate?
-
-    func handleTurnOnCTA() {
-        delegate?.duckPlayerOnboardingViewModelDidSelectTurnOn(self)
-    }
-
-    func handleNotNowCTA() {
-        delegate?.duckPlayerOnboardingViewModelDidSelectNotNow(self)
-    }
-
-    func handleGotItCTA() {
-        delegate?.duckPlayerOnboardingViewModelDidSelectGotIt(self)
-    }
-}
-
 struct DuckPlayerOnboardingModalView: View {
+    private enum Constants {
+        static let outerContainerWidth: CGFloat = 504
+        static let smallContainerHeight: CGFloat = 182
+        static let bigContainerHeight: CGFloat = 286
+        static let containerCornerRadius: CGFloat = 12
+        static let darkModeBorderColor: Color = .white.opacity(0.2)
+        static let whiteModeBorderColor: Color = .black.opacity(0.1)
+    }
+
     @ObservedObject var viewModel: DuckPlayerOnboardingViewModel
     @Environment(\.colorScheme) var colorScheme
-    @State var didPressFrame = false
-    let smallHeight: CGFloat = 182
-    let bigHeight: CGFloat = 286
 
     var body: some View {
         currentView
             .padding()
-            .frame(width: Consts.Layout.outerContainerWidth, height: containerHeight)
+            .frame(width: Constants.outerContainerWidth, height: containerHeight)
             .padding(.horizontal)
             .background(Color("DialogPanelBackground"))
-            .cornerRadius(Consts.Layout.containerCornerRadius)
+            .cornerRadius(Constants.containerCornerRadius)
             .overlay(
-                RoundedRectangle(cornerRadius: Consts.Layout.containerCornerRadius)
-                    .stroke(colorScheme == .dark ? Consts.Colors.darkModeBorderColor : Consts.Colors.whiteModeBorderColor, lineWidth: 1)
+                RoundedRectangle(cornerRadius: Constants.containerCornerRadius)
+                    .stroke(colorScheme == .dark ? Constants.darkModeBorderColor : Constants.whiteModeBorderColor, lineWidth: 1)
             )
     }
 
     private var containerHeight: CGFloat {
         switch viewModel.currentView {
         case .confirmation:
-            return smallHeight
+            return Constants.smallContainerHeight
 
         case .onboardingOptions:
-            return bigHeight
+            return Constants.bigContainerHeight
         }
     }
 
@@ -192,7 +170,6 @@ private struct DaxSpeechBubble<Content: View>: View {
 }
 
 private struct SpeechBubble: View {
-
     let radius: CGFloat = 20
     let tailSize: CGFloat = 12
     let tailPosition: CGFloat = 38
@@ -249,6 +226,10 @@ private struct SpeechBubble: View {
     }
 }
 
+private enum CTAConstants {
+    static let CTACornerRadius: CGFloat = 8
+}
+
 private struct PrimaryCTAStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
@@ -259,7 +240,7 @@ private struct PrimaryCTAStyle: ButtonStyle {
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity)
             .truncationMode(.tail)
-            .background(RoundedRectangle(cornerRadius: Consts.Layout.CTACornerRadius, style: .continuous).fill(color))
+            .background(RoundedRectangle(cornerRadius: CTAConstants.CTACornerRadius, style: .continuous).fill(color))
             .foregroundColor(.white)
             .font(.system(size: 13, weight: .light, design: .default))
     }
@@ -280,34 +261,14 @@ private struct SecondaryCTAStyle: ButtonStyle {
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity)
             .background(
-                RoundedRectangle(cornerRadius: Consts.Layout.CTACornerRadius, style: .continuous)
+                RoundedRectangle(cornerRadius: CTAConstants.CTACornerRadius, style: .continuous)
                     .fill(color)
                     .shadow(color: .black.opacity(0.1), radius: 0.1, x: 0, y: 1)
                     .shadow(color: .primary.opacity(outterShadowOpacity), radius: 0.1, x: 0, y: -0.6))
 
             .overlay(
-                RoundedRectangle(cornerRadius: Consts.Layout.CTACornerRadius)
+                RoundedRectangle(cornerRadius: CTAConstants.CTACornerRadius)
                     .stroke(Color.black.opacity(0.1), lineWidth: 1))
-    }
-}
-
-private enum Consts {
-    struct Layout {
-        static let outerContainerWidth: CGFloat = 504
-        static let outerContainerHeight: CGFloat = 286
-        static let daxContainerWidth: CGFloat = 84
-        static let containerCornerRadius: CGFloat = 12
-        static let CTACornerRadius: CGFloat = 8
-        static let containerPadding: CGFloat = 20
-    }
-
-    struct Colors {
-        static let darkModeBorderColor: Color = .white.opacity(0.2)
-        static let whiteModeBorderColor: Color = .black.opacity(0.1)
-        static let daxShadow: Color = .black.opacity(0.16)
-    }
-    struct Font {
-        static let size: CGFloat = 15
     }
 }
 
