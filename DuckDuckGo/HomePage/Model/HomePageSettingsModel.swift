@@ -357,7 +357,7 @@ extension HomePage.Models.SettingsModel {
         static let placeholderCustomImage: SolidColor = .gray
     }
 
-    enum Gradient: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
+    enum Gradient: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding, CustomBackgroundConvertible {
         var id: Self {
             self
         }
@@ -397,9 +397,13 @@ extension HomePage.Models.SettingsModel {
                     .dark
             }
         }
+
+        var customBackground: CustomBackground {
+            .gradient(self)
+        }
     }
 
-    enum Illustration: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
+    enum Illustration: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding, CustomBackgroundConvertible {
         var id: Self {
             self
         }
@@ -431,9 +435,13 @@ extension HomePage.Models.SettingsModel {
         var colorScheme: ColorScheme {
             .light
         }
+
+        var customBackground: CustomBackground {
+            .illustration(self)
+        }
     }
 
-    enum SolidColor: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding {
+    enum SolidColor: String, Equatable, Identifiable, CaseIterable, ColorSchemeProviding, CustomBackgroundConvertible {
         var id: Self {
             self
         }
@@ -494,5 +502,13 @@ extension HomePage.Models.SettingsModel {
                     .dark
             }
         }
+
+        var customBackground: CustomBackground {
+            .solidColor(self)
+        }
     }
+}
+
+protocol CustomBackgroundConvertible {
+    var customBackground: HomePage.Models.SettingsModel.CustomBackground { get }
 }

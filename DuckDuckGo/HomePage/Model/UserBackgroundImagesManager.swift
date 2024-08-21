@@ -23,12 +23,16 @@ import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct UserBackgroundImage: Hashable, Equatable, Identifiable, ColorSchemeProviding {
+struct UserBackgroundImage: Hashable, Equatable, Identifiable, ColorSchemeProviding, CustomBackgroundConvertible {
     let fileName: String
     let colorScheme: ColorScheme
 
     var id: String {
         fileName
+    }
+
+    var customBackground: HomePage.Models.SettingsModel.CustomBackground {
+        .customImage(self)
     }
 }
 

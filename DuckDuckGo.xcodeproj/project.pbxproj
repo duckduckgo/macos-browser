@@ -959,6 +959,14 @@
 		370C23012C769A0F00A80A3E /* HomePageSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3797C79F2C61806500DA77FB /* HomePageSettingsView.swift */; };
 		370C23022C769A0F00A80A3E /* ThemePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C22FD2C7698AE00A80A3E /* ThemePicker.swift */; };
 		370C23032C769A0F00A80A3E /* HomeContentSectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C22FF2C76996300A80A3E /* HomeContentSectionsView.swift */; };
+		370C23052C76A31F00A80A3E /* SettingsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C23042C76A31F00A80A3E /* SettingsGrid.swift */; };
+		370C23072C76A36500A80A3E /* BackgroundPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C23062C76A36500A80A3E /* BackgroundPickerView.swift */; };
+		370C23092C76A39900A80A3E /* BackgroundCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C23082C76A39900A80A3E /* BackgroundCategoryView.swift */; };
+		370C230B2C76A3BC00A80A3E /* BackgroundThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C230A2C76A3BC00A80A3E /* BackgroundThumbnailView.swift */; };
+		370C230C2C76A3D600A80A3E /* BackgroundCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C23082C76A39900A80A3E /* BackgroundCategoryView.swift */; };
+		370C230D2C76A3D600A80A3E /* BackgroundThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C230A2C76A3BC00A80A3E /* BackgroundThumbnailView.swift */; };
+		370C230E2C76A3D600A80A3E /* BackgroundPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C23062C76A36500A80A3E /* BackgroundPickerView.swift */; };
+		370C230F2C76A3D600A80A3E /* SettingsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370C23042C76A31F00A80A3E /* SettingsGrid.swift */; };
 		371209212C232E3F003ADF3D /* RemoteMessagingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371209202C232E3F003ADF3D /* RemoteMessagingClient.swift */; };
 		371209232C232E66003ADF3D /* RemoteMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 371209222C232E66003ADF3D /* RemoteMessaging */; };
 		371209252C232E6C003ADF3D /* RemoteMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 371209242C232E6C003ADF3D /* RemoteMessaging */; };
@@ -3153,6 +3161,10 @@
 		370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDebugMenu.swift; sourceTree = "<group>"; };
 		370C22FD2C7698AE00A80A3E /* ThemePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemePicker.swift; sourceTree = "<group>"; };
 		370C22FF2C76996300A80A3E /* HomeContentSectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeContentSectionsView.swift; sourceTree = "<group>"; };
+		370C23042C76A31F00A80A3E /* SettingsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsGrid.swift; sourceTree = "<group>"; };
+		370C23062C76A36500A80A3E /* BackgroundPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPickerView.swift; sourceTree = "<group>"; };
+		370C23082C76A39900A80A3E /* BackgroundCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundCategoryView.swift; sourceTree = "<group>"; };
+		370C230A2C76A3BC00A80A3E /* BackgroundThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundThumbnailView.swift; sourceTree = "<group>"; };
 		371209202C232E3F003ADF3D /* RemoteMessagingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingClient.swift; sourceTree = "<group>"; };
 		371209292C2333A0003ADF3D /* RemoteMessagingDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingDatabase.swift; sourceTree = "<group>"; };
 		3712092B2C23383C003ADF3D /* RemoteMessagingStoreErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessagingStoreErrorHandling.swift; sourceTree = "<group>"; };
@@ -4986,6 +4998,10 @@
 				3797C79F2C61806500DA77FB /* HomePageSettingsView.swift */,
 				370C22FD2C7698AE00A80A3E /* ThemePicker.swift */,
 				370C22FF2C76996300A80A3E /* HomeContentSectionsView.swift */,
+				370C23042C76A31F00A80A3E /* SettingsGrid.swift */,
+				370C23062C76A36500A80A3E /* BackgroundPickerView.swift */,
+				370C23082C76A39900A80A3E /* BackgroundCategoryView.swift */,
+				370C230A2C76A3BC00A80A3E /* BackgroundThumbnailView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -10365,6 +10381,10 @@
 				4B67854B2AA8DE76008A5004 /* VPNFeatureGatekeeper.swift in Sources */,
 				C168B9AD2B31DC7F001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */,
 				37CBCA9B2A8966E60050218F /* SyncSettingsAdapter.swift in Sources */,
+				370C230C2C76A3D600A80A3E /* BackgroundCategoryView.swift in Sources */,
+				370C230D2C76A3D600A80A3E /* BackgroundThumbnailView.swift in Sources */,
+				370C230E2C76A3D600A80A3E /* BackgroundPickerView.swift in Sources */,
+				370C230F2C76A3D600A80A3E /* SettingsGrid.swift in Sources */,
 				3707C72A294B5D2900682A9F /* URLExtension.swift in Sources */,
 				3706FB76293F65D500E42796 /* ASN1Parser.swift in Sources */,
 				F17E7DDF2C7C83E500907A84 /* Logger+FileDownload.swift in Sources */,
@@ -11884,6 +11904,7 @@
 				9FEE986D2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */,
 				B6BCC53B2AFD15DF002C5499 /* DataImportProfilePicker.swift in Sources */,
 				3158B1562B0BF75D00AF130C /* DataBrokerProtectionFeatureGatekeeper.swift in Sources */,
+				370C23092C76A39900A80A3E /* BackgroundCategoryView.swift in Sources */,
 				56D6A3D629DB2BAB0055215A /* ContinueSetUpView.swift in Sources */,
 				B6B5F5842B03580A008DB58A /* RequestFilePermissionView.swift in Sources */,
 				4B1E6EEE27AB5E5100F51793 /* PasswordManagementListSection.swift in Sources */,
@@ -11912,6 +11933,7 @@
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
 				4BF0E5052AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				AAC5E4D125D6A709007F5990 /* BookmarkManager.swift in Sources */,
+				370C230B2C76A3BC00A80A3E /* BackgroundThumbnailView.swift in Sources */,
 				37CD54CD27F2FDD100F1F7B9 /* AboutPreferences.swift in Sources */,
 				B6F1B0262BCE5A50005E863C /* TabContent.swift in Sources */,
 				4BE65476271FCD41008D1D63 /* PasswordManagementCreditCardItemView.swift in Sources */,
@@ -11997,6 +12019,7 @@
 				B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */,
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
 				C13909EF2B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */,
+				370C23072C76A36500A80A3E /* BackgroundPickerView.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				3768D8442C2CC884004120AE /* RemoteMessagingConfigMatcherProvider.swift in Sources */,
 				560EB9322C78946F0080DBC8 /* ContextualOnboardingDialogs.swift in Sources */,
@@ -12178,6 +12201,7 @@
 				85589E9427BFE1E70038AD11 /* FavoritesView.swift in Sources */,
 				85AC7ADB27BD628400FFB69B /* HomePage.swift in Sources */,
 				376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */,
+				370C23052C76A31F00A80A3E /* SettingsGrid.swift in Sources */,
 				B69B503F2726A12500758A2B /* LocalStatisticsStore.swift in Sources */,
 				B689ECD526C247DB006FB0C5 /* BackForwardListItem.swift in Sources */,
 				B69B50572727D16900758A2B /* AtbAndVariantCleanup.swift in Sources */,

@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import SwiftUIExtensions
 
 extension HomePage.Views {
@@ -43,17 +42,22 @@ extension HomePage.Views {
                             rootView
                                 .transition(.move(edge: .leading).combined(with: .opacity))
                         case .colorPicker:
-                            colorPickerView
+                            BackgroundPickerView(title: "Solid Colors", items: HomePage.Models.SettingsModel.SolidColor.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .gradientPicker:
-                            gradientPickerView
+                            BackgroundPickerView(title: "Gradients", items: HomePage.Models.SettingsModel.Gradient.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .illustrationPicker:
-                            illustrationPickerView
+                            BackgroundPickerView(title: "Illustrations", items: HomePage.Models.SettingsModel.Illustration.allCases)
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                         case .customImagePicker:
-                            userBackgroundImagePickerView
-                                .transition(.move(edge: .trailing).combined(with: .opacity))
+                            BackgroundPickerView(title: "My Backgrounds", items: model.availableUserBackgroundImages) {
+                                addBackgroundButton
+                                Text("Images are stored on your device so DuckDuckGo can't see or access them.")
+                                    .foregroundColor(.blackWhite60)
+                                    .multilineTextAlignment(.leading)
+                            }
+                            .transition(.move(edge: .trailing).combined(with: .opacity))
                         }
                     }
                     .animation(.none, value: model.customBackground)
@@ -123,8 +127,8 @@ extension HomePage.Views {
         @ViewBuilder
         var rootView: some View {
             SettingsSection(title: "Background") {
-                grid(with: model.customBackgroundModes) { mode in
-                    BackgroundMode(modeModel: mode) {
+                SettingsGrid(items: model.customBackgroundModes) { mode in
+                    BackgroundCategoryView(modeModel: mode) {
                         model.handleRootGridSelection(mode)
                     }
                 }
@@ -231,86 +235,6 @@ extension HomePage.Views {
         }
 
         @ViewBuilder
-        var colorPickerView: some View {
-            VStack(spacing: 16) {
-                backButton(title: "Solid Colors")
-                grid(with: HomePage.Models.SettingsModel.SolidColor.allCases) { solidColor in
-                    Button {
-                        withAnimation {
-                            if model.customBackground != .solidColor(solidColor) {
-                                model.customBackground = .solidColor(solidColor)
-                            }
-                        }
-                    } label: {
-                        BackgroundPreview(customBackground: .solidColor(solidColor))
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-
-        @ViewBuilder
-        var gradientPickerView: some View {
-            VStack(spacing: 16) {
-                backButton(title: "Gradients")
-                grid(with: HomePage.Models.SettingsModel.Gradient.allCases) { gradient in
-                    Button {
-                        withAnimation {
-                            if model.customBackground != .gradient(gradient) {
-                                model.customBackground = .gradient(gradient)
-                            }
-                        }
-                    } label: {
-                        BackgroundPreview(customBackground: .gradient(gradient))
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-
-        @ViewBuilder
-        var illustrationPickerView: some View {
-            VStack(spacing: 16) {
-                backButton(title: "Illustrations")
-                grid(with: HomePage.Models.SettingsModel.Illustration.allCases) { illustration in
-                    Button {
-                        withAnimation {
-                            if model.customBackground != .illustration(illustration) {
-                                model.customBackground = .illustration(illustration)
-                            }
-                        }
-                    } label: {
-                        BackgroundPreview(customBackground: .illustration(illustration))
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-
-        @ViewBuilder
-        var userBackgroundImagePickerView: some View {
-            VStack(spacing: 16) {
-                backButton(title: "My Backgrounds")
-                grid(with: model.availableUserBackgroundImages) { userBackgroundImage in
-                    Button {
-                        withAnimation {
-                            if model.customBackground != .customImage(userBackgroundImage) {
-                                model.customBackground = .customImage(userBackgroundImage)
-                            }
-                        }
-                    } label: {
-                        BackgroundPreview(customBackground: .customImage(userBackgroundImage))
-                    }
-                    .buttonStyle(.plain)
-                }
-                addBackgroundButton
-                Text("Images are stored on your device so DuckDuckGo can't see or access them.")
-                    .foregroundColor(.blackWhite60)
-                    .multilineTextAlignment(.leading)
-            }
-        }
-
-        @ViewBuilder
         var addBackgroundButton: some View {
             let button = Button {
                 model.addNewImage()
@@ -324,32 +248,6 @@ extension HomePage.Views {
                 button.buttonStyle(.borderedProminent)
             } else {
                 button.buttonStyle(DefaultActionButtonStyle(enabled: true))
-            }
-        }
-
-        @ViewBuilder
-        func grid<T: Identifiable & Hashable>(with items: [T], @ViewBuilder itemView: @escaping (T) -> some View) -> some View {
-            if #available(macOS 12.0, *), items.count > 1 {
-                LazyVGrid(
-                    columns: Array(repeating: GridItem(.flexible(minimum: 0, maximum: .infinity), spacing: 12), count: 2),
-                    spacing: 12
-                ) {
-                    ForEach(items, content: itemView)
-                }
-            } else {
-                let rows = items.chunked(into: 2)
-                VStack(alignment: .leading, spacing: 12) {
-                    ForEach(rows, id: \.self) { row in
-                        HStack(spacing: 12) {
-                            ForEach(row) { row in
-                                itemView(row).frame(width: 96)
-                            }
-                            if row.count == 1 {
-                                Spacer()
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -366,137 +264,17 @@ extension HomePage.Views {
             }
         }
     }
-
-    struct BackgroundMode: View {
-        let modeModel: HomePage.Models.SettingsModel.CustomBackgroundModeModel
-        let showTitle: Bool
-        let action: () -> Void
-
-        init(modeModel: HomePage.Models.SettingsModel.CustomBackgroundModeModel, showTitle: Bool = true, action: @escaping () -> Void) {
-            self.modeModel = modeModel
-            self.showTitle = showTitle
-            self.action = action
-        }
-
-        @EnvironmentObject var model: HomePage.Models.SettingsModel
-
-        var body: some View {
-            Button(action: action) {
-                VStack(alignment: .leading, spacing: 6) {
-                    ZStack {
-                        if modeModel.contentType == .customImagePicker && !model.hasUserImages {
-                            BackgroundPreview(showSelectionCheckmark: true) {
-                                ZStack {
-                                    Color.blackWhite5
-                                    Image(.share)
-                                }
-                            }
-                        } else {
-                            BackgroundPreview(
-                                showSelectionCheckmark: true,
-                                customBackground: modeModel.customBackgroundPreview ?? .solidColor(.gray)
-                            )
-                        }
-                    }
-                    if showTitle {
-                        Text(modeModel.title)
-                            .font(.system(size: 11))
-                    }
-                }
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    struct BackgroundPreview<Content>: View where Content: View {
-        let showSelectionCheckmark: Bool
-        let customBackground: HomePage.Models.SettingsModel.CustomBackground?
-        @ViewBuilder let content: () -> Content
-
-        @EnvironmentObject var model: HomePage.Models.SettingsModel
-
-        init(
-            showSelectionCheckmark: Bool = false,
-            customBackground: HomePage.Models.SettingsModel.CustomBackground,
-            @ViewBuilder content: @escaping () -> Content = { EmptyView() }
-        ) {
-            self.showSelectionCheckmark = showSelectionCheckmark
-            self.customBackground = customBackground
-            self.content = content
-        }
-
-        init(showSelectionCheckmark: Bool = false, @ViewBuilder content: @escaping () -> Content) {
-            customBackground = nil
-            self.showSelectionCheckmark = showSelectionCheckmark
-            self.content = content
-        }
-
-        var body: some View {
-            ZStack {
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(.clear)
-                    .background(previewContent)
-                    .cornerRadius(4)
-                RoundedRectangle(cornerRadius: 4)
-                    .stroke(Color.homeSettingsBackgroundPreviewStroke)
-                    .frame(height: 64)
-                    .background(selectionBackground)
-            }
-            .contentShape(Rectangle())
-        }
-
-        @ViewBuilder
-        private var previewContent: some View {
-            switch customBackground {
-            case .gradient(let gradient):
-                gradient.image.resizable().scaledToFill()
-            case .solidColor(let solidColor):
-                solidColor.color.scaledToFill()
-            case .illustration(let illustration):
-                illustration.image.resizable().scaledToFill()
-            case .customImage(let userBackgroundImage):
-                Group {
-                    if let image = model.customImagesManager.thumbnailImage(for: userBackgroundImage) {
-                        Image(nsImage: image).resizable().scaledToFill()
-                    } else {
-                        EmptyView()
-                    }
-                }
-                .contextMenu {
-                    Button("Delete Background", action: { model.customImagesManager.deleteImage(userBackgroundImage) })
-                }
-            case .none:
-                content()
-            }
-        }
-
-        @ViewBuilder
-        private var selectionBackground: some View {
-            if let customBackground, model.customBackground == customBackground {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(Color(.updateIndicator), lineWidth: 2)
-                    if showSelectionCheckmark {
-                        Image(.solidCheckmark)
-                            .opacity(0.8)
-                            .colorScheme(customBackground.colorScheme)
-                    }
-                }
-                .padding(-2)
-            }
-        }
-    }
 }
 
 extension HomePage.Views.SettingsView {
     fileprivate typealias CloseButton = HomePage.Views.CloseButton
     fileprivate typealias SettingsSection = HomePage.Views.SettingsSection
-    fileprivate typealias BackgroundPreview = HomePage.Views.BackgroundPreview
-    fileprivate typealias BackgroundMode = HomePage.Views.BackgroundMode
+    fileprivate typealias BackgroundThumbnailView = HomePage.Views.BackgroundThumbnailView
+    fileprivate typealias BackgroundCategoryView = HomePage.Views.BackgroundCategoryView
 }
 
-extension HomePage.Views.BackgroundMode {
-    fileprivate typealias BackgroundPreview = HomePage.Views.BackgroundPreview
+extension HomePage.Views.BackgroundCategoryView {
+    fileprivate typealias BackgroundThumbnailView = HomePage.Views.BackgroundThumbnailView
 }
 
 #Preview {
