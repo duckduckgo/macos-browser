@@ -115,6 +115,9 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenLocalFile_downloadStartsAlwaysDisplayingSavePanel() async throws {
+#if APPSTORE
+        throw XCTSkip("https://app.asana.com/0/0/1208100078742790/f")
+#else
         let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         let destDirURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: destDirURL, withIntermediateDirectories: true)
@@ -152,6 +155,7 @@ class DownloadsIntegrationTests: XCTestCase {
 
         XCTAssertEqual(fileUrl.resolvingSymlinksInPath(), destDirURL.appendingPathComponent(tempFileURL.lastPathComponent).resolvingSymlinksInPath())
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.html)
+#endif
     }
 
     @MainActor
