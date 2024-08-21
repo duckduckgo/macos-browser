@@ -873,11 +873,6 @@ final class BookmarkListViewController: NSViewController {
             if outlineView.isMouseLocationInsideBounds() {
                 outlineView.updateHighlightedRowUnderCursor()
             } else if !isChangingRootFolder,
-                      let highlightedRow = outlineView.highlightedRow,
-                      outlineView.numberOfRows > highlightedRow {
-                // restore current highlight on a highlighted row
-                outlineView.highlightedRow = highlightedRow
-            } else if !isChangingRootFolder,
                       let bookmarkListPopover = self?.bookmarkListPopover,
                       bookmarkListPopover.isShown,
                       let expandedFolder = bookmarkListPopover.rootFolder,
@@ -885,6 +880,11 @@ final class BookmarkListViewController: NSViewController {
                       let expandedRow = outlineView.rowIfValid(forItem: node) {
                 // restore current highlight on a expanded folder row
                 outlineView.highlightedRow = expandedRow
+            } else if !isChangingRootFolder,
+                      let highlightedRow = outlineView.highlightedRow,
+                      outlineView.numberOfRows > highlightedRow {
+                // restore current highlight on a highlighted row
+                outlineView.highlightedRow = highlightedRow
             }
         }
     }
