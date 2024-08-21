@@ -182,7 +182,7 @@ extension HomePage.Models {
                     }
                     return .customImage(lastUsedUserBackgroundImage)
                 }()
-                return CustomBackgroundModeModel(contentType: .customImagePicker, title: "My Images", customBackgroundPreview: preview)
+                return CustomBackgroundModeModel(contentType: .customImagePicker, title: "My Backgrounds", customBackgroundPreview: preview)
             case .addImage:
                 return CustomBackgroundModeModel(contentType: .addImage, title: "Add Background", customBackgroundPreview: nil)
             }

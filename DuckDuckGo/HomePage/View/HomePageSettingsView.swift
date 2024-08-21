@@ -39,17 +39,9 @@ extension HomePage.Views {
                             .font(.system(size: 17).bold())
                         Spacer()
                         CloseButton(icon: .closeLarge, size: 28) {
-                            if #available(macOS 14.0, *) {
-                                withAnimation {
-                                    isSettingsVisible = false
-                                } completion: {
-                                    model.contentType = .root
-                                }
-                            } else {
-                                withAnimation {
-                                    isSettingsVisible = false
-                                    model.contentType = .root
-                                }
+                            withAnimation {
+                                isSettingsVisible = false
+                                model.contentType = .root
                             }
                         }
                     }
@@ -298,7 +290,7 @@ extension HomePage.Views {
         @ViewBuilder
         var userBackgroundImagePickerView: some View {
             VStack(spacing: 16) {
-                backButton(title: "My Images")
+                backButton(title: "My Backgrounds")
                 grid(with: model.availableUserBackgroundImages) { userBackgroundImage in
                     Button {
                         withAnimation {
