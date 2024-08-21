@@ -35,7 +35,6 @@ CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBP
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
-//CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 PRODUCT_NAME = $(DBP_BACKGROUND_AGENT_PRODUCT_NAME)
 PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(DBP_BACKGROUND_AGENT_PRODUCT_NAME)
