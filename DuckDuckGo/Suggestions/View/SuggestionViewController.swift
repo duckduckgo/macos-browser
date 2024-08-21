@@ -245,7 +245,7 @@ extension SuggestionViewController: NSTableViewDelegate {
 
     func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
         if let _ = suggestionContainerViewModel.suggestionContainer.result?.instantAnswer, row == 0 {
-            return 60
+            return 48
         } else {
             return suggestionContainerViewModel.isHomePage ? 34 : 28
         }
