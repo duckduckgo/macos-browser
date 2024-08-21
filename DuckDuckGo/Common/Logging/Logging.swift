@@ -16,9 +16,8 @@
 //  limitations under the License.
 //
 
-import Common
 import Foundation
-import os.log // swiftlint:disable:this enforce_os_log_wrapper
+import os.log
 
 extension OSLog {
 
@@ -29,7 +28,6 @@ extension OSLog {
         case fire = "Fire"
         case dataImportExport = "Data Import/Export"
         case pixel = "Pixel"
-        case contentBlocking = "Content Blocking"
         case httpsUpgrade = "HTTPS Upgrade"
         case favicons = "Favicons"
         case autoLock = "Auto-Lock"
@@ -48,7 +46,7 @@ extension OSLog {
 
     enum AllCategories {
         static var allCases: [String] {
-            Categories.allCases.map(\.rawValue) + AppCategories.allCases.map(\.rawValue)
+            AppCategories.allCases.map(\.rawValue)
         }
     }
 
