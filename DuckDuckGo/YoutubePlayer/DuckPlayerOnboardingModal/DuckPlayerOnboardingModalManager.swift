@@ -31,21 +31,6 @@ final class DuckPlayerOnboardingModalManager {
 
 extension DuckPlayerOnboardingModalManager {
     /**
-     Called when the cookie consent popover is finished.
-
-     - Parameters:
-       - modal: The onboarding modal instance.
-       - result: A `Bool` indicating whether the user consented to cookies.
-     */
-    func cookieConsentPopover(_ modal: DuckPlayerOnboardingModal, didFinishWithResult result: Bool) {
-        modal.close(animated: true) {
-            withExtendedLifetime(modal) {}
-        }
-        self.modal = nil
-        self.currentTab = nil
-    }
-
-    /**
      Shows the onboarding modal on the specified view.
 
      - Parameters:
