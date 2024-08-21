@@ -122,7 +122,7 @@ struct DefaultVPNFeatureGatekeeper: VPNFeatureGatekeeper {
         }
 
         /// There's not much to be done for this error here.
-        /// The uninstall call already fires pixels to allow us to track success rate and see the errors.
+        /// The uninstall call already fires pixels to allow us to anonymously track success rate and see the errors.
         try? await vpnUninstaller.uninstall(removeSystemExtension: false)
     }
 }

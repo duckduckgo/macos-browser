@@ -74,6 +74,7 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
         }
         MockMigrationsProvider.didCallV2Migrations = false
         MockMigrationsProvider.didCallV3Migrations = false
+        MockMigrationsProvider.didCallV4Migrations = false
     }
 
     func testV3MigrationCleansUpOrphanedRecords_andResultsInNoDataIntegrityIssues() throws {
@@ -101,7 +102,7 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
 
     func testV3MigrationRecreatesTablesWithCascadingDeletes_andDeletingProfileQueryDeletesDependentRecords() throws {
         // Given
-        XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v3Migrations))
+        XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v4Migrations))
         XCTAssertEqual(try sut.fetchAllScans().filter { $0.profileQueryId == 43 }.count, 50)
         let allBrokerIds = try sut.fetchAllBrokers().map { $0.id! }
         var allExtractedProfiles = try allBrokerIds.flatMap { try sut.fetchExtractedProfiles(for: $0, with: 43) }
@@ -211,34 +212,26 @@ final class DataBrokerProtectionDatabaseProviderTests: XCTestCase {
         } while length < 20
     }
 
+    func testV4Migration() throws {
+        // Given
+        XCTAssertNoThrow(try DefaultDataBrokerProtectionDatabaseProvider(file: vaultURL, key: key, registerMigrationsHandler: Migrations.v4Migrations))
+
+        // When
+        let optOuts = try sut.fetchAllOptOuts()
+        let optOut = optOuts.first!.optOutDB
+
+        // Then
+        XCTAssertNil(optOut.submittedSuccessfullyDate)
+        XCTAssertFalse(optOut.sevenDaysConfirmationPixelFired)
+        XCTAssertFalse(optOut.fourteenDaysConfirmationPixelFired)
+        XCTAssertFalse(optOut.twentyOneDaysConfirmationPixelFired)
+
+    }
+
     func testDeleteAllDataSucceedsInRemovingAllData() throws {
         XCTAssertFalse(try sut.db.allTablesAreEmpty())
         XCTAssertNoThrow(try sut.deleteProfileData())
         XCTAssertTrue(try sut.db.allTablesAreEmpty())
-    }
-
-    func testCreationWithUserNotIn10PercentUsesV2Migrations() throws {
-        // Given
-        let mockFeatureFlagger = MockFeatureFlagger(isUserIn: false)
-
-        // When
-        _ = try DefaultDataBrokerProtectionDatabaseProvider.create(file: vaultURL, key: key, featureFlagger: mockFeatureFlagger, migrationProvider: MockMigrationsProvider.self)
-
-        // Then
-        XCTAssertTrue(MockMigrationsProvider.didCallV2Migrations)
-        XCTAssertFalse(MockMigrationsProvider.didCallV3Migrations)
-    }
-
-    func testCreationWithUserIn10PercentUsesV3Migrations() throws {
-        // Given
-        let mockFeatureFlagger = MockFeatureFlagger(isUserIn: true)
-
-        // When
-        _ = try DefaultDataBrokerProtectionDatabaseProvider.create(file: vaultURL, key: key, featureFlagger: mockFeatureFlagger, migrationProvider: MockMigrationsProvider.self)
-
-        // Then
-        XCTAssertFalse(MockMigrationsProvider.didCallV2Migrations)
-        XCTAssertTrue(MockMigrationsProvider.didCallV3Migrations)
     }
 }
 

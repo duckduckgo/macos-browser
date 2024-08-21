@@ -139,6 +139,15 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                                        profileQueryId: profileQueryId,
                                        extractedProfileId: extractedProfileId)
         }
+
+        if let extractedProfileId = extractedProfileId,
+           let optOutJob = optOutJob,
+           let lastEvent = brokerProfileQuery.events.last,
+           lastEvent.type == .optOutRequested && optOutJob.submittedSuccessfullyDate == nil
+        {
+            let submittedSuccessfullyDate = SystemDate().now
+            try database.updateSubmittedSuccessfullyDate(submittedSuccessfullyDate, forBrokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+        }
     }
 
     private func returnMostRecentDate(_ date1: Date?, _ date2: Date?) -> Date? {

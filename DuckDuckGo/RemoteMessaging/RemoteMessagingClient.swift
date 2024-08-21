@@ -36,8 +36,7 @@ struct DefaultRemoteMessagingStoreProvider: RemoteMessagingStoreProviding {
             database: database,
             notificationCenter: .default,
             errorEvents: RemoteMessagingStoreErrorHandling(),
-            remoteMessagingAvailabilityProvider: availabilityProvider,
-            log: .remoteMessaging
+            remoteMessagingAvailabilityProvider: availabilityProvider
         )
     }
 }
@@ -98,7 +97,6 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
             configurationFetcher: ConfigurationFetcher(
                 store: configurationStore,
                 urlSession: .session(),
-                log: .remoteMessaging,
                 eventMapping: ConfigurationManager.configurationDebugEvents
             ),
             configurationStore: ConfigurationStore.shared
@@ -195,7 +193,8 @@ final class RemoteMessagingClient: RemoteMessagingProcessing {
         isRemoteMessagingDatabaseLoaded = true
     }
 
-    private var isRemoteMessagingDatabaseLoaded = false
+    // Publicly accessible for use in RemoteMessagingDebugMenu
+    private(set) var isRemoteMessagingDatabaseLoaded = false
     private let remoteMessagingStoreProvider: RemoteMessagingStoreProviding
     private var scheduledRefreshCancellable: AnyCancellable?
     private var featureFlagCancellable: AnyCancellable?
