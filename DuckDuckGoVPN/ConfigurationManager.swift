@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 import BrowserServicesKit
 import Common
 import Configuration
@@ -26,7 +27,6 @@ import PixelKit
 final class ConfigurationManager: DefaultConfigurationManager {
 
     static let shared = ConfigurationManager(fetcher: ConfigurationFetcher(store: ConfigurationStore.shared,
-                                                                           log: .config,
                                                                            eventMapping: configurationDebugEvents))
 
     static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
@@ -56,7 +56,7 @@ final class ConfigurationManager: DefaultConfigurationManager {
             }
             fileDispatchSource?.resume()
         } catch {
-            os_log("unable to set up configuration dispatch source: %{public}s", log: .config, type: .error, error.localizedDescription)
+            Logger.config.error("unable to set up configuration dispatch source: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -65,8 +65,8 @@ final class ConfigurationManager: DefaultConfigurationManager {
     }
 
     func log() {
-        os_log("last update %{public}s", log: .config, type: .default, String(describing: lastUpdateTime))
-        os_log("last refresh check %{public}s", log: .config, type: .default, String(describing: lastRefreshCheckTime))
+        Logger.config.log("last update \(String(describing: self.lastUpdateTime), privacy: .public)")
+        Logger.config.log("last refresh check \(String(describing: self.lastRefreshCheckTime), privacy: .public)")
     }
 
     override public func refreshNow(isDebug: Bool = false) async {
@@ -89,11 +89,9 @@ final class ConfigurationManager: DefaultConfigurationManager {
             try await fetcher.fetch(.privacyConfiguration, isDebug: isDebug)
             return true
         } catch {
-            os_log("Failed to complete configuration update to %@: %@",
-                   log: .config,
-                   type: .error,
-                   Configuration.privacyConfiguration.rawValue,
-                   error.localizedDescription)
+            Logger.config.error(
+                "Failed to complete configuration update to \(Configuration.privacyConfiguration.rawValue, privacy: .public): \(error.localizedDescription, privacy: .public)"
+            )
             tryAgainSoon()
         }
 

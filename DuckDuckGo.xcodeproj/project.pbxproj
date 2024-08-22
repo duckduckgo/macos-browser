@@ -13,6 +13,7 @@
 		021EA0842BD6E01A00772C9A /* TabsPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021EA0822BD6DF1B00772C9A /* TabsPreferencesTests.swift */; };
 		021EA0852BD6E0EB00772C9A /* TabsPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021EA0822BD6DF1B00772C9A /* TabsPreferencesTests.swift */; };
 		0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A2272080090018F728 /* KeyedCodingExtension.swift */; };
+		0234D1082C778E82003A65EA /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = 0234D1072C778E82003A65EA /* Configuration */; };
 		026ADE1426C3010C002518EE /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
 		028904202A7B25380028369C /* AppConfigurationURLProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0289041E2A7B23CE0028369C /* AppConfigurationURLProviderTests.swift */; };
 		028904212A7B25770028369C /* AppConfigurationURLProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0289041E2A7B23CE0028369C /* AppConfigurationURLProviderTests.swift */; };
@@ -4480,6 +4481,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B23668A2C09FAE8002D393F /* VPNAppLauncher in Frameworks */,
+				0234D1082C778E82003A65EA /* Configuration in Frameworks */,
 				7B624F172BA25C1F00A6C544 /* NetworkProtectionUI in Frameworks */,
 				37269F052B3332C2005E8E46 /* Common in Frameworks */,
 			);
@@ -8912,6 +8914,7 @@
 				37269F042B3332C2005E8E46 /* Common */,
 				7B624F162BA25C1F00A6C544 /* NetworkProtectionUI */,
 				7B2366892C09FAE8002D393F /* VPNAppLauncher */,
+				0234D1072C778E82003A65EA /* Configuration */,
 			);
 			productName = DuckDuckGoNotifications;
 			productReference = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */;
@@ -13561,6 +13564,10 @@
 		020807B12C6CFF95006F94C4 /* Configuration */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Configuration;
+		};
+		0234D1072C778E82003A65EA /* Configuration */ = {
+			isa = XCSwiftPackageProductDependency;
 			productName = Configuration;
 		};
 		02FDA6562C764B740024CD8B /* Configuration */ = {

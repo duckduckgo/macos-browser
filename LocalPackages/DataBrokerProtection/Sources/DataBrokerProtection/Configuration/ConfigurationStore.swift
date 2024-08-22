@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 import BrowserServicesKit
 import Common
 import Configuration
@@ -56,7 +57,7 @@ final class ConfigurationStore: ConfigurationStoring {
     }
 
     func log() {
-        os_log("privacyConfigurationEtag %{public}s", log: .config, type: .default, privacyConfigurationEtag ?? "")
+        Logger.config.log("privacyConfigurationEtag \(self.privacyConfigurationEtag ?? "", privacy: .public)")
     }
 
     func loadData(for configuration: Configuration) -> Data? {
