@@ -178,9 +178,14 @@ final class TabViewModel {
             .switchToLatest()
             .sink { [weak self] _ in
                 guard let self else { return }
-
                 updateAddressBarStrings()
                 updateFavicon()
+            }
+            .store(in: &cancellables)
+
+        tab.$hasCommittedContent
+            .sink { [weak self] _ in
+                guard let self else { return }
                 updateCanBeBookmarked()
                 updateZoomForWebsite()
             }
