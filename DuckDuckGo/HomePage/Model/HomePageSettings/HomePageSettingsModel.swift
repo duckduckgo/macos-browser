@@ -18,6 +18,7 @@
 
 import Combine
 import Foundation
+import PixelKit
 import SwiftUI
 import SwiftUIExtensions
 
@@ -163,7 +164,7 @@ extension HomePage.Models {
                         customBackground = .customImage(image)
                     }
                 } catch {
-                    // pixel
+                    PixelKit.fire(GeneralPixel.newTabBackgroundAddingImageFailed)
                 }
             }
         }

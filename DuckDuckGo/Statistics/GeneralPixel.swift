@@ -421,6 +421,9 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case compilationFailed
 
+    case newTabBackgroundAddingImageFailed
+    case newTabBackgroundGeneratingThumbnailFailed
+
     var name: String {
         switch self {
 
@@ -1027,6 +1030,10 @@ enum GeneralPixel: PixelKitEventV2 {
         case .bookmarksSortByName: return "m_mac_sort_bookmarks_by_name"
         case .bookmarksSearchExecuted: return "m_mac_search_bookmarks_executed"
         case .bookmarksSearchResultClicked: return "m_mac_search_result_clicked"
+
+            // New Tab Page Custom Background
+        case .newTabBackgroundAddingImageFailed: return "newtab_mac_background_adding_image_failed"
+        case .newTabBackgroundGeneratingThumbnailFailed: return "newtab_mac_background_generating_thumbnail_failed"
         }
     }
 

@@ -18,6 +18,7 @@
 
 import Combine
 import Foundation
+import PixelKit
 import SwiftUI
 
 struct UserBackgroundImage: Hashable, Equatable, Identifiable, LosslessStringConvertible, ColorSchemeProviding, CustomBackgroundConvertible {
@@ -57,10 +58,12 @@ protocol UserBackgroundImagesManaging {
     var availableImages: [UserBackgroundImage] { get }
     var availableImagesPublisher: AnyPublisher<[UserBackgroundImage], Never> { get }
 
-    func addImage(with url: URL) async throws -> UserBackgroundImage
-    func deleteImage(_ userBackgroundImage: UserBackgroundImage)
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage?
     func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage?
+
+    func addImage(with url: URL) async throws -> UserBackgroundImage
+    func deleteImage(_ userBackgroundImage: UserBackgroundImage)
+
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage)
     func sortImagesByLastUsed()
 }
@@ -94,7 +97,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         static let storageDirectoryName = "UserBackgroundImages"
         static let thumbnailsDirectoryName = "thumbnails"
         static let thumbnailSize = CGSize(width: 192, height: 128)
-        static let storedImageExtension = "jpg"
+        static let jpegExtension = "jpg"
     }
 
     var availableImagesPublisher: AnyPublisher<[UserBackgroundImage], Never> {
@@ -137,30 +140,41 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         validateAvailableImages()
     }
 
+    func image(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
+        NSImage(contentsOf: storageLocation.appendingPathComponent(userBackgroundImage.fileName))
+    }
+
+    func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
+        guard let thumbnail = NSImage(contentsOf: thumbnailsStorageLocation.appendingPathComponent(userBackgroundImage.fileName)) else {
+            return image(for: userBackgroundImage)
+        }
+        return thumbnail
+    }
+
     func addImage(with url: URL) async throws -> UserBackgroundImage {
-        let fileName = [UUID().uuidString, Const.storedImageExtension].joined(separator: ".")
+        let fileName = [UUID().uuidString, Const.jpegExtension].joined(separator: ".")
         let destinationURL = storageLocation.appendingPathComponent(fileName)
 
-        // first copy the image converting it to JPEG
+        // first copy the image, converting it to JPEG
         try copyImage(at: url, toJPEGAt: destinationURL)
 
-        // then generate thumbnail ...
+        // then generate thumbnail...
         async let thumbnailTask: Void = {
             do {
                 let imageData = try Data(contentsOf: destinationURL)
                 let resizedImageData = try imageProcessor.resizeImage(with: imageData, to: Const.thumbnailSize)
                 try resizedImageData.write(to: thumbnailsStorageLocation.appendingPathComponent(fileName))
             } catch {
-                // pixel
+                PixelKit.fire(GeneralPixel.newTabBackgroundGeneratingThumbnailFailed)
             }
         }()
 
-        // ... and calculate color scheme ...
+        // ...and calculate color scheme...
         async let colorSchemeTask = {
             imageProcessor.calculatePreferredColorScheme(forImageAt: destinationURL)
         }()
 
-        // ... concurrently
+        // ...concurrently
         await thumbnailTask
         let colorScheme = await colorSchemeTask
 
@@ -176,33 +190,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
             return
         }
         imagesMetadata.remove(at: index)
-        deleteImages(for: userBackgroundImage)
-    }
-
-    private func copyImage(at sourceURL: URL, toJPEGAt destinationURL: URL) throws {
-        let data = try imageProcessor.convertImageToJPEG(at: sourceURL)
-        try data.write(to: destinationURL)
-    }
-
-    private func deleteImagesOverLimit() {
-        guard imagesMetadata.count >= maximumNumberOfImages else {
-            return
-        }
-        let imagesToDelete = imagesMetadata.suffix(from: maximumNumberOfImages - 1).compactMap(UserBackgroundImage.init)
-        imagesToDelete.forEach { deleteImages(for: $0) }
-    }
-
-    private func deleteImages(for userBackgroundImage: UserBackgroundImage) {
-        FileManager.default.remove(fileAtURL: storageLocation.appendingPathComponent(userBackgroundImage.fileName))
-        FileManager.default.remove(fileAtURL: thumbnailsStorageLocation.appendingPathComponent(userBackgroundImage.fileName))
-    }
-
-    func image(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
-        NSImage(contentsOf: storageLocation.appendingPathComponent(userBackgroundImage.fileName))
-    }
-
-    func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
-        NSImage(contentsOf: thumbnailsStorageLocation.appendingPathComponent(userBackgroundImage.fileName))
+        deleteImageFiles(for: userBackgroundImage)
     }
 
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage) {
@@ -217,6 +205,24 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
     func sortImagesByLastUsed() {
         imagesMetadata = availableImagesSortedByAccessTime.map(\.description)
+    }
+
+    private func copyImage(at sourceURL: URL, toJPEGAt destinationURL: URL) throws {
+        let data = try imageProcessor.convertImageToJPEG(at: sourceURL)
+        try data.write(to: destinationURL)
+    }
+
+    private func deleteImagesOverLimit() {
+        guard imagesMetadata.count >= maximumNumberOfImages else {
+            return
+        }
+        let imagesToDelete = imagesMetadata.suffix(from: maximumNumberOfImages - 1).compactMap(UserBackgroundImage.init)
+        imagesToDelete.forEach { deleteImageFiles(for: $0) }
+    }
+
+    private func deleteImageFiles(for userBackgroundImage: UserBackgroundImage) {
+        FileManager.default.remove(fileAtURL: storageLocation.appendingPathComponent(userBackgroundImage.fileName))
+        FileManager.default.remove(fileAtURL: thumbnailsStorageLocation.appendingPathComponent(userBackgroundImage.fileName))
     }
 
     private func setUpStorageDirectory(at path: String) throws {
