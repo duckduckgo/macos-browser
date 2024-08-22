@@ -57,7 +57,7 @@ protocol UserBackgroundImagesManaging {
     var availableImages: [UserBackgroundImage] { get }
     var availableImagesPublisher: AnyPublisher<[UserBackgroundImage], Never> { get }
 
-    func addImage(with url: URL) async throws -> UserBackgroundImage?
+    func addImage(with url: URL) async throws -> UserBackgroundImage
     func deleteImage(_ userBackgroundImage: UserBackgroundImage)
     func image(for userBackgroundImage: UserBackgroundImage) -> NSImage?
     func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage?
@@ -125,14 +125,18 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         storageLocation = applicationSupportDirectory.appendingPathComponent(Const.storageDirectoryName)
         thumbnailsStorageLocation = storageLocation.appendingPathComponent(Const.thumbnailsDirectoryName)
 
-        setUpStorageDirectory(at: storageLocation.path)
-        setUpStorageDirectory(at: thumbnailsStorageLocation.path)
+        do {
+            try setUpStorageDirectory(at: storageLocation.path)
+            try setUpStorageDirectory(at: thumbnailsStorageLocation.path)
+        } catch {
+            // fire pixel - failed to initialize storage
+        }
 
         availableImages = imagesMetadata.compactMap(UserBackgroundImage.init)
         verifyStoredImages()
     }
 
-    func addImage(with url: URL) async throws -> UserBackgroundImage? {
+    func addImage(with url: URL) async throws -> UserBackgroundImage {
         let fileName = [UUID().uuidString, "jpg"].joined(separator: ".")
         let destinationURL = storageLocation.appendingPathComponent(fileName)
 
@@ -166,10 +170,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
     }
 
     private func copyImage(at sourceURL: URL, toJPEGAt destinationURL: URL) throws {
-        guard let data = imageProcessor.convertImageToJPEG(at: sourceURL) else {
-            // throw error
-            return
-        }
+        let data = try imageProcessor.convertImageToJPEG(at: sourceURL)
         try data.write(to: destinationURL)
     }
 
@@ -212,7 +213,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         imagesMetadata = availableImagesSortedByAccessTime.map(\.description)
     }
 
-    private func setUpStorageDirectory(at path: String) {
+    private func setUpStorageDirectory(at path: String) throws {
         var isDirectory: ObjCBool = .init(booleanLiteral: false)
         let fileExists = FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory)
 
@@ -221,18 +222,10 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
             return
         case (true, false):
             assertionFailure("File at \(path) is not a directory")
-            do {
-                try FileManager.default.removeItem(atPath: path)
-            } catch {
-                // fire pixel
-            }
+            try FileManager.default.removeItem(atPath: path)
             fallthrough
         case (false, _):
-            do {
-                try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
-            } catch {
-                // fire pixel
-            }
+            try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
         }
     }
 

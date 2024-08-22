@@ -157,10 +157,13 @@ extension HomePage.Models {
                 return
             }
             Task {
-                if let image = try? await customImagesManager.addImage(with: url) {
+                do {
+                    let image = try await customImagesManager.addImage(with: url)
                     Task { @MainActor in
                         customBackground = .customImage(image)
                     }
+                } catch {
+                    // pixel
                 }
             }
         }

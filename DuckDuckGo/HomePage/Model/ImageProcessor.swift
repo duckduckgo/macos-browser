@@ -1,5 +1,5 @@
 //
-//  ImageProcesor.swift
+//  ImageProcessor.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -21,12 +21,15 @@ import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
 
-enum ImageProcessingError {
-    
+enum ImageProcessingError: Error {
+    case failedToReadImageData
+    case failedToWriteImageData
+    case failedToCorrectImageOrientation
+    case failedToSaveImage
 }
 
 protocol ImageProcessing {
-    func convertImageToJPEG(at url: URL) -> Data?
+    func convertImageToJPEG(at url: URL) throws -> Data
     func resizeImage(at url: URL, to newSize: CGSize) -> Data?
     func calculatePreferredColorScheme(forImageAt url: URL) -> ColorScheme
 }
@@ -38,14 +41,13 @@ final class ImageProcessor: ImageProcessing {
         return averageBrightness > 0.5 ? .light : .dark
     }
 
-    func convertImageToJPEG(at url: URL) -> Data? {
+    func convertImageToJPEG(at url: URL) throws -> Data {
         // Create a CGImageSource from the source image data
         guard let data = try? Data(contentsOf: url),
               let imageSource = CGImageSourceCreateWithData(data as CFData, nil),
               let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)
         else {
-            // pixel/error
-            return nil
+            throw ImageProcessingError.failedToReadImageData
         }
 
         // Create a mutable data object to hold the JPEG data
@@ -53,8 +55,7 @@ final class ImageProcessor: ImageProcessing {
 
         // Create a CGImageDestination for the JPEG format
         guard let imageDestination = CGImageDestinationCreateWithData(mutableData, UTType.jpeg.identifier as CFString, 1, nil) else {
-            // pixel/error
-            return nil
+            throw ImageProcessingError.failedToWriteImageData
         }
 
         let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [CFString: Any]
@@ -62,8 +63,7 @@ final class ImageProcessor: ImageProcessing {
         let orientation = CGImagePropertyOrientation(rawValue: orientationRawValue) ?? .up
 
         guard let correctedCGImage = correctImageOrientation(cgImage: cgImage, orientation: orientation) else {
-            // pixel/error
-            return nil
+            throw ImageProcessingError.failedToCorrectImageOrientation
         }
 
         // Add the CGImage to the destination
@@ -71,8 +71,7 @@ final class ImageProcessor: ImageProcessing {
 
         // Finalize the image destination to write the data
         guard CGImageDestinationFinalize(imageDestination) else {
-            // pixel/error
-            return nil
+            throw ImageProcessingError.failedToSaveImage
         }
 
         return mutableData as Data
@@ -128,7 +127,6 @@ final class ImageProcessor: ImageProcessing {
             space: cgImage.colorSpace ?? CGColorSpace(name: CGColorSpace.sRGB)!,
             bitmapInfo: cgImage.bitmapInfo.rawValue
         ) else {
-            // pixel/error
             return nil
         }
 
