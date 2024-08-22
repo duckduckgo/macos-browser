@@ -19,6 +19,8 @@
 import XCTest
 import Foundation
 @testable import DataBrokerProtection
+import PixelKitTestingUtilities
+@testable import PixelKit
 
 final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
 
@@ -368,4 +370,255 @@ final class DataBrokerProtectionStatsPixelsTests: XCTestCase {
         XCTAssertTrue(repository.wasMarkStatsMonthlyPixelDateCalled)
     }
 
+    // MARK: - opt out confirmed/unconfirmed pixel tests
+
+    private static let dataBroker = "Test broker"
+    private let optOutJobAt7DaysConfirmedPixel = DataBrokerProtectionPixels.optOutJobAt7DaysConfirmed(dataBroker: dataBroker)
+    private let optOutJobAt7DaysUnconfirmedPixel = DataBrokerProtectionPixels.optOutJobAt7DaysUnconfirmed(dataBroker: dataBroker)
+    private let optOutJobAt14DaysConfirmedPixel = DataBrokerProtectionPixels.optOutJobAt14DaysConfirmed(dataBroker: dataBroker)
+    private let optOutJobAt14DaysUnconfirmedPixel = DataBrokerProtectionPixels.optOutJobAt14DaysUnconfirmed(dataBroker: dataBroker)
+    private let optOutJobAt21DaysConfirmedPixel = DataBrokerProtectionPixels.optOutJobAt21DaysConfirmed(dataBroker: dataBroker)
+    private let optOutJobAt21DaysUnconfirmedPixel = DataBrokerProtectionPixels.optOutJobAt21DaysUnconfirmed(dataBroker: dataBroker)
+
+    private func validatePixelsFired(_ pixels: [DataBrokerProtectionPixels]) {
+        let pixelsFired = MockDataBrokerProtectionPixelsHandler.lastPixelsFired
+        for pixel in pixels {
+            let matchingPixelsFired = pixelsFired.filter { $0.name == pixel.name }
+            XCTAssertEqual(matchingPixelsFired.count, 1)
+            XCTAssertNotNil(matchingPixelsFired.first)
+            let matchingPixelFired = matchingPixelsFired.first!
+            XCTAssertEqual(matchingPixelFired.params, pixel.params)
+        }
+    }
+
+    private func validatePixelsNotFired(_ pixels: [DataBrokerProtectionPixels]) {
+        let pixelsFired = MockDataBrokerProtectionPixelsHandler.lastPixelsFired
+        for pixel in pixels {
+            let matchingPixelsFired = pixelsFired.filter { $0.name == pixel.name }
+            XCTAssertEqual(matchingPixelsFired.count, 0)
+        }
+    }
+
+    func testWhenSubmittedDateIs6DaysAgo_thenNoPixelsAreFired() async {
+        // Given
+        let mockDatabase = MockDatabase()
+        let submittedDate = Calendar.current.date(byAdding: .day, value: -6, to: Date())
+        let optOutJobData = OptOutJobData.mock(with: .optOutConfirmed,
+                                               submittedDate: submittedDate,
+                                               sevenDaysConfirmationPixelFired: false,
+                                               fourteenDaysConfirmationPixelFired: false,
+                                               twentyOneDaysConfirmationPixelFired: false)
+        let brokerProfileQueryData = BrokerProfileQueryData(
+            dataBroker: .mock,
+            profileQuery: .mock,
+            scanJobData: .mockWith(historyEvents: optOutJobData.historyEvents),
+            optOutJobData: [optOutJobData])
+
+        let sut = DataBrokerProtectionStatsPixels(database: mockDatabase,
+                                                  handler: handler,
+                                                  repository: MockDataBrokerProtectionStatsPixelsRepository())
+
+        // When
+        sut.fireRegularIntervalConfirmationPixelsForSubmittedOptOuts(for: [brokerProfileQueryData])
+        let pixels = MockDataBrokerProtectionPixelsHandler.lastPixelsFired
+        print(pixels)
+
+        // Then
+        validatePixelsNotFired([optOutJobAt7DaysConfirmedPixel,
+                                optOutJobAt7DaysUnconfirmedPixel,
+                                optOutJobAt14DaysConfirmedPixel,
+                                optOutJobAt14DaysUnconfirmedPixel,
+                                optOutJobAt21DaysConfirmedPixel,
+                                optOutJobAt21DaysUnconfirmedPixel
+                               ])
+
+        // Cleanup
+        handler.clear()
+    }
+
+    func testWhenSubmittedDateIs15DaysAgoAndOptOutConfirmed_then7And14ConfirmedPixelsAreFiredButNoOthers() async {
+        // Given
+        let mockDatabase = MockDatabase()
+        let submittedDate = Calendar.current.date(byAdding: .day, value: -15, to: Date())
+        let optOutJobData = OptOutJobData.mock(with: .optOutConfirmed,
+                                               submittedDate: submittedDate,
+                                               sevenDaysConfirmationPixelFired: false,
+                                               fourteenDaysConfirmationPixelFired: false,
+                                               twentyOneDaysConfirmationPixelFired: false)
+        let brokerProfileQueryData = BrokerProfileQueryData(
+            dataBroker: .mock,
+            profileQuery: .mock,
+            scanJobData: .mockWith(historyEvents: optOutJobData.historyEvents),
+            optOutJobData: [optOutJobData])
+
+        let sut = DataBrokerProtectionStatsPixels(database: mockDatabase,
+                                                  handler: handler,
+                                                  repository: MockDataBrokerProtectionStatsPixelsRepository())
+
+        // When
+        sut.fireRegularIntervalConfirmationPixelsForSubmittedOptOuts(for: [brokerProfileQueryData])
+        let pixels = MockDataBrokerProtectionPixelsHandler.lastPixelsFired
+        print(pixels)
+
+        // Then
+        validatePixelsFired([optOutJobAt7DaysConfirmedPixel,
+                             optOutJobAt14DaysConfirmedPixel])
+        validatePixelsNotFired([optOutJobAt7DaysUnconfirmedPixel,
+                                optOutJobAt14DaysUnconfirmedPixel,
+                                optOutJobAt21DaysConfirmedPixel,
+                                optOutJobAt21DaysUnconfirmedPixel
+                               ])
+
+        // Cleanup
+        handler.clear()
+    }
+
+    func testWhenSubmittedDateIs15DaysAgoAndOptOutNotConfirmed_then7And14UnconfirmedPixelsAreFiredButNoOthers() async {
+        // Given
+        let mockDatabase = MockDatabase()
+        let submittedDate = Calendar.current.date(byAdding: .day, value: -15, to: Date())
+        let optOutJobData = OptOutJobData.mock(with: .optOutRequested,
+                                               submittedDate: submittedDate,
+                                               sevenDaysConfirmationPixelFired: false,
+                                               fourteenDaysConfirmationPixelFired: false,
+                                               twentyOneDaysConfirmationPixelFired: false)
+        let brokerProfileQueryData = BrokerProfileQueryData(
+            dataBroker: .mock,
+            profileQuery: .mock,
+            scanJobData: .mockWith(historyEvents: optOutJobData.historyEvents),
+            optOutJobData: [optOutJobData])
+
+        let sut = DataBrokerProtectionStatsPixels(database: mockDatabase,
+                                                  handler: handler,
+                                                  repository: MockDataBrokerProtectionStatsPixelsRepository())
+
+        // When
+        sut.fireRegularIntervalConfirmationPixelsForSubmittedOptOuts(for: [brokerProfileQueryData])
+        let pixels = MockDataBrokerProtectionPixelsHandler.lastPixelsFired
+        print(pixels)
+
+        // Then
+        validatePixelsFired([optOutJobAt7DaysUnconfirmedPixel,
+                             optOutJobAt14DaysUnconfirmedPixel])
+        validatePixelsNotFired([optOutJobAt7DaysConfirmedPixel,
+                                optOutJobAt14DaysConfirmedPixel,
+                                optOutJobAt21DaysConfirmedPixel,
+                                optOutJobAt21DaysUnconfirmedPixel
+                               ])
+
+        // Cleanup
+        handler.clear()
+    }
+
+    func testWhenPixelAlreadySentFlagsTrue_thenPixelsNotSent() async {
+        // Given
+        let mockDatabase = MockDatabase()
+        let submittedDate = Calendar.current.date(byAdding: .day, value: -22, to: Date())
+        let optOutJobData = OptOutJobData.mock(with: .optOutConfirmed,
+                                               submittedDate: submittedDate,
+                                               sevenDaysConfirmationPixelFired: true,
+                                               fourteenDaysConfirmationPixelFired: true,
+                                               twentyOneDaysConfirmationPixelFired: true)
+        let brokerProfileQueryData = BrokerProfileQueryData(
+            dataBroker: .mock,
+            profileQuery: .mock,
+            scanJobData: .mockWith(historyEvents: optOutJobData.historyEvents),
+            optOutJobData: [optOutJobData])
+
+        let sut = DataBrokerProtectionStatsPixels(database: mockDatabase,
+                                                  handler: handler,
+                                                  repository: MockDataBrokerProtectionStatsPixelsRepository())
+
+        // When
+        sut.fireRegularIntervalConfirmationPixelsForSubmittedOptOuts(for: [brokerProfileQueryData])
+        let pixels = MockDataBrokerProtectionPixelsHandler.lastPixelsFired
+        print(pixels)
+
+        // Then
+        validatePixelsNotFired([optOutJobAt7DaysConfirmedPixel,
+                                optOutJobAt7DaysUnconfirmedPixel,
+                                optOutJobAt14DaysConfirmedPixel,
+                                optOutJobAt14DaysUnconfirmedPixel,
+                                optOutJobAt21DaysConfirmedPixel,
+                                optOutJobAt21DaysUnconfirmedPixel
+                               ])
+
+        // Cleanup
+        handler.clear()
+    }
+
+    func testWhenSomePixelAlreadySentFlagsTrue_thenPixelsSentOrNotSentAsPerFlag() async {
+        // Given
+        let mockDatabase = MockDatabase()
+        let submittedDate = Calendar.current.date(byAdding: .day, value: -22, to: Date())
+        let optOutJobData = OptOutJobData.mock(with: .optOutConfirmed,
+                                               submittedDate: submittedDate,
+                                               sevenDaysConfirmationPixelFired: true,
+                                               fourteenDaysConfirmationPixelFired: false,
+                                               twentyOneDaysConfirmationPixelFired: false)
+        let brokerProfileQueryData = BrokerProfileQueryData(
+            dataBroker: .mock,
+            profileQuery: .mock,
+            scanJobData: .mockWith(historyEvents: optOutJobData.historyEvents),
+            optOutJobData: [optOutJobData])
+
+        let sut = DataBrokerProtectionStatsPixels(database: mockDatabase,
+                                                  handler: handler,
+                                                  repository: MockDataBrokerProtectionStatsPixelsRepository())
+
+        // When
+        sut.fireRegularIntervalConfirmationPixelsForSubmittedOptOuts(for: [brokerProfileQueryData])
+        let pixels = MockDataBrokerProtectionPixelsHandler.lastPixelsFired
+        print(pixels)
+
+        // Then
+        validatePixelsFired([optOutJobAt14DaysConfirmedPixel,
+                             optOutJobAt21DaysConfirmedPixel])
+        validatePixelsNotFired([optOutJobAt7DaysConfirmedPixel,
+                                optOutJobAt7DaysUnconfirmedPixel,
+                                optOutJobAt14DaysUnconfirmedPixel,
+                                optOutJobAt21DaysUnconfirmedPixel
+                               ])
+
+        // Cleanup
+        handler.clear()
+    }
+
+    func testWhenSubmittedDateIsNil_thenNoPixelsAreFired() async {
+        // Migrating existing users the submitted date defaults to nil, and pixels shouldn't be fired
+
+        // Given
+        let mockDatabase = MockDatabase()
+        let optOutJobData = OptOutJobData.mock(with: .optOutConfirmed,
+                                               submittedDate: nil,
+                                               sevenDaysConfirmationPixelFired: false,
+                                               fourteenDaysConfirmationPixelFired: false,
+                                               twentyOneDaysConfirmationPixelFired: false)
+        let brokerProfileQueryData = BrokerProfileQueryData(
+            dataBroker: .mock,
+            profileQuery: .mock,
+            scanJobData: .mockWith(historyEvents: optOutJobData.historyEvents),
+            optOutJobData: [optOutJobData])
+
+        let sut = DataBrokerProtectionStatsPixels(database: mockDatabase,
+                                                  handler: handler,
+                                                  repository: MockDataBrokerProtectionStatsPixelsRepository())
+
+        // When
+        sut.fireRegularIntervalConfirmationPixelsForSubmittedOptOuts(for: [brokerProfileQueryData])
+        let pixels = MockDataBrokerProtectionPixelsHandler.lastPixelsFired
+        print(pixels)
+
+        // Then
+        validatePixelsNotFired([optOutJobAt7DaysConfirmedPixel,
+                                optOutJobAt7DaysUnconfirmedPixel,
+                                optOutJobAt14DaysConfirmedPixel,
+                                optOutJobAt14DaysUnconfirmedPixel,
+                                optOutJobAt21DaysConfirmedPixel,
+                                optOutJobAt21DaysUnconfirmedPixel
+                               ])
+
+        // Cleanup
+        handler.clear()
+    }
 }

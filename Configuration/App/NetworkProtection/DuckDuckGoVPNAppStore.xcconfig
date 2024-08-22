@@ -39,7 +39,7 @@ CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPN
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = 3rd Party Mac Developer Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
-CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] = Developer ID Application
 
 PRODUCT_NAME_PREFIX = $(AGENT_PRODUCT_NAME)
 PRODUCT_NAME = $(AGENT_PRODUCT_NAME)
@@ -47,6 +47,7 @@ PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(AGENT_PRODUCT_NAME)
 PRODUCT_NAME[config=Release][arch=*][sdk=*] = $(AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = macOS NetP VPN App App Store - CI (XPC)
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.vpn.agent macos
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.vpn.agent.review macos
 
