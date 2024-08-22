@@ -377,7 +377,22 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     var webViewDidFinishNavigationPublisher: some Publisher<Void, Never> {
-        navigationStatePublisher.compactMap { $0 }.filter { $0.isFinished }.asVoid()
+        navigationStatePublisher
+            .combineLatest(navigationDelegate.$currentNavigation)
+            .filter { navigationState, currentNavigation in
+                guard let navigationState = navigationState, navigationState.isFinished else {
+                    return false
+                }
+                guard let currentNavigation = currentNavigation else {
+                    return false
+                }
+                return MainActor.assumeIsolated {
+                    let isSameDocumentNavigation = (currentNavigation.redirectHistory.first ?? currentNavigation.navigationAction).navigationType.isSameDocumentNavigation
+                    return !isSameDocumentNavigation
+                }
+            }
+            .map { _ in () }
+            .eraseToAnyPublisher()
     }
 
     // MARK: - Properties
