@@ -36,13 +36,13 @@ final class BookmarkListViewController: NSViewController {
 
     private lazy var stackView = NSStackView()
     private lazy var newBookmarkButton = MouseOverButton(image: .addBookmark, target: self, action: #selector(newBookmarkButtonClicked))
-    private lazy var newFolderButton = MouseOverButton(image: .addFolder, target: self, action: #selector(newFolderButtonClicked))
+    private lazy var newFolderButton = MouseOverButton(image: .addFolder, target: outlineView.menu, action: #selector(FolderMenuItemSelectors.newFolder))
     private lazy var searchBookmarksButton = MouseOverButton(image: .searchBookmarks, target: self, action: #selector(searchBookmarkButtonClicked))
     private lazy var sortBookmarksButton = MouseOverButton(image: .bookmarkSortAsc, target: self, action: #selector(sortBookmarksButtonClicked))
     private var isSearchVisible = false
 
     private lazy var buttonsDivider = NSBox()
-    private lazy var manageBookmarksButton = MouseOverButton(title: UserText.bookmarksManage, target: self, action: #selector(openManagementInterface))
+    private lazy var manageBookmarksButton = MouseOverButton(title: UserText.bookmarksManage, target: self, action: #selector(BookmarkMenuItemSelectors.manageBookmarks))
     private lazy var boxDivider = NSBox()
 
     private lazy var scrollView = NSScrollView(frame: NSRect(x: 0, y: 0, width: 420, height: 408))
@@ -73,9 +73,6 @@ final class BookmarkListViewController: NSViewController {
             bookmarkManager: bookmarkManager,
             treeController: treeController,
             sortMode: sortBookmarksViewModel.selectedSortMode,
-            onMenuRequestedAction: { [weak self] cell in
-                self?.showContextMenu(for: cell)
-            },
             presentFaviconsFetcherOnboarding: { [weak self] in
                 guard let self, let window = self.view.window else {
                     return
@@ -147,6 +144,9 @@ final class BookmarkListViewController: NSViewController {
         stackView.addArrangedSubview(searchBookmarksButton)
         stackView.addArrangedSubview(buttonsDivider)
         stackView.addArrangedSubview(manageBookmarksButton)
+
+        // keep OutlineView menu declaration before the buttons as it‘s their target
+        outlineView.menu = BookmarksContextMenu(bookmarkManager: bookmarkManager, delegate: self)
 
         newBookmarkButton.bezelStyle = .shadowlessSquare
         newBookmarkButton.cornerRadius = 4
@@ -229,8 +229,6 @@ final class BookmarkListViewController: NSViewController {
         outlineView.usesAutomaticRowHeights = true
         outlineView.target = self
         outlineView.action = #selector(handleClick)
-        outlineView.menu = NSMenu()
-        outlineView.menu!.delegate = self
         outlineView.dataSource = dataSource
         outlineView.delegate = dataSource
 
@@ -437,13 +435,7 @@ final class BookmarkListViewController: NSViewController {
 
     @objc func newBookmarkButtonClicked(_ sender: AnyObject) {
         let view = BookmarksDialogViewFactory.makeAddBookmarkView(currentTab: currentTabWebsite)
-        showDialog(view: view)
-    }
-
-    @objc func newFolderButtonClicked(_ sender: AnyObject) {
-        let parentFolder = sender.representedObject as? BookmarkFolder
-        let view = BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: parentFolder)
-        showDialog(view: view)
+        showDialog(view)
     }
 
     @objc func searchBookmarkButtonClicked(_ sender: NSButton) {
@@ -491,10 +483,6 @@ final class BookmarkListViewController: NSViewController {
         outlineView.reloadData()
         sortBookmarksButton.backgroundColor = mode.shouldHighlightButton ? .buttonMouseDown : .clear
         sortBookmarksButton.mouseOverColor = mode.shouldHighlightButton ? .buttonMouseDown : .buttonMouseOver
-    }
-
-    @objc func openManagementInterface(_ sender: NSButton) {
-        showManageBookmarks()
     }
 
     @objc func handleClick(_ sender: NSOutlineView) {
@@ -627,214 +615,37 @@ final class BookmarkListViewController: NSViewController {
         outlineView.selectRowIndexes(indexes, byExtendingSelection: false)
     }
 
-    private func showContextMenu(for cell: BookmarkOutlineCellView) {
-        let row = outlineView.row(for: cell)
-        guard
-            let item = outlineView.item(atRow: row),
-            let contextMenu = ContextualMenu.menu(for: [item], target: self, forSearch: dataSource.isSearching)
-        else {
-            return
+}
+// MARK: - BookmarksContextMenuDelegate
+extension BookmarkListViewController: BookmarksContextMenuDelegate {
+
+    var isSearching: Bool { dataSource.isSearching }
+    var parentFolder: BookmarkFolder? { nil }
+    var shouldIncludeManageBookmarksItem: Bool { true }
+
+    func selectedItems() -> [Any] {
+        guard let row = outlineView.clickedRowIfValid else { return [] }
+
+        if outlineView.selectedRowIndexes.contains(row) {
+            return outlineView.selectedItems
         }
 
-        contextMenu.popUpAtMouseLocation(in: view)
+        return outlineView.item(atRow: row).map { [$0] } ?? []
     }
 
-}
-
-private extension BookmarkListViewController {
-
-    func showDialog(view: any ModalView) {
+    func showDialog(_ dialog: any ModalView) {
         delegate?.popover(shouldPreventClosure: true)
-
-        view.show(in: parent?.view.window) { [weak delegate] in
+        dialog.show(in: parent?.view.window) { [weak delegate] in
             delegate?.popover(shouldPreventClosure: false)
         }
     }
 
-    func showManageBookmarks() {
-        WindowControllersManager.shared.showBookmarksTab()
+    func closePopoverIfNeeded() {
         delegate?.popoverShouldClose(self)
     }
 
 }
-
-// MARK: - Menu Item Selectors
-
-extension BookmarkListViewController: NSMenuDelegate {
-
-    func contextualMenuForClickedRows() -> NSMenu? {
-        let row = outlineView.clickedRow
-
-        guard row != -1 else {
-            return ContextualMenu.menu(for: nil)
-        }
-
-        if outlineView.selectedRowIndexes.contains(row) {
-            return ContextualMenu.menu(for: outlineView.selectedItems)
-        }
-
-        if let item = outlineView.item(atRow: row) {
-            return ContextualMenu.menu(for: [item], forSearch: dataSource.isSearching)
-        } else {
-            return nil
-        }
-    }
-
-    public func menuNeedsUpdate(_ menu: NSMenu) {
-        menu.removeAllItems()
-
-        guard let contextualMenu = contextualMenuForClickedRows() else {
-            return
-        }
-
-        let items = contextualMenu.items
-        contextualMenu.removeAllItems()
-        for menuItem in items {
-            menu.addItem(menuItem)
-        }
-    }
-
-}
-
-extension BookmarkListViewController: BookmarkMenuItemSelectors {
-
-    func openBookmarkInNewTab(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-
-        WindowControllersManager.shared.show(url: bookmark.urlObject, source: .bookmark, newTab: true)
-    }
-
-    func openBookmarkInNewWindow(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-        guard let urlObject = bookmark.urlObject else {
-            return
-        }
-        WindowsManager.openNewWindow(with: urlObject, source: .bookmark, isBurner: false)
-    }
-
-    func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-
-        bookmark.isFavorite.toggle()
-        bookmarkManager.update(bookmark: bookmark)
-    }
-
-    func editBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to retrieve Bookmark from Edit Bookmark context menu item")
-            return
-        }
-
-        let view = BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark)
-        showDialog(view: view)
-    }
-
-    func copyBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-        bookmark.copyUrlToPasteboard()
-    }
-
-    func deleteBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
-            assertionFailure("Failed to cast menu represented object to Bookmark")
-            return
-        }
-
-        bookmarkManager.remove(bookmark: bookmark)
-    }
-
-    func deleteEntities(_ sender: NSMenuItem) {
-        guard let uuids = sender.representedObject as? [String] else {
-            assertionFailure("Failed to cast menu item's represented object to UUID array")
-            return
-        }
-
-        bookmarkManager.remove(objectsWithUUIDs: uuids)
-    }
-
-    func manageBookmarks(_ sender: NSMenuItem) {
-        showManageBookmarks()
-    }
-
-    func moveToEnd(_ sender: NSMenuItem) {
-        guard let bookmarkEntity = sender.representedObject as? BookmarksEntityIdentifiable else {
-            assertionFailure("Failed to cast menu item's represented object to BookmarkEntity")
-            return
-        }
-
-        let parentFolderType: ParentFolderType = bookmarkEntity.parentId.flatMap { .parent(uuid: $0) } ?? .root
-        bookmarkManager.move(objectUUIDs: [bookmarkEntity.entityId], toIndex: nil, withinParentFolder: parentFolderType) { _ in }
-    }
-
-}
-
-extension BookmarkListViewController: FolderMenuItemSelectors {
-
-    func newFolder(_ sender: NSMenuItem) {
-        newFolderButtonClicked(sender)
-    }
-
-    func editFolder(_ sender: NSMenuItem) {
-        guard let bookmarkEntityInfo = sender.representedObject as? BookmarkEntityInfo,
-              let folder = bookmarkEntityInfo.entity as? BookmarkFolder
-        else {
-            assertionFailure("Failed to retrieve Bookmark from Edit Folder context menu item")
-            return
-        }
-
-        let view = BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: bookmarkEntityInfo.parent)
-        showDialog(view: view)
-    }
-
-    func deleteFolder(_ sender: NSMenuItem) {
-        guard let folder = sender.representedObject as? BookmarkFolder else {
-            assertionFailure("Failed to retrieve Bookmark from Delete Folder context menu item")
-            return
-        }
-
-        bookmarkManager.remove(folder: folder)
-    }
-
-    func openInNewTabs(_ sender: NSMenuItem) {
-        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
-              let folder = sender.representedObject as? BookmarkFolder
-        else {
-            assertionFailure("Cannot open all in new tabs")
-            return
-        }
-
-        let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
-        tabCollection.append(tabs: tabs)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-    func openAllInNewWindow(_ sender: NSMenuItem) {
-        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
-              let folder = sender.representedObject as? BookmarkFolder
-        else {
-            assertionFailure("Cannot open all in new window")
-            return
-        }
-
-        let newTabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
-        WindowsManager.openNewWindow(with: newTabCollection, isBurner: tabCollection.isBurner)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-}
-
+// MARK: - BookmarkSearchMenuItemSelectors
 extension BookmarkListViewController: BookmarkSearchMenuItemSelectors {
     func showInFolder(_ sender: NSMenuItem) {
         guard let baseBookmark = sender.representedObject as? BaseBookmarkEntity else {
@@ -888,46 +699,6 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
             }
         }
     }
-}
-
-// MARK: - BookmarkListPopover
-
-final class BookmarkListPopover: NSPopover {
-
-    override init() {
-        super.init()
-
-        self.animates = false
-        self.behavior = .transient
-
-        setupContentController()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("BookmarkListPopover: Bad initializer")
-    }
-
-    // swiftlint:disable:next force_cast
-    var viewController: BookmarkListViewController { contentViewController as! BookmarkListViewController }
-
-    private func setupContentController() {
-        let controller = BookmarkListViewController()
-        controller.delegate = self
-        contentViewController = controller
-    }
-
-}
-
-extension BookmarkListPopover: BookmarkListViewControllerDelegate {
-
-    func popoverShouldClose(_ bookmarkListViewController: BookmarkListViewController) {
-        close()
-    }
-
-    func popover(shouldPreventClosure: Bool) {
-        behavior = shouldPreventClosure ? .applicationDefined : .transient
-    }
-
 }
 
 #if DEBUG

@@ -41,7 +41,6 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     private let bookmarkManager: BookmarkManager
     private let showMenuButtonOnHover: Bool
-    private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
     private let presentFaviconsFetcherOnboarding: (() -> Void)?
 
     private var favoritesPseudoFolder = PseudoFolder.favorites
@@ -53,14 +52,12 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         treeController: BookmarkTreeController,
         sortMode: BookmarksSortMode,
         showMenuButtonOnHover: Bool = true,
-        onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)? = nil,
         presentFaviconsFetcherOnboarding: (() -> Void)? = nil
     ) {
         self.contentMode = contentMode
         self.bookmarkManager = bookmarkManager
         self.treeController = treeController
         self.showMenuButtonOnHover = showMenuButtonOnHover
-        self.onMenuRequestedAction = onMenuRequestedAction
         self.presentFaviconsFetcherOnboarding = presentFaviconsFetcherOnboarding
 
         super.init()
@@ -365,11 +362,13 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
 }
-
 // MARK: - BookmarkOutlineCellViewDelegate
-
 extension BookmarkOutlineViewDataSource: BookmarkOutlineCellViewDelegate {
     func outlineCellViewRequestedMenu(_ cell: BookmarkOutlineCellView) {
-        onMenuRequestedAction?(cell)
+        guard let outlineView = cell.superview?.superview as? NSOutlineView else {
+            assertionFailure("cell.superview?.superview is not NSOutlineView")
+            return
+        }
+        outlineView.menu?.popUpAtMouseLocation(in: cell)
     }
 }

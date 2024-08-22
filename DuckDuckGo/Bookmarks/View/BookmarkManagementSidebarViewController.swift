@@ -120,8 +120,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         outlineView.rowHeight = 28
         outlineView.target = self
         outlineView.doubleAction = #selector(onDoubleClick)
-        outlineView.menu = NSMenu()
-        outlineView.menu!.delegate = self
+        outlineView.menu = BookmarksContextMenu(bookmarkManager: bookmarkManager, delegate: self)
         outlineView.dataSource = dataSource
         outlineView.delegate = dataSource
 
@@ -288,107 +287,27 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     }
 
 }
+// MARK: - BookmarksContextMenu
+extension BookmarkManagementSidebarViewController: BookmarksContextMenuDelegate {
 
-extension BookmarkManagementSidebarViewController: NSMenuDelegate {
+    var isSearching: Bool { false }
+    var parentFolder: BookmarkFolder? { nil }
+    var shouldIncludeManageBookmarksItem: Bool { false }
 
-    func contextualMenuForClickedRows() -> NSMenu? {
-        let row = outlineView.clickedRow
-
-        guard row != -1 else {
-            return ContextualMenu.menu(for: nil)
-        }
+    func selectedItems() -> [Any] {
+        guard let row = outlineView.clickedRowIfValid else { return [] }
 
         if outlineView.selectedRowIndexes.contains(row) {
-            return ContextualMenu.menu(for: outlineView.selectedItems)
+            return outlineView.selectedItems
         }
-
-        if let item = outlineView.item(atRow: row) {
-            return ContextualMenu.menu(for: [item])
-        } else {
-            return nil
-        }
+        return outlineView.item(atRow: row).map { [$0] } ?? []
     }
 
-    func menuNeedsUpdate(_ menu: NSMenu) {
-        menu.removeAllItems()
-
-        guard let contextualMenu = contextualMenuForClickedRows() else {
-            return
-        }
-
-        let items = contextualMenu.items
-        contextualMenu.removeAllItems()
-        for menuItem in items {
-            menu.addItem(menuItem)
-        }
+    func showDialog(_ dialog: any ModalView) {
+        dialog.show(in: view.window)
     }
 
-}
-
-extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
-
-    func newFolder(_ sender: NSMenuItem) {
-        let parent = sender.representedObject as? BookmarkFolder
-        BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: parent)
-            .show(in: view.window)
-    }
-
-    func editFolder(_ sender: NSMenuItem) {
-        guard let bookmarkEntityInfo = sender.representedObject as? BookmarkEntityInfo,
-              let folder = bookmarkEntityInfo.entity as? BookmarkFolder
-        else {
-            assertionFailure("Failed to cast menu represented object to BookmarkFolder")
-            return
-        }
-
-        BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: bookmarkEntityInfo.parent)
-            .show(in: view.window)
-    }
-
-    func deleteFolder(_ sender: NSMenuItem) {
-        guard let folder = sender.representedObject as? BookmarkFolder else {
-            assertionFailure("Failed to retrieve Folder from Delete Folder context menu item")
-            return
-        }
-
-        bookmarkManager.remove(folder: folder)
-    }
-
-    func moveToEnd(_ sender: NSMenuItem) {
-        guard let bookmarkEntity = sender.representedObject as? BookmarksEntityIdentifiable else {
-            assertionFailure("Failed to cast menu item's represented object to BookmarkEntity")
-            return
-        }
-
-        let parentFolderType: ParentFolderType = bookmarkEntity.parentId.flatMap { .parent(uuid: $0) } ?? .root
-        bookmarkManager.move(objectUUIDs: [bookmarkEntity.entityId], toIndex: nil, withinParentFolder: parentFolderType) { _ in }
-    }
-
-    func openInNewTabs(_ sender: NSMenuItem) {
-        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
-              let folder = sender.representedObject as? BookmarkFolder
-        else {
-            assertionFailure("Cannot open all in new tabs")
-            return
-        }
-
-        let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
-        tabCollection.append(tabs: tabs)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-    func openAllInNewWindow(_ sender: NSMenuItem) {
-        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
-              let folder = sender.representedObject as? BookmarkFolder
-        else {
-            assertionFailure("Cannot open all in new window")
-            return
-        }
-
-        let newTabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
-        WindowsManager.openNewWindow(with: newTabCollection, isBurner: tabCollection.isBurner)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
+    func closePopoverIfNeeded() {}
 
 }
 

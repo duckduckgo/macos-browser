@@ -20,17 +20,9 @@ import Cocoa
 
 protocol BookmarksBarCollectionViewItemDelegate: AnyObject {
 
-    func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem)
+    @MainActor func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem)
 
-    func bookmarksBarCollectionViewItemOpenInNewTabAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemOpenInNewWindowAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemToggleFavoritesAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewEditAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemMoveToEndAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemCopyBookmarkURLAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemDeleteEntityAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemAddEntityAction(_ item: BookmarksBarCollectionViewItem)
-    func bookmarksBarCollectionViewItemManageBookmarksAction(_ item: BookmarksBarCollectionViewItem)
+    func showDialog(_ dialog: any ModalView)
 
 }
 
@@ -66,12 +58,15 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        configureLayer()
-        createMenu()
+        view.wantsLayer = true
+        view.layer?.cornerRadius = 4.0
+        view.layer?.masksToBounds = true
+        view.menu = BookmarksContextMenu(delegate: self)
     }
 
     func updateItem(from entity: BaseBookmarkEntity, isInteractionPrevented: Bool) {
         self.title = entity.title
+        self.representedObject = entity
 
         if let bookmark = entity as? Bookmark {
             let favicon = bookmark.favicon(.small)?.copy() as? NSImage
@@ -108,99 +103,22 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         titleLabel.alphaValue = isInteractionPrevented ? 0.3 : 1
     }
 
-    private func configureLayer() {
-        view.wantsLayer = true
-        view.layer?.cornerRadius = 4.0
-        view.layer?.masksToBounds = true
-    }
-
-    private func createMenu() {
-        let menu = NSMenu()
-        menu.delegate = self
-        view.menu = menu
-    }
-
 }
+// MARK: - BookmarksContextMenuDelegate
+extension BookmarksBarCollectionViewItem: BookmarksContextMenuDelegate {
 
-// MARK: - NSMenu
+    var isSearching: Bool { false }
+    var parentFolder: BookmarkFolder? { nil }
+    var shouldIncludeManageBookmarksItem: Bool { true }
 
-extension BookmarksBarCollectionViewItem: NSMenuDelegate {
-
-    func menuNeedsUpdate(_ menu: NSMenu) {
-        menu.removeAllItems()
-
-        guard let entityType = entityType else {
-            return
-        }
-
-        switch entityType {
-        case .bookmark(_, _, _, let isFavorite):
-            menu.items = ContextualMenu.bookmarkMenuItems(isFavorite: isFavorite)
-        case .folder:
-            menu.items = ContextualMenu.folderMenuItems()
-        }
+    func selectedItems() -> [Any] {
+        self.representedObject.map { [$0] } ?? []
     }
 
-}
-
-extension BookmarksBarCollectionViewItem: BookmarkMenuItemSelectors {
-
-    func openBookmarkInNewTab(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewItemOpenInNewTabAction(self)
+    func showDialog(_ dialog: any ModalView) {
+        delegate?.showDialog(dialog)
     }
 
-    func openBookmarkInNewWindow(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewItemOpenInNewWindowAction(self)
-    }
-
-    func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewItemToggleFavoritesAction(self)
-    }
-
-    func editBookmark(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewEditAction(self)
-    }
-
-    func copyBookmark(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewItemCopyBookmarkURLAction(self)
-    }
-
-    func deleteBookmark(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewItemDeleteEntityAction(self)
-    }
-
-    func moveToEnd(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewItemMoveToEndAction(self)
-    }
-
-    func deleteEntities(_ sender: NSMenuItem) {}
-
-    func manageBookmarks(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewItemManageBookmarksAction(self)
-    }
-
-}
-
-extension BookmarksBarCollectionViewItem: FolderMenuItemSelectors {
-
-    func newFolder(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewItemAddEntityAction(self)
-    }
-
-    func editFolder(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewEditAction(self)
-    }
-
-    func deleteFolder(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewItemDeleteEntityAction(self)
-    }
-
-    func openInNewTabs(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewItemOpenInNewTabAction(self)
-    }
-
-    func openAllInNewWindow(_ sender: NSMenuItem) {
-        delegate?.bookmarksBarCollectionViewItemOpenInNewWindowAction(self)
-    }
+    func closePopoverIfNeeded() {}
 
 }

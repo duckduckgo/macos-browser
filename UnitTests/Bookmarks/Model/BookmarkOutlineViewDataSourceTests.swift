@@ -171,22 +171,25 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         // GIVEN
         let mockFolder = BookmarkFolder.mock
         let mockOutlineView = NSOutlineView(frame: .zero)
+        class MockMenu: NSMenu {
+            var didCallPopUp = false
+            override func popUp(positioning item: NSMenuItem?, at location: NSPoint, in view: NSView?) -> Bool {
+                XCTAssertTrue(view is NSOutlineView)
+                didCallPopUp = true
+                return false
+            }
+        }
+        mockOutlineView.menu = MockMenu()
         let treeController = createTreeController(with: [mockFolder])
         let mockFolderNode = treeController.node(representing: mockFolder)!
-        var didFireClosure = false
-        var capturedCell: BookmarkOutlineCellView?
-        let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: LocalBookmarkManager(), treeController: treeController, sortMode: .manual) { cell in
-            didFireClosure = true
-            capturedCell = cell
-        }
+        let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: LocalBookmarkManager(), treeController: treeController, sortMode: .manual)
         let cell = try XCTUnwrap(dataSource.outlineView(mockOutlineView, viewFor: nil, item: mockFolderNode) as? BookmarkOutlineCellView)
 
         // WHEN
         cell.delegate?.outlineCellViewRequestedMenu(cell)
 
         // THEN
-        XCTAssertTrue(didFireClosure)
-        XCTAssertEqual(cell, capturedCell)
+        XCTAssertTrue((mockOutlineView.menu as! MockMenu).didCallPopUp)
     }
 
     @MainActor
