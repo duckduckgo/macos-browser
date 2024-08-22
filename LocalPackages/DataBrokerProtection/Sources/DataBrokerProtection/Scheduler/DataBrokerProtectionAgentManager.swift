@@ -152,6 +152,7 @@ public final class DataBrokerProtectionAgentManager {
 
             activityScheduler.startScheduler()
             didStartActivityScheduler = true
+            fireMonitoringPixels()
             queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies, completion: nil)
 
             /// Monitors entitlement changes every 60 minutes to optimize system performance and resource utilization by avoiding unnecessary operations when entitlement is invalid.
@@ -165,9 +166,29 @@ public final class DataBrokerProtectionAgentManager {
     }
 }
 
+// MARK: - Regular monitoring pixels
+
+extension DataBrokerProtectionAgentManager {
+    func fireMonitoringPixels() {
+        let database = operationDependencies.database
+
+        let engagementPixels = DataBrokerProtectionEngagementPixels(database: database, handler: pixelHandler)
+        let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
+        let statsPixels = DataBrokerProtectionStatsPixels(database: database, handler: pixelHandler)
+
+        // This will fire the DAU/WAU/MAU pixels,
+        engagementPixels.fireEngagementPixel()
+        // This will try to fire the event weekly report pixels
+        eventPixels.tryToFireWeeklyPixels()
+        // This will try to fire the stats pixels
+        statsPixels.tryToFireStatsPixels()
+    }
+}
+
 extension DataBrokerProtectionAgentManager: DataBrokerProtectionBackgroundActivitySchedulerDelegate {
 
     public func dataBrokerProtectionBackgroundActivitySchedulerDidTrigger(_ activityScheduler: DataBrokerProtection.DataBrokerProtectionBackgroundActivityScheduler, completion: (() -> Void)?) {
+        fireMonitoringPixels()
         queueManager.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies) { _ in
             completion?()
         }
@@ -180,6 +201,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
         let backgroundAgentInitialScanStartTime = Date()
 
         userNotificationService.requestNotificationPermission()
+        fireMonitoringPixels()
         queueManager.startImmediateOperationsIfPermitted(showWebView: false, operationDependencies: operationDependencies) { [weak self] errors in
             guard let self = self else { return }
 
@@ -215,6 +237,7 @@ extension DataBrokerProtectionAgentManager: DataBrokerProtectionAgentAppEvents {
     }
 
     public func appLaunched() {
+        fireMonitoringPixels()
         queueManager.startScheduledOperationsIfPermitted(showWebView: false,
                                                          operationDependencies:
                                                             operationDependencies) { [weak self] errors in

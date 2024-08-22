@@ -142,6 +142,7 @@ enum BundleGroup {
     case ipc
     case dbp
     case subs
+    case appConfiguration
 
     var appGroupKey: String {
         switch self {
@@ -153,6 +154,8 @@ enum BundleGroup {
             return "NETP_APP_GROUP"
         case .subs:
             return "SUBSCRIPTION_APP_GROUP"
+        case .appConfiguration:
+            return "APP_CONFIGURATION_APP_GROUP"
         }
     }
 }

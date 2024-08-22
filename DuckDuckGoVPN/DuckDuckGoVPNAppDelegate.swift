@@ -352,7 +352,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     try await self.vpnUninstaller.uninstall(includingSystemExtension: true)
                     exit(EXIT_SUCCESS)
                 } catch {
-                    // Intentional no-op: we already track VPN uninstallation failures using
+                    // Intentional no-op: we already anonymously track VPN uninstallation failures using
                     // pixels within the vpn uninstaller.
                 }
             }

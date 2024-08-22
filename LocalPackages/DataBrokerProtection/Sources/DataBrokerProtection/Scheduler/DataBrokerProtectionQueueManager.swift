@@ -176,8 +176,6 @@ private extension DefaultDataBrokerProtectionQueueManager {
 
         updateBrokerData()
 
-        firePixels(operationDependencies: operationDependencies)
-
         addOperations(withType: type,
                       priorityDate: mode.priorityDate,
                       showWebView: showWebView,
@@ -242,22 +240,6 @@ private extension DefaultDataBrokerProtectionQueueManager {
 
     func operationErrorsForCurrentOperations() -> [Error]? {
         return operationErrors.count != 0 ? operationErrors : nil
-    }
-
-    func firePixels(operationDependencies: DataBrokerOperationDependencies) {
-        let database = operationDependencies.database
-        let pixelHandler = operationDependencies.pixelHandler
-
-        let engagementPixels = DataBrokerProtectionEngagementPixels(database: database, handler: pixelHandler)
-        let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
-        let statsPixels = DataBrokerProtectionStatsPixels(database: database, handler: pixelHandler)
-
-        // This will fire the DAU/WAU/MAU pixels,
-        engagementPixels.fireEngagementPixel()
-        // This will try to fire the event weekly report pixels
-        eventPixels.tryToFireWeeklyPixels()
-        // This will try to fire the stats pixels
-        statsPixels.tryToFireStatsPixels()
     }
 }
 
