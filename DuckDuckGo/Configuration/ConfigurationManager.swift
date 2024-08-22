@@ -45,7 +45,7 @@ final class ConfigurationManager: DefaultConfigurationManager {
 
     private var fileDispatchSource: DispatchSourceFileSystemObject?
 
-    override init(fetcher: ConfigurationFetcher, defaults: UserDefaults = UserDefaults()) {
+    override init(fetcher: ConfigurationFetcher, defaults: UserDefaults = UserDefaults.appConfiguration) {
         super.init(fetcher: fetcher, defaults: defaults)
 
         do {

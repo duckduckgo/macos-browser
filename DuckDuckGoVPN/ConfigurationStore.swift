@@ -45,7 +45,7 @@ final class ConfigurationStore: ConfigurationStoring {
     }
 
     static let shared = ConfigurationStore()
-    let defaults = UserDefaults.netP
+    let defaults = UserDefaults.appConfiguration
 
     var privacyConfigurationEtag: String? {
         get {
@@ -99,7 +99,7 @@ final class ConfigurationStore: ConfigurationStoring {
     func fileUrl(for config: Configuration) -> URL {
         let fm = FileManager.default
 
-        guard let dir = fm.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.bundleIdentifier!) else { // TODO: Change to Configuration group
+        guard let dir = fm.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .appConfiguration)) else {
             fatalError("Failed to get application group URL")
         }
         let subDir = dir.appendingPathComponent("Configuration")

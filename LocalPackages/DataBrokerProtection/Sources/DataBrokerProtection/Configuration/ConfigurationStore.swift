@@ -45,7 +45,7 @@ final class ConfigurationStore: ConfigurationStoring {
     }
 
     static let shared = ConfigurationStore()
-    let defaults = UserDefaults.dbp
+    let defaults = UserDefaults.config
 
     var privacyConfigurationEtag: String? {
         get {
@@ -99,7 +99,7 @@ final class ConfigurationStore: ConfigurationStoring {
     func fileUrl(for config: Configuration) -> URL {
         let fm = FileManager.default
 
-        guard let dir = fm.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.dbpAppGroup) else { // TODO: Change to Configuration group
+        guard let dir = fm.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.configAppGroup) else {
             fatalError("Failed to get application group URL")
         }
         let subDir = dir.appendingPathComponent("Configuration")

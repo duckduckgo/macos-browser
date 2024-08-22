@@ -37,28 +37,28 @@ final class ConfigurationStore: ConfigurationStoring {
 
     static let shared = ConfigurationStore()
 
-    @UserDefaultsWrapper(key: .configStorageTrackerRadarEtag, defaultValue: nil)
+    @UserDefaultsWrapper(key: .configStorageTrackerRadarEtag, defaultValue: nil, defaults: .appConfiguration)
     private var trackerRadarEtag: String?
 
-    @UserDefaultsWrapper(key: .configStorageBloomFilterSpecEtag, defaultValue: nil)
+    @UserDefaultsWrapper(key: .configStorageBloomFilterSpecEtag, defaultValue: nil, defaults: .appConfiguration)
     private var bloomFilterSpecEtag: String?
 
-    @UserDefaultsWrapper(key: .configStorageBloomFilterBinaryEtag, defaultValue: nil)
+    @UserDefaultsWrapper(key: .configStorageBloomFilterBinaryEtag, defaultValue: nil, defaults: .appConfiguration)
     private var bloomFilterBinaryEtag: String?
 
-    @UserDefaultsWrapper(key: .configStorageBloomFilterExclusionsEtag, defaultValue: nil)
+    @UserDefaultsWrapper(key: .configStorageBloomFilterExclusionsEtag, defaultValue: nil, defaults: .appConfiguration)
     private var bloomFilterExcludedDomainsEtag: String?
 
-    @UserDefaultsWrapper(key: .configStorageSurrogatesEtag, defaultValue: nil)
+    @UserDefaultsWrapper(key: .configStorageSurrogatesEtag, defaultValue: nil, defaults: .appConfiguration)
     private var surrogatesEtag: String?
 
-    @UserDefaultsWrapper(key: .configStoragePrivacyConfigurationEtag, defaultValue: nil)
+    @UserDefaultsWrapper(key: .configStoragePrivacyConfigurationEtag, defaultValue: nil, defaults: .appConfiguration)
     private var privacyConfigurationEtag: String?
 
-    @UserDefaultsWrapper(key: .configFBConfigEtag, defaultValue: nil)
+    @UserDefaultsWrapper(key: .configFBConfigEtag, defaultValue: nil, defaults: .appConfiguration)
     private var FBConfigEtag: String?
 
-    @UserDefaultsWrapper(key: .configStorageRemoteMessagingConfigEtag, defaultValue: nil)
+    @UserDefaultsWrapper(key: .configStorageRemoteMessagingConfigEtag, defaultValue: nil, defaults: .appConfiguration)
     private var remoteMessagingConfigEtag: String?
 
     private init() { }
@@ -133,7 +133,9 @@ final class ConfigurationStore: ConfigurationStoring {
     func fileUrl(for config: Configuration) -> URL {
         let fm = FileManager.default
 
-        let dir = URL.sandboxApplicationSupportURL
+        guard let dir = fm.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .appConfiguration)) else {
+            fatalError("Failed to get application group URL")
+        }
         let subDir = dir.appendingPathComponent("Configuration")
 
         var isDir: ObjCBool = false
