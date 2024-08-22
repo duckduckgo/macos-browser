@@ -56,7 +56,10 @@ get_task_id() {
 	if [[ "$url" =~ ${task_url_regex} ]]; then
 		local task_id="${BASH_REMATCH[1]}"
 		local http_code
-		http_code=$(curl -fLSs "${asana_api_url}/tasks/${task_id}?opt_fields=gid" -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" --write-out '%{http_code}' --output /dev/null)
+		http_code="$(curl -fLSs "${asana_api_url}/tasks/${task_id}?opt_fields=gid" \
+			-H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+			--write-out '%{http_code}' \
+			--output /dev/null)"
 		if [[ "$http_code" -eq 200 ]]; then
 			echo "${task_id}"
 		else
