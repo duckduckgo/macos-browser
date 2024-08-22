@@ -1,5 +1,5 @@
 //
-//  FreemiumStateTests.swift
+//  FreemiumPIRStateTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,23 +19,23 @@
 import XCTest
 @testable import Freemium
 
-final class FreemiumStateTests: XCTestCase {
+final class FreemiumPIRStateTests: XCTestCase {
 
     private static let testSuiteName = "test.defaults.freemium.state.tests"
     private let pir = "macos.browser.freemium.pir"
-    private let testUserDefaults = UserDefaults(suiteName: FreemiumStateTests.testSuiteName)!
+    private let testUserDefaults = UserDefaults(suiteName: FreemiumPIRStateTests.testSuiteName)!
 
     override func setUpWithError() throws {
-        testUserDefaults.removePersistentDomain(forName: FreemiumStateTests.testSuiteName)
+        testUserDefaults.removePersistentDomain(forName: FreemiumPIRStateTests.testSuiteName)
     }
 
     func testSetsHasFreemiumPIR() throws {
         // Given
-        let sut = DefaultFreemiumState(userDefaults: testUserDefaults)
+        let sut = DefaultFreemiumPIRState(userDefaults: testUserDefaults)
         XCTAssertFalse(testUserDefaults.bool(forKey: pir))
 
         // When
-        sut.hasFreemiumPIR = true
+        sut.didOnboard = true
 
         // Then
         XCTAssertTrue(testUserDefaults.bool(forKey: pir))
@@ -43,13 +43,13 @@ final class FreemiumStateTests: XCTestCase {
 
     func testGetsHasFreemiumPIR() throws {
         // Given
-        let sut = DefaultFreemiumState(userDefaults: testUserDefaults)
-        XCTAssertFalse(sut.hasFreemiumPIR)
+        let sut = DefaultFreemiumPIRState(userDefaults: testUserDefaults)
+        XCTAssertFalse(sut.didOnboard)
         testUserDefaults.setValue(true, forKey: pir)
         XCTAssertTrue(testUserDefaults.bool(forKey: pir))
 
         // When
-        let result = sut.hasFreemiumPIR
+        let result = sut.didOnboard
 
         // Then
         XCTAssertTrue(result)
