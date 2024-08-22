@@ -284,7 +284,6 @@ final class TabViewModel {
         tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
             guard let self = self else { return }
             self.sendAnimationTrigger()
-            self.updateZoomForWebsite()
         }.store(in: &cancellables)
     }
 
