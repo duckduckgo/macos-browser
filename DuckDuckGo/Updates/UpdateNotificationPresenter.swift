@@ -41,7 +41,7 @@ final class UpdateNotificationPresenter {
                                                               image: icon,
                                                               buttonText: buttonText,
                                                               buttonAction: buttonAction,
-                                                              shouldShowCloseButton: buttonText == nil,
+                                                              shouldShowCloseButton: true,
                                                               presentMultiline: presentMultiline,
                                                               autoDismissDuration: Self.presentationTimeInterval,
                                                               onClick: { [weak self] in
