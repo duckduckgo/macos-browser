@@ -71,6 +71,13 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     @Published private(set) var isUpdateBeingLoaded = false
     var isUpdateBeingLoadedPublisher: Published<Bool>.Publisher { $isUpdateBeingLoaded }
 
+    // Struct used to cache data until the updater finishes checking for updates
+    struct UpdateCheckResult {
+        let item: SUAppcastItem
+        let isInstalled: Bool
+    }
+    private var updateCheckResult: UpdateCheckResult?
+
     @Published private(set) var latestUpdate: Update? {
         didSet {
             if let latestUpdate, !latestUpdate.isInstalled {
@@ -201,6 +208,7 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     private func onUpdateCheckStart() {
+        updateCheckResult = nil
         isUpdateBeingLoaded = true
     }
 
@@ -217,7 +225,9 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
-        os_log("Updater did abort with error: \(error.localizedDescription)", log: .updates)
+        os_log("Updater did abort with error: %{public}@",
+               log: .updates,
+               error.localizedDescription)
 
         let errorCode = (error as NSError).code
         guard ![Int(Sparkle.SUError.noUpdateError.rawValue),
@@ -231,51 +241,69 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        os_log("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))", log: .updates)
+        os_log("Updater did find valid update: %{public}@",
+               log: .updates,
+               "\(item.displayVersionString)(\(item.versionString))")
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
 
-        guard !areAutomaticUpdatesEnabled else {
-            // If automatic updates are enabled, we are waiting until the update is downloaded
-            return
+        if !areAutomaticUpdatesEnabled {
+            // For manual updates, we can present the available update without waiting for the update cycle to finish. The Sparkle flow downloads the update later
+            updateCheckResult = UpdateCheckResult(item: item, isInstalled: false)
+            onUpdateCheckEnd()
         }
-        // For manual updates, show the available update without downloading
-        onUpdateCheckEnd(item: item, isInstalled: false)
     }
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
         let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem
-        os_log("Updater did not find update: \(String(describing: item?.displayVersionString))(\(String(describing: item?.versionString)))", log: .updates)
-
-        onUpdateCheckEnd(item: item, isInstalled: true)
+        os_log("Updater did not find update: %{public}@",
+               log: .updates,
+               "\(item?.displayVersionString ?? "")(\(item?.versionString ?? ""))")
+        if let item {
+            // User is running the latest version
+            updateCheckResult = UpdateCheckResult(item: item, isInstalled: true)
+        }
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
-        os_log("Updater did download update: \(item.displayVersionString)(\(item.versionString))", log: .updates)
+        os_log("Updater did download update: %{public}@",
+               log: .updates,
+               "\(item.displayVersionString)(\(item.versionString))")
 
-        guard areAutomaticUpdatesEnabled else {
-            // If manual are enabled, we don't download
+        if areAutomaticUpdatesEnabled {
+            // For automatic updates, the available item has to be downloaded
+            updateCheckResult = UpdateCheckResult(item: item, isInstalled: false)
             return
         }
-        // Automatic updates present the available update after it's downloaded
-        onUpdateCheckEnd(item: item, isInstalled: false)
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidDownloadUpdate))
     }
 
-    private func onUpdateCheckEnd(item: SUAppcastItem?, isInstalled: Bool) {
-        if let item {
-            latestUpdate = Update(appcastItem: item, isInstalled: isInstalled)
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
+        os_log("Updater did finish update cycle", log: .updates)
+
+        onUpdateCheckEnd()
+    }
+
+    private func onUpdateCheckEnd() {
+        guard isUpdateBeingLoaded else {
+            // The update check end is already handled
+            return
+        }
+
+        // If the update is available, present it
+        if let updateCheckResult = updateCheckResult {
+            latestUpdate = Update(appcastItem: updateCheckResult.item,
+                                  isInstalled: updateCheckResult.isInstalled)
         } else {
             latestUpdate = nil
         }
-        isUpdateBeingLoaded = false
-    }
 
-    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
-        os_log("Updater did finish update cycle", log: .updates)
+        // Clear cache
+        isUpdateBeingLoaded = false
+        updateCheckResult = nil
     }
 
 }
