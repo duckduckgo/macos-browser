@@ -31,7 +31,7 @@ final class BookmarksBarViewController: NSViewController {
     @IBOutlet private var clippedItemsIndicator: MouseOverButton!
     @IBOutlet private var promptAnchor: NSView!
 
-    private var bookmarkListPopover: BookmarkListPopover?
+    private var bookmarkMenuPopover: BookmarksBarMenuPopover?
 
     private let bookmarkManager: BookmarkManager
     private let viewModel: BookmarksBarViewModel
@@ -267,14 +267,14 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     func bookmarksBarViewModelReloadedData() {
         bookmarksBarCollectionView.reloadData()
 
-        if let bookmarkListPopover, bookmarkListPopover.isShown,
-           bookmarkListPopover.rootFolder?.id == PseudoFolder.bookmarks.id {
-            bookmarkListPopover.reloadData(withRootFolder: clippedItemsBookmarkFolder())
+        if let bookmarkMenuPopover, bookmarkMenuPopover.isShown,
+           bookmarkMenuPopover.rootFolder?.id == PseudoFolder.bookmarks.id {
+            bookmarkMenuPopover.reloadData(withRootFolder: clippedItemsBookmarkFolder())
         }
     }
 
     func mouseDidHover(over sender: Any) {
-        guard let bookmarkListPopover, bookmarkListPopover.isShown else { return }
+        guard let bookmarkMenuPopover, bookmarkMenuPopover.isShown else { return }
         var bookmarkFolder: BookmarkFolder?
         var view: NSView?
         if let item = sender as? BookmarksBarCollectionViewItem {
@@ -286,10 +286,10 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         }
         if let bookmarkFolder, let view {
             // already shown?
-            guard (bookmarkListPopover.viewController.representedObject as? BookmarkFolder)?.id != bookmarkFolder.id else { return }
+            guard (bookmarkMenuPopover.viewController.representedObject as? BookmarkFolder)?.id != bookmarkFolder.id else { return }
             showSubmenu(for: bookmarkFolder, fromView: view)
         } else {
-            bookmarkListPopover.close()
+            bookmarkMenuPopover.close()
         }
     }
 
@@ -379,23 +379,23 @@ private extension BookmarksBarViewController {
     }
 
     private func showSubmenu(for folder: BookmarkFolder, fromView view: NSView) {
-        let bookmarkListPopover: BookmarkListPopover
-        if let popover = self.bookmarkListPopover {
-            bookmarkListPopover = popover
-            if bookmarkListPopover.isShown {
-                bookmarkListPopover.close()
-                if (bookmarkListPopover.viewController.representedObject as? BookmarkFolder)?.id == folder.id {
+        let bookmarkMenuPopover: BookmarksBarMenuPopover
+        if let popover = self.bookmarkMenuPopover {
+            bookmarkMenuPopover = popover
+            if bookmarkMenuPopover.isShown {
+                bookmarkMenuPopover.close()
+                if (bookmarkMenuPopover.viewController.representedObject as? BookmarkFolder)?.id == folder.id {
                     return // close popover on 2nd click on the same folder
                 }
             }
-            bookmarkListPopover.reloadData(withRootFolder: folder)
+            bookmarkMenuPopover.reloadData(withRootFolder: folder)
         } else {
-            bookmarkListPopover = BookmarkListPopover(mode: .bookmarkBarMenu, rootFolder: folder)
-            bookmarkListPopover.delegate = self
-            self.bookmarkListPopover = bookmarkListPopover
+            bookmarkMenuPopover = BookmarksBarMenuPopover(rootFolder: folder)
+            bookmarkMenuPopover.delegate = self
+            self.bookmarkMenuPopover = bookmarkMenuPopover
         }
 
-        bookmarkListPopover.show(positionedBelow: view)
+        bookmarkMenuPopover.show(positionedBelow: view)
 
         if view === clippedItemsIndicator {
             // display pressed state
@@ -456,8 +456,8 @@ extension BookmarksBarViewController: NSPopoverDelegate {
     }
 
     func popoverDidClose(_ notification: Notification) {
-        guard let bookmarkListPopover = notification.object as? BookmarkListPopover,
-              let positioningView = bookmarkListPopover.positioningView else { return }
+        guard let bookmarkMenuPopover = notification.object as? BookmarksBarMenuPopover,
+              let positioningView = bookmarkMenuPopover.positioningView else { return }
 
         if positioningView === clippedItemsIndicator {
             clippedItemsIndicator.backgroundColor = .clear
