@@ -29,8 +29,9 @@ We have taken steps to update our terminology and remove words with problematic 
 
 Please refer to [contributing](CONTRIBUTING.md).
 
-## Discuss
+## Support
 
+Our [Help Center](https://duckduckgo.com/duckduckgo-help-pages/) offers a variety of information about DuckDuckGo, including [how we improve our products](https://duckduckgo.com/duckduckgo-help-pages/privacy/atb/) while keeping your search and browsing history anonymous.
 If you have feedback or questions, you can [contact us](https://duckduckgo.com/duckduckgo-help-pages/company/contact-us/). You can also use the feedback form in the browser. To do so, go to the three-dot menu > Send Feedback.
 
 ## License
