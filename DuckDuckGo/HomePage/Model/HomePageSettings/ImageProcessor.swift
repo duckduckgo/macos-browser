@@ -21,16 +21,33 @@ import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
 
-enum ImageProcessingError: Error {
+enum ImageProcessingError: Error, CustomNSError {
     case failedToReadImageData
     case failedToWriteImageData
+    case failedToInitializeGraphicsContext
     case failedToCorrectImageOrientation
     case failedToSaveImage
+    case failedToCropImage
+    case failedToResizeImage
+
+    static var errorDomain: String = "ImageProcessingError"
+
+    var errorCode: Int {
+        switch self {
+        case .failedToReadImageData: return 1
+        case .failedToWriteImageData: return 2
+        case .failedToInitializeGraphicsContext: return 3
+        case .failedToCorrectImageOrientation: return 4
+        case .failedToSaveImage: return 5
+        case .failedToCropImage: return 6
+        case .failedToResizeImage: return 7
+        }
+    }
 }
 
 protocol ImageProcessing {
     func convertImageToJPEG(at url: URL) throws -> Data
-    func resizeImage(at url: URL, to newSize: CGSize) -> Data?
+    func resizeImage(with data: Data, to newSize: CGSize) throws -> Data
     func calculatePreferredColorScheme(forImageAt url: URL) -> ColorScheme
 }
 
@@ -58,16 +75,20 @@ final class ImageProcessor: ImageProcessing {
             throw ImageProcessingError.failedToWriteImageData
         }
 
-        let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [CFString: Any]
-        let orientationRawValue = properties?[kCGImagePropertyOrientation] as? UInt32 ?? 1
-        let orientation = CGImagePropertyOrientation(rawValue: orientationRawValue) ?? .up
+        if let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [CFString: Any],
+           let orientationRawValue = properties[kCGImagePropertyOrientation] as? UInt32,
+           let orientation = CGImagePropertyOrientation(rawValue: orientationRawValue),
+           orientation != .up {
 
-        guard let correctedCGImage = correctImageOrientation(cgImage: cgImage, orientation: orientation) else {
-            throw ImageProcessingError.failedToCorrectImageOrientation
+            // transform the image according to the orientation
+            guard let correctedCGImage = correctImageOrientation(cgImage: cgImage, orientation: orientation) else {
+                throw ImageProcessingError.failedToCorrectImageOrientation
+            }
+
+            CGImageDestinationAddImage(imageDestination, correctedCGImage, nil)
+        } else {
+            CGImageDestinationAddImage(imageDestination, cgImage, nil)
         }
-
-        // Add the CGImage to the destination
-        CGImageDestinationAddImage(imageDestination, correctedCGImage, nil)
 
         // Finalize the image destination to write the data
         guard CGImageDestinationFinalize(imageDestination) else {
@@ -77,7 +98,7 @@ final class ImageProcessor: ImageProcessing {
         return mutableData as Data
     }
 
-    func correctImageOrientation(cgImage: CGImage, orientation: CGImagePropertyOrientation) -> CGImage? {
+    private func correctImageOrientation(cgImage: CGImage, orientation: CGImagePropertyOrientation) -> CGImage? {
         var transform = CGAffineTransform.identity
         let width = CGFloat(cgImage.width)
         let height = CGFloat(cgImage.height)
@@ -142,12 +163,11 @@ final class ImageProcessor: ImageProcessing {
         return context.makeImage()
     }
 
-    func resizeImage(at url: URL, to newSize: CGSize) -> Data? {
-        guard let data = try? Data(contentsOf: url),
-              let imageSource = CGImageSourceCreateWithData(data as CFData, nil),
+    func resizeImage(with data: Data, to newSize: CGSize) throws -> Data {
+        guard let imageSource = CGImageSourceCreateWithData(data as CFData, nil),
               let originalImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)
         else {
-            return nil
+            throw ImageProcessingError.failedToReadImageData
         }
 
         let originalWidth = CGFloat(originalImage.width)
@@ -166,11 +186,10 @@ final class ImageProcessor: ImageProcessing {
         let cropRect = CGRect(x: xOffset, y: yOffset, width: scaledWidth, height: scaledHeight)
 
         guard let croppedImage = originalImage.cropping(to: cropRect) else {
-            // pixel/error
-            return data
+            throw ImageProcessingError.failedToCropImage
         }
 
-        let context = CGContext(
+        guard let context = CGContext(
             data: nil,
             width: Int(newSize.width),
             height: Int(newSize.height),
@@ -178,19 +197,19 @@ final class ImageProcessor: ImageProcessing {
             bytesPerRow: originalImage.bytesPerRow,
             space: originalImage.colorSpace ?? CGColorSpace(name: CGColorSpace.sRGB)!,
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Little.rawValue
-        )
+        ) else {
+            throw ImageProcessingError.failedToInitializeGraphicsContext
+        }
 
-        context?.draw(croppedImage, in: CGRect(origin: .zero, size: newSize))
+        context.draw(croppedImage, in: CGRect(origin: .zero, size: newSize))
 
-        guard let resizedImage = context?.makeImage() else {
-            // pixel/error
-            return data
+        guard let resizedImage = context.makeImage() else {
+            throw ImageProcessingError.failedToResizeImage
         }
 
         let mutableData = NSMutableData()
         guard let imageDestination = CGImageDestinationCreateWithData(mutableData, UTType.jpeg.identifier as CFString, 1, nil) else {
-            // pixel/error
-            return data
+            throw ImageProcessingError.failedToWriteImageData
         }
 
         CGImageDestinationAddImage(imageDestination, resizedImage, nil)

@@ -94,6 +94,11 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         static let storageDirectoryName = "UserBackgroundImages"
         static let thumbnailsDirectoryName = "thumbnails"
         static let thumbnailSize = CGSize(width: 192, height: 128)
+        static let storedImageExtension = "jpg"
+    }
+
+    var availableImagesPublisher: AnyPublisher<[UserBackgroundImage], Never> {
+        $availableImages.removeDuplicates().eraseToAnyPublisher()
     }
 
     @Published private(set) var availableImages: [UserBackgroundImage] = [] {
@@ -102,10 +107,6 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
                 availableImagesSortedByAccessTime = availableImages
             }
         }
-    }
-
-    var availableImagesPublisher: AnyPublisher<[UserBackgroundImage], Never> {
-        $availableImages.removeDuplicates().eraseToAnyPublisher()
     }
 
     private var availableImagesSortedByAccessTime: [UserBackgroundImage] = []
@@ -133,28 +134,37 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         }
 
         availableImages = imagesMetadata.compactMap(UserBackgroundImage.init)
-        verifyStoredImages()
+        validateAvailableImages()
     }
 
     func addImage(with url: URL) async throws -> UserBackgroundImage {
-        let fileName = [UUID().uuidString, "jpg"].joined(separator: ".")
+        let fileName = [UUID().uuidString, Const.storedImageExtension].joined(separator: ".")
         let destinationURL = storageLocation.appendingPathComponent(fileName)
 
+        // first copy the image converting it to JPEG
         try copyImage(at: url, toJPEGAt: destinationURL)
 
-        async let resizeImageTask: Void = {
-            let resizedImage: Data? = imageProcessor.resizeImage(at: destinationURL, to: Const.thumbnailSize)
-            try resizedImage?.write(to: thumbnailsStorageLocation.appendingPathComponent(fileName))
+        // then generate thumbnail ...
+        async let thumbnailTask: Void = {
+            do {
+                let imageData = try Data(contentsOf: destinationURL)
+                let resizedImageData = try imageProcessor.resizeImage(with: imageData, to: Const.thumbnailSize)
+                try resizedImageData.write(to: thumbnailsStorageLocation.appendingPathComponent(fileName))
+            } catch {
+                // pixel
+            }
         }()
 
+        // ... and calculate color scheme ...
         async let colorSchemeTask = {
             imageProcessor.calculatePreferredColorScheme(forImageAt: destinationURL)
         }()
 
-        try await resizeImageTask
+        // ... concurrently
+        await thumbnailTask
         let colorScheme = await colorSchemeTask
 
-        deleteOldImages()
+        deleteImagesOverLimit()
 
         let userBackgroundImage = UserBackgroundImage(fileName: fileName, colorScheme: colorScheme)
         imagesMetadata = [userBackgroundImage.description] + imagesMetadata.prefix(maximumNumberOfImages - 1)
@@ -174,7 +184,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         try data.write(to: destinationURL)
     }
 
-    private func deleteOldImages() {
+    private func deleteImagesOverLimit() {
         guard imagesMetadata.count >= maximumNumberOfImages else {
             return
         }
@@ -192,11 +202,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
     }
 
     func thumbnailImage(for userBackgroundImage: UserBackgroundImage) -> NSImage? {
-        NSImage(
-            contentsOf: storageLocation
-                .appendingPathComponent(Const.thumbnailsDirectoryName)
-                .appendingPathComponent(userBackgroundImage.fileName)
-        )
+        NSImage(contentsOf: thumbnailsStorageLocation.appendingPathComponent(userBackgroundImage.fileName))
     }
 
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage) {
@@ -229,7 +235,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         }
     }
 
-    private func verifyStoredImages() {
+    private func validateAvailableImages() {
         availableImages = availableImages.filter { image in
             let imagePath = storageLocation.appendingPathComponent(image.fileName).path
             return FileManager.default.fileExists(atPath: imagePath)

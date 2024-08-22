@@ -4995,7 +4995,7 @@
 			path = BadgeAnimations;
 			sourceTree = "<group>";
 		};
-		370C22FC2C76989E00A80A3E /* Settings */ = {
+		370C22FC2C76989E00A80A3E /* HomePageSettings */ = {
 			isa = PBXGroup;
 			children = (
 				3797C79F2C61806500DA77FB /* HomePageSettingsView.swift */,
@@ -5006,7 +5006,17 @@
 				370C23082C76A39900A80A3E /* BackgroundCategoryView.swift */,
 				370C230A2C76A3BC00A80A3E /* BackgroundThumbnailView.swift */,
 			);
-			path = Settings;
+			path = HomePageSettings;
+			sourceTree = "<group>";
+		};
+		370C23172C77C47700A80A3E /* HomePageSettings */ = {
+			isa = PBXGroup;
+			children = (
+				3797C7A22C62C38800DA77FB /* HomePageSettingsModel.swift */,
+				379026D02C650CCD00A089E8 /* UserBackgroundImagesManager.swift */,
+				370C23102C7747E200A80A3E /* ImageProcessor.swift */,
+			);
+			path = HomePageSettings;
 			sourceTree = "<group>";
 		};
 		3712091F2C232E2B003ADF3D /* RemoteMessaging */ = {
@@ -6410,6 +6420,7 @@
 		85589E8527BBB8DD0038AD11 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				370C23172C77C47700A80A3E /* HomePageSettings */,
 				85589E8627BBB8F20038AD11 /* HomePageFavoritesModel.swift */,
 				85AC7ADC27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift */,
 				85589E9027BFB9810038AD11 /* HomePageRecentlyVisitedModel.swift */,
@@ -6417,9 +6428,6 @@
 				56D145EA29E6C99B00E3488A /* DataImportStatusProviding.swift */,
 				560C3FFE2BCD5A1E00F589CE /* PermanentSurveyManager.swift */,
 				3768D83A2C24C0A8004120AE /* RemoteMessageViewModel.swift */,
-				3797C7A22C62C38800DA77FB /* HomePageSettingsModel.swift */,
-				379026D02C650CCD00A089E8 /* UserBackgroundImagesManager.swift */,
-				370C23102C7747E200A80A3E /* ImageProcessor.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -7961,7 +7969,7 @@
 		AAE71DB325F66A3F00D74437 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				370C22FC2C76989E00A80A3E /* Settings */,
+				370C22FC2C76989E00A80A3E /* HomePageSettings */,
 				85589E9D27BFE4500038AD11 /* DefaultBrowserPromptView.swift */,
 				85589E9327BFE1E70038AD11 /* FavoritesView.swift */,
 				56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */,
