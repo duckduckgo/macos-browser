@@ -1,5 +1,5 @@
 //
-//  FreemiumState.swift
+//  FreemiumPIRState.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,26 +18,22 @@
 
 import Foundation
 
-/// Freemium-related `UserDefault` keys
-private enum Keys {
-    static let pir = "macos.browser.freemium.pir"
+/// `FreemiumPIRState` types provide access to Freemium PIR-related state
+protocol FreemiumPIRState {
+    var didOnboard: Bool { get set }
 }
 
-/// `FreemiumState` types provide access to Freemium-related state
-protocol FreemiumState {
-    var hasFreemiumPIR: Bool { get set }
-}
-
-/// Default implementation of `FreemiumState`. `UserDefaults` is used as underlying storage.
-public final class DefaultFreemiumState: FreemiumState {
+/// Default implementation of `FreemiumPIRState`. `UserDefaults` is used as underlying storage.
+public final class DefaultFreemiumPIRState: FreemiumPIRState {
 
     private let userDefaults: UserDefaults
+    private let key = "macos.browser.freemium.pir"
 
-    public var hasFreemiumPIR: Bool {
+    public var didOnboard: Bool {
         get {
-            userDefaults.bool(forKey: Keys.pir)
+            userDefaults.bool(forKey: key)
         } set {
-            userDefaults.set(newValue, forKey: Keys.pir)
+            userDefaults.set(newValue, forKey: key)
         }
     }
 
