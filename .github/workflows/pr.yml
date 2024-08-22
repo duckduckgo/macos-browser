@@ -65,6 +65,7 @@ on:
         required: true
       VPN_PROXY_EXTENSION_CI_PROVISION_PROFILE_BASE64:
         required: true
+
 jobs:
   swiftlint:
 
