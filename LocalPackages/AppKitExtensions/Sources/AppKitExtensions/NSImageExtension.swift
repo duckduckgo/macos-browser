@@ -62,16 +62,39 @@ extension NSImage {
     }
 
     public func averageBrightnessBenchmark() -> CGFloat? {
-        let brightness = calculateBrightness(downsample: true, invertGammaCorrection: false)
 
-        print(String(format: "physical all pixels average:  %.5f", calculateBrightness() ?? 0))
-        print(String(format: "physical 2048 pixels average: %.5f", calculateBrightness(sampleSize: 2048) ?? 0))
-        print(String(format: "physical downsampled:         %.5f", calculateBrightness(downsample: true) ?? 0))
-        print(String(format: "sRGB all pixels average:      %.5f", calculateBrightness(invertGammaCorrection: false) ?? 0))
-        print(String(format: "sRGB 2048 pixels average:     %.5f", calculateBrightness(sampleSize: 2048, invertGammaCorrection: false) ?? 0))
-        print(String(format: "sRGB downsampled:             %.5f", brightness ?? 0))
+        var date = Date()
+        let physicalAllPixels = calculateBrightness() ?? 0
+        let physicalAllPixelsDuration = Date().timeIntervalSince(date)
 
-        return brightness
+        date = Date()
+        let physicalSample = calculateBrightness(sampleSize: 2048) ?? 0
+        let physicalSampleDuration = Date().timeIntervalSince(date)
+
+        date = Date()
+        let physicalDownsampled = calculateBrightness(downsample: true) ?? 0
+        let physicalDownsampledDuration = Date().timeIntervalSince(date)
+
+        date = Date()
+        let sRGBAllPixels = calculateBrightness(invertGammaCorrection: false) ?? 0
+        let sRGBAllPixelsDuration = Date().timeIntervalSince(date)
+
+        date = Date()
+        let sRGBSample = calculateBrightness(sampleSize: 2048, invertGammaCorrection: false) ?? 0
+        let sRGBSampleDuration = Date().timeIntervalSince(date)
+
+        date = Date()
+        let sRGBDownsampled = calculateBrightness(downsample: true, invertGammaCorrection: false) ?? 0
+        let sRGBDownsampledDuration = Date().timeIntervalSince(date)
+
+        print(String(format: "physical all pixels average:  %.5f (%.5fs)", physicalAllPixels, physicalAllPixelsDuration))
+        print(String(format: "physical 2048 pixels average: %.5f (%.5fs)", physicalSample, physicalSampleDuration))
+        print(String(format: "physical downsampled:         %.5f (%.5fs)", physicalDownsampled, physicalDownsampledDuration))
+        print(String(format: "sRGB all pixels average:      %.5f (%.5fs)", sRGBAllPixels, sRGBAllPixelsDuration))
+        print(String(format: "sRGB 2048 pixels average:     %.5f (%.5fs)", sRGBSample, sRGBSampleDuration))
+        print(String(format: "sRGB downsampled:             %.5f (%.5fs)", sRGBDownsampled, sRGBDownsampledDuration))
+
+        return sRGBDownsampled
     }
 
     private func calculateBrightness(
@@ -79,7 +102,7 @@ extension NSImage {
         sampleSize: Int = 0,
         invertGammaCorrection: Bool = true
     ) -> CGFloat? {
-        let image = downsample ? downsampledTo1x1PixelUsingCoreImage() : self
+        let image = downsample ? downsampledTo1x1Pixel() : self
 
         guard let tiffData = image?.tiffRepresentation,
               let bitmapImage = NSBitmapImageRep(data: tiffData),
@@ -120,25 +143,39 @@ extension NSImage {
         return averageBrightness
     }
 
-    private func downsampledTo1x1Pixel() -> NSImage {
-        let newSize = NSSize(width: 1, height: 1)
-        let newImage = NSImage(size: newSize)
+    private func downsampledTo1x1Pixel() -> NSImage? {
+        // Define the size of the new image (1x1 pixel)
+        let newSize = CGSize(width: 1, height: 1)
 
-        // Lock focus on the new image to draw into it
-        newImage.lockFocus()
+        // Create a bitmap context with 1x1 pixel size
+        guard let context = CGContext(data: nil,
+                                      width: Int(newSize.width),
+                                      height: Int(newSize.height),
+                                      bitsPerComponent: 8,
+                                      bytesPerRow: 4,
+                                      space: CGColorSpaceCreateDeviceRGB(),
+                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+            return nil
+        }
 
         // Set the interpolation quality to high for better downsampling
-        NSGraphicsContext.current?.imageInterpolation = .high
+        context.interpolationQuality = .high
 
-        // Draw the original image into the new image context
-        self.draw(in: NSRect(origin: .zero, size: newSize),
-                  from: NSRect(origin: .zero, size: self.size),
-                  operation: .copy,
-                  fraction: 1.0)
+        // Draw the original image into the context
+        guard let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            return nil
+        }
+        context.draw(cgImage, in: CGRect(origin: .zero, size: newSize))
 
-        newImage.unlockFocus()
+        // Create a CGImage from the context
+        guard let downsampledCGImage = context.makeImage() else {
+            return nil
+        }
 
-        return newImage
+        // Convert the CGImage to NSImage
+        let downsampledImage = NSImage(cgImage: downsampledCGImage, size: NSSize(width: 1, height: 1))
+
+        return downsampledImage
     }
 
     private func downsampledTo1x1PixelUsingCoreImage() -> NSImage? {
