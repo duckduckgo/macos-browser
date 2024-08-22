@@ -23,6 +23,8 @@ class MockAppearancePreferencesPersistor: AppearancePreferencesPersistor {
 
     var homeButtonPosition: HomeButtonPosition = .hidden
 
+    var homePageCustomBackground: String? = nil
+
     var showFullURL: Bool = false
 
     var showAutocompleteSuggestions: Bool = false

@@ -234,6 +234,16 @@
                ReferencedContainer = "container:LocalPackages/UDSHelper">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AppKitExtensionsTests"
+               BuildableName = "AppKitExtensionsTests"
+               BlueprintName = "AppKitExtensionsTests"
+               ReferencedContainer = "container:LocalPackages/AppKitExtensions">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

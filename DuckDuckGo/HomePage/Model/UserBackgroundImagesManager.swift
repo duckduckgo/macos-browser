@@ -259,7 +259,7 @@ extension UserBackgroundImagesManager: ImageColorSchemeCalculating {
         defer {
             print("\(#function) for \(url.lastPathComponent) took \(Date().timeIntervalSince(date)) seconds")
         }
-        guard let averageBrightness = NSImage(contentsOf: url)?.averageBrightnessBenchmark() else { return .light }
+        guard let averageBrightness = NSImage(contentsOf: url)?.averageBrightness() else { return .light }
         return averageBrightness > 0.5 ? .light : .dark
     }
 
