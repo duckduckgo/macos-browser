@@ -125,6 +125,16 @@ final class BookmarksOutlineView: NSOutlineView {
         updateIsInKeyPopoverState()
     }
 
+    override var clickedRow: Int {
+        let clickedRow = super.clickedRow
+        if clickedRow != -1 {
+            return clickedRow
+        }
+        return self.withMouseLocationInViewCoordinates { point in
+            self.row(at: point)
+        } ?? -1
+    }
+
     override func frameOfOutlineCell(atRow row: Int) -> NSRect {
         let frame = super.frameOfOutlineCell(atRow: row)
 
@@ -369,6 +379,14 @@ final class BookmarksOutlineView: NSOutlineView {
 
         let visibleRowsRange = self.rows(in: self.visibleRect)
         return visibleRowsRange.contains(rowIndex)
+    }
+
+    override func validateProposedFirstResponder(_ responder: NSResponder, for event: NSEvent?) -> Bool {
+        if event?.type == .rightMouseDown {
+            // always allow context menu on a cell
+            return true
+        }
+        return super.validateProposedFirstResponder(responder, for: event)
     }
 
 }

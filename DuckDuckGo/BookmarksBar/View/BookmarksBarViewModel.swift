@@ -22,11 +22,12 @@ import Foundation
 
 protocol BookmarksBarViewModelDelegate: AnyObject {
 
-    func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem)
+    func didClick(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarViewModelWidthForContainer() -> CGFloat
     func bookmarksBarViewModelReloadedData()
     func mouseDidHover(over item: Any)
     func dragging(over item: BookmarksBarCollectionViewItem?, updatedWith info: NSDraggingInfo?)
+    func showDialog(_ dialog: any ModalView)
 
 }
 
@@ -42,19 +43,6 @@ final class BookmarksBarViewModel: NSObject {
 
         static let additionalItemWidth: CGFloat = 28.0
         static let ignoredXDragDistanceFromCellBorders: CGFloat = 5.0
-    }
-
-    enum BookmarksBarItemAction {
-        case clickItem
-        case openInNewTab
-        case openInNewWindow
-        case toggleFavorites
-        case edit
-        case moveToEnd
-        case copyURL
-        case deleteEntity
-        case addFolder
-        case manageBookmarks
     }
 
     struct BookmarksBarItem {
@@ -405,43 +393,11 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
             return
         }
 
-        delegate?.bookmarksBarViewModelReceived(action: .clickItem, for: item)
+        delegate?.didClick(item)
     }
 
-    func bookmarksBarCollectionViewItemOpenInNewTabAction(_ item: BookmarksBarCollectionViewItem) {
-        delegate?.bookmarksBarViewModelReceived(action: .openInNewTab, for: item)
-    }
-
-    func bookmarksBarCollectionViewItemOpenInNewWindowAction(_ item: BookmarksBarCollectionViewItem) {
-        delegate?.bookmarksBarViewModelReceived(action: .openInNewWindow, for: item)
-    }
-
-    func bookmarksBarCollectionViewItemToggleFavoritesAction(_ item: BookmarksBarCollectionViewItem) {
-        delegate?.bookmarksBarViewModelReceived(action: .toggleFavorites, for: item)
-    }
-
-    func bookmarksBarCollectionViewEditAction(_ item: BookmarksBarCollectionViewItem) {
-        delegate?.bookmarksBarViewModelReceived(action: .edit, for: item)
-    }
-
-    func bookmarksBarCollectionViewItemMoveToEndAction(_ item: BookmarksBarCollectionViewItem) {
-        delegate?.bookmarksBarViewModelReceived(action: .moveToEnd, for: item)
-    }
-
-    func bookmarksBarCollectionViewItemCopyBookmarkURLAction(_ item: BookmarksBarCollectionViewItem) {
-        delegate?.bookmarksBarViewModelReceived(action: .copyURL, for: item)
-    }
-
-    func bookmarksBarCollectionViewItemDeleteEntityAction(_ item: BookmarksBarCollectionViewItem) {
-        delegate?.bookmarksBarViewModelReceived(action: .deleteEntity, for: item)
-    }
-
-    func bookmarksBarCollectionViewItemAddEntityAction(_ item: BookmarksBarCollectionViewItem) {
-        delegate?.bookmarksBarViewModelReceived(action: .addFolder, for: item)
-    }
-
-    func bookmarksBarCollectionViewItemManageBookmarksAction(_ item: BookmarksBarCollectionViewItem) {
-        delegate?.bookmarksBarViewModelReceived(action: .manageBookmarks, for: item)
+    func showDialog(_ dialog: any ModalView) {
+        delegate?.showDialog(dialog)
     }
 
     func bookmarksBarCollectionViewItem(_ item: BookmarksBarCollectionViewItem, isMouseOver: Bool) {

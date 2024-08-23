@@ -73,7 +73,6 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
     private let bookmarkManager: BookmarkManager
     private let dragDropManager: BookmarkDragDropManager
     private let showMenuButtonOnHover: Bool
-    private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
     private let presentFaviconsFetcherOnboarding: (() -> Void)?
 
     init(
@@ -83,7 +82,6 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
         dragDropManager: BookmarkDragDropManager = .shared,
         sortMode: BookmarksSortMode,
         showMenuButtonOnHover: Bool = true,
-        onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)? = nil,
         presentFaviconsFetcherOnboarding: (() -> Void)? = nil
     ) {
         self.contentMode = contentMode
@@ -91,7 +89,6 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
         self.dragDropManager = dragDropManager
         self.treeController = treeController
         self.showMenuButtonOnHover = showMenuButtonOnHover
-        self.onMenuRequestedAction = onMenuRequestedAction
         self.presentFaviconsFetcherOnboarding = presentFaviconsFetcherOnboarding
 
         super.init()
@@ -244,7 +241,7 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
 
     func outlineView(_ outlineView: NSOutlineView, heightOfRowByItem item: Any) -> CGFloat {
         if let node = item as? BookmarkNode, node.representedObject is SpacerNode {
-            return OutlineSeparatorViewCell.rowHeight(for: contentMode == .bookmarksMenu ? .bookmarkBarMenu : .popover)
+            return OutlineSeparatorViewCell.rowHeight(for: contentMode)
         }
         return BookmarkOutlineCellView.rowHeight
     }
@@ -316,11 +313,13 @@ final class BookmarkOutlineViewDataSource: NSObject, BookmarksOutlineViewDataSou
     }
 
 }
-
 // MARK: - BookmarkOutlineCellViewDelegate
-
 extension BookmarkOutlineViewDataSource: BookmarkOutlineCellViewDelegate {
     func outlineCellViewRequestedMenu(_ cell: BookmarkOutlineCellView) {
-        onMenuRequestedAction?(cell)
+        guard let outlineView = cell.superview?.superview as? NSOutlineView else {
+            assertionFailure("cell.superview?.superview is not NSOutlineView")
+            return
+        }
+        outlineView.menu?.popUpAtMouseLocation(in: cell)
     }
 }

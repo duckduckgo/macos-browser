@@ -23,10 +23,10 @@ final class OutlineSeparatorViewCell: NSTableCellView {
     static let separatorIdentifier = NSUserInterfaceItemIdentifier(className() + "_separator")
     static let blankIdentifier = NSUserInterfaceItemIdentifier(className())
 
-    static func rowHeight(for mode: BookmarkListViewController.Mode) -> CGFloat {
+    static func rowHeight(for mode: BookmarkOutlineViewDataSource.ContentMode) -> CGFloat {
         switch mode {
-        case .bookmarkBarMenu: 11
-        case .popover: 28
+        case .bookmarksMenu: 11
+        case .bookmarksAndFolders, .foldersOnly: 28
         }
     }
 
