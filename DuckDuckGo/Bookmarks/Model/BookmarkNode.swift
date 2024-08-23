@@ -80,7 +80,14 @@ final class BookmarkNode: Hashable {
     }
 
     var canBeHighlighted: Bool {
-        return !(representedObject is SpacerNode)
+        switch representedObject {
+        case is SpacerNode:
+            return false
+        case let menuItem as MenuItemNode:
+            return menuItem.isEnabled
+        default:
+            return true
+        }
     }
 
     /// Creates an instance of a bookmark node.

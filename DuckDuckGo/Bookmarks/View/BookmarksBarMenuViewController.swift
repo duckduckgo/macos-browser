@@ -21,7 +21,7 @@ import Combine
 import Foundation
 
 protocol BookmarksBarMenuViewControllerDelegate: AnyObject {
-    func popoverShouldClose(_ sender: BookmarksBarMenuViewController)
+    func closeBookmarksPopovers(_ sender: BookmarksBarMenuViewController)
     func popover(shouldPreventClosure: Bool)
 }
 
@@ -148,6 +148,7 @@ final class BookmarksBarMenuViewController: NSViewController {
         scrollUpButton.normalTintColor = .labelColor
         scrollUpButton.backgroundColor = .clear
         scrollUpButton.mouseOverColor = .blackWhite10
+        scrollUpButton.delegate = self
 
         scrollDownButton = MouseOverButton(image: .expandDown, target: nil, action: nil)
         scrollDownButton.translatesAutoresizingMaskIntoConstraints = false
@@ -155,6 +156,7 @@ final class BookmarksBarMenuViewController: NSViewController {
         scrollDownButton.normalTintColor = .labelColor
         scrollDownButton.backgroundColor = .clear
         scrollDownButton.mouseOverColor = .blackWhite10
+        scrollDownButton.delegate = self
 
         view.addSubview(scrollView)
         scrollUpButton.map(view.addSubview)
@@ -308,7 +310,7 @@ final class BookmarksBarMenuViewController: NSViewController {
                    positioningView.isMouseLocationInsideBounds(event.locationInWindow) {
                     // don‘t close when the button used to open the popover is
                     // clicked again, it‘ll be managed by
-                    // BookmarksBarViewController.popoverShouldClose
+                    // BookmarksBarViewController.closeBookmarksPopovers
                     return false
                 }
                 // go up from the clicked window to figure out if the click is in a submenu
@@ -321,7 +323,7 @@ final class BookmarksBarMenuViewController: NSViewController {
             }.asVoid()
         )
         .sink { [weak self] _ in
-            self?.delegate?.popoverShouldClose(self!) // close
+            self?.delegate?.closeBookmarksPopovers(self!) // close
         }
         .store(in: &cancellables)
     }
@@ -418,7 +420,7 @@ final class BookmarksBarMenuViewController: NSViewController {
         updateScrollButtons()
     }
 
-    func calculatePreferredContentSize() -> NSSize {
+    private func calculatePreferredContentSize() -> NSSize {
         let contentInsets = BookmarksBarMenuPopover.popoverInsets
         var contentSize = NSSize(width: 0, height: 20)
         for row in 0..<outlineView.numberOfRows {
@@ -453,11 +455,36 @@ final class BookmarksBarMenuViewController: NSViewController {
         guard sender.clickedRow != -1 else { return }
 
         let item = sender.item(atRow: sender.clickedRow)
-        guard let node = item as? BookmarkNode,
-              let bookmark = node.representedObject as? Bookmark else { return }
+        guard let node = item as? BookmarkNode else { return }
 
-        WindowControllersManager.shared.open(bookmark: bookmark)
-        delegate?.popoverShouldClose(self)
+        switch node.representedObject {
+        case let bookmark as Bookmark:
+            WindowControllersManager.shared.open(bookmark: bookmark)
+            delegate?.closeBookmarksPopovers(self)
+
+        case let menuItem as MenuItemNode:
+            if menuItem.identifier == BookmarkTreeController.openAllInNewTabsIdentifier {
+                openAllInNewTabs()
+            } else {
+                assertionFailure("Unsupported menu item action \(menuItem.identifier)")
+            }
+            delegate?.closeBookmarksPopovers(self)
+
+        default: break
+        }
+    }
+
+    private func openAllInNewTabs() {
+        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
+              let folder = self.treeController.rootNode.representedObject as? BookmarkFolder else {
+            assertionFailure("Cannot open all in new tabs")
+            return
+        }
+        delegate?.closeBookmarksPopovers(self)
+
+        let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
+        tabCollection.append(tabs: tabs)
+        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
     }
 
     // MARK: NSOutlineView Configuration
@@ -674,7 +701,7 @@ extension BookmarksBarMenuViewController: BookmarksContextMenuDelegate {
     }
 
     func closePopoverIfNeeded() {
-        delegate?.popoverShouldClose(self)
+        delegate?.closeBookmarksPopovers(self)
     }
 
     func showDialog(_ view: any ModalView) {
@@ -689,6 +716,9 @@ extension BookmarksBarMenuViewController: BookmarksContextMenuDelegate {
         assertionFailure("BookmarksBarMenuViewController does not support search")
     }
 
+}
+// MARK: - MouseOverButtonDelegate
+extension BookmarksBarMenuViewController: MouseOverButtonDelegate {
 }
 
 #if DEBUG

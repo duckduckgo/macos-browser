@@ -21,7 +21,7 @@ import Combine
 
 protocol BookmarkListViewControllerDelegate: AnyObject {
 
-    func popoverShouldClose(_ bookmarkListViewController: BookmarkListViewController)
+    func closeBookmarksPopover(_ sender: BookmarkListViewController)
     func popover(shouldPreventClosure: Bool)
 
 }
@@ -567,7 +567,7 @@ final class BookmarkListViewController: NSViewController {
         }
 
         WindowControllersManager.shared.open(bookmark: bookmark)
-        delegate?.popoverShouldClose(self)
+        delegate?.closeBookmarksPopover(self)
     }
 
     private func handleItemClickWhenNotInSearchMode(item: Any?) {
@@ -584,7 +584,7 @@ final class BookmarkListViewController: NSViewController {
 
     private func showManageBookmarks() {
         WindowControllersManager.shared.showBookmarksTab()
-        delegate?.popoverShouldClose(self)
+        delegate?.closeBookmarksPopover(self)
     }
 
     // MARK: NSOutlineView Configuration
@@ -664,7 +664,7 @@ extension BookmarkListViewController: BookmarksContextMenuDelegate {
     }
 
     func closePopoverIfNeeded() {
-        delegate?.popoverShouldClose(self)
+        delegate?.closeBookmarksPopover(self)
     }
 
 }

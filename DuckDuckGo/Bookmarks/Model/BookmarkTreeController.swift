@@ -71,6 +71,12 @@ final class BookmarkTreeController {
         return node
     }
 
+    private static func menuItemNode(withIdentifier identifier: String, title: String, isEnabled: Bool = true, for parentNode: BookmarkNode) -> BookmarkNode {
+        let spacerObject = MenuItemNode(identifier: identifier, title: title, isEnabled: isEnabled)
+        let node = BookmarkNode(representedObject: spacerObject, parent: parentNode)
+        return node
+    }
+
     // MARK: - Public
 
     func rebuild(forSearchQuery searchQuery: String, sortMode: BookmarksSortMode) {
@@ -133,6 +139,21 @@ final class BookmarkTreeController {
         }
 
         if isBookmarksBarMenu {
+            // count up to 2 bookmarks in the node – add “Open all in new tabs” item if 2 bookmarks and more
+            var bookmarksCount = 0
+            for childNode in childNodes where childNode.representedObject is Bookmark {
+                bookmarksCount += 1
+                if bookmarksCount > 1 {
+                    break
+                }
+            }
+            if bookmarksCount > 1 {
+                node.childNodes.append(Self.separatorNode(for: node))
+                node.childNodes.append(Self.menuItemNode(withIdentifier: Self.openAllInNewTabsIdentifier, title: UserText.bookmarksOpenInNewTabs, for: node))
+
+            } else if childNodes.isEmpty {
+                node.childNodes.append(Self.menuItemNode(withIdentifier: Self.emptyPlaceholderIdentifier, title: UserText.bookmarksBarFolderEmpty, isEnabled: false, for: node))
+            }
         } else {
             childNodes.forEach { childNode in
                 if rebuildChildNodes(node: childNode, sortMode: sortMode) {
