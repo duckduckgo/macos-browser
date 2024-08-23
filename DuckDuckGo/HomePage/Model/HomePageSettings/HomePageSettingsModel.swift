@@ -69,6 +69,7 @@ extension HomePage.Models {
 
         let appearancePreferences: AppearancePreferences
         let customImagesManager: UserBackgroundImagesManaging
+        let sendPixel: (PixelKitEvent) -> Void
         let openSettings: () -> Void
 
         @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
@@ -81,11 +82,13 @@ extension HomePage.Models {
                 maximumNumberOfImages: Const.maximumNumberOfUserImages,
                 applicationSupportDirectory: URL.sandboxApplicationSupportURL
             ),
+            sendPixel: @escaping (PixelKitEvent) -> Void = { PixelKit.fire($0) },
             openSettings: @escaping () -> Void
         ) {
             self.appearancePreferences = appearancePreferences
             self.customImagesManager = userBackgroundImagesManager
             customBackground = appearancePreferences.homePageCustomBackground
+            self.sendPixel = sendPixel
             self.openSettings = openSettings
 
             availableCustomImagesCancellable = customImagesManager.availableImagesPublisher
@@ -142,15 +145,15 @@ extension HomePage.Models {
                 }
                 switch customBackground {
                 case .gradient:
-                    PixelKit.fire(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedGradient))
+                    sendPixel(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedGradient))
                 case .solidColor:
-                    PixelKit.fire(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedSolidColor))
+                    sendPixel(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedSolidColor))
                 case .illustration:
-                    PixelKit.fire(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedIllustration))
+                    sendPixel(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedIllustration))
                 case .customImage:
-                    PixelKit.fire(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedUserImage))
+                    sendPixel(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedUserImage))
                 case .none:
-                    PixelKit.fire(NonStandardEvent(NewTabPagePixel.newTabBackgroundReset))
+                    sendPixel(NonStandardEvent(NewTabPagePixel.newTabBackgroundReset))
                 }
             }
         }
@@ -176,7 +179,7 @@ extension HomePage.Models {
                         customBackground = .customImage(image)
                     }
                 } catch {
-                    PixelKit.fire(DebugEvent(NewTabPagePixel.newTabBackgroundAddImageError, error: error))
+                    sendPixel(DebugEvent(NewTabPagePixel.newTabBackgroundAddImageError, error: error))
                     await showAddImageFailedAlert()
                 }
             }
