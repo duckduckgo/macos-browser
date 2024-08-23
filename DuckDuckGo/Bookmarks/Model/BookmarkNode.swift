@@ -80,11 +80,7 @@ final class BookmarkNode: Hashable {
     }
 
     var canBeHighlighted: Bool {
-        if representedObject is SpacerNode {
-            return false
-        } else {
-            return true
-        }
+        return !(representedObject is SpacerNode)
     }
 
     /// Creates an instance of a bookmark node.

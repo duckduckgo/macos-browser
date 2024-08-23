@@ -79,12 +79,12 @@ final class BookmarkManagementDetailViewModel {
         return visibleBookmarks[safe: row]
     }
 
-    func fetchEntityAndParent(at row: Int) -> (entity: BaseBookmarkEntity?, parentFolder: BookmarkFolder?) {
+    func fetchParent() -> BookmarkFolder? {
         switch currentSelectionState {
         case .folder(let bookmarkFolder):
-            return (visibleBookmarks[safe: row], bookmarkFolder)
+            return bookmarkFolder
         default:
-            return (visibleBookmarks[safe: row], nil)
+            return nil
         }
     }
 
