@@ -171,6 +171,8 @@ final class BookmarksOutlineView: NSOutlineView {
     }
 
     override func didAdd(_ rowView: NSTableRowView, forRow row: Int) {
+        super.didAdd(rowView, forRow: row)
+
         guard let rowView = rowView as? RoundedSelectionRowView,
               let cell = rowView.subviews.first as? BookmarkOutlineCellView else { return }
 
