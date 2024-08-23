@@ -48,7 +48,7 @@ final class BookmarkListViewController: NSViewController {
     private lazy var boxDivider = NSBox()
 
     private lazy var scrollView = NSScrollView(frame: NSRect(x: 0, y: 0, width: 420, height: 408))
-    private(set) lazy var outlineView = BookmarksOutlineView(frame: scrollView.frame)
+    private lazy var outlineView = BookmarksOutlineView(frame: scrollView.frame)
 
     private lazy var emptyState = NSView()
     private lazy var emptyStateTitle = NSTextField()

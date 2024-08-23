@@ -6250,13 +6250,6 @@
 			path = VPNProxyExtension;
 			sourceTree = "<group>";
 		};
-		843D73BA2C786C6200E4F9DC /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 		853014D425E6709500FB8205 /* Support */ = {
 			isa = PBXGroup;
 			children = (
@@ -6873,7 +6866,6 @@
 				565E46DE2B2725DD0013AC2A /* SyncE2EUITests */,
 				AA585D7F248FD31100E9A3E2 /* Products */,
 				85AE2FF024A33A2D002D507F /* Frameworks */,
-				843D73BA2C786C6200E4F9DC /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
