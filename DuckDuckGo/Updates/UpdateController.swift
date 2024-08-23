@@ -58,27 +58,26 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     lazy var notificationPresenter = UpdateNotificationPresenter()
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
-    init(internalUserDecider: InternalUserDecider,
-         appRestarter: AppRestarting = AppRestarter()) {
-        willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
-        self.internalUserDecider = internalUserDecider
-        self.appRestarter = appRestarter
-        super.init()
-
-        configureUpdater()
-    }
-
     @Published private(set) var isUpdateBeingLoaded = false
     var isUpdateBeingLoadedPublisher: Published<Bool>.Publisher { $isUpdateBeingLoaded }
+
+    // Struct used to cache data until the updater finishes checking for updates
+    struct UpdateCheckResult {
+        let item: SUAppcastItem
+        let isInstalled: Bool
+    }
+    private var updateCheckResult: UpdateCheckResult?
 
     @Published private(set) var latestUpdate: Update? {
         didSet {
             if let latestUpdate, !latestUpdate.isInstalled {
-                switch latestUpdate.type {
-                case .critical:
-                    notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: UserText.criticalUpdateNotification, presentMultiline: true)
-                case .regular:
-                    notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
+                if !shouldShowManualUpdateDialog {
+                    switch latestUpdate.type {
+                    case .critical:
+                        notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: UserText.criticalUpdateNotification, presentMultiline: true)
+                    case .regular:
+                        notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
+                    }
                 }
                 isUpdateAvailableToInstall = !latestUpdate.isInstalled
             } else {
@@ -112,14 +111,33 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         }
     }
 
+    var automaticUpdateFlow: Bool {
+        // In case the current user is not the owner of the binary, we have to switch
+        // to manual update flow because the authentication is required.
+        return areAutomaticUpdatesEnabled && binaryOwnershipChecker.isCurrentUserOwner()
+    }
+
     var shouldShowManualUpdateDialog = false
 
     private(set) var updater: SPUStandardUpdaterController!
     private var appRestarter: AppRestarting
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
     private var internalUserDecider: InternalUserDecider
+    private let binaryOwnershipChecker: BinaryOwnershipChecking
 
     // MARK: - Public
+
+    init(internalUserDecider: InternalUserDecider,
+         appRestarter: AppRestarting = AppRestarter(),
+         binaryOwnershipChecker: BinaryOwnershipChecking = BinaryOwnershipChecker()) {
+        willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
+        self.internalUserDecider = internalUserDecider
+        self.appRestarter = appRestarter
+        self.binaryOwnershipChecker = binaryOwnershipChecker
+        super.init()
+
+        configureUpdater()
+    }
 
     func checkNewApplicationVersion() {
         let updateStatus = ApplicationUpdateDetector.isApplicationUpdated()
@@ -144,6 +162,18 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater.updater.checkForUpdatesInBackground()
     }
 
+    @objc func runUpdate() {
+        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidRunUpdate))
+
+        if automaticUpdateFlow {
+            appRestarter.restart()
+        } else {
+            updater.userDriver.activeUpdateAlert?.hideUnnecessaryUpdateButtons()
+            shouldShowManualUpdateDialog = true
+            checkForUpdate()
+        }
+    }
+
     // MARK: - Private
 
     private func configureUpdater() {
@@ -151,8 +181,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
         shouldShowManualUpdateDialog = false
 
-        if updater.updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
-            updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
+        if updater.updater.automaticallyDownloadsUpdates != automaticUpdateFlow {
+            updater.updater.automaticallyDownloadsUpdates = automaticUpdateFlow
         }
 
 #if DEBUG
@@ -160,24 +190,10 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater.updater.automaticallyDownloadsUpdates = false
         updater.updater.updateCheckInterval = 0
 #endif
-
-        checkForUpdateInBackground()
     }
 
-    @objc func openUpdatesPage() {
+    @objc private func openUpdatesPage() {
         notificationPresenter.openUpdatesPage()
-    }
-
-    @objc func runUpdate() {
-        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidRunUpdate))
-
-        if areAutomaticUpdatesEnabled {
-            appRestarter.restart()
-        } else {
-            updater.userDriver.activeUpdateAlert?.hideUnnecessaryUpdateButtons()
-            shouldShowManualUpdateDialog = true
-            checkForUpdate()
-        }
     }
 
 }
@@ -201,6 +217,7 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     private func onUpdateCheckStart() {
+        updateCheckResult = nil
         isUpdateBeingLoaded = true
     }
 
@@ -217,7 +234,9 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
-        os_log("Updater did abort with error: \(error.localizedDescription)", log: .updates)
+        os_log("Updater did abort with error: %{public}@",
+               log: .updates,
+               error.localizedDescription)
 
         let errorCode = (error as NSError).code
         guard ![Int(Sparkle.SUError.noUpdateError.rawValue),
@@ -231,51 +250,69 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        os_log("Updater did find valid update: \(item.displayVersionString)(\(item.versionString))", log: .updates)
+        os_log("Updater did find valid update: %{public}@",
+               log: .updates,
+               "\(item.displayVersionString)(\(item.versionString))")
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
 
-        guard !areAutomaticUpdatesEnabled else {
-            // If automatic updates are enabled, we are waiting until the update is downloaded
-            return
+        if !automaticUpdateFlow {
+            // For manual updates, we can present the available update without waiting for the update cycle to finish. The Sparkle flow downloads the update later
+            updateCheckResult = UpdateCheckResult(item: item, isInstalled: false)
+            onUpdateCheckEnd()
         }
-        // For manual updates, show the available update without downloading
-        onUpdateCheckEnd(item: item, isInstalled: false)
     }
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: any Error) {
         let item = (error as NSError).userInfo["SULatestAppcastItemFound"] as? SUAppcastItem
-        os_log("Updater did not find update: \(String(describing: item?.displayVersionString))(\(String(describing: item?.versionString)))", log: .updates)
-
-        onUpdateCheckEnd(item: item, isInstalled: true)
+        os_log("Updater did not find update: %{public}@",
+               log: .updates,
+               "\(item?.displayVersionString ?? "")(\(item?.versionString ?? ""))")
+        if let item {
+            // User is running the latest version
+            updateCheckResult = UpdateCheckResult(item: item, isInstalled: true)
+        }
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidNotFindUpdate, error: error))
     }
 
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
-        os_log("Updater did download update: \(item.displayVersionString)(\(item.versionString))", log: .updates)
+        os_log("Updater did download update: %{public}@",
+               log: .updates,
+               "\(item.displayVersionString)(\(item.versionString))")
 
-        guard areAutomaticUpdatesEnabled else {
-            // If manual are enabled, we don't download
+        if automaticUpdateFlow {
+            // For automatic updates, the available item has to be downloaded
+            updateCheckResult = UpdateCheckResult(item: item, isInstalled: false)
             return
         }
-        // Automatic updates present the available update after it's downloaded
-        onUpdateCheckEnd(item: item, isInstalled: false)
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidDownloadUpdate))
     }
 
-    private func onUpdateCheckEnd(item: SUAppcastItem?, isInstalled: Bool) {
-        if let item {
-            latestUpdate = Update(appcastItem: item, isInstalled: isInstalled)
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
+        os_log("Updater did finish update cycle", log: .updates)
+
+        onUpdateCheckEnd()
+    }
+
+    private func onUpdateCheckEnd() {
+        guard isUpdateBeingLoaded else {
+            // The update check end is already handled
+            return
+        }
+
+        // If the update is available, present it
+        if let updateCheckResult = updateCheckResult {
+            latestUpdate = Update(appcastItem: updateCheckResult.item,
+                                  isInstalled: updateCheckResult.isInstalled)
         } else {
             latestUpdate = nil
         }
-        isUpdateBeingLoaded = false
-    }
 
-    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
-        os_log("Updater did finish update cycle", log: .updates)
+        // Clear cache
+        isUpdateBeingLoaded = false
+        updateCheckResult = nil
     }
 
 }
