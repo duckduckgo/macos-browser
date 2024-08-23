@@ -50,6 +50,7 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
     "DuckDuckGo Privacy Pro": nonSandboxedExtraInputFiles,
 
     "Unit Tests": [
+        .init("BinaryOwnershipCheckerTests", .source),
         .init("BWEncryptionTests.swift", .source),
         .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source)
     ],
