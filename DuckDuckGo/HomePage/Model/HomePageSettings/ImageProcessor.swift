@@ -194,9 +194,9 @@ final class ImageProcessor: ImageProcessing {
             width: Int(newSize.width),
             height: Int(newSize.height),
             bitsPerComponent: originalImage.bitsPerComponent,
-            bytesPerRow: originalImage.bytesPerRow,
+            bytesPerRow: 0, // calculate automatically
             space: originalImage.colorSpace ?? CGColorSpace(name: CGColorSpace.sRGB)!,
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Little.rawValue
+            bitmapInfo: originalImage.bitmapInfo.rawValue
         ) else {
             throw ImageProcessingError.failedToInitializeGraphicsContext
         }

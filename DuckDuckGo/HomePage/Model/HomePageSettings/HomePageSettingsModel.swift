@@ -140,6 +140,18 @@ extension HomePage.Models {
                 if case .customImage(let userBackgroundImage) = customBackground {
                     customImagesManager.updateSelectedTimestamp(for: userBackgroundImage)
                 }
+                switch customBackground {
+                case .gradient:
+                    PixelKit.fire(GeneralPixel.newTabBackgroundSelectedGradient)
+                case .solidColor:
+                    PixelKit.fire(GeneralPixel.newTabBackgroundSelectedSolidColor)
+                case .illustration:
+                    PixelKit.fire(GeneralPixel.newTabBackgroundSelectedIllustration)
+                case .customImage:
+                    PixelKit.fire(GeneralPixel.newTabBackgroundSelectedUserImage)
+                case .none:
+                    PixelKit.fire(GeneralPixel.newTabBackgroundReset)
+                }
             }
         }
         @Published var vibrancyMaterial: NSVisualEffectView.Material = .fullScreenUI
@@ -164,8 +176,19 @@ extension HomePage.Models {
                         customBackground = .customImage(image)
                     }
                 } catch {
-                    PixelKit.fire(GeneralPixel.newTabBackgroundAddingImageFailed)
+                    PixelKit.fire(DebugEvent(GeneralPixel.newTabBackgroundAddImageError, error: error))
+                    await showAddImageFailedAlert()
                 }
+            }
+        }
+
+        @MainActor
+        private func showAddImageFailedAlert() async {
+            let alert = NSAlert.cannotReadImageAlert()
+            if let keyWindow = NSApplication.shared.keyWindow {
+                await alert.beginSheetModal(for: keyWindow)
+            } else {
+                await alert.runModal()
             }
         }
 
@@ -208,13 +231,12 @@ extension HomePage.Models {
         }
 
         var customBackgroundModes: [CustomBackgroundModeModel] {
-            var modes: [CustomBackgroundModeModel] = [
+            [
                 customBackgroundModeModel(for: .gradientPicker),
                 customBackgroundModeModel(for: .colorPicker),
                 customBackgroundModeModel(for: .illustrationPicker),
                 customBackgroundModeModel(for: .customImagePicker)
             ]
-            return modes
         }
 
         @ViewBuilder

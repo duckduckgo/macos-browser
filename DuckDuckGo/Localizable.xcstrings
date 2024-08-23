@@ -12286,6 +12286,30 @@
         }
       }
     },
+    "cannot.read.image.alert.header" : {
+      "comment" : "Header of the alert dialog informing user that the app failed to load the provided custom background image",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Processing Image Failed"
+          }
+        }
+      }
+    },
+    "cannot.read.image.informative" : {
+      "comment" : "Informative of the alert dialog informing user it is not possible to open the file",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The image file may be corrupted. Please try again with a different file."
+          }
+        }
+      }
+    },
     "Capitalize" : {
       "comment" : "Main Menu Edit-Transformations item",
       "localizations" : {

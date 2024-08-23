@@ -133,7 +133,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
             try setUpStorageDirectory(at: storageLocation.path)
             try setUpStorageDirectory(at: thumbnailsStorageLocation.path)
         } catch {
-            // fire pixel - failed to initialize storage
+            PixelKit.fire(DebugEvent(GeneralPixel.newTabBackgroundInitializeStorageError, error: error))
         }
 
         availableImages = imagesMetadata.compactMap(UserBackgroundImage.init)
@@ -165,7 +165,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
                 let resizedImageData = try imageProcessor.resizeImage(with: imageData, to: Const.thumbnailSize)
                 try resizedImageData.write(to: thumbnailsStorageLocation.appendingPathComponent(fileName))
             } catch {
-                PixelKit.fire(GeneralPixel.newTabBackgroundGeneratingThumbnailFailed)
+                PixelKit.fire(DebugEvent(GeneralPixel.newTabBackgroundThumbnailError, error: error))
             }
         }()
 
@@ -180,6 +180,8 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
         deleteImagesOverLimit()
 
+        PixelKit.fire(GeneralPixel.newTabBackgroundAddedUserImage)
+
         let userBackgroundImage = UserBackgroundImage(fileName: fileName, colorScheme: colorScheme)
         imagesMetadata = [userBackgroundImage.description] + imagesMetadata.prefix(maximumNumberOfImages - 1)
         return userBackgroundImage
@@ -191,6 +193,8 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         }
         imagesMetadata.remove(at: index)
         deleteImageFiles(for: userBackgroundImage)
+
+        PixelKit.fire(GeneralPixel.newTabBackgroundDeletedUserImage)
     }
 
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage) {

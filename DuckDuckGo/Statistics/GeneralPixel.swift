@@ -104,6 +104,15 @@ enum GeneralPixel: PixelKitEventV2 {
     case recentActivitySectionHidden
     case continueSetUpSectionHidden
 
+    // New Tab Custom Background
+    case newTabBackgroundSelectedGradient
+    case newTabBackgroundSelectedSolidColor
+    case newTabBackgroundSelectedIllustration
+    case newTabBackgroundSelectedUserImage
+    case newTabBackgroundAddedUserImage
+    case newTabBackgroundDeletedUserImage
+    case newTabBackgroundReset
+
     // Fire Button
     case fireButtonFirstBurn
     case fireButton(option: FireButtonOption)
@@ -421,8 +430,9 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case compilationFailed
 
-    case newTabBackgroundAddingImageFailed
-    case newTabBackgroundGeneratingThumbnailFailed
+    case newTabBackgroundInitializeStorageError
+    case newTabBackgroundAddImageError
+    case newTabBackgroundThumbnailError
 
     var name: String {
         switch self {
@@ -569,6 +579,20 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
             return "m_mac_continue-setup-section-hidden"
+        case .newTabBackgroundSelectedGradient:
+            return "newtab_mac_background_selected-gradient"
+        case .newTabBackgroundSelectedSolidColor:
+            return "newtab_mac_background_selected-solid-color"
+        case .newTabBackgroundSelectedIllustration:
+            return "newtab_mac_background_selected-illustration"
+        case .newTabBackgroundSelectedUserImage:
+            return "newtab_mac_background_selected-user-image"
+        case .newTabBackgroundAddedUserImage:
+            return "newtab_mac_background_added-user-image"
+        case .newTabBackgroundDeletedUserImage:
+            return "newtab_mac_background_deleted-user-image"
+        case .newTabBackgroundReset:
+            return "newtab_mac_background_reset"
 
             // Fire Button
         case .fireButtonFirstBurn:
@@ -1032,8 +1056,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .bookmarksSearchResultClicked: return "m_mac_search_result_clicked"
 
             // New Tab Page Custom Background
-        case .newTabBackgroundAddingImageFailed: return "newtab_mac_background_adding_image_failed"
-        case .newTabBackgroundGeneratingThumbnailFailed: return "newtab_mac_background_generating_thumbnail_failed"
+        case .newTabBackgroundInitializeStorageError: return "newtab_background_initialize-storage-error"
+        case .newTabBackgroundAddImageError: return "newtab_background_add-image-error"
+        case .newTabBackgroundThumbnailError: return "newtab_background_thumbnail-error"
         }
     }
 
