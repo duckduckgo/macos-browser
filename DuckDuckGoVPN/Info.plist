@@ -20,5 +20,7 @@
 	<string>public.app-category.productivity</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>APP_CONFIGURATION_APP_GROUP</key>
+	<string>$(APP_CONFIGURATION_APP_GROUP)</string>
 </dict>
 </plist>

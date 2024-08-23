@@ -214,12 +214,13 @@ final class BookmarksBarViewController: NSViewController {
         dispatchPrecondition(condition: .onQueue(.main))
         bookmarksBarCollectionView.reloadData()
     }
+
     @IBAction func importBookmarksClicked(_ sender: Any) {
         DataImportView().show()
     }
 
     @IBAction private func clippedItemsIndicatorClicked(_ sender: NSButton) {
-        showSubmenu(for: clippedItemsBookmarkFolder(), fromView: sender)
+        showSubmenu(for: clippedItemsBookmarkFolder(), from: sender)
     }
 
     @IBAction func mouseClickViewMouseUp(_ sender: MouseClickView) {
@@ -240,7 +241,7 @@ final class BookmarksBarViewController: NSViewController {
 
 extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
 
-    func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem) {
+    func didClick(_ item: BookmarksBarCollectionViewItem) {
         guard let indexPath = bookmarksBarCollectionView.indexPath(for: item) else {
             assertionFailure("Failed to look up index path for clicked item")
             return
@@ -251,11 +252,13 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             return
         }
 
-        if let bookmark = entity as? Bookmark {
-            handle(action, for: bookmark)
-        } else if let folder = entity as? BookmarkFolder {
-            handle(action, for: folder, item: item)
-        } else {
+        switch entity {
+        case let bookmark as Bookmark:
+            WindowControllersManager.shared.open(bookmark: bookmark)
+            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
+        case let folder as BookmarkFolder:
+            showSubmenu(for: folder, from: item.view)
+        default:
             assertionFailure("Failed to cast entity for clicked item")
         }
     }
@@ -287,65 +290,19 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         if let bookmarkFolder, let view {
             // already shown?
             guard (bookmarkMenuPopover.viewController.representedObject as? BookmarkFolder)?.id != bookmarkFolder.id else { return }
-            showSubmenu(for: bookmarkFolder, fromView: view)
+            showSubmenu(for: bookmarkFolder, from: view)
         } else {
             bookmarkMenuPopover.close()
         }
     }
 
+    func showDialog(_ dialog: any ModalView) {
+        dialog.show(in: view.window)
+    }
+
 }
 // MARK: - Private
 private extension BookmarksBarViewController {
-
-    func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for bookmark: Bookmark) {
-        switch action {
-        case .openInNewTab:
-            openInNewTab(bookmark: bookmark)
-        case .openInNewWindow:
-            openInNewWindow(bookmark: bookmark)
-        case .clickItem:
-            WindowControllersManager.shared.open(bookmark: bookmark)
-            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-        case .toggleFavorites:
-            bookmark.isFavorite.toggle()
-            bookmarkManager.update(bookmark: bookmark)
-        case .edit:
-            showDialog(view: BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark))
-        case .moveToEnd:
-            bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: .root) { _ in }
-        case .copyURL:
-            bookmark.copyUrlToPasteboard()
-        case .deleteEntity:
-            bookmarkManager.remove(bookmark: bookmark)
-        case .addFolder:
-            addFolder(inParent: nil)
-        case .manageBookmarks:
-            manageBookmarks()
-        }
-    }
-
-    func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for folder: BookmarkFolder, item: BookmarksBarCollectionViewItem) {
-        switch action {
-        case .clickItem:
-            showSubmenu(for: folder, fromView: item.view)
-        case .edit:
-            showDialog(view: BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: nil))
-        case .moveToEnd:
-            bookmarkManager.move(objectUUIDs: [folder.id], toIndex: nil, withinParentFolder: .root) { _ in }
-        case .deleteEntity:
-            bookmarkManager.remove(folder: folder)
-        case .addFolder:
-            addFolder(inParent: folder)
-        case .openInNewTab:
-            openAllInNewTabs(folder: folder)
-        case .openInNewWindow:
-            openAllInNewWindow(folder: folder)
-        case .manageBookmarks:
-            manageBookmarks()
-        default:
-            assertionFailure("Received unexpected action for bookmark folder")
-        }
-    }
 
     func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
         let menu = NSMenu()
@@ -354,31 +311,7 @@ private extension BookmarksBarViewController {
         return menu
     }
 
-    func openInNewTab(bookmark: Bookmark) {
-        guard let url = bookmark.urlObject else { return }
-        tabCollectionViewModel.appendNewTab(with: .url(url, source: .bookmark), selected: true)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-    func openInNewWindow(bookmark: Bookmark) {
-        guard let url = bookmark.urlObject else { return }
-        WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-    func openAllInNewTabs(folder: BookmarkFolder) {
-        let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollectionViewModel.burnerMode)
-        tabCollectionViewModel.append(tabs: tabs)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-    func openAllInNewWindow(folder: BookmarkFolder) {
-        let tabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollectionViewModel.burnerMode)
-        WindowsManager.openNewWindow(with: tabCollection, isBurner: tabCollectionViewModel.isBurner)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-    private func showSubmenu(for folder: BookmarkFolder, fromView view: NSView) {
+    func showSubmenu(for folder: BookmarkFolder, from view: NSView) {
         let bookmarkMenuPopover: BookmarksBarMenuPopover
         if let popover = self.bookmarkMenuPopover {
             bookmarkMenuPopover = popover
@@ -406,24 +339,16 @@ private extension BookmarksBarViewController {
         }
     }
 
-    func addFolder(inParent parent: BookmarkFolder?) {
-        showDialog(view: BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: parent))
-    }
-
-    func showDialog(view: any ModalView) {
-        view.show(in: self.view.window)
-    }
-
     @objc func manageBookmarks() {
         WindowControllersManager.shared.showBookmarksTab()
     }
 
     @objc func addFolder(sender: NSMenuItem) {
-        addFolder(inParent: nil)
+        showDialog(BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: nil))
     }
 
 }
-// MARK: - Menu
+// MARK: - NSMenuDelegate
 extension BookmarksBarViewController: NSMenuDelegate {
 
     public func menuNeedsUpdate(_ menu: NSMenu) {

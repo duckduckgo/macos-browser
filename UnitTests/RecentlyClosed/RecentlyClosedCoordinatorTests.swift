@@ -87,7 +87,7 @@ private extension RecentlyClosedWindow {
     }
 }
 
-private final class WindowControllersManagerMock: WindowControllersManagerProtocol {
+final class WindowControllersManagerMock: WindowControllersManagerProtocol {
 
     var pinnedTabsManager = PinnedTabsManager(tabCollection: .init())
 
@@ -96,4 +96,30 @@ private final class WindowControllersManagerMock: WindowControllersManagerProtoc
 
     func register(_ windowController: MainWindowController) {}
     func unregister(_ windowController: MainWindowController) {}
+
+    var lastKeyMainWindowController: MainWindowController?
+
+    struct ShowArgs: Equatable {
+        let url: URL?, source: Tab.TabContent.URLSource, newTab: Bool
+    }
+    var showCalled: ShowArgs?
+    func show(url: URL?, source: Tab.TabContent.URLSource, newTab: Bool) {
+        showCalled = .init(url: url, source: source, newTab: newTab)
+    }
+    var showBookmarksTabCalled = false
+    func showBookmarksTab() {
+        showBookmarksTabCalled = true
+    }
+
+    struct OpenNewWindowArgs: Equatable {
+        var contents: [TabContent]?
+        var burnerMode: BurnerMode = .regular, droppingPoint: NSPoint?, contentSize: NSSize?, showWindow: Bool = true, popUp: Bool = false, lazyLoadTabs: Bool = false, isMiniaturized: Bool = false
+    }
+    var openNewWindowCalled: OpenNewWindowArgs?
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel?, burnerMode: BurnerMode, droppingPoint: NSPoint?, contentSize: NSSize?, showWindow: Bool, popUp: Bool, lazyLoadTabs: Bool, isMiniaturized: Bool) -> MainWindow? {
+        openNewWindowCalled = .init(contents: tabCollectionViewModel?.tabs.map(\.content), burnerMode: burnerMode, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: lazyLoadTabs, isMiniaturized: isMiniaturized)
+        return nil
+    }
+
 }

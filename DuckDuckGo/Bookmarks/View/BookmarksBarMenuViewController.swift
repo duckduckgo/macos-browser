@@ -664,6 +664,7 @@ extension BookmarksBarMenuViewController: BookmarksContextMenuDelegate {
 
     var isSearching: Bool { false }
     var parentFolder: BookmarkFolder? { nil }
+    var shouldIncludeManageBookmarksItem: Bool { true }
 
     func selectedItems() -> [Any] {
         guard let row = outlineView.clickedRowIfValid ?? outlineView.highlightedRow else { return [] }
@@ -680,6 +681,10 @@ extension BookmarksBarMenuViewController: BookmarksContextMenuDelegate {
         view.show(in: parent?.view.window) { [weak delegate] in
             delegate?.popover(shouldPreventClosure: false)
         }
+    }
+
+    func showInFolder(_ sender: NSMenuItem) {
+        assertionFailure("BookmarksBarMenuViewController does not support search")
     }
 
 }

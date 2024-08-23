@@ -88,6 +88,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
         titleLabel.isEditable = false
         titleLabel.isBordered = false
         titleLabel.isSelectable = false
+        titleLabel.refusesFirstResponder = true
         titleLabel.drawsBackground = false
         titleLabel.font = .systemFont(ofSize: 13)
         titleLabel.textColor = .controlTextColor
@@ -97,6 +98,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
         countLabel.isEditable = false
         countLabel.isBordered = false
         countLabel.isSelectable = false
+        countLabel.refusesFirstResponder = true
         countLabel.drawsBackground = false
         countLabel.font = .preferredFont(forTextStyle: .body)
         countLabel.alignment = .right
