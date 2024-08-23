@@ -106,12 +106,10 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "")
 
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 0).entity, bookmarkOne)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 0).parentFolder)
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 1).entity, bookmarkTwo)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 1).parentFolder)
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 2).entity, bookmarkThree)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 2).parentFolder)
+        XCTAssertNil(sut.fetchParent())
+        XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkOne)
+        XCTAssertEqual(sut.fetchEntity(at: 1), bookmarkTwo)
+        XCTAssertEqual(sut.fetchEntity(at: 2), bookmarkThree)
     }
 
     func testWhenSearchAndEmptySelection_thenFecthEntityAndParentIsCorrect() {
@@ -122,12 +120,10 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .empty, searchQuery: "some")
 
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 0).entity, bookmarkTwo)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 0).parentFolder)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 1).entity)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 1).parentFolder)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 2).entity)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 2).parentFolder)
+        XCTAssertNil(sut.fetchParent())
+        XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkTwo)
+        XCTAssertNil(sut.fetchEntity(at: 1))
+        XCTAssertNil(sut.fetchEntity(at: 2))
     }
 
     // MARK: - Folder selection state tests
@@ -242,12 +238,10 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .folder(folder), searchQuery: "")
 
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 0).entity, bookmarkFour)
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 0).parentFolder, folder)
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 1).entity, bookmarkFive)
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 1).parentFolder, folder)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 2).entity)
-        XCTAssertNotNil(sut.fetchEntityAndParent(at: 2).parentFolder)
+        XCTAssertEqual(sut.fetchParent(), folder)
+        XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkFour)
+        XCTAssertEqual(sut.fetchEntity(at: 1), bookmarkFive)
+        XCTAssertNil(sut.fetchEntity(at: 2))
     }
 
     func testWhenSearchAndFolderSelection_thenFetchEntityAndParentIsCorrect() {
@@ -262,12 +256,10 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .folder(folder), searchQuery: "some")
 
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 0).entity, bookmarkOne)
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 0).parentFolder, folder)
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 1).entity, bookmarkFive)
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 1).parentFolder, folder)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 2).entity)
-        XCTAssertNotNil(sut.fetchEntityAndParent(at: 2).parentFolder)
+        XCTAssertEqual(sut.fetchParent(), folder)
+        XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkOne)
+        XCTAssertEqual(sut.fetchEntity(at: 1), bookmarkFive)
+        XCTAssertNil(sut.fetchEntity(at: 2))
     }
 
     // MARK: - Favorites selection state tests
@@ -351,10 +343,9 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .favorites, searchQuery: "")
 
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 0).entity, bookmarkTwo)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 0).parentFolder)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 1).entity)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 1).parentFolder)
+        XCTAssertNil(sut.fetchParent())
+        XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkTwo)
+        XCTAssertNil(sut.fetchEntity(at: 1))
     }
 
     func testWhenSearchAndFavoritesSelection_thenFetchEntityAndParentIsCorrect() {
@@ -365,10 +356,9 @@ final class BookmarkManagementDetailViewModelTests: XCTestCase {
         let sut = BookmarkManagementDetailViewModel(bookmarkManager: bookmarkManager, metrics: metrics)
         sut.update(selection: .favorites, searchQuery: "some")
 
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 0).entity, bookmarkOne)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 0).parentFolder)
-        XCTAssertEqual(sut.fetchEntityAndParent(at: 1).entity, bookmarkTwo)
-        XCTAssertNil(sut.fetchEntityAndParent(at: 1).parentFolder)
+        XCTAssertNil(sut.fetchParent())
+        XCTAssertEqual(sut.fetchEntity(at: 0), bookmarkOne)
+        XCTAssertEqual(sut.fetchEntity(at: 1), bookmarkTwo)
     }
 
     // MARK: - Content state tests
