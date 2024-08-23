@@ -31,7 +31,7 @@ final class BookmarksBarViewController: NSViewController {
     @IBOutlet private var clippedItemsIndicator: MouseOverButton!
     @IBOutlet private var promptAnchor: NSView!
 
-    private var bookmarkListPopover: BookmarkListPopover?
+    private var bookmarkMenuPopover: BookmarksBarMenuPopover?
 
     private let bookmarkManager: BookmarkManager
     private let dragDropManager: BookmarkDragDropManager
@@ -201,11 +201,11 @@ final class BookmarksBarViewController: NSViewController {
         guard let view, let folder, let cursorPosition = info?.draggingLocation else {
             dragDestination = nil
             // close all Bookmarks popovers including the Bookmarks Button popover
-            BookmarkListPopover.closeBookmarkListPopovers(shownIn: self.view.window)
+            BookmarksBarMenuPopover.closeBookmarkListPopovers(shownIn: self.view.window)
             return false
         }
-        if let bookmarkListPopover, bookmarkListPopover.isShown,
-           bookmarkListPopover.rootFolder?.id == folder.id {
+        if let bookmarkMenuPopover, bookmarkMenuPopover.isShown,
+           bookmarkMenuPopover.rootFolder?.id == folder.id {
             // folder menu already shown
             return true
         }
@@ -216,7 +216,7 @@ final class BookmarksBarViewController: NSViewController {
            dragDestination.mouseLocation.distance(to: cursorPosition) < Self.maxDragDistanceToExpandHoveredFolder {
 
             if Date().timeIntervalSince(dragDestination.hoverStarted) >= Self.dragOverFolderExpandDelay {
-                showSubmenu(for: folder, fromView: view)
+                showSubmenu(for: folder, from: view)
                 return true
             }
         } else {
@@ -246,12 +246,13 @@ final class BookmarksBarViewController: NSViewController {
         dispatchPrecondition(condition: .onQueue(.main))
         bookmarksBarCollectionView.reloadData()
     }
+
     @IBAction func importBookmarksClicked(_ sender: Any) {
         DataImportView().show()
     }
 
     @IBAction private func clippedItemsIndicatorClicked(_ sender: NSButton) {
-        showSubmenu(for: clippedItemsBookmarkFolder(), fromView: sender)
+        showSubmenu(for: clippedItemsBookmarkFolder(), from: sender)
     }
 
     private func clippedItemsBookmarkFolder() -> BookmarkFolder {
@@ -273,10 +274,10 @@ final class BookmarksBarViewController: NSViewController {
     }
 
 }
-
+// MARK: - BookmarksBarViewModelDelegate
 extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
 
-    func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem) {
+    func didClick(_ item: BookmarksBarCollectionViewItem) {
         guard let indexPath = bookmarksBarCollectionView.indexPath(for: item) else {
             assertionFailure("Failed to look up index path for clicked item")
             return
@@ -287,11 +288,13 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             return
         }
 
-        if let bookmark = entity as? Bookmark {
-            handle(action, for: bookmark)
-        } else if let folder = entity as? BookmarkFolder {
-            handle(action, for: folder, item: item)
-        } else {
+        switch entity {
+        case let bookmark as Bookmark:
+            WindowControllersManager.shared.open(bookmark: bookmark)
+            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
+        case let folder as BookmarkFolder:
+            showSubmenu(for: folder, from: item.view)
+        default:
             assertionFailure("Failed to cast entity for clicked item")
         }
     }
@@ -303,14 +306,14 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     func bookmarksBarViewModelReloadedData() {
         bookmarksBarCollectionView.reloadData()
 
-        if let bookmarkListPopover, bookmarkListPopover.isShown,
-           bookmarkListPopover.rootFolder?.id == PseudoFolder.bookmarks.id /* clipped items folder has id of the root */ {
-            bookmarkListPopover.reloadData(withRootFolder: clippedItemsBookmarkFolder())
+        if let bookmarkMenuPopover, bookmarkMenuPopover.isShown,
+           bookmarkMenuPopover.rootFolder?.id == PseudoFolder.bookmarks.id /* clipped items folder has id of the root */ {
+            bookmarkMenuPopover.reloadData(withRootFolder: clippedItemsBookmarkFolder())
         }
     }
 
     func mouseDidHover(over sender: Any) {
-        guard let bookmarkListPopover, bookmarkListPopover.isShown else { return }
+        guard let bookmarkMenuPopover, bookmarkMenuPopover.isShown else { return }
         var bookmarkFolder: BookmarkFolder?
         var view: NSView?
         if let item = sender as? BookmarksBarCollectionViewItem {
@@ -322,10 +325,10 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         }
         if let bookmarkFolder, let view {
             // already shown?
-            guard bookmarkListPopover.rootFolder?.id != bookmarkFolder.id else { return }
-            showSubmenu(for: bookmarkFolder, fromView: view)
+            guard bookmarkMenuPopover.rootFolder?.id != bookmarkFolder.id else { return }
+            showSubmenu(for: bookmarkFolder, from: view)
         } else {
-            bookmarkListPopover.close()
+            bookmarkMenuPopover.close()
         }
     }
 
@@ -353,6 +356,10 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
                 }
             }
         }
+    }
+
+    func showDialog(_ dialog: any ModalView) {
+        dialog.show(in: view.window)
     }
 
 }
@@ -398,56 +405,6 @@ extension BookmarksBarViewController: MouseOverButtonDelegate {
 // MARK: - Private
 private extension BookmarksBarViewController {
 
-    func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for bookmark: Bookmark) {
-        switch action {
-        case .openInNewTab:
-            openInNewTab(bookmark: bookmark)
-        case .openInNewWindow:
-            openInNewWindow(bookmark: bookmark)
-        case .clickItem:
-            WindowControllersManager.shared.open(bookmark: bookmark)
-            PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-        case .toggleFavorites:
-            bookmark.isFavorite.toggle()
-            bookmarkManager.update(bookmark: bookmark)
-        case .edit:
-            showDialog(view: BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark))
-        case .moveToEnd:
-            bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: .root) { _ in }
-        case .copyURL:
-            bookmark.copyUrlToPasteboard()
-        case .deleteEntity:
-            bookmarkManager.remove(bookmark: bookmark)
-        case .addFolder:
-            addFolder(inParent: nil)
-        case .manageBookmarks:
-            manageBookmarks()
-        }
-    }
-
-    func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for folder: BookmarkFolder, item: BookmarksBarCollectionViewItem) {
-        switch action {
-        case .clickItem:
-            showSubmenu(for: folder, fromView: item.view)
-        case .edit:
-            showDialog(view: BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: nil))
-        case .moveToEnd:
-            bookmarkManager.move(objectUUIDs: [folder.id], toIndex: nil, withinParentFolder: .root) { _ in }
-        case .deleteEntity:
-            bookmarkManager.remove(folder: folder)
-        case .addFolder:
-            addFolder(inParent: folder)
-        case .openInNewTab:
-            openAllInNewTabs(folder: folder)
-        case .openInNewWindow:
-            openAllInNewWindow(folder: folder)
-        case .manageBookmarks:
-            manageBookmarks()
-        default:
-            assertionFailure("Received unexpected action for bookmark folder")
-        }
-    }
-
     func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
         let menu = NSMenu()
         menu.items = items.isEmpty ? [NSMenuItem.empty] : items
@@ -455,48 +412,24 @@ private extension BookmarksBarViewController {
         return menu
     }
 
-    func openInNewTab(bookmark: Bookmark) {
-        guard let url = bookmark.urlObject else { return }
-        tabCollectionViewModel.appendNewTab(with: .url(url, source: .bookmark), selected: true)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-    func openInNewWindow(bookmark: Bookmark) {
-        guard let url = bookmark.urlObject else { return }
-        WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-    func openAllInNewTabs(folder: BookmarkFolder) {
-        let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollectionViewModel.burnerMode)
-        tabCollectionViewModel.append(tabs: tabs)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-    func openAllInNewWindow(folder: BookmarkFolder) {
-        let tabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollectionViewModel.burnerMode)
-        WindowsManager.openNewWindow(with: tabCollection, isBurner: tabCollectionViewModel.isBurner)
-        PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
-    }
-
-    private func showSubmenu(for folder: BookmarkFolder, fromView view: NSView) {
-        let bookmarkListPopover: BookmarkListPopover
-        if let popover = self.bookmarkListPopover {
-            bookmarkListPopover = popover
-            if bookmarkListPopover.isShown {
-                bookmarkListPopover.close()
-                if bookmarkListPopover.rootFolder?.id == folder.id {
+    func showSubmenu(for folder: BookmarkFolder, from view: NSView) {
+        let bookmarkMenuPopover: BookmarksBarMenuPopover
+        if let popover = self.bookmarkMenuPopover {
+            bookmarkMenuPopover = popover
+            if bookmarkMenuPopover.isShown {
+                bookmarkMenuPopover.close()
+                if bookmarkMenuPopover.rootFolder?.id == folder.id {
                     return // close popover on 2nd click on the same folder
                 }
             }
-            bookmarkListPopover.reloadData(withRootFolder: folder)
+            bookmarkMenuPopover.reloadData(withRootFolder: folder)
         } else {
-            bookmarkListPopover = BookmarkListPopover(mode: .bookmarkBarMenu, rootFolder: folder)
-            bookmarkListPopover.delegate = self
-            self.bookmarkListPopover = bookmarkListPopover
+            bookmarkMenuPopover = BookmarksBarMenuPopover(rootFolder: folder)
+            bookmarkMenuPopover.delegate = self
+            self.bookmarkMenuPopover = bookmarkMenuPopover
         }
 
-        bookmarkListPopover.show(positionedBelow: view)
+        bookmarkMenuPopover.show(positionedBelow: view)
 
         if view === clippedItemsIndicator {
             // display pressed state
@@ -507,24 +440,16 @@ private extension BookmarksBarViewController {
         }
     }
 
-    func addFolder(inParent parent: BookmarkFolder?) {
-        showDialog(view: BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: parent))
-    }
-
-    func showDialog(view: any ModalView) {
-        view.show(in: self.view.window)
-    }
-
     @objc func manageBookmarks() {
         WindowControllersManager.shared.showBookmarksTab()
     }
 
     @objc func addFolder(sender: NSMenuItem) {
-        addFolder(inParent: nil)
+        showDialog(BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: nil))
     }
 
 }
-// MARK: - Menu
+// MARK: - NSMenuDelegate
 extension BookmarksBarViewController: NSMenuDelegate {
 
     public func menuNeedsUpdate(_ menu: NSMenu) {
@@ -539,7 +464,7 @@ extension BookmarksBarViewController: NSMenuDelegate {
 
 }
 // MARK: - BookmarkListPopoverDelegate
-extension BookmarksBarViewController: BookmarkListPopoverDelegate {
+extension BookmarksBarViewController: BookmarksBarMenuPopoverDelegate {
 
     func popoverShouldClose(_ popover: NSPopover) -> Bool {
         if NSApp.currentEvent?.type == .leftMouseUp {
@@ -557,8 +482,8 @@ extension BookmarksBarViewController: BookmarkListPopoverDelegate {
     }
 
     func popoverDidClose(_ notification: Notification) {
-        guard let bookmarkListPopover = notification.object as? BookmarkListPopover,
-              let positioningView = bookmarkListPopover.positioningView else { return }
+        guard let bookmarkMenuPopover = notification.object as? BookmarksBarMenuPopover,
+              let positioningView = bookmarkMenuPopover.positioningView else { return }
 
         if positioningView === clippedItemsIndicator {
             clippedItemsIndicator.backgroundColor = .clear
@@ -568,7 +493,7 @@ extension BookmarksBarViewController: BookmarkListPopoverDelegate {
         }
     }
 
-    func openNextBookmarksMenu(_ sender: BookmarkListPopover) {
+    func openNextBookmarksMenu(_ sender: BookmarksBarMenuPopover) {
         guard let folder = sender.rootFolder else {
             assertionFailure("No root folder set in BookmarkListPopover")
             return
@@ -588,24 +513,24 @@ extension BookmarksBarViewController: BookmarkListPopoverDelegate {
             for idx in viewModel.bookmarksBarItems.indices[(folderIdx + 1)...] {
                 guard let folder = viewModel.bookmarksBarItems[idx].entity as? BookmarkFolder,
                       let cell = bookmarksBarCollectionView.item(at: idx)?.view else { continue }
-                showSubmenu(for: folder, fromView: cell)
+                showSubmenu(for: folder, from: cell)
                 return
             }
         }
         // next folder not found: open clipped items menu (if not switching from it: folderIdx != nil)
         if folderIdx != nil, !viewModel.clippedItems.isEmpty {
-            showSubmenu(for: clippedItemsBookmarkFolder(), fromView: clippedItemsIndicator)
+            showSubmenu(for: clippedItemsBookmarkFolder(), from: clippedItemsIndicator)
             return
         }
         // switch to 1st folder in the Bookmarks Bar after the Clipped Items menu or after last folder if no clipped items
         for (idx, item) in viewModel.bookmarksBarItems.enumerated() {
             guard let folder = item.entity as? BookmarkFolder, let cell = bookmarksBarCollectionView.item(at: idx)?.view else { continue }
-            showSubmenu(for: folder, fromView: cell)
+            showSubmenu(for: folder, from: cell)
             return
         }
     }
 
-    func openPreviousBookmarksMenu(_ sender: BookmarkListPopover) {
+    func openPreviousBookmarksMenu(_ sender: BookmarksBarMenuPopover) {
         guard let folder = sender.rootFolder else {
             assertionFailure("No root folder set in BookmarkListPopover")
             return
@@ -625,20 +550,20 @@ extension BookmarksBarViewController: BookmarkListPopoverDelegate {
             for idx in viewModel.bookmarksBarItems.indices[..<folderIdx].reversed() {
                 guard let folder = viewModel.bookmarksBarItems[idx].entity as? BookmarkFolder,
                       let cell = bookmarksBarCollectionView.item(at: idx)?.view else { continue }
-                showSubmenu(for: folder, fromView: cell)
+                showSubmenu(for: folder, from: cell)
                 return
             }
         }
         // previous folder not found: open clipped items menu (if not switching from it: folderIdx != nil)
         if !viewModel.clippedItems.isEmpty {
             guard folderIdx != viewModel.bookmarksBarItems.count else { return } // if already in the clipped items menu
-            showSubmenu(for: clippedItemsBookmarkFolder(), fromView: clippedItemsIndicator)
+            showSubmenu(for: clippedItemsBookmarkFolder(), from: clippedItemsIndicator)
             return
         }
         // switch to last folder in the Bookmarks Bar before the Clipped Items menu or after last folder if no clipped items
         for (idx, item) in viewModel.bookmarksBarItems.enumerated().reversed() {
             guard let folder = item.entity as? BookmarkFolder, let cell = bookmarksBarCollectionView.item(at: idx)?.view else { continue }
-            showSubmenu(for: folder, fromView: cell)
+            showSubmenu(for: folder, from: cell)
             return
         }
     }

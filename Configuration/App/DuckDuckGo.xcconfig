@@ -20,17 +20,16 @@ PRODUCT_BUNDLE_IDENTIFIER = $(MAIN_BUNDLE_IDENTIFIER)
 
 CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGo.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Debug][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoDebug.entitlements
-CODE_SIGN_ENTITLEMENTS[config=CI][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoCI.entitlements
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
-CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 FEATURE_FLAGS = FEEDBACK SPARKLE STRIPE
 
 PRODUCT_NAME_PREFIX = DuckDuckGo
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = MacOS Browser CI
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = MacOS Browser
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = MacOS Browser Product Review
 
