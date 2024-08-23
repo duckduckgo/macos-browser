@@ -155,11 +155,7 @@ final class BookmarkNode: Hashable {
     }
 
     func childNodeRepresenting(object: AnyObject) -> BookmarkNode? {
-        return findNodeRepresenting(object: object, recursively: false)
-    }
-
-    func descendantNodeRepresenting(object: AnyObject) -> BookmarkNode? {
-        return findNodeRepresenting(object: object, recursively: true)
+        return childNodes.first { $0.representedObjectEquals(object) }
     }
 
     func isAncestor(of node: BookmarkNode) -> Bool {
@@ -178,20 +174,6 @@ final class BookmarkNode: Hashable {
 
             currentNode = parent
         }
-    }
-
-    func findNodeRepresenting(object: AnyObject, recursively: Bool = false) -> BookmarkNode? {
-        for childNode in childNodes {
-            if childNode.representedObjectEquals(object) {
-                return childNode
-            }
-
-            if recursively, let foundNode = childNode.descendantNodeRepresenting(object: object) {
-                return foundNode
-            }
-        }
-
-        return nil
     }
 
     // MARK: - Hashable

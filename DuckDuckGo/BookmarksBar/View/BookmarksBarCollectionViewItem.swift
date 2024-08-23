@@ -66,6 +66,22 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         }
     }
 
+    override var highlightState: NSCollectionViewItem.HighlightState {
+        get { super.highlightState }
+        set {
+            switch newValue {
+            case .asDropTarget:
+                mouseOverView.isMouseOver = true
+            case .forSelection, .forDeselection, .none:
+                if highlightState == .asDropTarget {
+                    mouseOverView.isMouseOver = false
+                }
+            @unknown default: break
+            }
+            super.highlightState = newValue
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 

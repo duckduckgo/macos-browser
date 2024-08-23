@@ -192,8 +192,10 @@ final class BookmarksBarMenuViewController: NSViewController {
 
     override func viewDidLoad() {
         outlineView.setDraggingSourceOperationMask([.move], forLocal: true)
-        outlineView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
-                                             FolderPasteboardWriter.folderUTIInternalType])
+        outlineView.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
+        // allow scroll buttons to scroll when dragging bookmark over
+        scrollDownButton?.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
+        scrollUpButton?.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
     }
 
     override func viewWillAppear() {
@@ -215,6 +217,7 @@ final class BookmarksBarMenuViewController: NSViewController {
 
         subscribeToScrollingEvents()
         subscribeToMenuPopoverEvents()
+        subscribeToDragDropEvents()
         // only subscribe to click outside events in root bookmarks menu
         // to close all the bookmarks menu popovers
         if !(view.window?.parent?.contentViewController is Self) {
@@ -224,64 +227,133 @@ final class BookmarksBarMenuViewController: NSViewController {
 
     private func subscribeToMenuPopoverEvents() {
         // show submenu for folder when dragging or hovering over it
-        typealias RowEvtPub = AnyPublisher<(Int?, BookmarkFolder?), Never>
-        // hover over bookmarks menu row
-        outlineView.$highlightedRow
-        .compactMap { [weak self] (row) -> RowEvtPub? in
-            guard let self else { return nil }
-            let bookmarkNode = row.flatMap { self.outlineView.item(atRow: $0) } as? BookmarkNode
-            let folder = bookmarkNode?.representedObject as? BookmarkFolder
-
-            // prevent closing or opening another submenu when mouse is moving down+right
-            let isMouseMovingDownRight: Bool = {
-                if let currentEvent = NSApp.currentEvent,
-                   currentEvent.type == .mouseMoved,
-                   currentEvent.deltaY >= 0,
-                   currentEvent.deltaX >= currentEvent.deltaY {
-                    true
-                } else {
-                    false
+        Publishers.Merge(
+            // hover over bookmarks menu row
+            outlineView.$highlightedRow.map { ($0, HighlightEvent.hover) },
+            // dragging over folder
+            dataSource.$dragDestinationFolder.map { [weak self] folder in
+                guard let self, let folder,
+                      let node = treeController.findNodeWithId(representing: folder),
+                      let row = outlineView.rowIfValid(forItem: node) else {
+                    return (nil, .dragging)
                 }
-            }()
-            var delay: RunLoop.SchedulerTimeType.Stride
-            // is moving down+right to a submenu?
-            if isMouseMovingDownRight,
-               let submenuPopover, submenuPopover.isShown,
-               let expandedFolder = submenuPopover.rootFolder,
-               let node = treeController.node(representing: expandedFolder),
-               let expandedRow = outlineView.rowIfValid(forItem: node) {
-                guard expandedRow != row else { return nil }
-
-                // delay submenu hiding when cursor is moving right (to the menu)
-                // over other elements that would normally hide the submenu
-                delay = 0.3
-                // restore the originally highlighted row for the expanded folder
-                outlineView.highlightedRow = expandedRow
-
-            } else if folder != nil {
-                // delay folder expanding when hovering over a subfolder
-                delay = 0.1
-            } else {
-                // hide submenu instantly when mouse is moved away from folder
-                // unless it‘s moving down+right as handled above.
-                delay = 0
+                return (row, .dragging)
             }
-
-            let valuePublisher = Just((row, folder))
-            if delay > 0 {
-                return valuePublisher
-                    .delay(for: delay, scheduler: RunLoop.main)
-                    .eraseToAnyPublisher()
-            } else {
-                return valuePublisher.eraseToAnyPublisher()
-            }
+        )
+        .compactMap { [weak self] (row, event) in
+            self?.delayedHighlightRowEventPublisher(forRow: row, on: event)
         }
         .switchToLatest()
-        .filter { [weak outlineView] (row, _) in
-            return outlineView?.highlightedRow == row
+        .filter { [weak dataSource, weak outlineView] (row, folder, event) in
+            // following is valid only when dragging
+            guard event == .dragging else {
+                return outlineView?.highlightedRow == row
+            }
+            // don‘t hide subfolder menu or switch to another folder if
+            // mouse cursor is outside of the view
+            guard outlineView?.isMouseLocationInsideBounds() == true else { return false }
+            if let folder {
+                // only show submenu if cursor is still pointing to the folder
+                return folder == dataSource?.dragDestinationFolder
+            } else {
+                // hide submenu if mouse cursor moved away from the folder
+                return true
+            }
         }
-        .sink { [weak self] (row, folder) in
+        .sink { [weak self] (row, folder, _) in
             self?.outlineViewDidHighlight(folder, atRow: row)
+        }
+        .store(in: &cancellables)
+    }
+
+    private enum HighlightEvent { case hover, dragging }
+    /// Process Outline View row highlighing event on hover or drag over to expand or close a subfolder.
+    /// Cances the highlight or adds a delay for the event delivery as appropriate
+    /// - Returns:`BookmarkFolder?` (and row and the event kind) Publisher being currently highlighted
+    ///           with delay added if needed.
+    private func delayedHighlightRowEventPublisher(forRow row: Int?, on event: HighlightEvent) -> AnyPublisher<(Int?, BookmarkFolder?, HighlightEvent), Never>? {
+
+        let bookmarkNode = row.flatMap { outlineView.item(atRow: $0) } as? BookmarkNode
+        let folder = bookmarkNode?.representedObject as? BookmarkFolder
+
+        // prevent closing or opening another submenu when mouse is moving down+right
+        let isMouseMovingDownRight: Bool = {
+            if let currentEvent = NSApp.currentEvent,
+               currentEvent.type == .mouseMoved,
+               currentEvent.deltaY >= 0,
+               currentEvent.deltaX >= currentEvent.deltaY {
+                true
+            } else {
+                false
+            }
+        }()
+        var delay: RunLoop.SchedulerTimeType.Stride
+        // is moving down+right to a submenu?
+        if event == .hover, isMouseMovingDownRight,
+           let submenuPopover, submenuPopover.isShown,
+           let expandedFolder = submenuPopover.rootFolder,
+           let node = treeController.node(representing: expandedFolder),
+           let expandedRow = outlineView.rowIfValid(forItem: node) {
+            guard expandedRow != row else { return nil }
+
+            // delay submenu hiding when cursor is moving right (to the menu)
+            // over other elements that would normally hide the submenu
+            delay = 0.3
+            // restore the originally highlighted row for the expanded folder
+            outlineView.highlightedRow = expandedRow
+
+        } else if event == .dragging {
+            // delay folder expanding when dragging over a subfolder
+            delay = 0.2
+        } else if folder != nil {
+            // delay folder expanding when hovering over a subfolder
+            delay = 0.1
+        } else {
+            // hide submenu instantly when mouse is moved away from folder
+            // unless it‘s moving down+right as handled above.
+            delay = 0
+        }
+
+        let valuePublisher = Just((row, folder, event))
+        if delay > 0 {
+            return valuePublisher
+                .delay(for: delay, scheduler: RunLoop.main)
+                .eraseToAnyPublisher()
+        } else {
+            return valuePublisher.eraseToAnyPublisher()
+        }
+    }
+
+    private func subscribeToDragDropEvents() {
+        // restore drag&drop target folder highlight on mouse out
+        // when the submenu is shown
+        enum DropRowEvent {
+            case dropRow(Int?)
+            case highlightedRow(Int?)
+        }
+        Publishers.Merge(
+            dataSource.$targetRowForDropOperation.map(DropRowEvent.dropRow),
+            outlineView.$highlightedRow.map(DropRowEvent.highlightedRow)
+        )
+        .sink { [weak self] event in
+            guard let self else { return }
+            switch event {
+            case .dropRow(let row):
+                guard row == nil else { break }
+                if let submenuPopover, submenuPopover.isShown,
+                   let expandedFolder = submenuPopover.rootFolder,
+                   let node = treeController.node(representing: expandedFolder),
+                   let expandedRow = outlineView.rowIfValid(forItem: node),
+                   expandedRow != outlineView.highlightedRow {
+                    // restore expanded subfolder drop target row highlight
+                    dataSource.targetRowForDropOperation = expandedRow
+                }
+            case .highlightedRow:
+                // hide drop destination row highlight when drag operation ends
+                if dataSource.targetRowForDropOperation != nil {
+                    dataSource.targetRowForDropOperation = nil
+                }
+            }
         }
         .store(in: &cancellables)
     }
@@ -546,6 +618,8 @@ final class BookmarksBarMenuViewController: NSViewController {
             // close submenu if shown
             guard let submenuPopover, submenuPopover.isShown else { return }
             submenuPopover.close()
+            // unhighlight drop destination row if highlighted
+            dataSource.targetRowForDropOperation = nil
             return
         }
 
@@ -719,6 +793,22 @@ extension BookmarksBarMenuViewController: BookmarksContextMenuDelegate {
 }
 // MARK: - MouseOverButtonDelegate
 extension BookmarksBarMenuViewController: MouseOverButtonDelegate {
+
+    // scroll bookmarks menu up/down on scroll buttons mouse over
+    func mouseOverButton(_ sender: MouseOverButton, draggingEntered info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+
+        assert(sender === scrollUpButton || sender === scrollDownButton)
+        isMouseOver.pointee = true
+        return .none
+    }
+
+    // scroll bookmarks menu up/down on dragging over scroll buttons
+    func mouseOverButton(_ sender: MouseOverButton, draggingUpdatedWith info: any NSDraggingInfo, isMouseOver: UnsafeMutablePointer<Bool>) -> NSDragOperation {
+        assert(sender === scrollUpButton || sender === scrollDownButton)
+        isMouseOver.pointee = true
+        return .none
+    }
+
 }
 
 #if DEBUG

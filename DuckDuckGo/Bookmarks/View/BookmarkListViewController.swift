@@ -59,6 +59,7 @@ final class BookmarkListViewController: NSViewController {
     private var boxDividerTopConstraint = NSLayoutConstraint()
 
     private let bookmarkManager: BookmarkManager
+    private let dragDropManager: BookmarkDragDropManager
     private let treeControllerDataSource: BookmarkListTreeControllerDataSource
     private let treeControllerSearchDataSource: BookmarkListTreeControllerSearchDataSource
     private let sortBookmarksViewModel: SortBookmarksViewModel
@@ -86,6 +87,7 @@ final class BookmarkListViewController: NSViewController {
             contentMode: .bookmarksAndFolders,
             bookmarkManager: bookmarkManager,
             treeController: treeController,
+            dragDropManager: dragDropManager,
             sortMode: sortBookmarksViewModel.selectedSortMode,
             presentFaviconsFetcherOnboarding: { [weak self] in
                 guard let self, let window = self.view.window else {
@@ -112,8 +114,10 @@ final class BookmarkListViewController: NSViewController {
     }()
 
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         dragDropManager: BookmarkDragDropManager = BookmarkDragDropManager.shared,
          metrics: BookmarksSearchAndSortMetrics = BookmarksSearchAndSortMetrics()) {
         self.bookmarkManager = bookmarkManager
+        self.dragDropManager = dragDropManager
         self.treeControllerDataSource = BookmarkListTreeControllerDataSource(bookmarkManager: bookmarkManager)
         self.treeControllerSearchDataSource = BookmarkListTreeControllerSearchDataSource(bookmarkManager: bookmarkManager)
         self.bookmarkMetrics = metrics
@@ -379,8 +383,7 @@ final class BookmarkListViewController: NSViewController {
         preferredContentSize = Constants.preferredContentSize
 
         outlineView.setDraggingSourceOperationMask([.move], forLocal: true)
-        outlineView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
-                                             FolderPasteboardWriter.folderUTIInternalType])
+        outlineView.registerForDraggedTypes(BookmarkDragDropManager.draggedTypes)
     }
 
     override func viewWillAppear() {
@@ -404,7 +407,7 @@ final class BookmarkListViewController: NSViewController {
 
     private func reloadData() {
         if dataSource.isSearching {
-            if let destinationFolder = dataSource.dragDestinationFolderInSearchMode {
+            if let destinationFolder = dataSource.dragDestinationFolder {
                 hideSearchBar()
                 updateSearchAndExpand(destinationFolder)
             } else {

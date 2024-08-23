@@ -219,7 +219,10 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
         foldersStoreMock.lastBookmarkAllTabsFolderIdUsed = "1"
-        bookmarkStoreMock.bookmarkFolder = nil
+        bookmarkStoreMock.bookmarkFolderWithId = {
+            XCTAssertNotEqual($0, folder.id)
+            return nil
+        }
         bookmarkStoreMock.bookmarks = [folder]
         bookmarkManager.loadBookmarks()
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)
@@ -237,7 +240,10 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
         foldersStoreMock.lastBookmarkAllTabsFolderIdUsed = "1"
-        bookmarkStoreMock.bookmarkFolder = folder
+        bookmarkStoreMock.bookmarkFolderWithId = {
+            XCTAssertEqual($0, folder.id)
+            return folder
+        }
         bookmarkStoreMock.bookmarks = [folder]
         bookmarkManager.loadBookmarks()
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo)

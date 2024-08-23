@@ -152,6 +152,7 @@ final class BookmarksBarViewModelDelegateMock: BookmarksBarViewModelDelegate {
 
     func bookmarksBarViewModelReloadedData() {}
     func mouseDidHover(over item: Any) {}
+    func dragging(over item: BookmarksBarCollectionViewItem?, updatedWith info: (any NSDraggingInfo)?) {}
     func showDialog(_ dialog: any DuckDuckGo_Privacy_Browser.ModalView) {}
 
 }

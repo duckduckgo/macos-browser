@@ -26,6 +26,16 @@ import Cocoa
 import Persistence
 import PixelKit
 
+protocol BookmarkEntityProtocol {
+    var uuid: String? { get }
+    var bookmarkEntityParent: BookmarkEntityProtocol? { get }
+}
+extension BookmarkEntity: BookmarkEntityProtocol {
+    var bookmarkEntityParent: (any BookmarkEntityProtocol)? {
+        parent
+    }
+}
+
 final class LocalBookmarkStore: BookmarkStore {
 
     convenience init(bookmarkDatabase: BookmarkDatabase) {
@@ -597,24 +607,28 @@ final class LocalBookmarkStore: BookmarkStore {
             guard let folderToMove = folderToMoveFetchRequestResults?.first,
                   let parentFolder = parentFolderFetchRequestResults?.first,
                   folderToMove.isFolder,
-                  parentFolder.isFolder else {
-                return
-            }
+                  parentFolder.isFolder,
+                  let uuid = folderToMove.uuid else { return }
 
-            var currentParentFolder = parentFolder.parent
-
-            // Check each parent and verify that the folder being moved isn't being given itself as an ancestor
-            while let currentParent = currentParentFolder {
-                if currentParent.uuid == uuid {
-                    canMoveObject = false
-                    return
-                }
-
-                currentParentFolder = currentParent.parent
-            }
+            canMoveObject = Self.validateObjectMove(withUUID: uuid, to: parentFolder)
         }
 
         return canMoveObject
+    }
+
+    static func validateObjectMove(withUUID uuid: String, to parent: BookmarkEntityProtocol) -> Bool {
+        guard uuid != parent.uuid else { return false }
+        var currentParentFolder = parent.bookmarkEntityParent
+
+        // Check each parent and verify that the folder being moved isn't being given itself as an ancestor
+        while let currentParent = currentParentFolder {
+            if currentParent.uuid == uuid {
+                return false
+            }
+
+            currentParentFolder = currentParent.bookmarkEntityParent
+        }
+        return true
     }
 
     func move(objectUUIDs: [String], toIndex index: Int?, withinParentFolder type: ParentFolderType, completion: @escaping (Error?) -> Void) {
