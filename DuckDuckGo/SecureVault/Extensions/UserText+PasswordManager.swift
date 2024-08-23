@@ -25,9 +25,10 @@ extension UserText {
     static let pmUpdateCredentialsTitle = NSLocalizedString("pm.update-credentials.title", value: "Update password?", comment: "Title for the Update Credentials popover")
 
     static let pmEmptyStateDefaultTitle = NSLocalizedString("pm.empty.default.title", value: "No passwords or credit cards saved yet", comment: "Label for default empty state title")
-    static let pmEmptyStateDefaultDescription = NSLocalizedString("pm.empty.default.description",
-                                                                  value: "If your passwords are saved in another browser, you can import them into DuckDuckGo.",
+    static let pmEmptyStateDefaultDescription = NSLocalizedString("pm.empty.default.description.extended",
+                                                                  value: "You can import saved passwords from another browser into DuckDuckGo. Passwords are encrypted and nobody but you can see them, not even us.",
                                                                   comment: "Label for default empty state description")
+    static let pmEmptyStateLearnMoreLink = NSLocalizedString("pm.empty.learn.more.link", value: "Learn more", comment: "Text for link to learn more about DuckDuckGo password manager")
     static let pmEmptyStateDefaultButtonTitle = NSLocalizedString("pm.empty.default.button.title", value: "Import Passwords", comment: "Import passwords button title for default empty state")
 
     static let pmEmptyStateLoginsTitle = NSLocalizedString("pm.empty.logins.title", value: "No passwords saved yet", comment: "Label for logins empty state title")

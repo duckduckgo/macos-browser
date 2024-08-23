@@ -159,7 +159,8 @@ struct DataImportView: ModalView {
                 }
 
                 if dataType == .passwords {
-                    importPasswordSubtitle()
+                    // TODO: Check this
+                    passwordsExplainerView()
                 }
 
             case .summary(let dataTypes, let isFileImport):

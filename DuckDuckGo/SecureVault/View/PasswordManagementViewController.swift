@@ -76,6 +76,7 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
+    @IBOutlet var learnMoreButton: NSButton!
     @IBOutlet var lockScreenDurationLabel: NSTextField!
     @IBOutlet var lockScreenOpenInPreferencesTextView: NSTextView! {
         didSet {
@@ -107,6 +108,7 @@ final class PasswordManagementViewController: NSViewController {
             lockScreenOpenInPreferencesTextView.textStorage?.setAttributedString(string)
         }
     }
+    @IBOutlet weak var stackView: NSStackView!
 
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
@@ -171,6 +173,9 @@ final class PasswordManagementViewController: NSViewController {
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
+        emptyStateMessage.lineBreakMode = .byWordWrapping
+        emptyStateMessage.maximumNumberOfLines = 0
+        stackView.setCustomSpacing(0, after: emptyStateMessage)
 
         addVaultItemButton.toolTip = UserText.addItemTooltip
         moreButton.toolTip = UserText.moreOptionsTooltip
@@ -194,6 +199,9 @@ final class PasswordManagementViewController: NSViewController {
                 self?.refreshData()
             }
             .store(in: &cancellables)
+
+        learnMoreButton.isBordered = false
+        learnMoreButton.contentTintColor = .globalAccent
     }
 
     private func setupStrings() {
@@ -306,6 +314,10 @@ final class PasswordManagementViewController: NSViewController {
     @IBAction func openExportLogins(_ sender: Any) {
         self.dismiss()
         NSApp.sendAction(#selector(AppDelegate.openExportLogins(_:)), to: nil, from: sender)
+    }
+
+    @IBAction func onLearnMoreClicked(_ sender: NSButton) {
+        URL.gpcLearnMore
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {

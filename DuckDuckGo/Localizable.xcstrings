@@ -42134,7 +42134,7 @@
     },
     "pm.empty.default.description" : {
       "comment" : "Label for default empty state description",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -42188,6 +42188,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Если вы уже храните пароли в другом браузере, вы можете импортировать их в DuckDuckGo."
+          }
+        }
+      }
+    },
+    "pm.empty.default.description.extended" : {
+      "comment" : "Label for default empty state description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can import saved passwords from another browser into DuckDuckGo. Passwords are encrypted and nobody but you can see them, not even us."
           }
         }
       }
@@ -42308,6 +42320,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет учетных данных"
+          }
+        }
+      }
+    },
+    "pm.empty.learn.more.link" : {
+      "comment" : "Text for link to learn more about DuckDuckGo password manager",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn more"
           }
         }
       }
