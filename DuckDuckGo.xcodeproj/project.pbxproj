@@ -2580,6 +2580,10 @@
 		C17CA7AE2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */; };
 		C17CA7B22B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */; };
 		C17CA7B32B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7B12B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift */; };
+		C18BF9CC2C73678500ED6B8A /* Freemium in Frameworks */ = {isa = PBXBuildFile; productRef = C18BF9CB2C73678500ED6B8A /* Freemium */; };
+		C18BF9CE2C73678C00ED6B8A /* Freemium in Frameworks */ = {isa = PBXBuildFile; productRef = C18BF9CD2C73678C00ED6B8A /* Freemium */; };
+		C18BF9D02C736C9100ED6B8A /* Freemium in Frameworks */ = {isa = PBXBuildFile; productRef = C18BF9CF2C736C9100ED6B8A /* Freemium */; };
+		C18BF9D22C736C9700ED6B8A /* Freemium in Frameworks */ = {isa = PBXBuildFile; productRef = C18BF9D12C736C9700ED6B8A /* Freemium */; };
 		C1B1CBE12BE1915100B6049C /* DataImportShortcutsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */; };
 		C1B1CBE22BE1915100B6049C /* DataImportShortcutsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B1CBE02BE1915100B6049C /* DataImportShortcutsViewModel.swift */; };
 		C1D8BE452C1739E70057E426 /* DataBrokerProtectionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D8BE442C1739E70057E426 /* DataBrokerProtectionMocks.swift */; };
@@ -3692,6 +3696,7 @@
 		9D9AE91A2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgent.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoDBPBackgroundAgent.entitlements; sourceTree = "<group>"; };
 		9D9DE5712C63A96400D20B15 /* AppKitExtensions */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AppKitExtensions; sourceTree = "<group>"; };
 		9DB6E7222AA0DA7A00A17F3C /* LoginItems */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LoginItems; sourceTree = "<group>"; };
+		9DF2DB592C73B52F0025F43C /* Freemium */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Freemium; sourceTree = "<group>"; };
 		9F0660722BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAttributionPixelHandlerTests.swift; sourceTree = "<group>"; };
 		9F0660762BECC81800B8EEF1 /* PixelCapturedParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelCapturedParameters.swift; sourceTree = "<group>"; };
 		9F0A2CF72B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseBookmarkEntityTests.swift; sourceTree = "<group>"; };
@@ -4333,6 +4338,7 @@
 				F1D43AF52B98E48900BAB743 /* BareBonesBrowserKit in Frameworks */,
 				378F44E629B4BDEE00899924 /* SwiftUIExtensions in Frameworks */,
 				3706FCA7293F65D500E42796 /* BrowserServicesKit in Frameworks */,
+				C18BF9CE2C73678C00ED6B8A /* Freemium in Frameworks */,
 				3129788A2B64131200B67619 /* DataBrokerProtection in Frameworks */,
 				F198C7202BD18D92000BF24D /* SwiftLintTool in Frameworks */,
 				4BCBE4582BA7E17800FC75A1 /* SubscriptionUI in Frameworks */,
@@ -4510,6 +4516,7 @@
 			files = (
 				9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */,
 				F1D0428E2BFB9F9C00A31506 /* Subscription in Frameworks */,
+				C18BF9D02C736C9100ED6B8A /* Freemium in Frameworks */,
 				9D9AE8F92AAA3AD00026E7DC /* DataBrokerProtection in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4520,6 +4527,7 @@
 			files = (
 				315A023F2B6421AE00BFA577 /* Networking in Frameworks */,
 				F1D042902BFB9FA300A31506 /* Subscription in Frameworks */,
+				C18BF9D22C736C9700ED6B8A /* Freemium in Frameworks */,
 				9D9AE8FB2AAA3AD90026E7DC /* DataBrokerProtection in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4528,6 +4536,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C18BF9CC2C73678500ED6B8A /* Freemium in Frameworks */,
 				F1DF95E32BD1807C0045E591 /* Crashes in Frameworks */,
 				85E2BBCE2B8F534000DBEC7A /* History in Frameworks */,
 				1EA7B8D32B7E078C000330A4 /* SubscriptionUI in Frameworks */,
@@ -5053,6 +5062,7 @@
 				7B9167A82C09E88800322310 /* AppLauncher */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
+				9DF2DB592C73B52F0025F43C /* Freemium */,
 				9DB6E7222AA0DA7A00A17F3C /* LoginItems */,
 				7B25FE322AD12C990012AFAB /* NetworkProtectionMac */,
 				378F44E229B4B7B600899924 /* SwiftUIExtensions */,
@@ -8656,6 +8666,7 @@
 				371209242C232E6C003ADF3D /* RemoteMessaging */,
 				D6BC8AC72C5A95B10025375B /* DuckPlayer */,
 				9D9DE5742C63AA0C00D20B15 /* AppKitExtensions */,
+				C18BF9CD2C73678C00ED6B8A /* Freemium */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -8982,6 +8993,7 @@
 				9D9AE8F82AAA3AD00026E7DC /* DataBrokerProtection */,
 				9DEF97E02B06C4EE00764F03 /* Networking */,
 				F1D0428D2BFB9F9C00A31506 /* Subscription */,
+				C18BF9CF2C736C9100ED6B8A /* Freemium */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGo Personal Information Removal.app */;
@@ -9005,6 +9017,7 @@
 				9D9AE8FA2AAA3AD90026E7DC /* DataBrokerProtection */,
 				315A023E2B6421AE00BFA577 /* Networking */,
 				F1D0428F2BFB9FA300A31506 /* Subscription */,
+				C18BF9D12C736C9700ED6B8A /* Freemium */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal App Store.app */;
@@ -9068,6 +9081,7 @@
 				371209222C232E66003ADF3D /* RemoteMessaging */,
 				D6BC8AC52C5A95AA0025375B /* DuckPlayer */,
 				9D9DE5722C63AA0700D20B15 /* AppKitExtensions */,
+				C18BF9CB2C73678500ED6B8A /* Freemium */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -14041,6 +14055,22 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */;
 			productName = Lottie;
+		};
+		C18BF9CB2C73678500ED6B8A /* Freemium */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Freemium;
+		};
+		C18BF9CD2C73678C00ED6B8A /* Freemium */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Freemium;
+		};
+		C18BF9CF2C736C9100ED6B8A /* Freemium */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Freemium;
+		};
+		C18BF9D12C736C9700ED6B8A /* Freemium */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Freemium;
 		};
 		CBC83E3529B63D380008E19C /* Configuration */ = {
 			isa = XCSwiftPackageProductDependency;
