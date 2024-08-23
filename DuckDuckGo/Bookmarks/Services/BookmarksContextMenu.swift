@@ -18,7 +18,7 @@
 
 import AppKit
 
-protocol BookmarksContextMenuDelegate: NSMenuDelegate {
+protocol BookmarksContextMenuDelegate: NSMenuDelegate, BookmarkSearchMenuItemSelectors {
     var isSearching: Bool { get }
     var parentFolder: BookmarkFolder? { get }
     var shouldIncludeManageBookmarksItem: Bool { get }
@@ -345,7 +345,7 @@ extension BookmarksContextMenu: BookmarkMenuItemSelectors {
     }
 
     @objc func deleteEntities(_ sender: NSMenuItem) {
-        guard let uuids = sender.representedObject as? [String] else {
+        guard let uuids = sender.representedObject as? [String] ?? (sender.representedObject as? [BaseBookmarkEntity])?.map(\.id) else {
             assertionFailure("Failed to cast menu item's represented object to UUID array")
             return
         }
@@ -426,9 +426,17 @@ extension BookmarksContextMenu: FolderMenuItemSelectors {
         }
 
         let newTabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: newTabCollection, burnerMode: .regular)
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: newTabCollection, burnerMode: tabCollection.burnerMode)
         windowControllersManager.openNewWindow(with: tabCollectionViewModel, burnerMode: tabCollection.burnerMode)
         PixelExperiment.fireOnboardingBookmarkUsed5to7Pixel()
+    }
+
+}
+
+extension BookmarksContextMenu: BookmarkSearchMenuItemSelectors {
+
+    func showInFolder(_ sender: NSMenuItem) {
+        bookmarksContextMenuDelegate?.showInFolder(sender)
     }
 
 }

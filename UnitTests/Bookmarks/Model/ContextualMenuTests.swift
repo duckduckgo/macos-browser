@@ -339,7 +339,7 @@ final class ContextualMenuTests: XCTestCase {
     // MARK: - Actions
 
     @MainActor
-    func testWhenItemFiresOpenInNewTabActionThenDelegateReceivesOpenInNewTabAction() {
+    func testWhenItemFiresOpenInNewTabAction_showTabCalled() {
         // GIVEN
         let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
         let menu = BookmarksContextMenu.bookmarkMenu(with: bookmark)
@@ -356,7 +356,7 @@ final class ContextualMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenItemFiresOpenInNewWindowActionThenDelegateReceivesOpenInNewWindowAction() {
+    func testWhenItemFiresOpenInNewWindowAction_openNewWindowCalled() {
         // GIVEN
         let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
         let menu = BookmarksContextMenu.bookmarkMenu(with: bookmark)
@@ -373,7 +373,60 @@ final class ContextualMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenItemFiresToggleFavoritesActionThenDelegateReceivesToggleFavoritesAction() {
+    func testWhenItemFiresOpenAllInNewTabsAction_openNewWindowCalled() {
+        // GIVEN
+        let bookmark1 = Bookmark(id: "b1", url: "https://test1.com", title: "Test 1", isFavorite: false, parentFolderUUID: "1")
+        let bookmark2 = Bookmark(id: "b2", url: "https://test2.com", title: "Test 2", isFavorite: false, parentFolderUUID: "1")
+        let bookmark3 = Bookmark(id: "b3", url: "https://test3.com", title: "Test 3", isFavorite: false, parentFolderUUID: "1")
+        let folder = BookmarkFolder(id: "1", title: "Folder", children: [bookmark1, bookmark2, bookmark3])
+        let menu = BookmarksContextMenu.menu(for: [folder])
+        guard let menuItem = menu.items.first(where: { $0.title == UserText.openAllInNewTabs }) else {
+            XCTFail("No item")
+            return
+        }
+        let mainViewController = MainViewController(tabCollectionViewModel: TabCollectionViewModel(tabCollection: TabCollection(tabs: [])), autofillPopoverPresenter: DefaultAutofillPopoverPresenter())
+        (menu.windowControllersManager as! WindowControllersManagerMock).lastKeyMainWindowController = MainWindowController(mainViewController: mainViewController, popUp: false)
+
+        // WHEN
+        _=menuItem.target!.perform(menuItem.action!, with: menuItem)
+
+        // THEN
+        XCTAssertEqual(mainViewController.tabCollectionViewModel.tabs.map(\.content), [
+            .newtab,
+            TabContent.url(bookmark1.urlObject!, source: .bookmark),
+            TabContent.url(bookmark2.urlObject!, source: .bookmark),
+            TabContent.url(bookmark3.urlObject!, source: .bookmark),
+        ])
+    }
+
+    @MainActor
+    func testWhenItemFiresOpenAllInNewWindowsAction_openNewWindowCalled() {
+        // GIVEN
+        let bookmark1 = Bookmark(id: "b1", url: "https://test1.com", title: "Test 1", isFavorite: false, parentFolderUUID: "1")
+        let bookmark2 = Bookmark(id: "b2", url: "https://test2.com", title: "Test 2", isFavorite: false, parentFolderUUID: "1")
+        let bookmark3 = Bookmark(id: "b3", url: "https://test3.com", title: "Test 3", isFavorite: false, parentFolderUUID: "1")
+        let folder = BookmarkFolder(id: "1", title: "Folder", children: [bookmark1, bookmark2, bookmark3])
+        let menu = BookmarksContextMenu.menu(for: [folder])
+        guard let menuItem = menu.items.first(where: { $0.title == UserText.openAllTabsInNewWindow }) else {
+            XCTFail("No item")
+            return
+        }
+        let mainViewController = MainViewController(tabCollectionViewModel: TabCollectionViewModel(tabCollection: TabCollection(tabs: [])), autofillPopoverPresenter: DefaultAutofillPopoverPresenter())
+        (menu.windowControllersManager as! WindowControllersManagerMock).lastKeyMainWindowController = MainWindowController(mainViewController: mainViewController, popUp: false)
+
+        // WHEN
+        _=menuItem.target!.perform(menuItem.action!, with: menuItem)
+
+        // THEN
+        XCTAssertEqual((menu.windowControllersManager as! WindowControllersManagerMock).openNewWindowCalled, .init(contents: [
+            TabContent.url(bookmark1.urlObject!, source: .bookmark),
+            TabContent.url(bookmark2.urlObject!, source: .bookmark),
+            TabContent.url(bookmark3.urlObject!, source: .bookmark),
+        ], burnerMode: .regular))
+    }
+
+    @MainActor
+    func testWhenItemFiresToggleFavoritesAction_updateBookmarkCalled() {
         // GIVEN
         let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
         let menu = BookmarksContextMenu.bookmarkMenu(with: bookmark)
@@ -391,7 +444,7 @@ final class ContextualMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenItemFiresEditActionThenDelegateReceivesEditAction() {
+    func testWhenItemFiresEditAction_editDialogShown() {
         // GIVEN
         let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
         let menu = BookmarksContextMenu.bookmarkMenu(with: bookmark)
@@ -408,7 +461,7 @@ final class ContextualMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenItemFiresMoveToEndActionThenDelegateReceivesMoveToEndAction() {
+    func testWhenItemFiresMoveToEndAction_moveObjectsCalled() {
         // GIVEN
         let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
         let menu = BookmarksContextMenu.bookmarkMenu(with: bookmark)
@@ -425,7 +478,7 @@ final class ContextualMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenItemFiresCopyBookmarkURLActionThenDelegateReceivesCopyBookmarkURLAction() {
+    func testWhenItemFiresCopyBookmarkURLAction_itemWrittenToPasteboard() {
         // GIVEN
         let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
         let menu = BookmarksContextMenu.bookmarkMenu(with: bookmark)
@@ -447,7 +500,7 @@ final class ContextualMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenItemFiresDeleteEntityActionThenDelegateReceivesDeleteEntityAction() {
+    func testWhenItemFiresDeleteBookmarkAction_removeBookmarkCalled() {
         // GIVEN
         let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
         let menu = BookmarksContextMenu.bookmarkMenu(with: bookmark)
@@ -464,7 +517,42 @@ final class ContextualMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenItemFiresAddFolderActionThenDelegateReceivesAddFolderAction() {
+    func testWhenItemFiresDeleteFolderAction_removeBookmarkCalled() {
+        // GIVEN
+        let folder = BookmarkFolder(id: "1", title: "Folder")
+        let menu = BookmarksContextMenu.folderMenu(with: folder)
+        guard let menuItem = menu.items.first(where: { $0.title == UserText.bookmarksBarContextMenuDelete }) else {
+            XCTFail("No item")
+            return
+        }
+
+        // WHEN
+        _=menuItem.target!.perform(menuItem.action!, with: menuItem)
+
+        // THEN
+        XCTAssertTrue((menu.bookmarkManager as! MockBookmarkManager).removeFolderCalled)
+    }
+
+    @MainActor
+    func testWhenItemFiresDeleteEntitiesAction_removeBookmarkCalled() {
+        // GIVEN
+        let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
+        let folder = BookmarkFolder(id: "1", title: "Folder")
+        let menu = BookmarksContextMenu.menu(for: [bookmark, folder])
+        guard let menuItem = menu.items.first(where: { $0.title == UserText.bookmarksBarContextMenuDelete }) else {
+            XCTFail("No item")
+            return
+        }
+
+        // WHEN
+        _=menuItem.target!.perform(menuItem.action!, with: menuItem)
+
+        // THEN
+        XCTAssertEqual((menu.bookmarkManager as! MockBookmarkManager).removeObjectsCalled, ["n", "1"])
+    }
+
+    @MainActor
+    func testWhenItemFiresAddFolderAction_addFolderDialogShown() {
         // GIVEN
         let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
         let menu = BookmarksContextMenu.bookmarkMenu(with: bookmark)
@@ -481,7 +569,24 @@ final class ContextualMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenItemFiresManageBookmarksActionThenDelegateReceivesManageBookmarksAction() {
+    func testWhenItemFiresEditFolderAction_addFolderDialogShown() {
+        // GIVEN
+        let folder = BookmarkFolder(id: "1", title: "Folder")
+        let menu = BookmarksContextMenu.folderMenu(with: folder)
+        guard let menuItem = menu.items.first(where: { $0.title == UserText.editBookmark }) else {
+            XCTFail("No item")
+            return
+        }
+
+        // WHEN
+        _=menuItem.target!.perform(menuItem.action!, with: menuItem)
+
+        // THEN
+        XCTAssertTrue((menu.delegate as! MockBookmarksContextMenuDelegate).showDialogCalledWithView is AddEditBookmarkFolderDialogView)
+    }
+
+    @MainActor
+    func testWhenItemFiresManageBookmarksAction_showBookmarksCalled() {
         // GIVEN
         let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
         let menu = BookmarksContextMenu.bookmarkMenu(with: bookmark)
@@ -495,6 +600,40 @@ final class ContextualMenuTests: XCTestCase {
 
         // THEN
         XCTAssertTrue((menu.windowControllersManager as! WindowControllersManagerMock).showBookmarksTabCalled)
+    }
+
+    @MainActor
+    func testWhenBookmarkItemFiresShowInFolderAction_showInFolderDelegateMethodCalled() {
+        // GIVEN
+        let bookmark = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
+        let menu = BookmarksContextMenu.menu(for: [bookmark], forSearch: true)
+        guard let menuItem = menu.items.first(where: { $0.title == UserText.showInFolder }) else {
+            XCTFail("No item")
+            return
+        }
+
+        // WHEN
+        _=menuItem.target!.perform(menuItem.action!, with: menuItem)
+
+        // THEN
+        XCTAssertEqual((menu.delegate as! MockBookmarksContextMenuDelegate).showInFolderCalledWithObject as? Bookmark, bookmark)
+    }
+
+    @MainActor
+    func testWhenFolderItemFiresShowInFolderAction_showInFolderDelegateMethodCalled() {
+        // GIVEN
+        let folder = BookmarkFolder(id: "1", title: "Folder")
+        let menu = BookmarksContextMenu.menu(for: [folder], forSearch: true)
+        guard let menuItem = menu.items.first(where: { $0.title == UserText.showInFolder }) else {
+            XCTFail("No item")
+            return
+        }
+
+        // WHEN
+        _=menuItem.target!.perform(menuItem.action!, with: menuItem)
+
+        // THEN
+        XCTAssertEqual((menu.delegate as! MockBookmarksContextMenuDelegate).showInFolderCalledWithObject as? BookmarkFolder, folder)
     }
 
 }
@@ -539,6 +678,11 @@ class MockBookmarksContextMenuDelegate: NSObject, BookmarksContextMenuDelegate {
         closePopoverCalled = true
     }
 
+    var showInFolderCalledWithObject: Any?
+    func showInFolder(_ sender: NSMenuItem) {
+        showInFolderCalledWithObject = sender.representedObject
+    }
+
 }
 
 extension BookmarksContextMenu {
@@ -547,13 +691,12 @@ extension BookmarksContextMenu {
     static func bookmarkMenuItems(with bookmark: Bookmark, enableManageBookmarks: Bool = true) -> [NSMenuItem] {
         bookmarkMenu(with: bookmark, enableManageBookmarks: enableManageBookmarks).items
     }
-
     @MainActor
     static func bookmarkMenu(with bookmark: Bookmark, enableManageBookmarks: Bool = true) -> BookmarksContextMenu {
         let delegate = MockBookmarksContextMenuDelegate()
         delegate.selectedBookmarkItems = [bookmark]
         delegate.shouldIncludeManageBookmarksItem = enableManageBookmarks
-        let bkman = MockBookmarkManager(list: .init(entities: [], topLevelEntities: [BookmarkFolder(id: PseudoFolder.bookmarks.id, title: "Bookmarks", children: [])]))
+        let bkman = MockBookmarkManager(list: .init(entities: [bookmark], topLevelEntities: [BookmarkFolder(id: PseudoFolder.bookmarks.id, title: "Bookmarks", children: [bookmark])]))
         let menu = BookmarksContextMenu(bookmarkManager: bkman, windowControllersManager: WindowControllersManagerMock(), delegate: delegate)
         menu.onDeinit {
             withExtendedLifetime(delegate) {}
@@ -564,25 +707,30 @@ extension BookmarksContextMenu {
     }
     @MainActor
     static func folderMenuItems(with bookmarkFolder: BookmarkFolder, enableManageBookmarks: Bool = true) -> [NSMenuItem] {
+        folderMenu(with: bookmarkFolder, enableManageBookmarks: enableManageBookmarks).items
+    }
+    @MainActor
+    static func folderMenu(with bookmarkFolder: BookmarkFolder, enableManageBookmarks: Bool = true) -> BookmarksContextMenu {
         let delegate = MockBookmarksContextMenuDelegate()
         delegate.selectedBookmarkItems = [bookmarkFolder]
         delegate.shouldIncludeManageBookmarksItem = enableManageBookmarks
-        let bkman = MockBookmarkManager()
-        let menu = BookmarksContextMenu(bookmarkManager: bkman, delegate: delegate)
+        let bkman = MockBookmarkManager(list: .init(entities: [bookmarkFolder], topLevelEntities: [BookmarkFolder(id: PseudoFolder.bookmarks.id, title: "Bookmarks", children: [bookmarkFolder])]))
+        let menu = BookmarksContextMenu(bookmarkManager: bkman, windowControllersManager: WindowControllersManagerMock(), delegate: delegate)
         menu.onDeinit {
             withExtendedLifetime(delegate) {}
         }
         menu.update()
 
-        return menu.items
+        return menu
     }
     @MainActor
     static func menu(for items: [Any], forSearch: Bool = false) -> BookmarksContextMenu {
         let delegate = MockBookmarksContextMenuDelegate()
         delegate.selectedBookmarkItems = items
         delegate.isSearching = forSearch
-        let bkman = MockBookmarkManager()
-        let menu = BookmarksContextMenu(bookmarkManager: bkman, delegate: delegate)
+        let entities = items as? [BaseBookmarkEntity] ?? (items as? [BookmarkNode])!.map { $0.representedObject as! BaseBookmarkEntity }
+        let bkman = MockBookmarkManager(list: .init(entities: entities, topLevelEntities: [BookmarkFolder(id: PseudoFolder.bookmarks.id, title: "Bookmarks", children: entities)]))
+        let menu = BookmarksContextMenu(bookmarkManager: bkman, windowControllersManager: WindowControllersManagerMock(), delegate: delegate)
         menu.onDeinit {
             withExtendedLifetime(delegate) {}
         }

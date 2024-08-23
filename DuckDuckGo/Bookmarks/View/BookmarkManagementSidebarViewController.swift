@@ -308,6 +308,9 @@ extension BookmarkManagementSidebarViewController: BookmarksContextMenuDelegate 
     }
 
     func closePopoverIfNeeded() {}
+    func showInFolder(_ sender: NSMenuItem) {
+        assertionFailure("BookmarkManagementSidebarViewController does not support search")
+    }
 
 }
 

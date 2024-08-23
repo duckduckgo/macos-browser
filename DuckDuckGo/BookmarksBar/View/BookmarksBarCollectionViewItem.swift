@@ -120,5 +120,8 @@ extension BookmarksBarCollectionViewItem: BookmarksContextMenuDelegate {
     }
 
     func closePopoverIfNeeded() {}
+    func showInFolder(_ sender: NSMenuItem) {
+        assertionFailure("BookmarksBarCollectionViewItem does not support search")
+    }
 
 }
