@@ -697,7 +697,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         guard let backForwardNavigation else {
-            os_log(.error, "item `\(item.title ?? "") – \(item.url?.absoluteString ?? "")` is not in the backForwardList")
+            Logger..error("item `\(item.title ?? "") – \(item.url?.absoluteString ?? "")` is not in the backForwardList")
             return nil
         }
 

@@ -66,7 +66,7 @@ struct UDSReceiver {
             } catch {
                 switch error {
                 case ReadError.notEnoughData(let expected, let received):
-                    os_log("UDSServer - Connection closing due to error: Not enough data (expected: %{public}@, received:  %{public}@",
+                    os_log("UDSServer - Connection closing due to error: Not enough data (expected: \(, privacy: .public), received:  \(, privacy: .public)",
                            log: log,
                            type: .error,
                            String(describing: expected),
@@ -76,7 +76,7 @@ struct UDSReceiver {
                         return
                     }
                 case ReadError.connectionError(let error):
-                    os_log("UDSServer - Connection closing due to a connection error: %{public}@",
+                    os_log("UDSServer - Connection closing due to a connection error: \(, privacy: .public)",
                            log: log,
                            type: .error,
                            String(describing: error))
@@ -93,7 +93,7 @@ struct UDSReceiver {
                         return
                     }
                 default:
-                    os_log("UDSServer - Connection closing due to error: %{public}@",
+                    os_log("UDSServer - Connection closing due to error: \(, privacy: .public)",
                            log: log,
                            type: .error,
                            String(describing: error))

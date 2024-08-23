@@ -264,7 +264,7 @@
 		3706FA83293F65D500E42796 /* LazyLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534C9F28113101002621E7 /* LazyLoadable.swift */; };
 		3706FA85293F65D500E42796 /* KeyedCodingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A2272080090018F728 /* KeyedCodingExtension.swift */; };
 		3706FA87293F65D500E42796 /* DownloadListStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B22F26E61D630031CB7F /* DownloadListStore.swift */; };
-		3706FA88293F65D500E42796 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logging.swift */; };
+		3706FA88293F65D500E42796 /* Logger+Multiple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logger+Multiple.swift */; };
 		3706FA89293F65D500E42796 /* CrashReportPromptPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A2D268F1EE300D2D9CD /* CrashReportPromptPresenter.swift */; };
 		3706FA8B293F65D500E42796 /* PreferencesRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8627DA334800471A10 /* PreferencesRootView.swift */; };
 		3706FA8C293F65D500E42796 /* AppStateChangedPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684590725C9027900DC17B6 /* AppStateChangedPublisher.swift */; };
@@ -1700,7 +1700,7 @@
 		85774B002A713D3B00DE0561 /* BookmarksBarMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85774AFE2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift */; };
 		85774B032A71CDD000DE0561 /* BlockMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85774B022A71CDD000DE0561 /* BlockMenuItem.swift */; };
 		85774B042A71CDD000DE0561 /* BlockMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85774B022A71CDD000DE0561 /* BlockMenuItem.swift */; };
-		85799C1825DEBB3F0007EC87 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logging.swift */; };
+		85799C1825DEBB3F0007EC87 /* Logger+Multiple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logger+Multiple.swift */; };
 		857E44642A9F70F200ED77A7 /* CampaignVariantTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E44612A9F6F3500ED77A7 /* CampaignVariantTests.swift */; };
 		857E44652A9F70F300ED77A7 /* CampaignVariantTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E44612A9F6F3500ED77A7 /* CampaignVariantTests.swift */; };
 		857E5AF52A79045800FC0FB4 /* PixelExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E5AF42A79045800FC0FB4 /* PixelExperiment.swift */; };
@@ -3623,7 +3623,7 @@
 		85707F30276A7DCA00DC0649 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
 		85774AFE2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuFactory.swift; sourceTree = "<group>"; };
 		85774B022A71CDD000DE0561 /* BlockMenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockMenuItem.swift; sourceTree = "<group>"; };
-		85799C1725DEBB3F0007EC87 /* Logging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		85799C1725DEBB3F0007EC87 /* Logger+Multiple.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Logger+Multiple.swift"; sourceTree = "<group>"; };
 		857E44612A9F6F3500ED77A7 /* CampaignVariantTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CampaignVariantTests.swift; sourceTree = "<group>"; };
 		857E5AF42A79045800FC0FB4 /* PixelExperiment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelExperiment.swift; sourceTree = "<group>"; };
 		857E5AF82A79618100FC0FB4 /* PixelExperimentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelExperimentTests.swift; sourceTree = "<group>"; };
@@ -4709,14 +4709,6 @@
 				1D6216B129069BBF00386B2C /* BWKeyStorage.swift */,
 			);
 			path = Services;
-			sourceTree = "<group>";
-		};
-		1D43EAFF291D7D280065E5D6 /* Logging */ = {
-			isa = PBXGroup;
-			children = (
-				85799C1725DEBB3F0007EC87 /* Logging.swift */,
-			);
-			path = Logging;
 			sourceTree = "<group>";
 		};
 		1D72D5902BFF361700AEDE36 /* Updates */ = {
@@ -7268,7 +7260,6 @@
 				AADC60E92493B305008F8EF7 /* Extensions */,
 				4BA1A691258B06F600F6F690 /* FileSystem */,
 				AA80EC52256BE33A007083E7 /* Localizables */,
-				1D43EAFF291D7D280065E5D6 /* Logging */,
 				85AC3B3325DA828900C7D2AA /* Network */,
 				1D8057C62A83CAD500F4FED6 /* OsVersion */,
 				4BB88B4E25B7BA20006F6B06 /* Utilities */,
@@ -7276,6 +7267,7 @@
 				AA86491424D831C4001BABEE /* View */,
 				4B37EE5B2B4CFC3C00A89A61 /* Surveys */,
 				B65E5DAE2B74DE6D00480415 /* TrackerNetwork.swift */,
+				85799C1725DEBB3F0007EC87 /* Logger+Multiple.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -9901,7 +9893,7 @@
 				3706FA85293F65D500E42796 /* KeyedCodingExtension.swift in Sources */,
 				3706FA87293F65D500E42796 /* DownloadListStore.swift in Sources */,
 				37197EAB2942443D00394917 /* WebViewContainerView.swift in Sources */,
-				3706FA88293F65D500E42796 /* Logging.swift in Sources */,
+				3706FA88293F65D500E42796 /* Logger+Multiple.swift in Sources */,
 				3706FA89293F65D500E42796 /* CrashReportPromptPresenter.swift in Sources */,
 				3706FA8B293F65D500E42796 /* PreferencesRootView.swift in Sources */,
 				3706FA8C293F65D500E42796 /* AppStateChangedPublisher.swift in Sources */,
@@ -11346,7 +11338,7 @@
 				B6E3E55B2BC0041900A41922 /* DownloadListStoreMock.swift in Sources */,
 				9FA5A0A52BC8F34900153786 /* UserDefaultsBookmarkFoldersStore.swift in Sources */,
 				B6C0B23026E61D630031CB7F /* DownloadListStore.swift in Sources */,
-				85799C1825DEBB3F0007EC87 /* Logging.swift in Sources */,
+				85799C1825DEBB3F0007EC87 /* Logger+Multiple.swift in Sources */,
 				AAC30A2E268F1EE300D2D9CD /* CrashReportPromptPresenter.swift in Sources */,
 				1D2DC00629016798008083A1 /* BWCredential.swift in Sources */,
 				EEA3EEB12B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */,

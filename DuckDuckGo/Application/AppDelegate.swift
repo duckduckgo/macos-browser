@@ -545,7 +545,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             dataProvidersSource: syncDataProviders,
             errorEvents: SyncErrorHandler(),
             privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
-            log: OSLog.sync,
             environment: environment
         )
         syncService.initializeIfNeeded()

@@ -96,7 +96,7 @@ public final class UDSServer {
             print(error)
         }
 
-        os_log("UDSServer - Initialized with path: %{public}@", log: log, type: .info, socketFileURL.path)
+        os_log("UDSServer - Initialized with path: \(, privacy: .public)", log: log, type: .info, socketFileURL.path)
     }
 
     public func start(messageHandler: @escaping (Data) async throws -> Data?) throws {
@@ -114,7 +114,7 @@ public final class UDSServer {
             listener = try NWListener(using: params)
             self.listener = listener
         } catch {
-            os_log("UDSServer - Error creating listener: %{public}@",
+            os_log("UDSServer - Error creating listener: \(, privacy: .public)",
                    log: log,
                    type: .error,
                    String(describing: error))
@@ -132,7 +132,7 @@ public final class UDSServer {
             case .ready:
                 os_log("UDSServer - Listener is ready", log: log, type: .info)
             case .failed(let error):
-                os_log("UDSServer - Listener failed with error: %{public}@", log: log, type: .error, String(describing: error))
+                os_log("UDSServer - Listener failed with error: \(, privacy: .public)", log: log, type: .error, String(describing: error))
                 stop()
             case .cancelled:
                 os_log("UDSServer - Listener cancelled", log: log, type: .info)
@@ -168,7 +168,7 @@ public final class UDSServer {
 
     private func handleNewConnection(_ connection: NWConnection, messageHandler: @escaping (Data) async throws -> Data?) {
         Task {
-            os_log("UDSServer - New connection: %{public}@",
+            os_log("UDSServer - New connection: \(, privacy: .public)",
                    log: log,
                    type: .info,
                    String(describing: connection.hashValue))
@@ -181,7 +181,7 @@ public final class UDSServer {
                     os_log("UDSServer - Client connection is ready", log: log, type: .info)
                     self.startReceivingMessages(on: connection, messageHandler: messageHandler)
                 case .failed(let error):
-                    os_log("UDSServer - Client connection failed with error: %{public}@", log: log, type: .error, String(describing: error))
+                    os_log("UDSServer - Client connection failed with error: \(, privacy: .public)", log: log, type: .error, String(describing: error))
                     self.closeConnection(connection)
                 case .cancelled:
                     os_log("UDSServer - Client connection cancelled", log: log, type: .info)
@@ -262,7 +262,7 @@ public final class UDSServer {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             connection.send(content: lengthData + data, completion: .contentProcessed { error in
                 if let error {
-                    os_log("UDSServer - Send Error %{public}@", log: self.log, String(describing: error))
+                    os_log("UDSServer - Send Error \(, privacy: .public)", log: self.log, String(describing: error))
                     continuation.resume(throwing: error)
                     return
                 }

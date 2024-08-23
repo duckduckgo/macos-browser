@@ -45,7 +45,7 @@ final class LoginItemsManager: LoginItemsManaging {
         for item in items {
             do {
                 try item.enable()
-                os_log("🟢 Enabled successfully %{public}@", log: log, String(describing: item))
+                os_log("🟢 Enabled successfully \(, privacy: .public)", log: log, String(describing: item))
             } catch let error as NSError {
                 handleError(for: item, action: .enable, error: error)
             }
@@ -58,7 +58,7 @@ final class LoginItemsManager: LoginItemsManaging {
         for item in items {
             do {
                 try item.enable()
-                os_log("🟢 Enabled successfully %{public}@", log: log, String(describing: item))
+                os_log("🟢 Enabled successfully \(, privacy: .public)", log: log, String(describing: item))
             } catch let error as NSError {
                 handleError(for: item, action: .enable, error: error)
                 throw error
@@ -70,7 +70,7 @@ final class LoginItemsManager: LoginItemsManaging {
         for item in items {
             do {
                 try item.restart()
-                os_log("🟢 Restarted successfully %{public}@", log: log, String(describing: item))
+                os_log("🟢 Restarted successfully \(, privacy: .public)", log: log, String(describing: item))
             } catch let error as NSError {
                 handleError(for: item, action: .restart, error: error)
             }
@@ -95,7 +95,7 @@ final class LoginItemsManager: LoginItemsManaging {
                                                       buildType: AppVersion.shared.buildType,
                                                       osVersion: AppVersion.shared.osVersion)
         PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
-        os_log("🔴 Could not enable %{public}@: %{public}@", item.debugDescription, error.debugDescription)
+        os_log("🔴 Could not enable \(, privacy: .public): \(, privacy: .public)", item.debugDescription, error.debugDescription)
     }
 
     // MARK: - Debug Interactions

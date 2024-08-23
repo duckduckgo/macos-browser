@@ -532,13 +532,13 @@ struct FileImportView: View {
               let provider = providers.first(where: {
                   $0.hasItemConformingToTypeIdentifier(typeIdentifier)
               }) else {
-            os_log(.error, log: .dataImportExport, "invalid type identifiers: \(allowedTypeIdentifiers)")
+            Logger..error(log: .dataImportExport, "invalid type identifiers: \(allowedTypeIdentifiers)")
             return false
         }
 
         provider.loadItem(forTypeIdentifier: typeIdentifier) { data, error in
             guard let data else {
-                os_log(.error, log: .dataImportExport, "error loading \(typeIdentifier): \(error?.localizedDescription ?? "?")")
+                Logger..error(log: .dataImportExport, "error loading \(typeIdentifier): \(error?.localizedDescription ?? "?")")
                 return
             }
             let url: URL
@@ -547,12 +547,12 @@ struct FileImportView: View {
                 url = value
             case let data as Data:
                 guard let value = URL(dataRepresentation: data, relativeTo: nil) else {
-                    os_log(.error, log: .dataImportExport, "could not decode data: \(data.debugDescription)")
+                    Logger..error(log: .dataImportExport, "could not decode data: \(data.debugDescription)")
                     return
                 }
                 url = value
             default:
-                os_log(.error, log: .dataImportExport, "unsupported data: \(data)")
+                Logger..error(log: .dataImportExport, "unsupported data: \(data)")
                 return
             }
 

@@ -29,11 +29,11 @@ final class DuckDuckGoNotificationsApplication: NSApplication {
     private let _delegate = DuckDuckGoNotificationsAppDelegate()
 
     override init() {
-        os_log(.error, log: .networkProtection, "🟢 Notifications Agent starting: %{public}d", ProcessInfo.processInfo.processIdentifier)
+        Logger..error(log: .networkProtection, "🟢 Notifications Agent starting: \(, privacy: .public)", ProcessInfo.processInfo.processIdentifier)
 
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
-            os_log(.error, log: .networkProtection, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
+            Logger..error(log: .networkProtection, "🔴 Stopping: another instance is running: \(, privacy: .public).", anotherInstance.processIdentifier)
             exit(EXIT_SUCCESS)
         }
 

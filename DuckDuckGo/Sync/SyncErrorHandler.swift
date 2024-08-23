@@ -252,7 +252,7 @@ extension SyncErrorHandler: SyncErrorHandling {
                 PixelKit.fire(DebugEvent(modelType.syncFailedPixel, error: error), withAdditionalParameters: params)
             }
             let modelTypeString = modelType.rawValue.capitalized
-            os_log(.error, log: OSLog.sync, "%{public}@ Sync error: %{public}s", modelTypeString, String(reflecting: error))
+            Logger..error(log: OSLog.sync, "\(, privacy: .public) Sync error: \(, privacy: .public)", modelTypeString, String(reflecting: error))
         }
     }
 

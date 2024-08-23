@@ -93,7 +93,7 @@ final class DownloadListCoordinator {
 
             switch result {
             case .success(let items):
-                os_log(.error, log: log, "coordinator: loaded \(items.count) items")
+                Logger..error(log: log, "coordinator: loaded \(items.count) items")
                 for item in items {
                     do {
                         try add(item, ifModifiedLaterThan: clearDate)
@@ -109,7 +109,7 @@ final class DownloadListCoordinator {
                 }
 
             case .failure(let error):
-                os_log(.error, log: log, "coordinator: loading failed: \(error)")
+                Logger..error(log: log, "coordinator: loading failed: \(error)")
             }
         }
     }
@@ -413,7 +413,7 @@ final class DownloadListCoordinator {
                 try fm.removeItem(at: url)
             })
         } catch {
-            os_log(.error, log: self.log, "🦀 coordinator: failed to remove temp file: \(error)")
+            Logger..error(log: self.log, "🦀 coordinator: failed to remove temp file: \(error)")
         }
 
         struct DestinationFileNotEmpty: Error {}
@@ -427,7 +427,7 @@ final class DownloadListCoordinator {
         } catch is DestinationFileNotEmpty {
             // don‘t delete non-empty destination file
         } catch {
-            os_log(.error, log: self.log, "🦀 coordinator: failed to remove destination file: \(error)")
+            Logger..error(log: self.log, "🦀 coordinator: failed to remove destination file: \(error)")
         }
     }
 

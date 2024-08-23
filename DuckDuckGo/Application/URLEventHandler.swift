@@ -24,6 +24,7 @@ import Subscription
 import NetworkProtectionUI
 import VPNAppLauncher
 import DataBrokerProtection
+import os.log
 
 // @MainActor
 final class URLEventHandler {

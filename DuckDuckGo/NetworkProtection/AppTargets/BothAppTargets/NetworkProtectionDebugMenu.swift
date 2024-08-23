@@ -176,7 +176,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             do {
                 try await debugUtilities.resetAllState(keepAuthToken: false)
             } catch {
-                os_log("Error in resetAllState: %{public}@", log: .networkProtection, error.localizedDescription)
+                os_log("Error in resetAllState: \(, privacy: .public)", log: .networkProtection, error.localizedDescription)
             }
         }
     }
@@ -189,7 +189,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             do {
                 try await debugUtilities.resetAllState(keepAuthToken: true)
             } catch {
-                os_log("Error in resetAllState: %{public}@", log: .networkProtection, error.localizedDescription)
+                os_log("Error in resetAllState: \(, privacy: .public)", log: .networkProtection, error.localizedDescription)
             }
         }
     }

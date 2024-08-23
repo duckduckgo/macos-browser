@@ -20,6 +20,7 @@ import Common
 import Foundation
 import BrowserServicesKit
 import SecureStorage
+import os.log
 
 final class DataBrokerProtectionKeyStoreProvider: SecureStorageKeyStoreProvider {
 
@@ -109,7 +110,7 @@ private extension DataBrokerProtectionKeyStoreProvider {
             let legacyAttributes = whenUnlockedQueryAttributes(named: name, serviceName: serviceName)
 
             let accessibilityValueString = legacyAttributes[kSecAttrAccessible as String] as? String ?? "[value unavailable]"
-            os_log("Attempting read and migrate of DBP Keychain data with kSecAttrAccessible value of \(accessibilityValueString)", log: .dataBrokerProtection, type: .debug)
+            Logger.dataBrokerProtection.debug("Attempting read and migrate of DBP Keychain data with kSecAttrAccessible value of \(accessibilityValueString)")
 
             if let data = try read(serviceName: serviceName, queryAttributes: legacyAttributes) {
                 // We found Keychain data, so update it's `kSecAttrAccessible` value to `kSecAttrAccessibleAfterFirstUnlock`
@@ -169,7 +170,7 @@ private extension DataBrokerProtectionKeyStoreProvider {
         }
 
         let accessibilityValueString = attributeUpdate[kSecAttrAccessible as String] as? String ?? "[value unavailable]"
-        os_log("Updated DBP Keychain data kSecAttrAccessible value to \(accessibilityValueString)", log: .dataBrokerProtection, type: .debug)
+        Logger.dataBrokerProtection.debug("Updated DBP Keychain data kSecAttrAccessible value to \(accessibilityValueString)")
     }
 
     func afterFirstUnlockQueryAttributes(named name: String, serviceName: String) -> [String: Any] {

@@ -32,7 +32,7 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
     private let subscriptionManager: SubscriptionManager
 
     override init() {
-        os_log(.error, log: .dbpBackgroundAgent, "🟢 DBP background Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
+        Logger..error(log: .dbpBackgroundAgent, "🟢 DBP background Agent starting: \(, privacy: .public)", NSRunningApplication.current.processIdentifier)
 
         let dryRun: Bool
 #if DEBUG
@@ -62,7 +62,7 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
 
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
-            os_log(.error, log: .dbpBackgroundAgent, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
+            Logger..error(log: .dbpBackgroundAgent, "🔴 Stopping: another instance is running: \(, privacy: .public).", anotherInstance.processIdentifier)
             pixelHandler.fire(.backgroundAgentStartedStoppingDueToAnotherInstanceRunning)
             exit(0)
         }

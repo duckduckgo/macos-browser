@@ -120,7 +120,7 @@ extension NSPopover {
                 observer?.cancel()
             }
 
-            os_log(.error, "trying to present \(self) from \(positioningView) not in view hierarchy")
+            Logger..error("trying to present \(self) from \(positioningView) not in view hierarchy")
             return
         }
         self.swizzled_show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)

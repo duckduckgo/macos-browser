@@ -95,8 +95,8 @@ final class ConfigurationManager {
     }
 
     func log() {
-        os_log("last update %{public}s", log: .config, type: .default, String(describing: lastUpdateTime))
-        os_log("last refresh check %{public}s", log: .config, type: .default, String(describing: lastRefreshCheckTime))
+        os_log("last update \(, privacy: .public)", log: .config, type: .default, String(describing: lastUpdateTime))
+        os_log("last refresh check \(, privacy: .public)", log: .config, type: .default, String(describing: lastRefreshCheckTime))
     }
 
     private func refreshNow(isDebug: Bool = false) async {

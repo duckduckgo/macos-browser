@@ -74,7 +74,7 @@ public struct LoginItem: Equatable, Hashable {
                 $0["Label"] as? String == agentBundleID
             }) else { return .notRegistered }
 
-            os_log("🟢 found login item job: %{public}@", log: log, job.debugDescription)
+            os_log("🟢 found login item job: \(, privacy: .public)", log: log, job.debugDescription)
             return job["OnDemand"] as? Bool == true ? .enabled : .requiresApproval
         }
         return Status(SMAppService.loginItem(identifier: agentBundleID).status)
@@ -88,7 +88,7 @@ public struct LoginItem: Equatable, Hashable {
     }
 
     public func enable() throws {
-        os_log("🟢 registering login item %{public}@", log: log, self.debugDescription)
+        os_log("🟢 registering login item \(, privacy: .public)", log: log, self.debugDescription)
 
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).register()
@@ -103,7 +103,7 @@ public struct LoginItem: Equatable, Hashable {
     }
 
     public func disable() throws {
-        os_log("🟢 unregistering login item %{public}@", log: log, self.debugDescription)
+        os_log("🟢 unregistering login item \(, privacy: .public)", log: log, self.debugDescription)
 
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).unregister()
@@ -121,7 +121,7 @@ public struct LoginItem: Equatable, Hashable {
     ///
     public func restart() throws {
         guard [.enabled].contains(status) else {
-            os_log("🟢 restart not needed for login item %{public}@", log: log, self.debugDescription)
+            os_log("🟢 restart not needed for login item \(, privacy: .public)", log: log, self.debugDescription)
             return
         }
         try? disable()
@@ -130,7 +130,7 @@ public struct LoginItem: Equatable, Hashable {
 
     public func forceStop() {
         let runningApplications = runningApplications
-        os_log("🟢 stopping %{public}@", log: log, runningApplications.map { $0.processIdentifier }.description)
+        os_log("🟢 stopping \(, privacy: .public)", log: log, runningApplications.map { $0.processIdentifier }.description)
         runningApplications.forEach { $0.terminate() }
     }
 }

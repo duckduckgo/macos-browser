@@ -271,7 +271,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
 
         } catch {
             await MainActor.run {
-                os_log(.error, log: log, "🛑 download task callback: \(self): \(error)")
+                Logger..error(log: log, "🛑 download task callback: \(self): \(error)")
 
                 self.download.cancel()
                 self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: false)))
@@ -290,7 +290,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         let fileDescriptor = open(itemReplacementDirectory.path, O_EVTONLY)
         if fileDescriptor == -1 {
             let err = errno
-            os_log(.error, log: log, "could not open \(itemReplacementDirectory.path): \(err) – \(String(cString: strerror(err)))")
+            Logger..error(log: log, "could not open \(itemReplacementDirectory.path): \(err) – \(String(cString: strerror(err)))")
             throw NSError(domain: NSPOSIXErrorDomain, code: Int(err), userInfo: [NSLocalizedDescriptionKey: String(cString: strerror(err))])
         }
         let fileMonitor = DispatchSource.makeFileSystemObjectSource(fileDescriptor: fileDescriptor, eventMask: .write, queue: .main)
@@ -330,7 +330,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
             self.state = .downloading(destination: presenters.destinationFile, tempFile: presenters.tempFile)
 
         } catch {
-            os_log(.error, log: log, "🛑 file presenters failure: \(self): \(error)")
+            Logger..error(log: log, "🛑 file presenters failure: \(self): \(error)")
 
             self.download.cancel()
             self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: false)))
@@ -377,7 +377,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
                 try chooseAlternativeDuckloadFileNameOrRemove(&duckloadURL, destinationURL: destinationURL)
             } catch {
                 // that‘s ok, we‘ll keep using the original temp file
-                os_log(.error, log: log, "❗️ can‘t resolve duckload file exists: \"\(duckloadURL.path)\": \(error)")
+                Logger..error(log: log, "❗️ can‘t resolve duckload file exists: \"\(duckloadURL.path)\": \(error)")
                 duckloadURL = tempURL
             }
         }
@@ -393,7 +393,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
                     return duckloadURL
                 } catch {
                     // fallback: move failed, keep the temp file in the original location
-                    os_log(.error, log: log, "🙁 fallback with \(error), will use \(tempURL.path)")
+                    Logger..error(log: log, "🙁 fallback with \(error), will use \(tempURL.path)")
                     PixelKit.fire(DebugEvent(GeneralPixel.fileAccessRelatedItemFailed, error: error))
                     return tempURL
                 }
@@ -701,7 +701,7 @@ extension WebKitDownloadTask: WKDownloadDelegate {
 
         } catch {
             PixelKit.fire(DebugEvent(GeneralPixel.fileMoveToDownloadsFailed, error: error))
-            os_log(.error, log: log, "fileMoveToDownloadsFailed: \(error)")
+            Logger..error(log: log, "fileMoveToDownloadsFailed: \(error)")
             self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: false)))
         }
     }

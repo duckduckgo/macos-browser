@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import os.log
 
 public protocol DataBrokerProtectionDataManaging {
     var cache: InMemoryDataCache { get }
@@ -65,7 +66,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     public func fetchProfile() throws -> DataBrokerProtectionProfile? {
         if cache.profile != nil {
-            os_log("Returning cached profile", log: .dataBrokerProtection)
+            os_log("Returning cached profile")
             return cache.profile
         }
 
@@ -85,7 +86,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
             cache.profile = profile
             return profile
         } else {
-            os_log("No profile found", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("No profile found")
             return nil
         }
     }
@@ -94,13 +95,13 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         if let profile = try database.fetchProfile() {
             cache.profile = profile
         } else {
-            os_log("No profile found", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("No profile found")
         }
     }
 
     public func fetchBrokerProfileQueryData(ignoresCache: Bool = false) throws -> [BrokerProfileQueryData] {
         if !ignoresCache, !cache.brokerProfileQueryData.isEmpty {
-            os_log("Returning cached brokerProfileQueryData", log: .dataBrokerProtection)
+            Logger.dataBrokerProtection.debug("Returning cached brokerProfileQueryData")
             return cache.brokerProfileQueryData
         }
 

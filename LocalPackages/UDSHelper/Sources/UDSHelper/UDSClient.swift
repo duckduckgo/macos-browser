@@ -51,7 +51,7 @@ public actor UDSClient {
                 log: OSLog,
                 payloadHandler: PayloadHandler? = nil) {
 
-        os_log("UDSClient - Initialized with path: %{public}@", log: log, type: .info, socketFileURL.path)
+        os_log("UDSClient - Initialized with path: \(, privacy: .public)", log: log, type: .info, socketFileURL.path)
 
         self.receiver = UDSReceiver(log: log)
         self.socketFileURL = socketFileURL
@@ -110,13 +110,13 @@ public actor UDSClient {
 
             self.releaseConnection()
         case .failed(let error):
-            os_log("UDSClient - Connection failed with error: %{public}@", log: self.log, type: .error, String(describing: error))
+            os_log("UDSClient - Connection failed with error: \(, privacy: .public)", log: self.log, type: .error, String(describing: error))
 
             self.releaseConnection()
         case .ready:
             os_log("UDSClient - Connection ready", log: self.log, type: .info)
         case .waiting(let error):
-            os_log("UDSClient - Waiting to connect... %{public}@", log: self.log, type: .info, String(describing: error))
+            os_log("UDSClient - Waiting to connect... \(, privacy: .public)", log: self.log, type: .info, String(describing: error))
         default:
             os_log("UDSClient - Unexpected state", log: self.log, type: .info)
         }
@@ -171,7 +171,7 @@ public actor UDSClient {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
                 connection.send(content: payload, completion: .contentProcessed { error in
                     if let error {
-                        os_log("UDSClient - Send Error %{public}@", log: self.log, String(describing: error))
+                        os_log("UDSClient - Send Error \(, privacy: .public)", log: self.log, String(describing: error))
                         continuation.resume(throwing: error)
                         return
                     }

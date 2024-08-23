@@ -274,7 +274,7 @@ extension WKWebView {
     func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL) {
         guard responds(to: Selector.loadAlternateHTMLString) else {
             if #available(macOS 12.0, *) {
-                os_log(.error, log: .navigation, "WKWebView._loadAlternateHTMLString not available")
+                Logger..error(log: .navigation, "WKWebView._loadAlternateHTMLString not available")
                 loadSimulatedRequest(URLRequest(url: failingURL), responseHTML: html)
             }
             return

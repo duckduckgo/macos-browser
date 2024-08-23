@@ -119,14 +119,14 @@ final class ConfigurationStore: ConfigurationStoring {
     }
 
     func log() {
-        os_log("bloomFilterBinaryEtag %{public}s", log: .config, type: .default, bloomFilterBinaryEtag ?? "")
-        os_log("bloomFilterSpecEtag %{public}s", log: .config, type: .default, bloomFilterSpecEtag ?? "")
-        os_log("bloomFilterExcludedDomainsEtag %{public}s", log: .config, type: .default, bloomFilterExcludedDomainsEtag ?? "")
-        os_log("surrogatesEtag %{public}s", log: .config, type: .default, surrogatesEtag ?? "")
-        os_log("trackerRadarEtag %{public}s", log: .config, type: .default, trackerRadarEtag ?? "")
-        os_log("privacyConfigurationEtag %{public}s", log: .config, type: .default, privacyConfigurationEtag ?? "")
-        os_log("FBConfigEtag %{public}s", log: .config, type: .default, FBConfigEtag ?? "")
-        os_log("remoteMessagingConfig %{public}s", log: .config, type: .default, remoteMessagingConfigEtag ?? "")
+        os_log("bloomFilterBinaryEtag \(, privacy: .public)", log: .config, type: .default, bloomFilterBinaryEtag ?? "")
+        os_log("bloomFilterSpecEtag \(, privacy: .public)", log: .config, type: .default, bloomFilterSpecEtag ?? "")
+        os_log("bloomFilterExcludedDomainsEtag \(, privacy: .public)", log: .config, type: .default, bloomFilterExcludedDomainsEtag ?? "")
+        os_log("surrogatesEtag \(, privacy: .public)", log: .config, type: .default, surrogatesEtag ?? "")
+        os_log("trackerRadarEtag \(, privacy: .public)", log: .config, type: .default, trackerRadarEtag ?? "")
+        os_log("privacyConfigurationEtag \(, privacy: .public)", log: .config, type: .default, privacyConfigurationEtag ?? "")
+        os_log("FBConfigEtag \(, privacy: .public)", log: .config, type: .default, FBConfigEtag ?? "")
+        os_log("remoteMessagingConfig \(, privacy: .public)", log: .config, type: .default, remoteMessagingConfigEtag ?? "")
     }
 
     func fileUrl(for config: Configuration) -> URL {

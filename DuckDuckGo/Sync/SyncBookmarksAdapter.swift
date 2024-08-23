@@ -142,7 +142,7 @@ final class SyncBookmarksAdapter {
             stateStore = try BookmarksFaviconsFetcherStateStore(applicationSupportURL: URL.sandboxApplicationSupportURL)
         } catch {
             PixelKit.fire(DebugEvent(GeneralPixel.bookmarksFaviconsFetcherStateStoreInitializationFailed, error: error))
-            os_log(.error, log: OSLog.sync, "Failed to initialize BookmarksFaviconsFetcherStateStore: %{public}s", String(reflecting: error))
+            Logger..error(log: OSLog.sync, "Failed to initialize BookmarksFaviconsFetcherStateStore: \(, privacy: .public)", String(reflecting: error))
             return nil
         }
 

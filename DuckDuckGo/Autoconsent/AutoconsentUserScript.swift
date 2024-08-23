@@ -149,7 +149,7 @@ extension AutoconsentUserScript {
             let json = try JSONSerialization.data(withJSONObject: message)
             return try JSONDecoder().decode(Target.self, from: json)
         } catch {
-            os_log(.error, "Error decoding message body: %{public}@", error.localizedDescription)
+            Logger..error("Error decoding message body: \(, privacy: .public)", error.localizedDescription)
             return nil
         }
     }

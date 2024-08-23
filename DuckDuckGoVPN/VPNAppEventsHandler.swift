@@ -36,7 +36,7 @@ final class VPNAppEventsHandler {
         }
 
         let restartTunnel = {
-            os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", versionStore.lastAgentVersionRun ?? "null", currentVersion)
+            os_log(.info, log: .networkProtection, "App updated from \(, privacy: .public) to \(, privacy: .public): updating login items", versionStore.lastAgentVersionRun ?? "null", currentVersion)
             self.restartTunnel()
         }
 

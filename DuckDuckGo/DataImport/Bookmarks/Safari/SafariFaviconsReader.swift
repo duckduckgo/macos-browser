@@ -119,7 +119,7 @@ final class SafariFaviconsReader {
             do {
                 imageData = try readImageData(with: record.host)
             } catch {
-                os_log(.error, log: .dataImportExport, "could not read image data for \(record.host)")
+                Logger..error(log: .dataImportExport, "could not read image data for \(record.host)")
                 return nil
             }
             guard let formattedHost = record.formattedHost else { return nil }

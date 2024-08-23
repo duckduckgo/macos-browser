@@ -43,7 +43,7 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
             try dataManager.removeAllData()
             // the dataManagers delegate handles login item disabling
         } catch {
-            os_log("DataBrokerProtectionFeatureDisabler error: disableAndDelete, error: %{public}@", log: .error, error.localizedDescription)
+            os_log("DataBrokerProtectionFeatureDisabler error: disableAndDelete, error: \(, privacy: .public)", log: .error, error.localizedDescription)
         }
 
         DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerDisableAndDeleteDaily, frequency: .daily)

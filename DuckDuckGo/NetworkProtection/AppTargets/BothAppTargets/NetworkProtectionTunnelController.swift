@@ -839,10 +839,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     private func fetchAuthToken() throws -> NSString? {
 
         if let accessToken = try? accessTokenStorage.getAccessToken() {
-            os_log(.error, log: .networkProtection, "🟢 TunnelController found token")
+            Logger..error(log: .networkProtection, "🟢 TunnelController found token")
             return Self.adaptAccessTokenForVPN(accessToken) as NSString?
         }
-        os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
+        Logger..error(log: .networkProtection, "🔴 TunnelController found no token :(")
         return try tokenStore.fetchToken() as NSString?
     }
 

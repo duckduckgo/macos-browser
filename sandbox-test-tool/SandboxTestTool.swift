@@ -82,7 +82,7 @@ final class FileLogger {
     }()
 
     func log(_ message: String, includeTimestamp: Bool) {
-        os_log("%{public}s", message)
+        os_log("\(, privacy: .public)", message)
         queue.sync {
             let logMessage = includeTimestamp ? "[\(pid)] \(dateFormatter.string(from: Date())): \(message)\n" : (message + "\n")
 

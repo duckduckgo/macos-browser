@@ -383,7 +383,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 let registeredDevices = try await syncService.fetchDevices()
                 mapDevices(registeredDevices)
             } catch {
-                os_log(.error, log: .sync, "Failed to refresh devices: \(error)")
+                Logger..error(log: .sync, "Failed to refresh devices: \(error)")
             }
         }
     }

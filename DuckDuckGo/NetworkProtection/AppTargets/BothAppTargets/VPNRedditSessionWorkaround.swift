@@ -70,9 +70,9 @@ final class VPNRedditSessionWorkaround {
         }
 
         if requiresRedditSessionCookie {
-            os_log(.error, log: .networkProtection, "Installing VPN cookie workaround...")
+            Logger..error(log: .networkProtection, "Installing VPN cookie workaround...")
             await cookieStore.setCookie(redditSessionCookie)
-            os_log(.error, log: .networkProtection, "Installed VPN cookie workaround")
+            Logger..error(log: .networkProtection, "Installed VPN cookie workaround")
         }
     }
 
@@ -85,9 +85,9 @@ final class VPNRedditSessionWorkaround {
         for cookie in cookies {
             if cookie.domain == redditSessionCookie.domain, cookie.name == redditSessionCookie.name {
                 if cookie.value == redditSessionCookie.value {
-                    os_log(.error, log: .networkProtection, "Removing VPN cookie workaround")
+                    Logger..error(log: .networkProtection, "Removing VPN cookie workaround")
                     await cookieStore.deleteCookie(cookie)
-                    os_log(.error, log: .networkProtection, "Removed VPN cookie workaround")
+                    Logger..error(log: .networkProtection, "Removed VPN cookie workaround")
                 }
 
                 break

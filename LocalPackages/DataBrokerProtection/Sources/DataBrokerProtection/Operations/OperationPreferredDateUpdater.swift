@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import os.log
 
 enum OperationPreferredDateUpdaterOrigin {
     case optOut
@@ -83,7 +84,7 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                 }
             }
         } catch {
-            os_log("OperationPreferredDateUpdaterUseCase error: updateChildrenBrokerForParentBroker, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("OperationPreferredDateUpdaterUseCase error: updateChildrenBrokerForParentBroker, error: \(error.localizedDescription, privacy: .public)")
             throw error
         }
     }
@@ -168,10 +169,10 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                 try database.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
             }
         } catch {
-            os_log("OperationPreferredDateUpdaterUseCase error: updatePreferredRunDate, error: %{public}@", log: .error, error.localizedDescription)
+            Logger.dataBrokerProtection.error("OperationPreferredDateUpdaterUseCase error: updatePreferredRunDate, error: \(error.localizedDescription, privacy: .public)")
             throw error
         }
 
-        os_log("Updating preferredRunDate on operation with brokerId %{public}@ and profileQueryId %{public}@", log: .dataBrokerProtection, brokerId.description, profileQueryId.description)
+        Logger.dataBrokerProtection.debug("Updating preferredRunDate on operation with brokerId \(brokerId.description, privacy: .public) and profileQueryId \(profileQueryId.description, privacy: .public)")
     }
 }

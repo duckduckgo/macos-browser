@@ -40,14 +40,14 @@ final class DuckDuckGoVPNApplication: NSApplication {
     override init() {
         os_log(.default,
                log: .networkProtection,
-               "🟢 Status Bar Agent starting\nPath: (%{public}@)\nVersion: %{public}@\nPID: %{public}d",
+               "🟢 Status Bar Agent starting\nPath: (\(, privacy: .public))\nVersion: \(, privacy: .public)\nPID: \(, privacy: .public)",
                Bundle.main.bundlePath,
                "\(Bundle.main.versionNumber!).\(Bundle.main.buildNumber)",
                NSRunningApplication.current.processIdentifier)
 
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
-            os_log(.error, log: .networkProtection, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
+            Logger..error(log: .networkProtection, "🔴 Stopping: another instance is running: \(, privacy: .public).", anotherInstance.processIdentifier)
             exit(0)
         }
 
@@ -76,9 +76,9 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
 #if DEBUG
         if accountManager.accessToken != nil {
-            os_log(.error, log: .networkProtection, "🟢 VPN Agent found token")
+            Logger..error(log: .networkProtection, "🟢 VPN Agent found token")
         } else {
-            os_log(.error, log: .networkProtection, "🔴 VPN Agent found no token")
+            Logger..error(log: .networkProtection, "🔴 VPN Agent found no token")
         }
 #endif
     }
