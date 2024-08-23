@@ -415,6 +415,9 @@ final class BookmarksBarMenuViewController: NSViewController {
     }
 
     func reloadData(withRootFolder rootFolder: BookmarkFolder? = nil) {
+        // Are we reusing the popover to present another bookmarks menu while current menu is still shown?
+        // In this case `popover.isShown` would return `true` but we don‘t need to update the content size when
+        // `reloadData` is called before showing another folder contents, because `adjustPreferredContentSize` will be used.
         let isChangingRootFolder = if let rootFolder, let currentFolder = representedObject as? BookmarkFolder {
             currentFolder.id != rootFolder.id
         } else {
@@ -593,7 +596,7 @@ final class BookmarksBarMenuViewController: NSViewController {
         } else if /* heightChange <= 0 && */ contentSize.height < scrollView.frame.height {
             // reduce the offset of the popover upwards relative to the presenting view
             preferredContentOffset.y = max(0, preferredContentOffset.y + heightChange)
-            // contentSize.height = contentSize.height
+            // contentSize.height set to preferred height calculated before
         } else {
             // don‘t reduce the popover size if the content size still needs scrolling
             contentSize.height = preferredContentSize.height
