@@ -45,7 +45,6 @@
 		1D220BFC2B87AACF00F8BBC6 /* PrivacyProtectionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D220BFB2B87AACF00F8BBC6 /* PrivacyProtectionStatus.swift */; };
 		1D220BFD2B87AACF00F8BBC6 /* PrivacyProtectionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D220BFB2B87AACF00F8BBC6 /* PrivacyProtectionStatus.swift */; };
 		1D232E942C7860DA0043840D /* BinaryOwnershipChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D232E932C7860DA0043840D /* BinaryOwnershipChecker.swift */; };
-		1D232E952C7860DA0043840D /* BinaryOwnershipChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D232E932C7860DA0043840D /* BinaryOwnershipChecker.swift */; };
 		1D232E992C7870D90043840D /* BinaryOwnershipCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D232E962C786E7D0043840D /* BinaryOwnershipCheckerTests.swift */; };
 		1D232E9A2C7870DA0043840D /* BinaryOwnershipCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D232E962C786E7D0043840D /* BinaryOwnershipCheckerTests.swift */; };
 		1D26EBAC2B74BECB0002A93F /* NSImageSendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D26EBAB2B74BECB0002A93F /* NSImageSendable.swift */; };
@@ -10050,7 +10049,6 @@
 				1D36E659298AA3BA00AA485D /* InternalUserDeciderStore.swift in Sources */,
 				B6BCC5242AFCDABB002C5499 /* DataImportSourceViewModel.swift in Sources */,
 				B6F1B02B2BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift in Sources */,
-				1D232E952C7860DA0043840D /* BinaryOwnershipChecker.swift in Sources */,
 				3706FEBC293F6EFF00E42796 /* BWResponse.swift in Sources */,
 				B65C7DFC2B886CF0001E2D5C /* WKPDFHUDViewWrapper.swift in Sources */,
 				3706FAF4293F65D500E42796 /* SafariBookmarksReader.swift in Sources */,

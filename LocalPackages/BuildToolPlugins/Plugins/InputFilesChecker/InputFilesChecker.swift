@@ -21,6 +21,7 @@ import PackagePlugin
 import XcodeProjectPlugin
 
 let nonSandboxedExtraInputFiles: Set<InputFile> = [
+    .init("BinaryOwnershipChecker.swift", .source),
     .init("BWEncryption.m", .source),
     .init("BWEncryptionOutput.m", .source),
     .init("BWManager.swift", .source),
