@@ -105,7 +105,7 @@ extension HomePage.Views {
                 }
                 .frame(maxWidth: .infinity)
                 .background(
-                    settingsModel.backgroundView
+                    backgroundView
                         .animation(.none, value: isSettingsVisible)
                         .animation(.easeInOut(duration: 0.5), value: settingsModel.customBackground)
                 )
@@ -162,6 +162,30 @@ extension HomePage.Views {
                 }))
             } else {
                 EmptyView()
+            }
+        }
+
+        @ViewBuilder
+        var backgroundView: some View {
+            switch settingsModel.customBackground {
+            case .gradient(let gradient):
+                gradient.image.resizable().aspectRatio(contentMode: .fill)
+                    .animation(.none, value: settingsModel.contentType)
+            case .illustration(let illustration):
+                illustration.image.resizable().aspectRatio(contentMode: .fill)
+                    .animation(.none, value: settingsModel.contentType)
+            case .solidColor(let solidColor):
+                solidColor.color
+                    .animation(.none, value: settingsModel.contentType)
+            case .customImage(let userBackgroundImage):
+                if let nsImage = settingsModel.customImagesManager.image(for: userBackgroundImage) {
+                    Image(nsImage: nsImage).resizable().aspectRatio(contentMode: .fill)
+                        .animation(.none, value: settingsModel.contentType)
+                } else {
+                    Color.newTabPageBackground
+                }
+            case .none:
+                Color.newTabPageBackground
             }
         }
 

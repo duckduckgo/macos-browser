@@ -70,6 +70,7 @@ extension HomePage.Models {
         let appearancePreferences: AppearancePreferences
         let customImagesManager: UserBackgroundImagesManaging
         let sendPixel: (PixelKitEvent) -> Void
+        let openFilePanel: () -> URL?
         let openSettings: () -> Void
 
         @Published private(set) var availableUserBackgroundImages: [UserBackgroundImage] = []
@@ -83,11 +84,19 @@ extension HomePage.Models {
                 applicationSupportDirectory: URL.sandboxApplicationSupportURL
             ),
             sendPixel: @escaping (PixelKitEvent) -> Void = { PixelKit.fire($0) },
+            openFilePanel: @escaping () -> URL? = {
+                let panel = NSOpenPanel(allowedFileTypes: [.image])
+                guard case .OK = panel.runModal(), let url = panel.url else {
+                    return nil
+                }
+                return url
+            },
             openSettings: @escaping () -> Void
         ) {
             self.appearancePreferences = appearancePreferences
             self.customImagesManager = userBackgroundImagesManager
             customBackground = appearancePreferences.homePageCustomBackground
+            self.openFilePanel = openFilePanel
             self.sendPixel = sendPixel
             self.openSettings = openSettings
 
@@ -168,10 +177,10 @@ extension HomePage.Models {
         }
 
         func addNewImage() {
-            let panel = NSOpenPanel(allowedFileTypes: [.image])
-            guard case .OK = panel.runModal(), let url = panel.url else {
+            guard let url = openFilePanel() else {
                 return
             }
+
             Task {
                 do {
                     let image = try await customImagesManager.addImage(with: url)
@@ -240,33 +249,6 @@ extension HomePage.Models {
                 customBackgroundModeModel(for: .illustrationPicker),
                 customBackgroundModeModel(for: .customImagePicker)
             ]
-        }
-
-        @ViewBuilder
-        var backgroundView: some View {
-            if let customBackground {
-
-                switch customBackground {
-                case .gradient(let gradient):
-                    gradient.image.resizable().aspectRatio(contentMode: .fill)
-                        .animation(.none, value: contentType)
-                case .illustration(let illustration):
-                    illustration.image.resizable().aspectRatio(contentMode: .fill)
-                        .animation(.none, value: contentType)
-                case .solidColor(let solidColor):
-                    solidColor.color
-                        .animation(.none, value: contentType)
-                case .customImage(let userBackgroundImage):
-                    if let nsImage = customImagesManager.image(for: userBackgroundImage) {
-                        Image(nsImage: nsImage).resizable().aspectRatio(contentMode: .fill)
-                            .animation(.none, value: contentType)
-                    } else {
-                        Color.newTabPageBackground
-                    }
-                }
-            } else {
-                Color.newTabPageBackground
-            }
         }
     }
 }
