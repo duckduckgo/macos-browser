@@ -447,6 +447,8 @@ final class BookmarksBarMenuViewController: NSViewController {
         updateScrollButtons()
     }
 
+    // MARK: - Actions
+
     @objc func handleClick(_ sender: NSOutlineView) {
         guard sender.clickedRow != -1 else { return }
 

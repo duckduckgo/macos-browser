@@ -75,9 +75,9 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         treeController.rebuild(for: sortMode, withRootFolder: rootFolder)
     }
 
-    func reloadData(for searchQuery: String, sortMode: BookmarksSortMode) {
+    func reloadData(forSearchQuery searchQuery: String, sortMode: BookmarksSortMode) {
         isSearching = true
-        treeController.rebuild(for: searchQuery, sortMode: sortMode)
+        treeController.rebuild(forSearchQuery: searchQuery, sortMode: sortMode)
     }
 
     // MARK: - Private

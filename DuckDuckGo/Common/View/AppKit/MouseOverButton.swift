@@ -18,7 +18,12 @@
 
 import Cocoa
 
+@objc protocol MouseOverButtonDelegate: AnyObject {
+}
+
 internal class MouseOverButton: NSButton, Hoverable {
+
+    @IBOutlet weak var delegate: MouseOverButtonDelegate?
 
     private var backgroundLayer: CALayer?
 

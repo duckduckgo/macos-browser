@@ -86,6 +86,7 @@ final class BookmarksBarViewController: NSViewController {
             FolderPasteboardWriter.folderUTIInternalType
         ])
 
+        clippedItemsIndicator.delegate = self
         clippedItemsIndicator.sendAction(on: .leftMouseDown)
 
         importBookmarksLabel.stringValue = UserText.importBookmarks
@@ -238,7 +239,10 @@ final class BookmarksBarViewController: NSViewController {
     }
 
 }
-
+// MARK: - Drag&Drop over Clipped Items indicator
+extension BookmarksBarViewController: MouseOverButtonDelegate {
+}
+// MARK: - BookmarksBarViewModelDelegate
 extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
 
     func didClick(_ item: BookmarksBarCollectionViewItem) {

@@ -398,30 +398,8 @@ final class BookmarkListViewController: NSViewController {
         }.store(in: &cancellables)
 
         sortBookmarksViewModel.$selectedSortMode.sink { [weak self] newSortMode in
-            guard let self else { return }
-
-            switch newSortMode {
-            case .nameDescending:
-                self.sortBookmarksButton.image = .bookmarkSortDesc
-            default:
-                self.sortBookmarksButton.image = .bookmarkSortAsc
-            }
-
-            self.setupSort(mode: newSortMode)
+            self?.setupSort(mode: newSortMode)
         }.store(in: &cancellables)
-    }
-
-    override func keyDown(with event: NSEvent) {
-        let commandKeyDown = event.modifierFlags.contains(.command)
-        if commandKeyDown && event.keyCode == 3 { // CMD + F
-            if isSearchVisible {
-                searchBar.makeMeFirstResponder()
-            } else {
-                showSearchBar()
-            }
-        } else {
-            super.keyDown(with: event)
-        }
     }
 
     private func reloadData() {
@@ -430,7 +408,7 @@ final class BookmarkListViewController: NSViewController {
                 hideSearchBar()
                 updateSearchAndExpand(destinationFolder)
             } else {
-                dataSource.reloadData(for: searchBar.stringValue,
+                dataSource.reloadData(forSearchQuery: searchBar.stringValue,
                                       sortMode: sortBookmarksViewModel.selectedSortMode)
                 outlineView.reloadData()
             }
@@ -453,6 +431,15 @@ final class BookmarkListViewController: NSViewController {
         }
     }
 
+    private func setupSort(mode: BookmarksSortMode) {
+        hideSearchBar()
+        dataSource.reloadData(with: mode)
+        outlineView.reloadData()
+        sortBookmarksButton.image = (mode == .nameDescending) ? .bookmarkSortDesc : .bookmarkSortAsc
+        sortBookmarksButton.backgroundColor = mode.shouldHighlightButton ? .buttonMouseDown : .clear
+        sortBookmarksButton.mouseOverColor = mode.shouldHighlightButton ? .buttonMouseDown : .buttonMouseOver
+    }
+
     // MARK: Layout
 
     private func updateSearchAndExpand(_ folder: BookmarkFolder) {
@@ -463,21 +450,6 @@ final class BookmarkListViewController: NSViewController {
         guard let node = treeController.node(representing: folder) else { return }
 
         outlineView.highlight(node)
-    }
-
-    @objc func newBookmarkButtonClicked(_ sender: AnyObject) {
-        let view = BookmarksDialogViewFactory.makeAddBookmarkView(currentTab: currentTabWebsite)
-        showDialog(view)
-    }
-
-    @objc func searchBookmarkButtonClicked(_ sender: NSButton) {
-        isSearchVisible.toggle()
-    }
-
-    @objc func sortBookmarksButtonClicked(_ sender: NSButton) {
-        let menu = sortBookmarksViewModel.menu
-        bookmarkMetrics.fireSortButtonClicked(origin: .panel)
-        menu.popUpAtMouseLocation(in: sender)
     }
 
     private func showSearchBar() {
@@ -505,13 +477,68 @@ final class BookmarkListViewController: NSViewController {
         searchBookmarksButton.mouseOverColor = .buttonMouseOver
     }
 
-    private func setupSort(mode: BookmarksSortMode) {
-        hideSearchBar()
-        dataSource.reloadData(with: mode)
+    private func showTreeView() {
+        emptyState.isHidden = true
+        outlineView.isHidden = false
+        dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode)
         outlineView.reloadData()
-        sortBookmarksButton.image = (mode == .nameDescending) ? .bookmarkSortDesc : .bookmarkSortAsc
-        sortBookmarksButton.backgroundColor = mode.shouldHighlightButton ? .buttonMouseDown : .clear
-        sortBookmarksButton.mouseOverColor = mode.shouldHighlightButton ? .buttonMouseDown : .buttonMouseOver
+    }
+
+    private func expandFoldersAndScrollUntil(_ folder: BookmarkFolder) {
+        guard let folderNode = treeController.findNodeWithId(representing: folder) else { return }
+
+        expandFoldersUntil(node: folderNode)
+        outlineView.scrollToAdjustedPositionInOutlineView(folderNode)
+    }
+
+    private func expandFoldersUntil(node: BookmarkNode?) {
+        guard let folderParent = node?.parent else { return }
+        for parent in sequence(first: folderParent, next: \.parent).reversed() {
+            outlineView.animator().expandItem(parent)
+        }
+    }
+
+    private func showEmptyStateView(for mode: BookmarksEmptyStateContent) {
+        emptyState.isHidden = false
+        outlineView.isHidden = true
+        emptyStateTitle.stringValue = mode.title
+        emptyStateMessage.stringValue = mode.description
+        emptyStateImageView.image = mode.image
+        importButton.isHidden = mode.shouldHideImportButton
+    }
+
+    // MARK: Actions
+
+    override func keyDown(with event: NSEvent) {
+        let commandKeyDown = event.modifierFlags.contains(.command)
+        if commandKeyDown && event.keyCode == 3 { // CMD + F
+            if isSearchVisible {
+                searchBar.makeMeFirstResponder()
+            } else {
+                showSearchBar()
+            }
+        } else {
+            super.keyDown(with: event)
+        }
+    }
+
+    @objc func newBookmarkButtonClicked(_ sender: AnyObject) {
+        let view = BookmarksDialogViewFactory.makeAddBookmarkView(currentTab: currentTabWebsite)
+        showDialog(view)
+    }
+
+    @objc func searchBookmarkButtonClicked(_ sender: NSButton) {
+        isSearchVisible.toggle()
+    }
+
+    @objc func sortBookmarksButtonClicked(_ sender: NSButton) {
+        let menu = sortBookmarksViewModel.menu
+        bookmarkMetrics.fireSortButtonClicked(origin: .panel)
+        menu.popUpAtMouseLocation(in: sender)
+    }
+
+    @objc func openManagementInterface(_ sender: NSButton) {
+        showManageBookmarks()
     }
 
     @objc func handleClick(_ sender: NSOutlineView) {
@@ -551,50 +578,13 @@ final class BookmarkListViewController: NSViewController {
         }
     }
 
-    private func expandFoldersAndScrollUntil(_ folder: BookmarkFolder) {
-        guard let folderNode = treeController.findNodeWithId(representing: folder) else {
-            return
-        }
-
-        expandFoldersUntil(node: folderNode)
-        outlineView.scrollToAdjustedPositionInOutlineView(folderNode)
-    }
-
-    private func expandFoldersUntil(node: BookmarkNode?) {
-        var nodes: [BookmarkNode?] = []
-        var parent = node?.parent
-        nodes.append(node)
-
-        while parent != nil {
-            nodes.append(parent)
-            parent = parent?.parent
-        }
-
-        while !nodes.isEmpty {
-            if let current = nodes.removeLast() {
-                outlineView.animator().expandItem(current)
-            }
-        }
-    }
-
-    private func showTreeView() {
-        emptyState.isHidden = true
-        outlineView.isHidden = false
-        dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode)
-        outlineView.reloadData()
-    }
-
-    private func showEmptyStateView(for mode: BookmarksEmptyStateContent) {
-        emptyState.isHidden = false
-        outlineView.isHidden = true
-        emptyStateTitle.stringValue = mode.title
-        emptyStateMessage.stringValue = mode.description
-        emptyStateImageView.image = mode.image
-        importButton.isHidden = mode.shouldHideImportButton
-    }
-
     @objc func onImportClicked(_ sender: NSButton) {
         DataImportView().show()
+    }
+
+    private func showManageBookmarks() {
+        WindowControllersManager.shared.showBookmarksTab()
+        delegate?.popoverShouldClose(self)
     }
 
     // MARK: NSOutlineView Configuration
@@ -706,15 +696,15 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
             if searchQuery.isBlank {
                 showTreeView()
             } else {
-                showSearch(for: searchQuery)
+                showSearch(forSearchQuery: searchQuery)
             }
 
             bookmarkMetrics.fireSearchExecuted(origin: .panel)
         }
     }
 
-    private func showSearch(for searchQuery: String) {
-        dataSource.reloadData(for: searchQuery, sortMode: sortBookmarksViewModel.selectedSortMode)
+    private func showSearch(forSearchQuery searchQuery: String) {
+        dataSource.reloadData(forSearchQuery: searchQuery, sortMode: sortBookmarksViewModel.selectedSortMode)
 
         if treeController.rootNode.childNodes.isEmpty {
             showEmptyStateView(for: .noSearchResults)
@@ -730,6 +720,7 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
     }
 }
 
+// MARK: - Preview
 #if DEBUG
 // swiftlint:disable:next identifier_name
 func _mockPreviewBookmarkManager(previewEmptyState: Bool) -> BookmarkManager {
