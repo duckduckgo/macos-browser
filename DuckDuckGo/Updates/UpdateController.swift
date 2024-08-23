@@ -71,11 +71,13 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     @Published private(set) var latestUpdate: Update? {
         didSet {
             if let latestUpdate, !latestUpdate.isInstalled {
-                switch latestUpdate.type {
-                case .critical:
-                    notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: UserText.criticalUpdateNotification, presentMultiline: true)
-                case .regular:
-                    notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
+                if !shouldShowManualUpdateDialog {
+                    switch latestUpdate.type {
+                    case .critical:
+                        notificationPresenter.showUpdateNotification(icon: NSImage.criticalUpdateNotificationInfo, text: UserText.criticalUpdateNotification, presentMultiline: true)
+                    case .regular:
+                        notificationPresenter.showUpdateNotification(icon: NSImage.updateNotificationInfo, text: UserText.updateAvailableNotification, presentMultiline: true)
+                    }
                 }
                 isUpdateAvailableToInstall = !latestUpdate.isInstalled
             } else {
@@ -179,8 +181,8 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
         shouldShowManualUpdateDialog = false
 
-        if updater.updater.automaticallyDownloadsUpdates != areAutomaticUpdatesEnabled {
-            updater.updater.automaticallyDownloadsUpdates = areAutomaticUpdatesEnabled
+        if updater.updater.automaticallyDownloadsUpdates != automaticUpdateFlow {
+            updater.updater.automaticallyDownloadsUpdates = automaticUpdateFlow
         }
 
 #if DEBUG
