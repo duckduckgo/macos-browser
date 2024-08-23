@@ -19,6 +19,11 @@
 import AppKit
 import Foundation
 
+protocol BookmarkListPopoverDelegate: NSPopoverDelegate {
+    func openNextBookmarksMenu(_ sender: BookmarkListPopover)
+    func openPreviousBookmarksMenu(_ sender: BookmarkListPopover)
+}
+
 final class BookmarkListPopover: NSPopover {
 
     override init() {

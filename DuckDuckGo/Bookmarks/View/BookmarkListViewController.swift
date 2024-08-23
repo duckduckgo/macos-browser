@@ -460,6 +460,7 @@ final class BookmarkListViewController: NSViewController {
     private func showSearchBar() {
         isSearchVisible = true
         view.addSubview(searchBar)
+        outlineView.highlightedRow = nil
 
         boxDividerTopConstraint.isActive = false
         NSLayoutConstraint.activate([
