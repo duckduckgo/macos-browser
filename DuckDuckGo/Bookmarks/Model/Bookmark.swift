@@ -275,3 +275,16 @@ final class Bookmark: BaseBookmarkEntity {
     }
 
 }
+
+extension Array where Element == BaseBookmarkEntity {
+    func sorted(by sortMode: BookmarksSortMode) -> [BaseBookmarkEntity] {
+        switch sortMode {
+        case .manual:
+            return self
+        case .nameAscending:
+            return self.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+        case .nameDescending:
+            return self.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedDescending }
+        }
+    }
+}

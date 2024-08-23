@@ -36,7 +36,7 @@ final class PreferencesViewController: NSViewController {
     init(syncService: DDGSyncing, duckPlayer: DuckPlayer = DuckPlayer.shared) {
         model = PreferencesSidebarModel(syncService: syncService,
                                         vpnGatekeeper: DefaultVPNFeatureGatekeeper(subscriptionManager: Application.appDelegate.subscriptionManager),
-                                        includeDuckPlayer: duckPlayer.isAvailable)
+                                        includeDuckPlayer: duckPlayer.shouldDisplayPreferencesSideBar)
         super.init(nibName: nil, bundle: nil)
     }
 

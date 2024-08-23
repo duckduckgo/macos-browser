@@ -373,7 +373,14 @@ private extension Array where Element == [BrokerProfileQueryData] {
     /// - Returns: An array of `[BrokerProfileQueryData]` values sorted by the first `lastRunDate` of each element
     func sortedByLastRunDate() -> Self {
         self.sorted { lhs, rhs in
-            lhs.first?.scanJobData.lastRunDate < rhs.first?.scanJobData.lastRunDate
+            let lhsDate = lhs.first?.scanJobData.lastRunDate
+            let rhsDate = rhs.first?.scanJobData.lastRunDate
+
+            if lhsDate == rhsDate {
+                return lhs.first?.dataBroker.name ?? "" < rhs.first?.dataBroker.name ?? ""
+            } else {
+                return lhsDate < rhsDate
+            }
         }
     }
 }

@@ -57,7 +57,6 @@ public final class TunnelControllerViewModel: ObservableObject {
     private let statusReporter: NetworkProtectionStatusReporter
 
     private let vpnSettings: VPNSettings
-
     private let locationFormatter: VPNLocationFormatting
 
     private static let byteCountFormatter: ByteCountFormatter = {
@@ -67,7 +66,12 @@ public final class TunnelControllerViewModel: ObservableObject {
         return formatter
     }()
 
-    private let uiActionHandler: VPNUIActionHandler
+    private let uiActionHandler: VPNUIActionHandling
+
+    // MARK: - Environment
+
+    @EnvironmentObject
+    private var siteTroubleshootingViewModel: SiteTroubleshootingView.Model
 
     // MARK: - Misc
 
@@ -91,7 +95,7 @@ public final class TunnelControllerViewModel: ObservableObject {
                 runLoopMode: RunLoop.Mode? = nil,
                 vpnSettings: VPNSettings,
                 locationFormatter: VPNLocationFormatting,
-                uiActionHandler: VPNUIActionHandler) {
+                uiActionHandler: VPNUIActionHandling) {
 
         self.tunnelController = controller
         self.onboardingStatusPublisher = onboardingStatusPublisher
@@ -381,6 +385,9 @@ public final class TunnelControllerViewModel: ObservableObject {
             return UserText.networkProtectionStatusDisconnected
         case .disconnecting:
             return UserText.networkProtectionStatusDisconnecting
+        case .snoozing:
+            // Snooze mode is not supported on macOS, but fall back to the disconnected string to be safe.
+            return UserText.networkProtectionStatusDisconnected
         }
     }
 
@@ -531,11 +538,13 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 
+#if !APPSTORE && !DEBUG
     func moveToApplications() {
         Task { @MainActor in
             await uiActionHandler.moveAppToApplications()
         }
     }
+#endif
 }
 
 extension DataVolume {

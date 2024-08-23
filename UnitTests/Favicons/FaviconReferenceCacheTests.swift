@@ -21,9 +21,9 @@ import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 class FaviconReferenceCacheTests: XCTestCase {
 
+    @MainActor
     func testWhenFaviconUrlIsAddedToHostCache_ThenFaviconUrlIsUsedForWholeDomain() {
         let referenceCache = FaviconReferenceCache(faviconStoring: FaviconStoringMock())
         let burningExpectation = expectation(description: "Loading")
@@ -42,6 +42,7 @@ class FaviconReferenceCacheTests: XCTestCase {
         XCTAssertNil(referenceCache.getFaviconUrl(for: URL.aDocumentUrl3, sizeCategory: .small))
     }
 
+    @MainActor
     func testWhenFaviconUrlIsAddedToRefeceneCache_ThenFaviconUrlIsUsedForTheSpecialUrl() {
         let referenceCache = FaviconReferenceCache(faviconStoring: FaviconStoringMock())
         let burningExpectation = expectation(description: "Loading")
@@ -66,6 +67,7 @@ class FaviconReferenceCacheTests: XCTestCase {
         XCTAssertNil(referenceCache.getFaviconUrl(for: URL.aDocumentUrl3, sizeCategory: .small))
     }
 
+    @MainActor
     func testWhenUrlIsPartOfHostCacheAndReferenceCache_ThenOldEntryMustBeInvalidated() {
         let referenceCache = FaviconReferenceCache(faviconStoring: FaviconStoringMock())
         let burningExpectation = expectation(description: "Loading")

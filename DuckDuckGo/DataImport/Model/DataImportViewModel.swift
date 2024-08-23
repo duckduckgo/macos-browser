@@ -44,7 +44,7 @@ struct DataImportViewModel {
     /// Factory for a DataImporter for importSource
     private let dataImporterFactory: DataImporterFactory
 
-    /// Show a master password input dialog callback
+    /// Show a main password input dialog callback
     private let requestPrimaryPasswordCallback: @MainActor (Source) -> String?
 
     /// Show Open Panel to choose CSV/HTML file
@@ -298,7 +298,7 @@ struct DataImportViewModel {
                 // stay on the same screen
                 return true
 
-            // firefox passwords db is master-password protected: request password
+            // firefox passwords db is main-password protected: request password
             case let error as FirefoxLoginReader.ImportError where error.type == .requiresPrimaryPassword:
 
                 log("primary password required")

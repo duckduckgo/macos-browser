@@ -235,6 +235,61 @@ final class ContextualMenuTests: XCTestCase {
         assertMenu(item: items[2], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(BookmarkMenuItemSelectors.deleteEntities(_:)), representedObject: [bookmark, folder])
     }
 
+    func testWhenSearchIsHappeningThenMenuForBookmarksReturnsShowInFolder() throws {
+        // GIVEN
+        let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: false)
+
+        // WHEN
+        let menu = ContextualMenu.menu(for: [bookmark], forSearch: true)
+
+        // THEN
+        let items = try XCTUnwrap(menu?.items)
+        XCTAssertEqual(items.count, 13)
+        assertMenu(item: items[5], withTitle: UserText.showInFolder, selector: #selector(BookmarkSearchMenuItemSelectors.showInFolder(_:)), representedObject: bookmark)
+    }
+
+    func testWhenSearchIsHappeningThenMenuForFoldersReturnsShowInFolder() throws {
+        // GIVEN
+        let folder = BookmarkFolder(id: "1", title: "Folder")
+
+        // WHEN
+        let menu = ContextualMenu.menu(for: [folder], forSearch: true)
+
+        // THEN
+        let items = try XCTUnwrap(menu?.items)
+        XCTAssertEqual(items.count, 10)
+        assertMenu(item: items[3], withTitle: UserText.showInFolder, selector: #selector(BookmarkSearchMenuItemSelectors.showInFolder(_:)), representedObject: folder)
+    }
+
+    func testWhenGettingContextalMenuForMoreThanOneBookmarkThenShowInFolderIsNotReturned() throws {
+        // GIVEN
+        let bookmark = Bookmark(id: "1", url: "", title: "Bookmark", isFavorite: true)
+        let folder = BookmarkFolder(id: "1", title: "Folder")
+
+        // WHEN
+        let menu = ContextualMenu.menu(for: [bookmark, folder])
+
+        // THEN
+        let items = try XCTUnwrap(menu?.items)
+        XCTAssertEqual(items.count, 3)
+
+        for menuItem in items {
+            XCTAssertNotEqual(menuItem.title, UserText.showInFolder)
+            XCTAssertNotEqual(menuItem.action, #selector(BookmarkSearchMenuItemSelectors.showInFolder(_:)))
+        }
+    }
+
+    func testWhenGettingContextualMenuForItemThenShowInFolderIsNotReturned() throws {
+        // WHEN
+        let menu = ContextualMenu.menu(for: [])
+
+        // THEN
+        XCTAssertEqual(menu?.items.count, 1)
+        let menuItem = try XCTUnwrap(menu?.items.first)
+        XCTAssertNotEqual(menuItem.title, UserText.showInFolder)
+        XCTAssertNotEqual(menuItem.action, #selector(BookmarkSearchMenuItemSelectors.showInFolder(_:)))
+    }
+
 }
 
 private extension ContextualMenuTests {

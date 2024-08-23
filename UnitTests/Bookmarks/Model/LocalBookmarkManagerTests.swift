@@ -22,13 +22,13 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class LocalBookmarkManagerTests: XCTestCase {
 
     enum BookmarkManagerError: Error {
         case somethingReallyBad
     }
 
+    @MainActor
     func testWhenBookmarksAreNotLoadedYet_ThenManagerIgnoresBookmarkingRequests() {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
@@ -38,6 +38,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertNil(bookmarkManager.updateUrl(of: Bookmark.aBookmark, to: URL.duckDuckGoAutocomplete))
     }
 
+    @MainActor
     func testWhenBookmarksAreLoaded_ThenTheManagerHoldsAllLoadedBookmarks() {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
@@ -52,6 +53,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssert(bookmarkManager.list!.bookmarks().count > 0)
     }
 
+    @MainActor
     func testWhenLoadFails_ThenTheManagerHoldsBookmarksAreNil() {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
@@ -219,6 +221,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
     // MARK: - Save Multiple Bookmarks at once
 
+    @MainActor
     func testWhenMakeBookmarksForWebsitesInfoIsCalledThenBookmarkStoreIsAskedToCreateMultipleBookmarks() {
         // GIVEN
         let (sut, bookmarkStoreMock) = LocalBookmarkManager.aManager
@@ -245,6 +248,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .root)
     }
 
+    @MainActor
     func testWhenMakeBookmarksForWebsiteInfoIsCalledThenReloadAllBookmarks() {
         // GIVEN
         let (sut, bookmarkStoreMock) = LocalBookmarkManager.aManager
@@ -269,6 +273,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertTrue(results.isEmpty)
     }
 
+    @MainActor
     func testWhenQueryIsEmptyThenSearchResultsAreEmpty() {
         let bookmarkStore = BookmarkStoreMock(bookmarks: topLevelBookmarks())
         let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
@@ -280,6 +285,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertTrue(results.isEmpty)
     }
 
+    @MainActor
     func testWhenQueryIsBlankThenSearchResultsAreEmpty() {
         let bookmarkStore = BookmarkStoreMock(bookmarks: topLevelBookmarks())
         let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
@@ -291,6 +297,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertTrue(results.isEmpty)
     }
 
+    @MainActor
     func testWhenASearchIsDoneThenCorrectResultsAreReturnedAndIntheRightOrder() {
         let bookmarkStore = BookmarkStoreMock(bookmarks: topLevelBookmarks())
         let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
@@ -305,6 +312,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertEqual(results[2].title, "This is a sub-folder")
     }
 
+    @MainActor
     func testWhenASearchIsDoneThenFoldersAndBookmarksAreReturned() {
         let bookmarkStore = BookmarkStoreMock(bookmarks: topLevelBookmarks())
         let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
@@ -318,6 +326,23 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertTrue(results[0].isFolder)
         XCTAssertEqual(results[1].title, "Favorite bookmark")
         XCTAssertFalse(results[1].isFolder)
+    }
+
+    @MainActor
+    func testWhenASearchIsDoneThenItMatchesWithLowercaseResults() {
+        let bookmarkCapitalized = Bookmark(id: "1", url: "www.favorite.com", title: "Favorite bookmark", isFavorite: true)
+        let bookmarkNonCapitalized = Bookmark(id: "2", url: "www.favoritetwo.com", title: "favorite bookmark", isFavorite: true)
+
+        let bookmarkStore = BookmarkStoreMock(bookmarks: [bookmarkCapitalized, bookmarkNonCapitalized])
+        let sut = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+
+        sut.loadBookmarks()
+
+        let resultsWhtCapitalizedQuery = sut.search(by: "Favorite")
+        let resultsWithNotCapitalizedQuery = sut.search(by: "favorite")
+
+        XCTAssertTrue(resultsWhtCapitalizedQuery.count == 2)
+        XCTAssertTrue(resultsWithNotCapitalizedQuery.count == 2)
     }
 
     private func topLevelBookmarks() -> [BaseBookmarkEntity] {

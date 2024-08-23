@@ -1608,3 +1608,139 @@ final class MockActionsHandler: ActionsHandler {
         return nil
     }
 }
+
+private extension String {
+    static func random(length: Int) -> String {
+        let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return String((0..<length).map { _ in characters.randomElement()! })
+    }
+}
+
+private extension Int {
+    static func randomBirthdate() -> Int {
+        Int.random(in: 1960...2000)
+    }
+}
+
+extension Int64 {
+    static func randomValues(ofLength length: Int = 20, start: Int64 = 1001, end: Int64 = 2000) -> [Int64] {
+        [0..<length].map { _ in
+            Int64.random(in: start..<end)
+        }
+    }
+}
+
+private extension Data {
+    static func randomStringData(length: Int) -> Data {
+        String.random(length: length).data(using: .utf8)!
+    }
+
+    static func randomBirthdateData() -> Data {
+        String(Int.randomBirthdate()).data(using: .utf8)!
+    }
+
+    static func randomEventData(length: Int) -> Data {
+            return .randomStringData(length: length)
+        }
+}
+
+extension Date {
+    static func random() -> Date {
+        let currentTime = Date().timeIntervalSince1970
+        let randomTimeInterval = TimeInterval.random(in: 0..<currentTime)
+        return Date(timeIntervalSince1970: randomTimeInterval)
+    }
+}
+
+extension ProfileQueryDB {
+    static func random(withProfileIds profileIds: [Int64]) -> [ProfileQueryDB] {
+        profileIds.map {
+            ProfileQueryDB(id: nil, profileId: $0,
+                                         first: .randomStringData(length: 4),
+                                         last: .randomStringData(length: 4),
+                                         middle: nil,
+                                         suffix: nil,
+                                         city: .randomStringData(length: 4),
+                                         state: .randomStringData(length: 4), street: .randomStringData(length: 4),
+                                         zipCode: nil,
+                                         phone: nil,
+                                         birthYear: Data.randomBirthdateData(),
+                                         deprecated: Bool.random())
+        }
+    }
+}
+
+extension BrokerDB {
+    static func random(count: Int) -> [BrokerDB] {
+        [0..<count].map {
+            BrokerDB(id: nil, name: .random(length: 4),
+                     json: try! JSONSerialization.data(withJSONObject: [:], options: []),
+                     version: "\($0).\($0).\($0)",
+                     url: "www.testbroker.com")
+        }
+    }
+}
+
+extension ScanHistoryEventDB {
+    static func random(withBrokerIds brokerIds: [Int64], profileQueryIds: [Int64]) -> [ScanHistoryEventDB] {
+        brokerIds.flatMap { brokerId in
+            profileQueryIds.map { profileQueryId in
+                ScanHistoryEventDB(
+                    brokerId: brokerId,
+                    profileQueryId: profileQueryId,
+                    event: .randomEventData(length: 8),
+                    timestamp: .random()
+                )
+            }
+        }
+    }
+}
+
+extension OptOutHistoryEventDB {
+    static func random(withBrokerIds brokerIds: [Int64], profileQueryIds: [Int64], extractedProfileIds: [Int64]) -> [OptOutHistoryEventDB] {
+        brokerIds.flatMap { brokerId in
+            profileQueryIds.flatMap { profileQueryId in
+                extractedProfileIds.map { extractedProfileId in
+                    OptOutHistoryEventDB(
+                        brokerId: brokerId,
+                        profileQueryId: profileQueryId,
+                        extractedProfileId: extractedProfileId,
+                        event: .randomEventData(length: 8),
+                        timestamp: .random()
+                    )
+                }
+            }
+        }
+    }
+}
+
+extension ExtractedProfileDB {
+    static func random(withBrokerIds brokerIds: [Int64], profileQueryIds: [Int64]) -> [ExtractedProfileDB] {
+        brokerIds.flatMap { brokerId in
+            profileQueryIds.map { profileQueryId in
+                ExtractedProfileDB(
+                    id: nil,
+                    brokerId: brokerId,
+                    profileQueryId: profileQueryId,
+                    profile: .randomEventData(length: 50),
+                    removedDate: Bool.random() ? .random() : nil
+                )
+            }
+        }
+    }
+}
+
+struct MockMigrationsProvider: DataBrokerProtectionDatabaseMigrationsProvider {
+    static var didCallV2Migrations = false
+    static var didCallV3Migrations = false
+
+    static var v2Migrations: (inout GRDB.DatabaseMigrator) throws -> Void {
+        didCallV2Migrations = true
+        return { _ in }
+    }
+
+    static var v3Migrations: (inout GRDB.DatabaseMigrator) throws -> Void {
+        didCallV3Migrations = true
+        return { _ in }
+    }
+}
