@@ -58,16 +58,6 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
     lazy var notificationPresenter = UpdateNotificationPresenter()
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
-    init(internalUserDecider: InternalUserDecider,
-         appRestarter: AppRestarting = AppRestarter()) {
-        willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
-        self.internalUserDecider = internalUserDecider
-        self.appRestarter = appRestarter
-        super.init()
-
-        configureUpdater()
-    }
-
     @Published private(set) var isUpdateBeingLoaded = false
     var isUpdateBeingLoadedPublisher: Published<Bool>.Publisher { $isUpdateBeingLoaded }
 
@@ -119,14 +109,33 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         }
     }
 
+    var automaticUpdateFlow: Bool {
+        // In case the current user is not the owner of the binary, we have to switch
+        // to manual update flow because the authentication is required.
+        return areAutomaticUpdatesEnabled && binaryOwnershipChecker.isCurrentUserOwner()
+    }
+
     var shouldShowManualUpdateDialog = false
 
     private(set) var updater: SPUStandardUpdaterController!
     private var appRestarter: AppRestarting
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
     private var internalUserDecider: InternalUserDecider
+    private let binaryOwnershipChecker: BinaryOwnershipChecking
 
     // MARK: - Public
+
+    init(internalUserDecider: InternalUserDecider,
+         appRestarter: AppRestarting = AppRestarter(),
+         binaryOwnershipChecker: BinaryOwnershipChecking = BinaryOwnershipChecker()) {
+        willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
+        self.internalUserDecider = internalUserDecider
+        self.appRestarter = appRestarter
+        self.binaryOwnershipChecker = binaryOwnershipChecker
+        super.init()
+
+        configureUpdater()
+    }
 
     func checkNewApplicationVersion() {
         let updateStatus = ApplicationUpdateDetector.isApplicationUpdated()
@@ -151,6 +160,18 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater.updater.checkForUpdatesInBackground()
     }
 
+    @objc func runUpdate() {
+        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidRunUpdate))
+
+        if automaticUpdateFlow {
+            appRestarter.restart()
+        } else {
+            updater.userDriver.activeUpdateAlert?.hideUnnecessaryUpdateButtons()
+            shouldShowManualUpdateDialog = true
+            checkForUpdate()
+        }
+    }
+
     // MARK: - Private
 
     private func configureUpdater() {
@@ -166,25 +187,13 @@ final class UpdateController: NSObject, UpdateControllerProtocol {
         updater.updater.automaticallyChecksForUpdates = false
         updater.updater.automaticallyDownloadsUpdates = false
         updater.updater.updateCheckInterval = 0
-#endif
-
+#else
         checkForUpdateInBackground()
+#endif
     }
 
-    @objc func openUpdatesPage() {
+    @objc private func openUpdatesPage() {
         notificationPresenter.openUpdatesPage()
-    }
-
-    @objc func runUpdate() {
-        PixelKit.fire(DebugEvent(GeneralPixel.updaterDidRunUpdate))
-
-        if areAutomaticUpdatesEnabled {
-            appRestarter.restart()
-        } else {
-            updater.userDriver.activeUpdateAlert?.hideUnnecessaryUpdateButtons()
-            shouldShowManualUpdateDialog = true
-            checkForUpdate()
-        }
     }
 
 }
@@ -247,7 +256,7 @@ extension UpdateController: SPUUpdaterDelegate {
 
         PixelKit.fire(DebugEvent(GeneralPixel.updaterDidFindUpdate))
 
-        if !areAutomaticUpdatesEnabled {
+        if !automaticUpdateFlow {
             // For manual updates, we can present the available update without waiting for the update cycle to finish. The Sparkle flow downloads the update later
             updateCheckResult = UpdateCheckResult(item: item, isInstalled: false)
             onUpdateCheckEnd()
@@ -272,7 +281,7 @@ extension UpdateController: SPUUpdaterDelegate {
                log: .updates,
                "\(item.displayVersionString)(\(item.versionString))")
 
-        if areAutomaticUpdatesEnabled {
+        if automaticUpdateFlow {
             // For automatic updates, the available item has to be downloaded
             updateCheckResult = UpdateCheckResult(item: item, isInstalled: false)
             return
