@@ -80,11 +80,12 @@ final class BookmarkNode: Hashable {
     }
 
     var canBeHighlighted: Bool {
-        if representedObject is SpacerNode {
+        switch representedObject {
+        case is SpacerNode:
             return false
-        } else if let menuItem = representedObject as? MenuItemNode {
+        case let menuItem as MenuItemNode:
             return menuItem.isEnabled
-        } else {
+        default:
             return true
         }
     }

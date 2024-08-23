@@ -1,4 +1,7 @@
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  NSTableViewExtension.swift
+//
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -13,12 +16,16 @@
 //  limitations under the License.
 //
 
-#include "UnitTests.xcconfig"
-#include "../AppStore.xcconfig"
+import AppKit
 
-FEATURE_FLAGS = FEEDBACK
+extension NSTableView {
 
-PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.DuckDuckGoTests
-PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] = MacOS Unit Tests App Store CI
+    var clickedRowIfValid: Int? {
+        let clickedRow = self.clickedRow
+        if (0..<numberOfRows).contains(clickedRow) {
+            return clickedRow
+        }
+        return nil
+    }
 
-TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGo App Store.app/Contents/MacOS/DuckDuckGo App Store
+}
