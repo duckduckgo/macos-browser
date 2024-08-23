@@ -441,8 +441,6 @@ final class BrowserTabViewController: NSViewController {
             }
 
             self.duckPlayerOnboardingModalManager.show(on: self.view, animated: true)
-            self.duckPlayerOnboardingModalManager.currentTab = tab
-            
         }.store(in: &tabViewModelCancellables)
     }
 

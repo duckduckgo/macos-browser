@@ -18,26 +18,15 @@
 
 import Cocoa
 import Combine
-
 private enum AnimationConsts {
     static let yAnimationOffset: CGFloat = 65
     static let duration: CGFloat = 0.6
 }
 
-protocol DuckPlayerOnboardingModalDelegate: AnyObject {
-    func duckPlayerOnboardingModalDidFinish(_ modal: DuckPlayerOnboardingModal)
-}
-
-public final class DuckPlayerOnboardingModal {
-    weak var delegate: DuckPlayerOnboardingModalDelegate?
-    private lazy var viewController: DuckPlayerOnboardingViewController = {
-        let viewController = DuckPlayerOnboardingViewController()
-        viewController.delegate = self
-        return viewController
-    }()
-
+public final class TabModal {
+    private let modalViewController: NSViewController
     private lazy var windowController: NSWindowController = {
-        let  windowController = NSWindowController(window: NSWindow(contentViewController: viewController))
+        let windowController = NSWindowController(window: NSWindow(contentViewController: modalViewController))
 
         if let window = windowController.window {
             window.styleMask = [.borderless]
@@ -48,22 +37,50 @@ public final class DuckPlayerOnboardingModal {
             window.hasShadow = true
             window.level = .floating
         }
-        viewController.view.wantsLayer = true
+        modalViewController.view.wantsLayer = true
         return windowController
     }()
 
     private var resizeObserver: Any?
     private var cancellables = Set<AnyCancellable>()
 
-    public init() { }
+    public init(modalViewController: NSViewController) {
+        self.modalViewController = modalViewController
+    }
+
     public required init?(coder: NSCoder) {
-        fatalError("DuckPlayerOnboardingModal: Bad initializer")
+        fatalError("OnboardingModal: Bad initializer")
+    }
+
+    // MARK: - Private methods
+
+    private func windowDidResize(_ parent: NSWindow) {
+        guard let overlayWindow = windowController.window else {
+            return
+        }
+
+        let xPosition = (parent.frame.width / 2) - (overlayWindow.frame.width / 2) + parent.frame.origin.x
+        let yPosition = parent.frame.origin.y + parent.frame.height - overlayWindow.frame.height - AnimationConsts.yAnimationOffset
+
+        let size = overlayWindow.frame.size
+        let newOrigin = NSPoint(x: xPosition, y: yPosition)
+        overlayWindow.setFrame(NSRect(origin: newOrigin, size: size), display: true)
+    }
+
+    private func addObserverForWindowResize(_ window: NSWindow) {
+        NotificationCenter.default.publisher(for: NSWindow.didResizeNotification, object: window)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                guard let parent = notification.object as? NSWindow else { return }
+                self?.windowDidResize(parent)
+            }
+            .store(in: &cancellables)
     }
 }
 
-// MARK: - Public methods
-
-extension DuckPlayerOnboardingModal {
+extension TabModal: ModalPresentable {
+    
+    // MARK: - Public methods
     public func close(animated: Bool, completion: (() -> Void)? = nil) {
         guard let overlayWindow = windowController.window else {
             return
@@ -120,38 +137,5 @@ extension DuckPlayerOnboardingModal {
         } else {
             overlayWindow.setFrameOrigin(NSPoint(x: xPosition, y: yPosition - AnimationConsts.yAnimationOffset))
         }
-    }
-}
-
-// MARK: - Private methods
-
-extension DuckPlayerOnboardingModal {
-    private func windowDidResize(_ parent: NSWindow) {
-        guard let overlayWindow = windowController.window else {
-            return
-        }
-
-        let xPosition = (parent.frame.width / 2) - (overlayWindow.frame.width / 2) + parent.frame.origin.x
-        let yPosition = parent.frame.origin.y + parent.frame.height - overlayWindow.frame.height - AnimationConsts.yAnimationOffset
-
-        let size = overlayWindow.frame.size
-        let newOrigin = NSPoint(x: xPosition, y: yPosition)
-        overlayWindow.setFrame(NSRect(origin: newOrigin, size: size), display: true)
-    }
-
-    private func addObserverForWindowResize(_ window: NSWindow) {
-        NotificationCenter.default.publisher(for: NSWindow.didResizeNotification, object: window)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
-                guard let parent = notification.object as? NSWindow else { return }
-                self?.windowDidResize(parent)
-            }
-            .store(in: &cancellables)
-    }
-}
-
-extension DuckPlayerOnboardingModal: DuckPlayerOnboardingViewControllerDelegate {
-    func duckPlayerOnboardingViewControllerDidFinish(_ viewController: DuckPlayerOnboardingViewController) {
-        delegate?.duckPlayerOnboardingModalDidFinish(self)
     }
 }

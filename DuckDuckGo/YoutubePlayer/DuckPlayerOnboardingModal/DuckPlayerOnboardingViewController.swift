@@ -19,12 +19,17 @@
 import SwiftUI
 import AppKit
 
-protocol DuckPlayerOnboardingViewControllerDelegate: AnyObject {
-    func duckPlayerOnboardingViewControllerDidFinish(_ viewController: DuckPlayerOnboardingViewController)
-}
+final class DuckPlayerOnboardingViewController: NSViewController, TabModalViewControllerDelegate {
+    var didFinish: () -> Void
 
-final class DuckPlayerOnboardingViewController: NSViewController {
-    weak var delegate: DuckPlayerOnboardingViewControllerDelegate?
+    internal init(didFinish: @escaping () -> Void) {
+        self.didFinish = didFinish
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     private var hostingView: NSHostingView<DuckPlayerOnboardingModalView>!
     private lazy var viewModel: DuckPlayerOnboardingViewModel = {
@@ -44,11 +49,11 @@ final class DuckPlayerOnboardingViewController: NSViewController {
     }
 
     private func handleNotNowActionButton() {
-        delegate?.duckPlayerOnboardingViewControllerDidFinish(self)
+        didFinish()
     }
 
     private func handleGotItActionButton() {
-        delegate?.duckPlayerOnboardingViewControllerDidFinish(self)
+        didFinish()
     }
 }
 

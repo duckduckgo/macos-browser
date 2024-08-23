@@ -18,83 +18,59 @@
 
 import Foundation
 
-/// A manager for presenting the DuckPlayer onboarding modal.
-///
-/// The `DuckPlayerOnboardingModalManager` class is responsible for presenting the onboarding modal and handling its lifecycle.
-///
-final class DuckPlayerOnboardingModalManager {
-    weak var currentTab: Tab?
-    private(set) var modal: DuckPlayerOnboardingModal?
+protocol ModalPresentable: AnyObject {
+    func close(animated: Bool, completion: (() -> Void)?)
+    func show(on currentTabView: NSView, animated: Bool)
 }
 
-// MARK: - Public functions
+protocol TabModalViewControllerDelegate: AnyObject {
+    var didFinish: () -> Void { get set }
+}
 
-extension DuckPlayerOnboardingModalManager {
-    /**
-     Shows the onboarding modal on the specified view.
+protocol TabModalPresentable: AnyObject {
+    associatedtype ModalType: TabModal
 
-     - Parameters:
-       - view: The view on which to show the modal.
-       - animated: A `Bool` indicating whether to animate the presentation.
+    var modal: ModalType? { get set }
 
-     - Note: If the modal is already presented, this method does nothing.
-     */
+    func show(on view: NSView, animated: Bool)
+    func close(animated: Bool)
+    func createModal() -> ModalType
+}
+
+extension TabModalPresentable {
     func show(on view: NSView, animated: Bool) {
         prepareModal()
-        guard let modal = modal else {
-            return
-        }
-
-        modal.show(on: view, animated: animated)
+        modal?.show(on: view, animated: animated)
     }
 
-    /**
-     Closes the onboarding modal and cleans up memory references.
-
-     - Parameters:
-       - animated: A `Bool` indicating whether to animate the dismissal.
-
-     - Note: If the modal is not presented, this method does nothing.
-     */
     func close(animated: Bool) {
-        guard let modal = modal else {
-            return
-        }
-
-        modal.close(animated: animated) { [weak self] in
+        modal?.close(animated: animated) { [weak self] in
             self?.cleanUp()
         }
     }
 
-}
-
-// MARK: - Private functions
-
-extension DuckPlayerOnboardingModalManager {
-
-    private func cleanUp() {
-        self.modal = nil
-        self.currentTab = nil
+    func cleanUp() {
+        modal = nil
     }
 
-    private func prepareModal() {
-        // If the tab was closed, we want to start the animation again
-        if currentTab == nil {
-            modal = nil
+    func prepareModal() {
+        if modal == nil {
+            modal = createModal()
         }
-
-        guard modal == nil else {
-            return
-        }
-
-        modal = DuckPlayerOnboardingModal()
-        modal?.delegate = self
     }
 }
 
-extension DuckPlayerOnboardingModalManager: DuckPlayerOnboardingModalDelegate {
+final class DuckPlayerOnboardingModalManager: TabModalPresentable {
+    typealias ModalType = TabModal
 
-    func duckPlayerOnboardingModalDidFinish(_ modal: DuckPlayerOnboardingModal) {
-        self.close(animated: true)
+    var modal: TabModal?
+
+    func createModal() -> TabModal {
+        let viewController = DuckPlayerOnboardingViewController { [weak self] in
+            self?.close(animated: true)
+        }
+
+        let modal = TabModal(modalViewController: viewController)
+        return modal
     }
 }
