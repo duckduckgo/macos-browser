@@ -142,15 +142,15 @@ extension HomePage.Models {
                 }
                 switch customBackground {
                 case .gradient:
-                    PixelKit.fire(GeneralPixel.newTabBackgroundSelectedGradient)
+                    PixelKit.fire(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedGradient))
                 case .solidColor:
-                    PixelKit.fire(GeneralPixel.newTabBackgroundSelectedSolidColor)
+                    PixelKit.fire(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedSolidColor))
                 case .illustration:
-                    PixelKit.fire(GeneralPixel.newTabBackgroundSelectedIllustration)
+                    PixelKit.fire(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedIllustration))
                 case .customImage:
-                    PixelKit.fire(GeneralPixel.newTabBackgroundSelectedUserImage)
+                    PixelKit.fire(NonStandardEvent(NewTabPagePixel.newTabBackgroundSelectedUserImage))
                 case .none:
-                    PixelKit.fire(GeneralPixel.newTabBackgroundReset)
+                    PixelKit.fire(NonStandardEvent(NewTabPagePixel.newTabBackgroundReset))
                 }
             }
         }
@@ -176,7 +176,7 @@ extension HomePage.Models {
                         customBackground = .customImage(image)
                     }
                 } catch {
-                    PixelKit.fire(DebugEvent(GeneralPixel.newTabBackgroundAddImageError, error: error))
+                    PixelKit.fire(DebugEvent(NewTabPagePixel.newTabBackgroundAddImageError, error: error))
                     await showAddImageFailedAlert()
                 }
             }

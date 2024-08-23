@@ -133,7 +133,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
             try setUpStorageDirectory(at: storageLocation.path)
             try setUpStorageDirectory(at: thumbnailsStorageLocation.path)
         } catch {
-            PixelKit.fire(DebugEvent(GeneralPixel.newTabBackgroundInitializeStorageError, error: error))
+            PixelKit.fire(DebugEvent(NewTabPagePixel.newTabBackgroundInitializeStorageError, error: error))
         }
 
         availableImages = imagesMetadata.compactMap(UserBackgroundImage.init)
@@ -165,7 +165,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
                 let resizedImageData = try imageProcessor.resizeImage(with: imageData, to: Const.thumbnailSize)
                 try resizedImageData.write(to: thumbnailsStorageLocation.appendingPathComponent(fileName))
             } catch {
-                PixelKit.fire(DebugEvent(GeneralPixel.newTabBackgroundThumbnailError, error: error))
+                PixelKit.fire(DebugEvent(NewTabPagePixel.newTabBackgroundThumbnailError, error: error))
             }
         }()
 
@@ -180,7 +180,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
 
         deleteImagesOverLimit()
 
-        PixelKit.fire(GeneralPixel.newTabBackgroundAddedUserImage)
+        PixelKit.fire(NonStandardEvent(NewTabPagePixel.newTabBackgroundAddedUserImage))
 
         let userBackgroundImage = UserBackgroundImage(fileName: fileName, colorScheme: colorScheme)
         imagesMetadata = [userBackgroundImage.description] + imagesMetadata.prefix(maximumNumberOfImages - 1)
@@ -194,7 +194,7 @@ final class UserBackgroundImagesManager: UserBackgroundImagesManaging {
         imagesMetadata.remove(at: index)
         deleteImageFiles(for: userBackgroundImage)
 
-        PixelKit.fire(GeneralPixel.newTabBackgroundDeletedUserImage)
+        PixelKit.fire(NonStandardEvent(NewTabPagePixel.newTabBackgroundDeletedUserImage))
     }
 
     func updateSelectedTimestamp(for userBackgroundImage: UserBackgroundImage) {
