@@ -17,12 +17,18 @@
 //
 
 import AppKit
+import Carbon
 import Combine
 import Foundation
 
 protocol BookmarksBarMenuViewControllerDelegate: AnyObject {
+
     func closeBookmarksPopovers(_ sender: BookmarksBarMenuViewController)
     func popover(shouldPreventClosure: Bool)
+
+    func openNextBookmarksMenu(_ sender: BookmarksBarMenuViewController)
+    func openPreviousBookmarksMenu(_ sender: BookmarksBarMenuViewController)
+
 }
 
 final class BookmarksBarMenuViewController: NSViewController {
@@ -273,6 +279,14 @@ final class BookmarksBarMenuViewController: NSViewController {
     ///           with delay added if needed.
     private func delayedHighlightRowEventPublisher(forRow row: Int?, on event: HighlightEvent) -> AnyPublisher<(Int?, BookmarkFolder?, HighlightEvent), Never>? {
 
+        if let currentEvent = NSApp.currentEvent,
+           currentEvent.type == .keyDown,
+           currentEvent.keyCode == kVK_RightArrow {
+            // don‘t expand the first highlighted folder in a submenu when it was
+            // expanded using the Right arrow key
+            return Empty().eraseToAnyPublisher()
+        }
+
         let bookmarkNode = row.flatMap { outlineView.item(atRow: $0) } as? BookmarkNode
         let folder = bookmarkNode?.representedObject as? BookmarkFolder
 
@@ -521,7 +535,73 @@ final class BookmarksBarMenuViewController: NSViewController {
         updateScrollButtons()
     }
 
+    private func showSubmenu(for folder: BookmarkFolder, atRow row: Int) {
+        guard let cell = outlineView.view(atColumn: 0, row: row, makeIfNecessary: false) else { return }
+
+        let submenuPopover: BookmarksBarMenuPopover
+        if let popover = self.submenuPopover {
+            submenuPopover = popover
+            if submenuPopover.isShown {
+                if submenuPopover.rootFolder?.id == folder.id {
+                    // submenu for the folder is already shown
+                    return
+                }
+                submenuPopover.close()
+            }
+            // reuse the popover for another folder
+            submenuPopover.reloadData(withRootFolder: folder)
+        } else {
+            submenuPopover = BookmarksBarMenuPopover(rootFolder: folder)
+            submenuPopover.delegate = self
+            self.submenuPopover = submenuPopover
+        }
+
+        submenuPopover.show(positionedAsSubmenuAgainst: cell)
+    }
+
     // MARK: - Actions
+
+    override func keyDown(with event: NSEvent) {
+        switch Int(event.keyCode) {
+        case kVK_Return, kVK_ANSI_KeypadEnter, kVK_Space:
+            if outlineView.highlightedRow != nil {
+                // submit action when there‘s a highlighted row
+                handleClick(outlineView)
+
+            } else if outlineView.numberOfRows > 0 {
+                // when in child menu popover without selection: highlight first row
+                outlineView.highlightedRow = 0
+            }
+
+        case kVK_Escape:
+            delegate?.closeBookmarksPopovers(self)
+
+        case kVK_LeftArrow:
+            // if in submenu: close this submenu
+            if view.window?.parent?.contentViewController is Self,
+               let popover = nextResponder as? NSPopover {
+                popover.close()
+            } else /* we‘re in root menu */ {
+                // switch between bookmarks menus on left/right
+                delegate?.openPreviousBookmarksMenu(self)
+            }
+        case kVK_RightArrow:
+            // expand currently highlighted folder
+            if let highlightedRow = outlineView.highlightedRow,
+               let bookmarkNode = outlineView.item(atRow: highlightedRow) as? BookmarkNode,
+               let folder = bookmarkNode.representedObject as? BookmarkFolder {
+                showSubmenu(for: folder, atRow: highlightedRow)
+                // highlight first submenu row when expanding with Right key
+                submenuPopover?.viewController.outlineView.highlightFirstItem()
+            } else {
+                // switch between bookmarks menus on left/right
+                delegate?.openNextBookmarksMenu(self)
+            }
+
+        default:
+            super.keyDown(with: event)
+        }
+    }
 
     @objc func handleClick(_ sender: NSOutlineView) {
         guard sender.clickedRow != -1 else { return }
@@ -613,8 +693,7 @@ final class BookmarksBarMenuViewController: NSViewController {
     /// Show or close folder submenu on row hover
     /// the method is called from `outlineView.$highlightedRow` observer after a delay as needed
     func outlineViewDidHighlight(_ folder: BookmarkFolder?, atRow row: Int?) {
-        guard let row, let folder,
-              let cell = outlineView.view(atColumn: 0, row: row, makeIfNecessary: false) else {
+        guard let row, let folder else {
             // close submenu if shown
             guard let submenuPopover, submenuPopover.isShown else { return }
             submenuPopover.close()
@@ -623,24 +702,7 @@ final class BookmarksBarMenuViewController: NSViewController {
             return
         }
 
-        let submenuPopover: BookmarksBarMenuPopover
-        if let popover = self.submenuPopover {
-            submenuPopover = popover
-            if submenuPopover.isShown {
-                if submenuPopover.rootFolder?.id == folder.id {
-                    // submenu for the folder is already shown
-                    return
-                }
-                submenuPopover.close()
-            }
-            // reuse the popover for another folder
-            submenuPopover.reloadData(withRootFolder: folder)
-        } else {
-            submenuPopover = BookmarksBarMenuPopover(rootFolder: folder)
-            self.submenuPopover = submenuPopover
-        }
-
-        submenuPopover.show(positionedAsSubmenuAgainst: cell)
+        showSubmenu(for: folder, atRow: row)
     }
 
     // MARK: Bookmarks Menu scrolling
@@ -809,6 +871,16 @@ extension BookmarksBarMenuViewController: MouseOverButtonDelegate {
         return .none
     }
 
+}
+// MARK: - BookmarkListPopoverDelegate
+extension BookmarksBarMenuViewController: BookmarksBarMenuPopoverDelegate {
+    // pass delegate calls up when called from submenu
+    func openNextBookmarksMenu(_ sender: BookmarksBarMenuPopover) {
+        delegate?.openNextBookmarksMenu(self)
+    }
+    func openPreviousBookmarksMenu(_ sender: BookmarksBarMenuPopover) {
+        delegate?.openPreviousBookmarksMenu(self)
+    }
 }
 
 #if DEBUG

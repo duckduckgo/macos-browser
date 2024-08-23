@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Carbon
 import Combine
 
 protocol BookmarkListViewControllerDelegate: AnyObject {
@@ -134,6 +135,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     // MARK: View Lifecycle
+
     override func loadView() {
         view = ColorView(frame: .zero, backgroundColor: .popoverBackground)
 
@@ -473,6 +475,8 @@ final class BookmarkListViewController: NSViewController {
 
     private func hideSearchBar() {
         isSearchVisible = false
+        outlineView.highlightedRow = nil
+        outlineView.makeMeFirstResponder()
         searchBar.stringValue = ""
         searchBar.removeFromSuperview()
         boxDividerTopConstraint.isActive = true
@@ -485,6 +489,9 @@ final class BookmarkListViewController: NSViewController {
         outlineView.isHidden = false
         dataSource.reloadData(with: sortBookmarksViewModel.selectedSortMode)
         outlineView.reloadData()
+        if !isSearchVisible {
+            outlineView.makeMeFirstResponder()
+        }
     }
 
     private func expandFoldersAndScrollUntil(_ folder: BookmarkFolder) {
@@ -513,14 +520,37 @@ final class BookmarkListViewController: NSViewController {
     // MARK: Actions
 
     override func keyDown(with event: NSEvent) {
-        let commandKeyDown = event.modifierFlags.contains(.command)
-        if commandKeyDown && event.keyCode == 3 { // CMD + F
+        switch Int(event.keyCode) {
+        case kVK_ANSI_F where event.deviceIndependentFlags == .command:
             if isSearchVisible {
                 searchBar.makeMeFirstResponder()
             } else {
                 showSearchBar()
             }
-        } else {
+
+        case kVK_Return, kVK_ANSI_KeypadEnter, kVK_Space:
+            if outlineView.highlightedRow != nil {
+                // submit action when there‘s a highlighted row
+                handleClick(outlineView)
+
+            } else if outlineView.numberOfRows > 0 {
+                // when in child menu popover without selection: highlight first row
+                outlineView.highlightedRow = 0
+            }
+
+        case kVK_Escape:
+            delegate?.closeBookmarksPopover(self)
+
+        default:
+            // start search when letters are typed
+            if let characters = event.characters,
+               !characters.isEmpty {
+
+                showSearchBar()
+                searchBar.currentEditor()?.keyDown(with: event)
+                return
+            }
+
             super.keyDown(with: event)
         }
     }
@@ -545,9 +575,9 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @objc func handleClick(_ sender: NSOutlineView) {
-        guard sender.clickedRow != -1 else { return }
-
-        let item = sender.item(atRow: sender.clickedRow)
+        let row = NSApp.currentEvent?.type == .keyDown ? outlineView.highlightedRow : sender.clickedRow
+        guard let row, row != -1 else { return }
+        let item = sender.item(atRow: row)
         guard let node = item as? BookmarkNode else { return }
 
         switch node.representedObject {
@@ -707,6 +737,7 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
     }
 
     private func showSearch(forSearchQuery searchQuery: String) {
+        outlineView.highlightedRow = nil
         dataSource.reloadData(forSearchQuery: searchQuery, sortMode: sortBookmarksViewModel.selectedSortMode)
 
         if treeController.rootNode.childNodes.isEmpty {
@@ -721,6 +752,37 @@ extension BookmarkListViewController: NSSearchFieldDelegate {
             }
         }
     }
+
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy selector: Selector) -> Bool {
+        guard control === searchBar else {
+            assertionFailure("Unexpected delegating control")
+            return false
+        }
+        switch selector {
+        case #selector(cancelOperation):
+            // handle Esc key press while in search mode
+            isSearchVisible = false
+
+        case #selector(moveUp):
+            // handle Up Arrow in search mode
+            if !outlineView.highlightPreviousItem() {
+                // unhighlight for the first row
+                outlineView.highlightedRow = nil
+            }
+        case #selector(moveDown):
+            // handle Down Arrow in search mode
+            outlineView.highlightNextItem()
+
+        case #selector(insertNewline) where outlineView.highlightedRow != nil:
+            // handle Enter key in search mode when there‘s a highlighted row
+            handleClick(outlineView)
+
+        default:
+            return false
+        }
+        return true
+    }
+
 }
 
 // MARK: - Preview

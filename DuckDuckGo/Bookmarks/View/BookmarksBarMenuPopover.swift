@@ -19,6 +19,11 @@
 import AppKit
 import Foundation
 
+protocol BookmarksBarMenuPopoverDelegate: NSPopoverDelegate {
+    func openNextBookmarksMenu(_ sender: BookmarksBarMenuPopover)
+    func openPreviousBookmarksMenu(_ sender: BookmarksBarMenuPopover)
+}
+
 final class BookmarksBarMenuPopover: NSPopover {
 
     private let bookmarkManager: BookmarkManager
@@ -26,6 +31,10 @@ final class BookmarksBarMenuPopover: NSPopover {
 
     private(set) var preferredEdge: NSRectEdge?
     private(set) weak var positioningView: NSView?
+
+    private var bookmarksMenuPopoverDelegate: BookmarksBarMenuPopoverDelegate? {
+        delegate as? BookmarksBarMenuPopoverDelegate
+    }
 
     static let popoverInsets = NSEdgeInsets(top: 13, left: 13, bottom: 13, right: 13)
 
@@ -146,6 +155,14 @@ extension BookmarksBarMenuPopover: BookmarksBarMenuViewControllerDelegate {
             popover.behavior = shouldPreventClosure ? .applicationDefined : .transient
             popover = mainWindow?.contentViewController?.nextResponder as? BookmarksBarMenuPopover
         }
+    }
+
+    func openNextBookmarksMenu(_ sender: BookmarksBarMenuViewController) {
+        bookmarksMenuPopoverDelegate?.openNextBookmarksMenu(self)
+    }
+
+    func openPreviousBookmarksMenu(_ sender: BookmarksBarMenuViewController) {
+        bookmarksMenuPopoverDelegate?.openPreviousBookmarksMenu(self)
     }
 
 }
