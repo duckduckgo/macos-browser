@@ -23,6 +23,8 @@ protocol BinaryOwnershipChecking {
     func isCurrentUserOwner() -> Bool
 }
 
+/// A class responsible for checking whether the current user owns the binary of the app.
+/// The result is cached after the first check to avoid repeated file system access.
 final class BinaryOwnershipChecker: BinaryOwnershipChecking {
 
     private let fileManager: FileManager
@@ -32,6 +34,9 @@ final class BinaryOwnershipChecker: BinaryOwnershipChecking {
         self.fileManager = fileManager
     }
 
+    /// Checks if the current user owns the binary of the currently running app.
+    /// The method caches the result after the first check to improve performance on subsequent calls.
+    /// - Returns: `true` if the current user is the owner, `false` otherwise.
     func isCurrentUserOwner() -> Bool {
         if let cachedResult = ownershipCache {
             return cachedResult
