@@ -33,7 +33,6 @@ public actor UDSClient {
     private let socketFileURL: URL
     private let receiver: UDSReceiver
     private let queue = DispatchQueue(label: "com.duckduckgo.UDSConnection.queue.\(UUID().uuidString)")
-    private let log: OSLog
     private let payloadHandler: PayloadHandler?
 
     // MARK: - Message completion callbacks
@@ -47,15 +46,12 @@ public actor UDSClient {
     /// This should not be called directly because the socketFileURL needs to comply with some requirements in terms of
     /// maximum length of the path.  Use any public factory method provided below instead.
     ///
-    public init(socketFileURL: URL,
-                log: OSLog,
-                payloadHandler: PayloadHandler? = nil) {
+    public init(socketFileURL: URL, payloadHandler: PayloadHandler? = nil) {
 
-        os_log("UDSClient - Initialized with path: \(, privacy: .public)", log: log, type: .info, socketFileURL.path)
+        Logger.udsHelper.info("UDSClient - Initialized with path: \(socketFileURL.path, privacy: .public)")
 
-        self.receiver = UDSReceiver(log: log)
+        self.receiver = UDSReceiver()
         self.socketFileURL = socketFileURL
-        self.log = log
         self.payloadHandler = payloadHandler
     }
 
@@ -106,19 +102,19 @@ public actor UDSClient {
     private func statusUpdateHandler(_ state: NWConnection.State) {
         switch state {
         case .cancelled:
-            os_log("UDSClient - Connection cancelled", log: self.log, type: .info)
+            Logger.udsHelper.info("UDSClient - Connection cancelled")
 
             self.releaseConnection()
         case .failed(let error):
-            os_log("UDSClient - Connection failed with error: \(, privacy: .public)", log: self.log, type: .error, String(describing: error))
+            Logger.udsHelper.error("UDSClient - Connection failed with error: \(error.localizedDescription, privacy: .public)")
 
             self.releaseConnection()
         case .ready:
-            os_log("UDSClient - Connection ready", log: self.log, type: .info)
+            Logger.udsHelper.info("UDSClient - Connection ready")
         case .waiting(let error):
-            os_log("UDSClient - Waiting to connect... \(, privacy: .public)", log: self.log, type: .info, String(describing: error))
+            Logger.udsHelper.error("UDSClient - Waiting to connect... \(error.localizedDescription, privacy: .public)")
         default:
-            os_log("UDSClient - Unexpected state", log: self.log, type: .info)
+            Logger.udsHelper.info("UDSClient - Unexpected state")
         }
     }
 
@@ -171,12 +167,12 @@ public actor UDSClient {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
                 connection.send(content: payload, completion: .contentProcessed { error in
                     if let error {
-                        os_log("UDSClient - Send Error \(, privacy: .public)", log: self.log, String(describing: error))
+                        Logger.udsHelper.error("UDSClient - Send Error \(error.localizedDescription, privacy: .public)")
                         continuation.resume(throwing: error)
                         return
                     }
 
-                    os_log("UDSClient - Send Success", log: self.log)
+                    Logger.udsHelper.info("UDSClient - Send Success")
                     continuation.resume()
                 })
             }

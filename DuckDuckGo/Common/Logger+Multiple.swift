@@ -20,12 +20,20 @@ import Foundation
 import os.log
 
 extension Logger {
-//    static var dataBrokerProtection = { Logger(subsystem: subsystem, category: "") }()
-    
+    static var dataImportExport = { Logger(subsystem: "Data Import/Export", category: "") }()
+    static var config = { Logger(subsystem: "Configuration Downloading", category: "") }()
 }
 
 //extension OSLog {
+//fileprivate static let networkProtectionLoginItemLoggingEnabled = false
+//fileprivate static let networkProtectionLoginItemLog: OSLog = OSLog(subsystem: subsystem, category: "VPN: Login Item")
 //
+//fileprivate static let networkProtectionIPCLoginItemLoggingEnabled = false
+//fileprivate static let networkProtectionIPCLoginItemLog: OSLog = OSLog(subsystem: subsystem, category: "VPN: IPC (Login Item)")
+//
+//fileprivate static let networkProtectionMemoryLoggingEnabled = false
+//fileprivate static let networkProtectionMemoryLog: OSLog = OSLog(subsystem: subsystem, category: "VPN: Memory")
+
 //    enum AppCategories: String, CaseIterable {
 //        case atb = "ATB"
 //        case config = "Configuration Downloading"

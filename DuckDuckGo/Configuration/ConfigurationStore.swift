@@ -20,6 +20,7 @@ import Common
 import Foundation
 import Configuration
 import PixelKit
+import os.log
 
 final class ConfigurationStore: ConfigurationStoring {
 
@@ -119,14 +120,14 @@ final class ConfigurationStore: ConfigurationStoring {
     }
 
     func log() {
-        os_log("bloomFilterBinaryEtag \(, privacy: .public)", log: .config, type: .default, bloomFilterBinaryEtag ?? "")
-        os_log("bloomFilterSpecEtag \(, privacy: .public)", log: .config, type: .default, bloomFilterSpecEtag ?? "")
-        os_log("bloomFilterExcludedDomainsEtag \(, privacy: .public)", log: .config, type: .default, bloomFilterExcludedDomainsEtag ?? "")
-        os_log("surrogatesEtag \(, privacy: .public)", log: .config, type: .default, surrogatesEtag ?? "")
-        os_log("trackerRadarEtag \(, privacy: .public)", log: .config, type: .default, trackerRadarEtag ?? "")
-        os_log("privacyConfigurationEtag \(, privacy: .public)", log: .config, type: .default, privacyConfigurationEtag ?? "")
-        os_log("FBConfigEtag \(, privacy: .public)", log: .config, type: .default, FBConfigEtag ?? "")
-        os_log("remoteMessagingConfig \(, privacy: .public)", log: .config, type: .default, remoteMessagingConfigEtag ?? "")
+        Logger.config.info("bloomFilterBinaryEtag \(self.bloomFilterBinaryEtag ?? "", privacy: .public)")
+        Logger.config.info("bloomFilterSpecEtag \(self.bloomFilterSpecEtag ?? "", privacy: .public)")
+        Logger.config.info("bloomFilterExcludedDomainsEtag \(self.self.bloomFilterExcludedDomainsEtag ?? "", privacy: .public)")
+        Logger.config.info("surrogatesEtag \(self.surrogatesEtag ?? "", privacy: .public)")
+        Logger.config.info("trackerRadarEtag \(self.trackerRadarEtag ?? "", privacy: .public)")
+        Logger.config.info("privacyConfigurationEtag \(self.privacyConfigurationEtag ?? "", privacy: .public)")
+        Logger.config.info("FBConfigEtag \(self.FBConfigEtag ?? "", privacy: .public)")
+        Logger.config.info("remoteMessagingConfig \(self.remoteMessagingConfigEtag ?? "", privacy: .public)")
     }
 
     func fileUrl(for config: Configuration) -> URL {

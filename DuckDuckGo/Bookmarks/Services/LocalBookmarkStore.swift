@@ -25,6 +25,7 @@ import Bookmarks
 import Cocoa
 import Persistence
 import PixelKit
+import os.log
 
 final class LocalBookmarkStore: BookmarkStore {
 
@@ -430,9 +431,9 @@ final class LocalBookmarkStore: BookmarkStore {
                 bookmarkFolderToReturn = bookmarkFolder
 
             } catch BookmarkStoreError.badModelMapping {
-                os_log("Failed to map BookmarkEntity to BookmarkFolder, with error: %s", log: .bookmarks, type: .error)
+                Logger.bookmarks.error("Failed to map BookmarkEntity to BookmarkFolder, with error: BookmarkStoreError.badModelMapping")
             } catch {
-                os_log("Failed to fetch last saved folder for bookmarks all tabs, with error: %s", log: .bookmarks, type: .error, error.localizedDescription)
+                Logger.bookmarks.error("Failed to fetch last saved folder for bookmarks all tabs, with error: \(error.localizedDescription, privacy: .public)")
             }
         }
 
@@ -796,7 +797,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
         } catch {
-            os_log("Failed to import bookmarks, with error: %s", log: .dataImportExport, type: .error, error.localizedDescription)
+            Logger.dataImportExport.error("Failed to import bookmarks, with error: \(error.localizedDescription, privacy: .public)")
 
             let error = error as NSError
             let processedErrors = CoreDataErrorsParser.parse(error: error)
@@ -943,7 +944,7 @@ final class LocalBookmarkStore: BookmarkStore {
         } onError: { [weak self] error in
             self?.commonOnSaveErrorHandler(error)
 
-            os_log("Failed to remove invalid bookmark entities", type: .error)
+            Logger.bookmarks.error("Failed to remove invalid bookmark entities")
         } onDidSave: {}
 
     }

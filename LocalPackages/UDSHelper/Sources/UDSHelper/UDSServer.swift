@@ -88,7 +88,7 @@ public final class UDSServer {
         self.fileManager = fileManager
         self.socketFileURL = socketFileURL
         self.log = log
-        self.receiver = UDSReceiver(log: log)
+        self.receiver = UDSReceiver()
 
         do {
             try fileManager.removeItem(at: socketFileURL)
@@ -96,7 +96,7 @@ public final class UDSServer {
             print(error)
         }
 
-        os_log("UDSServer - Initialized with path: \(, privacy: .public)", log: log, type: .info, socketFileURL.path)
+        Logger.udsHelper.info("UDSServer - Initialized with path: \(socketFileURL.path, privacy: .public)")
     }
 
     public func start(messageHandler: @escaping (Data) async throws -> Data?) throws {
@@ -114,10 +114,7 @@ public final class UDSServer {
             listener = try NWListener(using: params)
             self.listener = listener
         } catch {
-            os_log("UDSServer - Error creating listener: \(, privacy: .public)",
-                   log: log,
-                   type: .error,
-                   String(describing: error))
+            Logger.udsHelper.error("UDSServer - Error creating listener: \(error.localizedDescription, privacy: .public)")
             throw error
         }
 
@@ -130,12 +127,12 @@ public final class UDSServer {
 
             switch state {
             case .ready:
-                os_log("UDSServer - Listener is ready", log: log, type: .info)
+                Logger.udsHelper.info("UDSServer - Listener is ready")
             case .failed(let error):
-                os_log("UDSServer - Listener failed with error: \(, privacy: .public)", log: log, type: .error, String(describing: error))
+                Logger.udsHelper.error("UDSServer - Listener failed with error: \(error.localizedDescription, privacy: .public)")
                 stop()
             case .cancelled:
-                os_log("UDSServer - Listener cancelled", log: log, type: .info)
+                Logger.udsHelper.info("UDSServer - Listener cancelled")
             default:
                 break
             }
@@ -168,23 +165,20 @@ public final class UDSServer {
 
     private func handleNewConnection(_ connection: NWConnection, messageHandler: @escaping (Data) async throws -> Data?) {
         Task {
-            os_log("UDSServer - New connection: \(, privacy: .public)",
-                   log: log,
-                   type: .info,
-                   String(describing: connection.hashValue))
+            Logger.udsHelper.info("UDSServer - New connection: \(String(describing: connection.hashValue), privacy: .public)")
 
             connection.stateUpdateHandler = { [weak self] state in
                 guard let self else { return }
 
                 switch state {
                 case .ready:
-                    os_log("UDSServer - Client connection is ready", log: log, type: .info)
+                    Logger.udsHelper.info("UDSServer - Client connection is ready")
                     self.startReceivingMessages(on: connection, messageHandler: messageHandler)
                 case .failed(let error):
-                    os_log("UDSServer - Client connection failed with error: \(, privacy: .public)", log: log, type: .error, String(describing: error))
+                    Logger.udsHelper.error("UDSServer - Client connection failed with error: \(error.localizedDescription, privacy: .public)")
                     self.closeConnection(connection)
                 case .cancelled:
-                    os_log("UDSServer - Client connection cancelled", log: log, type: .info)
+                    Logger.udsHelper.info("UDSServer - Client connection cancelled")
                 default:
                     break
                 }
@@ -262,7 +256,7 @@ public final class UDSServer {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             connection.send(content: lengthData + data, completion: .contentProcessed { error in
                 if let error {
-                    os_log("UDSServer - Send Error \(, privacy: .public)", log: self.log, String(describing: error))
+                    Logger.udsHelper.error("UDSServer - Send Error \(error.localizedDescription, privacy: .public)")
                     continuation.resume(throwing: error)
                     return
                 }

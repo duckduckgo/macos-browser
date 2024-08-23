@@ -35,12 +35,6 @@ struct UDSReceiver {
         case connectionClosed
     }
 
-    private let log: OSLog
-
-    init(log: OSLog) {
-        self.log = log
-    }
-
     /// Starts receiveing messages for a specific connection
     ///
     /// - Parameters:
@@ -66,37 +60,25 @@ struct UDSReceiver {
             } catch {
                 switch error {
                 case ReadError.notEnoughData(let expected, let received):
-                    os_log("UDSServer - Connection closing due to error: Not enough data (expected: \(, privacy: .public), received:  \(, privacy: .public)",
-                           log: log,
-                           type: .error,
-                           String(describing: expected),
-                           String(describing: received))
+                    Logger.udsHelper.error("UDSServer - Connection closing due to error: Not enough data (expected: \(String(describing: expected), privacy: .public), received:  \(String(describing: received), privacy: .public)")
 
                     guard await errorHandler(error) else {
                         return
                     }
                 case ReadError.connectionError(let error):
-                    os_log("UDSServer - Connection closing due to a connection error: \(, privacy: .public)",
-                           log: log,
-                           type: .error,
-                           String(describing: error))
+                    Logger.udsHelper.error("UDSServer - Connection closing due to a connection error: \(error.localizedDescription, privacy: .public)")
 
                     guard await errorHandler(error) else {
                         return
                     }
                 case ReadError.connectionClosed:
-                    os_log("UDSServer - Connection closing: End of file reached",
-                           log: log,
-                           type: .info)
+                    Logger.udsHelper.info("UDSServer - Connection closing: End of file reached")
 
                     guard await errorHandler(error) else {
                         return
                     }
                 default:
-                    os_log("UDSServer - Connection closing due to error: \(, privacy: .public)",
-                           log: log,
-                           type: .error,
-                           String(describing: error))
+                    Logger.udsHelper.error("UDSServer - Connection closing due to error: \(error.localizedDescription, privacy: .public)")
 
                     guard await errorHandler(error) else {
                         return
