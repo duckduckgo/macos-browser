@@ -56,9 +56,13 @@ struct PinnedTabView: View {
         }
 
         if controlActiveState == .key {
-            stack.onHover { [weak collectionModel, weak model] isHovered in
-                collectionModel?.hoveredItem = isHovered ? model : nil
-            }
+            stack
+                .onHover { [weak collectionModel, weak model] isHovered in
+                    collectionModel?.hoveredItem = isHovered ? model : nil
+                }
+                .onMouseMoving { [weak collectionModel] in
+                    collectionModel?.mouseMoving = ()
+                }
         } else {
             stack
         }

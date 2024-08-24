@@ -1907,6 +1907,10 @@
 		9FBD847B2BB3EC3300220859 /* MockAttributionOriginProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBD84792BB3EC3300220859 /* MockAttributionOriginProvider.swift */; };
 		9FDA6C212B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
 		9FDA6C222B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
+		9FDB93EB2BFEF71600AC50F6 /* Publishers.withLatestFrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDB93EA2BFEF71600AC50F6 /* Publishers.withLatestFrom.swift */; };
+		9FDB93EC2BFEF71600AC50F6 /* Publishers.withLatestFrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDB93EA2BFEF71600AC50F6 /* Publishers.withLatestFrom.swift */; };
+		9FDB93EE2BFEF84E00AC50F6 /* TabPreviewEventsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDB93ED2BFEF84E00AC50F6 /* TabPreviewEventsHandler.swift */; };
+		9FDB93EF2BFEF84E00AC50F6 /* TabPreviewEventsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDB93ED2BFEF84E00AC50F6 /* TabPreviewEventsHandler.swift */; };
 		9FEE98652B846870002E44E8 /* AddEditBookmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE98642B846870002E44E8 /* AddEditBookmarkView.swift */; };
 		9FEE98662B846870002E44E8 /* AddEditBookmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE98642B846870002E44E8 /* AddEditBookmarkView.swift */; };
 		9FEE98692B85B869002E44E8 /* BookmarksDialogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE98682B85B869002E44E8 /* BookmarksDialogViewModel.swift */; };
@@ -3760,6 +3764,8 @@
 		9FBD84762BB3E54200220859 /* InstallationAttributionPixelHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallationAttributionPixelHandlerTests.swift; sourceTree = "<group>"; };
 		9FBD84792BB3EC3300220859 /* MockAttributionOriginProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAttributionOriginProvider.swift; sourceTree = "<group>"; };
 		9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFavoriteView.swift; sourceTree = "<group>"; };
+		9FDB93EA2BFEF71600AC50F6 /* Publishers.withLatestFrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Publishers.withLatestFrom.swift; sourceTree = "<group>"; };
+		9FDB93ED2BFEF84E00AC50F6 /* TabPreviewEventsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPreviewEventsHandler.swift; sourceTree = "<group>"; };
 		9FEE98642B846870002E44E8 /* AddEditBookmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkView.swift; sourceTree = "<group>"; };
 		9FEE98682B85B869002E44E8 /* BookmarksDialogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksDialogViewModel.swift; sourceTree = "<group>"; };
 		9FEE986C2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkDialogCoordinatorViewModel.swift; sourceTree = "<group>"; };
@@ -7808,6 +7814,7 @@
 				B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */,
 				B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */,
 				B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */,
+				9FDB93EA2BFEF71600AC50F6 /* Publishers.withLatestFrom.swift */,
 				B68C2FB127706E6A00BF2C7D /* ProcessExtension.swift */,
 				B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */,
 				4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */,
@@ -7893,6 +7900,7 @@
 			children = (
 				AAC82C5F258B6CB5009B6B42 /* TabPreviewWindowController.swift */,
 				AAE8B10F258A456C00E81239 /* TabPreviewViewController.swift */,
+				9FDB93ED2BFEF84E00AC50F6 /* TabPreviewEventsHandler.swift */,
 				1DB67F272B6FE21D003DF243 /* Model */,
 				1DC6696E2B6CF08200AA0645 /* Services */,
 			);
@@ -10105,6 +10113,7 @@
 				3706FB0E293F65D500E42796 /* FaviconManager.swift in Sources */,
 				3706FB0F293F65D500E42796 /* ChromiumFaviconsReader.swift in Sources */,
 				4B0BD7B82A9FE6E600EF609D /* NetworkProtectionOnboardingMenu.swift in Sources */,
+				9FDB93EF2BFEF84E00AC50F6 /* TabPreviewEventsHandler.swift in Sources */,
 				3706FB10293F65D500E42796 /* SuggestionTableRowView.swift in Sources */,
 				3706FB11293F65D500E42796 /* DownloadsPreferences.swift in Sources */,
 				3706FB12293F65D500E42796 /* PasswordManagementItemList.swift in Sources */,
@@ -10114,6 +10123,7 @@
 				EE6666702B56EDE4001D898D /* VPNLocationsHostingViewController.swift in Sources */,
 				3706FB16293F65D500E42796 /* StoredPermission.swift in Sources */,
 				3706FB17293F65D500E42796 /* FirePopoverCollectionViewHeader.swift in Sources */,
+				9FDB93EC2BFEF71600AC50F6 /* Publishers.withLatestFrom.swift in Sources */,
 				85774B042A71CDD000DE0561 /* BlockMenuItem.swift in Sources */,
 				3706FB19293F65D500E42796 /* FireViewController.swift in Sources */,
 				B6E3E55C2BC0041A00A41922 /* DownloadListStoreMock.swift in Sources */,
@@ -11394,6 +11404,7 @@
 				B6106BAD26A7BF390013B453 /* PermissionState.swift in Sources */,
 				371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */,
 				B66260DD29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift in Sources */,
+				9FDB93EE2BFEF84E00AC50F6 /* TabPreviewEventsHandler.swift in Sources */,
 				1D1A33492A6FEB170080ACED /* BurnerMode.swift in Sources */,
 				14505A08256084EF00272CC6 /* UserAgent.swift in Sources */,
 				1D39E5772C2BFD5700757339 /* ReleaseNotesTabExtension.swift in Sources */,
@@ -11726,6 +11737,7 @@
 				B69A14F22B4D6FE800B9417D /* AddBookmarkFolderPopoverViewModel.swift in Sources */,
 				4BE65478271FCD41008D1D63 /* PasswordManagementNoteItemView.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
+				9FDB93EB2BFEF71600AC50F6 /* Publishers.withLatestFrom.swift in Sources */,
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
 				7BD3AF5D2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift in Sources */,
 				370A34B12AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */,

@@ -65,6 +65,8 @@ final class PinnedTabsViewModel: ObservableObject {
         }
     }
 
+    @Published var mouseMoving: Void = ()
+
     @Published var shouldDrawLastItemSeparator: Bool = true {
         didSet {
             updateItemsWithoutSeparator()
